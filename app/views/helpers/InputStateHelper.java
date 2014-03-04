@@ -3,7 +3,7 @@ package views.helpers;
 import com.google.common.collect.Maps;
 import models.ClusterEntity;
 import models.InputState;
-import models.Node;
+import models.InputState.InputStateType;
 
 import java.util.Map;
 
@@ -11,8 +11,8 @@ import java.util.Map;
  * @author Dennis Oelkers <dennis@torch.sh>
  */
 public class InputStateHelper {
-    public static Map<String, Integer> stateCounts(Map<ClusterEntity, InputState> inputStateMap) {
-        Map<String, Integer> results = Maps.newHashMap();
+    public static Map<InputStateType, Integer> stateCounts(Map<ClusterEntity, InputState> inputStateMap) {
+        Map<InputStateType, Integer> results = Maps.newHashMap();
         for (Map.Entry<ClusterEntity, InputState> entry : inputStateMap.entrySet()) {
             Integer count = results.get(entry.getValue().getState());
             if (count == null) {
@@ -25,11 +25,11 @@ public class InputStateHelper {
         return results;
     }
 
-    public static String labelClassForState(String state) {
+    public static String labelClassForState(InputStateType state) {
         switch(state) {
-            case "running": return "success";
-            case "failed": return "important";
-            case "starting": return "info";
+            case RUNNING: return "success";
+            case FAILED: return "important";
+            case STARTING: return "info";
             default: return "warning";
         }
     }

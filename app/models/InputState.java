@@ -18,6 +18,21 @@ public class InputState {
         InputState fromSummaryResponse(InputStateSummaryResponse input, ClusterEntity node);
     }
 
+    public enum InputStateType {
+        CREATED,
+        INITIALIZED,
+        STARTING,
+        RUNNING,
+        FAILED,
+        STOPPED,
+        TERMINATED;
+
+        @Override
+        public String toString() {
+            return super.toString().toLowerCase();
+        }
+    }
+
     private final ApiClient api;
     private final UniversalSearch.Factory searchFactory;
     private final Input.Factory inputFactory;
@@ -26,8 +41,9 @@ public class InputState {
 
     private final String id;
     private final DateTime startedAt;
-    private final String state;
+    private final InputStateType state;
     private final Input input;
+    private final String detailedMessage;
 
     @AssistedInject
     private InputState(ApiClient api,
@@ -43,9 +59,10 @@ public class InputState {
         this.node = node;
 
         this.id = issr.id;
-        this.state = issr.state;
+        this.state = InputStateType.valueOf(issr.state.toUpperCase());
         this.startedAt = DateTime.parse(issr.startedAt);
         this.input = inputFactory.fromSummaryResponse(issr.messageinput, node);
+        this.detailedMessage = issr.detailedMessage;
     }
 
     public String getId() {
@@ -56,7 +73,7 @@ public class InputState {
         return startedAt;
     }
 
-    public String getState() {
+    public InputStateType getState() {
         return state;
     }
 
@@ -66,5 +83,9 @@ public class InputState {
 
     public ClusterEntity getNode() {
         return node;
+    }
+
+    public String getDetailedMessage() {
+        return detailedMessage;
     }
 }

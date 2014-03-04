@@ -67,6 +67,12 @@
             }
         </h3>
 
+        @if((inputState.getState == InputState.InputStateType.FAILED) && (inputState.getDetailedMessage != null) && (!inputState.getDetailedMessage.isEmpty)) {
+            <div class="alert alert-error">
+                @inputState.getDetailedMessage
+            </div>
+        }
+
         @if(input.getReadBytes >= 0 && input.getWrittenBytes >= 0) {
             <div class="input-io focuslimit" data-node-id="@inputState.getNode.getNodeId" data-input-id="@input.getId">
                 Network IO:

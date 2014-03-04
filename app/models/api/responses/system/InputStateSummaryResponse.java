@@ -14,4 +14,7 @@ public class InputStateSummaryResponse {
 
     @SerializedName("started_at")
     public String startedAt;
+
+    @SerializedName("detailed_message")
+    public String detailedMessage;
 }

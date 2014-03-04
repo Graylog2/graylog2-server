@@ -3,6 +3,6 @@
 
 @for((state, count) <- InputStateHelper.stateCounts(nodeStates)) {
     <span class="label label-@InputStateHelper.labelClassForState(state)">
-        @count @state
+        @count @state.toString
     </span>
 }
