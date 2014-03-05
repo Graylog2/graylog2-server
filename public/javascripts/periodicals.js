@@ -276,12 +276,12 @@ $(document).ready(function() {
             ).toArray().reduce(function(a,b){return a+b;});
             $(".global-input-io[data-input-id="+y+"] .global-total .rx").text(printShortSize(count));
 
-            var count = $(".global-input-io-details[data-input-id="+y+"] .input-io .total .rx").map(
+            var count = $(".global-input-io-details[data-input-id="+y+"] .input-io .total .tx").map(
                 function(a,b) {
                     return parseShortSize($(b).text());
                 }
             ).toArray().reduce(function(a,b){return a+b;});
-            $(".global-input-io[data-input-id="+y+"] .global-total .rx").text(printShortSize(count));
+            $(".global-input-io[data-input-id="+y+"] .global-total .tx").text(printShortSize(count));
         }).promise().done(function(){ setTimeout(updateGlobalInputIO, interval); });;
     })();
 
