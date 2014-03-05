@@ -32,7 +32,7 @@ public class DeflectorExistsAsIndexNotification implements NotificationType {
     private static final String TITLE = "Deflector exists as an index and is not an alias.";
     private static final String DESCRIPTION = "The deflector is meant to be an alias but exists as an index. Multiple " +
             "failures of infrastructure can lead to this. Your messages are still indexed but searches and all " +
-            "maintenance tasks will fail or produce incorrect results. It is strongly recommend that act as soon " +
+            "maintenance tasks will fail or produce incorrect results. It is strongly recommend that you act as soon " +
             "as possible.";
 
     @Override
