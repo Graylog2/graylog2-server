@@ -93,7 +93,7 @@ function updateWidget_field_chart(widget, data) {
             field = graphElem.attr("data-config-field");
             var date = '<span class="date">' + new Date(x * 1000).toString() + '</span>';
             var swatch = '<span class="detail_swatch"></span>';
-            var content = '[' + graphElem.attr("data-config-valuetype") + '] ' + field + ': ' + parseInt(y) + '<br>' + date;
+            var content = '[' + graphElem.attr("data-config-valuetype") + '] ' + field + ': ' + y + '<br>' + date;
             return content;
         }
     });
