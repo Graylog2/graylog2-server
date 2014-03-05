@@ -122,7 +122,7 @@ public class MessageResult {
     }
 
     public Map<String, Object> getFormattedFields() {
-        final DecimalFormat doubleFormatter = new DecimalFormat("#");
+        final DecimalFormat doubleFormatter = new DecimalFormat("#.###");
 
         return Maps.transformEntries(getFilteredFields(), new Maps.EntryTransformer<String, Object, Object>() {
             @Override
