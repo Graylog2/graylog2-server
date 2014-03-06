@@ -144,8 +144,9 @@
 
                         @if(extractor.getTotalExceptions > 0) {
                             <div class="alert alert-danger">
+                                <i class="icon icon-warning-sign"></i>
                                 This extractor has thrown <em>@extractor.getExceptions</em> exception@if(extractor.getExceptions != 1) {s}
-                                during extracting and <em>@extractor.getConverterExceptions</em>
+                                during extraction and <em>@extractor.getConverterExceptions</em>
                                 exception@if(extractor.getConverterExceptions != 1) {s}
 
                                 while converting.
