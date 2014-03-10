@@ -22,5 +22,8 @@ application.secret=""
 # search result sidebar or for autocompletion of field names.
 field_list_limit=100
 
+# Use this to run Graylog2 with a path prefix
+#application.context=/graylog2
+
 # You usually do not want to change this.
 application.global=lib.Global
