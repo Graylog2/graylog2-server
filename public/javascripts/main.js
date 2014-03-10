@@ -1,6 +1,6 @@
 $(document).ready(function() {
 
-    ZeroClipboard.config( { moviePath: "/assets/images/ZeroClipboard.swf" } );
+    ZeroClipboard.config( { moviePath: appPrefixed("/assets/images/ZeroClipboard.swf") } );
     clipBoardClient = new ZeroClipboard($(".copy-clipboard"));
 
     clipBoardClient.on( 'mouseover', function(client, args) {
@@ -38,7 +38,7 @@ $(document).ready(function() {
 		spinner = "<h2><i class='icon-refresh icon-spin'></i> &nbsp;Loading message</h2>";
 		$("#sidebar-replacement").html(spinner);
 
-		$.get("/messages/" + index + "/" + messageId + "/partial", function(data) {
+		$.get(appPrefixed("/messages/" + index + "/" + messageId + "/partial"), function(data) {
 			$("#sidebar-replacement").html(data);
 		})
 
@@ -56,7 +56,7 @@ $(document).ready(function() {
                 list_link = $("#terms-msg-" + messageId + "-as-list");
 
                 if ($(this).attr("data-loaded") != "true") {
-                    $.get("/a/analyze/" + index + "/" + messageId + "/message", function(data) {
+                    $.get(appPrefixed("/a/analyze/" + index + "/" + messageId + "/message"), function(data) {
                         if (data.length > 0) {
                             for(var i = 0; i < data.length; i++) {
                                 list.append("<li>" + data[i] + "</li>");
@@ -308,7 +308,7 @@ $(document).ready(function() {
             type: "PUT",
             data: { node_id: $(this).attr("data-node-id") },
             success: function(data) {
-                document.location.href = "/system/nodes";
+                document.location.href = appPrefixed("/system/nodes");
             },
             error: function() {
                 showError("Could not " + action + " message processing.");
@@ -335,7 +335,7 @@ $(document).ready(function() {
         modal.modal();
 
         $("input", modal).val("");
-        $("form", modal).attr("action", "/system/inputs/" + $(this).attr("data-node-id") + "/" + $(this).attr("data-input-id") + "/staticfields");
+        $("form", modal).attr("action", appPrefixed("/system/inputs/" + $(this).attr("data-node-id") + "/" + $(this).attr("data-input-id") + "/staticfields"));
     });
 
     $(".input-list .add-static-field-global").on("click", function(event) {
@@ -344,7 +344,7 @@ $(document).ready(function() {
         modal.modal();
 
         $("input", modal).val("");
-        $("form", modal).attr("action", "/system/inputs/" + $(this).attr("data-input-id") + "/staticfields");
+        $("form", modal).attr("action", appPrefixed("/system/inputs/" + $(this).attr("data-input-id") + "/staticfields"));
     });
 
 
@@ -588,7 +588,7 @@ $(document).ready(function() {
     });
 
     $("#global-throughput").on("click", function() {
-        window.location.href = "/system";
+        window.location.href = appPrefixed("/system");
     });
 
     $(".toggle-fullscreen").on("click", function(e) {
@@ -685,7 +685,7 @@ $(document).ready(function() {
     $('table.indexer-failures').dynatable({
         dataset: {
             ajax: true,
-            ajaxUrl: '/a/system/indices/failures/dynatable',
+            ajaxUrl: appPrefixed('/a/system/indices/failures/dynatable'),
             ajaxOnLoad: true,
             records: [],
             perPageDefault: 50
@@ -817,7 +817,7 @@ $(document).ready(function() {
         if (result) {
             var elem = $(this).closest(".stream-row");
             var url = event.currentTarget.attributes["data-removeUrl"].value;
-            $.post(url, {}, function() {
+            $.post(appPrefixed(url), {}, function() {
                 elem.fadeOut();
             });
         }

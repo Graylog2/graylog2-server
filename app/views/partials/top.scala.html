@@ -27,7 +27,7 @@ gl2AppPathPrefix = "@Configuration.getApplicationContext";
 	  			<li><a href="@routes.SystemController.index(0)">System</a></li>
 
                 <li>
-                    <a href="/system" class="notification-badge-link">
+                    <a href="@routes.SystemController.index(0)" class="notification-badge-link">
                         <span class="badge badge-important" id="notification-badge"></span>
                     </a>
                 </li>
@@ -38,7 +38,7 @@ gl2AppPathPrefix = "@Configuration.getApplicationContext";
                     <strong class="total-throughput focuslimit"></strong> msg/s<span class="total-nodes"></span>.
                 </span>
 
-                <a href="/logout" title="Logout" id="logout" class="btn btn-small btn-danger"><i class="icon-off"></i></a>
+                <a href="@routes.SessionsController.destroy()" title="Logout" id="logout" class="btn btn-small btn-danger"><i class="icon-off"></i></a>
             </div>
         </div>
  	</div>

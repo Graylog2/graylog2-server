@@ -34,7 +34,7 @@ $(document).ready(function() {
         if (result) {
             var elem = $(this).parent();
             var url = event.currentTarget.attributes["data-removeUrl"].value;
-            $.post(url, {}, function() {
+            $.post(appPrefixed(url), {}, function() {
                 var parent_list = $(elem).closest("ul");
                 elem.remove();
 

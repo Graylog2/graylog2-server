@@ -1,7 +1,7 @@
 @(node: Node)
 
 
-<a href="/system/nodes/@node.getNodeId">
+<a href="@routes.NodesController.node(node.getNodeId)">
     <i class="icon icon-code-fork"></i>
     @node.getShortNodeId / @node.getHostname
 </a>

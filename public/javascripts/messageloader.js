@@ -21,7 +21,7 @@
             recentButton.on("click", function(e) {
                 var nodeId = $(this).attr("data-node-id");
                 var inputId = $(this).attr("data-input-id");
-                var url = '/a/system/inputs/' + nodeId + '/' + inputId + '/recent_message';
+                var url = '/a/system/inputs/' + nodeId + '/' + inputId + '/recent_message'; // url prefix applied when doing the ajax call!
 
                 loadMessage(undefined, undefined, url);
             });
