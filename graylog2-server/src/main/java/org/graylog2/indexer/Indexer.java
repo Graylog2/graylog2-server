@@ -64,7 +64,7 @@ public class Indexer {
 
     public static enum DateHistogramInterval {
         YEAR(Period.years(1)),
-        QUARTER(Period.months(3)), // TODO this isn't really correct, is it?
+        QUARTER(Period.months(3)),
         MONTH(Period.months(1)),
         WEEK(Period.weeks(1)),
         DAY(Period.days(1)),
