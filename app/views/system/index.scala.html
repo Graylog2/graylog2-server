@@ -39,7 +39,7 @@
                             Your options:
                         </h4>
 
-                        <form action="/systemjobs/trigger" method="POST">
+                        <form action="@routes.SystemJobsController.trigger()" method="POST">
                             @for((jobType, description) <- notification.get().options()) {
                                 <label class="radio">
                                     <input type="radio" value="@jobType" name="job" required="required">

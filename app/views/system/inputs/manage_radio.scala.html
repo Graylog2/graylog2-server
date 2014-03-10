@@ -1,5 +1,7 @@
 @(currentUser: User, breadcrumbs: lib.BreadcrumbList, radio: Radio, inputTypes: Map[String, models.api.responses.system.InputTypeSummaryResponse])
 
+@import controllers.routes;
+
 @main("Inputs of radio", views.html.system.sidebar(), "", currentUser) {
 
     @views.html.partials.breadcrumbs(breadcrumbs)
@@ -122,7 +124,7 @@
                 </h2>
             </div>
 
-            <form action="/system/inputs/radio/@radio.getId" method="POST">
+            <form action="@routes.InputsController.launchRadio(radio.getId)" method="POST">
                 <input type="hidden" name="type" value="@inputType" />
 
                 <fieldset>

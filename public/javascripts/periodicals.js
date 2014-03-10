@@ -176,7 +176,7 @@ $(document).ready(function() {
             var inputId = $(this).attr("data-input-id");
             var io = $(this);
             $.ajax({
-                url: '/a/system/inputs/global/' + encodeURIComponent(inputId) + '/io',
+                url: appPrefixed('/a/system/inputs/global/' + encodeURIComponent(inputId) + '/io'),
                 headers: { "X-Graylog2-No-Session-Extension" : "true"},
                 success: function(data) {
                     $(".global-persec .rx", io).text(data.rx);

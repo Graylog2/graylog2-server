@@ -77,7 +77,7 @@
                 </h2>
             </div>
 
-            <form action="/system/inputs" method="POST">
+            <form action="@routes.InputsController.launch()" method="POST">
                 <input type="hidden" name="type" value="@inputType" />
 
                 <fieldset>
