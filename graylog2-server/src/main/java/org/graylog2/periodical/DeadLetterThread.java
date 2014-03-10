@@ -22,6 +22,7 @@ package org.graylog2.periodical;
 import com.codahale.metrics.Gauge;
 import com.codahale.metrics.MetricRegistry;
 import com.google.common.collect.Maps;
+import com.mongodb.BasicDBObject;
 import org.elasticsearch.action.bulk.BulkItemResponse;
 import org.graylog2.Core;
 import org.graylog2.indexer.DeadLetter;
@@ -44,6 +45,8 @@ public class DeadLetterThread extends Periodical {
 
     @Override
     public void run() {
+        verifyIndices();
+
         // Poll queue forever.
         while(true) {
             List<DeadLetter> items;
@@ -90,6 +93,14 @@ public class DeadLetterThread extends Periodical {
                 }
             }
         }
+    }
+
+    private void verifyIndices() {
+        core.getMongoConnection().getDatabase().getCollection(IndexFailure.COLLECTION).ensureIndex(new BasicDBObject("timestamp", 1));
+        core.getMongoConnection().getDatabase().getCollection(IndexFailure.COLLECTION).ensureIndex(new BasicDBObject("letter_id", 1));
+
+        core.getMongoConnection().getDatabase().getCollection(PersistedDeadLetter.COLLECTION).ensureIndex(new BasicDBObject("timestamp", 1));
+        core.getMongoConnection().getDatabase().getCollection(PersistedDeadLetter.COLLECTION).ensureIndex(new BasicDBObject("letter_id", 1));
     }
 
     @Override

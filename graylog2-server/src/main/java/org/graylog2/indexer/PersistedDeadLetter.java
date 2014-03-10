@@ -19,10 +19,7 @@
  */
 package org.graylog2.indexer;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBObject;
 import org.bson.types.ObjectId;
 import org.graylog2.Core;
 import org.graylog2.database.Persisted;
