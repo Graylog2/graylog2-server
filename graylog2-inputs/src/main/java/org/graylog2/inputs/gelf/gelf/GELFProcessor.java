@@ -176,9 +176,16 @@ public class GELFProcessor {
                 fieldValue = value.asDouble();
             } else if (value.isIntegralNumber()) {
                 fieldValue = value.asLong();
-            } else {
+            } else if (value.isNull()) {
+                LOG.debug("Field [{}] is NULL. Skipping.", key);
+                continue;
+            } else if(value.isTextual()) {
                 fieldValue = value.asText();
+            } else {
+                LOG.debug("Field [{}] has unknown value type. Skipping.", key);
+                continue;
             }
+
             lm.addField(key, fieldValue);
         }
 
