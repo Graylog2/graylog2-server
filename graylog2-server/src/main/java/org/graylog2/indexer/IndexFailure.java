@@ -53,7 +53,7 @@ public class IndexFailure extends Persisted {
         List<IndexFailure> failures = Lists.newArrayList();
 
         DBObject sort = new BasicDBObject();
-        sort.put("timestamp", -1);
+        sort.put("$natural", -1);
 
         List<DBObject> results = query(new BasicDBObject(), sort, limit, offset, core, COLLECTION);
         for (DBObject o : results) {
