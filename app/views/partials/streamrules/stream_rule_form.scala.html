@@ -25,7 +25,7 @@
         </div>
         <div class="modal-body">
             <div class="span8" id="sr">
-                <label>Field</label>
+                <label id="sr-label-field">Field</label>
                 <input type="text"
                 id="sr-field"
                 class="sr-input typeahead-fields validatable"
@@ -37,7 +37,7 @@
                 placeholder="user_id"
                 autocomplete="off"/>
 
-                <label>Type</label>
+                <label id="sr-label-type">Type</label>
                 <select name="category"
                 id="sr-type"
                 class="sr-input validatable"
@@ -53,7 +53,7 @@
                     }
                 </select>
 
-                <label>Value</label>
+                <label id="sr-label-value">Value</label>
                 <input type="text"
                 id="sr-value"
                 class="sr-input validatable"
@@ -64,7 +64,7 @@
                 }
                 placeholder="19983" />
 
-                <label class="checkbox">
+                <label id="sr-label-inverted" class="checkbox">
                     <input type="checkbox"
                         @if(streamRule != null && streamRule.getInverted) {
                            checked="true"

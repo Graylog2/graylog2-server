@@ -10,6 +10,20 @@ $(document).ready(function() {
         value = $(this).val();
         var modalBody = $(this).closest("form#streamrule-form").find(".modal-body");
 
+        if ($(this).attr("id") == "sr-type") {
+            if (parseInt(value) == 5) {
+                $("#sr-value", modalBody).hide();
+                $("#sr-value", modalBody).val("placeholder");
+                $("#sr-label-value", modalBody).hide();
+                $("#sr-result-value", modalBody).hide();
+            } else {
+                $("#sr-value", modalBody).val("");
+                $("#sr-value", modalBody).show();
+                $("#sr-label-value", modalBody).show();
+                $("#sr-result-value", modalBody).show();
+            }
+        }
+
         if (value != undefined && value != "") {
             // Selectbox options can have a custom replace string.
             s = $("option:selected", this);
