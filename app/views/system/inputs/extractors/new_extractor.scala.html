@@ -97,6 +97,8 @@
                     <option value="number">Numeric</option>
                     <option value="date">Date</option>
                     <option value="hash">Hash</option>
+                    <option value="lowercase">Lowercase</option>
+                    <option value="uppercase">Uppercase</option>
                     <option value="split-and-count">Split & Count</option>
                     <option value="tokenizer">Key=Value pairs to fields</option>
                     <option value="csv">CSV to fields</option>
@@ -116,6 +118,8 @@
             @views.html.system.inputs.extractors.converters.ip_anonymizer()
             @views.html.system.inputs.extractors.converters.tokenizer()
             @views.html.system.inputs.extractors.converters.csv()
+            @views.html.system.inputs.extractors.converters.lowercase()
+            @views.html.system.inputs.extractors.converters.uppercase()
 
             <div class="alert alert-info">
                 Please note that you cannot use the cutting feature on standard fields
