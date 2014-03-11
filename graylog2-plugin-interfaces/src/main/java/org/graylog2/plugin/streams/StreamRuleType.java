@@ -27,6 +27,12 @@ public enum StreamRuleType {
         public Integer toInteger() {
             return 2;
         }
+    },
+    PRESENCE {
+        @Override
+        public Integer toInteger() {
+            return 5;
+        }
     };
 
     public abstract Integer toInteger();
@@ -41,6 +47,8 @@ public enum StreamRuleType {
                 return GREATER;
             case 4:
                 return SMALLER;
+            case 5:
+                return PRESENCE;
             default:
                 return null;
         }

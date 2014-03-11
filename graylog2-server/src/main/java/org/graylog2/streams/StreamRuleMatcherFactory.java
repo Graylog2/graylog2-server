@@ -44,11 +44,13 @@ public class StreamRuleMatcherFactory {
             case SMALLER:
                 matcher = new SmallerMatcher();
                 break;
+            case PRESENCE:
+                matcher = new FieldPresenceMatcher();
+                break;
             default:
                 throw new InvalidStreamRuleTypeException();
         }
 
         return matcher;
     }
-
 }
