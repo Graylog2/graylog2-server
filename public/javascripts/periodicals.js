@@ -11,13 +11,6 @@ $(window).focus(function(){
 
 
 $(document).ready(function() {
-    $.ajaxSetup({
-        statusCode: {
-            401: function() {
-                window.location.href = "/"; // TODO use router!
-            }
-        }
-    });
     // Total event counts;
     (function updateTotalEvents() {
         if ($(".total-events").length > 0) {
