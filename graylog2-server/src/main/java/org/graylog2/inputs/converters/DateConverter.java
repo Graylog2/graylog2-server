@@ -49,7 +49,9 @@ public class DateConverter extends Converter {
             return value;
         }
 
-        return DateTime.parse(value, DateTimeFormat.forPattern(dateFormat).withZoneUTC());
+        DateTime localNow = new DateTime();
+
+        return DateTime.parse(value,DateTimeFormat.forPattern(dateFormat).withDefaultYear(localNow.getYear()));
     }
 
     @Override
