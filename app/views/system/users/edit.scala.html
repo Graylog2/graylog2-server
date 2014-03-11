@@ -97,7 +97,7 @@
 
                     </div>
                 </div>
-                @if(!isPermitted(user, "*")) {
+                @if(isPermitted("*")) {
                 <div class="control-group">
                     <label class="control-label" for="session-timeout-never">Session timeout</label>
                     <div class="controls">
