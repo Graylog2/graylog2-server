@@ -34,7 +34,9 @@ public class Converter {
         SYSLOG_PRI_LEVEL,
         SYSLOG_PRI_FACILITY,
         TOKENIZER,
-        CSV;
+        CSV,
+        LOWERCASE,
+        UPPERCASE;
 
         public static Type fromString(String type) {
             return valueOf(type.toUpperCase());
