@@ -40,6 +40,7 @@ public class StreamRule {
         put(2, Lists.newArrayList("match regular expression", "match regular expression"));
         put(3, Lists.newArrayList("greater than", "be greater than"));
         put(4, Lists.newArrayList("smaller than", "be smaller than"));
+        put(5, Lists.newArrayList("field presence", "be present"));
     }};
 
     private final String id;
@@ -106,6 +107,10 @@ public class StreamRule {
         String inverter = "";
         if (this.getInverted())
             inverter = " not ";
+
+        if (this.getType() == 5)
+            return (this.field + " must " + inverter + this.getSentenceRepresentation());
+
         return (this.field + " must " + inverter + this.getSentenceRepresentation() + " " + this.value);
     }
 }
