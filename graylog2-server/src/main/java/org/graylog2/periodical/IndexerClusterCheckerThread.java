@@ -16,19 +16,26 @@ public class IndexerClusterCheckerThread extends Periodical {
 
     @Override
     public void run() {
+        if (!Notification.isFirst(core, Notification.Type.ES_OPEN_FILES))
+            return;
         boolean allHigher = true;
         for (NodeInfo node : core.getIndexer().cluster().getDataNodes()) {
             // Check number of maximum open files.
             if (node.getProcess().getMaxFileDescriptors() < MINIMUM_OPEN_FILES_LIMIT) {
-                LOG.info("Indexer node <{}> has a too low open file limit: [{}]",
-                        node.getNode().getName(),
-                        node.getProcess().getMaxFileDescriptors());
 
                 // Write notification.
-                Notification.buildNow(core)
+                final boolean published = Notification.buildNow(core)
                         .addType(Notification.Type.ES_OPEN_FILES)
                         .addSeverity(Notification.Severity.URGENT)
                         .publishIfFirst();
+                if (published) {
+                    LOG.warn("Indexer node <{}> open file limit is too low: [{}]. Set it to at least {}.",
+                             new Object[] {
+                                     node.getNode().getName(),
+                                     node.getProcess().getMaxFileDescriptors(),
+                                     MINIMUM_OPEN_FILES_LIMIT
+                             });
+                }
                 allHigher = false;
             }
         }
