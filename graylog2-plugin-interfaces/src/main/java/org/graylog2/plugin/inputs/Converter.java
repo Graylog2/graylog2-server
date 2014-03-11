@@ -37,7 +37,9 @@ public abstract class Converter {
         SYSLOG_PRI_FACILITY,
         TOKENIZER,
         IP_ANONYMIZER,
-        CSV
+        CSV,
+        LOWERCASE,
+        UPPERCASE
     }
 
     private final Type type;
