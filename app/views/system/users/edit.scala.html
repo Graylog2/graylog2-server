@@ -9,9 +9,11 @@
         streams: List[models.Stream],
         dashboards: List[models.dashboards.Dashboard],
         breadcrumbs: lib.BreadcrumbList)
+
 @import com.google.common.collect.ImmutableList
 @import views.helpers.Permissions._
 @import lib.security.RestPermissions._
+@import controllers.routes
 
 @main("Users", views.html.system.sidebar(), "", currentUser) {
 

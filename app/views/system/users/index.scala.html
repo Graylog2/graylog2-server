@@ -2,6 +2,7 @@
 
 @import views.helpers.Permissions._
 @import lib.security.RestPermissions._
+@import controllers.routes
 
 @hasAdminPermission(user: User) = @{
     user.getPermissions().indexOf("*") != -1;
