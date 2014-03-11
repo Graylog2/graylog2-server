@@ -31,6 +31,7 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -96,6 +97,8 @@ public class Message {
         fields.put("message", message);
         fields.put("source", source);
         fields.put("timestamp", timestamp);
+
+        streams = Lists.newArrayList();
     }
 
     public Message(Map<String, Object> fields) {
@@ -249,6 +252,12 @@ public class Message {
     		this.fields.remove(key);
     	}
     }
+
+    public <T> T getFieldAs(Class<T> T, String key) throws ClassCastException{
+        Object rawField = getField(key);
+
+        return T.cast(rawField);
+    }
     
     public Object getField(String key) {
     	return fields.get(key);
@@ -264,6 +273,16 @@ public class Message {
 
     public List<Stream> getStreams() {
         return this.streams;
+    }
+
+    public List<String> getStreamIds() {
+        List<String> result = new ArrayList<String>();
+        try {
+            result.addAll(getFieldAs(result.getClass(), "streams"));
+        } catch (ClassCastException e) {
+        }
+
+        return result;
     }
     
     public void setFilterOut(boolean set) {
