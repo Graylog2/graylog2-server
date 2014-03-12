@@ -3,11 +3,12 @@
 @import lib.security.RestPermissions._
 @import views.helpers.Permissions._
 @import views.helpers.StringHelper._
+@import controllers.routes
 
 @main("Streams", views.html.sidebars.standard(currentUser), "", currentUser, false) {
 
     @if(isPermitted(STREAMS_CREATE)) {
-    <a href="/streams/new" class="btn btn-success pull-right">Create stream</a>
+    <a href="@routes.StreamsController.newStream()" class="btn btn-success pull-right">Create stream</a>
     }
 
     <div class="row-fluid">
