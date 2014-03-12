@@ -43,6 +43,7 @@ public class FlexibleDateConverterTest {
         assertTrue(c.convert("2014-3-12 12:27").toString().startsWith("2014-03-12T12:27:00.000"));
         assertTrue(c.convert("Mar 12").toString().startsWith("2014-03-12T"));
         assertTrue(c.convert("Mar 2pm").toString().startsWith("2014-03-12T14:00:00.000"));
+        assertTrue(c.convert("Mar 12 14:45:38").toString().startsWith("2014-03-12T14:45:38.000"));
     }
 
 }
