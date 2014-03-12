@@ -19,6 +19,8 @@
  */
 package org.graylog2.indexer.results;
 
+import org.elasticsearch.search.SearchHits;
+
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
@@ -26,10 +28,16 @@ public class CountResult {
 
     private final long count;
     private final long tookMs;
+    private SearchHits searchHits = null;
 
     public CountResult(long count, long tookMs) {
         this.count = count;
         this.tookMs = tookMs;
+    }
+
+    public CountResult(long totalHits, long tookInMillis, SearchHits searchHits) {
+        this(totalHits, tookInMillis);
+        this.searchHits = searchHits;
     }
 
     public long getCount() {
@@ -40,4 +48,7 @@ public class CountResult {
         return tookMs;
     }
 
+    public SearchHits getSearchHits() {
+        return searchHits;
+    }
 }

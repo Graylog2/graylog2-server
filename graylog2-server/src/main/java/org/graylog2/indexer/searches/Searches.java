@@ -80,7 +80,7 @@ public class Searches {
         request.searchType(SearchType.COUNT);
 
         SearchResponse r = c.search(request).actionGet();
-        return new CountResult(r.getHits().getTotalHits(), r.getTookInMillis());
+        return new CountResult(r.getHits().getTotalHits(), r.getTookInMillis(), r.getHits());
     }
 
     public SearchResult search(String query, TimeRange range, int limit, int offset, Sorting sorting) throws IndexHelper.InvalidRangeFormatException {
@@ -180,6 +180,7 @@ public class Searches {
 
         return new FieldStatsResult(
                 (StatisticalFacet) r.getFacets().facet(STATS_FACET_NAME),
+                r.getHits(),
                 query,
                 request.source(),
                 r.getTook()
