@@ -99,21 +99,50 @@ public class AlertCondition {
     }
 
     public String getDescription() {
+        StringBuilder sb = new StringBuilder();
+        int grace = (int) ((Double) parameters.get("grace")).longValue();
+        int backlog = (parameters.get("backlog") != null && parameters.get("backlog") instanceof Number) ?
+                (int) ((Double) parameters.get("backlog")).longValue() : 0;
+
+
         switch (type) {
             case MESSAGE_COUNT:
-                return buildMessageCountDescription();
+                sb.append(buildMessageCountDescription());
+                break;
             case FIELD_VALUE:
-                return buildFieldValueDescription();
+                sb.append(buildFieldValueDescription());
+                break;
             default:
                 throw new RuntimeException("Cannot build description for unknown alert condition type [" + type + "]");
         }
+
+        sb.append(buildGraceDescription(grace));
+        sb.append(buildBacklogDescription(backlog));
+
+        return sb.toString();
+    }
+
+    private String buildBacklogDescription(int backlog) {
+        StringBuilder sb = new StringBuilder();
+
+        if (backlog > 0) {
+            sb.append(" Include last ");
+            if (backlog == 1)
+                sb.append(" message");
+            else
+                sb.append(backlog).append(" messages");
+            sb.append(" in alert notification.");
+        } else {
+            sb.append(" Not including any messages in alert notification.");
+        }
+
+        return sb.toString();
     }
 
     private String buildMessageCountDescription() {
         StringBuilder sb = new StringBuilder();
         int threshold = (int) ((Double) parameters.get("threshold")).longValue();
         int time = (int) ((Double) parameters.get("time")).longValue();
-        int grace = (int) ((Double) parameters.get("grace")).longValue();
 
         sb.append("Alert is triggered when there");
 
@@ -139,6 +168,11 @@ public class AlertCondition {
             sb.append(time).append(" minutes. ");
         }
 
+        return sb.toString();
+    }
+
+    private String buildGraceDescription(int grace) {
+        StringBuilder sb = new StringBuilder();
         sb.append("Grace period: ").append(grace);
 
         if (grace == 1) {
@@ -154,7 +188,6 @@ public class AlertCondition {
         StringBuilder sb = new StringBuilder();
         double threshold = (Double) parameters.get("threshold");
         int time = (int) ((Double) parameters.get("time")).longValue();
-        int grace = (int) ((Double) parameters.get("grace")).longValue();
 
         sb.append("Alert is triggered when the field ")
                 .append(parameters.get("field")).append(" has a ")
@@ -177,14 +210,6 @@ public class AlertCondition {
             sb.append("minute. ");
         } else {
             sb.append(time).append(" minutes. ");
-        }
-
-        sb.append("Grace period: ").append(grace);
-
-        if (grace == 1) {
-            sb.append(" minute.");
-        } else {
-            sb.append(" minutes.");
         }
 
         return sb.toString();
