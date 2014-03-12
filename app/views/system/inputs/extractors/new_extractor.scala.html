@@ -96,6 +96,7 @@
                 <select id="add-converter">
                     <option value="number">Numeric</option>
                     <option value="date">Date</option>
+                    <option value="flexdate">Flexible date</option>
                     <option value="hash">Hash</option>
                     <option value="lowercase">Lowercase</option>
                     <option value="uppercase">Uppercase</option>
@@ -120,6 +121,7 @@
             @views.html.system.inputs.extractors.converters.csv()
             @views.html.system.inputs.extractors.converters.lowercase()
             @views.html.system.inputs.extractors.converters.uppercase()
+            @views.html.system.inputs.extractors.converters.flexdate()
 
             <div class="alert alert-info">
                 Please note that you cannot use the cutting feature on standard fields

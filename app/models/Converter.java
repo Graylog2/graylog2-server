@@ -36,7 +36,8 @@ public class Converter {
         TOKENIZER,
         CSV,
         LOWERCASE,
-        UPPERCASE;
+        UPPERCASE,
+        FLEXDATE;
 
         public static Type fromString(String type) {
             return valueOf(type.toUpperCase());
