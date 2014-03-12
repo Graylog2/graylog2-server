@@ -93,7 +93,8 @@ public class AlertsController extends AuthenticatedController {
 
         if(!checkParam("grace", form) || !checkParam("time", form)
                 || !checkParam("threshold", form)
-                || !checkParam("threshold_type", form)) {
+                || !checkParam("threshold_type", form)
+                || !checkParam("backlog", form)) {
             flash("error", "Could not add alert condition: Missing parameters.");
             return redirect(routes.AlertsController.index(streamId));
         }
@@ -108,6 +109,7 @@ public class AlertsController extends AuthenticatedController {
             request.parameters.put("time", Integer.parseInt(form.get("time")));
             request.parameters.put("threshold", Integer.parseInt(form.get("threshold")));
             request.parameters.put("threshold_type", form.get("threshold_type"));
+            request.parameters.put("backlog", Integer.parseInt(form.get("backlog")));
 
             stream.addAlertCondition(request);
         } catch (IOException e) {
@@ -128,7 +130,8 @@ public class AlertsController extends AuthenticatedController {
                 || !checkParam("threshold", form)
                 || !checkParam("threshold_type", form)
                 || !checkParam("field", form)
-                || !checkParam("type", form)) {
+                || !checkParam("type", form)
+                || !checkParam("backlog", form)) {
             flash("error", "Could not add alert condition: Missing parameters.");
             return redirect(routes.AlertsController.index(streamId));
         }
@@ -145,6 +148,7 @@ public class AlertsController extends AuthenticatedController {
             request.parameters.put("threshold_type", form.get("threshold_type"));
             request.parameters.put("type", form.get("type"));
             request.parameters.put("field", form.get("field"));
+            request.parameters.put("backlog", Integer.parseInt(form.get("backlog")));
 
             stream.addAlertCondition(request);
         } catch (IOException e) {

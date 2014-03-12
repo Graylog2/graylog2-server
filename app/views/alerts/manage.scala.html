@@ -52,14 +52,7 @@
             <input name="time" type="text" class="input-mini pluralsingular validatable" data-validate="positive_number" data-pluralsingular="time-descr" />
             <span class="time-descr" data-plural="minutes" data-singular="minute">minutes</span>
 
-            <br />
-            and then wait at least
-            <input name="grace" type="text" class="input-mini validatable" data-validate="not_negative_number" />
-            minutes until triggering a new alert. (grace period)
-
-            <p style="margin-top: 10px;">
-                <button type="submit" class="btn btn-success">Add alert condition</button>
-            </p>
+            @views.html.partials.alerts.form_common.render()
 
         </div>
     </form>
@@ -108,15 +101,7 @@
             <span class="time-descr" data-plural="minutes" data-singular="minute">minutes</span>
 
 
-            and <br /> then wait at least
-            <input name="grace" type="text" class="input-mini pluralsingular validatable" data-pluralsingular="grace-descr" data-validate="not_negative_number" />
-            <span class="grace-descr" data-plural="minutes" data-singular="minute">minutes</span> until triggering
-            a new alert. (grace period)
-
-
-            <p style="margin-top: 10px;">
-                <button type="submit" class="btn btn-success">Add alert condition</button>
-            </p>
+            @views.html.partials.alerts.form_common.render()
 
         </div>
     </form>
