@@ -1,5 +1,5 @@
 /**
- * Copyright 2013 Lennart Koopmann <lennart@torch.sh>
+ * Copyright 2014 Lennart Koopmann <lennart@torch.sh>
  *
  * This file is part of Graylog2.
  *
@@ -19,28 +19,21 @@
  */
 package org.graylog2.inputs.converters;
 
-import org.graylog2.ConfigurationException;
+import com.joestelmach.natty.DateGroup;
 import org.graylog2.plugin.inputs.Converter;
+import com.joestelmach.natty.Parser;
 import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
 
+import java.util.List;
 import java.util.Map;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-public class DateConverter extends Converter {
+public class FlexibleDateConverter extends Converter {
 
-    private final String dateFormat;
-
-    public DateConverter(Map<String, Object> config) throws ConfigurationException {
-        super(Type.DATE, config);
-
-        if (config.get("date_format") == null || ((String) config.get("date_format")).isEmpty()) {
-            throw new ConfigurationException("Missing config [date_format].");
-        }
-
-        dateFormat = (String) config.get("date_format");
+    public FlexibleDateConverter(Map<String, Object> config) {
+        super(Type.FLEXDATE, config);
     }
 
     @Override
@@ -49,9 +42,15 @@ public class DateConverter extends Converter {
             return null;
         }
 
-        DateTime localNow = new DateTime();
+        // Parser is using local timezone with no constructor parameter passed.
+        Parser parser = new Parser();
+        List<DateGroup> r = parser.parse(value);
 
-        return DateTime.parse(value,DateTimeFormat.forPattern(dateFormat).withDefaultYear(localNow.getYear()));
+        if(r.isEmpty() || r.get(0).getDates().isEmpty()) {
+            return null;
+        }
+
+        return new DateTime(r.get(0).getDates().get(0));
     }
 
     @Override
