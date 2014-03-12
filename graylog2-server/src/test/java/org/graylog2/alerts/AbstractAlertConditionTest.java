@@ -19,6 +19,7 @@
 
 package org.graylog2.alerts;
 
+import org.elasticsearch.search.SearchHits;
 import org.graylog2.plugin.Tools;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -68,12 +69,17 @@ public class AbstractAlertConditionTest extends AlertConditionTest {
         return new AlertCondition(core, stream, CONDITION_ID, null, Tools.iso8601(), STREAM_CREATOR, parameters) {
             @Override
             public String getDescription() {
-                return null;  //To change body of implemented methods use File | Settings | File Templates.
+                return null;
             }
 
             @Override
             protected CheckResult runCheck() {
-                return null;  //To change body of implemented methods use File | Settings | File Templates.
+                return null;
+            }
+
+            @Override
+            public SearchHits getSearchHits() {
+                return null;
             }
         };
     }

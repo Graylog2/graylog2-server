@@ -18,9 +18,12 @@
  *
  */
 package org.graylog2.periodical;
+import com.beust.jcommander.internal.Lists;
+import org.elasticsearch.search.SearchHit;
 import org.graylog2.alerts.Alert;
 import org.graylog2.alerts.AlertCondition;
 import org.graylog2.alerts.AlertSender;
+import org.graylog2.plugin.Message;
 import org.graylog2.plugin.alarms.transports.TransportConfigurationException;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.streams.StreamImpl;
@@ -66,7 +69,15 @@ public class AlertScannerThread extends Periodical {
                         if (stream.getAlertReceivers().size() > 0) {
                             try {
                                 AlertSender sender = new AlertSender(core);
-                                sender.sendEmails(stream, result);
+                                if (alertCondition.getBacklog() > 0 && alertCondition.getSearchHits() != null) {
+                                    List<Message> backlog = Lists.newArrayList();
+                                    for (SearchHit searchHit : alertCondition.getSearchHits().getHits()) {
+                                        backlog.add(new Message(searchHit.getSource()));
+                                    }
+                                    sender.sendEmails(stream, result, backlog.subList(0, alertCondition.getBacklog()));
+                                } else {
+                                    sender.sendEmails(stream, result);
+                                }
                             } catch (TransportConfigurationException e) {
                                 LOG.warn("Stream [{}] has alert receivers and is triggered, but email transport is not configured.", stream);
                             } catch (Exception e) {

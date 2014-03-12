@@ -1,5 +1,6 @@
 package org.graylog2.alerts.types;
 
+import org.elasticsearch.search.SearchHits;
 import org.graylog2.Core;
 import org.graylog2.alerts.AlertCondition;
 import org.graylog2.plugin.Tools;
@@ -26,5 +27,10 @@ public class DummyAlertCondition extends AlertCondition {
     @Override
     public CheckResult runCheck() {
         return new CheckResult(true, this, this.description, Tools.iso8601());
+    }
+
+    @Override
+    public SearchHits getSearchHits() {
+        return null;
     }
 }

@@ -19,9 +19,11 @@
  */
 package org.graylog2.alerts.types;
 
+import org.elasticsearch.search.SearchHits;
 import org.graylog2.Core;
 import org.graylog2.alerts.AlertCondition;
 import org.graylog2.indexer.IndexHelper;
+import org.graylog2.indexer.results.CountResult;
 import org.graylog2.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.Tools;
@@ -47,6 +49,7 @@ public class MessageCountAlertCondition extends AlertCondition {
     private final int time;
     private final ThresholdType thresholdType;
     private final int threshold;
+    private SearchHits searchHits = null;
 
     public MessageCountAlertCondition(Core core, Stream stream, String id, DateTime createdAt, String creatorUserId, Map<String, Object> parameters) {
         super(core, stream, id, Type.MESSAGE_COUNT, createdAt, creatorUserId, parameters);
@@ -69,9 +72,12 @@ public class MessageCountAlertCondition extends AlertCondition {
 
     @Override
     protected CheckResult runCheck() {
+        this.searchHits = null;
         try {
             String filter = "streams:"+stream.getId();
-            long count = core.getIndexer().searches().count("*", new RelativeRange(time * 60), filter).getCount();
+            CountResult result = core.getIndexer().searches().count("*", new RelativeRange(time * 60), filter);
+            long count = result.getCount();
+            this.searchHits = result.getSearchHits();
 
             LOG.debug("Alert check <{}> result: [{}]", id, count);
 
@@ -109,4 +115,8 @@ public class MessageCountAlertCondition extends AlertCondition {
         }
     }
 
+    @Override
+    public SearchHits getSearchHits() {
+        return this.searchHits;
+    }
 }

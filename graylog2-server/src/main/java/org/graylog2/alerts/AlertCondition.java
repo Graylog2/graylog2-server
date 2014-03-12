@@ -18,6 +18,7 @@
  */
 package org.graylog2.alerts;
 
+import org.elasticsearch.search.SearchHits;
 import org.graylog2.Core;
 import org.graylog2.alerts.types.FieldValueAlertCondition;
 import org.graylog2.alerts.types.MessageCountAlertCondition;
@@ -79,6 +80,7 @@ public abstract class AlertCondition implements EmbeddedPersistable {
 
     public abstract String getDescription();
     protected abstract CheckResult runCheck();
+    public abstract SearchHits getSearchHits();
 
     public static AlertCondition fromRequest(CreateConditionRequest ccr, Stream stream, Core core) throws NoSuchAlertConditionTypeException {
         Type type;
@@ -174,6 +176,14 @@ public abstract class AlertCondition implements EmbeddedPersistable {
         return parameters;
     }
 
+    public Integer getBacklog() {
+        Object rawParameter = getParameters().get("backlog");
+        if (rawParameter != null && rawParameter instanceof Number)
+            return (Integer)rawParameter;
+        else
+            return 0;
+    }
+
     public boolean inGracePeriod() {
         int lastAlertSecondsAgo = Alert.triggeredSecondsAgo(stream.getId(), getId(), core);
 
@@ -240,6 +250,8 @@ public abstract class AlertCondition implements EmbeddedPersistable {
 
         public CheckResult(boolean isTriggered) {
             this(false, null, null, null);
+            if (isTriggered)
+                throw new RuntimeException("Boolean only constructor should only be called if CheckResult is not triggered!");
         }
 
         public boolean isTriggered() {
