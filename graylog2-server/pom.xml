@@ -130,7 +130,7 @@
         <dependency> 
             <groupId>com.joestelmach</groupId>
             <artifactId>natty</artifactId>
-            <version>0.6</version>
+            <version>0.8</version>
         </dependency>
         <dependency>
             <groupId>net.sf.opencsv</groupId>
