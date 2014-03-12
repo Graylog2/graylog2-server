@@ -53,6 +53,8 @@ public class ConverterFactory {
                 return new LowercaseConverter(config);
             case UPPERCASE:
                 return new UppercaseConverter(config);
+            case FLEXDATE:
+                return new FlexibleDateConverter(config);
             default:
                 throw new NoSuchConverterException();
         }
