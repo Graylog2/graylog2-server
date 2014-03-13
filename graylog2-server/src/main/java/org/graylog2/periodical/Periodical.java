@@ -19,12 +19,9 @@
  */
 package org.graylog2.periodical;
 
-import com.google.common.base.Stopwatch;
 import org.graylog2.Core;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.concurrent.TimeUnit;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
