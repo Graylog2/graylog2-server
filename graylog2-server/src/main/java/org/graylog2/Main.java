@@ -46,6 +46,7 @@ import org.graylog2.inputs.raw.tcp.RawTCPInput;
 import org.graylog2.inputs.raw.udp.RawUDPInput;
 import org.graylog2.inputs.syslog.tcp.SyslogTCPInput;
 import org.graylog2.inputs.syslog.udp.SyslogUDPInput;
+import org.graylog2.lifecycles.Lifecycle;
 import org.graylog2.notifications.Notification;
 import org.graylog2.outputs.ElasticSearchOutput;
 import org.graylog2.plugin.Tools;
@@ -172,6 +173,8 @@ public final class Main {
 
         // Le server object. This is where all the magic happens.
         Core server = new Core();
+        server.setLifecycle(Lifecycle.STARTING);
+
         server.initialize(configuration, metrics);
 
         // Register this node.
@@ -269,6 +272,8 @@ public final class Main {
             System.exit(1);
         }
 
+        server.setLifecycle(Lifecycle.RUNNING);
+
         server.getActivityWriter().write(new Activity("Started up.", Main.class));
         LOG.info("Graylog2 up and running.");
 
@@ -279,8 +284,6 @@ public final class Main {
             }
         } catch (InterruptedException e) {
             return;
-        } finally {
-            LOG.info("Graylog2 {} exiting.", Core.GRAYLOG2_VERSION);
         }
     }
 

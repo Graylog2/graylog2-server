@@ -24,6 +24,7 @@ import org.graylog2.ProcessingPauseLockedException;
 import org.graylog2.caches.Caches;
 import org.graylog2.Core;
 import org.graylog2.buffers.Buffers;
+import org.graylog2.lifecycles.Lifecycle;
 import org.graylog2.periodical.Periodical;
 import org.graylog2.plugin.inputs.InputState;
 import org.graylog2.plugin.inputs.MessageInput;
@@ -53,6 +54,8 @@ public class GracefulShutdown implements Runnable {
     @Override
     public void run() {
         LOG.info("Graceful shutdown initiated.");
+        core.setLifecycle(Lifecycle.HALTING);
+
         core.getActivityWriter().write(
                 new Activity("Graceful shutdown initiated.", GracefulShutdown.class)
         );
@@ -72,6 +75,7 @@ public class GracefulShutdown implements Runnable {
         core.unlockProcessingPause();
         try {
             core.resumeMessageProcessing();
+            core.setLifecycle(Lifecycle.HALTING); // Was overwritten with RUNNING when resuming message processing,
         } catch (ProcessingPauseLockedException e) {
             throw new RuntimeException("Seems like unlocking the processing pause did not succeed.", e);
         }
