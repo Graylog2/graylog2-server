@@ -56,6 +56,14 @@ public class GracefulShutdown implements Runnable {
         LOG.info("Graceful shutdown initiated.");
         core.setLifecycle(Lifecycle.HALTING);
 
+        // Give possible load balancers time to recognize state change. State is DEAD because of HALTING.
+        LOG.info("Node status: [{}]. Waiting <{}sec> for possible load balancers to recognize state change.",
+                core.getLifecycle().toString(),
+                core.getConfiguration().getLoadBalancerRecognitionPeriodSeconds());
+        try {
+            Thread.sleep(core.getConfiguration().getLoadBalancerRecognitionPeriodSeconds()*1000);
+        } catch (InterruptedException ignored) { /* nope */ }
+
         core.getActivityWriter().write(
                 new Activity("Graceful shutdown initiated.", GracefulShutdown.class)
         );

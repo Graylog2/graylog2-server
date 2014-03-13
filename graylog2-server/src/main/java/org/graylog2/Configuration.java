@@ -160,6 +160,9 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "enable_metrics_collection", required = false)
     private boolean metricsCollectionEnabled = false;
 
+    @Parameter(value = "lb_recognition_period_seconds", validator = PositiveIntegerValidator.class)
+    private int loadBalancerRecognitionPeriodSeconds = 3;
+
     /* Elasticsearch defaults */
     @Parameter(value = "elasticsearch_cluster_name", required = false)
     private String esClusterName = "graylog2";
@@ -534,6 +537,10 @@ public class Configuration extends BaseConfiguration {
 
     public boolean isDeadLettersEnabled() {
         return deadLettersEnabled;
+    }
+
+    public int getLoadBalancerRecognitionPeriodSeconds() {
+        return loadBalancerRecognitionPeriodSeconds;
     }
 
 }
