@@ -49,6 +49,7 @@ public class Indexer {
     private static final Logger LOG = LoggerFactory.getLogger(Indexer.class);
 
     private Client client;
+    private Node node;
     private MessageGateway messageGateway;
     public static final String TYPE = "message";
     
@@ -93,7 +94,7 @@ public class Indexer {
         Map<String, String> settings = readNodeSettings(server.getConfiguration());
 
         builder.settings().put(settings);
-        final Node node = builder.node();
+        node = builder.node();
         client = node.client();
 
         try {
@@ -101,13 +102,6 @@ public class Indexer {
         } catch(ElasticSearchTimeoutException e) {
             UI.exitHardWithWall("No ElasticSearch master was found.", new String[]{ "graylog2-server/configuring-and-tuning-elasticsearch-for-graylog2-v0200" });
         }
-
-        Runtime.getRuntime().addShutdownHook(new Thread() {
-            @Override
-            public void run() {
-                node.close();
-            }
-        });
 
         messageGateway = new MessageGatewayImpl(server);
         searches = new Searches(client, server);
@@ -292,6 +286,10 @@ public class Indexer {
         b.setConsistencyLevel(WriteConsistencyLevel.ONE);
 
         return b;
+    }
+
+    public Node getNode() {
+        return node;
     }
 
 }
