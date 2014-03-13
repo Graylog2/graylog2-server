@@ -20,12 +20,15 @@
 package org.graylog2.periodical;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import org.graylog2.Core;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -38,9 +41,11 @@ public class Periodicals {
     private final Core core;
 
     private final List<Periodical> periodicals;
+    private final Map<Periodical, ScheduledFuture> futures;
 
     public Periodicals(Core core) {
         this.periodicals = Lists.newArrayList();
+        this.futures = Maps.newHashMap();
         this.core = core;
     }
 
@@ -61,12 +66,14 @@ public class Periodicals {
             );
 
             ScheduledExecutorService scheduler = periodical.isDaemon() ? core.getDaemonScheduler() : core.getScheduler();
-            scheduler.scheduleAtFixedRate(
+            ScheduledFuture<?> future = scheduler.scheduleAtFixedRate(
                     periodical,
                     periodical.getInitialDelaySeconds(),
                     periodical.getPeriodSeconds(),
                     TimeUnit.SECONDS
             );
+
+            futures.put(periodical, future);
         }
 
         periodicals.add(periodical);
@@ -74,10 +81,33 @@ public class Periodicals {
 
     /**
      *
-     * @return a copy of all registered periodicals.
+     * @return a copy of the list of all registered periodicals.
      */
     public List<Periodical> getAll() {
         return Lists.newArrayList(periodicals);
     }
 
+    /**
+     *
+     * @return a copy of the list of all registered periodicals that are configured to be
+     * stopped on a graceful shutdown.
+     */
+    public List<Periodical> getAllStoppedOnGracefulShutdown() {
+        List<Periodical> result = Lists.newArrayList();
+        for (Periodical periodical : periodicals) {
+            if (periodical.stopOnGracefulShutdown()) {
+                result.add(periodical);
+            }
+        }
+
+        return result;
+    }
+
+    /**
+     *
+     * @return a copy of the map of all executor futures
+     */
+    public Map<Periodical, ScheduledFuture> getFutures() {
+        return Maps.newHashMap(futures);
+    }
 }

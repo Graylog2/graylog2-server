@@ -24,12 +24,15 @@ import org.graylog2.ProcessingPauseLockedException;
 import org.graylog2.caches.Caches;
 import org.graylog2.Core;
 import org.graylog2.buffers.Buffers;
+import org.graylog2.periodical.Periodical;
 import org.graylog2.plugin.inputs.InputState;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.system.activities.Activity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Map;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -79,21 +82,48 @@ public class GracefulShutdown implements Runnable {
         // Wait for buffers.
         Buffers.waitForEmptyBuffers(core);
 
-        // Shut down. (Note that this will trigger shutdown hooks.)
-        System.exit(0);
+        // Stop all threads that should be stopped.
+        shutdownPeriodicals();
+
+        // Properly close ElasticSearch node.
+        core.getIndexer().getNode().close();
+
+        // Shut down hard with no shutdown hooks running.
+        LOG.info("Goodbye.");
+        Runtime.getRuntime().halt(0);
+    }
+
+    private void shutdownPeriodicals() {
+        for (Periodical periodical : core.periodicals().getAllStoppedOnGracefulShutdown()) {
+            LOG.info("Shutting down periodical [{}].", periodical.getClass().getCanonicalName());
+            Stopwatch s = new Stopwatch().start();
+
+            // Cancel future executions.
+            Map<Periodical,ScheduledFuture> futures = core.periodicals().getFutures();
+            if (futures.containsKey(periodical)) {
+                futures.get(periodical).cancel(false);
+
+                s.stop();
+                LOG.info("Shutdown of periodical [{}] complete, took <{}ms>.",
+                        periodical.getClass().getCanonicalName(), s.elapsed(TimeUnit.MILLISECONDS));
+            } else {
+                LOG.error("Could not find periodical [{}] in futures list. Not stopping execution.",
+                        periodical.getClass().getCanonicalName());
+            }
+        }
     }
 
     private void stopInputs() {
         for (InputState state : core.inputs().getRunningInputs()) {
             MessageInput input = state.getMessageInput();
 
-            LOG.info("Graceful shutdown: Attempting to close input <{}> [{}].", input.getId(), input.getName());
+            LOG.info("Attempting to close input <{}> [{}].", input.getUniqueReadableId(), input.getName());
 
             Stopwatch s = new Stopwatch().start();
             input.stop();
             s.stop();
 
-            LOG.info("Input closed. Took [{}ms]", s.elapsed(TimeUnit.MILLISECONDS));
+            LOG.info("Input [{}] closed. Took [{}ms]", input.getUniqueReadableId(), s.elapsed(TimeUnit.MILLISECONDS));
         }
     }
 
