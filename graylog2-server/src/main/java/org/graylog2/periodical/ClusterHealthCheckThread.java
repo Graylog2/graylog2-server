@@ -12,9 +12,6 @@ import org.slf4j.LoggerFactory;
 public class ClusterHealthCheckThread extends Periodical {
     private static final Logger LOG = LoggerFactory.getLogger(ClusterHealthCheckThread.class);
 
-    public static final int INITIAL_DELAY = 0;
-    public static final int PERIOD = 20;
-
     @Override
     public void run() {
         try {
