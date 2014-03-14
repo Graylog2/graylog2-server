@@ -165,6 +165,9 @@ public class Configuration {
     @Parameter(value = "allow_leading_wildcard_searches", required = false)
     private boolean allowLeadingWildcardSearches = false;
 
+    @Parameter(value = "allow_highlighting", required = false)
+    private boolean allowHighlighting = false;
+
     @Parameter(value = "enable_metrics_collection", required = false)
     private boolean metricsCollectionEnabled = false;
 
@@ -515,6 +518,9 @@ public class Configuration {
 
     public boolean isAllowLeadingWildcardSearches() {
         return allowLeadingWildcardSearches;
+    }
+    public boolean isAllowHighlighting() {
+        return allowHighlighting;
     }
 
     public boolean isMetricsCollectionEnabled() {
