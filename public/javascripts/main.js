@@ -111,12 +111,10 @@ $(document).ready(function() {
 		th = $("#result-th-" + hash);
         var fieldname = $(this).data("field-name");
         if ($(this).is(':checked')) {
-            console.log("adding field " + fieldname);
             searchViewState.addField(fieldname);
 			th.show();
 			td.show();
 		} else {
-            console.log("removing field " + fieldname);
             searchViewState.removeField(fieldname);
             th.hide();
 			td.hide();
@@ -826,8 +824,6 @@ $(document).ready(function() {
     $("input.input-global-checkbox").on("click", function(event) {
         var form = $(this).closest("form");
         var nodeselector = $("select.input-node-selector", form);
-        console.log(form);
-        console.log(nodeselector);
 
         if ($(this).is(":checked")) {
             nodeselector.prop('disabled', true);

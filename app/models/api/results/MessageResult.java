@@ -23,7 +23,9 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.gson.Gson;
 import models.FieldMapper;
+import models.api.responses.HighlightRange;
 import org.joda.time.DateTime;
 
 import javax.annotation.Nullable;
@@ -50,9 +52,11 @@ public class MessageResult {
     private final String sourceRadioId;
     private final String sourceRadioInputId;
     private final List<String> streamIds;
+    private final Map<String, List<HighlightRange>> highlightRanges;
     private final FieldMapper fieldMapper;
 
-    public MessageResult(Map<String, Object> message, String index, FieldMapper fieldMapper) {
+    public MessageResult(Map<String, Object> message, String index, Map<String, List<HighlightRange>> highlightRanges, FieldMapper fieldMapper) {
+        this.highlightRanges = highlightRanges;
         this.fieldMapper = fieldMapper;
         // this comparator sorts fields alphabetically, but always leaves full_message at the end.
         // it really is interface, but I don't want to put it into the template either.
@@ -176,4 +180,11 @@ public class MessageResult {
         }
     }
 
+    public Map<String, List<HighlightRange>> getHighlightRanges() {
+        return highlightRanges;
+    }
+
+    public String getHighlightRangesAsJson() {
+        return new Gson().toJson(getHighlightRanges());
+    }
 }

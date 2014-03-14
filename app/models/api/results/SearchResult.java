@@ -64,7 +64,7 @@ public class SearchResult {
         results = Lists.newArrayList();
         if (summaryResponses != null) {
             for (MessageSummaryResponse response : summaryResponses) {
-                results.add(new MessageResult(response.message, response.index, fieldMapper));
+                results.add(new MessageResult(response.message, response.index, response.highlightRanges, fieldMapper));
             }
         }
     }
