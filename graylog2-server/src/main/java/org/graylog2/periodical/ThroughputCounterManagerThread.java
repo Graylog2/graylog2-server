@@ -17,17 +17,22 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package org.graylog2.shared.periodical;
+package org.graylog2.periodical;
+
+import com.google.inject.Inject;
+import org.graylog2.shared.stats.ThroughputStats;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
 public class ThroughputCounterManagerThread extends Periodical {
+    @Inject
+    private ThroughputStats throughputStats;
 
     @Override
     public void run() {
-        core.setCurrentThroughput(core.getThroughputCounter().get());
-        core.getThroughputCounter().set(0);
+        throughputStats.setCurrentThroughput(throughputStats.getThroughputCounter().get());
+        throughputStats.getThroughputCounter().set(0);
     }
 
     @Override

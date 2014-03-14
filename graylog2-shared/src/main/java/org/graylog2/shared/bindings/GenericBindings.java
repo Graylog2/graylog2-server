@@ -24,9 +24,7 @@ import com.codahale.metrics.MetricRegistry;
 import com.google.inject.AbstractModule;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import org.graylog2.shared.buffers.ProcessBuffer;
-import org.graylog2.shared.buffers.processors.ProcessBufferProcessor;
 import org.graylog2.shared.filters.FilterRegistry;
-import org.graylog2.shared.periodical.ThroughputCounterManagerThread;
 import org.graylog2.shared.stats.ThroughputStats;
 import org.graylog2.shared.filters.FilterRegistry;
 
@@ -42,6 +40,5 @@ public class GenericBindings extends AbstractModule {
         bind(ThroughputStats.class).toInstance(new ThroughputStats());
 
         install(new FactoryModuleBuilder().build(ProcessBuffer.Factory.class));
-        install(new FactoryModuleBuilder().build(ThroughputCounterManagerThread.Factory.class));
     }
 }

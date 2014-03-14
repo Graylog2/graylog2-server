@@ -83,7 +83,7 @@ public class AlertScannerThread extends Periodical {
                                     sender.sendEmails(stream, result);
                                 }
                             } catch (TransportConfigurationException e) {
-                                Notification notification = Notification.buildNow(server)
+                                Notification notification = Notification.buildNow(core)
                                         .addThisNode()
                                         .addType(Notification.Type.EMAIL_TRANSPORT_CONFIGURATION_INVALID)
                                         .addDetail("stream_id", stream.getId())
@@ -91,7 +91,7 @@ public class AlertScannerThread extends Periodical {
                                 notification.publishIfFirst();
                                 LOG.warn("Stream [{}] has alert receivers and is triggered, but email transport is not configured.", stream);
                             } catch (Exception e) {
-                                Notification notification = Notification.buildNow(server)
+                                Notification notification = Notification.buildNow(core)
                                         .addThisNode()
                                         .addType(Notification.Type.EMAIL_TRANSPORT_FAILED)
                                         .addDetail("stream_id", stream.getId())

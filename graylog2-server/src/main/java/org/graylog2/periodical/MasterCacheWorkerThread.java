@@ -17,14 +17,13 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package org.graylog2.shared.periodical;
+package org.graylog2.periodical;
 
 import com.codahale.metrics.Meter;
 import org.graylog2.inputs.Cache;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.buffers.Buffer;
 import org.graylog2.plugin.buffers.BufferOutOfCapacityException;
-import org.graylog2.shared.ProcessingHost;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

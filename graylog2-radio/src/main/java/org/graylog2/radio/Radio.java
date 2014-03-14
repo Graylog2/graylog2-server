@@ -61,8 +61,6 @@ import org.graylog2.shared.ProcessingHost;
 import org.graylog2.shared.buffers.ProcessBuffer;
 import org.graylog2.shared.buffers.processors.ProcessBufferProcessor;
 import org.graylog2.shared.inputs.InputRegistry;
-import org.graylog2.shared.periodical.MasterCacheWorkerThread;
-import org.graylog2.shared.periodical.ThroughputCounterManagerThread;
 import org.graylog2.shared.stats.ThroughputStats;
 import org.jboss.netty.bootstrap.ServerBootstrap;
 import org.jboss.netty.channel.ChannelPipeline;
@@ -118,8 +116,6 @@ public class Radio implements InputHost, GraylogServer, ProcessingHost {
     private ProcessBuffer.Factory processBufferFactory;
     @Inject
     private RadioProcessBufferProcessor.Factory processBufferProcessorFactory;
-    @Inject
-    private ThroughputCounterManagerThread.Factory throughputCounterThreadFactory;
     @Inject
     private ThroughputStats throughputStats;
 
@@ -185,11 +181,11 @@ public class Radio implements InputHost, GraylogServer, ProcessingHost {
                 new ThreadFactoryBuilder().setNameFormat("scheduled-%d").build()
         );
 
-        ThroughputCounterManagerThread tt = throughputCounterThreadFactory.create();
-        scheduler.scheduleAtFixedRate(tt, 0, 1, TimeUnit.SECONDS);
+        /*ThroughputCounterManagerThread tt = throughputCounterThreadFactory.create();
+        scheduler.scheduleAtFixedRate(tt, 0, 1, TimeUnit.SECONDS);*/
 
-        MasterCacheWorkerThread masterCacheWorker = new MasterCacheWorkerThread(this, inputCache, processBuffer);
-        scheduler.scheduleAtFixedRate(masterCacheWorker, 0, 1, TimeUnit.SECONDS);
+        /*MasterCacheWorkerThread masterCacheWorker = new MasterCacheWorkerThread(this, inputCache, processBuffer);
+        scheduler.scheduleAtFixedRate(masterCacheWorker, 0, 1, TimeUnit.SECONDS);*/
     }
 
     public void launchPersistedInputs() throws InterruptedException, ExecutionException, IOException {
