@@ -53,8 +53,6 @@ import org.graylog2.radio.transports.kafka.KafkaProducer;
 import org.graylog2.shared.ProcessingHost;
 import org.graylog2.shared.buffers.ProcessBuffer;
 import org.graylog2.shared.inputs.InputRegistry;
-import org.graylog2.shared.periodical.MasterCacheWorkerThread;
-import org.graylog2.shared.periodical.ThroughputCounterManagerThread;
 import org.graylog2.radio.transports.RadioTransport;
 import org.graylog2.radio.transports.kafka.KafkaProducer;
 import org.graylog2.shared.ProcessingHost;
