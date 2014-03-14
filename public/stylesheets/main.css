@@ -1910,3 +1910,20 @@ hr.search-result-head-separator {
     cursor: move;
 }
 .zeroclipboard-is-active { color: #1a5273; }
+
+.result-highlight-colored {
+    background-color: #ffff00;
+}
+
+
+.result-highlight-control label {
+    font-size: 12px;
+    display: inline;
+    position: relative;
+    top: 3px;
+}
+
+.result-highlight-control input {
+    font-size: 12px;
+    display: inline;
+}

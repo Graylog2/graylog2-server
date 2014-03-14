@@ -19,16 +19,14 @@
 
 package models;
 
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import lib.APIException;
 import lib.ApiClient;
 import lib.Configuration;
-import models.api.responses.GetMessageResponse;
-import models.api.responses.MessageAnalyzeResponse;
-import models.api.responses.MessageCountResponse;
-import models.api.responses.MessageFieldResponse;
+import models.api.responses.*;
 import models.api.results.MessageAnalyzeResult;
 import models.api.results.MessageResult;
 import org.slf4j.Logger;
@@ -37,6 +35,7 @@ import play.cache.Cache;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
 
@@ -105,7 +104,7 @@ public class MessagesService {
         final GetMessageResponse r = api.get(GetMessageResponse.class)
                 .path("/messages/{0}/{1}", index, id)
                 .execute();
-		return new MessageResult(r.message, r.index, fieldMapper);
+		return new MessageResult(r.message, r.index, Maps.<String, List<HighlightRange>>newHashMap(), fieldMapper);
 	}
 	
 	public MessageAnalyzeResult analyze(String index, String what) throws IOException, APIException {

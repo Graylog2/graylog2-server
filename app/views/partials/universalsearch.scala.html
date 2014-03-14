@@ -10,6 +10,7 @@
             <input type="hidden" name="rangetype"
                     value="@if(request.getQueryString("rangetype") == null) {relative} else {@request.getQueryString("rangetype")}"
                     id="universalsearch-rangetype" />
+            <input type="hidden" name="fields" id="universalsearch-fields" value="" />
 
             @*** Those are never changed by JS and can be read by methods that need the *original* information. ***@
             @if(request.getQueryString("rangetype") != null && !request.getQueryString("rangetype").isEmpty) {

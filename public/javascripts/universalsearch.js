@@ -31,6 +31,12 @@ $(document).ready(function() {
             }
         });
     });
+
+    // on submit fill the 'fields' field with the current viewstate
+    $(".universalsearch-form").on("submit", function(){
+        $("#universalsearch-fields", $(this)).val(searchViewState.getFieldsString());
+    });
+
     // initialize the user readable dates on page load
     $("#universalsearch .timerange-selector-container .absolute input[type='hidden']").each(function() {
         var input = $("input[type='text']", $(this).parent());
@@ -73,6 +79,37 @@ $(document).ready(function() {
         wait: 500,
         highlight: true,
         captureLength: 0
+    });
+
+
+    $(".toggle-result-highlight").on("change", function(e) {
+        $(".result-highlight").toggleClass("result-highlight-colored", $(this).is(":checked"));
+    });
+
+    /* TODO figure out if we want to keep it this way */
+    String.prototype.gl2_splice = function( idx, s ) {
+        return (this.slice(0,idx) + s + this.slice(idx));
+    };
+    $(".messages tbody tr").each(function() {
+        var ranges = $(this).data('highlight');
+        for (var field in ranges) {
+            if (! ranges.hasOwnProperty(field) ) {
+                continue;
+            }
+            var positions = ranges[field];
+            var fieldNameHash = CryptoJS.MD5(field);
+            $(".result-td-" + fieldNameHash, $(this)).each(function(){
+                var elemText = $(this).text();
+                for (var idx = positions.length - 1; idx >= 0; idx--) {
+                    var range = positions[idx];
+                    elemText = elemText.gl2_splice(range.start + range.length, "</span>");
+                    elemText = elemText.gl2_splice(range.start, '<span class="result-highlight">');
+                }
+                $(this).html(elemText);
+                $(".result-highlight", $(this)).toggleClass("result-highlight-colored");
+            });
+            $(".result-highlight-control").show();
+        }
     });
 
     // Save a search: Open save dialog.
