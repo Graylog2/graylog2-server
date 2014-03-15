@@ -1912,7 +1912,8 @@ hr.search-result-head-separator {
 .zeroclipboard-is-active { color: #1a5273; }
 
 .result-highlight-colored {
-    background-color: #ffff00;
+    /*background-color: #afd8e4;*/
+    background-color: #fffcb0;
 }
 
 
