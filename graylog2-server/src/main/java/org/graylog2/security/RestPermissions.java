@@ -95,6 +95,7 @@ public class RestPermissions {
     public static final String JVMSTATS_READ = "jvmstats:read";
     public static final String THREADS_DUMP = "threads:dump";
     public static final String NODE_SHUTDOWN = "node:shutdown";
+    public static final String LBSTATUS_CHANGE = "lbstatus:change";
 
     private static Map<String, Collection<String>> allPermissions;
 

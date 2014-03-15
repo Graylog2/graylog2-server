@@ -30,6 +30,10 @@ public class Lifecycle {
     public static final Lifecycle PAUSED = new Lifecycle("Paused", LoadBalancerStatus.ALIVE);
     public static final Lifecycle HALTING = new Lifecycle("Halting", LoadBalancerStatus.DEAD);
 
+    // Manual lifecycle override, usually set by REST calls.
+    public static final Lifecycle OVERRIDE_LB_DEAD = new Lifecycle("Override lb:DEAD", LoadBalancerStatus.DEAD);
+    public static final Lifecycle OVERRIDE_LB_ALIVE = new Lifecycle("Override lb:ALIVE", LoadBalancerStatus.ALIVE);
+
     private final String name;
     private final LoadBalancerStatus loadBalancerStatus;
 
