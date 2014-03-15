@@ -27,7 +27,7 @@ public class Lifecycle {
     public static final Lifecycle UNINITIALIZED = new Lifecycle("Uninitialized", LoadBalancerStatus.DEAD);
     public static final Lifecycle STARTING = new Lifecycle("Starting", LoadBalancerStatus.DEAD);
     public static final Lifecycle RUNNING = new Lifecycle("Running", LoadBalancerStatus.ALIVE);
-    public static final Lifecycle PAUSED = new Lifecycle("Paused", LoadBalancerStatus.DEAD);
+    public static final Lifecycle PAUSED = new Lifecycle("Paused", LoadBalancerStatus.ALIVE);
     public static final Lifecycle HALTING = new Lifecycle("Halting", LoadBalancerStatus.DEAD);
 
     private final String name;
