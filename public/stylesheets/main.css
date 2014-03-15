@@ -1927,3 +1927,7 @@ hr.search-result-head-separator {
     font-size: 12px;
     display: inline;
 }
+
+#built-query .copy-clipboard {
+    cursor: pointer;
+}
