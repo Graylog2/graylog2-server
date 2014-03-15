@@ -23,7 +23,7 @@ We'd love for you to contribute to our project and to make Graylog2 even better!
 
 ## Feature requests
 
-We are always happy about any feature request! Do not hesitate to create as many feature requests issues as you want.
+We are always happy about any feature request! Do not hesitate to create as many feature request issues as you want.
 
   1. Please sign the [TORCH Contributor Agreement](https://github.com/Graylog2/graylog2-web-interface/raw/0.20/ContributorAgreement.pdf) if your issue contains
      any code. We cannot go on without this.
