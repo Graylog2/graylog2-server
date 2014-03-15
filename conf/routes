@@ -84,6 +84,7 @@ GET         /system/indices/:index/close                                        
 GET         /system/indices/:index/reopen                                            @controllers.IndicesController.reopenIndex(index: String)
 GET         /system/indices/:index/delete                                            @controllers.IndicesController.deleteIndex(index: String)
 GET         /system/indices/failures                                                 @controllers.IndicesController.failures(page:Integer ?= 1)
+GET         /system/nodes/:node_id/lb/override/:status                               @controllers.NodesController.overrideLbStatus(node_id: String, status: String)
 
 # Saved searches
 GET         /savedsearches                                                           @controllers.api.SavedSearchesApiController.list()

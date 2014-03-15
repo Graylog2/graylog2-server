@@ -144,4 +144,19 @@ public class NodesController extends AuthenticatedController {
         }
     }
 
+    public Result overrideLbStatus(String nodeId, String override) {
+        try {
+            final Node node = nodeService.loadNode(nodeId);
+            node.overrideLbStatus(override);
+            return redirect(routes.NodesController.nodes());
+        } catch (IOException e) {
+            return status(504, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
+        } catch (APIException e) {
+            String message = "Could not set load balancer state. We expected HTTP 200, but got a HTTP " + e.getHttpCode() + ".";
+            return status(504, views.html.errors.error.render(message, e, request()));
+        } catch (NodeService.NodeNotFoundException e) {
+            return status(404, views.html.errors.error.render(ApiClient.ERROR_MSG_NODE_NOT_FOUND, e, request()));
+        }
+    }
+
 }

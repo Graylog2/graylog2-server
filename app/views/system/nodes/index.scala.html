@@ -80,6 +80,25 @@
                         }
                         </li>
                         }
+
+                        <li class="dropdown-submenu">
+                            <a href="#">Override LB status</a>
+
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <a href="@routes.NodesController.overrideLbStatus(jvm.getNodeId, "alive")"
+                                            @if(nodes.get(jvm.getNodeId).lbAlive()) { class="selected" }>
+                                        ALIVE
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="@routes.NodesController.overrideLbStatus(jvm.getNodeId, "dead")"
+                                            @if(!nodes.get(jvm.getNodeId).lbAlive()) { class="selected" }>
+                                        DEAD
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
                     </ul>
                 </div>
             </span>

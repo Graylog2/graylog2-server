@@ -425,6 +425,13 @@ public class Node extends ClusterEntity {
             .execute();
     }
 
+    public void overrideLbStatus(String override) throws APIException, IOException {
+        api.put()
+            .path("/system/lbstatus/override/{0}", override)
+            .node(this)
+            .execute();
+    }
+
     public int getThroughput() {
         try {
             return api.get(NodeThroughputResponse.class).node(this).path("/system/throughput").execute().throughput;

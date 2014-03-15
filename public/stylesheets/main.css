@@ -1936,3 +1936,7 @@ hr.search-result-head-separator {
 .node-state {
     cursor: help
 }
+
+.node-row .dropdown-menu a.selected {
+    font-weight: bold;
+}
