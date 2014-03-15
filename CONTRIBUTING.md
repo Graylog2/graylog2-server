@@ -1,4 +1,6 @@
-We'd love for you to contribute to our project and to make Graylog2 even better!
+Thank you very much for considering contributing to the Graylog2 project! We <3 our community.
+
+To make handling all the community contributions as easy as possible for us we ask you to follow these steps as good as possible:
 
 ## Bug reports
 
