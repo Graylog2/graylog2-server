@@ -87,10 +87,28 @@
             <h3>
                 @views.html.partials.node_title_link(nodes.get(jvm.getNodeId))
 
+                <span class="label label-info node-state" data-toggle="tooltip" title="Current lifecycle state">
+                    @nodes.get(jvm.getNodeId).getLifecycle()
+                </span>
+
                 @if(nodes.get(jvm.getNodeId).isProcessing) {
-                    <span class="label label-success">Processing</span>
+                    <span class="label label-success node-state" data-toggle="tooltip" title="Message processing is enabled">
+                        processing
+                    </span>
                 } else {
-                    <span class="label label-important">Processing paused</span>
+                    <span class="label label-important node-state" data-toggle="tooltip" title="Message processing is paused">
+                        processing paused
+                    </span>
+                }
+
+                @if(nodes.get(jvm.getNodeId).lbAlive()) {
+                    <span class="label label-success node-state" data-toggle="tooltip" title="Marked as ALIVE for load balancers">
+                        lb:ALIVE
+                    </span>
+                } else {
+                    <span class="label label-important node-state" data-toggle="tooltip" title="Marked as DEAD for load balancers">
+                        lb:DEAD
+                    </span>
                 }
             </h3>
 

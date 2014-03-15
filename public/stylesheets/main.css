@@ -1932,3 +1932,7 @@ hr.search-result-head-separator {
 #built-query .copy-clipboard {
     cursor: pointer;
 }
+
+.node-state {
+    cursor: help
+}

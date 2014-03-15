@@ -360,6 +360,16 @@ public class Node extends ClusterEntity {
         return this.systemInfo.isProcessing;
     }
 
+    public String getLifecycle() {
+        requireSystemInfo();
+        return this.systemInfo.lifecycle;
+    }
+
+    public boolean lbAlive() {
+        requireSystemInfo();
+        return this.systemInfo.lbStatus != null && this.systemInfo.lbStatus.equals("alive");
+    }
+
     public String getVersion() {
         requireSystemInfo();
         return systemInfo.version;

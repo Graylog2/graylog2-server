@@ -865,6 +865,8 @@ $(document).ready(function() {
     }
 
     $('input, textarea').placeholder();
+
+    $(".node-state").tooltip();
 });
 
 function searchDateTimeFormatted(date) {
