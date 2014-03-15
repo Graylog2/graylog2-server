@@ -18,7 +18,7 @@ To make handling all the community contributions as easy as possible for us we a
      We cannot accept code without this.
   2. Search the issues of both the [graylog2-server](https://github.com/Graylog2/graylog2-server) and [graylog2-web-interface](https://github.com/Graylog2/graylog2-web-interface)
      repositories for opened or closed issues to avoid duplicating effort.
-  3. Contact [TORCH](http://www.torch.sh/) via any communication channel (contact form, mailing list, IRC, Github issue tracker) before working on a big change to make sure
+  3. Contact the [TORCH](http://www.torch.sh/) team via [any communication channel](http://graylog2.org/support) (contact form, mailing list, IRC, Github issue tracker) before working on a big change to make sure
      that there are chances of acceptance.
   4. Include tests if at any possible.
   5. Submit the pull request.
