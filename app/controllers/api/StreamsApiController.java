@@ -2,13 +2,14 @@ package controllers.api;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 import com.google.inject.Inject;
 import controllers.AuthenticatedController;
 import lib.APIException;
-import models.Stream;
-import models.StreamRule;
-import models.StreamService;
+import lib.ApiClient;
+import lib.Tools;
+import models.*;
 import models.api.requests.streams.TestMatchRequest;
 import models.api.responses.streams.TestMatchResponse;
 import play.data.Form;
@@ -18,11 +19,14 @@ import play.mvc.Http;
 import play.mvc.Result;
 
 import java.io.IOException;
+import java.util.Map;
 
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
+ *         Lennart Koopmann <lennart@torch.sh>
  */
 public class StreamsApiController extends AuthenticatedController {
+
     @Inject
     StreamService streamService;
 
@@ -45,4 +49,5 @@ public class StreamsApiController extends AuthenticatedController {
 
         return ok(new Gson().toJson(response)).as("application/json");
     }
+
 }

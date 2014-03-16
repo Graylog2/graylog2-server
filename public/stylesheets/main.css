@@ -115,7 +115,6 @@ h4 {
 
 #sidebar-inner {
 	margin-left: -25px;
-    z-index: 1050;
 }
 
 #universalsearch {
@@ -415,7 +414,7 @@ form #stream-rules {
 
 .rickshaw_graph .x_tick {
     position: relative;
-    top: 30px;
+    top: 38px;
 }
 
 #sidebar .rickshaw_graph .x_tick {
@@ -1950,3 +1949,6 @@ hr.search-result-head-separator {
     font-weight: bold;
 }
 
+.annotation .content {
+    margin-bottom: 10px;
+}

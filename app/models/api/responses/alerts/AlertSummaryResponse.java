@@ -29,8 +29,10 @@ import java.util.Map;
 public class AlertSummaryResponse {
 
     public String id;
-    public String streamId;
     public String description;
+
+    @SerializedName("stream_id")
+    public String streamId;
 
     @SerializedName("condition_id")
     public String conditionId;
