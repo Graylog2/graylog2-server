@@ -17,18 +17,12 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package org.graylog2.rest.resources.system;
+package org.graylog2.radio.rest.resources.system;
 
 import com.codahale.metrics.annotation.Timed;
-import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.plugin.lifecycles.Lifecycle;
 import org.graylog2.plugin.lifecycles.LoadBalancerStatus;
-import org.graylog2.rest.documentation.annotations.Api;
-import org.graylog2.rest.documentation.annotations.ApiOperation;
-import org.graylog2.rest.documentation.annotations.ApiParam;
-import org.graylog2.rest.resources.RestResource;
-import org.graylog2.security.RestPermissions;
+import org.graylog2.radio.rest.resources.RestResource;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -37,21 +31,16 @@ import javax.ws.rs.core.Response;
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-@Api(value = "System/LoadBalancers", description = "Status propagation for load balancers")
 @Path("/system/lbstatus")
-public class LoadBalancerStatusResource extends RestResource{
-
-    /*
-     *  IMPORTANT: this resource is unauthenticated to allow easy
-     *             acccess for load balancers. think about this
-     *             when adding more stuff.
-     */
+public class LoadBalancerStatusResource extends RestResource {
 
     @GET @Timed
-    @ApiOperation(value = "Get status of this graylog2-server node for load balancers. " +
-            "Returns either ALIVE with HTTP 200 or DEAD with HTTP 503.")
-    public Response status() {
-        LoadBalancerStatus lbStatus = core.getLifecycle().getLoadbalancerStatus();
+    public javax.ws.rs.core.Response status() {
+        /*
+         * IMPORTANT!! When implementing permissions for radio: This must be
+         *             accessible without authorization. LBs don't do that.
+         */
+        LoadBalancerStatus lbStatus = radio.getLifecycle().getLoadbalancerStatus();
 
         Response.Status status = lbStatus.equals(LoadBalancerStatus.ALIVE)
                 ? Response.Status.OK : Response.Status.SERVICE_UNAVAILABLE;
@@ -63,13 +52,9 @@ public class LoadBalancerStatusResource extends RestResource{
     }
 
     @PUT @Timed
-    @RequiresAuthentication
-    @RequiresPermissions(RestPermissions.LBSTATUS_CHANGE)
     @Produces(MediaType.APPLICATION_JSON)
-    @ApiOperation(value = "Override load balancer status of this graylog2-server node. Next lifecycle " +
-            "change will override it again to its default. Set to ALIVE or DEAD.")
     @Path("/override/{status}")
-    public Response override(@ApiParam(title = "status") @PathParam("status") String status) {
+    public Response override(@PathParam("status") String status) {
         LoadBalancerStatus lbStatus;
         try {
             lbStatus = LoadBalancerStatus.valueOf(status.toUpperCase());
@@ -79,10 +64,10 @@ public class LoadBalancerStatusResource extends RestResource{
 
         switch (lbStatus) {
             case DEAD:
-                core.setLifecycle(Lifecycle.OVERRIDE_LB_DEAD);
+                radio.setLifecycle(Lifecycle.OVERRIDE_LB_DEAD);
                 break;
             case ALIVE:
-                core.setLifecycle(Lifecycle.OVERRIDE_LB_ALIVE);
+                radio.setLifecycle(Lifecycle.OVERRIDE_LB_ALIVE);
                 break;
         }
 

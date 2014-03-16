@@ -49,6 +49,8 @@ public class SystemResource extends RestResource {
         result.put("version", Radio.VERSION.toString());
         result.put("started_at", Tools.getISO8601String(radio.getStartedAt()));
         result.put("hostname", Tools.getLocalCanonicalHostname());
+        result.put("lifecycle", radio.getLifecycle().getName().toLowerCase());
+        result.put("lb_status", radio.getLifecycle().getLoadbalancerStatus().toString().toLowerCase());
 
         return json(result);
     }

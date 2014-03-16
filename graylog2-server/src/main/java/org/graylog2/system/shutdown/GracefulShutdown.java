@@ -24,7 +24,7 @@ import org.graylog2.ProcessingPauseLockedException;
 import org.graylog2.caches.Caches;
 import org.graylog2.Core;
 import org.graylog2.buffers.Buffers;
-import org.graylog2.lifecycles.Lifecycle;
+import org.graylog2.plugin.lifecycles.Lifecycle;
 import org.graylog2.periodical.Periodical;
 import org.graylog2.plugin.inputs.InputState;
 import org.graylog2.plugin.inputs.MessageInput;

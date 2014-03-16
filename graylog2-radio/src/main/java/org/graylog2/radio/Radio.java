@@ -36,6 +36,7 @@ import org.graylog2.plugin.InputHost;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.Version;
 import org.graylog2.plugin.buffers.Buffer;
+import org.graylog2.plugin.lifecycles.Lifecycle;
 import org.graylog2.plugin.rest.AnyExceptionClassMapper;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.radio.buffers.ProcessBuffer;
@@ -70,6 +71,8 @@ public class Radio implements InputHost {
     private static final Logger LOG = LoggerFactory.getLogger(Radio.class);
 
     public static final Version VERSION = RadioVersion.VERSION;
+
+    private Lifecycle lifecycle = Lifecycle.UNINITIALIZED;
 
     private DateTime startedAt;
     private MetricRegistry metricRegistry;
@@ -284,4 +287,13 @@ public class Radio implements InputHost {
     public AsyncHttpClient getHttpClient() {
         return httpClient;
     }
+
+    public Lifecycle getLifecycle() {
+        return lifecycle;
+    }
+
+    public void setLifecycle(Lifecycle lifecycle) {
+        this.lifecycle = lifecycle;
+    }
+
 }

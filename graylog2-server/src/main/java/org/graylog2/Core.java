@@ -50,7 +50,7 @@ import org.graylog2.inputs.Cache;
 import org.graylog2.inputs.InputRegistry;
 import org.graylog2.inputs.gelf.gelf.GELFChunkManager;
 import org.graylog2.jersey.container.netty.NettyContainer;
-import org.graylog2.lifecycles.Lifecycle;
+import org.graylog2.plugin.lifecycles.Lifecycle;
 import org.graylog2.metrics.jersey2.MetricsDynamicBinding;
 import org.graylog2.periodical.Periodicals;
 import org.graylog2.rest.RestAccessLogFilter;

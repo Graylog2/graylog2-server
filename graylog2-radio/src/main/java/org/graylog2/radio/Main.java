@@ -40,6 +40,7 @@ import org.graylog2.inputs.raw.udp.RawUDPInput;
 import org.graylog2.inputs.syslog.tcp.SyslogTCPInput;
 import org.graylog2.inputs.syslog.udp.SyslogUDPInput;
 import org.graylog2.plugin.Tools;
+import org.graylog2.plugin.lifecycles.Lifecycle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
@@ -123,6 +124,7 @@ public class Main {
         }
 
         Radio radio = new Radio();
+        radio.setLifecycle(Lifecycle.STARTING);
         radio.initialize(configuration, metrics);
 
         // Register in Graylog2 cluster.
@@ -166,6 +168,7 @@ public class Main {
         radio.inputs().register(LocalMetricsInput.class, LocalMetricsInput.NAME);
         radio.inputs().register(JsonPathInput.class, JsonPathInput.NAME);
 
+        radio.setLifecycle(Lifecycle.RUNNING);
         LOG.info("Graylog2 Radio up and running.");
 
         while (true) {
