@@ -91,12 +91,14 @@
                                 <ul class="dropdown-menu">
                                     <li>
                                         <a href="@routes.NodesController.overrideLbStatus(jvm.getNodeId, "alive")"
+                                                data-confirm="Really change load balancer status?"
                                                 @if(nodes.get(jvm.getNodeId).lbAlive()) { class="selected" }>
                                             ALIVE
                                         </a>
                                     </li>
                                     <li>
                                         <a href="@routes.NodesController.overrideLbStatus(jvm.getNodeId, "dead")"
+                                                data-confirm="Really change load balancer status?"
                                                 @if(!nodes.get(jvm.getNodeId).lbAlive()) { class="selected" }>
                                             DEAD
                                         </a>
@@ -185,12 +187,14 @@
                                     <ul class="dropdown-menu">
                                         <li>
                                             <a href="@routes.RadiosController.overrideLbStatus(radio.getNodeId, "alive")"
+                                                    data-confirm="Really change load balancer status?"
                                                     @if(radio.lbAlive()) { class="selected" }>
                                                 ALIVE
                                             </a>
                                         </li>
                                         <li>
                                             <a href="@routes.RadiosController.overrideLbStatus(radio.getNodeId, "dead")"
+                                                    data-confirm="Really change load balancer status?"
                                                     @if(!radio.lbAlive()) { class="selected" }>
                                                 DEAD
                                             </a>
