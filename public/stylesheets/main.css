@@ -1851,6 +1851,14 @@ input.required-input-highlight {
     color: #ebebeb;
 }
 
+.quickvalues_widget table {
+    table-layout:fixed;
+}
+
+.quickvalues_widget td {
+    word-wrap:break-word;
+}
+
 .widget .replay-link {
     color: #000;
 }
@@ -1940,3 +1948,4 @@ hr.search-result-head-separator {
 .node-row .dropdown-menu a.selected {
     font-weight: bold;
 }
+
