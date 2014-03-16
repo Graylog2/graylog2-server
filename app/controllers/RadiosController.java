@@ -74,4 +74,19 @@ public class RadiosController extends AuthenticatedController {
         }
     }
 
+    public Result overrideLbStatus(String radioId, String override) {
+        try {
+            Radio radio = nodeService.loadRadio(radioId);
+            radio.overrideLbStatus(override);
+            return redirect(routes.NodesController.nodes());
+        } catch (IOException e) {
+            return status(504, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
+        } catch (APIException e) {
+            String message = "Could not set load balancer state. We expected HTTP 200, but got a HTTP " + e.getHttpCode() + ".";
+            return status(504, views.html.errors.error.render(message, e, request()));
+        } catch (NodeService.NodeNotFoundException e) {
+            return status(404, views.html.errors.error.render(ApiClient.ERROR_MSG_NODE_NOT_FOUND, e, request()));
+        }
+    }
+
 }

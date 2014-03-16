@@ -64,8 +64,11 @@
                         </li>
                         <li><a href="@routes.NodesController.threadDump(jvm.getNodeId)">Get thread dump</a></li>
 
+                        @if(isPermitted(PROCESSING_CHANGESTATE) || isPermitted(LBSTATUS_CHANGE)) {
+                            <li class="divider"></li>
+                        }
+
                         @if(isPermitted(PROCESSING_CHANGESTATE)) {
-                        <li class="divider"></li>
                         <li>
                         @if(nodes.get(jvm.getNodeId).isProcessing) {
                             <a class="change-message-processing"
@@ -81,24 +84,26 @@
                         </li>
                         }
 
-                        <li class="dropdown-submenu">
-                            <a href="#">Override LB status</a>
+                        @if(isPermitted(LBSTATUS_CHANGE)) {
+                            <li class="dropdown-submenu">
+                                <a href="#">Override LB status</a>
 
-                            <ul class="dropdown-menu">
-                                <li>
-                                    <a href="@routes.NodesController.overrideLbStatus(jvm.getNodeId, "alive")"
-                                            @if(nodes.get(jvm.getNodeId).lbAlive()) { class="selected" }>
-                                        ALIVE
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="@routes.NodesController.overrideLbStatus(jvm.getNodeId, "dead")"
-                                            @if(!nodes.get(jvm.getNodeId).lbAlive()) { class="selected" }>
-                                        DEAD
-                                    </a>
-                                </li>
-                            </ul>
-                        </li>
+                                <ul class="dropdown-menu">
+                                    <li>
+                                        <a href="@routes.NodesController.overrideLbStatus(jvm.getNodeId, "alive")"
+                                                @if(nodes.get(jvm.getNodeId).lbAlive()) { class="selected" }>
+                                            ALIVE
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="@routes.NodesController.overrideLbStatus(jvm.getNodeId, "dead")"
+                                                @if(!nodes.get(jvm.getNodeId).lbAlive()) { class="selected" }>
+                                            DEAD
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                        }
                     </ul>
                 </div>
             </span>
@@ -170,12 +175,49 @@
                             <li><a href="@routes.InputsController.manageRadio(radio.getId)">Manage inputs</a></li>
                             <li><a href="@routes.MetricsController.ofRadio(radio.getId)">Metrics</a></li>
                             <li><a href="@routes.RadiosController.threadDump(radio.getId)">Get thread dump</a></li>
+
+                            @if(isPermitted(LBSTATUS_CHANGE)) {
+                                <li class="divider"></li>
+
+                                <li class="dropdown-submenu">
+                                    <a href="#">Override LB status</a>
+
+                                    <ul class="dropdown-menu">
+                                        <li>
+                                            <a href="@routes.RadiosController.overrideLbStatus(radio.getNodeId, "alive")"
+                                                    @if(radio.lbAlive()) { class="selected" }>
+                                                ALIVE
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a href="@routes.RadiosController.overrideLbStatus(radio.getNodeId, "dead")"
+                                                    @if(!radio.lbAlive()) { class="selected" }>
+                                                DEAD
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </li>
+                            }
                         </ul>
                     </div>
                 </div>
 
                 <h3>
                     @views.html.partials.radio_title_link(radio)
+
+                    <span class="label label-info node-state" data-toggle="tooltip" title="Current lifecycle state">
+                        @radio.getLifecycle
+                    </span>
+
+                    @if(radio.lbAlive()) {
+                        <span class="label label-success node-state" data-toggle="tooltip" title="Marked as ALIVE for load balancers">
+                            lb:ALIVE
+                        </span>
+                    } else {
+                        <span class="label label-important node-state" data-toggle="tooltip" title="Marked as DEAD for load balancers">
+                            lb:DEAD
+                        </span>
+                    }
                 </h3>
 
                 <div class="node-heap-usage" data-radio-id="@radio.getId" data-node-type="radio">

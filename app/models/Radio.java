@@ -145,6 +145,13 @@ public class Radio extends ClusterEntity {
         return jvm().getInfo();
     }
 
+    public void overrideLbStatus(String override) throws APIException, IOException {
+        api.put()
+                .path("/system/lbstatus/override/{0}", override)
+                .radio(this)
+                .execute();
+    }
+
     public boolean launchExistingInput(String inputId) {
         try {
             api.get(InputLaunchResponse.class)
@@ -203,6 +210,22 @@ public class Radio extends ClusterEntity {
         }
 
         return systemInfo.version;
+    }
+
+    public String getLifecycle() {
+        if (systemInfo == null) {
+            loadSystemInformation();
+        }
+
+        return this.systemInfo.lifecycle;
+    }
+
+    public boolean lbAlive() {
+        if (systemInfo == null) {
+            loadSystemInformation();
+        }
+
+        return this.systemInfo.lbStatus != null && this.systemInfo.lbStatus.equals("alive");
     }
 
     @Override
