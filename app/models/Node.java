@@ -498,6 +498,13 @@ public class Node extends ClusterEntity {
         this.active.set(active);
     }
 
+    public void shutdown() throws APIException, IOException {
+        api.post().path("/system/shutdown")
+                .node(this)
+                .expect(Http.Status.ACCEPTED)
+                .execute();
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

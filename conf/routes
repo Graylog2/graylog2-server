@@ -86,6 +86,7 @@ GET         /system/indices/:index/delete                                       
 GET         /system/indices/failures                                                 @controllers.IndicesController.failures(page:Integer ?= 1)
 GET         /system/nodes/:node_id/lb/override/:status                               @controllers.NodesController.overrideLbStatus(node_id: String, status: String)
 GET         /system/radios/:radio_id/lb/override/:status                             @controllers.RadiosController.overrideLbStatus(radio_id: String, status: String)
+GET         /system/nodes/:node_id/shutdown                                          @controllers.NodesController.shutdown(node_id: String)
 
 # Saved searches
 GET         /savedsearches                                                           @controllers.api.SavedSearchesApiController.list()

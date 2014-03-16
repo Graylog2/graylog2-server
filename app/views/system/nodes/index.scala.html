@@ -64,7 +64,7 @@
                         </li>
                         <li><a href="@routes.NodesController.threadDump(jvm.getNodeId)">Get thread dump</a></li>
 
-                        @if(isPermitted(PROCESSING_CHANGESTATE) || isPermitted(LBSTATUS_CHANGE)) {
+                        @if(isPermitted(PROCESSING_CHANGESTATE) || isPermitted(LBSTATUS_CHANGE) || isPermitted(NODE_SHUTDOWN)) {
                             <li class="divider"></li>
                         }
 
@@ -104,6 +104,16 @@
                                         </a>
                                     </li>
                                 </ul>
+                            </li>
+                        }
+
+                        @if(isPermitted(NODE_SHUTDOWN)) {
+                            <li>
+                                <a href="@routes.NodesController.shutdown(jvm.getNodeId)"
+                                        data-super-confirm="Really shutdown node?"
+                                        data-super-confirm-word="SHUTDOWN">
+                                    Graceful shutdown
+                                </a>
                             </li>
                         }
                     </ul>

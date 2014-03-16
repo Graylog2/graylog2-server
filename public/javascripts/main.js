@@ -732,6 +732,18 @@ $(document).ready(function() {
         );
     });
 
+    // Super confirmations (tm)
+    $("a[data-super-confirm]").on("click", function(e) {
+        var text = $(this).attr("data-super-confirm") + " (Confirm by typing in \"" + $(this).attr("data-super-confirm-word") + "\")";
+        var confirm = prompt(text);
+
+        if (confirm === $(this).attr("data-super-confirm-word")) {
+            return true;
+        }
+
+        return false;
+    });
+
     function scrollToSearchbarHint() {
         if ($(document).scrollTop() > 50) {
             $("#scroll-to-search-hint").fadeIn("fast").delay(1500).fadeOut("fast");
