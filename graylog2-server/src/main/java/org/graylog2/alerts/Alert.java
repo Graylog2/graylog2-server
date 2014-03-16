@@ -46,9 +46,8 @@ public class Alert extends Persisted {
 
     public static final String COLLECTION = "alerts";
 
-    public static final int MAX_LIST_COUNT = 100;
+    public static final int MAX_LIST_COUNT = 300;
     public static final int REST_CHECK_CACHE_SECONDS = 30;
-
 
     protected Alert(Core core, Map<String, Object> fields) {
         super(core, fields);
