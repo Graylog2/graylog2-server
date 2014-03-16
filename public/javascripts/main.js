@@ -672,6 +672,11 @@ $(document).ready(function() {
     });
 
     $(".sources").dynatable({
+        readers: {
+            'messageCount': function(el, record) {
+                return Number(el.innerHTML) || 0;
+            }
+        },
         inputs: {
             perPageText: "Per page: "
         },
