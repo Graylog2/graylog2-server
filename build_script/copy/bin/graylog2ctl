@@ -2,6 +2,7 @@
 
 CMD=$1
 NOHUP=`which nohup`
+PS=`which ps`
 
 # resolve links - $0 may be a softlink
 GRAYLOG2CTL="$0"
@@ -29,11 +30,21 @@ start() {
 }
 
 stop() {
+    if [ ! -f $GRAYLOG2_PID ]; then
+      echo "Not stopping. Pidfile not found: $GRAYLOG2_PID"
+      return
+    fi
+
     PID=`cat ${GRAYLOG2_PID}`
     echo "Stopping graylog2-server ($PID) ..."
-    if kill $PID; then
-        rm ${GRAYLOG2_PID}
-    fi
+    echo "Waiting for graylog2-server to halt."
+
+    kill $PID
+
+    while $PS -p $PID > /dev/null; do sleep 1; done;
+    rm ${GRAYLOG2_PID}
+
+    echo "graylog2-server is dead"
 }
 
 restart() {
