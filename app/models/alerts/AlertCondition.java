@@ -126,7 +126,7 @@ public class AlertCondition {
         StringBuilder sb = new StringBuilder();
 
         if (backlog > 0) {
-            sb.append(" Include last ");
+            sb.append(" Including last ");
             if (backlog == 1)
                 sb.append(" message");
             else
