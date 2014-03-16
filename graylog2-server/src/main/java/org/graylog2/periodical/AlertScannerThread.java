@@ -71,10 +71,17 @@ public class AlertScannerThread extends Periodical {
                                 AlertSender sender = new AlertSender(core);
                                 if (alertCondition.getBacklog() > 0 && alertCondition.getSearchHits() != null) {
                                     List<Message> backlog = Lists.newArrayList();
+
                                     for (SearchHit searchHit : alertCondition.getSearchHits().getHits()) {
                                         backlog.add(new Message(searchHit.getSource()));
                                     }
-                                    sender.sendEmails(stream, result, backlog.subList(0, alertCondition.getBacklog()));
+
+                                    // Read as many messages as possible (max: backlog size) from backlog.
+                                    int readTo = alertCondition.getBacklog();
+                                    if(backlog.size() < readTo) {
+                                        readTo = backlog.size();
+                                    }
+                                    sender.sendEmails(stream, result, backlog.subList(0, readTo));
                                 } else {
                                     sender.sendEmails(stream, result);
                                 }
