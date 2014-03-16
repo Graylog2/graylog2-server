@@ -115,6 +115,7 @@ h4 {
 
 #sidebar-inner {
 	margin-left: -25px;
+    z-index: 1050;
 }
 
 #universalsearch {
@@ -887,7 +888,7 @@ form #stream-rules {
 }
 
 .quickvalues-up .arrow {
-    top: 380px;
+    top: 350px;
 }
 
 .quickvalues-down .arrow {
