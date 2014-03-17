@@ -1951,5 +1951,5 @@ hr.search-result-head-separator {
 
 .annotation .content {
     margin-bottom: 10px;
-    cursor: auto;
+    cursor: auto !important;
 }
