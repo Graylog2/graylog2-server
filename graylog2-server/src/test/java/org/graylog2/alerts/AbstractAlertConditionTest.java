@@ -19,11 +19,12 @@
 
 package org.graylog2.alerts;
 
-import org.elasticsearch.search.SearchHits;
+import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.plugin.Tools;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import java.util.List;
 import java.util.Map;
 
 import static org.testng.AssertJUnit.*;
@@ -78,7 +79,7 @@ public class AbstractAlertConditionTest extends AlertConditionTest {
             }
 
             @Override
-            public SearchHits getSearchHits() {
+            public List<ResultMessage> getSearchHits() {
                 return null;
             }
         };

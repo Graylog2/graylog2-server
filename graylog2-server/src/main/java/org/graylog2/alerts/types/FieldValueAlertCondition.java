@@ -24,6 +24,7 @@ import org.graylog2.Core;
 import org.graylog2.alerts.AlertCondition;
 import org.graylog2.indexer.IndexHelper;
 import org.graylog2.indexer.results.FieldStatsResult;
+import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.indexer.searches.Searches;
 import org.graylog2.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.indexer.searches.timeranges.RelativeRange;
@@ -33,6 +34,7 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -41,7 +43,7 @@ import java.util.Map;
 public class FieldValueAlertCondition extends AlertCondition {
 
     private static final Logger LOG = LoggerFactory.getLogger(FieldValueAlertCondition.class);
-    private SearchHits searchHits = null;
+    private List<ResultMessage> searchHits = null;
 
     public enum CheckType {
         MEAN, MIN, MAX, SUM, STDDEV
@@ -87,7 +89,8 @@ public class FieldValueAlertCondition extends AlertCondition {
         try {
             String filter = "streams:"+stream.getId();
             FieldStatsResult fieldStatsResult = core.getIndexer().searches().fieldStats(field, "*", filter, new RelativeRange(time * 60));
-            this.searchHits = fieldStatsResult.getSearchHits();
+            if (getBacklog() != null && getBacklog() > 0)
+                this.searchHits = fieldStatsResult.getSearchHits();
 
             if (fieldStatsResult.getCount() == 0) {
                 LOG.debug("Alert check <{}> did not match any messages. Returning not triggered.", type);
@@ -164,7 +167,7 @@ public class FieldValueAlertCondition extends AlertCondition {
     }
 
     @Override
-    public SearchHits getSearchHits() {
+    public List<ResultMessage> getSearchHits() {
         return this.searchHits;
     }
 }
