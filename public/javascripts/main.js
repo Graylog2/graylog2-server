@@ -831,8 +831,8 @@ $(document).ready(function() {
         var result = confirm("Really delete stream?");
         if (result) {
             var elem = $(this).closest(".stream-row");
-            var url = event.currentTarget.attributes["data-removeUrl"].value;
-            $.post(appPrefixed(url), {}, function() {
+            var url = event.currentTarget.attributes["data-removeUrl"].value; // url already prefixed in template
+            $.post(url, {}, function() {
                 elem.fadeOut();
             });
         }
