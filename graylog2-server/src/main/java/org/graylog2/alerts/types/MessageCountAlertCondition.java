@@ -24,6 +24,9 @@ import org.graylog2.Core;
 import org.graylog2.alerts.AlertCondition;
 import org.graylog2.indexer.IndexHelper;
 import org.graylog2.indexer.results.CountResult;
+import org.graylog2.indexer.results.ResultMessage;
+import org.graylog2.indexer.results.SearchResult;
+import org.graylog2.indexer.searches.Sorting;
 import org.graylog2.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.Tools;
@@ -32,6 +35,7 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -49,7 +53,7 @@ public class MessageCountAlertCondition extends AlertCondition {
     private final int time;
     private final ThresholdType thresholdType;
     private final int threshold;
-    private SearchHits searchHits = null;
+    private List<ResultMessage> searchHits = null;
 
     public MessageCountAlertCondition(Core core, Stream stream, String id, DateTime createdAt, String creatorUserId, Map<String, Object> parameters) {
         super(core, stream, id, Type.MESSAGE_COUNT, createdAt, creatorUserId, parameters);
@@ -77,7 +81,6 @@ public class MessageCountAlertCondition extends AlertCondition {
             String filter = "streams:"+stream.getId();
             CountResult result = core.getIndexer().searches().count("*", new RelativeRange(time * 60), filter);
             long count = result.getCount();
-            this.searchHits = result.getSearchHits();
 
             LOG.debug("Alert check <{}> result: [{}]", id, count);
 
@@ -92,6 +95,12 @@ public class MessageCountAlertCondition extends AlertCondition {
             }
 
             if (triggered) {
+                Integer backlogSize = getBacklog();
+                if (backlogSize != null && backlogSize > 0) {
+                    SearchResult backlogResult = core.getIndexer().searches().search("*", filter, new RelativeRange(time * 60), 0, backlogSize, new Sorting("timestamp", Sorting.Direction.DESC));
+                    this.searchHits = backlogResult.getResults();
+                }
+
                 StringBuilder resultDescription = new StringBuilder();
 
                 resultDescription.append("Stream had ").append(count).append(" messages in the last ")
@@ -116,7 +125,7 @@ public class MessageCountAlertCondition extends AlertCondition {
     }
 
     @Override
-    public SearchHits getSearchHits() {
+    public List<ResultMessage> getSearchHits() {
         return this.searchHits;
     }
 }

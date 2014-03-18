@@ -145,7 +145,7 @@ public class StreamResource extends RestResource {
     }
 
     @GET @Path("/enabled") @Timed
-    @ApiOperation(value = "Get a list of all streams")
+    @ApiOperation(value = "Get a list of all enabled streams")
     @Produces(MediaType.APPLICATION_JSON)
     public String getEnabled() {
         List<Map<String, Object>> streams = Lists.newArrayList();

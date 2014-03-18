@@ -63,17 +63,6 @@ public class SearchResult extends IndexQueryResult {
 		return fields;
 	}
 	
-	private List<ResultMessage> buildResults(SearchHits hits) {
-		List<ResultMessage> r = Lists.newArrayList();
-
-		Iterator<SearchHit> i = hits.iterator();
-		while(i.hasNext()) {
-			r.add(ResultMessage.parseFromSource(i.next()));
-		}
-		
-		return r;
-	}
-	
 	private Set<String> extractFields(SearchHits hits) {
 		Set<String> fields = Sets.newHashSet();
 

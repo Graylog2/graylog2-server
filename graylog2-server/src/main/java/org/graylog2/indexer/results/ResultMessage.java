@@ -20,8 +20,13 @@
 
 package org.graylog2.indexer.results;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.Range;
 import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.highlight.HighlightField;
 import org.graylog2.plugin.Tools;
 import org.joda.time.format.DateTimeFormat;
 import org.slf4j.Logger;
@@ -34,12 +39,12 @@ import java.util.Map;
  */
 public class ResultMessage {
     private static final Logger log = LoggerFactory.getLogger(ResultMessage.class);
-    /*
-	 * I suppress all the warnings because Eclipse doesn't know shit
-	 * about JSON POJO serialization.
-	 */
-	@SuppressWarnings("unused") public Map<String, Object> message;
-	@SuppressWarnings("unused") public String index;
+
+    public Map<String, Object> message;
+    public String index;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    public Multimap<String, Range<Integer>> highlightRanges;
 
 	protected ResultMessage() { /* use factory method */}
 	
@@ -47,6 +52,7 @@ public class ResultMessage {
 		ResultMessage m = new ResultMessage();
 		m.setMessage(hit.getSource());
 		m.setIndex(hit.getIndex());
+        m.setHighlightRanges(hit.getHighlightFields());
 		return m;
 	}
 	
@@ -54,8 +60,7 @@ public class ResultMessage {
 		ResultMessage m = new ResultMessage();
 		m.setMessage(r.getSource());
 		m.setIndex(r.getIndex());
-
-		return m;
+        return m;
 	}
 	
 	public void setMessage(Map<String, Object> message) {
@@ -69,6 +74,31 @@ public class ResultMessage {
                 // could not parse date string, this is likely a bug, but we will leave the original value alone
                 log.warn("Could not parse timestamp of message {}", message.get("id"),  e);
             }
+        }
+    }
+
+    public void setHighlightRanges(Map<String, HighlightField> highlightFields) {
+        if (!highlightFields.isEmpty()) {
+            highlightRanges = ArrayListMultimap.create();
+            for (Map.Entry<String, HighlightField> hlEntry : highlightFields.entrySet()) {
+                final HighlightField highlight = hlEntry.getValue();
+                final String s = highlight.fragments()[0].toString();
+
+                int pos = 0;
+                int cutChars = 0;
+                while (true) {
+                    int startIdx = s.indexOf("<em>", pos);
+                    if (startIdx == -1) {
+                        break;
+                    }
+                    final int endIdx = s.indexOf("</em>", startIdx);
+                    final Range<Integer> highlightPosition = Range.closedOpen(startIdx - cutChars, endIdx - cutChars - 4);
+                    pos = endIdx;
+                    cutChars += 9;
+                    highlightRanges.put(hlEntry.getKey(), highlightPosition);
+                }
+            }
+            log.debug("Highlight positions for message {}: {}", message.get("_id"), highlightRanges);
         }
     }
 	

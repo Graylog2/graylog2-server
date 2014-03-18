@@ -13,9 +13,9 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
+ *
  */
 
 package org.graylog2.radio;
@@ -40,6 +40,7 @@ import org.graylog2.plugin.InputHost;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.Version;
 import org.graylog2.plugin.buffers.Buffer;
+import org.graylog2.plugin.lifecycles.Lifecycle;
 import org.graylog2.plugin.filters.MessageFilter;
 import org.graylog2.plugin.indexer.MessageGateway;
 import org.graylog2.plugin.rest.AnyExceptionClassMapper;
@@ -87,6 +88,8 @@ public class Radio implements InputHost, GraylogServer, ProcessingHost {
     private static final Logger LOG = LoggerFactory.getLogger(Radio.class);
 
     public static final Version VERSION = RadioVersion.VERSION;
+
+    private Lifecycle lifecycle = Lifecycle.UNINITIALIZED;
 
     private DateTime startedAt;
     @Inject
@@ -355,4 +358,13 @@ public class Radio implements InputHost, GraylogServer, ProcessingHost {
     public boolean isRadio() {
         return true;
     }
+
+    public Lifecycle getLifecycle() {
+        return lifecycle;
+    }
+
+    public void setLifecycle(Lifecycle lifecycle) {
+        this.lifecycle = lifecycle;
+    }
+
 }

@@ -46,9 +46,8 @@ public class Alert extends Persisted {
 
     public static final String COLLECTION = "alerts";
 
-    public static final int MAX_LIST_COUNT = 100;
+    public static final int MAX_LIST_COUNT = 300;
     public static final int REST_CHECK_CACHE_SECONDS = 30;
-
 
     protected Alert(Core core, Map<String, Object> fields) {
         super(core, fields);
@@ -74,12 +73,17 @@ public class Alert extends Persisted {
         return new Alert(core, fields);
     }
 
-    public static List<Alert> loadRecentOfStream(Core core, String streamId) {
-        BasicDBObject query = new BasicDBObject("stream_id", streamId);
+    public static List<Alert> loadRecentOfStream(Core core, String streamId, DateTime since) {
+        QueryBuilder qb = QueryBuilder.start("stream_id").is(streamId);
+
+        if (since != null) {
+            qb.and("triggered_at").greaterThanEquals(since.toDate());
+        }
+
         BasicDBObject sort = new BasicDBObject("triggered_at", -1);
 
         final List<DBObject> alertObjects = query(
-                query,
+                qb.get(),
                 sort,
                 MAX_LIST_COUNT,
                 0,

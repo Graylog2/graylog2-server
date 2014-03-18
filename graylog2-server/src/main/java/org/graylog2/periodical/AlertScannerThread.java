@@ -18,14 +18,12 @@
  *
  */
 package org.graylog2.periodical;
-
-import org.graylog2.Core;
 import com.beust.jcommander.internal.Lists;
 import org.elasticsearch.search.SearchHit;
 import org.graylog2.alerts.Alert;
 import org.graylog2.alerts.AlertCondition;
 import org.graylog2.alerts.AlertSender;
-import org.graylog2.notifications.Notification;
+import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.plugin.Message;
 import org.graylog2.notifications.Notification;
 import org.graylog2.plugin.alarms.transports.TransportConfigurationException;
@@ -75,10 +73,17 @@ public class AlertScannerThread extends Periodical {
                                 AlertSender sender = new AlertSender(core);
                                 if (alertCondition.getBacklog() > 0 && alertCondition.getSearchHits() != null) {
                                     List<Message> backlog = Lists.newArrayList();
-                                    for (SearchHit searchHit : alertCondition.getSearchHits().getHits()) {
-                                        backlog.add(new Message(searchHit.getSource()));
+
+                                    for (ResultMessage searchHit : alertCondition.getSearchHits()) {
+                                        backlog.add(new Message(searchHit.message));
                                     }
-                                    sender.sendEmails(stream, result, backlog.subList(0, alertCondition.getBacklog()));
+
+                                    // Read as many messages as possible (max: backlog size) from backlog.
+                                    int readTo = alertCondition.getBacklog();
+                                    if(backlog.size() < readTo) {
+                                        readTo = backlog.size();
+                                    }
+                                    sender.sendEmails(stream, result, backlog.subList(0, readTo));
                                 } else {
                                     sender.sendEmails(stream, result);
                                 }

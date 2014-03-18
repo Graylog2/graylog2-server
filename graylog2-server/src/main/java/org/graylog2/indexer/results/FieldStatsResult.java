@@ -24,6 +24,8 @@ import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.facet.statistical.StatisticalFacet;
 
+import java.util.List;
+
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
@@ -37,7 +39,7 @@ public class FieldStatsResult extends IndexQueryResult {
     private final double max;
     private final double variance;
     private final double stdDeviation;
-    private SearchHits searchHits;
+    private List<ResultMessage> searchHits;
 
     public FieldStatsResult(StatisticalFacet f, String originalQuery, BytesReference builtQuery, TimeValue took) {
         super(originalQuery, builtQuery, took);
@@ -54,7 +56,7 @@ public class FieldStatsResult extends IndexQueryResult {
 
     public FieldStatsResult(StatisticalFacet facet, SearchHits searchHits, String query, BytesReference source, TimeValue took) {
         this(facet, query, source, took);
-        this.searchHits = searchHits;
+        this.searchHits = buildResults(searchHits);
     }
 
     public long getCount() {
@@ -89,7 +91,7 @@ public class FieldStatsResult extends IndexQueryResult {
         return stdDeviation;
     }
 
-    public SearchHits getSearchHits() {
+    public List<ResultMessage> getSearchHits() {
         return searchHits;
     }
 }

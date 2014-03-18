@@ -287,6 +287,11 @@ public class Searches {
             srb.addSort(sort.getField(), sort.asElastic());
         }
 
+        if (server.getConfiguration().isAllowHighlighting()) {
+            srb.setHighlighterRequireFieldMatch(false);
+            srb.addHighlightedField("*", 0, 0);
+        }
+
         return srb;
     }
 

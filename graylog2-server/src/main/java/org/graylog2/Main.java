@@ -54,7 +54,7 @@ import org.graylog2.inputs.raw.tcp.RawTCPInput;
 import org.graylog2.inputs.raw.udp.RawUDPInput;
 import org.graylog2.inputs.syslog.tcp.SyslogTCPInput;
 import org.graylog2.inputs.syslog.udp.SyslogUDPInput;
-import org.graylog2.lifecycles.Lifecycle;
+import org.graylog2.plugin.lifecycles.Lifecycle;
 import org.graylog2.notifications.Notification;
 import org.graylog2.outputs.ElasticSearchOutput;
 import org.graylog2.plugin.Tools;

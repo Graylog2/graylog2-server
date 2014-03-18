@@ -78,6 +78,7 @@ public class SystemResource extends RestResource {
         result.put("is_processing", core.isProcessing());
         result.put("hostname", Tools.getLocalCanonicalHostname());
         result.put("lifecycle", core.getLifecycle().getName().toLowerCase());
+        result.put("lb_status", core.getLifecycle().getLoadbalancerStatus().toString().toLowerCase());
 
         return json(result);
     }
