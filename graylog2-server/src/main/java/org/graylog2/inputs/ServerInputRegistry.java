@@ -97,4 +97,8 @@ public class ServerInputRegistry extends InputRegistry {
     @Override
     protected void finishedTermination(InputState state) {
     }
+
+    @Override
+    protected void finishedStop(InputState inputState) {
+    }
 }

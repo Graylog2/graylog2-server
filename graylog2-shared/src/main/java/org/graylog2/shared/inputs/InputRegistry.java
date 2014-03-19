@@ -76,7 +76,7 @@ public abstract class InputRegistry {
         return classLoaders.get(type);
     }
 
-    public String launch(final MessageInput input, String id) {
+    public InputState launch(final MessageInput input, String id) {
         return launch(input, id, false);
     }
 
@@ -84,7 +84,7 @@ public abstract class InputRegistry {
 
     protected abstract void finishedTermination(InputState state);
 
-    public String launch(final MessageInput input, String id, boolean register) {
+    public InputState launch(final MessageInput input, String id, boolean register) {
         final InputState inputState = new InputState(input, id);
         inputStates.add(inputState);
 
@@ -108,7 +108,7 @@ public abstract class InputRegistry {
             }
         });
 
-        return inputState.getId();
+        return inputState;
     }
 
     protected void handleLaunchException(Throwable e, MessageInput input, InputState inputState) {
@@ -144,7 +144,7 @@ public abstract class InputRegistry {
         return causeMsg.toString();
     }
 
-    public String launch(final MessageInput input) {
+    public InputState launch(final MessageInput input) {
         return launch(input, UUID.randomUUID().toString());
     }
 
@@ -195,7 +195,7 @@ public abstract class InputRegistry {
         inputStates.remove(thisInputState);
     }
 
-    public String launchPersisted(MessageInput input) {
+    public InputState launchPersisted(MessageInput input) {
         try {
             input.checkConfiguration();
         } catch (ConfigurationException e) {
@@ -215,18 +215,30 @@ public abstract class InputRegistry {
     }
 
     public InputState terminate(MessageInput input) {
-        InputState inputState = getRunningInputState(input.getId());
+        InputState inputState = stop(input);
 
-        if (inputState == null)
-            return null;
-
-        input.stop();
-        removeFromRunning(input);
-        inputState.setState(InputState.InputStateType.TERMINATED);
-        finishedTermination(inputState);
+        if (inputState != null) {
+            inputState.setState(InputState.InputStateType.TERMINATED);
+            finishedTermination(inputState);
+        }
 
         return inputState;
     }
+
+    public InputState stop(MessageInput input) {
+        InputState inputState = getRunningInputState(input.getId());
+
+        if (inputState != null) {
+            input.stop();
+            removeFromRunning(input);
+            inputState.setState(InputState.InputStateType.STOPPED);
+            finishedStop(inputState);
+        }
+
+        return inputState;
+    }
+
+    protected abstract void finishedStop(InputState inputState);
 
     public MessageInput getRunningInput(String inputId) {
         for (InputState inputState : inputStates) {

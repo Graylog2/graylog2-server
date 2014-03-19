@@ -186,7 +186,7 @@ public class RadioInputRegistry extends InputRegistry {
     }
 
     @Override
-    public String launch(MessageInput input, String id, boolean register) {
+    public InputState launch(MessageInput input, String id, boolean register) {
         if (register) {
             try {
                 final RegisterInputResponse response = registerInCluster(input);
@@ -198,5 +198,9 @@ public class RadioInputRegistry extends InputRegistry {
             }
         }
         return super.launch(input, id, register);
+    }
+
+    @Override
+    protected void finishedStop(InputState inputState) {
     }
 }

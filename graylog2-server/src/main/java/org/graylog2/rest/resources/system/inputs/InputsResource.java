@@ -273,6 +273,56 @@ public class InputsResource extends RestResource {
     }
 
     @GET @Timed
+    @Path("/{inputId}/stop")
+    @ApiOperation(value = "Stop existing input on this node")
+    @Produces(MediaType.APPLICATION_JSON)
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "No such input on this node.")
+    })
+    public Response stop(@ApiParam(title = "inputId", required = true) @PathParam("inputId") String inputId) {
+        MessageInput input = null;
+        try {
+            input = ServerInputRegistry.getMessageInput(Input.findForThisNode(core, inputId), core);
+        } catch (NoSuchInputTypeException e) {
+            LOG.info("Cannot launch input. Input not found.");
+            throw new WebApplicationException(404);
+        } catch (ConfigurationException e) {
+            LOG.info("Cannot launch input. Configuration is invalid.");
+            throw new WebApplicationException(404);
+        }
+
+        if (input == null) {
+            LOG.info("Cannot launch input. Input not found.");
+            throw new WebApplicationException(404);
+        }
+
+        String msg = "Stopping input [" + input.getName()+ "]. Reason: REST request.";
+        LOG.info(msg);
+        core.getActivityWriter().write(new Activity(msg, InputsResource.class));
+
+        core.inputs().stop(input);
+
+        String msg2 = "Stopped input [" + input.getName()+ "]. Reason: REST request.";
+        LOG.info(msg2);
+        core.getActivityWriter().write(new Activity(msg2, InputsResource.class));
+
+        return Response.status(Response.Status.ACCEPTED).build();
+    }
+
+    @GET @Timed
+    @Path("/{inputId}/restart")
+    @ApiOperation(value = "Restart existing input on this node")
+    @Produces(MediaType.APPLICATION_JSON)
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "No such input on this node.")
+    })
+    public Response restart(@ApiParam(title = "inputId", required = true) @PathParam("inputId") String inputId) {
+        stop(inputId);
+        launchExisting(inputId);
+        return Response.status(Response.Status.ACCEPTED).build();
+    }
+
+    @GET @Timed
     @Path("/types/{inputType}")
     @ApiOperation(value = "Get information about a single input type")
     @Produces(MediaType.APPLICATION_JSON)
