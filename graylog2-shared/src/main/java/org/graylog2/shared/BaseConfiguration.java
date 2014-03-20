@@ -1,3 +1,22 @@
+/*
+ * Copyright 2013-2014 TORCH GmbH
+ *
+ * This file is part of Graylog2.
+ *
+ * Graylog2 is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Graylog2 is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package org.graylog2.shared;
 
 import com.github.joschi.jadconfig.Parameter;
@@ -12,7 +31,7 @@ import java.net.URI;
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
  */
-public class BaseConfiguration {
+public abstract class BaseConfiguration {
     private static final Logger LOG = LoggerFactory.getLogger(BaseConfiguration.class);
 
     @Parameter(value = "rest_transport_uri", required = false)
@@ -61,4 +80,6 @@ public class BaseConfiguration {
                 + " Falling back to default: BlockingWaitStrategy.");
         return new BlockingWaitStrategy();
     }
+
+    public abstract String getNodeIdFile();
 }

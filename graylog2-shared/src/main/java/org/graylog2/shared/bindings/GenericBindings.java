@@ -13,7 +13,6 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -26,7 +25,6 @@ import com.google.inject.assistedinject.FactoryModuleBuilder;
 import org.graylog2.shared.buffers.ProcessBuffer;
 import org.graylog2.shared.filters.FilterRegistry;
 import org.graylog2.shared.stats.ThroughputStats;
-import org.graylog2.shared.filters.FilterRegistry;
 
 /**
  * @author Dennis Oelkers <dennis@torch.sh>

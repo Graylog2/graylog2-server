@@ -16,6 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package org.graylog2.rest.resources.dashboards;
 
 import com.beust.jcommander.internal.Lists;
@@ -119,7 +120,7 @@ public class DashboardsResource extends RestResource {
         restrictToMaster();
         List<Map<String, Object>> dashboards = Lists.newArrayList();
 
-        for (Dashboard dashboard : dashboardService.all()) {
+        for (Dashboard dashboard : dashboardService.all(core)) {
             if (isPermitted(RestPermissions.DASHBOARDS_READ, dashboard.getId())) {
                 dashboards.add(dashboard.asMap());
             }

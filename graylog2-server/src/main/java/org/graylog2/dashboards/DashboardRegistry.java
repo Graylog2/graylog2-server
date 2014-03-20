@@ -16,9 +16,11 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package org.graylog2.dashboards;
 
 import com.google.common.collect.Maps;
+import org.graylog2.Core;
 
 import java.util.Map;
 
@@ -34,8 +36,8 @@ public class DashboardRegistry {
         this.dashboardService = dashboardService;
     }
 
-    public void loadPersisted() {
-        for (Dashboard dashboard : dashboardService.all()) {
+    public void loadPersisted(Core core) {
+        for (Dashboard dashboard : dashboardService.all(core)) {
             dashboards.put(dashboard.getId(), dashboard);
         }
     }

@@ -75,7 +75,6 @@ import org.graylog2.plugin.lifecycles.Lifecycle;
 import org.graylog2.plugin.outputs.MessageOutput;
 import org.graylog2.plugin.rest.AnyExceptionClassMapper;
 import org.graylog2.plugin.rest.JacksonPropertyExceptionMapper;
-import org.graylog2.plugin.system.NodeId;
 import org.graylog2.plugins.PluginLoader;
 import org.graylog2.rest.CORSFilter;
 import org.graylog2.rest.ObjectMapperProvider;
@@ -91,6 +90,7 @@ import org.graylog2.security.ldap.LdapSettingsService;
 import org.graylog2.security.ldap.LdapSettingsServiceImpl;
 import org.graylog2.security.realm.LdapUserAuthenticator;
 import org.graylog2.shared.ProcessingHost;
+import org.graylog2.shared.ServerStatus;
 import org.graylog2.shared.buffers.ProcessBuffer;
 import org.graylog2.shared.buffers.processors.ProcessBufferProcessor;
 import org.graylog2.shared.filters.FilterRegistry;
@@ -117,7 +117,6 @@ import org.jboss.netty.handler.codec.http.HttpRequestDecoder;
 import org.jboss.netty.handler.codec.http.HttpResponseEncoder;
 import org.jboss.netty.handler.stream.ChunkedWriteHandler;
 import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -142,14 +141,14 @@ public class Core implements GraylogServer, InputHost, ProcessingHost {
 
     private static final Logger LOG = LoggerFactory.getLogger(Core.class);
 
-    private Lifecycle lifecycle = Lifecycle.UNINITIALIZED;
-
     @Inject
     private MongoConnection mongoConnection;
     @Inject
     private MongoBridge mongoBridge;
     @Inject
     private Configuration configuration;
+    @Inject
+    private ServerStatus serverStatus;
     private RulesEngineImpl rulesEngine;
     private GELFChunkManager gelfChunkManager;
 
@@ -192,19 +191,17 @@ public class Core implements GraylogServer, InputHost, ProcessingHost {
     
     private Deflector deflector;
     
+    @Inject
     private ActivityWriter activityWriter;
 
     private SystemJobManager systemJobManager;
 
-    private String nodeId;
-    
     private boolean localMode = false;
     private boolean statsMode = false;
 
     private AtomicBoolean isProcessing = new AtomicBoolean(true);
     private AtomicBoolean processingPauseLocked = new AtomicBoolean(false);
     
-    private DateTime startedAt;
     @Inject
     private MetricRegistry metricRegistry;
     private LdapUserAuthenticator ldapUserAuthenticator;
@@ -224,11 +221,6 @@ public class Core implements GraylogServer, InputHost, ProcessingHost {
     private ThroughputStats throughputStats;
 
     public void initialize() {
-    	startedAt = new DateTime(DateTimeZone.UTC);
-
-        NodeId id = new NodeId(configuration.getNodeIdFile());
-        this.nodeId = id.readOrGenerate();
-
         if (configuration.isMetricsCollectionEnabled()) {
             metricsReporter = MongoDbMetricsReporter.forRegistry(this, metricRegistry).build();
             metricsReporter.start(1, TimeUnit.SECONDS);
@@ -255,10 +247,8 @@ public class Core implements GraylogServer, InputHost, ProcessingHost {
         if (isMaster()) {
             final DashboardService dashboardService = new DashboardServiceImpl(getMongoConnection());
             dashboards = new DashboardRegistry(dashboardService);
-            dashboards.loadPersisted();
+            dashboards.loadPersisted(this);
         }
-
-        activityWriter = new ActivityWriter(this);
 
         systemJobManager = new SystemJobManager(this);
 
@@ -616,7 +606,7 @@ public class Core implements GraylogServer, InputHost, ProcessingHost {
     
     @Override
     public String getNodeId() {
-        return this.nodeId;
+        return serverStatus.getNodeId().toString();
     }
     
     @Override
@@ -649,7 +639,7 @@ public class Core implements GraylogServer, InputHost, ProcessingHost {
     }
     
     public DateTime getStartedAt() {
-    	return startedAt;
+    	return serverStatus.getStartedAt();
     }
 
     public void pauseMessageProcessing(boolean locked) {
@@ -743,11 +733,11 @@ public class Core implements GraylogServer, InputHost, ProcessingHost {
     }
 
     public Lifecycle getLifecycle() {
-        return lifecycle;
+        return serverStatus.getLifecycle();
     }
 
     public void setLifecycle(Lifecycle lifecycle) {
-        this.lifecycle = lifecycle;
+        serverStatus.setLifecycle(lifecycle);
     }
 
 }
