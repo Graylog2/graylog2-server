@@ -1,5 +1,5 @@
-/**
- * Copyright 2013 Lennart Koopmann <lennart@torch.sh>
+/*
+ * Copyright 2013-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -15,7 +15,6 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 package org.graylog2.rest.resources.system;
 
@@ -31,9 +30,11 @@ import org.graylog2.rest.documentation.annotations.ApiParam;
 import org.graylog2.rest.resources.RestResource;
 import org.graylog2.security.RestPermissions;
 import org.graylog2.system.activities.SystemMessage;
+import org.graylog2.system.activities.SystemMessageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -52,6 +53,9 @@ public class    MessagesResource extends RestResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(MessagesResource.class);
 
+    @Inject
+    private SystemMessageService systemMessageService;
+
     @GET @Timed
     @ApiOperation(value = "Get internal Graylog2 system messages")
     @RequiresPermissions(RestPermissions.SYSTEMMESSAGES_READ)
@@ -59,7 +63,7 @@ public class    MessagesResource extends RestResource {
     public String all(@ApiParam(title = "page", description = "Page", required = false) @QueryParam("page") int page) {
         List<Map<String, Object>> messages = Lists.newArrayList();
 
-        for (SystemMessage sm : SystemMessage.all(core, page(page))) {
+        for (SystemMessage sm : systemMessageService.all(page(page))) {
             Map<String, Object> message = Maps.newHashMap();
             message.put("caller", sm.getCaller());
             message.put("content", sm.getContent());
@@ -71,7 +75,7 @@ public class    MessagesResource extends RestResource {
 
         Map<String, Object> result = Maps.newHashMap();
         result.put("messages", messages);
-        result.put("total", SystemMessage.totalCount(core, SystemMessage.COLLECTION));
+        result.put("total", systemMessageService.totalCount());
 
         return json(result);
     }

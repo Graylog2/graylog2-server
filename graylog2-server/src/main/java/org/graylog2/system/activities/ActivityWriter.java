@@ -1,5 +1,5 @@
-/**
- * Copyright 2012 Lennart Koopmann <lennart@socketfeed.com>
+/*
+ * Copyright 2013-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -15,7 +15,6 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 package org.graylog2.system.activities;
 
@@ -35,13 +34,14 @@ public class ActivityWriter {
 
     private static final Logger LOG = LoggerFactory.getLogger(ActivityWriter.class);
 
-    Core server;
+    private final Core server;
 
     public ActivityWriter(Core server) {
         this.server = server;
     }
     
     public void write(Activity activity) {
+        final SystemMessageService systemMessageService = new SystemMessageServiceImpl(server.getMongoConnection());
         try {
             Map<String, Object> entry = Maps.newHashMap();
             entry.put("timestamp", Tools.iso8601());
@@ -49,8 +49,8 @@ public class ActivityWriter {
             entry.put("caller", activity.getCaller().getCanonicalName());
             entry.put("node_id", server.getNodeId());
 
-            SystemMessage sm = new SystemMessage(entry, server);
-            sm.save();
+            SystemMessageImpl sm = new SystemMessageImpl(entry);
+            systemMessageService.save(sm);
         } catch (ValidationException e) {
             LOG.error("Could not write activity.", e);
         }

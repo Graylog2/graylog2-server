@@ -1,5 +1,5 @@
-/**
- * Copyright 2014 Lennart Koopmann <lennart@torch.sh>
+/*
+ * Copyright 2013-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -15,7 +15,6 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 package org.graylog2.alerts;
 
@@ -25,11 +24,16 @@ import org.apache.commons.mail.EmailException;
 import org.apache.commons.mail.SimpleEmail;
 import org.graylog2.Configuration;
 import org.graylog2.Core;
+import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.alarms.transports.TransportConfigurationException;
-import org.graylog2.streams.StreamImpl;
+import org.graylog2.plugin.streams.Stream;
+import org.graylog2.streams.StreamRuleService;
+import org.graylog2.streams.StreamRuleServiceImpl;
 import org.graylog2.users.User;
+import org.graylog2.users.UserService;
+import org.graylog2.users.UserServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,38 +48,44 @@ public class AlertSender {
     private static final Logger LOG = LoggerFactory.getLogger(AlertSender.class);
 
     private final Core core;
+    private final StreamRuleService streamRuleService;
+    private final Configuration configuration;
+    private final UserService userService;
 
     public AlertSender(Core core) {
         this.core = core;
+        this.streamRuleService = new StreamRuleServiceImpl(core.getMongoConnection());
+        this.configuration = core.getConfiguration();
+        this.userService = new UserServiceImpl(core.getMongoConnection(), core.getConfiguration());
     }
 
-    public void sendEmails(StreamImpl stream, AlertCondition.CheckResult checkResult) throws TransportConfigurationException, EmailException {
+    public void sendEmails(Stream stream, AlertCondition.CheckResult checkResult) throws TransportConfigurationException, EmailException {
         sendEmails(stream, checkResult, null);
     }
 
-    private void sendEmail(String emailAddress, StreamImpl stream, AlertCondition.CheckResult checkResult, List<Message> backlog) throws TransportConfigurationException, EmailException {
-        if(!core.getConfiguration().isEmailTransportEnabled()) {
+    private void sendEmail(String emailAddress, Stream stream, AlertCondition.CheckResult checkResult, List<Message> backlog) throws TransportConfigurationException, EmailException {
+        if(!configuration.isEmailTransportEnabled()) {
             throw new TransportConfigurationException();
         }
 
         Email email = new SimpleEmail();
-        email.setHostName(core.getConfiguration().getEmailTransportHostname());
-        email.setSmtpPort(core.getConfiguration().getEmailTransportPort());
-        if (core.getConfiguration().isEmailTransportUseSsl()) {
-            email.setSslSmtpPort(Integer.toString(core.getConfiguration().getEmailTransportPort()));
+        email.setHostName(configuration.getEmailTransportHostname());
+        email.setSmtpPort(configuration.getEmailTransportPort());
+        if (configuration.isEmailTransportUseSsl()) {
+            email.setSslSmtpPort(Integer.toString(configuration.getEmailTransportPort()));
         }
 
         if(core.getConfiguration().isEmailTransportUseAuth()) {
             email.setAuthenticator(new DefaultAuthenticator(
-                    core.getConfiguration().getEmailTransportUsername(),
-                    core.getConfiguration().getEmailTransportPassword()
+                    configuration.getEmailTransportUsername(),
+                    configuration.getEmailTransportPassword()
             ));
         }
 
-        email.setSSLOnConnect(core.getConfiguration().isEmailTransportUseSsl());
-        email.setStartTLSEnabled(core.getConfiguration().isEmailTransportUseTls());
-        email.setFrom(core.getConfiguration().getEmailTransportFromEmail());
-        email.setSubject(buildSubject(stream, checkResult, core.getConfiguration()));
+        email.setSSLOnConnect(configuration.isEmailTransportUseSsl());
+        email.setStartTLSEnabled(configuration.isEmailTransportUseTls());
+        email.setFrom(configuration.getEmailTransportFromEmail());
+        email.setSubject(buildSubject(stream, checkResult, configuration));
 
         StringBuilder body = new StringBuilder();
         body.append(buildBody(stream, checkResult));
@@ -88,7 +98,7 @@ public class AlertSender {
         email.send();
     }
 
-    private String buildSubject(StreamImpl stream, AlertCondition.CheckResult checkResult, Configuration config) {
+    private String buildSubject(Stream stream, AlertCondition.CheckResult checkResult, Configuration config) {
         StringBuilder sb = new StringBuilder();
 
         if (config.getEmailTransportSubjectPrefix() != null && !config.getEmailTransportSubjectPrefix().isEmpty()) {
@@ -100,7 +110,7 @@ public class AlertSender {
         return sb.toString();
     }
 
-    private String buildBody(StreamImpl stream, AlertCondition.CheckResult checkResult) {
+    private String buildBody(Stream stream, AlertCondition.CheckResult checkResult) {
         StringBuilder sb = new StringBuilder();
 
         sb.append(checkResult.getResultDescription());
@@ -110,7 +120,11 @@ public class AlertSender {
         sb.append("Date: ").append(Tools.iso8601().toString()).append("\n");
         sb.append("Stream ID: ").append(stream.getId()).append("\n");
         sb.append("Stream title: ").append(stream.getTitle()).append("\n");
-        sb.append("Stream rules: ").append(stream.getStreamRules()).append("\n");
+        try {
+            sb.append("Stream rules: ").append(streamRuleService.loadForStream(stream)).append("\n");
+        } catch (NotFoundException e) {
+            LOG.error("Unable to find stream rules for stream: " + stream.getId(), e);
+        }
         sb.append("Alert triggered at: ").append(checkResult.getTriggeredAt()).append("\n");
         sb.append("Triggered condition: ").append(checkResult.getTriggeredCondition()).append("\n");
         sb.append("##########");
@@ -141,8 +155,8 @@ public class AlertSender {
     }
 
 
-    public void sendEmails(StreamImpl stream, AlertCondition.CheckResult checkResult, List<Message> backlog) throws TransportConfigurationException, EmailException {
-        if(!core.getConfiguration().isEmailTransportEnabled()) {
+    public void sendEmails(Stream stream, AlertCondition.CheckResult checkResult, List<Message> backlog) throws TransportConfigurationException, EmailException {
+        if(!configuration.isEmailTransportEnabled()) {
             throw new TransportConfigurationException();
         }
 
@@ -153,7 +167,7 @@ public class AlertSender {
         // Send emails to subscribed users.
         if(stream.getAlertReceivers().get("users") != null) {
             for (String username : stream.getAlertReceivers().get("users")) {
-                User user = User.load(username, core);
+                User user = userService.load(username);
 
                 if(user != null && user.getEmail() != null && !user.getEmail().isEmpty()) {
                     sendEmail(user.getEmail(), stream, checkResult, backlog);

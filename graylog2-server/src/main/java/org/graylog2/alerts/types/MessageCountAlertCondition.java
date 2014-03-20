@@ -1,5 +1,5 @@
-/**
- * Copyright 2013 Lennart Koopmann <lennart@torch.sh>
+/*
+ * Copyright 2013-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -15,14 +15,12 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 package org.graylog2.alerts.types;
 
-import org.elasticsearch.search.SearchHits;
-import org.graylog2.Core;
 import org.graylog2.alerts.AlertCondition;
 import org.graylog2.indexer.IndexHelper;
+import org.graylog2.indexer.Indexer;
 import org.graylog2.indexer.results.CountResult;
 import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.indexer.results.SearchResult;
@@ -55,8 +53,8 @@ public class MessageCountAlertCondition extends AlertCondition {
     private final int threshold;
     private List<ResultMessage> searchHits = null;
 
-    public MessageCountAlertCondition(Core core, Stream stream, String id, DateTime createdAt, String creatorUserId, Map<String, Object> parameters) {
-        super(core, stream, id, Type.MESSAGE_COUNT, createdAt, creatorUserId, parameters);
+    public MessageCountAlertCondition(Stream stream, String id, DateTime createdAt, String creatorUserId, Map<String, Object> parameters) {
+        super(stream, id, Type.MESSAGE_COUNT, createdAt, creatorUserId, parameters);
 
         this.grace = (Integer) parameters.get("grace");
         this.time = (Integer) parameters.get("time");
@@ -75,11 +73,11 @@ public class MessageCountAlertCondition extends AlertCondition {
     }
 
     @Override
-    protected CheckResult runCheck() {
+    protected CheckResult runCheck(Indexer indexer) {
         this.searchHits = null;
         try {
             String filter = "streams:"+stream.getId();
-            CountResult result = core.getIndexer().searches().count("*", new RelativeRange(time * 60), filter);
+            CountResult result = indexer.searches().count("*", new RelativeRange(time * 60), filter);
             long count = result.getCount();
 
             LOG.debug("Alert check <{}> result: [{}]", id, count);
@@ -97,7 +95,7 @@ public class MessageCountAlertCondition extends AlertCondition {
             if (triggered) {
                 Integer backlogSize = getBacklog();
                 if (backlogSize != null && backlogSize > 0) {
-                    SearchResult backlogResult = core.getIndexer().searches().search("*", filter, new RelativeRange(time * 60), 0, backlogSize, new Sorting("timestamp", Sorting.Direction.DESC));
+                    SearchResult backlogResult = indexer.searches().search("*", filter, new RelativeRange(time * 60), 0, backlogSize, new Sorting("timestamp", Sorting.Direction.DESC));
                     this.searchHits = backlogResult.getResults();
                 }
 

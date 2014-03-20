@@ -13,27 +13,38 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package org.graylog2.plugin.streams;
 
+import org.graylog2.plugin.database.Persisted;
+
 import java.util.List;
+import java.util.Map;
 
 /**
  *
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
-public interface Stream {
+public interface Stream extends Persisted {
 
-    public List<StreamRule> getStreamRules();
-    
     public String getId();
 
     public String getTitle();
+    public String getDescription();
+    public Boolean getDisabled();
 
-    @Override
+    public void setTitle(String title);
+    public void setDescription(String description);
+    public void setDisabled(Boolean disabled);
+
+    public Boolean isPaused();
+
+    Map<String, List<String>> getAlertReceivers();
+
+    public Map<String, Object> asMap(List<StreamRule> streamRules);
+
     public String toString();
 }

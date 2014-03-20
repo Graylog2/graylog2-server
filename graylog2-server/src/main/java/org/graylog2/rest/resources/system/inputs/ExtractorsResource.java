@@ -1,5 +1,5 @@
-/**
- * Copyright 2013 Lennart Koopmann <lennart@torch.sh>
+/*
+ * Copyright 2013-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -15,7 +15,6 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 package org.graylog2.rest.resources.system.inputs;
 
@@ -26,6 +25,7 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.ConfigurationException;
 import org.graylog2.database.ValidationException;
 import org.graylog2.inputs.Input;
+import org.graylog2.inputs.InputService;
 import org.graylog2.inputs.converters.ConverterFactory;
 import org.graylog2.inputs.extractors.ExtractorFactory;
 import org.graylog2.plugin.inputs.Converter;
@@ -39,6 +39,7 @@ import org.graylog2.system.activities.Activity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -55,6 +56,9 @@ import java.util.Map;
 public class ExtractorsResource extends RestResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(ExtractorsResource.class);
+
+    @Inject
+    private InputService inputService;
 
     @POST @Timed
     @Consumes(MediaType.APPLICATION_JSON)
@@ -124,9 +128,9 @@ public class ExtractorsResource extends RestResource {
 
         input.addExtractor(id, extractor);
 
-        Input mongoInput = Input.find(core, input.getPersistId());
+        Input mongoInput = inputService.find(input.getPersistId());
         try {
-            mongoInput.addExtractor(extractor);
+            inputService.addExtractor(mongoInput, extractor);
         } catch (ValidationException e) {
             LOG.error("Extractor persist validation failed.", e);
             throw new WebApplicationException(e, Response.Status.BAD_REQUEST);
@@ -210,8 +214,8 @@ public class ExtractorsResource extends RestResource {
         }
 
         // Remove from Mongo.
-        Input mongoInput = Input.find(core, input.getPersistId());
-        mongoInput.removeExtractor(extractorId);
+        Input mongoInput = inputService.find(input.getPersistId());
+        inputService.removeExtractor(mongoInput, extractorId);
 
         Extractor extractor = input.getExtractors().get(extractorId);
         input.getExtractors().remove(extractorId);

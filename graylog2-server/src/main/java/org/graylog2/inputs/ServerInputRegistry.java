@@ -1,10 +1,30 @@
+/*
+ * Copyright 2013-2014 TORCH GmbH
+ *
+ * This file is part of Graylog2.
+ *
+ * Graylog2 is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Graylog2 is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package org.graylog2.inputs;
 
 import com.google.common.collect.Lists;
-import com.mongodb.BasicDBObject;
-import org.bson.types.ObjectId;
 import org.graylog2.Core;
 import org.graylog2.notifications.Notification;
+import org.graylog2.notifications.NotificationImpl;
+import org.graylog2.notifications.NotificationService;
+import org.graylog2.notifications.NotificationServiceImpl;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationException;
 import org.graylog2.plugin.inputs.Extractor;
@@ -19,9 +39,13 @@ import java.util.Map;
 
 public class ServerInputRegistry extends InputRegistry {
     protected final Core _core;
+    protected final InputService inputService;
+    protected final NotificationService notificationService;
     public ServerInputRegistry(Core core) {
         super(core);
         this._core = core;
+        this.inputService = new InputServiceImpl(core.getMongoConnection());
+        this.notificationService = new NotificationServiceImpl(core.getMongoConnection());
     }
 
     public static MessageInput getMessageInput(Input io, Core core) throws NoSuchInputTypeException, ConfigurationException {
@@ -54,7 +78,7 @@ public class ServerInputRegistry extends InputRegistry {
     protected List<MessageInput> getAllPersisted() {
         List<MessageInput> result = Lists.newArrayList();
 
-        for (Input io : Input.allOfThisNode(_core)) {
+        for (Input io : inputService.allOfThisNode(_core)) {
             MessageInput input = null;
             try {
                 input = getMessageInput(io, _core);
@@ -69,27 +93,27 @@ public class ServerInputRegistry extends InputRegistry {
         return result;
     }
 
-    public void cleanInput(MessageInput input) {
-        // Remove in Mongo.
-        Input.destroy(new BasicDBObject("_id", new ObjectId(input.getPersistId())), _core, Input.COLLECTION);
+    public void cleanInput(MessageInput messageInput) {
+        Input input = inputService.find(messageInput.getPersistId());
+        inputService.destroy(input);
     }
 
     @Override
     protected void finishedLaunch(InputState state) {
         switch (state.getState()) {
             case RUNNING:
-                Notification.fixed(_core, Notification.Type.NO_INPUT_RUNNING);
+                notificationService.fixed(Notification.Type.NO_INPUT_RUNNING);
                 String msg = "Completed starting [" + state.getMessageInput().getClass().getCanonicalName() + "] input with ID <" + state.getMessageInput().getId() + ">";
                 _core.getActivityWriter().write(new Activity(msg, InputRegistry.class));
                 break;
             case FAILED:
                 _core.getActivityWriter().write(new Activity(state.getDetailedMessage(), InputRegistry.class));
-                Notification notification = Notification.buildNow(_core);
-                notification.addType(Notification.Type.INPUT_FAILED_TO_START).addSeverity(Notification.Severity.NORMAL);
-                notification.addThisNode();
+                Notification notification = notificationService.buildNow();
+                notification.addType(NotificationImpl.Type.INPUT_FAILED_TO_START).addSeverity(NotificationImpl.Severity.NORMAL);
+                notification.addThisNode(_core);
                 notification.addDetail("input_id", state.getMessageInput().getId());
                 notification.addDetail("reason", state.getDetailedMessage());
-                notification.publishIfFirst();
+                notificationService.publishIfFirst(notification);
                 break;
         }
     }

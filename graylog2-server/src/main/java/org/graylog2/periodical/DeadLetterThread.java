@@ -1,5 +1,5 @@
-/**
- * Copyright 2014 Lennart Koopmann <lennart@torch.sh>
+/*
+ * Copyright 2013-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -15,7 +15,6 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 package org.graylog2.periodical;
 
@@ -25,11 +24,11 @@ import com.google.common.collect.Maps;
 import com.mongodb.BasicDBObject;
 import org.elasticsearch.action.bulk.BulkItemResponse;
 import org.graylog2.Core;
-import org.graylog2.indexer.DeadLetter;
-import org.graylog2.indexer.IndexFailure;
-import org.graylog2.indexer.PersistedDeadLetter;
+import org.graylog2.database.CollectionName;
+import org.graylog2.indexer.*;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
+import org.graylog2.plugin.database.Persisted;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,6 +44,9 @@ public class DeadLetterThread extends Periodical {
 
     @Override
     public void run() {
+        final PersistedDeadLetterService persistedDeadLetterService = new PersistedDeadLetterServiceImpl(core.getMongoConnection());
+        final IndexFailureService indexFailureService = new IndexFailureServiceImpl(core.getMongoConnection());
+
         verifyIndices();
 
         // Poll queue forever.
@@ -67,7 +69,8 @@ public class DeadLetterThread extends Periodical {
                         doc.put("timestamp", Tools.iso8601());
                         doc.put("message", message.toElasticSearchObject());
 
-                        new PersistedDeadLetter(doc, core).saveWithoutValidation();
+                        PersistedDeadLetter persistedDeadLetter = new PersistedDeadLetterImpl(doc);
+                        persistedDeadLetterService.saveWithoutValidation(persistedDeadLetter);
                         written = true;
                     } catch(Exception e) {
                         LOG.error("Could not write message to dead letter queue.", e);
@@ -86,7 +89,8 @@ public class DeadLetterThread extends Periodical {
                     doc.put("timestamp", item.getTimestamp());
                     doc.put("written", written);
 
-                    new IndexFailure(doc, core).saveWithoutValidation();
+                    IndexFailure indexFailure = new IndexFailureImpl(doc);
+                    indexFailureService.saveWithoutValidation(indexFailure);
                 } catch(Exception e) {
                     LOG.error("Could not persist index failure.", e);
                     continue;
@@ -95,12 +99,17 @@ public class DeadLetterThread extends Periodical {
         }
     }
 
+    // TODO: Move this to the related persisted service classes
     private void verifyIndices() {
-        core.getMongoConnection().getDatabase().getCollection(IndexFailure.COLLECTION).ensureIndex(new BasicDBObject("timestamp", 1));
-        core.getMongoConnection().getDatabase().getCollection(IndexFailure.COLLECTION).ensureIndex(new BasicDBObject("letter_id", 1));
+        core.getMongoConnection().getDatabase().getCollection(getCollectionName(IndexFailureImpl.class)).ensureIndex(new BasicDBObject("timestamp", 1));
+        core.getMongoConnection().getDatabase().getCollection(getCollectionName(IndexFailureImpl.class)).ensureIndex(new BasicDBObject("letter_id", 1));
 
-        core.getMongoConnection().getDatabase().getCollection(PersistedDeadLetter.COLLECTION).ensureIndex(new BasicDBObject("timestamp", 1));
-        core.getMongoConnection().getDatabase().getCollection(PersistedDeadLetter.COLLECTION).ensureIndex(new BasicDBObject("letter_id", 1));
+        core.getMongoConnection().getDatabase().getCollection(getCollectionName(PersistedDeadLetterImpl.class)).ensureIndex(new BasicDBObject("timestamp", 1));
+        core.getMongoConnection().getDatabase().getCollection(getCollectionName(PersistedDeadLetterImpl.class)).ensureIndex(new BasicDBObject("letter_id", 1));
+    }
+
+    private String getCollectionName(Class<? extends Persisted> modelClass) {
+        return modelClass.getAnnotation(CollectionName.class).value();
     }
 
     @Override

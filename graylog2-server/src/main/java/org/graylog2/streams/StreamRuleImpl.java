@@ -1,5 +1,5 @@
-/**
- * Copyright 2011 Lennart Koopmann <lennart@socketfeed.com>
+/*
+ * Copyright 2013-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -15,28 +15,22 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 
 package org.graylog2.streams;
 
 import com.google.common.collect.Maps;
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBObject;
 import org.bson.types.ObjectId;
-import org.graylog2.Core;
-import org.graylog2.database.NotFoundException;
-import org.graylog2.database.Persisted;
+import org.graylog2.database.CollectionName;
+import org.graylog2.database.PersistedImpl;
 import org.graylog2.database.validators.FilledStringValidator;
 import org.graylog2.database.validators.IntegerValidator;
 import org.graylog2.database.validators.ObjectIdValidator;
-import org.graylog2.database.validators.Validator;
+import org.graylog2.plugin.database.validators.Validator;
 import org.graylog2.plugin.streams.StreamRule;
 import org.graylog2.plugin.streams.StreamRuleType;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -44,42 +38,15 @@ import java.util.Map;
  *
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
-public class StreamRuleImpl extends Persisted implements StreamRule {
+@CollectionName("streamrules")
+public class StreamRuleImpl extends PersistedImpl implements StreamRule {
 
-    private static final String COLLECTION = "streamrules";
-
-    public StreamRuleImpl(Map<String, Object> fields, Core core) {
-        super(core, fields);
+    public StreamRuleImpl(Map<String, Object> fields) {
+        super(fields);
     }
 
-    protected StreamRuleImpl(ObjectId id, Map<String, Object> fields, Core core) {
-        super(core, id, fields);
-    }
-
-    public static StreamRuleImpl load(ObjectId id, Core core) throws NotFoundException {
-        BasicDBObject o = (BasicDBObject) get(id, core, COLLECTION);
-
-        if (o == null) {
-            throw new NotFoundException();
-        }
-
-        return new StreamRuleImpl((ObjectId) o.get("_id"), o.toMap(), core);
-    }
-
-    public static List<StreamRule> findAllForStream(String streamId, Core core) throws NotFoundException {
-        ObjectId id = new ObjectId(streamId);
-        final List<StreamRule> streamRules = new ArrayList<StreamRule>();
-        final List<DBObject> respStreamRules = StreamRuleImpl.query(
-                new BasicDBObject("stream_id", id),
-                core,
-                COLLECTION
-        );
-
-        for (DBObject streamRule : respStreamRules) {
-            streamRules.add(load((ObjectId)streamRule.get("_id"), core));
-        }
-
-        return streamRules;
+    protected StreamRuleImpl(ObjectId id, Map<String, Object> fields) {
+        super(id, fields);
     }
 
     /**
@@ -142,12 +109,7 @@ public class StreamRuleImpl extends Persisted implements StreamRule {
         return StreamImpl.load(getStreamId(), core);
     }*/
 
-    @Override
-    public String getCollectionName() {
-        return COLLECTION;
-    }
-
-    protected Map<String, Validator> getValidations() {
+    public Map<String, Validator> getValidations() {
         return new HashMap<String, Validator>() {{
             put("type", new IntegerValidator());
             put("value", new FilledStringValidator());
@@ -157,7 +119,7 @@ public class StreamRuleImpl extends Persisted implements StreamRule {
     }
 
     @Override
-    protected Map<String, Validator> getEmbeddedValidations(String key) {
+    public Map<String, Validator> getEmbeddedValidations(String key) {
         return Maps.newHashMap();
     }
 

@@ -1,5 +1,5 @@
-/**
- * Copyright 2013 Kay Roepke <kay@torch.sh>
+/*
+ * Copyright 2013-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -15,7 +15,6 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 package org.graylog2.security.realm;
 
@@ -24,6 +23,9 @@ import org.apache.shiro.realm.AuthenticatingRealm;
 import org.apache.shiro.util.ByteSource;
 import org.graylog2.Core;
 import org.graylog2.users.User;
+import org.graylog2.users.UserImpl;
+import org.graylog2.users.UserService;
+import org.graylog2.users.UserServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,9 +35,11 @@ import org.slf4j.LoggerFactory;
 public class PasswordAuthenticator extends AuthenticatingRealm {
     private static final Logger log = LoggerFactory.getLogger(PasswordAuthenticator.class);
     private final Core core;
+    private final UserService userService;
 
     public PasswordAuthenticator(Core core) {
         this.core = core;
+        this.userService = new UserServiceImpl(core.getMongoConnection(), core.getConfiguration());
     }
 
     @Override
@@ -43,8 +47,8 @@ public class PasswordAuthenticator extends AuthenticatingRealm {
         UsernamePasswordToken token = (UsernamePasswordToken) authToken;
         log.debug("Retrieving authc info for user {}", token.getUsername());
 
-        final User user = User.load(token.getUsername(), core);
-        if (user instanceof User.LocalAdminUser || user == null) {
+        final User user = userService.load(token.getUsername());
+        if (user instanceof UserImpl.LocalAdminUser || user == null) {
             // skip the local admin user here, it's ugly, but for auth that user is treated specially.
             return null;
         }

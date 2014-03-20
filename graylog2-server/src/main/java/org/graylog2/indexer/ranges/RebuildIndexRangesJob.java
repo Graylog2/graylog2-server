@@ -1,5 +1,5 @@
-/**
- * Copyright 2013 Lennart Koopmann <lennart@torch.sh>
+/*
+ * Copyright 2013-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -15,7 +15,6 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 package org.graylog2.indexer.ranges;
 
@@ -24,9 +23,9 @@ import com.google.common.base.Stopwatch;
 import com.google.common.collect.Maps;
 import org.elasticsearch.search.SearchHit;
 import org.graylog2.Core;
-import org.graylog2.system.activities.Activity;
 import org.graylog2.indexer.EmptyIndexException;
 import org.graylog2.plugin.Tools;
+import org.graylog2.system.activities.Activity;
 import org.graylog2.system.jobs.SystemJob;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,8 +47,11 @@ public class RebuildIndexRangesJob extends SystemJob {
     private int indicesToCalculate = 0;
     private int indicesCalculated = 0;
 
+    private final IndexRangeService indexRangeService;
+
     public RebuildIndexRangesJob(Core core) {
         this.core = core;
+        this.indexRangeService = new IndexRangeServiceImpl(core.getMongoConnection(), core.getActivityWriter());
     }
 
     @Override
@@ -142,9 +144,10 @@ public class RebuildIndexRangesJob extends SystemJob {
     }
 
     private void updateCollection(List<Map<String, Object>> ranges) {
-        IndexRange.destroyAll(core, IndexRange.COLLECTION);
+        indexRangeService.destroyAll();
         for (Map<String, Object> range : ranges) {
-            new IndexRange(core, range).saveWithoutValidation();
+            IndexRange indexRange = indexRangeService.create(range);
+            indexRangeService.saveWithoutValidation(indexRange);
         }
     }
 

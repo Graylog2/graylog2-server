@@ -1,5 +1,5 @@
-/**
- * Copyright 2013 Lennart Koopmann <lennart@torch.sh>
+/*
+ * Copyright 2013-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -15,14 +15,12 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 package org.graylog2.alerts.types;
 
-import org.elasticsearch.search.SearchHits;
-import org.graylog2.Core;
 import org.graylog2.alerts.AlertCondition;
 import org.graylog2.indexer.IndexHelper;
+import org.graylog2.indexer.Indexer;
 import org.graylog2.indexer.results.FieldStatsResult;
 import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.indexer.searches.Searches;
@@ -60,8 +58,8 @@ public class FieldValueAlertCondition extends AlertCondition {
     private final CheckType type;
     private final String field;
 
-    public FieldValueAlertCondition(Core core, Stream stream, String id, DateTime createdAt, String creatorUserId, Map<String, Object> parameters) {
-        super(core, stream, id, Type.FIELD_VALUE, createdAt, creatorUserId, parameters);
+    public FieldValueAlertCondition(Stream stream, String id, DateTime createdAt, String creatorUserId, Map<String, Object> parameters) {
+        super(stream, id, Type.FIELD_VALUE, createdAt, creatorUserId, parameters);
 
         this.grace = (Integer) parameters.get("grace");
         this.time = (Integer) parameters.get("time");
@@ -84,11 +82,11 @@ public class FieldValueAlertCondition extends AlertCondition {
     }
 
     @Override
-    protected CheckResult runCheck() {
+    protected CheckResult runCheck(Indexer indexer) {
         this.searchHits = null;
         try {
             String filter = "streams:"+stream.getId();
-            FieldStatsResult fieldStatsResult = core.getIndexer().searches().fieldStats(field, "*", filter, new RelativeRange(time * 60));
+            FieldStatsResult fieldStatsResult = indexer.searches().fieldStats(field, "*", filter, new RelativeRange(time * 60));
             if (getBacklog() != null && getBacklog() > 0)
                 this.searchHits = fieldStatsResult.getSearchHits();
 

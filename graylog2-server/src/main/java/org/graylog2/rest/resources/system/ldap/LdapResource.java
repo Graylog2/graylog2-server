@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 TORCH UG
+ * Copyright 2013-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -36,12 +36,11 @@ import org.graylog2.rest.resources.system.ldap.requests.LdapTestConfigRequest;
 import org.graylog2.rest.resources.system.ldap.responses.LdapTestConfigResponse;
 import org.graylog2.security.RestPermissions;
 import org.graylog2.security.TrustAllX509TrustManager;
-import org.graylog2.security.ldap.LdapConnector;
-import org.graylog2.security.ldap.LdapEntry;
-import org.graylog2.security.ldap.LdapSettings;
+import org.graylog2.security.ldap.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -60,13 +59,16 @@ public class LdapResource extends RestResource {
 
     private static final Logger log = LoggerFactory.getLogger(LdapResource.class);
 
+    @Inject
+    private LdapSettingsService ldapSettingsService;
+
     @GET
     @Timed
     @ApiOperation("Get the LDAP configuration if it is configured")
     @Path("/settings")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getLdapSettings() {
-        final LdapSettings ldapSettings = LdapSettings.load(core);
+        final LdapSettings ldapSettings = ldapSettingsService.load();
         if (ldapSettings == null) {
             return noContent().build();
         }
@@ -183,9 +185,9 @@ public class LdapResource extends RestResource {
             throw new WebApplicationException(e, Response.Status.BAD_REQUEST);
         }
         // load the existing config, or create a new one. we only support having one, currently
-        LdapSettings ldapSettings = LdapSettings.load(core);
+        LdapSettings ldapSettings = ldapSettingsService.load();
         if (ldapSettings == null) {
-            ldapSettings = new LdapSettings(core);
+            ldapSettings = new LdapSettingsImpl();
         }
         ldapSettings.setSystemUsername(request.systemUsername);
         ldapSettings.setSystemPassword(request.systemPassword);
@@ -200,7 +202,7 @@ public class LdapResource extends RestResource {
         ldapSettings.setDefaultGroup(request.defaultGroup);
 
         try {
-            ldapSettings.save();
+            ldapSettingsService.save(ldapSettings);
         } catch (ValidationException e) {
             log.error("Invalid LDAP settings, not updated!", e);
             throw new WebApplicationException(e, Response.Status.BAD_REQUEST);
@@ -215,7 +217,7 @@ public class LdapResource extends RestResource {
     @ApiOperation("Remove the LDAP configuration")
     @Path("/settings")
     public Response deleteLdapSettings() {
-        LdapSettings.delete(core);
+        ldapSettingsService.delete();
         core.getLdapAuthenticator().applySettings(null);
         return noContent().build();
     }

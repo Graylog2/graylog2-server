@@ -1,5 +1,5 @@
-/**
- * Copyright 2013 Lennart Koopmann <lennart@torch.sh>
+/*
+ * Copyright 2013-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -15,23 +15,22 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 package org.graylog2.rest.resources.system;
 
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.mongodb.BasicDBObject;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.notifications.Notification;
-import org.graylog2.plugin.Tools;
+import org.graylog2.notifications.NotificationService;
 import org.graylog2.rest.documentation.annotations.*;
 import org.graylog2.rest.resources.RestResource;
 import org.graylog2.security.RestPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -48,13 +47,16 @@ public class NotificationsResource extends RestResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(NotificationsResource.class);
 
+    @Inject
+    private NotificationService notificationService;
+
     @GET @Timed
     @ApiOperation(value = "Get all active notifications")
     @Produces(MediaType.APPLICATION_JSON)
     public String listNotifications() {
         List<Map<String, Object>> notifications = Lists.newArrayList();
 
-        for (Notification n : Notification.all(core)) {
+        for (Notification n : notificationService.all()) {
             final String notificationType = n.getType().toString().toLowerCase();
             if (!isPermitted(RestPermissions.NOTIFICATIONS_READ, notificationType)) {
                 continue;
@@ -92,7 +94,7 @@ public class NotificationsResource extends RestResource {
             return Response.status(400).build();
         }
 
-        Notification.destroy(new BasicDBObject("type", type.toString().toLowerCase()), core, Notification.COLLECTION);
+        notificationService.destroyAllByType(type);
 
         return Response.status(Response.Status.NO_CONTENT).build();
     }

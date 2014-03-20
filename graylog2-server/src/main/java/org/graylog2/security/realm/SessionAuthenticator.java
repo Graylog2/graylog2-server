@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 TORCH GmbH
+ * Copyright 2013-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -27,6 +27,8 @@ import org.apache.shiro.util.ThreadContext;
 import org.graylog2.Core;
 import org.graylog2.security.SessionIdToken;
 import org.graylog2.users.User;
+import org.graylog2.users.UserService;
+import org.graylog2.users.UserServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,12 +38,14 @@ public class SessionAuthenticator extends AuthenticatingRealm {
     private static final Logger log = LoggerFactory.getLogger(SessionAuthenticator.class);
 
     private final Core core;
+    private final UserService userService;
 
     public SessionAuthenticator(Core core) {
         this.core = core;
         // this realm either rejects a session, or allows the associated user implicitly
         setAuthenticationTokenClass(SessionIdToken.class);
         setCredentialsMatcher(new AllowAllCredentialsMatcher());
+        this.userService = new UserServiceImpl(core.getMongoConnection(), core.getConfiguration());
     }
 
     @Override
@@ -55,7 +59,7 @@ public class SessionAuthenticator extends AuthenticatingRealm {
         }
 
         final Object username = subject.getPrincipal();
-        final User user = User.load(String.valueOf(username), core);
+        final User user = userService.load(String.valueOf(username));
         if (user == null) {
             log.debug("No user named {} found for session {}", username, sessionIdToken.getSessionId());
             return null;

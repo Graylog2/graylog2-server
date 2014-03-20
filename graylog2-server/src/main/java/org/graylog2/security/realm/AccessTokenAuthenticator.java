@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 TORCH GmbH
+ * Copyright 2013-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -25,7 +25,11 @@ import org.graylog2.Core;
 import org.graylog2.database.ValidationException;
 import org.graylog2.security.AccessToken;
 import org.graylog2.security.AccessTokenAuthToken;
+import org.graylog2.security.AccessTokenService;
+import org.graylog2.security.AccessTokenServiceImpl;
 import org.graylog2.users.User;
+import org.graylog2.users.UserService;
+import org.graylog2.users.UserServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,23 +37,27 @@ public class AccessTokenAuthenticator extends AuthenticatingRealm {
     private static final Logger log = LoggerFactory.getLogger(AccessTokenAuthenticator.class);
 
     private final Core core;
+    private final AccessTokenService accessTokenService;
+    private final UserService userService;
 
     public AccessTokenAuthenticator(Core core) {
         this.core = core;
         setAuthenticationTokenClass(AccessTokenAuthToken.class);
         // the presence of a valid access token is enough, we don't have any other credentials
         setCredentialsMatcher(new AllowAllCredentialsMatcher());
+        this.accessTokenService = new AccessTokenServiceImpl(core.getMongoConnection());
+        this.userService = new UserServiceImpl(core.getMongoConnection(), core.getConfiguration());
     }
 
     @Override
     protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token) throws AuthenticationException {
         AccessTokenAuthToken authToken = (AccessTokenAuthToken) token;
-        final AccessToken accessToken = AccessToken.load(String.valueOf(authToken.getToken()), core);
+        final AccessToken accessToken = accessTokenService.load(String.valueOf(authToken.getToken()));
 
         if (accessToken == null) {
             return null;
         }
-        final User user = User.load(accessToken.getUserName(), core);
+        final User user = userService.load(accessToken.getUserName());
         if (user == null) {
             return null;
         }
@@ -60,7 +68,7 @@ public class AccessTokenAuthenticator extends AuthenticatingRealm {
             log.debug("Found user {} for access token.", user);
         }
         try {
-            accessToken.touch();
+            accessTokenService.touch(accessToken);
         } catch (ValidationException e) {
             log.warn("Unable to update access token's last access date.", e);
         }

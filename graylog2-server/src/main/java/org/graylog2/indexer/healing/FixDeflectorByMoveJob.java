@@ -1,5 +1,5 @@
-/**
- * Copyright 2013 Lennart Koopmann <lennart@torch.sh>
+/*
+ * Copyright 2013-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -15,16 +15,18 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 package org.graylog2.indexer.healing;
 
 import org.graylog2.Core;
 import org.graylog2.ProcessingPauseLockedException;
-import org.graylog2.system.activities.Activity;
 import org.graylog2.buffers.Buffers;
 import org.graylog2.indexer.Deflector;
 import org.graylog2.notifications.Notification;
+import org.graylog2.notifications.NotificationImpl;
+import org.graylog2.notifications.NotificationService;
+import org.graylog2.notifications.NotificationServiceImpl;
+import org.graylog2.system.activities.Activity;
 import org.graylog2.system.jobs.SystemJob;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,8 +43,11 @@ public class FixDeflectorByMoveJob extends SystemJob {
     private boolean cancelRequested = false;
     private int progress = 0;
 
+    private final NotificationService notificationService;
+
     public FixDeflectorByMoveJob(Core core) {
         this.core = core;
+        this.notificationService = new NotificationServiceImpl(core.getMongoConnection());
     }
 
     @Override
@@ -106,9 +111,9 @@ public class FixDeflectorByMoveJob extends SystemJob {
         }
 
         progress = 90;
-        core.getActivityWriter().write(new Activity("Notification condition [" + Notification.Type.DEFLECTOR_EXISTS_AS_INDEX + "] " +
+        core.getActivityWriter().write(new Activity("Notification condition [" + NotificationImpl.Type.DEFLECTOR_EXISTS_AS_INDEX + "] " +
                 "has been fixed.", this.getClass()));
-        Notification.fixed(core, Notification.Type.DEFLECTOR_EXISTS_AS_INDEX);
+        notificationService.fixed(Notification.Type.DEFLECTOR_EXISTS_AS_INDEX);
 
         progress = 100;
         LOG.info("Finished.");

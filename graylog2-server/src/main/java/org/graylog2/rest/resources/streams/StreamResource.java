@@ -1,5 +1,5 @@
-/**
- * Copyright 2013 Lennart Koopmann <lennart@socketfeed.com>
+/*
+ * Copyright 2013-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -15,7 +15,6 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 package org.graylog2.rest.resources.streams;
 
@@ -38,9 +37,7 @@ import org.graylog2.rest.documentation.annotations.*;
 import org.graylog2.rest.resources.RestResource;
 import org.graylog2.rest.resources.streams.requests.CreateRequest;
 import org.graylog2.security.RestPermissions;
-import org.graylog2.streams.StreamImpl;
-import org.graylog2.streams.StreamRouter;
-import org.graylog2.streams.StreamRuleImpl;
+import org.graylog2.streams.*;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
@@ -67,6 +64,12 @@ public class StreamResource extends RestResource {
     @Inject
     protected Core core;
 
+    @Inject
+    protected StreamService streamService;
+
+    @Inject
+    protected StreamRuleService streamRuleService;
+
     @POST @Timed
     @ApiOperation(value = "Create a stream")
     @RequiresPermissions(RestPermissions.STREAMS_CREATE)
@@ -89,12 +92,11 @@ public class StreamResource extends RestResource {
         streamData.put("creator_user_id", cr.creatorUserId);
         streamData.put("created_at", new DateTime(DateTimeZone.UTC));
 
-        StreamImpl stream = new StreamImpl(streamData, core);
-        stream.pause();
+        final StreamImpl stream = new StreamImpl(streamData);
         String id;
+        stream.setDisabled(true);
         try {
-            stream.save();
-            id = stream.getId();
+            id = streamService.save(stream);
         } catch (ValidationException e) {
             LOG.error("Validation error.", e);
             throw new WebApplicationException(e, Response.Status.BAD_REQUEST);
@@ -110,9 +112,9 @@ public class StreamResource extends RestResource {
                 streamRuleData.put("inverted", request.inverted);
                 streamRuleData.put("stream_id", id);
 
-                StreamRuleImpl streamRule = new StreamRuleImpl(streamRuleData, core);
+                StreamRuleImpl streamRule = new StreamRuleImpl(streamRuleData);
                 try {
-                    streamRule.save();
+                    streamRuleService.save(streamRule);
                 } catch (ValidationException e) {
                     LOG.error("Validation error while trying to save a stream rule: ", e);
                     throw new WebApplicationException(e, Response.Status.BAD_REQUEST);
@@ -131,9 +133,13 @@ public class StreamResource extends RestResource {
     @Produces(MediaType.APPLICATION_JSON)
     public String get() {
         List<Map<String, Object>> streams = Lists.newArrayList();
-        for (Stream stream : StreamImpl.loadAll(core)) {
+        for (Stream stream : streamService.loadAll()) {
             if (isPermitted(RestPermissions.STREAMS_READ, stream.getId())) {
-               streams.add(((StreamImpl) stream).asMap());
+                try {
+                    List<StreamRule> streamRules = streamRuleService.loadForStream(stream);
+                    streams.add(stream.asMap(streamRules));
+                } catch (NotFoundException e) {
+                }
             }
         }
         
@@ -149,9 +155,13 @@ public class StreamResource extends RestResource {
     @Produces(MediaType.APPLICATION_JSON)
     public String getEnabled() {
         List<Map<String, Object>> streams = Lists.newArrayList();
-        for (Stream stream : StreamImpl.loadAllEnabled(core)) {
+        for (Stream stream : streamService.loadAllEnabled()) {
             if (isPermitted(RestPermissions.STREAMS_READ, stream.getId())) {
-                streams.add(((StreamImpl) stream).asMap());
+                try {
+                    List<StreamRule> streamRules = streamRuleService.loadForStream(stream);
+                    streams.add(stream.asMap(streamRules));
+                } catch (NotFoundException e) {
+                }
             }
         }
 
@@ -176,14 +186,16 @@ public class StreamResource extends RestResource {
         }
         checkPermission(RestPermissions.STREAMS_READ, streamId);
 
-        StreamImpl stream;
+        Stream stream;
+        List<StreamRule> streamRules;
         try {
-        	stream = StreamImpl.load(loadObjectId(streamId), core);
+        	stream = streamService.load(streamId);
+            streamRules = streamRuleService.loadForStream(stream);
         } catch (NotFoundException e) {
         	throw new WebApplicationException(404);
         }
 
-        return json(stream.asMap());
+        return json(stream.asMap(streamRules));
     }
 
     @PUT @Timed
@@ -207,15 +219,18 @@ public class StreamResource extends RestResource {
             throw new WebApplicationException(e, Response.Status.BAD_REQUEST);
         }
 
-        StreamImpl stream;
+        Stream stream;
         try {
-            stream = StreamImpl.load(loadObjectId(streamId), core);
+            stream = streamService.load(streamId);
         } catch (NotFoundException e) {
             throw new WebApplicationException(404);
         }
 
+        stream.setTitle(cr.title);
+        stream.setDescription(cr.description);
+
         try {
-            stream.update(cr);
+            streamService.save(stream);
         } catch (ValidationException e) {
             LOG.error("Validation error.", e);
             throw new WebApplicationException(e, Response.Status.BAD_REQUEST);
@@ -237,8 +252,8 @@ public class StreamResource extends RestResource {
         }
         checkPermission(RestPermissions.STREAMS_EDIT, streamId);
         try {
-        	StreamImpl stream = StreamImpl.load(loadObjectId(streamId), core);
-        	stream.destroy();
+        	Stream stream = streamService.load(streamId);
+        	streamService.destroy(stream);
         } catch (NotFoundException e) {
         	throw new WebApplicationException(404);
         }
@@ -260,8 +275,8 @@ public class StreamResource extends RestResource {
         checkPermission(RestPermissions.STREAMS_CHANGESTATE, streamId);
 
         try {
-            StreamImpl stream = StreamImpl.load(loadObjectId(streamId), core);
-            stream.pause();
+            Stream stream = streamService.load(streamId);
+            streamService.pause(stream);
         } catch (NotFoundException e) {
             throw new WebApplicationException(404);
         }
@@ -283,8 +298,8 @@ public class StreamResource extends RestResource {
         checkPermission(RestPermissions.STREAMS_CHANGESTATE, streamId);
 
         try {
-            StreamImpl stream = StreamImpl.load(loadObjectId(streamId), core);
-            stream.resume();
+            Stream stream = streamService.load(streamId);
+            streamService.resume(stream);
         } catch (NotFoundException e) {
             throw new WebApplicationException(404);
         }
@@ -318,10 +333,10 @@ public class StreamResource extends RestResource {
             throw new WebApplicationException(400);
         }
 
-        StreamImpl stream = fetchStream(streamId);
+        Stream stream = fetchStream(streamId);
         Message message = new Message(serialisedMessage.get("message"));
 
-        StreamRouter router = new StreamRouter(false);
+        StreamRouter router = new StreamRouter(false, streamService, streamRuleService);
 
         Map<StreamRule, Boolean> ruleMatches = router.getRuleMatches(core, stream, message);
         Map<String, Boolean> rules = Maps.newHashMap();
@@ -360,7 +375,7 @@ public class StreamResource extends RestResource {
         checkPermission(RestPermissions.STREAMS_CREATE);
         checkPermission(RestPermissions.STREAMS_READ, streamId);
 
-        StreamImpl sourceStream = fetchStream(streamId);
+        Stream sourceStream = fetchStream(streamId);
 
         // Create stream.
         Map<String, Object> streamData = Maps.newHashMap();
@@ -369,19 +384,27 @@ public class StreamResource extends RestResource {
         streamData.put("creator_user_id", cr.creatorUserId);
         streamData.put("created_at", new DateTime(DateTimeZone.UTC));
 
-        StreamImpl stream = new StreamImpl(streamData, core);
-        stream.pause();
+        StreamImpl stream = new StreamImpl(streamData);
+        streamService.pause(stream);
         String id;
         try {
-            stream.save();
+            streamService.save(stream);
             id = stream.getId();
         } catch (ValidationException e) {
             LOG.error("Validation error.", e);
             throw new WebApplicationException(e, Response.Status.BAD_REQUEST);
         }
 
-        if (sourceStream.getStreamRules().size() > 0) {
-            for (StreamRule streamRule : sourceStream.getStreamRules()) {
+        List<StreamRule> sourceStreamRules;
+
+        try {
+            sourceStreamRules = streamRuleService.loadForStream(sourceStream);
+        } catch (NotFoundException e) {
+            sourceStreamRules = Lists.newArrayList();
+        }
+
+        if (sourceStreamRules.size() > 0) {
+            for (StreamRule streamRule : sourceStreamRules) {
                 Map<String, Object> streamRuleData = Maps.newHashMap();
 
                 streamRuleData.put("type", streamRule.getType().toInteger());
@@ -390,9 +413,9 @@ public class StreamResource extends RestResource {
                 streamRuleData.put("inverted", streamRule.getInverted());
                 streamRuleData.put("stream_id", new ObjectId(id));
 
-                StreamRuleImpl newStreamRule = new StreamRuleImpl(streamRuleData, core);
+                StreamRuleImpl newStreamRule = new StreamRuleImpl(streamRuleData);
                 try {
-                    newStreamRule.save();
+                    streamRuleService.save(newStreamRule);
                 } catch (ValidationException e) {
                     LOG.error("Validation error while trying to clone a stream rule: ", e);
                     throw new WebApplicationException(e, Response.Status.BAD_REQUEST);
@@ -400,10 +423,10 @@ public class StreamResource extends RestResource {
             }
         }
 
-        if (sourceStream.getAlertConditions().size() > 0) {
-            for (AlertCondition alertCondition : sourceStream.getAlertConditions()) {
+        if (streamService.getAlertConditions(sourceStream).size() > 0) {
+            for (AlertCondition alertCondition : streamService.getAlertConditions(sourceStream)) {
                 try {
-                    stream.addAlertCondition(alertCondition);
+                    streamService.addAlertCondition(stream, alertCondition);
                 } catch (ValidationException e) {
                     LOG.error("Validation error while trying to clone an alert condition: ", e);
                     throw new WebApplicationException(e, Response.Status.BAD_REQUEST);
@@ -456,14 +479,14 @@ public class StreamResource extends RestResource {
         return Response.ok().entity(json(result)).build();
     }
 
-    protected StreamImpl fetchStream(String streamId) {
+    protected Stream fetchStream(String streamId) {
         if (streamId == null || streamId.isEmpty()) {
             LOG.error("Missing streamId. Returning HTTP 400.");
             throw new WebApplicationException(400);
         }
 
         try {
-            StreamImpl stream = StreamImpl.load(loadObjectId(streamId), core);
+            Stream stream = streamService.load(streamId);
             return stream;
         } catch (NotFoundException e) {
             throw new WebApplicationException(404);

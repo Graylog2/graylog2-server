@@ -1,5 +1,5 @@
-/**
- * Copyright 2013 Lennart Koopmann <lennart@torch.sh>
+/*
+ * Copyright 2013-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -15,7 +15,6 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 package org.graylog2.rest.resources.search;
 
@@ -24,12 +23,13 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.bson.types.ObjectId;
 import org.graylog2.Core;
 import org.graylog2.database.ValidationException;
 import org.graylog2.rest.documentation.annotations.*;
 import org.graylog2.rest.resources.search.requests.CreateSavedSearchRequest;
 import org.graylog2.savedsearches.SavedSearch;
+import org.graylog2.savedsearches.SavedSearchImpl;
+import org.graylog2.savedsearches.SavedSearchService;
 import org.graylog2.security.RestPermissions;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -57,6 +57,9 @@ public class SavedSearchesResource extends SearchResource {
     @Inject
     protected Core core;
 
+    @Inject
+    private SavedSearchService savedSearchService;
+
     @POST
     @Timed
     @ApiOperation(value = "Create a new saved search")
@@ -80,17 +83,17 @@ public class SavedSearchesResource extends SearchResource {
         searchData.put("creator_user_id", cr.creatorUserId);
         searchData.put("created_at", new DateTime(DateTimeZone.UTC));
 
-        SavedSearch search = new SavedSearch(searchData, core);
-        ObjectId id;
+        SavedSearch search = new SavedSearchImpl(searchData);
+        String id;
         try {
-            id = search.save();
+            id = savedSearchService.save(search);
         } catch (ValidationException e) {
             LOG.error("Validation error.", e);
             throw new WebApplicationException(e, Response.Status.BAD_REQUEST);
         }
 
         Map<String, Object> result = Maps.newHashMap();
-        result.put("search_id", id.toStringMongod());
+        result.put("search_id", id);
 
         return Response.status(Response.Status.CREATED).entity(json(result)).build();
     }
@@ -100,7 +103,7 @@ public class SavedSearchesResource extends SearchResource {
     @Produces(MediaType.APPLICATION_JSON)
     public String list() {
         List<Map<String, Object>> searches = Lists.newArrayList();
-        for (SavedSearch search : SavedSearch.all(core)) {
+        for (SavedSearch search : savedSearchService.all()) {
             if (isPermitted(RestPermissions.SAVEDSEARCHES_READ, search.getId())) {
                 searches.add(search.asMap());
             }
@@ -127,7 +130,7 @@ public class SavedSearchesResource extends SearchResource {
         checkPermission(RestPermissions.SAVEDSEARCHES_READ, searchId);
 
         try {
-            SavedSearch search = SavedSearch.load(loadObjectId(searchId), core);
+            SavedSearch search = savedSearchService.load(searchId);
             return json(search.asMap());
         } catch (org.graylog2.database.NotFoundException e) {
             throw new WebApplicationException(404);
@@ -147,8 +150,8 @@ public class SavedSearchesResource extends SearchResource {
         }
         checkPermission(RestPermissions.SAVEDSEARCHES_EDIT, searchId);
         try {
-            SavedSearch search = SavedSearch.load(loadObjectId(searchId), core);
-            search.destroy();
+            SavedSearch search = savedSearchService.load(searchId);
+            savedSearchService.destroy(search);
         } catch (org.graylog2.database.NotFoundException e) {
             throw new WebApplicationException(404);
         }

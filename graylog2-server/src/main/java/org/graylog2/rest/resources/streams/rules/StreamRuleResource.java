@@ -13,7 +13,6 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -32,11 +31,9 @@ import org.graylog2.plugin.streams.StreamRule;
 import org.graylog2.plugin.streams.StreamRuleType;
 import org.graylog2.rest.documentation.annotations.*;
 import org.graylog2.rest.resources.RestResource;
-import org.graylog2.rest.resources.streams.StreamResource;
 import org.graylog2.rest.resources.streams.rules.requests.CreateRequest;
 import org.graylog2.security.RestPermissions;
-import org.graylog2.streams.StreamImpl;
-import org.graylog2.streams.StreamRuleImpl;
+import org.graylog2.streams.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -73,10 +70,10 @@ public class StreamRuleResource extends RestResource {
             throw new WebApplicationException(e, Response.Status.BAD_REQUEST);
         }
 
-        StreamImpl stream = null;
+        final StreamService streamService = new StreamServiceImpl(core.getMongoConnection());
         try {
-            stream = StreamImpl.load(loadObjectId(streamid), core);
-        } catch (org.graylog2.database.NotFoundException e) {
+            streamService.load(streamid);
+        } catch (NotFoundException e) {
             throw new WebApplicationException(404);
         }
 
@@ -87,11 +84,11 @@ public class StreamRuleResource extends RestResource {
         streamRuleData.put("inverted", cr.inverted);
         streamRuleData.put("stream_id", new ObjectId(streamid));
 
-        final StreamRuleImpl streamRule = new StreamRuleImpl(streamRuleData, core);
+        final StreamRule streamRule = new StreamRuleImpl(streamRuleData);
 
         String id;
         try {
-            id = streamRule.save().toStringMongod();
+            id = streamService.save(streamRule);
         } catch (ValidationException e) {
             LOG.error("Validation error.", e);
             throw new WebApplicationException(e, Response.Status.BAD_REQUEST);
@@ -126,8 +123,9 @@ public class StreamRuleResource extends RestResource {
         }
 
         StreamRule streamRule;
+        final StreamRuleService streamRuleService = new StreamRuleServiceImpl(core.getMongoConnection());
         try {
-            streamRule = StreamRuleImpl.load(loadObjectId(streamRuleId), core);
+            streamRule = streamRuleService.load(loadObjectId(streamRuleId));
             if (!streamRule.getStreamId().equals(streamid)) {
                 throw new NotFoundException();
             }
@@ -142,7 +140,7 @@ public class StreamRuleResource extends RestResource {
 
         String id;
         try {
-            ((StreamRuleImpl)streamRule).save();
+            streamRuleService.save(streamRule);
             id = streamRule.getId();
         } catch (ValidationException e) {
             LOG.error("Validation error.", e);
@@ -162,11 +160,22 @@ public class StreamRuleResource extends RestResource {
         List<Map<String, Object>> streamRules = Lists.newArrayList();
         checkPermission(RestPermissions.STREAMS_READ, streamid);
 
+        final StreamRuleService streamRuleService = new StreamRuleServiceImpl(core.getMongoConnection());
+        final StreamService streamService = new StreamServiceImpl(core.getMongoConnection());
+
+        final Stream stream;
         try {
-            for (StreamRule streamRule : StreamRuleImpl.findAllForStream(streamid, core)) {
-                streamRules.add(((StreamRuleImpl) streamRule).asMap());
+            stream = streamService.load(streamid);
+        } catch (NotFoundException e) {
+            throw new WebApplicationException(404);
+        }
+
+        try {
+            for (StreamRule streamRule : streamRuleService.loadForStream(stream)) {
+                streamRules.add(streamRule.asMap());
             }
         } catch (org.graylog2.database.NotFoundException e) {
+            throw new WebApplicationException(404);
         }
 
         Map<String, Object> result = Maps.newHashMap();
@@ -183,10 +192,12 @@ public class StreamRuleResource extends RestResource {
     public Response get(@ApiParam(title = "streamid", description = "The id of the stream whose stream rule we want.", required = true) @PathParam("streamid") String streamid,
                       @ApiParam(title = "streamRuleId", description = "The stream rule id we are getting", required = true) @PathParam("streamRuleId") String streamRuleId) {
         StreamRule streamRule;
+        final StreamRuleService streamRuleService = new StreamRuleServiceImpl(core.getMongoConnection());
+
         checkPermission(RestPermissions.STREAMS_READ, streamid);
 
         try {
-            streamRule = StreamRuleImpl.load(loadObjectId(streamRuleId), core);
+            streamRule = streamRuleService.load(loadObjectId(streamRuleId));
         } catch (org.graylog2.database.NotFoundException e) {
             throw new WebApplicationException(404);
         }
@@ -209,9 +220,10 @@ public class StreamRuleResource extends RestResource {
         checkPermission(RestPermissions.STREAMS_EDIT, streamid);
 
         try {
-            StreamRuleImpl streamRule = StreamRuleImpl.load(loadObjectId(streamRuleId), core);
+            final StreamRuleService streamRuleService = new StreamRuleServiceImpl(core.getMongoConnection());
+            StreamRule streamRule = streamRuleService.load(loadObjectId(streamRuleId));
             if (streamRule.getStreamId().equals(streamid)) {
-                streamRule.destroy();
+                streamRuleService.destroy(streamRule);
             } else {
                 throw new NotFoundException();
             }

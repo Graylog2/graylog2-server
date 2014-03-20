@@ -1,5 +1,5 @@
-/**
- * Copyright 2012 Lennart Koopmann <lennart@socketfeed.com>
+/*
+ * Copyright 2013-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -15,14 +15,16 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 package org.graylog2.periodical;
 
-import org.graylog2.system.activities.Activity;
+import org.graylog2.Core;
 import org.graylog2.indexer.Deflector;
 import org.graylog2.indexer.NoTargetIndexException;
 import org.graylog2.notifications.Notification;
+import org.graylog2.notifications.NotificationService;
+import org.graylog2.notifications.NotificationServiceImpl;
+import org.graylog2.system.activities.Activity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,6 +34,14 @@ import org.slf4j.LoggerFactory;
 public class DeflectorManagerThread extends Periodical { // public class Klimperkiste
     
     private static final Logger LOG = LoggerFactory.getLogger(DeflectorManagerThread.class);
+
+    private NotificationService notificationService;
+
+    @Override
+    public void initialize(Core core) {
+        super.initialize(core);
+        this.notificationService = new NotificationServiceImpl(core.getMongoConnection());
+    }
 
     @Override
     public void run() {
@@ -77,10 +87,10 @@ public class DeflectorManagerThread extends Periodical { // public class Klimper
         if (!core.getDeflector().isUp()) {
             if (core.getIndexer().indices().exists(Deflector.DEFLECTOR_NAME)) {
                 // Publish a notification if there is an *index* called graylog2_deflector
-                final boolean published = Notification.buildNow(core)
+                Notification notification = notificationService.buildNow()
                         .addType(Notification.Type.DEFLECTOR_EXISTS_AS_INDEX)
-                        .addSeverity(Notification.Severity.URGENT)
-                        .publishIfFirst();
+                        .addSeverity(Notification.Severity.URGENT);
+                final boolean published = notificationService.publishIfFirst(notification);
                 if (published) {
                     LOG.warn("There is an index called [" + Deflector.DEFLECTOR_NAME + "]. Cannot fix this automatically and published a notification.");
                 }

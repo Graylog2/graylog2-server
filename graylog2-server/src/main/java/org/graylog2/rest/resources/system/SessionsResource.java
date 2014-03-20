@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 TORCH GmbH
+ * Copyright 2013-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -34,10 +34,12 @@ import org.graylog2.rest.documentation.annotations.ApiParam;
 import org.graylog2.rest.resources.RestResource;
 import org.graylog2.security.ShiroSecurityContext;
 import org.graylog2.users.User;
+import org.graylog2.users.UserService;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.core.Context;
@@ -53,6 +55,9 @@ import static javax.ws.rs.core.Response.noContent;
 @Api(value = "System/Sessions", description = "Login for interactive user sessions")
 public class SessionsResource extends RestResource {
     private static final Logger log = LoggerFactory.getLogger(SessionsResource.class);
+
+    @Inject
+    private UserService userService;
 
     @POST
     @ApiOperation(value = "Create a new session", notes = "This request creates a new session for a user or reactivates an existing session: the equivalent of logging in.")
@@ -76,7 +81,7 @@ public class SessionsResource extends RestResource {
 
         try {
             subject.login(new UsernamePasswordToken(createRequest.username, createRequest.password));
-            final User user = User.load(createRequest.username, core);
+            final User user = userService.load(createRequest.username);
             if (user != null) {
                 long timeoutInMillis = user.getSessionTimeoutMs();
                 subject.getSession().setTimeout(timeoutInMillis);

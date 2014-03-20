@@ -1,5 +1,5 @@
-/**
- * Copyright 2011, 2012 Lennart Koopmann <lennart@socketfeed.com>
+/*
+ * Copyright 2013-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -15,7 +15,6 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 
 package org.graylog2.streams;
@@ -28,7 +27,9 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.inject.Inject;
 import org.graylog2.Core;
+import org.graylog2.database.MongoConnection;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.GraylogServer;
 import org.graylog2.plugin.Message;
@@ -52,20 +53,30 @@ public class StreamRouter {
 
     private static final Logger LOG = LoggerFactory.getLogger(StreamRouter.class);
     private static LoadingCache<String, List<Stream>> cachedStreams;
-    private static LoadingCache<String, List<StreamRule>> cachedStreamRules;
+    private static LoadingCache<Stream, List<StreamRule>> cachedStreamRules;
 
     private final Map<String, Meter> streamIncomingMeters = Maps.newHashMap();
     private final Map<String, Timer> streamExecutionTimers = Maps.newHashMap();
     private final Map<String, Meter> streamExceptionMeters = Maps.newHashMap();
 
-    private Boolean useCaching = false;
+    private final StreamService streamService;
+    private final StreamRuleService streamRuleService;
 
-    public StreamRouter() {
-        this(true);
+    private final Boolean useCaching;
+
+    @Inject
+    public StreamRouter(MongoConnection mongoConnection) {
+        this(true, mongoConnection);
     }
 
-    public StreamRouter(Boolean useCaching) {
+    public StreamRouter(Boolean useCaching, MongoConnection mongoConnection) {
+        this(useCaching, new StreamServiceImpl(mongoConnection), new StreamRuleServiceImpl(mongoConnection));
+    }
+
+    public StreamRouter(boolean useCaching, StreamService streamService, StreamRuleService streamRuleService) {
         this.useCaching = useCaching;
+        this.streamService = streamService;
+        this.streamRuleService = streamRuleService;
     }
 
     public List<Stream> route(Core server, Message msg) {
@@ -101,7 +112,7 @@ public class StreamRouter {
                                 new CacheLoader<String, List<Stream>>() {
                                     @Override
                                     public List<Stream> load(String s) throws Exception {
-                                        return StreamImpl.loadAllEnabled(server);
+                                        return streamService.loadAllEnabled();
                                     }
                                 }
                         );
@@ -113,26 +124,26 @@ public class StreamRouter {
             }
             return result;
         } else {
-            return StreamImpl.loadAllEnabled(server);
+            return streamService.loadAllEnabled();
         }
     }
 
-    private List<StreamRule> getStreamRules(String streamId, final Core server) {
+    private List<StreamRule> getStreamRules(Stream stream, final Core server) {
         if (this.useCaching) {
             if (cachedStreamRules == null)
                 cachedStreamRules = CacheBuilder.newBuilder()
                         .expireAfterWrite(1, TimeUnit.SECONDS)
                         .build(
-                                new CacheLoader<String, List<StreamRule>>() {
+                                new CacheLoader<Stream, List<StreamRule>>() {
                                     @Override
-                                    public List<StreamRule> load(String s) throws Exception {
-                                        return StreamRuleImpl.findAllForStream(s, server);
+                                    public List<StreamRule> load(Stream s) throws Exception {
+                                        return streamRuleService.loadForStream(s);
                                     }
                                 }
                         );
             List<StreamRule> result = null;
             try {
-                result = cachedStreamRules.get(streamId);
+                result = cachedStreamRules.get(stream);
             } catch (ExecutionException e) {
                 LOG.error("Caught exception while fetching from cache", e);
             }
@@ -140,7 +151,7 @@ public class StreamRouter {
             return result;
         } else {
             try {
-                return StreamRuleImpl.findAllForStream(streamId, server);
+                return streamRuleService.loadForStream(stream);
             } catch (NotFoundException e) {
                 LOG.error("Caught exception while fetching stream rules", e);
                 return null;
@@ -151,7 +162,7 @@ public class StreamRouter {
     public Map<StreamRule, Boolean> getRuleMatches(final Core server, Stream stream, Message msg) {
         Map<StreamRule, Boolean> result = Maps.newHashMap();
 
-        List<StreamRule> streamRules = getStreamRules(stream.getId(), server);
+        List<StreamRule> streamRules = getStreamRules(stream, server);
 
         for (StreamRule rule : streamRules) {
             try {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 TORCH GmbH
+ * Copyright 2013-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -19,6 +19,8 @@
 
 package org.graylog2.alerts;
 
+import org.graylog2.database.MongoConnection;
+import org.graylog2.indexer.Indexer;
 import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.plugin.Tools;
 import org.testng.annotations.BeforeClass;
@@ -27,13 +29,15 @@ import org.testng.annotations.Test;
 import java.util.List;
 import java.util.Map;
 
-import static org.testng.AssertJUnit.*;
+import static org.testng.AssertJUnit.assertFalse;
+import static org.testng.AssertJUnit.assertTrue;
 
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
  */
 public class AbstractAlertConditionTest extends AlertConditionTest {
     protected AlertCondition alertCondition;
+    protected AlertService alertService;
     final protected int grace = 10;
     final protected int time = 10;
 
@@ -42,39 +46,41 @@ public class AbstractAlertConditionTest extends AlertConditionTest {
     public void setUp() throws Exception {
         super.setUp();
         alertCondition = getDummyAlertCondition(getParametersMap(grace, time, 0));
+        final MongoConnection mongoConnection = new MongoConnection();
+        alertService = new AlertServiceImpl(mongoConnection);
     }
 
     @Test
     public void testInGracePeriod() throws Exception {
         alertLastTriggered(-1);
-        assertFalse("Should not be in grace period because alert was never fired", alertCondition.inGracePeriod());
+        assertFalse("Should not be in grace period because alert was never fired", alertService.inGracePeriod(alertCondition));
         alertLastTriggered(0);
-        assertTrue("Should be in grace period because alert was just fired", alertCondition.inGracePeriod());
+        assertTrue("Should be in grace period because alert was just fired", alertService.inGracePeriod(alertCondition));
         alertLastTriggered(grace * 60 - 1);
-        assertTrue("Should be in grace period because alert was fired during grace period", alertCondition.inGracePeriod());
+        assertTrue("Should be in grace period because alert was fired during grace period", alertService.inGracePeriod(alertCondition));
         alertLastTriggered(grace * 60 + 1);
-        assertFalse("Should not be in grace period because alert was fired after grace period has passed", alertCondition.inGracePeriod());
+        assertFalse("Should not be in grace period because alert was fired after grace period has passed", alertService.inGracePeriod(alertCondition));
         alertLastTriggered(Integer.MAX_VALUE);
-        assertFalse("Should not be in grace period because alert was fired after grace period has passed", alertCondition.inGracePeriod());
+        assertFalse("Should not be in grace period because alert was fired after grace period has passed", alertService.inGracePeriod(alertCondition));
 
         final AlertCondition alertConditionZeroGrace = getDummyAlertCondition(getParametersMap(0, time, 0));
         alertLastTriggered(0);
-        assertFalse("Should not be in grace period because grace is zero", alertConditionZeroGrace.inGracePeriod());
+        assertFalse("Should not be in grace period because grace is zero", alertService.inGracePeriod(alertConditionZeroGrace));
         alertLastTriggered(-1);
-        assertFalse("Should not be in grace period because grace is zero", alertConditionZeroGrace.inGracePeriod());
+        assertFalse("Should not be in grace period because grace is zero", alertService.inGracePeriod(alertConditionZeroGrace));
         alertLastTriggered(Integer.MAX_VALUE);
-        assertFalse("Should not be in grace period because grace is zero", alertConditionZeroGrace.inGracePeriod());
+        assertFalse("Should not be in grace period because grace is zero", alertService.inGracePeriod(alertConditionZeroGrace));
     }
 
     protected AlertCondition getDummyAlertCondition(Map<String, Object> parameters) {
-        return new AlertCondition(core, stream, CONDITION_ID, null, Tools.iso8601(), STREAM_CREATOR, parameters) {
+        return new AlertCondition(stream, CONDITION_ID, null, Tools.iso8601(), STREAM_CREATOR, parameters) {
             @Override
             public String getDescription() {
                 return null;
             }
 
             @Override
-            protected CheckResult runCheck() {
+            protected CheckResult runCheck(Indexer indexer) {
                 return null;
             }
 

@@ -1,5 +1,5 @@
-/**
- * Copyright 2013 Lennart Koopmann <lennart@torch.sh>
+/*
+ * Copyright 2013-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -15,7 +15,6 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 package org.graylog2.rest.resources.streams.alerts;
 
@@ -26,22 +25,22 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.apache.commons.mail.EmailException;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.graylog2.alerts.Alert;
-import org.graylog2.alerts.AlertCondition;
-import org.graylog2.alerts.AlertSender;
+import org.graylog2.alerts.*;
 import org.graylog2.alerts.types.DummyAlertCondition;
-import org.graylog2.database.*;
+import org.graylog2.database.ValidationException;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.alarms.transports.TransportConfigurationException;
+import org.graylog2.plugin.streams.Stream;
 import org.graylog2.rest.documentation.annotations.*;
 import org.graylog2.rest.resources.RestResource;
 import org.graylog2.rest.resources.streams.alerts.requests.CreateConditionRequest;
 import org.graylog2.security.RestPermissions;
-import org.graylog2.streams.StreamImpl;
+import org.graylog2.streams.StreamService;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -62,10 +61,16 @@ public class StreamAlertResource extends RestResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(StreamAlertResource.class);
 
+    @Inject
+    private StreamService streamService;
+
+    @Inject
+    private AlertService alertService;
+
     private static final String CACHE_KEY_BASE = "alerts";
 
     private static final Cache<String, Map<String, Object>> cache = CacheBuilder.newBuilder()
-            .expireAfterWrite(Alert.REST_CHECK_CACHE_SECONDS, TimeUnit.SECONDS)
+            .expireAfterWrite(AlertImpl.REST_CHECK_CACHE_SECONDS, TimeUnit.SECONDS)
             .build();
 
     @POST @Timed
@@ -89,23 +94,23 @@ public class StreamAlertResource extends RestResource {
             throw new WebApplicationException(e, Response.Status.BAD_REQUEST);
         }
 
-        StreamImpl stream;
+        Stream stream;
         try {
-            stream = StreamImpl.load(loadObjectId(streamid), core);
+            stream = streamService.load(streamid);
         } catch (org.graylog2.database.NotFoundException e) {
             throw new WebApplicationException(404);
         }
 
         final AlertCondition alertCondition;
         try {
-            alertCondition = AlertCondition.fromRequest(ccr, stream, core);
+            alertCondition = alertService.fromRequest(ccr, stream);
         } catch (AlertCondition.NoSuchAlertConditionTypeException e) {
             LOG.error("Invalid alarm condition type.", e);
             throw new WebApplicationException(e, Response.Status.BAD_REQUEST);
         }
 
         try {
-            stream.addAlertCondition(alertCondition);
+            streamService.addAlertCondition(stream, alertCondition);
         } catch (ValidationException e) {
             LOG.error("Validation error.", e);
             throw new WebApplicationException(e, Response.Status.BAD_REQUEST);
@@ -118,7 +123,7 @@ public class StreamAlertResource extends RestResource {
     }
 
     @GET @Timed
-    @ApiOperation(value = "Get the " + Alert.MAX_LIST_COUNT + " most recent alarms of this stream.")
+    @ApiOperation(value = "Get the " + AlertImpl.MAX_LIST_COUNT + " most recent alarms of this stream.")
     @Produces(MediaType.APPLICATION_JSON)
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "Stream not found."),
@@ -128,9 +133,9 @@ public class StreamAlertResource extends RestResource {
                          @ApiParam(title = "since", description = "Optional parameter to define a lower date boundary. (UNIX timestamp)", required = false) @QueryParam("since") int sinceTs) {
         checkPermission(RestPermissions.STREAMS_READ, streamid);
 
-        StreamImpl stream;
+        Stream stream;
         try {
-            stream = StreamImpl.load(loadObjectId(streamid), core);
+            stream = streamService.load(streamid);
         } catch (org.graylog2.database.NotFoundException e) {
             throw new WebApplicationException(404);
         }
@@ -143,11 +148,11 @@ public class StreamAlertResource extends RestResource {
         }
 
         List<Map<String,Object>> conditions = Lists.newArrayList();
-        for(Alert alert : Alert.loadRecentOfStream(core, stream.getId(), since)) {
+        for(Alert alert : alertService.loadRecentOfStream(stream.getId(), since)) {
             conditions.add(alert.toMap());
         }
 
-        long total = Alert.totalCount(core, Alert.COLLECTION);
+        long total = alertService.totalCount();
 
         Map<String, Object> result = Maps.newHashMap();
         result.put("alerts", conditions);
@@ -158,7 +163,7 @@ public class StreamAlertResource extends RestResource {
 
     @GET @Timed
     @Path("check")
-    @ApiOperation(value = "Check for triggered alert conditions of this streams. Results cached for " + Alert.REST_CHECK_CACHE_SECONDS + " seconds.")
+    @ApiOperation(value = "Check for triggered alert conditions of this streams. Results cached for " + AlertImpl.REST_CHECK_CACHE_SECONDS + " seconds.")
     @Produces(MediaType.APPLICATION_JSON)
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "Stream not found."),
@@ -167,9 +172,9 @@ public class StreamAlertResource extends RestResource {
     public Response checkConditions(@ApiParam(title = "streamId", description = "The ID of the stream to check.", required = true) @PathParam("streamId") String streamid) {
         checkPermission(RestPermissions.STREAMS_READ, streamid);
 
-        final StreamImpl stream;
+        final Stream stream;
         try {
-            stream = StreamImpl.load(loadObjectId(streamid), core);
+            stream = streamService.load(streamid);
         } catch (org.graylog2.database.NotFoundException e) {
             throw new WebApplicationException(404);
         }
@@ -181,11 +186,11 @@ public class StreamAlertResource extends RestResource {
                 public Map<String, Object> call() throws Exception {
                     List<Map<String, Object>> results = Lists.newArrayList();
                     int triggered = 0;
-                    for (AlertCondition alertCondition : stream.getAlertConditions()) {
+                    for (AlertCondition alertCondition : streamService.getAlertConditions(stream)) {
                         Map<String, Object> conditionResult = Maps.newHashMap();
-                        conditionResult.put("condition", alertCondition.asMap());
+                        conditionResult.put("condition", alertService.asMap(alertCondition));
 
-                        AlertCondition.CheckResult checkResult = alertCondition.triggeredNoGrace();
+                        AlertCondition.CheckResult checkResult = alertService.triggeredNoGrace(alertCondition, core.getIndexer());
                         conditionResult.put("triggered", checkResult.isTriggered());
 
                         if (checkResult.isTriggered()) {
@@ -223,16 +228,16 @@ public class StreamAlertResource extends RestResource {
     public Response listConditions(@ApiParam(title = "streamId", description = "The stream id this new alert condition belongs to.", required = true) @PathParam("streamId") String streamid) {
         checkPermission(RestPermissions.STREAMS_READ, streamid);
 
-        StreamImpl stream;
+        Stream stream;
         try {
-            stream = StreamImpl.load(loadObjectId(streamid), core);
+            stream = streamService.load(streamid);
         } catch (org.graylog2.database.NotFoundException e) {
             throw new WebApplicationException(404);
         }
 
         List<Map<String, Object>> conditions = Lists.newArrayList();
-        for (AlertCondition alertCondition : stream.getAlertConditions()) {
-            conditions.add(alertCondition.asMap());
+        for (AlertCondition alertCondition : streamService.getAlertConditions(stream)) {
+            conditions.add(alertService.asMap(alertCondition));
         }
 
         Map<String, Object> result = Maps.newHashMap();
@@ -254,14 +259,14 @@ public class StreamAlertResource extends RestResource {
                          @ApiParam(title = "conditionId", description = "The stream id this new alert condition belongs to.", required = true) @PathParam("conditionId") String conditionId) {
         checkPermission(RestPermissions.STREAMS_READ, streamid);
 
-        StreamImpl stream;
+        Stream stream;
         try {
-            stream = StreamImpl.load(loadObjectId(streamid), core);
+            stream = streamService.load(streamid);
         } catch (org.graylog2.database.NotFoundException e) {
             throw new WebApplicationException(404);
         }
 
-        stream.removeAlertCondition(conditionId);
+        streamService.removeAlertCondition(stream, conditionId);
 
         return Response.status(Response.Status.NO_CONTENT).build();
     }
@@ -285,9 +290,9 @@ public class StreamAlertResource extends RestResource {
             throw new WebApplicationException(400);
         }
 
-        StreamImpl stream;
+        Stream stream;
         try {
-            stream = StreamImpl.load(loadObjectId(streamid), core);
+            stream = streamService.load(streamid);
         } catch (org.graylog2.database.NotFoundException e) {
             throw new WebApplicationException(404);
         }
@@ -299,7 +304,7 @@ public class StreamAlertResource extends RestResource {
             }
         }
 
-        stream.addAlertReceiver(type, entity);
+        streamService.addAlertReceiver(stream, type, entity);
 
         return Response.status(Response.Status.CREATED).build();
     }
@@ -322,14 +327,14 @@ public class StreamAlertResource extends RestResource {
             throw new WebApplicationException(400);
         }
 
-        StreamImpl stream;
+        Stream stream;
         try {
-            stream = StreamImpl.load(loadObjectId(streamid), core);
+            stream = streamService.load(streamid);
         } catch (org.graylog2.database.NotFoundException e) {
             throw new WebApplicationException(404);
         }
 
-        stream.removeAlertReceiver(type, entity);
+        streamService.removeAlertReceiver(stream, type, entity);
 
         return Response.status(Response.Status.NO_CONTENT).build();
     }
@@ -347,9 +352,9 @@ public class StreamAlertResource extends RestResource {
             throws TransportConfigurationException, EmailException {
         checkPermission(RestPermissions.STREAMS_EDIT, streamid);
 
-        StreamImpl stream;
+        Stream stream;
         try {
-            stream = StreamImpl.load(loadObjectId(streamid), core);
+            stream = streamService.load(streamid);
         } catch (org.graylog2.database.NotFoundException e) {
             throw new WebApplicationException(404);
         }
@@ -360,7 +365,7 @@ public class StreamAlertResource extends RestResource {
         DummyAlertCondition dummyAlertCondition = new DummyAlertCondition(core, stream, null, null, Tools.iso8601(), "admin", parameters);
 
         try {
-            AlertCondition.CheckResult checkResult = dummyAlertCondition.runCheck();
+            AlertCondition.CheckResult checkResult = dummyAlertCondition.runCheck(core.getIndexer());
             alertSender.sendEmails(stream,checkResult);
         } catch (TransportConfigurationException e) {
             return Response.serverError().entity("E-Mail transport is not or improperly configured.").build();

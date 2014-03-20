@@ -1,5 +1,5 @@
-/**
- * Copyright 2013 Kay Roepke <kay@torch.sh>
+/*
+ * Copyright 2013-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -15,7 +15,6 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 package org.graylog2.security;
 
@@ -39,6 +38,8 @@ import org.graylog2.Configuration;
 import org.graylog2.Core;
 import org.graylog2.jersey.container.netty.SecurityContextFactory;
 import org.graylog2.security.ldap.LdapConnector;
+import org.graylog2.security.ldap.LdapSettingsService;
+import org.graylog2.security.ldap.LdapSettingsServiceImpl;
 import org.graylog2.security.realm.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,7 +68,8 @@ public class ShiroSecurityContextFactory implements SecurityContextFactory {
 
         final LdapConnector ldapConnector = new LdapConnector(core);
         core.setLdapConnector(ldapConnector);
-        final LdapUserAuthenticator ldapUserAuthenticator = new LdapUserAuthenticator(core, ldapConnector);
+        final LdapSettingsService ldapSettingsService = new LdapSettingsServiceImpl(core.getMongoConnection());
+        final LdapUserAuthenticator ldapUserAuthenticator = new LdapUserAuthenticator(core, ldapConnector, ldapSettingsService);
         ldapUserAuthenticator.setCachingEnabled(false);
         core.setLdapAuthenticator(ldapUserAuthenticator);
 

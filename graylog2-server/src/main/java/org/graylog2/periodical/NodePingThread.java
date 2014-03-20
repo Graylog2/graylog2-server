@@ -1,5 +1,5 @@
-/**
- * Copyright 2013 Lennart Koopmann <lennart@torch.sh>
+/*
+ * Copyright 2013-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -15,13 +15,18 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 package org.graylog2.periodical;
 
+import org.graylog2.Core;
 import org.graylog2.cluster.Node;
 import org.graylog2.cluster.NodeNotFoundException;
+import org.graylog2.cluster.NodeService;
+import org.graylog2.cluster.NodeServiceImpl;
 import org.graylog2.notifications.Notification;
+import org.graylog2.notifications.NotificationImpl;
+import org.graylog2.notifications.NotificationService;
+import org.graylog2.notifications.NotificationServiceImpl;
 import org.graylog2.system.activities.Activity;
 import org.graylog2.system.activities.ActivityWriter;
 import org.slf4j.Logger;
@@ -33,57 +38,53 @@ import org.slf4j.LoggerFactory;
 public class NodePingThread extends Periodical {
 
     private static final Logger LOG = LoggerFactory.getLogger(NodePingThread.class);
+    private NodeService nodeService;
+    private NotificationService notificationService;
+
+    @Override
+    public void initialize(Core core) {
+        super.initialize(core);
+        this.nodeService = new NodeServiceImpl(core.getMongoConnection());
+        this.notificationService = new NotificationServiceImpl(core.getMongoConnection());
+    }
 
     @Override
     public void run() {
         try {
-            Node.thisNode(core).markAsAlive(core.isMaster(), core.getConfiguration().getRestTransportUri());
+            Node node = nodeService.thisNode(core);
+            nodeService.markAsAlive(node, core.isMaster(), core.getConfiguration().getRestTransportUri());
         } catch (NodeNotFoundException e) {
             LOG.warn("Did not find meta info of this node. Re-registering.");
-            Node.registerServer(core, core.isMaster(), core.getConfiguration().getRestTransportUri());
+            nodeService.registerServer(core, core.isMaster(), core.getConfiguration().getRestTransportUri());
         }
         try {
             // Remove old nodes that are no longer running. (Just some housekeeping)
-            Node.dropOutdated(core);
+            nodeService.dropOutdated();
 
             final ActivityWriter activityWriter = core.getActivityWriter();
-            try {
-                // Check that we still have a master node in the cluster, if not, warn the user.
-                if (Node.thisNode(core).isAnyMasterPresent()) {
-                    boolean removedNotification = Notification.build(core)
-                            .addType(Notification.Type.NO_MASTER)
-                            .fixed();
-                    if (removedNotification) {
-                        activityWriter.write(
-                            new Activity("Notification condition [" + Notification.Type.NO_MASTER + "] " +
-                                                 "has been fixed.", NodePingThread.class));
-                    }
-                } else {
-                    Notification.buildNow(core)
-                            .addThisNode()
-                            .addType(Notification.Type.NO_MASTER)
-                            .addSeverity(Notification.Severity.URGENT)
-                            .publishIfFirst();
+            // Check that we still have a master node in the cluster, if not, warn the user.
+            if (nodeService.isAnyMasterPresent()) {
+                Notification notification = notificationService.build()
+                        .addType(Notification.Type.NO_MASTER);
+                boolean removedNotification = notificationService.fixed(notification);
+                if (removedNotification) {
                     activityWriter.write(
-                            new Activity(
-                                    "No graylog2 master node available. Check the configuration for is_master=true " +
-                                            "on at least one node.",
-                                    NodePingThread.class));
+                        new Activity("Notification condition [" + NotificationImpl.Type.NO_MASTER + "] " +
+                                             "has been fixed.", NodePingThread.class));
                 }
-            } catch (NodeNotFoundException e) {
-                LOG.debug("Our node has immediately been purged again. This should not happen and indicates a clock skew.");
-                /*Notification.buildNow(core)
-                        .addThisNode()
-                        .addType(Notification.Type.CHECK_SERVER_CLOCKS)
-                        .addSeverity(Notification.Severity.URGENT)
-                        .publishIfFirst();
+            } else {
+                Notification notification = notificationService.buildNow()
+                        .addThisNode(core)
+                        .addType(Notification.Type.NO_MASTER)
+                        .addSeverity(Notification.Severity.URGENT);
+                notificationService.publishIfFirst(notification);
                 activityWriter.write(
-                        new Activity("This graylog2 server node (" + core.getNodeId() + ") was immediately purged, " +
-                                             "clock skew on other graylog2-server node is likely. Check your system clocks.",
-                                     NodePingThread.class));
-                */
-                // Removed for now. https://github.com/Graylog2/graylog2-web-interface/issues/625
+                        new Activity(
+                                "No graylog2 master node available. Check the configuration for is_master=true " +
+                                        "on at least one node.",
+                                NodePingThread.class));
             }
+
         } catch (Exception e) {
             LOG.warn("Caught exception during node ping.", e);
         }

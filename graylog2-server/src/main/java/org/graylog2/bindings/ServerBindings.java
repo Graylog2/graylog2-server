@@ -13,7 +13,6 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -23,10 +22,11 @@ package org.graylog2.bindings;
 import com.google.inject.AbstractModule;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import org.graylog2.Configuration;
-import org.graylog2.buffers.processors.ServerProcessBufferProcessor;
 import org.graylog2.buffers.OutputBuffer;
 import org.graylog2.buffers.processors.OutputBufferProcessor;
 import org.graylog2.buffers.processors.ServerProcessBufferProcessor;
+import org.graylog2.cluster.NodeService;
+import org.graylog2.cluster.NodeServiceImpl;
 import org.graylog2.database.MongoBridge;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.outputs.OutputRegistry;
@@ -62,6 +62,7 @@ public class ServerBindings extends AbstractModule {
         bind(MongoConnection.class).toInstance(mongoConnection);
         bind(MongoBridge.class).toInstance(new MongoBridge());
         bind(OutputRegistry.class).toInstance(new OutputRegistry());
+        bind(NodeService.class).to(NodeServiceImpl.class);
 
         install(new FactoryModuleBuilder().build(OutputBuffer.Factory.class));
         install(new FactoryModuleBuilder().build(OutputBufferProcessor.Factory.class));

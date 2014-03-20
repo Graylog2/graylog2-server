@@ -1,5 +1,5 @@
-/**
- * Copyright 2013 Lennart Koopmann <lennart@torch.sh>
+/*
+ * Copyright 2013-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -15,19 +15,20 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 package org.graylog2.rest.resources.system.radio;
 
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBObject;
 import org.bson.types.ObjectId;
 import org.graylog2.cluster.Node;
+import org.graylog2.cluster.NodeImpl;
+import org.graylog2.cluster.NodeService;
 import org.graylog2.database.ValidationException;
 import org.graylog2.inputs.Input;
+import org.graylog2.inputs.InputImpl;
+import org.graylog2.inputs.InputService;
 import org.graylog2.plugin.Tools;
 import org.graylog2.rest.documentation.annotations.*;
 import org.graylog2.rest.resources.RestResource;
@@ -38,12 +39,12 @@ import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 import static javax.ws.rs.core.Response.ok;
 
@@ -57,11 +58,17 @@ public class RadiosResource extends RestResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(RadiosResource.class);
 
+    @Inject
+    private NodeService nodeService;
+
+    @Inject
+    private InputService inputService;
+
     @GET @Timed
     @ApiOperation(value = "List all active radios in this cluster.")
     public String radios() {
         List<Map<String, Object>> radioList = Lists.newArrayList();
-        Map<String, Node> radios = Node.allActive(core, Node.Type.RADIO);
+        Map<String, Node> radios = nodeService.allActive(NodeImpl.Type.RADIO);
 
         for(Map.Entry<String, Node> radio : radios.entrySet()) {
             radioList.add(radioSummary(radio.getValue()));
@@ -83,7 +90,7 @@ public class RadiosResource extends RestResource {
             @ApiResponse(code = 404, message = "Radio not found.")
     })
     public String radio(@ApiParam(title = "radioId", required = true) @PathParam("radioId") String radioId) {
-        Node radio = Node.byNodeId(core, radioId);
+        Node radio = nodeService.byNodeId(core, radioId);
 
         if (radio == null) {
             LOG.error("Radio <{}> not found.", radioId);
@@ -104,7 +111,7 @@ public class RadiosResource extends RestResource {
     })
     public Response registerInput(@ApiParam(title = "JSON body", required = true) String body,
                                 @ApiParam(title = "radioId", required = true) @PathParam("radioId") String radioId) {
-        Node radio = Node.byNodeId(core, radioId);
+        Node radio = nodeService.byNodeId(core, radioId);
 
         if (radio == null) {
             LOG.error("Radio <{}> not found.", radioId);
@@ -131,19 +138,19 @@ public class RadiosResource extends RestResource {
         inputData.put("created_at", new DateTime(DateTimeZone.UTC));
         inputData.put("radio_id", rir.radioId);
 
-        Input mongoInput = new Input(core, inputData);
+        Input mongoInput = new InputImpl(inputData);
 
         // Write to database.
-        ObjectId id;
+        String id;
         try {
-            id = mongoInput.save();
+            id = inputService.save(mongoInput);
         } catch (ValidationException e) {
             LOG.error("Validation error.", e);
             throw new WebApplicationException(e, Response.Status.BAD_REQUEST);
         }
 
         Map<String, Object> result = Maps.newHashMap();
-        result.put("persist_id", id.toStringMongod());
+        result.put("persist_id", id);
 
         return Response.status(Response.Status.CREATED).entity(json(result)).build();
     }
@@ -157,18 +164,19 @@ public class RadiosResource extends RestResource {
     })
     public Response unregisterInput(@ApiParam(title = "radioId", required = true) @PathParam("radioId") String radioId,
                                     @ApiParam(title = "inputId", required = true) @PathParam("inputId") String inputId) {
-        Node radio = Node.byNodeId(core, radioId);
+        final Node radio = nodeService.byNodeId(core, radioId);
 
         if (radio == null) {
             LOG.error("Radio <{}> not found.", radioId);
             throw new WebApplicationException(404);
         }
 
-        DBObject query = new BasicDBObject();
-        query.put("_id", new ObjectId(inputId));
-        query.put("radio_id", radioId);
-
-        Input.destroy(query, core, Input.COLLECTION);
+        try {
+            final Input input = inputService.findForThisNode(radioId, inputId);
+            inputService.destroy(input);
+        } catch (org.graylog2.database.NotFoundException e) {
+            throw new WebApplicationException(404);
+        }
 
         return Response.status(Response.Status.NO_CONTENT).build();
     }
@@ -182,7 +190,7 @@ public class RadiosResource extends RestResource {
             @ApiResponse(code = 404, message = "Radio not found.")
     })
     public String persistedInputs(@ApiParam(title = "radioId", required = true) @PathParam("radioId") String radioId) {
-        Node radio = Node.byNodeId(core, radioId);
+        Node radio = nodeService.byNodeId(core, radioId);
 
         if (radio == null) {
             LOG.error("Radio <{}> not found.", radioId);
@@ -192,7 +200,7 @@ public class RadiosResource extends RestResource {
         Map<String, Object> result = Maps.newHashMap();
         List<Map<String, Object>> inputs = Lists.newArrayList();
 
-        for (Input input : Input.allOfRadio(core, radio)) {
+        for (Input input : inputService.allOfRadio(radio)) {
             Map<String, Object> inputSummary = Maps.newHashMap();
 
             inputSummary.put("type", input.getType());
@@ -230,14 +238,14 @@ public class RadiosResource extends RestResource {
 
         LOG.debug("Ping from graylog2-radio node [{}].", radioId);
 
-        Node node = Node.byNodeId(core, radioId);
+        Node node = nodeService.byNodeId(core, radioId);
 
         if (node != null) {
-            node.markAsAlive(false, pr.restTransportAddress);
+            nodeService.markAsAlive(node, false, pr.restTransportAddress);
             LOG.debug("Updated state of graylog2-radio node [{}].", radioId);
         } else {
             LOG.debug("There is no registered (or only outdated) graylog2-radio node [{}]. Registering.", radioId);
-            Node.registerRadio(core, radioId, pr.restTransportAddress);
+            nodeService.registerRadio(radioId, pr.restTransportAddress);
         }
 
         return ok().build();

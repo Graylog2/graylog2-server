@@ -1,5 +1,5 @@
-/**
- * Copyright 2013 Lennart Koopmann <lennart@torch.sh>
+/*
+ * Copyright 2013-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -15,7 +15,6 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 package org.graylog2.rest.resources.users;
 
@@ -27,7 +26,6 @@ import com.google.common.collect.Maps;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.apache.shiro.crypto.hash.SimpleHash;
-import org.bson.types.ObjectId;
 import org.graylog2.database.ValidationException;
 import org.graylog2.rest.documentation.annotations.*;
 import org.graylog2.rest.resources.RestResource;
@@ -35,12 +33,15 @@ import org.graylog2.rest.resources.users.requests.ChangePasswordRequest;
 import org.graylog2.rest.resources.users.requests.CreateRequest;
 import org.graylog2.rest.resources.users.requests.PermissionEditRequest;
 import org.graylog2.security.AccessToken;
+import org.graylog2.security.AccessTokenService;
 import org.graylog2.security.RestPermissions;
 import org.graylog2.users.User;
+import org.graylog2.users.UserService;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -67,6 +68,12 @@ public class UsersResource extends RestResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(RestResource.class);
 
+    @Inject
+    private UserService userService;
+
+    @Inject
+    private AccessTokenService accessTokenService;
+
     @GET
     @Path("{username}")
     @ApiOperation(value = "Get user details", notes = "The user's permissions are only included if a user asks for his " +
@@ -75,7 +82,7 @@ public class UsersResource extends RestResource {
             @ApiResponse(code = 404, message = "The user could not be found.")
     })
     public Response get(@ApiParam(title = "username", description = "The username to return information for.", required = true) @PathParam("username") String username) {
-        final User user = User.load(username, core);
+        final User user = userService.load(username);
         if (user == null) {
             return status(NOT_FOUND).build();
         }
@@ -90,12 +97,12 @@ public class UsersResource extends RestResource {
     @RequiresPermissions(RestPermissions.USERS_LIST)
     @ApiOperation(value = "List all users", notes = "The permissions assigned to the users are always included.")
     public Response listUsers() {
-        final List<User> users = User.loadAll(core);
+        final List<User> users = userService.loadAll();
         final List<Map<String, Object>> resultUsers = Lists.newArrayList();
         for (User user : users) {
             resultUsers.add(toMap(user));
         }
-        resultUsers.add(toMap(new User.LocalAdminUser(core)));
+        resultUsers.add(toMap(userService.getAdminUser()));
         final HashMap<Object, Object> map = Maps.newHashMap();
         map.put("users", resultUsers);
         return ok(json(map)).build();
@@ -116,31 +123,29 @@ public class UsersResource extends RestResource {
         CreateRequest cr = getCreateRequest(body);
 
         // Create user.
-        Map<String, Object> userData = Maps.newHashMap();
-        userData.put(User.USERNAME, cr.username);
+        User user = userService.create();
+        user.setName(cr.username);
         final String hashedPassword = new SimpleHash("SHA-1", cr.password, core.getConfiguration().getPasswordSecret()).toString();
-        userData.put(User.PASSWORD, hashedPassword);
-        userData.put(User.FULL_NAME, cr.fullname);
-        userData.put(User.EMAIL, cr.email);
-        userData.put(User.PERMISSIONS, cr.permissions);
-        if (cr.timezone != null) {
-            userData.put(User.TIMEZONE, cr.timezone);
-        }
-        if (cr.session_timeout_ms != null) {
-            userData.put(User.SESSION_TIMEOUT, cr.session_timeout_ms);
-        }
-        User user = new User(userData, core);
-        ObjectId id;
+        user.setHashedPassword(hashedPassword);
+        user.setFullName(cr.fullname);
+        user.setEmail(cr.email);
+        user.setPermissions(cr.permissions);
+        if (cr.timezone != null)
+            user.setTimeZone(cr.timezone);
+        if (cr.session_timeout_ms != null)
+            user.setSessionTimeoutMs(cr.session_timeout_ms);
+
+        String id;
         try {
             // TODO JPA this is wrong, the primary key is the username
-            id = user.save();
+            id = userService.save(user);
         } catch (ValidationException e) {
             LOG.error("Validation error.", e);
             throw new WebApplicationException(e, BAD_REQUEST);
         }
         // TODO don't expose mongo object id here, we never accept it. set location header instead
         Map<String, Object> result = Maps.newHashMap();
-        result.put("id", id.toStringMongod());
+        result.put("id", id);
 
         return status(CREATED).entity(json(result)).build();
     }
@@ -159,7 +164,7 @@ public class UsersResource extends RestResource {
         checkPermission(USERS_EDIT, username);
         CreateRequest cr = getCreateRequest(body);
 
-        final User user = User.load(username, core);
+        final User user = userService.load(username);
         if (user == null) {
             return status(NOT_FOUND).build();
         }
@@ -196,7 +201,7 @@ public class UsersResource extends RestResource {
         }
         try {
             // TODO JPA this is wrong, the primary key is the username
-            user.save();
+            userService.save(user);
         } catch (ValidationException e) {
             LOG.error("Validation error.", e);
             throw new BadRequestException("Validation error for " + username, e);
@@ -211,7 +216,7 @@ public class UsersResource extends RestResource {
     @ApiOperation("Removes a user account.")
     @ApiResponses({@ApiResponse(code = 400, message = "When attempting to remove a read only user (e.g. built-in or LDAP user).")})
     public Response deleteUser(@ApiParam(title = "username", description = "The name of the user to delete.", required = true) @PathParam("username") String username) {
-        final User user = User.load(username, core);
+        final User user = userService.load(username);
         if (user == null) {
             return status(NOT_FOUND).build();
         }
@@ -219,7 +224,7 @@ public class UsersResource extends RestResource {
             throw new BadRequestException("Cannot delete readonly user " + username);
         }
 
-        user.destroy();
+        userService.destroy(user);
         return Response.noContent().build();
     }
 
@@ -240,13 +245,13 @@ public class UsersResource extends RestResource {
             throw new BadRequestException(e);
         }
 
-        final User user = User.load(username, core);
+        final User user = userService.load(username);
         if (user == null) {
             return status(NOT_FOUND).build();
         }
         user.setPermissions(permissionRequest.permissions);
         try {
-            user.save();
+            userService.save(user);
         } catch (ValidationException e) {
             LOG.error("Validation error.", e);
             throw new BadRequestException("Validation error for " + username, e);
@@ -262,13 +267,13 @@ public class UsersResource extends RestResource {
             @ApiResponse(code = 500, message = "When saving the user failed.")
     })
     public Response deletePermissions(@ApiParam(title = "username", description = "The name of the user to modify.", required = true) @PathParam("username") String username) {
-        final User user = User.load(username, core);
+        final User user = userService.load(username);
         if (user == null) {
             return status(NOT_FOUND).build();
         }
         user.setPermissions(Lists.<String>newArrayList());
         try {
-            user.save();
+            userService.save(user);
         } catch (ValidationException e) {
             throw new InternalServerErrorException(e);
         }
@@ -300,7 +305,7 @@ public class UsersResource extends RestResource {
             throw new WebApplicationException(e, BAD_REQUEST);
         }
 
-        final User user = User.load(username, core);
+        final User user = userService.load(username);
         if (user == null) {
             return status(NOT_FOUND).build();
         }
@@ -345,7 +350,7 @@ public class UsersResource extends RestResource {
             final String newHashedPassword = new SimpleHash("SHA-1", cr.password, secret).toString();
             user.setHashedPassword(newHashedPassword);
             try {
-                user.save();
+                userService.save(user);
             } catch (ValidationException e) {
                 throw new BadRequestException("Validation error for " + username, e);
             }
@@ -361,7 +366,7 @@ public class UsersResource extends RestResource {
     public TokenList listTokens(@ApiParam(title = "username", required = true) @PathParam("username") String username) {
         final User user = _tokensCheckAndLoadUser(username);
         final TokenList tokenList = new TokenList();
-        List<AccessToken>  tokens = AccessToken.loadAll(user.getName(), core);
+        List<AccessToken>  tokens = accessTokenService.loadAll(user.getName());
         for (AccessToken token : tokens) {
             tokenList.addToken(new Token(token));
         }
@@ -376,7 +381,7 @@ public class UsersResource extends RestResource {
             @ApiParam(title = "username", required = true) @PathParam("username") String username,
             @ApiParam(title = "name", description = "Descriptive name for this token (e.g. 'cronjob') ", required = true) @PathParam("name") String name) {
         final User user = _tokensCheckAndLoadUser(username);
-        final AccessToken accessToken = AccessToken.create(core, user.getName(), name);
+        final AccessToken accessToken = accessTokenService.create(user.getName(), name);
         return new Token(accessToken);
     }
 
@@ -388,16 +393,16 @@ public class UsersResource extends RestResource {
             @ApiParam(title = "username", required = true) @PathParam("username") String username,
             @ApiParam(title = "access token", required = true) @PathParam("token") String token) {
         final User user = _tokensCheckAndLoadUser(username);
-        final AccessToken accessToken = AccessToken.load(token, core);
+        final AccessToken accessToken = accessTokenService.load(token);
         if (accessToken != null) {
-            accessToken.destroy();
+            accessTokenService.destroy(accessToken);
             return noContent().build();
         }
         return Response.status(NOT_FOUND).build();
     }
 
     private User _tokensCheckAndLoadUser(String username) {
-        final User user = User.load(username, core);
+        final User user = userService.load(username);
         if (user == null) {
             throw new NotFoundException("Unknown user " + username);
         }

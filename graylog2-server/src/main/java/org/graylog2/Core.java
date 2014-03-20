@@ -15,7 +15,6 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 
 package org.graylog2;
@@ -23,7 +22,6 @@ package org.graylog2;
 import com.codahale.metrics.MetricRegistry;
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.inject.Inject;
 import com.mongodb.BasicDBObjectBuilder;
@@ -36,30 +34,32 @@ import org.glassfish.jersey.server.ContainerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.filter.EncodingFilter;
 import org.glassfish.jersey.server.internal.scanning.PackageNamesScanner;
+import org.graylog2.alerts.AlertService;
+import org.graylog2.alerts.AlertServiceImpl;
 import org.graylog2.blacklists.BlacklistCache;
 import org.graylog2.buffers.OutputBuffer;
 import org.graylog2.buffers.processors.ServerProcessBufferProcessor;
+import org.graylog2.cluster.NodeService;
+import org.graylog2.cluster.NodeServiceImpl;
 import org.graylog2.dashboards.DashboardRegistry;
+import org.graylog2.dashboards.DashboardService;
+import org.graylog2.dashboards.DashboardServiceImpl;
+import org.graylog2.database.CollectionName;
 import org.graylog2.database.MongoBridge;
 import org.graylog2.database.MongoConnection;
-import org.graylog2.indexer.Deflector;
-import org.graylog2.indexer.IndexFailure;
-import org.graylog2.indexer.Indexer;
+import org.graylog2.indexer.*;
+import org.graylog2.indexer.ranges.IndexRangeService;
+import org.graylog2.indexer.ranges.IndexRangeServiceImpl;
 import org.graylog2.initializers.Initializers;
-import org.graylog2.inputs.BasicCache;
-import org.graylog2.inputs.Cache;
-import org.graylog2.inputs.ServerInputRegistry;
-import org.graylog2.shared.filters.FilterRegistry;
-import org.graylog2.shared.inputs.InputRegistry;
-import org.graylog2.inputs.ServerInputRegistry;
+import org.graylog2.inputs.*;
 import org.graylog2.inputs.gelf.gelf.GELFChunkManager;
 import org.graylog2.jersey.container.netty.NettyContainer;
-import org.graylog2.plugin.lifecycles.Lifecycle;
-import org.graylog2.metrics.jersey2.MetricsDynamicBinding;
-import org.graylog2.periodical.Periodicals;
-import org.graylog2.rest.RestAccessLogFilter;
-import org.graylog2.outputs.OutputRegistry;
 import org.graylog2.metrics.MongoDbMetricsReporter;
+import org.graylog2.metrics.jersey2.MetricsDynamicBinding;
+import org.graylog2.notifications.NotificationService;
+import org.graylog2.notifications.NotificationServiceImpl;
+import org.graylog2.outputs.OutputRegistry;
+import org.graylog2.periodical.Periodicals;
 import org.graylog2.plugin.GraylogServer;
 import org.graylog2.plugin.InputHost;
 import org.graylog2.plugin.Tools;
@@ -71,18 +71,24 @@ import org.graylog2.plugin.filters.MessageFilter;
 import org.graylog2.plugin.indexer.MessageGateway;
 import org.graylog2.plugin.initializers.Initializer;
 import org.graylog2.plugin.inputs.MessageInput;
+import org.graylog2.plugin.lifecycles.Lifecycle;
 import org.graylog2.plugin.outputs.MessageOutput;
 import org.graylog2.plugin.rest.AnyExceptionClassMapper;
 import org.graylog2.plugin.rest.JacksonPropertyExceptionMapper;
-import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.plugins.PluginLoader;
 import org.graylog2.rest.CORSFilter;
 import org.graylog2.rest.ObjectMapperProvider;
 import org.graylog2.rest.RestAccessLogFilter;
+import org.graylog2.savedsearches.SavedSearchService;
+import org.graylog2.savedsearches.SavedSearchServiceImpl;
+import org.graylog2.security.AccessTokenService;
+import org.graylog2.security.AccessTokenServiceImpl;
 import org.graylog2.security.ShiroSecurityBinding;
 import org.graylog2.security.ShiroSecurityContextFactory;
 import org.graylog2.security.ldap.LdapConnector;
+import org.graylog2.security.ldap.LdapSettingsService;
+import org.graylog2.security.ldap.LdapSettingsServiceImpl;
 import org.graylog2.security.realm.LdapUserAuthenticator;
 import org.graylog2.shared.ProcessingHost;
 import org.graylog2.shared.buffers.ProcessBuffer;
@@ -90,15 +96,18 @@ import org.graylog2.shared.buffers.processors.ProcessBufferProcessor;
 import org.graylog2.shared.filters.FilterRegistry;
 import org.graylog2.shared.inputs.InputRegistry;
 import org.graylog2.shared.stats.ThroughputStats;
-import org.graylog2.shared.buffers.ProcessBuffer;
-import org.graylog2.shared.filters.FilterRegistry;
-import org.graylog2.shared.inputs.InputRegistry;
-import org.graylog2.shared.stats.ThroughputStats;
-import org.graylog2.streams.StreamImpl;
+import org.graylog2.streams.StreamRuleService;
+import org.graylog2.streams.StreamRuleServiceImpl;
+import org.graylog2.streams.StreamService;
+import org.graylog2.streams.StreamServiceImpl;
 import org.graylog2.system.activities.Activity;
 import org.graylog2.system.activities.ActivityWriter;
+import org.graylog2.system.activities.SystemMessageService;
+import org.graylog2.system.activities.SystemMessageServiceImpl;
 import org.graylog2.system.jobs.SystemJobManager;
 import org.graylog2.system.shutdown.GracefulShutdown;
+import org.graylog2.users.UserService;
+import org.graylog2.users.UserServiceImpl;
 import org.jboss.netty.bootstrap.ServerBootstrap;
 import org.jboss.netty.channel.ChannelPipeline;
 import org.jboss.netty.channel.ChannelPipelineFactory;
@@ -244,7 +253,8 @@ public class Core implements GraylogServer, InputHost, ProcessingHost {
         periodicals = new Periodicals(this);
 
         if (isMaster()) {
-            dashboards = new DashboardRegistry(this);
+            final DashboardService dashboardService = new DashboardServiceImpl(getMongoConnection());
+            dashboards = new DashboardRegistry(dashboardService);
             dashboards.loadPersisted();
         }
 
@@ -275,13 +285,14 @@ public class Core implements GraylogServer, InputHost, ProcessingHost {
         gelfChunkManager = new GELFChunkManager(this);
 
         // Make sure that the index failures collection is always created capped.
-        if(!mongoConnection.getDatabase().collectionExists(IndexFailure.COLLECTION)) {
+        final String collectionName = IndexFailureImpl.class.getAnnotation(CollectionName.class).value();
+        if(!mongoConnection.getDatabase().collectionExists(collectionName)) {
             DBObject options = BasicDBObjectBuilder.start()
                     .add("capped", true)
                     .add("size", 52428800) // 50MB max size.
                     .get();
 
-            mongoConnection.getDatabase().createCollection(IndexFailure.COLLECTION, options);
+            mongoConnection.getDatabase().createCollection(collectionName, options);
         }
 
         indexer = new Indexer(this);
@@ -406,6 +417,21 @@ public class Core implements GraylogServer, InputHost, ProcessingHost {
             bind(Core.this).to(Core.class);
             bind(metricRegistry).to(MetricRegistry.class);
             bind(throughputStats).to(ThroughputStats.class);
+            bind(new StreamServiceImpl(mongoConnection)).to(StreamService.class);
+            bind(new StreamRuleServiceImpl(mongoConnection)).to(StreamRuleService.class);
+            bind(new DashboardServiceImpl(mongoConnection)).to(DashboardService.class);
+            bind(new NodeServiceImpl(mongoConnection)).to(NodeService.class);
+            bind(new LdapSettingsServiceImpl(mongoConnection)).to(LdapSettingsService.class);
+            bind(new SystemMessageServiceImpl(mongoConnection)).to(SystemMessageService.class);
+            bind(new NotificationServiceImpl(mongoConnection)).to(NotificationService.class);
+            bind(new InputServiceImpl(mongoConnection)).to(InputService.class);
+            bind(new AlertServiceImpl(mongoConnection)).to(AlertService.class);
+            bind(new UserServiceImpl(mongoConnection, configuration)).to(UserService.class);
+            bind(new AccessTokenServiceImpl(mongoConnection)).to(AccessTokenService.class);
+            bind(new IndexRangeServiceImpl(mongoConnection, getActivityWriter())).to(IndexRangeService.class);
+            bind(new SavedSearchServiceImpl(mongoConnection)).to(SavedSearchService.class);
+            bind(new IndexFailureServiceImpl(mongoConnection)).to(IndexFailureService.class);
+            bind(dashboards).to(DashboardRegistry.class);
         }
     }
 
@@ -614,20 +640,6 @@ public class Core implements GraylogServer, InputHost, ProcessingHost {
         return statsMode;
     }
     
-    /*
-     * For plugins that need a list of all active streams. Could be moved somewhere
-     * more appropiate.
-     */
-    @Override
-    public Map<String, Stream> getEnabledStreams() {
-        Map<String, Stream> streams = Maps.newHashMap();
-        for (Stream stream : StreamImpl.loadAllEnabled(this)) {
-            streams.put(stream.getId().toString(), stream);
-        }
-        
-        return streams;
-    }
-
     public Cache getInputCache() {
         return inputCache;
     }

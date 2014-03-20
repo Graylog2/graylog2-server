@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 TORCH GmbH
+ * Copyright 2013-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -23,7 +23,6 @@ import com.google.common.collect.Maps;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.session.mgt.SimpleSession;
 import org.apache.shiro.session.mgt.eis.CachingSessionDAO;
-import org.bson.types.ObjectId;
 import org.graylog2.Core;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,9 +36,11 @@ public class MongoDbSessionDAO extends CachingSessionDAO {
     private static final Logger log = LoggerFactory.getLogger(MongoDbSessionDAO.class);
 
     private final Core core;
+    private final MongoDBSessionService mongoDBSessionService;
 
     public MongoDbSessionDAO(Core core) {
         this.core = core;
+        this.mongoDBSessionService = new MongoDBSessionServiceImpl(core.getMongoConnection());
     }
 
     @Override
@@ -58,16 +59,16 @@ public class MongoDbSessionDAO extends CachingSessionDAO {
             attributes.put(key.toString(), session.getAttribute(key));
         }
         fields.put("attributes", attributes);
-        final MongoDbSession dbSession = new MongoDbSession(core, fields);
+        final MongoDbSession dbSession = new MongoDbSession(fields);
         log.debug("Created session {}", id);
-        final ObjectId objectId = dbSession.saveWithoutValidation();
+        final String objectId = mongoDBSessionService.saveWithoutValidation(dbSession);
 
         return id;
     }
 
     @Override
     protected Session doReadSession(Serializable sessionId) {
-        final MongoDbSession dbSession = MongoDbSession.load(sessionId.toString(), core);
+        final MongoDbSession dbSession = mongoDBSessionService.load(sessionId.toString());
         log.debug("Reading session for id {} from MongoDB: {}", sessionId, dbSession);
         if (dbSession == null) {
             // expired session or it was never there to begin with
@@ -90,7 +91,7 @@ public class MongoDbSessionDAO extends CachingSessionDAO {
 
     @Override
     protected void doUpdate(Session session) {
-        final MongoDbSession dbSession = MongoDbSession.load(session.getId().toString(), core);
+        final MongoDbSession dbSession = mongoDBSessionService.load(session.getId().toString());
         log.debug("Updating session {}", session);
         dbSession.setHost(session.getHost());
         dbSession.setTimeout(session.getTimeout());
@@ -103,22 +104,22 @@ public class MongoDbSessionDAO extends CachingSessionDAO {
         } else {
             throw new RuntimeException("Unsupported session type: " + session.getClass().getCanonicalName());
         }
-        dbSession.saveWithoutValidation();
+        mongoDBSessionService.saveWithoutValidation(dbSession);
     }
 
     @Override
     protected void doDelete(Session session) {
         log.debug("Deleting session {}", session);
         final Serializable id = session.getId();
-        final MongoDbSession dbSession = MongoDbSession.load(id.toString(), core);
-        dbSession.destroy();
+        final MongoDbSession dbSession = mongoDBSessionService.load(id.toString());
+        mongoDBSessionService.destroy(dbSession);
     }
 
     @Override
     public Collection<Session> getActiveSessions() {
         log.debug("Retrieving all active sessions.");
 
-        Collection<MongoDbSession> dbSessions = MongoDbSession.loadAll(core);
+        Collection<MongoDbSession> dbSessions = mongoDBSessionService.loadAll();
         List<Session> sessions = Lists.newArrayList();
         for (MongoDbSession dbSession : dbSessions) {
             sessions.add(getSimpleSession(dbSession.getSessionId(), dbSession));

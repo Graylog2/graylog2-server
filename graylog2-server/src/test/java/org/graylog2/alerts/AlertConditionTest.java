@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 TORCH GmbH
+ * Copyright 2013-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -40,12 +40,13 @@ import static org.testng.AssertJUnit.*;
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
  */
-@PrepareForTest(Alert.class)
+@PrepareForTest(AlertImpl.class)
 public class AlertConditionTest extends PowerMockTestCase {
     protected Stream stream;
     protected Core core;
     protected Indexer indexer;
     protected Searches searches;
+    protected AlertService alertService;
 
     protected final String STREAM_ID = "STREAMMOCKID";
     protected final String STREAM_CREATOR = "MOCKUSER";
@@ -57,6 +58,8 @@ public class AlertConditionTest extends PowerMockTestCase {
         core = mock(Core.class);
         indexer = mock(Indexer.class);
         searches = mock(Searches.class);
+        alertService = mock(AlertService.class);
+
         when(stream.getId()).thenReturn(STREAM_ID);
         when(indexer.searches()).thenReturn(searches);
         when(core.getIndexer()).thenReturn(indexer);
@@ -68,7 +71,7 @@ public class AlertConditionTest extends PowerMockTestCase {
         assertEquals("AlertCondition of result is not the same we created!", result.getTriggeredCondition(), alertCondition);
         long difference = Tools.iso8601().getMillis() - result.getTriggeredAt().getMillis();
         assertTrue("AlertCondition should be triggered about now", difference < 50);
-        assertFalse("Alert was triggered, so we should not be in grace period!", alertCondition.inGracePeriod());
+        assertFalse("Alert was triggered, so we should not be in grace period!", alertService.inGracePeriod(alertCondition));
     }
 
     protected void assertNotTriggered(AlertCondition.CheckResult result) {
@@ -86,8 +89,8 @@ public class AlertConditionTest extends PowerMockTestCase {
     }
 
     protected void alertLastTriggered(int seconds) {
-        PowerMockito.mockStatic(Alert.class);
-        PowerMockito.when(Alert.triggeredSecondsAgo(STREAM_ID, CONDITION_ID, core)).thenReturn(seconds);
+        PowerMockito.mockStatic(AlertImpl.class);
+        PowerMockito.when(alertService.triggeredSecondsAgo(STREAM_ID, CONDITION_ID)).thenReturn(seconds);
     }
 
     protected <T extends AlertCondition> T getTestInstance(Class<T> klazz, Map<String, Object> parameters) {

@@ -1,5 +1,5 @@
-/**
- * Copyright 2014 Lennart Koopmann <lennart@torch.sh>
+/*
+ * Copyright 2013-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -15,7 +15,6 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 package org.graylog2.periodical;
 
@@ -35,6 +34,8 @@ import org.graylog2.Configuration;
 import org.graylog2.Core;
 import org.graylog2.ServerVersion;
 import org.graylog2.notifications.Notification;
+import org.graylog2.notifications.NotificationService;
+import org.graylog2.notifications.NotificationServiceImpl;
 import org.graylog2.plugin.Version;
 import org.graylog2.versioncheck.VersionCheckResponse;
 import org.slf4j.Logger;
@@ -52,6 +53,13 @@ import java.nio.charset.Charset;
 public class VersionCheckThread extends Periodical {
 
     private static final Logger LOG = LoggerFactory.getLogger(VersionCheckThread.class);
+    private NotificationService notificationService;
+
+    @Override
+    public void initialize(Core core) {
+        super.initialize(core);
+        notificationService = new NotificationServiceImpl(core.getMongoConnection());
+    }
 
     @Override
     public void run() {
@@ -119,14 +127,14 @@ public class VersionCheckThread extends Periodical {
             if (reportedVersion.greaterMinor(Core.GRAYLOG2_VERSION)) {
                 LOG.debug("Reported version is higher than ours ({}). Writing notification.", Core.GRAYLOG2_VERSION);
 
-                Notification.buildNow(core)
+                Notification notification = notificationService.buildNow()
                         .addSeverity(Notification.Severity.NORMAL)
                         .addType(Notification.Type.OUTDATED_VERSION)
-                        .addDetail("current_version", parsedResponse.toString())
-                        .publishIfFirst();
+                        .addDetail("current_version", parsedResponse.toString());
+                notificationService.publishIfFirst(notification);
             } else {
                 LOG.debug("Reported version is not higher than ours ({}).", Core.GRAYLOG2_VERSION);
-                Notification.fixed(core, Notification.Type.OUTDATED_VERSION);
+                notificationService.fixed(Notification.Type.OUTDATED_VERSION);
             }
 
             EntityUtils.consume(entity);

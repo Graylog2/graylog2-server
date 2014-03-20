@@ -1,8 +1,29 @@
+/*
+ * Copyright 2013-2014 TORCH GmbH
+ *
+ * This file is part of Graylog2.
+ *
+ * Graylog2 is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Graylog2 is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package org.graylog2.periodical;
 
-import org.graylog2.cluster.Node;
+import org.graylog2.Core;
 import org.graylog2.cluster.NodeNotFoundException;
 import org.graylog2.notifications.Notification;
+import org.graylog2.notifications.NotificationService;
+import org.graylog2.notifications.NotificationServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,16 +32,24 @@ import org.slf4j.LoggerFactory;
  */
 public class ClusterHealthCheckThread extends Periodical {
     private static final Logger LOG = LoggerFactory.getLogger(ClusterHealthCheckThread.class);
+    private NotificationService notificationService;
+
+    @Override
+    public void initialize(Core core) {
+        super.initialize(core);
+        this.notificationService = new NotificationServiceImpl(core.getMongoConnection());
+    }
 
     @Override
     public void run() {
+        final NotificationService notificationService = new NotificationServiceImpl(core.getMongoConnection());
         try {
             if (core.inputs().runningCount() == 0) {
                 LOG.debug("No input running in cluster!");
-                getNotification().publishIfFirst();
+                notificationService.publishIfFirst(getNotification());
             } else {
                 LOG.debug("Running inputs found, disabling notification");
-                getNotification().fixed();
+                notificationService.fixed(getNotification());
             }
         } catch (NodeNotFoundException e) {
             LOG.error("Unable to find own node: ", e.getMessage(), e);
@@ -28,10 +57,10 @@ public class ClusterHealthCheckThread extends Periodical {
     }
 
     protected Notification getNotification() throws NodeNotFoundException {
-        Notification notification = Notification.buildNow(core);
+        Notification notification = notificationService.buildNow();
         notification.addType(Notification.Type.NO_INPUT_RUNNING);
         notification.addSeverity(Notification.Severity.URGENT);
-        notification.addNode(Node.thisNode(core));
+        notification.addNode(core.getNodeId());
 
         return notification;
     }

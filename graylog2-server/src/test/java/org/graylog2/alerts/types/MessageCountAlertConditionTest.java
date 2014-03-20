@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 TORCH GmbH
+ * Copyright 2013-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -19,9 +19,9 @@
 
 package org.graylog2.alerts.types;
 
-import org.graylog2.alerts.Alert;
 import org.graylog2.alerts.AlertCondition;
 import org.graylog2.alerts.AlertConditionTest;
+import org.graylog2.alerts.AlertImpl;
 import org.graylog2.indexer.IndexHelper;
 import org.graylog2.indexer.results.CountResult;
 import org.graylog2.indexer.searches.timeranges.TimeRange;
@@ -37,7 +37,7 @@ import static org.testng.AssertJUnit.*;
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
  */
-@PrepareForTest(Alert.class)
+@PrepareForTest(AlertImpl.class)
 public class MessageCountAlertConditionTest extends AlertConditionTest {
     protected final int threshold = 100;
 
@@ -60,9 +60,9 @@ public class MessageCountAlertConditionTest extends AlertConditionTest {
         searchCountShouldReturn(threshold+1);
         // AlertCondition was never triggered before
         alertLastTriggered(-1);
-        final AlertCondition.CheckResult result = messageCountAlertCondition.triggered();
+        final AlertCondition.CheckResult result = alertService.triggered(messageCountAlertCondition, core.getIndexer());
 
-        assertFalse("We should not be in grace period!", messageCountAlertCondition.inGracePeriod());
+        assertFalse("We should not be in grace period!", alertService.inGracePeriod(messageCountAlertCondition));
         assertTriggered(messageCountAlertCondition, result);
     }
 
@@ -75,7 +75,7 @@ public class MessageCountAlertConditionTest extends AlertConditionTest {
         searchCountShouldReturn(threshold - 1);
         alertLastTriggered(-1);
 
-        final AlertCondition.CheckResult result = messageCountAlertCondition.triggered();
+        final AlertCondition.CheckResult result = alertService.triggered(messageCountAlertCondition, core.getIndexer());
 
         assertTriggered(messageCountAlertCondition, result);
     }
@@ -89,7 +89,7 @@ public class MessageCountAlertConditionTest extends AlertConditionTest {
         searchCountShouldReturn(threshold);
         alertLastTriggered(-1);
 
-        final AlertCondition.CheckResult result = messageCountAlertCondition.triggered();
+        final AlertCondition.CheckResult result = alertService.triggered(messageCountAlertCondition, core.getIndexer());
 
         assertNotTriggered(result);
     }
@@ -103,7 +103,7 @@ public class MessageCountAlertConditionTest extends AlertConditionTest {
         searchCountShouldReturn(threshold);
         alertLastTriggered(-1);
 
-        final AlertCondition.CheckResult result = messageCountAlertCondition.triggered();
+        final AlertCondition.CheckResult result = alertService.triggered(messageCountAlertCondition, core.getIndexer());
 
         assertNotTriggered(result);
     }
@@ -127,14 +127,14 @@ public class MessageCountAlertConditionTest extends AlertConditionTest {
 
         alertLastTriggered(0);
         assertTrue("Alert condition should be in grace period because grace is greater than zero and alert has just been triggered!",
-                messageCountAlertCondition.inGracePeriod());
-        final AlertCondition.CheckResult resultJustTriggered = messageCountAlertCondition.triggered();
+                alertService.inGracePeriod(messageCountAlertCondition));
+        final AlertCondition.CheckResult resultJustTriggered = alertService.triggered(messageCountAlertCondition, core.getIndexer());
         assertNotTriggered(resultJustTriggered);
 
         alertLastTriggered(grace*60-1);
         assertTrue("Alert condition should be in grace period because grace is greater than zero and alert has been triggered during grace period!",
-                messageCountAlertCondition.inGracePeriod());
-        final AlertCondition.CheckResult resultTriggeredAgo = messageCountAlertCondition.triggered();
+                alertService.inGracePeriod(messageCountAlertCondition));
+        final AlertCondition.CheckResult resultTriggeredAgo = alertService.triggered(messageCountAlertCondition, core.getIndexer());
         assertNotTriggered(resultTriggeredAgo);
     }
 
@@ -159,7 +159,7 @@ public class MessageCountAlertConditionTest extends AlertConditionTest {
     }
 
     protected MessageCountAlertCondition getMessageCountAlertCondition(Map<String, Object> parameters) {
-        return new MessageCountAlertCondition(core,
+        return new MessageCountAlertCondition(
                 stream,
                 CONDITION_ID,
                 Tools.iso8601(),
