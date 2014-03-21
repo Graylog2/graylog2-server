@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 TORCH GmbH
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -19,7 +19,7 @@
 package org.graylog2.periodical;
 
 import com.beust.jcommander.internal.Lists;
-import org.graylog2.Core;
+import com.google.inject.Inject;
 import org.graylog2.alerts.*;
 import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.notifications.Notification;
@@ -45,10 +45,9 @@ public class AlertScannerThread extends Periodical {
     private static final Logger LOG = LoggerFactory.getLogger(AlertScannerThread.class);
     private AlertService alertService;
 
-    @Override
-    public void initialize(Core core) {
-        super.initialize(core);
-        this.alertService = new AlertServiceImpl(core.getMongoConnection());
+    @Inject
+    public AlertScannerThread(AlertService alertService) {
+        this.alertService = alertService;
     }
 
     @Override

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 TORCH GmbH
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -32,6 +32,7 @@ import com.google.inject.Injector;
 import com.google.inject.Module;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Level;
+import org.graylog2.bindings.PersistenceServicesBindings;
 import org.graylog2.bindings.ServerBindings;
 import org.graylog2.cluster.Node;
 import org.graylog2.cluster.NodeNotFoundException;
@@ -62,6 +63,7 @@ import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.lifecycles.Lifecycle;
 import org.graylog2.plugins.PluginInstaller;
 import org.graylog2.shared.NodeRunner;
+import org.graylog2.shared.bindings.GuiceInstantiationService;
 import org.graylog2.shared.filters.FilterRegistry;
 import org.graylog2.system.activities.Activity;
 import org.slf4j.Logger;
@@ -133,8 +135,12 @@ public final class Main extends NodeRunner {
             logLevel = Level.DEBUG;
         }
 
-        List<Module> bindingsModules = getBindingsModules(new ServerBindings(configuration));
+        GuiceInstantiationService instantiationService = new GuiceInstantiationService();
+        List<Module> bindingsModules = getBindingsModules(instantiationService,
+                new ServerBindings(configuration),
+                new PersistenceServicesBindings());
         Injector injector = Guice.createInjector(bindingsModules);
+        instantiationService.setInjector(injector);
 
         // This is holding all our metrics.
         final MetricRegistry metrics = injector.getInstance(MetricRegistry.class);
@@ -252,16 +258,16 @@ public final class Main extends NodeRunner {
         server.inputs().register(RadioInput.class, RadioInput.NAME);
 
         // Register initializers.
-        server.initializers().register(new DroolsInitializer());
-        server.initializers().register(new PeriodicalsInitializer());
+        server.initializers().register(injector.getInstance(DroolsInitializer.class));
+        server.initializers().register(injector.getInstance(PeriodicalsInitializer.class));
 
         // Register message filters. (Order is important here)
         final FilterRegistry filterRegistry = injector.getInstance(FilterRegistry.class);
-        filterRegistry.register(new StaticFieldFilter());
-        filterRegistry.register(new ExtractorFilter());
-        filterRegistry.register(new BlacklistFilter());
+        filterRegistry.register(injector.getInstance(StaticFieldFilter.class));
+        filterRegistry.register(injector.getInstance(ExtractorFilter.class));
+        filterRegistry.register(injector.getInstance(BlacklistFilter.class));
         filterRegistry.register(injector.getInstance(StreamMatcherFilter.class));
-        filterRegistry.register(new RewriteFilter());
+        filterRegistry.register(injector.getInstance(RewriteFilter.class));
 
         // Register outputs.
         server.outputs().register(new ElasticSearchOutput(server));

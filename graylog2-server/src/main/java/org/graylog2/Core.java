@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 TORCH GmbH
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -43,7 +43,10 @@ import org.graylog2.dashboards.DashboardRegistry;
 import org.graylog2.dashboards.DashboardService;
 import org.graylog2.dashboards.DashboardServiceImpl;
 import org.graylog2.database.MongoConnection;
-import org.graylog2.indexer.*;
+import org.graylog2.indexer.Deflector;
+import org.graylog2.indexer.IndexFailureService;
+import org.graylog2.indexer.IndexFailureServiceImpl;
+import org.graylog2.indexer.Indexer;
 import org.graylog2.indexer.ranges.IndexRangeService;
 import org.graylog2.indexer.ranges.IndexRangeServiceImpl;
 import org.graylog2.initializers.Initializers;
@@ -173,8 +176,6 @@ public class Core implements GraylogServer, InputHost, ProcessingHost {
     private OutputRegistry outputs;
     private Periodicals periodicals;
 
-    private DashboardRegistry dashboards;
-    
     private ProcessBuffer processBuffer;
     private OutputBuffer outputBuffer;
     private AtomicInteger outputBufferWatermark = new AtomicInteger();
@@ -214,6 +215,9 @@ public class Core implements GraylogServer, InputHost, ProcessingHost {
     @Inject
     private ThroughputStats throughputStats;
 
+    @Inject
+    private DashboardRegistry dashboardRegistry;
+
     public void initialize() {
         if (configuration.isMetricsCollectionEnabled()) {
             metricsReporter = MongoDbMetricsReporter.forRegistry(this, metricRegistry).build();
@@ -239,9 +243,7 @@ public class Core implements GraylogServer, InputHost, ProcessingHost {
         periodicals = new Periodicals(this);
 
         if (isMaster()) {
-            final DashboardService dashboardService = new DashboardServiceImpl(getMongoConnection());
-            dashboards = new DashboardRegistry(dashboardService);
-            dashboards.loadPersisted(this);
+            dashboardRegistry.loadPersisted(this);
         }
 
         systemJobManager = new SystemJobManager(this);
@@ -404,7 +406,8 @@ public class Core implements GraylogServer, InputHost, ProcessingHost {
             bind(new IndexRangeServiceImpl(mongoConnection, getActivityWriter())).to(IndexRangeService.class);
             bind(new SavedSearchServiceImpl(mongoConnection)).to(SavedSearchService.class);
             bind(new IndexFailureServiceImpl(mongoConnection)).to(IndexFailureService.class);
-            bind(dashboards).to(DashboardRegistry.class);
+            bind(dashboardRegistry).to(DashboardRegistry.class);
+            bind(activityWriter).to(ActivityWriter.class);
         }
     }
 
@@ -691,14 +694,6 @@ public class Core implements GraylogServer, InputHost, ProcessingHost {
 
     public Periodicals periodicals() {
         return periodicals;
-    }
-
-    public DashboardRegistry dashboards() {
-        if (!isMaster()) {
-            throw new RuntimeException("Dashboards can only be accessed on master nodes.");
-        }
-
-        return dashboards;
     }
 
     @Override

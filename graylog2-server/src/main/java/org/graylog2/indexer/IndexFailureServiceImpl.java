@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 TORCH GmbH
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -20,6 +20,7 @@
 package org.graylog2.indexer;
 
 import com.google.common.collect.Lists;
+import com.google.inject.Inject;
 import com.mongodb.BasicDBObject;
 import com.mongodb.BasicDBObjectBuilder;
 import com.mongodb.DBObject;
@@ -32,6 +33,7 @@ import org.joda.time.DateTime;
 import java.util.List;
 
 public class IndexFailureServiceImpl extends PersistedServiceImpl implements IndexFailureService {
+    @Inject
     public IndexFailureServiceImpl(MongoConnection mongoConnection) {
         super(mongoConnection);
 

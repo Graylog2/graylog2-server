@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 TORCH GmbH
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -21,6 +21,7 @@ package org.graylog2.alerts;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.inject.Inject;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import com.mongodb.QueryBuilder;
@@ -45,6 +46,7 @@ import java.util.Map;
 public class AlertServiceImpl extends PersistedServiceImpl implements AlertService {
     private static final Logger LOG = LoggerFactory.getLogger(AlertServiceImpl.class);
 
+    @Inject
     public AlertServiceImpl(MongoConnection mongoConnection) {
         super(mongoConnection);
     }

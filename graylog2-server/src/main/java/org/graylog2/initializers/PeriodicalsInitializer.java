@@ -1,5 +1,5 @@
-/**
- * Copyright 2014 Lennart Koopmann <lennart@torch.sh>
+/*
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -15,16 +15,17 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 package org.graylog2.initializers;
 
 import com.google.common.collect.Maps;
+import com.google.inject.Inject;
 import org.graylog2.Core;
 import org.graylog2.periodical.Periodical;
 import org.graylog2.plugin.GraylogServer;
 import org.graylog2.plugin.initializers.Initializer;
 import org.graylog2.plugin.initializers.InitializerConfigurationException;
+import org.graylog2.shared.bindings.InstantiationService;
 import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,6 +40,12 @@ public class PeriodicalsInitializer implements Initializer {
     private static final Logger LOG = LoggerFactory.getLogger(PeriodicalsInitializer.class);
 
     public static final String NAME = "Periodicals initializer";
+    private final InstantiationService instantiationService;
+
+    @Inject
+    public PeriodicalsInitializer(InstantiationService instantiationService) {
+        this.instantiationService = instantiationService;
+    }
 
     @Override
     public void initialize(GraylogServer server, Map<String, String> config) throws InitializerConfigurationException {
@@ -47,7 +54,7 @@ public class PeriodicalsInitializer implements Initializer {
 
         for (Class<? extends Periodical> type : reflections.getSubTypesOf(Periodical.class)) {
             try {
-                Periodical periodical = type.newInstance();
+                Periodical periodical = instantiationService.getInstance(type);
 
                 periodical.initialize(core);
 

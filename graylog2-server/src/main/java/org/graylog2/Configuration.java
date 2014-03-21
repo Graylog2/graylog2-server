@@ -1,5 +1,5 @@
-/**
- * Copyright 2010, 2011, 2012 Lennart Koopmann <lennart@socketfeed.com>
+/*
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -15,7 +15,6 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 
 package org.graylog2;
@@ -28,7 +27,6 @@ import com.github.joschi.jadconfig.validators.FileReadableValidator;
 import com.github.joschi.jadconfig.validators.InetPortValidator;
 import com.github.joschi.jadconfig.validators.PositiveIntegerValidator;
 import com.google.common.collect.Lists;
-import com.lmax.disruptor.*;
 import com.mongodb.ServerAddress;
 import org.graylog2.plugin.Tools;
 import org.graylog2.shared.BaseConfiguration;
@@ -242,12 +240,6 @@ public class Configuration extends BaseConfiguration {
 
     @Parameter(value = "transport_email_from_email", required = false)
     private String emailTransportFromEmail;
-
-    @Parameter(value = "rest_enable_cors", required = false)
-    private boolean restEnableCors = false;
-
-    @Parameter(value = "rest_enable_gzip", required = false)
-    private boolean restEnableGzip = false;
 
     public boolean isMaster() {
         return isMaster;
@@ -519,14 +511,6 @@ public class Configuration extends BaseConfiguration {
 
     public String getEmailTransportFromEmail() {
         return emailTransportFromEmail;
-    }
-
-    public boolean isRestEnableCors() {
-        return restEnableCors;
-    }
-
-    public boolean isRestEnableGzip() {
-        return restEnableGzip;
     }
 
     public boolean isVersionchecks() {

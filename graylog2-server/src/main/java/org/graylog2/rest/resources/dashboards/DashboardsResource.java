@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 TORCH GmbH
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -37,6 +37,7 @@ import org.graylog2.rest.resources.RestResource;
 import org.graylog2.rest.resources.dashboards.requests.*;
 import org.graylog2.security.RestPermissions;
 import org.graylog2.system.activities.Activity;
+import org.graylog2.system.activities.ActivityWriter;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
@@ -65,6 +66,9 @@ public class DashboardsResource extends RestResource {
 
     @Inject
     private DashboardRegistry dashboardRegistry;
+
+    @Inject
+    private ActivityWriter activityWriter;
 
     @POST
     @Timed
@@ -172,7 +176,7 @@ public class DashboardsResource extends RestResource {
 
             String msg = "Deleted dashboard <" + dashboard.getId() + ">. Reason: REST request.";
             LOG.info(msg);
-            core.getActivityWriter().write(new Activity(msg, DashboardsResource.class));
+            activityWriter.write(new Activity(msg, DashboardsResource.class));
         } catch (org.graylog2.database.NotFoundException e) {
             throw new WebApplicationException(404);
         }
@@ -289,7 +293,7 @@ public class DashboardsResource extends RestResource {
         try {
             widget = DashboardWidget.fromRequest(core, awr);
 
-            Dashboard dashboard = core.dashboards().get(dashboardId);
+            Dashboard dashboard = dashboardRegistry.get(dashboardId);
 
             if (dashboard == null) {
                 LOG.error("Dashboard not found.");
@@ -355,7 +359,7 @@ public class DashboardsResource extends RestResource {
 
         String msg = "Deleted widget <" + widgetId + "> from dashboard <" + dashboardId + ">. Reason: REST request.";
         LOG.info(msg);
-        core.getActivityWriter().write(new Activity(msg, DashboardsResource.class));
+        activityWriter.write(new Activity(msg, DashboardsResource.class));
 
         return Response.status(Response.Status.NO_CONTENT).build();
     }
@@ -375,7 +379,7 @@ public class DashboardsResource extends RestResource {
         restrictToMaster();
         checkPermission(RestPermissions.DASHBOARDS_READ, dashboardId);
 
-        Dashboard dashboard = core.dashboards().get(dashboardId);
+        Dashboard dashboard = dashboardRegistry.get(dashboardId);
 
         if (dashboard == null) {
             LOG.error("Dashboard not found.");
@@ -432,7 +436,7 @@ public class DashboardsResource extends RestResource {
         }
 
         try {
-            Dashboard dashboard = core.dashboards().get(dashboardId);
+            Dashboard dashboard = dashboardRegistry.get(dashboardId);
 
             if (dashboard == null) {
                 LOG.error("Dashboard not found.");
@@ -491,7 +495,7 @@ public class DashboardsResource extends RestResource {
         }
 
         try {
-            Dashboard dashboard = core.dashboards().get(dashboardId);
+            Dashboard dashboard = dashboardRegistry.get(dashboardId);
 
             if (dashboard == null) {
                 LOG.error("Dashboard not found.");

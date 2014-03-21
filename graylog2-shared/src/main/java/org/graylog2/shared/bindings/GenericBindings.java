@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 TORCH GmbH
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -30,12 +30,20 @@ import org.graylog2.shared.stats.ThroughputStats;
  * @author Dennis Oelkers <dennis@torch.sh>
  */
 public class GenericBindings extends AbstractModule {
+    private final InstantiationService instantiationService;
+
+    public GenericBindings(InstantiationService instantiationService) {
+        this.instantiationService = instantiationService;
+    }
+
     @Override
     protected void configure() {
         // This is holding all our metrics.
         bind(MetricRegistry.class).toInstance(new MetricRegistry());
         bind(FilterRegistry.class).toInstance(new FilterRegistry());
         bind(ThroughputStats.class).toInstance(new ThroughputStats());
+
+        bind(InstantiationService.class).toInstance(instantiationService);
 
         install(new FactoryModuleBuilder().build(ProcessBuffer.Factory.class));
     }

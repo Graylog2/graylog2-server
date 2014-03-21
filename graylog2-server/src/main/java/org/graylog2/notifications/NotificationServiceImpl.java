@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 TORCH GmbH
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -20,6 +20,7 @@
 package org.graylog2.notifications;
 
 import com.google.common.collect.Lists;
+import com.google.inject.Inject;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import org.bson.types.ObjectId;
@@ -36,6 +37,7 @@ import java.util.List;
 public class NotificationServiceImpl extends PersistedServiceImpl implements NotificationService {
     private static final Logger LOG = LoggerFactory.getLogger(NotificationServiceImpl.class);
 
+    @Inject
     public NotificationServiceImpl(MongoConnection mongoConnection) {
         super(mongoConnection);
     }

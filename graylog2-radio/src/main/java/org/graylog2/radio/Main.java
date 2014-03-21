@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 TORCH GmbH
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -15,7 +15,6 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 package org.graylog2.radio;
 
@@ -46,6 +45,7 @@ import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.lifecycles.Lifecycle;
 import org.graylog2.radio.bindings.RadioBindings;
 import org.graylog2.shared.NodeRunner;
+import org.graylog2.shared.bindings.GuiceInstantiationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
@@ -106,8 +106,10 @@ public class Main extends NodeRunner {
             logLevel = Level.DEBUG;
         }
 
-        List<Module> bindingsModules = getBindingsModules(new RadioBindings(configuration));
+        GuiceInstantiationService instantiationService = new GuiceInstantiationService();
+        List<Module> bindingsModules = getBindingsModules(instantiationService, new RadioBindings(configuration));
         Injector injector = Guice.createInjector(bindingsModules);
+        instantiationService.setInjector(injector);
 
         // This is holding all our metrics.
         final MetricRegistry metrics = injector.getInstance(MetricRegistry.class);

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 TORCH GmbH
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -43,6 +43,12 @@ public abstract class BaseConfiguration {
     @Parameter(value = "processor_wait_strategy", required = true)
     private String processorWaitStrategy = "blocking";
 
+    @Parameter(value = "rest_enable_cors", required = false)
+    private boolean restEnableCors = false;
+
+    @Parameter(value = "rest_enable_gzip", required = false)
+    private boolean restEnableGzip = false;
+
     public URI getRestTransportUri() {
         if (restTransportUri == null || restTransportUri.isEmpty()) {
             return null;
@@ -81,5 +87,14 @@ public abstract class BaseConfiguration {
         return new BlockingWaitStrategy();
     }
 
+    public boolean isRestEnableCors() {
+        return restEnableCors;
+    }
+
+    public boolean isRestEnableGzip() {
+        return restEnableGzip;
+    }
+
     public abstract String getNodeIdFile();
+    public abstract URI getRestListenUri();
 }

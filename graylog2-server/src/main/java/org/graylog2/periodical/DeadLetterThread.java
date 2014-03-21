@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 TORCH GmbH
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -21,6 +21,7 @@ package org.graylog2.periodical;
 import com.codahale.metrics.Gauge;
 import com.codahale.metrics.MetricRegistry;
 import com.google.common.collect.Maps;
+import com.google.inject.Inject;
 import com.mongodb.BasicDBObject;
 import org.elasticsearch.action.bulk.BulkItemResponse;
 import org.graylog2.Core;
@@ -42,11 +43,17 @@ public class DeadLetterThread extends Periodical {
 
     private static final Logger LOG = LoggerFactory.getLogger(DeadLetterThread.class);
 
+    private final PersistedDeadLetterService persistedDeadLetterService;
+    private final IndexFailureService indexFailureService;
+
+    @Inject
+    public DeadLetterThread(PersistedDeadLetterService persistedDeadLetterService, IndexFailureService indexFailureService) {
+        this.persistedDeadLetterService = persistedDeadLetterService;
+        this.indexFailureService = indexFailureService;
+    }
+
     @Override
     public void run() {
-        final PersistedDeadLetterService persistedDeadLetterService = new PersistedDeadLetterServiceImpl(core.getMongoConnection());
-        final IndexFailureService indexFailureService = new IndexFailureServiceImpl(core.getMongoConnection());
-
         verifyIndices();
 
         // Poll queue forever.

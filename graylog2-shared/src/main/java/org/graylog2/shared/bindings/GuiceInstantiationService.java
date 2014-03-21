@@ -17,18 +17,22 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.graylog2.indexer;
+package org.graylog2.shared.bindings;
 
-import com.google.inject.Inject;
-import org.graylog2.database.MongoConnection;
-import org.graylog2.database.PersistedServiceImpl;
+import com.google.inject.Injector;
 
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
  */
-public class PersistedDeadLetterServiceImpl extends PersistedServiceImpl implements PersistedDeadLetterService {
-    @Inject
-    public PersistedDeadLetterServiceImpl(MongoConnection mongoConnection) {
-        super(mongoConnection);
+public class GuiceInstantiationService implements InstantiationService {
+    private Injector injector;
+
+    public void setInjector(Injector injector) {
+        this.injector = injector;
+    }
+
+    @Override
+    public <T> T getInstance(Class<T> requiredClass) {
+        return injector.getInstance(requiredClass);
     }
 }
