@@ -23,18 +23,18 @@ import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
+import org.graylog2.database.MongoConnection;
+import org.graylog2.database.PersistedServiceImpl;
 
 /**
  *  @author Lennart Koopmann <lennart@socketfeed.com>
  */
-public class SystemSetting {
+public class SystemSetting extends PersistedServiceImpl {
     
     private static final String COLLECTION_NAME = "system_settings";
 
-    private Core server;
-    
-    public SystemSetting(Core server) {
-        this.server = server;
+    public SystemSetting(MongoConnection mongoConnection) {
+        super(mongoConnection);
     }
     
     public boolean getBoolean(String key) {
@@ -66,7 +66,7 @@ public class SystemSetting {
     }
 
     private DBCollection getCollection() {
-        return server.getMongoConnection().getDatabase().getCollection(COLLECTION_NAME);
+        return mongoConnection.getDatabase().getCollection(COLLECTION_NAME);
     }
     
 }

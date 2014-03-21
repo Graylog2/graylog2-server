@@ -21,8 +21,10 @@ package org.graylog2.indexer;
 
 import com.google.common.collect.Lists;
 import com.mongodb.BasicDBObject;
+import com.mongodb.BasicDBObjectBuilder;
 import com.mongodb.DBObject;
 import org.bson.types.ObjectId;
+import org.graylog2.database.CollectionName;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PersistedServiceImpl;
 import org.joda.time.DateTime;
@@ -32,6 +34,17 @@ import java.util.List;
 public class IndexFailureServiceImpl extends PersistedServiceImpl implements IndexFailureService {
     public IndexFailureServiceImpl(MongoConnection mongoConnection) {
         super(mongoConnection);
+
+        // Make sure that the index failures collection is always created capped.
+        final String collectionName = IndexFailureImpl.class.getAnnotation(CollectionName.class).value();
+        if(!mongoConnection.getDatabase().collectionExists(collectionName)) {
+            DBObject options = BasicDBObjectBuilder.start()
+                    .add("capped", true)
+                    .add("size", 52428800) // 50MB max size.
+                    .get();
+
+            mongoConnection.getDatabase().createCollection(collectionName, options);
+        }
     }
 
     @Override

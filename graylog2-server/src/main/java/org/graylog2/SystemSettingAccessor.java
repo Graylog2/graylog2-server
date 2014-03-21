@@ -38,13 +38,13 @@ public class SystemSettingAccessor {
     }
     
     public boolean allowUsageStats() {
-        SystemSetting s = new SystemSetting(server);
+        SystemSetting s = new SystemSetting(server.getMongoConnection());
         return s.getBoolean(KEY_ALLOW_USAGE_STATS);
     }
     
     public Set<String> getForcedAlarmCallbacks() {
         Set<String> callbacks = Sets.newHashSet();
-        SystemSetting s = new SystemSetting(server);
+        SystemSetting s = new SystemSetting(server.getMongoConnection());
         BasicDBList objs = s.getList(KEY_FORCED_ALARM_CALLBACKS);
         
         for (Object obj : objs) {

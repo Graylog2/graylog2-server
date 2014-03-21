@@ -20,28 +20,15 @@
 package org.graylog2.plugins;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.Maps;
-import org.graylog2.Configuration;
 import org.graylog2.Core;
-import org.graylog2.database.MongoBridge;
-import org.graylog2.database.MongoConnection;
 import org.graylog2.plugin.Tools;
-import org.graylog2.plugin.alarms.callbacks.AlarmCallback;
-import org.graylog2.plugin.alarms.transports.Transport;
-import org.graylog2.plugin.filters.MessageFilter;
-import org.graylog2.plugin.initializers.Initializer;
-import org.graylog2.plugin.inputs.MessageInput;
-import org.graylog2.plugin.outputs.MessageOutput;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLClassLoader;
-import java.util.Map;
 import java.util.Set;
 
 /**

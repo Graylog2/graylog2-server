@@ -19,9 +19,12 @@
 package org.graylog2.system.activities;
 
 import com.google.common.collect.Maps;
+import com.google.inject.Inject;
 import org.graylog2.Core;
 import org.graylog2.database.ValidationException;
 import org.graylog2.plugin.Tools;
+import org.graylog2.plugin.system.NodeId;
+import org.graylog2.shared.ServerStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,21 +36,22 @@ import java.util.Map;
 public class ActivityWriter {
 
     private static final Logger LOG = LoggerFactory.getLogger(ActivityWriter.class);
+    private final SystemMessageService systemMessageService;
+    private final ServerStatus serverStatus;
 
-    private final Core server;
-
-    public ActivityWriter(Core server) {
-        this.server = server;
+    @Inject
+    public ActivityWriter(SystemMessageService systemMessageService, ServerStatus serverStatus) {
+        this.systemMessageService = systemMessageService;
+        this.serverStatus = serverStatus;
     }
     
     public void write(Activity activity) {
-        final SystemMessageService systemMessageService = new SystemMessageServiceImpl(server.getMongoConnection());
         try {
             Map<String, Object> entry = Maps.newHashMap();
             entry.put("timestamp", Tools.iso8601());
             entry.put("content", activity.getMessage());
             entry.put("caller", activity.getCaller().getCanonicalName());
-            entry.put("node_id", server.getNodeId());
+            entry.put("node_id", serverStatus.getNodeId().toString());
 
             SystemMessageImpl sm = new SystemMessageImpl(entry);
             systemMessageService.save(sm);

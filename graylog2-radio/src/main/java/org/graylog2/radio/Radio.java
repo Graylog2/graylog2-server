@@ -42,13 +42,13 @@ import org.graylog2.plugin.filters.MessageFilter;
 import org.graylog2.plugin.indexer.MessageGateway;
 import org.graylog2.plugin.lifecycles.Lifecycle;
 import org.graylog2.plugin.rest.AnyExceptionClassMapper;
-import org.graylog2.plugin.system.NodeId;
 import org.graylog2.radio.buffers.processors.RadioProcessBufferProcessor;
 import org.graylog2.radio.cluster.Ping;
 import org.graylog2.radio.inputs.RadioInputRegistry;
 import org.graylog2.radio.transports.RadioTransport;
 import org.graylog2.radio.transports.kafka.KafkaProducer;
 import org.graylog2.shared.ProcessingHost;
+import org.graylog2.shared.ServerStatus;
 import org.graylog2.shared.buffers.ProcessBuffer;
 import org.graylog2.shared.buffers.processors.ProcessBufferProcessor;
 import org.graylog2.shared.inputs.InputRegistry;
@@ -80,13 +80,12 @@ public class Radio implements InputHost, GraylogServer, ProcessingHost {
 
     public static final Version VERSION = RadioVersion.VERSION;
 
-    private Lifecycle lifecycle = Lifecycle.UNINITIALIZED;
-
-    private DateTime startedAt;
     @Inject
     private MetricRegistry metricRegistry;
     @Inject
     private Configuration configuration;
+    @Inject
+    private ServerStatus serverStatus;
 
     private GELFChunkManager gelfChunkManager;
 
@@ -102,8 +101,6 @@ public class Radio implements InputHost, GraylogServer, ProcessingHost {
 
     private final AsyncHttpClient httpClient;
 
-    private String nodeId;
-
     @Inject
     private ProcessBuffer.Factory processBufferFactory;
     @Inject
@@ -118,11 +115,6 @@ public class Radio implements InputHost, GraylogServer, ProcessingHost {
     }
 
     public void initialize() {
-        startedAt = new DateTime(DateTimeZone.UTC);
-
-        NodeId id = new NodeId(configuration.getNodeIdFile());
-        this.nodeId = id.readOrGenerate();
-
         gelfChunkManager = new GELFChunkManager(this);
         gelfChunkManager.start();
 
@@ -167,7 +159,7 @@ public class Radio implements InputHost, GraylogServer, ProcessingHost {
             this.configuration.setRestTransportUri(transportStr);
         }
 
-        pinger = new Ping.Pinger(httpClient, nodeId, configuration.getRestTransportUri(), configuration.getGraylog2ServerUri());
+        pinger = new Ping.Pinger(httpClient, serverStatus.getNodeId().toString(), configuration.getRestTransportUri(), configuration.getGraylog2ServerUri());
 
         scheduler = Executors.newScheduledThreadPool(SCHEDULED_THREADS_POOL_SIZE,
                 new ThreadFactoryBuilder().setNameFormat("scheduled-%d").build()
@@ -269,7 +261,7 @@ public class Radio implements InputHost, GraylogServer, ProcessingHost {
     }
 
     public String getNodeId() {
-        return nodeId;
+        return serverStatus.getNodeId().toString();
     }
 
     @Override
@@ -283,7 +275,7 @@ public class Radio implements InputHost, GraylogServer, ProcessingHost {
     }
 
     public DateTime getStartedAt() {
-        return startedAt;
+        return serverStatus.getStartedAt();
     }
 
     public InputRegistry inputs() {
@@ -345,11 +337,11 @@ public class Radio implements InputHost, GraylogServer, ProcessingHost {
     }
 
     public Lifecycle getLifecycle() {
-        return lifecycle;
+        return serverStatus.getLifecycle();
     }
 
     public void setLifecycle(Lifecycle lifecycle) {
-        this.lifecycle = lifecycle;
+        serverStatus.setLifecycle(lifecycle);
     }
 
 }

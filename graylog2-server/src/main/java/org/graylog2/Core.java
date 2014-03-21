@@ -24,8 +24,6 @@ import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.inject.Inject;
-import com.mongodb.BasicDBObjectBuilder;
-import com.mongodb.DBObject;
 import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.cliffc.high_scale_lib.Counter;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
@@ -44,8 +42,6 @@ import org.graylog2.cluster.NodeServiceImpl;
 import org.graylog2.dashboards.DashboardRegistry;
 import org.graylog2.dashboards.DashboardService;
 import org.graylog2.dashboards.DashboardServiceImpl;
-import org.graylog2.database.CollectionName;
-import org.graylog2.database.MongoBridge;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.indexer.*;
 import org.graylog2.indexer.ranges.IndexRangeService;
@@ -143,8 +139,6 @@ public class Core implements GraylogServer, InputHost, ProcessingHost {
 
     @Inject
     private MongoConnection mongoConnection;
-    @Inject
-    private MongoBridge mongoBridge;
     @Inject
     private Configuration configuration;
     @Inject
@@ -273,17 +267,6 @@ public class Core implements GraylogServer, InputHost, ProcessingHost {
         );
 
         gelfChunkManager = new GELFChunkManager(this);
-
-        // Make sure that the index failures collection is always created capped.
-        final String collectionName = IndexFailureImpl.class.getAnnotation(CollectionName.class).value();
-        if(!mongoConnection.getDatabase().collectionExists(collectionName)) {
-            DBObject options = BasicDBObjectBuilder.start()
-                    .add("capped", true)
-                    .add("size", 52428800) // 50MB max size.
-                    .get();
-
-            mongoConnection.getDatabase().createCollection(collectionName, options);
-        }
 
         indexer = new Indexer(this);
         indexer.start();
@@ -515,10 +498,6 @@ public class Core implements GraylogServer, InputHost, ProcessingHost {
 
     public MongoConnection getMongoConnection() {
         return mongoConnection;
-    }
-
-    public MongoBridge getMongoBridge() {
-        return mongoBridge;
     }
 
     public ScheduledExecutorService getScheduler() {
