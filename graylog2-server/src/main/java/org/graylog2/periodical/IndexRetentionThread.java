@@ -1,5 +1,5 @@
-/**
- * Copyright 2012 Lennart Koopmann <lennart@socketfeed.com>
+/*
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -15,15 +15,15 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 
 package org.graylog2.periodical;
 
+import com.google.inject.Inject;
 import org.elasticsearch.action.admin.indices.stats.IndexStats;
+import org.graylog2.Configuration;
 import org.graylog2.indexer.IndexHelper;
 import org.graylog2.indexer.NoTargetIndexException;
-import org.graylog2.indexer.ranges.IndexRange;
 import org.graylog2.indexer.ranges.RebuildIndexRangesJob;
 import org.graylog2.indexer.retention.RetentionStrategyFactory;
 import org.graylog2.plugin.indexer.retention.RetentionStrategy;
@@ -31,7 +31,6 @@ import org.graylog2.system.activities.Activity;
 import org.graylog2.system.jobs.SystemJobConcurrencyException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.graylog2.Core;
 
 import java.util.Map;
 
@@ -42,11 +41,18 @@ public class IndexRetentionThread extends Periodical {
 
     private static final Logger LOG = LoggerFactory.getLogger(IndexRetentionThread.class);
 
+    private final Configuration configuration;
+
+    @Inject
+    public IndexRetentionThread(Configuration configuration) {
+        this.configuration = configuration;
+    }
+
     @Override
     public void run() {
         Map<String, IndexStats> indices = core.getDeflector().getAllDeflectorIndices();
         int indexCount = indices.size();
-        int maxIndices = core.getConfiguration().getMaxNumberOfIndices();
+        int maxIndices = configuration.getMaxNumberOfIndices();
 
         // Do we have more indices than the configured maximum?
         if (indexCount <= maxIndices) {
@@ -64,7 +70,7 @@ public class IndexRetentionThread extends Periodical {
 
         try {
             runRetention(
-                    RetentionStrategyFactory.fromString(core, core.getConfiguration().getRetentionStrategy()),
+                    RetentionStrategyFactory.fromString(core, configuration.getRetentionStrategy()),
                     indices,
                     removeCount
             );

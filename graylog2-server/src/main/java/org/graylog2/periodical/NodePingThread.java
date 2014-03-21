@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 TORCH GmbH
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -18,15 +18,14 @@
  */
 package org.graylog2.periodical;
 
-import org.graylog2.Core;
+import com.google.inject.Inject;
+import org.graylog2.Configuration;
 import org.graylog2.cluster.Node;
 import org.graylog2.cluster.NodeNotFoundException;
 import org.graylog2.cluster.NodeService;
-import org.graylog2.cluster.NodeServiceImpl;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationImpl;
 import org.graylog2.notifications.NotificationService;
-import org.graylog2.notifications.NotificationServiceImpl;
 import org.graylog2.system.activities.Activity;
 import org.graylog2.system.activities.ActivityWriter;
 import org.slf4j.Logger;
@@ -38,24 +37,25 @@ import org.slf4j.LoggerFactory;
 public class NodePingThread extends Periodical {
 
     private static final Logger LOG = LoggerFactory.getLogger(NodePingThread.class);
-    private NodeService nodeService;
-    private NotificationService notificationService;
+    private final NodeService nodeService;
+    private final NotificationService notificationService;
+    private final Configuration configuration;
 
-    @Override
-    public void initialize(Core core) {
-        super.initialize(core);
-        this.nodeService = new NodeServiceImpl(core.getMongoConnection());
-        this.notificationService = new NotificationServiceImpl(core.getMongoConnection());
+    @Inject
+    public NodePingThread(NodeService nodeService, NotificationService notificationService, Configuration configuration) {
+        this.nodeService = nodeService;
+        this.notificationService = notificationService;
+        this.configuration = configuration;
     }
 
     @Override
     public void run() {
         try {
             Node node = nodeService.thisNode(core);
-            nodeService.markAsAlive(node, core.isMaster(), core.getConfiguration().getRestTransportUri());
+            nodeService.markAsAlive(node, core.isMaster(), configuration.getRestTransportUri());
         } catch (NodeNotFoundException e) {
             LOG.warn("Did not find meta info of this node. Re-registering.");
-            nodeService.registerServer(core, core.isMaster(), core.getConfiguration().getRestTransportUri());
+            nodeService.registerServer(core, core.isMaster(), configuration.getRestTransportUri());
         }
         try {
             // Remove old nodes that are no longer running. (Just some housekeeping)

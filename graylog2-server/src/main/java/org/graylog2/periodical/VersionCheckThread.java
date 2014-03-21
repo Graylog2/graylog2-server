@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 TORCH GmbH
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -19,6 +19,7 @@
 package org.graylog2.periodical;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.inject.Inject;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
@@ -35,7 +36,6 @@ import org.graylog2.Core;
 import org.graylog2.ServerVersion;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
-import org.graylog2.notifications.NotificationServiceImpl;
 import org.graylog2.plugin.Version;
 import org.graylog2.versioncheck.VersionCheckResponse;
 import org.slf4j.Logger;
@@ -53,12 +53,13 @@ import java.nio.charset.Charset;
 public class VersionCheckThread extends Periodical {
 
     private static final Logger LOG = LoggerFactory.getLogger(VersionCheckThread.class);
-    private NotificationService notificationService;
+    private final NotificationService notificationService;
+    private final Configuration configuration;
 
-    @Override
-    public void initialize(Core core) {
-        super.initialize(core);
-        notificationService = new NotificationServiceImpl(core.getMongoConnection());
+    @Inject
+    public VersionCheckThread(NotificationService notificationService, Configuration configuration) {
+        this.notificationService = notificationService;
+        this.configuration = configuration;
     }
 
     @Override
@@ -66,8 +67,7 @@ public class VersionCheckThread extends Periodical {
         final URIBuilder uri;
         final HttpGet get;
         try {
-            final Configuration config = core.getConfiguration();
-            uri = new URIBuilder(config.getVersionchecksUri());
+            uri = new URIBuilder(configuration.getVersionchecksUri());
             uri.addParameter("anonid", DigestUtils.sha256Hex(core.getNodeId()));
             uri.addParameter("version", ServerVersion.VERSION.toString());
 
@@ -86,14 +86,14 @@ public class VersionCheckThread extends Periodical {
                     .setConnectTimeout(10000)
                     .setSocketTimeout(10000)
                     .setConnectionRequestTimeout(10000);
-            if (config.getHttpProxyUri() != null) {
+            if (configuration.getHttpProxyUri() != null) {
                 try {
-                    final URIBuilder uriBuilder = new URIBuilder(config.getHttpProxyUri());
+                    final URIBuilder uriBuilder = new URIBuilder(configuration.getHttpProxyUri());
                     final URI proxyURI = uriBuilder.build();
 
                     configBuilder.setProxy(new HttpHost(proxyURI.getHost(), proxyURI.getPort(), proxyURI.getScheme()));
                 } catch (Exception e) {
-                    LOG.error("Invalid version check proxy URI: " + config.getHttpProxyUri(), e);
+                    LOG.error("Invalid version check proxy URI: " + configuration.getHttpProxyUri(), e);
                     return;
                 }
             }

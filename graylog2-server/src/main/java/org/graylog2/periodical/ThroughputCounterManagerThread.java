@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 TORCH GmbH
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -15,7 +15,6 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 package org.graylog2.periodical;
 
@@ -26,8 +25,12 @@ import org.graylog2.shared.stats.ThroughputStats;
  * @author Lennart Koopmann <lennart@torch.sh>
  */
 public class ThroughputCounterManagerThread extends Periodical {
+    private final ThroughputStats throughputStats;
+
     @Inject
-    private ThroughputStats throughputStats;
+    public ThroughputCounterManagerThread(ThroughputStats throughputStats) {
+        this.throughputStats = throughputStats;
+    }
 
     @Override
     public void run() {

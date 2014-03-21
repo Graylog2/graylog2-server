@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 TORCH GmbH
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -18,12 +18,11 @@
  */
 package org.graylog2.periodical;
 
-import org.graylog2.Core;
+import com.google.inject.Inject;
 import org.graylog2.indexer.Deflector;
 import org.graylog2.indexer.NoTargetIndexException;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
-import org.graylog2.notifications.NotificationServiceImpl;
 import org.graylog2.system.activities.Activity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,10 +36,9 @@ public class DeflectorManagerThread extends Periodical { // public class Klimper
 
     private NotificationService notificationService;
 
-    @Override
-    public void initialize(Core core) {
-        super.initialize(core);
-        this.notificationService = new NotificationServiceImpl(core.getMongoConnection());
+    @Inject
+    public DeflectorManagerThread(NotificationService notificationService) {
+        this.notificationService = notificationService;
     }
 
     @Override

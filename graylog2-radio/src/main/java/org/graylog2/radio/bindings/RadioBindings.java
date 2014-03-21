@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 TORCH GmbH
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -13,24 +13,29 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package org.graylog2.radio.bindings;
 
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.inject.AbstractModule;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
+import com.google.inject.name.Names;
 import org.graylog2.radio.Configuration;
 import org.graylog2.radio.buffers.processors.RadioProcessBufferProcessor;
 import org.graylog2.shared.ServerStatus;
+
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
  */
 public class RadioBindings extends AbstractModule {
     private final Configuration configuration;
+    private static final int SCHEDULED_THREADS_POOL_SIZE = 10;
 
     public RadioBindings(Configuration configuration) {
         this.configuration = configuration;
@@ -38,8 +43,24 @@ public class RadioBindings extends AbstractModule {
 
     @Override
     protected void configure() {
-        bind(Configuration.class).toInstance(configuration);
+        bindSingletons();
         install(new FactoryModuleBuilder().build(RadioProcessBufferProcessor.Factory.class));
+        bindSchedulers();
+    }
+
+    private void bindSingletons() {
+        bind(Configuration.class).toInstance(configuration);
         bind(ServerStatus.class).toInstance(new ServerStatus(configuration));
+    }
+
+    private void bindSchedulers() {
+        final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(SCHEDULED_THREADS_POOL_SIZE,
+                new ThreadFactoryBuilder()
+                        .setNameFormat("scheduled-%d")
+                        .setDaemon(false)
+                        .build()
+        );
+
+        bind(ScheduledExecutorService.class).annotatedWith(Names.named("scheduler")).toInstance(scheduler);
     }
 }
