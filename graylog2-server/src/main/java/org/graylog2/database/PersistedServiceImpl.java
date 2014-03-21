@@ -152,7 +152,7 @@ public class PersistedServiceImpl implements PersistedService {
 
     @Override
     public <T extends Persisted> int destroy(T model) {
-        return collection(model).remove(new BasicDBObject("_id", model.getId())).getN();
+        return collection(model).remove(new BasicDBObject("_id", new ObjectId(model.getId()))).getN();
     }
 
     @Override
@@ -192,7 +192,7 @@ public class PersistedServiceImpl implements PersistedService {
         BasicDBObject q = new BasicDBObject("_id", new ObjectId(model.getId()));
         collection(model).update(q, doc, true, false);
 
-        return model.getObjectId().toStringMongod();
+        return model.getId();
     }
 
     @Override
@@ -238,8 +238,7 @@ public class PersistedServiceImpl implements PersistedService {
         return validate(model, model.getFields());
     }
 
-    @Override
-    public <T extends Persisted> void embed(T model, String key, EmbeddedPersistable o) throws ValidationException {
+    protected <T extends Persisted> void embed(T model, String key, EmbeddedPersistable o) throws ValidationException {
         if (!validate(model.getEmbeddedValidations(key), o.getPersistedFields())) {
             throw new ValidationException();
         }
@@ -251,10 +250,9 @@ public class PersistedServiceImpl implements PersistedService {
         collection(model).update(new BasicDBObject("_id", model.getId()), new BasicDBObject("$push", new BasicDBObject(key, dbo)));
     }
 
-    @Override
-    public <T extends Persisted> void removeEmbedded(T model, String key, String searchId) {
+    protected <T extends Persisted> void removeEmbedded(T model, String key, String searchId) {
         BasicDBObject aryQry = new BasicDBObject("id", searchId);
-        BasicDBObject qry = new BasicDBObject("_id", model.getId());
+        BasicDBObject qry = new BasicDBObject("_id", new ObjectId(model.getId()));
         BasicDBObject update = new BasicDBObject("$pull", new BasicDBObject(key, aryQry));
 
         // http://docs.mongodb.org/manual/reference/operator/pull/
@@ -262,8 +260,7 @@ public class PersistedServiceImpl implements PersistedService {
         collection(model).update(qry, update);
     }
 
-    @Override
-    public <T extends Persisted> void removeEmbedded(T model, String arrayKey, String key, String searchId) {
+    protected <T extends Persisted> void removeEmbedded(T model, String arrayKey, String key, String searchId) {
         BasicDBObject aryQry = new BasicDBObject(arrayKey, searchId);
         BasicDBObject qry = new BasicDBObject("_id", model.getId());
         BasicDBObject update = new BasicDBObject("$pull", new BasicDBObject(key, aryQry));
@@ -273,8 +270,7 @@ public class PersistedServiceImpl implements PersistedService {
         collection(model).update(qry, update);
     }
 
-    @Override
-    public void fieldTransformations(Map<String, Object> doc) {
+    private void fieldTransformations(Map<String, Object> doc) {
         for (Map.Entry<String, Object> x : doc.entrySet()) {
 
             // Work on embedded Maps, too.

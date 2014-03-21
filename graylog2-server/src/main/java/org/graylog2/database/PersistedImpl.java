@@ -54,8 +54,7 @@ public abstract class PersistedImpl implements Persisted {
         }
     }
 
-    @Override
-    public ObjectId getObjectId() {
+    protected ObjectId getObjectId() {
         return this.id;
     }
 

@@ -42,12 +42,4 @@ public interface PersistedService {
     <T extends Persisted> boolean validate(T model);
 
     boolean validate(Map<String, Validator> validators, Map<String, Object> fields);
-
-    <T extends Persisted> void embed(T model, String key, EmbeddedPersistable o) throws ValidationException;
-
-    <T extends Persisted> void removeEmbedded(T model, String key, String searchId);
-
-    <T extends Persisted> void removeEmbedded(T model, String arrayKey, String key, String searchId);
-
-    void fieldTransformations(Map<String, Object> doc);
 }
