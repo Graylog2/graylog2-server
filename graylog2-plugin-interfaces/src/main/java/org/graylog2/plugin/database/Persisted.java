@@ -19,7 +19,6 @@
 
 package org.graylog2.plugin.database;
 
-import org.bson.types.ObjectId;
 import org.graylog2.plugin.database.validators.Validator;
 
 import java.util.Map;
@@ -28,8 +27,6 @@ import java.util.Map;
  * @author Dennis Oelkers <dennis@torch.sh>
  */
 public interface Persisted {
-    ObjectId getObjectId();
-
     String getId();
 
     Map<String, Object> getFields();
