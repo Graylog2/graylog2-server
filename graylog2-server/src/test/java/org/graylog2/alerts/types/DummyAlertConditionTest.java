@@ -26,8 +26,8 @@ import org.testng.annotations.Test;
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
  */
+@Test
 public class DummyAlertConditionTest extends AlertConditionTest {
-    @Test
     public void testRunCheck() throws Exception {
 
     }

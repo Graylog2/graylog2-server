@@ -42,9 +42,8 @@ import static org.testng.AssertJUnit.assertNotNull;
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
  */
-@PrepareForTest(AlertImpl.class)
+@Test(enabled=false)
 public class FieldValueAlertConditionTest extends AlertConditionTest {
-    @Test
     public void testConstructor() throws Exception {
         Map<String, Object> parameters = getParametersMap(0,
                 0,
@@ -59,7 +58,6 @@ public class FieldValueAlertConditionTest extends AlertConditionTest {
         assertNotNull(fieldValueAlertCondition.getDescription());
     }
 
-    @Test
     public void testRunCheckHigherPositive() throws Exception {
         for (FieldValueAlertCondition.CheckType checkType : FieldValueAlertCondition.CheckType.values()) {
             final double threshold = 50.0;
@@ -76,7 +74,6 @@ public class FieldValueAlertConditionTest extends AlertConditionTest {
         }
     }
 
-    @Test
     public void testRunCheckHigherNegative() throws Exception {
         for (FieldValueAlertCondition.CheckType checkType : FieldValueAlertCondition.CheckType.values()) {
             final double threshold = 50.0;
@@ -94,7 +91,6 @@ public class FieldValueAlertConditionTest extends AlertConditionTest {
         }
     }
 
-    @Test
     public void testRunCheckLowerPositive() throws Exception {
         for (FieldValueAlertCondition.CheckType checkType : FieldValueAlertCondition.CheckType.values()) {
             final double threshold = 50.0;
@@ -112,7 +108,6 @@ public class FieldValueAlertConditionTest extends AlertConditionTest {
         }
     }
 
-    @Test
     public void testRunCheckLowerNegative() throws Exception {
         for (FieldValueAlertCondition.CheckType checkType : FieldValueAlertCondition.CheckType.values()) {
             final double threshold = 50.0;

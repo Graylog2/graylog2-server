@@ -21,6 +21,7 @@ package org.graylog2.alerts;
 
 import com.google.common.collect.Maps;
 import org.graylog2.Core;
+import org.graylog2.database.MongoConnection;
 import org.graylog2.indexer.Indexer;
 import org.graylog2.indexer.searches.Searches;
 import org.graylog2.plugin.Tools;
@@ -40,13 +41,13 @@ import static org.testng.AssertJUnit.*;
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
  */
-@PrepareForTest(AlertImpl.class)
-public class AlertConditionTest extends PowerMockTestCase {
+public class AlertConditionTest {
     protected Stream stream;
     protected Core core;
     protected Indexer indexer;
     protected Searches searches;
     protected AlertService alertService;
+    protected MongoConnection mongoConnection;
 
     protected final String STREAM_ID = "STREAMMOCKID";
     protected final String STREAM_CREATOR = "MOCKUSER";
@@ -58,7 +59,8 @@ public class AlertConditionTest extends PowerMockTestCase {
         core = mock(Core.class);
         indexer = mock(Indexer.class);
         searches = mock(Searches.class);
-        alertService = mock(AlertService.class);
+        mongoConnection = mock(MongoConnection.class);
+        alertService = new AlertServiceImpl(mongoConnection);
 
         when(stream.getId()).thenReturn(STREAM_ID);
         when(indexer.searches()).thenReturn(searches);
@@ -89,14 +91,15 @@ public class AlertConditionTest extends PowerMockTestCase {
     }
 
     protected void alertLastTriggered(int seconds) {
-        PowerMockito.mockStatic(AlertImpl.class);
-        PowerMockito.when(alertService.triggeredSecondsAgo(STREAM_ID, CONDITION_ID)).thenReturn(seconds);
+        //PowerMockito.mockStatic(AlertImpl.class);
+        //PowerMockito.when(alertService.triggeredSecondsAgo(STREAM_ID, CONDITION_ID)).thenReturn(seconds);
+        when(alertService.triggeredSecondsAgo(STREAM_ID, CONDITION_ID)).thenReturn(seconds);
     }
 
     protected <T extends AlertCondition> T getTestInstance(Class<T> klazz, Map<String, Object> parameters) {
         try {
-            return klazz.getConstructor(Core.class, Stream.class, String.class, DateTime.class, String.class, Map.class)
-                    .newInstance(core, stream, CONDITION_ID, Tools.iso8601(), STREAM_CREATOR, parameters);
+            return klazz.getConstructor(Stream.class, String.class, DateTime.class, String.class, Map.class)
+                    .newInstance(stream, CONDITION_ID, Tools.iso8601(), STREAM_CREATOR, parameters);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
