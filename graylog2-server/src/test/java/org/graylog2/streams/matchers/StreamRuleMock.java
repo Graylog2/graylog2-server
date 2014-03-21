@@ -19,8 +19,6 @@
 
 package org.graylog2.streams.matchers;
 
-import com.mongodb.DBObject;
-import org.bson.types.ObjectId;
 import org.graylog2.plugin.database.validators.Validator;
 import org.graylog2.plugin.streams.StreamRule;
 import org.graylog2.plugin.streams.StreamRuleType;
@@ -38,7 +36,7 @@ public class StreamRuleMock implements StreamRule {
     private String field;
     private Boolean inverted;
 
-    public StreamRuleMock(DBObject rule) {
+    public StreamRuleMock(Map<String, Object> rule) {
         this.id = rule.get("_id").toString();
         if (rule.get("type") != null)
             this.type = StreamRuleType.fromInteger((Integer) rule.get("type"));
@@ -91,11 +89,6 @@ public class StreamRuleMock implements StreamRule {
 
     public void setStreamId(String streamId) {
         this.streamId = streamId;
-    }
-
-    @Override
-    public ObjectId getObjectId() {
-        return new ObjectId(id);
     }
 
     @Override
