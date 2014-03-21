@@ -44,10 +44,10 @@ public class SystemMessageImpl extends PersistedImpl implements SystemMessage {
     public SystemMessageImpl(Map<String, Object> fields) {
         super(fields);
 
-        this.caller = (String) fields.get("caller");
-        this.content = (String) fields.get("content");
-        this.timestamp = (DateTime) fields.get("timestamp");
-        this.nodeId = (String) fields.get("node_id");
+        this.caller = fields.get("caller").toString();
+        this.content = fields.get("content").toString();
+        this.timestamp = new DateTime(fields.get("timestamp").toString());
+        this.nodeId = fields.get("node_id").toString();
     }
 
     protected SystemMessageImpl(ObjectId id, Map<String, Object> fields) {
