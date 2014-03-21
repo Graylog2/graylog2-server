@@ -31,7 +31,7 @@ import com.mongodb.MongoClientOptions.Builder;
  *
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
-public final class MongoConnection {
+public class MongoConnection {
     private MongoClient m;
     private DB db;
 
