@@ -198,6 +198,11 @@ public class UserImpl extends PersistedImpl implements User {
     }
 
     @Override
+    public boolean isLocalAdmin() {
+        return false;
+    }
+
+    @Override
     public void setStartpage(String type, String id) {
         Map<String, String> startpage = Maps.newHashMap();
 
@@ -258,6 +263,11 @@ public class UserImpl extends PersistedImpl implements User {
         @Override
         public DateTimeZone getTimeZone() {
             return null;
+        }
+
+        @Override
+        public boolean isLocalAdmin() {
+            return true;
         }
     }
 }

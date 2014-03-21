@@ -51,7 +51,7 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
     }
 
     @Override
-    public UserImpl load(String username) {
+    public User load(String username) {
         LOG.debug("Loading user {}", username);
         // special case for the locally defined user, we don't store that in MongoDB.
         if (configuration.getRootUsername().equals(username)) {
@@ -103,7 +103,7 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
 
     @Override
     public User syncFromLdapEntry(LdapEntry userEntry, LdapSettings ldapSettings, String username) {
-        UserImpl user = load(username);
+        User user = load(username);
         // create new user object if necessary
         if (user == null) {
             Map<String, Object> fields = Maps.newHashMap();

@@ -68,4 +68,6 @@ public interface User extends Persisted {
     void setExternal(boolean external);
 
     void setStartpage(String type, String id);
+
+    boolean isLocalAdmin();
 }
