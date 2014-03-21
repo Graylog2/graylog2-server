@@ -23,7 +23,6 @@ import org.apache.shiro.realm.AuthenticatingRealm;
 import org.apache.shiro.util.ByteSource;
 import org.graylog2.Core;
 import org.graylog2.users.User;
-import org.graylog2.users.UserImpl;
 import org.graylog2.users.UserService;
 import org.graylog2.users.UserServiceImpl;
 import org.slf4j.Logger;
@@ -48,7 +47,7 @@ public class PasswordAuthenticator extends AuthenticatingRealm {
         log.debug("Retrieving authc info for user {}", token.getUsername());
 
         final User user = userService.load(token.getUsername());
-        if (user instanceof UserImpl.LocalAdminUser || user == null) {
+        if (user == null || user.isLocalAdmin()) {
             // skip the local admin user here, it's ugly, but for auth that user is treated specially.
             return null;
         }
