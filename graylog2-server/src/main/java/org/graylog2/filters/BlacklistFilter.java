@@ -29,19 +29,27 @@ import org.graylog2.plugin.filters.MessageFilter;
 import org.graylog2.plugin.Message;
 
 import java.util.regex.Pattern;
+import java.util.Map;
+import java.util.HashMap;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class BlacklistFilter implements MessageFilter {
-    
+
+    private static Map<String, Pattern> patterns = new HashMap<String, Pattern>();
     private static final Logger LOG = LoggerFactory.getLogger(BlacklistFilter.class);
 
     @Override
     public boolean filter(Message msg, GraylogServer server) {
         for (Blacklist blacklist : Blacklist.fetchAll()) {
             for (BlacklistRule rule : blacklist.getRules()) {
-                if (Pattern.compile(rule.getTerm(), Pattern.DOTALL).matcher(msg.getMessage()).matches()) {
+                Pattern pattern = patterns.get(rule.getTerm());
+                if (pattern == null) {
+                    pattern = Pattern.compile(rule.getTerm(), Pattern.DOTALL);
+                }
+
+                if (pattern.matcher(msg.getMessage()).matches()) {
                     LOG.debug("Message <{}> is blacklisted. First match on {}", this, rule.getTerm());
 
                     // Done - This message is blacklisted.
