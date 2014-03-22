@@ -21,6 +21,8 @@
 package org.graylog2.streams.matchers;
 
 import java.util.regex.Pattern;
+import java.util.Map;
+import java.util.HashMap;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.streams.StreamRule;
 
@@ -29,11 +31,20 @@ import org.graylog2.plugin.streams.StreamRule;
  */
 public class RegexMatcher implements StreamRuleMatcher {
 
+    private static Map<String, Pattern> patterns = new HashMap<String, Pattern>();
+
     @Override
     public boolean match(Message msg, StreamRule rule) {
-        if (msg.getField(rule.getField()) == null)
+        if (msg.getField(rule.getField()) == null) {
             return false;
-        return rule.getInverted() ^ Pattern.compile(rule.getValue(), Pattern.DOTALL).matcher(msg.getField(rule.getField()).toString()).find();
+        }
+
+        Pattern pattern = patterns.get(rule.getValue());
+        if (pattern == null) {
+            pattern = Pattern.compile(rule.getValue(), Pattern.DOTALL);
+        }
+
+        return rule.getInverted() ^ pattern.matcher(msg.getField(rule.getField()).toString()).find();
     }
 
 }
