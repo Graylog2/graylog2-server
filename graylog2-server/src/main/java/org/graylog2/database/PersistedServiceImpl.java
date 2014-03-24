@@ -40,7 +40,7 @@ public class PersistedServiceImpl implements PersistedService {
     private static final Logger LOG = LoggerFactory.getLogger(PersistedServiceImpl.class);
     public final MongoConnection mongoConnection;
 
-    public PersistedServiceImpl(MongoConnection mongoConnection) {
+    protected PersistedServiceImpl(MongoConnection mongoConnection) {
         this.mongoConnection = mongoConnection;
     }
 
