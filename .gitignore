@@ -16,6 +16,7 @@ nbactions.xml
 .DS_Store
 
 graylog2-server/dependency-reduced-pom.xml
+graylog2-radio/dependency-reduced-pom.xml
 
 misc/elasticsearch.yml.2
 misc/elasticsearch.yml.dev
