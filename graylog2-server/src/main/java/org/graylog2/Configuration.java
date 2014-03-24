@@ -15,6 +15,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
+ *
  */
 
 package org.graylog2;
@@ -240,6 +241,9 @@ public class Configuration extends BaseConfiguration {
 
     @Parameter(value = "transport_email_from_email", required = false)
     private String emailTransportFromEmail;
+
+    @Parameter(value = "transport_email_web_interface_url", required = false)
+    private URI emailTransportWebInterfaceUrl;
 
     public boolean isMaster() {
         return isMaster;
@@ -511,6 +515,10 @@ public class Configuration extends BaseConfiguration {
 
     public String getEmailTransportFromEmail() {
         return emailTransportFromEmail;
+    }
+
+    public URI getEmailTransportWebInterfaceUrl() {
+        return emailTransportWebInterfaceUrl;
     }
 
     public boolean isVersionchecks() {
