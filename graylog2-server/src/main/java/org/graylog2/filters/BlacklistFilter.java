@@ -1,5 +1,5 @@
-/**
- * Copyright 2012 Lennart Koopmann <lennart@socketfeed.com>
+/*
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -15,19 +15,22 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 
 package org.graylog2.filters;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import org.graylog2.blacklists.Blacklist;
 import org.graylog2.blacklists.BlacklistRule;
 import org.graylog2.plugin.GraylogServer;
-import org.graylog2.plugin.filters.MessageFilter;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.filters.MessageFilter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.util.concurrent.ExecutionException;
 import java.util.regex.Pattern;
 
 /**
@@ -36,12 +39,32 @@ import java.util.regex.Pattern;
 public class BlacklistFilter implements MessageFilter {
     
     private static final Logger LOG = LoggerFactory.getLogger(BlacklistFilter.class);
+    private static final long CACHESIZE = 1000;
+
+    private final LoadingCache<String, Pattern> patternCache;
+
+    public BlacklistFilter() {
+        this.patternCache = CacheBuilder.newBuilder().maximumSize(CACHESIZE).build(new CacheLoader<String, Pattern>() {
+            @Override
+            public Pattern load(String key) throws Exception {
+                return Pattern.compile(key, Pattern.DOTALL);
+            }
+        });
+    }
 
     @Override
     public boolean filter(Message msg, GraylogServer server) {
         for (Blacklist blacklist : Blacklist.fetchAll()) {
             for (BlacklistRule rule : blacklist.getRules()) {
-                if (Pattern.compile(rule.getTerm(), Pattern.DOTALL).matcher(msg.getMessage()).matches()) {
+                Pattern pattern;
+                try {
+                    pattern = this.patternCache.get(rule.getTerm());
+                } catch (ExecutionException e) {
+                    LOG.error("Unable to get regex from cache: ", e);
+                    return false;
+                }
+
+                if (pattern.matcher(msg.getMessage()).matches()) {
                     LOG.debug("Message <{}> is blacklisted. First match on {}", this, rule.getTerm());
 
                     // Done - This message is blacklisted.
