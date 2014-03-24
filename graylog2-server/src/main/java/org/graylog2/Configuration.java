@@ -251,6 +251,9 @@ public class Configuration {
     @Parameter(value = "transport_email_from_email", required = false)
     private String emailTransportFromEmail;
 
+    @Parameter(value = "transport_email_web_interface_url", required = false)
+    private URI emailTransportWebInterfaceUrl;
+
     @Parameter(value = "rest_enable_cors", required = false)
     private boolean restEnableCors = false;
 
@@ -565,6 +568,10 @@ public class Configuration {
 
     public String getEmailTransportFromEmail() {
         return emailTransportFromEmail;
+    }
+
+    public URI getEmailTransportWebInterfaceUrl() {
+        return emailTransportWebInterfaceUrl;
     }
 
     public boolean isRestEnableCors() {

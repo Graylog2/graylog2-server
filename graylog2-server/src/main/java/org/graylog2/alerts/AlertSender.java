@@ -30,9 +30,11 @@ import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.alarms.transports.TransportConfigurationException;
 import org.graylog2.streams.StreamImpl;
 import org.graylog2.users.User;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.net.URI;
 import java.util.List;
 
 
@@ -110,10 +112,33 @@ public class AlertSender {
         sb.append("Date: ").append(Tools.iso8601().toString()).append("\n");
         sb.append("Stream ID: ").append(stream.getId()).append("\n");
         sb.append("Stream title: ").append(stream.getTitle()).append("\n");
+        if (core.getConfiguration().getEmailTransportWebInterfaceUrl() != null)
+            sb.append("Stream URL: ").append(
+                    buildStreamDetailsURL(core.getConfiguration().getEmailTransportWebInterfaceUrl(),
+                            checkResult, stream));
         sb.append("Stream rules: ").append(stream.getStreamRules()).append("\n");
         sb.append("Alert triggered at: ").append(checkResult.getTriggeredAt()).append("\n");
         sb.append("Triggered condition: ").append(checkResult.getTriggeredCondition()).append("\n");
         sb.append("##########");
+
+        return sb.toString();
+    }
+
+    private String buildStreamDetailsURL(URI baseUri, AlertCondition.CheckResult checkResult, StreamImpl stream) {
+        StringBuilder sb = new StringBuilder();
+
+        int time = 5;
+        if (checkResult.getTriggeredCondition().getParameters().get("time") != null)
+            time = (int)checkResult.getTriggeredCondition().getParameters().get("time");
+
+        DateTime dateAlertEnd = checkResult.getTriggeredAt();
+        DateTime dateAlertStart = dateAlertEnd.minusMinutes(time);
+        String alertStart = Tools.getISO8601String(dateAlertStart);
+        String alertEnd = Tools.getISO8601String(dateAlertEnd);
+
+        sb.append(baseUri).append("/streams/").append(stream.getId()).append("/messages");
+        sb.append("?rangetype=absolute&from=").append(alertStart)
+                .append("&to=").append(alertEnd).append("&q=*\n");
 
         return sb.toString();
     }
