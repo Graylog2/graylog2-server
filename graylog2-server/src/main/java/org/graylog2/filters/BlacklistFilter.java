@@ -61,7 +61,7 @@ public class BlacklistFilter implements MessageFilter {
                     pattern = this.patternCache.get(rule.getTerm());
                 } catch (ExecutionException e) {
                     LOG.error("Unable to get regex from cache: ", e);
-                    return false;
+                    continue;
                 }
 
                 if (pattern.matcher(msg.getMessage()).matches()) {
