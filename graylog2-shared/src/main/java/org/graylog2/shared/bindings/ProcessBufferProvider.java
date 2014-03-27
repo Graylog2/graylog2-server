@@ -17,29 +17,31 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.graylog2;
+package org.graylog2.shared.bindings;
 
 import org.graylog2.inputs.BasicCache;
-import org.graylog2.plugin.Message;
-import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.shared.buffers.ProcessBuffer;
+import org.graylog2.shared.buffers.ProcessBufferWatermark;
+
+import javax.inject.Inject;
+import javax.inject.Provider;
 
 /**
- * @author Lennart Koopmann <lennart@socketfeed.com>
+ * @author Dennis Oelkers <dennis@torch.sh>
  */
-public class ProcessBufferStub extends ProcessBuffer {
+public class ProcessBufferProvider implements Provider<ProcessBuffer> {
+    private static ProcessBuffer processBuffer = null;
 
-    GraylogServerStub serverStub;
-
-    public ProcessBufferStub(GraylogServerStub server) {
-        super(null, null, new BasicCache(), null);
-        serverStub = server;
+    @Inject
+    public ProcessBufferProvider(ProcessBuffer.Factory processBufferFactory, ProcessBufferWatermark processBufferWatermark) {
+        if (processBuffer == null) {
+            BasicCache inputCache = new BasicCache();
+            processBuffer = processBufferFactory.create(inputCache, processBufferWatermark);
+        }
     }
 
     @Override
-    public void insertCached(Message msg, MessageInput sourceInput) {
-        serverStub.callsToProcessBufferInserter++;
-        serverStub.lastInsertedToProcessBuffer = msg;
+    public ProcessBuffer get() {
+        return processBuffer;
     }
-
 }

@@ -1,5 +1,5 @@
-/**
- * Copyright 2012 Lennart Koopmann <lennart@socketfeed.com>
+/*
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -15,31 +15,32 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 package org.graylog2.indexer;
 
 import org.elasticsearch.action.ActionFuture;
 import org.elasticsearch.action.count.CountRequestBuilder;
 import org.elasticsearch.action.count.CountResponse;
-import org.graylog2.plugin.indexer.MessageGateway;
 import org.elasticsearch.index.query.QueryBuilder;
-import org.graylog2.Core;
+import org.graylog2.plugin.indexer.MessageGateway;
 
-import static org.elasticsearch.index.query.QueryBuilders.filteredQuery;
+import javax.inject.Inject;
+
 import static org.elasticsearch.index.query.FilterBuilders.rangeFilter;
-import static org.elasticsearch.index.query.QueryBuilders.matchQuery;
-import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
+import static org.elasticsearch.index.query.QueryBuilders.*;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class MessageGatewayImpl implements MessageGateway {
- 
-    private final Core server;
+    private final Indexer indexer;
+    private final Deflector deflector;
     
-    public MessageGatewayImpl(Core server) {
-        this.server = server;
+    @Inject
+    public MessageGatewayImpl(Indexer indexer,
+                              Deflector deflector) {
+        this.indexer = indexer;
+        this.deflector = deflector;
     }
     
     @Override
@@ -63,12 +64,12 @@ public class MessageGatewayImpl implements MessageGateway {
     }
     
     private int countOnAllIndices(QueryBuilder qb) {
-       CountRequestBuilder b = server.getIndexer().getClient().prepareCount();
+       CountRequestBuilder b = indexer.getClient().prepareCount();
         
-        b.setIndices(server.getDeflector().getAllDeflectorIndexNames());
+        b.setIndices(deflector.getAllDeflectorIndexNames(indexer));
         b.setQuery(qb);
         
-        ActionFuture<CountResponse> future = server.getIndexer().getClient().count(b.request());
+        ActionFuture<CountResponse> future = indexer.getClient().count(b.request());
         return (int) future.actionGet().getCount();
     }
     

@@ -23,6 +23,7 @@ import com.codahale.metrics.MetricRegistry;
 import com.google.inject.AbstractModule;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import org.graylog2.shared.buffers.ProcessBuffer;
+import org.graylog2.shared.buffers.ProcessBufferWatermark;
 import org.graylog2.shared.filters.FilterRegistry;
 import org.graylog2.shared.stats.ThroughputStats;
 
@@ -42,9 +43,12 @@ public class GenericBindings extends AbstractModule {
         bind(MetricRegistry.class).toInstance(new MetricRegistry());
         bind(FilterRegistry.class).toInstance(new FilterRegistry());
         bind(ThroughputStats.class).toInstance(new ThroughputStats());
+        bind(ProcessBufferWatermark.class).toInstance(new ProcessBufferWatermark());
 
         bind(InstantiationService.class).toInstance(instantiationService);
 
         install(new FactoryModuleBuilder().build(ProcessBuffer.Factory.class));
+
+        bind(ProcessBuffer.class).toProvider(ProcessBufferProvider.class);
     }
 }

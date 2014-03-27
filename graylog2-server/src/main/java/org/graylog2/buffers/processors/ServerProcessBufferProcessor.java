@@ -1,3 +1,22 @@
+/*
+ * Copyright 2012-2014 TORCH GmbH
+ *
+ * This file is part of Graylog2.
+ *
+ * Graylog2 is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Graylog2 is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package org.graylog2.buffers.processors;
 
 import com.codahale.metrics.Meter;
@@ -14,6 +33,8 @@ import org.graylog2.shared.filters.FilterRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 import static com.codahale.metrics.MetricRegistry.name;
 
 /**
@@ -22,15 +43,16 @@ import static com.codahale.metrics.MetricRegistry.name;
 public class ServerProcessBufferProcessor extends ProcessBufferProcessor {
     public interface Factory {
         public ServerProcessBufferProcessor create(
-                GraylogServer server,
                 OutputBuffer outputBuffer,
+                GraylogServer graylogServer,
+                AtomicInteger processBufferWatermark,
                 @Assisted("ordinal") final long ordinal,
                 @Assisted("numberOfConsumers") final long numberOfConsumers
         );
     }
 
     private static final Logger LOG = LoggerFactory.getLogger(ServerProcessBufferProcessor.class);
-    private final GraylogServer server;
+    private final GraylogServer graylogServer;
     private final OutputBuffer outputBuffer;
     private final Meter filteredOutMessages;
     private final FilterRegistry filterRegistry;
@@ -39,13 +61,14 @@ public class ServerProcessBufferProcessor extends ProcessBufferProcessor {
     @AssistedInject
     public ServerProcessBufferProcessor(MetricRegistry metricRegistry,
                                   FilterRegistry filterRegistry,
-                                  @Assisted GraylogServer server,
+                                  @Assisted GraylogServer graylogServer,
+                                  @Assisted AtomicInteger processBufferWatermark,
                                   @Assisted("ordinal") final long ordinal,
                                   @Assisted("numberOfConsumers") final long numberOfConsumers,
                                   @Assisted OutputBuffer outputBuffer) {
-        super(metricRegistry, server.processBufferWatermark(), ordinal, numberOfConsumers);
+        super(metricRegistry, processBufferWatermark, ordinal, numberOfConsumers);
         this.filterRegistry = filterRegistry;
-        this.server = server;
+        this.graylogServer = graylogServer;
         this.outputBuffer = outputBuffer;
         this.filteredOutMessages = metricRegistry.meter(name(ProcessBufferProcessor.class, "filteredOutMessages"));
     }
@@ -60,7 +83,7 @@ public class ServerProcessBufferProcessor extends ProcessBufferProcessor {
             try {
                 LOG.debug("Applying filter [{}] on message <{}>.", filter.getName(), msg.getId());
 
-                if (filter.filter(msg, server)) {
+                if (filter.filter(msg, graylogServer)) {
                     LOG.debug("Filter [{}] marked message <{}> to be discarded. Dropping message.", filter.getName(), msg.getId());
                     filteredOutMessages.mark();
                     return;

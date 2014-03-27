@@ -1,5 +1,5 @@
-/**
- * Copyright 2013 Lennart Koopmann <lennart@socketfeed.com>
+/*
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -15,7 +15,6 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 
 package org.graylog2.rest.resources.system;
@@ -29,7 +28,7 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresGuest;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.Core;
-import org.graylog2.ProcessingPauseLockedException;
+import org.graylog2.buffers.Buffers;
 import org.graylog2.plugin.Tools;
 import org.graylog2.rest.documentation.annotations.Api;
 import org.graylog2.rest.documentation.annotations.ApiOperation;
@@ -37,10 +36,12 @@ import org.graylog2.rest.documentation.annotations.ApiParam;
 import org.graylog2.rest.resources.RestResource;
 import org.graylog2.rest.resources.system.responses.ReaderPermissionResponse;
 import org.graylog2.security.RestPermissions;
+import org.graylog2.shared.ProcessingPauseLockedException;
 import org.graylog2.system.shutdown.GracefulShutdown;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 import java.io.ByteArrayOutputStream;
@@ -63,6 +64,9 @@ import static javax.ws.rs.core.Response.ok;
 public class SystemResource extends RestResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(SystemResource.class);
+
+    @Inject
+    private Buffers bufferSynchronizer;
 
     @GET @Timed
     @ApiOperation(value = "Get system overview")
@@ -232,7 +236,7 @@ public class SystemResource extends RestResource {
     public Response shutdown() {
         checkPermission(RestPermissions.NODE_SHUTDOWN, core.getNodeId());
 
-        new Thread(new GracefulShutdown(core)).start();
+        new Thread(new GracefulShutdown(core, bufferSynchronizer)).start();
         return accepted().build();
     }
 

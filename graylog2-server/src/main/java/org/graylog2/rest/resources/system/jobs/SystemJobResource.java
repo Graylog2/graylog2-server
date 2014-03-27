@@ -1,5 +1,5 @@
-/**
- * Copyright 2013 Lennart Koopmann <lennart@torch.sh>
+/*
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -15,7 +15,6 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 package org.graylog2.rest.resources.system.jobs;
 
@@ -34,6 +33,7 @@ import org.graylog2.system.jobs.SystemJobFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -50,6 +50,9 @@ import java.util.Map;
 public class SystemJobResource extends RestResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(SystemJobResource.class);
+
+    @Inject
+    private SystemJobFactory systemJobFactory;
 
     @GET @Timed
     @ApiOperation(value = "List currently running jobs")
@@ -121,7 +124,7 @@ public class SystemJobResource extends RestResource {
 
         SystemJob job;
         try {
-            job = SystemJobFactory.build(tr.jobName, core);
+            job = systemJobFactory.build(tr.jobName);
         } catch(NoSuchJobException e) {
             LOG.error("Such a system job type does not exist. Returning HTTP 400.");
             throw new WebApplicationException(400);

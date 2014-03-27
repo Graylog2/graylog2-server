@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 TORCH GmbH
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -15,7 +15,6 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 
 package org.graylog2.shared.buffers;
@@ -23,26 +22,26 @@ package org.graylog2.shared.buffers;
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import com.lmax.disruptor.WaitStrategy;
 import com.lmax.disruptor.dsl.Disruptor;
 import com.lmax.disruptor.dsl.ProducerType;
 import org.graylog2.inputs.Cache;
-import org.graylog2.plugin.GraylogServer;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.buffers.Buffer;
 import org.graylog2.plugin.buffers.BufferOutOfCapacityException;
 import org.graylog2.plugin.buffers.MessageEvent;
 import org.graylog2.plugin.buffers.ProcessingDisabledException;
 import org.graylog2.plugin.inputs.MessageInput;
+import org.graylog2.shared.ServerStatus;
 import org.graylog2.shared.buffers.processors.ProcessBufferProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.codahale.metrics.MetricRegistry.name;
 
@@ -51,7 +50,7 @@ import static com.codahale.metrics.MetricRegistry.name;
  */
 public class ProcessBuffer extends Buffer {
     public interface Factory {
-        public ProcessBuffer create(GraylogServer server, Cache masterCache);
+        public ProcessBuffer create(Cache masterCache, AtomicInteger processBufferWatermark);
     }
 
     private static final Logger LOG = LoggerFactory.getLogger(ProcessBuffer.class);
@@ -65,37 +64,41 @@ public class ProcessBuffer extends Buffer {
                 .build()
     );
 
-    private GraylogServer server;
-    
     private final Cache masterCache;
+    private final AtomicInteger processBufferWatermark;
 
     private final Meter incomingMessages;
     private final Meter rejectedMessages;
     private final Meter cachedMessages;
 
     private final MetricRegistry metricRegistry;
+    private final ServerStatus serverStatus;
 
     @AssistedInject
     public ProcessBuffer(MetricRegistry metricRegistry,
-                         @Assisted GraylogServer server,
-                         @Assisted Cache masterCache) {
+                         ServerStatus serverStatus,
+                         @Assisted Cache masterCache,
+                         @Assisted AtomicInteger processBufferWatermark) {
         this.metricRegistry = metricRegistry;
-        this.server = server;
+        this.serverStatus = serverStatus;
         this.masterCache = masterCache;
+        this.processBufferWatermark = processBufferWatermark;
 
         incomingMessages = metricRegistry.meter(name(ProcessBuffer.class, "incomingMessages"));
         rejectedMessages = metricRegistry.meter(name(ProcessBuffer.class, "rejectedMessages"));
         cachedMessages = metricRegistry.meter(name(ProcessBuffer.class, "cachedMessages"));
 
-        if (server.isServer()) {
+        if (serverStatus.hasCapability(ServerStatus.Capability.RADIO)) {
+            SOURCE_INPUT_ATTR_NAME = "gl2_source_radio_input";
+            SOURCE_NODE_ATTR_NAME = "gl2_source_radio";
+        } else {
             SOURCE_INPUT_ATTR_NAME = "gl2_source_input";
             SOURCE_NODE_ATTR_NAME = "gl2_source_node";
         }
+    }
 
-        if (server.isRadio()) {
-            SOURCE_INPUT_ATTR_NAME = "gl2_source_radio_input";
-            SOURCE_NODE_ATTR_NAME = "gl2_source_radio";
-        }
+    public Cache getMasterCache() {
+        return masterCache;
     }
 
     public void initialize(ProcessBufferProcessor[] processors, int ringBufferSize, WaitStrategy waitStrategy, int processBufferProcessors) {
@@ -121,9 +124,9 @@ public class ProcessBuffer extends Buffer {
         message.setSourceInput(sourceInput);
 
         message.addField(SOURCE_INPUT_ATTR_NAME, sourceInput.getPersistId());
-        message.addField(SOURCE_NODE_ATTR_NAME, server.getNodeId());
+        message.addField(SOURCE_NODE_ATTR_NAME, serverStatus.getNodeId());
 
-        if (!server.isProcessing()) {
+        if (!serverStatus.isProcessing()) {
             LOG.debug("Message processing is paused. Writing to cache.");
             cachedMessages.mark();
             masterCache.add(message);
@@ -145,9 +148,9 @@ public class ProcessBuffer extends Buffer {
         message.setSourceInput(sourceInput);
 
         message.addField(SOURCE_INPUT_ATTR_NAME, sourceInput.getId());
-        message.addField(SOURCE_NODE_ATTR_NAME, server.getNodeId());
+        message.addField(SOURCE_NODE_ATTR_NAME, serverStatus.getNodeId());
 
-        if (!server.isProcessing()) {
+        if (!serverStatus.isProcessing()) {
             LOG.debug("Rejecting message, because message processing is paused.");
             throw new ProcessingDisabledException();
         }
@@ -167,7 +170,7 @@ public class ProcessBuffer extends Buffer {
         event.setMessage(message);
         ringBuffer.publish(sequence);
 
-        server.processBufferWatermark().incrementAndGet();
+        this.processBufferWatermark.incrementAndGet();
         incomingMessages.mark();
     }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 TORCH GmbH
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -19,15 +19,15 @@
 
 package org.graylog2.indexer.healing;
 
-import org.graylog2.Core;
-import org.graylog2.ProcessingPauseLockedException;
+import com.google.inject.assistedinject.AssistedInject;
 import org.graylog2.buffers.Buffers;
 import org.graylog2.indexer.Deflector;
+import org.graylog2.indexer.Indexer;
 import org.graylog2.notifications.Notification;
-import org.graylog2.notifications.NotificationImpl;
 import org.graylog2.notifications.NotificationService;
-import org.graylog2.notifications.NotificationServiceImpl;
+import org.graylog2.shared.ServerStatus;
 import org.graylog2.system.activities.Activity;
+import org.graylog2.system.activities.ActivityWriter;
 import org.graylog2.system.jobs.SystemJob;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,23 +36,41 @@ import org.slf4j.LoggerFactory;
  * @author Lennart Koopmann <lennart@torch.sh>
  */
 public class FixDeflectorByDeleteJob extends SystemJob {
+    public interface Factory {
+        FixDeflectorByDeleteJob create();
+    }
 
     private static final Logger LOG = LoggerFactory.getLogger(FixDeflectorByDeleteJob.class);
 
     public static final int MAX_CONCURRENCY = 1;
+    private final Deflector deflector;
+    private final Indexer indexer;
+    private final ServerStatus serverStatus;
+    private final ActivityWriter activityWriter;
+    private final Buffers bufferSynchronizer;
+    private final NotificationService notificationService;
 
     private int progress = 0;
 
-    private final NotificationService notificationService;
-
-    public FixDeflectorByDeleteJob(Core core) {
-        this.core = core;
-        this.notificationService = new NotificationServiceImpl(core.getMongoConnection());
+    @AssistedInject
+    public FixDeflectorByDeleteJob(Deflector deflector,
+                                   Indexer indexer,
+                                   ServerStatus serverStatus,
+                                   ActivityWriter activityWriter,
+                                   Buffers bufferSynchronizer,
+                                   NotificationService notificationService) {
+        super(serverStatus);
+        this.deflector = deflector;
+        this.indexer = indexer;
+        this.serverStatus = serverStatus;
+        this.activityWriter = activityWriter;
+        this.bufferSynchronizer = bufferSynchronizer;
+        this.notificationService = notificationService;
     }
 
     @Override
     public void execute() {
-        if (core.getDeflector().isUp() || !core.getIndexer().indices().exists(Deflector.DEFLECTOR_NAME)) {
+        if (deflector.isUp(indexer) || !indexer.indices().exists(Deflector.DEFLECTOR_NAME)) {
             LOG.error("There is no index <{}>. No need to run this job. Aborting.", Deflector.DEFLECTOR_NAME);
             return;
         }
@@ -60,36 +78,36 @@ public class FixDeflectorByDeleteJob extends SystemJob {
         LOG.info("Attempting to fix deflector with delete strategy.");
 
         // Pause message processing and lock the pause.
-        boolean wasProcessing = core.isProcessing();
-        core.pauseMessageProcessing(true);
+        boolean wasProcessing = serverStatus.isProcessing();
+        serverStatus.pauseMessageProcessing();
         progress = 10;
 
-        Buffers.waitForEmptyBuffers(core);
+        bufferSynchronizer.waitForEmptyBuffers();
         progress = 25;
 
         // Delete deflector index.
         LOG.info("Deleting <{}> index.", Deflector.DEFLECTOR_NAME);
-        core.getIndexer().indices().delete(Deflector.DEFLECTOR_NAME);
+        indexer.indices().delete(Deflector.DEFLECTOR_NAME);
         progress = 70;
 
         // Set up deflector.
-        core.getDeflector().setUp();
+        deflector.setUp(indexer);
         progress = 80;
 
         // Start message processing again.
         try {
 
-            core.unlockProcessingPause();
+            serverStatus.unlockProcessingPause();
             if (wasProcessing) {
-                core.resumeMessageProcessing();
+                serverStatus.resumeMessageProcessing();
             }
-        } catch (ProcessingPauseLockedException e) {
+        } catch (Exception e) {
             // lol checked exceptions
             throw new RuntimeException("Could not unlock processing pause.", e);
         }
 
         progress = 90;
-        core.getActivityWriter().write(new Activity("Notification condition [" + NotificationImpl.Type.DEFLECTOR_EXISTS_AS_INDEX + "] " +
+        activityWriter.write(new Activity("Notification condition [" + Notification.Type.DEFLECTOR_EXISTS_AS_INDEX + "] " +
                 "has been fixed.", this.getClass()));
         notificationService.fixed(Notification.Type.DEFLECTOR_EXISTS_AS_INDEX);
 

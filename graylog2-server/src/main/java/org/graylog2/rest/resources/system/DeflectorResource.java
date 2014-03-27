@@ -1,5 +1,5 @@
-/**
- * Copyright 2013 Lennart Koopmann <lennart@torch.sh>
+/*
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -15,7 +15,6 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 package org.graylog2.rest.resources.system;
 
@@ -23,6 +22,8 @@ import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Maps;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.graylog2.indexer.Deflector;
+import org.graylog2.indexer.Indexer;
 import org.graylog2.rest.documentation.annotations.Api;
 import org.graylog2.rest.documentation.annotations.ApiOperation;
 import org.graylog2.rest.resources.RestResource;
@@ -31,6 +32,7 @@ import org.graylog2.system.activities.Activity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -48,6 +50,11 @@ import java.util.Map;
 public class DeflectorResource extends RestResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(DeflectorResource.class);
+    
+    @Inject
+    private Deflector deflector;
+    @Inject
+    private Indexer indexer;
 
     @GET @Timed
     @ApiOperation(value = "Get current deflector status")
@@ -56,8 +63,8 @@ public class DeflectorResource extends RestResource {
     public Response deflector() {
         Map<String, Object> result = Maps.newHashMap();
 
-        result.put("is_up", core.getDeflector().isUp());
-        result.put("current_target", core.getDeflector().getCurrentActualTargetIndex());
+        result.put("is_up", deflector.isUp(indexer));
+        result.put("current_target", deflector.getCurrentActualTargetIndex(indexer));
 
         return Response.ok().entity(json(result)).build();
     }
@@ -89,7 +96,7 @@ public class DeflectorResource extends RestResource {
         LOG.info(msg);
         core.getActivityWriter().write(new Activity(msg, DeflectorResource.class));
 
-        core.getDeflector().cycle();
+        deflector.cycle(indexer);
         return Response.ok().build();
     }
 }

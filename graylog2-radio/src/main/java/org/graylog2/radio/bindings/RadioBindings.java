@@ -50,7 +50,10 @@ public class RadioBindings extends AbstractModule {
 
     private void bindSingletons() {
         bind(Configuration.class).toInstance(configuration);
-        bind(ServerStatus.class).toInstance(new ServerStatus(configuration));
+
+        ServerStatus serverStatus = new ServerStatus(configuration);
+        serverStatus.addCapability(ServerStatus.Capability.RADIO);
+        bind(ServerStatus.class).toInstance(serverStatus);
     }
 
     private void bindSchedulers() {

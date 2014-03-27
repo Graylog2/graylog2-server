@@ -1,5 +1,5 @@
-/**
- * Copyright 2013 Lennart Koopmann <lennart@torch.sh>
+/*
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -15,13 +15,14 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 package org.graylog2.buffers;
 
-import org.graylog2.Core;
+import org.graylog2.shared.buffers.ProcessBuffer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.inject.Inject;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
@@ -29,17 +30,21 @@ import org.slf4j.LoggerFactory;
 public class Buffers {
 
     private static final Logger LOG = LoggerFactory.getLogger(Buffers.class);
+    private final ProcessBuffer processBuffer;
+    private final OutputBuffer outputBuffer;
 
-    public static void waitForEmptyBuffers(Core core) {
+    @Inject
+    public Buffers(ProcessBuffer processBuffer, OutputBuffer outputBuffer) {
+        this.processBuffer = processBuffer;
+        this.outputBuffer = outputBuffer;
+    }
+
+    public void waitForEmptyBuffers() {
         // Wait until the buffers are empty. Messages that were already started to be processed must be fully processed.
-        while(true) {
-            LOG.info("Waiting until all buffers are empty.");
-            if(core.getProcessBuffer().isEmpty() && core.getOutputBuffer().isEmpty()) {
-                break;
-            }
-
+        LOG.info("Waiting until all buffers are empty.");
+        while(!(processBuffer.isEmpty() && outputBuffer.isEmpty())) {
             try {
-                LOG.info("Not all buffers are empty. Waiting another second. ({}p/{}o)", core.getProcessBuffer().getUsage(), core.getOutputBuffer().getUsage());
+                LOG.info("Not all buffers are empty. Waiting another second. ({}p/{}o)", processBuffer.getUsage(), outputBuffer.getUsage());
                 Thread.sleep(1000);
             } catch (InterruptedException e) { /* */ }
         }

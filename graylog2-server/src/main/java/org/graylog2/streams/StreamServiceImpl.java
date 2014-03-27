@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 TORCH GmbH
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -61,7 +61,7 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
 
     @SuppressWarnings("unchecked")
     public Stream load(ObjectId id) throws NotFoundException {
-        BasicDBObject o = (BasicDBObject) get(StreamImpl.class, id);
+        DBObject o = get(StreamImpl.class, id);
 
         if (o == null) {
             throw new NotFoundException();

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 TORCH GmbH
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -30,6 +30,7 @@ import org.graylog2.system.activities.ActivityWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
 import java.util.List;
 import java.util.Map;
 
@@ -37,6 +38,7 @@ public class IndexRangeServiceImpl extends PersistedServiceImpl implements Index
     private static final Logger LOG = LoggerFactory.getLogger(IndexRangeServiceImpl.class);
     private final ActivityWriter activityWriter;
 
+    @Inject
     public IndexRangeServiceImpl(MongoConnection mongoConnection, ActivityWriter activityWriter) {
         super(mongoConnection);
         this.activityWriter = activityWriter;

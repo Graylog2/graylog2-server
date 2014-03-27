@@ -1,5 +1,5 @@
-/**
- * Copyright 2013 Lennart Koopmann <lennart@torch.sh>
+/*
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -15,7 +15,6 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 package org.graylog2.rest.resources.system.indexer;
 
@@ -35,15 +34,20 @@ import org.elasticsearch.cluster.ClusterState;
 import org.elasticsearch.cluster.metadata.IndexMetaData;
 import org.elasticsearch.cluster.routing.ShardRouting;
 import org.elasticsearch.common.collect.UnmodifiableIterator;
+import org.graylog2.Configuration;
+import org.graylog2.indexer.Deflector;
+import org.graylog2.indexer.Indexer;
 import org.graylog2.indexer.ranges.RebuildIndexRangesJob;
 import org.graylog2.rest.documentation.annotations.*;
 import org.graylog2.rest.resources.RestResource;
 import org.graylog2.security.RestPermissions;
 import org.graylog2.system.jobs.SystemJob;
 import org.graylog2.system.jobs.SystemJobConcurrencyException;
+import org.graylog2.system.jobs.SystemJobManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -63,6 +67,17 @@ public class IndicesResource extends RestResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(IndicesResource.class);
 
+    @Inject
+    private RebuildIndexRangesJob.Factory rebuildIndexRangesJobFactory;
+    @Inject
+    private Indexer indexer;
+    @Inject
+    private Deflector deflector;
+    @Inject
+    private SystemJobManager systemJobManager;
+    @Inject
+    private Configuration configuration;
+
     @GET @Timed
     @Path("/{index}")
     @ApiOperation(value = "Get information of an index and its shards.")
@@ -74,7 +89,7 @@ public class IndicesResource extends RestResource {
 
         IndexStats indexStats;
         try {
-            IndicesStatsResponse indicesStatsResponse = core.getIndexer().getClient().admin().indices().stats(new IndicesStatsRequest().all()).get();
+            IndicesStatsResponse indicesStatsResponse = indexer.getClient().admin().indices().stats(new IndicesStatsRequest().all()).get();
             indexStats = indicesStatsResponse.getIndex(index);
 
             if (indexStats == null) {
@@ -90,7 +105,7 @@ public class IndicesResource extends RestResource {
             result.put("primary_shards", indexStats(indexStats.getPrimaries()));
             result.put("all_shards", indexStats(indexStats.getTotal()));
             result.put("routing", routing);
-            result.put("is_reopened", core.getIndexer().indices().isReopened(index));
+            result.put("is_reopened", indexer.indices().isReopened(index));
         } catch (Exception e) {
             LOG.error("Could not get indices information.", e);
             return Response.status(500).build();
@@ -114,14 +129,14 @@ public class IndicesResource extends RestResource {
                     .filterRoutingTable(true)
                     .filterBlocks(true)
                     .filterMetaData(false);
-            ClusterState state = core.getIndexer().getClient().admin().cluster().state(csr).actionGet().getState();
+            ClusterState state = indexer.getClient().admin().cluster().state(csr).actionGet().getState();
 
             UnmodifiableIterator<IndexMetaData> it = state.getMetaData().getIndices().valuesIt();
 
             while(it.hasNext()) {
                 IndexMetaData indexMeta = it.next();
                 // Only search in our indices.
-                if (!indexMeta.getIndex().startsWith(core.getConfiguration().getElasticSearchIndexPrefix())) {
+                if (!indexMeta.getIndex().startsWith(configuration.getElasticSearchIndexPrefix())) {
                     continue;
                 }
                 if (!isPermitted(RestPermissions.INDICES_READ, indexMeta.getIndex())) {
@@ -154,15 +169,15 @@ public class IndicesResource extends RestResource {
         settings.settings(new HashMap() {{
             put("graylog2_reopened", true);
         }});
-        core.getIndexer().getClient().admin().indices().updateSettings(settings).actionGet();
+        indexer.getClient().admin().indices().updateSettings(settings).actionGet();
 
         // Open index.
-        core.getIndexer().getClient().admin().indices().open(new OpenIndexRequest(index)).actionGet();
+        indexer.getClient().admin().indices().open(new OpenIndexRequest(index)).actionGet();
 
         // Trigger index ranges rebuild job.
-        SystemJob rebuildJob = new RebuildIndexRangesJob(core);
+        SystemJob rebuildJob = rebuildIndexRangesJobFactory.create(deflector);
         try {
-            core.getSystemJobManager().submit(rebuildJob);
+            systemJobManager.submit(rebuildJob);
         } catch (SystemJobConcurrencyException e) {
             LOG.error("Concurrency level of this job reached: " + e.getMessage());
             throw new WebApplicationException(403);
@@ -181,17 +196,17 @@ public class IndicesResource extends RestResource {
     public Response close(@ApiParam(title = "index") @PathParam("index") String index) {
         checkPermission(RestPermissions.INDICES_CHANGESTATE, index);
 
-        if (core.getDeflector().getCurrentActualTargetIndex().equals(index)) {
+        if (deflector.getCurrentActualTargetIndex(indexer).equals(index)) {
             return Response.status(403).build();
         }
 
         // Close index.
-        core.getIndexer().getClient().admin().indices().close(new CloseIndexRequest(index)).actionGet();
+        indexer.getClient().admin().indices().close(new CloseIndexRequest(index)).actionGet();
 
         // Trigger index ranges rebuild job.
-        SystemJob rebuildJob = new RebuildIndexRangesJob(core);
+        SystemJob rebuildJob = rebuildIndexRangesJobFactory.create(deflector);
         try {
-            core.getSystemJobManager().submit(rebuildJob);
+            systemJobManager.submit(rebuildJob);
         } catch (SystemJobConcurrencyException e) {
             LOG.error("Concurrency level of this job reached: " + e.getMessage());
             throw new WebApplicationException(403);
@@ -210,17 +225,17 @@ public class IndicesResource extends RestResource {
     public Response delete(@ApiParam(title = "index") @PathParam("index") String index) {
         checkPermission(RestPermissions.INDICES_DELETE, index);
 
-        if (core.getDeflector().getCurrentActualTargetIndex().equals(index)) {
+        if (deflector.getCurrentActualTargetIndex(indexer).equals(index)) {
             return Response.status(403).build();
         }
 
         // Delete index.
-        core.getIndexer().indices().delete(index);
+        indexer.indices().delete(index);
 
         // Trigger index ranges rebuild job.
-        SystemJob rebuildJob = new RebuildIndexRangesJob(core);
+        SystemJob rebuildJob = rebuildIndexRangesJobFactory.create(deflector);
         try {
-            core.getSystemJobManager().submit(rebuildJob);
+            systemJobManager.submit(rebuildJob);
         } catch (SystemJobConcurrencyException e) {
             LOG.error("Concurrency level of this job reached: " + e.getMessage());
             throw new WebApplicationException(403);
@@ -295,7 +310,7 @@ public class IndicesResource extends RestResource {
     }
 
     private String translateESNodeIdToName(String id) {
-        NodeInfo[] result = core.getIndexer().getClient().admin().cluster().nodesInfo(new NodesInfoRequest(id)).actionGet().getNodes();
+        NodeInfo[] result = indexer.getClient().admin().cluster().nodesInfo(new NodesInfoRequest(id)).actionGet().getNodes();
         if (result == null || result.length == 0) {
             return "unknown";
         }
@@ -304,7 +319,7 @@ public class IndicesResource extends RestResource {
     }
 
     private String translateESNodeIdToHostname(String id) {
-        NodeInfo[] result = core.getIndexer().getClient().admin().cluster().nodesInfo(new NodesInfoRequest(id)).actionGet().getNodes();
+        NodeInfo[] result = indexer.getClient().admin().cluster().nodesInfo(new NodesInfoRequest(id)).actionGet().getNodes();
         if (result == null || result.length == 0) {
             return "unknown";
         }

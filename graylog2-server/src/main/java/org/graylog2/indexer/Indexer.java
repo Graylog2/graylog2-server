@@ -1,3 +1,22 @@
+/*
+ * Copyright 2012-2014 TORCH GmbH
+ *
+ * This file is part of Graylog2.
+ *
+ * Graylog2 is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Graylog2 is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package org.graylog2.indexer;
 
 import com.google.common.base.Joiner;
@@ -21,7 +40,6 @@ import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.node.Node;
 import org.elasticsearch.node.NodeBuilder;
 import org.graylog2.Configuration;
-import org.graylog2.Core;
 import org.graylog2.UI;
 import org.graylog2.indexer.cluster.Cluster;
 import org.graylog2.indexer.counts.Counts;
@@ -29,7 +47,6 @@ import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.messages.Messages;
 import org.graylog2.indexer.searches.Searches;
 import org.graylog2.plugin.Message;
-import org.graylog2.plugin.indexer.MessageGateway;
 import org.joda.time.Period;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,10 +64,14 @@ import static org.elasticsearch.node.NodeBuilder.nodeBuilder;
 // TODO figure out how to gracefully deal with failure to connect (or losing connection) to the elastic search cluster!
 public class Indexer {
     private static final Logger LOG = LoggerFactory.getLogger(Indexer.class);
+    private final Configuration configuration;
+    private final Searches.Factory searchesFactory;
+    private final Counts.Factory countsFactory;
+    private final Cluster.Factory clusterFactory;
+    private final Indices.Factory indicesFactory;
 
     private Client client;
     private Node node;
-    private MessageGateway messageGateway;
     public static final String TYPE = "message";
     
     private Searches searches;
@@ -60,8 +81,6 @@ public class Indexer {
     private Indices indices;
 
     private LinkedBlockingQueue<List<DeadLetter>> deadLetterQueue;
-
-    private Core server;
 
     public static enum DateHistogramInterval {
         YEAR(Period.years(1)),
@@ -83,15 +102,22 @@ public class Indexer {
         }
     }
 
-    public Indexer(Core graylogServer) {
-        this.server = graylogServer;
-
+    public Indexer(Configuration configuration,
+                   Searches.Factory searchesFactory,
+                   Counts.Factory countsFactory,
+                   Cluster.Factory clusterFactory,
+                   Indices.Factory indicesFactory) {
+        this.configuration = configuration;
+        this.searchesFactory = searchesFactory;
+        this.countsFactory = countsFactory;
+        this.clusterFactory = clusterFactory;
+        this.indicesFactory = indicesFactory;
         this.deadLetterQueue = new LinkedBlockingQueue<List<DeadLetter>>(1000);
     }
 
     public void start() {
         final NodeBuilder builder = nodeBuilder().client(true);
-        Map<String, String> settings = readNodeSettings(server.getConfiguration());
+        Map<String, String> settings = readNodeSettings(configuration);
 
         builder.settings().put(settings);
         node = builder.node();
@@ -103,12 +129,11 @@ public class Indexer {
             UI.exitHardWithWall("No ElasticSearch master was found.", new String[]{ "graylog2-server/configuring-and-tuning-elasticsearch-for-graylog2-v0200" });
         }
 
-        messageGateway = new MessageGatewayImpl(server);
-        searches = new Searches(client, server);
-        counts = new Counts(client, server);
-        messages = new Messages(client, server);
-        cluster = new Cluster(client, server);
-        indices = new Indices(client, server);
+        searches = searchesFactory.create(client);
+        counts = countsFactory.create(client);
+        messages = new Messages(client);
+        cluster = clusterFactory.create(client);
+        indices = indicesFactory.create(client);
     }
 
     // default visibility for tests
@@ -158,10 +183,6 @@ public class Indexer {
 
     public Client getClient() {
         return client;
-    }
-
-    public MessageGateway getMessageGateway() {
-        return messageGateway;
     }
 
     public String nodeIdToName(String nodeId) {

@@ -16,30 +16,29 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.plugin;
 
-import com.codahale.metrics.MetricRegistry;
-import org.graylog2.plugin.buffers.Buffer;
+package org.graylog2.bindings;
 
-import java.util.concurrent.atomic.AtomicInteger;
+import org.graylog2.system.activities.ActivityWriter;
+import org.graylog2.system.jobs.SystemJobManager;
+
+import javax.inject.Inject;
+import javax.inject.Provider;
 
 /**
- *
- * @author Lennart Koopmann <lennart@socketfeed.com>
+ * @author Dennis Oelkers <dennis@torch.sh>
  */
-public interface GraylogServer extends Runnable, GenericHost {
+public class SystemJobManagerProvider implements Provider<SystemJobManager> {
+    private static SystemJobManager systemJobManager = null;
 
-    public Buffer getOutputBuffer();
-    
-    public boolean isMaster();
-    
-    public String getNodeId();
+    @Inject
+    public SystemJobManagerProvider(ActivityWriter activityWriter) {
+        if (systemJobManager == null)
+            systemJobManager = new SystemJobManager(activityWriter);
+    }
 
-    public MetricRegistry metrics();
-
-    void deleteIndexShortcut(String indexName);
-
-    void closeIndexShortcut(String indexName);
-
-    public AtomicInteger processBufferWatermark();
+    @Override
+    public SystemJobManager get() {
+        return systemJobManager;
+    }
 }

@@ -1,5 +1,5 @@
-/**
- * Copyright 2013 Lennart Koopmann <lennart@torch.sh>
+/*
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -15,18 +15,20 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 package org.graylog2.indexer.cluster;
 
 import com.google.common.collect.Lists;
+import com.google.inject.assistedinject.Assisted;
+import com.google.inject.assistedinject.AssistedInject;
 import org.elasticsearch.action.admin.cluster.health.ClusterHealthRequest;
 import org.elasticsearch.action.admin.cluster.health.ClusterHealthResponse;
 import org.elasticsearch.action.admin.cluster.health.ClusterHealthStatus;
 import org.elasticsearch.action.admin.cluster.node.info.NodeInfo;
 import org.elasticsearch.action.admin.cluster.node.info.NodesInfoRequest;
 import org.elasticsearch.client.Client;
-import org.graylog2.Core;
+import org.graylog2.indexer.Deflector;
+import org.graylog2.indexer.Indexer;
 
 import java.util.List;
 
@@ -34,13 +36,20 @@ import java.util.List;
  * @author Lennart Koopmann <lennart@torch.sh>
  */
 public class Cluster {
+    public interface Factory {
+        Cluster create(Client client);
+    }
 
-    private final Core server;
+    //private final Core server;
     private final Client c;
+    private final Deflector deflector;
+    private final Indexer indexer;
 
-    public Cluster(Client client, Core server) {
-        this.server = server;
+    @AssistedInject
+    public Cluster(@Assisted Client client, Deflector deflector, Indexer indexer) {
         this.c = client;
+        this.deflector = deflector;
+        this.indexer = indexer;
     }
 
     public String getName() {
@@ -68,7 +77,7 @@ public class Cluster {
     }
 
     private ClusterHealthResponse health() {
-        String[] indices = server.getDeflector().getAllDeflectorIndexNames();
+        String[] indices = deflector.getAllDeflectorIndexNames(indexer);
         return c.admin().cluster().health(new ClusterHealthRequest(indices)).actionGet();
     }
 

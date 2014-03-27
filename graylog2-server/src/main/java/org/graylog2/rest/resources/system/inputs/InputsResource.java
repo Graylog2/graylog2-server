@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 TORCH GmbH
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -35,6 +35,7 @@ import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.rest.documentation.annotations.*;
 import org.graylog2.rest.resources.RestResource;
 import org.graylog2.security.RestPermissions;
+import org.graylog2.shared.ServerStatus;
 import org.graylog2.shared.inputs.InputRegistry;
 import org.graylog2.shared.inputs.NoSuchInputTypeException;
 import org.graylog2.shared.rest.resources.system.inputs.requests.InputLaunchRequest;
@@ -228,7 +229,7 @@ public class InputsResource extends RestResource {
 
         core.inputs().terminate(input);
 
-        if (core.isMaster() || !input.getGlobal()) {
+        if (serverStatus.hasCapability(ServerStatus.Capability.MASTER) || !input.getGlobal()) {
             // Remove from list and mongo.
             core.inputs().cleanInput(input);
         }

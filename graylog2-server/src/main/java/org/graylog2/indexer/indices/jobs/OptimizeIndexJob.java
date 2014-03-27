@@ -1,5 +1,5 @@
-/**
- * Copyright 2013 Lennart Koopmann <lennart@torch.sh>
+/*
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -15,13 +15,17 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 package org.graylog2.indexer.indices.jobs;
 
+import com.google.inject.assistedinject.Assisted;
+import com.google.inject.assistedinject.AssistedInject;
 import org.elasticsearch.action.admin.indices.optimize.OptimizeRequest;
-import org.graylog2.Core;
+import org.graylog2.indexer.Deflector;
+import org.graylog2.indexer.Indexer;
+import org.graylog2.shared.ServerStatus;
 import org.graylog2.system.activities.Activity;
+import org.graylog2.system.activities.ActivityWriter;
 import org.graylog2.system.jobs.SystemJob;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,22 +34,36 @@ import org.slf4j.LoggerFactory;
  * @author Lennart Koopmann <lennart@torch.sh>
  */
 public class OptimizeIndexJob extends SystemJob {
+    public interface Factory {
+        OptimizeIndexJob create(Deflector deflector, String index);
+    }
 
     private static final Logger LOG = LoggerFactory.getLogger(OptimizeIndexJob.class);
 
     public static final int MAX_CONCURRENCY = 1000;
 
+    private final ActivityWriter activityWriter;
     private final String index;
+    private final Deflector deflector;
+    private final Indexer indexer;
 
-    public OptimizeIndexJob(Core core, String index) {
-        this.core = core;
+    @AssistedInject
+    public OptimizeIndexJob(@Assisted Deflector deflector,
+                            ServerStatus serverStatus,
+                            Indexer indexer,
+                            ActivityWriter activityWriter,
+                            @Assisted String index) {
+        super(serverStatus);
+        this.deflector = deflector;
+        this.indexer = indexer;
+        this.activityWriter = activityWriter;
         this.index = index;
     }
 
     @Override
     public void execute() {
         String msg = "Optimizing index <" + index + ">.";
-        core.getActivityWriter().write(new Activity(msg, OptimizeIndexJob.class));
+        activityWriter.write(new Activity(msg, OptimizeIndexJob.class));
         LOG.info(msg);
 
         // http://www.elasticsearch.org/guide/reference/api/admin-indices-optimize/
@@ -56,7 +74,7 @@ public class OptimizeIndexJob extends SystemJob {
         or.flush(true);
         or.waitForMerge(true); // This makes us block until the operation finished.
 
-        core.getIndexer().getClient().admin().indices().optimize(or).actionGet();
+        indexer.getClient().admin().indices().optimize(or).actionGet();
     }
 
     @Override

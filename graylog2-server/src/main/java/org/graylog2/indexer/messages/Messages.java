@@ -1,5 +1,5 @@
-/**
- * Copyright 2013 Lennart Koopmann <lennart@socketfeed.com>
+/*
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -15,13 +15,11 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 
 package org.graylog2.indexer.messages;
 
-import java.util.List;
-
+import com.beust.jcommander.internal.Lists;
 import org.elasticsearch.action.admin.indices.analyze.AnalyzeRequestBuilder;
 import org.elasticsearch.action.admin.indices.analyze.AnalyzeResponse;
 import org.elasticsearch.action.admin.indices.analyze.AnalyzeResponse.AnalyzeToken;
@@ -29,10 +27,9 @@ import org.elasticsearch.action.get.GetRequestBuilder;
 import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.indices.IndexMissingException;
-import org.graylog2.Core;
 import org.graylog2.indexer.results.ResultMessage;
 
-import com.beust.jcommander.internal.Lists;
+import java.util.List;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
@@ -40,11 +37,9 @@ import com.beust.jcommander.internal.Lists;
 public class Messages {
 	
 	@SuppressWarnings("unused")
-	private final Core server;
 	private final Client c;
 	
-	public Messages(Client client, Core server) {
-		this.server = server;
+	public Messages(Client client) {
 		this.c = client;
 	}
 	

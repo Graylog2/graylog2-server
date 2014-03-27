@@ -16,10 +16,12 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package org.graylog2.periodical;
 
 import com.google.inject.Inject;
 import org.graylog2.indexer.Deflector;
+import org.graylog2.indexer.Indexer;
 import org.graylog2.indexer.NoTargetIndexException;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
@@ -35,10 +37,13 @@ public class DeflectorManagerThread extends Periodical { // public class Klimper
     private static final Logger LOG = LoggerFactory.getLogger(DeflectorManagerThread.class);
 
     private NotificationService notificationService;
+    private final Indexer indexer;
 
     @Inject
-    public DeflectorManagerThread(NotificationService notificationService) {
+    public DeflectorManagerThread(NotificationService notificationService,
+                                  Indexer indexer) {
         this.notificationService = notificationService;
+        this.indexer = indexer;
     }
 
     @Override
@@ -58,7 +63,7 @@ public class DeflectorManagerThread extends Periodical { // public class Klimper
         long messageCountInTarget = 0;
         
         try {
-            currentTarget = core.getDeflector().getNewestTargetName();
+            currentTarget = core.getDeflector().getNewestTargetName(indexer);
             messageCountInTarget = core.getIndexer().indices().numberOfMessages(currentTarget);
         } catch(Exception e) {
             LOG.error("Tried to check for number of messages in current deflector target but did not find index. Aborting.", e);
@@ -71,7 +76,7 @@ public class DeflectorManagerThread extends Periodical { // public class Klimper
                             currentTarget, messageCountInTarget,
                             core.getConfiguration().getElasticSearchMaxDocsPerIndex()
                     });
-            core.getDeflector().cycle();
+            core.getDeflector().cycle(indexer);
         } else {
             LOG.debug("Number of messages in <{}> ({}) is lower than the limit ({}). Not doing anything.",
                     new Object[] {
@@ -82,7 +87,7 @@ public class DeflectorManagerThread extends Periodical { // public class Klimper
     }
 
     private void checkAndRepair() {
-        if (!core.getDeflector().isUp()) {
+        if (!core.getDeflector().isUp(indexer)) {
             if (core.getIndexer().indices().exists(Deflector.DEFLECTOR_NAME)) {
                 // Publish a notification if there is an *index* called graylog2_deflector
                 Notification notification = notificationService.buildNow()
@@ -93,19 +98,19 @@ public class DeflectorManagerThread extends Periodical { // public class Klimper
                     LOG.warn("There is an index called [" + Deflector.DEFLECTOR_NAME + "]. Cannot fix this automatically and published a notification.");
                 }
             } else {
-                core.getDeflector().setUp();
+                core.getDeflector().setUp(indexer);
             }
         } else {
             try {
-                String currentTarget = core.getDeflector().getCurrentActualTargetIndex();
-                String shouldBeTarget = core.getDeflector().getNewestTargetName();
+                String currentTarget = core.getDeflector().getCurrentActualTargetIndex(indexer);
+                String shouldBeTarget = core.getDeflector().getNewestTargetName(indexer);
 
                 if (!currentTarget.equals(shouldBeTarget)) {
                     String msg = "Deflector is pointing to [" + currentTarget + "], not the newest one: [" + shouldBeTarget + "]. Re-pointing.";
                     LOG.warn(msg);
                     core.getActivityWriter().write(new Activity(msg, DeflectorManagerThread.class));
 
-                    core.getDeflector().pointTo(shouldBeTarget, currentTarget);
+                    core.getDeflector().pointTo(indexer, shouldBeTarget, currentTarget);
                 }
             } catch (NoTargetIndexException e) {
                 LOG.warn("Deflector is not up. Not trying to point to another index.");

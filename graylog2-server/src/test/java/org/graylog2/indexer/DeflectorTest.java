@@ -1,12 +1,37 @@
 /*
+ * Copyright 2012-2014 TORCH GmbH
+ *
+ * This file is part of Graylog2.
+ *
+ * Graylog2 is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Graylog2 is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+/*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
 package org.graylog2.indexer;
 
-import org.graylog2.GraylogServerStub;
+import org.graylog2.Configuration;
+import org.graylog2.indexer.indices.jobs.OptimizeIndexJob;
+import org.graylog2.indexer.ranges.RebuildIndexRangesJob;
+import org.graylog2.system.activities.ActivityWriter;
+import org.graylog2.system.jobs.SystemJobManager;
 import org.testng.annotations.Test;
-import static org.testng.AssertJUnit.*;
+
+import static org.mockito.Mockito.mock;
+import static org.testng.AssertJUnit.assertEquals;
 
 /**
  *
@@ -35,7 +60,11 @@ public class DeflectorTest {
     
     @Test
     public void testBuildIndexName() {
-        Deflector d = new Deflector(new GraylogServerStub());
+        Deflector d = new Deflector(mock(SystemJobManager.class),
+                mock(Configuration.class),
+                mock(ActivityWriter.class),
+                mock(RebuildIndexRangesJob.Factory.class),
+                mock(OptimizeIndexJob.Factory.class));
 
         assertEquals("graylog2_0", d.buildIndexName("graylog2", 0));
         assertEquals("graylog2_1", d.buildIndexName("graylog2", 1));

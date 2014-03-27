@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 TORCH GmbH
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -23,6 +23,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.graylog2.indexer.Deflector;
 import org.graylog2.indexer.ranges.IndexRange;
 import org.graylog2.indexer.ranges.IndexRangeService;
 import org.graylog2.indexer.ranges.RebuildIndexRangesJob;
@@ -35,6 +36,7 @@ import org.graylog2.rest.resources.RestResource;
 import org.graylog2.security.RestPermissions;
 import org.graylog2.system.jobs.SystemJob;
 import org.graylog2.system.jobs.SystemJobConcurrencyException;
+import org.graylog2.system.jobs.SystemJobManager;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,6 +60,15 @@ public class IndexRangesResource extends RestResource {
 
     @Inject
     private IndexRangeService indexRangeService;
+
+    @Inject
+    private RebuildIndexRangesJob.Factory rebuildIndexRangesJobFactory;
+
+    @Inject
+    private Deflector deflector;
+
+    @Inject
+    private SystemJobManager systemJobManager;
 
     @GET @Timed
     @ApiOperation(value = "Get a list of all index ranges")
@@ -107,9 +118,9 @@ public class IndexRangesResource extends RestResource {
     })
     @Produces(MediaType.APPLICATION_JSON)
     public Response rebuild() {
-        SystemJob rebuildJob = new RebuildIndexRangesJob(core);
+        SystemJob rebuildJob = rebuildIndexRangesJobFactory.create(this.deflector);
         try {
-            core.getSystemJobManager().submit(rebuildJob);
+            this.systemJobManager.submit(rebuildJob);
         } catch (SystemJobConcurrencyException e) {
             LOG.error("Concurrency level of this job reached: " + e.getMessage());
             throw new WebApplicationException(403);

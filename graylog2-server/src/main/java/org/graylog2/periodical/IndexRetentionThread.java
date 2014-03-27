@@ -22,7 +22,9 @@ package org.graylog2.periodical;
 import com.google.inject.Inject;
 import org.elasticsearch.action.admin.indices.stats.IndexStats;
 import org.graylog2.Configuration;
+import org.graylog2.indexer.Deflector;
 import org.graylog2.indexer.IndexHelper;
+import org.graylog2.indexer.Indexer;
 import org.graylog2.indexer.NoTargetIndexException;
 import org.graylog2.indexer.ranges.RebuildIndexRangesJob;
 import org.graylog2.indexer.retention.RetentionStrategyFactory;
@@ -42,15 +44,24 @@ public class IndexRetentionThread extends Periodical {
     private static final Logger LOG = LoggerFactory.getLogger(IndexRetentionThread.class);
 
     private final Configuration configuration;
+    private final RebuildIndexRangesJob.Factory rebuildIndexRangesJobFactory;
+    private final Deflector deflector;
+    private final Indexer indexer;
 
     @Inject
-    public IndexRetentionThread(Configuration configuration) {
+    public IndexRetentionThread(Configuration configuration,
+                                RebuildIndexRangesJob.Factory rebuildIndexRangesJobFactory,
+                                Deflector deflector,
+                                Indexer indexer) {
         this.configuration = configuration;
+        this.rebuildIndexRangesJobFactory = rebuildIndexRangesJobFactory;
+        this.deflector = deflector;
+        this.indexer = indexer;
     }
 
     @Override
     public void run() {
-        Map<String, IndexStats> indices = core.getDeflector().getAllDeflectorIndices();
+        Map<String, IndexStats> indices = deflector.getAllDeflectorIndices(indexer);
         int indexCount = indices.size();
         int maxIndices = configuration.getMaxNumberOfIndices();
 
@@ -84,7 +95,7 @@ public class IndexRetentionThread extends Periodical {
     public void runRetention(RetentionStrategy strategy, Map<String, IndexStats> indices, int removeCount) throws NoTargetIndexException {
         for (String indexName : IndexHelper.getOldestIndices(indices.keySet(), removeCount)) {
             // Never run against the current deflector target.
-            if (core.getDeflector().getCurrentActualTargetIndex().equals(indexName)) {
+            if (core.getDeflector().getCurrentActualTargetIndex(indexer).equals(indexName)) {
                 LOG.info("Not running retention against current deflector target <{}>.", indexName);
                 continue;
             }
@@ -109,7 +120,7 @@ public class IndexRetentionThread extends Periodical {
 
         // Re-calculate index ranges.
         try {
-            core.getSystemJobManager().submit(new RebuildIndexRangesJob(core));
+            core.getSystemJobManager().submit(rebuildIndexRangesJobFactory.create(deflector));
         } catch (SystemJobConcurrencyException e) {
             String msg = "Could not re-calculate index ranges after running retention: Maximum concurrency of job is reached.";
             core.getActivityWriter().write(new Activity(msg, IndexRetentionThread.class));

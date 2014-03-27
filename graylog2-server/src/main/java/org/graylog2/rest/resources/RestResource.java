@@ -1,5 +1,5 @@
-/**
- * Copyright 2013 Lennart Koopmann <lennart@socketfeed.com>
+/*
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -15,7 +15,6 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 
 package org.graylog2.rest.resources;
@@ -39,6 +38,7 @@ import org.apache.shiro.subject.Subject;
 import org.bson.types.ObjectId;
 import org.graylog2.Core;
 import org.graylog2.security.ShiroSecurityContext;
+import org.graylog2.shared.ServerStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,6 +62,9 @@ public abstract class RestResource {
 
     @Inject
     protected Core core;
+
+    @Inject
+    protected ServerStatus serverStatus;
 
     private boolean prettyPrint;
 
@@ -273,7 +276,7 @@ public abstract class RestResource {
     }
 
     protected void restrictToMaster() {
-        if(!core.isMaster()) {
+        if(!serverStatus.hasCapability(ServerStatus.Capability.MASTER)) {
             LOG.warn("Rejected request that is only allowed against master nodes. Returning HTTP 403.");
             throw new WebApplicationException(403);
         }

@@ -1,5 +1,5 @@
-/**
- * Copyright 2013 Lennart Koopmann <lennart@torch.sh>
+/*
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -15,12 +15,11 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 package org.graylog2.system.jobs;
 
-import org.graylog2.Core;
 import org.graylog2.plugin.Tools;
+import org.graylog2.shared.ServerStatus;
 import org.joda.time.DateTime;
 
 import java.util.HashMap;
@@ -30,6 +29,8 @@ import java.util.Map;
  * @author Lennart Koopmann <lennart@torch.sh>
  */
 public abstract class SystemJob {
+
+    private final ServerStatus serverStatus;
 
     // Known types that can be resolved in the SystemJobFactory.
     public enum Type {
@@ -47,9 +48,17 @@ public abstract class SystemJob {
     public abstract String getDescription();
     public abstract String getClassName();
 
-    protected Core core;
+    //protected Core core;
     protected String id;
     protected DateTime startedAt;
+
+    protected SystemJob(ServerStatus serverStatus) {
+        this.serverStatus = serverStatus;
+    }
+
+    protected SystemJob() {
+        this.serverStatus = null;
+    }
 
     public String getId() {
         if (id == null) {
@@ -80,7 +89,7 @@ public abstract class SystemJob {
             put("percent_complete", getProgress());
             put("provides_progress", providesProgress());
             put("is_cancelable", isCancelable());
-            put("node_id", core.getNodeId());
+            put("node_id", serverStatus.getNodeId());
         }};
     }
 

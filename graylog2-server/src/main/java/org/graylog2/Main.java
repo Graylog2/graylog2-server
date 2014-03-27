@@ -270,7 +270,7 @@ public final class Main extends NodeRunner {
         filterRegistry.register(injector.getInstance(RewriteFilter.class));
 
         // Register outputs.
-        server.outputs().register(new ElasticSearchOutput(server));
+        server.outputs().register(injector.getInstance(ElasticSearchOutput.class));
 
         // Start services.
         server.run();
