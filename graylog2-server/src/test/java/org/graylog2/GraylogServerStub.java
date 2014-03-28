@@ -21,7 +21,6 @@ package org.graylog2;
 
 import com.codahale.metrics.MetricRegistry;
 import org.graylog2.plugin.Message;
-import org.graylog2.plugin.buffers.Buffer;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
@@ -32,12 +31,6 @@ public class GraylogServerStub extends Core {
     public Message lastInsertedToProcessBuffer = null;
     private Configuration configurationStub;
     private MetricRegistry fakeMetricRegistry = new MetricRegistry();
-
-    @Override
-    public Buffer getProcessBuffer() {
-        // The process buffer stuf writes back to our counter instance variables.
-        return new ProcessBufferStub(this);
-    }
 
     public void setConfigurationStub(Configuration stub) {
         this.configurationStub = stub;

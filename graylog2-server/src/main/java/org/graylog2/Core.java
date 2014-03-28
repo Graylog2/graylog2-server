@@ -71,7 +71,6 @@ import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.Version;
 import org.graylog2.plugin.alarms.callbacks.AlarmCallback;
 import org.graylog2.plugin.alarms.transports.Transport;
-import org.graylog2.plugin.buffers.Buffer;
 import org.graylog2.plugin.filters.MessageFilter;
 import org.graylog2.plugin.initializers.Initializer;
 import org.graylog2.plugin.inputs.MessageInput;
@@ -94,13 +93,11 @@ import org.graylog2.security.ldap.LdapConnector;
 import org.graylog2.security.ldap.LdapSettingsService;
 import org.graylog2.security.ldap.LdapSettingsServiceImpl;
 import org.graylog2.security.realm.LdapUserAuthenticator;
-import org.graylog2.shared.ProcessingPauseLockedException;
 import org.graylog2.shared.ServerStatus;
 import org.graylog2.shared.buffers.ProcessBuffer;
 import org.graylog2.shared.buffers.ProcessBufferWatermark;
 import org.graylog2.shared.buffers.processors.ProcessBufferProcessor;
 import org.graylog2.shared.filters.FilterRegistry;
-import org.graylog2.shared.inputs.InputRegistry;
 import org.graylog2.shared.stats.ThroughputStats;
 import org.graylog2.streams.StreamRuleService;
 import org.graylog2.streams.StreamRuleServiceImpl;
@@ -123,7 +120,6 @@ import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory;
 import org.jboss.netty.handler.codec.http.HttpRequestDecoder;
 import org.jboss.netty.handler.codec.http.HttpResponseEncoder;
 import org.jboss.netty.handler.stream.ChunkedWriteHandler;
-import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -328,11 +324,11 @@ public class Core implements GraylogServer {
         registerPlugins(MessageInput.class, "inputs");
 
         // Ramp it all up. (both plugins and built-in types)
-        initializers().initialize();
-        outputs().initialize();
+        initializers.initialize();
+        outputs.initialize();
 
         // Load persisted inputs.
-        inputs().launchAllPersisted();
+        inputs.launchAllPersisted();
     }
 
     public void setLdapConnector(LdapConnector ldapConnector) {
@@ -512,10 +508,6 @@ public class Core implements GraylogServer {
         return configuration;
     }
 
-    public void setRulesEngine(RulesEngineImpl engine) {
-        rulesEngine = engine;
-    }
-
     public RulesEngine getRulesEngine() {
         return rulesEngine;
     }
@@ -524,35 +516,10 @@ public class Core implements GraylogServer {
         return indexer;
     }
 
-    public GELFChunkManager getGELFChunkManager() {
-        return this.gelfChunkManager;
-    }
-
-    public Buffer getProcessBuffer() {
-        return this.processBuffer;
-    }
-
-    @Override
-    public Buffer getOutputBuffer() {
-        return this.outputBuffer;
-    }
-    
-    public AtomicInteger outputBufferWatermark() {
-        return outputBufferWatermark;
-    }
-    
     public AtomicInteger processBufferWatermark() {
         return processBufferWatermark;
     }
     
-    public List<Transport> getTransports() {
-        return this.transports;
-    }
-    
-    public List<AlarmCallback> getAlarmCallbacks() {
-        return this.alarmCallbacks;
-    }
-
     public void setLdapAuthenticator(LdapUserAuthenticator authenticator) {
         this.ldapUserAuthenticator = authenticator;
     }
@@ -575,18 +542,10 @@ public class Core implements GraylogServer {
         this.localMode = mode;
     }
    
-    public boolean isLocalMode() {
-        return localMode;
-    }
-
     public void setStatsMode(boolean mode) {
         this.statsMode = mode;
     }
    
-    public boolean isStatsMode() {
-        return statsMode;
-    }
-    
     public Cache getInputCache() {
         return processBuffer.getMasterCache();
     }
@@ -595,26 +554,6 @@ public class Core implements GraylogServer {
         return outputBuffer.getOverflowCache();
     }
     
-    public DateTime getStartedAt() {
-    	return serverStatus.getStartedAt();
-    }
-
-    public void pauseMessageProcessing(boolean locked) {
-        serverStatus.pauseMessageProcessing(locked);
-    }
-
-    public void resumeMessageProcessing() throws ProcessingPauseLockedException {
-        serverStatus.resumeMessageProcessing();
-    }
-
-    public boolean processingPauseLocked() {
-        return serverStatus.processingPauseLocked();
-    }
-
-    public void unlockProcessingPause() {
-        serverStatus.unlockProcessingPause();
-    }
-
     public boolean isProcessing() {
         return serverStatus.isProcessing();
     }
@@ -623,40 +562,8 @@ public class Core implements GraylogServer {
         return metricRegistry;
     }
 
-    /**
-     * Shortcut to delete an index. This is for plugin compat. We seriously need proper DI.
-     *
-     * @param indexName The name of the index to delete.
-     */
-    @Override
-    public void deleteIndexShortcut(String indexName) {
-        getIndexer().indices().delete(indexName);
-    }
-
-    /**
-     * Shortcut to close an index. This is for plugin compat. We seriously need proper DI.
-     *
-     * @param indexName The name of the index to close.
-     */
-    @Override
-    public void closeIndexShortcut(String indexName) {
-        getIndexer().indices().close(indexName);
-    }
-
-    public Initializers initializers() {
-        return initializers;
-    }
-
-    public InputRegistry inputs() {
-        return inputs;
-    }
-
     public OutputRegistry outputs() {
         return outputs;
-    }
-
-    public Periodicals periodicals() {
-        return periodicals;
     }
 
     @Override
@@ -667,10 +574,6 @@ public class Core implements GraylogServer {
     @Override
     public boolean isRadio() {
         return serverStatus.hasCapability(ServerStatus.Capability.RADIO);
-    }
-
-    public Lifecycle getLifecycle() {
-        return serverStatus.getLifecycle();
     }
 
     public void setLifecycle(Lifecycle lifecycle) {

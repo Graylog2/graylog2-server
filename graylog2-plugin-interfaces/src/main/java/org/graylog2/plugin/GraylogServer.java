@@ -16,10 +16,10 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package org.graylog2.plugin;
 
 import com.codahale.metrics.MetricRegistry;
-import org.graylog2.plugin.buffers.Buffer;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -29,17 +29,11 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public interface GraylogServer extends Runnable, GenericHost {
 
-    public Buffer getOutputBuffer();
-    
     public boolean isMaster();
     
     public String getNodeId();
 
     public MetricRegistry metrics();
-
-    void deleteIndexShortcut(String indexName);
-
-    void closeIndexShortcut(String indexName);
 
     public AtomicInteger processBufferWatermark();
 }

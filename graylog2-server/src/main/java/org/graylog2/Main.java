@@ -39,7 +39,9 @@ import org.graylog2.cluster.NodeNotFoundException;
 import org.graylog2.cluster.NodeService;
 import org.graylog2.cluster.NodeServiceImpl;
 import org.graylog2.filters.*;
+import org.graylog2.initializers.Initializers;
 import org.graylog2.initializers.PeriodicalsInitializer;
+import org.graylog2.inputs.ServerInputRegistry;
 import org.graylog2.inputs.gelf.http.GELFHttpInput;
 import org.graylog2.inputs.gelf.tcp.GELFTCPInput;
 import org.graylog2.inputs.gelf.udp.GELFUDPInput;
@@ -61,8 +63,10 @@ import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.lifecycles.Lifecycle;
 import org.graylog2.plugins.PluginInstaller;
 import org.graylog2.shared.NodeRunner;
+import org.graylog2.shared.ServerStatus;
 import org.graylog2.shared.bindings.GuiceInstantiationService;
 import org.graylog2.shared.filters.FilterRegistry;
+import org.graylog2.shared.inputs.InputRegistry;
 import org.graylog2.system.activities.Activity;
 import org.graylog2.system.activities.ActivityWriter;
 import org.slf4j.Logger;
@@ -166,7 +170,8 @@ public final class Main extends NodeRunner {
 
         // Le server object. This is where all the magic happens.
         Core server = injector.getInstance(Core.class);
-        server.setLifecycle(Lifecycle.STARTING);
+        ServerStatus serverStatus = injector.getInstance(ServerStatus.class);
+        serverStatus.setLifecycle(Lifecycle.STARTING);
 
         server.initialize();
 
@@ -213,13 +218,13 @@ public final class Main extends NodeRunner {
         if (commandLineArguments.isLocal() || commandLineArguments.isDebug()) {
             // In local mode, systemstats are sent to localhost for example.
             LOG.info("Running in local mode");
-            server.setLocalMode(true);
+            serverStatus.setLocalMode(true);
         }
 
         // Are we in stats mode?
         if (commandLineArguments.isStats()) {
             LOG.info("Printing system utilization information.");
-            server.setStatsMode(true);
+            serverStatus.setStatsMode(true);
         }
 
 
@@ -231,21 +236,23 @@ public final class Main extends NodeRunner {
         MessageInput.setDefaultRecvBufferSize(configuration.getUdpRecvBufferSizes());
 
         // Register standard inputs.
-        server.inputs().register(SyslogUDPInput.class, SyslogUDPInput.NAME);
-        server.inputs().register(SyslogTCPInput.class, SyslogTCPInput.NAME);
-        server.inputs().register(RawUDPInput.class, RawUDPInput.NAME);
-        server.inputs().register(RawTCPInput.class, RawTCPInput.NAME);
-        server.inputs().register(GELFUDPInput.class, GELFUDPInput.NAME);
-        server.inputs().register(GELFTCPInput.class, GELFTCPInput.NAME);
-        server.inputs().register(GELFHttpInput.class, GELFHttpInput.NAME);
-        server.inputs().register(FakeHttpMessageInput.class, FakeHttpMessageInput.NAME);
-        server.inputs().register(LocalMetricsInput.class, LocalMetricsInput.NAME);
-        server.inputs().register(JsonPathInput.class, JsonPathInput.NAME);
-        server.inputs().register(KafkaInput.class, KafkaInput.NAME);
-        server.inputs().register(RadioInput.class, RadioInput.NAME);
+        InputRegistry inputRegistry = injector.getInstance(ServerInputRegistry.class);
+        inputRegistry.register(SyslogUDPInput.class, SyslogUDPInput.NAME);
+        inputRegistry.register(SyslogTCPInput.class, SyslogTCPInput.NAME);
+        inputRegistry.register(RawUDPInput.class, RawUDPInput.NAME);
+        inputRegistry.register(RawTCPInput.class, RawTCPInput.NAME);
+        inputRegistry.register(GELFUDPInput.class, GELFUDPInput.NAME);
+        inputRegistry.register(GELFTCPInput.class, GELFTCPInput.NAME);
+        inputRegistry.register(GELFHttpInput.class, GELFHttpInput.NAME);
+        inputRegistry.register(FakeHttpMessageInput.class, FakeHttpMessageInput.NAME);
+        inputRegistry.register(LocalMetricsInput.class, LocalMetricsInput.NAME);
+        inputRegistry.register(JsonPathInput.class, JsonPathInput.NAME);
+        inputRegistry.register(KafkaInput.class, KafkaInput.NAME);
+        inputRegistry.register(RadioInput.class, RadioInput.NAME);
 
         // Register initializers.
-        server.initializers().register(injector.getInstance(PeriodicalsInitializer.class));
+        Initializers initializers = injector.getInstance(Initializers.class);
+        initializers.register(injector.getInstance(PeriodicalsInitializer.class));
 
         // Register message filters. (Order is important here)
         final FilterRegistry filterRegistry = injector.getInstance(FilterRegistry.class);

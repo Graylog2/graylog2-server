@@ -19,7 +19,6 @@
 
 package org.graylog2.radio;
 
-import com.beust.jcommander.internal.Lists;
 import com.codahale.metrics.MetricRegistry;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.inject.name.Named;
@@ -35,8 +34,6 @@ import org.graylog2.jersey.container.netty.NettyContainer;
 import org.graylog2.plugin.GraylogServer;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.Version;
-import org.graylog2.plugin.buffers.Buffer;
-import org.graylog2.plugin.filters.MessageFilter;
 import org.graylog2.plugin.lifecycles.Lifecycle;
 import org.graylog2.plugin.rest.AnyExceptionClassMapper;
 import org.graylog2.radio.buffers.processors.RadioProcessBufferProcessor;
@@ -64,7 +61,6 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.util.List;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -96,6 +92,7 @@ public class Radio implements GraylogServer {
 
     @Inject
     private InputCache inputCache;
+    @Inject
     private ProcessBuffer processBuffer;
 
     @Inject
@@ -242,20 +239,12 @@ public class Radio implements GraylogServer {
 
     }
 
-    public Buffer getProcessBuffer() {
-        return processBuffer;
-    }
-
     public AtomicInteger processBufferWatermark() {
         return processBufferWatermark;
     }
 
     public String getNodeId() {
         return serverStatus.getNodeId().toString();
-    }
-
-    public GELFChunkManager getGELFChunkManager() {
-        return this.gelfChunkManager;
     }
 
     @Override
@@ -279,31 +268,9 @@ public class Radio implements GraylogServer {
         return inputCache;
     }
 
-    private AsyncHttpClient getHttpClient() {
-        return httpClient;
-    }
-
-    public List<MessageFilter> getFilters() {
-        List<MessageFilter> result = Lists.newArrayList();
-        return result;
-    }
-
-    @Override
-    public void closeIndexShortcut(String indexName) {
-    }
-
-    @Override
-    public void deleteIndexShortcut(String indexName) {
-    }
-
     @Override
     public boolean isMaster() {
         return false;
-    }
-
-    @Override
-    public Buffer getOutputBuffer() {
-        return null;
     }
 
     @Override

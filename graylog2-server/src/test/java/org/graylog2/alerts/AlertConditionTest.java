@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 TORCH GmbH
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -27,9 +27,6 @@ import org.graylog2.indexer.searches.Searches;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.streams.Stream;
 import org.joda.time.DateTime;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.testng.PowerMockTestCase;
 import org.testng.annotations.BeforeClass;
 
 import java.util.Map;
@@ -56,7 +53,6 @@ public class AlertConditionTest {
     @BeforeClass
     public void setUp() throws Exception {
         stream = mock(Stream.class);
-        core = mock(Core.class);
         indexer = mock(Indexer.class);
         searches = mock(Searches.class);
         mongoConnection = mock(MongoConnection.class);
@@ -64,7 +60,6 @@ public class AlertConditionTest {
 
         when(stream.getId()).thenReturn(STREAM_ID);
         when(indexer.searches()).thenReturn(searches);
-        when(core.getIndexer()).thenReturn(indexer);
     }
 
     protected void assertTriggered(AlertCondition alertCondition, AlertCondition.CheckResult result) {

@@ -134,4 +134,13 @@ public class ServerStatus {
         processingPauseLocked.set(false);
     }
 
+    public void setStatsMode(boolean statsMode) {
+        if (statsMode)
+            addCapability(Capability.STATSMODE);
+    }
+
+    public void setLocalMode(boolean localMode) {
+        if (localMode)
+            addCapability(Capability.LOCALMODE);
+    }
 }
