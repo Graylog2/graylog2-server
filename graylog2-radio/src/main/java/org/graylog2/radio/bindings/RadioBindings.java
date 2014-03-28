@@ -23,8 +23,10 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.inject.AbstractModule;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.name.Names;
+import com.ning.http.client.AsyncHttpClient;
 import org.graylog2.radio.Configuration;
 import org.graylog2.radio.buffers.processors.RadioProcessBufferProcessor;
+import org.graylog2.radio.inputs.RadioInputRegistry;
 import org.graylog2.shared.ServerStatus;
 
 import java.util.concurrent.Executors;
@@ -43,6 +45,7 @@ public class RadioBindings extends AbstractModule {
 
     @Override
     protected void configure() {
+        bindProviders();
         bindSingletons();
         install(new FactoryModuleBuilder().build(RadioProcessBufferProcessor.Factory.class));
         bindSchedulers();
@@ -54,6 +57,7 @@ public class RadioBindings extends AbstractModule {
         ServerStatus serverStatus = new ServerStatus(configuration);
         serverStatus.addCapability(ServerStatus.Capability.RADIO);
         bind(ServerStatus.class).toInstance(serverStatus);
+        bind(RadioInputRegistry.class).toProvider(RadioInputRegistryProvider.class);
     }
 
     private void bindSchedulers() {
@@ -65,5 +69,9 @@ public class RadioBindings extends AbstractModule {
         );
 
         bind(ScheduledExecutorService.class).annotatedWith(Names.named("scheduler")).toInstance(scheduler);
+    }
+
+    private void bindProviders() {
+        bind(AsyncHttpClient.class).toProvider(AsyncHttpClientProvider.class);
     }
 }

@@ -1,5 +1,5 @@
-/**
- * Copyright 2013 Lennart Koopmann <lennart@torch.sh>
+/*
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -15,7 +15,6 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 package org.graylog2.shared.inputs;
 
@@ -23,13 +22,11 @@ package org.graylog2.shared.inputs;
 import com.beust.jcommander.internal.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import org.graylog2.plugin.InputHost;
-import org.graylog2.plugin.Tools;
-import org.graylog2.plugin.InputHost;
 import org.graylog2.plugin.configuration.ConfigurationException;
 import org.graylog2.plugin.inputs.InputState;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.MisfireException;
+import org.graylog2.shared.buffers.ProcessBuffer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,34 +43,21 @@ public abstract class InputRegistry {
 
     protected static final Logger LOG = LoggerFactory.getLogger(InputRegistry.class);
     protected static final Map<String, ClassLoader> classLoaders = Maps.newHashMap();
-    protected final InputHost core;
     protected final List<InputState> inputStates = Lists.newArrayList();
     protected final Map<String, String> availableInputs = Maps.newHashMap();
     protected final ExecutorService executor = Executors.newCachedThreadPool(
             new ThreadFactoryBuilder().setNameFormat("inputs-%d").build()
     );
+    private final MessageInputFactory messageInputFactory;
+    private final ProcessBuffer processBuffer;
 
-    public InputRegistry(InputHost core) {
-        this.core = core;
+    public InputRegistry(MessageInputFactory messageInputFactory, ProcessBuffer processBuffer) {
+        this.messageInputFactory = messageInputFactory;
+        this.processBuffer = processBuffer;
     }
 
-    public static MessageInput factory(String type) throws NoSuchInputTypeException {
-        try {
-            final ClassLoader classLoader = lookupClassLoader(type);
-            if (classLoader == null) {
-                throw new NoSuchInputTypeException("There is no classloader to load input of type <" + type + ">.");
-            }
-            Class c = Class.forName(type, true, classLoader);
-            return (MessageInput) c.newInstance();
-        } catch (ClassNotFoundException e) {
-            throw new NoSuchInputTypeException("There is no input of type <" + type + "> registered.");
-        } catch (Exception e) {
-            throw new RuntimeException("Could not create input of type <" + type + ">", e);
-        }
-    }
-
-    protected static ClassLoader lookupClassLoader(String type) {
-        return classLoaders.get(type);
+    public MessageInput create(String inputClass) throws NoSuchInputTypeException {
+        return messageInputFactory.create(inputClass);
     }
 
     public InputState launch(final MessageInput input, String id) {
@@ -94,7 +78,7 @@ public abstract class InputRegistry {
                 LOG.info("Starting [{}] input with ID <{}>", input.getClass().getCanonicalName(), input.getId());
                 try {
                     inputState.setState(InputState.InputStateType.STARTING);
-                    input.launch();
+                    input.launch(processBuffer);
                     inputState.setState(InputState.InputStateType.RUNNING);
                     String msg = "Completed starting [" + input.getClass().getCanonicalName() + "] input with ID <" + input.getId() + ">";
                     LOG.info(msg);

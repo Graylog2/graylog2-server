@@ -32,6 +32,8 @@ import org.graylog2.indexer.PersistedDeadLetterService;
 import org.graylog2.indexer.PersistedDeadLetterServiceImpl;
 import org.graylog2.indexer.ranges.IndexRangeService;
 import org.graylog2.indexer.ranges.IndexRangeServiceImpl;
+import org.graylog2.inputs.InputService;
+import org.graylog2.inputs.InputServiceImpl;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.notifications.NotificationServiceImpl;
 import org.graylog2.system.activities.SystemMessageService;
@@ -51,5 +53,6 @@ public class PersistenceServicesBindings extends AbstractModule {
         bind(IndexFailureService.class).to(IndexFailureServiceImpl.class);
         bind(NodeService.class).to(NodeServiceImpl.class);
         bind(IndexRangeService.class).to(IndexRangeServiceImpl.class);
+        bind(InputService.class).to(InputServiceImpl.class);
     }
 }

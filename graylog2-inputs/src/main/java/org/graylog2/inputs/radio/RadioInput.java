@@ -1,5 +1,5 @@
-/**
- * Copyright 2013 Lennart Koopmann <lennart@torch.sh>
+/*
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -15,21 +15,22 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 package org.graylog2.inputs.radio;
 
+import com.codahale.metrics.MetricRegistry;
 import org.graylog2.inputs.kafka.KafkaInput;
-import org.graylog2.plugin.InputHost;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationException;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.configuration.fields.ConfigurationField;
 import org.graylog2.plugin.configuration.fields.NumberField;
 import org.graylog2.plugin.configuration.fields.TextField;
+import org.graylog2.plugin.system.NodeId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
 import java.util.Map;
 
 /**
@@ -37,9 +38,14 @@ import java.util.Map;
  */
 public class RadioInput extends KafkaInput {
 
-    private static final Logger LOG = LoggerFactory.getLogger(KafkaInput.class);
+    private static final Logger LOG = LoggerFactory.getLogger(RadioInput.class);
 
     public static final String NAME = "Graylog2 Radio Input";
+
+    @Inject
+    public RadioInput(MetricRegistry metricRegistry, NodeId nodeId) {
+        super(metricRegistry, nodeId);
+    }
 
     @Override
     public void checkConfiguration() throws ConfigurationException {

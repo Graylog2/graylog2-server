@@ -24,13 +24,12 @@ import com.codahale.metrics.MetricRegistry;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.inject.name.Named;
 import com.ning.http.client.AsyncHttpClient;
-import com.ning.http.client.AsyncHttpClientConfig;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.glassfish.jersey.server.ContainerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.internal.scanning.PackageNamesScanner;
-import org.graylog2.inputs.BasicCache;
 import org.graylog2.inputs.Cache;
+import org.graylog2.inputs.InputCache;
 import org.graylog2.inputs.gelf.gelf.GELFChunkManager;
 import org.graylog2.jersey.container.netty.NettyContainer;
 import org.graylog2.plugin.GraylogServer;
@@ -49,6 +48,7 @@ import org.graylog2.radio.transports.kafka.KafkaProducer;
 import org.graylog2.shared.ProcessingHost;
 import org.graylog2.shared.ServerStatus;
 import org.graylog2.shared.buffers.ProcessBuffer;
+import org.graylog2.shared.buffers.ProcessBufferWatermark;
 import org.graylog2.shared.buffers.processors.ProcessBufferProcessor;
 import org.graylog2.shared.inputs.InputRegistry;
 import org.graylog2.shared.stats.ThroughputStats;
@@ -92,17 +92,20 @@ public class Radio implements InputHost, GraylogServer, ProcessingHost {
     @Named("scheduler")
     private ScheduledExecutorService scheduler;
 
+    @Inject
     private RadioInputRegistry inputs;
-    private Cache inputCache;
+
+    @Inject
+    private InputCache inputCache;
     private ProcessBuffer processBuffer;
 
     @Inject
-    @Named("processBufferWatermark")
-    private AtomicInteger processBufferWatermark;
+    private ProcessBufferWatermark processBufferWatermark;
 
     private Ping.Pinger pinger;
 
-    private final AsyncHttpClient httpClient;
+    @Inject
+    private AsyncHttpClient httpClient;
 
     @Inject
     private ProcessBuffer.Factory processBufferFactory;
@@ -112,24 +115,14 @@ public class Radio implements InputHost, GraylogServer, ProcessingHost {
     private ThroughputStats throughputStats;
 
     public Radio() {
-        AsyncHttpClientConfig.Builder builder = new AsyncHttpClientConfig.Builder();
-        builder.setAllowPoolingConnection(false);
-        httpClient = new AsyncHttpClient(builder.build());
     }
 
     public void initialize() {
-        gelfChunkManager = new GELFChunkManager(this);
         gelfChunkManager.start();
-
-        inputCache = new BasicCache();
 
         RadioTransport transport = new KafkaProducer(this);
 
         int processBufferProcessorCount = configuration.getProcessBufferProcessors();
-        this.inputs = new RadioInputRegistry(this,
-                this.getHttpClient(),
-                this.getConfiguration().getGraylog2ServerUri()
-        );
 
         ProcessBufferProcessor[] processors = new ProcessBufferProcessor[processBufferProcessorCount];
 
@@ -141,11 +134,6 @@ public class Radio implements InputHost, GraylogServer, ProcessingHost {
         processBuffer.initialize(processors, configuration.getRingSize(),
                 configuration.getProcessorWaitStrategy(),
                 configuration.getProcessBufferProcessors()
-        );
-
-        this.inputs = new RadioInputRegistry(this,
-                this.getHttpClient(),
-                configuration.getGraylog2ServerUri()
         );
 
         if (this.configuration.getRestTransportUri() == null) {
@@ -248,6 +236,7 @@ public class Radio implements InputHost, GraylogServer, ProcessingHost {
             bind(throughputStats).to(ThroughputStats.class);
             bind(configuration).to(Configuration.class);
             bind(serverStatus).to(ServerStatus.class);
+            bind(inputs).to(InputRegistry.class);
         }
 
     }

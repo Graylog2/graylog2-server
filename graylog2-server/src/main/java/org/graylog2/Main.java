@@ -66,6 +66,7 @@ import org.graylog2.shared.NodeRunner;
 import org.graylog2.shared.bindings.GuiceInstantiationService;
 import org.graylog2.shared.filters.FilterRegistry;
 import org.graylog2.system.activities.Activity;
+import org.graylog2.system.activities.ActivityWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
@@ -195,6 +196,8 @@ public final class Main extends NodeRunner {
         } catch (NodeNotFoundException e) {
             throw new RuntimeException("Did not find own node. This should never happen.", e);
         }
+
+        final ActivityWriter activityWriter = injector.getInstance(ActivityWriter.class);
         if (configuration.isMaster() && !nodeService.isOnlyMaster(server)) {
             LOG.warn("Detected another master in the cluster. Retrying in {} seconds to make sure it is not "
                     + "an old stale instance.", NodeServiceImpl.PING_TIMEOUT);
@@ -207,7 +210,7 @@ public final class Main extends NodeRunner {
                 String what = "Detected other master node in the cluster! Starting as non-master! "
                         + "This is a mis-configuration you should fix.";
                 LOG.warn(what);
-                server.getActivityWriter().write(new Activity(what, Main.class));
+                activityWriter.write(new Activity(what, Main.class));
 
                 // Write a notification.
                 final NotificationService notificationService = injector.getInstance(NotificationService.class);
@@ -285,7 +288,7 @@ public final class Main extends NodeRunner {
 
         server.setLifecycle(Lifecycle.RUNNING);
 
-        server.getActivityWriter().write(new Activity("Started up.", Main.class));
+        activityWriter.write(new Activity("Started up.", Main.class));
         LOG.info("Graylog2 up and running.");
 
         // Block forever.

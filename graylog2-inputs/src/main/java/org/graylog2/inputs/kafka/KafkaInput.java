@@ -1,5 +1,5 @@
-/**
- * Copyright 2013 Lennart Koopmann <lennart@torch.sh>
+/*
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -15,18 +15,18 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 package org.graylog2.inputs.kafka;
 
 import com.codahale.metrics.Gauge;
 import com.codahale.metrics.MetricRegistry;
+import com.google.inject.Inject;
 import kafka.consumer.*;
 import kafka.javaapi.consumer.ConsumerConnector;
 import kafka.message.MessageAndMetadata;
-import org.graylog2.plugin.InputHost;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.RadioMessage;
+import org.graylog2.plugin.buffers.Buffer;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationException;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
@@ -35,6 +35,7 @@ import org.graylog2.plugin.configuration.fields.NumberField;
 import org.graylog2.plugin.configuration.fields.TextField;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.MisfireException;
+import org.graylog2.plugin.system.NodeId;
 import org.joda.time.DateTime;
 import org.msgpack.MessagePack;
 import org.slf4j.Logger;
@@ -59,6 +60,8 @@ public class KafkaInput extends MessageInput {
     private static final Logger LOG = LoggerFactory.getLogger(KafkaInput.class);
 
     public static final String NAME = "Kafka Input";
+    private final MetricRegistry metricRegistry;
+    private final NodeId nodeId;
 
     private ConsumerConnector cc;
 
@@ -67,6 +70,13 @@ public class KafkaInput extends MessageInput {
     private AtomicLong totalBytesRead = new AtomicLong(0);
     private AtomicLong lastSecBytesRead = new AtomicLong(0);
     private AtomicLong lastSecBytesReadTmp = new AtomicLong(0);
+
+    @Inject
+    public KafkaInput(MetricRegistry metricRegistry,
+                      NodeId nodeId) {
+        this.metricRegistry = metricRegistry;
+        this.nodeId = nodeId;
+    }
 
     @Override
     public void checkConfiguration() throws ConfigurationException {
@@ -84,13 +94,13 @@ public class KafkaInput extends MessageInput {
     public static final String CK_THREADS = "threads";
 
     @Override
-    public void launch() throws MisfireException {
+    public void launch(final Buffer processBuffer) throws MisfireException {
         setupMetrics();
 
         Properties props = new Properties();
 
         props.put("group.id", GROUP_ID);
-        props.put("client.id", "gl2-" + graylogServer.getNodeId() + "-" + getId());
+        props.put("client.id", "gl2-" + nodeId + "-" + getId());
 
         props.put("fetch.min.bytes", String.valueOf(configuration.getInt(CK_FETCH_MIN_BYTES)));
         props.put("fetch.wait.max.ms", String.valueOf(configuration.getInt(CK_FETCH_WAIT_MAX)));
@@ -139,7 +149,7 @@ public class KafkaInput extends MessageInput {
                             event.addLongFields(msg.longs);
                             event.addDoubleFields(msg.doubles);
 
-                            graylogServer.getProcessBuffer().insertCached(event, thisInput);
+                            processBuffer.insertCached(event, thisInput);
                         } catch (Exception e) {
                             LOG.error("Error while trying to process Kafka message.", e);
                             continue;
@@ -245,7 +255,7 @@ public class KafkaInput extends MessageInput {
     }
 
     private void setupMetrics() {
-        graylogServer.metrics().register(MetricRegistry.name(getUniqueReadableId(), "read_bytes_1sec"), new Gauge<Long>() {
+        metricRegistry.register(MetricRegistry.name(getUniqueReadableId(), "read_bytes_1sec"), new Gauge<Long>() {
             @Override
             public Long getValue() {
                 // TODO
@@ -253,7 +263,7 @@ public class KafkaInput extends MessageInput {
             }
         });
 
-        graylogServer.metrics().register(MetricRegistry.name(getUniqueReadableId(), "written_bytes_1sec"), new Gauge<Long>() {
+        metricRegistry.register(MetricRegistry.name(getUniqueReadableId(), "written_bytes_1sec"), new Gauge<Long>() {
             @Override
             public Long getValue() {
                 // TODO
@@ -261,14 +271,14 @@ public class KafkaInput extends MessageInput {
             }
         });
 
-        graylogServer.metrics().register(MetricRegistry.name(getUniqueReadableId(), "read_bytes_total"), new Gauge<Long>() {
+        metricRegistry.register(MetricRegistry.name(getUniqueReadableId(), "read_bytes_total"), new Gauge<Long>() {
             @Override
             public Long getValue() {
                 return totalBytesRead.get();
             }
         });
 
-        graylogServer.metrics().register(MetricRegistry.name(getUniqueReadableId(), "written_bytes_total"), new Gauge<Long>() {
+        metricRegistry.register(MetricRegistry.name(getUniqueReadableId(), "written_bytes_total"), new Gauge<Long>() {
             @Override
             public Long getValue() {
                 // TODO

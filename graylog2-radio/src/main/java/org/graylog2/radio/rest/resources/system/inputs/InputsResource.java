@@ -1,5 +1,5 @@
-/**
- * Copyright 2013 Lennart Koopmann <lennart@torch.sh>
+/*
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -15,7 +15,6 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 package org.graylog2.radio.rest.resources.system.inputs;
 
@@ -26,16 +25,16 @@ import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationException;
 import org.graylog2.plugin.inputs.InputState;
 import org.graylog2.plugin.inputs.MessageInput;
+import org.graylog2.radio.rest.resources.RestResource;
 import org.graylog2.shared.inputs.InputRegistry;
 import org.graylog2.shared.inputs.NoSuchInputTypeException;
-import org.graylog2.radio.inputs.api.InputSummaryResponse;
-import org.graylog2.radio.rest.resources.RestResource;
 import org.graylog2.shared.rest.resources.system.inputs.requests.InputLaunchRequest;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -43,7 +42,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.ExecutionException;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
@@ -52,13 +50,16 @@ import java.util.concurrent.ExecutionException;
 public class InputsResource extends RestResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(InputsResource.class);
+    
+    @Inject
+    private InputRegistry inputRegistry;
 
     @GET @Timed
     @Produces(MediaType.APPLICATION_JSON)
     public String list() {
         List<Map<String, Object>> inputStates = Lists.newArrayList();
 
-        for (InputState inputState : radio.inputs().getInputStates()) {
+        for (InputState inputState : inputRegistry.getInputStates()) {
             inputStates.add(inputState.asMap());
         }
 
@@ -73,7 +74,7 @@ public class InputsResource extends RestResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/{inputId}")
     public String single(@PathParam("inputId") String inputId) {
-        MessageInput input = radio.inputs().getRunningInput(inputId);
+        MessageInput input = inputRegistry.getRunningInput(inputId);
 
         if (input == null) {
             LOG.info("Input [{}] not found. Returning HTTP 404.", inputId);
@@ -104,8 +105,8 @@ public class InputsResource extends RestResource {
         DateTime createdAt = new DateTime(DateTimeZone.UTC);
         MessageInput input;
         try {
-            input = InputRegistry.factory(lr.type);
-            input.initialize(inputConfig, radio);
+            input = inputRegistry.create(lr.type);
+            input.initialize(inputConfig);
             input.setTitle(lr.title);
             input.setCreatorUserId(lr.creatorUserId);
             input.setCreatedAt(createdAt);
@@ -124,13 +125,13 @@ public class InputsResource extends RestResource {
         //input.setPersistId(inputId);
 
         // Don't run if exclusive and another instance is already running.
-        if (input.isExclusive() && radio.inputs().hasTypeRunning(input.getClass())) {
+        if (input.isExclusive() && inputRegistry.hasTypeRunning(input.getClass())) {
             LOG.error("Type is exclusive and already has input running.");
             throw new WebApplicationException(Response.Status.BAD_REQUEST);
         }
 
         // Launch input. (this will run async and clean up itself in case of an error.)
-        radio.inputs().launch(input, inputId, true);
+        inputRegistry.launch(input, inputId, true);
 
         Map<String, Object> result = Maps.newHashMap();
         result.put("input_id", inputId);
@@ -143,7 +144,7 @@ public class InputsResource extends RestResource {
     @DELETE @Timed
     @Path("/{inputId}")
     public Response terminate(@PathParam("inputId") String inputId) {
-        MessageInput input = radio.inputs().getRunningInput(inputId);
+        MessageInput input = inputRegistry.getRunningInput(inputId);
 
         if (input == null) {
             LOG.info("Cannot terminate input. Input not found.");
@@ -153,7 +154,7 @@ public class InputsResource extends RestResource {
         String msg = "Attempting to terminate input [" + input.getName()+ "]. Reason: REST request.";
         LOG.info(msg);
 
-        radio.inputs().terminate(input);
+        inputRegistry.terminate(input);
 
         String msg2 = "Terminated input [" + input.getName()+ "]. Reason: REST request.";
         LOG.info(msg2);
@@ -166,7 +167,7 @@ public class InputsResource extends RestResource {
     @Produces(MediaType.APPLICATION_JSON)
     public String types() {
         Map<String, Object> result = Maps.newHashMap();
-        result.put("types", radio.inputs().getAvailableInputs());
+        result.put("types", inputRegistry.getAvailableInputs());
 
         return json(result);
     }
@@ -178,7 +179,7 @@ public class InputsResource extends RestResource {
 
         MessageInput input;
         try {
-            input = InputRegistry.factory(inputType);
+            input = inputRegistry.create(inputType);
         } catch (NoSuchInputTypeException e) {
             LOG.error("There is no such input type registered.", e);
             throw new WebApplicationException(e, Response.Status.NOT_FOUND);
@@ -198,12 +199,12 @@ public class InputsResource extends RestResource {
     @Path("/{inputId}/launch")
     @Produces(MediaType.APPLICATION_JSON)
     public Response launchExisting(@PathParam("inputId") String inputId) {
-        MessageInput isr = radio.inputs().getPersisted(inputId);
+        MessageInput isr = inputRegistry.getPersisted(inputId);
         if (isr == null) {
             throw new WebApplicationException(404);
         }
 
-        radio.inputs().launchPersisted(isr);
+        inputRegistry.launchPersisted(isr);
 
         Map<String, Object> result = Maps.newHashMap();
         result.put("input_id", inputId);

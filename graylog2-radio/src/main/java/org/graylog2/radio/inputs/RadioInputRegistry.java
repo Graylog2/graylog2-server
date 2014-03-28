@@ -1,5 +1,5 @@
-/**
- * Copyright 2013 Lennart Koopmann <lennart@torch.sh>
+/*
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -15,7 +15,6 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 package org.graylog2.radio.inputs;
 
@@ -23,7 +22,6 @@ import com.beust.jcommander.internal.Lists;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.Response;
-import org.graylog2.plugin.InputHost;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationException;
 import org.graylog2.plugin.inputs.InputState;
@@ -31,11 +29,15 @@ import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.radio.inputs.api.InputSummaryResponse;
 import org.graylog2.radio.inputs.api.PersistedInputsResponse;
 import org.graylog2.radio.inputs.api.RegisterInputResponse;
+import org.graylog2.shared.ServerStatus;
+import org.graylog2.shared.buffers.ProcessBuffer;
 import org.graylog2.shared.inputs.InputRegistry;
+import org.graylog2.shared.inputs.MessageInputFactory;
 import org.graylog2.shared.inputs.NoSuchInputTypeException;
 import org.graylog2.shared.rest.resources.system.inputs.requests.RegisterInputRequest;
 import org.joda.time.DateTime;
 
+import javax.inject.Inject;
 import javax.ws.rs.core.UriBuilder;
 import java.io.IOException;
 import java.net.URI;
@@ -50,20 +52,27 @@ public class RadioInputRegistry extends InputRegistry {
     protected final ObjectMapper mapper = new ObjectMapper();
     protected final AsyncHttpClient httpclient;
     protected final URI serverUrl;
+    private final ServerStatus serverStatus;
 
-    public RadioInputRegistry(InputHost core, AsyncHttpClient httpclient, URI serverUrl) {
-        super(core);
+    @Inject
+    public RadioInputRegistry(MessageInputFactory messageInputFactory,
+                              ProcessBuffer processBuffer,
+                              AsyncHttpClient httpclient,
+                              URI serverUrl,
+                              ServerStatus serverStatus) {
+        super(messageInputFactory, processBuffer);
         this.httpclient = httpclient;
         this.serverUrl = serverUrl;
+        this.serverStatus = serverStatus;
     }
 
     protected MessageInput getMessageInput(InputSummaryResponse isr) {
         MessageInput input;
         try {
-            input = InputRegistry.factory(isr.type);
+            input = this.create(isr.type);
 
             // Add all standard fields.
-            input.initialize(new Configuration(isr.configuration), core);
+            input.initialize(new Configuration(isr.configuration));
             input.setTitle(isr.title);
             input.setCreatorUserId(isr.creatorUserId);
             input.setPersistId(isr.id);
@@ -84,9 +93,9 @@ public class RadioInputRegistry extends InputRegistry {
     // TODO make this use a generic ApiClient class that knows the graylog2-server node address(es) or something.
     public RegisterInputResponse registerInCluster(MessageInput input) throws ExecutionException, InterruptedException, IOException {
         final UriBuilder uriBuilder = UriBuilder.fromUri(serverUrl);
-        uriBuilder.path("/system/radios/" + core.getNodeId() + "/inputs");
+        uriBuilder.path("/system/radios/" + serverStatus.getNodeId().toString() + "/inputs");
 
-        RegisterInputRequest rir = new RegisterInputRequest(input, core.getNodeId());
+        RegisterInputRequest rir = new RegisterInputRequest(input, serverStatus.getNodeId().toString());
 
         String json;
         try {
@@ -115,7 +124,7 @@ public class RadioInputRegistry extends InputRegistry {
 
     public void unregisterInCluster(MessageInput input) throws ExecutionException, InterruptedException, IOException {
         final UriBuilder uriBuilder = UriBuilder.fromUri(serverUrl);
-        uriBuilder.path("/system/radios/" + core.getNodeId() + "/inputs/" + input.getPersistId());
+        uriBuilder.path("/system/radios/" + serverStatus.getNodeId().toString() + "/inputs/" + input.getPersistId());
 
         Future<Response> f = httpclient.prepareDelete(uriBuilder.build().toString()).execute();
 
@@ -130,7 +139,7 @@ public class RadioInputRegistry extends InputRegistry {
     public List<MessageInput> getAllPersisted() {
         final List<MessageInput> result = Lists.newArrayList();
         final UriBuilder uriBuilder = UriBuilder.fromUri(serverUrl);
-        uriBuilder.path("/system/radios/" + core.getNodeId() + "/inputs");
+        uriBuilder.path("/system/radios/" + serverStatus.getNodeId().toString() + "/inputs");
 
         List<InputSummaryResponse> response;
         try {

@@ -1,5 +1,5 @@
-/**
- * Copyright 2012 Lennart Koopmann <lennart@socketfeed.com>
+/*
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -15,17 +15,17 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 
 package org.graylog2.inputs.gelf.tcp;
 
-import org.graylog2.plugin.GraylogServer;
-import org.graylog2.plugin.InputHost;
+import com.codahale.metrics.MetricRegistry;
+import org.graylog2.inputs.gelf.GELFDispatcher;
+import org.graylog2.inputs.gelf.gelf.GELFChunkManager;
+import org.graylog2.plugin.buffers.Buffer;
+import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.util.ConnectionCounter;
 import org.graylog2.plugin.inputs.util.ThroughputCounter;
-import org.graylog2.inputs.gelf.GELFDispatcher;
-import org.graylog2.plugin.inputs.MessageInput;
 import org.jboss.netty.channel.ChannelPipeline;
 import org.jboss.netty.channel.ChannelPipelineFactory;
 import org.jboss.netty.channel.Channels;
@@ -37,13 +37,22 @@ import org.jboss.netty.handler.codec.frame.Delimiters;
  */
 public class GELFTCPPipelineFactory implements ChannelPipelineFactory {
 
-    private final InputHost server;
+    private final MetricRegistry metricRegistry;
+    private final Buffer processBuffer;
+    private final GELFChunkManager gelfChunkManager;
     private final MessageInput sourceInput;
     private final ThroughputCounter throughputCounter;
     private final ConnectionCounter connectionCounter;
 
-    public GELFTCPPipelineFactory(InputHost server, MessageInput sourceInput, ThroughputCounter throughputCounter, ConnectionCounter connectionCounter) {
-        this.server = server;
+    public GELFTCPPipelineFactory(MetricRegistry metricRegistry,
+                                  Buffer processBuffer,
+                                  GELFChunkManager gelfChunkManager,
+                                  MessageInput sourceInput,
+                                  ThroughputCounter throughputCounter,
+                                  ConnectionCounter connectionCounter) {
+        this.metricRegistry = metricRegistry;
+        this.processBuffer = processBuffer;
+        this.gelfChunkManager = gelfChunkManager;
         this.sourceInput = sourceInput;
         this.throughputCounter = throughputCounter;
         this.connectionCounter = connectionCounter;
@@ -56,7 +65,7 @@ public class GELFTCPPipelineFactory implements ChannelPipelineFactory {
         p.addLast("connection-counter", connectionCounter);
         p.addLast("framer", new DelimiterBasedFrameDecoder(2 * 1024 * 1024, Delimiters.nulDelimiter()));
         p.addLast("traffic-counter", throughputCounter);
-        p.addLast("handler", new GELFDispatcher(server, sourceInput));
+        p.addLast("handler", new GELFDispatcher(metricRegistry, gelfChunkManager, processBuffer, sourceInput));
 
         return p;
     }

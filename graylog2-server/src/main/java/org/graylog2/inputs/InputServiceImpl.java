@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 TORCH GmbH
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -45,10 +45,10 @@ public class InputServiceImpl extends PersistedServiceImpl implements InputServi
     }
 
     @Override
-    public List<Input> allOfThisNode(Core core) {
+    public List<Input> allOfThisNode(String nodeId) {
         List<Input> inputs = Lists.newArrayList();
         List<BasicDBObject> query = new ArrayList<BasicDBObject>();
-        query.add(new BasicDBObject("node_id", core.getNodeId()));
+        query.add(new BasicDBObject("node_id", nodeId));
         query.add(new BasicDBObject("global", true));
         List<DBObject> ownInputs = query(org.graylog2.inputs.InputImpl.class, new BasicDBObject("$or", query));
         for (DBObject o : ownInputs) {
@@ -56,6 +56,11 @@ public class InputServiceImpl extends PersistedServiceImpl implements InputServi
         }
 
         return inputs;
+    }
+
+    @Override
+    public List<Input> allOfThisNode(Core core) {
+        return allOfThisNode(core.getNodeId());
     }
 
     @Override

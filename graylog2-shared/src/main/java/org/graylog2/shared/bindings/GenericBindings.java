@@ -22,6 +22,8 @@ package org.graylog2.shared.bindings;
 import com.codahale.metrics.MetricRegistry;
 import com.google.inject.AbstractModule;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
+import org.graylog2.inputs.gelf.gelf.GELFChunkManager;
+import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.buffers.ProcessBuffer;
 import org.graylog2.shared.buffers.ProcessBufferWatermark;
 import org.graylog2.shared.filters.FilterRegistry;
@@ -50,5 +52,7 @@ public class GenericBindings extends AbstractModule {
         install(new FactoryModuleBuilder().build(ProcessBuffer.Factory.class));
 
         bind(ProcessBuffer.class).toProvider(ProcessBufferProvider.class);
+        bind(GELFChunkManager.class).toProvider(GELFChunkManagerProvider.class);
+        bind(NodeId.class).toProvider(NodeIdProvider.class);
     }
 }

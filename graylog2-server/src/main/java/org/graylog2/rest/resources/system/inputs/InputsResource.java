@@ -37,7 +37,6 @@ import org.graylog2.rest.documentation.annotations.*;
 import org.graylog2.rest.resources.RestResource;
 import org.graylog2.security.RestPermissions;
 import org.graylog2.shared.ServerStatus;
-import org.graylog2.shared.inputs.InputRegistry;
 import org.graylog2.shared.inputs.NoSuchInputTypeException;
 import org.graylog2.shared.rest.resources.system.inputs.requests.InputLaunchRequest;
 import org.graylog2.system.activities.Activity;
@@ -68,6 +67,8 @@ public class InputsResource extends RestResource {
 
     @Inject
     private InputService inputService;
+    @Inject
+    private ServerInputRegistry inputRegistry;
     @Inject
     private ActivityWriter activityWriter;
 
@@ -135,8 +136,8 @@ public class InputsResource extends RestResource {
         DateTime createdAt = new DateTime(DateTimeZone.UTC);
         MessageInput input = null;
         try {
-            input = InputRegistry.factory(lr.type);
-            input.initialize(inputConfig, core);
+            input = inputRegistry.create(lr.type);
+            input.initialize(inputConfig);
             input.setTitle(lr.title);
             input.setGlobal(lr.global);
             input.setCreatorUserId(lr.creatorUserId);
@@ -255,7 +256,7 @@ public class InputsResource extends RestResource {
     public Response launchExisting(@ApiParam(title = "inputId", required = true) @PathParam("inputId") String inputId) {
         MessageInput input = null;
         try {
-             input = ServerInputRegistry.getMessageInput(inputService.findForThisNode(core.getNodeId(), inputId), core);
+             input = inputRegistry.getMessageInput(inputService.findForThisNode(core.getNodeId(), inputId));
         } catch (NoSuchInputTypeException e) {
             LOG.info("Cannot launch input. Input not found.");
             throw new WebApplicationException(404);
@@ -294,7 +295,7 @@ public class InputsResource extends RestResource {
     public Response stop(@ApiParam(title = "inputId", required = true) @PathParam("inputId") String inputId) {
         MessageInput input = null;
         try {
-            input = ServerInputRegistry.getMessageInput(inputService.findForThisNode(core.getNodeId(), inputId), core);
+            input = inputRegistry.getMessageInput(inputService.findForThisNode(core.getNodeId(), inputId));
         } catch (NoSuchInputTypeException e) {
             LOG.info("Cannot launch input. Input not found.");
             throw new WebApplicationException(404);
@@ -347,7 +348,7 @@ public class InputsResource extends RestResource {
 
         MessageInput input;
         try {
-            input = InputRegistry.factory(inputType);
+            input = inputRegistry.create(inputType);
         } catch (NoSuchInputTypeException e) {
             LOG.error("There is no such input type registered.", e);
             throw new WebApplicationException(e, Response.Status.NOT_FOUND);

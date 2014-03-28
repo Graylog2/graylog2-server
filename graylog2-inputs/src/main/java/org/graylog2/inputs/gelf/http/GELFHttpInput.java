@@ -1,5 +1,5 @@
-/**
- * Copyright 2012 Kay Roepke <kroepke@googlemail.com>
+/*
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -15,7 +15,6 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 package org.graylog2.inputs.gelf.http;
 
@@ -23,12 +22,14 @@ import com.codahale.metrics.Gauge;
 import com.codahale.metrics.MetricRegistry;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.graylog2.inputs.gelf.GELFInputBase;
-import org.graylog2.plugin.inputs.*;
+import org.graylog2.plugin.buffers.Buffer;
+import org.graylog2.plugin.inputs.MisfireException;
 import org.jboss.netty.bootstrap.ServerBootstrap;
 import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -38,17 +39,23 @@ public class GELFHttpInput extends GELFInputBase {
     private static final Logger LOG = LoggerFactory.getLogger(GELFHttpInput.class);
 
     public static final String NAME = "GELF HTTP";
+    private final MetricRegistry metricRegistry;
+
+    @Inject
+    public GELFHttpInput(MetricRegistry metricRegistry) {
+        this.metricRegistry = metricRegistry;
+    }
 
     @Override
-    public void launch() throws MisfireException {
+    public void launch(Buffer processBuffer) throws MisfireException {
         // Register throughput counter gauges.
         for(Map.Entry<String,Gauge<Long>> gauge : throughputCounter.gauges().entrySet()) {
-            graylogServer.metrics().register(MetricRegistry.name(getUniqueReadableId(), gauge.getKey()), gauge.getValue());
+            metricRegistry.register(MetricRegistry.name(getUniqueReadableId(), gauge.getKey()), gauge.getValue());
         }
 
         // Register connection counter gauges.
-        graylogServer.metrics().register(MetricRegistry.name(getUniqueReadableId(), "open_connections"), connectionCounter.gaugeCurrent());
-        graylogServer.metrics().register(MetricRegistry.name(getUniqueReadableId(), "total_connections"), connectionCounter.gaugeTotal());
+        metricRegistry.register(MetricRegistry.name(getUniqueReadableId(), "open_connections"), connectionCounter.gaugeCurrent());
+        metricRegistry.register(MetricRegistry.name(getUniqueReadableId(), "total_connections"), connectionCounter.gaugeTotal());
 
         final ExecutorService bossExecutor = Executors.newCachedThreadPool(
                 new ThreadFactoryBuilder()
@@ -63,7 +70,7 @@ public class GELFHttpInput extends GELFInputBase {
         bootstrap = new ServerBootstrap(
                 new NioServerSocketChannelFactory(bossExecutor, workerExecutor)
         );
-        bootstrap.setPipelineFactory(new GELFHttpPipelineFactory(graylogServer, this, throughputCounter, connectionCounter));
+        bootstrap.setPipelineFactory(new GELFHttpPipelineFactory(metricRegistry, processBuffer, this, throughputCounter, connectionCounter));
 
         try {
             channel = ((ServerBootstrap) bootstrap).bind(socketAddress);

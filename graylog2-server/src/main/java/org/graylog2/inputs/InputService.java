@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 TORCH GmbH
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -32,6 +32,7 @@ import java.util.List;
  * @author Dennis Oelkers <dennis@torch.sh>
  */
 public interface InputService extends PersistedService {
+    List<Input> allOfThisNode(String nodeId);
     List<Input> allOfThisNode(Core core);
 
     List<Input> allOfRadio(Node radio);

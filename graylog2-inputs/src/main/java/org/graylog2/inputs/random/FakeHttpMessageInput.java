@@ -1,5 +1,5 @@
-/**
- * Copyright 2013 Lennart Koopmann <lennart@torch.sh>
+/*
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -15,13 +15,12 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 package org.graylog2.inputs.random;
 
 import org.graylog2.inputs.random.generators.FakeHttpMessageGenerator;
 import org.graylog2.inputs.random.generators.Tools;
-import org.graylog2.plugin.InputHost;
+import org.graylog2.plugin.buffers.Buffer;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationException;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
@@ -33,6 +32,7 @@ import org.graylog2.plugin.inputs.MisfireException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
 import java.util.Map;
 import java.util.Random;
 
@@ -57,6 +57,10 @@ public class FakeHttpMessageInput extends MessageInput {
     private int sleepMs;
     private int maxSleepDeviation;
 
+    @Inject
+    public FakeHttpMessageInput() {
+    }
+
     @Override
     public void checkConfiguration() throws ConfigurationException {
         if (!checkConfig(configuration)) {
@@ -69,13 +73,13 @@ public class FakeHttpMessageInput extends MessageInput {
     }
 
     @Override
-    public void launch() throws MisfireException {
+    public void launch(final Buffer processBuffer) throws MisfireException {
         final MessageInput thisInput = this;
         final FakeHttpMessageGenerator generator = new FakeHttpMessageGenerator(source);
         Thread t = new Thread(new Runnable() {
             public void run() {
                 while(!stopRequested) {
-                    graylogServer.getProcessBuffer().insertCached(generator.generate(), thisInput);
+                    processBuffer.insertCached(generator.generate(), thisInput);
 
                     try {
                         Thread.sleep(Tools.deviation(sleepMs, maxSleepDeviation, rand));

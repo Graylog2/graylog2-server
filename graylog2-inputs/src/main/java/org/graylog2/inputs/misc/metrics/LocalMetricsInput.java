@@ -1,5 +1,5 @@
-/**
- * Copyright 2013 Lennart Koopmann <lennart@torch.sh>
+/*
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -15,14 +15,13 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 package org.graylog2.inputs.misc.metrics;
 
-import org.graylog2.inputs.misc.metrics.agent.*;
-import org.graylog2.plugin.GraylogServer;
-import org.graylog2.plugin.InputHost;
-import org.graylog2.plugin.configuration.Configuration;
+import com.codahale.metrics.MetricRegistry;
+import org.graylog2.inputs.misc.metrics.agent.Graylog2Reporter;
+import org.graylog2.inputs.misc.metrics.agent.InProcessMessageWriter;
+import org.graylog2.plugin.buffers.Buffer;
 import org.graylog2.plugin.configuration.ConfigurationException;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.configuration.fields.ConfigurationField;
@@ -31,7 +30,9 @@ import org.graylog2.plugin.configuration.fields.NumberField;
 import org.graylog2.plugin.configuration.fields.TextField;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.MisfireException;
+import org.graylog2.plugin.system.NodeId;
 
+import javax.inject.Inject;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -41,8 +42,11 @@ import java.util.concurrent.TimeUnit;
 public class LocalMetricsInput extends MessageInput {
 
     public static final String NAME = "Internal metrics reporter";
+    private final MetricRegistry metricRegistry;
+    private final NodeId nodeId;
 
     private Graylog2Reporter reporter;
+    private Graylog2Reporter.Builder builder;
 
     private static final String CK_REPORT_INTERVAL = "report_interval";
     private static final String CK_REPORT_UNIT = "report_unit";
@@ -50,17 +54,23 @@ public class LocalMetricsInput extends MessageInput {
     private static final String CK_RATE_UNIT = "rate_unit";
     private static final String CK_SOURCE = "source";
 
-    @Override
-    public void checkConfiguration() throws ConfigurationException {
-        reporter = Graylog2Reporter.forRegistry(graylogServer.metrics())
-                            .useSource(configuration.getString(CK_SOURCE))
-                            .convertDurationsTo(TimeUnit.valueOf(configuration.getString(CK_DURATION_UNIT)))
-                            .convertRatesTo(TimeUnit.valueOf(configuration.getString(CK_RATE_UNIT)))
-                            .build(new InProcessMessageWriter(graylogServer, this));
+    @Inject
+    public LocalMetricsInput(MetricRegistry metricRegistry, NodeId nodeId) {
+        this.metricRegistry = metricRegistry;
+        this.nodeId = nodeId;
     }
 
     @Override
-    public void launch() throws MisfireException {
+    public void checkConfiguration() throws ConfigurationException {
+        builder = Graylog2Reporter.forRegistry(metricRegistry)
+                            .useSource(configuration.getString(CK_SOURCE))
+                            .convertDurationsTo(TimeUnit.valueOf(configuration.getString(CK_DURATION_UNIT)))
+                            .convertRatesTo(TimeUnit.valueOf(configuration.getString(CK_RATE_UNIT)));
+    }
+
+    @Override
+    public void launch(Buffer processBuffer) throws MisfireException {
+        reporter = builder.build(new InProcessMessageWriter(processBuffer, nodeId.toString(), this));
         reporter.start(
                 configuration.getInt(CK_REPORT_INTERVAL),
                 TimeUnit.valueOf(configuration.getString(CK_REPORT_UNIT))

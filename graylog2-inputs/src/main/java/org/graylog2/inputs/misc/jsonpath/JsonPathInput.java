@@ -1,5 +1,5 @@
-/**
- * Copyright 2013 Lennart Koopmann <lennart@torch.sh>
+/*
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -15,7 +15,6 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 package org.graylog2.inputs.misc.jsonpath;
 
@@ -24,6 +23,7 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.jayway.jsonpath.JsonPath;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
+import org.graylog2.plugin.buffers.Buffer;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationException;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
@@ -82,7 +82,7 @@ public class JsonPathInput extends MessageInput {
     }
 
     @Override
-    public void launch() throws MisfireException {
+    public void launch(final Buffer processBuffer) throws MisfireException {
         final MessageInput parentInput = this;
 
         Runnable task = new Runnable() {
@@ -114,7 +114,7 @@ public class JsonPathInput extends MessageInput {
                     m.addFields(fields);
 
                     // Add to buffer.
-                    graylogServer.getProcessBuffer().insertCached(m, parentInput);
+                    processBuffer.insertCached(m, parentInput);
                 } catch(Exception e) {
                     LOG.error("Could not run collector for JsonPathInput <{}>.", getId(), e);
                 }

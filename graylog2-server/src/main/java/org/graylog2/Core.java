@@ -156,6 +156,8 @@ public class Core implements GraylogServer, InputHost, ProcessingHost {
     @Inject
     private ServerStatus serverStatus;
     private RulesEngineImpl rulesEngine;
+
+    @Inject
     private GELFChunkManager gelfChunkManager;
 
     @Inject
@@ -183,6 +185,7 @@ public class Core implements GraylogServer, InputHost, ProcessingHost {
     private List<AlarmCallback> alarmCallbacks = Lists.newArrayList();
 
     private Initializers initializers;
+    @Inject
     private ServerInputRegistry inputs;
 
     @Inject
@@ -266,7 +269,6 @@ public class Core implements GraylogServer, InputHost, ProcessingHost {
         }
 
         initializers = new Initializers(this);
-        inputs = new ServerInputRegistry(this);
 
         if (serverStatus.hasCapability(ServerStatus.Capability.MASTER)) {
             dashboardRegistry.loadPersisted(this);
@@ -287,11 +289,8 @@ public class Core implements GraylogServer, InputHost, ProcessingHost {
                 this.getConfiguration().getProcessBufferProcessors()
         );
 
-        gelfChunkManager = new GELFChunkManager(this);
-
         indexer.start();
 
-        final Core core = this;
         Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override
             public void run() {
@@ -393,7 +392,7 @@ public class Core implements GraylogServer, InputHost, ProcessingHost {
             bind(new AlertServiceImpl(mongoConnection)).to(AlertService.class);
             bind(new UserServiceImpl(mongoConnection, configuration)).to(UserService.class);
             bind(new AccessTokenServiceImpl(mongoConnection)).to(AccessTokenService.class);
-            bind(new IndexRangeServiceImpl(mongoConnection, getActivityWriter())).to(IndexRangeService.class);
+            bind(new IndexRangeServiceImpl(mongoConnection, activityWriter)).to(IndexRangeService.class);
             bind(new SavedSearchServiceImpl(mongoConnection)).to(SavedSearchService.class);
             bind(new IndexFailureServiceImpl(mongoConnection)).to(IndexFailureService.class);
             bind(dashboardRegistry).to(DashboardRegistry.class);
@@ -408,6 +407,8 @@ public class Core implements GraylogServer, InputHost, ProcessingHost {
             bind(configuration).to(Configuration.class);
             bind(systemJobManager).to(SystemJobManager.class);
             bind(rebuildIndexRangesJobFactory).to(RebuildIndexRangesJob.Factory.class);
+            bind(cacheSynchronizer).to(Caches.class);
+            bind(inputs).to(ServerInputRegistry.class);
         }
     }
 
@@ -551,10 +552,6 @@ public class Core implements GraylogServer, InputHost, ProcessingHost {
     
     public List<AlarmCallback> getAlarmCallbacks() {
         return this.alarmCallbacks;
-    }
-
-    public ActivityWriter getActivityWriter() {
-        return this.activityWriter;
     }
 
     public void setLdapAuthenticator(LdapUserAuthenticator authenticator) {
