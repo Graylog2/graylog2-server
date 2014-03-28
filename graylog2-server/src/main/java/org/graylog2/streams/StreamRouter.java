@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 TORCH GmbH
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -28,10 +28,8 @@ import com.google.common.cache.LoadingCache;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.inject.Inject;
-import org.graylog2.Core;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.NotFoundException;
-import org.graylog2.plugin.GraylogServer;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.streams.StreamRule;
@@ -61,39 +59,41 @@ public class StreamRouter {
 
     private final StreamService streamService;
     private final StreamRuleService streamRuleService;
+    private final MetricRegistry metricRegistry;
 
     private final Boolean useCaching;
 
     @Inject
-    public StreamRouter(MongoConnection mongoConnection) {
-        this(true, mongoConnection);
+    public StreamRouter(MongoConnection mongoConnection, MetricRegistry metricRegistry) {
+        this(true, mongoConnection, metricRegistry);
     }
 
-    public StreamRouter(Boolean useCaching, MongoConnection mongoConnection) {
-        this(useCaching, new StreamServiceImpl(mongoConnection), new StreamRuleServiceImpl(mongoConnection));
+    public StreamRouter(Boolean useCaching, MongoConnection mongoConnection, MetricRegistry metricRegistry) {
+        this(useCaching, new StreamServiceImpl(mongoConnection), new StreamRuleServiceImpl(mongoConnection), metricRegistry);
     }
 
-    public StreamRouter(boolean useCaching, StreamService streamService, StreamRuleService streamRuleService) {
+    public StreamRouter(boolean useCaching, StreamService streamService, StreamRuleService streamRuleService, MetricRegistry metricRegistry) {
         this.useCaching = useCaching;
         this.streamService = streamService;
         this.streamRuleService = streamRuleService;
+        this.metricRegistry = metricRegistry;
     }
 
-    public List<Stream> route(Core server, Message msg) {
+    public List<Stream> route(Message msg) {
         List<Stream> matches = Lists.newArrayList();
-        List<Stream> streams = getStreams(server);
+        List<Stream> streams = getStreams();
 
         for (Stream stream : streams) {
-            Timer timer = getExecutionTimer(stream.getId(), server);
+            Timer timer = getExecutionTimer(stream.getId());
             final Timer.Context timerContext = timer.time();
 
-            Map<StreamRule, Boolean> result = getRuleMatches(server, stream, msg);
+            Map<StreamRule, Boolean> result = getRuleMatches(stream, msg);
 
             boolean matched = doesStreamMatch(result);
 
             // All rules were matched.
             if (matched) {
-                getIncomingMeter(stream.getId(), server).mark();
+                getIncomingMeter(stream.getId()).mark();
                 matches.add(stream);
             }
             timerContext.close();
@@ -102,7 +102,7 @@ public class StreamRouter {
         return matches;
     }
 
-    private List<Stream> getStreams(final Core server) {
+    private List<Stream> getStreams() {
         if (this.useCaching) {
             if (cachedStreams == null)
                 cachedStreams = CacheBuilder.newBuilder()
@@ -128,7 +128,7 @@ public class StreamRouter {
         }
     }
 
-    private List<StreamRule> getStreamRules(Stream stream, final Core server) {
+    private List<StreamRule> getStreamRules(Stream stream) {
         if (this.useCaching) {
             if (cachedStreamRules == null)
                 cachedStreamRules = CacheBuilder.newBuilder()
@@ -159,15 +159,15 @@ public class StreamRouter {
         }
     }
 
-    public Map<StreamRule, Boolean> getRuleMatches(final Core server, Stream stream, Message msg) {
+    public Map<StreamRule, Boolean> getRuleMatches(Stream stream, Message msg) {
         Map<StreamRule, Boolean> result = Maps.newHashMap();
 
-        List<StreamRule> streamRules = getStreamRules(stream, server);
+        List<StreamRule> streamRules = getStreamRules(stream);
 
         for (StreamRule rule : streamRules) {
             try {
                 StreamRuleMatcher matcher = StreamRuleMatcherFactory.build(rule.getType());
-                result.put(rule, matchStreamRule(msg, matcher, rule, server));
+                result.put(rule, matchStreamRule(msg, matcher, rule));
             } catch (InvalidStreamRuleTypeException e) {
                 LOG.warn("Invalid stream rule type. Skipping matching for this rule. " + e.getMessage(), e);
             }
@@ -180,40 +180,40 @@ public class StreamRouter {
         return !ruleMatches.isEmpty() && !ruleMatches.values().contains(false);
     }
 
-    public boolean matchStreamRule(Message msg, StreamRuleMatcher matcher, StreamRule rule, Core server) {
+    public boolean matchStreamRule(Message msg, StreamRuleMatcher matcher, StreamRule rule) {
         try {
             return matcher.match(msg, rule);
         } catch (Exception e) {
             LOG.debug("Could not match stream rule <" + rule.getType() + "/" + rule.getValue() + ">: " + e.getMessage(), e);
-            getExceptionMeter(rule.getStreamId(), server).mark();
+            getExceptionMeter(rule.getStreamId()).mark();
             return false;
         }
     }
 
-    protected Meter getIncomingMeter(String streamId, GraylogServer server) {
+    protected Meter getIncomingMeter(String streamId) {
         Meter meter = this.streamIncomingMeters.get(streamId);
         if (meter == null) {
-            meter = server.metrics().meter(MetricRegistry.name(Stream.class, streamId, "incomingMessages"));
+            meter = metricRegistry.meter(MetricRegistry.name(Stream.class, streamId, "incomingMessages"));
             this.streamIncomingMeters.put(streamId, meter);
         }
 
         return meter;
     }
 
-    protected Timer getExecutionTimer(String streamId, GraylogServer server) {
+    protected Timer getExecutionTimer(String streamId) {
         Timer timer = this.streamExecutionTimers.get(streamId);
         if (timer == null) {
-            timer = server.metrics().timer(MetricRegistry.name(Stream.class, streamId, "executionTime"));
+            timer = metricRegistry.timer(MetricRegistry.name(Stream.class, streamId, "executionTime"));
             this.streamExecutionTimers.put(streamId, timer);
         }
 
         return timer;
     }
 
-    protected Meter getExceptionMeter(String streamId, GraylogServer server) {
+    protected Meter getExceptionMeter(String streamId) {
         Meter meter = this.streamExceptionMeters.get(streamId);
         if (meter == null) {
-            meter = server.metrics().meter(MetricRegistry.name(Stream.class, streamId, "matchingExceptions"));
+            meter = metricRegistry.meter(MetricRegistry.name(Stream.class, streamId, "matchingExceptions"));
             this.streamExceptionMeters.put(streamId, meter);
         }
 

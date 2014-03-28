@@ -16,6 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package org.graylog2.rest.resources.streams.alerts;
 
 import com.codahale.metrics.annotation.Timed;
@@ -28,6 +29,7 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.alerts.*;
 import org.graylog2.alerts.types.DummyAlertCondition;
 import org.graylog2.database.ValidationException;
+import org.graylog2.indexer.Indexer;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.alarms.transports.TransportConfigurationException;
 import org.graylog2.plugin.streams.Stream;
@@ -75,6 +77,9 @@ public class StreamAlertResource extends RestResource {
     private static final Cache<String, Map<String, Object>> cache = CacheBuilder.newBuilder()
             .expireAfterWrite(AlertImpl.REST_CHECK_CACHE_SECONDS, TimeUnit.SECONDS)
             .build();
+
+    @Inject
+    private Indexer indexer;
 
     @POST @Timed
     @Path("conditions")
@@ -193,7 +198,7 @@ public class StreamAlertResource extends RestResource {
                         Map<String, Object> conditionResult = Maps.newHashMap();
                         conditionResult.put("condition", alertService.asMap(alertCondition));
 
-                        AlertCondition.CheckResult checkResult = alertService.triggeredNoGrace(alertCondition, core.getIndexer());
+                        AlertCondition.CheckResult checkResult = alertService.triggeredNoGrace(alertCondition, indexer);
                         conditionResult.put("triggered", checkResult.isTriggered());
 
                         if (checkResult.isTriggered()) {
@@ -363,10 +368,10 @@ public class StreamAlertResource extends RestResource {
         }
 
         Map<String, Object> parameters = Maps.newHashMap();
-        DummyAlertCondition dummyAlertCondition = new DummyAlertCondition(core, stream, null, null, Tools.iso8601(), "admin", parameters);
+        DummyAlertCondition dummyAlertCondition = new DummyAlertCondition(stream, null, null, Tools.iso8601(), "admin", parameters);
 
         try {
-            AlertCondition.CheckResult checkResult = dummyAlertCondition.runCheck(core.getIndexer());
+            AlertCondition.CheckResult checkResult = dummyAlertCondition.runCheck(indexer);
             alertSender.sendEmails(stream,checkResult);
         } catch (TransportConfigurationException e) {
             return Response.serverError().entity("E-Mail transport is not or improperly configured.").build();

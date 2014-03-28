@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 TORCH GmbH
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -19,6 +19,7 @@
 package org.graylog2.rest.resources.streams;
 
 import com.beust.jcommander.internal.Lists;
+import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.annotation.Timed;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.collect.Maps;
@@ -26,7 +27,6 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.bson.types.ObjectId;
 import org.cliffc.high_scale_lib.Counter;
-import org.graylog2.Core;
 import org.graylog2.alerts.AlertCondition;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.database.ValidationException;
@@ -37,6 +37,7 @@ import org.graylog2.rest.documentation.annotations.*;
 import org.graylog2.rest.resources.RestResource;
 import org.graylog2.rest.resources.streams.requests.CreateRequest;
 import org.graylog2.security.RestPermissions;
+import org.graylog2.shared.stats.ThroughputStats;
 import org.graylog2.streams.*;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -62,13 +63,15 @@ public class StreamResource extends RestResource {
 	private static final Logger LOG = LoggerFactory.getLogger(StreamResource.class);
 
     @Inject
-    protected Core core;
-
-    @Inject
     protected StreamService streamService;
 
     @Inject
     protected StreamRuleService streamRuleService;
+
+    @Inject
+    private ThroughputStats throughputStats;
+    @Inject
+    private MetricRegistry metricRegistry;
 
     @POST @Timed
     @ApiOperation(value = "Create a stream")
@@ -336,9 +339,9 @@ public class StreamResource extends RestResource {
         Stream stream = fetchStream(streamId);
         Message message = new Message(serialisedMessage.get("message"));
 
-        StreamRouter router = new StreamRouter(false, streamService, streamRuleService);
+        StreamRouter router = new StreamRouter(false, streamService, streamRuleService, metricRegistry);
 
-        Map<StreamRule, Boolean> ruleMatches = router.getRuleMatches(core, stream, message);
+        Map<StreamRule, Boolean> ruleMatches = router.getRuleMatches(stream, message);
         Map<String, Boolean> rules = Maps.newHashMap();
 
         for (StreamRule ruleMatch : ruleMatches.keySet()) {
@@ -448,7 +451,7 @@ public class StreamResource extends RestResource {
         Map<String, Long> result = Maps.newHashMap();
         result.put("throughput", 0L);
 
-        final HashMap<String,Counter> currentStreamThroughput = core.getCurrentStreamThroughput();
+        final HashMap<String,Counter> currentStreamThroughput = throughputStats.getCurrentStreamThroughput();
         if (currentStreamThroughput != null) {
             final Counter counter = currentStreamThroughput.get(streamId);
             if (counter != null && isPermitted(RestPermissions.STREAMS_READ, streamId)) {
@@ -467,7 +470,7 @@ public class StreamResource extends RestResource {
         final Map<String, Long> perStream = Maps.newHashMap();
         result.put("throughput", perStream);
 
-        final HashMap<String,Counter> currentStreamThroughput = core.getCurrentStreamThroughput();
+        final HashMap<String,Counter> currentStreamThroughput = throughputStats.getCurrentStreamThroughput();
         if (currentStreamThroughput != null) {
             for (Map.Entry<String, Counter> entry : currentStreamThroughput.entrySet()) {
                 if (entry.getValue() != null && isPermitted(RestPermissions.STREAMS_READ, entry.getKey())) {

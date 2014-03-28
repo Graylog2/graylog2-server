@@ -1,5 +1,5 @@
-/**
- * Copyright 2013 Lennart Koopmann <lennart@socketfeed.com>
+/*
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -15,7 +15,6 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 
 package org.graylog2.rest.resources.search;
@@ -44,6 +43,7 @@ import org.graylog2.security.RestPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.ForbiddenException;
 import javax.ws.rs.WebApplicationException;
@@ -55,6 +55,8 @@ import java.util.Map;
  */
 public class SearchResource extends RestResource {
     private static final Logger LOG = LoggerFactory.getLogger(SearchResource.class);
+    @Inject
+    private Indexer indexer;
 
     protected void validateInterval(String interval) {
         try {
@@ -106,7 +108,7 @@ public class SearchResource extends RestResource {
 
     protected FieldStatsResult fieldStats(String field, String query, String filter, TimeRange timeRange) throws IndexHelper.InvalidRangeFormatException {
         try {
-            return core.getIndexer().searches().fieldStats(field, query, filter, timeRange);
+            return indexer.searches().fieldStats(field, query, filter, timeRange);
         } catch(Searches.FieldTypeException e) {
             LOG.error("Stats query failed. Make sure that field [{}] is a numeric type.", field);
             throw new WebApplicationException(400);
@@ -115,7 +117,7 @@ public class SearchResource extends RestResource {
 
     protected HistogramResult fieldHistogram(String field, String query, String interval, String filter, TimeRange timeRange) throws IndexHelper.InvalidRangeFormatException {
         try {
-            return core.getIndexer().searches().fieldHistogram(
+            return indexer.searches().fieldHistogram(
                     query,
                     field,
                     Indexer.DateHistogramInterval.valueOf(interval),

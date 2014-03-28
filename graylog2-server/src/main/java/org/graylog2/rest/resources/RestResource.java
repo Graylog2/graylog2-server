@@ -36,7 +36,6 @@ import com.fasterxml.jackson.jaxrs.cfg.ObjectWriterModifier;
 import com.google.common.collect.Maps;
 import org.apache.shiro.subject.Subject;
 import org.bson.types.ObjectId;
-import org.graylog2.Core;
 import org.graylog2.security.ShiroSecurityContext;
 import org.graylog2.shared.ServerStatus;
 import org.slf4j.Logger;
@@ -59,9 +58,6 @@ public abstract class RestResource {
 	private static final Logger LOG = LoggerFactory.getLogger(RestResource.class);
 
     protected final ObjectMapper objectMapper = new ObjectMapper();
-
-    @Inject
-    protected Core core;
 
     @Inject
     protected ServerStatus serverStatus;

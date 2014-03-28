@@ -1,5 +1,5 @@
-/**
- * Copyright 2013 Lennart Koopmann <lennart@torch.sh>
+/*
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -15,7 +15,6 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 package org.graylog2.rest.resources.search;
 
@@ -34,6 +33,7 @@ import org.graylog2.security.RestPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 
@@ -46,6 +46,8 @@ import javax.ws.rs.core.MediaType;
 public class AbsoluteSearchResource extends SearchResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(AbsoluteSearchResource.class);
+    @Inject
+    private Indexer indexer;
 
     @GET @Timed
     @ApiOperation(value = "Message search with absolute timerange.",
@@ -74,11 +76,11 @@ public class AbsoluteSearchResource extends SearchResource {
 
             if (filter == null) {
                 searchResponse = buildSearchResponse(
-                        core.getIndexer().searches().search(query, buildAbsoluteTimeRange(from, to), limit, offset, sorting)
+                        indexer.searches().search(query, buildAbsoluteTimeRange(from, to), limit, offset, sorting)
                 );
             } else {
                 searchResponse = buildSearchResponse(
-                        core.getIndexer().searches().search(query, filter, buildAbsoluteTimeRange(from, to), limit, offset, sorting)
+                        indexer.searches().search(query, filter, buildAbsoluteTimeRange(from, to), limit, offset, sorting)
                 );
             }
 
@@ -110,7 +112,7 @@ public class AbsoluteSearchResource extends SearchResource {
 
         try {
             return json(buildTermsResult(
-                    core.getIndexer().searches().terms(field, size, query, filter, buildAbsoluteTimeRange(from, to))
+                    indexer.searches().terms(field, size, query, filter, buildAbsoluteTimeRange(from, to))
             ));
         } catch (IndexHelper.InvalidRangeFormatException e) {
             LOG.warn("Invalid timerange parameters provided. Returning HTTP 400.", e);
@@ -168,7 +170,7 @@ public class AbsoluteSearchResource extends SearchResource {
 
         try {
             return json(buildHistogramResult(
-                    core.getIndexer().searches().histogram(
+                    indexer.searches().histogram(
                             query,
                             Indexer.DateHistogramInterval.valueOf(interval),
                             filter,

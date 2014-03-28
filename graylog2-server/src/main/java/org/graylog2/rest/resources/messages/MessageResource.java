@@ -1,5 +1,5 @@
-/**
- * Copyright 2013 Lennart Koopmann <lennart@socketfeed.com>
+/*
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -15,27 +15,26 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 
 package org.graylog2.rest.resources.messages;
 
-import com.beust.jcommander.internal.Lists;
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Maps;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.elasticsearch.indices.IndexMissingException;
+import org.graylog2.indexer.Indexer;
 import org.graylog2.indexer.messages.DocumentNotFoundException;
 import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.plugin.Message;
-import org.graylog2.plugin.streams.Stream;
 import org.graylog2.rest.documentation.annotations.*;
 import org.graylog2.rest.resources.RestResource;
 import org.graylog2.security.RestPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import java.util.List;
@@ -49,6 +48,8 @@ import java.util.Map;
 @Path("/messages/{index}")
 public class MessageResource extends RestResource {
     private static final Logger LOG = LoggerFactory.getLogger(MessageResource.class);
+    @Inject
+    private Indexer indexer;
 
     @GET @Path("/{messageId}") @Timed
     @ApiOperation(value = "Get a single message.")
@@ -66,7 +67,7 @@ public class MessageResource extends RestResource {
         }
         checkPermission(RestPermissions.MESSAGES_READ, messageId);
 		try {
-            ResultMessage resultMessage = core.getIndexer().messages().get(messageId, index);
+            ResultMessage resultMessage = indexer.messages().get(messageId, index);
             Message message = new Message(resultMessage.message);
             checkMessageReadPermission(message);
 
@@ -113,7 +114,7 @@ public class MessageResource extends RestResource {
         
         List<String> tokens;
         try {
-        	tokens = core.getIndexer().messages().analyze(string, index);
+        	tokens = indexer.messages().analyze(string, index);
 		} catch (IndexMissingException e) {
         	LOG.error("Index does not exist. Returning HTTP 404.");
         	throw new WebApplicationException(404);

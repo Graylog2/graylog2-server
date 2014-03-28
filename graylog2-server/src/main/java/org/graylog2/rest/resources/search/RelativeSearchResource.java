@@ -1,5 +1,5 @@
-/**
- * Copyright 2013 Lennart Koopmann <lennart@torch.sh>
+/*
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -15,13 +15,11 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 package org.graylog2.rest.resources.search;
 
 import com.codahale.metrics.annotation.Timed;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.elasticsearch.action.search.SearchPhaseExecutionException;
 import org.graylog2.indexer.IndexHelper;
 import org.graylog2.indexer.Indexer;
@@ -35,6 +33,7 @@ import org.graylog2.security.RestPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 
@@ -47,6 +46,8 @@ import javax.ws.rs.core.MediaType;
 public class RelativeSearchResource extends SearchResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(RelativeSearchResource.class);
+    @Inject
+    private Indexer indexer;
 
     @GET @Timed
     @ApiOperation(value = "Message search with relative timerange.",
@@ -74,11 +75,11 @@ public class RelativeSearchResource extends SearchResource {
 
             if (filter == null) {
                 searchResponse = buildSearchResponse(
-                        core.getIndexer().searches().search(query, buildRelativeTimeRange(range), limit, offset, sorting)
+                        indexer.searches().search(query, buildRelativeTimeRange(range), limit, offset, sorting)
                 );
             } else {
                 searchResponse = buildSearchResponse(
-                        core.getIndexer().searches().search(query, filter, buildRelativeTimeRange(range), limit, offset, sorting)
+                        indexer.searches().search(query, filter, buildRelativeTimeRange(range), limit, offset, sorting)
                 );
             }
 
@@ -109,7 +110,7 @@ public class RelativeSearchResource extends SearchResource {
 
         try {
             return json(buildTermsResult(
-                    core.getIndexer().searches().terms(field, size, query, filter, buildRelativeTimeRange(range))
+                    indexer.searches().terms(field, size, query, filter, buildRelativeTimeRange(range))
             ));
         } catch (IndexHelper.InvalidRangeFormatException e) {
             LOG.warn("Invalid timerange parameters provided. Returning HTTP 400.", e);
@@ -165,7 +166,7 @@ public class RelativeSearchResource extends SearchResource {
 
         try {
             return json(buildHistogramResult(
-                    core.getIndexer().searches().histogram(
+                    indexer.searches().histogram(
                             query,
                             Indexer.DateHistogramInterval.valueOf(interval),
                             filter,

@@ -16,9 +16,11 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package org.graylog2.rest.resources.system.inputs;
 
 import com.beust.jcommander.internal.Lists;
+import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Maps;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
@@ -26,6 +28,7 @@ import org.graylog2.ConfigurationException;
 import org.graylog2.database.ValidationException;
 import org.graylog2.inputs.Input;
 import org.graylog2.inputs.InputService;
+import org.graylog2.inputs.ServerInputRegistry;
 import org.graylog2.inputs.converters.ConverterFactory;
 import org.graylog2.inputs.extractors.ExtractorFactory;
 import org.graylog2.plugin.inputs.Converter;
@@ -62,6 +65,10 @@ public class ExtractorsResource extends RestResource {
     private InputService inputService;
     @Inject
     private ActivityWriter activityWriter;
+    @Inject
+    private ServerInputRegistry inputs;
+    @Inject
+    private MetricRegistry metricRegistry;
 
     @POST @Timed
     @Consumes(MediaType.APPLICATION_JSON)
@@ -81,7 +88,7 @@ public class ExtractorsResource extends RestResource {
         }
         checkPermission(RestPermissions.INPUTS_EDIT, inputId);
 
-        MessageInput input = core.inputs().getRunningInput(inputId);
+        MessageInput input = inputs.getRunningInput(inputId);
 
         if (input == null) {
             LOG.error("Input <{}> not found.", inputId);
@@ -162,7 +169,7 @@ public class ExtractorsResource extends RestResource {
         }
         checkPermission(RestPermissions.INPUTS_READ, inputId);
 
-        MessageInput input = core.inputs().getRunningInput(inputId);
+        MessageInput input = inputs.getRunningInput(inputId);
 
         if (input == null) {
             LOG.error("Input <{}> not found.", inputId);
@@ -204,7 +211,7 @@ public class ExtractorsResource extends RestResource {
         }
         checkPermission(RestPermissions.INPUTS_EDIT, inputId);
 
-        MessageInput input = core.inputs().getRunningInput(inputId);
+        MessageInput input = inputs.getRunningInput(inputId);
 
         if (input == null) {
             LOG.error("Input <{}> not found.", inputId);
@@ -250,8 +257,8 @@ public class ExtractorsResource extends RestResource {
         map.put("converter_exceptions", extractor.getConverterExceptionCount());
 
         Map<String, Object> metrics = Maps.newHashMap();
-        metrics.put("total",  buildTimerMap(core.metrics().getTimers().get(extractor.getTotalTimerName())));
-        metrics.put("converters", buildTimerMap(core.metrics().getTimers().get(extractor.getConverterTimerName())));
+        metrics.put("total",  buildTimerMap(metricRegistry.getTimers().get(extractor.getTotalTimerName())));
+        metrics.put("converters", buildTimerMap(metricRegistry.getTimers().get(extractor.getConverterTimerName())));
         map.put("metrics", metrics);
 
         return map;

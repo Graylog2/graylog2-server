@@ -24,6 +24,7 @@ import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Maps;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.graylog2.Core;
 import org.graylog2.dashboards.Dashboard;
 import org.graylog2.dashboards.DashboardImpl;
 import org.graylog2.dashboards.DashboardRegistry;
@@ -60,6 +61,9 @@ import java.util.concurrent.ExecutionException;
 @Path("/dashboards")
 public class DashboardsResource extends RestResource {
     private static final Logger LOG = LoggerFactory.getLogger(DashboardsResource.class);
+
+    @Inject
+    private Core core;
 
     @Inject
     private DashboardService dashboardService;

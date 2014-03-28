@@ -23,6 +23,7 @@ import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Maps;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.graylog2.Configuration;
 import org.graylog2.indexer.Deflector;
 import org.graylog2.indexer.Indexer;
 import org.graylog2.rest.documentation.annotations.Api;
@@ -59,6 +60,8 @@ public class DeflectorResource extends RestResource {
     private Indexer indexer;
     @Inject
     private ActivityWriter activityWriter;
+    @Inject
+    private Configuration configuration;
 
     @GET @Timed
     @ApiOperation(value = "Get current deflector status")
@@ -83,8 +86,8 @@ public class DeflectorResource extends RestResource {
 
         Map<String, Object> result = Maps.newHashMap();
 
-        result.put("max_docs_per_index", core.getConfiguration().getElasticSearchMaxDocsPerIndex());
-        result.put("max_number_of_indices", core.getConfiguration().getMaxNumberOfIndices());
+        result.put("max_docs_per_index", configuration.getElasticSearchMaxDocsPerIndex());
+        result.put("max_number_of_indices", configuration.getMaxNumberOfIndices());
 
         return Response.ok().entity(json(result)).build();
     }

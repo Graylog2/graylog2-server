@@ -33,7 +33,6 @@ import org.graylog2.inputs.InputCache;
 import org.graylog2.inputs.gelf.gelf.GELFChunkManager;
 import org.graylog2.jersey.container.netty.NettyContainer;
 import org.graylog2.plugin.GraylogServer;
-import org.graylog2.plugin.InputHost;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.Version;
 import org.graylog2.plugin.buffers.Buffer;
@@ -45,7 +44,6 @@ import org.graylog2.radio.cluster.Ping;
 import org.graylog2.radio.inputs.RadioInputRegistry;
 import org.graylog2.radio.transports.RadioTransport;
 import org.graylog2.radio.transports.kafka.KafkaProducer;
-import org.graylog2.shared.ProcessingHost;
 import org.graylog2.shared.ServerStatus;
 import org.graylog2.shared.buffers.ProcessBuffer;
 import org.graylog2.shared.buffers.ProcessBufferWatermark;
@@ -73,7 +71,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-public class Radio implements InputHost, GraylogServer, ProcessingHost {
+public class Radio implements GraylogServer {
 
     private static final Logger LOG = LoggerFactory.getLogger(Radio.class);
 
@@ -86,6 +84,7 @@ public class Radio implements InputHost, GraylogServer, ProcessingHost {
     @Inject
     private ServerStatus serverStatus;
 
+    @Inject
     private GELFChunkManager gelfChunkManager;
 
     @Inject
@@ -237,11 +236,12 @@ public class Radio implements InputHost, GraylogServer, ProcessingHost {
             bind(configuration).to(Configuration.class);
             bind(serverStatus).to(ServerStatus.class);
             bind(inputs).to(InputRegistry.class);
+            bind((InputCache)getInputCache()).to(InputCache.class);
+            bind(processBuffer).to(ProcessBuffer.class);
         }
 
     }
 
-    @Override
     public Buffer getProcessBuffer() {
         return processBuffer;
     }
@@ -254,7 +254,6 @@ public class Radio implements InputHost, GraylogServer, ProcessingHost {
         return serverStatus.getNodeId().toString();
     }
 
-    @Override
     public GELFChunkManager getGELFChunkManager() {
         return this.gelfChunkManager;
     }

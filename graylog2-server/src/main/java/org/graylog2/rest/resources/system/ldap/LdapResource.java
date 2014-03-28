@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 TORCH GmbH
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -26,6 +26,7 @@ import org.apache.directory.ldap.client.api.LdapConnectionConfig;
 import org.apache.directory.ldap.client.api.LdapNetworkConnection;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.graylog2.Core;
 import org.graylog2.database.ValidationException;
 import org.graylog2.rest.documentation.annotations.Api;
 import org.graylog2.rest.documentation.annotations.ApiOperation;
@@ -58,6 +59,9 @@ import static javax.ws.rs.core.Response.ok;
 public class LdapResource extends RestResource {
 
     private static final Logger log = LoggerFactory.getLogger(LdapResource.class);
+
+    @Inject
+    private Core core;
 
     @Inject
     private LdapSettingsService ldapSettingsService;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 TORCH GmbH
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -19,7 +19,6 @@
 
 package org.graylog2.alerts.types;
 
-import org.graylog2.Core;
 import org.graylog2.alerts.AlertCondition;
 import org.graylog2.indexer.Indexer;
 import org.graylog2.indexer.results.ResultMessage;
@@ -36,7 +35,7 @@ import java.util.Map;
 public class DummyAlertCondition extends AlertCondition {
     final String description = "Dummy alert to test notifications";
 
-    public DummyAlertCondition(Core core, Stream stream, String id, Type type, DateTime createdAt, String creatorUserId, Map<String, Object> parameters) {
+    public DummyAlertCondition(Stream stream, String id, Type type, DateTime createdAt, String creatorUserId, Map<String, Object> parameters) {
         super(stream, id, type, createdAt, creatorUserId, parameters);
     }
 

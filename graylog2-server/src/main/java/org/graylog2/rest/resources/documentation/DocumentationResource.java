@@ -1,5 +1,5 @@
-/**
- * Copyright 2013 Lennart Koopmann <lennart@torch.sh>
+/*
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -15,17 +15,18 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 package org.graylog2.rest.resources.documentation;
 
 import com.codahale.metrics.annotation.Timed;
+import org.graylog2.Configuration;
 import org.graylog2.rest.documentation.annotations.Api;
 import org.graylog2.rest.documentation.annotations.ApiOperation;
 import org.graylog2.rest.documentation.annotations.ApiParam;
 import org.graylog2.rest.documentation.generator.Generator;
 import org.graylog2.rest.resources.RestResource;
 
+import javax.inject.Inject;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -42,6 +43,8 @@ import java.util.Map;
 public class DocumentationResource extends RestResource {
 
     private static final String RESOURCE_PACKAGE = "org.graylog2.rest.resources";
+    @Inject
+    private Configuration configuration;
 
     @GET
     @Timed
@@ -58,7 +61,7 @@ public class DocumentationResource extends RestResource {
     @Path("/{route: .+}")
     public Response route(
             @ApiParam(title = "route", description = "Route to fetch. For example /system", required = true) @PathParam("route") String route) {        return buildSuccessfulCORSResponse(
-                new Generator(RESOURCE_PACKAGE, objectMapper).generateForRoute(route, core.getConfiguration().getRestTransportUri().toString())
+                new Generator(RESOURCE_PACKAGE, objectMapper).generateForRoute(route, configuration.getRestTransportUri().toString())
         );
     }
 

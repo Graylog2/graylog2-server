@@ -1,5 +1,5 @@
-/**
- * Copyright 2013 Lennart Koopmann <lennart@torch.sh>
+/*
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -15,7 +15,6 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 package org.graylog2.rest.resources.system.indexer;
 
@@ -23,6 +22,7 @@ import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Maps;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.graylog2.indexer.Indexer;
 import org.graylog2.rest.documentation.annotations.Api;
 import org.graylog2.rest.documentation.annotations.ApiOperation;
 import org.graylog2.rest.resources.RestResource;
@@ -30,6 +30,7 @@ import org.graylog2.security.RestPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -45,6 +46,8 @@ import java.util.Map;
 public class ClusterResource extends RestResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(ClusterResource.class);
+    @Inject
+    private Indexer indexer;
 
     @GET @Timed
     @Path("/name")
@@ -53,7 +56,7 @@ public class ClusterResource extends RestResource {
     @Produces(MediaType.APPLICATION_JSON)
     public String clusterName() {
         Map<String, Object> result = Maps.newHashMap();
-        result.put("name", core.getIndexer().cluster().getName());
+        result.put("name", indexer.cluster().getName());
 
         return json(result);
     }
@@ -65,13 +68,13 @@ public class ClusterResource extends RestResource {
     @Produces(MediaType.APPLICATION_JSON)
     public String clusterHealth() {
         Map<String, Integer> shards = Maps.newHashMap();
-        shards.put("active", core.getIndexer().cluster().getActiveShards());
-        shards.put("initializing", core.getIndexer().cluster().getInitializingShards());
-        shards.put("relocating", core.getIndexer().cluster().getRelocatingShards());
-        shards.put("unassigned", core.getIndexer().cluster().getUnassignedShards());
+        shards.put("active", indexer.cluster().getActiveShards());
+        shards.put("initializing", indexer.cluster().getInitializingShards());
+        shards.put("relocating", indexer.cluster().getRelocatingShards());
+        shards.put("unassigned", indexer.cluster().getUnassignedShards());
 
         Map<String, Object> health = Maps.newHashMap();
-        health.put("status", core.getIndexer().cluster().getHealth().toString().toLowerCase());
+        health.put("status", indexer.cluster().getHealth().toString().toLowerCase());
         health.put("shards", shards);
 
         return json(health);

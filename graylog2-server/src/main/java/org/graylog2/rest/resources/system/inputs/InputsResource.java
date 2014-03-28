@@ -71,6 +71,8 @@ public class InputsResource extends RestResource {
     private ServerInputRegistry inputRegistry;
     @Inject
     private ActivityWriter activityWriter;
+    @Inject
+    private ServerInputRegistry inputs;
 
     @GET @Timed
     @Produces(MediaType.APPLICATION_JSON)
@@ -82,7 +84,7 @@ public class InputsResource extends RestResource {
     public String single(@ApiParam(title = "inputId", required = true) @PathParam("inputId") String inputId) {
         checkPermission(RestPermissions.INPUTS_READ, inputId);
 
-        MessageInput input = core.inputs().getRunningInput(inputId);
+        MessageInput input = inputs.getRunningInput(inputId);
 
         if (input == null) {
             LOG.info("Input [{}] not found. Returning HTTP 404.", inputId);
@@ -99,7 +101,7 @@ public class InputsResource extends RestResource {
     public String list() {
         List<Map<String, Object>> inputStates = Lists.newArrayList();
         Map<String, Object> result = Maps.newHashMap();
-        for (InputState inputState : core.inputs().getInputStates()) {
+        for (InputState inputState : inputs.getInputStates()) {
 			checkPermission(RestPermissions.INPUTS_READ, inputState.getMessageInput().getId());
             inputStates.add(inputState.asMap());
 		}
@@ -165,7 +167,7 @@ public class InputsResource extends RestResource {
         if (lr.global)
             inputData.put("global", true);
         else
-            inputData.put("node_id", core.getNodeId());
+            inputData.put("node_id", serverStatus.getNodeId().toString());
 
         // ... and check if it would pass validation. We don't need to go on if it doesn't.
         Input mongoInput = new InputImpl(inputData);
@@ -175,7 +177,7 @@ public class InputsResource extends RestResource {
         }
 
         // Don't run if exclusive and another instance is already running.
-        if (input.isExclusive() && core.inputs().hasTypeRunning(input.getClass())) {
+        if (input.isExclusive() && inputs.hasTypeRunning(input.getClass())) {
             LOG.error("Type is exclusive and already has input running.");
             throw new WebApplicationException(Response.Status.BAD_REQUEST);
         }
@@ -191,7 +193,7 @@ public class InputsResource extends RestResource {
         }
 
         // Launch input. (this will run async and clean up itself in case of an error.)
-        core.inputs().launch(input, inputId);
+        inputs.launch(input, inputId);
 
         Map<String, Object> result = Maps.newHashMap();
         result.put("input_id", inputId);
@@ -206,7 +208,7 @@ public class InputsResource extends RestResource {
     @Produces(MediaType.APPLICATION_JSON)
     public String types() {
         Map<String, Object> result = Maps.newHashMap();
-        result.put("types", core.inputs().getAvailableInputs());
+        result.put("types", inputs.getAvailableInputs());
 
         return json(result);
     }
@@ -221,7 +223,7 @@ public class InputsResource extends RestResource {
     public Response terminate(@ApiParam(title = "inputId", required = true) @PathParam("inputId") String inputId) {
         checkPermission(RestPermissions.INPUTS_TERMINATE, inputId);
 
-        MessageInput input = core.inputs().getRunningInput(inputId);
+        MessageInput input = inputs.getRunningInput(inputId);
 
         if (input == null) {
             LOG.info("Cannot terminate input. Input not found.");
@@ -232,11 +234,11 @@ public class InputsResource extends RestResource {
         LOG.info(msg);
         activityWriter.write(new Activity(msg, InputsResource.class));
 
-        core.inputs().terminate(input);
+        inputs.terminate(input);
 
         if (serverStatus.hasCapability(ServerStatus.Capability.MASTER) || !input.getGlobal()) {
             // Remove from list and mongo.
-            core.inputs().cleanInput(input);
+            inputs.cleanInput(input);
         }
 
         String msg2 = "Terminated input [" + input.getName()+ "]. Reason: REST request.";
@@ -256,7 +258,7 @@ public class InputsResource extends RestResource {
     public Response launchExisting(@ApiParam(title = "inputId", required = true) @PathParam("inputId") String inputId) {
         MessageInput input = null;
         try {
-             input = inputRegistry.getMessageInput(inputService.findForThisNode(core.getNodeId(), inputId));
+             input = inputRegistry.getMessageInput(inputService.findForThisNode(serverStatus.getNodeId().toString(), inputId));
         } catch (NoSuchInputTypeException e) {
             LOG.info("Cannot launch input. Input not found.");
             throw new WebApplicationException(404);
@@ -276,7 +278,7 @@ public class InputsResource extends RestResource {
         LOG.info(msg);
         activityWriter.write(new Activity(msg, InputsResource.class));
 
-        core.inputs().launch(input);
+        inputs.launch(input);
 
         String msg2 = "Launched existing input [" + input.getName()+ "]. Reason: REST request.";
         LOG.info(msg2);
@@ -295,7 +297,7 @@ public class InputsResource extends RestResource {
     public Response stop(@ApiParam(title = "inputId", required = true) @PathParam("inputId") String inputId) {
         MessageInput input = null;
         try {
-            input = inputRegistry.getMessageInput(inputService.findForThisNode(core.getNodeId(), inputId));
+            input = inputRegistry.getMessageInput(inputService.findForThisNode(serverStatus.getNodeId().toString(), inputId));
         } catch (NoSuchInputTypeException e) {
             LOG.info("Cannot launch input. Input not found.");
             throw new WebApplicationException(404);
@@ -315,7 +317,7 @@ public class InputsResource extends RestResource {
         LOG.info(msg);
         activityWriter.write(new Activity(msg, InputsResource.class));
 
-        core.inputs().stop(input);
+        inputs.stop(input);
 
         String msg2 = "Stopped input [" + input.getName()+ "]. Reason: REST request.";
         LOG.info(msg2);

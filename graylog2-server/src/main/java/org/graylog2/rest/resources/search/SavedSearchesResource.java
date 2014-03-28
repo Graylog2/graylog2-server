@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 TORCH GmbH
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -23,7 +23,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.graylog2.Core;
 import org.graylog2.database.ValidationException;
 import org.graylog2.rest.documentation.annotations.*;
 import org.graylog2.rest.resources.search.requests.CreateSavedSearchRequest;
@@ -53,9 +52,6 @@ import java.util.Map;
 public class SavedSearchesResource extends SearchResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(SavedSearchesResource.class);
-
-    @Inject
-    protected Core core;
 
     @Inject
     private SavedSearchService savedSearchService;

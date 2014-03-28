@@ -16,6 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package org.graylog2.rest.resources.system;
 
 import com.codahale.metrics.annotation.Timed;
@@ -25,6 +26,7 @@ import org.graylog2.cluster.Node;
 import org.graylog2.cluster.NodeNotFoundException;
 import org.graylog2.cluster.NodeService;
 import org.graylog2.plugin.Tools;
+import org.graylog2.plugin.system.NodeId;
 import org.graylog2.rest.documentation.annotations.*;
 import org.graylog2.rest.resources.RestResource;
 import org.slf4j.Logger;
@@ -48,6 +50,9 @@ public class ClusterResource extends RestResource {
 
     @Inject
     private NodeService nodeService;
+
+    @Inject
+    private NodeId nodeId;
 
     @GET @Timed
     @Path("/nodes")
@@ -74,7 +79,7 @@ public class ClusterResource extends RestResource {
                     "Use the system API of the node itself to get system information.")
     public String node() {
         try {
-            return json(nodeSummary(nodeService.thisNode(core)));
+            return json(nodeSummary(nodeService.byNodeId(nodeId)));
         } catch (NodeNotFoundException e) {
             // this exception should never happen, if it does we have made it worksn't.(tm)
             throw new WebApplicationException(500);

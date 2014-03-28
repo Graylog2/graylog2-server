@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 TORCH GmbH
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -26,6 +26,7 @@ import com.google.common.collect.Maps;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.apache.shiro.crypto.hash.SimpleHash;
+import org.graylog2.Configuration;
 import org.graylog2.database.ValidationException;
 import org.graylog2.rest.documentation.annotations.*;
 import org.graylog2.rest.resources.RestResource;
@@ -73,6 +74,8 @@ public class UsersResource extends RestResource {
 
     @Inject
     private AccessTokenService accessTokenService;
+    @Inject
+    private Configuration configuration;
 
     @GET
     @Path("{username}")
@@ -125,7 +128,7 @@ public class UsersResource extends RestResource {
         // Create user.
         User user = userService.create();
         user.setName(cr.username);
-        final String hashedPassword = new SimpleHash("SHA-1", cr.password, core.getConfiguration().getPasswordSecret()).toString();
+        final String hashedPassword = new SimpleHash("SHA-1", cr.password, configuration.getPasswordSecret()).toString();
         user.setHashedPassword(hashedPassword);
         user.setFullName(cr.fullname);
         user.setEmail(cr.email);
@@ -333,7 +336,7 @@ public class UsersResource extends RestResource {
 
         final String currentPasswordHash = user.getHashedPassword();
         boolean changeAllowed = false;
-        final String secret = core.getConfiguration().getPasswordSecret();
+        final String secret = configuration.getPasswordSecret();
         if (checkOldPassword) {
             if (cr.old_password == null) {
                 LOG.info("Changing password for user {} must supply the old password.", username);

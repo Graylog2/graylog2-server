@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 TORCH GmbH
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -33,10 +33,13 @@ import org.graylog2.rest.documentation.annotations.*;
 import org.graylog2.rest.resources.RestResource;
 import org.graylog2.rest.resources.streams.rules.requests.CreateRequest;
 import org.graylog2.security.RestPermissions;
-import org.graylog2.streams.*;
+import org.graylog2.streams.StreamRuleImpl;
+import org.graylog2.streams.StreamRuleService;
+import org.graylog2.streams.StreamService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -52,6 +55,10 @@ import java.util.Map;
 @Path("/streams/{streamid}/rules")
 public class StreamRuleResource extends RestResource {
     private static final Logger LOG = LoggerFactory.getLogger(StreamRuleResource.class);
+    @Inject
+    private StreamRuleService streamRuleService;
+    @Inject
+    private StreamService streamService;
 
     @POST
     @Timed
@@ -70,7 +77,6 @@ public class StreamRuleResource extends RestResource {
             throw new WebApplicationException(e, Response.Status.BAD_REQUEST);
         }
 
-        final StreamService streamService = new StreamServiceImpl(core.getMongoConnection());
         try {
             streamService.load(streamid);
         } catch (NotFoundException e) {
@@ -123,7 +129,6 @@ public class StreamRuleResource extends RestResource {
         }
 
         StreamRule streamRule;
-        final StreamRuleService streamRuleService = new StreamRuleServiceImpl(core.getMongoConnection());
         try {
             streamRule = streamRuleService.load(loadObjectId(streamRuleId));
             if (!streamRule.getStreamId().equals(streamid)) {
@@ -160,9 +165,6 @@ public class StreamRuleResource extends RestResource {
         List<Map<String, Object>> streamRules = Lists.newArrayList();
         checkPermission(RestPermissions.STREAMS_READ, streamid);
 
-        final StreamRuleService streamRuleService = new StreamRuleServiceImpl(core.getMongoConnection());
-        final StreamService streamService = new StreamServiceImpl(core.getMongoConnection());
-
         final Stream stream;
         try {
             stream = streamService.load(streamid);
@@ -192,7 +194,6 @@ public class StreamRuleResource extends RestResource {
     public Response get(@ApiParam(title = "streamid", description = "The id of the stream whose stream rule we want.", required = true) @PathParam("streamid") String streamid,
                       @ApiParam(title = "streamRuleId", description = "The stream rule id we are getting", required = true) @PathParam("streamRuleId") String streamRuleId) {
         StreamRule streamRule;
-        final StreamRuleService streamRuleService = new StreamRuleServiceImpl(core.getMongoConnection());
 
         checkPermission(RestPermissions.STREAMS_READ, streamid);
 
@@ -220,7 +221,6 @@ public class StreamRuleResource extends RestResource {
         checkPermission(RestPermissions.STREAMS_EDIT, streamid);
 
         try {
-            final StreamRuleService streamRuleService = new StreamRuleServiceImpl(core.getMongoConnection());
             StreamRule streamRule = streamRuleService.load(loadObjectId(streamRuleId));
             if (streamRule.getStreamId().equals(streamid)) {
                 streamRuleService.destroy(streamRule);

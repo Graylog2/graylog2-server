@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 TORCH GmbH
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -45,7 +45,7 @@ public class StreamMatcherFilter implements MessageFilter {
     public boolean filter(Message msg, GraylogServer server) {
         Core core = (Core) server;
 
-        List<Stream> streams = streamRouter.route(core, msg);
+        List<Stream> streams = streamRouter.route(msg);
 
         for (Stream stream : streams) {
             core.incrementStreamThroughput(stream.getId());

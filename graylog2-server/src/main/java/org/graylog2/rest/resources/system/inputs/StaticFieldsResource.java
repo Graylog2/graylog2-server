@@ -16,6 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package org.graylog2.rest.resources.system.inputs;
 
 import com.codahale.metrics.annotation.Timed;
@@ -23,6 +24,7 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.database.ValidationException;
 import org.graylog2.inputs.Input;
 import org.graylog2.inputs.InputService;
+import org.graylog2.inputs.ServerInputRegistry;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.rest.documentation.annotations.*;
@@ -54,6 +56,8 @@ public class StaticFieldsResource extends RestResource {
     private InputService inputService;
     @Inject
     private ActivityWriter activityWriter;
+    @Inject
+    private ServerInputRegistry inputs;
 
     @POST
     @Timed
@@ -73,7 +77,7 @@ public class StaticFieldsResource extends RestResource {
         }
         checkPermission(RestPermissions.INPUTS_EDIT, inputId);
 
-        MessageInput input = core.inputs().getRunningInput(inputId);
+        MessageInput input = inputs.getRunningInput(inputId);
 
         if (input == null) {
             LOG.error("Input <{}> not found.", inputId);
@@ -140,7 +144,7 @@ public class StaticFieldsResource extends RestResource {
         }
         checkPermission(RestPermissions.INPUTS_EDIT, inputId);
 
-        MessageInput input = core.inputs().getRunningInput(inputId);
+        MessageInput input = inputs.getRunningInput(inputId);
 
         if (input == null) {
             LOG.error("Input <{}> not found.", inputId);

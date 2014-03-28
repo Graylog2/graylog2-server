@@ -56,10 +56,7 @@ import org.graylog2.indexer.ranges.IndexRangeService;
 import org.graylog2.indexer.ranges.IndexRangeServiceImpl;
 import org.graylog2.indexer.ranges.RebuildIndexRangesJob;
 import org.graylog2.initializers.Initializers;
-import org.graylog2.inputs.Cache;
-import org.graylog2.inputs.InputService;
-import org.graylog2.inputs.InputServiceImpl;
-import org.graylog2.inputs.ServerInputRegistry;
+import org.graylog2.inputs.*;
 import org.graylog2.inputs.gelf.gelf.GELFChunkManager;
 import org.graylog2.jersey.container.netty.NettyContainer;
 import org.graylog2.metrics.MongoDbMetricsReporter;
@@ -68,7 +65,10 @@ import org.graylog2.notifications.NotificationService;
 import org.graylog2.notifications.NotificationServiceImpl;
 import org.graylog2.outputs.OutputRegistry;
 import org.graylog2.periodical.Periodicals;
-import org.graylog2.plugin.*;
+import org.graylog2.plugin.GraylogServer;
+import org.graylog2.plugin.RulesEngine;
+import org.graylog2.plugin.Tools;
+import org.graylog2.plugin.Version;
 import org.graylog2.plugin.alarms.callbacks.AlarmCallback;
 import org.graylog2.plugin.alarms.transports.Transport;
 import org.graylog2.plugin.buffers.Buffer;
@@ -79,6 +79,7 @@ import org.graylog2.plugin.lifecycles.Lifecycle;
 import org.graylog2.plugin.outputs.MessageOutput;
 import org.graylog2.plugin.rest.AnyExceptionClassMapper;
 import org.graylog2.plugin.rest.JacksonPropertyExceptionMapper;
+import org.graylog2.plugin.system.NodeId;
 import org.graylog2.plugins.PluginLoader;
 import org.graylog2.rest.CORSFilter;
 import org.graylog2.rest.ObjectMapperProvider;
@@ -93,7 +94,6 @@ import org.graylog2.security.ldap.LdapConnector;
 import org.graylog2.security.ldap.LdapSettingsService;
 import org.graylog2.security.ldap.LdapSettingsServiceImpl;
 import org.graylog2.security.realm.LdapUserAuthenticator;
-import org.graylog2.shared.ProcessingHost;
 import org.graylog2.shared.ProcessingPauseLockedException;
 import org.graylog2.shared.ServerStatus;
 import org.graylog2.shared.buffers.ProcessBuffer;
@@ -146,7 +146,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * 
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
-public class Core implements GraylogServer, InputHost, ProcessingHost {
+public class Core implements GraylogServer {
 
     private static final Logger LOG = LoggerFactory.getLogger(Core.class);
 
@@ -402,6 +402,13 @@ public class Core implements GraylogServer, InputHost, ProcessingHost {
             bind(cacheSynchronizer).to(Caches.class);
             bind(inputs).to(ServerInputRegistry.class);
             bind(alertSender).to(AlertSender.class);
+            bind(periodicals).to(Periodicals.class);
+            bind(mongoConnection).to(MongoConnection.class);
+            bind(serverStatus.getNodeId()).to(NodeId.class);
+            bind((InputCache)getInputCache()).to(InputCache.class);
+            bind((OutputCache)getOutputCache()).to(OutputCache.class);
+            bind(processBuffer).to(ProcessBuffer.class);
+            bind(outputBuffer).to(OutputBuffer.class);
         }
     }
 
@@ -521,7 +528,6 @@ public class Core implements GraylogServer, InputHost, ProcessingHost {
         return this.gelfChunkManager;
     }
 
-    @Override
     public Buffer getProcessBuffer() {
         return this.processBuffer;
     }

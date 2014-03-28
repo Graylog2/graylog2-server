@@ -21,6 +21,7 @@ package org.graylog2.bindings.providers;
 
 import org.graylog2.buffers.OutputBuffer;
 import org.graylog2.inputs.BasicCache;
+import org.graylog2.inputs.OutputCache;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -34,7 +35,7 @@ public class OutputBufferProvider implements Provider<OutputBuffer> {
     @Inject
     public OutputBufferProvider(OutputBuffer.Factory outputBufferFactory) {
         if (outputBuffer == null) {
-            BasicCache outputCache = new BasicCache();
+            BasicCache outputCache = new OutputCache();
             outputBuffer = outputBufferFactory.create(outputCache);
         }
     }

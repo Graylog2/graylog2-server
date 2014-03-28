@@ -1,5 +1,5 @@
-/**
- * Copyright 2014 Lennart Koopmann <lennart@torch.sh>
+/*
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -15,7 +15,6 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 package org.graylog2.rest.resources.system;
 
@@ -51,7 +50,7 @@ public class LoadBalancerStatusResource extends RestResource{
     @ApiOperation(value = "Get status of this graylog2-server node for load balancers. " +
             "Returns either ALIVE with HTTP 200 or DEAD with HTTP 503.")
     public Response status() {
-        LoadBalancerStatus lbStatus = core.getLifecycle().getLoadbalancerStatus();
+        LoadBalancerStatus lbStatus = serverStatus.getLifecycle().getLoadbalancerStatus();
 
         Response.Status status = lbStatus.equals(LoadBalancerStatus.ALIVE)
                 ? Response.Status.OK : Response.Status.SERVICE_UNAVAILABLE;
@@ -79,10 +78,10 @@ public class LoadBalancerStatusResource extends RestResource{
 
         switch (lbStatus) {
             case DEAD:
-                core.setLifecycle(Lifecycle.OVERRIDE_LB_DEAD);
+                serverStatus.setLifecycle(Lifecycle.OVERRIDE_LB_DEAD);
                 break;
             case ALIVE:
-                core.setLifecycle(Lifecycle.OVERRIDE_LB_ALIVE);
+                serverStatus.setLifecycle(Lifecycle.OVERRIDE_LB_ALIVE);
                 break;
         }
 
