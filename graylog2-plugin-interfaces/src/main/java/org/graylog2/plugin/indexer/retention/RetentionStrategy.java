@@ -1,5 +1,5 @@
-/**
- * Copyright 2013 Lennart Koopmann <lennart@torch.sh>
+/*
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -15,12 +15,10 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 package org.graylog2.plugin.indexer.retention;
 
 import com.google.common.base.Stopwatch;
-import org.graylog2.plugin.GraylogServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,16 +31,15 @@ import java.util.concurrent.TimeUnit;
 public abstract class RetentionStrategy {
 
     private static final Logger LOG = LoggerFactory.getLogger(RetentionStrategy.class);
+    private final IndexManagement indexManagement;
 
     public enum Art {
         DELETE,
         CLOSE
     }
 
-    private GraylogServer server;
-
-    protected RetentionStrategy(GraylogServer server) {
-        this.server = server;
+    protected RetentionStrategy(IndexManagement indexManagement) {
+        this.indexManagement = indexManagement;
     }
 
     protected abstract void onMessage(Map<String, String> message);
@@ -60,11 +57,11 @@ public abstract class RetentionStrategy {
         switch (getArt()) {
             case DELETE:
                 LOG.info("Strategy is deleting.");
-                server.deleteIndexShortcut(indexName);
+                indexManagement.delete(indexName);
                 break;
             case CLOSE:
                 LOG.info("Strategy is closing.");
-                server.closeIndexShortcut(indexName);
+                indexManagement.close(indexName);
                 break;
         }
 

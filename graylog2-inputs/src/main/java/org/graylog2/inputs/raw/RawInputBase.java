@@ -1,5 +1,5 @@
-/**
- * Copyright 2013 Lennart Koopmann <lennart@torch.sh>
+/*
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -15,10 +15,10 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 package org.graylog2.inputs.raw;
 
+import org.graylog2.plugin.buffers.Buffer;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationException;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
@@ -121,7 +121,7 @@ public class RawInputBase extends MessageInput {
     }
 
     @Override
-    public void launch() throws MisfireException {
+    public void launch(Buffer processBuffer) throws MisfireException {
         throw new RuntimeException("Must be overridden in syslog input classes.");
     }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 TORCH GmbH
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -15,7 +15,6 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 package org.graylog2.alerts;
 
@@ -24,21 +23,19 @@ import org.apache.commons.mail.Email;
 import org.apache.commons.mail.EmailException;
 import org.apache.commons.mail.SimpleEmail;
 import org.graylog2.Configuration;
-import org.graylog2.Core;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.alarms.transports.TransportConfigurationException;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.streams.StreamRuleService;
-import org.graylog2.streams.StreamRuleServiceImpl;
 import org.graylog2.users.User;
 import org.graylog2.users.UserService;
-import org.graylog2.users.UserServiceImpl;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
 import java.net.URI;
 import java.util.List;
 
@@ -50,16 +47,17 @@ public class AlertSender {
 
     private static final Logger LOG = LoggerFactory.getLogger(AlertSender.class);
 
-    private final Core core;
     private final StreamRuleService streamRuleService;
     private final Configuration configuration;
     private final UserService userService;
 
-    public AlertSender(Core core) {
-        this.core = core;
-        this.streamRuleService = new StreamRuleServiceImpl(core.getMongoConnection());
-        this.configuration = core.getConfiguration();
-        this.userService = new UserServiceImpl(core.getMongoConnection(), core.getConfiguration());
+    @Inject
+    public AlertSender(Configuration configuration,
+                       StreamRuleService streamRuleService,
+                       UserService userService) {
+        this.configuration = configuration;
+        this.streamRuleService = streamRuleService;
+        this.userService = userService;
     }
 
     public void sendEmails(Stream stream, AlertCondition.CheckResult checkResult) throws TransportConfigurationException, EmailException {
@@ -78,7 +76,7 @@ public class AlertSender {
             email.setSslSmtpPort(Integer.toString(configuration.getEmailTransportPort()));
         }
 
-        if(core.getConfiguration().isEmailTransportUseAuth()) {
+        if(configuration.isEmailTransportUseAuth()) {
             email.setAuthenticator(new DefaultAuthenticator(
                     configuration.getEmailTransportUsername(),
                     configuration.getEmailTransportPassword()
@@ -123,9 +121,9 @@ public class AlertSender {
         sb.append("Date: ").append(Tools.iso8601().toString()).append("\n");
         sb.append("Stream ID: ").append(stream.getId()).append("\n");
         sb.append("Stream title: ").append(stream.getTitle()).append("\n");
-        if (core.getConfiguration().getEmailTransportWebInterfaceUrl() != null)
+        if (configuration.getEmailTransportWebInterfaceUrl() != null)
             sb.append("Stream URL: ").append(
-                    buildStreamDetailsURL(core.getConfiguration().getEmailTransportWebInterfaceUrl(),
+                    buildStreamDetailsURL(configuration.getEmailTransportWebInterfaceUrl(),
                             checkResult, stream));
         try {
             sb.append("Stream rules: ").append(streamRuleService.loadForStream(stream)).append("\n");

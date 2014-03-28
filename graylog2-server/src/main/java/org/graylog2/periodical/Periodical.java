@@ -1,5 +1,5 @@
-/**
- * Copyright 2014 Lennart Koopmann <lennart@torch.sh>
+/*
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -15,11 +15,9 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 package org.graylog2.periodical;
 
-import org.graylog2.Core;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,8 +27,6 @@ import org.slf4j.LoggerFactory;
 public abstract class Periodical implements Runnable {
 
     private static final Logger LOG = LoggerFactory.getLogger(Periodical.class);
-
-    protected Core core;
 
     /**
      * Defines if this thread should be called periodically or only once
@@ -80,8 +76,7 @@ public abstract class Periodical implements Runnable {
      */
     public abstract int getPeriodSeconds();
 
-    public void initialize(Core core) {
-        this.core = core;
+    public void initialize() {
     }
 
 }

@@ -16,6 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package org.graylog2.periodical;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -37,6 +38,7 @@ import org.graylog2.ServerVersion;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.Version;
+import org.graylog2.shared.ServerStatus;
 import org.graylog2.versioncheck.VersionCheckResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,11 +56,15 @@ public class VersionCheckThread extends Periodical {
 
     private static final Logger LOG = LoggerFactory.getLogger(VersionCheckThread.class);
     private final NotificationService notificationService;
+    private final ServerStatus serverStatus;
     private final Configuration configuration;
 
     @Inject
-    public VersionCheckThread(NotificationService notificationService, Configuration configuration) {
+    public VersionCheckThread(NotificationService notificationService,
+                              ServerStatus serverStatus,
+                              Configuration configuration) {
         this.notificationService = notificationService;
+        this.serverStatus = serverStatus;
         this.configuration = configuration;
     }
 
@@ -68,7 +74,7 @@ public class VersionCheckThread extends Periodical {
         final HttpGet get;
         try {
             uri = new URIBuilder(configuration.getVersionchecksUri());
-            uri.addParameter("anonid", DigestUtils.sha256Hex(core.getNodeId()));
+            uri.addParameter("anonid", DigestUtils.sha256Hex(serverStatus.getNodeId().toString()));
             uri.addParameter("version", ServerVersion.VERSION.toString());
 
             get = new HttpGet(uri.build());
@@ -174,7 +180,7 @@ public class VersionCheckThread extends Periodical {
 
     @Override
     public boolean startOnThisNode() {
-        return core.getConfiguration().isVersionchecks() && !core.isLocalMode();
+        return configuration.isVersionchecks() && !serverStatus.hasCapability(ServerStatus.Capability.LOCALMODE);
     }
 
     @Override

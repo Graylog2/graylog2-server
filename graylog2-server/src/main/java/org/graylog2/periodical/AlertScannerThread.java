@@ -16,22 +16,26 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package org.graylog2.periodical;
 
 import com.beust.jcommander.internal.Lists;
 import com.google.inject.Inject;
-import org.graylog2.alerts.*;
+import org.graylog2.alerts.Alert;
+import org.graylog2.alerts.AlertCondition;
+import org.graylog2.alerts.AlertSender;
+import org.graylog2.alerts.AlertService;
+import org.graylog2.indexer.Indexer;
 import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationImpl;
 import org.graylog2.notifications.NotificationService;
-import org.graylog2.notifications.NotificationServiceImpl;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.alarms.transports.TransportConfigurationException;
 import org.graylog2.plugin.streams.Stream;
+import org.graylog2.plugin.system.NodeId;
 import org.graylog2.streams.StreamImpl;
 import org.graylog2.streams.StreamService;
-import org.graylog2.streams.StreamServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,18 +47,31 @@ import java.util.List;
 public class AlertScannerThread extends Periodical {
 
     private static final Logger LOG = LoggerFactory.getLogger(AlertScannerThread.class);
+    private final AlertSender alertSender;
     private AlertService alertService;
+    private final StreamService streamService;
+    private final NotificationService notificationService;
+    private final NodeId nodeId;
+    private final Indexer indexer;
 
     @Inject
-    public AlertScannerThread(AlertService alertService) {
+    public AlertScannerThread(AlertSender alertSender,
+                              AlertService alertService,
+                              StreamService streamService,
+                              NotificationService notificationService,
+                              NodeId nodeId,
+                              Indexer indexer) {
+        this.alertSender = alertSender;
         this.alertService = alertService;
+        this.streamService = streamService;
+        this.notificationService = notificationService;
+        this.nodeId = nodeId;
+        this.indexer = indexer;
     }
 
     @Override
     public void run() {
         LOG.debug("Running alert checks.");
-        final StreamService streamService = new StreamServiceImpl(core.getMongoConnection());
-
         List<Stream> alertedStreams = streamService.loadAllWithConfiguredAlertConditions();
 
         LOG.debug("There are {} streams with configured alert conditions.", alertedStreams.size());
@@ -68,20 +85,18 @@ public class AlertScannerThread extends Periodical {
             // Check if a threshold is reached.
             for (AlertCondition alertCondition : streamService.getAlertConditions(stream)) {
                 try {
-                    AlertCondition.CheckResult result = alertService.triggered(alertCondition, core.getIndexer());
+                    AlertCondition.CheckResult result = alertService.triggered(alertCondition, indexer);
                     if (result.isTriggered()) {
                         // Alert is triggered!
                         LOG.info("Alert condition [{}] is triggered. Sending alerts.", alertCondition);
 
                         // Persist alert.
-                        final AlertService alertService = new AlertServiceImpl(core.getMongoConnection());
                         Alert alert = alertService.factory(result);
                         alertService.save(alert);
 
                         // Send alerts.
                         if (stream.getAlertReceivers().size() > 0) {
                             try {
-                                AlertSender sender = new AlertSender(core);
                                 if (alertCondition.getBacklog() > 0 && alertCondition.getSearchHits() != null) {
                                     List<Message> backlog = Lists.newArrayList();
 
@@ -94,23 +109,21 @@ public class AlertScannerThread extends Periodical {
                                     if(backlog.size() < readTo) {
                                         readTo = backlog.size();
                                     }
-                                    sender.sendEmails(stream, result, backlog.subList(0, readTo));
+                                    alertSender.sendEmails(stream, result, backlog.subList(0, readTo));
                                 } else {
-                                    sender.sendEmails(stream, result);
+                                    alertSender.sendEmails(stream, result);
                                 }
                             } catch (TransportConfigurationException e) {
-                                final NotificationService notificationService = new NotificationServiceImpl(core.getMongoConnection());
                                 Notification notification = notificationService.buildNow()
-                                        .addThisNode(core)
+                                        .addNode(nodeId.toString())
                                         .addType(NotificationImpl.Type.EMAIL_TRANSPORT_CONFIGURATION_INVALID)
                                         .addDetail("stream_id", stream.getId())
                                         .addDetail("exception", e);
                                 notificationService.publishIfFirst(notification);
                                 LOG.warn("Stream [{}] has alert receivers and is triggered, but email transport is not configured.", stream);
                             } catch (Exception e) {
-                                final NotificationService notificationService = new NotificationServiceImpl(core.getMongoConnection());
                                 Notification notification = notificationService.buildNow()
-                                        .addThisNode(core)
+                                        .addNode(nodeId.toString())
                                         .addType(NotificationImpl.Type.EMAIL_TRANSPORT_FAILED)
                                         .addDetail("stream_id", stream.getId())
                                         .addDetail("exception", e);

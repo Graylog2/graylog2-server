@@ -16,32 +16,13 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.indexer.retention.strategies;
 
-import org.graylog2.plugin.indexer.retention.IndexManagement;
-import org.graylog2.plugin.indexer.retention.RetentionStrategy;
-
-import java.util.Map;
+package org.graylog2.plugin.indexer.retention;
 
 /**
- * @author Lennart Koopmann <lennart@torch.sh>
+ * @author Dennis Oelkers <dennis@torch.sh>
  */
-public class DeletionRetentionStrategy extends RetentionStrategy {
-
-    public DeletionRetentionStrategy(IndexManagement indexManagement) {
-        super(indexManagement);
-    }
-
-    protected void onMessage(Map<String, String> message) {}
-
-    @Override
-    protected boolean iterates() {
-        return false;
-    }
-
-    @Override
-    protected Art getArt() {
-        return Art.DELETE;
-    }
-
+public interface IndexManagement {
+    void delete(String indexName);
+    void close(String indexName);
 }

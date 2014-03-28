@@ -16,6 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package org.graylog2.periodical;
 
 import com.codahale.metrics.Gauge;
@@ -24,8 +25,9 @@ import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 import com.mongodb.BasicDBObject;
 import org.elasticsearch.action.bulk.BulkItemResponse;
-import org.graylog2.Core;
+import org.graylog2.Configuration;
 import org.graylog2.database.CollectionName;
+import org.graylog2.database.MongoConnection;
 import org.graylog2.indexer.*;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
@@ -45,11 +47,24 @@ public class DeadLetterThread extends Periodical {
 
     private final PersistedDeadLetterService persistedDeadLetterService;
     private final IndexFailureService indexFailureService;
+    private final Indexer indexer;
+    private final Configuration configuration;
+    private final MongoConnection mongoConnection;
+    private final MetricRegistry metricRegistry;
 
     @Inject
-    public DeadLetterThread(PersistedDeadLetterService persistedDeadLetterService, IndexFailureService indexFailureService) {
+    public DeadLetterThread(PersistedDeadLetterService persistedDeadLetterService,
+                            IndexFailureService indexFailureService,
+                            Indexer indexer,
+                            Configuration configuration,
+                            MongoConnection mongoConnection,
+                            MetricRegistry metricRegistry) {
         this.persistedDeadLetterService = persistedDeadLetterService;
         this.indexFailureService = indexFailureService;
+        this.indexer = indexer;
+        this.configuration = configuration;
+        this.mongoConnection = mongoConnection;
+        this.metricRegistry = metricRegistry;
     }
 
     @Override
@@ -60,14 +75,14 @@ public class DeadLetterThread extends Periodical {
         while(true) {
             List<DeadLetter> items;
             try {
-                items = core.getIndexer().getDeadLetterQueue().take();
+                items = indexer.getDeadLetterQueue().take();
             } catch (InterruptedException ignored) { continue; /* daemon thread */ }
 
             for (DeadLetter item : items) {
                 boolean written = false;
 
                 // Try to write the failed message to MongoDB if enabled.
-                if (core.getConfiguration().isDeadLettersEnabled()) {
+                if (configuration.isDeadLettersEnabled()) {
                     try {
                         Message message = item.getMessage();
 
@@ -108,11 +123,11 @@ public class DeadLetterThread extends Periodical {
 
     // TODO: Move this to the related persisted service classes
     private void verifyIndices() {
-        core.getMongoConnection().getDatabase().getCollection(getCollectionName(IndexFailureImpl.class)).ensureIndex(new BasicDBObject("timestamp", 1));
-        core.getMongoConnection().getDatabase().getCollection(getCollectionName(IndexFailureImpl.class)).ensureIndex(new BasicDBObject("letter_id", 1));
+        mongoConnection.getDatabase().getCollection(getCollectionName(IndexFailureImpl.class)).ensureIndex(new BasicDBObject("timestamp", 1));
+        mongoConnection.getDatabase().getCollection(getCollectionName(IndexFailureImpl.class)).ensureIndex(new BasicDBObject("letter_id", 1));
 
-        core.getMongoConnection().getDatabase().getCollection(getCollectionName(PersistedDeadLetterImpl.class)).ensureIndex(new BasicDBObject("timestamp", 1));
-        core.getMongoConnection().getDatabase().getCollection(getCollectionName(PersistedDeadLetterImpl.class)).ensureIndex(new BasicDBObject("letter_id", 1));
+        mongoConnection.getDatabase().getCollection(getCollectionName(PersistedDeadLetterImpl.class)).ensureIndex(new BasicDBObject("timestamp", 1));
+        mongoConnection.getDatabase().getCollection(getCollectionName(PersistedDeadLetterImpl.class)).ensureIndex(new BasicDBObject("letter_id", 1));
     }
 
     private String getCollectionName(Class<? extends Persisted> modelClass) {
@@ -155,13 +170,11 @@ public class DeadLetterThread extends Periodical {
     }
 
     @Override
-    public void initialize(final Core core) {
-        this.core = core;
-
-        core.metrics().register(MetricRegistry.name(DeadLetterThread.class, "queueSize"), new Gauge<Integer>() {
+    public void initialize() {
+        metricRegistry.register(MetricRegistry.name(DeadLetterThread.class, "queueSize"), new Gauge<Integer>() {
             @Override
             public Integer getValue() {
-                return core.getIndexer().getDeadLetterQueue().size();
+                return indexer.getDeadLetterQueue().size();
             }
         });
     }

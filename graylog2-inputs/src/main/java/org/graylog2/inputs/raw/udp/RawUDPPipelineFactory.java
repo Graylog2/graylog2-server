@@ -1,5 +1,5 @@
-/**
- * Copyright 2013 Lennart Koopmann <lennart@torch.sh>
+/*
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -15,13 +15,12 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 package org.graylog2.inputs.raw.udp;
 
+import com.codahale.metrics.MetricRegistry;
 import org.graylog2.inputs.raw.RawDispatcher;
-import org.graylog2.plugin.GraylogServer;
-import org.graylog2.plugin.InputHost;
+import org.graylog2.plugin.buffers.Buffer;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.util.ThroughputCounter;
@@ -34,13 +33,19 @@ import org.jboss.netty.channel.Channels;
  */
 public class RawUDPPipelineFactory implements ChannelPipelineFactory {
 
-    private final InputHost server;
+    private final MetricRegistry metricRegistry;
+    private final Buffer processBuffer;
     private final Configuration config;
     private final MessageInput sourceInput;
     private final ThroughputCounter throughputCounter;
 
-    public RawUDPPipelineFactory(InputHost server, Configuration config, MessageInput sourceInput, ThroughputCounter throughputCounter) {
-        this.server = server;
+    public RawUDPPipelineFactory(MetricRegistry metricRegistry,
+                                 Buffer processBuffer,
+                                 Configuration config,
+                                 MessageInput sourceInput,
+                                 ThroughputCounter throughputCounter) {
+        this.metricRegistry = metricRegistry;
+        this.processBuffer = processBuffer;
         this.config = config;
         this.sourceInput = sourceInput;
         this.throughputCounter = throughputCounter;
@@ -50,7 +55,7 @@ public class RawUDPPipelineFactory implements ChannelPipelineFactory {
     public ChannelPipeline getPipeline() throws Exception {
         ChannelPipeline p = Channels.pipeline();
         p.addLast("traffic-counter", throughputCounter);
-        p.addLast("handler", new RawDispatcher(server, config, sourceInput));
+        p.addLast("handler", new RawDispatcher(metricRegistry, processBuffer, config, sourceInput));
 
         return p;
     }

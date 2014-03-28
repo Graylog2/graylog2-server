@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 TORCH GmbH
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -21,6 +21,7 @@ package org.graylog2.cluster;
 
 import org.graylog2.Core;
 import org.graylog2.database.PersistedService;
+import org.graylog2.plugin.system.NodeId;
 
 import java.net.URI;
 import java.util.Map;
@@ -29,13 +30,16 @@ import java.util.Map;
  * @author Dennis Oelkers <dennis@torch.sh>
  */
 public interface NodeService extends PersistedService {
+    String registerServer(String nodeId, boolean isMaster, URI restTransportUri);
     String registerServer(Core core, boolean isMaster, URI restTransportUri);
 
     String registerRadio(String nodeId, String restTransportUri);
 
     Node thisNode(Core core) throws NodeNotFoundException;
 
-    Node byNodeId(Core core, String nodeId);
+    Node byNodeId(Core core, String nodeId) throws NodeNotFoundException;
+    Node byNodeId(String nodeId) throws NodeNotFoundException;
+    Node byNodeId(NodeId nodeId) throws NodeNotFoundException;
 
     Map<String, Node> allActive(Node.Type type);
 

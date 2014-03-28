@@ -1,5 +1,5 @@
-/**
- * Copyright 2013 Lennart Koopmann <lennart@torch.sh>
+/*
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -15,13 +15,12 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 package org.graylog2.inputs.raw;
 
 import com.codahale.metrics.Meter;
-import org.graylog2.plugin.GraylogServer;
-import org.graylog2.plugin.InputHost;
+import com.codahale.metrics.MetricRegistry;
+import org.graylog2.plugin.buffers.Buffer;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.jboss.netty.buffer.ChannelBuffer;
@@ -47,10 +46,13 @@ public class RawDispatcher extends SimpleChannelHandler {
     private final RawProcessor processor;
     private final Meter receivedMessages;
 
-    public RawDispatcher(InputHost server, Configuration config, MessageInput sourceInput) {
-        this.processor = new RawProcessor(server, config, sourceInput);
+    public RawDispatcher(MetricRegistry metricRegistry,
+                         Buffer processBuffer,
+                         Configuration config,
+                         MessageInput sourceInput) {
+        this.processor = new RawProcessor(metricRegistry, processBuffer, config, sourceInput);
 
-        this.receivedMessages = server.metrics().meter(name(sourceInput.getUniqueReadableId(), "receivedMessages"));
+        this.receivedMessages = metricRegistry.meter(name(sourceInput.getUniqueReadableId(), "receivedMessages"));
     }
 
     @Override

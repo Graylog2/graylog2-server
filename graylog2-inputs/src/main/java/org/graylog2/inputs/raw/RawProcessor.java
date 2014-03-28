@@ -1,5 +1,5 @@
-/**
- * Copyright 2013 Lennart Koopmann <lennart@torch.sh>
+/*
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -15,15 +15,15 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 package org.graylog2.inputs.raw;
 
 import com.codahale.metrics.Meter;
+import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
-import org.graylog2.plugin.InputHost;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
+import org.graylog2.plugin.buffers.Buffer;
 import org.graylog2.plugin.buffers.BufferOutOfCapacityException;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.inputs.MessageInput;
@@ -40,7 +40,7 @@ import static com.codahale.metrics.MetricRegistry.name;
 public class RawProcessor {
 
     private static final Logger LOG = LoggerFactory.getLogger(RawProcessor.class);
-    private final InputHost server;
+    private final Buffer processBuffer;
     private final Configuration config;
 
     private final MessageInput sourceInput;
@@ -51,18 +51,21 @@ public class RawProcessor {
     private final Meter processedMessages;
     private final Timer parseTime;
 
-    public RawProcessor(InputHost server, Configuration config, MessageInput sourceInput) {
-        this.server = server;
+    public RawProcessor(MetricRegistry metricRegistry,
+                        Buffer processBuffer,
+                        Configuration config,
+                        MessageInput sourceInput) {
+        this.processBuffer = processBuffer;
         this.config = config;
 
         this.sourceInput = sourceInput;
 
         String metricName = sourceInput.getUniqueReadableId();
-        this.incomingMessages = server.metrics().meter(name(metricName, "incomingMessages"));
-        this.failures = server.metrics().meter(name(metricName, "failures"));
-        this.processedMessages = server.metrics().meter(name(metricName, "processedMessages"));
-        this.incompleteMessages = server.metrics().meter(name(metricName, "incompleteMessages"));
-        this.parseTime = server.metrics().timer(name(metricName, "parseTime"));
+        this.incomingMessages = metricRegistry.meter(name(metricName, "incomingMessages"));
+        this.failures = metricRegistry.meter(name(metricName, "failures"));
+        this.processedMessages = metricRegistry.meter(name(metricName, "processedMessages"));
+        this.incompleteMessages = metricRegistry.meter(name(metricName, "incompleteMessages"));
+        this.parseTime = metricRegistry.timer(name(metricName, "parseTime"));
     }
 
     public void messageReceived(String msg, InetAddress remoteAddress) throws BufferOutOfCapacityException {
@@ -87,7 +90,7 @@ public class RawProcessor {
         // Add to process buffer.
         LOG.debug("Adding received raw message <{}> to process buffer: {}", lm.getId(), lm);
         processedMessages.mark();
-        server.getProcessBuffer().insertCached(lm, sourceInput);
+        processBuffer.insertCached(lm, sourceInput);
     }
 
     private String parseSource(String msg, InetAddress remoteAddress) {

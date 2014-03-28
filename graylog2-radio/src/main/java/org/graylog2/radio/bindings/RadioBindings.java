@@ -25,6 +25,8 @@ import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.name.Names;
 import com.ning.http.client.AsyncHttpClient;
 import org.graylog2.radio.Configuration;
+import org.graylog2.radio.bindings.providers.AsyncHttpClientProvider;
+import org.graylog2.radio.bindings.providers.RadioInputRegistryProvider;
 import org.graylog2.radio.buffers.processors.RadioProcessBufferProcessor;
 import org.graylog2.radio.inputs.RadioInputRegistry;
 import org.graylog2.shared.ServerStatus;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 TORCH GmbH
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -66,6 +66,9 @@ public class StreamAlertResource extends RestResource {
 
     @Inject
     private AlertService alertService;
+
+    @Inject
+    private AlertSender alertSender;
 
     private static final String CACHE_KEY_BASE = "alerts";
 
@@ -358,8 +361,6 @@ public class StreamAlertResource extends RestResource {
         } catch (org.graylog2.database.NotFoundException e) {
             throw new WebApplicationException(404);
         }
-
-        AlertSender alertSender = new AlertSender(core);
 
         Map<String, Object> parameters = Maps.newHashMap();
         DummyAlertCondition dummyAlertCondition = new DummyAlertCondition(core, stream, null, null, Tools.iso8601(), "admin", parameters);

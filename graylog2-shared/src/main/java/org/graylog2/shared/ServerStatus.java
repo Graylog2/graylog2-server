@@ -37,7 +37,8 @@ public class ServerStatus {
         SERVER,
         RADIO,
         MASTER,
-        STATSMODE
+        STATSMODE,
+        LOCALMODE
     }
 
     private final NodeId nodeId;

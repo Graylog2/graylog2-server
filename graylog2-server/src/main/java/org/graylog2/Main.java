@@ -39,7 +39,6 @@ import org.graylog2.cluster.NodeNotFoundException;
 import org.graylog2.cluster.NodeService;
 import org.graylog2.cluster.NodeServiceImpl;
 import org.graylog2.filters.*;
-import org.graylog2.initializers.DroolsInitializer;
 import org.graylog2.initializers.PeriodicalsInitializer;
 import org.graylog2.inputs.gelf.http.GELFHttpInput;
 import org.graylog2.inputs.gelf.tcp.GELFTCPInput;
@@ -58,7 +57,6 @@ import org.graylog2.notifications.NotificationImpl;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.outputs.ElasticSearchOutput;
 import org.graylog2.plugin.Tools;
-import org.graylog2.plugin.initializers.InitializerConfigurationException;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.lifecycles.Lifecycle;
 import org.graylog2.plugins.PluginInstaller;
@@ -161,20 +159,6 @@ public final class Main extends NodeRunner {
 
         LOG.info("Graylog2 {} starting up. (JRE: {})", Core.GRAYLOG2_VERSION, Tools.getSystemInformation());
 
-        // If we only want to check our configuration, we just initialize the rules engine to check if the rules compile
-        if (commandLineArguments.isConfigTest()) {
-            Core server = injector.getInstance(Core.class);
-            server.setConfiguration(configuration);
-            DroolsInitializer drools = new DroolsInitializer();
-            try {
-                drools.initialize(server, null);
-            } catch (InitializerConfigurationException e) {
-                LOG.error("Drools initialization failed.", e);
-            }
-            // rules have been checked, exit gracefully
-            System.exit(0);
-        }
-
         // Do not use a PID file if the user requested not to
         if (!commandLineArguments.isNoPidFile()) {
             savePidFile(commandLineArguments.getPidFile());
@@ -261,7 +245,6 @@ public final class Main extends NodeRunner {
         server.inputs().register(RadioInput.class, RadioInput.NAME);
 
         // Register initializers.
-        server.initializers().register(injector.getInstance(DroolsInitializer.class));
         server.initializers().register(injector.getInstance(PeriodicalsInitializer.class));
 
         // Register message filters. (Order is important here)

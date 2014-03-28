@@ -1,5 +1,5 @@
-/**
- * Copyright 2013 Lennart Koopmann <lennart@torch.sh>
+/*
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -15,13 +15,12 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 package org.graylog2.indexer.retention;
 
 import org.graylog2.indexer.retention.strategies.ClosingRetentionStrategy;
 import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategy;
-import org.graylog2.plugin.GraylogServer;
+import org.graylog2.plugin.indexer.retention.IndexManagement;
 import org.graylog2.plugin.indexer.retention.RetentionStrategy;
 
 /**
@@ -29,11 +28,11 @@ import org.graylog2.plugin.indexer.retention.RetentionStrategy;
  */
 public class RetentionStrategyFactory {
 
-    public static RetentionStrategy fromString(GraylogServer server, String retentionStrategy) throws NoSuchStrategyException {
+    public static RetentionStrategy fromString(String retentionStrategy, IndexManagement indexManagement) throws NoSuchStrategyException {
         if (retentionStrategy.equals("delete")) {
-            return new DeletionRetentionStrategy(server);
+            return new DeletionRetentionStrategy(indexManagement);
         } else if(retentionStrategy.equals("close")) {
-            return new ClosingRetentionStrategy(server);
+            return new ClosingRetentionStrategy(indexManagement);
         }
 
         throw new NoSuchStrategyException("No such retention strategy [" + retentionStrategy + "]");

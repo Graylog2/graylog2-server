@@ -24,6 +24,7 @@ import com.google.inject.AbstractModule;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.name.Names;
 import org.graylog2.Configuration;
+import org.graylog2.bindings.providers.*;
 import org.graylog2.buffers.OutputBuffer;
 import org.graylog2.buffers.OutputBufferWatermark;
 import org.graylog2.buffers.processors.OutputBufferProcessor;
@@ -44,6 +45,7 @@ import org.graylog2.inputs.OutputCache;
 import org.graylog2.inputs.ServerInputRegistry;
 import org.graylog2.outputs.OutputRegistry;
 import org.graylog2.periodical.Periodicals;
+import org.graylog2.plugin.RulesEngine;
 import org.graylog2.plugin.indexer.MessageGateway;
 import org.graylog2.shared.ServerStatus;
 import org.graylog2.system.jobs.SystemJobManager;
@@ -116,6 +118,7 @@ public class ServerBindings extends AbstractModule {
         bind(InputCache.class).toProvider(InputCacheProvider.class);
         bind(OutputCache.class).toProvider(OutputCacheProvider.class);
         bind(ServerInputRegistry.class).toProvider(ServerInputRegistryProvider.class);
+        bind(RulesEngine.class).toProvider(RulesEngineProvider.class);
     }
 
     private void bindInterfaces() {

@@ -21,8 +21,10 @@ package org.graylog2.periodical;
 
 import com.google.inject.Inject;
 import org.graylog2.cluster.NodeNotFoundException;
+import org.graylog2.inputs.ServerInputRegistry;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
+import org.graylog2.plugin.system.NodeId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,16 +34,22 @@ import org.slf4j.LoggerFactory;
 public class ClusterHealthCheckThread extends Periodical {
     private static final Logger LOG = LoggerFactory.getLogger(ClusterHealthCheckThread.class);
     private NotificationService notificationService;
+    private final ServerInputRegistry inputRegistry;
+    private final NodeId nodeId;
 
     @Inject
-    public ClusterHealthCheckThread(NotificationService notificationService) {
+    public ClusterHealthCheckThread(NotificationService notificationService,
+                                    ServerInputRegistry inputRegistry,
+                                    NodeId nodeId) {
         this.notificationService = notificationService;
+        this.inputRegistry = inputRegistry;
+        this.nodeId = nodeId;
     }
 
     @Override
     public void run() {
         try {
-            if (core.inputs().runningCount() == 0) {
+            if (inputRegistry.runningCount() == 0) {
                 LOG.debug("No input running in cluster!");
                 notificationService.publishIfFirst(getNotification());
             } else {
@@ -57,7 +65,7 @@ public class ClusterHealthCheckThread extends Periodical {
         Notification notification = notificationService.buildNow();
         notification.addType(Notification.Type.NO_INPUT_RUNNING);
         notification.addSeverity(Notification.Severity.URGENT);
-        notification.addNode(core.getNodeId());
+        notification.addNode(nodeId.toString());
 
         return notification;
     }

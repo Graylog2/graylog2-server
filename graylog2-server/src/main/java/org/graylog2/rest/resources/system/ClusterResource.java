@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 TORCH GmbH
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -96,9 +96,10 @@ public class ClusterResource extends RestResource {
             throw new WebApplicationException(400);
         }
 
-        Node node = nodeService.byNodeId(core, nodeId);
-
-        if (node == null) {
+        Node node = null;
+        try {
+            node = nodeService.byNodeId(nodeId);
+        } catch (NodeNotFoundException e) {
             LOG.error("Node <{}> not found.", nodeId);
             throw new WebApplicationException(404);
         }

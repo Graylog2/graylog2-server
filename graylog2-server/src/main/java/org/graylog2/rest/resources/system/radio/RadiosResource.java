@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 TORCH GmbH
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -24,6 +24,7 @@ import com.google.common.collect.Maps;
 import org.bson.types.ObjectId;
 import org.graylog2.cluster.Node;
 import org.graylog2.cluster.NodeImpl;
+import org.graylog2.cluster.NodeNotFoundException;
 import org.graylog2.cluster.NodeService;
 import org.graylog2.database.ValidationException;
 import org.graylog2.inputs.Input;
@@ -90,7 +91,13 @@ public class RadiosResource extends RestResource {
             @ApiResponse(code = 404, message = "Radio not found.")
     })
     public String radio(@ApiParam(title = "radioId", required = true) @PathParam("radioId") String radioId) {
-        Node radio = nodeService.byNodeId(core, radioId);
+        Node radio = null;
+        try {
+            radio = nodeService.byNodeId(radioId);
+        } catch (NodeNotFoundException e) {
+            LOG.error("Radio <{}> not found.", radioId);
+            throw new WebApplicationException(404);
+        }
 
         if (radio == null) {
             LOG.error("Radio <{}> not found.", radioId);
@@ -111,7 +118,13 @@ public class RadiosResource extends RestResource {
     })
     public Response registerInput(@ApiParam(title = "JSON body", required = true) String body,
                                 @ApiParam(title = "radioId", required = true) @PathParam("radioId") String radioId) {
-        Node radio = nodeService.byNodeId(core, radioId);
+        Node radio = null;
+        try {
+            radio = nodeService.byNodeId(radioId);
+        } catch (NodeNotFoundException e) {
+            LOG.error("Radio <{}> not found.", radioId);
+            throw new WebApplicationException(404);
+        }
 
         if (radio == null) {
             LOG.error("Radio <{}> not found.", radioId);
@@ -164,7 +177,13 @@ public class RadiosResource extends RestResource {
     })
     public Response unregisterInput(@ApiParam(title = "radioId", required = true) @PathParam("radioId") String radioId,
                                     @ApiParam(title = "inputId", required = true) @PathParam("inputId") String inputId) {
-        final Node radio = nodeService.byNodeId(core, radioId);
+        final Node radio;
+        try {
+            radio = nodeService.byNodeId(radioId);
+        } catch (NodeNotFoundException e) {
+            LOG.error("Radio <{}> not found.", radioId);
+            throw new WebApplicationException(404);
+        }
 
         if (radio == null) {
             LOG.error("Radio <{}> not found.", radioId);
@@ -190,7 +209,13 @@ public class RadiosResource extends RestResource {
             @ApiResponse(code = 404, message = "Radio not found.")
     })
     public String persistedInputs(@ApiParam(title = "radioId", required = true) @PathParam("radioId") String radioId) {
-        Node radio = nodeService.byNodeId(core, radioId);
+        Node radio = null;
+        try {
+            radio = nodeService.byNodeId(radioId);
+        } catch (NodeNotFoundException e) {
+            LOG.error("Radio <{}> not found.", radioId);
+            throw new WebApplicationException(404);
+        }
 
         if (radio == null) {
             LOG.error("Radio <{}> not found.", radioId);
@@ -238,7 +263,13 @@ public class RadiosResource extends RestResource {
 
         LOG.debug("Ping from graylog2-radio node [{}].", radioId);
 
-        Node node = nodeService.byNodeId(core, radioId);
+        Node node = null;
+        try {
+            node = nodeService.byNodeId(radioId);
+        } catch (NodeNotFoundException e) {
+            LOG.error("Unable to find radio for id " + radioId, e);
+            throw new WebApplicationException(404);
+        }
 
         if (node != null) {
             nodeService.markAsAlive(node, false, pr.restTransportAddress);

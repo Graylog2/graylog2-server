@@ -22,10 +22,10 @@ package org.graylog2.initializers;
 import com.beust.jcommander.internal.Maps;
 import org.graylog2.buffers.OutputBuffer;
 import org.graylog2.inputs.BasicCache;
-import org.graylog2.plugin.GraylogServer;
 import org.graylog2.plugin.initializers.Initializer;
 import org.graylog2.plugin.initializers.InitializerConfigurationException;
 
+import javax.inject.Inject;
 import java.util.Map;
 
 /**
@@ -35,13 +35,14 @@ public class OutputBufferInitializer implements Initializer {
     private final OutputBuffer.Factory outputBufferFactory;
     private final BasicCache outputCache;
 
+    @Inject
     public OutputBufferInitializer(OutputBuffer.Factory outputBufferFactory) {
         this.outputBufferFactory = outputBufferFactory;
         this.outputCache = new BasicCache();
     }
 
     @Override
-    public void initialize(GraylogServer server, Map<String, String> config) throws InitializerConfigurationException {
+    public void initialize(Map<String, String> config) throws InitializerConfigurationException {
         OutputBuffer outputBuffer = outputBufferFactory.create(outputCache);
         outputBuffer.initialize();
     }

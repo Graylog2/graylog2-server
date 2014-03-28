@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 TORCH GmbH
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -13,7 +13,6 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -22,6 +21,11 @@ package org.graylog2.shared.stats;
 
 import org.cliffc.high_scale_lib.Counter;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicReference;
+
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
  */
@@ -29,11 +33,17 @@ public class ThroughputStats {
     private long currentThroughput;
     private final Counter throughputCounter;
     private final Counter benchmarkCounter;
+    private final AtomicReference<ConcurrentHashMap<String, Counter>> streamThroughput;
+    private final AtomicReference<HashMap<String, Counter>> currentStreamThroughput;
+
 
     public ThroughputStats() {
         this.currentThroughput = 0;
         this.throughputCounter = new Counter();
         this.benchmarkCounter = new Counter();
+        this.streamThroughput = new AtomicReference<ConcurrentHashMap<String, Counter>>(new ConcurrentHashMap<String, Counter>());
+        this.currentStreamThroughput =  new AtomicReference<HashMap<String, Counter>>();
+
     }
 
     public long getCurrentThroughput() {
@@ -50,5 +60,34 @@ public class ThroughputStats {
 
     public void setCurrentThroughput(long currentThroughput) {
         this.currentThroughput = currentThroughput;
+    }
+
+    public AtomicReference<ConcurrentHashMap<String, Counter>> getStreamThroughput() {
+        return streamThroughput;
+    }
+
+    public Map<String, Counter> cycleStreamThroughput() {
+        return streamThroughput.getAndSet(new ConcurrentHashMap<String, Counter>());
+    }
+
+    public void incrementStreamThroughput(String streamId) {
+        final ConcurrentHashMap<String, Counter> counterMap = streamThroughput.get();
+        Counter counter;
+        synchronized (counterMap) {
+            counter = counterMap.get(streamId);
+            if (counter == null) {
+                counter = new Counter();
+                counterMap.put(streamId, counter);
+            }
+        }
+        counter.increment();
+    }
+
+    public void setCurrentStreamThroughput(HashMap<String, Counter> throughput) {
+        currentStreamThroughput.set(throughput);
+    }
+
+    public HashMap<String, Counter> getCurrentStreamThroughput() {
+        return currentStreamThroughput.get();
     }
 }

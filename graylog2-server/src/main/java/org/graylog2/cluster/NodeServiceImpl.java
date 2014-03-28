@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 TORCH GmbH
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -29,6 +29,7 @@ import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PersistedServiceImpl;
 import org.graylog2.database.ValidationException;
 import org.graylog2.plugin.Tools;
+import org.graylog2.plugin.system.NodeId;
 
 import java.net.URI;
 import java.util.Map;
@@ -43,10 +44,10 @@ public class NodeServiceImpl extends PersistedServiceImpl implements NodeService
     }
 
     @Override
-    public String registerServer(Core core, boolean isMaster, URI restTransportUri) {
+    public String registerServer(String nodeId, boolean isMaster, URI restTransportUri) {
         Map<String, Object> fields = Maps.newHashMap();
         fields.put("last_seen", Tools.getUTCTimestamp());
-        fields.put("node_id", core.getNodeId());
+        fields.put("node_id", nodeId);
         fields.put("type", NodeImpl.Type.SERVER.toString());
         fields.put("is_master", isMaster);
         fields.put("transport_address", restTransportUri.toString());
@@ -56,6 +57,11 @@ public class NodeServiceImpl extends PersistedServiceImpl implements NodeService
         } catch (ValidationException e) {
             throw new RuntimeException("Validation failed.", e);
         }
+    }
+
+    @Override
+    public String registerServer(Core core, boolean isMaster, URI restTransportUri) {
+        return registerServer(core.getNodeId(), isMaster, restTransportUri);
     }
 
     @Override
@@ -85,15 +91,25 @@ public class NodeServiceImpl extends PersistedServiceImpl implements NodeService
     }
 
     @Override
-    public Node byNodeId(Core core, String nodeId) {
+    public Node byNodeId(String nodeId) throws NodeNotFoundException {
         DBObject query = new BasicDBObject("node_id", nodeId);
         DBObject o = findOne(NodeImpl.class, query);
 
-        if (o == null) {
-            return null;
+        if (o == null || !o.containsField("node_id")) {
+            throw new NodeNotFoundException("Did not find our own node. This should never happen.");
         }
 
         return new NodeImpl((ObjectId) o.get("_id"), o.toMap());
+    }
+
+    @Override
+    public Node byNodeId(Core core, String nodeId) {
+        return byNodeId(core, nodeId);
+    }
+
+    @Override
+    public Node byNodeId(NodeId nodeId) throws NodeNotFoundException {
+        return byNodeId(nodeId.toString());
     }
 
     @Override

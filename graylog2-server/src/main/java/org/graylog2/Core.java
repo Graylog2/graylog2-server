@@ -23,6 +23,7 @@ import com.codahale.metrics.MetricRegistry;
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import com.google.inject.internal.util.$Nullable;
 import com.google.inject.name.Named;
 import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.cliffc.high_scale_lib.Counter;
@@ -32,6 +33,7 @@ import org.glassfish.jersey.server.ContainerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.filter.EncodingFilter;
 import org.glassfish.jersey.server.internal.scanning.PackageNamesScanner;
+import org.graylog2.alerts.AlertSender;
 import org.graylog2.alerts.AlertService;
 import org.graylog2.alerts.AlertServiceImpl;
 import org.graylog2.blacklists.BlacklistCache;
@@ -66,10 +68,7 @@ import org.graylog2.notifications.NotificationService;
 import org.graylog2.notifications.NotificationServiceImpl;
 import org.graylog2.outputs.OutputRegistry;
 import org.graylog2.periodical.Periodicals;
-import org.graylog2.plugin.GraylogServer;
-import org.graylog2.plugin.InputHost;
-import org.graylog2.plugin.Tools;
-import org.graylog2.plugin.Version;
+import org.graylog2.plugin.*;
 import org.graylog2.plugin.alarms.callbacks.AlarmCallback;
 import org.graylog2.plugin.alarms.transports.Transport;
 import org.graylog2.plugin.buffers.Buffer;
@@ -134,9 +133,11 @@ import java.net.InetSocketAddress;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Server core, handling and holding basically everything.
@@ -155,7 +156,8 @@ public class Core implements GraylogServer, InputHost, ProcessingHost {
     private Configuration configuration;
     @Inject
     private ServerStatus serverStatus;
-    private RulesEngineImpl rulesEngine;
+    @Inject @$Nullable
+    private RulesEngine rulesEngine;
 
     @Inject
     private GELFChunkManager gelfChunkManager;
@@ -176,14 +178,13 @@ public class Core implements GraylogServer, InputHost, ProcessingHost {
 
     private Counter benchmarkCounter = new Counter();
     private Counter throughputCounter = new Counter();
-    private AtomicReference<ConcurrentHashMap<String, Counter>> streamThroughput =
-            new AtomicReference<ConcurrentHashMap<String, Counter>>(new ConcurrentHashMap<String, Counter>());
     @Inject
     private FilterRegistry filterRegistry;
 
     private List<Transport> transports = Lists.newArrayList();
     private List<AlarmCallback> alarmCallbacks = Lists.newArrayList();
 
+    @Inject
     private Initializers initializers;
     @Inject
     private ServerInputRegistry inputs;
@@ -221,7 +222,6 @@ public class Core implements GraylogServer, InputHost, ProcessingHost {
     private LdapConnector ldapConnector;
     private DefaultSecurityManager securityManager;
     private MongoDbMetricsReporter metricsReporter;
-    private AtomicReference<HashMap<String, Counter>> currentStreamThroughput = new AtomicReference<HashMap<String, Counter>>();
 
     @Inject
     private ProcessBuffer.Factory processBufferFactory;
@@ -248,6 +248,9 @@ public class Core implements GraylogServer, InputHost, ProcessingHost {
     @Inject
     private RebuildIndexRangesJob.Factory rebuildIndexRangesJobFactory;
 
+    @Inject
+    AlertSender alertSender;
+
     public void initialize() {
         if (configuration.isMetricsCollectionEnabled()) {
             metricsReporter = MongoDbMetricsReporter.forRegistry(this, metricRegistry).build();
@@ -267,8 +270,6 @@ public class Core implements GraylogServer, InputHost, ProcessingHost {
                 LOG.info("No rest_transport_uri set. Falling back to [{}].", transportStr);
                 this.configuration.setRestTransportUri(transportStr);
         }
-
-        initializers = new Initializers(this);
 
         if (serverStatus.hasCapability(ServerStatus.Capability.MASTER)) {
             dashboardRegistry.loadPersisted(this);
@@ -351,28 +352,19 @@ public class Core implements GraylogServer, InputHost, ProcessingHost {
     }
 
     public void incrementStreamThroughput(String streamId) {
-        final ConcurrentHashMap<String, Counter> counterMap = streamThroughput.get();
-        Counter counter;
-        synchronized (counterMap) {
-            counter = counterMap.get(streamId);
-            if (counter == null) {
-                counter = new Counter();
-                counterMap.put(streamId, counter);
-            }
-        }
-        counter.increment();
+        throughputStats.incrementStreamThroughput(streamId);
     }
 
     public Map<String, Counter> cycleStreamThroughput() {
-        return streamThroughput.getAndSet(new ConcurrentHashMap<String, Counter>());
+        return throughputStats.cycleStreamThroughput();
     }
 
     public void setCurrentStreamThroughput(HashMap<String, Counter> throughput) {
-        currentStreamThroughput.set(throughput);
+        throughputStats.setCurrentStreamThroughput(throughput);
     }
 
     public HashMap<String, Counter> getCurrentStreamThroughput() {
-        return currentStreamThroughput.get();
+        return throughputStats.getCurrentStreamThroughput();
     }
 
     private class Graylog2Binder extends AbstractBinder {
@@ -409,6 +401,7 @@ public class Core implements GraylogServer, InputHost, ProcessingHost {
             bind(rebuildIndexRangesJobFactory).to(RebuildIndexRangesJob.Factory.class);
             bind(cacheSynchronizer).to(Caches.class);
             bind(inputs).to(ServerInputRegistry.class);
+            bind(alertSender).to(AlertSender.class);
         }
     }
 
@@ -516,7 +509,7 @@ public class Core implements GraylogServer, InputHost, ProcessingHost {
         rulesEngine = engine;
     }
 
-    public RulesEngineImpl getRulesEngine() {
+    public RulesEngine getRulesEngine() {
         return rulesEngine;
     }
 

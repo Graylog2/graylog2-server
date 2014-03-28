@@ -89,7 +89,7 @@ public class IndexRetentionThread extends Periodical {
 
         try {
             runRetention(
-                    RetentionStrategyFactory.fromString(core, configuration.getRetentionStrategy()),
+                    RetentionStrategyFactory.fromString(configuration.getRetentionStrategy(), indexer.indices()),
                     indices,
                     removeCount
             );

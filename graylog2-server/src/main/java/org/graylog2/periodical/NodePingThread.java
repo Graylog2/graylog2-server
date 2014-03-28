@@ -27,6 +27,7 @@ import org.graylog2.cluster.NodeService;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationImpl;
 import org.graylog2.notifications.NotificationService;
+import org.graylog2.shared.ServerStatus;
 import org.graylog2.system.activities.Activity;
 import org.graylog2.system.activities.ActivityWriter;
 import org.slf4j.Logger;
@@ -42,26 +43,30 @@ public class NodePingThread extends Periodical {
     private final NotificationService notificationService;
     private final ActivityWriter activityWriter;
     private final Configuration configuration;
+    private final ServerStatus serverStatus;
 
     @Inject
     public NodePingThread(NodeService nodeService,
                           NotificationService notificationService,
                           ActivityWriter activityWriter,
-                          Configuration configuration) {
+                          Configuration configuration,
+                          ServerStatus serverStatus) {
         this.nodeService = nodeService;
         this.notificationService = notificationService;
         this.activityWriter = activityWriter;
         this.configuration = configuration;
+        this.serverStatus = serverStatus;
     }
 
     @Override
     public void run() {
+        final boolean isMaster = serverStatus.hasCapability(ServerStatus.Capability.MASTER);
         try {
-            Node node = nodeService.thisNode(core);
-            nodeService.markAsAlive(node, core.isMaster(), configuration.getRestTransportUri());
+            Node node = nodeService.byNodeId(serverStatus.getNodeId());
+            nodeService.markAsAlive(node, isMaster, configuration.getRestTransportUri());
         } catch (NodeNotFoundException e) {
             LOG.warn("Did not find meta info of this node. Re-registering.");
-            nodeService.registerServer(core, core.isMaster(), configuration.getRestTransportUri());
+            nodeService.registerServer(serverStatus.getNodeId().toString(), isMaster, configuration.getRestTransportUri());
         }
         try {
             // Remove old nodes that are no longer running. (Just some housekeeping)
@@ -79,7 +84,7 @@ public class NodePingThread extends Periodical {
                 }
             } else {
                 Notification notification = notificationService.buildNow()
-                        .addThisNode(core)
+                        .addNode(serverStatus.getNodeId().toString())
                         .addType(Notification.Type.NO_MASTER)
                         .addSeverity(Notification.Severity.URGENT);
                 notificationService.publishIfFirst(notification);

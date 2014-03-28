@@ -61,6 +61,7 @@ import org.graylog2.Configuration;
 import org.graylog2.indexer.IndexNotFoundException;
 import org.graylog2.indexer.Indexer;
 import org.graylog2.indexer.Mapping;
+import org.graylog2.plugin.indexer.retention.IndexManagement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -73,7 +74,7 @@ import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-public class Indices {
+public class Indices implements IndexManagement {
     public interface Factory {
         Indices create(Client client);
     }
