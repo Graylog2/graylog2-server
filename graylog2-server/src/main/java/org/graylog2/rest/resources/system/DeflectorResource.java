@@ -16,6 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package org.graylog2.rest.resources.system;
 
 import com.codahale.metrics.annotation.Timed;
@@ -29,6 +30,7 @@ import org.graylog2.rest.documentation.annotations.ApiOperation;
 import org.graylog2.rest.resources.RestResource;
 import org.graylog2.security.RestPermissions;
 import org.graylog2.system.activities.Activity;
+import org.graylog2.system.activities.ActivityWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,6 +57,8 @@ public class DeflectorResource extends RestResource {
     private Deflector deflector;
     @Inject
     private Indexer indexer;
+    @Inject
+    private ActivityWriter activityWriter;
 
     @GET @Timed
     @ApiOperation(value = "Get current deflector status")
@@ -94,7 +98,7 @@ public class DeflectorResource extends RestResource {
 
         String msg = "Cycling deflector. Reason: REST request.";
         LOG.info(msg);
-        core.getActivityWriter().write(new Activity(msg, DeflectorResource.class));
+        activityWriter.write(new Activity(msg, DeflectorResource.class));
 
         deflector.cycle(indexer);
         return Response.ok().build();

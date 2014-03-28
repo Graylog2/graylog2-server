@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 TORCH GmbH
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -30,6 +30,7 @@ import org.graylog2.rest.resources.RestResource;
 import org.graylog2.rest.resources.system.inputs.requests.CreateStaticFieldRequest;
 import org.graylog2.security.RestPermissions;
 import org.graylog2.system.activities.Activity;
+import org.graylog2.system.activities.ActivityWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,6 +52,8 @@ public class StaticFieldsResource extends RestResource {
 
     @Inject
     private InputService inputService;
+    @Inject
+    private ActivityWriter activityWriter;
 
     @POST
     @Timed
@@ -114,7 +117,7 @@ public class StaticFieldsResource extends RestResource {
 
         String msg = "Added static field [" + csfr.key + "] to input <" + inputId + ">.";
         LOG.info(msg);
-        core.getActivityWriter().write(new Activity(msg, StaticFieldsResource.class));
+        activityWriter.write(new Activity(msg, StaticFieldsResource.class));
 
         return Response.status(Response.Status.CREATED).build();
     }
@@ -156,7 +159,7 @@ public class StaticFieldsResource extends RestResource {
 
         String msg = "Removed static field [" + key + "] of input <" + inputId + ">.";
         LOG.info(msg);
-        core.getActivityWriter().write(new Activity(msg, StaticFieldsResource.class));
+        activityWriter.write(new Activity(msg, StaticFieldsResource.class));
 
         return Response.status(Response.Status.NO_CONTENT).build();
     }

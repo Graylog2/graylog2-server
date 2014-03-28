@@ -16,6 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package org.graylog2.rest.resources.system.jobs;
 
 import com.codahale.metrics.annotation.Timed;
@@ -26,10 +27,7 @@ import org.graylog2.rest.documentation.annotations.*;
 import org.graylog2.rest.resources.RestResource;
 import org.graylog2.rest.resources.system.jobs.requests.TriggerRequest;
 import org.graylog2.security.RestPermissions;
-import org.graylog2.system.jobs.NoSuchJobException;
-import org.graylog2.system.jobs.SystemJob;
-import org.graylog2.system.jobs.SystemJobConcurrencyException;
-import org.graylog2.system.jobs.SystemJobFactory;
+import org.graylog2.system.jobs.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,6 +51,8 @@ public class SystemJobResource extends RestResource {
 
     @Inject
     private SystemJobFactory systemJobFactory;
+    @Inject
+    private SystemJobManager systemJobManager;
 
     @GET @Timed
     @ApiOperation(value = "List currently running jobs")
@@ -60,7 +60,7 @@ public class SystemJobResource extends RestResource {
     public String list() {
         List<Map<String, Object>> jobs = Lists.newArrayList();
 
-        for (Map.Entry<String, SystemJob> entry : core.getSystemJobManager().getRunningJobs().entrySet()) {
+        for (Map.Entry<String, SystemJob> entry : systemJobManager.getRunningJobs().entrySet()) {
             // TODO jobId is ephemeral, this is not a good key for permission checks. we should use the name of the job type (but there is no way to get it yet)
             if (isPermitted(RestPermissions.SYSTEMJOBS_READ, entry.getKey())) {
                 jobs.add(entry.getValue().toMap());
@@ -88,7 +88,7 @@ public class SystemJobResource extends RestResource {
         // TODO jobId is ephemeral, this is not a good key for permission checks. we should use the name of the job type (but there is no way to get it yet)
         checkPermission(RestPermissions.SYSTEMJOBS_READ, jobId);
 
-        SystemJob job = core.getSystemJobManager().getRunningJobs().get(jobId);
+        SystemJob job = systemJobManager.getRunningJobs().get(jobId);
         if (job == null) {
             LOG.error("No system job with ID <{}> found.", jobId);
             throw new WebApplicationException(404);
@@ -131,7 +131,7 @@ public class SystemJobResource extends RestResource {
         }
 
         try {
-            core.getSystemJobManager().submit(job);
+            systemJobManager.submit(job);
         } catch (SystemJobConcurrencyException e) {
             LOG.error("Maximum concurrency level of this job reached. ", e);
             throw new WebApplicationException(403);

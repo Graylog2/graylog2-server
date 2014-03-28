@@ -16,6 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package org.graylog2.rest.resources.system.inputs;
 
 import com.beust.jcommander.internal.Lists;
@@ -40,6 +41,7 @@ import org.graylog2.shared.inputs.InputRegistry;
 import org.graylog2.shared.inputs.NoSuchInputTypeException;
 import org.graylog2.shared.rest.resources.system.inputs.requests.InputLaunchRequest;
 import org.graylog2.system.activities.Activity;
+import org.graylog2.system.activities.ActivityWriter;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
@@ -66,6 +68,8 @@ public class InputsResource extends RestResource {
 
     @Inject
     private InputService inputService;
+    @Inject
+    private ActivityWriter activityWriter;
 
     @GET @Timed
     @Produces(MediaType.APPLICATION_JSON)
@@ -225,7 +229,7 @@ public class InputsResource extends RestResource {
 
         String msg = "Attempting to terminate input [" + input.getName()+ "]. Reason: REST request.";
         LOG.info(msg);
-        core.getActivityWriter().write(new Activity(msg, InputsResource.class));
+        activityWriter.write(new Activity(msg, InputsResource.class));
 
         core.inputs().terminate(input);
 
@@ -236,7 +240,7 @@ public class InputsResource extends RestResource {
 
         String msg2 = "Terminated input [" + input.getName()+ "]. Reason: REST request.";
         LOG.info(msg2);
-        core.getActivityWriter().write(new Activity(msg2, InputsResource.class));
+        activityWriter.write(new Activity(msg2, InputsResource.class));
 
         return Response.status(Response.Status.ACCEPTED).build();
     }
@@ -269,13 +273,13 @@ public class InputsResource extends RestResource {
 
         String msg = "Launching existing input [" + input.getName()+ "]. Reason: REST request.";
         LOG.info(msg);
-        core.getActivityWriter().write(new Activity(msg, InputsResource.class));
+        activityWriter.write(new Activity(msg, InputsResource.class));
 
         core.inputs().launch(input);
 
         String msg2 = "Launched existing input [" + input.getName()+ "]. Reason: REST request.";
         LOG.info(msg2);
-        core.getActivityWriter().write(new Activity(msg2, InputsResource.class));
+        activityWriter.write(new Activity(msg2, InputsResource.class));
 
         return Response.status(Response.Status.ACCEPTED).build();
     }
@@ -308,13 +312,13 @@ public class InputsResource extends RestResource {
 
         String msg = "Stopping input [" + input.getName()+ "]. Reason: REST request.";
         LOG.info(msg);
-        core.getActivityWriter().write(new Activity(msg, InputsResource.class));
+        activityWriter.write(new Activity(msg, InputsResource.class));
 
         core.inputs().stop(input);
 
         String msg2 = "Stopped input [" + input.getName()+ "]. Reason: REST request.";
         LOG.info(msg2);
-        core.getActivityWriter().write(new Activity(msg2, InputsResource.class));
+        activityWriter.write(new Activity(msg2, InputsResource.class));
 
         return Response.status(Response.Status.ACCEPTED).build();
     }

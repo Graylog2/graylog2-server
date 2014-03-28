@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 TORCH GmbH
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -36,6 +36,7 @@ import org.graylog2.rest.resources.RestResource;
 import org.graylog2.rest.resources.system.inputs.requests.CreateExtractorRequest;
 import org.graylog2.security.RestPermissions;
 import org.graylog2.system.activities.Activity;
+import org.graylog2.system.activities.ActivityWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,6 +60,8 @@ public class ExtractorsResource extends RestResource {
 
     @Inject
     private InputService inputService;
+    @Inject
+    private ActivityWriter activityWriter;
 
     @POST @Timed
     @Consumes(MediaType.APPLICATION_JSON)
@@ -138,7 +141,7 @@ public class ExtractorsResource extends RestResource {
 
         String msg = "Added extractor <" + id + "> of type [" + cer.extractorType + "] to input <" + inputId + ">.";
         LOG.info(msg);
-        core.getActivityWriter().write(new Activity(msg, ExtractorsResource.class));
+        activityWriter.write(new Activity(msg, ExtractorsResource.class));
 
         Map<String, Object> result = Maps.newHashMap();
         result.put("extractor_id", id);
@@ -223,7 +226,7 @@ public class ExtractorsResource extends RestResource {
         String msg = "Deleted extractor <" + extractorId + "> of type [" + extractor.getType() + "] " +
                 "from input <" + inputId + ">. Reason: REST request.";
         LOG.info(msg);
-        core.getActivityWriter().write(new Activity(msg, InputsResource.class));
+        activityWriter.write(new Activity(msg, InputsResource.class));
 
         return Response.status(Response.Status.NO_CONTENT).build();
     }

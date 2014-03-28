@@ -16,6 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package org.graylog2.periodical;
 
 import com.google.inject.Inject;
@@ -39,12 +40,17 @@ public class NodePingThread extends Periodical {
     private static final Logger LOG = LoggerFactory.getLogger(NodePingThread.class);
     private final NodeService nodeService;
     private final NotificationService notificationService;
+    private final ActivityWriter activityWriter;
     private final Configuration configuration;
 
     @Inject
-    public NodePingThread(NodeService nodeService, NotificationService notificationService, Configuration configuration) {
+    public NodePingThread(NodeService nodeService,
+                          NotificationService notificationService,
+                          ActivityWriter activityWriter,
+                          Configuration configuration) {
         this.nodeService = nodeService;
         this.notificationService = notificationService;
+        this.activityWriter = activityWriter;
         this.configuration = configuration;
     }
 
@@ -61,7 +67,6 @@ public class NodePingThread extends Periodical {
             // Remove old nodes that are no longer running. (Just some housekeeping)
             nodeService.dropOutdated();
 
-            final ActivityWriter activityWriter = core.getActivityWriter();
             // Check that we still have a master node in the cluster, if not, warn the user.
             if (nodeService.isAnyMasterPresent()) {
                 Notification notification = notificationService.build()

@@ -27,8 +27,11 @@ import com.google.common.collect.Sets;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresGuest;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.graylog2.Configuration;
 import org.graylog2.Core;
 import org.graylog2.buffers.Buffers;
+import org.graylog2.caches.Caches;
+import org.graylog2.indexer.Indexer;
 import org.graylog2.plugin.Tools;
 import org.graylog2.rest.documentation.annotations.Api;
 import org.graylog2.rest.documentation.annotations.ApiOperation;
@@ -37,6 +40,8 @@ import org.graylog2.rest.resources.RestResource;
 import org.graylog2.rest.resources.system.responses.ReaderPermissionResponse;
 import org.graylog2.security.RestPermissions;
 import org.graylog2.shared.ProcessingPauseLockedException;
+import org.graylog2.shared.ServerStatus;
+import org.graylog2.system.activities.ActivityWriter;
 import org.graylog2.system.shutdown.GracefulShutdown;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,6 +72,16 @@ public class SystemResource extends RestResource {
 
     @Inject
     private Buffers bufferSynchronizer;
+    @Inject
+    private ServerStatus serverStatus;
+    @Inject
+    private ActivityWriter activityWriter;
+    @Inject
+    private Configuration configuration;
+    @Inject
+    private Indexer indexer;
+    @Inject
+    private Caches cacheSynchronizer;
 
     @GET @Timed
     @ApiOperation(value = "Get system overview")
@@ -236,7 +251,8 @@ public class SystemResource extends RestResource {
     public Response shutdown() {
         checkPermission(RestPermissions.NODE_SHUTDOWN, core.getNodeId());
 
-        new Thread(new GracefulShutdown(core, bufferSynchronizer)).start();
+        new Thread(new GracefulShutdown(serverStatus, activityWriter, configuration, bufferSynchronizer,
+                cacheSynchronizer, indexer, core.periodicals(), core.inputs())).start();
         return accepted().build();
     }
 

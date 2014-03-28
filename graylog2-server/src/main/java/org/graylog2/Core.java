@@ -39,6 +39,7 @@ import org.graylog2.buffers.Buffers;
 import org.graylog2.buffers.OutputBuffer;
 import org.graylog2.buffers.OutputBufferWatermark;
 import org.graylog2.buffers.processors.ServerProcessBufferProcessor;
+import org.graylog2.caches.Caches;
 import org.graylog2.cluster.NodeService;
 import org.graylog2.cluster.NodeServiceImpl;
 import org.graylog2.dashboards.DashboardRegistry;
@@ -236,6 +237,9 @@ public class Core implements GraylogServer, InputHost, ProcessingHost {
     private Buffers bufferSynchronizer;
 
     @Inject
+    private Caches cacheSynchronizer;
+
+    @Inject
     private SystemJobFactory systemJobFactory;
 
     @Inject
@@ -295,7 +299,8 @@ public class Core implements GraylogServer, InputHost, ProcessingHost {
                 LOG.info(msg);
                 activityWriter.write(new Activity(msg, Core.class));
 
-                GracefulShutdown gs = new GracefulShutdown(core, bufferSynchronizer);
+                GracefulShutdown gs = new GracefulShutdown(serverStatus, activityWriter, configuration,
+                        bufferSynchronizer, cacheSynchronizer, indexer, periodicals, inputs);
                 gs.run();
             }
         });
@@ -548,16 +553,8 @@ public class Core implements GraylogServer, InputHost, ProcessingHost {
         return this.alarmCallbacks;
     }
 
-    public Deflector getDeflector() {
-        return this.deflector;
-    }
-
     public ActivityWriter getActivityWriter() {
         return this.activityWriter;
-    }
-
-    public SystemJobManager getSystemJobManager() {
-        return this.systemJobManager;
     }
 
     public void setLdapAuthenticator(LdapUserAuthenticator authenticator) {

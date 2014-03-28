@@ -30,7 +30,9 @@ import org.graylog2.indexer.ranges.RebuildIndexRangesJob;
 import org.graylog2.indexer.retention.RetentionStrategyFactory;
 import org.graylog2.plugin.indexer.retention.RetentionStrategy;
 import org.graylog2.system.activities.Activity;
+import org.graylog2.system.activities.ActivityWriter;
 import org.graylog2.system.jobs.SystemJobConcurrencyException;
+import org.graylog2.system.jobs.SystemJobManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,16 +49,22 @@ public class IndexRetentionThread extends Periodical {
     private final RebuildIndexRangesJob.Factory rebuildIndexRangesJobFactory;
     private final Deflector deflector;
     private final Indexer indexer;
+    private final ActivityWriter activityWriter;
+    private final SystemJobManager systemJobManager;
 
     @Inject
     public IndexRetentionThread(Configuration configuration,
                                 RebuildIndexRangesJob.Factory rebuildIndexRangesJobFactory,
                                 Deflector deflector,
-                                Indexer indexer) {
+                                Indexer indexer,
+                                ActivityWriter activityWriter,
+                                SystemJobManager systemJobManager) {
         this.configuration = configuration;
         this.rebuildIndexRangesJobFactory = rebuildIndexRangesJobFactory;
         this.deflector = deflector;
         this.indexer = indexer;
+        this.activityWriter = activityWriter;
+        this.systemJobManager = systemJobManager;
     }
 
     @Override
@@ -77,7 +85,7 @@ public class IndexRetentionThread extends Periodical {
         String msg = "Number of indices (" + indexCount + ") higher than limit (" + maxIndices + "). " +
                 "Running retention for " + removeCount + " indices.";
         LOG.info(msg);
-        core.getActivityWriter().write(new Activity(msg, IndexRetentionThread.class));
+        activityWriter.write(new Activity(msg, IndexRetentionThread.class));
 
         try {
             runRetention(
@@ -95,7 +103,7 @@ public class IndexRetentionThread extends Periodical {
     public void runRetention(RetentionStrategy strategy, Map<String, IndexStats> indices, int removeCount) throws NoTargetIndexException {
         for (String indexName : IndexHelper.getOldestIndices(indices.keySet(), removeCount)) {
             // Never run against the current deflector target.
-            if (core.getDeflector().getCurrentActualTargetIndex(indexer).equals(indexName)) {
+            if (deflector.getCurrentActualTargetIndex(indexer).equals(indexName)) {
                 LOG.info("Not running retention against current deflector target <{}>.", indexName);
                 continue;
             }
@@ -104,7 +112,7 @@ public class IndexRetentionThread extends Periodical {
              * Never run against a re-opened index. Indices are marked as re-opened by storing a setting
              * attribute and we can check for that here.
              */
-            if (core.getIndexer().indices().isReopened(indexName)) {
+            if (indexer.indices().isReopened(indexName)) {
                 LOG.info("Not running retention against reopened index <{}>.", indexName);
                 continue;
             }
@@ -112,7 +120,7 @@ public class IndexRetentionThread extends Periodical {
             String msg = "Running retention strategy [" + strategy.getClass().getCanonicalName() + "] " +
                     "for index <" + indexName + ">";
             LOG.info(msg);
-            core.getActivityWriter().write(new Activity(msg, IndexRetentionThread.class));
+            activityWriter.write(new Activity(msg, IndexRetentionThread.class));
 
             // Sorry if this should ever go mad. Run retention strategy!
             strategy.runStrategy(indexName);
@@ -120,10 +128,10 @@ public class IndexRetentionThread extends Periodical {
 
         // Re-calculate index ranges.
         try {
-            core.getSystemJobManager().submit(rebuildIndexRangesJobFactory.create(deflector));
+            systemJobManager.submit(rebuildIndexRangesJobFactory.create(deflector));
         } catch (SystemJobConcurrencyException e) {
             String msg = "Could not re-calculate index ranges after running retention: Maximum concurrency of job is reached.";
-            core.getActivityWriter().write(new Activity(msg, IndexRetentionThread.class));
+            activityWriter.write(new Activity(msg, IndexRetentionThread.class));
             LOG.error(msg);
         }
     }
@@ -145,7 +153,7 @@ public class IndexRetentionThread extends Periodical {
 
     @Override
     public boolean startOnThisNode() {
-        return core.getConfiguration().performRetention();
+        return configuration.performRetention();
     }
 
     @Override
