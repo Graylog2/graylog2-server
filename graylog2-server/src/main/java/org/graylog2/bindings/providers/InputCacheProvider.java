@@ -17,28 +17,24 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.graylog2.bindings;
+package org.graylog2.bindings.providers;
 
-import org.graylog2.system.activities.ActivityWriter;
-import org.graylog2.system.jobs.SystemJobManager;
+import org.graylog2.inputs.InputCache;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
  */
-public class SystemJobManagerProvider implements Provider<SystemJobManager> {
-    private static SystemJobManager systemJobManager = null;
-
-    @Inject
-    public SystemJobManagerProvider(ActivityWriter activityWriter) {
-        if (systemJobManager == null)
-            systemJobManager = new SystemJobManager(activityWriter);
+public class InputCacheProvider implements Provider<InputCache> {
+    private static InputCache inputCache = null;
+    public InputCacheProvider() {
+        if (inputCache == null)
+            inputCache = new InputCache();
     }
 
     @Override
-    public SystemJobManager get() {
-        return systemJobManager;
+    public InputCache get() {
+        return inputCache;
     }
 }

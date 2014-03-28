@@ -17,10 +17,11 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.graylog2.shared.bindings;
+package org.graylog2.shared.bindings.providers;
 
-import org.graylog2.plugin.system.NodeId;
-import org.graylog2.shared.ServerStatus;
+import org.graylog2.inputs.BasicCache;
+import org.graylog2.shared.buffers.ProcessBuffer;
+import org.graylog2.shared.buffers.ProcessBufferWatermark;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -28,16 +29,19 @@ import javax.inject.Provider;
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
  */
-public class NodeIdProvider implements Provider<NodeId> {
-    private final ServerStatus serverStatus;
+public class ProcessBufferProvider implements Provider<ProcessBuffer> {
+    private static ProcessBuffer processBuffer = null;
 
     @Inject
-    public NodeIdProvider(ServerStatus serverStatus) {
-        this.serverStatus = serverStatus;
+    public ProcessBufferProvider(ProcessBuffer.Factory processBufferFactory, ProcessBufferWatermark processBufferWatermark) {
+        if (processBuffer == null) {
+            BasicCache inputCache = new BasicCache();
+            processBuffer = processBufferFactory.create(inputCache, processBufferWatermark);
+        }
     }
 
     @Override
-    public NodeId get() {
-        return serverStatus.getNodeId();
+    public ProcessBuffer get() {
+        return processBuffer;
     }
 }

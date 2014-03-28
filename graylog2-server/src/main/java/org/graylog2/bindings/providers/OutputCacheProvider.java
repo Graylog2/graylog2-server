@@ -17,21 +17,24 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.graylog2.radio.bindings;
+package org.graylog2.bindings.providers;
 
-import com.ning.http.client.AsyncHttpClient;
-import com.ning.http.client.AsyncHttpClientConfig;
+import org.graylog2.inputs.OutputCache;
 
 import javax.inject.Provider;
 
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
  */
-public class AsyncHttpClientProvider implements Provider<AsyncHttpClient> {
+public class OutputCacheProvider implements Provider<OutputCache> {
+    private static OutputCache outputCache = null;
+    public OutputCacheProvider() {
+        if (outputCache == null)
+            outputCache = new OutputCache();
+    }
+
     @Override
-    public AsyncHttpClient get() {
-        AsyncHttpClientConfig.Builder builder = new AsyncHttpClientConfig.Builder();
-        builder.setAllowPoolingConnection(false);
-        return new AsyncHttpClient(builder.build());
+    public OutputCache get() {
+        return outputCache;
     }
 }

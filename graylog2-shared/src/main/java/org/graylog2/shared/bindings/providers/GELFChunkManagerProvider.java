@@ -17,11 +17,11 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.graylog2.shared.bindings;
+package org.graylog2.shared.bindings.providers;
 
-import org.graylog2.inputs.BasicCache;
+import com.codahale.metrics.MetricRegistry;
+import org.graylog2.inputs.gelf.gelf.GELFChunkManager;
 import org.graylog2.shared.buffers.ProcessBuffer;
-import org.graylog2.shared.buffers.ProcessBufferWatermark;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -29,19 +29,18 @@ import javax.inject.Provider;
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
  */
-public class ProcessBufferProvider implements Provider<ProcessBuffer> {
-    private static ProcessBuffer processBuffer = null;
+public class GELFChunkManagerProvider implements Provider<GELFChunkManager> {
+    private static GELFChunkManager gelfChunkManager = null;
 
     @Inject
-    public ProcessBufferProvider(ProcessBuffer.Factory processBufferFactory, ProcessBufferWatermark processBufferWatermark) {
-        if (processBuffer == null) {
-            BasicCache inputCache = new BasicCache();
-            processBuffer = processBufferFactory.create(inputCache, processBufferWatermark);
-        }
+    public GELFChunkManagerProvider(MetricRegistry metricRegistry,
+                                    ProcessBuffer processBuffer) {
+        if (gelfChunkManager == null)
+            gelfChunkManager = new GELFChunkManager(metricRegistry, processBuffer);
     }
 
     @Override
-    public ProcessBuffer get() {
-        return processBuffer;
+    public GELFChunkManager get() {
+        return gelfChunkManager;
     }
 }

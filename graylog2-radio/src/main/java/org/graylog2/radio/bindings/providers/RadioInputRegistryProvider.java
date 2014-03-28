@@ -17,7 +17,7 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.graylog2.radio.bindings;
+package org.graylog2.radio.bindings.providers;
 
 import com.ning.http.client.AsyncHttpClient;
 import org.graylog2.radio.Configuration;

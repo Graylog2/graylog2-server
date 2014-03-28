@@ -17,30 +17,21 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.graylog2.shared.bindings;
+package org.graylog2.radio.bindings.providers;
 
-import com.codahale.metrics.MetricRegistry;
-import org.graylog2.inputs.gelf.gelf.GELFChunkManager;
-import org.graylog2.shared.buffers.ProcessBuffer;
+import com.ning.http.client.AsyncHttpClient;
+import com.ning.http.client.AsyncHttpClientConfig;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
  */
-public class GELFChunkManagerProvider implements Provider<GELFChunkManager> {
-    private static GELFChunkManager gelfChunkManager = null;
-
-    @Inject
-    public GELFChunkManagerProvider(MetricRegistry metricRegistry,
-                                    ProcessBuffer processBuffer) {
-        if (gelfChunkManager == null)
-            gelfChunkManager = new GELFChunkManager(metricRegistry, processBuffer);
-    }
-
+public class AsyncHttpClientProvider implements Provider<AsyncHttpClient> {
     @Override
-    public GELFChunkManager get() {
-        return gelfChunkManager;
+    public AsyncHttpClient get() {
+        AsyncHttpClientConfig.Builder builder = new AsyncHttpClientConfig.Builder();
+        builder.setAllowPoolingConnection(false);
+        return new AsyncHttpClient(builder.build());
     }
 }

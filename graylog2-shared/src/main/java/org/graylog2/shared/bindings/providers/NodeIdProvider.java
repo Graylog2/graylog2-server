@@ -17,24 +17,27 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.graylog2.bindings;
+package org.graylog2.shared.bindings.providers;
 
-import org.graylog2.inputs.OutputCache;
+import org.graylog2.plugin.system.NodeId;
+import org.graylog2.shared.ServerStatus;
 
+import javax.inject.Inject;
 import javax.inject.Provider;
 
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
  */
-public class OutputCacheProvider implements Provider<OutputCache> {
-    private static OutputCache outputCache = null;
-    public OutputCacheProvider() {
-        if (outputCache == null)
-            outputCache = new OutputCache();
+public class NodeIdProvider implements Provider<NodeId> {
+    private final ServerStatus serverStatus;
+
+    @Inject
+    public NodeIdProvider(ServerStatus serverStatus) {
+        this.serverStatus = serverStatus;
     }
 
     @Override
-    public OutputCache get() {
-        return outputCache;
+    public NodeId get() {
+        return serverStatus.getNodeId();
     }
 }
