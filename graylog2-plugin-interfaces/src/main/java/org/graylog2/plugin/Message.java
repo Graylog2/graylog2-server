@@ -22,6 +22,7 @@
 
 package org.graylog2.plugin;
 
+import com.google.common.base.Function;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -90,6 +91,8 @@ public class Message {
     private static final ImmutableSet<String> REQUIRED_FIELDS = ImmutableSet.of(
             "message", "source", "_id"
     );
+
+    public static final Function<Message, String> ID_FUNCTION = new MessageIdFunction();
 
     public Message(String message, String source, DateTime timestamp) {
     	// Adding the fields directly because they would not be accepted as a reserved fields.
@@ -301,4 +304,10 @@ public class Message {
         this.sourceInput = input;
     }
 
+    public static class MessageIdFunction implements Function<Message, String> {
+        @Override
+        public String apply(Message input) {
+            return input.getId();
+        }
+    }
 }
