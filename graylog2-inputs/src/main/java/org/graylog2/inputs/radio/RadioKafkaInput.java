@@ -38,7 +38,7 @@ public class RadioKafkaInput extends KafkaInput {
 
     private static final Logger LOG = LoggerFactory.getLogger(KafkaInput.class);
 
-    public static final String NAME = "Graylog2 Radio Input";
+    public static final String NAME = "Graylog2 Radio Input (Kafka)";
 
     @Override
     public void checkConfiguration() throws ConfigurationException {

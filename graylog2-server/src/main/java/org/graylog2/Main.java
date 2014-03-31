@@ -41,6 +41,7 @@ import org.graylog2.inputs.gelf.udp.GELFUDPInput;
 import org.graylog2.inputs.kafka.KafkaInput;
 import org.graylog2.inputs.misc.jsonpath.JsonPathInput;
 import org.graylog2.inputs.misc.metrics.LocalMetricsInput;
+import org.graylog2.inputs.radio.RadioAMQPInput;
 import org.graylog2.inputs.radio.RadioInput;
 import org.graylog2.inputs.radio.RadioKafkaInput;
 import org.graylog2.inputs.random.FakeHttpMessageInput;
@@ -247,9 +248,9 @@ public final class Main {
         server.inputs().register(LocalMetricsInput.class, LocalMetricsInput.NAME);
         server.inputs().register(JsonPathInput.class, JsonPathInput.NAME);
         server.inputs().register(KafkaInput.class, KafkaInput.NAME);
-        server.inputs().register(RadioInput.class, RadioInput.NAME);
         server.inputs().register(RadioKafkaInput.class, RadioKafkaInput.NAME);
         server.inputs().register(AMQPInput.class, AMQPInput.NAME);
+        server.inputs().register(RadioAMQPInput.class, RadioAMQPInput.NAME);
 
         // Register initializers.
         server.initializers().register(new DroolsInitializer());

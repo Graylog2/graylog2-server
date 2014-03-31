@@ -21,6 +21,7 @@ package org.graylog2.inputs.amqp;
 
 import com.codahale.metrics.Gauge;
 import com.codahale.metrics.MetricRegistry;
+import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationException;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.configuration.fields.ConfigurationField;
@@ -200,15 +201,17 @@ public class AMQPInput extends MessageInput {
 
     @Override
     public void checkConfiguration() throws ConfigurationException {
-        boolean r = configuration.stringIsSet(CK_HOSTNAME)
+        if (!checkConfig(configuration)) {
+            throw new ConfigurationException(configuration.getSource().toString());
+        }
+    }
+
+    protected boolean checkConfig(Configuration configuration) {
+        return configuration.stringIsSet(CK_HOSTNAME)
                 && configuration.intIsSet(CK_PORT)
                 && configuration.stringIsSet(CK_QUEUE)
                 && configuration.stringIsSet(CK_EXCHANGE)
                 && configuration.stringIsSet(CK_ROUTING_KEY);
-
-        if (!r) {
-            throw new ConfigurationException(configuration.getSource().toString());
-        }
     }
 
     private void setupMetrics() {
