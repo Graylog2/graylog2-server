@@ -25,7 +25,9 @@ import com.google.common.collect.Maps;
 import org.graylog2.plugin.Tools;
 import org.graylog2.radio.Radio;
 import org.graylog2.radio.rest.resources.RestResource;
+import org.graylog2.shared.ServerStatus;
 
+import javax.inject.Inject;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -39,18 +41,20 @@ import java.util.Map;
  */
 @Path("/system")
 public class SystemResource extends RestResource {
+    @Inject
+    private ServerStatus serverStatus;
 
     @GET @Timed
     @Produces(MediaType.APPLICATION_JSON)
     public String system() {
         Map<String, Object> result = Maps.newHashMap();
         result.put("facility", "graylog2-radio");
-        result.put("server_id", radio.getNodeId());
+        result.put("server_id", serverStatus.getNodeId().toString());
         result.put("version", Radio.VERSION.toString());
-        result.put("started_at", Tools.getISO8601String(radio.getStartedAt()));
+        result.put("started_at", Tools.getISO8601String(serverStatus.getStartedAt()));
         result.put("hostname", Tools.getLocalCanonicalHostname());
-        result.put("lifecycle", radio.getLifecycle().getName().toLowerCase());
-        result.put("lb_status", radio.getLifecycle().getLoadbalancerStatus().toString().toLowerCase());
+        result.put("lifecycle", serverStatus.getLifecycle().getName().toLowerCase());
+        result.put("lb_status", serverStatus.getLifecycle().getLoadbalancerStatus().toString().toLowerCase());
 
         return json(result);
     }
@@ -67,7 +71,7 @@ public class SystemResource extends RestResource {
         result.put("total_memory", bytesToValueMap(runtime.totalMemory()));
         result.put("used_memory", bytesToValueMap(runtime.totalMemory() - runtime.freeMemory()));
 
-        result.put("node_id", radio.getNodeId());
+        result.put("node_id", serverStatus.getNodeId().toString());
         result.put("pid", Tools.getPID());
         result.put("info", Tools.getSystemInformation());
 

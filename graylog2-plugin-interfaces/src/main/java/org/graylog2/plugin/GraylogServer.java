@@ -34,6 +34,4 @@ public interface GraylogServer extends Runnable, GenericHost {
     public String getNodeId();
 
     public MetricRegistry metrics();
-
-    public AtomicInteger processBufferWatermark();
 }
