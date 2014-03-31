@@ -35,8 +35,15 @@ public class Configuration {
 
     private static final Logger LOG = LoggerFactory.getLogger(Configuration.class);
 
+    public enum TRANSPORT_TYPE {
+        AMQP, KAFKA
+    }
+
     @Parameter(value = "node_id_file", required = false)
     private String nodeIdFile = "/etc/graylog2-radio-node-id";
+
+    @Parameter(value = "transport_type", required = true)
+    private String transportType = "amqp";
 
     @Parameter(value = "rest_listen_uri", required = true)
     private String restListenUri = "http://127.0.0.1:12950/";
@@ -74,6 +81,14 @@ public class Configuration {
 
     public String getNodeIdFile() {
         return nodeIdFile;
+    }
+
+    public TRANSPORT_TYPE getTransportType() {
+        try {
+            return TRANSPORT_TYPE.valueOf(transportType.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new RuntimeException("Invalid [transport_type] configured: " + transportType);
+        }
     }
 
     public URI getRestListenUri() {

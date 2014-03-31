@@ -45,6 +45,7 @@ import org.graylog2.radio.inputs.InputRegistry;
 import org.graylog2.radio.periodical.MasterCacheWorkerThread;
 import org.graylog2.radio.periodical.ThroughputCounterManagerThread;
 import org.graylog2.radio.transports.RadioTransport;
+import org.graylog2.radio.transports.amqp.AMQPProducer;
 import org.graylog2.radio.transports.kafka.KafkaProducer;
 import org.jboss.netty.bootstrap.ServerBootstrap;
 import org.jboss.netty.channel.ChannelPipeline;
@@ -121,7 +122,17 @@ public class Radio implements InputHost {
         processBuffer = new ProcessBuffer(this, inputCache);
         processBuffer.initialize();
 
-        transport = new KafkaProducer(this);
+        // Set up transport.
+        switch (configuration.getTransportType()) {
+            case AMQP:
+                transport = new AMQPProducer(this);
+                break;
+            case KAFKA:
+                transport = new KafkaProducer(this);
+                break;
+            default:
+                throw new RuntimeException("Cannot map transport type to transport.");
+        }
 
         this.inputs = new InputRegistry(this);
 

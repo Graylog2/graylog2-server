@@ -125,7 +125,13 @@ public class Main {
 
         Radio radio = new Radio();
         radio.setLifecycle(Lifecycle.STARTING);
-        radio.initialize(configuration, metrics);
+
+        try {
+            radio.initialize(configuration, metrics);
+        } catch(Exception e) {
+            LOG.error("Initialization error.", e);
+            System.exit(1);
+        }
 
         // Register in Graylog2 cluster.
         radio.ping();
