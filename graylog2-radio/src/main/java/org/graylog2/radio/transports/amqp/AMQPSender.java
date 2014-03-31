@@ -83,12 +83,6 @@ public class AMQPSender {
         connection = factory.newConnection();
         channel = connection.createChannel();
 
-        if (prefetchCount > 0) {
-            channel.basicQos(prefetchCount);
-
-            LOG.info("AMQP prefetch count overriden to <{}>.", prefetchCount);
-        }
-
         // It's ok if the queue or exchange already exist.
         channel.queueDeclare(AMQPProducer.QUEUE, true, false, false, null);
         channel.exchangeDeclare(AMQPProducer.EXCHANGE, "topic", true, false, null);
@@ -104,11 +98,11 @@ public class AMQPSender {
     }
 
     public void close() throws IOException {
-        if (channel != null) {
+        if (channel != null && channel.isOpen()) {
             channel.close();
         }
 
-        if (connection != null) {
+        if (connection != null && connection.isOpen()) {
             connection.close();
         }
     }
