@@ -22,19 +22,41 @@ package org.graylog2.radio.transports.amqp;
 import org.graylog2.plugin.Message;
 import org.graylog2.radio.Radio;
 import org.graylog2.radio.transports.RadioTransport;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
 public class AMQPProducer implements RadioTransport {
 
-    public AMQPProducer(Radio radio) {
+    private static final Logger LOG = LoggerFactory.getLogger(AMQPProducer.class);
 
+    public final static String EXCHANGE = "graylog2";
+    public final static String QUEUE = "graylog2-radio-messages";
+    public final static String ROUTING_KEY = "graylog2-radio-message";
+
+    private final AMQPSender sender;
+
+    public AMQPProducer(Radio radio) {
+        sender = new AMQPSender(
+                radio.getConfiguration().getAmqpHostname(),
+                radio.getConfiguration().getAmqpPort(),
+                radio.getConfiguration().getAmqpUsername(),
+                radio.getConfiguration().getAmqpPassword(),
+                radio.getConfiguration().getAmqpPrefetchCount()
+        );
     }
 
     @Override
     public void send(Message msg) {
-        System.out.println("AMQP: " + msg);
+        try {
+            sender.send(msg);
+        } catch (IOException e) {
+            LOG.error("Could not write to AMQP.", e);
+        }
     }
 
 }
