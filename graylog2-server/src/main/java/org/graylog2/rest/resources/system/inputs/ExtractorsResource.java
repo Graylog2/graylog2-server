@@ -101,6 +101,7 @@ public class ExtractorsResource extends RestResource {
             extractor = ExtractorFactory.factory(
                     id,
                     cer.title,
+                    cer.order,
                     Extractor.CursorStrategy.valueOf(cer.cutOrCopy.toUpperCase()),
                     Extractor.Type.valueOf(cer.extractorType.toUpperCase()),
                     cer.sourceField,

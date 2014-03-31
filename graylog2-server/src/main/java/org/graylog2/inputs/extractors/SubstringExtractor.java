@@ -38,6 +38,7 @@ public class SubstringExtractor extends Extractor {
 
     public SubstringExtractor(String id,
                               String title,
+                              int order,
                               CursorStrategy cursorStrategy,
                               String sourceField,
                               String targetField,
@@ -46,7 +47,7 @@ public class SubstringExtractor extends Extractor {
                               List<Converter> converters,
                               ConditionType conditionType,
                               String conditionValue) throws ReservedFieldException, ConfigurationException {
-        super(id, title, Type.SUBSTRING, cursorStrategy, sourceField, targetField, extractorConfig, creatorUserId, converters, conditionType, conditionValue);
+        super(id, title, order, Type.SUBSTRING, cursorStrategy, sourceField, targetField, extractorConfig, creatorUserId, converters, conditionType, conditionValue);
 
         if (extractorConfig == null || extractorConfig.get("begin_index") == null || extractorConfig.get("end_index") == null) {
             throw new ConfigurationException("Missing configuration fields. Required: begin_index, end_index");

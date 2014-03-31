@@ -203,10 +203,18 @@ public class Input extends Persisted {
         Iterator<Object> iterator = mEx.iterator();
         while(iterator.hasNext()) {
             DBObject ex = (BasicDBObject) iterator.next();
+
+            // SOFT MIGRATION: does this extractor have an order set? Implemented for issue: #726
+            Long order = new Long(0);
+            if (ex.containsField("order")) {
+                order = (Long) ex.get("order"); // mongodb driver gives us a java.lang.Long
+            }
+
             try {
                 Extractor extractor = ExtractorFactory.factory(
                         (String) ex.get("id"),
                         (String) ex.get("title"),
+                        order.intValue(),
                         Extractor.CursorStrategy.valueOf(((String) ex.get("cursor_strategy")).toUpperCase()),
                         Extractor.Type.valueOf(((String) ex.get("type")).toUpperCase()),
                         (String) ex.get("source_field"),

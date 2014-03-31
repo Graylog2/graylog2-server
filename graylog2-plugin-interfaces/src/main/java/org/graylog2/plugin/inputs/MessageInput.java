@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2012 Lennart Koopmann <lennart@socketfeed.com>
+ * Copyright (c) 2013, 2014 Lennart Koopmann <lennart@socketfeed.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -21,6 +21,7 @@
 */
 package org.graylog2.plugin.inputs;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.graylog2.plugin.InputHost;
 import org.graylog2.plugin.Tools;
@@ -30,8 +31,7 @@ import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.configuration.fields.TextField;
 import org.joda.time.DateTime;
 
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
@@ -51,7 +51,8 @@ public abstract class MessageInput {
     protected Configuration configuration;
     protected InputHost graylogServer;
 
-    private Map<String, Extractor> extractors = Maps.newConcurrentMap();
+    private Map<String, Extractor> extractors = Maps.newHashMap(); // access is synchronized.
+    private List<Extractor> sortedExtractors = Lists.newArrayList();
     private Map<String, String> staticFields = Maps.newConcurrentMap();
 
     public void initialize(Configuration configuration, InputHost graylogServer) {
@@ -157,12 +158,25 @@ public abstract class MessageInput {
         return inputMap;
     }
 
-    public void addExtractor(String id, Extractor extractor) {
+    public synchronized void addExtractor(String id, Extractor extractor) {
         this.extractors.put(id, extractor);
+
+        // Sort the sorted extractors list again.
+        this.sortedExtractors = new ArrayList<>(this.extractors.values());
+
+        Collections.sort(sortedExtractors, new Comparator<Extractor>() {
+            public int compare(Extractor e1, Extractor e2) {
+                return e1.getOrder() - e2.getOrder();
+            }
+        });
     }
 
     public Map<String, Extractor> getExtractors() {
         return this.extractors;
+    }
+
+    public List<Extractor> getExecutionSortedExtractors() {
+        return this.sortedExtractors;
     }
 
     public void addStaticField(String key, String value) {

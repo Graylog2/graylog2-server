@@ -56,4 +56,6 @@ public class CreateExtractorRequest {
     @JsonProperty("condition_value")
     public String conditionValue;
 
+    public int order;
+
 }

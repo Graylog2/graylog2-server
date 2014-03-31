@@ -280,7 +280,7 @@ public class StreamAlertResource extends RestResource {
             ) {
         checkPermission(RestPermissions.STREAMS_EDIT, streamid);
 
-        if(!type.equals("users") && !type.equals("emails")) {
+        if(type == null || (!type.equals("users") && !type.equals("emails"))) {
             LOG.warn("No such type: [{}]", type);
             throw new WebApplicationException(400);
         }
