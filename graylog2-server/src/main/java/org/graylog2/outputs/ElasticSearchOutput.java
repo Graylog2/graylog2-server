@@ -22,18 +22,21 @@ package org.graylog2.outputs;
 
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.Timer;
-import org.graylog2.plugin.outputs.MessageOutput;
-import org.graylog2.plugin.Message;
-
-import java.util.List;
-import java.util.Map;
+import com.google.common.base.Joiner;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Ordering;
 import org.graylog2.Core;
 import org.graylog2.plugin.GraylogServer;
+import org.graylog2.plugin.Message;
+import org.graylog2.plugin.outputs.MessageOutput;
 import org.graylog2.plugin.outputs.MessageOutputConfigurationException;
 import org.graylog2.plugin.outputs.OutputStreamConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.List;
+import java.util.Map;
 
 import static com.codahale.metrics.MetricRegistry.name;
 
@@ -58,7 +61,10 @@ public class ElasticSearchOutput implements MessageOutput {
     @Override
     public void write(List<Message> messages, OutputStreamConfiguration streamConfig, GraylogServer server) throws Exception {
         LOG.debug("Writing <{}> messages.", messages.size());
-        
+        if (LOG.isTraceEnabled()) {
+            final List<String> sortedIds = Ordering.natural().sortedCopy(Lists.transform(messages,  Message.ID_FUNCTION));
+            LOG.trace("Writing message ids to [{}]: <{}>", getName(), Joiner.on(", ").join(sortedIds));
+        }
         Core serverImpl = (Core) server;
         
         writes.mark();

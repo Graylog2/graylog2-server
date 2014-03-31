@@ -22,8 +22,10 @@ package org.graylog2.buffers.processors;
 
 import com.codahale.metrics.Histogram;
 import com.codahale.metrics.Meter;
+import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Ordering;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.lmax.disruptor.EventHandler;
 import org.bson.types.ObjectId;
@@ -108,7 +110,10 @@ public class OutputBufferProcessor implements EventHandler<MessageEvent> {
                     final List<Message> myBuffer = Lists.newArrayList(buffer);
 
                     LOG.debug("Writing message batch to [{}]. Size <{}>", output.getName(), buffer.size());
-
+                    if (LOG.isTraceEnabled()) {
+                        final List<String> sortedIds = Ordering.natural().sortedCopy(Lists.transform(myBuffer, Message.ID_FUNCTION));
+                        LOG.trace("Message ids in batch of [{}]: <{}>", output.getName(), Joiner.on(", ").join(sortedIds));
+                    }
                     batchSize.update(buffer.size());
 
                     executor.submit(new Runnable() {
@@ -170,5 +175,5 @@ public class OutputBufferProcessor implements EventHandler<MessageEvent> {
         
         return configs;
     }
-    
+
 }
