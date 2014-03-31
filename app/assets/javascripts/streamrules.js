@@ -17,7 +17,6 @@ $(document).ready(function() {
                 $("#sr-label-value", modalBody).hide();
                 $("#sr-result-value", modalBody).hide();
             } else {
-                $("#sr-value", modalBody).val("");
                 $("#sr-value", modalBody).show();
                 $("#sr-label-value", modalBody).show();
                 $("#sr-result-value", modalBody).show();
