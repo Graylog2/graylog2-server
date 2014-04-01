@@ -21,9 +21,12 @@ package org.graylog2.radio;
 
 import com.codahale.metrics.MetricRegistry;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import com.google.inject.Injector;
 import com.google.inject.name.Named;
 import com.ning.http.client.AsyncHttpClient;
+import org.glassfish.hk2.extension.ServiceLocatorGenerator;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
+import org.glassfish.jersey.internal.inject.Injections;
 import org.glassfish.jersey.server.ContainerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.internal.scanning.PackageNamesScanner;
@@ -42,6 +45,7 @@ import org.graylog2.radio.inputs.RadioInputRegistry;
 import org.graylog2.radio.transports.RadioTransport;
 import org.graylog2.radio.transports.kafka.KafkaProducer;
 import org.graylog2.shared.ServerStatus;
+import org.graylog2.shared.bindings.OwnServiceLocatorGenerator;
 import org.graylog2.shared.buffers.ProcessBuffer;
 import org.graylog2.shared.buffers.ProcessBufferWatermark;
 import org.graylog2.shared.buffers.processors.ProcessBufferProcessor;
@@ -60,6 +64,8 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.io.IOException;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.net.InetSocketAddress;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -160,7 +166,21 @@ public class Radio implements GraylogServer {
         inputs.launchAllPersisted();
     }
 
-    public void startRestApi() throws IOException {
+    public void startRestApi(Injector injector) throws IOException {
+        ServiceLocatorGenerator ownGenerator = new OwnServiceLocatorGenerator(injector);
+        try {
+            Field field = Injections.class.getDeclaredField("generator");
+            field.setAccessible(true);
+            Field modifiers = Field.class.getDeclaredField("modifiers");
+            modifiers.setAccessible(true);
+            modifiers.setInt(field, field.getModifiers() & ~Modifier.FINAL);
+
+            field.set(null, ownGenerator);
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            LOG.error("Monkey patching Jersey's HK2 failed: ", e);
+            System.exit(-1);
+        }
+
         final ExecutorService bossExecutor = Executors.newCachedThreadPool(
                 new ThreadFactoryBuilder()
                         .setNameFormat("restapi-boss-%d")
@@ -228,13 +248,13 @@ public class Radio implements GraylogServer {
         @Override
         protected void configure() {
             bind(Radio.this).to(Radio.class);
-            bind(metricRegistry).to(MetricRegistry.class);
+            /*bind(metricRegistry).to(MetricRegistry.class);
             bind(throughputStats).to(ThroughputStats.class);
             bind(configuration).to(Configuration.class);
             bind(serverStatus).to(ServerStatus.class);
             bind(inputs).to(InputRegistry.class);
             bind((InputCache)getInputCache()).to(InputCache.class);
-            bind(processBuffer).to(ProcessBuffer.class);
+            bind(processBuffer).to(ProcessBuffer.class);*/
         }
 
     }

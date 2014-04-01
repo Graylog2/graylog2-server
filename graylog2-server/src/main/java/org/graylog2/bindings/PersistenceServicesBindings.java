@@ -36,6 +36,10 @@ import org.graylog2.inputs.InputService;
 import org.graylog2.inputs.InputServiceImpl;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.notifications.NotificationServiceImpl;
+import org.graylog2.savedsearches.SavedSearchService;
+import org.graylog2.savedsearches.SavedSearchServiceImpl;
+import org.graylog2.security.AccessTokenService;
+import org.graylog2.security.AccessTokenServiceImpl;
 import org.graylog2.streams.StreamRuleService;
 import org.graylog2.streams.StreamRuleServiceImpl;
 import org.graylog2.streams.StreamService;
@@ -63,5 +67,7 @@ public class PersistenceServicesBindings extends AbstractModule {
         bind(StreamRuleService.class).to(StreamRuleServiceImpl.class);
         bind(UserService.class).to(UserServiceImpl.class);
         bind(StreamService.class).to(StreamServiceImpl.class);
+        bind(AccessTokenService.class).to(AccessTokenServiceImpl.class);
+        bind(SavedSearchService.class).to(SavedSearchServiceImpl.class);
     }
 }

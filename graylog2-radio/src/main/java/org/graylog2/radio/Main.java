@@ -16,6 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package org.graylog2.radio;
 
 import com.beust.jcommander.JCommander;
@@ -146,7 +147,7 @@ public class Main extends NodeRunner {
 
         // Start REST API.
         try {
-            radio.startRestApi();
+            radio.startRestApi(injector);
         } catch(Exception e) {
             LOG.error("Could not start REST API on <{}>. Terminating.", configuration.getRestListenUri(), e);
             System.exit(1);

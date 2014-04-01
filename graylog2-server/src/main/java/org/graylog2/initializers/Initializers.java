@@ -16,6 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package org.graylog2.initializers;
 
 import com.google.common.collect.Lists;
@@ -55,6 +56,7 @@ public class Initializers {
     }
 
     public void initialize() {
+        LOG.info("Running [{}] initializers ...", initializers.size());
         for(Initializer i : initializers) {
             try {
                 i.initialize(new HashMap<String, String>());
