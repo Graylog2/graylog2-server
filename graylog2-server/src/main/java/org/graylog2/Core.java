@@ -23,38 +23,46 @@ import com.codahale.metrics.MetricRegistry;
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import com.google.inject.Injector;
 import com.google.inject.internal.util.$Nullable;
 import com.google.inject.name.Named;
 import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.cliffc.high_scale_lib.Counter;
-import org.glassfish.hk2.extension.ServiceLocatorGenerator;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
-import org.glassfish.jersey.internal.inject.Injections;
 import org.glassfish.jersey.message.GZipEncoder;
 import org.glassfish.jersey.server.ContainerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.filter.EncodingFilter;
 import org.glassfish.jersey.server.internal.scanning.PackageNamesScanner;
 import org.graylog2.alerts.AlertSender;
+import org.graylog2.alerts.AlertService;
+import org.graylog2.alerts.AlertServiceImpl;
 import org.graylog2.blacklists.BlacklistCache;
 import org.graylog2.buffers.Buffers;
 import org.graylog2.buffers.OutputBuffer;
 import org.graylog2.buffers.OutputBufferWatermark;
 import org.graylog2.buffers.processors.ServerProcessBufferProcessor;
 import org.graylog2.caches.Caches;
+import org.graylog2.cluster.NodeService;
+import org.graylog2.cluster.NodeServiceImpl;
 import org.graylog2.dashboards.DashboardRegistry;
+import org.graylog2.dashboards.DashboardService;
+import org.graylog2.dashboards.DashboardServiceImpl;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.indexer.Deflector;
+import org.graylog2.indexer.IndexFailureService;
+import org.graylog2.indexer.IndexFailureServiceImpl;
 import org.graylog2.indexer.Indexer;
+import org.graylog2.indexer.ranges.IndexRangeService;
+import org.graylog2.indexer.ranges.IndexRangeServiceImpl;
 import org.graylog2.indexer.ranges.RebuildIndexRangesJob;
 import org.graylog2.initializers.Initializers;
-import org.graylog2.inputs.Cache;
-import org.graylog2.inputs.ServerInputRegistry;
+import org.graylog2.inputs.*;
 import org.graylog2.inputs.gelf.gelf.GELFChunkManager;
 import org.graylog2.jersey.container.netty.NettyContainer;
 import org.graylog2.metrics.MongoDbMetricsReporter;
 import org.graylog2.metrics.jersey2.MetricsDynamicBinding;
+import org.graylog2.notifications.NotificationService;
+import org.graylog2.notifications.NotificationServiceImpl;
 import org.graylog2.outputs.OutputRegistry;
 import org.graylog2.periodical.Periodicals;
 import org.graylog2.plugin.GraylogServer;
@@ -70,26 +78,41 @@ import org.graylog2.plugin.lifecycles.Lifecycle;
 import org.graylog2.plugin.outputs.MessageOutput;
 import org.graylog2.plugin.rest.AnyExceptionClassMapper;
 import org.graylog2.plugin.rest.JacksonPropertyExceptionMapper;
+import org.graylog2.plugin.system.NodeId;
+import org.graylog2.plugins.LegacyPluginLoader;
 import org.graylog2.plugins.PluginLoader;
 import org.graylog2.rest.CORSFilter;
 import org.graylog2.rest.ObjectMapperProvider;
 import org.graylog2.rest.RestAccessLogFilter;
+import org.graylog2.savedsearches.SavedSearchService;
+import org.graylog2.savedsearches.SavedSearchServiceImpl;
+import org.graylog2.security.AccessTokenService;
+import org.graylog2.security.AccessTokenServiceImpl;
 import org.graylog2.security.ShiroSecurityBinding;
 import org.graylog2.security.ShiroSecurityContextFactory;
 import org.graylog2.security.ldap.LdapConnector;
+import org.graylog2.security.ldap.LdapSettingsService;
+import org.graylog2.security.ldap.LdapSettingsServiceImpl;
 import org.graylog2.security.realm.LdapUserAuthenticator;
 import org.graylog2.shared.ServerStatus;
-import org.graylog2.shared.bindings.OwnServiceLocatorGenerator;
 import org.graylog2.shared.buffers.ProcessBuffer;
 import org.graylog2.shared.buffers.ProcessBufferWatermark;
 import org.graylog2.shared.buffers.processors.ProcessBufferProcessor;
 import org.graylog2.shared.filters.FilterRegistry;
 import org.graylog2.shared.stats.ThroughputStats;
+import org.graylog2.streams.StreamRuleService;
+import org.graylog2.streams.StreamRuleServiceImpl;
+import org.graylog2.streams.StreamService;
+import org.graylog2.streams.StreamServiceImpl;
 import org.graylog2.system.activities.Activity;
 import org.graylog2.system.activities.ActivityWriter;
+import org.graylog2.system.activities.SystemMessageService;
+import org.graylog2.system.activities.SystemMessageServiceImpl;
 import org.graylog2.system.jobs.SystemJobFactory;
 import org.graylog2.system.jobs.SystemJobManager;
 import org.graylog2.system.shutdown.GracefulShutdown;
+import org.graylog2.users.UserService;
+import org.graylog2.users.UserServiceImpl;
 import org.jboss.netty.bootstrap.ServerBootstrap;
 import org.jboss.netty.channel.ChannelPipeline;
 import org.jboss.netty.channel.ChannelPipelineFactory;
@@ -103,8 +126,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.io.IOException;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import java.net.InetSocketAddress;
 import java.util.HashMap;
 import java.util.List;
@@ -347,7 +368,7 @@ public class Core implements GraylogServer {
         @Override
         protected void configure() {
             bind(Core.this).to(Core.class);
-            /*bind(metricRegistry).to(MetricRegistry.class);
+            bind(metricRegistry).to(MetricRegistry.class);
             bind(throughputStats).to(ThroughputStats.class);
             bind(new StreamServiceImpl(mongoConnection)).to(StreamService.class);
             bind(new StreamRuleServiceImpl(mongoConnection)).to(StreamRuleService.class);
@@ -384,29 +405,12 @@ public class Core implements GraylogServer {
             bind((InputCache)getInputCache()).to(InputCache.class);
             bind((OutputCache)getOutputCache()).to(OutputCache.class);
             bind(processBuffer).to(ProcessBuffer.class);
-            bind(outputBuffer).to(OutputBuffer.class);*/
+            bind(outputBuffer).to(OutputBuffer.class);
         }
     }
 
 
-    public void startRestApi(Injector injector) throws IOException {
-        ServiceLocatorGenerator ownGenerator = new OwnServiceLocatorGenerator(injector);
-        try {
-            Field field = Injections.class.getDeclaredField("generator");
-            field.setAccessible(true);
-            Field modifiers = Field.class.getDeclaredField("modifiers");
-            modifiers.setAccessible(true);
-            modifiers.setInt(field, field.getModifiers() & ~Modifier.FINAL);
-
-            field.set(null, ownGenerator);
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            LOG.error("Monkey patching Jersey's HK2 failed: ", e);
-            System.exit(-1);
-        }
-
-        /*ServiceLocatorFactory factory = ServiceLocatorFactory.getInstance();
-        factory.addListener(new HK2ServiceLocatorListener(injector));*/
-
+    public void startRestApi() throws IOException {
         final ExecutorService bossExecutor = Executors.newCachedThreadPool(
                 new ThreadFactoryBuilder()
                         .setNameFormat("restapi-boss-%d")
