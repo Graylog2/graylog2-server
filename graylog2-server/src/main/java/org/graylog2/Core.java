@@ -57,10 +57,7 @@ import org.graylog2.metrics.MongoDbMetricsReporter;
 import org.graylog2.metrics.jersey2.MetricsDynamicBinding;
 import org.graylog2.outputs.OutputRegistry;
 import org.graylog2.periodical.Periodicals;
-import org.graylog2.plugin.GraylogServer;
-import org.graylog2.plugin.RulesEngine;
-import org.graylog2.plugin.Tools;
-import org.graylog2.plugin.Version;
+import org.graylog2.plugin.*;
 import org.graylog2.plugin.alarms.callbacks.AlarmCallback;
 import org.graylog2.plugin.alarms.transports.Transport;
 import org.graylog2.plugin.filters.MessageFilter;
@@ -69,11 +66,17 @@ import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.outputs.MessageOutput;
 import org.graylog2.plugin.rest.AnyExceptionClassMapper;
 import org.graylog2.plugin.rest.JacksonPropertyExceptionMapper;
-import org.graylog2.plugins.PluginLoader;
+import org.graylog2.plugin.system.NodeId;
+import org.graylog2.plugins.LegacyPluginLoader;
 import org.graylog2.rest.CORSFilter;
 import org.graylog2.rest.ObjectMapperProvider;
 import org.graylog2.rest.RestAccessLogFilter;
+import org.graylog2.savedsearches.SavedSearchService;
+import org.graylog2.savedsearches.SavedSearchServiceImpl;
+import org.graylog2.security.AccessTokenService;
+import org.graylog2.security.AccessTokenServiceImpl;
 import org.graylog2.security.ShiroSecurityBinding;
+import org.graylog2.security.ShiroSecurityContextFactory;
 import org.graylog2.security.ldap.LdapConnector;
 import org.graylog2.security.realm.LdapUserAuthenticator;
 import org.graylog2.shared.ServerStatus;
@@ -82,6 +85,7 @@ import org.graylog2.shared.buffers.ProcessBuffer;
 import org.graylog2.shared.buffers.ProcessBufferWatermark;
 import org.graylog2.shared.buffers.processors.ProcessBufferProcessor;
 import org.graylog2.shared.filters.FilterRegistry;
+import org.graylog2.shared.plugins.PluginLoader;
 import org.graylog2.shared.stats.ThroughputStats;
 import org.graylog2.system.activities.Activity;
 import org.graylog2.system.activities.ActivityWriter;
@@ -100,6 +104,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -358,7 +363,6 @@ public class Core implements GraylogServer {
         }
     }
 
-
     public void startRestApi(Injector injector) throws IOException {
         ServiceLocatorGenerator ownGenerator = new OwnServiceLocatorGenerator(injector);
         try {
@@ -441,7 +445,7 @@ public class Core implements GraylogServer {
 
 
     private <A> void registerPlugins(Class<A> type, String subDirectory) {
-        PluginLoader<A> pl = new PluginLoader<A>(configuration.getPluginDir(), subDirectory, type);
+        LegacyPluginLoader<A> pl = new LegacyPluginLoader<A>(configuration.getPluginDir(), subDirectory, type);
         for (A plugin : pl.getPlugins()) {
             LOG.info("Loaded <{}> plugin [{}].", type.getSimpleName(), plugin.getClass().getCanonicalName());
 
@@ -459,6 +463,19 @@ public class Core implements GraylogServer {
                 registerTransport((Transport) plugin);
             } else {
                 LOG.error("Could not load plugin [{}] - Not supported type.", plugin.getClass().getCanonicalName());
+            }
+        }
+
+        PluginLoader pluginLoader = new PluginLoader(new File(configuration.getPluginDir()));
+        for (Plugin plugin : pluginLoader.loadPlugins()) {
+            for (Class<? extends MessageInput> inputClass : plugin.inputs()) {
+                final MessageInput messageInput;
+                try {
+                    messageInput = inputClass.newInstance();
+                    inputs.register(inputClass, messageInput.getName());
+                } catch (Exception e) {
+                    LOG.error("Unable to register message input " + inputClass.getCanonicalName(), e);
+                }
             }
         }
     }

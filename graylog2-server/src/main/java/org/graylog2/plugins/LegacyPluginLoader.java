@@ -33,15 +33,15 @@ import java.util.List;
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
-public class PluginLoader<A> {
+public class LegacyPluginLoader<A> {
     
-    private static final Logger LOG = LoggerFactory.getLogger(PluginLoader.class);
+    private static final Logger LOG = LoggerFactory.getLogger(LegacyPluginLoader.class);
 
     private final String baseDirectory;
     private final String subDirectory;
     private final Class<A> type;
     
-    public PluginLoader(String baseDirectory, String subDirectory, Class<A> clazz) {
+    public LegacyPluginLoader(String baseDirectory, String subDirectory, Class<A> clazz) {
         this.baseDirectory = baseDirectory;
         this.subDirectory = subDirectory;
         this.type = clazz;
