@@ -23,11 +23,14 @@ import com.codahale.metrics.MetricRegistry;
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import com.google.inject.Injector;
 import com.google.inject.internal.util.$Nullable;
 import com.google.inject.name.Named;
 import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.cliffc.high_scale_lib.Counter;
+import org.glassfish.hk2.extension.ServiceLocatorGenerator;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
+import org.glassfish.jersey.internal.inject.Injections;
 import org.glassfish.jersey.message.GZipEncoder;
 import org.glassfish.jersey.server.ContainerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
@@ -65,10 +68,7 @@ import org.graylog2.notifications.NotificationService;
 import org.graylog2.notifications.NotificationServiceImpl;
 import org.graylog2.outputs.OutputRegistry;
 import org.graylog2.periodical.Periodicals;
-import org.graylog2.plugin.GraylogServer;
-import org.graylog2.plugin.RulesEngine;
-import org.graylog2.plugin.Tools;
-import org.graylog2.plugin.Version;
+import org.graylog2.plugin.*;
 import org.graylog2.plugin.alarms.callbacks.AlarmCallback;
 import org.graylog2.plugin.alarms.transports.Transport;
 import org.graylog2.plugin.filters.MessageFilter;
@@ -80,7 +80,6 @@ import org.graylog2.plugin.rest.AnyExceptionClassMapper;
 import org.graylog2.plugin.rest.JacksonPropertyExceptionMapper;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.plugins.LegacyPluginLoader;
-import org.graylog2.plugins.PluginLoader;
 import org.graylog2.rest.CORSFilter;
 import org.graylog2.rest.ObjectMapperProvider;
 import org.graylog2.rest.RestAccessLogFilter;
@@ -95,10 +94,12 @@ import org.graylog2.security.ldap.LdapSettingsService;
 import org.graylog2.security.ldap.LdapSettingsServiceImpl;
 import org.graylog2.security.realm.LdapUserAuthenticator;
 import org.graylog2.shared.ServerStatus;
+import org.graylog2.shared.bindings.OwnServiceLocatorGenerator;
 import org.graylog2.shared.buffers.ProcessBuffer;
 import org.graylog2.shared.buffers.ProcessBufferWatermark;
 import org.graylog2.shared.buffers.processors.ProcessBufferProcessor;
 import org.graylog2.shared.filters.FilterRegistry;
+import org.graylog2.shared.plugins.PluginLoader;
 import org.graylog2.shared.stats.ThroughputStats;
 import org.graylog2.streams.StreamRuleService;
 import org.graylog2.streams.StreamRuleServiceImpl;
@@ -125,7 +126,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.net.InetSocketAddress;
 import java.util.HashMap;
 import java.util.List;
@@ -409,8 +413,24 @@ public class Core implements GraylogServer {
         }
     }
 
+    public void startRestApi(Injector injector) throws IOException {
+        ServiceLocatorGenerator ownGenerator = new OwnServiceLocatorGenerator(injector);
+        try {
+            Field field = Injections.class.getDeclaredField("generator");
+            field.setAccessible(true);
+            Field modifiers = Field.class.getDeclaredField("modifiers");
+            modifiers.setAccessible(true);
+            modifiers.setInt(field, field.getModifiers() & ~Modifier.FINAL);
 
-    public void startRestApi() throws IOException {
+            field.set(null, ownGenerator);
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            LOG.error("Monkey patching Jersey's HK2 failed: ", e);
+            System.exit(-1);
+        }
+
+        /*ServiceLocatorFactory factory = ServiceLocatorFactory.getInstance();
+        factory.addListener(new HK2ServiceLocatorListener(injector));*/
+
         final ExecutorService bossExecutor = Executors.newCachedThreadPool(
                 new ThreadFactoryBuilder()
                         .setNameFormat("restapi-boss-%d")
@@ -475,7 +495,7 @@ public class Core implements GraylogServer {
 
 
     private <A> void registerPlugins(Class<A> type, String subDirectory) {
-        PluginLoader<A> pl = new PluginLoader<A>(configuration.getPluginDir(), subDirectory, type);
+        LegacyPluginLoader<A> pl = new LegacyPluginLoader<A>(configuration.getPluginDir(), subDirectory, type);
         for (A plugin : pl.getPlugins()) {
             LOG.info("Loaded <{}> plugin [{}].", type.getSimpleName(), plugin.getClass().getCanonicalName());
 
@@ -493,6 +513,19 @@ public class Core implements GraylogServer {
                 registerTransport((Transport) plugin);
             } else {
                 LOG.error("Could not load plugin [{}] - Not supported type.", plugin.getClass().getCanonicalName());
+            }
+        }
+
+        PluginLoader pluginLoader = new PluginLoader(new File(configuration.getPluginDir()));
+        for (Plugin plugin : pluginLoader.loadPlugins()) {
+            for (Class<? extends MessageInput> inputClass : plugin.inputs()) {
+                final MessageInput messageInput;
+                try {
+                    messageInput = inputClass.newInstance();
+                    inputs.register(inputClass, messageInput.getName());
+                } catch (Exception e) {
+                    LOG.error("Unable to register message input " + inputClass.getCanonicalName(), e);
+                }
             }
         }
     }
