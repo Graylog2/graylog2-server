@@ -214,4 +214,7 @@ $(document).ready(function() {
         });
     });
 
+    // Ordering
+    $(".xtrc-list-drag").sortable({ handle: ".xtrc-order-handle" });
+
 });

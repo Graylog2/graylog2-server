@@ -1953,3 +1953,7 @@ hr.search-result-head-separator {
     margin-bottom: 10px;
     cursor: auto !important;
 }
+
+.xtrc-order-handle {
+    cursor: pointer;
+}
