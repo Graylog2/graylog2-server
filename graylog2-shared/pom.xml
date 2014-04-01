@@ -59,6 +59,11 @@
             <artifactId>guice-assistedinject</artifactId>
             <version>3.0</version>
         </dependency>
+        <dependency>
+            <groupId>org.glassfish.hk2</groupId>
+            <artifactId>guice-bridge</artifactId>
+            <version>2.2.0-b21</version>
+        </dependency>
     </dependencies>
 
     <build>
