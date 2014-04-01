@@ -54,10 +54,12 @@ public class LdapController extends AuthenticatedController {
             final LdapSettingsRequest newRequest = new LdapSettingsRequest();
             newRequest.ldapUri = "ldap:///";
             newRequest.enabled = true;
+            newRequest.defaultGroup = "";
             ldapSettingsForm = settingsForm.fill(newRequest);
         } else {
             ldapSettingsForm = settingsForm.fill(ldapSettings.toRequest());
         }
+
         return ok(views.html.system.ldap.index.render(currentUser(), breadcrumbs(), ldapSettingsForm));
     }
 
