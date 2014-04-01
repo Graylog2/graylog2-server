@@ -276,7 +276,7 @@ public final class Main extends NodeRunner {
             System.exit(1);
         }
 
-        server.setLifecycle(Lifecycle.RUNNING);
+        serverStatus.setLifecycle(Lifecycle.RUNNING);
 
         activityWriter.write(new Activity("Started up.", Main.class));
         LOG.info("Graylog2 up and running.");

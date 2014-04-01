@@ -75,7 +75,6 @@ public class PeriodicalsInitializer implements Initializer {
                 }
 
                 // Register and start.
-                LOG.info("Starting [{}] periodcal.", periodical.getClass().getCanonicalName());
                 periodicals.registerAndStart(periodical);
             } catch (Exception e) {
                 LOG.error("Could not initialize periodical.", e);

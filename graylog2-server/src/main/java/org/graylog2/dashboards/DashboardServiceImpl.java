@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 TORCH GmbH
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -19,6 +19,7 @@
 
 package org.graylog2.dashboards;
 
+import com.codahale.metrics.MetricRegistry;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.inject.Inject;
@@ -32,6 +33,7 @@ import org.graylog2.database.MongoConnection;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.database.PersistedServiceImpl;
 import org.graylog2.database.ValidationException;
+import org.graylog2.indexer.Indexer;
 import org.graylog2.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.rest.resources.dashboards.requests.WidgetPositionRequest;
 import org.slf4j.Logger;
@@ -42,10 +44,16 @@ import java.util.Map;
 
 public class DashboardServiceImpl extends PersistedServiceImpl implements DashboardService {
     private static final Logger LOG = LoggerFactory.getLogger(DashboardServiceImpl.class);
+    private final MetricRegistry metricRegistry;
+    private final Indexer indexer;
 
     @Inject
-    public DashboardServiceImpl(MongoConnection mongoConnection) {
+    public DashboardServiceImpl(MongoConnection mongoConnection,
+                                MetricRegistry metricRegistry,
+                                Indexer indexer) {
         super(mongoConnection);
+        this.metricRegistry = metricRegistry;
+        this.indexer = indexer;
     }
 
     @Override
@@ -73,7 +81,7 @@ public class DashboardServiceImpl extends PersistedServiceImpl implements Dashbo
                 for (BasicDBObject widgetFields : (List<BasicDBObject>) fields.get(DashboardImpl.EMBEDDED_WIDGETS)) {
                     DashboardWidget widget = null;
                     try {
-                        widget = DashboardWidget.fromPersisted(core, widgetFields);
+                        widget = DashboardWidget.fromPersisted(metricRegistry, indexer, widgetFields);
                     } catch (DashboardWidget.NoSuchWidgetTypeException e) {
                         LOG.error("No such widget type: [{}] - Dashboard: [" + dashboard.getId() + "]", widgetFields.get("type"), e);
                         continue;

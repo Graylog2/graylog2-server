@@ -1,5 +1,5 @@
-/**
- * Copyright 2012 Lennart Koopmann <lennart@socketfeed.com>
+/*
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -15,36 +15,37 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 package org.graylog2;
 
 import com.google.common.collect.Sets;
 import com.mongodb.BasicDBList;
+import org.graylog2.database.MongoConnection;
+
 import java.util.Set;
 
 /**
  *  @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class SystemSettingAccessor {
-    
-    private Core server;
-    
+
+    private final MongoConnection mongoConnection;
+
     private final static String KEY_ALLOW_USAGE_STATS = "allow_usage_stats";
     private final static String KEY_FORCED_ALARM_CALLBACKS = "forced_alarm_callbacks";
     
-    public SystemSettingAccessor(Core server) {
-        this.server = server;
+    public SystemSettingAccessor(MongoConnection mongoConnection) {
+        this.mongoConnection = mongoConnection;
     }
     
     public boolean allowUsageStats() {
-        SystemSetting s = new SystemSetting(server.getMongoConnection());
+        SystemSetting s = new SystemSetting(mongoConnection);
         return s.getBoolean(KEY_ALLOW_USAGE_STATS);
     }
     
     public Set<String> getForcedAlarmCallbacks() {
         Set<String> callbacks = Sets.newHashSet();
-        SystemSetting s = new SystemSetting(server.getMongoConnection());
+        SystemSetting s = new SystemSetting(mongoConnection);
         BasicDBList objs = s.getList(KEY_FORCED_ALARM_CALLBACKS);
         
         for (Object obj : objs) {

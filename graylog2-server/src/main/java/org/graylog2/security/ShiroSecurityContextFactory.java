@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 TORCH GmbH
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -18,100 +18,24 @@
  */
 package org.graylog2.security;
 
-import com.google.common.collect.Lists;
-import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationToken;
-import org.apache.shiro.authc.Authenticator;
 import org.apache.shiro.authc.UsernamePasswordToken;
-import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
-import org.apache.shiro.authc.pam.FirstSuccessfulStrategy;
-import org.apache.shiro.authc.pam.ModularRealmAuthenticator;
-import org.apache.shiro.authz.ModularRealmAuthorizer;
-import org.apache.shiro.cache.MemoryConstrainedCacheManager;
 import org.apache.shiro.mgt.DefaultSecurityManager;
-import org.apache.shiro.mgt.DefaultSessionStorageEvaluator;
-import org.apache.shiro.mgt.DefaultSubjectDAO;
-import org.apache.shiro.realm.Realm;
-import org.apache.shiro.session.mgt.DefaultSessionManager;
 import org.apache.shiro.subject.Subject;
-import org.graylog2.Configuration;
-import org.graylog2.Core;
 import org.graylog2.jersey.container.netty.SecurityContextFactory;
-import org.graylog2.security.ldap.LdapConnector;
-import org.graylog2.security.ldap.LdapSettingsService;
-import org.graylog2.security.ldap.LdapSettingsServiceImpl;
-import org.graylog2.security.realm.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
 import javax.ws.rs.core.SecurityContext;
 
 public class ShiroSecurityContextFactory implements SecurityContextFactory {
     private static final Logger log = LoggerFactory.getLogger(ShiroSecurityContextFactory.class);
-    private DefaultSecurityManager sm;
+    private final DefaultSecurityManager sm;
 
-    public ShiroSecurityContextFactory(Core core) {
-        final GraylogSimpleAccountRealm inMemoryRealm = new GraylogSimpleAccountRealm();
-        inMemoryRealm.setCachingEnabled(false);
-        final Configuration config = core.getConfiguration();
-        inMemoryRealm.addRootAccount(
-                config.getRootUsername(),
-                config.getRootPasswordSha2()
-        );
-        inMemoryRealm.setCredentialsMatcher(new HashedCredentialsMatcher("SHA-256"));
-
-        final PasswordAuthenticator passwordAuthenticator = new PasswordAuthenticator(core);
-        passwordAuthenticator.setCachingEnabled(false);
-        passwordAuthenticator.setCredentialsMatcher(new HashedCredentialsMatcher("SHA-1"));
-        final MongoDbAuthorizationRealm mongoDbAuthorizationRealm = new MongoDbAuthorizationRealm(core);
-        mongoDbAuthorizationRealm.setCachingEnabled(false);
-
-        final LdapConnector ldapConnector = new LdapConnector(core);
-        core.setLdapConnector(ldapConnector);
-        final LdapSettingsService ldapSettingsService = new LdapSettingsServiceImpl(core.getMongoConnection());
-        final LdapUserAuthenticator ldapUserAuthenticator = new LdapUserAuthenticator(core, ldapConnector, ldapSettingsService);
-        ldapUserAuthenticator.setCachingEnabled(false);
-        core.setLdapAuthenticator(ldapUserAuthenticator);
-
-        final SessionAuthenticator sessionAuthenticator = new SessionAuthenticator(core);
-        sessionAuthenticator.setCachingEnabled(false);
-        final AccessTokenAuthenticator accessTokenAuthenticator = new AccessTokenAuthenticator(core);
-        accessTokenAuthenticator.setCachingEnabled(false);
-
-
-        sm = new DefaultSecurityManager(Lists.<Realm>newArrayList(
-                sessionAuthenticator,
-                accessTokenAuthenticator,
-                ldapUserAuthenticator,
-                passwordAuthenticator,
-                inMemoryRealm));
-        final Authenticator authenticator = sm.getAuthenticator();
-        if (authenticator instanceof ModularRealmAuthenticator) {
-            ((ModularRealmAuthenticator) authenticator).setAuthenticationStrategy(new FirstSuccessfulStrategy());
-        }
-        sm.setAuthorizer(new ModularRealmAuthorizer(Lists.<Realm>newArrayList(mongoDbAuthorizationRealm, inMemoryRealm)));
-
-        final DefaultSubjectDAO subjectDAO = new DefaultSubjectDAO();
-        final DefaultSessionStorageEvaluator sessionStorageEvaluator = new DefaultSessionStorageEvaluator() {
-            @Override
-            public boolean isSessionStorageEnabled(Subject subject) {
-                // save to session if we already have a session. do not create on just for saving the subject
-                return (subject.getSession(false) != null);
-            }
-        };
-        sessionStorageEvaluator.setSessionStorageEnabled(false);
-        subjectDAO.setSessionStorageEvaluator(sessionStorageEvaluator);
-        sm.setSubjectDAO(subjectDAO);
-
-        final DefaultSessionManager defaultSessionManager = (DefaultSessionManager) sm.getSessionManager();
-        defaultSessionManager.setSessionDAO(new MongoDbSessionDAO(core));
-        defaultSessionManager.setDeleteInvalidSessions(true);
-        defaultSessionManager.setCacheManager(new MemoryConstrainedCacheManager());
-        // DO NOT USE global session timeout!!! It's fucky.
-        //defaultSessionManager.setGlobalSessionTimeout(TimeUnit.SECONDS.toMillis(5));
-        core.setSecurityManager(sm);
-
-        SecurityUtils.setSecurityManager(sm);
+    @Inject
+    public ShiroSecurityContextFactory(DefaultSecurityManager sm) {
+        this.sm = sm;
     }
 
     @Override

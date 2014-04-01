@@ -16,6 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package org.graylog2.rest.resources.system.ldap;
 
 import com.codahale.metrics.annotation.Timed;
@@ -38,6 +39,7 @@ import org.graylog2.rest.resources.system.ldap.responses.LdapTestConfigResponse;
 import org.graylog2.security.RestPermissions;
 import org.graylog2.security.TrustAllX509TrustManager;
 import org.graylog2.security.ldap.*;
+import org.graylog2.security.realm.LdapUserAuthenticator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,6 +67,12 @@ public class LdapResource extends RestResource {
 
     @Inject
     private LdapSettingsService ldapSettingsService;
+
+    @Inject
+    private LdapConnector ldapConnector;
+
+    @Inject
+    private LdapUserAuthenticator ldapAuthenticator;
 
     @GET
     @Timed
@@ -101,8 +109,6 @@ public class LdapResource extends RestResource {
     public LdapTestConfigResponse testLdapConfiguration(@ApiParam(title = "Configuration to test", required = true) LdapTestConfigRequest request) {
         LdapTestConfigResponse response = new LdapTestConfigResponse();
 
-
-        final LdapConnector ldapConnector = core.getLdapConnector();
 
         final LdapConnectionConfig config = new LdapConnectionConfig();
         final URI ldapUri = request.ldapUri;
@@ -211,7 +217,7 @@ public class LdapResource extends RestResource {
             log.error("Invalid LDAP settings, not updated!", e);
             throw new WebApplicationException(e, Response.Status.BAD_REQUEST);
         }
-        core.getLdapAuthenticator().applySettings(ldapSettings);
+        ldapAuthenticator.applySettings(ldapSettings);
 
         return noContent().build();
     }
@@ -222,7 +228,7 @@ public class LdapResource extends RestResource {
     @Path("/settings")
     public Response deleteLdapSettings() {
         ldapSettingsService.delete();
-        core.getLdapAuthenticator().applySettings(null);
+        ldapAuthenticator.applySettings(null);
         return noContent().build();
     }
 

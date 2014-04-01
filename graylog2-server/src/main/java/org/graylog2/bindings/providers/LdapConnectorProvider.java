@@ -17,23 +17,25 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.graylog2;
+package org.graylog2.bindings.providers;
 
-import com.codahale.metrics.MetricRegistry;
-import org.graylog2.plugin.Message;
+import org.graylog2.security.ldap.LdapConnector;
+
+import javax.inject.Provider;
+
 
 /**
- * @author Lennart Koopmann <lennart@socketfeed.com>
+ * @author Dennis Oelkers <dennis@torch.sh>
  */
-public class GraylogServerStub extends Core {
-
-    public int callsToProcessBufferInserter = 0;
-    public Message lastInsertedToProcessBuffer = null;
-    private MetricRegistry fakeMetricRegistry = new MetricRegistry();
-
-    @Override
-    public MetricRegistry metrics() {
-        return fakeMetricRegistry;
+public class LdapConnectorProvider implements Provider<LdapConnector> {
+    private static LdapConnector ldapConnector = null;
+    public LdapConnectorProvider() {
+        if (ldapConnector == null)
+            ldapConnector = new LdapConnector();
     }
 
+    @Override
+    public LdapConnector get() {
+        return ldapConnector;
+    }
 }

@@ -40,6 +40,10 @@ import org.graylog2.savedsearches.SavedSearchService;
 import org.graylog2.savedsearches.SavedSearchServiceImpl;
 import org.graylog2.security.AccessTokenService;
 import org.graylog2.security.AccessTokenServiceImpl;
+import org.graylog2.security.MongoDBSessionService;
+import org.graylog2.security.MongoDBSessionServiceImpl;
+import org.graylog2.security.ldap.LdapSettingsService;
+import org.graylog2.security.ldap.LdapSettingsServiceImpl;
 import org.graylog2.streams.StreamRuleService;
 import org.graylog2.streams.StreamRuleServiceImpl;
 import org.graylog2.streams.StreamService;
@@ -69,5 +73,7 @@ public class PersistenceServicesBindings extends AbstractModule {
         bind(StreamService.class).to(StreamServiceImpl.class);
         bind(AccessTokenService.class).to(AccessTokenServiceImpl.class);
         bind(SavedSearchService.class).to(SavedSearchServiceImpl.class);
+        bind(LdapSettingsService.class).to(LdapSettingsServiceImpl.class);
+        bind(MongoDBSessionService.class).to(MongoDBSessionServiceImpl.class);
     }
 }

@@ -1,5 +1,5 @@
-/**
- * Copyright 2013 Lennart Koopmann <lennart@torch.sh>
+/*
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -15,7 +15,6 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 package org.graylog2.dashboards.widgets;
 
@@ -25,7 +24,7 @@ import com.codahale.metrics.Timer;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.mongodb.BasicDBObject;
-import org.graylog2.Core;
+import org.graylog2.indexer.Indexer;
 import org.graylog2.indexer.searches.timeranges.*;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.database.EmbeddedPersistable;
@@ -44,6 +43,8 @@ import java.util.concurrent.TimeUnit;
  */
 public abstract class DashboardWidget implements EmbeddedPersistable {
 
+    private final MetricRegistry metricRegistry;
+
     public enum Type {
         SEARCH_RESULT_COUNT,
         STREAM_SEARCH_RESULT_COUNT,
@@ -56,7 +57,6 @@ public abstract class DashboardWidget implements EmbeddedPersistable {
 
     public static final int DEFAULT_CACHE_TIME = 10;
 
-    private final Core core;
     private final Type type;
     private final String id;
     private final Map<String, Object> config;
@@ -66,8 +66,8 @@ public abstract class DashboardWidget implements EmbeddedPersistable {
 
     private Cache<String, ComputationResult> cache;
 
-    protected DashboardWidget(Core core, Type type, String id, String description, int cacheTimeS, Map<String, Object> config, String creatorUserId) {
-        this.core = core;
+    protected DashboardWidget(MetricRegistry metricRegistry, Type type, String id, String description, int cacheTimeS, Map<String, Object> config, String creatorUserId) {
+        this.metricRegistry = metricRegistry;
         this.type =  type;
         this.id = id;
         this.config = config;
@@ -90,7 +90,7 @@ public abstract class DashboardWidget implements EmbeddedPersistable {
                 .build();
     }
 
-    public static DashboardWidget fromRequest(Core core, AddWidgetRequest awr) throws NoSuchWidgetTypeException, InvalidRangeParametersException, InvalidWidgetConfigurationException {
+    public static DashboardWidget fromRequest(MetricRegistry metricRegistry, Indexer indexer, AddWidgetRequest awr) throws NoSuchWidgetTypeException, InvalidRangeParametersException, InvalidWidgetConfigurationException {
         Type type;
         try {
             type = Type.valueOf(awr.type.toUpperCase());
@@ -121,21 +121,21 @@ public abstract class DashboardWidget implements EmbeddedPersistable {
 
         switch (type) {
             case SEARCH_RESULT_COUNT:
-                return new SearchResultCountWidget(core, id, awr.description, 0, awr.config, (String) awr.config.get("query"), timeRange, awr.creatorUserId);
+                return new SearchResultCountWidget(metricRegistry, indexer, id, awr.description, 0, awr.config, (String) awr.config.get("query"), timeRange, awr.creatorUserId);
             case STREAM_SEARCH_RESULT_COUNT:
-                return new StreamSearchResultCountWidget(core, id, awr.description, 0, awr.config, (String) awr.config.get("query"), timeRange, awr.creatorUserId);
+                return new StreamSearchResultCountWidget(metricRegistry, indexer, id, awr.description, 0, awr.config, (String) awr.config.get("query"), timeRange, awr.creatorUserId);
             case FIELD_CHART:
-                return new FieldChartWidget(core, id, awr.description, 0, awr.config, (String) awr.config.get("query"), timeRange, awr.creatorUserId);
+                return new FieldChartWidget(metricRegistry, indexer, id, awr.description, 0, awr.config, (String) awr.config.get("query"), timeRange, awr.creatorUserId);
             case QUICKVALUES:
-                return new QuickvaluesWidget(core, id, awr.description, 0, awr.config, (String) awr.config.get("query"), timeRange, awr.creatorUserId);
+                return new QuickvaluesWidget(metricRegistry, indexer, id, awr.description, 0, awr.config, (String) awr.config.get("query"), timeRange, awr.creatorUserId);
             case SEARCH_RESULT_CHART:
-                return new SearchResultChartWidget(core, id, awr.description, 0, awr.config, (String) awr.config.get("query"), timeRange, awr.creatorUserId);
+                return new SearchResultChartWidget(metricRegistry, indexer, id, awr.description, 0, awr.config, (String) awr.config.get("query"), timeRange, awr.creatorUserId);
             default:
                 throw new NoSuchWidgetTypeException();
         }
     }
 
-    public static DashboardWidget fromPersisted(Core core, BasicDBObject fields) throws NoSuchWidgetTypeException, InvalidRangeParametersException, InvalidWidgetConfigurationException {
+    public static DashboardWidget fromPersisted(MetricRegistry metricRegistry, Indexer indexer, BasicDBObject fields) throws NoSuchWidgetTypeException, InvalidRangeParametersException, InvalidWidgetConfigurationException {
         Type type;
         try {
             type = Type.valueOf(((String) fields.get("type")).toUpperCase());
@@ -184,15 +184,15 @@ public abstract class DashboardWidget implements EmbeddedPersistable {
         // XXX TODO: these long constructors suck and 90% of it can be unified in a step before
         switch (type) {
             case SEARCH_RESULT_COUNT:
-                return new SearchResultCountWidget(core, (String) fields.get("id"), description, cacheTime, config, (String) config.get("query"), timeRange, (String) fields.get("creator_user_id"));
+                return new SearchResultCountWidget(metricRegistry, indexer, (String) fields.get("id"), description, cacheTime, config, (String) config.get("query"), timeRange, (String) fields.get("creator_user_id"));
             case STREAM_SEARCH_RESULT_COUNT:
-                return new StreamSearchResultCountWidget(core, (String) fields.get("id"), description, cacheTime, config, (String) config.get("query"), timeRange, (String) fields.get("creator_user_id"));
+                return new StreamSearchResultCountWidget(metricRegistry, indexer, (String) fields.get("id"), description, cacheTime, config, (String) config.get("query"), timeRange, (String) fields.get("creator_user_id"));
             case FIELD_CHART:
-                return new FieldChartWidget(core, (String) fields.get("id"), description, cacheTime, config, (String) config.get("query"), timeRange, (String) fields.get("creator_user_id"));
+                return new FieldChartWidget(metricRegistry, indexer, (String) fields.get("id"), description, cacheTime, config, (String) config.get("query"), timeRange, (String) fields.get("creator_user_id"));
             case QUICKVALUES:
-                return new QuickvaluesWidget(core, (String) fields.get("id"), description, cacheTime, config, (String) config.get("query"), timeRange, (String) fields.get("creator_user_id"));
+                return new QuickvaluesWidget(metricRegistry, indexer, (String) fields.get("id"), description, cacheTime, config, (String) config.get("query"), timeRange, (String) fields.get("creator_user_id"));
             case SEARCH_RESULT_CHART:
-                return new SearchResultChartWidget(core, (String) fields.get("id"), description, cacheTime, config, (String) config.get("query"), timeRange, (String) fields.get("creator_user_id"));
+                return new SearchResultChartWidget(metricRegistry, indexer, (String) fields.get("id"), description, cacheTime, config, (String) config.get("query"), timeRange, (String) fields.get("creator_user_id"));
             default:
                 throw new NoSuchWidgetTypeException();
         }
@@ -267,11 +267,11 @@ public abstract class DashboardWidget implements EmbeddedPersistable {
 
 
     private Timer getCalculationTimer() {
-        return core.metrics().timer(MetricRegistry.name(this.getClass(), getId(), "calculationTime"));
+        return metricRegistry.timer(MetricRegistry.name(this.getClass(), getId(), "calculationTime"));
     }
 
     private Meter getCalculationMeter() {
-        return core.metrics().meter(MetricRegistry.name(this.getClass(), getId(), "calculations"));
+        return metricRegistry.meter(MetricRegistry.name(this.getClass(), getId(), "calculations"));
     }
 
     public static class NoSuchWidgetTypeException extends Exception {

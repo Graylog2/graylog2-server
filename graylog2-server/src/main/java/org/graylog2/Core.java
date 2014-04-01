@@ -49,10 +49,10 @@ import org.graylog2.indexer.Deflector;
 import org.graylog2.indexer.Indexer;
 import org.graylog2.indexer.ranges.RebuildIndexRangesJob;
 import org.graylog2.initializers.Initializers;
-import org.graylog2.inputs.Cache;
 import org.graylog2.inputs.ServerInputRegistry;
 import org.graylog2.inputs.gelf.gelf.GELFChunkManager;
 import org.graylog2.jersey.container.netty.NettyContainer;
+import org.graylog2.jersey.container.netty.SecurityContextFactory;
 import org.graylog2.metrics.MongoDbMetricsReporter;
 import org.graylog2.metrics.jersey2.MetricsDynamicBinding;
 import org.graylog2.outputs.OutputRegistry;
@@ -66,7 +66,6 @@ import org.graylog2.plugin.alarms.transports.Transport;
 import org.graylog2.plugin.filters.MessageFilter;
 import org.graylog2.plugin.initializers.Initializer;
 import org.graylog2.plugin.inputs.MessageInput;
-import org.graylog2.plugin.lifecycles.Lifecycle;
 import org.graylog2.plugin.outputs.MessageOutput;
 import org.graylog2.plugin.rest.AnyExceptionClassMapper;
 import org.graylog2.plugin.rest.JacksonPropertyExceptionMapper;
@@ -75,7 +74,6 @@ import org.graylog2.rest.CORSFilter;
 import org.graylog2.rest.ObjectMapperProvider;
 import org.graylog2.rest.RestAccessLogFilter;
 import org.graylog2.security.ShiroSecurityBinding;
-import org.graylog2.security.ShiroSecurityContextFactory;
 import org.graylog2.security.ldap.LdapConnector;
 import org.graylog2.security.realm.LdapUserAuthenticator;
 import org.graylog2.shared.ServerStatus;
@@ -106,14 +104,11 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.net.InetSocketAddress;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Server core, handling and holding basically everything.
@@ -225,11 +220,14 @@ public class Core implements GraylogServer {
     private RebuildIndexRangesJob.Factory rebuildIndexRangesJobFactory;
 
     @Inject
-    AlertSender alertSender;
+    private AlertSender alertSender;
+
+    @Inject
+    private SecurityContextFactory shiroSecurityContextFactory;
 
     public void initialize() {
         if (configuration.isMetricsCollectionEnabled()) {
-            metricsReporter = MongoDbMetricsReporter.forRegistry(this, metricRegistry).build();
+            metricsReporter = MongoDbMetricsReporter.forRegistry(metricRegistry, mongoConnection, serverStatus).build();
             metricsReporter.start(1, TimeUnit.SECONDS);
         }
 
@@ -261,9 +259,9 @@ public class Core implements GraylogServer {
             processors[i] = processBufferProcessorFactory.create(outputBuffer, this, processBufferWatermark, i, processBufferProcessorCount);
         }
 
-        processBuffer.initialize(processors, this.getConfiguration().getRingSize(),
-                this.getConfiguration().getProcessorWaitStrategy(),
-                this.getConfiguration().getProcessBufferProcessors()
+        processBuffer.initialize(processors, configuration.getRingSize(),
+                configuration.getProcessorWaitStrategy(),
+                configuration.getProcessBufferProcessors()
         );
 
         indexer.start();
@@ -311,36 +309,8 @@ public class Core implements GraylogServer {
         inputs.launchAllPersisted();
     }
 
-    public void setLdapConnector(LdapConnector ldapConnector) {
-        this.ldapConnector = ldapConnector;
-    }
-
-    public LdapConnector getLdapConnector() {
-        return ldapConnector;
-    }
-
-    public DefaultSecurityManager getSecurityManager() {
-        return securityManager;
-    }
-
-    public void setSecurityManager(DefaultSecurityManager securityManager) {
-        this.securityManager = securityManager;
-    }
-
     public void incrementStreamThroughput(String streamId) {
         throughputStats.incrementStreamThroughput(streamId);
-    }
-
-    public Map<String, Counter> cycleStreamThroughput() {
-        return throughputStats.cycleStreamThroughput();
-    }
-
-    public void setCurrentStreamThroughput(HashMap<String, Counter> throughput) {
-        throughputStats.setCurrentStreamThroughput(throughput);
-    }
-
-    public HashMap<String, Counter> getCurrentStreamThroughput() {
-        return throughputStats.getCurrentStreamThroughput();
     }
 
     private class Graylog2Binder extends AbstractBinder {
@@ -445,7 +415,7 @@ public class Core implements GraylogServer {
         /*rc = rc.registerFinder(new PackageNamesScanner(new String[]{"org.graylog2.rest.resources"}, true));*/
 
         final NettyContainer jerseyHandler = ContainerFactory.createContainer(NettyContainer.class, rc);
-        jerseyHandler.setSecurityContextFactory(new ShiroSecurityContextFactory(this));
+        jerseyHandler.setSecurityContextFactory(shiroSecurityContextFactory);
 
         bootstrap.setPipelineFactory(new ChannelPipelineFactory() {
             @Override
@@ -497,34 +467,6 @@ public class Core implements GraylogServer {
         return mongoConnection;
     }
 
-    public void setConfiguration(Configuration configuration) {
-        this.configuration = configuration;
-    }
-
-    public Configuration getConfiguration() {
-        return configuration;
-    }
-
-    public RulesEngine getRulesEngine() {
-        return rulesEngine;
-    }
-
-    public Indexer getIndexer() {
-        return indexer;
-    }
-
-    public AtomicInteger processBufferWatermark() {
-        return processBufferWatermark;
-    }
-    
-    public void setLdapAuthenticator(LdapUserAuthenticator authenticator) {
-        this.ldapUserAuthenticator = authenticator;
-    }
-
-    public LdapUserAuthenticator getLdapAuthenticator() {
-        return ldapUserAuthenticator;
-    }
-
     @Override
     public boolean isMaster() {
         return serverStatus.hasCapability(ServerStatus.Capability.MASTER);
@@ -533,22 +475,6 @@ public class Core implements GraylogServer {
     @Override
     public String getNodeId() {
         return serverStatus.getNodeId().toString();
-    }
-    
-    public void setLocalMode(boolean mode) {
-        this.localMode = mode;
-    }
-   
-    public void setStatsMode(boolean mode) {
-        this.statsMode = mode;
-    }
-   
-    public Cache getInputCache() {
-        return processBuffer.getMasterCache();
-    }
-    
-    public Cache getOutputCache() {
-        return outputBuffer.getOverflowCache();
     }
     
     public boolean isProcessing() {
@@ -571,10 +497,6 @@ public class Core implements GraylogServer {
     @Override
     public boolean isRadio() {
         return serverStatus.hasCapability(ServerStatus.Capability.RADIO);
-    }
-
-    public void setLifecycle(Lifecycle lifecycle) {
-        serverStatus.setLifecycle(lifecycle);
     }
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 TORCH GmbH
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -21,14 +21,12 @@ package org.graylog2.alerts.types;
 
 import org.graylog2.alerts.AlertCondition;
 import org.graylog2.alerts.AlertConditionTest;
-import org.graylog2.alerts.AlertImpl;
 import org.graylog2.indexer.IndexHelper;
 import org.graylog2.indexer.results.FieldStatsResult;
 import org.graylog2.indexer.searches.Searches;
 import org.graylog2.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.Tools;
 import org.mockito.Matchers;
-import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.testng.annotations.Test;
 
 import java.util.Map;
@@ -68,7 +66,7 @@ public class FieldValueAlertConditionTest extends AlertConditionTest {
             fieldStatsShouldReturn(getFieldStatsResult(checkType, higherThanThreshold));
             alertLastTriggered(-1);
 
-            AlertCondition.CheckResult result = alertService.triggered(fieldValueAlertCondition, core.getIndexer());
+            AlertCondition.CheckResult result = alertService.triggered(fieldValueAlertCondition, indexer);
 
             assertTriggered(fieldValueAlertCondition, result);
         }
@@ -85,7 +83,7 @@ public class FieldValueAlertConditionTest extends AlertConditionTest {
             fieldStatsShouldReturn(getFieldStatsResult(checkType, lowerThanThreshold));
             alertLastTriggered(-1);
 
-            AlertCondition.CheckResult result = alertService.triggered(fieldValueAlertCondition, core.getIndexer());
+            AlertCondition.CheckResult result = alertService.triggered(fieldValueAlertCondition, indexer);
 
             assertNotTriggered(result);
         }
@@ -102,7 +100,7 @@ public class FieldValueAlertConditionTest extends AlertConditionTest {
             fieldStatsShouldReturn(getFieldStatsResult(checkType, lowerThanThreshold));
             alertLastTriggered(-1);
 
-            AlertCondition.CheckResult result = alertService.triggered(fieldValueAlertCondition, core.getIndexer());
+            AlertCondition.CheckResult result = alertService.triggered(fieldValueAlertCondition, indexer);
 
             assertTriggered(fieldValueAlertCondition, result);
         }
@@ -119,7 +117,7 @@ public class FieldValueAlertConditionTest extends AlertConditionTest {
             fieldStatsShouldReturn(getFieldStatsResult(checkType, higherThanThreshold));
             alertLastTriggered(-1);
 
-            AlertCondition.CheckResult result = alertService.triggered(fieldValueAlertCondition, core.getIndexer());
+            AlertCondition.CheckResult result = alertService.triggered(fieldValueAlertCondition, indexer);
 
             assertNotTriggered(result);
         }

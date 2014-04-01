@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 TORCH GmbH
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -21,32 +21,34 @@ package org.graylog2.security.realm;
 import org.apache.shiro.authc.*;
 import org.apache.shiro.authc.credential.AllowAllCredentialsMatcher;
 import org.apache.shiro.realm.AuthenticatingRealm;
-import org.graylog2.Core;
 import org.graylog2.database.ValidationException;
 import org.graylog2.security.AccessToken;
 import org.graylog2.security.AccessTokenAuthToken;
 import org.graylog2.security.AccessTokenService;
-import org.graylog2.security.AccessTokenServiceImpl;
 import org.graylog2.users.User;
 import org.graylog2.users.UserService;
-import org.graylog2.users.UserServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.inject.Inject;
 
 public class AccessTokenAuthenticator extends AuthenticatingRealm {
     private static final Logger log = LoggerFactory.getLogger(AccessTokenAuthenticator.class);
 
-    private final Core core;
     private final AccessTokenService accessTokenService;
     private final UserService userService;
+    private final LdapUserAuthenticator ldapAuthenticator;
 
-    public AccessTokenAuthenticator(Core core) {
-        this.core = core;
+    @Inject
+    public AccessTokenAuthenticator(AccessTokenService accessTokenService,
+                                    UserService userService,
+                                    LdapUserAuthenticator ldapAuthenticator) {
+        this.accessTokenService = accessTokenService;
+        this.userService = userService;
+        this.ldapAuthenticator = ldapAuthenticator;
         setAuthenticationTokenClass(AccessTokenAuthToken.class);
         // the presence of a valid access token is enough, we don't have any other credentials
         setCredentialsMatcher(new AllowAllCredentialsMatcher());
-        this.accessTokenService = new AccessTokenServiceImpl(core.getMongoConnection());
-        this.userService = new UserServiceImpl(core.getMongoConnection(), core.getConfiguration());
     }
 
     @Override
@@ -61,7 +63,7 @@ public class AccessTokenAuthenticator extends AuthenticatingRealm {
         if (user == null) {
             return null;
         }
-        if (user.isExternalUser() && !core.getLdapAuthenticator().isEnabled()) {
+        if (user.isExternalUser() && !ldapAuthenticator.isEnabled()) {
             throw new LockedAccountException("LDAP authentication is currently disabled.");
         }
         if (log.isDebugEnabled()) {

@@ -1,5 +1,5 @@
-/**
- * Copyright 2013 Lennart Koopmann <lennart@torch.sh>
+/*
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -15,11 +15,10 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 package org.graylog2.dashboards.widgets;
 
-import org.graylog2.Core;
+import com.codahale.metrics.MetricRegistry;
 import org.graylog2.indexer.IndexHelper;
 import org.graylog2.indexer.Indexer;
 import org.graylog2.indexer.results.HistogramResult;
@@ -38,14 +37,15 @@ public class FieldChartWidget extends DashboardWidget {
 
     private static final Logger LOG = LoggerFactory.getLogger(FieldChartWidget.class);
 
-    private final Core core;
     private final String query;
     private final TimeRange timeRange;
     private final String streamId;
     private final Map<String, Object> config;
+    private final Indexer indexer;
 
-    public FieldChartWidget(Core core, String id, String description, int cacheTime, Map<String, Object> config, String query, TimeRange timeRange, String creatorUserId) throws InvalidWidgetConfigurationException {
-        super(core, Type.FIELD_CHART, id, description, cacheTime, config, creatorUserId);
+    public FieldChartWidget(MetricRegistry metricRegistry, Indexer indexer, String id, String description, int cacheTime, Map<String, Object> config, String query, TimeRange timeRange, String creatorUserId) throws InvalidWidgetConfigurationException {
+        super(metricRegistry, Type.FIELD_CHART, id, description, cacheTime, config, creatorUserId);
+        this.indexer = indexer;
 
         if (!checkConfig(config)) {
             throw new InvalidWidgetConfigurationException("Missing or invalid widget configuration. Provided config was: " + config.toString());
@@ -58,7 +58,6 @@ public class FieldChartWidget extends DashboardWidget {
         }
 
         this.timeRange = timeRange;
-        this.core = core;
         this.config = config;
 
         if (config.containsKey("stream_id")) {
@@ -91,7 +90,7 @@ public class FieldChartWidget extends DashboardWidget {
         }
 
         try {
-            HistogramResult histogramResult = core.getIndexer().searches().fieldHistogram(
+            HistogramResult histogramResult = indexer.searches().fieldHistogram(
                     query,
                     (String) config.get("field"),
                     Indexer.DateHistogramInterval.valueOf(((String) config.get("interval")).toUpperCase()),

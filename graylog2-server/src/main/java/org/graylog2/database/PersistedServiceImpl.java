@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 TORCH GmbH
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -247,7 +247,7 @@ public class PersistedServiceImpl implements PersistedService {
         fieldTransformations(fields);
 
         BasicDBObject dbo = new BasicDBObject(fields);
-        collection(model).update(new BasicDBObject("_id", model.getId()), new BasicDBObject("$push", new BasicDBObject(key, dbo)));
+        collection(model).update(new BasicDBObject("_id", new ObjectId(model.getId())), new BasicDBObject("$push", new BasicDBObject(key, dbo)));
     }
 
     protected <T extends Persisted> void removeEmbedded(T model, String key, String searchId) {
@@ -262,7 +262,7 @@ public class PersistedServiceImpl implements PersistedService {
 
     protected <T extends Persisted> void removeEmbedded(T model, String arrayKey, String key, String searchId) {
         BasicDBObject aryQry = new BasicDBObject(arrayKey, searchId);
-        BasicDBObject qry = new BasicDBObject("_id", model.getId());
+        BasicDBObject qry = new BasicDBObject("_id", new ObjectId(model.getId()));
         BasicDBObject update = new BasicDBObject("$pull", new BasicDBObject(key, aryQry));
 
         // http://docs.mongodb.org/manual/reference/operator/pull/

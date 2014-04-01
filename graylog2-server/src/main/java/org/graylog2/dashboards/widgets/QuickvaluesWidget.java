@@ -1,5 +1,5 @@
-/**
- * Copyright 2014 Lennart Koopmann <lennart@torch.sh>
+/*
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -15,13 +15,13 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 package org.graylog2.dashboards.widgets;
 
+import com.codahale.metrics.MetricRegistry;
 import com.google.common.collect.Maps;
-import org.graylog2.Core;
 import org.graylog2.indexer.IndexHelper;
+import org.graylog2.indexer.Indexer;
 import org.graylog2.indexer.results.TermsResult;
 import org.graylog2.indexer.searches.timeranges.TimeRange;
 import org.slf4j.Logger;
@@ -37,15 +37,16 @@ public class QuickvaluesWidget extends DashboardWidget {
 
     private static final Logger LOG = LoggerFactory.getLogger(QuickvaluesWidget.class);
 
-    private final Core core;
     private final String query;
     private final TimeRange timeRange;
     private final String streamId;
 
     private final String field;
+    private final Indexer indexer;
 
-    public QuickvaluesWidget(Core core, String id, String description, int cacheTime, Map<String, Object> config, String query, TimeRange timeRange, String creatorUserId) throws InvalidWidgetConfigurationException {
-        super(core, Type.QUICKVALUES, id, description, cacheTime, config, creatorUserId);
+    public QuickvaluesWidget(MetricRegistry metricRegistry, Indexer indexer, String id, String description, int cacheTime, Map<String, Object> config, String query, TimeRange timeRange, String creatorUserId) throws InvalidWidgetConfigurationException {
+        super(metricRegistry, Type.QUICKVALUES, id, description, cacheTime, config, creatorUserId);
+        this.indexer = indexer;
 
         if (!checkConfig(config)) {
             throw new InvalidWidgetConfigurationException("Missing or invalid widget configuration. Provided config was: " + config.toString());
@@ -53,7 +54,6 @@ public class QuickvaluesWidget extends DashboardWidget {
 
         this.query = query;
         this.timeRange = timeRange;
-        this.core = core;
 
         this.field = (String) config.get("field");
 
@@ -91,7 +91,7 @@ public class QuickvaluesWidget extends DashboardWidget {
         }
 
         try {
-            TermsResult terms = core.getIndexer().searches().terms(field, 50, query, filter, timeRange);
+            TermsResult terms = indexer.searches().terms(field, 50, query, filter, timeRange);
 
             Map<String, Object> result = Maps.newHashMap();
             result.put("terms", terms.getTerms());

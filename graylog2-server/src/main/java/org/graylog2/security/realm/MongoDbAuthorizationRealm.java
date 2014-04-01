@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 TORCH GmbH
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -26,24 +26,22 @@ import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
-import org.graylog2.Core;
 import org.graylog2.users.User;
 import org.graylog2.users.UserService;
-import org.graylog2.users.UserServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
 import java.util.List;
 
 public class MongoDbAuthorizationRealm extends AuthorizingRealm {
 
     private static final Logger log = LoggerFactory.getLogger(MongoDbAuthorizationRealm.class);
-    private final Core core;
     private final UserService userService;
 
-    public MongoDbAuthorizationRealm(Core core) {
-        this.core = core;
-        this.userService = new UserServiceImpl(core.getMongoConnection(), core.getConfiguration());
+    @Inject
+    public MongoDbAuthorizationRealm(UserService userService) {
+        this.userService = userService;
     }
 
     @Override

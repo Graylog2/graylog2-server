@@ -1,5 +1,5 @@
-/**
- * Copyright 2012, 2013 Lennart Koopmann <lennart@socketfeed.com>
+/*
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -15,28 +15,34 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 
 package org.graylog2.filters;
 
+import com.google.inject.internal.util.$Nullable;
 import org.graylog2.plugin.GraylogServer;
-import org.graylog2.plugin.filters.MessageFilter;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.RulesEngine;
+import org.graylog2.plugin.filters.MessageFilter;
 
-import org.graylog2.Core;
+import javax.inject.Inject;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class RewriteFilter implements MessageFilter {
 
+    private final RulesEngine rulesEngine;
+
+    @Inject
+    public RewriteFilter(@$Nullable RulesEngine rulesEngine) {
+        this.rulesEngine = rulesEngine;
+    }
+
     @Override
     public boolean filter(Message msg, GraylogServer server) {
-        Core serverImpl = (Core) server;
-
-        if (serverImpl.getRulesEngine() != null) {
-            serverImpl.getRulesEngine().evaluate(msg);
+        if (rulesEngine != null) {
+            rulesEngine.evaluate(msg);
         }
 
         // false if not expecitly set to true in the rules.

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 TORCH GmbH
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -23,10 +23,10 @@ import com.google.common.collect.Maps;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.session.mgt.SimpleSession;
 import org.apache.shiro.session.mgt.eis.CachingSessionDAO;
-import org.graylog2.Core;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
@@ -35,12 +35,11 @@ import java.util.Map;
 public class MongoDbSessionDAO extends CachingSessionDAO {
     private static final Logger log = LoggerFactory.getLogger(MongoDbSessionDAO.class);
 
-    private final Core core;
     private final MongoDBSessionService mongoDBSessionService;
 
-    public MongoDbSessionDAO(Core core) {
-        this.core = core;
-        this.mongoDBSessionService = new MongoDBSessionServiceImpl(core.getMongoConnection());
+    @Inject
+    public MongoDbSessionDAO(MongoDBSessionService mongoDBSessionService) {
+        this.mongoDBSessionService = mongoDBSessionService;
     }
 
     @Override

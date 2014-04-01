@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 TORCH GmbH
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -27,11 +27,13 @@ import org.graylog2.database.PersistedServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
 import java.util.List;
 
 public class LdapSettingsServiceImpl extends PersistedServiceImpl implements LdapSettingsService {
     private static final Logger log = LoggerFactory.getLogger(LdapSettingsServiceImpl.class);
 
+    @Inject
     public LdapSettingsServiceImpl(MongoConnection mongoConnection) {
         super(mongoConnection);
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 TORCH GmbH
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -20,12 +20,17 @@ package org.graylog2.metrics;
 
 import com.codahale.metrics.*;
 import com.google.common.collect.Lists;
-import com.mongodb.*;
+import com.mongodb.BasicDBObject;
+import com.mongodb.DBCollection;
+import com.mongodb.DBObject;
+import com.mongodb.WriteConcern;
 import org.bson.types.ObjectId;
-import org.graylog2.Core;
+import org.graylog2.database.MongoConnection;
+import org.graylog2.shared.ServerStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -35,36 +40,40 @@ import java.util.concurrent.TimeUnit;
 public class MongoDbMetricsReporter extends ScheduledReporter {
     private static final Logger log = LoggerFactory.getLogger(MongoDbMetricsReporter.class);
 
-    private final Core core;
     private final Clock clock;
     private final String nodeId;
-
-    private MongoDbMetricsReporter(Core core, MetricRegistry registry,
-            Clock clock,
-            TimeUnit rateUnit,
-            TimeUnit durationUnit,
-            MetricFilter filter) {
+    private final MongoConnection mongoConnection;
+    private MongoDbMetricsReporter(MetricRegistry registry,
+                                   MongoConnection mongoConnection,
+                                   ServerStatus serverStatus,
+                                   Clock clock,
+                                   TimeUnit rateUnit,
+                                   TimeUnit durationUnit,
+                                   MetricFilter filter) {
         super(registry, "mongodb-reporter", filter, rateUnit, durationUnit);
-        this.core = core;
-        nodeId = core.getNodeId();
+        this.mongoConnection = mongoConnection;
+        this.nodeId = serverStatus.getNodeId().toString();
         this.clock = clock;
     }
 
-    public static Builder forRegistry(Core core, MetricRegistry registry) {
-        return new Builder(core, registry);
+    public static Builder forRegistry(MetricRegistry registry, MongoConnection mongoConnection, ServerStatus serverStatus) {
+        return new Builder(registry, mongoConnection, serverStatus);
     }
 
     public static class Builder {
-        private final Core core;
         private final MetricRegistry registry;
+        private final MongoConnection mongoConnection;
+        private final ServerStatus serverStatus;
         private final Clock clock;
         private final TimeUnit rateUnit;
         private final TimeUnit durationUnit;
         private final MetricFilter filter;
 
-        private Builder(Core core, MetricRegistry registry) {
-            this.core = core;
+        @Inject
+        private Builder(MetricRegistry registry, MongoConnection mongoConnection, ServerStatus serverStatus) {
             this.registry = registry;
+            this.mongoConnection = mongoConnection;
+            this.serverStatus = serverStatus;
             this.clock = Clock.defaultClock();
             this.rateUnit = TimeUnit.SECONDS;
             this.durationUnit = TimeUnit.MILLISECONDS;
@@ -73,8 +82,9 @@ public class MongoDbMetricsReporter extends ScheduledReporter {
 
         public MongoDbMetricsReporter build() {
             return new MongoDbMetricsReporter(
-                    core,
                     registry,
+                    mongoConnection,
+                    serverStatus,
                     clock,
                     rateUnit,
                     durationUnit,
@@ -101,7 +111,7 @@ public class MongoDbMetricsReporter extends ScheduledReporter {
         collectTimerReports(docs, timers, timestamp);
 
         try {
-            final DBCollection collection = core.getMongoConnection().getDatabase().getCollection("graylog2_metrics");
+            final DBCollection collection = mongoConnection.getDatabase().getCollection("graylog2_metrics");
             // don't hang on to the data for too long.
             final BasicDBObject indexField = new BasicDBObject("timestamp", 1);
             final BasicDBObject indexOptions = new BasicDBObject("expireAfterSeconds", 5 * 60);

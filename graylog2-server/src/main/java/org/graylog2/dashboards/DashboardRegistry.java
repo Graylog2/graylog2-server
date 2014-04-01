@@ -23,11 +23,13 @@ import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 import org.graylog2.Core;
 
+import javax.inject.Singleton;
 import java.util.Map;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
+@Singleton
 public class DashboardRegistry {
 
     private final DashboardService dashboardService;

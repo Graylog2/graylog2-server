@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 TORCH UG
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -31,7 +31,6 @@ import org.apache.directory.api.ldap.model.message.ResultCodeEnum;
 import org.apache.directory.api.ldap.model.message.SearchScope;
 import org.apache.directory.ldap.client.api.LdapConnectionConfig;
 import org.apache.directory.ldap.client.api.LdapNetworkConnection;
-import org.graylog2.Core;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,12 +42,6 @@ import java.util.concurrent.TimeUnit;
 
 public class LdapConnector {
     private static final Logger log = LoggerFactory.getLogger(LdapConnector.class);
-
-    private final Core core;
-
-    public LdapConnector(Core core) {
-        this.core = core;
-    }
 
     public LdapNetworkConnection connect(LdapConnectionConfig config) throws LdapException {
         final LdapNetworkConnection connection = new LdapNetworkConnection(config);

@@ -1,5 +1,5 @@
-/**
- * Copyright 2013 Lennart Koopmann <lennart@torch.sh>
+/*
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -15,12 +15,12 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 package org.graylog2.dashboards.widgets;
 
-import org.graylog2.Core;
+import com.codahale.metrics.MetricRegistry;
 import org.graylog2.indexer.IndexHelper;
+import org.graylog2.indexer.Indexer;
 import org.graylog2.indexer.results.CountResult;
 import org.graylog2.indexer.searches.timeranges.TimeRange;
 
@@ -32,16 +32,16 @@ import java.util.Map;
  */
 public class SearchResultCountWidget extends DashboardWidget {
 
-    private final Core core;
+    private final Indexer indexer;
     private final String query;
     private final TimeRange timeRange;
 
-    public SearchResultCountWidget(Core core, String id, String description, int cacheTime, Map<String, Object> config, String query, TimeRange timeRange, String creatorUserId) {
-        super(core, Type.SEARCH_RESULT_COUNT, id, description, cacheTime, config, creatorUserId);
+    public SearchResultCountWidget(MetricRegistry metricRegistry, Indexer indexer, String id, String description, int cacheTime, Map<String, Object> config, String query, TimeRange timeRange, String creatorUserId) {
+        super(metricRegistry, Type.SEARCH_RESULT_COUNT, id, description, cacheTime, config, creatorUserId);
+        this.indexer = indexer;
 
         this.query = query;
         this.timeRange = timeRange;
-        this.core = core;
     }
 
     public String getQuery() {
@@ -63,7 +63,7 @@ public class SearchResultCountWidget extends DashboardWidget {
     @Override
     protected ComputationResult compute() {
         try {
-            CountResult cr = core.getIndexer().searches().count(query, timeRange);
+            CountResult cr = indexer.searches().count(query, timeRange);
             return new ComputationResult(cr.getCount(), cr.getTookMs());
         } catch (IndexHelper.InvalidRangeFormatException e) {
             throw new RuntimeException("Invalid timerange format.", e);

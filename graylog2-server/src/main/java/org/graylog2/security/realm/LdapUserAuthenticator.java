@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 TORCH GmbH
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -25,7 +25,6 @@ import org.apache.directory.ldap.client.api.LdapNetworkConnection;
 import org.apache.shiro.authc.*;
 import org.apache.shiro.authc.credential.AllowAllCredentialsMatcher;
 import org.apache.shiro.realm.AuthenticatingRealm;
-import org.graylog2.Core;
 import org.graylog2.security.TrustAllX509TrustManager;
 import org.graylog2.security.ldap.LdapConnector;
 import org.graylog2.security.ldap.LdapEntry;
@@ -33,7 +32,6 @@ import org.graylog2.security.ldap.LdapSettings;
 import org.graylog2.security.ldap.LdapSettingsService;
 import org.graylog2.users.User;
 import org.graylog2.users.UserService;
-import org.graylog2.users.UserServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,19 +41,17 @@ import java.util.concurrent.atomic.AtomicReference;
 public class LdapUserAuthenticator extends AuthenticatingRealm {
     private static final Logger log = LoggerFactory.getLogger(LdapUserAuthenticator.class);
 
-    private final Core core;
     private final LdapConnector ldapConnector;
 
     private final AtomicReference<LdapSettings> settings;
     private final UserService userService;
 
-    public LdapUserAuthenticator(Core core, LdapConnector ldapConnector, LdapSettingsService ldapSettingsService) {
-        this.core = core;
+    public LdapUserAuthenticator(LdapConnector ldapConnector, LdapSettingsService ldapSettingsService, UserService userService) {
         this.ldapConnector = ldapConnector;
+        this.userService = userService;
         setAuthenticationTokenClass(UsernamePasswordToken.class);
         setCredentialsMatcher(new AllowAllCredentialsMatcher());
         this.settings = new AtomicReference<LdapSettings>(ldapSettingsService.load());
-        this.userService = new UserServiceImpl(core.getMongoConnection(), core.getConfiguration());
     }
 
     @Override

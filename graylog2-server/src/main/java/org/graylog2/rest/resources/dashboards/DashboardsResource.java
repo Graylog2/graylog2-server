@@ -20,6 +20,7 @@
 package org.graylog2.rest.resources.dashboards;
 
 import com.beust.jcommander.internal.Lists;
+import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Maps;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
@@ -32,6 +33,7 @@ import org.graylog2.dashboards.DashboardService;
 import org.graylog2.dashboards.widgets.DashboardWidget;
 import org.graylog2.dashboards.widgets.InvalidWidgetConfigurationException;
 import org.graylog2.database.ValidationException;
+import org.graylog2.indexer.Indexer;
 import org.graylog2.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.rest.documentation.annotations.*;
 import org.graylog2.rest.resources.RestResource;
@@ -73,6 +75,12 @@ public class DashboardsResource extends RestResource {
 
     @Inject
     private ActivityWriter activityWriter;
+
+    @Inject
+    private MetricRegistry metricRegistry;
+
+    @Inject
+    private Indexer indexer;
 
     @POST
     @Timed
@@ -295,12 +303,12 @@ public class DashboardsResource extends RestResource {
 
         DashboardWidget widget;
         try {
-            widget = DashboardWidget.fromRequest(core, awr);
+            widget = DashboardWidget.fromRequest(metricRegistry, indexer, awr);
 
             Dashboard dashboard = dashboardRegistry.get(dashboardId);
 
             if (dashboard == null) {
-                LOG.error("Dashboard not found.");
+                LOG.error("Dashboard [{}] not found.", dashboardId);
                 throw new WebApplicationException(404);
             }
 

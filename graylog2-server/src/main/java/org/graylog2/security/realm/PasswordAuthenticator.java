@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 TORCH GmbH
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -21,24 +21,26 @@ package org.graylog2.security.realm;
 import org.apache.shiro.authc.*;
 import org.apache.shiro.realm.AuthenticatingRealm;
 import org.apache.shiro.util.ByteSource;
-import org.graylog2.Core;
+import org.graylog2.Configuration;
 import org.graylog2.users.User;
 import org.graylog2.users.UserService;
-import org.graylog2.users.UserServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.inject.Inject;
 
 /**
  * @author Kay Roepke <kay@torch.sh>
  */
 public class PasswordAuthenticator extends AuthenticatingRealm {
     private static final Logger log = LoggerFactory.getLogger(PasswordAuthenticator.class);
-    private final Core core;
     private final UserService userService;
+    private final Configuration configuration;
 
-    public PasswordAuthenticator(Core core) {
-        this.core = core;
-        this.userService = new UserServiceImpl(core.getMongoConnection(), core.getConfiguration());
+    @Inject
+    public PasswordAuthenticator(UserService userService, Configuration configuration) {
+        this.userService = userService;
+        this.configuration = configuration;
     }
 
     @Override
@@ -62,7 +64,7 @@ public class PasswordAuthenticator extends AuthenticatingRealm {
         }
         return new SimpleAccount(token.getPrincipal(),
                 user.getHashedPassword(),
-                ByteSource.Util.bytes(core.getConfiguration().getPasswordSecret()),
+                ByteSource.Util.bytes(configuration.getPasswordSecret()),
                 "graylog2MongoDbRealm");
     }
 }

@@ -19,7 +19,6 @@
 
 package org.graylog2.filters;
 
-import com.google.inject.Inject;
 import org.graylog2.Core;
 import org.graylog2.plugin.GraylogServer;
 import org.graylog2.plugin.Message;
@@ -29,6 +28,7 @@ import org.graylog2.streams.StreamRouter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
 import java.util.List;
 
 /**
@@ -38,8 +38,12 @@ public class StreamMatcherFilter implements MessageFilter {
 
     private static final Logger LOG = LoggerFactory.getLogger(StreamMatcherFilter.class);
 
+    private final StreamRouter streamRouter;
+
     @Inject
-    private StreamRouter streamRouter;
+    public StreamMatcherFilter(StreamRouter streamRouter) {
+        this.streamRouter = streamRouter;
+    }
 
     @Override
     public boolean filter(Message msg, GraylogServer server) {

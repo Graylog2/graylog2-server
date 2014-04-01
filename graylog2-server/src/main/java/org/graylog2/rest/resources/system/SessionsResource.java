@@ -16,6 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package org.graylog2.rest.resources.system;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
@@ -62,6 +63,8 @@ public class SessionsResource extends RestResource {
 
     @Inject
     private UserService userService;
+    @Inject
+    private DefaultSecurityManager securityManager;
 
     @POST
     @ApiOperation(value = "Create a new session", notes = "This request creates a new session for a user or reactivates an existing session: the equivalent of logging in.")
@@ -120,7 +123,7 @@ public class SessionsResource extends RestResource {
     @RequiresAuthentication
     public Response terminateSession(@ApiParam(title = "sessionId", required = true) @PathParam("sessionId") String sessionId) {
         final Subject subject = getSubject();
-        core.getSecurityManager().logout(subject);
+        securityManager.logout(subject);
 
         final org.apache.shiro.session.Session session = subject.getSession(false);
         if (session == null || !session.getId().equals(sessionId)) {

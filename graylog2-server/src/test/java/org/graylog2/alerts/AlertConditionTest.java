@@ -20,7 +20,6 @@
 package org.graylog2.alerts;
 
 import com.google.common.collect.Maps;
-import org.graylog2.Core;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.indexer.Indexer;
 import org.graylog2.indexer.searches.Searches;
@@ -40,7 +39,6 @@ import static org.testng.AssertJUnit.*;
  */
 public class AlertConditionTest {
     protected Stream stream;
-    protected Core core;
     protected Indexer indexer;
     protected Searches searches;
     protected AlertService alertService;
