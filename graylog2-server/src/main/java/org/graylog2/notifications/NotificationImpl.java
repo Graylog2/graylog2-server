@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 TORCH GmbH
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -20,7 +20,6 @@ package org.graylog2.notifications;
 
 import com.google.common.collect.Maps;
 import org.bson.types.ObjectId;
-import org.graylog2.Core;
 import org.graylog2.cluster.Node;
 import org.graylog2.database.CollectionName;
 import org.graylog2.database.PersistedImpl;
@@ -132,11 +131,6 @@ public class NotificationImpl extends PersistedImpl implements Notification {
         result.remove("_id");
 
         return result;
-    }
-
-    @Override
-    public Notification addThisNode(Core core) {
-        return addNode(core.getNodeId());
     }
 
     @Override

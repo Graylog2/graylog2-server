@@ -19,7 +19,6 @@
 
 package org.graylog2.cluster;
 
-import org.graylog2.Core;
 import org.graylog2.database.PersistedService;
 import org.graylog2.plugin.system.NodeId;
 
@@ -31,13 +30,9 @@ import java.util.Map;
  */
 public interface NodeService extends PersistedService {
     String registerServer(String nodeId, boolean isMaster, URI restTransportUri);
-    String registerServer(Core core, boolean isMaster, URI restTransportUri);
 
     String registerRadio(String nodeId, String restTransportUri);
 
-    Node thisNode(Core core) throws NodeNotFoundException;
-
-    Node byNodeId(Core core, String nodeId) throws NodeNotFoundException;
     Node byNodeId(String nodeId) throws NodeNotFoundException;
     Node byNodeId(NodeId nodeId) throws NodeNotFoundException;
 
@@ -51,7 +46,7 @@ public interface NodeService extends PersistedService {
 
     void markAsAlive(Node node, boolean isMaster, URI restTransportAddress);
 
-    boolean isOnlyMaster(Core core);
+    boolean isOnlyMaster(NodeId nodeIde);
 
     boolean isAnyMasterPresent();
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 TORCH GmbH
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -19,7 +19,6 @@
 
 package org.graylog2.notifications;
 
-import org.graylog2.Core;
 import org.graylog2.cluster.Node;
 import org.graylog2.plugin.database.Persisted;
 import org.joda.time.DateTime;
@@ -49,8 +48,6 @@ public interface Notification extends Persisted {
     Notification addDetail(String key, Object value);
 
     Map<String, Object> asMap();
-
-    Notification addThisNode(Core core);
 
     Notification addNode(String nodeId);
 

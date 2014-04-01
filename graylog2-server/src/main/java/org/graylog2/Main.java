@@ -177,24 +177,24 @@ public final class Main extends NodeRunner {
 
         // Register this node.
         final NodeService nodeService = injector.getInstance(NodeService.class);
-        nodeService.registerServer(server, configuration.isMaster(), configuration.getRestTransportUri());
+        nodeService.registerServer(serverStatus.getNodeId().toString(), configuration.isMaster(), configuration.getRestTransportUri());
 
         Node thisNode = null;
         try {
-            thisNode = nodeService.thisNode(server);
+            thisNode = nodeService.byNodeId(serverStatus.getNodeId());
         } catch (NodeNotFoundException e) {
             throw new RuntimeException("Did not find own node. This should never happen.", e);
         }
 
         final ActivityWriter activityWriter = injector.getInstance(ActivityWriter.class);
-        if (configuration.isMaster() && !nodeService.isOnlyMaster(server)) {
+        if (configuration.isMaster() && !nodeService.isOnlyMaster(serverStatus.getNodeId())) {
             LOG.warn("Detected another master in the cluster. Retrying in {} seconds to make sure it is not "
                     + "an old stale instance.", NodeServiceImpl.PING_TIMEOUT);
             try {
                 Thread.sleep(NodeServiceImpl.PING_TIMEOUT*1000);
             } catch (InterruptedException e) { /* nope */ }
             
-            if (!nodeService.isOnlyMaster(server)) {
+            if (!nodeService.isOnlyMaster(serverStatus.getNodeId())) {
                 // All devils here.
                 String what = "Detected other master node in the cluster! Starting as non-master! "
                         + "This is a mis-configuration you should fix.";

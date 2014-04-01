@@ -26,7 +26,6 @@ import com.google.inject.Inject;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import org.bson.types.ObjectId;
-import org.graylog2.Core;
 import org.graylog2.dashboards.widgets.DashboardWidget;
 import org.graylog2.dashboards.widgets.InvalidWidgetConfigurationException;
 import org.graylog2.database.MongoConnection;
@@ -68,7 +67,7 @@ public class DashboardServiceImpl extends PersistedServiceImpl implements Dashbo
     }
 
     @Override
-    public List<Dashboard> all(Core core) {
+    public List<Dashboard> all() {
         List<Dashboard> dashboards = Lists.newArrayList();
 
         List<DBObject> results = query(DashboardImpl.class, new BasicDBObject());

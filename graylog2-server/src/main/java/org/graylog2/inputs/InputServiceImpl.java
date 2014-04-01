@@ -24,7 +24,6 @@ import com.google.inject.Inject;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import org.bson.types.ObjectId;
-import org.graylog2.Core;
 import org.graylog2.cluster.Node;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.NotFoundException;
@@ -59,18 +58,13 @@ public class InputServiceImpl extends PersistedServiceImpl implements InputServi
     }
 
     @Override
-    public List<Input> allOfThisNode(Core core) {
-        return allOfThisNode(core.getNodeId());
-    }
-
-    @Override
     public List<Input> allOfRadio(Node radio) {
         List<Input> inputs = Lists.newArrayList();
         List<BasicDBObject> query = Lists.newArrayList();
         query.add(new BasicDBObject("radio_id", radio.getNodeId()));
         query.add(new BasicDBObject("global", true));
 
-        for (DBObject o : query(org.graylog2.inputs.InputImpl.class, new BasicDBObject("$or", query))) {
+        for (DBObject o : query(InputImpl.class, new BasicDBObject("$or", query))) {
             inputs.add(new org.graylog2.inputs.InputImpl((ObjectId) o.get("_id"), o.toMap()));
         }
 

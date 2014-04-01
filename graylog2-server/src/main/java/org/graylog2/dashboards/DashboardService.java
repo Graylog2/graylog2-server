@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 TORCH GmbH
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -19,7 +19,6 @@
 
 package org.graylog2.dashboards;
 
-import org.graylog2.Core;
 import org.graylog2.dashboards.widgets.DashboardWidget;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.database.PersistedService;
@@ -34,7 +33,7 @@ import java.util.List;
 public interface DashboardService extends PersistedService {
     Dashboard load(String id) throws NotFoundException;
 
-    List<Dashboard> all(Core core);
+    List<Dashboard> all();
 
     void updateWidgetPositions(Dashboard dashboard, List<WidgetPositionRequest> positions) throws ValidationException;
 

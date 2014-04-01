@@ -66,17 +66,11 @@ import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.outputs.MessageOutput;
 import org.graylog2.plugin.rest.AnyExceptionClassMapper;
 import org.graylog2.plugin.rest.JacksonPropertyExceptionMapper;
-import org.graylog2.plugin.system.NodeId;
 import org.graylog2.plugins.LegacyPluginLoader;
 import org.graylog2.rest.CORSFilter;
 import org.graylog2.rest.ObjectMapperProvider;
 import org.graylog2.rest.RestAccessLogFilter;
-import org.graylog2.savedsearches.SavedSearchService;
-import org.graylog2.savedsearches.SavedSearchServiceImpl;
-import org.graylog2.security.AccessTokenService;
-import org.graylog2.security.AccessTokenServiceImpl;
 import org.graylog2.security.ShiroSecurityBinding;
-import org.graylog2.security.ShiroSecurityContextFactory;
 import org.graylog2.security.ldap.LdapConnector;
 import org.graylog2.security.realm.LdapUserAuthenticator;
 import org.graylog2.shared.ServerStatus;
@@ -251,7 +245,7 @@ public class Core implements GraylogServer {
         }
 
         if (serverStatus.hasCapability(ServerStatus.Capability.MASTER)) {
-            dashboardRegistry.loadPersisted(this);
+            dashboardRegistry.loadPersisted();
         }
 
         outputBuffer.initialize();
@@ -312,10 +306,6 @@ public class Core implements GraylogServer {
 
         // Load persisted inputs.
         inputs.launchAllPersisted();
-    }
-
-    public void incrementStreamThroughput(String streamId) {
-        throughputStats.incrementStreamThroughput(streamId);
     }
 
     private class Graylog2Binder extends AbstractBinder {

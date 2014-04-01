@@ -19,7 +19,6 @@
 
 package org.graylog2.inputs;
 
-import org.graylog2.Core;
 import org.graylog2.cluster.Node;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.database.PersistedService;
@@ -33,7 +32,6 @@ import java.util.List;
  */
 public interface InputService extends PersistedService {
     List<Input> allOfThisNode(String nodeId);
-    List<Input> allOfThisNode(Core core);
 
     List<Input> allOfRadio(Node radio);
 

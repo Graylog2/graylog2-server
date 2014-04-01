@@ -24,7 +24,6 @@ import com.google.inject.Inject;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import org.bson.types.ObjectId;
-import org.graylog2.Core;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PersistedServiceImpl;
 import org.graylog2.database.ValidationException;
@@ -60,11 +59,6 @@ public class NodeServiceImpl extends PersistedServiceImpl implements NodeService
     }
 
     @Override
-    public String registerServer(Core core, boolean isMaster, URI restTransportUri) {
-        return registerServer(core.getNodeId(), isMaster, restTransportUri);
-    }
-
-    @Override
     public String registerRadio(String nodeId, String restTransportUri) {
         Map<String, Object> fields = Maps.newHashMap();
         fields.put("last_seen", Tools.getUTCTimestamp());
@@ -80,17 +74,6 @@ public class NodeServiceImpl extends PersistedServiceImpl implements NodeService
     }
 
     @Override
-    public Node thisNode(Core core) throws NodeNotFoundException {
-        DBObject o = findOne(NodeImpl.class, new BasicDBObject("node_id", core.getNodeId()));
-
-        if (o == null || !o.containsField("node_id")) {
-            throw new NodeNotFoundException("Did not find our own node. This should never happen.");
-        }
-
-        return new NodeImpl((ObjectId) o.get("_id"), o.toMap());
-    }
-
-    @Override
     public Node byNodeId(String nodeId) throws NodeNotFoundException {
         DBObject query = new BasicDBObject("node_id", nodeId);
         DBObject o = findOne(NodeImpl.class, query);
@@ -100,11 +83,6 @@ public class NodeServiceImpl extends PersistedServiceImpl implements NodeService
         }
 
         return new NodeImpl((ObjectId) o.get("_id"), o.toMap());
-    }
-
-    @Override
-    public Node byNodeId(Core core, String nodeId) {
-        return byNodeId(core, nodeId);
     }
 
     @Override
@@ -172,11 +150,11 @@ public class NodeServiceImpl extends PersistedServiceImpl implements NodeService
     }
 
     @Override
-    public boolean isOnlyMaster(Core core) {
+    public boolean isOnlyMaster(NodeId nodeId) {
         BasicDBObject query = new BasicDBObject();
         query.put("type", NodeImpl.Type.SERVER.toString());
         query.put("last_seen", new BasicDBObject("$gte", Tools.getUTCTimestamp()-PING_TIMEOUT));
-        query.put("node_id", new BasicDBObject("$ne", core.getNodeId()));
+        query.put("node_id", new BasicDBObject("$ne", nodeId.toString()));
         query.put("is_master", true);
 
         return query(NodeImpl.class, query).size() == 0;
