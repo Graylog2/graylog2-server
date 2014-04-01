@@ -414,7 +414,7 @@ form #stream-rules {
 
 .rickshaw_graph .x_tick {
     position: relative;
-    top: 30px;
+    top: 38px;
 }
 
 #sidebar .rickshaw_graph .x_tick {
@@ -887,7 +887,7 @@ form #stream-rules {
 }
 
 .quickvalues-up .arrow {
-    top: 380px;
+    top: 350px;
 }
 
 .quickvalues-down .arrow {
@@ -1851,6 +1851,14 @@ input.required-input-highlight {
     color: #ebebeb;
 }
 
+.quickvalues_widget table {
+    table-layout:fixed;
+}
+
+.quickvalues_widget td {
+    word-wrap:break-word;
+}
+
 .widget .replay-link {
     color: #000;
 }
@@ -1912,7 +1920,7 @@ hr.search-result-head-separator {
 .zeroclipboard-is-active { color: #1a5273; }
 
 .result-highlight-colored {
-    background-color: #ffff00;
+    background-color: #fffcb0;
 }
 
 
@@ -1926,4 +1934,21 @@ hr.search-result-head-separator {
 .result-highlight-control input {
     font-size: 12px;
     display: inline;
+}
+
+#built-query .copy-clipboard {
+    cursor: pointer;
+}
+
+.node-state {
+    cursor: help
+}
+
+.node-row .dropdown-menu a.selected {
+    font-weight: bold;
+}
+
+.annotation .content {
+    margin-bottom: 10px;
+    cursor: auto !important;
 }

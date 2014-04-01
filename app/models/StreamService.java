@@ -22,6 +22,7 @@ import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 import lib.APIException;
 import lib.ApiClient;
+import models.alerts.Alert;
 import models.api.requests.streams.CreateStreamRequest;
 import models.api.requests.streams.TestMatchRequest;
 import models.api.responses.EmptyResponse;
@@ -71,7 +72,6 @@ public class StreamService {
             streams.add(streamFactory.fromSummaryResponse(stream));
         }
 
-        //return new StreamsResult(r.total, r.streams);
         return streams;
     }
 
@@ -116,5 +116,15 @@ public class StreamService {
 
     public void sendDummyAlert(String streamId) throws APIException, IOException {
         api.get(EmptyResponse.class).path("/streams/"+streamId+"/alerts/sendDummyAlert").expect(Http.Status.NO_CONTENT).execute();
+    }
+
+    public List<Alert> allowedAlertsSince(int since) throws IOException, APIException {
+        List<Alert> alerts = Lists.newArrayList();
+
+        for(Stream stream : all()) {
+            alerts.addAll(stream.getAlertsSince(since));
+        }
+
+        return alerts;
     }
 }

@@ -360,6 +360,16 @@ public class Node extends ClusterEntity {
         return this.systemInfo.isProcessing;
     }
 
+    public String getLifecycle() {
+        requireSystemInfo();
+        return this.systemInfo.lifecycle;
+    }
+
+    public boolean lbAlive() {
+        requireSystemInfo();
+        return this.systemInfo.lbStatus != null && this.systemInfo.lbStatus.equals("alive");
+    }
+
     public String getVersion() {
         requireSystemInfo();
         return systemInfo.version;
@@ -411,6 +421,13 @@ public class Node extends ClusterEntity {
     public void resume() throws IOException, APIException {
         api.put()
             .path("/system/processing/resume")
+            .node(this)
+            .execute();
+    }
+
+    public void overrideLbStatus(String override) throws APIException, IOException {
+        api.put()
+            .path("/system/lbstatus/override/{0}", override)
             .node(this)
             .execute();
     }
@@ -479,6 +496,13 @@ public class Node extends ClusterEntity {
 
     public void setActive(boolean active) {
         this.active.set(active);
+    }
+
+    public void shutdown() throws APIException, IOException {
+        api.post().path("/system/shutdown")
+                .node(this)
+                .expect(Http.Status.ACCEPTED)
+                .execute();
     }
 
     @Override

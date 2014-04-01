@@ -23,6 +23,7 @@ import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import lib.APIException;
 import lib.ApiClient;
+import lib.ApiRequestBuilder;
 import models.alerts.Alert;
 import models.alerts.AlertConditionService;
 import models.api.requests.alerts.CreateAlertConditionRequest;
@@ -34,6 +35,7 @@ import models.api.responses.streams.StreamThroughputResponse;
 import org.joda.time.DateTime;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 
 public class Stream {
@@ -137,9 +139,13 @@ public class Stream {
     }
 
     public List<Alert> getAlerts() throws APIException, IOException {
+        return getAlertsSince(0);
+    }
+
+    public List<Alert> getAlertsSince(int since) throws APIException, IOException {
         List<Alert> alerts = Lists.newArrayList();
 
-        for (AlertSummaryResponse alert : getAlertsInformation().alerts) {
+        for (AlertSummaryResponse alert : getAlertsInformation(since).alerts) {
             alerts.add(new Alert(alert));
         }
 
@@ -147,7 +153,7 @@ public class Stream {
     }
 
     public Long getTotalAlerts() throws APIException, IOException {
-        return getAlertsInformation().total;
+        return getAlertsInformation(0).total;
     }
 
     public String getId() {
@@ -182,9 +188,16 @@ public class Stream {
         return (disabled != null && disabled);
     }
 
-    private final AlertsResponse getAlertsInformation() throws APIException, IOException {
+    private final AlertsResponse getAlertsInformation(int since) throws APIException, IOException {
         if (alertsResponse == null) {
-            alertsResponse = api.get(AlertsResponse.class).path("/streams/{0}/alerts", getId()).execute();
+            ApiRequestBuilder<AlertsResponse> call = api.get(AlertsResponse.class)
+                    .path("/streams/{0}/alerts", getId());
+
+            if (since > 0) {
+                call.queryParam("since", since);
+            }
+
+            alertsResponse = call.execute();
         }
 
         return alertsResponse;
@@ -210,4 +223,5 @@ public class Stream {
     public List<String> getEmailAlertReceivers() {
         return emailAlertReceivers;
     }
+
 }

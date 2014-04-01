@@ -672,6 +672,11 @@ $(document).ready(function() {
     });
 
     $(".sources").dynatable({
+        readers: {
+            'messageCount': function(el, record) {
+                return Number(el.innerHTML) || 0;
+            }
+        },
         inputs: {
             perPageText: "Per page: "
         },
@@ -730,6 +735,18 @@ $(document).ready(function() {
         $(".alert-condition[data-condition-id=" + $(this).attr("data-condition-id") + "]").effect(
             "highlight", { duration: 2000 }
         );
+    });
+
+    // Super confirmations (tm)
+    $("a[data-super-confirm]").on("click", function(e) {
+        var text = $(this).attr("data-super-confirm") + " (Confirm by typing in \"" + $(this).attr("data-super-confirm-word") + "\")";
+        var confirm = prompt(text);
+
+        if (confirm === $(this).attr("data-super-confirm-word")) {
+            return true;
+        }
+
+        return false;
     });
 
     function scrollToSearchbarHint() {
@@ -814,8 +831,8 @@ $(document).ready(function() {
         var result = confirm("Really delete stream?");
         if (result) {
             var elem = $(this).closest(".stream-row");
-            var url = event.currentTarget.attributes["data-removeUrl"].value;
-            $.post(appPrefixed(url), {}, function() {
+            var url = event.currentTarget.attributes["data-removeUrl"].value; // url already prefixed in template
+            $.post(url, {}, function() {
                 elem.fadeOut();
             });
         }
@@ -865,6 +882,8 @@ $(document).ready(function() {
     }
 
     $('input, textarea').placeholder();
+
+    $(".node-state").tooltip();
 });
 
 function searchDateTimeFormatted(date) {

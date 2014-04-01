@@ -34,7 +34,12 @@ public class SystemOverviewResponse {
 
     public String hostname;
 
+    public String lifecycle;
+
     @SerializedName("is_processing")
     public boolean isProcessing;
+
+    @SerializedName("lb_status")
+    public String lbStatus;
 
 }

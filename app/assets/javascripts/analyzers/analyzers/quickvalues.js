@@ -227,7 +227,7 @@ $(document).ready(function() {
 
         switch(direction)  {
             case "up":
-                var top = button.offset().top-$(window).scrollTop()-390;
+                var top = button.offset().top-$(window).scrollTop()-355;
                 quickvalues.removeClass("quickvalues-down");
                 quickvalues.addClass("quickvalues-up");
                 break;

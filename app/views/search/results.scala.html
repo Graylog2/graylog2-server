@@ -127,6 +127,7 @@
 
 <div id="y_axis"></div>
 <div id="result-graph"></div>
+<div id="result-graph-timeline"></div>
 
 
 <script>
@@ -180,6 +181,13 @@
         new Rickshaw.Graph.Graylog2Selector( {
             graph: resultGraph
         });
+
+        var annotator = new Rickshaw.Graph.Annotate({
+            graph: resultGraph,
+            element: document.getElementById('result-graph-timeline')
+        });
+
+        fillAlertAnnotator(resultGraph, annotator);
 
         resultGraph.render();
     }

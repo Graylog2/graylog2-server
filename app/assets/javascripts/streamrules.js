@@ -17,6 +17,7 @@ $(document).ready(function() {
                 $("#sr-label-value", modalBody).hide();
                 $("#sr-result-value", modalBody).hide();
             } else {
+                $("#sr-value", modalBody).val("");
                 $("#sr-value", modalBody).show();
                 $("#sr-label-value", modalBody).show();
                 $("#sr-result-value", modalBody).show();
@@ -46,8 +47,8 @@ $(document).ready(function() {
         var streamId = $(this).attr('data-stream-id');
         if (result) {
             var elem = $(this).parent();
-            var url = event.currentTarget.attributes["data-removeUrl"].value;
-            $.post(appPrefixed(url), {}, function() {
+            var url = event.currentTarget.attributes["data-removeUrl"].value; // url already prefixed in template
+            $.post(url, {}, function() {
                 var parent_list = $(elem).closest("ul");
                 elem.remove();
 
