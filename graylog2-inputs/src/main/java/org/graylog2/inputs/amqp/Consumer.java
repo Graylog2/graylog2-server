@@ -80,12 +80,6 @@ public class Consumer {
 
         this.graylogServer = graylogServer;
         this.sourceInput = sourceInput;
-    }
-
-    public void run() throws IOException {
-        if (!isConnected()) {
-            connect();
-        }
 
         ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
         scheduler.scheduleAtFixedRate(new Runnable() {
@@ -95,6 +89,12 @@ public class Consumer {
                 lastSecBytesReadTmp.set(0);
             }
         }, 1, 1, TimeUnit.SECONDS);
+    }
+
+    public void run() throws IOException {
+        if (!isConnected()) {
+            connect();
+        }
 
         final MessagePack msgpack = new MessagePack();
 
@@ -155,6 +155,31 @@ public class Consumer {
 
             LOG.info("AMQP prefetch count overriden to <{}>.", prefetchCount);
         }
+
+        connection.addShutdownListener(new ShutdownListener() {
+            @Override
+            public void shutdownCompleted(ShutdownSignalException cause) {
+                while (true) {
+                    try {
+                        LOG.error("AMQP connection lost! Trying reconnect in 1 second.");
+
+                        Thread.sleep(1000);
+
+                        connect();
+
+                        LOG.info("Connected! Re-starting consumer.");
+
+                        run();
+
+                        LOG.info("Consumer running.");
+                        break;
+                    } catch(IOException e) {
+                        LOG.error("Could not re-connect to AMQP broker.", e);
+                    } catch(InterruptedException ignored) {
+                    }
+                }
+            }
+        });
     }
 
 
