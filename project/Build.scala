@@ -5,7 +5,7 @@ import play.Project._
 object ApplicationBuild extends Build {
 
   val appName         = "graylog2-web-interface"
-  val appVersion      = "0.20.1"
+  val appVersion      = "0.20.2-snapshot"
 
   val appDependencies = Seq(
     cache,
