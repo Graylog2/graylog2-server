@@ -20,13 +20,13 @@
 
 package org.graylog2.inputs.syslog.tcp;
 
-import org.graylog2.plugin.GraylogServer;
-import org.graylog2.plugin.InputHost;
-import org.graylog2.plugin.inputs.util.ConnectionCounter;
-import org.graylog2.plugin.inputs.util.ThroughputCounter;
+import org.graylog2.inputs.network.PacketInformationDumper;
 import org.graylog2.inputs.syslog.SyslogDispatcher;
+import org.graylog2.plugin.InputHost;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.inputs.MessageInput;
+import org.graylog2.plugin.inputs.util.ConnectionCounter;
+import org.graylog2.plugin.inputs.util.ThroughputCounter;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.channel.ChannelPipeline;
 import org.jboss.netty.channel.ChannelPipelineFactory;
@@ -64,6 +64,7 @@ public class SyslogTCPPipelineFactory implements ChannelPipelineFactory {
         }
                 
         ChannelPipeline p = Channels.pipeline();
+        p.addLast("packet-meta-dumper", new PacketInformationDumper(sourceInput));
         p.addLast("connection-counter", connectionCounter);
         p.addLast("framer", new DelimiterBasedFrameDecoder(2 * 1024 * 1024, delimiter));
         p.addLast("traffic-counter", throughputCounter);

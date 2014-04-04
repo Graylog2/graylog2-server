@@ -19,8 +19,8 @@
  */
 package org.graylog2.inputs.raw.tcp;
 
+import org.graylog2.inputs.network.PacketInformationDumper;
 import org.graylog2.inputs.raw.RawDispatcher;
-import org.graylog2.plugin.GraylogServer;
 import org.graylog2.plugin.InputHost;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.inputs.MessageInput;
@@ -63,6 +63,7 @@ public class RawTCPPipelineFactory implements ChannelPipelineFactory {
         }
 
         ChannelPipeline p = Channels.pipeline();
+        p.addLast("packet-meta-dumper", new PacketInformationDumper(sourceInput));
         p.addLast("connection-counter", connectionCounter);
         p.addLast("traffic-counter", throughputCounter);
         p.addLast("framer", new DelimiterBasedFrameDecoder(2 * 1024 * 1024, delimiter));

@@ -19,11 +19,11 @@
  */
 package org.graylog2.inputs.gelf.http;
 
-import org.graylog2.plugin.GraylogServer;
+import org.graylog2.inputs.network.PacketInformationDumper;
 import org.graylog2.plugin.InputHost;
+import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.util.ConnectionCounter;
 import org.graylog2.plugin.inputs.util.ThroughputCounter;
-import org.graylog2.plugin.inputs.MessageInput;
 import org.jboss.netty.channel.ChannelPipeline;
 import org.jboss.netty.channel.ChannelPipelineFactory;
 import org.jboss.netty.channel.Channels;
@@ -49,6 +49,7 @@ public class GELFHttpPipelineFactory implements ChannelPipelineFactory {
     public ChannelPipeline getPipeline() throws Exception {
         final ChannelPipeline pipeline = Channels.pipeline();
 
+        pipeline.addLast("packet-meta-dumper", new PacketInformationDumper(sourceInput));
         pipeline.addLast("connection-counter", connectionCounter);
         pipeline.addLast("traffic-counter", throughputCounter);
         pipeline.addLast("decoder", new HttpRequestDecoder());

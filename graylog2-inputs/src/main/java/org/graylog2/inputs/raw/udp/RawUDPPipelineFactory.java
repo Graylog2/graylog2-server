@@ -19,8 +19,8 @@
  */
 package org.graylog2.inputs.raw.udp;
 
+import org.graylog2.inputs.network.PacketInformationDumper;
 import org.graylog2.inputs.raw.RawDispatcher;
-import org.graylog2.plugin.GraylogServer;
 import org.graylog2.plugin.InputHost;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.inputs.MessageInput;
@@ -49,6 +49,7 @@ public class RawUDPPipelineFactory implements ChannelPipelineFactory {
     @Override
     public ChannelPipeline getPipeline() throws Exception {
         ChannelPipeline p = Channels.pipeline();
+        p.addLast("packet-meta-dumper", new PacketInformationDumper(sourceInput));
         p.addLast("traffic-counter", throughputCounter);
         p.addLast("handler", new RawDispatcher(server, config, sourceInput));
 

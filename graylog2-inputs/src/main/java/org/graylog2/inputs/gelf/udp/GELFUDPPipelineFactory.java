@@ -20,14 +20,12 @@
 
 package org.graylog2.inputs.gelf.udp;
 
-import org.graylog2.plugin.GraylogServer;
-import org.graylog2.plugin.InputHost;
-import org.graylog2.plugin.inputs.util.ThroughputCounter;
 import org.graylog2.inputs.gelf.GELFDispatcher;
+import org.graylog2.inputs.network.PacketInformationDumper;
+import org.graylog2.plugin.InputHost;
 import org.graylog2.plugin.inputs.MessageInput;
-import org.jboss.netty.channel.ChannelPipeline;
-import org.jboss.netty.channel.ChannelPipelineFactory;
-import org.jboss.netty.channel.Channels;
+import org.graylog2.plugin.inputs.util.ThroughputCounter;
+import org.jboss.netty.channel.*;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
@@ -47,10 +45,10 @@ public class GELFUDPPipelineFactory implements ChannelPipelineFactory {
     @Override
     public ChannelPipeline getPipeline() throws Exception {
         ChannelPipeline p = Channels.pipeline();
+        p.addLast("packet-meta-dumper", new PacketInformationDumper(sourceInput));
         p.addLast("traffic-counter", throughputCounter);
         p.addLast("handler", new GELFDispatcher(server, sourceInput));
 
         return p;
     }
-    
 }

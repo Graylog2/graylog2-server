@@ -118,6 +118,19 @@ public class Message {
         return true;
     }
 
+    public String getValidationErrors() {
+        StringBuilder sb = new StringBuilder();
+
+        for (String key : REQUIRED_FIELDS) {
+            if (getField(key) == null) {
+                sb.append(key).append(" is missing, ");
+            } else if (((String)getField(key)).isEmpty()) {
+                sb.append(key).append(" is empty, ");
+            }
+        }
+        return sb.toString();
+    }
+
     public String getId() {
         return (String) getField("_id");
     }
