@@ -34,6 +34,7 @@ public class ExtractorFactory {
     // TODO: This parameter list is growing a bit out of control.
     public static Extractor factory(String id,
                                     String title,
+                                    int order,
                                     Extractor.CursorStrategy cursorStrategy,
                                     Extractor.Type type,
                                     String sourceField,
@@ -46,13 +47,13 @@ public class ExtractorFactory {
 
         switch (type) {
             case REGEX:
-                return new RegexExtractor(id, title, cursorStrategy, sourceField, targetField, extractorConfig, creatorUserId, converters, conditionType, conditionValue);
+                return new RegexExtractor(id, title, order, cursorStrategy, sourceField, targetField, extractorConfig, creatorUserId, converters, conditionType, conditionValue);
             case SUBSTRING:
-                return new SubstringExtractor(id, title, cursorStrategy, sourceField, targetField, extractorConfig, creatorUserId, converters, conditionType, conditionValue);
+                return new SubstringExtractor(id, title, order, cursorStrategy, sourceField, targetField, extractorConfig, creatorUserId, converters, conditionType, conditionValue);
             case SPLIT_AND_INDEX:
-                return new SplitAndIndexExtractor(id, title, cursorStrategy, sourceField, targetField, extractorConfig, creatorUserId, converters, conditionType, conditionValue);
+                return new SplitAndIndexExtractor(id, title, order, cursorStrategy, sourceField, targetField, extractorConfig, creatorUserId, converters, conditionType, conditionValue);
             case COPY_INPUT:
-                return new CopyInputExtractor(id, title, cursorStrategy, sourceField, targetField, extractorConfig, creatorUserId, converters, conditionType, conditionValue);
+                return new CopyInputExtractor(id, title, order, cursorStrategy, sourceField, targetField, extractorConfig, creatorUserId, converters, conditionType, conditionValue);
             default:
                 throw new NoSuchExtractorException();
         }

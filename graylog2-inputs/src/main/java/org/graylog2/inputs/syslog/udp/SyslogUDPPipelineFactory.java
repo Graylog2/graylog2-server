@@ -19,7 +19,9 @@
 
 package org.graylog2.inputs.syslog.udp;
 
+
 import com.codahale.metrics.MetricRegistry;
+import org.graylog2.inputs.network.PacketInformationDumper;
 import org.graylog2.inputs.syslog.SyslogDispatcher;
 import org.graylog2.plugin.buffers.Buffer;
 import org.graylog2.plugin.configuration.Configuration;
@@ -54,6 +56,8 @@ public class SyslogUDPPipelineFactory implements ChannelPipelineFactory {
     @Override
     public ChannelPipeline getPipeline() throws Exception {
         ChannelPipeline p = Channels.pipeline();
+
+        p.addLast("packet-meta-dumper", new PacketInformationDumper(sourceInput));
         p.addLast("traffic-counter", throughputCounter);
         p.addLast("handler", new SyslogDispatcher(metricRegistry, processBuffer, config, sourceInput));
         

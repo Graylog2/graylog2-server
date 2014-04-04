@@ -19,9 +19,11 @@
 
 package org.graylog2.inputs.gelf.udp;
 
+
 import com.codahale.metrics.MetricRegistry;
 import org.graylog2.inputs.gelf.GELFDispatcher;
 import org.graylog2.inputs.gelf.gelf.GELFChunkManager;
+import org.graylog2.inputs.network.PacketInformationDumper;
 import org.graylog2.plugin.buffers.Buffer;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.util.ThroughputCounter;
@@ -55,10 +57,10 @@ public class GELFUDPPipelineFactory implements ChannelPipelineFactory {
     @Override
     public ChannelPipeline getPipeline() throws Exception {
         ChannelPipeline p = Channels.pipeline();
+        p.addLast("packet-meta-dumper", new PacketInformationDumper(sourceInput));
         p.addLast("traffic-counter", throughputCounter);
         p.addLast("handler", new GELFDispatcher(metricRegistry, gelfChunkManager, processBuffer, sourceInput));
 
         return p;
     }
-    
 }

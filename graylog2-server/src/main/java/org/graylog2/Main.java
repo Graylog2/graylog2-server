@@ -42,13 +42,15 @@ import org.graylog2.filters.*;
 import org.graylog2.initializers.Initializers;
 import org.graylog2.initializers.PeriodicalsInitializer;
 import org.graylog2.inputs.ServerInputRegistry;
+import org.graylog2.inputs.amqp.AMQPInput;
 import org.graylog2.inputs.gelf.http.GELFHttpInput;
 import org.graylog2.inputs.gelf.tcp.GELFTCPInput;
 import org.graylog2.inputs.gelf.udp.GELFUDPInput;
 import org.graylog2.inputs.kafka.KafkaInput;
 import org.graylog2.inputs.misc.jsonpath.JsonPathInput;
 import org.graylog2.inputs.misc.metrics.LocalMetricsInput;
-import org.graylog2.inputs.radio.RadioInput;
+import org.graylog2.inputs.radio.RadioAMQPInput;
+import org.graylog2.inputs.radio.RadioKafkaInput;
 import org.graylog2.inputs.random.FakeHttpMessageInput;
 import org.graylog2.inputs.raw.tcp.RawTCPInput;
 import org.graylog2.inputs.raw.udp.RawUDPInput;
@@ -248,7 +250,10 @@ public final class Main extends NodeRunner {
         inputRegistry.register(LocalMetricsInput.class, LocalMetricsInput.NAME);
         inputRegistry.register(JsonPathInput.class, JsonPathInput.NAME);
         inputRegistry.register(KafkaInput.class, KafkaInput.NAME);
-        inputRegistry.register(RadioInput.class, RadioInput.NAME);
+        inputRegistry.register(RadioKafkaInput.class, RadioKafkaInput.NAME);
+        inputRegistry.register(AMQPInput.class, AMQPInput.NAME);
+        inputRegistry.register(RadioAMQPInput.class, RadioAMQPInput.NAME);
+
 
         // Register initializers.
         Initializers initializers = injector.getInstance(Initializers.class);

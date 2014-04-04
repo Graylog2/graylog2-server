@@ -43,6 +43,7 @@ import org.graylog2.radio.buffers.processors.RadioProcessBufferProcessor;
 import org.graylog2.radio.cluster.Ping;
 import org.graylog2.radio.inputs.RadioInputRegistry;
 import org.graylog2.radio.transports.RadioTransport;
+import org.graylog2.radio.transports.amqp.AMQPProducer;
 import org.graylog2.radio.transports.kafka.KafkaProducer;
 import org.graylog2.shared.ServerStatus;
 import org.graylog2.shared.bindings.OwnServiceLocatorGenerator;
@@ -129,7 +130,21 @@ public class Radio implements GraylogServer {
         ProcessBufferProcessor[] processors = new ProcessBufferProcessor[processBufferProcessorCount];
 
         for (int i = 0; i < processBufferProcessorCount; i++) {
-            processors[i] = processBufferProcessorFactory.create(this.processBufferWatermark, i, processBufferProcessorCount, transport);
+            processors[i] = processBufferProcessorFactory.create(this.processBufferWatermark,
+                                                                 i,
+                                                                 processBufferProcessorCount,
+                                                                 transport);
+        }
+        // Set up transport.
+        switch (configuration.getTransportType()) {
+            case AMQP:
+                transport = new AMQPProducer(this);
+                break;
+            case KAFKA:
+                transport = new KafkaProducer(this);
+                break;
+            default:
+                throw new RuntimeException("Cannot map transport type to transport.");
         }
 
         processBuffer = processBufferFactory.create(inputCache, processBufferWatermark);

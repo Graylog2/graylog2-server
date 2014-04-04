@@ -23,25 +23,11 @@ package org.graylog2.shared.buffers.processors;
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
-import com.google.inject.assistedinject.Assisted;
-import com.google.inject.assistedinject.AssistedInject;
-import com.google.inject.Inject;
 import com.lmax.disruptor.EventHandler;
-import org.graylog2.plugin.GraylogServer;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.buffers.MessageEvent;
-import org.graylog2.plugin.filters.MessageFilter;
-import org.graylog2.shared.filters.FilterRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.graylog2.plugin.Message;
-import org.graylog2.plugin.buffers.MessageEvent;
-import org.graylog2.plugin.filters.MessageFilter;
-import org.graylog2.shared.filters.FilterRegistry;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.concurrent.atomic.AtomicInteger;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -101,6 +87,12 @@ public abstract class ProcessBufferProcessor implements EventHandler<MessageEven
             outgoingMessages.mark();
             tcx.stop();
         }
+
+        LOG.debug("Finished processing message <{}>. Writing to output buffer.", msg.getId());
+        handleMessage(msg);
+
+        outgoingMessages.mark();
+        tcx.stop();
     }
 
     protected abstract void handleMessage(Message msg);

@@ -22,7 +22,11 @@ package org.graylog2.outputs;
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
+import com.google.common.base.Joiner;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Ordering;
+import com.google.inject.Inject;
 import org.graylog2.indexer.Indexer;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.outputs.MessageOutput;
@@ -31,7 +35,6 @@ import org.graylog2.plugin.outputs.OutputStreamConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
 import java.util.List;
 import java.util.Map;
 
@@ -62,7 +65,11 @@ public class ElasticSearchOutput implements MessageOutput {
     @Override
     public void write(List<Message> messages, OutputStreamConfiguration streamConfig) throws Exception {
         LOG.debug("Writing <{}> messages.", messages.size());
-        
+        if (LOG.isTraceEnabled()) {
+            final List<String> sortedIds = Ordering.natural().sortedCopy(Lists.transform(messages, Message.ID_FUNCTION));
+            LOG.trace("Writing message ids to [{}]: <{}>", getName(), Joiner.on(", ").join(sortedIds));
+        }
+
         writes.mark();
 
         Timer.Context tcx = processTime.time();
