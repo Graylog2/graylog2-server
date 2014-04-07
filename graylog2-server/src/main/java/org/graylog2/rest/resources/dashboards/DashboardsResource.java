@@ -64,20 +64,24 @@ import java.util.concurrent.ExecutionException;
 public class DashboardsResource extends RestResource {
     private static final Logger LOG = LoggerFactory.getLogger(DashboardsResource.class);
 
-    @Inject
     private DashboardService dashboardService;
-
-    @Inject
     private DashboardRegistry dashboardRegistry;
-
-    @Inject
     private ActivityWriter activityWriter;
-
-    @Inject
     private MetricRegistry metricRegistry;
+    private Indexer indexer;
 
     @Inject
-    private Indexer indexer;
+    public DashboardsResource(DashboardService dashboardService,
+                              DashboardRegistry dashboardRegistry,
+                              ActivityWriter activityWriter,
+                              MetricRegistry metricRegistry,
+                              Indexer indexer) {
+        this.dashboardService = dashboardService;
+        this.dashboardRegistry = dashboardRegistry;
+        this.activityWriter = activityWriter;
+        this.metricRegistry = metricRegistry;
+        this.indexer = indexer;
+    }
 
     @POST
     @Timed

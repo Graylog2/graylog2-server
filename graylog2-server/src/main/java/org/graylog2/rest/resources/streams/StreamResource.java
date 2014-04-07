@@ -39,6 +39,7 @@ import org.graylog2.rest.resources.streams.requests.CreateRequest;
 import org.graylog2.security.RestPermissions;
 import org.graylog2.shared.stats.ThroughputStats;
 import org.graylog2.streams.*;
+import org.graylog2.system.jobs.SystemJobFactory;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
@@ -62,16 +63,21 @@ import java.util.Map;
 public class StreamResource extends RestResource {
 	private static final Logger LOG = LoggerFactory.getLogger(StreamResource.class);
 
-    @Inject
-    protected StreamService streamService;
+    private final StreamService streamService;
+    private final StreamRuleService streamRuleService;
+    private final ThroughputStats throughputStats;
+    private final MetricRegistry metricRegistry;
 
     @Inject
-    protected StreamRuleService streamRuleService;
-
-    @Inject
-    private ThroughputStats throughputStats;
-    @Inject
-    private MetricRegistry metricRegistry;
+    public StreamResource(StreamService streamService,
+                          StreamRuleService streamRuleService,
+                          ThroughputStats throughputStats,
+                          MetricRegistry metricRegistry) {
+        this.streamService = streamService;
+        this.streamRuleService = streamRuleService;
+        this.throughputStats = throughputStats;
+        this.metricRegistry = metricRegistry;
+    }
 
     @POST @Timed
     @ApiOperation(value = "Create a stream")

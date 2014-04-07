@@ -46,8 +46,11 @@ import javax.ws.rs.core.MediaType;
 public class AbsoluteSearchResource extends SearchResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(AbsoluteSearchResource.class);
+
     @Inject
-    private Indexer indexer;
+    public AbsoluteSearchResource(Indexer indexer) {
+        super(indexer);
+    }
 
     @GET @Timed
     @ApiOperation(value = "Message search with absolute timerange.",

@@ -54,14 +54,21 @@ public class DeflectorResource extends RestResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(DeflectorResource.class);
     
+    private final Deflector deflector;
+    private final Indexer indexer;
+    private final ActivityWriter activityWriter;
+    private final Configuration configuration;
+
     @Inject
-    private Deflector deflector;
-    @Inject
-    private Indexer indexer;
-    @Inject
-    private ActivityWriter activityWriter;
-    @Inject
-    private Configuration configuration;
+    public DeflectorResource(Deflector deflector,
+                             Indexer indexer,
+                             ActivityWriter activityWriter,
+                             Configuration configuration) {
+        this.deflector = deflector;
+        this.indexer = indexer;
+        this.activityWriter = activityWriter;
+        this.configuration = configuration;
+    }
 
     @GET @Timed
     @ApiOperation(value = "Get current deflector status")

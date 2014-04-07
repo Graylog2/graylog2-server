@@ -47,8 +47,12 @@ public class NotificationsResource extends RestResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(NotificationsResource.class);
 
+    private final NotificationService notificationService;
+
     @Inject
-    private NotificationService notificationService;
+    public NotificationsResource(NotificationService notificationService) {
+        this.notificationService = notificationService;
+    }
 
     @GET @Timed
     @ApiOperation(value = "Get all active notifications")

@@ -55,8 +55,12 @@ import java.util.Map;
  */
 public class SearchResource extends RestResource {
     private static final Logger LOG = LoggerFactory.getLogger(SearchResource.class);
+    protected final Indexer indexer;
+
     @Inject
-    private Indexer indexer;
+    public SearchResource(Indexer indexer) {
+        this.indexer = indexer;
+    }
 
     protected void validateInterval(String interval) {
         try {

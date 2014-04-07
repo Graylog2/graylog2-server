@@ -43,8 +43,12 @@ import java.util.Map;
 @Path("/count")
 public class CountResource extends RestResource {
 
-    @Inject
     private Indexer indexer;
+
+    @Inject
+    public CountResource(Indexer indexer) {
+        this.indexer = indexer;
+    }
 
     @GET @Path("/total") @Timed
     @RequiresPermissions(RestPermissions.MESSAGECOUNT_READ)

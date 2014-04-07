@@ -46,8 +46,11 @@ import javax.ws.rs.core.MediaType;
 public class KeywordSearchResource extends SearchResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(KeywordSearchResource.class);
+
     @Inject
-    private Indexer indexer;
+    public KeywordSearchResource(Indexer indexer) {
+        super(indexer);
+    }
 
     @GET @Timed
     @ApiOperation(value = "Message search with keyword as timerange.",

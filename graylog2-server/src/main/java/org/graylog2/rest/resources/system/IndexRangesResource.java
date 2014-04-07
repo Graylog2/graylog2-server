@@ -58,17 +58,21 @@ public class IndexRangesResource extends RestResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(IndexRangesResource.class);
 
-    @Inject
-    private IndexRangeService indexRangeService;
+    private final IndexRangeService indexRangeService;
+    private final RebuildIndexRangesJob.Factory rebuildIndexRangesJobFactory;
+    private final Deflector deflector;
+    private final SystemJobManager systemJobManager;
 
     @Inject
-    private RebuildIndexRangesJob.Factory rebuildIndexRangesJobFactory;
-
-    @Inject
-    private Deflector deflector;
-
-    @Inject
-    private SystemJobManager systemJobManager;
+    public IndexRangesResource(IndexRangeService indexRangeService,
+                               RebuildIndexRangesJob.Factory rebuildIndexRangesJobFactory,
+                               Deflector deflector,
+                               SystemJobManager systemJobManager) {
+        this.indexRangeService = indexRangeService;
+        this.rebuildIndexRangesJobFactory = rebuildIndexRangesJobFactory;
+        this.deflector = deflector;
+        this.systemJobManager = systemJobManager;
+    }
 
     @GET @Timed
     @ApiOperation(value = "Get a list of all index ranges")

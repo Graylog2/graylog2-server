@@ -43,8 +43,13 @@ import java.util.Map;
 public class DocumentationResource extends RestResource {
 
     private static final String RESOURCE_PACKAGE = "org.graylog2.rest.resources";
-    @Inject
+
     private Configuration configuration;
+
+    @Inject
+    public DocumentationResource(Configuration configuration) {
+        this.configuration = configuration;
+    }
 
     @GET
     @Timed

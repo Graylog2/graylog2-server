@@ -52,10 +52,15 @@ import java.util.Map;
 public class MetricsResource extends RestResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(MetricsResource.class);
+    private final MetricRegistry metricRegistry;
+    private final MongoConnection mongoConnection;
+
     @Inject
-    private MetricRegistry metricRegistry;
-    @Inject
-    private MongoConnection mongoConnection;
+    public MetricsResource(MetricRegistry metricRegistry,
+                           MongoConnection mongoConnection) {
+        this.metricRegistry = metricRegistry;
+        this.mongoConnection = mongoConnection;
+    }
 
     @GET @Timed
     @RequiresPermissions(RestPermissions.METRICS_READALL)

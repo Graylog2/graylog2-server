@@ -63,14 +63,10 @@ public class StreamAlertResource extends RestResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(StreamAlertResource.class);
 
-    @Inject
-    private StreamService streamService;
-
-    @Inject
-    private AlertService alertService;
-
-    @Inject
-    private AlertSender alertSender;
+    private final StreamService streamService;
+    private final AlertService alertService;
+    private final AlertSender alertSender;
+    private final Indexer indexer;
 
     private static final String CACHE_KEY_BASE = "alerts";
 
@@ -79,7 +75,15 @@ public class StreamAlertResource extends RestResource {
             .build();
 
     @Inject
-    private Indexer indexer;
+    public StreamAlertResource(StreamService streamService,
+                               AlertService alertService,
+                               AlertSender alertSender,
+                               Indexer indexer) {
+        this.streamService = streamService;
+        this.alertService = alertService;
+        this.alertSender = alertSender;
+        this.indexer = indexer;
+    }
 
     @POST @Timed
     @Path("conditions")

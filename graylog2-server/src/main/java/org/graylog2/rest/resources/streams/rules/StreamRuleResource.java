@@ -55,10 +55,15 @@ import java.util.Map;
 @Path("/streams/{streamid}/rules")
 public class StreamRuleResource extends RestResource {
     private static final Logger LOG = LoggerFactory.getLogger(StreamRuleResource.class);
+    private final StreamRuleService streamRuleService;
+    private final StreamService streamService;
+
     @Inject
-    private StreamRuleService streamRuleService;
-    @Inject
-    private StreamService streamService;
+    public StreamRuleResource(StreamRuleService streamRuleService,
+                              StreamService streamService) {
+        this.streamRuleService = streamRuleService;
+        this.streamService = streamService;
+    }
 
     @POST
     @Timed

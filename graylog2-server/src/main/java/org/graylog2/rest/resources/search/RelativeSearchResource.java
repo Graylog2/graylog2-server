@@ -46,8 +46,11 @@ import javax.ws.rs.core.MediaType;
 public class RelativeSearchResource extends SearchResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(RelativeSearchResource.class);
+
     @Inject
-    private Indexer indexer;
+    public RelativeSearchResource(Indexer indexer) {
+        super(indexer);
+    }
 
     @GET @Timed
     @ApiOperation(value = "Message search with relative timerange.",

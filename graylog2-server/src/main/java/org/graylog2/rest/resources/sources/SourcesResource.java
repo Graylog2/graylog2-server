@@ -60,8 +60,12 @@ public class SourcesResource extends RestResource {
             .expireAfterWrite(10, TimeUnit.SECONDS)
             .build();
 
+    private final Indexer indexer;
+
     @Inject
-    private Indexer indexer;
+    public SourcesResource(Indexer indexer) {
+        this.indexer = indexer;
+    }
 
     @GET @Timed
     @ApiOperation(

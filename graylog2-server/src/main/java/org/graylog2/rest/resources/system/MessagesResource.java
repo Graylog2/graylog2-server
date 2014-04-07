@@ -53,8 +53,12 @@ public class    MessagesResource extends RestResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(MessagesResource.class);
 
+    private final SystemMessageService systemMessageService;
+
     @Inject
-    private SystemMessageService systemMessageService;
+    public MessagesResource(SystemMessageService systemMessageService) {
+        this.systemMessageService = systemMessageService;
+    }
 
     @GET @Timed
     @ApiOperation(value = "Get internal Graylog2 system messages")

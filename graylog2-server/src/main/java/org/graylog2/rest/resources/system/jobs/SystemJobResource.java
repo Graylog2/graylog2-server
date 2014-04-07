@@ -49,10 +49,15 @@ public class SystemJobResource extends RestResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(SystemJobResource.class);
 
+    private final SystemJobFactory systemJobFactory;
+    private final SystemJobManager systemJobManager;
+
     @Inject
-    private SystemJobFactory systemJobFactory;
-    @Inject
-    private SystemJobManager systemJobManager;
+    public SystemJobResource(SystemJobFactory systemJobFactory,
+                             SystemJobManager systemJobManager) {
+        this.systemJobFactory = systemJobFactory;
+        this.systemJobManager = systemJobManager;
+    }
 
     @GET @Timed
     @ApiOperation(value = "List currently running jobs")

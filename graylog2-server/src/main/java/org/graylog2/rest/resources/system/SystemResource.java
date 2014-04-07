@@ -72,22 +72,33 @@ public class SystemResource extends RestResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(SystemResource.class);
 
+    private final Buffers bufferSynchronizer;
+    private final ServerStatus serverStatus;
+    private final ActivityWriter activityWriter;
+    private final Configuration configuration;
+    private final Indexer indexer;
+    private final Caches cacheSynchronizer;
+    private final ServerInputRegistry inputs;
+    private final Periodicals periodicals;
+
     @Inject
-    private Buffers bufferSynchronizer;
-    @Inject
-    private ServerStatus serverStatus;
-    @Inject
-    private ActivityWriter activityWriter;
-    @Inject
-    private Configuration configuration;
-    @Inject
-    private Indexer indexer;
-    @Inject
-    private Caches cacheSynchronizer;
-    @Inject
-    private ServerInputRegistry inputs;
-    @Inject
-    private Periodicals periodicals;
+    public SystemResource(Buffers bufferSynchronizer,
+                          ServerStatus serverStatus,
+                          ActivityWriter activityWriter,
+                          Configuration configuration,
+                          Indexer indexer,
+                          Caches cacheSynchronizer,
+                          ServerInputRegistry inputs,
+                          Periodicals periodicals) {
+        this.bufferSynchronizer = bufferSynchronizer;
+        this.serverStatus = serverStatus;
+        this.activityWriter = activityWriter;
+        this.configuration = configuration;
+        this.indexer = indexer;
+        this.cacheSynchronizer = cacheSynchronizer;
+        this.inputs = inputs;
+        this.periodicals = periodicals;
+    }
 
     @GET @Timed
     @ApiOperation(value = "Get system overview")

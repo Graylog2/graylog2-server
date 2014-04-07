@@ -48,16 +48,24 @@ import java.util.Map;
 @Path("/system/buffers")
 public class BufferResource extends RestResource {
 
+    private final InputCache inputCache;
+    private final OutputCache outputCache;
+    private final ProcessBufferWatermark processBufferWatermark;
+    private final OutputBufferWatermark outputBufferWatermark;
+    private final Configuration configuration;
+
     @Inject
-    private InputCache inputCache;
-    @Inject
-    private OutputCache outputCache;
-    @Inject
-    private ProcessBufferWatermark processBufferWatermark;
-    @Inject
-    private OutputBufferWatermark outputBufferWatermark;
-    @Inject
-    private Configuration configuration;
+    public BufferResource(InputCache inputCache,
+                          OutputCache outputCache,
+                          ProcessBufferWatermark processBufferWatermark,
+                          OutputBufferWatermark outputBufferWatermark,
+                          Configuration configuration) {
+        this.inputCache = inputCache;
+        this.outputCache = outputCache;
+        this.processBufferWatermark = processBufferWatermark;
+        this.outputBufferWatermark = outputBufferWatermark;
+        this.configuration = configuration;
+    }
 
     @GET @Timed
     @ApiOperation(value = "Get current utilization of buffers and caches of this node.")

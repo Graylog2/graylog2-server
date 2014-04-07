@@ -48,11 +48,15 @@ public class ClusterResource extends RestResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(ClusterResource.class);
 
-    @Inject
-    private NodeService nodeService;
+    private final NodeService nodeService;
+    private final NodeId nodeId;
 
     @Inject
-    private NodeId nodeId;
+    public ClusterResource(NodeService nodeService,
+                           NodeId nodeId) {
+        this.nodeService = nodeService;
+        this.nodeId = nodeId;
+    }
 
     @GET @Timed
     @Path("/nodes")

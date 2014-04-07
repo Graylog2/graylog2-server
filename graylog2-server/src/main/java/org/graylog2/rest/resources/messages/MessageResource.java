@@ -48,8 +48,12 @@ import java.util.Map;
 @Path("/messages/{index}")
 public class MessageResource extends RestResource {
     private static final Logger LOG = LoggerFactory.getLogger(MessageResource.class);
-    @Inject
     private Indexer indexer;
+
+    @Inject
+    public MessageResource(Indexer indexer) {
+        this.indexer = indexer;
+    }
 
     @GET @Path("/{messageId}") @Timed
     @ApiOperation(value = "Get a single message.")

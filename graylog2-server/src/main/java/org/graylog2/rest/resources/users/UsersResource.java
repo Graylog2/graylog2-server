@@ -69,13 +69,18 @@ public class UsersResource extends RestResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(RestResource.class);
 
-    @Inject
-    private UserService userService;
+    private final UserService userService;
+    private final AccessTokenService accessTokenService;
+    private final Configuration configuration;
 
     @Inject
-    private AccessTokenService accessTokenService;
-    @Inject
-    private Configuration configuration;
+    public UsersResource(UserService userService,
+                         AccessTokenService accessTokenService,
+                         Configuration configuration) {
+        this.userService = userService;
+        this.accessTokenService = accessTokenService;
+        this.configuration = configuration;
+    }
 
     @GET
     @Path("{username}")

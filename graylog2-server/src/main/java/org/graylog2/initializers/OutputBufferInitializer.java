@@ -43,8 +43,8 @@ public class OutputBufferInitializer implements Initializer {
 
     @Override
     public void initialize(Map<String, String> config) throws InitializerConfigurationException {
-        OutputBuffer outputBuffer = outputBufferFactory.create(outputCache);
-        outputBuffer.initialize();
+        //OutputBuffer outputBuffer = outputBufferFactory.create(outputCache);
+        //outputBuffer.initialize();
     }
 
     @Override

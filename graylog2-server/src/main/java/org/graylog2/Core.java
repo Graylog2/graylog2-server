@@ -212,8 +212,8 @@ public class Core implements GraylogServer {
     @Inject
     private Caches cacheSynchronizer;
 
-//    @Inject
-//    private SystemJobFactory systemJobFactory;
+    @Inject
+    private SystemJobFactory systemJobFactory;
 
 //    @Inject
 //    private RebuildIndexRangesJob.Factory rebuildIndexRangesJobFactory;
@@ -312,6 +312,7 @@ public class Core implements GraylogServer {
     private class Graylog2Binder extends AbstractBinder {
         @Override
         protected void configure() {
+            bind(systemJobFactory).to(SystemJobFactory.class);
             //bind(Core.this).to(Core.class);
             /*bind(metricRegistry).to(MetricRegistry.class);
             bind(throughputStats).to(ThroughputStats.class);
