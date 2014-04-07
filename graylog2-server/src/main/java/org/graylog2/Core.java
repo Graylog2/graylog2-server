@@ -126,8 +126,8 @@ public class Core implements GraylogServer {
     private Configuration configuration;
     @Inject
     private ServerStatus serverStatus;
-    @Inject @$Nullable
-    private RulesEngine rulesEngine;
+//    @Inject @$Nullable
+//    private RulesEngine rulesEngine;
 
     @Inject
     private GELFChunkManager gelfChunkManager;
@@ -146,8 +146,8 @@ public class Core implements GraylogServer {
     @Inject
     private Indexer indexer;
 
-    private Counter benchmarkCounter = new Counter();
-    private Counter throughputCounter = new Counter();
+//    private Counter benchmarkCounter = new Counter();
+//    private Counter throughputCounter = new Counter();
     @Inject
     private FilterRegistry filterRegistry;
 
@@ -169,8 +169,8 @@ public class Core implements GraylogServer {
     @Inject
     private OutputBuffer outputBuffer;
 
-    @Inject
-    private OutputBufferWatermark outputBufferWatermark;
+//    @Inject
+//    private OutputBufferWatermark outputBufferWatermark;
     @Inject
     private ProcessBufferWatermark processBufferWatermark;
     
@@ -180,28 +180,28 @@ public class Core implements GraylogServer {
     @Inject
     private ActivityWriter activityWriter;
 
-    @Inject
-    private SystemJobManager systemJobManager;
+//    @Inject
+//    private SystemJobManager systemJobManager;
 
-    private boolean localMode = false;
-    private boolean statsMode = false;
+//    private boolean localMode = false;
+//    private boolean statsMode = false;
 
     @Inject
     private MetricRegistry metricRegistry;
-    private LdapUserAuthenticator ldapUserAuthenticator;
-    private LdapConnector ldapConnector;
-    private DefaultSecurityManager securityManager;
-    private MongoDbMetricsReporter metricsReporter;
+//    private LdapUserAuthenticator ldapUserAuthenticator;
+//    private LdapConnector ldapConnector;
+//    private DefaultSecurityManager securityManager;
+//    private MongoDbMetricsReporter metricsReporter;
 
-    @Inject
-    private ProcessBuffer.Factory processBufferFactory;
+//    @Inject
+//    private ProcessBuffer.Factory processBufferFactory;
     @Inject
     private ServerProcessBufferProcessor.Factory processBufferProcessorFactory;
-    @Inject
-    private OutputBuffer.Factory outputBufferFactory;
+//    @Inject
+//    private OutputBuffer.Factory outputBufferFactory;
 
-    @Inject
-    private ThroughputStats throughputStats;
+//    @Inject
+//    private ThroughputStats throughputStats;
 
     @Inject
     private DashboardRegistry dashboardRegistry;
@@ -212,19 +212,20 @@ public class Core implements GraylogServer {
     @Inject
     private Caches cacheSynchronizer;
 
-    @Inject
-    private SystemJobFactory systemJobFactory;
+//    @Inject
+//    private SystemJobFactory systemJobFactory;
 
-    @Inject
-    private RebuildIndexRangesJob.Factory rebuildIndexRangesJobFactory;
+//    @Inject
+//    private RebuildIndexRangesJob.Factory rebuildIndexRangesJobFactory;
 
-    @Inject
-    private AlertSender alertSender;
+//    @Inject
+//    private AlertSender alertSender;
 
     @Inject
     private SecurityContextFactory shiroSecurityContextFactory;
 
     public void initialize() {
+        final MongoDbMetricsReporter metricsReporter;
         if (configuration.isMetricsCollectionEnabled()) {
             metricsReporter = MongoDbMetricsReporter.forRegistry(metricRegistry, mongoConnection, serverStatus).build();
             metricsReporter.start(1, TimeUnit.SECONDS);
@@ -311,7 +312,7 @@ public class Core implements GraylogServer {
     private class Graylog2Binder extends AbstractBinder {
         @Override
         protected void configure() {
-            bind(Core.this).to(Core.class);
+            //bind(Core.this).to(Core.class);
             /*bind(metricRegistry).to(MetricRegistry.class);
             bind(throughputStats).to(ThroughputStats.class);
             bind(new StreamServiceImpl(mongoConnection)).to(StreamService.class);
@@ -475,35 +476,11 @@ public class Core implements GraylogServer {
     }
 
     @Override
-    public boolean isMaster() {
-        return serverStatus.hasCapability(ServerStatus.Capability.MASTER);
-    }
-    
-    @Override
     public String getNodeId() {
         return serverStatus.getNodeId().toString();
     }
     
-    public boolean isProcessing() {
-        return serverStatus.isProcessing();
-    }
-
     public MetricRegistry metrics() {
         return metricRegistry;
     }
-
-    public OutputRegistry outputs() {
-        return outputs;
-    }
-
-    @Override
-    public boolean isServer() {
-        return serverStatus.hasCapability(ServerStatus.Capability.SERVER);
-    }
-
-    @Override
-    public boolean isRadio() {
-        return serverStatus.hasCapability(ServerStatus.Capability.RADIO);
-    }
-
 }

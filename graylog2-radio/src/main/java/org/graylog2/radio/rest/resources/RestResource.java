@@ -46,8 +46,8 @@ public class RestResource {
 
     protected final ObjectMapper objectMapper = new ObjectMapper();
 
-    @Inject
-    protected Radio radio;
+    //@Inject
+    //protected Radio radio;
 
     @QueryParam("pretty")
     boolean prettyPrint;

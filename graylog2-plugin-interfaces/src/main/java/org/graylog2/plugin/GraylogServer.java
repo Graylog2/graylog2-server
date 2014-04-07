@@ -27,10 +27,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  *
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
-public interface GraylogServer extends Runnable, GenericHost {
-
-    public boolean isMaster();
-    
+public interface GraylogServer extends Runnable {
     public String getNodeId();
 
     public MetricRegistry metrics();

@@ -23,7 +23,9 @@ import com.codahale.metrics.annotation.Timed;
 import org.graylog2.plugin.lifecycles.Lifecycle;
 import org.graylog2.plugin.lifecycles.LoadBalancerStatus;
 import org.graylog2.radio.rest.resources.RestResource;
+import org.graylog2.shared.ServerStatus;
 
+import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -33,6 +35,8 @@ import javax.ws.rs.core.Response;
  */
 @Path("/system/lbstatus")
 public class LoadBalancerStatusResource extends RestResource {
+    @Inject
+    private ServerStatus serverStatus;
 
     @GET @Timed
     public javax.ws.rs.core.Response status() {
@@ -40,7 +44,7 @@ public class LoadBalancerStatusResource extends RestResource {
          * IMPORTANT!! When implementing permissions for radio: This must be
          *             accessible without authorization. LBs don't do that.
          */
-        LoadBalancerStatus lbStatus = radio.getLifecycle().getLoadbalancerStatus();
+        LoadBalancerStatus lbStatus = serverStatus.getLifecycle().getLoadbalancerStatus();
 
         Response.Status status = lbStatus.equals(LoadBalancerStatus.ALIVE)
                 ? Response.Status.OK : Response.Status.SERVICE_UNAVAILABLE;
@@ -64,10 +68,10 @@ public class LoadBalancerStatusResource extends RestResource {
 
         switch (lbStatus) {
             case DEAD:
-                radio.setLifecycle(Lifecycle.OVERRIDE_LB_DEAD);
+                serverStatus.setLifecycle(Lifecycle.OVERRIDE_LB_DEAD);
                 break;
             case ALIVE:
-                radio.setLifecycle(Lifecycle.OVERRIDE_LB_ALIVE);
+                serverStatus.setLifecycle(Lifecycle.OVERRIDE_LB_ALIVE);
                 break;
         }
 

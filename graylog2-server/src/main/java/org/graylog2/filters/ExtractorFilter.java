@@ -19,18 +19,12 @@
  */
 package org.graylog2.filters;
 
-import com.codahale.metrics.Timer;
-import org.graylog2.Core;
 import org.graylog2.plugin.GraylogServer;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.filters.MessageFilter;
 import org.graylog2.plugin.inputs.Extractor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Set;
-
-import static com.codahale.metrics.MetricRegistry.name;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>

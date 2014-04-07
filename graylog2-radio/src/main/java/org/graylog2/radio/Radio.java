@@ -162,10 +162,6 @@ public class Radio implements GraylogServer {
         scheduler.scheduleAtFixedRate(masterCacheWorker, 0, 1, TimeUnit.SECONDS);*/
     }
 
-    public void launchPersistedInputs() throws InterruptedException, ExecutionException, IOException {
-        inputs.launchAllPersisted();
-    }
-
     public void startRestApi(Injector injector) throws IOException {
         ServiceLocatorGenerator ownGenerator = new OwnServiceLocatorGenerator(injector);
         try {
@@ -239,10 +235,6 @@ public class Radio implements GraylogServer {
         pinger.ping();
     }
 
-    public boolean isProcessing() {
-        return true;
-    }
-
     private class Graylog2Binder extends AbstractBinder {
 
         @Override
@@ -259,10 +251,6 @@ public class Radio implements GraylogServer {
 
     }
 
-    public AtomicInteger processBufferWatermark() {
-        return processBufferWatermark;
-    }
-
     public String getNodeId() {
         return serverStatus.getNodeId().toString();
     }
@@ -272,47 +260,11 @@ public class Radio implements GraylogServer {
         return metricRegistry;
     }
 
-    public DateTime getStartedAt() {
-        return serverStatus.getStartedAt();
-    }
-
-    public InputRegistry inputs() {
-        return inputs;
-    }
-
     public Configuration getConfiguration() {
         return configuration;
-    }
-
-    public Cache getInputCache() {
-        return inputCache;
-    }
-
-    @Override
-    public boolean isMaster() {
-        return false;
     }
 
     @Override
     public void run() {
     }
-
-    @Override
-    public boolean isServer() {
-        return serverStatus.hasCapability(ServerStatus.Capability.SERVER);
-    }
-
-    @Override
-    public boolean isRadio() {
-        return serverStatus.hasCapability(ServerStatus.Capability.RADIO);
-    }
-
-    public Lifecycle getLifecycle() {
-        return serverStatus.getLifecycle();
-    }
-
-    public void setLifecycle(Lifecycle lifecycle) {
-        serverStatus.setLifecycle(lifecycle);
-    }
-
 }

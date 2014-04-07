@@ -19,6 +19,7 @@
 
 package org.graylog2.database;
 
+import com.google.common.base.Objects;
 import org.bson.types.ObjectId;
 import org.graylog2.plugin.database.Persisted;
 import org.joda.time.DateTime;
@@ -66,5 +67,19 @@ public abstract class PersistedImpl implements Persisted {
     @Override
     public Map<String, Object> getFields() {
         return fields;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof PersistedImpl))
+            return false;
+
+        PersistedImpl other = (PersistedImpl) o;
+        return Objects.equal(fields, other.fields) && Objects.equal(getObjectId(), other.getObjectId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(getObjectId(), fields);
     }
 }
