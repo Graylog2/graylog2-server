@@ -80,6 +80,7 @@ public abstract class ProcessBufferProcessor implements EventHandler<MessageEven
         LOG.debug("Starting to process message <{}>.", msg.getId());
 
         try {
+            LOG.debug("Finished processing message <{}>. Writing to output buffer.", msg.getId());
             handleMessage(msg);
         } catch (Exception e) {
             LOG.warn("Unable to process message <{}>: {}", msg.getId(), e);
@@ -87,12 +88,6 @@ public abstract class ProcessBufferProcessor implements EventHandler<MessageEven
             outgoingMessages.mark();
             tcx.stop();
         }
-
-        LOG.debug("Finished processing message <{}>. Writing to output buffer.", msg.getId());
-        handleMessage(msg);
-
-        outgoingMessages.mark();
-        tcx.stop();
     }
 
     protected abstract void handleMessage(Message msg);
