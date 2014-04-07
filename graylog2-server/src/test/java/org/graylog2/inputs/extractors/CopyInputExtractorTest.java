@@ -41,7 +41,7 @@ public class CopyInputExtractorTest {
 
         msg.addField("somefield", "foo");
 
-        CopyInputExtractor x = new CopyInputExtractor("bar", "bar", Extractor.CursorStrategy.COPY, "somefield", "our_result", noConfig(), "foo", noConverters(), Extractor.ConditionType.NONE, null);
+        CopyInputExtractor x = new CopyInputExtractor("bar", "bar", 0, Extractor.CursorStrategy.COPY, "somefield", "our_result", noConfig(), "foo", noConverters(), Extractor.ConditionType.NONE, null);
         x.runExtractor(new GraylogServerStub(), msg);
 
         assertEquals("foo", msg.getField("our_result"));

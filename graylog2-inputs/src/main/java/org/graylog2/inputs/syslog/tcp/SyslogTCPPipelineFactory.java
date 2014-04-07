@@ -19,7 +19,9 @@
 
 package org.graylog2.inputs.syslog.tcp;
 
+
 import com.codahale.metrics.MetricRegistry;
+import org.graylog2.inputs.network.PacketInformationDumper;
 import org.graylog2.inputs.syslog.SyslogDispatcher;
 import org.graylog2.plugin.buffers.Buffer;
 import org.graylog2.plugin.configuration.Configuration;
@@ -70,6 +72,7 @@ public class SyslogTCPPipelineFactory implements ChannelPipelineFactory {
         }
                 
         ChannelPipeline p = Channels.pipeline();
+        p.addLast("packet-meta-dumper", new PacketInformationDumper(sourceInput));
         p.addLast("connection-counter", connectionCounter);
         p.addLast("framer", new DelimiterBasedFrameDecoder(2 * 1024 * 1024, delimiter));
         p.addLast("traffic-counter", throughputCounter);

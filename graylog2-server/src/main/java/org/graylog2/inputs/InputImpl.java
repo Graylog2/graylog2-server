@@ -49,10 +49,9 @@ import java.util.Map;
 @CollectionName("inputs")
 public class InputImpl extends PersistedImpl implements Input {
 
-    private static final Logger LOG = LoggerFactory.getLogger(InputImpl.class);
-
     public static final String EMBEDDED_EXTRACTORS = "extractors";
     public static final String EMBEDDED_STATIC_FIELDS = "static_fields";
+    private static final Logger LOG = LoggerFactory.getLogger(InputImpl.class);
 
     public InputImpl(Map<String, Object> fields) {
         super(fields);
@@ -124,12 +123,20 @@ public class InputImpl extends PersistedImpl implements Input {
 
         BasicDBList mEx = (BasicDBList) fields.get(EMBEDDED_EXTRACTORS);
         Iterator<Object> iterator = mEx.iterator();
-        while(iterator.hasNext()) {
+        while (iterator.hasNext()) {
             DBObject ex = (BasicDBObject) iterator.next();
+
+            // SOFT MIGRATION: does this extractor have an order set? Implemented for issue: #726
+            Long order = new Long(0);
+            if (ex.containsField("order")) {
+                order = (Long) ex.get("order"); // mongodb driver gives us a java.lang.Long
+            }
+
             try {
                 Extractor extractor = ExtractorFactory.factory(
                         (String) ex.get("id"),
                         (String) ex.get("title"),
+                        order.intValue(),
                         Extractor.CursorStrategy.valueOf(((String) ex.get("cursor_strategy")).toUpperCase()),
                         Extractor.Type.valueOf(((String) ex.get("type")).toUpperCase()),
                         (String) ex.get("source_field"),
@@ -161,7 +168,7 @@ public class InputImpl extends PersistedImpl implements Input {
 
         BasicDBList list = (BasicDBList) fields.get(EMBEDDED_STATIC_FIELDS);
         Iterator<Object> iterator = list.iterator();
-        while(iterator.hasNext()) {
+        while (iterator.hasNext()) {
             try {
                 DBObject field = (BasicDBObject) iterator.next();
                 staticFields.put((String) field.get("key"), (String) field.get("value"));
@@ -194,7 +201,7 @@ public class InputImpl extends PersistedImpl implements Input {
 
         BasicDBList m = (BasicDBList) extractor.get("converters");
         Iterator<Object> iterator = m.iterator();
-        while(iterator.hasNext()) {
+        while (iterator.hasNext()) {
             DBObject c = (BasicDBObject) iterator.next();
 
             try {

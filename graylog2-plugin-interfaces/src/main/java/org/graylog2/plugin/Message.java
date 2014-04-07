@@ -22,6 +22,7 @@
 
 package org.graylog2.plugin;
 
+import com.google.common.base.Function;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -91,6 +92,8 @@ public class Message {
             "message", "source", "_id"
     );
 
+    public static final Function<Message, String> ID_FUNCTION = new MessageIdFunction();
+
     public Message(String message, String source, DateTime timestamp) {
     	// Adding the fields directly because they would not be accepted as a reserved fields.
         fields.put("_id", new com.eaio.uuid.UUID().toString());
@@ -113,6 +116,19 @@ public class Message {
     	}
     	
         return true;
+    }
+
+    public String getValidationErrors() {
+        StringBuilder sb = new StringBuilder();
+
+        for (String key : REQUIRED_FIELDS) {
+            if (getField(key) == null) {
+                sb.append(key).append(" is missing, ");
+            } else if (((String)getField(key)).isEmpty()) {
+                sb.append(key).append(" is empty, ");
+            }
+        }
+        return sb.toString();
     }
 
     public String getId() {
@@ -301,4 +317,10 @@ public class Message {
         this.sourceInput = input;
     }
 
+    public static class MessageIdFunction implements Function<Message, String> {
+        @Override
+        public String apply(Message input) {
+            return input.getId();
+        }
+    }
 }

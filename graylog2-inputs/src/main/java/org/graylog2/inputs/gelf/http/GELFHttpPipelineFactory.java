@@ -19,6 +19,7 @@
 package org.graylog2.inputs.gelf.http;
 
 import com.codahale.metrics.MetricRegistry;
+import org.graylog2.inputs.network.PacketInformationDumper;
 import org.graylog2.plugin.buffers.Buffer;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.util.ConnectionCounter;
@@ -54,6 +55,7 @@ public class GELFHttpPipelineFactory implements ChannelPipelineFactory {
     public ChannelPipeline getPipeline() throws Exception {
         final ChannelPipeline pipeline = Channels.pipeline();
 
+        pipeline.addLast("packet-meta-dumper", new PacketInformationDumper(sourceInput));
         pipeline.addLast("connection-counter", connectionCounter);
         pipeline.addLast("traffic-counter", throughputCounter);
         pipeline.addLast("decoder", new HttpRequestDecoder());

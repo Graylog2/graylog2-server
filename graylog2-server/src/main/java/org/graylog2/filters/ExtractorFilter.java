@@ -41,7 +41,7 @@ public class ExtractorFilter implements MessageFilter {
             return false;
         }
 
-        for (Extractor extractor : msg.getSourceInput().getExtractors().values()) {
+        for (Extractor extractor : msg.getSourceInput().getExecutionSortedExtractors()) {
             try {
                 extractor.runExtractor(server, msg);
             } catch (Exception e) {

@@ -73,7 +73,7 @@ public class GELFProcessor {
 
         if (lm == null || !lm.isComplete()) {
             metricRegistry.meter(name(metricName, "incompleteMessages")).mark();
-            LOG.debug("Skipping incomplete message.");
+            LOG.debug("Skipping incomplete message: {}", lm.getValidationErrors());
             return;
         }
 

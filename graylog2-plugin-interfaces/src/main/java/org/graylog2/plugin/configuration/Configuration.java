@@ -53,14 +53,14 @@ public class Configuration {
                 try {
                     if (e.getValue() instanceof String) {
                         strings.put(e.getKey(), (String) e.getValue());
-                    }
-
-                    if (e.getValue() instanceof Integer) {
+                    } else if (e.getValue() instanceof Integer) {
                         ints.put(e.getKey(), (Integer) e.getValue());
-                    }
-
-                    if (e.getValue() instanceof Boolean) {
+                    } else if (e.getValue() instanceof Long) {
+                        ints.put(e.getKey(), ((Long) e.getValue()).intValue()); // We only support integers but MongoDB likes to return longs.
+                    } else if (e.getValue() instanceof Boolean) {
                         bools.put(e.getKey(), (Boolean) e.getValue());
+                    } else {
+                        LOG.error("Cannot handle type [{}] of plugin configuration key <{}>.", e.getValue().getClass().getCanonicalName(), e.getKey());
                     }
                 } catch(Exception ex) {
                     LOG.warn("Could not read input configuration key <{}>. Skipping.", e.getKey(), ex);

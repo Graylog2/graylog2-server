@@ -22,6 +22,7 @@ package org.graylog2.inputs.gelf.tcp;
 import com.codahale.metrics.MetricRegistry;
 import org.graylog2.inputs.gelf.GELFDispatcher;
 import org.graylog2.inputs.gelf.gelf.GELFChunkManager;
+import org.graylog2.inputs.network.PacketInformationDumper;
 import org.graylog2.plugin.buffers.Buffer;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.util.ConnectionCounter;
@@ -63,6 +64,7 @@ public class GELFTCPPipelineFactory implements ChannelPipelineFactory {
         ChannelPipeline p = Channels.pipeline();
 
         p.addLast("connection-counter", connectionCounter);
+        p.addLast("packet-meta-dumper", new PacketInformationDumper(sourceInput));
         p.addLast("framer", new DelimiterBasedFrameDecoder(2 * 1024 * 1024, Delimiters.nulDelimiter()));
         p.addLast("traffic-counter", throughputCounter);
         p.addLast("handler", new GELFDispatcher(metricRegistry, gelfChunkManager, processBuffer, sourceInput));
