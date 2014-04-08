@@ -20,6 +20,7 @@
 package org.graylog2.radio;
 
 import com.codahale.metrics.MetricRegistry;
+import com.google.common.util.concurrent.ServiceManager;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.inject.Injector;
 import com.google.inject.name.Named;
@@ -30,18 +31,14 @@ import org.glassfish.jersey.internal.inject.Injections;
 import org.glassfish.jersey.server.ContainerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.internal.scanning.PackageNamesScanner;
-import org.graylog2.inputs.Cache;
 import org.graylog2.inputs.InputCache;
 import org.graylog2.inputs.gelf.gelf.GELFChunkManager;
 import org.graylog2.jersey.container.netty.NettyContainer;
-import org.graylog2.plugin.GraylogServer;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.Version;
-import org.graylog2.plugin.lifecycles.Lifecycle;
 import org.graylog2.plugin.rest.AnyExceptionClassMapper;
 import org.graylog2.radio.buffers.processors.RadioProcessBufferProcessor;
 import org.graylog2.radio.cluster.Ping;
-import org.graylog2.radio.inputs.RadioInputRegistry;
 import org.graylog2.radio.transports.RadioTransport;
 import org.graylog2.radio.transports.amqp.AMQPProducer;
 import org.graylog2.radio.transports.kafka.KafkaProducer;
@@ -59,7 +56,6 @@ import org.jboss.netty.channel.Channels;
 import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory;
 import org.jboss.netty.handler.codec.http.HttpRequestDecoder;
 import org.jboss.netty.handler.codec.http.HttpResponseEncoder;
-import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,13 +64,15 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.net.InetSocketAddress;
-import java.util.concurrent.*;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-public class Radio implements GraylogServer {
+public class Radio {
 
     private static final Logger LOG = LoggerFactory.getLogger(Radio.class);
 
@@ -95,7 +93,7 @@ public class Radio implements GraylogServer {
     private ScheduledExecutorService scheduler;
 
     @Inject
-    private RadioInputRegistry inputs;
+    private InputRegistry inputs;
 
     @Inject
     private InputCache inputCache;
@@ -116,6 +114,12 @@ public class Radio implements GraylogServer {
     private RadioProcessBufferProcessor.Factory processBufferProcessorFactory;
     @Inject
     private ThroughputStats throughputStats;
+    @Inject
+    private KafkaProducer kafkaProducer;
+    @Inject
+    private AMQPProducer amqpProducer;
+    @Inject
+    private ServiceManager serviceManager;
 
     public Radio() {
     }
@@ -123,7 +127,19 @@ public class Radio implements GraylogServer {
     public void initialize() {
         gelfChunkManager.start();
 
-        RadioTransport transport = new KafkaProducer(this);
+        RadioTransport transport;
+
+        // Set up transport.
+        switch (configuration.getTransportType()) {
+            case AMQP:
+                transport = amqpProducer;
+                break;
+            case KAFKA:
+                transport = kafkaProducer;
+                break;
+            default:
+                throw new RuntimeException("Cannot map transport type to transport.");
+        }
 
         int processBufferProcessorCount = configuration.getProcessBufferProcessors();
 
@@ -131,20 +147,9 @@ public class Radio implements GraylogServer {
 
         for (int i = 0; i < processBufferProcessorCount; i++) {
             processors[i] = processBufferProcessorFactory.create(this.processBufferWatermark,
-                                                                 i,
-                                                                 processBufferProcessorCount,
-                                                                 transport);
-        }
-        // Set up transport.
-        switch (configuration.getTransportType()) {
-            case AMQP:
-                transport = new AMQPProducer(this);
-                break;
-            case KAFKA:
-                transport = new KafkaProducer(this);
-                break;
-            default:
-                throw new RuntimeException("Cannot map transport type to transport.");
+                    i,
+                    processBufferProcessorCount,
+                    transport);
         }
 
         processBuffer = processBufferFactory.create(inputCache, processBufferWatermark);
@@ -166,6 +171,8 @@ public class Radio implements GraylogServer {
             LOG.info("No rest_transport_uri set. Falling back to [{}].", transportStr);
             this.configuration.setRestTransportUri(transportStr);
         }
+
+        serviceManager.startAsync().awaitHealthy();
 
         pinger = new Ping.Pinger(httpClient, serverStatus.getNodeId().toString(), configuration.getRestTransportUri(), configuration.getGraylog2ServerUri());
 
@@ -254,8 +261,8 @@ public class Radio implements GraylogServer {
 
         @Override
         protected void configure() {
-            bind(Radio.this).to(Radio.class);
-            /*bind(metricRegistry).to(MetricRegistry.class);
+            /*bind(Radio.this).to(Radio.class);
+            bind(metricRegistry).to(MetricRegistry.class);
             bind(throughputStats).to(ThroughputStats.class);
             bind(configuration).to(Configuration.class);
             bind(serverStatus).to(ServerStatus.class);
@@ -266,20 +273,6 @@ public class Radio implements GraylogServer {
 
     }
 
-    public String getNodeId() {
-        return serverStatus.getNodeId().toString();
-    }
-
-    @Override
-    public MetricRegistry metrics() {
-        return metricRegistry;
-    }
-
-    public Configuration getConfiguration() {
-        return configuration;
-    }
-
-    @Override
     public void run() {
     }
 }

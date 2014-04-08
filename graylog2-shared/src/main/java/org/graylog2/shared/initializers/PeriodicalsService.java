@@ -17,14 +17,13 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.graylog2.initializers;
+package org.graylog2.shared.initializers;
 
-import com.google.common.collect.Maps;
+import com.google.common.base.Stopwatch;
+import com.google.common.util.concurrent.AbstractIdleService;
 import com.google.inject.Inject;
 import org.graylog2.periodical.Periodical;
 import org.graylog2.periodical.Periodicals;
-import org.graylog2.plugin.initializers.Initializer;
-import org.graylog2.plugin.initializers.InitializerConfigurationException;
 import org.graylog2.shared.ServerStatus;
 import org.graylog2.shared.bindings.InstantiationService;
 import org.reflections.Reflections;
@@ -32,13 +31,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Map;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 /**
- * @author Lennart Koopmann <lennart@torch.sh>
+ * @author Dennis Oelkers <dennis@torch.sh>
  */
-public class PeriodicalsInitializer implements Initializer {
-
-    private static final Logger LOG = LoggerFactory.getLogger(PeriodicalsInitializer.class);
+public class PeriodicalsService extends AbstractIdleService {
+    private static final Logger LOG = LoggerFactory.getLogger(PeriodicalsService.class);
 
     public static final String NAME = "Periodicals initializer";
     private final InstantiationService instantiationService;
@@ -46,7 +46,7 @@ public class PeriodicalsInitializer implements Initializer {
     private final ServerStatus serverStatus;
 
     @Inject
-    public PeriodicalsInitializer(InstantiationService instantiationService,
+    public PeriodicalsService(InstantiationService instantiationService,
                                   Periodicals periodicals,
                                   ServerStatus serverStatus) {
         this.instantiationService = instantiationService;
@@ -55,9 +55,8 @@ public class PeriodicalsInitializer implements Initializer {
     }
 
     @Override
-    public void initialize(Map<String, String> config) throws InitializerConfigurationException {
-        String packageName = Periodical.class.getPackage().toString();
-        Reflections reflections = new Reflections("org.graylog2.shared.periodical");
+    protected void startUp() throws Exception {
+        Reflections reflections = new Reflections("org.graylog2.periodical");
 
         for (Class<? extends Periodical> type : reflections.getSubTypesOf(Periodical.class)) {
             try {
@@ -84,17 +83,23 @@ public class PeriodicalsInitializer implements Initializer {
     }
 
     @Override
-    public Map<String, String> getRequestedConfiguration() {
-        return Maps.newHashMap();
-    }
+    protected void shutDown() throws Exception {
+        for (Periodical periodical : periodicals.getAllStoppedOnGracefulShutdown()) {
+            LOG.info("Shutting down periodical [{}].", periodical.getClass().getCanonicalName());
+            Stopwatch s = new Stopwatch().start();
 
-    @Override
-    public String getName() {
-        return NAME;
-    }
+            // Cancel future executions.
+            Map<Periodical,ScheduledFuture> futures = periodicals.getFutures();
+            if (futures.containsKey(periodical)) {
+                futures.get(periodical).cancel(false);
 
-    @Override
-    public boolean masterOnly() {
-        return false;
+                s.stop();
+                LOG.info("Shutdown of periodical [{}] complete, took <{}ms>.",
+                        periodical.getClass().getCanonicalName(), s.elapsed(TimeUnit.MILLISECONDS));
+            } else {
+                LOG.error("Could not find periodical [{}] in futures list. Not stopping execution.",
+                        periodical.getClass().getCanonicalName());
+            }
+        }
     }
 }

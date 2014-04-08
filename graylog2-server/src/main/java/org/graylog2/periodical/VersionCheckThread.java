@@ -33,7 +33,6 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.graylog2.Configuration;
-import org.graylog2.Core;
 import org.graylog2.ServerVersion;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
@@ -130,8 +129,8 @@ public class VersionCheckThread extends Periodical {
 
             LOG.debug("Version check reports current version: " + parsedResponse);
 
-            if (reportedVersion.greaterMinor(Core.GRAYLOG2_VERSION)) {
-                LOG.debug("Reported version is higher than ours ({}). Writing notification.", Core.GRAYLOG2_VERSION);
+            if (reportedVersion.greaterMinor(ServerVersion.VERSION)) {
+                LOG.debug("Reported version is higher than ours ({}). Writing notification.", ServerVersion.VERSION);
 
                 Notification notification = notificationService.buildNow()
                         .addSeverity(Notification.Severity.NORMAL)
@@ -139,7 +138,7 @@ public class VersionCheckThread extends Periodical {
                         .addDetail("current_version", parsedResponse.toString());
                 notificationService.publishIfFirst(notification);
             } else {
-                LOG.debug("Reported version is not higher than ours ({}).", Core.GRAYLOG2_VERSION);
+                LOG.debug("Reported version is not higher than ours ({}).", ServerVersion.VERSION);
                 notificationService.fixed(Notification.Type.OUTDATED_VERSION);
             }
 

@@ -24,13 +24,13 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.database.ValidationException;
 import org.graylog2.inputs.Input;
 import org.graylog2.inputs.InputService;
-import org.graylog2.inputs.ServerInputRegistry;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.rest.documentation.annotations.*;
 import org.graylog2.rest.resources.RestResource;
 import org.graylog2.rest.resources.system.inputs.requests.CreateStaticFieldRequest;
 import org.graylog2.security.RestPermissions;
+import org.graylog2.shared.inputs.InputRegistry;
 import org.graylog2.system.activities.Activity;
 import org.graylog2.system.activities.ActivityWriter;
 import org.slf4j.Logger;
@@ -57,7 +57,7 @@ public class StaticFieldsResource extends RestResource {
     @Inject
     private ActivityWriter activityWriter;
     @Inject
-    private ServerInputRegistry inputs;
+    private InputRegistry inputs;
 
     @POST
     @Timed

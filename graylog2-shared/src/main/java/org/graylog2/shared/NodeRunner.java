@@ -20,19 +20,40 @@
 package org.graylog2.shared;
 
 import com.beust.jcommander.internal.Lists;
+import com.google.inject.AbstractModule;
 import com.google.inject.Module;
 import org.graylog2.shared.bindings.GenericBindings;
 import org.graylog2.shared.bindings.InstantiationService;
+import org.reflections.Reflections;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
  */
 public class NodeRunner {
+    private static final Logger LOG = LoggerFactory.getLogger(NodeRunner.class);
+
     protected static List<Module> getBindingsModules(InstantiationService instantiationService, Module... specificModules) {
         List<Module> result = Lists.newArrayList();
         result.add(new GenericBindings(instantiationService));
+        Reflections reflections = new Reflections("org.graylog2.shared.bindings");
+        for (Class<? extends AbstractModule> type : reflections.getSubTypesOf(AbstractModule.class)) {
+            try {
+                Constructor<? extends AbstractModule> constructor = type.getConstructor();
+                Module module = constructor.newInstance();
+                result.add(module);
+            } catch (InstantiationException | InvocationTargetException | IllegalAccessException e) {
+                LOG.error("Unable to instantiate Module {}: {}", type, e);
+            } catch (NoSuchMethodException e) {
+                LOG.info("No constructor found for guice module {}", type);
+            }
+        }
+
         for (Module module : specificModules)
             result.add(module);
         return result;

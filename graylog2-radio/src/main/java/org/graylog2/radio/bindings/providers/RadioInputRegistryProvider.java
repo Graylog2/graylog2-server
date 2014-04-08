@@ -24,6 +24,7 @@ import org.graylog2.radio.Configuration;
 import org.graylog2.radio.inputs.RadioInputRegistry;
 import org.graylog2.shared.ServerStatus;
 import org.graylog2.shared.buffers.ProcessBuffer;
+import org.graylog2.shared.inputs.InputRegistry;
 import org.graylog2.shared.inputs.MessageInputFactory;
 
 import javax.inject.Inject;
@@ -32,7 +33,7 @@ import javax.inject.Provider;
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
  */
-public class RadioInputRegistryProvider implements Provider<RadioInputRegistry> {
+public class RadioInputRegistryProvider implements Provider<InputRegistry> {
     private static RadioInputRegistry radioInputRegistry = null;
 
     @Inject
@@ -50,7 +51,7 @@ public class RadioInputRegistryProvider implements Provider<RadioInputRegistry> 
     }
 
     @Override
-    public RadioInputRegistry get() {
+    public InputRegistry get() {
         return radioInputRegistry;
     }
 }

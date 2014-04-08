@@ -17,40 +17,34 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.graylog2.filters;
+package org.graylog2.initializers;
 
-import com.google.inject.internal.util.$Nullable;
-import org.graylog2.plugin.Message;
-import org.graylog2.plugin.RulesEngine;
-import org.graylog2.plugin.filters.MessageFilter;
+import com.google.common.util.concurrent.AbstractIdleService;
+import org.graylog2.buffers.Buffers;
+import org.graylog2.caches.Caches;
 
 import javax.inject.Inject;
 
 /**
- * @author Lennart Koopmann <lennart@socketfeed.com>
+ * @author Dennis Oelkers <dennis@torch.sh>
  */
-public class RewriteFilter implements MessageFilter {
-
-    private final RulesEngine rulesEngine;
+public class BufferSynchronizerService extends AbstractIdleService {
+    private final Buffers bufferSynchronizer;
+    private final Caches cacheSynchronizer;
 
     @Inject
-    public RewriteFilter(@$Nullable RulesEngine rulesEngine) {
-        this.rulesEngine = rulesEngine;
+    public BufferSynchronizerService(Buffers bufferSynchronizer, Caches cacheSynchronizer) {
+        this.bufferSynchronizer = bufferSynchronizer;
+        this.cacheSynchronizer = cacheSynchronizer;
     }
 
     @Override
-    public boolean filter(Message msg) {
-        if (rulesEngine != null) {
-            rulesEngine.evaluate(msg);
-        }
-
-        // false if not expecitly set to true in the rules.
-        return msg.getFilterOut();
+    protected void startUp() throws Exception {
     }
-    
+
     @Override
-    public String getName() {
-        return "Rewriter";
+    protected void shutDown() throws Exception {
+        bufferSynchronizer.waitForEmptyBuffers();
+        cacheSynchronizer.waitForEmptyCaches();
     }
-
 }

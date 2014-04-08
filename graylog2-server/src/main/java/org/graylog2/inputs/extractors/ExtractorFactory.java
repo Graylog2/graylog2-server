@@ -1,5 +1,5 @@
-/**
- * Copyright 2013 Lennart Koopmann <lennart@torch.sh>
+/*
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -15,10 +15,11 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 package org.graylog2.inputs.extractors;
 
+import com.codahale.metrics.MetricRegistry;
+import com.google.inject.Inject;
 import org.graylog2.ConfigurationException;
 import org.graylog2.plugin.inputs.Converter;
 import org.graylog2.plugin.inputs.Extractor;
@@ -30,9 +31,15 @@ import java.util.Map;
  * @author Lennart Koopmann <lennart@torch.sh>
  */
 public class ExtractorFactory {
+    private final MetricRegistry metricRegistry;
+
+    @Inject
+    public ExtractorFactory(MetricRegistry metricRegistry) {
+        this.metricRegistry = metricRegistry;
+    }
 
     // TODO: This parameter list is growing a bit out of control.
-    public static Extractor factory(String id,
+    public Extractor factory(String id,
                                     String title,
                                     int order,
                                     Extractor.CursorStrategy cursorStrategy,
@@ -47,13 +54,13 @@ public class ExtractorFactory {
 
         switch (type) {
             case REGEX:
-                return new RegexExtractor(id, title, order, cursorStrategy, sourceField, targetField, extractorConfig, creatorUserId, converters, conditionType, conditionValue);
+                return new RegexExtractor(metricRegistry, id, title, order, cursorStrategy, sourceField, targetField, extractorConfig, creatorUserId, converters, conditionType, conditionValue);
             case SUBSTRING:
-                return new SubstringExtractor(id, title, order, cursorStrategy, sourceField, targetField, extractorConfig, creatorUserId, converters, conditionType, conditionValue);
+                return new SubstringExtractor(metricRegistry, id, title, order, cursorStrategy, sourceField, targetField, extractorConfig, creatorUserId, converters, conditionType, conditionValue);
             case SPLIT_AND_INDEX:
-                return new SplitAndIndexExtractor(id, title, order, cursorStrategy, sourceField, targetField, extractorConfig, creatorUserId, converters, conditionType, conditionValue);
+                return new SplitAndIndexExtractor(metricRegistry, id, title, order, cursorStrategy, sourceField, targetField, extractorConfig, creatorUserId, converters, conditionType, conditionValue);
             case COPY_INPUT:
-                return new CopyInputExtractor(id, title, order, cursorStrategy, sourceField, targetField, extractorConfig, creatorUserId, converters, conditionType, conditionValue);
+                return new CopyInputExtractor(metricRegistry, id, title, order, cursorStrategy, sourceField, targetField, extractorConfig, creatorUserId, converters, conditionType, conditionValue);
             default:
                 throw new NoSuchExtractorException();
         }

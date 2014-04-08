@@ -1,5 +1,5 @@
-/**
- * Copyright 2013 Lennart Koopmann <lennart@torch.sh>
+/*
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -15,7 +15,6 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 package org.graylog2.rest.documentation.generator;
 
@@ -33,7 +32,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.primitives.Primitives;
-import org.graylog2.Core;
+import org.graylog2.ServerVersion;
 import org.graylog2.rest.documentation.annotations.*;
 import org.reflections.Reflections;
 import org.slf4j.Logger;
@@ -112,7 +111,7 @@ public class Generator {
             Map<String, String> info = Maps.newHashMap();
             info.put("title", "Graylog2 REST API");
 
-            overviewResult.put("apiVersion", Core.GRAYLOG2_VERSION.toString());
+            overviewResult.put("apiVersion", ServerVersion.VERSION.toString());
             overviewResult.put("swaggerVersion", EMULATED_SWAGGER_VERSION);
             overviewResult.put("apis", apis);
 
@@ -256,7 +255,7 @@ public class Generator {
         result.put("basePath", basePath);
         result.put("models", models);
         result.put("resourcePath", cleanRoute(route));
-        result.put("apiVersion", Core.GRAYLOG2_VERSION.toString());
+        result.put("apiVersion", ServerVersion.VERSION.toString());
         result.put("swaggerVersion", EMULATED_SWAGGER_VERSION);
 
         return result;

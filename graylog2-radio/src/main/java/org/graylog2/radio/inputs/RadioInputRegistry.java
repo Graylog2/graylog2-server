@@ -16,6 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package org.graylog2.radio.inputs;
 
 import com.beust.jcommander.internal.Lists;
@@ -37,7 +38,6 @@ import org.graylog2.shared.inputs.NoSuchInputTypeException;
 import org.graylog2.shared.rest.resources.system.inputs.requests.RegisterInputRequest;
 import org.joda.time.DateTime;
 
-import javax.inject.Inject;
 import javax.ws.rs.core.UriBuilder;
 import java.io.IOException;
 import java.net.URI;
@@ -54,7 +54,6 @@ public class RadioInputRegistry extends InputRegistry {
     protected final URI serverUrl;
     private final ServerStatus serverStatus;
 
-    @Inject
     public RadioInputRegistry(MessageInputFactory messageInputFactory,
                               ProcessBuffer processBuffer,
                               AsyncHttpClient httpclient,

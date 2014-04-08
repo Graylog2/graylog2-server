@@ -28,11 +28,10 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresGuest;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.Configuration;
-import org.graylog2.Core;
+import org.graylog2.ServerVersion;
 import org.graylog2.buffers.Buffers;
 import org.graylog2.caches.Caches;
 import org.graylog2.indexer.Indexer;
-import org.graylog2.inputs.ServerInputRegistry;
 import org.graylog2.periodical.Periodicals;
 import org.graylog2.plugin.Tools;
 import org.graylog2.rest.documentation.annotations.Api;
@@ -43,6 +42,7 @@ import org.graylog2.rest.resources.system.responses.ReaderPermissionResponse;
 import org.graylog2.security.RestPermissions;
 import org.graylog2.shared.ProcessingPauseLockedException;
 import org.graylog2.shared.ServerStatus;
+import org.graylog2.shared.inputs.InputRegistry;
 import org.graylog2.system.activities.ActivityWriter;
 import org.graylog2.system.shutdown.GracefulShutdown;
 import org.slf4j.Logger;
@@ -78,7 +78,7 @@ public class SystemResource extends RestResource {
     private final Configuration configuration;
     private final Indexer indexer;
     private final Caches cacheSynchronizer;
-    private final ServerInputRegistry inputs;
+    private final InputRegistry inputs;
     private final Periodicals periodicals;
 
     @Inject
@@ -88,7 +88,7 @@ public class SystemResource extends RestResource {
                           Configuration configuration,
                           Indexer indexer,
                           Caches cacheSynchronizer,
-                          ServerInputRegistry inputs,
+                          InputRegistry inputs,
                           Periodicals periodicals) {
         this.bufferSynchronizer = bufferSynchronizer;
         this.serverStatus = serverStatus;
@@ -107,9 +107,9 @@ public class SystemResource extends RestResource {
         checkPermission(RestPermissions.SYSTEM_READ, serverStatus.getNodeId().toString());
         Map<String, Object> result = Maps.newHashMap();
         result.put("facility", "graylog2-server");
-        result.put("codename", Core.GRAYLOG2_CODENAME);
+        result.put("codename", ServerVersion.CODENAME);
         result.put("server_id", serverStatus.getNodeId().toString());
-       	result.put("version", Core.GRAYLOG2_VERSION.toString());
+       	result.put("version", ServerVersion.VERSION.toString());
         result.put("started_at", Tools.getISO8601String(serverStatus.getStartedAt()));
         result.put("is_processing", serverStatus.isProcessing());
         result.put("hostname", Tools.getLocalCanonicalHostname());

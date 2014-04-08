@@ -24,6 +24,7 @@ import org.graylog2.Configuration;
 import org.graylog2.indexer.Deflector;
 import org.graylog2.indexer.Indexer;
 import org.graylog2.indexer.NoTargetIndexException;
+import org.graylog2.initializers.IndexerSetupService;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.system.activities.Activity;
@@ -43,24 +44,28 @@ public class DeflectorManagerThread extends Periodical { // public class Klimper
     private final Deflector deflector;
     private final Configuration configuration;
     private final ActivityWriter activityWriter;
+    private final IndexerSetupService indexerSetupService;
 
     @Inject
     public DeflectorManagerThread(NotificationService notificationService,
                                   Indexer indexer,
                                   Deflector deflector,
                                   Configuration configuration,
-                                  ActivityWriter activityWriter) {
+                                  ActivityWriter activityWriter,
+                                  IndexerSetupService indexerSetupService) {
         this.notificationService = notificationService;
         this.indexer = indexer;
         this.deflector = deflector;
         this.configuration = configuration;
         this.activityWriter = activityWriter;
+        this.indexerSetupService = indexerSetupService;
     }
 
     @Override
     public void run() {
         // Point deflector to a new index if required.
         try {
+            indexerSetupService.startAndWait();
             checkAndRepair();
             point();
         } catch (Exception e) {

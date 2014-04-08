@@ -22,9 +22,7 @@ package org.graylog2.inputs;
 import com.google.common.collect.Lists;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
-import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationException;
-import org.graylog2.plugin.inputs.Extractor;
 import org.graylog2.plugin.inputs.InputState;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.shared.ServerStatus;
@@ -35,9 +33,7 @@ import org.graylog2.shared.inputs.NoSuchInputTypeException;
 import org.graylog2.system.activities.Activity;
 import org.graylog2.system.activities.ActivityWriter;
 
-import javax.inject.Inject;
 import java.util.List;
-import java.util.Map;
 
 public class ServerInputRegistry extends InputRegistry {
     protected final InputService inputService;
@@ -45,7 +41,6 @@ public class ServerInputRegistry extends InputRegistry {
     private final ServerStatus serverStatus;
     private final ActivityWriter activityWriter;
 
-    @Inject
     public ServerInputRegistry(MessageInputFactory messageInputFactory,
                                ProcessBuffer processBuffer,
                                ServerStatus serverStatus,
@@ -59,40 +54,13 @@ public class ServerInputRegistry extends InputRegistry {
         this.notificationService = notificationService;
     }
 
-    public MessageInput getMessageInput(Input io) throws NoSuchInputTypeException, ConfigurationException {
-        MessageInput input = this.create(io.getType());
-
-        // Add all standard fields.
-        input.initialize(new Configuration(io.getConfiguration()));
-        input.setTitle(io.getTitle());
-        input.setCreatorUserId(io.getCreatorUserId());
-        input.setPersistId(io.getId());
-        input.setCreatedAt(io.getCreatedAt());
-        if (io.isGlobal())
-            input.setGlobal(true);
-
-        // Add extractors.
-        for (Extractor extractor : io.getExtractors()) {
-            input.addExtractor(extractor.getId(), extractor);
-        }
-
-        // Add static fields.
-        for (Map.Entry<String, String> field : io.getStaticFields().entrySet()) {
-            input.addStaticField(field.getKey(), field.getValue());
-        }
-
-        input.checkConfiguration();
-
-        return input;
-    }
-
     protected List<MessageInput> getAllPersisted() {
         List<MessageInput> result = Lists.newArrayList();
 
         for (Input io : inputService.allOfThisNode(serverStatus.getNodeId().toString())) {
             MessageInput input = null;
             try {
-                input = getMessageInput(io);
+                input = inputService.getMessageInput(io);
                 result.add(input);
             } catch (NoSuchInputTypeException e) {
                 LOG.warn("Cannot launch persisted input. No such type [{}].", io.getType());

@@ -1,5 +1,5 @@
-/**
- * Copyright 2013 Lennart Koopmann <lennart@torch.sh>
+/*
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -15,12 +15,11 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 package org.graylog2.inputs.extractors;
 
+import com.codahale.metrics.MetricRegistry;
 import org.graylog2.ConfigurationException;
-import org.graylog2.plugin.Message;
 import org.graylog2.plugin.inputs.Converter;
 import org.graylog2.plugin.inputs.Extractor;
 
@@ -29,8 +28,6 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static com.codahale.metrics.MetricRegistry.name;
-
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
@@ -38,7 +35,8 @@ public class RegexExtractor extends Extractor {
 
     private final Pattern pattern;
 
-    public RegexExtractor(String id,
+    public RegexExtractor(MetricRegistry metricRegistry,
+                          String id,
                           String title,
                           int order,
                           CursorStrategy cursorStrategy,
@@ -49,7 +47,7 @@ public class RegexExtractor extends Extractor {
                           List<Converter> converters,
                           ConditionType conditionType,
                           String conditionValue) throws ReservedFieldException, ConfigurationException {
-        super(id, title, order, Type.REGEX, cursorStrategy, sourceField, targetField, extractorConfig, creatorUserId, converters, conditionType, conditionValue);
+        super(metricRegistry, id, title, order, Type.REGEX, cursorStrategy, sourceField, targetField, extractorConfig, creatorUserId, converters, conditionType, conditionValue);
 
         if (extractorConfig == null || extractorConfig.get("regex_value") == null || ((String) extractorConfig.get("regex_value")).isEmpty()) {
             throw new ConfigurationException("Missing regex configuration field: regex_value");

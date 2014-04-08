@@ -21,6 +21,7 @@ package org.graylog2.inputs;
 
 import com.google.common.collect.Lists;
 import com.google.inject.Inject;
+import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import org.bson.types.ObjectId;
@@ -29,18 +30,34 @@ import org.graylog2.database.MongoConnection;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.database.PersistedServiceImpl;
 import org.graylog2.database.ValidationException;
+import org.graylog2.inputs.converters.ConverterFactory;
+import org.graylog2.inputs.extractors.ExtractorFactory;
+import org.graylog2.plugin.configuration.Configuration;
+import org.graylog2.plugin.configuration.ConfigurationException;
 import org.graylog2.plugin.database.EmbeddedPersistable;
+import org.graylog2.plugin.inputs.Converter;
 import org.graylog2.plugin.inputs.Extractor;
+import org.graylog2.plugin.inputs.MessageInput;
+import org.graylog2.shared.inputs.MessageInputFactory;
+import org.graylog2.shared.inputs.NoSuchInputTypeException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class InputServiceImpl extends PersistedServiceImpl implements InputService {
+    private static final Logger LOG = LoggerFactory.getLogger(InputServiceImpl.class);
+
+    private final ExtractorFactory extractorFactory;
+    private final MessageInputFactory messageInputFactory;
+
     @Inject
-    public InputServiceImpl(MongoConnection mongoConnection) {
+    public InputServiceImpl(MongoConnection mongoConnection,
+                            ExtractorFactory extractorFactory,
+                            MessageInputFactory messageInputFactory) {
         super(mongoConnection);
+        this.extractorFactory = extractorFactory;
+        this.messageInputFactory = messageInputFactory;
     }
 
     @Override
@@ -130,6 +147,76 @@ public class InputServiceImpl extends PersistedServiceImpl implements InputServi
     }
 
     @Override
+    public List<Extractor> getExtractors(Input input) {
+        List<Extractor> extractors = Lists.newArrayList();
+
+        if (input.getFields().get(InputImpl.EMBEDDED_EXTRACTORS) == null) {
+            return extractors;
+        }
+
+        BasicDBList mEx = (BasicDBList) input.getFields().get(InputImpl.EMBEDDED_EXTRACTORS);
+        Iterator<Object> iterator = mEx.iterator();
+        while (iterator.hasNext()) {
+            DBObject ex = (BasicDBObject) iterator.next();
+
+            // SOFT MIGRATION: does this extractor have an order set? Implemented for issue: #726
+            Long order = new Long(0);
+            if (ex.containsField("order")) {
+                order = (Long) ex.get("order"); // mongodb driver gives us a java.lang.Long
+            }
+
+            try {
+                Extractor extractor = extractorFactory.factory(
+                        (String) ex.get("id"),
+                        (String) ex.get("title"),
+                        order.intValue(),
+                        Extractor.CursorStrategy.valueOf(((String) ex.get("cursor_strategy")).toUpperCase()),
+                        Extractor.Type.valueOf(((String) ex.get("type")).toUpperCase()),
+                        (String) ex.get("source_field"),
+                        (String) ex.get("target_field"),
+                        (Map<String, Object>) ex.get("extractor_config"),
+                        (String) ex.get("creator_user_id"),
+                        getConvertersOfExtractor(ex),
+                        Extractor.ConditionType.valueOf(((String) ex.get("condition_type")).toUpperCase()),
+                        (String) ex.get("condition_value")
+                );
+
+                extractors.add(extractor);
+            } catch (Exception e) {
+                LOG.error("Cannot build extractor from persisted data. Skipping.", e);
+                continue;
+            }
+        }
+
+        return extractors;
+    }
+
+    private List<Converter> getConvertersOfExtractor(DBObject extractor) {
+        List<Converter> cl = Lists.newArrayList();
+
+        BasicDBList m = (BasicDBList) extractor.get("converters");
+        Iterator<Object> iterator = m.iterator();
+        while (iterator.hasNext()) {
+            DBObject c = (BasicDBObject) iterator.next();
+
+            try {
+                cl.add(ConverterFactory.factory(
+                        Converter.Type.valueOf(((String) c.get("type")).toUpperCase()),
+                        (Map<String, Object>) c.get("config")
+                ));
+            } catch (ConverterFactory.NoSuchConverterException e1) {
+                LOG.error("Cannot build converter from persisted data. No such converter.", e1);
+                continue;
+            } catch (Exception e) {
+                LOG.error("Cannot build converter from persisted data.", e);
+                continue;
+            }
+        }
+
+        return cl;
+    }
+
+    @Override
     public void removeExtractor(Input input, String extractorId) {
         removeEmbedded(input, InputImpl.EMBEDDED_EXTRACTORS, extractorId);
     }
@@ -137,5 +224,32 @@ public class InputServiceImpl extends PersistedServiceImpl implements InputServi
     @Override
     public void removeStaticField(Input input, String key) {
         removeEmbedded(input, InputImpl.EMBEDDED_STATIC_FIELDS, key);
+    }
+
+    public MessageInput getMessageInput(Input io) throws NoSuchInputTypeException, ConfigurationException {
+        MessageInput input = messageInputFactory.create(io.getType());
+
+        // Add all standard fields.
+        input.initialize(new Configuration(io.getConfiguration()));
+        input.setTitle(io.getTitle());
+        input.setCreatorUserId(io.getCreatorUserId());
+        input.setPersistId(io.getId());
+        input.setCreatedAt(io.getCreatedAt());
+        if (io.isGlobal())
+            input.setGlobal(true);
+
+        // Add extractors.
+        for (Extractor extractor : this.getExtractors(io)) {
+            input.addExtractor(extractor.getId(), extractor);
+        }
+
+        // Add static fields.
+        for (Map.Entry<String, String> field : io.getStaticFields().entrySet()) {
+            input.addStaticField(field.getKey(), field.getValue());
+        }
+
+        input.checkConfiguration();
+
+        return input;
     }
 }

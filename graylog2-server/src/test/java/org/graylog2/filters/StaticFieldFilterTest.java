@@ -16,6 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package org.graylog2.filters;
 
 import org.graylog2.plugin.Message;
@@ -46,7 +47,7 @@ public class StaticFieldFilterTest {
         msg.setSourceInput(fakeInput);
 
         StaticFieldFilter filter = new StaticFieldFilter();
-        filter.filter(msg, null);
+        filter.filter(msg);
 
         assertEquals("hello", msg.getMessage());
         assertEquals("junit", msg.getSource());
@@ -64,7 +65,7 @@ public class StaticFieldFilterTest {
         msg.setSourceInput(fakeInput);
 
         StaticFieldFilter filter = new StaticFieldFilter();
-        filter.filter(msg, null);
+        filter.filter(msg);
 
         assertEquals("hello", msg.getMessage());
         assertEquals("junit", msg.getSource());

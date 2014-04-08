@@ -1,5 +1,5 @@
-/**
- * Copyright 2013 Lennart Koopmann <lennart@torch.sh>
+/*
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -15,7 +15,6 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 package org.graylog2.radio.transports.kafka;
 
@@ -24,12 +23,14 @@ import kafka.producer.KeyedMessage;
 import kafka.producer.ProducerConfig;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.RadioMessage;
-import org.graylog2.radio.Radio;
+import org.graylog2.radio.Configuration;
 import org.graylog2.radio.transports.RadioTransport;
+import org.graylog2.shared.ServerStatus;
 import org.msgpack.MessagePack;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
 import java.io.IOException;
 import java.util.Properties;
 
@@ -46,18 +47,20 @@ public class KafkaProducer implements RadioTransport {
 
     private final MessagePack pack;
 
-    public KafkaProducer(Radio radio) {
+    @Inject
+    public KafkaProducer(ServerStatus serverStatus, Configuration configuration) {
+
         pack = new MessagePack();
 
         Properties props = new Properties();
-        props.put("metadata.broker.list", radio.getConfiguration().getKafkaBrokers());
+        props.put("metadata.broker.list", configuration.getKafkaBrokers());
         props.put("partitioner.class", "kafka.producer.DefaultPartitioner");
         props.put("serializer.class", "kafka.serializer.DefaultEncoder");
-        props.put("request.required.acks", String.valueOf(radio.getConfiguration().getKafkaRequiredAcks()));
-        props.put("client.id", "graylog2-radio-" + radio.getNodeId());
-        props.put("producer.type", radio.getConfiguration().getKafkaProducerType());
-        props.put("queue.buffering.max.ms", String.valueOf(radio.getConfiguration().getKafkaBatchMaxWaitMs()));
-        props.put("batch.num.messages", String.valueOf(radio.getConfiguration().getKafkaBatchSize()));
+        props.put("request.required.acks", String.valueOf(configuration.getKafkaRequiredAcks()));
+        props.put("client.id", "graylog2-radio-" + serverStatus.getNodeId().toString());
+        props.put("producer.type", configuration.getKafkaProducerType());
+        props.put("queue.buffering.max.ms", String.valueOf(configuration.getKafkaBatchMaxWaitMs()));
+        props.put("batch.num.messages", String.valueOf(configuration.getKafkaBatchSize()));
 
         ProducerConfig config = new ProducerConfig(props);
         producer = new Producer<byte[], byte[]>(config);

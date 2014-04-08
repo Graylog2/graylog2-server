@@ -19,10 +19,8 @@
 
 package org.graylog2.bindings;
 
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.inject.AbstractModule;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
-import com.google.inject.name.Names;
 import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.graylog2.Configuration;
 import org.graylog2.bindings.providers.*;
@@ -41,23 +39,18 @@ import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.indices.jobs.OptimizeIndexJob;
 import org.graylog2.indexer.ranges.RebuildIndexRangesJob;
 import org.graylog2.indexer.searches.Searches;
-import org.graylog2.initializers.Initializers;
 import org.graylog2.inputs.InputCache;
 import org.graylog2.inputs.OutputCache;
-import org.graylog2.inputs.ServerInputRegistry;
 import org.graylog2.jersey.container.netty.SecurityContextFactory;
 import org.graylog2.outputs.OutputRegistry;
-import org.graylog2.periodical.Periodicals;
 import org.graylog2.plugin.RulesEngine;
 import org.graylog2.plugin.indexer.MessageGateway;
 import org.graylog2.security.ShiroSecurityContextFactory;
 import org.graylog2.security.ldap.LdapConnector;
 import org.graylog2.security.realm.LdapUserAuthenticator;
 import org.graylog2.shared.ServerStatus;
+import org.graylog2.shared.inputs.InputRegistry;
 import org.graylog2.system.jobs.SystemJobManager;
-
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
@@ -65,7 +58,6 @@ import java.util.concurrent.ScheduledExecutorService;
 public class ServerBindings extends AbstractModule {
     private final Configuration configuration;
     private final MongoConnection mongoConnection;
-    private static final int SCHEDULED_THREADS_POOL_SIZE = 30;
 
     public ServerBindings(Configuration configuration) {
         this.configuration = configuration;
@@ -88,7 +80,6 @@ public class ServerBindings extends AbstractModule {
         bindInterfaces();
         bindSingletons();
         bindFactoryModules();
-        bindSchedulers();
     }
 
     private void bindFactoryModules() {
@@ -123,9 +114,9 @@ public class ServerBindings extends AbstractModule {
         bind(SystemJobManager.class).toProvider(SystemJobManagerProvider.class);
         bind(InputCache.class).toProvider(InputCacheProvider.class);
         bind(OutputCache.class).toProvider(OutputCacheProvider.class);
-        bind(ServerInputRegistry.class).toProvider(ServerInputRegistryProvider.class);
+        bind(InputRegistry.class).toProvider(ServerInputRegistryProvider.class);
         bind(RulesEngine.class).toProvider(RulesEngineProvider.class);
-        bind(Initializers.class).toInstance(new Initializers(serverStatus));
+        //bind(Initializers.class).toInstance(new Initializers(serverStatus));
         bind(LdapConnector.class).toProvider(LdapConnectorProvider.class);
         bind(LdapUserAuthenticator.class).toProvider(LdapUserAuthenticatorProvider.class);
         bind(DefaultSecurityManager.class).toProvider(DefaultSecurityManagerProvider.class);
@@ -138,26 +129,5 @@ public class ServerBindings extends AbstractModule {
 
     private MongoConnection getMongoConnection() {
         return this.mongoConnection;
-    }
-
-    private void bindSchedulers() {
-        final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(SCHEDULED_THREADS_POOL_SIZE,
-                new ThreadFactoryBuilder()
-                        .setNameFormat("scheduled-%d")
-                        .setDaemon(false)
-                        .build()
-        );
-
-        bind(ScheduledExecutorService.class).annotatedWith(Names.named("scheduler")).toInstance(scheduler);
-
-        final ScheduledExecutorService daemonScheduler = Executors.newScheduledThreadPool(SCHEDULED_THREADS_POOL_SIZE,
-                new ThreadFactoryBuilder()
-                        .setNameFormat("scheduled-%d")
-                        .setDaemon(true)
-                        .build()
-        );
-
-        bind(ScheduledExecutorService.class).annotatedWith(Names.named("daemonScheduler")).toInstance(daemonScheduler);
-        bind(Periodicals.class).toInstance(new Periodicals(scheduler, daemonScheduler));
     }
 }

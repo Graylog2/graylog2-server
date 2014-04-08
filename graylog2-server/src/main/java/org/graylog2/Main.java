@@ -32,16 +32,17 @@ import com.google.inject.Injector;
 import com.google.inject.Module;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Level;
+import org.glassfish.hk2.extension.ServiceLocatorGenerator;
+import org.glassfish.jersey.internal.inject.Injections;
+import org.graylog2.bindings.InitializerBindings;
 import org.graylog2.bindings.PersistenceServicesBindings;
 import org.graylog2.bindings.ServerBindings;
-import org.graylog2.cluster.Node;
-import org.graylog2.cluster.NodeNotFoundException;
 import org.graylog2.cluster.NodeService;
 import org.graylog2.cluster.NodeServiceImpl;
-import org.graylog2.filters.*;
-import org.graylog2.initializers.Initializers;
-import org.graylog2.initializers.PeriodicalsInitializer;
-import org.graylog2.inputs.ServerInputRegistry;
+import org.graylog2.filters.ExtractorFilter;
+import org.graylog2.filters.RewriteFilter;
+import org.graylog2.filters.StaticFieldFilter;
+import org.graylog2.filters.StreamMatcherFilter;
 import org.graylog2.inputs.amqp.AMQPInput;
 import org.graylog2.inputs.gelf.http.GELFHttpInput;
 import org.graylog2.inputs.gelf.tcp.GELFTCPInput;
@@ -65,9 +66,11 @@ import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.lifecycles.Lifecycle;
 import org.graylog2.plugins.PluginInstaller;
+import org.graylog2.plugins.PluginRegistry;
 import org.graylog2.shared.NodeRunner;
 import org.graylog2.shared.ServerStatus;
 import org.graylog2.shared.bindings.GuiceInstantiationService;
+import org.graylog2.shared.bindings.OwnServiceLocatorGenerator;
 import org.graylog2.shared.filters.FilterRegistry;
 import org.graylog2.shared.inputs.InputRegistry;
 import org.graylog2.system.activities.Activity;
@@ -79,6 +82,8 @@ import org.slf4j.bridge.SLF4JBridgeHandler;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.Writer;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.List;
 
 /**
@@ -107,7 +112,7 @@ public final class Main extends NodeRunner {
         }
 
         if (commandLineArguments.isShowVersion()) {
-            System.out.println("Graylog2 Server " + Core.GRAYLOG2_VERSION);
+            System.out.println("Graylog2 Server " + ServerVersion.VERSION);
             System.out.println("JRE: " + Tools.getSystemInformation());
             System.exit(0);
         }
@@ -144,7 +149,8 @@ public final class Main extends NodeRunner {
         GuiceInstantiationService instantiationService = new GuiceInstantiationService();
         List<Module> bindingsModules = getBindingsModules(instantiationService,
                 new ServerBindings(configuration),
-                new PersistenceServicesBindings());
+                new PersistenceServicesBindings(),
+                new InitializerBindings());
         Injector injector = Guice.createInjector(bindingsModules);
         instantiationService.setInjector(injector);
 
@@ -164,12 +170,16 @@ public final class Main extends NodeRunner {
         SLF4JBridgeHandler.removeHandlersForRootLogger();
         SLF4JBridgeHandler.install();
 
-        LOG.info("Graylog2 {} starting up. (JRE: {})", Core.GRAYLOG2_VERSION, Tools.getSystemInformation());
+        LOG.info("Graylog2 {} starting up. (JRE: {})", ServerVersion.VERSION, Tools.getSystemInformation());
 
         // Do not use a PID file if the user requested not to
         if (!commandLineArguments.isNoPidFile()) {
             savePidFile(commandLineArguments.getPidFile());
         }
+
+        monkeyPatchHK2(injector);
+        PluginRegistry pluginRegistry = injector.getInstance(PluginRegistry.class);
+        pluginRegistry.register(MessageInput.class, "inputs");
 
         // Le server object. This is where all the magic happens.
         Core server = injector.getInstance(Core.class);
@@ -181,13 +191,6 @@ public final class Main extends NodeRunner {
         // Register this node.
         final NodeService nodeService = injector.getInstance(NodeService.class);
         nodeService.registerServer(serverStatus.getNodeId().toString(), configuration.isMaster(), configuration.getRestTransportUri());
-
-        Node thisNode = null;
-        try {
-            thisNode = nodeService.byNodeId(serverStatus.getNodeId());
-        } catch (NodeNotFoundException e) {
-            throw new RuntimeException("Did not find own node. This should never happen.", e);
-        }
 
         final ActivityWriter activityWriter = injector.getInstance(ActivityWriter.class);
         if (configuration.isMaster() && !nodeService.isOnlyMaster(serverStatus.getNodeId())) {
@@ -239,7 +242,7 @@ public final class Main extends NodeRunner {
         MessageInput.setDefaultRecvBufferSize(configuration.getUdpRecvBufferSizes());
 
         // Register standard inputs.
-        InputRegistry inputRegistry = injector.getInstance(ServerInputRegistry.class);
+        InputRegistry inputRegistry = injector.getInstance(InputRegistry.class);
         inputRegistry.register(SyslogUDPInput.class, SyslogUDPInput.NAME);
         inputRegistry.register(SyslogTCPInput.class, SyslogTCPInput.NAME);
         inputRegistry.register(RawUDPInput.class, RawUDPInput.NAME);
@@ -256,15 +259,10 @@ public final class Main extends NodeRunner {
         inputRegistry.register(RadioAMQPInput.class, RadioAMQPInput.NAME);
 
 
-        // Register initializers.
-        Initializers initializers = injector.getInstance(Initializers.class);
-        initializers.register(injector.getInstance(PeriodicalsInitializer.class));
-
         // Register message filters. (Order is important here)
         final FilterRegistry filterRegistry = injector.getInstance(FilterRegistry.class);
         filterRegistry.register(injector.getInstance(StaticFieldFilter.class));
         filterRegistry.register(injector.getInstance(ExtractorFilter.class));
-        filterRegistry.register(injector.getInstance(BlacklistFilter.class));
         filterRegistry.register(injector.getInstance(StreamMatcherFilter.class));
         filterRegistry.register(injector.getInstance(RewriteFilter.class));
 
@@ -274,16 +272,6 @@ public final class Main extends NodeRunner {
 
         // Start services.
         server.run();
-
-        // Start REST API.
-        try {
-            server.startRestApi(injector);
-        } catch(Exception e) {
-            LOG.error("Could not start REST API on <{}>. Terminating.", configuration.getRestListenUri(), e);
-            System.exit(1);
-        }
-
-        serverStatus.setLifecycle(Lifecycle.RUNNING);
 
         activityWriter.write(new Activity("Started up.", Main.class));
         LOG.info("Graylog2 up and running.");
@@ -313,6 +301,20 @@ public final class Main extends NodeRunner {
             System.exit(1);
         }
 
+        if (configuration.getRestTransportUri() == null) {
+            String guessedIf;
+            try {
+                guessedIf = Tools.guessPrimaryNetworkAddress().getHostAddress();
+            } catch (Exception e) {
+                LOG.error("Could not guess primary network address for rest_transport_uri. Please configure it in your graylog2.conf.", e);
+                throw new RuntimeException("No rest_transport_uri.");
+            }
+
+            String transportStr = "http://" + guessedIf + ":" + configuration.getRestListenUri().getPort();
+            LOG.info("No rest_transport_uri set. Falling back to [{}].", transportStr);
+            configuration.setRestTransportUri(transportStr);
+        }
+
         return configuration;
     }
 
@@ -338,4 +340,23 @@ public final class Main extends NodeRunner {
         }
     }
 
+    private static void monkeyPatchHK2(Injector injector) {
+        ServiceLocatorGenerator ownGenerator = new OwnServiceLocatorGenerator(injector);
+        try {
+            Field field = Injections.class.getDeclaredField("generator");
+            field.setAccessible(true);
+            Field modifiers = Field.class.getDeclaredField("modifiers");
+            modifiers.setAccessible(true);
+            modifiers.setInt(field, field.getModifiers() & ~Modifier.FINAL);
+
+            field.set(null, ownGenerator);
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            LOG.error("Monkey patching Jersey's HK2 failed: ", e);
+            System.exit(-1);
+        }
+
+        /*ServiceLocatorFactory factory = ServiceLocatorFactory.getInstance();
+        factory.addListener(new HK2ServiceLocatorListener(injector));*/
+
+    }
 }

@@ -45,7 +45,6 @@ import org.graylog2.inputs.syslog.udp.SyslogUDPInput;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.lifecycles.Lifecycle;
 import org.graylog2.radio.bindings.RadioBindings;
-import org.graylog2.radio.inputs.RadioInputRegistry;
 import org.graylog2.shared.NodeRunner;
 import org.graylog2.shared.ServerStatus;
 import org.graylog2.shared.bindings.GuiceInstantiationService;
@@ -54,7 +53,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
-import javax.ws.rs.HEAD;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.Writer;
@@ -160,7 +158,7 @@ public class Main extends NodeRunner {
         }
 
         // Register inputs. (find an automatic way here (annotations?) and do the same in graylog2-server.Main
-        final InputRegistry inputRegistry = injector.getInstance(RadioInputRegistry.class);
+        final InputRegistry inputRegistry = injector.getInstance(InputRegistry.class);
         inputRegistry.register(SyslogUDPInput.class, SyslogUDPInput.NAME);
         inputRegistry.register(SyslogTCPInput.class, SyslogTCPInput.NAME);
         inputRegistry.register(RawUDPInput.class, RawUDPInput.NAME);

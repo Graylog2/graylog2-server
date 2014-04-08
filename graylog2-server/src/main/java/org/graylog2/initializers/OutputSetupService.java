@@ -1,5 +1,5 @@
-/**
- * Copyright 2011 Lennart Koopmann <lennart@socketfeed.com>
+/*
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -15,35 +15,32 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 
-package org.graylog2.blacklists;
+package org.graylog2.initializers;
 
-import com.mongodb.DBObject;
-import org.bson.types.ObjectId;
+import com.google.common.util.concurrent.AbstractIdleService;
+import org.graylog2.outputs.OutputRegistry;
+
+import javax.inject.Inject;
 
 /**
- * Representing rule of a blacklist.
- *
- * @author Lennart Koopmann <lennart@socketfeed.com>
+ * @author Dennis Oelkers <dennis@torch.sh>
  */
-public class BlacklistRule {
+public class OutputSetupService extends AbstractIdleService {
+    private final OutputRegistry outputRegistry;
 
-    private ObjectId id = null;
-    private String term = null;
-
-    public BlacklistRule(DBObject blacklistRule) {
-        this.id = (ObjectId) blacklistRule.get("_id");
-        this.term = (String) blacklistRule.get("term");
+    @Inject
+    public OutputSetupService(OutputRegistry outputRegistry) {
+        this.outputRegistry = outputRegistry;
     }
 
-    public String getTerm() {
-        return this.term;
+    @Override
+    protected void startUp() throws Exception {
+        outputRegistry.initialize();
     }
 
-    public ObjectId getId() {
-        return this.id;
+    @Override
+    protected void shutDown() throws Exception {
     }
-
 }

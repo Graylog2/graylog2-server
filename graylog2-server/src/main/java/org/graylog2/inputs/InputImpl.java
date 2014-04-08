@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 TORCH GmbH
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -18,7 +18,6 @@
  */
 package org.graylog2.inputs;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
@@ -29,18 +28,13 @@ import org.graylog2.database.PersistedImpl;
 import org.graylog2.database.validators.DateValidator;
 import org.graylog2.database.validators.FilledStringValidator;
 import org.graylog2.database.validators.MapValidator;
-import org.graylog2.inputs.converters.ConverterFactory;
-import org.graylog2.inputs.extractors.ExtractorFactory;
 import org.graylog2.plugin.database.validators.Validator;
-import org.graylog2.plugin.inputs.Converter;
-import org.graylog2.plugin.inputs.Extractor;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -114,51 +108,6 @@ public class InputImpl extends PersistedImpl implements Input {
     }
 
     @Override
-    public List<Extractor> getExtractors() {
-        List<Extractor> extractors = Lists.newArrayList();
-
-        if (fields.get(EMBEDDED_EXTRACTORS) == null) {
-            return extractors;
-        }
-
-        BasicDBList mEx = (BasicDBList) fields.get(EMBEDDED_EXTRACTORS);
-        Iterator<Object> iterator = mEx.iterator();
-        while (iterator.hasNext()) {
-            DBObject ex = (BasicDBObject) iterator.next();
-
-            // SOFT MIGRATION: does this extractor have an order set? Implemented for issue: #726
-            Long order = new Long(0);
-            if (ex.containsField("order")) {
-                order = (Long) ex.get("order"); // mongodb driver gives us a java.lang.Long
-            }
-
-            try {
-                Extractor extractor = ExtractorFactory.factory(
-                        (String) ex.get("id"),
-                        (String) ex.get("title"),
-                        order.intValue(),
-                        Extractor.CursorStrategy.valueOf(((String) ex.get("cursor_strategy")).toUpperCase()),
-                        Extractor.Type.valueOf(((String) ex.get("type")).toUpperCase()),
-                        (String) ex.get("source_field"),
-                        (String) ex.get("target_field"),
-                        (Map<String, Object>) ex.get("extractor_config"),
-                        (String) ex.get("creator_user_id"),
-                        getConvertersOfExtractor(ex),
-                        Extractor.ConditionType.valueOf(((String) ex.get("condition_type")).toUpperCase()),
-                        (String) ex.get("condition_value")
-                );
-
-                extractors.add(extractor);
-            } catch (Exception e) {
-                LOG.error("Cannot build extractor from persisted data. Skipping.", e);
-                continue;
-            }
-        }
-
-        return extractors;
-    }
-
-    @Override
     public Map<String, String> getStaticFields() {
         Map<String, String> staticFields = Maps.newHashMap();
 
@@ -194,31 +143,6 @@ public class InputImpl extends PersistedImpl implements Input {
     @Override
     public String getInputId() {
         return (String) fields.get("input_id");
-    }
-
-    private List<Converter> getConvertersOfExtractor(DBObject extractor) {
-        List<Converter> cl = Lists.newArrayList();
-
-        BasicDBList m = (BasicDBList) extractor.get("converters");
-        Iterator<Object> iterator = m.iterator();
-        while (iterator.hasNext()) {
-            DBObject c = (BasicDBObject) iterator.next();
-
-            try {
-                cl.add(ConverterFactory.factory(
-                        Converter.Type.valueOf(((String) c.get("type")).toUpperCase()),
-                        (Map<String, Object>) c.get("config")
-                ));
-            } catch (ConverterFactory.NoSuchConverterException e1) {
-                LOG.error("Cannot build converter from persisted data. No such converter.", e1);
-                continue;
-            } catch (Exception e) {
-                LOG.error("Cannot build converter from persisted data.", e);
-                continue;
-            }
-        }
-
-        return cl;
     }
 
     @Override

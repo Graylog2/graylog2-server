@@ -19,7 +19,6 @@
 
 package org.graylog2;
 
-import com.codahale.metrics.MetricRegistry;
 import org.graylog2.plugin.Message;
 
 /**
@@ -29,11 +28,4 @@ public class GraylogServerStub extends Core {
 
     public int callsToProcessBufferInserter = 0;
     public Message lastInsertedToProcessBuffer = null;
-    private MetricRegistry fakeMetricRegistry = new MetricRegistry();
-
-    @Override
-    public MetricRegistry metrics() {
-        return fakeMetricRegistry;
-    }
-
 }

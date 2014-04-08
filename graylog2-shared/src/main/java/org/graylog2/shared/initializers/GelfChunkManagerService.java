@@ -17,18 +17,30 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.graylog2.plugin;
+package org.graylog2.shared.initializers;
 
-import com.codahale.metrics.MetricRegistry;
+import com.google.common.util.concurrent.AbstractIdleService;
+import org.graylog2.inputs.gelf.gelf.GELFChunkManager;
 
-import java.util.concurrent.atomic.AtomicInteger;
+import javax.inject.Inject;
 
 /**
- *
- * @author Lennart Koopmann <lennart@socketfeed.com>
+ * @author Dennis Oelkers <dennis@torch.sh>
  */
-public interface GraylogServer extends Runnable {
-    public String getNodeId();
+public class GelfChunkManagerService extends AbstractIdleService {
+    private GELFChunkManager gelfChunkManager;
 
-    public MetricRegistry metrics();
+    @Inject
+    public GelfChunkManagerService(GELFChunkManager gelfChunkManager) {
+        this.gelfChunkManager = gelfChunkManager;
+    }
+
+    @Override
+    protected void startUp() throws Exception {
+        gelfChunkManager.start();
+    }
+
+    @Override
+    protected void shutDown() throws Exception {
+    }
 }

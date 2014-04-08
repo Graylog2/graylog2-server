@@ -19,20 +19,15 @@
 
 package org.graylog2.radio.bindings;
 
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.inject.AbstractModule;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
-import com.google.inject.name.Names;
 import com.ning.http.client.AsyncHttpClient;
 import org.graylog2.radio.Configuration;
 import org.graylog2.radio.bindings.providers.AsyncHttpClientProvider;
 import org.graylog2.radio.bindings.providers.RadioInputRegistryProvider;
 import org.graylog2.radio.buffers.processors.RadioProcessBufferProcessor;
-import org.graylog2.radio.inputs.RadioInputRegistry;
 import org.graylog2.shared.ServerStatus;
-
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
+import org.graylog2.shared.inputs.InputRegistry;
 
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
@@ -50,7 +45,6 @@ public class RadioBindings extends AbstractModule {
         bindProviders();
         bindSingletons();
         install(new FactoryModuleBuilder().build(RadioProcessBufferProcessor.Factory.class));
-        bindSchedulers();
     }
 
     private void bindSingletons() {
@@ -59,18 +53,7 @@ public class RadioBindings extends AbstractModule {
         ServerStatus serverStatus = new ServerStatus(configuration);
         serverStatus.addCapability(ServerStatus.Capability.RADIO);
         bind(ServerStatus.class).toInstance(serverStatus);
-        bind(RadioInputRegistry.class).toProvider(RadioInputRegistryProvider.class);
-    }
-
-    private void bindSchedulers() {
-        final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(SCHEDULED_THREADS_POOL_SIZE,
-                new ThreadFactoryBuilder()
-                        .setNameFormat("scheduled-%d")
-                        .setDaemon(false)
-                        .build()
-        );
-
-        bind(ScheduledExecutorService.class).annotatedWith(Names.named("scheduler")).toInstance(scheduler);
+        bind(InputRegistry.class).toProvider(RadioInputRegistryProvider.class);
     }
 
     private void bindProviders() {

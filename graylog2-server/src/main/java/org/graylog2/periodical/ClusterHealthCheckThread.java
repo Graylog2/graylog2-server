@@ -21,10 +21,10 @@ package org.graylog2.periodical;
 
 import com.google.inject.Inject;
 import org.graylog2.cluster.NodeNotFoundException;
-import org.graylog2.inputs.ServerInputRegistry;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.system.NodeId;
+import org.graylog2.shared.inputs.InputRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,12 +34,12 @@ import org.slf4j.LoggerFactory;
 public class ClusterHealthCheckThread extends Periodical {
     private static final Logger LOG = LoggerFactory.getLogger(ClusterHealthCheckThread.class);
     private NotificationService notificationService;
-    private final ServerInputRegistry inputRegistry;
+    private final InputRegistry inputRegistry;
     private final NodeId nodeId;
 
     @Inject
     public ClusterHealthCheckThread(NotificationService notificationService,
-                                    ServerInputRegistry inputRegistry,
+                                    InputRegistry inputRegistry,
                                     NodeId nodeId) {
         this.notificationService = notificationService;
         this.inputRegistry = inputRegistry;

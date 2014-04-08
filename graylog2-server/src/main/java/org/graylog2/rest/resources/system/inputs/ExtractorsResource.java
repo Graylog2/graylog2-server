@@ -28,7 +28,6 @@ import org.graylog2.ConfigurationException;
 import org.graylog2.database.ValidationException;
 import org.graylog2.inputs.Input;
 import org.graylog2.inputs.InputService;
-import org.graylog2.inputs.ServerInputRegistry;
 import org.graylog2.inputs.converters.ConverterFactory;
 import org.graylog2.inputs.extractors.ExtractorFactory;
 import org.graylog2.plugin.inputs.Converter;
@@ -38,6 +37,7 @@ import org.graylog2.rest.documentation.annotations.*;
 import org.graylog2.rest.resources.RestResource;
 import org.graylog2.rest.resources.system.inputs.requests.CreateExtractorRequest;
 import org.graylog2.security.RestPermissions;
+import org.graylog2.shared.inputs.InputRegistry;
 import org.graylog2.system.activities.Activity;
 import org.graylog2.system.activities.ActivityWriter;
 import org.slf4j.Logger;
@@ -61,14 +61,24 @@ public class ExtractorsResource extends RestResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(ExtractorsResource.class);
 
+    private final InputService inputService;
+    private final ActivityWriter activityWriter;
+    private final InputRegistry inputs;
+    private final MetricRegistry metricRegistry;
+    private final ExtractorFactory extractorFactory;
+
     @Inject
-    private InputService inputService;
-    @Inject
-    private ActivityWriter activityWriter;
-    @Inject
-    private ServerInputRegistry inputs;
-    @Inject
-    private MetricRegistry metricRegistry;
+    public ExtractorsResource(InputService inputService,
+                              ActivityWriter activityWriter,
+                              InputRegistry inputs,
+                              MetricRegistry metricRegistry,
+                              ExtractorFactory extractorFactory) {
+        this.inputService = inputService;
+        this.activityWriter = activityWriter;
+        this.inputs = inputs;
+        this.metricRegistry = metricRegistry;
+        this.extractorFactory = extractorFactory;
+    }
 
     @POST @Timed
     @Consumes(MediaType.APPLICATION_JSON)
@@ -112,7 +122,7 @@ public class ExtractorsResource extends RestResource {
         String id = new com.eaio.uuid.UUID().toString();
         Extractor extractor;
         try {
-            extractor = ExtractorFactory.factory(
+            extractor = extractorFactory.factory(
                     id,
                     cer.title,
                     cer.order,

@@ -19,8 +19,6 @@
 
 package org.graylog2.filters;
 
-import org.graylog2.Core;
-import org.graylog2.plugin.GraylogServer;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.filters.MessageFilter;
 import org.graylog2.plugin.streams.Stream;
@@ -50,9 +48,7 @@ public class StreamMatcherFilter implements MessageFilter {
     }
 
     @Override
-    public boolean filter(Message msg, GraylogServer server) {
-        Core core = (Core) server;
-
+    public boolean filter(Message msg) {
         List<Stream> streams = streamRouter.route(msg);
 
         for (Stream stream : streams) {

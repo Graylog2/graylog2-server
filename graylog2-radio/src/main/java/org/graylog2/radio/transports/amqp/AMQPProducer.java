@@ -1,5 +1,5 @@
-/**
- * Copyright 2014 Lennart Koopmann <lennart@torch.sh>
+/*
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -15,16 +15,16 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 package org.graylog2.radio.transports.amqp;
 
 import org.graylog2.plugin.Message;
-import org.graylog2.radio.Radio;
+import org.graylog2.radio.Configuration;
 import org.graylog2.radio.transports.RadioTransport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
 import java.io.IOException;
 
 /**
@@ -40,13 +40,14 @@ public class AMQPProducer implements RadioTransport {
 
     private final AMQPSender sender;
 
-    public AMQPProducer(Radio radio) {
+    @Inject
+    public AMQPProducer(Configuration configuration) {
         sender = new AMQPSender(
-                radio.getConfiguration().getAmqpHostname(),
-                radio.getConfiguration().getAmqpPort(),
-                radio.getConfiguration().getAmqpUsername(),
-                radio.getConfiguration().getAmqpPassword(),
-                radio.getConfiguration().getAmqpPrefetchCount()
+                configuration.getAmqpHostname(),
+                configuration.getAmqpPort(),
+                configuration.getAmqpUsername(),
+                configuration.getAmqpPassword(),
+                configuration.getAmqpPrefetchCount()
         );
     }
 

@@ -1,5 +1,5 @@
-/**
- * Copyright 2012 Lennart Koopmann <lennart@socketfeed.com>
+/*
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -15,12 +15,11 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 package org.graylog2.plugins;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.graylog2.Core;
+import org.graylog2.ServerVersion;
 import org.graylog2.plugin.Tools;
 
 import java.io.BufferedReader;
@@ -161,7 +160,7 @@ public class PluginInstaller {
             return false;
         }
         
-        return versions.contains(Core.GRAYLOG2_VERSION);
+        return versions.contains(ServerVersion.VERSION);
     }
     
     public static String jarPath(String jarUrl, String pluginType) {

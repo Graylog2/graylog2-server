@@ -25,7 +25,6 @@ import com.codahale.metrics.Timer;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import org.graylog2.buffers.OutputBuffer;
-import org.graylog2.plugin.GraylogServer;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.filters.MessageFilter;
 import org.graylog2.shared.buffers.processors.ProcessBufferProcessor;
@@ -44,7 +43,6 @@ public class ServerProcessBufferProcessor extends ProcessBufferProcessor {
     public interface Factory {
         public ServerProcessBufferProcessor create(
                 OutputBuffer outputBuffer,
-                GraylogServer graylogServer,
                 AtomicInteger processBufferWatermark,
                 @Assisted("ordinal") final long ordinal,
                 @Assisted("numberOfConsumers") final long numberOfConsumers
@@ -52,7 +50,6 @@ public class ServerProcessBufferProcessor extends ProcessBufferProcessor {
     }
 
     private static final Logger LOG = LoggerFactory.getLogger(ServerProcessBufferProcessor.class);
-    private final GraylogServer graylogServer;
     private final OutputBuffer outputBuffer;
     private final Meter filteredOutMessages;
     private final FilterRegistry filterRegistry;
@@ -61,14 +58,12 @@ public class ServerProcessBufferProcessor extends ProcessBufferProcessor {
     @AssistedInject
     public ServerProcessBufferProcessor(MetricRegistry metricRegistry,
                                   FilterRegistry filterRegistry,
-                                  @Assisted GraylogServer graylogServer,
                                   @Assisted AtomicInteger processBufferWatermark,
                                   @Assisted("ordinal") final long ordinal,
                                   @Assisted("numberOfConsumers") final long numberOfConsumers,
                                   @Assisted OutputBuffer outputBuffer) {
         super(metricRegistry, processBufferWatermark, ordinal, numberOfConsumers);
         this.filterRegistry = filterRegistry;
-        this.graylogServer = graylogServer;
         this.outputBuffer = outputBuffer;
         this.filteredOutMessages = metricRegistry.meter(name(ProcessBufferProcessor.class, "filteredOutMessages"));
     }
@@ -83,7 +78,7 @@ public class ServerProcessBufferProcessor extends ProcessBufferProcessor {
             try {
                 LOG.debug("Applying filter [{}] on message <{}>.", filter.getName(), msg.getId());
 
-                if (filter.filter(msg, graylogServer)) {
+                if (filter.filter(msg)) {
                     LOG.debug("Filter [{}] marked message <{}> to be discarded. Dropping message.", filter.getName(), msg.getId());
                     filteredOutMessages.mark();
                     return;
