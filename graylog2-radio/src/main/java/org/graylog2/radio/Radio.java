@@ -117,8 +117,8 @@ public class Radio {
             this.configuration.setRestTransportUri(transportStr);
         }
 
-        pinger = new Ping.Pinger(httpClient, serverStatus.getNodeId().toString(), configuration.getRestTransportUri(), configuration.getGraylog2ServerUri());
-        startPings();
+/*        pinger = new Ping.Pinger(httpClient, serverStatus.getNodeId().toString(), configuration.getRestTransportUri(), configuration.getGraylog2ServerUri());
+        startPings();*/
 
         serviceManager.addListener(serviceManagerListener, MoreExecutors.sameThreadExecutor());
         serviceManager.startAsync().awaitHealthy();

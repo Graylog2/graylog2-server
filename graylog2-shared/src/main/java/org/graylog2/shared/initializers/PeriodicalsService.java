@@ -59,6 +59,7 @@ public class PeriodicalsService extends AbstractIdleService {
     protected void startUp() throws Exception {
         Reflections reflections = new Reflections("org.graylog2.periodical");
         Set<Class<? extends Periodical>> periodicalSet = reflections.getSubTypesOf(Periodical.class);
+        System.out.println("Starting " + periodicalSet.size() + " periodicals: " + periodicalSet);
         LOG.info("Starting {} periodicals ...", periodicalSet.size());
 
         for (Class<? extends Periodical> type : periodicalSet) {

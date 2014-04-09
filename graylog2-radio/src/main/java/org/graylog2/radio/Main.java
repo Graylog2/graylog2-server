@@ -159,10 +159,10 @@ public class Main extends NodeRunner {
         radio.initialize();
 
         // Register in Graylog2 cluster.
-        radio.ping();
+        //radio.ping();
 
         // Start regular pinging Graylog2 cluster to show that we are alive.
-        radio.startPings();
+        //radio.startPings();
 
 
         LOG.info("Graylog2 Radio up and running.");
