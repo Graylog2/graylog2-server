@@ -70,7 +70,6 @@ import org.graylog2.plugins.PluginRegistry;
 import org.graylog2.shared.NodeRunner;
 import org.graylog2.shared.ServerStatus;
 import org.graylog2.shared.bindings.GuiceInstantiationService;
-import org.graylog2.shared.bindings.OwnServiceLocatorGenerator;
 import org.graylog2.shared.filters.FilterRegistry;
 import org.graylog2.shared.inputs.InputRegistry;
 import org.graylog2.system.activities.Activity;
@@ -82,8 +81,6 @@ import org.slf4j.bridge.SLF4JBridgeHandler;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.Writer;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import java.util.List;
 
 /**
@@ -338,25 +335,5 @@ public final class Main extends NodeRunner {
             // make sure to remove our pid when we exit
             new File(pidFile).deleteOnExit();
         }
-    }
-
-    private static void monkeyPatchHK2(Injector injector) {
-        ServiceLocatorGenerator ownGenerator = new OwnServiceLocatorGenerator(injector);
-        try {
-            Field field = Injections.class.getDeclaredField("generator");
-            field.setAccessible(true);
-            Field modifiers = Field.class.getDeclaredField("modifiers");
-            modifiers.setAccessible(true);
-            modifiers.setInt(field, field.getModifiers() & ~Modifier.FINAL);
-
-            field.set(null, ownGenerator);
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            LOG.error("Monkey patching Jersey's HK2 failed: ", e);
-            System.exit(-1);
-        }
-
-        /*ServiceLocatorFactory factory = ServiceLocatorFactory.getInstance();
-        factory.addListener(new HK2ServiceLocatorListener(injector));*/
-
     }
 }

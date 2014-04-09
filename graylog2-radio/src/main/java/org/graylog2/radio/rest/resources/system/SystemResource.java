@@ -24,6 +24,7 @@ import com.codahale.metrics.jvm.ThreadDump;
 import com.google.common.collect.Maps;
 import org.graylog2.plugin.Tools;
 import org.graylog2.radio.Radio;
+import org.graylog2.radio.RadioVersion;
 import org.graylog2.radio.rest.resources.RestResource;
 import org.graylog2.shared.ServerStatus;
 
@@ -50,7 +51,7 @@ public class SystemResource extends RestResource {
         Map<String, Object> result = Maps.newHashMap();
         result.put("facility", "graylog2-radio");
         result.put("server_id", serverStatus.getNodeId().toString());
-        result.put("version", Radio.VERSION.toString());
+        result.put("version", RadioVersion.VERSION.toString());
         result.put("started_at", Tools.getISO8601String(serverStatus.getStartedAt()));
         result.put("hostname", Tools.getLocalCanonicalHostname());
         result.put("lifecycle", serverStatus.getLifecycle().getName().toLowerCase());

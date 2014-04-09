@@ -1,4 +1,4 @@
-package org.graylog2.rest;
+package org.graylog2.shared.rest;
 
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerResponseContext;

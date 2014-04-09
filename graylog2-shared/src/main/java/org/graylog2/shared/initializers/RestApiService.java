@@ -17,28 +17,25 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.graylog2.initializers;
+package org.graylog2.shared.initializers;
 
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 import com.google.common.util.concurrent.AbstractIdleService;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import org.glassfish.hk2.utilities.binding.AbstractBinder;
+import com.google.inject.internal.util.$Nullable;
 import org.glassfish.jersey.message.GZipEncoder;
 import org.glassfish.jersey.server.ContainerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.filter.EncodingFilter;
 import org.glassfish.jersey.server.internal.scanning.PackageNamesScanner;
-import org.graylog2.Configuration;
 import org.graylog2.jersey.container.netty.NettyContainer;
-import org.graylog2.metrics.jersey2.MetricsDynamicBinding;
+import org.graylog2.jersey.container.netty.SecurityContextFactory;
+import org.graylog2.shared.BaseConfiguration;
+import org.graylog2.shared.metrics.jersey2.MetricsDynamicBinding;
 import org.graylog2.plugin.rest.AnyExceptionClassMapper;
 import org.graylog2.plugin.rest.JacksonPropertyExceptionMapper;
-import org.graylog2.rest.CORSFilter;
-import org.graylog2.rest.ObjectMapperProvider;
-import org.graylog2.rest.RestAccessLogFilter;
-import org.graylog2.security.ShiroSecurityBinding;
-import org.graylog2.security.ShiroSecurityContextFactory;
-import org.graylog2.system.jobs.SystemJobFactory;
+import org.graylog2.shared.rest.CORSFilter;
+import org.graylog2.shared.rest.ObjectMapperProvider;
 import org.jboss.netty.bootstrap.ServerBootstrap;
 import org.jboss.netty.channel.ChannelPipeline;
 import org.jboss.netty.channel.ChannelPipelineFactory;
@@ -51,7 +48,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import javax.ws.rs.container.ContainerResponseFilter;
+import javax.ws.rs.container.DynamicFeature;
 import java.net.InetSocketAddress;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -59,26 +59,22 @@ import java.util.concurrent.Executors;
  * @author Dennis Oelkers <dennis@torch.sh>
  */
 public class RestApiService extends AbstractIdleService {
-    private class Graylog2Binder extends AbstractBinder {
-        @Override
-        protected void configure() {
-            bind(systemJobFactory).to(SystemJobFactory.class);
-        }
-    }
-
     private final Logger LOG = LoggerFactory.getLogger(RestApiService.class);
-    private final Configuration configuration;
-    private final ShiroSecurityContextFactory shiroSecurityContextFactory;
-    private final SystemJobFactory systemJobFactory;
+    private final BaseConfiguration configuration;
+    private final SecurityContextFactory securityContextFactory;
+    private final Set<Class<? extends DynamicFeature>> dynamicFeatures;
+    private final Set<Class<? extends ContainerResponseFilter>> containerResponseFilters;
     private ServerBootstrap bootstrap;
 
     @Inject
-    public RestApiService(Configuration configuration,
-                          ShiroSecurityContextFactory shiroSecurityContextFactory,
-                          SystemJobFactory systemJobFactory) {
+    public RestApiService(BaseConfiguration configuration,
+                          @$Nullable SecurityContextFactory securityContextFactory,
+                          Set<Class<? extends DynamicFeature>> dynamicFeatures,
+                          Set<Class<? extends ContainerResponseFilter>> containerResponseFilters) {
         this.configuration = configuration;
-        this.shiroSecurityContextFactory = shiroSecurityContextFactory;
-        this.systemJobFactory = systemJobFactory;
+        this.securityContextFactory = securityContextFactory;
+        this.dynamicFeatures = dynamicFeatures;
+        this.containerResponseFilters = containerResponseFilters;
     }
 
     @Override
@@ -100,15 +96,19 @@ public class RestApiService extends AbstractIdleService {
 
         ResourceConfig rc = new ResourceConfig()
                 .property(NettyContainer.PROPERTY_BASE_URI, configuration.getRestListenUri())
-                .registerClasses(MetricsDynamicBinding.class,
-                        JacksonPropertyExceptionMapper.class,
-                        AnyExceptionClassMapper.class,
-                        ShiroSecurityBinding.class,
-                        RestAccessLogFilter.class)
-                .register(new Graylog2Binder())
-                .register(ObjectMapperProvider.class)
-                .register(JacksonJsonProvider.class)
-                .registerFinder(new PackageNamesScanner(new String[]{"org.graylog2.rest.resources"}, true));
+                .registerClasses(JacksonPropertyExceptionMapper.class,
+                        AnyExceptionClassMapper.class);
+
+        for (Class<? extends DynamicFeature> dynamicFeatureClass : dynamicFeatures)
+            rc.registerClasses(dynamicFeatureClass);
+
+        for (Class<? extends ContainerResponseFilter> responseFilter : containerResponseFilters)
+            rc.registerClasses(responseFilter);
+
+        rc.register(ObjectMapperProvider.class)
+            .register(JacksonJsonProvider.class)
+            .registerFinder(new PackageNamesScanner(new String[]{"org.graylog2.rest.resources",
+                    "org.graylog2.radio.rest.resources"}, true));
 
         if (configuration.isRestEnableGzip())
             EncodingFilter.enableFor(rc, GZipEncoder.class);
@@ -121,7 +121,12 @@ public class RestApiService extends AbstractIdleService {
         /*rc = rc.registerFinder(new PackageNamesScanner(new String[]{"org.graylog2.rest.resources"}, true));*/
 
         final NettyContainer jerseyHandler = ContainerFactory.createContainer(NettyContainer.class, rc);
-        jerseyHandler.setSecurityContextFactory(shiroSecurityContextFactory);
+        if (securityContextFactory != null) {
+            LOG.info("Adding security context factory: <{}>", securityContextFactory);
+            jerseyHandler.setSecurityContextFactory(securityContextFactory);
+        } else {
+            LOG.info("Not adding security context factory.");
+        }
 
         bootstrap.setPipelineFactory(new ChannelPipelineFactory() {
             @Override
@@ -148,6 +153,7 @@ public class RestApiService extends AbstractIdleService {
     @Override
     protected void shutDown() throws Exception {
         LOG.info("Shutting down REST API at <{}>", configuration.getRestListenUri());
+        bootstrap.releaseExternalResources();
         bootstrap.shutdown();
     }
 }

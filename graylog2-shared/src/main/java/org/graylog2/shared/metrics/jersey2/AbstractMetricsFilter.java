@@ -1,4 +1,4 @@
-package org.graylog2.metrics.jersey2;
+package org.graylog2.shared.metrics.jersey2;
 
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;

@@ -130,7 +130,7 @@ public class Main extends NodeRunner {
         SLF4JBridgeHandler.removeHandlersForRootLogger();
         SLF4JBridgeHandler.install();
 
-        LOG.info("Graylog2 Radio {} starting up. (JRE: {})", Radio.VERSION, Tools.getSystemInformation());
+        LOG.info("Graylog2 Radio {} starting up. (JRE: {})", RadioVersion.VERSION, Tools.getSystemInformation());
 
         // Do not use a PID file if the user requested not to
         if (!commandLineArguments.isNoPidFile()) {
@@ -138,24 +138,6 @@ public class Main extends NodeRunner {
         }
 
         ServerStatus serverStatus = injector.getInstance(ServerStatus.class);
-
-        Radio radio = injector.getInstance(Radio.class);
-        serverStatus.setLifecycle(Lifecycle.STARTING);
-        radio.initialize();
-
-        // Register in Graylog2 cluster.
-        radio.ping();
-
-        // Start regular pinging Graylog2 cluster to show that we are alive.
-        radio.startPings();
-
-        // Start REST API.
-        try {
-            radio.startRestApi(injector);
-        } catch(Exception e) {
-            LOG.error("Could not start REST API on <{}>. Terminating.", configuration.getRestListenUri(), e);
-            System.exit(1);
-        }
 
         // Register inputs. (find an automatic way here (annotations?) and do the same in graylog2-server.Main
         final InputRegistry inputRegistry = injector.getInstance(InputRegistry.class);
@@ -170,22 +152,19 @@ public class Main extends NodeRunner {
         inputRegistry.register(LocalMetricsInput.class, LocalMetricsInput.NAME);
         inputRegistry.register(JsonPathInput.class, JsonPathInput.NAME);
 
-        // Try loading persisted inputs. Retry until server connection succeeds.
-        while(true) {
-            try {
-                inputRegistry.launchAllPersisted();
-                break;
-            } catch(Exception e) {
-                LOG.error("Could not load persisted inputs. Trying again in one second.", e);
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e1) {
-                    return;
-                }
-            }
-        }
+        monkeyPatchHK2(injector);
 
-        serverStatus.setLifecycle(Lifecycle.RUNNING);
+        Radio radio = injector.getInstance(Radio.class);
+        serverStatus.setLifecycle(Lifecycle.STARTING);
+        radio.initialize();
+
+        // Register in Graylog2 cluster.
+        radio.ping();
+
+        // Start regular pinging Graylog2 cluster to show that we are alive.
+        radio.startPings();
+
+
         LOG.info("Graylog2 Radio up and running.");
 
         while (true) {

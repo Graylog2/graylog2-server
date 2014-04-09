@@ -19,22 +19,33 @@
 
 package org.graylog2.radio.bindings;
 
+import com.beust.jcommander.internal.Sets;
 import com.google.inject.AbstractModule;
+import com.google.inject.TypeLiteral;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
+import com.google.inject.multibindings.Multibinder;
+import com.google.inject.util.Providers;
 import com.ning.http.client.AsyncHttpClient;
+import org.graylog2.jersey.container.netty.SecurityContextFactory;
 import org.graylog2.radio.Configuration;
 import org.graylog2.radio.bindings.providers.AsyncHttpClientProvider;
 import org.graylog2.radio.bindings.providers.RadioInputRegistryProvider;
 import org.graylog2.radio.buffers.processors.RadioProcessBufferProcessor;
+import org.graylog2.radio.transports.RadioTransport;
+import org.graylog2.radio.transports.amqp.AMQPProducer;
+import org.graylog2.radio.transports.kafka.KafkaProducer;
+import org.graylog2.shared.BaseConfiguration;
 import org.graylog2.shared.ServerStatus;
 import org.graylog2.shared.inputs.InputRegistry;
+
+import javax.ws.rs.container.ContainerResponseFilter;
+import javax.ws.rs.container.DynamicFeature;
 
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
  */
 public class RadioBindings extends AbstractModule {
     private final Configuration configuration;
-    private static final int SCHEDULED_THREADS_POOL_SIZE = 10;
 
     public RadioBindings(Configuration configuration) {
         this.configuration = configuration;
@@ -44,11 +55,17 @@ public class RadioBindings extends AbstractModule {
     protected void configure() {
         bindProviders();
         bindSingletons();
+        bindTransport();
         install(new FactoryModuleBuilder().build(RadioProcessBufferProcessor.Factory.class));
+        SecurityContextFactory instance = null;
+        bind(SecurityContextFactory.class).toProvider(Providers.of(instance));
+        bindDynamicFeatures();
+        bindContainerResponseFilters();
     }
 
     private void bindSingletons() {
         bind(Configuration.class).toInstance(configuration);
+        bind(BaseConfiguration.class).toInstance(configuration);
 
         ServerStatus serverStatus = new ServerStatus(configuration);
         serverStatus.addCapability(ServerStatus.Capability.RADIO);
@@ -58,5 +75,28 @@ public class RadioBindings extends AbstractModule {
 
     private void bindProviders() {
         bind(AsyncHttpClient.class).toProvider(AsyncHttpClientProvider.class);
+    }
+
+    private void bindTransport() {
+        switch (configuration.getTransportType()) {
+            case AMQP:
+                bind(RadioTransport.class).to(AMQPProducer.class);
+                break;
+            case KAFKA:
+                bind(RadioTransport.class).to(KafkaProducer.class);
+                break;
+            default:
+                throw new RuntimeException("Cannot map transport type to transport.");
+        }
+    }
+
+    private void bindDynamicFeatures() {
+        TypeLiteral<Class<? extends DynamicFeature>> type = new TypeLiteral<Class<? extends DynamicFeature>>(){};
+        Multibinder<Class<? extends DynamicFeature>> setBinder = Multibinder.newSetBinder(binder(), type);
+    }
+
+    private void bindContainerResponseFilters() {
+        TypeLiteral<Class<? extends ContainerResponseFilter>> type = new TypeLiteral<Class<? extends ContainerResponseFilter>>(){};
+        Multibinder<Class<? extends ContainerResponseFilter>> setBinder = Multibinder.newSetBinder(binder(), type);
     }
 }

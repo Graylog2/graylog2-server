@@ -20,8 +20,11 @@
 package org.graylog2.bindings;
 
 import com.google.inject.AbstractModule;
+import com.google.inject.TypeLiteral;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
+import com.google.inject.multibindings.Multibinder;
 import org.apache.shiro.mgt.DefaultSecurityManager;
+import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.graylog2.Configuration;
 import org.graylog2.bindings.providers.*;
 import org.graylog2.buffers.OutputBuffer;
@@ -45,12 +48,20 @@ import org.graylog2.jersey.container.netty.SecurityContextFactory;
 import org.graylog2.outputs.OutputRegistry;
 import org.graylog2.plugin.RulesEngine;
 import org.graylog2.plugin.indexer.MessageGateway;
+import org.graylog2.rest.RestAccessLogFilter;
+import org.graylog2.security.ShiroSecurityBinding;
 import org.graylog2.security.ShiroSecurityContextFactory;
 import org.graylog2.security.ldap.LdapConnector;
 import org.graylog2.security.realm.LdapUserAuthenticator;
+import org.graylog2.shared.BaseConfiguration;
 import org.graylog2.shared.ServerStatus;
 import org.graylog2.shared.inputs.InputRegistry;
+import org.graylog2.shared.metrics.jersey2.MetricsDynamicBinding;
+import org.graylog2.system.jobs.SystemJobFactory;
 import org.graylog2.system.jobs.SystemJobManager;
+
+import javax.ws.rs.container.ContainerResponseFilter;
+import javax.ws.rs.container.DynamicFeature;
 
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
@@ -80,6 +91,8 @@ public class ServerBindings extends AbstractModule {
         bindInterfaces();
         bindSingletons();
         bindFactoryModules();
+        bindDynamicFeatures();
+        bindContainerResponseFilters();
     }
 
     private void bindFactoryModules() {
@@ -98,6 +111,7 @@ public class ServerBindings extends AbstractModule {
 
     private void bindSingletons() {
         bind(Configuration.class).toInstance(configuration);
+        bind(BaseConfiguration.class).toInstance(configuration);
 
         bind(MongoConnection.class).toInstance(mongoConnection);
         bind(OutputRegistry.class).toInstance(new OutputRegistry());
@@ -120,6 +134,7 @@ public class ServerBindings extends AbstractModule {
         bind(LdapConnector.class).toProvider(LdapConnectorProvider.class);
         bind(LdapUserAuthenticator.class).toProvider(LdapUserAuthenticatorProvider.class);
         bind(DefaultSecurityManager.class).toProvider(DefaultSecurityManagerProvider.class);
+        bind(SystemJobFactory.class).toProvider(SystemJobFactoryProvider.class);
     }
 
     private void bindInterfaces() {
@@ -129,5 +144,18 @@ public class ServerBindings extends AbstractModule {
 
     private MongoConnection getMongoConnection() {
         return this.mongoConnection;
+    }
+
+    private void bindDynamicFeatures() {
+        TypeLiteral<Class<? extends DynamicFeature>> type = new TypeLiteral<Class<? extends DynamicFeature>>(){};
+        Multibinder<Class<? extends DynamicFeature>> setBinder = Multibinder.newSetBinder(binder(), type);
+        setBinder.addBinding().toInstance(ShiroSecurityBinding.class);
+        setBinder.addBinding().toInstance(MetricsDynamicBinding.class);
+    }
+
+    private void bindContainerResponseFilters() {
+        TypeLiteral<Class<? extends ContainerResponseFilter>> type = new TypeLiteral<Class<? extends ContainerResponseFilter>>(){};
+        Multibinder<Class<? extends ContainerResponseFilter>> setBinder = Multibinder.newSetBinder(binder(), type);
+        setBinder.addBinding().toInstance(RestAccessLogFilter.class);
     }
 }

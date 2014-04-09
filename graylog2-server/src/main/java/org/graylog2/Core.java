@@ -21,7 +21,7 @@ package org.graylog2;
 
 import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.ServiceManager;
-import org.graylog2.initializers.ServiceManagerListener;
+import org.graylog2.shared.initializers.ServiceManagerListener;
 import org.graylog2.plugin.lifecycles.Lifecycle;
 import org.graylog2.shared.ServerStatus;
 import org.graylog2.system.activities.Activity;
@@ -42,8 +42,6 @@ public class Core {
 
     private static final Logger LOG = LoggerFactory.getLogger(Core.class);
 
-    @Inject
-    private Configuration configuration;
     @Inject
     private ServerStatus serverStatus;
 

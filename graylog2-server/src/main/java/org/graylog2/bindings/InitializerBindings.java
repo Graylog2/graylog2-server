@@ -23,6 +23,7 @@ import com.google.common.util.concurrent.Service;
 import com.google.inject.AbstractModule;
 import com.google.inject.multibindings.Multibinder;
 import org.graylog2.initializers.*;
+import org.graylog2.shared.initializers.RestApiService;
 
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
@@ -37,7 +38,6 @@ public class InitializerBindings extends AbstractModule {
         serviceBinder.addBinding().to(DeflectorSetupService.class);
         serviceBinder.addBinding().to(IndexerSetupService.class);
         serviceBinder.addBinding().to(OutputSetupService.class);
-        serviceBinder.addBinding().to(RestApiService.class);
         serviceBinder.addBinding().to(BufferSynchronizerService.class);
     }
 }

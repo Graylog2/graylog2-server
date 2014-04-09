@@ -210,33 +210,28 @@ public class RadiosResource extends RestResource {
     })
     public String persistedInputs(@ApiParam(title = "radioId", required = true) @PathParam("radioId") String radioId) {
         Node radio = null;
+        Map<String, Object> result = Maps.newHashMap();
+        List<Map<String, Object>> inputs = Lists.newArrayList();
         try {
             radio = nodeService.byNodeId(radioId);
         } catch (NodeNotFoundException e) {
-            LOG.error("Radio <{}> not found.", radioId);
-            throw new WebApplicationException(404);
+            LOG.debug("Radio <{}> not found.", radioId);
         }
 
-        if (radio == null) {
-            LOG.error("Radio <{}> not found.", radioId);
-            throw new WebApplicationException(404);
-        }
+        if (radio != null) {
+            for (Input input : inputService.allOfRadio(radio)) {
+                Map<String, Object> inputSummary = Maps.newHashMap();
 
-        Map<String, Object> result = Maps.newHashMap();
-        List<Map<String, Object>> inputs = Lists.newArrayList();
+                inputSummary.put("type", input.getType());
+                inputSummary.put("id", input.getId());
+                inputSummary.put("title", input.getTitle());
+                inputSummary.put("configuration", input.getConfiguration());
+                inputSummary.put("creator_user_id", input.getCreatorUserId());
+                inputSummary.put("created_at", Tools.getISO8601String(input.getCreatedAt()));
+                inputSummary.put("global", input.isGlobal());
 
-        for (Input input : inputService.allOfRadio(radio)) {
-            Map<String, Object> inputSummary = Maps.newHashMap();
-
-            inputSummary.put("type", input.getType());
-            inputSummary.put("id", input.getId());
-            inputSummary.put("title", input.getTitle());
-            inputSummary.put("configuration", input.getConfiguration());
-            inputSummary.put("creator_user_id", input.getCreatorUserId());
-            inputSummary.put("created_at", Tools.getISO8601String(input.getCreatedAt()));
-            inputSummary.put("global", input.isGlobal());
-
-            inputs.add(inputSummary);
+                inputs.add(inputSummary);
+            }
         }
 
         result.put("inputs", inputs);
@@ -267,15 +262,13 @@ public class RadiosResource extends RestResource {
         try {
             node = nodeService.byNodeId(radioId);
         } catch (NodeNotFoundException e) {
-            LOG.error("Unable to find radio for id " + radioId, e);
-            throw new WebApplicationException(404);
+            LOG.debug("There is no registered (or only outdated) graylog2-radio node [{}]. Registering.", radioId);
         }
 
         if (node != null) {
             nodeService.markAsAlive(node, false, pr.restTransportAddress);
             LOG.debug("Updated state of graylog2-radio node [{}].", radioId);
         } else {
-            LOG.debug("There is no registered (or only outdated) graylog2-radio node [{}]. Registering.", radioId);
             nodeService.registerRadio(radioId, pr.restTransportAddress);
         }
 

@@ -31,6 +31,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
@@ -38,7 +39,7 @@ import java.util.concurrent.TimeUnit;
  * @author Dennis Oelkers <dennis@torch.sh>
  */
 public class PeriodicalsService extends AbstractIdleService {
-    private static final Logger LOG = LoggerFactory.getLogger(PeriodicalsService.class);
+    private final Logger LOG = LoggerFactory.getLogger(PeriodicalsService.class);
 
     public static final String NAME = "Periodicals initializer";
     private final InstantiationService instantiationService;
@@ -57,8 +58,10 @@ public class PeriodicalsService extends AbstractIdleService {
     @Override
     protected void startUp() throws Exception {
         Reflections reflections = new Reflections("org.graylog2.periodical");
+        Set<Class<? extends Periodical>> periodicalSet = reflections.getSubTypesOf(Periodical.class);
+        LOG.info("Starting {} periodicals ...", periodicalSet.size());
 
-        for (Class<? extends Periodical> type : reflections.getSubTypesOf(Periodical.class)) {
+        for (Class<? extends Periodical> type : periodicalSet) {
             try {
                 Periodical periodical = instantiationService.getInstance(type);
 

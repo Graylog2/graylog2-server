@@ -53,7 +53,7 @@ public class SystemJobManager {
     @Inject
     public SystemJobManager(ActivityWriter activityWriter) {
         this.activityWriter = activityWriter;
-        jobs = new ConcurrentHashMap<String, SystemJob>();
+        jobs = new ConcurrentHashMap<>();
     }
 
     public String submit(final SystemJob job) throws SystemJobConcurrencyException {

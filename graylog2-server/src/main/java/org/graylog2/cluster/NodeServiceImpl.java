@@ -79,7 +79,7 @@ public class NodeServiceImpl extends PersistedServiceImpl implements NodeService
         DBObject o = findOne(NodeImpl.class, query);
 
         if (o == null || !o.containsField("node_id")) {
-            throw new NodeNotFoundException("Did not find our own node. This should never happen.");
+            throw new NodeNotFoundException("Unable to find node " + nodeId);
         }
 
         return new NodeImpl((ObjectId) o.get("_id"), o.toMap());

@@ -17,7 +17,7 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.graylog2.initializers;
+package org.graylog2.shared.initializers;
 
 import com.google.common.util.concurrent.Service;
 import com.google.common.util.concurrent.ServiceManager.Listener;

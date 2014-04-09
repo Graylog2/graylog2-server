@@ -21,15 +21,21 @@ package org.graylog2.shared;
 
 import com.beust.jcommander.internal.Lists;
 import com.google.inject.AbstractModule;
+import com.google.inject.Injector;
 import com.google.inject.Module;
+import org.glassfish.hk2.extension.ServiceLocatorGenerator;
+import org.glassfish.jersey.internal.inject.Injections;
 import org.graylog2.shared.bindings.GenericBindings;
 import org.graylog2.shared.bindings.InstantiationService;
+import org.graylog2.shared.bindings.OwnServiceLocatorGenerator;
 import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Modifier;
 import java.util.List;
 
 /**
@@ -57,5 +63,25 @@ public class NodeRunner {
         for (Module module : specificModules)
             result.add(module);
         return result;
+    }
+
+    protected static void monkeyPatchHK2(Injector injector) {
+        ServiceLocatorGenerator ownGenerator = new OwnServiceLocatorGenerator(injector);
+        try {
+            Field field = Injections.class.getDeclaredField("generator");
+            field.setAccessible(true);
+            Field modifiers = Field.class.getDeclaredField("modifiers");
+            modifiers.setAccessible(true);
+            modifiers.setInt(field, field.getModifiers() & ~Modifier.FINAL);
+
+            field.set(null, ownGenerator);
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            LOG.error("Monkey patching Jersey's HK2 failed: ", e);
+            System.exit(-1);
+        }
+
+        /*ServiceLocatorFactory factory = ServiceLocatorFactory.getInstance();
+        factory.addListener(new HK2ServiceLocatorListener(injector));*/
+
     }
 }

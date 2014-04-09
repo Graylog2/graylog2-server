@@ -25,6 +25,7 @@ import com.google.inject.multibindings.Multibinder;
 import org.graylog2.shared.initializers.GelfChunkManagerService;
 import org.graylog2.shared.initializers.InputSetupService;
 import org.graylog2.shared.initializers.PeriodicalsService;
+import org.graylog2.shared.initializers.RestApiService;
 
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
@@ -36,5 +37,6 @@ public class GenericInitializerBindings extends AbstractModule {
         serviceBinder.addBinding().to(GelfChunkManagerService.class);
         serviceBinder.addBinding().to(InputSetupService.class);
         serviceBinder.addBinding().to(PeriodicalsService.class);
+        serviceBinder.addBinding().to(RestApiService.class);
     }
 }
