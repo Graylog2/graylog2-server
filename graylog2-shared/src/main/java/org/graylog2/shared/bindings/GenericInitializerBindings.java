@@ -22,10 +22,7 @@ package org.graylog2.shared.bindings;
 import com.google.common.util.concurrent.Service;
 import com.google.inject.AbstractModule;
 import com.google.inject.multibindings.Multibinder;
-import org.graylog2.shared.initializers.GelfChunkManagerService;
-import org.graylog2.shared.initializers.InputSetupService;
-import org.graylog2.shared.initializers.PeriodicalsService;
-import org.graylog2.shared.initializers.RestApiService;
+import org.graylog2.shared.initializers.*;
 
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
@@ -38,5 +35,6 @@ public class GenericInitializerBindings extends AbstractModule {
         serviceBinder.addBinding().to(InputSetupService.class);
         serviceBinder.addBinding().to(PeriodicalsService.class);
         serviceBinder.addBinding().to(RestApiService.class);
+        serviceBinder.addBinding().to(GroovyShellSetupService.class);
     }
 }

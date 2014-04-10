@@ -30,10 +30,7 @@ import com.github.joschi.jadconfig.repositories.PropertiesRepository;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Module;
-import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Level;
-import org.glassfish.hk2.extension.ServiceLocatorGenerator;
-import org.glassfish.jersey.internal.inject.Injections;
 import org.graylog2.bindings.InitializerBindings;
 import org.graylog2.bindings.PersistenceServicesBindings;
 import org.graylog2.bindings.ServerBindings;
@@ -78,9 +75,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.Writer;
 import java.util.List;
 
 /**
@@ -313,27 +307,5 @@ public final class Main extends NodeRunner {
         }
 
         return configuration;
-    }
-
-    private static void savePidFile(String pidFile) {
-
-        String pid = Tools.getPID();
-        Writer pidFileWriter = null;
-
-        try {
-            if (pid == null || pid.isEmpty() || pid.equals("unknown")) {
-                throw new Exception("Could not determine PID.");
-            }
-
-            pidFileWriter = new FileWriter(pidFile);
-            IOUtils.write(pid, pidFileWriter);
-        } catch (Exception e) {
-            LOG.error("Could not write PID file: " + e.getMessage(), e);
-            System.exit(1);
-        } finally {
-            IOUtils.closeQuietly(pidFileWriter);
-            // make sure to remove our pid when we exit
-            new File(pidFile).deleteOnExit();
-        }
     }
 }

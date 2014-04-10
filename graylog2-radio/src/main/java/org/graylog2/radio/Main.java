@@ -30,7 +30,6 @@ import com.github.joschi.jadconfig.repositories.PropertiesRepository;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Module;
-import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Level;
 import org.graylog2.inputs.gelf.http.GELFHttpInput;
 import org.graylog2.inputs.gelf.tcp.GELFTCPInput;
@@ -53,9 +52,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.Writer;
 import java.util.List;
 
 /**
@@ -110,7 +106,8 @@ public class Main extends NodeRunner {
         }
 
         GuiceInstantiationService instantiationService = new GuiceInstantiationService();
-        List<Module> bindingsModules = getBindingsModules(instantiationService, new RadioBindings(configuration));
+        List<Module> bindingsModules = getBindingsModules(instantiationService,
+                new RadioBindings(configuration));
         Injector injector = Guice.createInjector(bindingsModules);
         instantiationService.setInjector(injector);
 
@@ -171,27 +168,4 @@ public class Main extends NodeRunner {
             try { Thread.sleep(1000); } catch (InterruptedException e) { /* lol, i don't care */ }
         }
     }
-
-    private static void savePidFile(String pidFile) {
-
-        String pid = Tools.getPID();
-        Writer pidFileWriter = null;
-
-        try {
-            if (pid == null || pid.isEmpty() || pid.equals("unknown")) {
-                throw new Exception("Could not determine PID.");
-            }
-
-            pidFileWriter = new FileWriter(pidFile);
-            IOUtils.write(pid, pidFileWriter);
-        } catch (Exception e) {
-            LOG.error("Could not write PID file: " + e.getMessage(), e);
-            System.exit(1);
-        } finally {
-            IOUtils.closeQuietly(pidFileWriter);
-            // make sure to remove our pid when we exit
-            new File(pidFile).deleteOnExit();
-        }
-    }
-
 }

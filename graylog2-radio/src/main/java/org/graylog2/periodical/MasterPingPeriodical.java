@@ -1,7 +1,25 @@
-package org.graylog2.periodicals;
+/*
+ * Copyright 2012-2014 TORCH GmbH
+ *
+ * This file is part of Graylog2.
+ *
+ * Graylog2 is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Graylog2 is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+package org.graylog2.periodical;
 
 import com.ning.http.client.AsyncHttpClient;
-import org.graylog2.periodical.Periodical;
 import org.graylog2.radio.Configuration;
 import org.graylog2.radio.cluster.Ping;
 import org.graylog2.shared.ServerStatus;
@@ -69,14 +87,11 @@ public class MasterPingPeriodical extends Periodical {
     @Override
     public void run() {
         try {
-            System.out.println("Pinging master ...");
             Ping.ping(httpClient,
                     configuration.getGraylog2ServerUri(),
                     configuration.getRestTransportUri(),
                     serverStatus.getNodeId().toString());
         } catch (IOException | ExecutionException | InterruptedException e) {
-            System.out.println("Master ping failed.");
-            e.printStackTrace();
             LOG.error("Master ping failed.", e);
         }
     }

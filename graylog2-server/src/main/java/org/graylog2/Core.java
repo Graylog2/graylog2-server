@@ -21,9 +21,9 @@ package org.graylog2;
 
 import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.ServiceManager;
-import org.graylog2.shared.initializers.ServiceManagerListener;
 import org.graylog2.plugin.lifecycles.Lifecycle;
 import org.graylog2.shared.ServerStatus;
+import org.graylog2.shared.initializers.ServiceManagerListener;
 import org.graylog2.system.activities.Activity;
 import org.graylog2.system.activities.ActivityWriter;
 import org.slf4j.Logger;
@@ -67,7 +67,7 @@ public class Core {
                 serviceManager.stopAsync().awaitStopped();
 
                 /*GracefulShutdown gs = new GracefulShutdown(serverStatus, activityWriter, configuration,
-                        bufferSynchronizer, cacheSynchronizer, indexer, periodicals, inputs);
+                        bufferSynchronizer, cacheSynchronizer, indexer, periodical, inputs);
                 gs.run();*/
             }
         });

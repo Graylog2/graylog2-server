@@ -24,7 +24,6 @@ import com.google.inject.TypeLiteral;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.multibindings.Multibinder;
 import org.apache.shiro.mgt.DefaultSecurityManager;
-import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.graylog2.Configuration;
 import org.graylog2.bindings.providers.*;
 import org.graylog2.buffers.OutputBuffer;
@@ -130,7 +129,6 @@ public class ServerBindings extends AbstractModule {
         bind(OutputCache.class).toProvider(OutputCacheProvider.class);
         bind(InputRegistry.class).toProvider(ServerInputRegistryProvider.class);
         bind(RulesEngine.class).toProvider(RulesEngineProvider.class);
-        //bind(Initializers.class).toInstance(new Initializers(serverStatus));
         bind(LdapConnector.class).toProvider(LdapConnectorProvider.class);
         bind(LdapUserAuthenticator.class).toProvider(LdapUserAuthenticatorProvider.class);
         bind(DefaultSecurityManager.class).toProvider(DefaultSecurityManagerProvider.class);

@@ -183,7 +183,6 @@
             <version>2.2.0-b21</version>
         </dependency>
     </dependencies>
-
     <build>
         <plugins>
             <plugin>

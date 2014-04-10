@@ -49,6 +49,12 @@ public abstract class BaseConfiguration {
     @Parameter(value = "rest_enable_gzip", required = false)
     private boolean restEnableGzip = false;
 
+    @Parameter(value = "groovy_shell_enable", required = false)
+    private boolean groovyShellEnable = false;
+
+    @Parameter(value = "groovy_shell_port", required = false)
+    private int groovyShellPort = 6789;
+
     public URI getRestTransportUri() {
         if (restTransportUri == null || restTransportUri.isEmpty()) {
             return null;
@@ -93,6 +99,14 @@ public abstract class BaseConfiguration {
 
     public boolean isRestEnableGzip() {
         return restEnableGzip;
+    }
+
+    public boolean isGroovyShellEnable() {
+        return groovyShellEnable;
+    }
+
+    public int getGroovyShellPort() {
+        return groovyShellPort;
     }
 
     public abstract String getNodeIdFile();

@@ -23,8 +23,10 @@ import com.beust.jcommander.internal.Lists;
 import com.google.inject.AbstractModule;
 import com.google.inject.Injector;
 import com.google.inject.Module;
+import org.apache.commons.io.IOUtils;
 import org.glassfish.hk2.extension.ServiceLocatorGenerator;
 import org.glassfish.jersey.internal.inject.Injections;
+import org.graylog2.plugin.Tools;
 import org.graylog2.shared.bindings.GenericBindings;
 import org.graylog2.shared.bindings.InstantiationService;
 import org.graylog2.shared.bindings.OwnServiceLocatorGenerator;
@@ -32,6 +34,9 @@ import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.Writer;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -48,9 +53,9 @@ public class NodeRunner {
         List<Module> result = Lists.newArrayList();
         result.add(new GenericBindings(instantiationService));
         Reflections reflections = new Reflections("org.graylog2.shared.bindings");
-        for (Class<? extends AbstractModule> type : reflections.getSubTypesOf(AbstractModule.class)) {
+        for (Class<? extends Module> type : reflections.getSubTypesOf(AbstractModule.class)) {
             try {
-                Constructor<? extends AbstractModule> constructor = type.getConstructor();
+                Constructor<? extends Module> constructor = type.getConstructor();
                 Module module = constructor.newInstance();
                 result.add(module);
             } catch (InstantiationException | InvocationTargetException | IllegalAccessException e) {
@@ -83,5 +88,27 @@ public class NodeRunner {
         /*ServiceLocatorFactory factory = ServiceLocatorFactory.getInstance();
         factory.addListener(new HK2ServiceLocatorListener(injector));*/
 
+    }
+
+    protected static void savePidFile(String pidFile) {
+
+        String pid = Tools.getPID();
+        Writer pidFileWriter = null;
+
+        try {
+            if (pid == null || pid.isEmpty() || pid.equals("unknown")) {
+                throw new Exception("Could not determine PID.");
+            }
+
+            pidFileWriter = new FileWriter(pidFile);
+            IOUtils.write(pid, pidFileWriter);
+        } catch (Exception e) {
+            LOG.error("Could not write PID file: " + e.getMessage(), e);
+            System.exit(1);
+        } finally {
+            IOUtils.closeQuietly(pidFileWriter);
+            // make sure to remove our pid when we exit
+            new File(pidFile).deleteOnExit();
+        }
     }
 }
