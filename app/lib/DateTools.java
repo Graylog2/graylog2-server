@@ -71,7 +71,7 @@ public class DateTools {
     public static DateTime inUserTimeZone(DateTime timestamp) {
         DateTimeZone tz = globalTimezone;
         final User currentUser = UserService.current();
-        if (currentUser != null) {
+        if (currentUser != null && currentUser.getTimeZone() != null) {
             tz = currentUser.getTimeZone();
         }
         return timestamp.toDateTime(tz);
