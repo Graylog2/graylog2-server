@@ -85,6 +85,7 @@
                     <div class="controls">
                         <select name="timezone" id="timezone" data-placeholder="Pick your time zone" class="timezone-select">
                             @for(group <- ImmutableList.copyOf(timezones.keys).sorted) {
+                                <option></option>
                                 <optgroup label="@group">
                                 @for(zone <- ImmutableList.copyOf(timezones.get(group).iterator()).sorted) {
                                     @if(form("timezone").valueOr("").equals(group+"/"+zone)) {
