@@ -213,7 +213,7 @@ public class User extends Persisted {
     }
 
     public void setTimeZone(DateTimeZone timeZone) {
-        fields.put(TIMEZONE, timeZone.getID());
+        fields.put(TIMEZONE, timeZone == null ? null : timeZone.getID());
     }
 
     public boolean isExternalUser() {
