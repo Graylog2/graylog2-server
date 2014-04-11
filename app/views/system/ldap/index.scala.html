@@ -113,8 +113,8 @@
                 <label class="control-label" for="defaultGroup">Default permission group</label>
                 <div class="controls">
                     <select id="defaultGroup" name="defaultGroup" placeholder="" required>
-                        <option value="reader" @if(ldapForm("defaultGroup").value().equals("reader")) {selected}>Reader</option>
-                        <option value="admin" @if(ldapForm("defaultGroup").value().equals("admin")) {selected}>Administrative</option>
+                        <option value="reader" @if("reader".equals(ldapForm("defaultGroup").value())) {selected}>Reader</option>
+                        <option value="admin" @if("admin".equals(ldapForm("defaultGroup").value())) {selected}>Administrative</option>
                     </select>
                     <span class="help-block">This determines the default set of permissions a user will be assigned.</span>
                     <div class="alert">Changing this will not affect accounts that have previously been created via LDAP!
