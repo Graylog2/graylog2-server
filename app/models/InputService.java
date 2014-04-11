@@ -150,8 +150,13 @@ public class InputService {
 
         for (Map.Entry<Node, Map<String, String>> entry : getAllInputTypes().entrySet()) {
             for (String type : entry.getValue().keySet()) {
-                InputTypeSummaryResponse itr = getInputTypeInformation(entry.getKey(), type);
-                types.put(itr.type, itr);
+                try {
+                    InputTypeSummaryResponse itr = getInputTypeInformation(entry.getKey(), type);
+                    if (itr != null && itr.type != null)
+                        types.put(itr.type, itr);
+                } catch (IOException | APIException e) {
+                    log.error("Unable to get details for input <" + type + ">: ", e);
+                }
             }
         }
 
