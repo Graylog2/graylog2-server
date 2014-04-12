@@ -77,6 +77,7 @@
             <span class="help-block">Choose your local time zone or leave it as it is to use the system's default.</span>
             <select name="timezone" id="timezone" data-placeholder="Pick your time zone" class="timezone-select">
             @for(group <- ImmutableList.copyOf(timezones.keys).sorted) {
+                <option></option>
                 <optgroup label="@group">
                 @for(zone <- ImmutableList.copyOf(timezones.get(group).iterator()).sorted) {
                     <option value="@group/@zone" @if(applicationTimeZone.getID.equals(group+"/"+zone)) {selected}>@zone</option>
