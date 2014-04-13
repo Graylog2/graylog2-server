@@ -32,6 +32,7 @@ public class ExtractorSummaryResponse {
     public String id;
     public String title;
     public String type;
+    public int order;
 
     @SerializedName("target_field")
     public String targetField;

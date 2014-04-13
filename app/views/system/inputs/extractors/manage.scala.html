@@ -113,9 +113,9 @@
         </h2>
 
         @if(extractors.size() > 0) {
-            <ul class="xtrc-list-drag">
-            @for(extractor <- extractors) {
-                <li>
+            <ul class="xtrc-list-drag" data-input-persist-id="@input.getPersistId">
+            @for(extractor <- extractors.sortBy(_.getOrder)) {
+                <li id="@extractor.getId">
                 <div class="row-fluid node-row">
                     <h3>
                         <i class="icon icon-reorder xtrc-order-handle"></i>

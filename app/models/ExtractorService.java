@@ -22,12 +22,15 @@ import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 import lib.APIException;
 import lib.ApiClient;
+import models.api.requests.ExtractorOrderRequest;
+import models.api.responses.EmptyResponse;
 import models.api.responses.system.ExtractorSummaryResponse;
 import models.api.responses.system.ExtractorsResponse;
 import play.mvc.Http;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.SortedMap;
 
 public class ExtractorService {
 
@@ -62,4 +65,16 @@ public class ExtractorService {
 
         return extractors;
     }
+
+    public void order(String inputId, SortedMap<Integer, String> order) throws APIException, IOException {
+        ExtractorOrderRequest req = new ExtractorOrderRequest();
+        req.order = order;
+
+        api.post(EmptyResponse.class)
+                .path("/system/inputs/{0}/extractors/order", inputId)
+                .body(req)
+                .onlyMasterNode()
+                .execute();
+    }
+
 }

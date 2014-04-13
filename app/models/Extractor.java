@@ -96,6 +96,7 @@ public class Extractor {
 
     private String id;
     private final String title;
+    private final int order;
     private final CursorStrategy cursorStrategy;
     private final Type extractorType;
     private final String sourceField;
@@ -128,7 +129,7 @@ public class Extractor {
         this.metrics = new ExtractorMetrics(esr.metrics.get("total"), esr.metrics.get("converters"));
         this.exceptions = esr.exceptions;
         this.converterExceptions = esr.converterExceptions;
-
+        this.order = esr.order;
     }
 
     @AssistedInject
@@ -159,7 +160,7 @@ public class Extractor {
         this.metrics = null;
         this.exceptions = 0;
         this.converterExceptions = 0;
-
+        this.order = 0;
     }
 
     public Extractor create(Node node, Input input) throws IOException, APIException {
@@ -388,4 +389,9 @@ public class Extractor {
     public long getTotalExceptions() {
         return exceptions + converterExceptions;
     }
+
+    public int getOrder() {
+        return order;
+    }
+
 }
