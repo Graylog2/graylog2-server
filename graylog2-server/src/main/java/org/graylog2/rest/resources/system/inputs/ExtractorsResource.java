@@ -28,12 +28,14 @@ import org.graylog2.database.ValidationException;
 import org.graylog2.inputs.Input;
 import org.graylog2.inputs.converters.ConverterFactory;
 import org.graylog2.inputs.extractors.ExtractorFactory;
+import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.inputs.Converter;
 import org.graylog2.plugin.inputs.Extractor;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.rest.documentation.annotations.*;
 import org.graylog2.rest.resources.RestResource;
 import org.graylog2.rest.resources.system.inputs.requests.CreateExtractorRequest;
+import org.graylog2.rest.resources.system.inputs.requests.OrderExtractorsRequest;
 import org.graylog2.security.RestPermissions;
 import org.graylog2.system.activities.Activity;
 import org.slf4j.Logger;
@@ -156,7 +158,7 @@ public class ExtractorsResource extends RestResource {
         }
         checkPermission(RestPermissions.INPUTS_READ, inputId);
 
-        MessageInput input = core.inputs().getRunningInput(inputId);
+        Input input = Input.find(core, inputId);
 
         if (input == null) {
             LOG.error("Input <{}> not found.", inputId);
@@ -165,7 +167,7 @@ public class ExtractorsResource extends RestResource {
 
         List<Map<String, Object>> extractors = Lists.newArrayList();
 
-        for (Extractor extractor : input.getExtractors().values()) {
+        for (Extractor extractor : input.getExtractors()) {
             extractors.add(toMap(extractor));
         }
 
@@ -225,6 +227,50 @@ public class ExtractorsResource extends RestResource {
         return Response.status(Response.Status.NO_CONTENT).build();
     }
 
+    @POST @Timed
+    @Consumes(MediaType.APPLICATION_JSON)
+    @ApiOperation(value = "Update extractor order of an input")
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "No such input on this node.")
+    })
+    @Path("order")
+    public Response order(@ApiParam(title = "JSON body", required = true) String body,
+                          @ApiParam(title = "inputId", description = "Persist ID (!) of input.", required = true) @PathParam("inputId") String inputPersistId) {
+        if (inputPersistId == null || inputPersistId.isEmpty()) {
+            LOG.error("Missing inputId. Returning HTTP 400.");
+            throw new WebApplicationException(400);
+        }
+        checkPermission(RestPermissions.INPUTS_EDIT, inputPersistId);
+
+        Input mongoInput = Input.find(core, inputPersistId);
+
+        OrderExtractorsRequest oer;
+        try {
+            oer = objectMapper.readValue(body, OrderExtractorsRequest.class);
+        } catch(IOException e) {
+            LOG.error("Error while parsing JSON", e);
+            throw new WebApplicationException(e, Response.Status.BAD_REQUEST);
+        }
+
+        for (Extractor extractor : mongoInput.getExtractors()) {
+            if (oer.order.containsValue(extractor.getId())) {
+                extractor.setOrder(Tools.getKeyByValue(oer.order, extractor.getId()));
+            }
+
+            // Docs embedded in MongoDB array cannot be updated atomically... :/
+            mongoInput.removeExtractor(extractor.getId());
+            try {
+                mongoInput.addExtractor(extractor);
+            } catch (ValidationException e) {
+                LOG.warn("Validation error for extractor update.", e);
+            }
+        }
+
+        LOG.info("Updated extractor ordering of input <persist:{}>.", inputPersistId);
+
+        return Response.ok().build();
+    }
+
     private Map<String, Object> toMap(Extractor extractor) {
         Map<String, Object> map = Maps.newHashMap();
 
@@ -239,6 +285,7 @@ public class ExtractorsResource extends RestResource {
         map.put("converters", extractor.converterConfigMap());
         map.put("condition_type", extractor.getConditionType().toString().toLowerCase());
         map.put("condition_value", extractor.getConditionValue());
+        map.put("order", extractor.getOrder());
 
         map.put("exceptions", extractor.getExceptionCount());
         map.put("converter_exceptions", extractor.getConverterExceptionCount());

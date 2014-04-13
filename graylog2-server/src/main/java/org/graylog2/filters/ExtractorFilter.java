@@ -19,12 +19,24 @@
  */
 package org.graylog2.filters;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.collect.Lists;
+import org.graylog2.Core;
+import org.graylog2.inputs.Input;
 import org.graylog2.plugin.GraylogServer;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.filters.MessageFilter;
 import org.graylog2.plugin.inputs.Extractor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
@@ -35,13 +47,17 @@ public class ExtractorFilter implements MessageFilter {
 
     private static final String NAME = "Extractor";
 
+    private Cache<String, List<Extractor>> cache = CacheBuilder.newBuilder()
+            .expireAfterWrite(1, TimeUnit.SECONDS)
+            .build();
+
     @Override
     public boolean filter(Message msg, GraylogServer server) {
         if (msg.getSourceInput() == null) {
             return false;
         }
 
-        for (Extractor extractor : msg.getSourceInput().getExecutionSortedExtractors()) {
+        for (Extractor extractor : loadExtractors(msg.getSourceInput().getId(), server)) {
             try {
                 extractor.runExtractor(server, msg);
             } catch (Exception e) {
@@ -52,6 +68,32 @@ public class ExtractorFilter implements MessageFilter {
         }
 
         return false;
+    }
+
+    private List<Extractor> loadExtractors(final String inputId, final GraylogServer server) {
+        try {
+            return cache.get(inputId, new Callable<List<Extractor>>() {
+                @Override
+                public List<Extractor> call() throws Exception {
+                    LOG.debug("Re-loading extractors for input <{}> into cache.", inputId);
+
+                    Input input = Input.find((Core) server, inputId);
+
+                    List<Extractor> sorted = Lists.newArrayList(input.getExtractors());
+
+                    Collections.sort(sorted, new Comparator<Extractor>() {
+                        public int compare(Extractor e1, Extractor e2) {
+                            return e1.getOrder().intValue() - e2.getOrder().intValue();
+                        }
+                    });
+
+                    return sorted;
+                }
+            });
+        } catch (ExecutionException e) {
+            LOG.error("Could not load extractors into cache. Returning empty list.", e);
+            return Lists.newArrayList();
+        }
     }
 
     @Override

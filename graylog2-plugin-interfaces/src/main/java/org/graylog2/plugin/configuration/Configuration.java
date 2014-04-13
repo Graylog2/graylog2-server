@@ -57,6 +57,8 @@ public class Configuration {
                         ints.put(e.getKey(), (Integer) e.getValue());
                     } else if (e.getValue() instanceof Long) {
                         ints.put(e.getKey(), ((Long) e.getValue()).intValue()); // We only support integers but MongoDB likes to return longs.
+                    } else if (e.getValue() instanceof Double) {
+                        ints.put(e.getKey(), ((Double) e.getValue()).intValue()); // same as for longs lol
                     } else if (e.getValue() instanceof Boolean) {
                         bools.put(e.getKey(), (Boolean) e.getValue());
                     } else {
