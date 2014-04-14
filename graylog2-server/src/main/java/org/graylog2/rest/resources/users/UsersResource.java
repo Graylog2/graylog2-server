@@ -190,12 +190,18 @@ public class UsersResource extends RestResource {
         if (permitted && cr.permissions != null) {
             user.setPermissions(cr.permissions);
         }
-        if (cr.timezone != null) {
+        if (cr.timezone == null) {
+            user.setTimeZone((String)null);
+        } else {
             try {
-                final DateTimeZone tz = DateTimeZone.forID(cr.timezone);
-                user.setTimeZone(tz);
+                if (cr.timezone.isEmpty()) {
+                    user.setTimeZone((String)null);
+                } else {
+                    final DateTimeZone tz = DateTimeZone.forID(cr.timezone);
+                    user.setTimeZone(tz);
+                }
             } catch (IllegalArgumentException e) {
-                LOG.error("Invalid timezone {}, discarding it for user {}.", cr.timezone, username);
+                LOG.error("Invalid timezone '{}', ignoring it for user {}.", cr.timezone, username);
             }
         }
 
@@ -203,7 +209,7 @@ public class UsersResource extends RestResource {
             user.setStartpage(cr.startpage.type, cr.startpage.id);
         }
         if (isPermitted("*")) {
-            if (cr.session_timeout_ms != 0) {
+            if (cr.session_timeout_ms != null && cr.session_timeout_ms != 0) {
                 user.setSessionTimeoutMs(cr.session_timeout_ms);
             }
         }
