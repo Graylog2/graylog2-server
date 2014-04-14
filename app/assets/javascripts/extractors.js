@@ -214,4 +214,43 @@ $(document).ready(function() {
         });
     });
 
+    // Ordering
+    $(".xtrc-list-drag").sortable({
+        handle: ".xtrc-order-handle",
+        axis: "y",
+        opacity: 0.6,
+        scroll: true,
+        cursor: "move",
+        tolerance: "intersect",
+        containment: "parent",
+        start: function(event, ui) {
+            ui.item.toggleClass("xtrc-order-active");
+        },
+        stop: function(event, ui) {
+            ui.item.toggleClass("xtrc-order-active");
+        },
+        update: function(event, ui) {
+            var sorted = $(this).sortable("toArray");
+            var inputPersistId = $(this).attr("data-input-persist-id");
+            var body = {
+                order: sorted
+            }
+
+            $.ajax({
+                url: appPrefixed('/a/system/inputs/' + inputPersistId + '/extractors/order'),
+                type: "POST",
+                data: JSON.stringify(body),
+                processData: false,
+                contentType: 'application/json',
+                success: function() {
+                    showSuccess("Extractor positions updated.")
+                },
+                error: function() {
+                    showError("Could not update extractor order. Please try again.");
+                }
+            });
+
+        }
+    });
+
 });

@@ -102,16 +102,23 @@
     </div>
 
     <div class="row-fluid xtrc-list-container">
+        <span class="pull-right">
+            <i class="icon icon-lightbulb"></i>
+            Change execution order by dragging on the icons.
+        </span>
+
         <h2>
             <i class="icon icon-cogs"></i>
             Configured extractors
         </h2>
 
         @if(extractors.size() > 0) {
-            @for(extractor <- extractors) {
+            <ul class="xtrc-list-drag" data-input-persist-id="@input.getPersistId">
+            @for(extractor <- extractors.sortBy(_.getOrder)) {
+                <li id="@extractor.getId">
                 <div class="row-fluid node-row">
                     <h3>
-                        <i class="icon icon-ellipsis-vertical"></i>
+                        <i class="icon icon-reorder xtrc-order-handle"></i>
                         <strong>@extractor.getTitle</strong> (@extractor.getType().toHumanReadable)
 
                         @if(extractor.getTotalExceptions > 0) {
@@ -206,7 +213,9 @@
 
                     </div>
                 </div>
+                </li>
             }
+            </ul>
         } else {
             <div class="alert alert-danger">This input has no configured extractors.</div>
         }
