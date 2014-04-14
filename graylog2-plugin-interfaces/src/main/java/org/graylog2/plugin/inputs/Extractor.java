@@ -65,7 +65,6 @@ public abstract class Extractor implements EmbeddedPersistable {
 
     protected final String id;
     protected final String title;
-    protected final int order;
     protected final Type superType;
     protected final CursorStrategy cursorStrategy;
     protected final String targetField;
@@ -75,6 +74,8 @@ public abstract class Extractor implements EmbeddedPersistable {
     protected final List<Converter> converters;
     protected final ConditionType conditionType;
     protected final String conditionValue;
+
+    protected long order;
 
     protected Pattern regexConditionPattern;
 
@@ -236,8 +237,12 @@ public abstract class Extractor implements EmbeddedPersistable {
         return title;
     }
 
-    public int getOrder() {
+    public Long getOrder() {
         return order;
+    }
+
+    public void setOrder(long order) {
+        this.order = order;
     }
 
     public Type getType() {
@@ -276,6 +281,7 @@ public abstract class Extractor implements EmbeddedPersistable {
         return new HashMap<String, Object>() {{
             put("id", id);
             put("title", title);
+            put("order", order);
             put("type", superType.toString().toLowerCase());
             put("cursor_strategy", cursorStrategy.toString().toLowerCase());
             put("target_field", targetField);
