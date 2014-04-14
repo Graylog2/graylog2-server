@@ -1,10 +1,18 @@
 package org.graylog2.indexer;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Joiner;
+import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.ning.http.client.AsyncHttpClient;
+import com.ning.http.client.AsyncHttpClientConfig;
+import com.ning.http.client.ListenableFuture;
+import com.ning.http.client.Response;
 import org.apache.commons.io.FileUtils;
 import org.elasticsearch.ElasticSearchTimeoutException;
+import org.elasticsearch.Version;
 import org.elasticsearch.action.WriteConsistencyLevel;
 import org.elasticsearch.action.admin.cluster.health.ClusterHealthRequest;
 import org.elasticsearch.action.admin.cluster.node.info.NodesInfoRequest;
@@ -36,8 +44,10 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
@@ -47,6 +57,8 @@ import static org.elasticsearch.node.NodeBuilder.nodeBuilder;
 // TODO figure out how to gracefully deal with failure to connect (or losing connection) to the elastic search cluster!
 public class Indexer {
     private static final Logger LOG = LoggerFactory.getLogger(Indexer.class);
+
+    private final AsyncHttpClient httpClient;
 
     private Client client;
     private Node node;
@@ -85,8 +97,10 @@ public class Indexer {
 
     public Indexer(Core graylogServer) {
         this.server = graylogServer;
-
         this.deadLetterQueue = new LinkedBlockingQueue<List<DeadLetter>>(1000);
+        AsyncHttpClientConfig.Builder builder = new AsyncHttpClientConfig.Builder();
+        builder.setAllowPoolingConnection(false);
+        this.httpClient = new AsyncHttpClient(builder.build());
     }
 
     public void start() {
@@ -100,7 +114,53 @@ public class Indexer {
         try {
             client.admin().cluster().health(new ClusterHealthRequest().waitForYellowStatus()).actionGet(5, SECONDS);
         } catch(ElasticSearchTimeoutException e) {
-            UI.exitHardWithWall("No ElasticSearch master was found.", new String[]{ "graylog2-server/configuring-and-tuning-elasticsearch-for-graylog2-v0200" });
+            final String hosts = node.settings().get("discovery.zen.ping.unicast.hosts");
+            final Iterable<String> hostList = Splitter.on(',').split(hosts);
+
+            // if no elasticsearch running
+            for (String host : hostList) {
+                // guess that elasticsearch http is listening on port 9200
+                final Iterable<String> hostAndPort = Splitter.on(':').limit(2).split(host);
+                final Iterator<String> it = hostAndPort.iterator();
+                final String ip = it.next();
+                LOG.info("Checking Elasticsearch HTTP API at http://{}:9200/", ip);
+
+                try {
+                    // Try the HTTP API endpoint
+                    final ListenableFuture<Response> future = httpClient.prepareGet("http://" + ip + ":9200/_nodes").execute();
+                    final Response response = future.get();
+
+                    final JsonNode resultTree = new ObjectMapper().readTree(response.getResponseBody());
+                    final String clusterName = resultTree.get("cluster_name").textValue();
+                    final JsonNode nodesList = resultTree.get("nodes");
+
+                    final Iterator<String> nodes = nodesList.fieldNames();
+                    while (nodes.hasNext()) {
+                        final String id = nodes.next();
+                        final String version = nodesList.get(id).get("version").textValue();
+                        if (!Version.CURRENT.toString().equals(version)) {
+                            LOG.error("Elasticsearch node is of the wrong version {}, it must be {}!",
+                                      version,
+                                      Version.CURRENT.toString());
+                        }
+                        if (!node.settings().get("cluster.name").equals(clusterName)) {
+                            LOG.error("Elasticsearch cluster name is different, Graylog2 uses `{}`, Elasticsearch cluster uses `{}`",
+                                      node.settings().get("cluster.name"), clusterName);
+                        }
+
+                    }
+                } catch (IOException ioException) {
+                    LOG.error("Could not connect to Elasticsearch.", ioException);
+                } catch (InterruptedException ignore) {
+                } catch (ExecutionException e1) {
+                   // could not find any server on that address
+                   LOG.error("Could not connect to Elasticsearch at http://" + ip + ":9200/, is it running?" , e1.getCause());
+                }
+            }
+
+            UI.exitHardWithWall("No ElasticSearch master was found.",
+                                new String[]{"graylog2-server/configuring-and-tuning-elasticsearch-for-graylog2-v0200"});
+
         }
 
         messageGateway = new MessageGatewayImpl(server);
