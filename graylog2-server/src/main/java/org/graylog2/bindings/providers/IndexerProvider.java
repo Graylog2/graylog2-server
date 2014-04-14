@@ -19,6 +19,7 @@
 
 package org.graylog2.bindings.providers;
 
+import com.ning.http.client.AsyncHttpClient;
 import org.graylog2.Configuration;
 import org.graylog2.indexer.Indexer;
 import org.graylog2.indexer.cluster.Cluster;
@@ -40,13 +41,15 @@ public class IndexerProvider implements Provider<Indexer> {
                            Searches.Factory searchesFactory,
                            Counts.Factory countsFactory,
                            Cluster.Factory clusterFactory,
-                           Indices.Factory indicesFactory) {
+                           Indices.Factory indicesFactory,
+                           AsyncHttpClient httpClient) {
         if (indexer == null) {
             indexer = new Indexer(configuration,
                     searchesFactory,
                     countsFactory,
                     clusterFactory,
-                    indicesFactory);
+                    indicesFactory,
+                    httpClient);
         }
     }
 
