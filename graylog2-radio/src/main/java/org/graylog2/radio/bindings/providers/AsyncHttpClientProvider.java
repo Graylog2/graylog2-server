@@ -28,10 +28,18 @@ import javax.inject.Provider;
  * @author Dennis Oelkers <dennis@torch.sh>
  */
 public class AsyncHttpClientProvider implements Provider<AsyncHttpClient> {
+    private static AsyncHttpClient asyncHttpClient = null;
+
+    public AsyncHttpClientProvider() {
+        if (asyncHttpClient == null) {
+            AsyncHttpClientConfig.Builder builder = new AsyncHttpClientConfig.Builder();
+            builder.setAllowPoolingConnection(false);
+            asyncHttpClient = new AsyncHttpClient(builder.build());
+        }
+    }
+
     @Override
     public AsyncHttpClient get() {
-        AsyncHttpClientConfig.Builder builder = new AsyncHttpClientConfig.Builder();
-        builder.setAllowPoolingConnection(false);
-        return new AsyncHttpClient(builder.build());
+        return asyncHttpClient;
     }
 }

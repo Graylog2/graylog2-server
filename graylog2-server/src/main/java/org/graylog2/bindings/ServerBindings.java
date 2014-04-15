@@ -23,6 +23,7 @@ import com.google.inject.AbstractModule;
 import com.google.inject.TypeLiteral;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.multibindings.Multibinder;
+import com.ning.http.client.AsyncHttpClient;
 import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.graylog2.Configuration;
 import org.graylog2.bindings.providers.*;
@@ -55,6 +56,7 @@ import org.graylog2.security.ldap.LdapConnector;
 import org.graylog2.security.realm.LdapUserAuthenticator;
 import org.graylog2.shared.BaseConfiguration;
 import org.graylog2.shared.ServerStatus;
+import org.graylog2.shared.bindings.providers.AsyncHttpClientProvider;
 import org.graylog2.shared.inputs.InputRegistry;
 import org.graylog2.shared.metrics.jersey2.MetricsDynamicBinding;
 import org.graylog2.system.jobs.SystemJobFactory;
@@ -135,6 +137,7 @@ public class ServerBindings extends AbstractModule {
         bind(DefaultSecurityManager.class).toProvider(DefaultSecurityManagerProvider.class);
         bind(SystemJobFactory.class).toProvider(SystemJobFactoryProvider.class);
         bind(DashboardRegistry.class).toProvider(DashboardRegistryProvider.class);
+        bind(AsyncHttpClient.class).toProvider(AsyncHttpClientProvider.class);
     }
 
     private void bindInterfaces() {

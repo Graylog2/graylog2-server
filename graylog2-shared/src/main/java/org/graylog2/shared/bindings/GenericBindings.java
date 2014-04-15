@@ -57,6 +57,5 @@ public class GenericBindings extends AbstractModule {
         bind(ProcessBuffer.class).toProvider(ProcessBufferProvider.class);
         bind(GELFChunkManager.class).toProvider(GELFChunkManagerProvider.class);
         bind(NodeId.class).toProvider(NodeIdProvider.class);
-        bind(AsyncHttpClient.class).toProvider(AsyncHttpClientProvider.class);
     }
 }
