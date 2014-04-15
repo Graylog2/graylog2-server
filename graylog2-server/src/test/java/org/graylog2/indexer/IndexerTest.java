@@ -72,7 +72,7 @@ public class IndexerTest {
         Configuration config = setupConfig(settings);
 
         Indexer indexer = new Indexer(config, mock(Searches.Factory.class),
-                mock(Counts.Factory.class), mock(Cluster.Factory.class), mock(Indices.Factory.class));
+                mock(Counts.Factory.class), mock(Cluster.Factory.class), mock(Indices.Factory.class), null);
         Map<String, String> nodeSettings = indexer.readNodeSettings(config);
 
         assertEquals(defaultConfig.getEsClusterName(), nodeSettings.get("cluster.name"));
@@ -119,7 +119,7 @@ public class IndexerTest {
         Configuration config = setupConfig(settings);
 
         Indexer indexer = new Indexer(config, mock(Searches.Factory.class),
-                mock(Counts.Factory.class), mock(Cluster.Factory.class), mock(Indices.Factory.class));
+                mock(Counts.Factory.class), mock(Cluster.Factory.class), mock(Indices.Factory.class), null);
         Map<String, String> nodeSettings = indexer.readNodeSettings(config);
 
         for (Map.Entry<String, String> property : esPropNames.entrySet()) {
@@ -154,7 +154,7 @@ public class IndexerTest {
         Configuration config = setupConfig(settings);
 
         Indexer indexer = new Indexer(config, mock(Searches.Factory.class),
-                mock(Counts.Factory.class), mock(Cluster.Factory.class), mock(Indices.Factory.class));
+                mock(Counts.Factory.class), mock(Cluster.Factory.class), mock(Indices.Factory.class), null);
         Map<String, String> nodeSettings = indexer.readNodeSettings(config);
 
         assertNotEquals("cluster.name", config.getEsClusterName(), nodeSettings.get("cluster.name"));
