@@ -15,7 +15,6 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 
 package org.graylog2;
@@ -140,9 +139,6 @@ public class Configuration extends BaseConfiguration {
 
     @Parameter("rules_file")
     private String droolsRulesFile;
-
-    @Parameter(value = "plugin_dir", required = false)
-    private String pluginDir = "plugin";
 
     @Parameter(value = "node_id_file", required = false)
     private String nodeIdFile = "/etc/graylog2-server-node-id";
@@ -380,10 +376,6 @@ public class Configuration extends BaseConfiguration {
         }
 
         return replicaServers;
-    }
-
-    public String getPluginDir() {
-        return pluginDir;
     }
 
     public String getNodeIdFile() {

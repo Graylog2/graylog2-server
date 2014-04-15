@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 TORCH GmbH
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -18,11 +18,8 @@
  */
 package org.graylog2.plugin;
 
-import org.graylog2.plugin.inputs.MessageInput;
-
 import java.util.Collection;
 
 public interface Plugin {
-
-    Collection<Class<? extends MessageInput>> inputs();
+    Collection<PluginModule> modules();
 }

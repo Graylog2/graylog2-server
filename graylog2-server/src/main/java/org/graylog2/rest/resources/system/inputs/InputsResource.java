@@ -352,6 +352,9 @@ public class InputsResource extends RestResource {
         } catch (NoSuchInputTypeException e) {
             LOG.error("There is no such input type registered.", e);
             throw new WebApplicationException(e, Response.Status.NOT_FOUND);
+        } catch (Exception e) {
+            LOG.error("Unable to instantiate input of type <" + inputType + ">", e);
+            throw new WebApplicationException(e, Response.Status.INTERNAL_SERVER_ERROR);
         }
 
         Map<String, Object> result = Maps.newHashMap();

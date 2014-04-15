@@ -16,6 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package org.graylog2.shared.inputs;
 
 
@@ -44,14 +45,14 @@ public abstract class InputRegistry {
     protected static final Logger LOG = LoggerFactory.getLogger(InputRegistry.class);
     protected static final Map<String, ClassLoader> classLoaders = Maps.newHashMap();
     protected final List<InputState> inputStates = Lists.newArrayList();
-    protected final Map<String, String> availableInputs = Maps.newHashMap();
     protected final ExecutorService executor = Executors.newCachedThreadPool(
             new ThreadFactoryBuilder().setNameFormat("inputs-%d").build()
     );
     private final MessageInputFactory messageInputFactory;
     private final ProcessBuffer processBuffer;
 
-    public InputRegistry(MessageInputFactory messageInputFactory, ProcessBuffer processBuffer) {
+    public InputRegistry(MessageInputFactory messageInputFactory,
+                         ProcessBuffer processBuffer) {
         this.messageInputFactory = messageInputFactory;
         this.processBuffer = processBuffer;
     }
@@ -82,9 +83,7 @@ public abstract class InputRegistry {
                     inputState.setState(InputState.InputStateType.RUNNING);
                     String msg = "Completed starting [" + input.getClass().getCanonicalName() + "] input with ID <" + input.getId() + ">";
                     LOG.info(msg);
-                } catch (MisfireException e) {
-                    handleLaunchException(e, input, inputState);
-                } catch (Exception e) {
+                } catch (MisfireException | Exception e) {
                     handleLaunchException(e, input, inputState);
                 } finally {
                     finishedLaunch(inputState);
@@ -156,16 +155,11 @@ public abstract class InputRegistry {
     }
 
     public Map<String, String> getAvailableInputs() {
-        return availableInputs;
+        return messageInputFactory.getAvailableInputs();
     }
 
     public int runningCount() {
         return getRunningInputs().size();
-    }
-
-    public void register(Class clazz, String name) {
-        classLoaders.put(clazz.getCanonicalName(), clazz.getClassLoader());
-        availableInputs.put(clazz.getCanonicalName(), name);
     }
 
     public void removeFromRunning(MessageInput input) {

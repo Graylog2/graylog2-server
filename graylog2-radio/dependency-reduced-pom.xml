@@ -52,6 +52,7 @@
               <mainClass>${mainClass}</mainClass>
             </transformer>
           </transformers>
+          <minimizeJar>true</minimizeJar>
         </configuration>
       </plugin>
       <plugin>
@@ -127,28 +128,6 @@
           <groupId>org.yaml</groupId>
         </exclusion>
       </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>org.easymock</groupId>
-      <artifactId>easymock</artifactId>
-      <version>3.0</version>
-      <scope>test</scope>
-      <exclusions>
-        <exclusion>
-          <artifactId>cglib-nodep</artifactId>
-          <groupId>cglib</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>objenesis</artifactId>
-          <groupId>org.objenesis</groupId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>org.scalatest</groupId>
-      <artifactId>scalatest_2.9.2</artifactId>
-      <version>1.8</version>
-      <scope>test</scope>
     </dependency>
   </dependencies>
   <properties>

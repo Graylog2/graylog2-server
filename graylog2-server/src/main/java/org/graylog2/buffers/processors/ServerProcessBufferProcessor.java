@@ -28,10 +28,10 @@ import org.graylog2.buffers.OutputBuffer;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.filters.MessageFilter;
 import org.graylog2.shared.buffers.processors.ProcessBufferProcessor;
-import org.graylog2.shared.filters.FilterRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.codahale.metrics.MetricRegistry.name;
@@ -52,12 +52,12 @@ public class ServerProcessBufferProcessor extends ProcessBufferProcessor {
     private static final Logger LOG = LoggerFactory.getLogger(ServerProcessBufferProcessor.class);
     private final OutputBuffer outputBuffer;
     private final Meter filteredOutMessages;
-    private final FilterRegistry filterRegistry;
+    private final Set<MessageFilter> filterRegistry;
 
 
     @AssistedInject
     public ServerProcessBufferProcessor(MetricRegistry metricRegistry,
-                                  FilterRegistry filterRegistry,
+                                  Set<MessageFilter> filterRegistry,
                                   @Assisted AtomicInteger processBufferWatermark,
                                   @Assisted("ordinal") final long ordinal,
                                   @Assisted("numberOfConsumers") final long numberOfConsumers,
@@ -71,7 +71,10 @@ public class ServerProcessBufferProcessor extends ProcessBufferProcessor {
     @Override
     protected void handleMessage(Message msg) {
 
-        for (MessageFilter filter : filterRegistry.all()) {
+        if (filterRegistry.size() == 0)
+            throw new RuntimeException("Empty filter registry!");
+
+        for (MessageFilter filter : filterRegistry) {
             Timer timer = metricRegistry.timer(name(filter.getClass(), "executionTime"));
             final Timer.Context timerContext = timer.time();
 

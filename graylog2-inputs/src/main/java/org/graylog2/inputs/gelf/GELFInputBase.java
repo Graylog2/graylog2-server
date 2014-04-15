@@ -16,6 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package org.graylog2.inputs.gelf;
 
 import org.graylog2.plugin.buffers.Buffer;
@@ -35,7 +36,7 @@ import java.util.Map;
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-public class GELFInputBase extends MessageInput {
+public abstract class GELFInputBase extends MessageInput {
 
     public static final String CK_BIND_ADDRESS = "bind_address";
     public static final String CK_PORT = "port";

@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 TORCH GmbH
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -19,7 +19,6 @@
 package org.graylog2.shared.plugins;
 
 import com.google.common.collect.Sets;
-import com.google.common.io.PatternFilenameFilter;
 import org.graylog2.plugin.Plugin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,23 +72,27 @@ public class PluginLoader {
         final HashSet<Plugin> plugins = Sets.newHashSet();
 
         if (!pluginDir.exists()) {
-            log.info("No plugin directory {} does not exist, not loading plugins.", pluginDir);
+            log.warn("No plugin directory {} does not exist, not loading plugins.", pluginDir);
             return plugins;
         }
         if (!pluginDir.isDirectory()) {
-            log.info("Path {} is not a directory, cannot load plugins.", pluginDir);
+            log.warn("Path {} is not a directory, cannot load plugins.", pluginDir);
             return plugins;
         }
 
         final ClassLoader classLoader = getClass().getClassLoader();
 
-        final File[] files = pluginDir.listFiles(new PatternFilenameFilter("\\.jar$"));
+        log.debug("Scanning directory <{}> for plugins...", pluginDir.getAbsolutePath());
+        final File[] files = pluginDir.listFiles();
+        log.debug("Loading [{}] plugins", files.length);
         for (File jar : files) {
             try {
+                log.debug("Loading <" + jar.getAbsolutePath() + ">");
                 final URLClassLoader pluginClassLoader = new URLClassLoader(new URL[]{ jar.toURI().toURL() }, classLoader);
 
                 final Set<Class<? extends Plugin>> pluginClasses = loadPluginClasses(pluginClassLoader);
                 for (Class<? extends Plugin> pluginClass : pluginClasses) {
+                    log.debug("Found plugin " + pluginClass);
                     final Plugin plugin = instantiatePlugin(pluginClass);
                     if (plugin != null) {
                         plugins.add(plugin);
@@ -121,9 +124,10 @@ public class PluginLoader {
                 final InputStream inputStream = url.openStream();
                 properties.load(inputStream);
             } catch (IOException e) {
-                log.error("Unabled to read plugin properties file", e);
+                log.error("Unable to read plugin properties file", e);
             }
             final String pluginClassName = properties.getProperty("plugin");
+            log.debug("Plugin class name is {}", pluginClassName);
             if (pluginClassName == null) {
                 log.error("Missing plugin property in property descriptor file: {}", url);
                 continue;

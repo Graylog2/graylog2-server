@@ -55,6 +55,9 @@ public abstract class BaseConfiguration {
     @Parameter(value = "groovy_shell_port", required = false)
     private int groovyShellPort = 6789;
 
+    @Parameter(value = "plugin_dir", required = false)
+    private String pluginDir = "plugin";
+
     public URI getRestTransportUri() {
         if (restTransportUri == null || restTransportUri.isEmpty()) {
             return null;
@@ -107,6 +110,10 @@ public abstract class BaseConfiguration {
 
     public int getGroovyShellPort() {
         return groovyShellPort;
+    }
+
+    public String getPluginDir() {
+        return pluginDir;
     }
 
     public abstract String getNodeIdFile();

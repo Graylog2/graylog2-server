@@ -20,6 +20,7 @@
 package org.graylog2;
 
 import com.beust.jcommander.JCommander;
+import com.beust.jcommander.internal.Lists;
 import com.codahale.metrics.JmxReporter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.log4j.InstrumentedAppender;
@@ -31,50 +32,31 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Module;
 import org.apache.log4j.Level;
-import org.graylog2.bindings.InitializerBindings;
-import org.graylog2.bindings.PersistenceServicesBindings;
-import org.graylog2.bindings.ServerBindings;
+import org.graylog2.bindings.*;
 import org.graylog2.cluster.NodeService;
 import org.graylog2.cluster.NodeServiceImpl;
-import org.graylog2.filters.ExtractorFilter;
-import org.graylog2.filters.RewriteFilter;
-import org.graylog2.filters.StaticFieldFilter;
-import org.graylog2.filters.StreamMatcherFilter;
-import org.graylog2.inputs.amqp.AMQPInput;
-import org.graylog2.inputs.gelf.http.GELFHttpInput;
-import org.graylog2.inputs.gelf.tcp.GELFTCPInput;
-import org.graylog2.inputs.gelf.udp.GELFUDPInput;
-import org.graylog2.inputs.kafka.KafkaInput;
-import org.graylog2.inputs.misc.jsonpath.JsonPathInput;
-import org.graylog2.inputs.misc.metrics.LocalMetricsInput;
-import org.graylog2.inputs.radio.RadioAMQPInput;
-import org.graylog2.inputs.radio.RadioKafkaInput;
-import org.graylog2.inputs.random.FakeHttpMessageInput;
-import org.graylog2.inputs.raw.tcp.RawTCPInput;
-import org.graylog2.inputs.raw.udp.RawUDPInput;
-import org.graylog2.inputs.syslog.tcp.SyslogTCPInput;
-import org.graylog2.inputs.syslog.udp.SyslogUDPInput;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationImpl;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.outputs.ElasticSearchOutput;
 import org.graylog2.outputs.OutputRegistry;
+import org.graylog2.plugin.Plugin;
+import org.graylog2.plugin.PluginModule;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.lifecycles.Lifecycle;
 import org.graylog2.plugins.PluginInstaller;
-import org.graylog2.plugins.PluginRegistry;
 import org.graylog2.shared.NodeRunner;
 import org.graylog2.shared.ServerStatus;
 import org.graylog2.shared.bindings.GuiceInstantiationService;
-import org.graylog2.shared.filters.FilterRegistry;
-import org.graylog2.shared.inputs.InputRegistry;
+import org.graylog2.shared.plugins.PluginLoader;
 import org.graylog2.system.activities.Activity;
 import org.graylog2.system.activities.ActivityWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
+import java.io.File;
 import java.util.List;
 
 /**
@@ -136,12 +118,25 @@ public final class Main extends NodeRunner {
             LOG.info("Running in Debug mode");
             logLevel = Level.DEBUG;
         }
+        org.apache.log4j.Logger.getRootLogger().setLevel(logLevel);
+        org.apache.log4j.Logger.getLogger(Main.class.getPackage().getName()).setLevel(logLevel);
+
+        PluginLoader pluginLoader = new PluginLoader(new File(configuration.getPluginDir()));
+        List<PluginModule> pluginModules = Lists.newArrayList();
+        for (Plugin plugin : pluginLoader.loadPlugins())
+            pluginModules.addAll(plugin.modules());
+
+        LOG.info("Loaded modules: " + pluginModules);
 
         GuiceInstantiationService instantiationService = new GuiceInstantiationService();
         List<Module> bindingsModules = getBindingsModules(instantiationService,
                 new ServerBindings(configuration),
                 new PersistenceServicesBindings(),
+                new ServerMessageInputBindings(),
+                new MessageFilterBindings(),
                 new InitializerBindings());
+        LOG.info("Adding plugin modules: " + pluginModules);
+        bindingsModules.addAll(pluginModules);
         Injector injector = Guice.createInjector(bindingsModules);
         instantiationService.setInjector(injector);
 
@@ -154,8 +149,6 @@ public final class Main extends NodeRunner {
 
         InstrumentedAppender logMetrics = new InstrumentedAppender(metrics);
         logMetrics.activateOptions();
-        org.apache.log4j.Logger.getRootLogger().setLevel(logLevel);
-        org.apache.log4j.Logger.getLogger(Main.class.getPackage().getName()).setLevel(logLevel);
         org.apache.log4j.Logger.getRootLogger().addAppender(logMetrics);
 
         SLF4JBridgeHandler.removeHandlersForRootLogger();
@@ -169,8 +162,6 @@ public final class Main extends NodeRunner {
         }
 
         monkeyPatchHK2(injector);
-        PluginRegistry pluginRegistry = injector.getInstance(PluginRegistry.class);
-        pluginRegistry.register(MessageInput.class, "inputs");
 
         // Le server object. This is where all the magic happens.
         Core server = injector.getInstance(Core.class);
@@ -231,31 +222,6 @@ public final class Main extends NodeRunner {
 
         // propagate default size to input plugins
         MessageInput.setDefaultRecvBufferSize(configuration.getUdpRecvBufferSizes());
-
-        // Register standard inputs.
-        InputRegistry inputRegistry = injector.getInstance(InputRegistry.class);
-        inputRegistry.register(SyslogUDPInput.class, SyslogUDPInput.NAME);
-        inputRegistry.register(SyslogTCPInput.class, SyslogTCPInput.NAME);
-        inputRegistry.register(RawUDPInput.class, RawUDPInput.NAME);
-        inputRegistry.register(RawTCPInput.class, RawTCPInput.NAME);
-        inputRegistry.register(GELFUDPInput.class, GELFUDPInput.NAME);
-        inputRegistry.register(GELFTCPInput.class, GELFTCPInput.NAME);
-        inputRegistry.register(GELFHttpInput.class, GELFHttpInput.NAME);
-        inputRegistry.register(FakeHttpMessageInput.class, FakeHttpMessageInput.NAME);
-        inputRegistry.register(LocalMetricsInput.class, LocalMetricsInput.NAME);
-        inputRegistry.register(JsonPathInput.class, JsonPathInput.NAME);
-        inputRegistry.register(KafkaInput.class, KafkaInput.NAME);
-        inputRegistry.register(RadioKafkaInput.class, RadioKafkaInput.NAME);
-        inputRegistry.register(AMQPInput.class, AMQPInput.NAME);
-        inputRegistry.register(RadioAMQPInput.class, RadioAMQPInput.NAME);
-
-
-        // Register message filters. (Order is important here)
-        final FilterRegistry filterRegistry = injector.getInstance(FilterRegistry.class);
-        filterRegistry.register(injector.getInstance(StaticFieldFilter.class));
-        filterRegistry.register(injector.getInstance(ExtractorFilter.class));
-        filterRegistry.register(injector.getInstance(StreamMatcherFilter.class));
-        filterRegistry.register(injector.getInstance(RewriteFilter.class));
 
         // Register outputs.
         final OutputRegistry outputRegistry = injector.getInstance(OutputRegistry.class);

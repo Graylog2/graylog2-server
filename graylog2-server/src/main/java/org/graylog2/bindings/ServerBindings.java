@@ -30,6 +30,7 @@ import org.graylog2.buffers.OutputBuffer;
 import org.graylog2.buffers.OutputBufferWatermark;
 import org.graylog2.buffers.processors.OutputBufferProcessor;
 import org.graylog2.buffers.processors.ServerProcessBufferProcessor;
+import org.graylog2.dashboards.DashboardRegistry;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.indexer.Indexer;
 import org.graylog2.indexer.MessageGatewayImpl;
@@ -133,6 +134,7 @@ public class ServerBindings extends AbstractModule {
         bind(LdapUserAuthenticator.class).toProvider(LdapUserAuthenticatorProvider.class);
         bind(DefaultSecurityManager.class).toProvider(DefaultSecurityManagerProvider.class);
         bind(SystemJobFactory.class).toProvider(SystemJobFactoryProvider.class);
+        bind(DashboardRegistry.class).toProvider(DashboardRegistryProvider.class);
     }
 
     private void bindInterfaces() {

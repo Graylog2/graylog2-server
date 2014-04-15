@@ -29,7 +29,6 @@ import org.graylog2.shared.bindings.providers.NodeIdProvider;
 import org.graylog2.shared.bindings.providers.ProcessBufferProvider;
 import org.graylog2.shared.buffers.ProcessBuffer;
 import org.graylog2.shared.buffers.ProcessBufferWatermark;
-import org.graylog2.shared.filters.FilterRegistry;
 import org.graylog2.shared.stats.ThroughputStats;
 
 /**
@@ -46,7 +45,6 @@ public class GenericBindings extends AbstractModule {
     protected void configure() {
         // This is holding all our metrics.
         bind(MetricRegistry.class).toInstance(new MetricRegistry());
-        bind(FilterRegistry.class).toInstance(new FilterRegistry());
         bind(ThroughputStats.class).toInstance(new ThroughputStats());
         bind(ProcessBufferWatermark.class).toInstance(new ProcessBufferWatermark());
 

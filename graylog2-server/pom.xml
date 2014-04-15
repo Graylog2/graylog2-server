@@ -209,6 +209,7 @@
                             <mainClass>${mainClass}</mainClass>
                         </transformer>
                     </transformers>
+                    <minimizeJar>true</minimizeJar>
                 </configuration>
                 <executions>
                     <execution>

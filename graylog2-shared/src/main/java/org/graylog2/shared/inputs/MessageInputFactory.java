@@ -19,35 +19,42 @@
 
 package org.graylog2.shared.inputs;
 
+import com.google.common.collect.Maps;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.shared.bindings.InstantiationService;
 
 import javax.inject.Inject;
+import java.util.Map;
+import java.util.Set;
 
 public class MessageInputFactory {
     private final InstantiationService instantiationService;
+    private final Set<Class<? extends MessageInput>> implClasses;
 
     @Inject
-    public MessageInputFactory(InstantiationService instantiationService) {
+    public MessageInputFactory(InstantiationService instantiationService,
+                               Set<Class<? extends MessageInput>> implClasses) {
         this.instantiationService = instantiationService;
+        this.implClasses = implClasses;
     }
 
     public MessageInput create(String type) throws NoSuchInputTypeException {
         try {
-            final ClassLoader classLoader = lookupClassLoader(type);
-            if (classLoader == null) {
-                throw new NoSuchInputTypeException("There is no classloader to load input of type <" + type + ">.");
-            }
-            Class c = Class.forName(type, true, classLoader);
-            return (MessageInput) instantiationService.getInstance(c);
-        } catch (ClassNotFoundException e) {
-            throw new NoSuchInputTypeException("There is no input of type <" + type + "> registered.");
+            for (Class<? extends MessageInput> implClass : implClasses)
+                if (implClass.getCanonicalName().equals(type))
+                    return instantiationService.getInstance(implClass);
         } catch (Exception e) {
             throw new RuntimeException("Could not create input of type <" + type + ">", e);
         }
+        throw new NoSuchInputTypeException("There is no input of type <" + type + "> registered.");
     }
 
-    public ClassLoader lookupClassLoader(String type) {
-        return InputRegistry.classLoaders.get(type);
+    public Map<String, String> getAvailableInputs() {
+        Map<String, String> result = Maps.newHashMap();
+        for (Class<? extends MessageInput> implClass : implClasses) {
+            MessageInput instance = instantiationService.getInstance(implClass);
+            result.put(implClass.getCanonicalName(), instance.getName());
+        }
+        return result;
     }
 }

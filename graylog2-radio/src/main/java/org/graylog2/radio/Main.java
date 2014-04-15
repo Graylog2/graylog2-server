@@ -31,23 +31,12 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Module;
 import org.apache.log4j.Level;
-import org.graylog2.inputs.gelf.http.GELFHttpInput;
-import org.graylog2.inputs.gelf.tcp.GELFTCPInput;
-import org.graylog2.inputs.gelf.udp.GELFUDPInput;
-import org.graylog2.inputs.misc.jsonpath.JsonPathInput;
-import org.graylog2.inputs.misc.metrics.LocalMetricsInput;
-import org.graylog2.inputs.random.FakeHttpMessageInput;
-import org.graylog2.inputs.raw.tcp.RawTCPInput;
-import org.graylog2.inputs.raw.udp.RawUDPInput;
-import org.graylog2.inputs.syslog.tcp.SyslogTCPInput;
-import org.graylog2.inputs.syslog.udp.SyslogUDPInput;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.lifecycles.Lifecycle;
 import org.graylog2.radio.bindings.RadioBindings;
 import org.graylog2.shared.NodeRunner;
 import org.graylog2.shared.ServerStatus;
 import org.graylog2.shared.bindings.GuiceInstantiationService;
-import org.graylog2.shared.inputs.InputRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
@@ -136,31 +125,11 @@ public class Main extends NodeRunner {
 
         ServerStatus serverStatus = injector.getInstance(ServerStatus.class);
 
-        // Register inputs. (find an automatic way here (annotations?) and do the same in graylog2-server.Main
-        final InputRegistry inputRegistry = injector.getInstance(InputRegistry.class);
-        inputRegistry.register(SyslogUDPInput.class, SyslogUDPInput.NAME);
-        inputRegistry.register(SyslogTCPInput.class, SyslogTCPInput.NAME);
-        inputRegistry.register(RawUDPInput.class, RawUDPInput.NAME);
-        inputRegistry.register(RawTCPInput.class, RawTCPInput.NAME);
-        inputRegistry.register(GELFUDPInput.class, GELFUDPInput.NAME);
-        inputRegistry.register(GELFTCPInput.class, GELFTCPInput.NAME);
-        inputRegistry.register(GELFHttpInput.class, GELFHttpInput.NAME);
-        inputRegistry.register(FakeHttpMessageInput.class, FakeHttpMessageInput.NAME);
-        inputRegistry.register(LocalMetricsInput.class, LocalMetricsInput.NAME);
-        inputRegistry.register(JsonPathInput.class, JsonPathInput.NAME);
-
         monkeyPatchHK2(injector);
 
         Radio radio = injector.getInstance(Radio.class);
         serverStatus.setLifecycle(Lifecycle.STARTING);
         radio.initialize();
-
-        // Register in Graylog2 cluster.
-        //radio.ping();
-
-        // Start regular pinging Graylog2 cluster to show that we are alive.
-        //radio.startPings();
-
 
         LOG.info("Graylog2 Radio up and running.");
 

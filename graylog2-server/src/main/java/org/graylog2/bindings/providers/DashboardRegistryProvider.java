@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 TORCH GmbH
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -13,37 +13,32 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.graylog2.shared.filters;
+package org.graylog2.bindings.providers;
 
-import com.beust.jcommander.internal.Lists;
-import org.graylog2.plugin.filters.MessageFilter;
+import org.graylog2.dashboards.DashboardRegistry;
+import org.graylog2.dashboards.DashboardService;
 
-import java.util.Iterator;
-import java.util.List;
+import javax.inject.Inject;
+import javax.inject.Provider;
 
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
  */
-public class FilterRegistry {
-    private final List<MessageFilter> messageFilters;
-    public FilterRegistry() {
-        messageFilters = Lists.newArrayList();
+public class DashboardRegistryProvider implements Provider<DashboardRegistry> {
+    private static DashboardRegistry dashboardRegistry = null;
+
+    @Inject
+    public DashboardRegistryProvider(DashboardService dashboardService) {
+        if (dashboardRegistry == null)
+            dashboardRegistry = new DashboardRegistry(dashboardService);
     }
 
-    public boolean register(MessageFilter messageFilter) {
-        return messageFilters.add(messageFilter);
-    }
-
-    public int size() {
-        return messageFilters.size();
-    }
-
-    public List<MessageFilter> all() {
-        return messageFilters;
+    @Override
+    public DashboardRegistry get() {
+        return dashboardRegistry;
     }
 }

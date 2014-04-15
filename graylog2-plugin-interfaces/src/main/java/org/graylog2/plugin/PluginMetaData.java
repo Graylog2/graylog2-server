@@ -1,5 +1,5 @@
-/**
- * Copyright 2012 Lennart Koopmann <lennart@socketfeed.com>
+/*
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -15,26 +15,20 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
-package org.graylog2.plugins;
+
+package org.graylog2.plugin;
+
+import java.net.URL;
 
 /**
- * @author Lennart Koopmann <lennart@socketfeed.com>
+ * @author Dennis Oelkers <dennis@torch.sh>
  */
-public class InvalidJarNameException extends Exception {
-    
-    /**
-	 * Re-generate if you modify the class structure.
-	 */
-	private static final long serialVersionUID = -7295134658260134545L;
-
-	public InvalidJarNameException() {
-        super();
-    }
-    
-    public InvalidJarNameException(String msg) {
-        super(msg);
-    }
-    
+public interface PluginMetaData {
+    String getName();
+    String getAuthor();
+    URL getURL();
+    Version getVersion();
+    String getDescription();
+    Version getRequiredVersion();
 }

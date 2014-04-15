@@ -58,8 +58,6 @@ public class PeriodicalsService extends AbstractIdleService {
     @Override
     protected void startUp() throws Exception {
         Reflections reflections = new Reflections("org.graylog2.periodical");
-        //Reflections reflections = new Reflections(ClasspathHelper.forPackage("org.graylog2.periodical"),
-        //        new SubTypesScanner());
         Set<Class<? extends Periodical>> periodicalSet = reflections.getSubTypesOf(Periodical.class);
         LOG.info("Starting {} periodicals ...", periodicalSet.size());
 

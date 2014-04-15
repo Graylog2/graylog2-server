@@ -16,10 +16,13 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package org.graylog2.inputs.radio;
 
 import com.codahale.metrics.MetricRegistry;
 import org.graylog2.plugin.system.NodeId;
+
+import javax.inject.Inject;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
@@ -34,6 +37,14 @@ public class RadioInput extends RadioKafkaInput {
      * lol naming.
      */
 
+    public static final String NAME = "Graylog2 legacy Radio Input (Kafka)";
+
+    @Override
+    public String getName() {
+        return NAME;
+    }
+
+    @Inject
     public RadioInput(MetricRegistry metricRegistry, NodeId nodeId) {
         super(metricRegistry, nodeId);
     }
