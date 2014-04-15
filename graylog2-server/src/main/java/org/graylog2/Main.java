@@ -20,7 +20,6 @@
 package org.graylog2;
 
 import com.beust.jcommander.JCommander;
-import com.beust.jcommander.internal.Lists;
 import com.codahale.metrics.JmxReporter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.log4j.InstrumentedAppender;
@@ -28,6 +27,7 @@ import com.github.joschi.jadconfig.JadConfig;
 import com.github.joschi.jadconfig.RepositoryException;
 import com.github.joschi.jadconfig.ValidationException;
 import com.github.joschi.jadconfig.repositories.PropertiesRepository;
+import com.google.common.collect.Lists;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Module;
@@ -126,7 +126,7 @@ public final class Main extends NodeRunner {
         for (Plugin plugin : pluginLoader.loadPlugins())
             pluginModules.addAll(plugin.modules());
 
-        LOG.info("Loaded modules: " + pluginModules);
+        LOG.debug("Loaded modules: " + pluginModules);
 
         GuiceInstantiationService instantiationService = new GuiceInstantiationService();
         List<Module> bindingsModules = getBindingsModules(instantiationService,
@@ -135,7 +135,7 @@ public final class Main extends NodeRunner {
                 new ServerMessageInputBindings(),
                 new MessageFilterBindings(),
                 new InitializerBindings());
-        LOG.info("Adding plugin modules: " + pluginModules);
+        LOG.debug("Adding plugin modules: " + pluginModules);
         bindingsModules.addAll(pluginModules);
         Injector injector = Guice.createInjector(bindingsModules);
         instantiationService.setInjector(injector);

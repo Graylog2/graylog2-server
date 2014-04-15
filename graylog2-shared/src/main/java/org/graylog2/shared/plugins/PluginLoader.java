@@ -72,7 +72,7 @@ public class PluginLoader {
         final HashSet<Plugin> plugins = Sets.newHashSet();
 
         if (!pluginDir.exists()) {
-            log.warn("No plugin directory {} does not exist, not loading plugins.", pluginDir);
+            log.warn("Plugin directory {} does not exist, not loading plugins.", pluginDir.getAbsolutePath());
             return plugins;
         }
         if (!pluginDir.isDirectory()) {

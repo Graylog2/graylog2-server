@@ -27,20 +27,25 @@ import com.github.joschi.jadconfig.JadConfig;
 import com.github.joschi.jadconfig.RepositoryException;
 import com.github.joschi.jadconfig.ValidationException;
 import com.github.joschi.jadconfig.repositories.PropertiesRepository;
+import com.google.common.collect.Lists;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Module;
 import org.apache.log4j.Level;
+import org.graylog2.plugin.Plugin;
+import org.graylog2.plugin.PluginModule;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.lifecycles.Lifecycle;
 import org.graylog2.radio.bindings.RadioBindings;
 import org.graylog2.shared.NodeRunner;
 import org.graylog2.shared.ServerStatus;
 import org.graylog2.shared.bindings.GuiceInstantiationService;
+import org.graylog2.shared.plugins.PluginLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
+import java.io.File;
 import java.util.List;
 
 /**
@@ -94,9 +99,18 @@ public class Main extends NodeRunner {
             logLevel = Level.DEBUG;
         }
 
+        PluginLoader pluginLoader = new PluginLoader(new File(configuration.getPluginDir()));
+        List<PluginModule> pluginModules = Lists.newArrayList();
+        for (Plugin plugin : pluginLoader.loadPlugins())
+            pluginModules.addAll(plugin.modules());
+
+        LOG.debug("Loaded modules: " + pluginModules);
+
         GuiceInstantiationService instantiationService = new GuiceInstantiationService();
         List<Module> bindingsModules = getBindingsModules(instantiationService,
                 new RadioBindings(configuration));
+        LOG.debug("Adding plugin modules: " + pluginModules);
+        bindingsModules.addAll(pluginModules);
         Injector injector = Guice.createInjector(bindingsModules);
         instantiationService.setInjector(injector);
 
