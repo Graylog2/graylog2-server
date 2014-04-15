@@ -36,8 +36,11 @@ import java.util.Map;
  */
 @Path("/system/throughput")
 public class ThroughputResource extends RestResource {
-    @Inject
-    private ThroughputStats throughputStats;
+    private final ThroughputStats throughputStats;
+
+    public ThroughputResource(ThroughputStats throughputStats) {
+        this.throughputStats = throughputStats;
+    }
 
     @GET @Timed
     @Produces(MediaType.APPLICATION_JSON)
