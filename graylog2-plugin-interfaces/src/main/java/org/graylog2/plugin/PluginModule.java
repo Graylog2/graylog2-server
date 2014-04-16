@@ -43,5 +43,6 @@ public abstract class PluginModule extends AbstractModule {
 
     protected void addPeriodical(Class<? extends Periodical> periodicalClass) {
         Multibinder<Periodical> periodicalBinder = Multibinder.newSetBinder(binder(), Periodical.class);
+        periodicalBinder.addBinding().to(periodicalClass);
     }
 }
