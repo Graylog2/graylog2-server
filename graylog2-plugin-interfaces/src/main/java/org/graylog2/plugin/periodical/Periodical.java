@@ -17,17 +17,12 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.graylog2.periodical;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+package org.graylog2.plugin.periodical;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
 public abstract class Periodical implements Runnable {
-
-    private static final Logger LOG = LoggerFactory.getLogger(Periodical.class);
 
     /**
      * Defines if this thread should be called periodically or only once

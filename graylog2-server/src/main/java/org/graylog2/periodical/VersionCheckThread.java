@@ -37,6 +37,7 @@ import org.graylog2.ServerVersion;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.Version;
+import org.graylog2.plugin.periodical.Periodical;
 import org.graylog2.shared.ServerStatus;
 import org.graylog2.versioncheck.VersionCheckResponse;
 import org.slf4j.Logger;

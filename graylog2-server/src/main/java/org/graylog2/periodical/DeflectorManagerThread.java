@@ -27,6 +27,7 @@ import org.graylog2.indexer.NoTargetIndexException;
 import org.graylog2.initializers.IndexerSetupService;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
+import org.graylog2.plugin.periodical.Periodical;
 import org.graylog2.system.activities.Activity;
 import org.graylog2.system.activities.ActivityWriter;
 import org.slf4j.Logger;

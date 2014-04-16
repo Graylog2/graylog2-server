@@ -17,31 +17,22 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.graylog2.plugin;
+package org.graylog2.shared.bindings;
 
 import com.google.inject.AbstractModule;
-import com.google.inject.TypeLiteral;
 import com.google.inject.multibindings.Multibinder;
-import org.graylog2.plugin.filters.MessageFilter;
-import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.periodical.Periodical;
+import org.reflections.Reflections;
 
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
  */
-public abstract class PluginModule extends AbstractModule {
-    protected void addMessageInput(Class<? extends MessageInput> messageInputClass) {
-        TypeLiteral<Class<? extends MessageInput>> typeLiteral = new TypeLiteral<Class<? extends MessageInput>>(){};
-        Multibinder<Class<? extends MessageInput>> messageInputs = Multibinder.newSetBinder(binder(), typeLiteral);
-        messageInputs.addBinding().toInstance(messageInputClass);
-    }
-
-    protected void addMessageFilter(Class<? extends MessageFilter> messageFilterClass) {
-        Multibinder<MessageFilter> messageInputs = Multibinder.newSetBinder(binder(), MessageFilter.class);
-        messageInputs.addBinding().to(messageFilterClass);
-    }
-
-    protected void addPeriodical(Class<? extends Periodical> periodicalClass) {
+public class PeriodicalBindings extends AbstractModule {
+    @Override
+    protected void configure() {
         Multibinder<Periodical> periodicalBinder = Multibinder.newSetBinder(binder(), Periodical.class);
+        Reflections reflections = new Reflections("org.graylog2.periodical");
+        for (Class<? extends Periodical> periodicalClass : reflections.getSubTypesOf(Periodical.class))
+            periodicalBinder.addBinding().to(periodicalClass);
     }
 }

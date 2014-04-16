@@ -22,11 +22,10 @@ package org.graylog2.shared.initializers;
 import com.google.common.base.Stopwatch;
 import com.google.common.util.concurrent.AbstractIdleService;
 import com.google.inject.Inject;
-import org.graylog2.periodical.Periodical;
 import org.graylog2.periodical.Periodicals;
+import org.graylog2.plugin.periodical.Periodical;
 import org.graylog2.shared.ServerStatus;
 import org.graylog2.shared.bindings.InstantiationService;
-import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,26 +44,25 @@ public class PeriodicalsService extends AbstractIdleService {
     private final InstantiationService instantiationService;
     private final Periodicals periodicals;
     private final ServerStatus serverStatus;
+    private final Set<Periodical> periodicalSet;
 
     @Inject
     public PeriodicalsService(InstantiationService instantiationService,
                                   Periodicals periodicals,
-                                  ServerStatus serverStatus) {
+                                  ServerStatus serverStatus,
+                                  Set<Periodical> periodicalSet) {
         this.instantiationService = instantiationService;
         this.periodicals = periodicals;
         this.serverStatus = serverStatus;
+        this.periodicalSet = periodicalSet;
     }
 
     @Override
     protected void startUp() throws Exception {
-        Reflections reflections = new Reflections("org.graylog2.periodical");
-        Set<Class<? extends Periodical>> periodicalSet = reflections.getSubTypesOf(Periodical.class);
         LOG.info("Starting {} periodicals ...", periodicalSet.size());
 
-        for (Class<? extends Periodical> type : periodicalSet) {
+        for (Periodical periodical : periodicalSet) {
             try {
-                Periodical periodical = instantiationService.getInstance(type);
-
                 periodical.initialize();
 
                 if (periodical.masterOnly() && !serverStatus.hasCapability(ServerStatus.Capability.MASTER)) {

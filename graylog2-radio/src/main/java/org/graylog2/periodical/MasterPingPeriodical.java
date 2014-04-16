@@ -20,6 +20,7 @@
 package org.graylog2.periodical;
 
 import com.ning.http.client.AsyncHttpClient;
+import org.graylog2.plugin.periodical.Periodical;
 import org.graylog2.radio.Configuration;
 import org.graylog2.radio.cluster.Ping;
 import org.graylog2.shared.ServerStatus;

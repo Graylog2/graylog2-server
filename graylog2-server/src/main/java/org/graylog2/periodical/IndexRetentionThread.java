@@ -29,6 +29,7 @@ import org.graylog2.indexer.NoTargetIndexException;
 import org.graylog2.indexer.ranges.RebuildIndexRangesJob;
 import org.graylog2.indexer.retention.RetentionStrategyFactory;
 import org.graylog2.plugin.indexer.retention.RetentionStrategy;
+import org.graylog2.plugin.periodical.Periodical;
 import org.graylog2.system.activities.Activity;
 import org.graylog2.system.activities.ActivityWriter;
 import org.graylog2.system.jobs.SystemJobConcurrencyException;

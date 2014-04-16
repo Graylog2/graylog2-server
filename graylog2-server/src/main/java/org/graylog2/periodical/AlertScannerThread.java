@@ -32,9 +32,9 @@ import org.graylog2.notifications.NotificationImpl;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.alarms.transports.TransportConfigurationException;
+import org.graylog2.plugin.periodical.Periodical;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.system.NodeId;
-import org.graylog2.streams.StreamImpl;
 import org.graylog2.streams.StreamService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -77,8 +77,7 @@ public class AlertScannerThread extends Periodical {
         LOG.debug("There are {} streams with configured alert conditions.", alertedStreams.size());
 
         // Load all streams that have configured alert conditions.
-        for (Stream streamIF : alertedStreams) {
-            StreamImpl stream = (StreamImpl) streamIF;
+        for (Stream stream : alertedStreams) {
 
             LOG.debug("Stream [{}] has [{}] configured alert conditions.", stream, streamService.getAlertConditions(stream).size());
 

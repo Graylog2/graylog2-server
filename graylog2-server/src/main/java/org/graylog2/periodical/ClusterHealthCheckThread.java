@@ -23,6 +23,7 @@ import com.google.inject.Inject;
 import org.graylog2.cluster.NodeNotFoundException;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
+import org.graylog2.plugin.periodical.Periodical;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.inputs.InputRegistry;
 import org.slf4j.Logger;

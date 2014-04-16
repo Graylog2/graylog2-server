@@ -24,6 +24,7 @@ import org.elasticsearch.action.admin.cluster.node.info.NodeInfo;
 import org.graylog2.indexer.Indexer;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
+import org.graylog2.plugin.periodical.Periodical;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

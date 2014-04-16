@@ -27,6 +27,7 @@ import org.graylog2.cluster.NodeService;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationImpl;
 import org.graylog2.notifications.NotificationService;
+import org.graylog2.plugin.periodical.Periodical;
 import org.graylog2.shared.ServerStatus;
 import org.graylog2.system.activities.Activity;
 import org.graylog2.system.activities.ActivityWriter;
