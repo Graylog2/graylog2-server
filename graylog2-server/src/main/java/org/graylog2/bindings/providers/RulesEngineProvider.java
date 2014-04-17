@@ -27,10 +27,12 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
+import javax.inject.Singleton;
 
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
  */
+@Singleton
 public class RulesEngineProvider implements Provider<RulesEngine> {
     private static final Logger LOG = LoggerFactory.getLogger(RulesEngineProvider.class);
     private static RulesEngine rulesEngine = null;

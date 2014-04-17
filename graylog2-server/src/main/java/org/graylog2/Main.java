@@ -134,6 +134,7 @@ public final class Main extends NodeRunner {
                 new PersistenceServicesBindings(),
                 new ServerMessageInputBindings(),
                 new MessageFilterBindings(),
+                new AlarmCallbackBindings(),
                 new InitializerBindings());
         LOG.debug("Adding plugin modules: " + pluginModules);
         bindingsModules.addAll(pluginModules);

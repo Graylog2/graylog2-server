@@ -24,13 +24,15 @@ import com.google.inject.Inject;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import org.bson.types.ObjectId;
-import org.graylog2.alerts.AlertCondition;
+import org.graylog2.alerts.AbstractAlertCondition;
 import org.graylog2.alerts.AlertService;
 import org.graylog2.alerts.AlertServiceImpl;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.database.PersistedServiceImpl;
 import org.graylog2.database.ValidationException;
+import org.graylog2.plugin.alarms.AlertCondition;
+import org.graylog2.plugin.database.EmbeddedPersistable;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.streams.StreamRule;
 import org.slf4j.Logger;
@@ -168,7 +170,7 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
             for (BasicDBObject conditionFields : (List<BasicDBObject>) stream.getFields().get(StreamImpl.EMBEDDED_ALERT_CONDITIONS)) {
                 try {
                     conditions.add(alertService.fromPersisted(conditionFields, stream));
-                } catch (AlertCondition.NoSuchAlertConditionTypeException e) {
+                } catch (AbstractAlertCondition.NoSuchAlertConditionTypeException e) {
                     LOG.error("Skipping unknown alert condition type.", e);
                     continue;
                 } catch (Exception e) {
@@ -182,7 +184,7 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
     }
 
     public void addAlertCondition(Stream stream, AlertCondition condition) throws ValidationException {
-        embed(stream, StreamImpl.EMBEDDED_ALERT_CONDITIONS, condition);
+        embed(stream, StreamImpl.EMBEDDED_ALERT_CONDITIONS, (EmbeddedPersistable)condition);
     }
 
     public void removeAlertCondition(Stream stream, String conditionId) {

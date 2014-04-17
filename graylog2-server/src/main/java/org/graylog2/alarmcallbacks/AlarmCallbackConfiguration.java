@@ -16,27 +16,19 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.plugin.alarms.callbacks;
 
-import org.graylog2.plugin.alarms.AlertCondition;
+package org.graylog2.alarmcallbacks;
+
 import org.graylog2.plugin.configuration.Configuration;
-import org.graylog2.plugin.configuration.ConfigurationException;
-import org.graylog2.plugin.configuration.ConfigurationRequest;
+import org.graylog2.plugin.database.Persisted;
 import org.graylog2.plugin.streams.Stream;
 
-import java.util.Map;
-
 /**
- *
- * @author Lennart Koopmann <lennart@socketfeed.com>
+ * @author Dennis Oelkers <dennis@torch.sh>
  */
-public interface AlarmCallback {
-    
-    public void initialize(Configuration config) throws AlarmCallbackConfigurationException;
-    public void call(Stream stream, AlertCondition alertCondition, AlertCondition.CheckResult result) throws AlarmCallbackException;
-
-    public ConfigurationRequest getRequestedConfiguration();
-    public String getName();
-    public Map<String, Object> getAttributes();
-    public void checkConfiguration() throws ConfigurationException;
+public interface AlarmCallbackConfiguration extends Persisted {
+    public void setStream(Stream stream);
+    public String getStreamId();
+    public String getType();
+    public Configuration getConfiguration();
 }

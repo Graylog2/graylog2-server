@@ -17,24 +17,11 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.graylog2.streams;
-
-import org.bson.types.ObjectId;
-import org.graylog2.database.NotFoundException;
-import org.graylog2.database.PersistedService;
-import org.graylog2.plugin.streams.Stream;
-import org.graylog2.plugin.streams.StreamRule;
-
-import java.util.List;
-import java.util.Map;
+package org.graylog2.plugin.streams;
 
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
  */
-public interface StreamRuleService extends PersistedService {
-    StreamRule load(ObjectId id) throws NotFoundException;
-
-    List<StreamRule> loadForStream(Stream stream) throws NotFoundException;
-
-    StreamRule create(Map<String, Object> data);
+public interface AlertAction {
+    public void handle(Stream stream);
 }

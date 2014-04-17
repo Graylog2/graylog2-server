@@ -31,6 +31,7 @@ import org.graylog2.alerts.types.DummyAlertCondition;
 import org.graylog2.database.ValidationException;
 import org.graylog2.indexer.Indexer;
 import org.graylog2.plugin.Tools;
+import org.graylog2.plugin.alarms.AlertCondition;
 import org.graylog2.plugin.alarms.transports.TransportConfigurationException;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.rest.documentation.annotations.*;
@@ -116,7 +117,7 @@ public class StreamAlertResource extends RestResource {
         final AlertCondition alertCondition;
         try {
             alertCondition = alertService.fromRequest(ccr, stream);
-        } catch (AlertCondition.NoSuchAlertConditionTypeException e) {
+        } catch (AbstractAlertCondition.NoSuchAlertConditionTypeException e) {
             LOG.error("Invalid alarm condition type.", e);
             throw new WebApplicationException(e, Response.Status.BAD_REQUEST);
         }
@@ -375,7 +376,7 @@ public class StreamAlertResource extends RestResource {
         DummyAlertCondition dummyAlertCondition = new DummyAlertCondition(stream, null, null, Tools.iso8601(), "admin", parameters);
 
         try {
-            AlertCondition.CheckResult checkResult = dummyAlertCondition.runCheck(indexer);
+            AbstractAlertCondition.CheckResult checkResult = dummyAlertCondition.runCheck(indexer);
             alertSender.sendEmails(stream,checkResult);
         } catch (TransportConfigurationException e) {
             return Response.serverError().entity("E-Mail transport is not or improperly configured.").build();

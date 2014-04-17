@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 TORCH GmbH
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -20,8 +20,9 @@
 package org.graylog2.alerts;
 
 import org.graylog2.indexer.Indexer;
-import org.graylog2.indexer.results.ResultMessage;
+import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
+import org.graylog2.plugin.alarms.AlertCondition;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -70,7 +71,7 @@ public class AbstractAlertConditionTest extends AlertConditionTest {
     }
 
     protected AlertCondition getDummyAlertCondition(Map<String, Object> parameters) {
-        return new AlertCondition(stream, CONDITION_ID, null, Tools.iso8601(), STREAM_CREATOR, parameters) {
+        return new AbstractAlertCondition(stream, CONDITION_ID, null, Tools.iso8601(), STREAM_CREATOR, parameters) {
             @Override
             public String getDescription() {
                 return null;
@@ -82,7 +83,7 @@ public class AbstractAlertConditionTest extends AlertConditionTest {
             }
 
             @Override
-            public List<ResultMessage> getSearchHits() {
+            public List<Message> getSearchHits() {
                 return null;
             }
         };

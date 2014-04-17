@@ -19,22 +19,18 @@
 
 package org.graylog2.periodical;
 
-import com.beust.jcommander.internal.Lists;
 import com.google.inject.Inject;
+import org.graylog2.alarmcallbacks.AlarmCallbackConfiguration;
+import org.graylog2.alarmcallbacks.AlarmCallbackConfigurationService;
+import org.graylog2.alarmcallbacks.AlarmCallbackFactory;
+import org.graylog2.alarmcallbacks.EmailAlarmCallback;
 import org.graylog2.alerts.Alert;
-import org.graylog2.alerts.AlertCondition;
-import org.graylog2.alerts.AlertSender;
 import org.graylog2.alerts.AlertService;
 import org.graylog2.indexer.Indexer;
-import org.graylog2.indexer.results.ResultMessage;
-import org.graylog2.notifications.Notification;
-import org.graylog2.notifications.NotificationImpl;
-import org.graylog2.notifications.NotificationService;
-import org.graylog2.plugin.Message;
-import org.graylog2.plugin.alarms.transports.TransportConfigurationException;
+import org.graylog2.plugin.alarms.AlertCondition;
+import org.graylog2.plugin.alarms.callbacks.AlarmCallback;
 import org.graylog2.plugin.periodical.Periodical;
 import org.graylog2.plugin.streams.Stream;
-import org.graylog2.plugin.system.NodeId;
 import org.graylog2.streams.StreamService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,26 +42,26 @@ import java.util.List;
  */
 public class AlertScannerThread extends Periodical {
 
-    private static final Logger LOG = LoggerFactory.getLogger(AlertScannerThread.class);
-    private final AlertSender alertSender;
+    private final Logger LOG = LoggerFactory.getLogger(AlertScannerThread.class);
     private AlertService alertService;
     private final StreamService streamService;
-    private final NotificationService notificationService;
-    private final NodeId nodeId;
+    private final AlarmCallbackConfigurationService alarmCallbackConfigurationService;
+    private final AlarmCallbackFactory alarmCallbackFactory;
+    private final EmailAlarmCallback emailAlarmCallback;
     private final Indexer indexer;
 
     @Inject
-    public AlertScannerThread(AlertSender alertSender,
-                              AlertService alertService,
+    public AlertScannerThread(AlertService alertService,
                               StreamService streamService,
-                              NotificationService notificationService,
-                              NodeId nodeId,
+                              AlarmCallbackConfigurationService alarmCallbackConfigurationService,
+                              AlarmCallbackFactory alarmCallbackFactory,
+                              EmailAlarmCallback emailAlarmCallback,
                               Indexer indexer) {
-        this.alertSender = alertSender;
         this.alertService = alertService;
         this.streamService = streamService;
-        this.notificationService = notificationService;
-        this.nodeId = nodeId;
+        this.alarmCallbackConfigurationService = alarmCallbackConfigurationService;
+        this.alarmCallbackFactory = alarmCallbackFactory;
+        this.emailAlarmCallback = emailAlarmCallback;
         this.indexer = indexer;
     }
 
@@ -93,50 +89,20 @@ public class AlertScannerThread extends Periodical {
                         Alert alert = alertService.factory(result);
                         alertService.save(alert);
 
-                        // Send alerts.
-                        if (stream.getAlertReceivers().size() > 0) {
-                            try {
-                                if (alertCondition.getBacklog() > 0 && alertCondition.getSearchHits() != null) {
-                                    List<Message> backlog = Lists.newArrayList();
-
-                                    for (ResultMessage searchHit : alertCondition.getSearchHits()) {
-                                        backlog.add(new Message(searchHit.message));
-                                    }
-
-                                    // Read as many messages as possible (max: backlog size) from backlog.
-                                    int readTo = alertCondition.getBacklog();
-                                    if(backlog.size() < readTo) {
-                                        readTo = backlog.size();
-                                    }
-                                    alertSender.sendEmails(stream, result, backlog.subList(0, readTo));
-                                } else {
-                                    alertSender.sendEmails(stream, result);
-                                }
-                            } catch (TransportConfigurationException e) {
-                                Notification notification = notificationService.buildNow()
-                                        .addNode(nodeId.toString())
-                                        .addType(NotificationImpl.Type.EMAIL_TRANSPORT_CONFIGURATION_INVALID)
-                                        .addDetail("stream_id", stream.getId())
-                                        .addDetail("exception", e);
-                                notificationService.publishIfFirst(notification);
-                                LOG.warn("Stream [{}] has alert receivers and is triggered, but email transport is not configured.", stream);
-                            } catch (Exception e) {
-                                Notification notification = notificationService.buildNow()
-                                        .addNode(nodeId.toString())
-                                        .addType(NotificationImpl.Type.EMAIL_TRANSPORT_FAILED)
-                                        .addDetail("stream_id", stream.getId())
-                                        .addDetail("exception", e);
-                                notificationService.publishIfFirst(notification);
-                                LOG.error("Stream [{}] has alert receivers and is triggered, but sending emails failed", stream, e);
+                        List<AlarmCallbackConfiguration> callConfigurations = alarmCallbackConfigurationService.getForStream(stream);
+                        if (callConfigurations.size() > 0)
+                            for (AlarmCallbackConfiguration configuration : callConfigurations) {
+                                AlarmCallback alarmCallback = alarmCallbackFactory.create(configuration);
+                                alarmCallback.call(stream, alertCondition, result);
                             }
-                        }
+                        else
+                            emailAlarmCallback.call(stream, alertCondition, result);
                     } else {
                         // Alert not triggered.
                         LOG.debug("Alert condition [{}] is triggered.", alertCondition);
                     }
                 } catch(Exception e) {
                     LOG.error("Skipping alert check that threw an exception.", e);
-                    continue;
                 }
             }
 

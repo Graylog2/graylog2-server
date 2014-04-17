@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 TORCH GmbH
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -18,7 +18,8 @@
  */
 package org.graylog2.alerts.types;
 
-import org.graylog2.alerts.AlertCondition;
+import com.beust.jcommander.internal.Lists;
+import org.graylog2.alerts.AbstractAlertCondition;
 import org.graylog2.indexer.IndexHelper;
 import org.graylog2.indexer.Indexer;
 import org.graylog2.indexer.results.FieldStatsResult;
@@ -26,6 +27,7 @@ import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.indexer.searches.Searches;
 import org.graylog2.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.indexer.searches.timeranges.RelativeRange;
+import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.streams.Stream;
 import org.joda.time.DateTime;
@@ -38,10 +40,10 @@ import java.util.Map;
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-public class FieldValueAlertCondition extends AlertCondition {
+public class FieldValueAlertCondition extends AbstractAlertCondition {
 
     private static final Logger LOG = LoggerFactory.getLogger(FieldValueAlertCondition.class);
-    private List<ResultMessage> searchHits = null;
+    private List<Message> searchHits = null;
 
     public enum CheckType {
         MEAN, MIN, MAX, SUM, STDDEV
@@ -87,8 +89,12 @@ public class FieldValueAlertCondition extends AlertCondition {
         try {
             String filter = "streams:"+stream.getId();
             FieldStatsResult fieldStatsResult = indexer.searches().fieldStats(field, "*", filter, new RelativeRange(time * 60));
-            if (getBacklog() != null && getBacklog() > 0)
-                this.searchHits = fieldStatsResult.getSearchHits();
+            if (getBacklog() != null && getBacklog() > 0) {
+                this.searchHits = Lists.newArrayList();
+                for (ResultMessage resultMessage : fieldStatsResult.getSearchHits()) {
+                    this.searchHits.add(new Message(resultMessage.getMessage()));
+                }
+            }
 
             if (fieldStatsResult.getCount() == 0) {
                 LOG.debug("Alert check <{}> did not match any messages. Returning not triggered.", type);
@@ -165,7 +171,7 @@ public class FieldValueAlertCondition extends AlertCondition {
     }
 
     @Override
-    public List<ResultMessage> getSearchHits() {
+    public List<Message> getSearchHits() {
         return this.searchHits;
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 TORCH GmbH
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -21,6 +21,7 @@ package org.graylog2.alerts;
 
 import org.graylog2.database.PersistedService;
 import org.graylog2.indexer.Indexer;
+import org.graylog2.plugin.alarms.AlertCondition;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.rest.resources.streams.alerts.requests.CreateConditionRequest;
 import org.joda.time.DateTime;
@@ -40,8 +41,8 @@ public interface AlertService extends PersistedService {
 
     long totalCount();
 
-    AlertCondition fromPersisted(Map<String, Object> conditionFields, Stream stream)throws AlertCondition.NoSuchAlertConditionTypeException;
-    AlertCondition fromRequest(CreateConditionRequest ccr, Stream stream) throws AlertCondition.NoSuchAlertConditionTypeException;
+    AlertCondition fromPersisted(Map<String, Object> conditionFields, Stream stream) throws AbstractAlertCondition.NoSuchAlertConditionTypeException;
+    AlertCondition fromRequest(CreateConditionRequest ccr, Stream stream) throws AbstractAlertCondition.NoSuchAlertConditionTypeException;
 
     boolean inGracePeriod(AlertCondition alertCondition);
 

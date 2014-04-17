@@ -17,24 +17,18 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.graylog2.streams;
+package org.graylog2.alarmcallbacks;
 
-import org.bson.types.ObjectId;
-import org.graylog2.database.NotFoundException;
-import org.graylog2.database.PersistedService;
-import org.graylog2.plugin.streams.Stream;
-import org.graylog2.plugin.streams.StreamRule;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-import java.util.List;
 import java.util.Map;
 
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
  */
-public interface StreamRuleService extends PersistedService {
-    StreamRule load(ObjectId id) throws NotFoundException;
-
-    List<StreamRule> loadForStream(Stream stream) throws NotFoundException;
-
-    StreamRule create(Map<String, Object> data);
+public class CreateAlarmCallbackRequest {
+    public String type;
+    public Map<String, Object> configuration;
+    @JsonProperty("creator_user_id")
+    public String creatorUserId;
 }

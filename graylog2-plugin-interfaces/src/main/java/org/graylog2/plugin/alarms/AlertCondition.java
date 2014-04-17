@@ -17,12 +17,9 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.graylog2.alerts.types;
+package org.graylog2.plugin.alarms;
 
-import org.graylog2.alerts.AbstractAlertCondition;
-import org.graylog2.indexer.Indexer;
 import org.graylog2.plugin.Message;
-import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.streams.Stream;
 import org.joda.time.DateTime;
 
@@ -32,25 +29,31 @@ import java.util.Map;
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
  */
-public class DummyAlertCondition extends AbstractAlertCondition {
-    final String description = "Dummy alert to test notifications";
+public interface AlertCondition {
+    String getDescription();
 
-    public DummyAlertCondition(Stream stream, String id, Type type, DateTime createdAt, String creatorUserId, Map<String, Object> parameters) {
-        super(stream, id, type, createdAt, creatorUserId, parameters);
-    }
+    List<Message> getSearchHits();
 
-    @Override
-    public String getDescription() {
-        return this.description;
-    }
+    String getId();
 
-    @Override
-    public CheckResult runCheck(Indexer indexer) {
-        return new CheckResult(true, this, this.description, Tools.iso8601());
-    }
+    DateTime getCreatedAt();
 
-    @Override
-    public List<Message> getSearchHits() {
-        return null;
+    String getCreatorUserId();
+
+    Stream getStream();
+
+    Map<String, Object> getParameters();
+
+    Integer getBacklog();
+
+    int getGrace();
+
+    String getTypeString();
+
+    public interface CheckResult {
+        boolean isTriggered();
+        String getResultDescription();
+        AlertCondition getTriggeredCondition();
+        DateTime getTriggeredAt();
     }
 }

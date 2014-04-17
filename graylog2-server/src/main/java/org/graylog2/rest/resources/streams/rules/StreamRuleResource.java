@@ -33,7 +33,6 @@ import org.graylog2.rest.documentation.annotations.*;
 import org.graylog2.rest.resources.RestResource;
 import org.graylog2.rest.resources.streams.rules.requests.CreateRequest;
 import org.graylog2.security.RestPermissions;
-import org.graylog2.streams.StreamRuleImpl;
 import org.graylog2.streams.StreamRuleService;
 import org.graylog2.streams.StreamService;
 import org.slf4j.Logger;
@@ -95,7 +94,7 @@ public class StreamRuleResource extends RestResource {
         streamRuleData.put("inverted", cr.inverted);
         streamRuleData.put("stream_id", new ObjectId(streamid));
 
-        final StreamRule streamRule = new StreamRuleImpl(streamRuleData);
+        final StreamRule streamRule = streamRuleService.create(streamRuleData);
 
         String id;
         try {
@@ -208,7 +207,7 @@ public class StreamRuleResource extends RestResource {
             throw new WebApplicationException(404);
         }
 
-        return Response.status(Response.Status.OK).entity(json(((StreamRuleImpl)streamRule).asMap())).build();
+        return Response.status(Response.Status.OK).entity(json(streamRule.asMap())).build();
     }
 
     @DELETE @Path("/{streamRuleId}") @Timed

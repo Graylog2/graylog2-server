@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 TORCH GmbH
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -19,8 +19,8 @@
 package org.graylog2.alerts;
 
 import org.graylog2.indexer.Indexer;
-import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.plugin.Tools;
+import org.graylog2.plugin.alarms.AlertCondition;
 import org.graylog2.plugin.database.EmbeddedPersistable;
 import org.graylog2.plugin.streams.Stream;
 import org.joda.time.DateTime;
@@ -28,16 +28,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-public abstract class AlertCondition implements EmbeddedPersistable {
+public abstract class AbstractAlertCondition implements EmbeddedPersistable, AlertCondition {
 
-    private static final Logger LOG = LoggerFactory.getLogger(AlertCondition.class);
+    private static final Logger LOG = LoggerFactory.getLogger(AbstractAlertCondition.class);
 
     public enum Type {
         MESSAGE_COUNT,
@@ -53,7 +52,7 @@ public abstract class AlertCondition implements EmbeddedPersistable {
 
     private final Map<String, Object> parameters;
 
-    protected AlertCondition(Stream stream, String id, Type type, DateTime createdAt, String creatorUserId, Map<String, Object> parameters) {
+    protected AbstractAlertCondition(Stream stream, String id, Type type, DateTime createdAt, String creatorUserId, Map<String, Object> parameters) {
         if(id == null) {
             this.id = UUID.randomUUID().toString();
         } else {
@@ -74,10 +73,9 @@ public abstract class AlertCondition implements EmbeddedPersistable {
 
     }
 
-    public abstract String getDescription();
     protected abstract CheckResult runCheck(Indexer indexer);
-    public abstract List<ResultMessage> getSearchHits();
 
+    @Override
     public String getId() {
         return id;
     }
@@ -86,10 +84,17 @@ public abstract class AlertCondition implements EmbeddedPersistable {
         return type;
     }
 
+    @Override
+    public String getTypeString() {
+        return type.toString();
+    }
+
+    @Override
     public DateTime getCreatedAt() {
         return createdAt;
     }
 
+    @Override
     public String getCreatorUserId() {
         return creatorUserId;
     }
@@ -98,10 +103,12 @@ public abstract class AlertCondition implements EmbeddedPersistable {
         return stream;
     }
 
+    @Override
     public Map<String, Object> getParameters() {
         return parameters;
     }
 
+    @Override
     public Integer getBacklog() {
         Object rawParameter = getParameters().get("backlog");
         if (rawParameter != null && rawParameter instanceof Number)
@@ -129,6 +136,7 @@ public abstract class AlertCondition implements EmbeddedPersistable {
         }};
     }
 
+    @Override
     public int getGrace() {
         return grace;
     }
@@ -139,7 +147,7 @@ public abstract class AlertCondition implements EmbeddedPersistable {
         }
     }
 
-    public static class CheckResult {
+    public static class CheckResult implements AlertCondition.CheckResult {
 
         private final boolean isTriggered;
         private final String resultDescription;

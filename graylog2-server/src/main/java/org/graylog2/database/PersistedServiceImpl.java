@@ -96,6 +96,8 @@ public class PersistedServiceImpl implements PersistedService {
 
     protected <T extends Persisted> DBCollection collection(Class<T> modelClass) {
         CollectionName collectionNameAnnotation = modelClass.getAnnotation(CollectionName.class);
+        if (collectionNameAnnotation == null)
+            throw new RuntimeException("Unable to determine collection for class " + modelClass.getCanonicalName());
         final String collectionName = (collectionNameAnnotation == null ? null : collectionNameAnnotation.value());
 
         if (collectionName == null)

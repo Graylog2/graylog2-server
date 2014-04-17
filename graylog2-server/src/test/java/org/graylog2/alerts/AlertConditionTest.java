@@ -24,6 +24,7 @@ import org.graylog2.database.MongoConnection;
 import org.graylog2.indexer.Indexer;
 import org.graylog2.indexer.searches.Searches;
 import org.graylog2.plugin.Tools;
+import org.graylog2.plugin.alarms.AlertCondition;
 import org.graylog2.plugin.streams.Stream;
 import org.joda.time.DateTime;
 import org.testng.annotations.BeforeClass;
@@ -89,7 +90,7 @@ public class AlertConditionTest {
         when(alertService.triggeredSecondsAgo(STREAM_ID, CONDITION_ID)).thenReturn(seconds);
     }
 
-    protected <T extends AlertCondition> T getTestInstance(Class<T> klazz, Map<String, Object> parameters) {
+    protected <T extends AbstractAlertCondition> T getTestInstance(Class<T> klazz, Map<String, Object> parameters) {
         try {
             return klazz.getConstructor(Stream.class, String.class, DateTime.class, String.class, Map.class)
                     .newInstance(stream, CONDITION_ID, Tools.iso8601(), STREAM_CREATOR, parameters);

@@ -72,7 +72,7 @@ public class MessageResource extends RestResource {
         checkPermission(RestPermissions.MESSAGES_READ, messageId);
 		try {
             ResultMessage resultMessage = indexer.messages().get(messageId, index);
-            Message message = new Message(resultMessage.message);
+            Message message = new Message(resultMessage.getMessage());
             checkMessageReadPermission(message);
 
             return json(resultMessage);
