@@ -18,6 +18,9 @@
  */
 package controllers;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 import lib.APIException;
 import lib.ApiClient;
@@ -27,6 +30,7 @@ import play.Logger;
 import play.mvc.Result;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -156,6 +160,44 @@ public class ExtractorsController extends AuthenticatedController {
             return status(500, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
         } catch (APIException e) {
             String message = "Could not delete extractor! We expected HTTP 204, but got a HTTP " + e.getHttpCode() + ".";
+            return status(500, views.html.errors.error.render(message, e, request()));
+        } catch (NodeService.NodeNotFoundException e) {
+            return status(404, views.html.errors.error.render(ApiClient.ERROR_MSG_NODE_NOT_FOUND, e, request()));
+        }
+    }
+
+    public Result export(String nodeId, String inputId) {
+        try {
+            Node node = nodeService.loadNode(nodeId);
+            Input input = node.getInput(inputId);
+
+            BreadcrumbList bc = standardBreadcrumbs(node, input);
+            bc.addCrumb("Export", routes.ExtractorsController.export(nodeId, inputId));
+
+            List<Map<String, Object>> exports = Lists.newArrayList();
+            for (Extractor extractor : extractorService.all(node, input)) {
+                exports.add(extractor.export());
+            }
+
+            String extractorExport = "[]";
+            try {
+                ObjectMapper om = new ObjectMapper();
+                extractorExport = om.writeValueAsString(exports);
+            } catch(JsonProcessingException e) {
+                Logger.error("Could not generate extractor export.", e);
+            }
+
+            return ok(views.html.system.inputs.extractors.export.render(
+                    currentUser(),
+                    bc,
+                    node,
+                    input,
+                    extractorExport)
+            );
+        } catch (IOException e) {
+            return status(500, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
+        } catch (APIException e) {
+            String message = "Could not fetch system information. We expected HTTP 200, but got a HTTP " + e.getHttpCode() + ".";
             return status(500, views.html.errors.error.render(message, e, request()));
         } catch (NodeService.NodeNotFoundException e) {
             return status(404, views.html.errors.error.render(ApiClient.ERROR_MSG_NODE_NOT_FOUND, e, request()));

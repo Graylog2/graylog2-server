@@ -1961,3 +1961,10 @@ hr.search-result-head-separator {
 .xtrc-order-active {
     background-color: #00a5cf;
 }
+
+#extractor-export-json {
+    width: 90%;
+    height: 700px;
+    font-family: monospace;
+    font-size: 13px;
+}
