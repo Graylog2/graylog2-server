@@ -51,19 +51,26 @@ $(document).ready(function() {
         });
     });
 
-    // Try substring against example.
-    $(".xtrc-try-substring").on("click", function() {
-        var button = $(this);
+    function trySubstring(e) {
+        var button = e;
 
         var warningText = "We were not able to run the substring extraction. Please check index boundaries.";
+
+        var beginIndex = $("#begin_index").val();
+        var endIndex = $("#end_index").val();
+
+        if (parseInt(beginIndex) == parseInt(endIndex)) {
+            highlightMatchResult({"match": {"start":parseInt(beginIndex), "end":parseInt(endIndex)}});
+            return;
+        }
 
         button.html("<i class='icon-refresh icon-spin'></i> Trying...");
         $.ajax({
             url: appPrefixed('/a/tools/substring_test'),
             data: {
                 "string":$("#xtrc-example").text(),
-                "start":$("#begin_index").val(),
-                "end":$("#end_index").val()
+                "start":beginIndex,
+                "end":endIndex
             },
             success: function(result) {
                 if(result.successful) {
@@ -79,6 +86,38 @@ $(document).ready(function() {
                 button.html("Try!");
             }
         });
+    }
+
+    $("#begin_index").on("change", function(e) {
+        var elem = $("#begin_index");
+        var endIndex = $("#end_index");
+
+        if (parseInt(elem.val()) < 0) {
+            elem.val(0);
+        }
+        if (parseInt(elem.val()) > parseInt(endIndex.val())) {
+            elem.val(endIndex.val());
+        }
+        trySubstring($(".xtrc-try-substring"));
+    });
+
+    $("#end_index").on("change", function(e) {
+        var elem = $("#end_index");
+        var maxLength = $("#xtrc-example").text().length;
+        var beginIndex = $("#begin_index").val();
+
+        if (parseInt(elem.val()) > maxLength) {
+            elem.val(maxLength);
+        }
+        if (parseInt(beginIndex) > parseInt(elem.val())) {
+            elem.val(beginIndex);
+        }
+        trySubstring($(".xtrc-try-substring"));
+    });
+
+    // Try substring against example.
+    $(".xtrc-try-substring").on("click", function() {
+        trySubstring($(this));
     });
 
     // Try split&index against example.
