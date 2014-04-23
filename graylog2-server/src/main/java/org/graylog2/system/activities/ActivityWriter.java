@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 TORCH GmbH
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -20,10 +20,8 @@ package org.graylog2.system.activities;
 
 import com.google.common.collect.Maps;
 import com.google.inject.Inject;
-import org.graylog2.Core;
 import org.graylog2.database.ValidationException;
 import org.graylog2.plugin.Tools;
-import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.ServerStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

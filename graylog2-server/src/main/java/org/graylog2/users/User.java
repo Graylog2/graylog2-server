@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 TORCH GmbH
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -19,12 +19,8 @@
 
 package org.graylog2.users;
 
-import com.mongodb.DBObject;
-import org.bson.types.ObjectId;
-import org.graylog2.Core;
 import org.graylog2.plugin.database.Persisted;
 import org.joda.time.DateTimeZone;
-import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Map;

@@ -28,6 +28,8 @@ import com.github.joschi.jadconfig.RepositoryException;
 import com.github.joschi.jadconfig.ValidationException;
 import com.github.joschi.jadconfig.repositories.PropertiesRepository;
 import com.google.common.collect.Lists;
+import com.google.common.util.concurrent.MoreExecutors;
+import com.google.common.util.concurrent.ServiceManager;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Module;
@@ -49,6 +51,7 @@ import org.graylog2.plugins.PluginInstaller;
 import org.graylog2.shared.NodeRunner;
 import org.graylog2.shared.ServerStatus;
 import org.graylog2.shared.bindings.GuiceInstantiationService;
+import org.graylog2.shared.initializers.ServiceManagerListener;
 import org.graylog2.shared.plugins.PluginLoader;
 import org.graylog2.system.activities.Activity;
 import org.graylog2.system.activities.ActivityWriter;
@@ -165,17 +168,29 @@ public final class Main extends NodeRunner {
         monkeyPatchHK2(injector);
 
         // Le server object. This is where all the magic happens.
-        Core server = injector.getInstance(Core.class);
-        ServerStatus serverStatus = injector.getInstance(ServerStatus.class);
+        final ServerStatus serverStatus = injector.getInstance(ServerStatus.class);
         serverStatus.setLifecycle(Lifecycle.STARTING);
 
-        server.initialize();
+        final ActivityWriter activityWriter = injector.getInstance(ActivityWriter.class);
+        final ServiceManager serviceManager = injector.getInstance(ServiceManager.class);
+
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+            @Override
+            public void run() {
+                String msg = "SIGNAL received. Shutting down.";
+                LOG.info(msg);
+                activityWriter.write(new Activity(msg, Main.class));
+
+                serverStatus.setLifecycle(Lifecycle.HALTING);
+
+                serviceManager.stopAsync().awaitStopped();
+            }
+        });
 
         // Register this node.
         final NodeService nodeService = injector.getInstance(NodeService.class);
         nodeService.registerServer(serverStatus.getNodeId().toString(), configuration.isMaster(), configuration.getRestTransportUri());
 
-        final ActivityWriter activityWriter = injector.getInstance(ActivityWriter.class);
         if (configuration.isMaster() && !nodeService.isOnlyMaster(serverStatus.getNodeId())) {
             LOG.warn("Detected another master in the cluster. Retrying in {} seconds to make sure it is not "
                     + "an old stale instance.", NodeServiceImpl.PING_TIMEOUT);
@@ -229,7 +244,9 @@ public final class Main extends NodeRunner {
         outputRegistry.register(injector.getInstance(ElasticSearchOutput.class));
 
         // Start services.
-        server.run();
+        final ServiceManagerListener serviceManagerListener = injector.getInstance(ServiceManagerListener.class);
+        serviceManager.addListener(serviceManagerListener, MoreExecutors.sameThreadExecutor());
+        serviceManager.startAsync().awaitHealthy();
 
         activityWriter.write(new Activity("Started up.", Main.class));
         LOG.info("Graylog2 up and running.");

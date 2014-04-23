@@ -25,7 +25,6 @@ import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Maps;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.graylog2.Core;
 import org.graylog2.dashboards.Dashboard;
 import org.graylog2.dashboards.DashboardImpl;
 import org.graylog2.dashboards.DashboardRegistry;
