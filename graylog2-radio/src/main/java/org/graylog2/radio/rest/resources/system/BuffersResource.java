@@ -1,5 +1,5 @@
-/**
- * Copyright 2013 Lennart Koopmann <lennart@torch.sh>
+/*
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -15,7 +15,6 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 package org.graylog2.radio.rest.resources.system;
 
@@ -24,7 +23,6 @@ import com.google.common.collect.Maps;
 import org.graylog2.inputs.InputCache;
 import org.graylog2.plugin.buffers.BufferWatermark;
 import org.graylog2.radio.Configuration;
-import org.graylog2.radio.Radio;
 import org.graylog2.radio.rest.resources.RestResource;
 import org.graylog2.shared.buffers.ProcessBufferWatermark;
 

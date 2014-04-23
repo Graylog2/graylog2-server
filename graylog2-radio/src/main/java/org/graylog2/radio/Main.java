@@ -28,6 +28,8 @@ import com.github.joschi.jadconfig.RepositoryException;
 import com.github.joschi.jadconfig.ValidationException;
 import com.github.joschi.jadconfig.repositories.PropertiesRepository;
 import com.google.common.collect.Lists;
+import com.google.common.util.concurrent.MoreExecutors;
+import com.google.common.util.concurrent.ServiceManager;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Module;
@@ -37,9 +39,11 @@ import org.graylog2.plugin.PluginModule;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.lifecycles.Lifecycle;
 import org.graylog2.radio.bindings.RadioBindings;
+import org.graylog2.radio.bindings.RadioInitializerBindings;
 import org.graylog2.shared.NodeRunner;
 import org.graylog2.shared.ServerStatus;
 import org.graylog2.shared.bindings.GuiceInstantiationService;
+import org.graylog2.shared.initializers.ServiceManagerListener;
 import org.graylog2.shared.plugins.PluginLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -78,19 +82,7 @@ public class Main extends NodeRunner {
         String configFile = commandLineArguments.getConfigFile();
         LOG.info("Using config file: {}", configFile);
 
-        final Configuration configuration = new Configuration();
-        JadConfig jadConfig = new JadConfig(new PropertiesRepository(configFile), configuration);
-
-        LOG.info("Loading configuration");
-        try {
-            jadConfig.process();
-        } catch (RepositoryException e) {
-            LOG.error("Couldn't load configuration file: [{}]", configFile, e);
-            System.exit(1);
-        } catch (ValidationException e) {
-            LOG.error("Invalid configuration", e);
-            System.exit(1);
-        }
+        final Configuration configuration = getConfiguration(configFile);
 
         // Are we in debug mode?
         Level logLevel = Level.INFO;
@@ -108,7 +100,8 @@ public class Main extends NodeRunner {
 
         GuiceInstantiationService instantiationService = new GuiceInstantiationService();
         List<Module> bindingsModules = getBindingsModules(instantiationService,
-                new RadioBindings(configuration));
+                new RadioBindings(configuration),
+                new RadioInitializerBindings());
         LOG.debug("Adding plugin modules: " + pluginModules);
         bindingsModules.addAll(pluginModules);
         Injector injector = Guice.createInjector(bindingsModules);
@@ -141,14 +134,49 @@ public class Main extends NodeRunner {
 
         monkeyPatchHK2(injector);
 
-        Radio radio = injector.getInstance(Radio.class);
         serverStatus.setLifecycle(Lifecycle.STARTING);
-        radio.initialize();
+
+        final ServiceManager serviceManager = injector.getInstance(ServiceManager.class);
+        final ServiceManagerListener serviceManagerListener = injector.getInstance(ServiceManagerListener.class);
+        serviceManager.addListener(serviceManagerListener, MoreExecutors.sameThreadExecutor());
+        serviceManager.startAsync().awaitHealthy();
 
         LOG.info("Graylog2 Radio up and running.");
 
         while (true) {
             try { Thread.sleep(1000); } catch (InterruptedException e) { /* lol, i don't care */ }
         }
+    }
+
+    private static Configuration getConfiguration(String configFile) {
+        final Configuration configuration = new Configuration();
+        JadConfig jadConfig = new JadConfig(new PropertiesRepository(configFile), configuration);
+
+        LOG.info("Loading configuration");
+        try {
+            jadConfig.process();
+        } catch (RepositoryException e) {
+            LOG.error("Couldn't load configuration file: [{}]", configFile, e);
+            System.exit(1);
+        } catch (ValidationException e) {
+            LOG.error("Invalid configuration", e);
+            System.exit(1);
+        }
+
+        if (configuration.getRestTransportUri() == null) {
+            String guessedIf;
+            try {
+                guessedIf = Tools.guessPrimaryNetworkAddress().getHostAddress();
+            } catch (Exception e) {
+                LOG.error("Could not guess primary network address for rest_transport_uri. Please configure it in your graylog2-radio.conf.", e);
+                throw new RuntimeException("No rest_transport_uri.");
+            }
+
+            String transportStr = "http://" + guessedIf + ":" + configuration.getRestListenUri().getPort();
+            LOG.info("No rest_transport_uri set. Falling back to [{}].", transportStr);
+            configuration.setRestTransportUri(transportStr);
+        }
+
+        return configuration;
     }
 }
