@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 TORCH GmbH
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -20,6 +20,7 @@
 package org.graylog2.streams;
 
 import com.beust.jcommander.internal.Lists;
+import com.fasterxml.jackson.annotation.JsonValue;
 import com.google.common.collect.Maps;
 import org.bson.types.ObjectId;
 import org.graylog2.database.CollectionName;
@@ -109,12 +110,7 @@ public class StreamImpl extends PersistedImpl implements Stream {
     }
 	
 	public Map<String, Object> asMap(List<StreamRule> streamRules) {
-		// We work on the result a bit to allow correct JSON serializing.
-		Map<String, Object> result = Maps.newHashMap(fields);
-		result.remove("_id");
-		result.put("id", ((ObjectId) fields.get("_id")).toStringMongod());
-        result.remove("created_at");
-        result.put("created_at", (Tools.getISO8601String((DateTime) fields.get("created_at"))));
+        Map<String, Object> result = asMap();
 
         List<Map<String, Object>> streamRulesMap = Lists.newArrayList();
 
@@ -126,6 +122,17 @@ public class StreamImpl extends PersistedImpl implements Stream {
 
 		return result;
 	}
+
+    @JsonValue
+    private Map<String, Object> asMap() {
+        // We work on the result a bit to allow correct JSON serializing.
+        Map<String, Object> result = Maps.newHashMap(fields);
+        result.remove("_id");
+        result.put("id", ((ObjectId) fields.get("_id")).toStringMongod());
+        result.remove("created_at");
+        result.put("created_at", (Tools.getISO8601String((DateTime) fields.get("created_at"))));
+        return result;
+    }
 
     public Map<String, Validator> getValidations() {
         return new HashMap<String, Validator>() {{

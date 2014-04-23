@@ -1,49 +1,39 @@
-/**
- * Copyright (c) 2013 Lennart Koopmann <lennart@socketfeed.com>
+/*
+ * Copyright 2012-2014 TORCH GmbH
  *
- * Permission is hereby granted, free of charge, to any person obtaining a copy of
- * this software and associated documentation files (the "Software"), to deal in
- * the Software without restriction, including without limitation the rights to
- * use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
- * of the Software, and to permit persons to whom the Software is furnished to do
- * so, subject to the following conditions:
+ * This file is part of Graylog2.
  *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
+ * Graylog2 is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
+ * Graylog2 is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  */
 package org.graylog2.plugin.configuration.fields;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-public class TextField implements ConfigurationField {
-
+public class TextField extends AbstractConfigurationField implements ConfigurationField {
     public static final String FIELD_TYPE = "text";
 
     public enum Attribute {
-        IS_PASSWORD
+        IS_PASSWORD,
+        TEXTAREA
     }
 
-    private final String name;
-    private final String humanName;
     private final String defaultValue;
-    private final String description;
-    private final Optional optional;
 
     private final List<String> attributes;
 
@@ -56,11 +46,8 @@ public class TextField implements ConfigurationField {
     }
 
     public TextField(String name, String humanName, String defaultValue, String description, Optional isOptional, Attribute... attrs) {
-        this.name = name;
-        this.humanName = humanName;
+        super(FIELD_TYPE, name, humanName, description, isOptional);
         this.defaultValue = defaultValue;
-        this.description = description;
-        this.optional = isOptional;
 
         this.attributes = Lists.newArrayList();
         if (attrs != null) {
@@ -71,43 +58,12 @@ public class TextField implements ConfigurationField {
     }
 
     @Override
-    public String getFieldType() {
-        return FIELD_TYPE;
-    }
-
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    @Override
-    public String getHumanName() {
-        return humanName;
-    }
-
-    @Override
-    public String getDescription() {
-        return description;
-    }
-
-    @Override
     public Object getDefaultValue() {
         return defaultValue;
-    }
-
-    @Override
-    public Optional isOptional() {
-        return optional;
     }
 
     @Override
     public List<String> getAttributes() {
         return attributes;
     }
-
-    @Override
-    public Map<String, Map<String, String>> getAdditionalInformation() {
-        return Maps.newHashMap();
-    }
-
 }

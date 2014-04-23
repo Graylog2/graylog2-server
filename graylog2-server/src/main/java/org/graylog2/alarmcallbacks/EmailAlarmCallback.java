@@ -22,6 +22,7 @@ package org.graylog2.alarmcallbacks;
 import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 import org.graylog2.alerts.AlertSender;
+import org.graylog2.alerts.FormattedEmailAlertSender;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationImpl;
 import org.graylog2.notifications.NotificationService;
@@ -62,8 +63,9 @@ public class EmailAlarmCallback implements AlarmCallback {
         this.nodeId = nodeId;
     }
 
-    public void call(Stream stream, AlertCondition alertCondition, AlertCondition.CheckResult result) {
+    public void call(Stream stream, AlertCondition.CheckResult result) {
         // Send alerts.
+        AlertCondition alertCondition = result.getTriggeredCondition();
         if (stream.getAlertReceivers().size() > 0) {
             try {
                 if (alertCondition.getBacklog() > 0 && alertCondition.getSearchHits() != null) {
@@ -105,22 +107,30 @@ public class EmailAlarmCallback implements AlarmCallback {
     @Override
     public void initialize(Configuration config) throws AlarmCallbackConfigurationException {
         this.configuration = config;
+        this.alertSender.initialize(configuration);
     }
 
     @Override
     public ConfigurationRequest getRequestedConfiguration() {
         ConfigurationRequest configurationRequest = new ConfigurationRequest();
-        configurationRequest.addField(new TextField("subject",
-                "E-Mail Subject",
-                "Graylog2 alert!",
-                "The subject of sent out mail alerts",
-                ConfigurationField.Optional.NOT_OPTIONAL));
-
         configurationRequest.addField(new TextField("sender",
                 "Sender",
                 "graylog2@example.org",
                 "The sender of sent out mail alerts",
                 ConfigurationField.Optional.NOT_OPTIONAL));
+
+        configurationRequest.addField(new TextField("subject",
+                "E-Mail Subject",
+                "Graylog2 alert for stream: ${stream.title}",
+                "The subject of sent out mail alerts",
+                ConfigurationField.Optional.NOT_OPTIONAL));
+
+        configurationRequest.addField(new TextField("body",
+                "E-Mail Body",
+                FormattedEmailAlertSender.bodyTemplate,
+                "The template to generate the body from",
+                ConfigurationField.Optional.OPTIONAL,
+                TextField.Attribute.TEXTAREA));
 
         return configurationRequest;
     }
@@ -137,5 +147,8 @@ public class EmailAlarmCallback implements AlarmCallback {
 
     @Override
     public void checkConfiguration() throws ConfigurationException {
+        if (configuration.getString("sender") == null || configuration.getString("sender").isEmpty()
+                || configuration.getString("subject") == null || configuration.getString("subject").isEmpty())
+            throw new ConfigurationException("Sender or subject are missing or invalid!");
     }
 }

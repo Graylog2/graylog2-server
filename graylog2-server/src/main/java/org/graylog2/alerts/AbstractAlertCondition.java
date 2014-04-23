@@ -16,8 +16,10 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package org.graylog2.alerts;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.graylog2.indexer.Indexer;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.alarms.AlertCondition;
@@ -40,7 +42,8 @@ public abstract class AbstractAlertCondition implements EmbeddedPersistable, Ale
 
     public enum Type {
         MESSAGE_COUNT,
-        FIELD_VALUE
+        FIELD_VALUE,
+        DUMMY
     }
 
     protected final String id;
@@ -99,6 +102,7 @@ public abstract class AbstractAlertCondition implements EmbeddedPersistable, Ale
         return creatorUserId;
     }
 
+    @JsonIgnore
     public Stream getStream() {
         return stream;
     }
@@ -126,6 +130,7 @@ public abstract class AbstractAlertCondition implements EmbeddedPersistable, Ale
     }
 
     @Override
+    @JsonIgnore
     public Map<String, Object> getPersistedFields() {
         return new HashMap<String, Object>() {{
             put("id", id);

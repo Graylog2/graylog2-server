@@ -26,12 +26,22 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.apache.commons.mail.EmailException;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.graylog2.alerts.*;
+import org.graylog2.alarmcallbacks.AlarmCallbackConfiguration;
+import org.graylog2.alarmcallbacks.AlarmCallbackConfigurationService;
+import org.graylog2.alarmcallbacks.AlarmCallbackFactory;
+import org.graylog2.alarmcallbacks.EmailAlarmCallback;
+import org.graylog2.alerts.AbstractAlertCondition;
+import org.graylog2.alerts.Alert;
+import org.graylog2.alerts.AlertImpl;
+import org.graylog2.alerts.AlertService;
 import org.graylog2.alerts.types.DummyAlertCondition;
 import org.graylog2.database.ValidationException;
 import org.graylog2.indexer.Indexer;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.alarms.AlertCondition;
+import org.graylog2.plugin.alarms.callbacks.AlarmCallback;
+import org.graylog2.plugin.alarms.callbacks.AlarmCallbackConfigurationException;
+import org.graylog2.plugin.alarms.callbacks.AlarmCallbackException;
 import org.graylog2.plugin.alarms.transports.TransportConfigurationException;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.rest.documentation.annotations.*;
@@ -66,8 +76,10 @@ public class StreamAlertResource extends RestResource {
 
     private final StreamService streamService;
     private final AlertService alertService;
-    private final AlertSender alertSender;
     private final Indexer indexer;
+    private final AlarmCallbackConfigurationService alarmCallbackConfigurationService;
+    private final EmailAlarmCallback emailAlarmCallback;
+    private final AlarmCallbackFactory alarmCallbackFactory;
 
     private static final String CACHE_KEY_BASE = "alerts";
 
@@ -78,12 +90,16 @@ public class StreamAlertResource extends RestResource {
     @Inject
     public StreamAlertResource(StreamService streamService,
                                AlertService alertService,
-                               AlertSender alertSender,
-                               Indexer indexer) {
+                               Indexer indexer,
+                               AlarmCallbackConfigurationService alarmCallbackConfigurationService,
+                               EmailAlarmCallback emailAlarmCallback,
+                               AlarmCallbackFactory alarmCallbackFactory) {
         this.streamService = streamService;
         this.alertService = alertService;
-        this.alertSender = alertSender;
         this.indexer = indexer;
+        this.alarmCallbackConfigurationService = alarmCallbackConfigurationService;
+        this.emailAlarmCallback = emailAlarmCallback;
+        this.alarmCallbackFactory = alarmCallbackFactory;
     }
 
     @POST @Timed
@@ -373,15 +389,20 @@ public class StreamAlertResource extends RestResource {
         }
 
         Map<String, Object> parameters = Maps.newHashMap();
-        DummyAlertCondition dummyAlertCondition = new DummyAlertCondition(stream, null, null, Tools.iso8601(), "admin", parameters);
+        DummyAlertCondition dummyAlertCondition = new DummyAlertCondition(stream, null, Tools.iso8601(), getSubject().getPrincipal().toString(), parameters);
 
         try {
             AbstractAlertCondition.CheckResult checkResult = dummyAlertCondition.runCheck(indexer);
-            alertSender.sendEmails(stream,checkResult);
-        } catch (TransportConfigurationException e) {
-            return Response.serverError().entity("E-Mail transport is not or improperly configured.").build();
-        } catch (EmailException e) {
-            LOG.error("Sending dummy alert failed: {}", e);
+            List<AlarmCallbackConfiguration> callConfigurations = alarmCallbackConfigurationService.getForStream(stream);
+            if (callConfigurations.size() > 0)
+                for (AlarmCallbackConfiguration configuration : callConfigurations) {
+                    AlarmCallback alarmCallback = alarmCallbackFactory.create(configuration);
+                    alarmCallback.call(stream, checkResult);
+                }
+            else
+                emailAlarmCallback.call(stream, checkResult);
+
+        } catch (AlarmCallbackException | ClassNotFoundException | AlarmCallbackConfigurationException e) {
             return Response.serverError().entity(e.getMessage()).build();
         }
 

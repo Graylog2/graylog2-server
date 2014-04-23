@@ -26,6 +26,8 @@ import com.google.inject.multibindings.Multibinder;
 import com.ning.http.client.AsyncHttpClient;
 import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.graylog2.Configuration;
+import org.graylog2.alerts.AlertSender;
+import org.graylog2.alerts.FormattedEmailAlertSender;
 import org.graylog2.bindings.providers.*;
 import org.graylog2.buffers.OutputBuffer;
 import org.graylog2.buffers.OutputBufferWatermark;
@@ -143,6 +145,7 @@ public class ServerBindings extends AbstractModule {
     private void bindInterfaces() {
         bind(MessageGateway.class).to(MessageGatewayImpl.class);
         bind(SecurityContextFactory.class).to(ShiroSecurityContextFactory.class);
+        bind(AlertSender.class).to(FormattedEmailAlertSender.class);
     }
 
     private MongoConnection getMongoConnection() {

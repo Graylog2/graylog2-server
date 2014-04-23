@@ -93,10 +93,10 @@ public class AlertScannerThread extends Periodical {
                         if (callConfigurations.size() > 0)
                             for (AlarmCallbackConfiguration configuration : callConfigurations) {
                                 AlarmCallback alarmCallback = alarmCallbackFactory.create(configuration);
-                                alarmCallback.call(stream, alertCondition, result);
+                                alarmCallback.call(stream, result);
                             }
                         else
-                            emailAlarmCallback.call(stream, alertCondition, result);
+                            emailAlarmCallback.call(stream, result);
                     } else {
                         // Alert not triggered.
                         LOG.debug("Alert condition [{}] is triggered.", alertCondition);

@@ -16,6 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package org.graylog2.plugin.alarms.callbacks;
 
 import org.graylog2.plugin.alarms.AlertCondition;
@@ -33,7 +34,7 @@ import java.util.Map;
 public interface AlarmCallback {
     
     public void initialize(Configuration config) throws AlarmCallbackConfigurationException;
-    public void call(Stream stream, AlertCondition alertCondition, AlertCondition.CheckResult result) throws AlarmCallbackException;
+    public void call(Stream stream, AlertCondition.CheckResult result) throws AlarmCallbackException;
 
     public ConfigurationRequest getRequestedConfiguration();
     public String getName();

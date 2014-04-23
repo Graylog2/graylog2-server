@@ -19,6 +19,11 @@
 
 package org.graylog2.alarmcallbacks;
 
+import com.beust.jcommander.internal.Maps;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ning.http.client.AsyncHttpClient;
+import com.ning.http.client.Response;
 import org.graylog2.plugin.alarms.AlertCondition;
 import org.graylog2.plugin.alarms.callbacks.AlarmCallback;
 import org.graylog2.plugin.alarms.callbacks.AlarmCallbackConfigurationException;
@@ -30,13 +35,27 @@ import org.graylog2.plugin.configuration.fields.ConfigurationField;
 import org.graylog2.plugin.configuration.fields.TextField;
 import org.graylog2.plugin.streams.Stream;
 
+import javax.inject.Inject;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
  */
 public class HTTPAlarmCallback implements AlarmCallback {
     private Configuration configuration;
+    private final AsyncHttpClient asyncHttpClient;
+    private final ObjectMapper objectMapper;
+
+    @Inject
+    public HTTPAlarmCallback(AsyncHttpClient asyncHttpClient,
+                             ObjectMapper objectMapper) {
+        this.asyncHttpClient = asyncHttpClient;
+        this.objectMapper = objectMapper;
+    }
 
     @Override
     public void initialize(Configuration config) throws AlarmCallbackConfigurationException {
@@ -44,8 +63,40 @@ public class HTTPAlarmCallback implements AlarmCallback {
     }
 
     @Override
-    public void call(Stream stream, AlertCondition alertCondition, AlertCondition.CheckResult result) throws AlarmCallbackException {
+    public void call(Stream stream, AlertCondition.CheckResult result) throws AlarmCallbackException {
         System.out.println("Calling " + configuration.getString("url"));
+
+        Map<String, Object> event = Maps.newHashMap();
+        event.put("stream", stream);
+        event.put("check_result", result);
+
+        String body = null;
+
+        try {
+            body = objectMapper.writeValueAsString(event);
+        } catch (JsonProcessingException e) {
+            throw new AlarmCallbackException("Unable to serialize alarm: " + e.getMessage());
+        }
+
+        final URL url;
+        try {
+             url = new URL(configuration.getString("url"));
+        } catch (MalformedURLException e) {
+            throw new AlarmCallbackException("Malformed URL: " + e.getMessage());
+        }
+
+        Response r = null;
+        try {
+            r = asyncHttpClient.preparePut(url.toString())
+                    .setBody(body)
+                    .execute().get();
+        } catch (IOException | InterruptedException | ExecutionException e) {
+            throw new AlarmCallbackException(e.getMessage());
+        }
+
+        if (r.getStatusCode() != 200) {
+            throw new RuntimeException("Expected ping HTTP response [200] but got [" + r.getStatusCode() + "].");
+        }
     }
 
     @Override
@@ -74,5 +125,10 @@ public class HTTPAlarmCallback implements AlarmCallback {
     public void checkConfiguration() throws ConfigurationException {
         if (configuration.getString("url") == null || configuration.getString("url").isEmpty())
             throw new ConfigurationException("URL parameter is missing!");
+        try {
+            URL url = new URL(configuration.getString("url"));
+        } catch (MalformedURLException e) {
+            throw new ConfigurationException("Malformed URL: " + e.getMessage());
+        }
     }
 }

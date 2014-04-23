@@ -16,24 +16,20 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.plugin.configuration.fields;
+
+package org.graylog2.shared.bindings.providers;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import javax.inject.Provider;
 
 /**
- * @author Lennart Koopmann <lennart@torch.sh>
+ * @author Dennis Oelkers <dennis@torch.sh>
  */
-public class BooleanField extends AbstractConfigurationField implements ConfigurationField {
-
-    public static final String FIELD_TYPE = "boolean";
-
-    private final boolean defaultValue;
-
-    public BooleanField(String name, String humanName, boolean defaultValue, String description) {
-        super(FIELD_TYPE, name, humanName, description, Optional.OPTIONAL);
-        this.defaultValue = defaultValue;
-    }
-
+public class ObjectMapperProvider implements Provider<ObjectMapper> {
     @Override
-    public Object getDefaultValue() {
-        return this.defaultValue;
+    public ObjectMapper get() {
+        org.graylog2.shared.rest.ObjectMapperProvider provider = new org.graylog2.shared.rest.ObjectMapperProvider();
+        return provider.getContext(null);
     }
 }
