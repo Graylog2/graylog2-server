@@ -37,7 +37,7 @@ import org.jboss.netty.channel.ExceptionEvent;
 import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.channel.SimpleChannelHandler;
 import org.jboss.netty.channel.socket.DatagramChannel;
-import org.jboss.netty.handler.codec.http.DefaultFullHttpResponse;
+import org.jboss.netty.handler.codec.http.DefaultHttpResponse;
 import org.jboss.netty.handler.codec.http.HttpHeaders;
 import org.jboss.netty.handler.codec.http.HttpMethod;
 import org.jboss.netty.handler.codec.http.HttpRequest;
@@ -102,7 +102,7 @@ public class GELFHttpHandler extends SimpleChannelHandler {
 
     private void writeResponse(Channel channel, boolean keepAlive, HttpVersion httpRequestVersion, HttpResponseStatus status) {
         final HttpResponse response =
-            new DefaultFullHttpResponse(httpRequestVersion, status);
+            new DefaultHttpResponse(httpRequestVersion, status);
 
         response.setHeader(HttpHeaders.Names.CONTENT_LENGTH, 0);
 
