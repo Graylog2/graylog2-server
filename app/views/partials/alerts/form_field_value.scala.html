@@ -1,0 +1,50 @@
+@(stream: Stream)
+
+<form action="@routes.AlertsController.addTypeFieldValue(stream.getId)" method="POST" class="alert-type-form alert-type-form-field-value" id="field-value">
+    <div class="well well-small">
+        <h2 style="margin-bottom: 10px;">
+            <i class="icon icon-bell-alt"></i>
+            New alert condition
+        </h2>
+
+        Trigger alert when the field
+        <input name="field" type="text" class="input-large typeahead-fields" autocomplete="off" />
+
+        <br />
+        has a
+
+        <select name="type">
+            <option value="mean">mean value</option>
+            <option value="min">minimum value</option>
+            <option value="max">maximum value</option>
+            <option value="sum">sum</option>
+            <option value="stddev">standard deviation</option>
+        </select>
+
+        <br />
+        that was
+
+        <span class="threshold-type">
+            <label class="radio inline">
+                <input type="radio" name="threshold_type" value="lower" selected="selected"> lower
+            </label>
+
+            <label class="radio inline">
+                <input type="radio" name="threshold_type" value="higher"> higher
+            </label>
+        </span>
+
+        than
+
+        <input name="threshold" type="text" class="input-small validatable" data-validate="number" />
+
+        in the last
+
+        <input name="time" type="text" class="input-mini pluralsingular validatable" data-pluralsingular="time-descr" data-validate="positive_number" />
+        <span class="time-descr" data-plural="minutes" data-singular="minute">minutes</span>
+
+
+        @views.html.partials.alerts.form_common.render()
+
+    </div>
+</form>

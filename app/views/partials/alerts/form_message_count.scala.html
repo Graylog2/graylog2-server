@@ -1,0 +1,34 @@
+@(stream: Stream)
+
+<form action="@routes.AlertsController.addTypeMessageCount(stream.getId)" method="POST" class="alert-type-form alert-type-form-message-count" id="message-count">
+    <div class="well well-small">
+        <h2 style="margin-bottom: 10px;">
+            <i class="icon icon-bell-alt"></i>
+            New alert condition
+        </h2>
+
+        Trigger alert when there are
+
+        <span class="threshold-type">
+            <label class="radio inline">
+                <input type="radio" name="threshold_type" value="more" checked="checked"> more
+            </label>
+
+            <label class="radio inline">
+                <input type="radio" name="threshold_type" value="less"> less
+            </label>
+        </span>
+
+        <br />
+        than
+        <input name="threshold" type="text" class="input-mini pluralsingular validatable" data-validate="number" data-pluralsingular="threshold-descr" />
+        <span class="threshold-descr" data-plural="messages" data-singular="message">messages</span>
+        in the last
+
+        <input name="time" type="text" class="input-mini pluralsingular validatable" data-validate="positive_number" data-pluralsingular="time-descr" />
+        <span class="time-descr" data-plural="minutes" data-singular="minute">minutes</span>
+
+        @views.html.partials.alerts.form_common.render()
+
+    </div>
+</form>

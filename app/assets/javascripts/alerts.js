@@ -5,10 +5,27 @@ $(document).ready(function() {
         $("#" + $(".add-alert-type").val()).show();
     });
 
+    $(".add-alert-destination").on("click", function() {
+        $(".alert-destination-form").hide();
+        $(".alert-destination-form[data-callback-type='" + $(".add-alert-destination-type").val() + "']").show();
+    });
+
     $(".alert-type-form").on("submit", function(e) {
         return validate("#" + $(this).attr("id"));
     });
 
+    $(".alert-destination-form").on("submit", function(e) {
+        return validate("#" + $(this).attr("id"));
+    });
+
+    $(".cancel-destination-form").on("click", function(e) {
+        $(".alert-destination-form").hide();
+        e.preventDefault();
+    });
+
+    $(".edit-alarm-destination").on("click", function(e) {
+        var callbackId = $(this).attr("data-callback-id");
+    });
 });
 
 function fillAlertAnnotator(chart, annotator) {

@@ -1,0 +1,41 @@
+@(alarmCallbacks: List[AlarmCallback],
+        availableAlarmCallbacks: Map[String, models.api.responses.alarmcallbacks.GetSingleAvailableAlarmCallbackResponse],
+        stream: Stream)
+@import lib.security.RestPermissions._
+@import views.helpers.Permissions._
+
+@if(alarmCallbacks.isEmpty) {
+    <div style="margin-top: 10px;" class="alert alert-info">
+        No configured alarm destinations. Default alarm destination (E-Mail transport) will be used.
+    </div>
+} else {
+    @for(callback <- alarmCallbacks) {
+        <div class="row-fluid node-row alert-condition" data-destination-id="@callback">
+            <span class="pull-right node-row-info">
+                    Created by @views.html.partials.links.to_user.render(callback.getCreatorUser)
+                <span class="moment-from-now" title="@callback.getCreatedAt()">@callback.getCreatedAt()</span>
+
+                @if(isPermitted(STREAMS_EDIT, stream.getId)) {
+                        &nbsp;
+                        <!-- <button type="submit" id="edit-alarm-destination" data-alarm-destination-id="@callback.getId" class="btn btn-success btn-mini">Edit</button> -->
+                    <form action="@routes.AlarmCallbacksController.delete(stream.getId, callback.getId)" method="POST" style="position: relative; top: -1px;">
+                        <button type="submit" class="btn btn-danger btn-mini" data-confirm="Really delete alarm destination?">Delete</button>
+                    </form>
+                }
+                </span>
+
+            <h3>
+                <i class="icon icon-ellipsis-vertical"></i>
+                @availableAlarmCallbacks.get(callback.getType).name
+            </h3>
+
+            <div class="well well-small">
+                <dl>
+                @for((k,v) <- callback.getConfiguration) {
+                    <dt>@k:</dt><dd>@Html(v.toString.replaceAll("\n", "<br>"))</dd>
+                }
+                </dl>
+            </div>
+        </div>
+    }
+}

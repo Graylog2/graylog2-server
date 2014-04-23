@@ -1,0 +1,39 @@
+@(availableAlarmCallbacks: Map[String, models.api.responses.alarmcallbacks.GetSingleAvailableAlarmCallbackResponse],
+        stream: Stream)
+
+@for((callbackType, details) <- availableAlarmCallbacks) {
+    <form action="@routes.AlarmCallbacksController.create(stream.getId)" method="POST" class="alert-destination-form alert-destination-form-value" data-callback-type="@callbackType">
+        <div class="well well-small">
+            <h2 style="margin-bottom: 10px;">
+                <i class="icon icon-bitbucket"></i>
+                New alert destination: @details.name
+            </h2>
+
+            <input type="hidden" name="type" value="@callbackType" />
+
+            @for(field <- details.getRequestedConfiguration()) {
+
+                @if(field.getType().equals("text")) {
+                    @views.html.system.inputs.fields.text_field(field)
+                }
+
+                @if(field.getType().equals("number")) {
+                    @views.html.system.inputs.fields.number_field(field)
+                }
+
+                @if(field.getType().equals("boolean")) {
+                    @views.html.system.inputs.fields.boolean_field(field)
+                }
+
+                @if(field.getType().equals("dropdown")) {
+                    @views.html.system.inputs.fields.dropdown_field(field.asInstanceOf[lib.plugin.configuration.DropdownField])
+                }
+            }
+
+            <p style="margin-top: 10px;">
+                <button type="submit" class="btn btn-success">Add alert destination</button>
+                <button class="btn btn-warning cancel-destination-form">Cancel</button>
+            </p>
+        </div>
+    </form>
+}

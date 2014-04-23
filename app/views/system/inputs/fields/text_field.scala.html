@@ -7,7 +7,12 @@
     }
 </label>
 <span class="help-block">@field.getDescription</span>
-<input name="configuration_@field.getTitle"
+@if(field.hasAttribute("textarea")) {
+    <textarea class="textarea-xlarge"
+} else {
+    <input class="input-xlarge"
+}
+    name="configuration[@field.getTitle]"
 
     @if(!field.isOptional) {
         required
@@ -20,7 +25,9 @@
     }
 
     @if(field.getDefaultValue() != null && !field.getDefaultValue().toString().isEmpty()) {
-        value="@field.getDefaultValue()"
+        @if(!field.hasAttribute("textarea")) {
+            value="@field.getDefaultValue()">
+        } else {
+            >@field.getDefaultValue()</textarea>
+        }
     }
-
-    class="input-xlarge">

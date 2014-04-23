@@ -1,6 +1,5 @@
 package controllers;
 
-import com.google.gson.Gson;
 import com.google.inject.Inject;
 import lib.APIException;
 import lib.ApiClient;

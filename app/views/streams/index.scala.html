@@ -52,6 +52,7 @@
                                 Quick add rule
                             </a>
                         </li>
+                    }
 
                         <li><a href="@routes.AlertsController.index(stream.getId)">Manage alerts</a></li>
                         @if(isPermitted(METRICS_READ, "org.graylog2.plugin.streams.Stream." + stream.getId)) {
@@ -68,7 +69,6 @@
                                 }
                             </ul>
                         </li>
-                        }
                         @if(isPermitted(STREAMS_CHANGESTATE, stream.getId)) {
                         @if(stream.getDisabled() == false) {
                             <li><a href="@routes.StreamsController.pause(stream.getId)" data-confirm="Really pause stream?">Pause this stream</a></li>

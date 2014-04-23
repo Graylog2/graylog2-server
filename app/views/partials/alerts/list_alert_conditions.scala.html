@@ -1,0 +1,39 @@
+@(alertConditions: List[models.alerts.AlertCondition],
+        stream: Stream)
+@import lib.security.RestPermissions._
+@import views.helpers.Permissions._
+
+@if(alertConditions.isEmpty) {
+    <div style="margin-top: 10px;" class="alert alert-info">
+        No configured alarm conditions.
+    </div>
+} else {
+    @for(condition <- alertConditions) {
+        <div class="row-fluid node-row alert-condition" data-condition-id="@condition.getId">
+            <span class="pull-right node-row-info">
+                    Created by @views.html.partials.links.to_user.render(condition.getCreatorUser)
+                <span class="moment-from-now" title="@condition.getCreatedAt()">@condition.getCreatedAt()</span>
+
+                @if(isPermitted(STREAMS_EDIT, stream.getId)) {
+                        &nbsp;
+                    <form action="@routes.AlertsController.removeCondition(stream.getId, condition.getId)" method="POST" style="position: relative; top: -1px;">
+                        <button type="submit" class="btn btn-danger btn-mini" data-confirm="Really delete alarm condition?">Delete</button>
+                    </form>
+                }
+                </span>
+
+            <h3>
+                <i class="icon icon-ellipsis-vertical"></i>
+                @condition.getSummary
+
+                @if(condition.isInGrace) {
+                    <span class="in-grace">(in grace period)</span>
+                }
+            </h3>
+
+            <div class="alert-condition">
+            @condition.getDescription
+            </div>
+        </div>
+    }
+}

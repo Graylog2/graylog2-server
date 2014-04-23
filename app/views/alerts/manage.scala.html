@@ -2,7 +2,9 @@
         alertConditions: List[models.alerts.AlertCondition],
         totalAlerts: Long,
         alerts: List[models.alerts.Alert],
-        users: String)
+        users: String,
+        availableAlarmCallbacks: Map[String, models.api.responses.alarmcallbacks.GetSingleAvailableAlarmCallbackResponse],
+        alarmCallbacks: List[AlarmCallback])
 
 @import lib.security.RestPermissions._
 @import views.helpers.Permissions._
@@ -13,142 +15,55 @@
         Alerts of stream &raquo;@stream.getTitle&laquo;
     </h1>
 
-    <div class="row-fluid">
-        You can define thresholds on any message field or message count of a stream and be alerted based on this definition.
-    </div>
-
-    <select class="add-alert-type">
-        <option value="message-count">Message count condition</option>
-        <option value="field-value">Field value condition</option>
-    </select>
-
-    <button class="btn btn-success add-alert">Configure new alert condition</button>
-
-    <form action="@routes.AlertsController.addTypeMessageCount(stream.getId)" method="POST" class="alert-type-form alert-type-form-message-count" id="message-count">
-        <div class="well well-small">
-            <h2 style="margin-bottom: 10px;">
-                <i class="icon icon-bell-alt"></i>
-                New alert condition
-            </h2>
-
-            Trigger alert when there are
-
-            <span class="threshold-type">
-                <label class="radio inline">
-                    <input type="radio" name="threshold_type" value="more" checked="checked"> more
-                </label>
-
-                <label class="radio inline">
-                    <input type="radio" name="threshold_type" value="less"> less
-                </label>
-            </span>
-
-            <br />
-            than
-            <input name="threshold" type="text" class="input-mini pluralsingular validatable" data-validate="number" data-pluralsingular="threshold-descr" />
-            <span class="threshold-descr" data-plural="messages" data-singular="message">messages</span>
-            in the last
-
-            <input name="time" type="text" class="input-mini pluralsingular validatable" data-validate="positive_number" data-pluralsingular="time-descr" />
-            <span class="time-descr" data-plural="minutes" data-singular="minute">minutes</span>
-
-            @views.html.partials.alerts.form_common.render()
-
+    @if(isPermitted(STREAMS_EDIT, stream.getId)) {
+        <div class="row-fluid">
+            You can define thresholds on any message field or message count of a stream and be alerted based on this definition.
         </div>
-    </form>
 
-    <form action="@routes.AlertsController.addTypeFieldValue(stream.getId)" method="POST" class="alert-type-form alert-type-form-field-value" id="field-value">
-        <div class="well well-small">
-            <h2 style="margin-bottom: 10px;">
-                <i class="icon icon-bell-alt"></i>
-                New alert condition
-            </h2>
+        <select class="add-alert-type">
+            <option value="message-count">Message count condition</option>
+            <option value="field-value">Field value condition</option>
+        </select>
 
-            Trigger alert when the field
-            <input name="field" type="text" class="input-large typeahead-fields" autocomplete="off" />
+        <button class="btn btn-success add-alert">Configure new alert condition</button>
 
-            <br />
-            has a
+        @views.html.partials.alerts.form_message_count.render(stream)
 
-            <select name="type">
-                <option value="mean">mean value</option>
-                <option value="min">minimum value</option>
-                <option value="max">maximum value</option>
-                <option value="sum">sum</option>
-                <option value="stddev">standard deviation</option>
-            </select>
-
-            <br />
-            that was
-
-            <span class="threshold-type">
-                <label class="radio inline">
-                    <input type="radio" name="threshold_type" value="lower" selected="selected"> lower
-                </label>
-
-                <label class="radio inline">
-                    <input type="radio" name="threshold_type" value="higher"> higher
-                </label>
-            </span>
-
-            than
-
-            <input name="threshold" type="text" class="input-small validatable" data-validate="number" />
-
-            in the last
-
-            <input name="time" type="text" class="input-mini pluralsingular validatable" data-pluralsingular="time-descr" data-validate="positive_number" />
-            <span class="time-descr" data-plural="minutes" data-singular="minute">minutes</span>
-
-
-            @views.html.partials.alerts.form_common.render()
-
-        </div>
-    </form>
+        @views.html.partials.alerts.form_field_value.render(stream)
+    }
 
     <hr />
 
     <h2 style="margin-bottom: 5px;"><i class="icon icon-tasks"></i> Configured alert conditions</h2>
 
 
-    @if(alertConditions.isEmpty) {
-        <div style="margin-top: 10px;" class="alert alert-info">
-            No configured alarm conditions.
-        </div>
-    } else {
-        @for(condition <- alertConditions) {
-            <div class="row-fluid node-row alert-condition" data-condition-id="@condition.getId">
-                <span class="pull-right node-row-info">
-                    Created by @views.html.partials.links.to_user.render(condition.getCreatorUser)
-                    <span class="moment-from-now" title="@condition.getCreatedAt()">@condition.getCreatedAt()</span>
-
-                    @if(isPermitted(STREAMS_EDIT, stream.getId)) {
-                        &nbsp;
-                        <form action="@routes.AlertsController.removeCondition(stream.getId, condition.getId)" method="POST" style="position: relative; top: -1px;">
-                            <button type="submit" class="btn btn-danger btn-mini" data-confirm="Really delete alarm condition?">Delete</button>
-                        </form>
-                    }
-                </span>
-
-                <h3>
-                    <i class="icon icon-ellipsis-vertical"></i>
-                    @condition.getSummary
-
-                    @if(condition.isInGrace) {
-                        <span class="in-grace">(in grace period)</span>
-                    }
-                </h3>
-
-                <div class="alert-condition">
-                    @condition.getDescription
-                </div>
-            </div>
-        }
-    }
+    @views.html.partials.alerts.list_alert_conditions.render(alertConditions, stream)
 
     <hr />
 
-    @if(stream.getUserAlertReceivers.size() > 0 || stream.getEmailAlertReceivers.size() > 0) {
+    <h2><i class="icon icon-bitbucket"></i> Alert destinations</h2>
+
+    <div class="row-fluid" style="margin-bottom: 5px;">
+        The following actions will be taken when an alert is triggered for this stream.
+    </div>
+
+    @if(isPermitted(STREAMS_EDIT, stream.getId)) {
+        <select class="add-alert-destination-type">
+            @for((callbackType, details) <- availableAlarmCallbacks.toArray.sortBy(_._2.name)) {
+                <option value="@callbackType">@details.name</option>
+            }
+        </select>
+
+        <button class="btn btn-success add-alert-destination">Configure new alert destination</button>
+
+        @views.html.partials.alerts.list_forms_available_callbacks.render(availableAlarmCallbacks, stream)
+    }
+
+    @views.html.partials.alerts.list_alarm_callbacks.render(alarmCallbacks, availableAlarmCallbacks, stream)
+
+    <hr />
+
+    @if(stream.getUserAlertReceivers.size() > 0 || stream.getEmailAlertReceivers.size() > 0 || isPermitted(STREAMS_EDIT, stream.getId)) {
         <div class="sendDummyAlert">
             <form action="@routes.AlertsController.sendDummyAlert(stream.getId)" method="POST">
                 <button type="submit" class="btn btn-info btn-mini pull-right">Send test alert</button>
@@ -174,9 +89,11 @@
                     <i class="icon icon-user"></i>&nbsp;
                     <a href="@routes.UsersController.show(user)">@user</a>
 
-                    <a href="@routes.AlertsController.removeReceiverUser(stream.getId, user)" data-confirm="Really remove receiver?">
-                        <i class="icon icon-remove"></i>
-                    </a>
+                    @if(isPermitted(STREAMS_EDIT, stream.getId)) {
+                        <a href="@routes.AlertsController.removeReceiverUser(stream.getId, user)" data-confirm="Really remove receiver?">
+                            <i class="icon icon-remove"></i>
+                        </a>
+                    }
                 </li>
             }
 
@@ -185,80 +102,51 @@
                     <i class="icon icon-envelope"></i>&nbsp;
                     @email
 
-                    <a href="@routes.AlertsController.removeReceiverEmail(stream.getId, email)" data-confirm="Really remove receiver?">
-                        <i class="icon icon-remove"></i>
-                    </a>
+                    @if(isPermitted(STREAMS_EDIT, stream.getId)) {
+                        <a href="@routes.AlertsController.removeReceiverEmail(stream.getId, email)" data-confirm="Really remove receiver?">
+                            <i class="icon icon-remove"></i>
+                        </a>
+                    }
                 </li>
             }
         </ul>
     }
 
-    <div class="row-fluid" style="margin-top: 15px;">
-        <div class="span6">
-            <form action="@routes.AlertsController.addReceiverUser(stream.getId)" method="POST">
-                <label for="user">Username:</label>
-                <input name="username"
-                style="margin-bottom: 0px;"
-                type="text"
-                id="user"
-                class="input-large"
-                autocomplete="off"
-                data-provide="typeahead"
-                data-source="@users" />
+    @if(isPermitted(STREAMS_EDIT, stream.getId)) {
+        <div class="row-fluid" style="margin-top: 15px;">
+            <div class="span6">
+                <form action="@routes.AlertsController.addReceiverUser(stream.getId)" method="POST">
+                    <label for="user">Username:</label>
+                    <input name="username"
+                    style="margin-bottom: 0px;"
+                    type="text"
+                    id="user"
+                    class="input-large"
+                    autocomplete="off"
+                    data-provide="typeahead"
+                    data-source="@users" />
 
-                <button type="submit" class="btn btn-success">Subscribe</button>
-            </form>
+                    <button type="submit" class="btn btn-success">Subscribe</button>
+                </form>
+            </div>
+
+            <div class="span6">
+                <form action="@routes.AlertsController.addReceiverEmail(stream.getId)" method="POST">
+                    <label for="email">Email address:</label>
+                    <input name="email"
+                    style="margin-bottom: 0px;"
+                    type="text"
+                    id="email"
+                    class="input-large" />
+
+                    <button type="submit" class="btn btn-success">Subscribe</button>
+                </form>
+            </div>
+
         </div>
-
-        <div class="span6">
-            <form action="@routes.AlertsController.addReceiverEmail(stream.getId)" method="POST">
-                <label for="email">Email address:</label>
-                <input name="email"
-                style="margin-bottom: 0px;"
-                type="text"
-                id="email"
-                class="input-large" />
-
-                <button type="submit" class="btn btn-success">Subscribe</button>
-            </form>
-        </div>
-
-    </div>
+    }
 
     <hr />
 
-    <h2><i class="icon icon-bell"></i> Triggered alerts</h2>
-    Showing the most recent alerts. This stream triggered a total of @totalAlerts alerts.
-
-    @if(stream.getAlerts.isEmpty) {
-        <div style="margin-top: 10px;" class="alert alert-info">
-            This stream has never triggered an alert.
-        </div>
-    } else {
-        <table class="alerts table table-striped table-hover table-condensed">
-            <thead>
-                <tr>
-                    <th style="width: 130px;" data-dynatable-sorts="timestamp">Triggered</th>
-                    <th style="display:none">Timestamp</th>
-                    <th>Condition</th>
-                    <th>Description</th>
-                </tr>
-            </thead>
-            <tbody>
-            @for(alert <- alerts) {
-                <tr>
-                    <td>
-                        <span class="moment-from-now" title="@alert.getTriggeredAt">@alert.getTriggeredAt</span>
-                    </td>
-                    <td style="display:none">@alert.getTriggeredAt</td>
-                    <td>
-                        <a href="#" class="condition-id" data-condition-id="@alert.getConditionId">@alert.getConditionId</a>
-                    </td>
-                    <td>@alert.getDescription</td>
-                </tr>
-            }
-            </tbody>
-        </table>
-    }
-
+    @views.html.partials.alerts.list_triggered_alerts.render(alerts, totalAlerts, stream)
 }

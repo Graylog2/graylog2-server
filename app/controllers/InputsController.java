@@ -21,14 +21,16 @@ package controllers;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.inject.Inject;
 import lib.*;
 import lib.security.RestPermissions;
 import models.*;
+import models.api.requests.inputs.LaunchInputRequest;
 import models.api.responses.system.InputTypeSummaryResponse;
+import play.data.Form;
 import play.mvc.Result;
 import views.helpers.Permissions;
 
+import javax.inject.Inject;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -38,17 +40,18 @@ import java.util.Map;
  */
 public class InputsController extends AuthenticatedController {
 
-    @Inject
-    private NodeService nodeService;
+    public static final Form<LaunchInputRequest> launchInputRequestForm = Form.form(LaunchInputRequest.class);
+
+    private final NodeService nodeService;
+    private final InputService inputService;
+    private final ServerNodes servernodes;
 
     @Inject
-    private InputService inputService;
-
-    @Inject
-    private ServerNodes servernodes;
-
-    @Inject
-    private ClusterService clusterService;
+    public InputsController(NodeService nodeService, InputService inputService, ServerNodes servernodes) {
+        this.nodeService = nodeService;
+        this.inputService = inputService;
+        this.servernodes = servernodes;
+    }
 
     public Result index() {
         try {
@@ -178,41 +181,29 @@ public class InputsController extends AuthenticatedController {
         }
     }
 
-    protected Map<String, Object> extractConfiguration(Map<String, String[]> form, InputTypeSummaryResponse inputInfo) {
+    protected Map<String, Object> extractConfiguration(Map<String, Object> form, InputTypeSummaryResponse inputInfo) {
         Map<String, Object> configuration = Maps.newHashMap();
-        for (Map.Entry<String, String[]> f : form.entrySet()) {
-            if (!f.getKey().startsWith("configuration_")) {
-                continue;
-            }
-
-            String key = f.getKey().substring("configuration_".length());
+        for (Map.Entry<String, Object> entry : form.entrySet()) {
             Object value;
-
-            if (f.getValue().length > 0) {
-                String stringValue = f.getValue()[0];
-
-                // Decide what to cast to. (string, bool, number)
-                switch((String) inputInfo.requestedConfiguration.get(key).get("type")) {
-                    case "text":
-                        value = stringValue;
-                        break;
-                    case "number":
-                        value = Integer.parseInt(stringValue);
-                        break;
-                    case "boolean":
-                        value = stringValue.equals("true");
-                        break;
-                    case "dropdown":
-                        value = stringValue;
-                        break;
-                    default: continue;
-                }
-
-            } else {
-                continue;
+            // Decide what to cast to. (string, bool, number)
+            switch((String) inputInfo.requestedConfiguration.get(entry.getKey()).get("type")) {
+                case "text":
+                    value = entry.getValue().toString();
+                    break;
+                case "number":
+                    value = Integer.parseInt(entry.getValue().toString());
+                    break;
+                case "boolean":
+                    value = entry.getValue().toString().equals("true");
+                    break;
+                case "dropdown":
+                    value = entry.getValue().toString();
+                    break;
+                default:
+                    value = entry.getValue();
             }
 
-            configuration.put(key, value);
+            configuration.put(entry.getKey(), value);
         }
 
         return configuration;
@@ -222,14 +213,9 @@ public class InputsController extends AuthenticatedController {
         if (!Permissions.isPermitted(RestPermissions.INPUTS_EDIT)) {
             return redirect(routes.StartpageController.redirect());
         }
-        final Map<String, String[]> form = request().body().asFormUrlEncoded();
 
-        final String inputType = form.get("type")[0];
-        final String inputTitle = form.get("title")[0];
-        final Boolean global = (form.get("global") != null
-                && form.get("global").length > 0
-                && form.get("global")[0] instanceof String
-                && form.get("global")[0].equals("on"));
+        final Form<LaunchInputRequest> form = launchInputRequestForm.bindFromRequest();
+        final LaunchInputRequest request = form.get();
 
         try {
             ClusterEntity node = null;
@@ -239,8 +225,8 @@ public class InputsController extends AuthenticatedController {
             if(nodeIdParam != null && !nodeIdParam.isEmpty()) {
                 nodeId = nodeIdParam;
             } else {
-                if(form.get("node") != null && form.get("node").length > 0) {
-                    nodeId = form.get("node")[0];
+                if(request.node != null && !request.node.isEmpty()) {
+                    nodeId = request.node;
                 }
             }
 
@@ -252,26 +238,26 @@ public class InputsController extends AuthenticatedController {
                 }
             }
 
-            if (global)
+            if (request.global)
                 node = nodeService.loadMasterNode();
 
             if (node == null)
                 return status(404, views.html.errors.error.render(ApiClient.ERROR_MSG_NODE_NOT_FOUND, new RuntimeException("Could not find Node to launch input on!"), request()));
 
-            inputInfo = node.getInputTypeInformation(inputType);
+            inputInfo = node.getInputTypeInformation(request.type);
 
-            final Map<String, Object> configuration = extractConfiguration(form, inputInfo);
+            final Map<String, Object> configuration = extractConfiguration(request.configuration, inputInfo);
 
             try {
                 Boolean result;
-                if (global) {
-                    result = (inputService.launchGlobal(inputTitle, inputType, configuration, currentUser(), inputInfo.isExclusive) != null);
+                if (request.global) {
+                    result = (inputService.launchGlobal(request.title, request.type, configuration, currentUser(), inputInfo.isExclusive) != null);
                 } else {
-                    result = (node.launchInput(inputTitle, inputType, global, configuration, currentUser(), inputInfo.isExclusive) != null);
+                    result = (node.launchInput(request.title, request.type, request.global, configuration, currentUser(), inputInfo.isExclusive) != null);
                 }
 
                 if (!result) {
-                    return status(500, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, new RuntimeException("Could not launch input " + inputTitle), request()));
+                    return status(500, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, new RuntimeException("Could not launch input " + request.title), request()));
                 }
             } catch (ExclusiveInputException e) {
                 flash("error", "This input is exclusive and already running.");
@@ -293,56 +279,18 @@ public class InputsController extends AuthenticatedController {
         if (!Permissions.isPermitted(RestPermissions.INPUTS_EDIT)) {
             return redirect(routes.StartpageController.redirect());
         }
-        Map<String, Object> configuration = Maps.newHashMap();
-        Map<String, String[]> form = request().body().asFormUrlEncoded();
-
-        String inputType = form.get("type")[0];
-        String inputTitle = form.get("title")[0];
-
-        // TODO so duplicate. wow. #doge
+        final Form<LaunchInputRequest> form = launchInputRequestForm.bindFromRequest();
+        final LaunchInputRequest request = form.get();
 
         try {
             final Radio radio = nodeService.loadRadio(radioId);
-            InputTypeSummaryResponse inputInfo = radio.getInputTypeInformation(inputType);
+            InputTypeSummaryResponse inputInfo = radio.getInputTypeInformation(request.type);
 
-            for (Map.Entry<String, String[]> f : form.entrySet()) {
-                if (!f.getKey().startsWith("configuration_")) {
-                    continue;
-                }
-
-                String key = f.getKey().substring("configuration_".length());
-                Object value;
-
-                if (f.getValue().length > 0) {
-                    String stringValue = f.getValue()[0];
-
-                    // Decide what to cast to. (string, bool, number)
-                    switch((String) inputInfo.requestedConfiguration.get(key).get("type")) {
-                        case "text":
-                            value = stringValue;
-                            break;
-                        case "number":
-                            value = Integer.parseInt(stringValue);
-                            break;
-                        case "boolean":
-                            value = stringValue.equals("true");
-                            break;
-                        case "dropdown":
-                            value = stringValue;
-                            break;
-                        default: continue;
-                    }
-
-                } else {
-                    continue;
-                }
-
-                configuration.put(key, value);
-            }
+            Map<String, Object> configuration = extractConfiguration(request.configuration, inputInfo);
 
             try {
-                if (radio.launchInput(inputTitle, inputType, false, configuration, currentUser(), inputInfo.isExclusive) == null) {
-                    return status(500, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, new RuntimeException("Could not launch input " + inputTitle), request()));
+                if (radio.launchInput(request.title, request.type, false, configuration, currentUser(), inputInfo.isExclusive) == null) {
+                    return status(500, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, new RuntimeException("Could not launch input " + request.title), request()));
                 }
             } catch (ExclusiveInputException e) {
                 flash("error", "This input is exclusive and already running.");

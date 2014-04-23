@@ -22,14 +22,13 @@ package controllers;
 import com.google.inject.Inject;
 import lib.APIException;
 import lib.ApiClient;
-import models.User;
-import models.UserService;
+import lib.plugin.configuration.RequestedConfigurationField;
+import models.*;
 import models.alerts.Alert;
 import models.alerts.AlertCondition;
 import models.alerts.AlertConditionService;
-import models.Stream;
-import models.StreamService;
 import models.api.requests.alerts.CreateAlertConditionRequest;
+import models.api.responses.alarmcallbacks.GetSingleAvailableAlarmCallbackResponse;
 import play.Logger;
 import play.mvc.Result;
 
@@ -50,6 +49,9 @@ public class AlertsController extends AuthenticatedController {
 
     @Inject
     private AlertConditionService alertConditionService;
+
+    @Inject
+    private AlarmCallbackService alarmCallbackService;
 
     public Result index(String streamId) {
         try {
@@ -72,13 +74,18 @@ public class AlertsController extends AuthenticatedController {
             }
             users.append("]");
 
+            Map<String, GetSingleAvailableAlarmCallbackResponse> availableAlarmCallbacks = alarmCallbackService.available(streamId);
+            List<AlarmCallback> alarmCallbacks = alarmCallbackService.all(streamId);
+
             return ok(views.html.alerts.manage.render(
                     currentUser(),
                     stream,
                     alertConditions,
                     totalAlerts,
                     alerts,
-                    users.toString()
+                    users.toString(),
+                    availableAlarmCallbacks,
+                    alarmCallbacks
             ));
         } catch (IOException e) {
             return status(504, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
