@@ -19,6 +19,7 @@
 
 package org.graylog2.plugin;
 
+import com.google.common.util.concurrent.Service;
 import com.google.inject.AbstractModule;
 import com.google.inject.TypeLiteral;
 import com.google.inject.multibindings.Multibinder;
@@ -51,5 +52,10 @@ public abstract class PluginModule extends AbstractModule {
         TypeLiteral<Class<? extends AlarmCallback>> type = new TypeLiteral<Class<? extends AlarmCallback>>(){};
         Multibinder<Class<? extends AlarmCallback>> alarmCallbackBinder = Multibinder.newSetBinder(binder(), type);
         alarmCallbackBinder.addBinding().toInstance(alarmCallbackClass);
+    }
+
+    protected void addInitializer(Class<? extends Service> initializerClass) {
+        Multibinder<Service> serviceBinder = Multibinder.newSetBinder(binder(), Service.class);
+        serviceBinder.addBinding().to(initializerClass);
     }
 }

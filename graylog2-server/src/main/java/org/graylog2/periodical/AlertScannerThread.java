@@ -83,7 +83,7 @@ public class AlertScannerThread extends Periodical {
                     AlertCondition.CheckResult result = alertService.triggered(alertCondition, indexer);
                     if (result.isTriggered()) {
                         // Alert is triggered!
-                        LOG.info("Alert condition [{}] is triggered. Sending alerts.", alertCondition);
+                        LOG.debug("Alert condition [{}] is triggered. Sending alerts.", alertCondition);
 
                         // Persist alert.
                         Alert alert = alertService.factory(result);
