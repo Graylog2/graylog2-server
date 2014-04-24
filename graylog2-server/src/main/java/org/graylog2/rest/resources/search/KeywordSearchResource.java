@@ -21,10 +21,11 @@ package org.graylog2.rest.resources.search;
 
 import com.codahale.metrics.annotation.Timed;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.elasticsearch.action.search.SearchPhaseExecutionException;
+import org.glassfish.jersey.server.ChunkedOutput;
 import org.graylog2.indexer.IndexHelper;
 import org.graylog2.indexer.Indexer;
+import org.graylog2.indexer.results.ScrollResult;
 import org.graylog2.indexer.searches.Sorting;
 import org.graylog2.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.indexer.searches.timeranges.KeywordRange;
@@ -37,6 +38,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
+import java.util.List;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
@@ -51,7 +53,7 @@ public class KeywordSearchResource extends SearchResource {
     @GET @Timed
     @ApiOperation(value = "Message search with keyword as timerange.",
             notes = "Search for messages in a timerange defined by a keyword like \"yesterday\" or \"2 weeks ago to wednesday\".")
-    @Produces({ MediaType.APPLICATION_JSON, "text/csv" })
+    @Produces(MediaType.APPLICATION_JSON)
     @ApiResponses(value = {
             @ApiResponse(code = 400, message = "Invalid keyword provided.")
     })
@@ -83,6 +85,43 @@ public class KeywordSearchResource extends SearchResource {
             throw new WebApplicationException(400);
         } catch (SearchPhaseExecutionException e) {
             throw createRequestExceptionForParseFailure(query, e);
+        }
+    }
+
+    @GET @Timed
+    @ApiOperation(value = "Message search with keyword as timerange.",
+                  notes = "Search for messages in a timerange defined by a keyword like \"yesterday\" or \"2 weeks ago to wednesday\".")
+    @Produces("text/csv")
+    @ApiResponses(value = {
+            @ApiResponse(code = 400, message = "Invalid keyword provided.")
+    })
+    public ChunkedOutput<ScrollResult.ScrollChunk> searchKeywordChunked(
+            @ApiParam(title = "query", description = "Query (Lucene syntax)", required = true) @QueryParam("query") String query,
+            @ApiParam(title = "keyword", description = "Range keyword", required = true) @QueryParam("keyword") String keyword,
+            @ApiParam(title = "limit", description = "Maximum number of messages to return.", required = false) @QueryParam("limit") int limit,
+            @ApiParam(title = "offset", description = "Offset", required = false) @QueryParam("offset") int offset,
+            @ApiParam(title = "filter", description = "Filter", required = false) @QueryParam("filter") String filter,
+            @ApiParam(title = "fields", description = "Comma separated list of fields to return", required = true) @QueryParam("fields") String fields) {
+        checkSearchPermission(filter, RestPermissions.SEARCHES_KEYWORD);
+
+        checkQuery(query);
+        final List<String> fieldList = parseFields(fields);
+        final TimeRange timeRange = buildKeywordTimeRange(keyword);
+
+        try {
+            final ScrollResult scroll = core.getIndexer().searches()
+                    .scroll(query, timeRange, limit, offset, fieldList, filter);
+            final ChunkedOutput<ScrollResult.ScrollChunk> output = new ChunkedOutput<>(ScrollResult.ScrollChunk.class);
+
+            LOG.debug("[{}] Scroll result contains a total of {} messages", scroll.getQueryHash(), scroll.totalHits());
+            Runnable scrollIterationAction = createScrollChunkProducer(scroll, output);
+            // TODO use a shared executor for async responses here instead of a single thread that's not limited
+            new Thread(scrollIterationAction).start();
+            return output;
+        } catch (SearchPhaseExecutionException e) {
+            throw createRequestExceptionForParseFailure(query, e);
+        } catch (IndexHelper.InvalidRangeFormatException e) {
+            throw new BadRequestException(e);
         }
     }
 

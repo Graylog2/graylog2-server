@@ -20,6 +20,8 @@
 
 package org.graylog2.rest.resources.search;
 
+import com.google.common.base.Splitter;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.queryparser.classic.Token;
@@ -27,12 +29,10 @@ import org.elasticsearch.ExceptionsHelper;
 import org.elasticsearch.action.search.SearchPhaseExecutionException;
 import org.elasticsearch.action.search.ShardSearchFailure;
 import org.elasticsearch.search.SearchParseException;
+import org.glassfish.jersey.server.ChunkedOutput;
 import org.graylog2.indexer.IndexHelper;
 import org.graylog2.indexer.Indexer;
-import org.graylog2.indexer.results.FieldStatsResult;
-import org.graylog2.indexer.results.HistogramResult;
-import org.graylog2.indexer.results.SearchResult;
-import org.graylog2.indexer.results.TermsResult;
+import org.graylog2.indexer.results.*;
 import org.graylog2.indexer.searches.Searches;
 import org.graylog2.indexer.searches.Sorting;
 import org.graylog2.indexer.searches.timeranges.TimeRange;
@@ -48,6 +48,9 @@ import javax.ws.rs.BadRequestException;
 import javax.ws.rs.ForbiddenException;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -98,6 +101,24 @@ public class SearchResource extends RestResource {
             LOG.warn("Missing parameters. Returning HTTP 400.");
             throw new WebApplicationException(400);
         }
+    }
+
+    protected List<String> parseFields(String fields) {
+        if (fields == null || fields.isEmpty()) {
+            LOG.warn("Missing fields parameter. Returning HTTP 400");
+            throw new BadRequestException("Missing required parameter `fields`");
+        }
+        final Iterable<String> split = Splitter.on(',').omitEmptyStrings().trimResults().split(fields);
+        final ArrayList<String> fieldList = Lists.newArrayList("timestamp", "source");
+        // skip the mandatory fields timestamp and source
+        for (String field : split) {
+            if ("timestamp".equals(field) || "source".equals(field)) {
+                continue;
+            }
+            fieldList.add(field);
+        }
+
+        return fieldList;
     }
 
     protected FieldStatsResult fieldStats(String field, String query, TimeRange timeRange) throws IndexHelper.InvalidRangeFormatException {
@@ -272,4 +293,32 @@ public class SearchResource extends RestResource {
         }
     }
 
+    protected Runnable createScrollChunkProducer(final ScrollResult scroll,
+                                                 final ChunkedOutput<ScrollResult.ScrollChunk> output) {
+        return new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    ScrollResult.ScrollChunk chunk = scroll.nextChunk();
+                    while (chunk != null) {
+                        LOG.debug("[{}] Writing scroll chunk with {} messages",
+                                  scroll.getQueryHash(),
+                                  chunk.getMessages().size());
+                        if (output.isClosed()) {
+                            LOG.debug("[{}] Client connection is closed, client disconnected. Aborting scroll.",
+                                      scroll.getQueryHash());
+                            scroll.cancel();
+                            return;
+                        }
+                        output.write(chunk);
+                        chunk = scroll.nextChunk();
+                    }
+                    LOG.debug("[{}] Reached end of scroll result.", scroll.getQueryHash());
+                    output.close();
+                } catch (IOException e) {
+                    LOG.warn("[{}] Could not close chunked output stream for query scroll.", scroll.getQueryHash());
+                }
+            }
+        };
+    }
 }

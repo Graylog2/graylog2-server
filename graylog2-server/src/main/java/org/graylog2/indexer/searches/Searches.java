@@ -25,6 +25,8 @@ import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.client.Client;
+import org.elasticsearch.common.unit.TimeValue;
+import org.elasticsearch.common.xcontent.XContentHelper;
 import org.elasticsearch.index.query.*;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.facet.FacetBuilders;
@@ -40,8 +42,13 @@ import org.graylog2.indexer.IndexHelper;
 import org.graylog2.indexer.Indexer;
 import org.graylog2.indexer.results.*;
 import org.graylog2.indexer.searches.timeranges.TimeRange;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.util.List;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
 import static org.elasticsearch.index.query.QueryBuilders.queryString;
@@ -50,6 +57,7 @@ import static org.elasticsearch.index.query.QueryBuilders.queryString;
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class Searches {
+    private static final Logger log = LoggerFactory.getLogger(Searches.class);
 
     private final Core server;
 	private final Client c;
@@ -81,6 +89,31 @@ public class Searches {
 
         SearchResponse r = c.search(request).actionGet();
         return new CountResult(r.getHits().getTotalHits(), r.getTookInMillis(), r.getHits());
+    }
+
+    public ScrollResult scroll(String query, TimeRange range, int limit, int offset, List<String> fields, String filter) throws IndexHelper.InvalidRangeFormatException {
+        final Set<String> indices = IndexHelper.determineAffectedIndices(server, range);
+        final SearchRequestBuilder srb = standardSearchRequest(query, indices, limit, offset, range, null, false);
+        if (range != null && filter != null) {
+            srb.setPostFilter(standardFilters(range, filter));
+        }
+
+        // only request the fields we asked for otherwise we can't figure out which fields will be in the result set
+        // until we've scrolled through the entire set.
+        srb.addFields(fields.toArray(new String[fields.size()]));
+        srb.addField("_source"); // always request the _source field because otherwise we can't access non-stored values
+
+        final SearchRequest request = srb.setSearchType(SearchType.SCAN)
+                .setScroll(new TimeValue(1, TimeUnit.MINUTES))
+                .setSize(500).request(); // TODO magic numbers
+        if (log.isDebugEnabled()) {
+            try {
+                log.debug("ElasticSearch scroll query: {}", XContentHelper.convertToJson(request.source(), false));
+            } catch (IOException ignored) {}
+        }
+        final SearchResponse r = c.search(request).actionGet();
+
+        return new ScrollResult(c, query, request.source(), r, fields);
     }
 
     public SearchResult search(String query, TimeRange range, int limit, int offset, Sorting sorting) throws IndexHelper.InvalidRangeFormatException {
@@ -257,7 +290,23 @@ public class Searches {
         return standardSearchRequest(query, indices, 0, 0, range, null);
     }
 
-    private SearchRequestBuilder standardSearchRequest(String query, Set<String> indices, int limit, int offset, TimeRange range, Sorting sort) throws IndexHelper.InvalidRangeFormatException {
+    private SearchRequestBuilder standardSearchRequest(String query,
+                                                       Set<String> indices,
+                                                       int limit,
+                                                       int offset,
+                                                       TimeRange range,
+                                                       Sorting sort) throws IndexHelper.InvalidRangeFormatException {
+        return standardSearchRequest(query, indices, limit, offset, range, sort, true);
+    }
+
+    private SearchRequestBuilder standardSearchRequest(
+            String query,
+            Set<String> indices,
+            int limit,
+            int offset,
+            TimeRange range,
+            Sorting sort,
+            boolean highlight) throws IndexHelper.InvalidRangeFormatException {
         if (query == null || query.trim().isEmpty()) {
             query = "*";
         }
@@ -287,7 +336,7 @@ public class Searches {
             srb.addSort(sort.getField(), sort.asElastic());
         }
 
-        if (server.getConfiguration().isAllowHighlighting()) {
+        if (highlight && server.getConfiguration().isAllowHighlighting()) {
             srb.setHighlighterRequireFieldMatch(false);
             srb.addHighlightedField("*", 0, 0);
         }

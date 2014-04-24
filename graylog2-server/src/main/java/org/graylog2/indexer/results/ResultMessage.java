@@ -27,12 +27,12 @@ import com.google.common.collect.Range;
 import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.highlight.HighlightField;
-import org.graylog2.plugin.Tools;
-import org.joda.time.format.DateTimeFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Map;
+
+import static org.graylog2.plugin.Tools.ES_DATE_FORMAT_FORMATTER;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
@@ -46,11 +46,11 @@ public class ResultMessage {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     public Multimap<String, Range<Integer>> highlightRanges;
 
-	protected ResultMessage() { /* use factory method */}
+    protected ResultMessage() { /* use factory method */}
 	
 	public static ResultMessage parseFromSource(SearchHit hit) {
 		ResultMessage m = new ResultMessage();
-		m.setMessage(hit.getSource());
+        m.setMessage(hit.getSource());
 		m.setIndex(hit.getIndex());
         m.setHighlightRanges(hit.getHighlightFields());
 		return m;
@@ -64,15 +64,15 @@ public class ResultMessage {
 	}
 	
 	public void setMessage(Map<String, Object> message) {
-		this.message = message;
+        this.message = message;
         if (this.message.containsKey("timestamp")) {
             final Object tsField = this.message.get("timestamp");
             try {
                 this.message.put("timestamp",
-                                 DateTimeFormat.forPattern(Tools.ES_DATE_FORMAT).withZoneUTC().parseDateTime(String.valueOf(tsField)));
+                                 ES_DATE_FORMAT_FORMATTER.parseDateTime(String.valueOf(tsField)));
             } catch (IllegalArgumentException e) {
                 // could not parse date string, this is likely a bug, but we will leave the original value alone
-                log.warn("Could not parse timestamp of message {}", message.get("id"),  e);
+                log.warn("Could not parse timestamp of message {}", message.get("id"), e);
             }
         }
     }
