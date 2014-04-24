@@ -104,6 +104,8 @@ public class GELFHttpHandler extends SimpleChannelHandler {
         final HttpResponse response =
             new DefaultHttpResponse(httpRequestVersion, status);
 
+        response.setHeader(HttpHeaders.Names.CONTENT_LENGTH, 0);
+
         if (keepAlive) {
             response.setHeader(HttpHeaders.Names.CONNECTION, HttpHeaders.Values.KEEP_ALIVE);
         }
