@@ -19,39 +19,23 @@
  */
 package org.graylog2.inputs.gelf.http;
 
-import static com.codahale.metrics.MetricRegistry.name;
-import static org.jboss.netty.handler.codec.http.HttpHeaders.isKeepAlive;
-
 import com.codahale.metrics.Meter;
 import org.graylog2.inputs.gelf.gelf.GELFMessage;
 import org.graylog2.inputs.gelf.gelf.GELFProcessor;
-import org.graylog2.plugin.GraylogServer;
 import org.graylog2.plugin.InputHost;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.jboss.netty.buffer.ChannelBuffer;
-import org.jboss.netty.channel.Channel;
-import org.jboss.netty.channel.ChannelFuture;
-import org.jboss.netty.channel.ChannelFutureListener;
-import org.jboss.netty.channel.ChannelHandlerContext;
-import org.jboss.netty.channel.ExceptionEvent;
-import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.channel.SimpleChannelHandler;
-import org.jboss.netty.channel.socket.DatagramChannel;
-import org.jboss.netty.handler.codec.http.DefaultHttpResponse;
-import org.jboss.netty.handler.codec.http.HttpHeaders;
-import org.jboss.netty.handler.codec.http.HttpMethod;
-import org.jboss.netty.handler.codec.http.HttpRequest;
-import org.jboss.netty.handler.codec.http.HttpResponse;
-import org.jboss.netty.handler.codec.http.HttpResponseStatus;
-import org.jboss.netty.handler.codec.http.HttpVersion;
+import org.jboss.netty.channel.*;
+import org.jboss.netty.handler.codec.http.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static com.codahale.metrics.MetricRegistry.name;
+import static org.jboss.netty.handler.codec.http.HttpHeaders.isKeepAlive;
 
 public class GELFHttpHandler extends SimpleChannelHandler {
 
     private static final Logger LOG = LoggerFactory.getLogger(GELFHttpHandler.class);
-
-	private final InputHost server;
 
     private final Meter receivedMessages;
     private final Meter gelfMessages;
@@ -61,7 +45,6 @@ public class GELFHttpHandler extends SimpleChannelHandler {
     private final GELFProcessor gelfProcessor;
 
     public GELFHttpHandler(InputHost server, MessageInput sourceInput) {
-        this.server = server;
         this.gelfProcessor = new GELFProcessor(server);
 
         this.sourceInput = sourceInput;
@@ -104,10 +87,10 @@ public class GELFHttpHandler extends SimpleChannelHandler {
         final HttpResponse response =
             new DefaultHttpResponse(httpRequestVersion, status);
 
-        response.setHeader(HttpHeaders.Names.CONTENT_LENGTH, 0);
+        response.headers().set(HttpHeaders.Names.CONTENT_LENGTH, 0);
 
         if (keepAlive) {
-            response.setHeader(HttpHeaders.Names.CONNECTION, HttpHeaders.Values.KEEP_ALIVE);
+            response.headers().set(HttpHeaders.Names.CONNECTION, HttpHeaders.Values.KEEP_ALIVE);
         }
 
         final ChannelFuture channelFuture = channel.write(response);
