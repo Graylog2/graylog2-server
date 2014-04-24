@@ -64,11 +64,6 @@ public class NodePingThread extends Periodical {
                             .addType(Notification.Type.NO_MASTER)
                             .addSeverity(Notification.Severity.URGENT)
                             .publishIfFirst();
-                    activityWriter.write(
-                            new Activity(
-                                    "No graylog2 master node available. Check the configuration for is_master=true " +
-                                            "on at least one node.",
-                                    NodePingThread.class));
                 }
             } catch (NodeNotFoundException e) {
                 LOG.debug("Our node has immediately been purged again. This should not happen and indicates a clock skew.");
