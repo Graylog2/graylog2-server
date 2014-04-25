@@ -18,12 +18,14 @@
  */
 package models;
 
+import com.google.common.base.Joiner;
 import com.google.common.net.MediaType;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import controllers.routes;
 import lib.APIException;
 import lib.ApiClient;
+import lib.ApiRequestBuilder;
 import lib.Tools;
 import lib.timeranges.TimeRange;
 import models.api.responses.*;
@@ -36,6 +38,7 @@ import play.mvc.Http.Request;
 
 import javax.annotation.Nullable;
 import java.io.IOException;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import static lib.Configuration.apiTimeout;
@@ -102,23 +105,28 @@ public class UniversalSearch {
         }
     }
 
-    private <T> T doSearch(Class<T> clazz, MediaType mediaType, int pageSize) throws APIException, IOException {
-        return api.get(clazz)
+    private <T> T doSearch(Class<T> clazz, MediaType mediaType, int pageSize, Set<String> selectedFields) throws APIException, IOException {
+        final ApiRequestBuilder<T> builder = api.get(clazz)
                 .path("/search/universal/{0}", timeRange.getType().toString().toLowerCase())
                 .queryParams(timeRange.getQueryParams())
                 .queryParam("query", query)
                 .queryParam("limit", pageSize)
                 .queryParam("offset", page * pageSize)
                 .queryParam("filter", (filter == null ? "*" : filter))
-                .queryParam("sort", order.toApiParam())
+                .queryParam("sort", order.toApiParam());
+        if (selectedFields != null && !selectedFields.isEmpty()) {
+            builder.queryParam("fields", Joiner.on(',').skipNulls().join(selectedFields));
+        }
+        final T result = builder
                 .accept(mediaType)
                 .timeout(KEITH, TimeUnit.SECONDS)
                 .expect(200, 400)
                 .execute();
+        return result;
     }
 
     public SearchResult search() throws IOException, APIException {
-        SearchResultResponse response = doSearch(SearchResultResponse.class, MediaType.JSON_UTF_8, PER_PAGE);
+        SearchResultResponse response = doSearch(SearchResultResponse.class, MediaType.JSON_UTF_8, PER_PAGE, null);
         if (response == null) {
             log.error("We should never get an empty result without throwing an IOException.");
             throw new APIException(null, null, new RuntimeException("Empty search response, this is likely a bug in exception handling."));
@@ -140,8 +148,8 @@ public class UniversalSearch {
         return result;
     }
 
-    public String searchAsCsv() throws IOException, APIException {
-        return doSearch(String.class, MediaType.CSV_UTF_8, 100000);  // TODO fix huge page size by using scroll searches and streaming results
+    public String searchAsCsv(Set<String> selectedFields) throws IOException, APIException {
+        return doSearch(String.class, MediaType.CSV_UTF_8, 10_000, selectedFields);  // TODO make use of streaming support in the server.
     }
 
     public DateHistogramResult dateHistogram(String interval) throws IOException, APIException {
@@ -243,6 +251,7 @@ public class UniversalSearch {
         String from = Tools.stringSearchParamOrEmpty(request, "from");
         String to = Tools.stringSearchParamOrEmpty(request, "to");
         String keyword = Tools.stringSearchParamOrEmpty(request, "keyword");
+        String fields = Tools.stringSearchParamOrEmpty(request, "fields");
         if (stream == null) {
             return routes.SearchController.exportAsCsv(
                     query,
@@ -251,7 +260,8 @@ public class UniversalSearch {
                     relative,
                     from,
                     to,
-                    keyword
+                    keyword,
+                    fields
             );
         } else {
             return routes.StreamSearchController.exportAsCsv(
@@ -261,7 +271,8 @@ public class UniversalSearch {
                     relative,
                     from,
                     to,
-                    keyword
+                    keyword,
+                    fields
             );
         }
     }

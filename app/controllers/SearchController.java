@@ -131,7 +131,7 @@ public class SearchController extends AuthenticatedController {
         return selectedFields;
     }
 
-    public Result exportAsCsv(String q, String filter, String rangeType, int relative, String from, String to, String keyword) {
+    public Result exportAsCsv(String q, String filter, String rangeType, int relative, String from, String to, String keyword, String fields) {
         UniversalSearch search;
         try {
             search = getSearch(q, filter.isEmpty() ? null : filter, rangeType, relative, from, to, keyword, 0, UniversalSearch.DEFAULT_SORT);
@@ -143,7 +143,8 @@ public class SearchController extends AuthenticatedController {
 
         final String s;
         try {
-            s = search.searchAsCsv();
+            Set<String> selectedFields = getSelectedFields(fields);
+            s = search.searchAsCsv(selectedFields);
         } catch (IOException e) {
             return status(504, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
         } catch (APIException e) {
