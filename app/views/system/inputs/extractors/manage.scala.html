@@ -2,6 +2,19 @@
 
 @main("Extractors", views.html.system.sidebar(), "", currentUser) {
 
+    <div class="pull-right">
+        <div class="btn-group">
+            <a class="btn btn-info btn-small dropdown-toggle" data-toggle="dropdown" href="#">
+                Actions
+                <span class="caret"></span>
+            </a>
+            <ul class="dropdown-menu">
+                <li><a href="#">Import extractors</a></li>
+                <li><a href="@routes.ExtractorsController.export(node.getNodeId, input.getId)">Export extractors</a></li>
+            </ul>
+        </div>
+    </div>
+
     @views.html.partials.breadcrumbs(breadcrumbs)
 
     <div class="row-fluid">

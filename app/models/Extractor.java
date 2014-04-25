@@ -394,4 +394,26 @@ public class Extractor {
         return order;
     }
 
+    public Map<String, Object> export() {
+        Map<String, Object> export = Maps.newTreeMap();
+
+        List<Map<String, Object>> converterConfigList = Lists.newArrayList();
+        for (Converter converter : converters) {
+            converterConfigList.add(converter.getConfig());
+        }
+
+        export.put("title", title);
+        export.put("order", order);
+        export.put("source_field", sourceField);
+        export.put("target_field", targetField);
+        export.put("cursor_strategy", cursorStrategy.toString().toLowerCase());
+        export.put("condition_type", conditionType.toString().toLowerCase());
+        export.put("condition_value", conditionValue);
+        export.put("extractor_type", extractorType.toString().toLowerCase());
+        export.put("extractor_config", extractorConfig);
+        export.put("converters", converterConfigList);
+
+        return export;
+    }
+
 }

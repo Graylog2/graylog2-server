@@ -18,7 +18,7 @@ GET         /startpage                                                          
 
 # Search
 GET         /search                                                                  @controllers.SearchController.index(q ?= "", rangetype ?= "", relative:Integer ?= -1, from ?= "", to ?= "", keyword ?= "", interval ?= "", page:Integer ?= 1, saved:String ?= "", sortField:String ?= "", sortOrder:String ?= "", fields:String ?= "")
-GET         /search/csv                                                              @controllers.SearchController.exportAsCsv(q ?= "", filter ?= "", rangetype ?= "", relative:Integer ?= -1, from ?= "", to ?= "", keyword ?= "")
+GET         /search/csv                                                              @controllers.SearchController.exportAsCsv(q ?= "", filter ?= "", rangetype ?= "", relative:Integer ?= -1, from ?= "", to ?= "", keyword ?= "", fields:String ?= "")
 
 # Messages
 GET         /messages/:index/:id                                                     @controllers.MessagesController.show(index: String, id: String)
@@ -40,7 +40,7 @@ GET         /streams/:stream_id/edit                                            
 POST        /streams/:stream_id/update                                               @controllers.StreamsController.update(stream_id: String)
 GET         /streams/:stream_id/clone                                                @controllers.StreamsController.cloneStreamForm(stream_id: String)
 POST        /streams/:stream_id/clone                                                @controllers.StreamsController.cloneStream(stream_id: String)
-GET         /streams/:stream_id/csv                                                  @controllers.StreamSearchController.exportAsCsv(q ?= "", stream_id: String, rangetype ?= "", relative:Integer ?= -1, from ?= "", to ?= "", keyword ?= "")
+GET         /streams/:stream_id/csv                                                  @controllers.StreamSearchController.exportAsCsv(q ?= "", stream_id: String, rangetype ?= "", relative:Integer ?= -1, from ?= "", to ?= "", keyword ?= "", fields:String ?="")
 
 # Alerts
 GET         /streams/:stream_id/alerts                                               @controllers.AlertsController.index(stream_id: String)
@@ -103,6 +103,7 @@ GET         /system/inputs/:node_id/:input_id/extractors                        
 GET         /system/inputs/:node_id/:input_id/extractors/new                         @controllers.ExtractorsController.newExtractor(node_id: String, input_id: String, extractor_type ?= "", field ?= "", example ?= "")
 POST        /system/inputs/:node_id/:input_id/extractors                             @controllers.ExtractorsController.create(node_id: String, input_id: String)
 POST        /system/inputs/:node_id/:input_id/extractors/:extractor_id/delete        @controllers.ExtractorsController.delete(node_id: String, input_id: String, extractor_id: String)
+GET         /system/inputs/:node_id/:input_id/extractors/export                      @controllers.ExtractorsController.export(node_id: String, input_id: String)
 
 # Users
 GET         /system/users                                                            @controllers.UsersController.index()
