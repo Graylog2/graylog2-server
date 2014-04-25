@@ -34,6 +34,8 @@ import org.graylog2.system.activities.ActivityWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.ws.rs.HEAD;
+
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
@@ -89,11 +91,6 @@ public class NodePingThread extends Periodical {
                         .addType(Notification.Type.NO_MASTER)
                         .addSeverity(Notification.Severity.URGENT);
                 notificationService.publishIfFirst(notification);
-                activityWriter.write(
-                        new Activity(
-                                "No graylog2 master node available. Check the configuration for is_master=true " +
-                                        "on at least one node.",
-                                NodePingThread.class));
             }
 
         } catch (Exception e) {

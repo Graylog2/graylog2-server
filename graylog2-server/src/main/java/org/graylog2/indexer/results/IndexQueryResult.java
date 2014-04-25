@@ -27,14 +27,12 @@ import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 
 import java.io.IOException;
-import java.util.Iterator;
 import java.util.List;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
 public class IndexQueryResult {
-
     private final String originalQuery;
     private final TimeValue took;
     private final BytesReference builtQuery;
@@ -65,11 +63,9 @@ public class IndexQueryResult {
     protected List<ResultMessage> buildResults(SearchHits hits) {
         List<ResultMessage> r = Lists.newArrayList();
 
-        Iterator<SearchHit> i = hits.iterator();
-        while(i.hasNext()) {
-            r.add(ResultMessage.parseFromSource(i.next()));
+        for (SearchHit hit : hits) {
+            r.add(ResultMessage.parseFromSource(hit));
         }
-
         return r;
     }
 }

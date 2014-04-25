@@ -48,7 +48,6 @@ public class GELFHttpHandler extends SimpleChannelHandler {
                            Buffer processBuffer,
                            MessageInput sourceInput) {
         this.gelfProcessor = new GELFProcessor(metricRegistry, processBuffer);
-
         this.sourceInput = sourceInput;
 
         this.receivedMessages = metricRegistry.meter(name(GELFHttpHandler.class, "receivedMessages"));
@@ -89,9 +88,9 @@ public class GELFHttpHandler extends SimpleChannelHandler {
         final HttpResponse response =
             new DefaultHttpResponse(httpRequestVersion, status);
 
-        if (keepAlive) {
-            response.setHeader(HttpHeaders.Names.CONNECTION, HttpHeaders.Values.KEEP_ALIVE);
-        }
+        response.headers().set(HttpHeaders.Names.CONTENT_LENGTH, 0);
+        response.headers().set(HttpHeaders.Names.CONNECTION,
+                               keepAlive ? HttpHeaders.Values.KEEP_ALIVE : HttpHeaders.Values.CLOSE);
 
         final ChannelFuture channelFuture = channel.write(response);
         if (!keepAlive) {
