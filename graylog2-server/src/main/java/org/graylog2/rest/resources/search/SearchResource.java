@@ -294,8 +294,11 @@ public class SearchResource extends RestResource {
     }
 
     protected Runnable createScrollChunkProducer(final ScrollResult scroll,
-                                                 final ChunkedOutput<ScrollResult.ScrollChunk> output) {
+                                                 final ChunkedOutput<ScrollResult.ScrollChunk> output,
+                                                 final int limit) {
         return new Runnable() {
+            private int collectedHits = 0;
+
             @Override
             public void run() {
                 try {
@@ -311,6 +314,12 @@ public class SearchResource extends RestResource {
                             return;
                         }
                         output.write(chunk);
+                        collectedHits += chunk.getMessages().size();
+                        if (limit != 0 && collectedHits >= limit) {
+                            scroll.cancel();
+                            output.close();
+                            return;
+                        }
                         chunk = scroll.nextChunk();
                     }
                     LOG.debug("[{}] Reached end of scroll result.", scroll.getQueryHash());

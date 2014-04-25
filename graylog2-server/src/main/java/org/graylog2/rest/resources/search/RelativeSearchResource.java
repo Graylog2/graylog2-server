@@ -114,7 +114,7 @@ public class RelativeSearchResource extends SearchResource {
             final ChunkedOutput<ScrollResult.ScrollChunk> output = new ChunkedOutput<>(ScrollResult.ScrollChunk.class);
 
             LOG.debug("[{}] Scroll result contains a total of {} messages", scroll.getQueryHash(), scroll.totalHits());
-            Runnable scrollIterationAction = createScrollChunkProducer(scroll, output);
+            Runnable scrollIterationAction = createScrollChunkProducer(scroll, output, limit);
             // TODO use a shared executor for async responses here instead of a single thread that's not limited
             new Thread(scrollIterationAction).start();
             return output;
