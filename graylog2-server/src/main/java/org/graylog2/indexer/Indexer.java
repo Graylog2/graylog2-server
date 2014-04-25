@@ -139,12 +139,14 @@ public class Indexer {
                         final String id = nodes.next();
                         final String version = nodesList.get(id).get("version").textValue();
                         if (!Version.CURRENT.toString().equals(version)) {
-                            LOG.error("Elasticsearch node is of the wrong version {}, it must be {}!",
+                            LOG.error("Elasticsearch node is of the wrong version {}, it must be {}! " +
+                                              "Please make sure you are running the correct version of ElasticSearch.",
                                       version,
                                       Version.CURRENT.toString());
                         }
                         if (!node.settings().get("cluster.name").equals(clusterName)) {
-                            LOG.error("Elasticsearch cluster name is different, Graylog2 uses `{}`, Elasticsearch cluster uses `{}`",
+                            LOG.error("Elasticsearch cluster name is different, Graylog2 uses `{}`, Elasticsearch cluster uses `{}`. " +
+                                              "Please check the `cluster.name` setting of both Graylog2 and ElasticSearch.",
                                       node.settings().get("cluster.name"), clusterName);
                         }
 
@@ -158,9 +160,9 @@ public class Indexer {
                 }
             }
 
-            UI.exitHardWithWall("No ElasticSearch master was found.",
+            UI.exitHardWithWall("Could not successfully connect to ElasticSearch. Check that your cluster state is not RED " +
+                                        "and that ElasticSearch is running properly.",
                                 new String[]{"graylog2-server/configuring-and-tuning-elasticsearch-for-graylog2-v0200"});
-
         }
 
         messageGateway = new MessageGatewayImpl(server);
