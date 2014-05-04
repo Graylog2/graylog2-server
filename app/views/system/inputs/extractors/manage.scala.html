@@ -9,8 +9,8 @@
                 <span class="caret"></span>
             </a>
             <ul class="dropdown-menu">
-                <li><a href="#">Import extractors</a></li>
-                <li><a href="@routes.ExtractorsController.export(node.getNodeId, input.getId)">Export extractors</a></li>
+                <li><a href="@routes.ExtractorsController.importExtractorsPage(node.getNodeId, input.getId)">Import extractors</a></li>
+                <li><a href="@routes.ExtractorsController.exportExtractors(node.getNodeId, input.getId)">Export extractors</a></li>
             </ul>
         </div>
     </div>

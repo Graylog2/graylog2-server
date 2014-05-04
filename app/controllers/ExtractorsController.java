@@ -21,15 +21,20 @@ package controllers;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 import lib.APIException;
 import lib.ApiClient;
 import lib.BreadcrumbList;
+import lib.Version;
 import models.*;
+import models.api.requests.ExtractorImportRequest;
+import models.api.requests.ExtractorListImportRequest;
 import play.Logger;
 import play.mvc.Result;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -166,23 +171,26 @@ public class ExtractorsController extends AuthenticatedController {
         }
     }
 
-    public Result export(String nodeId, String inputId) {
+    public Result exportExtractors(String nodeId, String inputId) {
         try {
             Node node = nodeService.loadNode(nodeId);
             Input input = node.getInput(inputId);
 
             BreadcrumbList bc = standardBreadcrumbs(node, input);
-            bc.addCrumb("Export", routes.ExtractorsController.export(nodeId, inputId));
+            bc.addCrumb("Export", routes.ExtractorsController.exportExtractors(nodeId, inputId));
 
-            List<Map<String, Object>> exports = Lists.newArrayList();
+            Map<String, Object> result = Maps.newHashMap();
+            List<Map<String, Object>> extractors = Lists.newArrayList();
             for (Extractor extractor : extractorService.all(node, input)) {
-                exports.add(extractor.export());
+                extractors.add(extractor.export());
             }
+            result.put("extractors", extractors);
+            result.put("version", Version.VERSION.toString());
 
             String extractorExport = "[]";
             try {
                 ObjectMapper om = new ObjectMapper();
-                extractorExport = om.writeValueAsString(exports);
+                extractorExport = om.writeValueAsString(result);
             } catch(JsonProcessingException e) {
                 Logger.error("Could not generate extractor export.", e);
             }
@@ -202,6 +210,88 @@ public class ExtractorsController extends AuthenticatedController {
         } catch (NodeService.NodeNotFoundException e) {
             return status(404, views.html.errors.error.render(ApiClient.ERROR_MSG_NODE_NOT_FOUND, e, request()));
         }
+    }
+
+    public Result importExtractorsPage(String nodeId, String inputId) {
+        try {
+            Node node = nodeService.loadNode(nodeId);
+            Input input = node.getInput(inputId);
+
+            BreadcrumbList bc = standardBreadcrumbs(node, input);
+            bc.addCrumb("Import", routes.ExtractorsController.importExtractorsPage(nodeId, inputId));
+
+            return ok(views.html.system.inputs.extractors.importPage.render(
+                    currentUser(),
+                    bc,
+                    node,
+                    input
+            ));
+        } catch (IOException e) {
+            return status(500, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
+        } catch (APIException e) {
+            String message = "Could not fetch system information. We expected HTTP 200, but got a HTTP " + e.getHttpCode() + ".";
+            return status(500, views.html.errors.error.render(message, e, request()));
+        } catch (NodeService.NodeNotFoundException e) {
+            return status(404, views.html.errors.error.render(ApiClient.ERROR_MSG_NODE_NOT_FOUND, e, request()));
+        }
+    }
+
+    public Result importExtractors(String nodeId, String inputId) {
+        Map<String, String> form = flattenFormUrlEncoded(request().body().asFormUrlEncoded());
+
+        if(!form.containsKey("extractors") || form.get("extractors").isEmpty()) {
+            flash("error", "No JSON provided. Please fill out the import definition field.");
+            return redirect(routes.ExtractorsController.importExtractorsPage(nodeId, inputId));
+        }
+
+        ExtractorListImportRequest elir;
+        try {
+            ObjectMapper om = new ObjectMapper();
+            elir = om.readValue(form.get("extractors"), ExtractorListImportRequest.class);
+        } catch(Exception e) {
+            Logger.error("Could not read JSON.", e);
+            flash("error", "Could not read JSON.");
+            return redirect(routes.ExtractorsController.importExtractorsPage(nodeId, inputId));
+        }
+
+        /*
+         * For future versions with breaking changes: check the "version" field in the ExtractorListImportRequest.
+         *
+         * Thank me later.
+         */
+
+        int successes = 0;
+        for (ExtractorImportRequest importRequest : elir.extractors) {
+            try {
+                Node node = nodeService.loadNode(nodeId);
+
+                Extractor.Type type = Extractor.Type.valueOf(importRequest.extractorType.toUpperCase());
+
+                Extractor extractor = extractorFactory.forCreate(
+                        Extractor.CursorStrategy.valueOf(importRequest.cursorStrategy.toUpperCase()),
+                        importRequest.title,
+                        importRequest.sourceField,
+                        importRequest.targetField,
+                        type,
+                        currentUser(),
+                        Extractor.ConditionType.valueOf(importRequest.conditionType.toUpperCase()),
+                        importRequest.conditionValue
+                );
+
+                extractor.loadConfigFromImport(type, importRequest.extractorConfig);
+                extractor.loadConvertersFromImport(importRequest.converters);
+                extractor.setOrder(importRequest.order);
+                extractor.create(node, node.getInput(inputId));
+            } catch (Exception e) {
+                Logger.error("Could not import extractor. Continuing.", e);
+                continue;
+            }
+
+            successes++;
+        }
+
+        flash("success", "Successfully imported " + successes + " of " + elir.extractors.size() + " extractors.");
+        return redirect(routes.ExtractorsController.manage(nodeId, inputId));
     }
 
     private static BreadcrumbList standardBreadcrumbs(Node node, Input input) {

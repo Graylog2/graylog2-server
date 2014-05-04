@@ -1962,7 +1962,7 @@ hr.search-result-head-separator {
     background-color: #00a5cf;
 }
 
-#extractor-export-json {
+.extractor-json {
     width: 90%;
     height: 700px;
     font-family: monospace;

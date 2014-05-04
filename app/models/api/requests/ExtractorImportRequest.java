@@ -1,5 +1,5 @@
-/*
- * Copyright 2013 TORCH UG
+/**
+ * Copyright 2014 Lennart Koopmann <lennart@torch.sh>
  *
  * This file is part of Graylog2.
  *
@@ -15,46 +15,45 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
+ *
  */
 package models.api.requests;
 
-import com.google.gson.annotations.SerializedName;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.List;
 import java.util.Map;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-public class CreateExtractorRequest extends ApiRequest {
+public class ExtractorImportRequest {
 
     public String title;
 
-    @SerializedName("cut_or_copy")
-    public String cutOrCopy;
+    public int order;
 
-    @SerializedName("target_field")
-    public String targetField;
-
-    @SerializedName("source_field")
-    public String sourceField;
-
-    @SerializedName("extractor_type")
-    public String extractorType;
-
-    @SerializedName("creator_user_id")
-    public String creatorUserId;
-
-    @SerializedName("extractor_config")
-    public Map<String, Object> extractorConfig;
-
-    public Map<String, Map<String, Object>> converters;
-
-    @SerializedName("condition_type")
+    @JsonProperty("condition_type")
     public String conditionType;
 
-    @SerializedName("condition_value")
+    @JsonProperty("condition_value")
     public String conditionValue;
 
-    public int order;
+    @JsonProperty("cursor_strategy")
+    public String cursorStrategy;
+
+    @JsonProperty("extractor_type")
+    public String extractorType;
+
+    @JsonProperty("source_field")
+    public String sourceField;
+
+    @JsonProperty("target_field")
+    public String targetField;
+
+    @JsonProperty("extractor_config")
+    public Map<String, Object> extractorConfig;
+
+    public List<Map<String, Object>> converters;
 
 }

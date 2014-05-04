@@ -1,0 +1,28 @@
+@(currentUser: User, breadcrumbs: lib.BreadcrumbList, node: Node, input: Input)
+
+@main("Import extractors", views.html.system.sidebar(), "", currentUser) {
+
+    @views.html.partials.breadcrumbs(breadcrumbs)
+
+    <div class="row-fluid">
+        <h1>
+            <i class="icon icon-cloud-download"></i>
+            Import extractors to input <em>@input.getTitle</em>
+        </h1>
+
+        Exported extractors can be imported to an input. All you need is the JSON export of extractors from any other
+        Graylog2 setup or from the extractor directory on <a href="http://www.graylog2.org/" target="_blank">graylog2.org</a>.
+    </div>
+
+    <form action="@routes.ExtractorsController.importExtractors(node.getNodeId, input.getId)" method="POST">
+        <div class="row-fluid">
+            <textarea class="extractor-json" name="extractors"></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-success" data-confirm="Really add all extractors to this input?">
+            <i class="icon icon-cloud-download"></i>
+            Add extractors to input
+        </button>
+    </form>
+
+}

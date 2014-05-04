@@ -99,7 +99,9 @@ GET         /system/inputs/:node_id/:input_id/extractors                        
 GET         /system/inputs/:node_id/:input_id/extractors/new                         @controllers.ExtractorsController.newExtractor(node_id: String, input_id: String, extractor_type ?= "", field ?= "", example ?= "")
 POST        /system/inputs/:node_id/:input_id/extractors                             @controllers.ExtractorsController.create(node_id: String, input_id: String)
 POST        /system/inputs/:node_id/:input_id/extractors/:extractor_id/delete        @controllers.ExtractorsController.delete(node_id: String, input_id: String, extractor_id: String)
-GET         /system/inputs/:node_id/:input_id/extractors/export                      @controllers.ExtractorsController.export(node_id: String, input_id: String)
+GET         /system/inputs/:node_id/:input_id/extractors/export                      @controllers.ExtractorsController.exportExtractors(node_id: String, input_id: String)
+GET         /system/inputs/:node_id/:input_id/extractors/import                      @controllers.ExtractorsController.importExtractorsPage(node_id: String, input_id: String)
+POST        /system/inputs/:node_id/:input_id/extractors/import                      @controllers.ExtractorsController.importExtractors(node_id: String, input_id: String)
 
 # Users
 GET         /system/users                                                            @controllers.UsersController.index()
