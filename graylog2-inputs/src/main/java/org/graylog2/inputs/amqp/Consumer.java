@@ -56,6 +56,8 @@ public class Consumer {
     private final String exchange;
     private final String routingKey;
 
+    private boolean stopped = false;
+
     private Connection connection;
     private Channel channel;
 
@@ -163,7 +165,7 @@ public class Consumer {
         connection.addShutdownListener(new ShutdownListener() {
             @Override
             public void shutdownCompleted(ShutdownSignalException cause) {
-                while (true) {
+                while (!stopped) {
                     try {
                         LOG.error("AMQP connection lost! Trying reconnect in 1 second.");
 
@@ -188,6 +190,8 @@ public class Consumer {
 
 
     public void stop() throws IOException {
+        this.stopped = true; // Disables reconnector.
+
         if (channel != null && channel.isOpen()) {
             channel.close();
         }
