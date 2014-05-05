@@ -1,6 +1,7 @@
-@(streamId: String, streamRule: models.StreamRule)
+@(streamId: String, streamRule: org.graylog2.restclient.models.StreamRule)
 
-@import models.StreamRule
+@import org.graylog2.restclient.models.StreamRule
+@import org.graylog2.restclient.lib.Version
 
 <form id="streamrule-form"
     @if(streamRule != null) {
@@ -88,7 +89,7 @@
 
                     <br /><br />
                     <i class="icon-github"></i>
-                    <a href="https://github.com/Graylog2/graylog2-server/tree/@lib.Version.VERSION.getBranchName/graylog2-server/src/main/java/org/graylog2/streams/matchers"
+                    <a href="https://github.com/Graylog2/graylog2-server/tree/@Version.VERSION.getBranchName/graylog2-server/src/main/java/org/graylog2/streams/matchers"
                     target="_blank">
                         Take a look at the matcher code on GitHub
                     </a>

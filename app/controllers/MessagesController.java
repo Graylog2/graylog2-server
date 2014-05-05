@@ -22,11 +22,12 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 import com.google.inject.Inject;
-import lib.APIException;
-import lib.ApiClient;
+import org.graylog2.restclient.lib.APIException;
+import org.graylog2.restclient.lib.ApiClient;
 import models.*;
-import models.api.results.MessageAnalyzeResult;
-import models.api.results.MessageResult;
+import org.graylog2.restclient.models.*;
+import org.graylog2.restclient.models.api.results.MessageAnalyzeResult;
+import org.graylog2.restclient.models.api.results.MessageResult;
 import play.Logger;
 import play.mvc.Result;
 

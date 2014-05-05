@@ -1,6 +1,9 @@
-@(currentUser: User, breadcrumbs: lib.BreadcrumbList, radio: Radio, inputTypes: Map[String, models.api.responses.system.InputTypeSummaryResponse])
+@(currentUser: org.graylog2.restclient.models.User, breadcrumbs: lib.BreadcrumbList, radio: org.graylog2.restclient.models.Radio, inputTypes: Map[String, org.graylog2.restclient.models.api.responses.system.InputTypeSummaryResponse])
 
 @import controllers.routes;
+@import org.graylog2.restclient.models._
+@import org.graylog2.restclient.lib.Tools
+@import org.graylog2.restclient.lib.plugin.configuration.DropdownField
 
 @main("Inputs of radio", views.html.system.sidebar(), "", currentUser) {
 
@@ -64,19 +67,19 @@
 
                             <span class="persec">
                                 <i class="icon icon-caret-down channel-direction channel-direction-down"></i>
-                                <span class="rx value">@lib.Tools.byteToHuman(input.getReadBytes)</span>
+                                <span class="rx value">@Tools.byteToHuman(input.getReadBytes)</span>
 
                                 <i class="icon icon-caret-up channel-direction channel-direction-up"></i>
-                                <span class="tx value">@lib.Tools.byteToHuman(input.getWrittenBytes)</span>
+                                <span class="tx value">@Tools.byteToHuman(input.getWrittenBytes)</span>
                             </span>
 
                             <span class="total">
                                 (total:
                                 <i class="icon icon-caret-down channel-direction channel-direction-down"></i>
-                                <span class="rx value">@lib.Tools.byteToHuman(input.getTotalReadBytes)</span>
+                                <span class="rx value">@Tools.byteToHuman(input.getTotalReadBytes)</span>
 
                                 <i class="icon icon-caret-up channel-direction channel-direction-up"></i>
-                                <span class="tx value">@lib.Tools.byteToHuman(input.getTotalWrittenBytes)</span>
+                                <span class="tx value">@Tools.byteToHuman(input.getTotalWrittenBytes)</span>
                                 )
                             </span>
 
@@ -148,7 +151,7 @@
                             }
 
                             @if(field.getType().equals("dropdown")) {
-                                @views.html.system.inputs.fields.dropdown_field(field.asInstanceOf[lib.plugin.configuration.DropdownField])
+                                @views.html.system.inputs.fields.dropdown_field(field.asInstanceOf[DropdownField])
                             }
                         }
                     </div>

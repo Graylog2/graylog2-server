@@ -19,7 +19,7 @@
  */
 package views.helpers;
 
-import lib.DateTools;
+import org.graylog2.restclient.lib.DateTools;
 import org.joda.time.DateTime;
 import play.api.templates.Html;
 

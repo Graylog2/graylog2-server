@@ -19,7 +19,8 @@
 package models;
 
 import com.google.common.collect.Lists;
-import lib.ApiClient;
+import org.graylog2.restclient.lib.ApiClient;
+import org.graylog2.restclient.models.User;
 import play.Play;
 
 import java.util.List;

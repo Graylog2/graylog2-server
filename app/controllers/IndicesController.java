@@ -20,15 +20,15 @@
 package controllers;
 
 import com.google.inject.Inject;
-import lib.APIException;
-import lib.ApiClient;
+import org.graylog2.restclient.lib.APIException;
+import org.graylog2.restclient.lib.ApiClient;
 import lib.BreadcrumbList;
-import models.ClusterService;
-import models.ESClusterHealth;
-import models.IndexService;
-import models.api.responses.system.indices.ClosedIndicesResponse;
-import models.api.responses.system.indices.DeflectorConfigResponse;
-import models.api.responses.system.indices.DeflectorInformationResponse;
+import org.graylog2.restclient.models.ClusterService;
+import org.graylog2.restclient.models.ESClusterHealth;
+import org.graylog2.restclient.models.IndexService;
+import org.graylog2.restclient.models.api.responses.system.indices.ClosedIndicesResponse;
+import org.graylog2.restclient.models.api.responses.system.indices.DeflectorConfigResponse;
+import org.graylog2.restclient.models.api.responses.system.indices.DeflectorInformationResponse;
 import play.mvc.Result;
 
 import java.io.IOException;

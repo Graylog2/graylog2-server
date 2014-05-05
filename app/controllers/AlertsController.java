@@ -20,15 +20,16 @@
 package controllers;
 
 import com.google.inject.Inject;
-import lib.APIException;
-import lib.ApiClient;
-import lib.plugin.configuration.RequestedConfigurationField;
+import org.graylog2.restclient.lib.APIException;
+import org.graylog2.restclient.lib.ApiClient;
+import org.graylog2.restclient.lib.plugin.configuration.RequestedConfigurationField;
 import models.*;
-import models.alerts.Alert;
-import models.alerts.AlertCondition;
-import models.alerts.AlertConditionService;
-import models.api.requests.alerts.CreateAlertConditionRequest;
-import models.api.responses.alarmcallbacks.GetSingleAvailableAlarmCallbackResponse;
+import org.graylog2.restclient.models.*;
+import org.graylog2.restclient.models.alerts.Alert;
+import org.graylog2.restclient.models.alerts.AlertCondition;
+import org.graylog2.restclient.models.alerts.AlertConditionService;
+import org.graylog2.restclient.models.api.requests.alerts.CreateAlertConditionRequest;
+import org.graylog2.restclient.models.api.responses.alarmcallbacks.GetSingleAvailableAlarmCallbackResponse;
 import play.Logger;
 import play.mvc.Result;
 

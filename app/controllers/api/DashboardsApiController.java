@@ -21,26 +21,29 @@ package controllers.api;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 import com.google.inject.Inject;
 import controllers.AuthenticatedController;
-import lib.APIException;
-import lib.ApiClient;
+import org.graylog2.restclient.lib.APIException;
+import org.graylog2.restclient.lib.ApiClient;
 import lib.security.RestPermissions;
-import lib.timeranges.InvalidRangeParametersException;
-import lib.timeranges.TimeRange;
-import models.api.requests.dashboards.UserSetWidgetPositionsRequest;
-import models.dashboards.Dashboard;
-import models.dashboards.DashboardService;
-import models.NodeService;
-import models.dashboards.widgets.*;
+import org.graylog2.restclient.lib.timeranges.InvalidRangeParametersException;
+import org.graylog2.restclient.lib.timeranges.TimeRange;
+import org.graylog2.restclient.models.User;
+import org.graylog2.restclient.models.api.requests.dashboards.UserSetWidgetPositionsRequest;
+import org.graylog2.restclient.models.dashboards.Dashboard;
+import org.graylog2.restclient.models.dashboards.DashboardService;
+import org.graylog2.restclient.models.NodeService;
+import org.graylog2.restclient.models.dashboards.widgets.*;
 import play.Logger;
 import play.mvc.Result;
 import views.helpers.Permissions;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -79,7 +82,7 @@ public class DashboardsApiController extends AuthenticatedController {
     public Result listWritable() {
         try {
             Map<String, Object> result = Maps.newHashMap();
-            for (Dashboard d : dashboardService.getAllWritable(currentUser())) {
+            for (Dashboard d : getAllWritable(currentUser())) {
                 Map<String, String> dashboard = Maps.newHashMap();
 
                 dashboard.put("title", d.getTitle());
@@ -96,6 +99,18 @@ public class DashboardsApiController extends AuthenticatedController {
         } catch (IOException e) {
             return status(504, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
         }
+    }
+
+    private Iterable<? extends Dashboard> getAllWritable(User user) throws IOException, APIException {
+        List<Dashboard> writable = Lists.newArrayList();
+
+        for(Dashboard dashboard : dashboardService.getAll()) {
+            if (Permissions.isPermitted(user, RestPermissions.DASHBOARDS_EDIT, dashboard.getId())) {
+                writable.add(dashboard);
+            }
+        }
+
+        return writable;
     }
 
     public Result setWidgetPositions(String dashboardId) {

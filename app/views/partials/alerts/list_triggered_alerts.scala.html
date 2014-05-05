@@ -1,6 +1,4 @@
-@(alerts: List[models.alerts.Alert],
-        totalAlerts: Long,
-        stream: Stream)
+@(alerts: List[org.graylog2.restclient.models.alerts.Alert], totalAlerts: Long, stream: org.graylog2.restclient.models.Stream)
 
 <h2><i class="icon icon-bell"></i> Triggered alerts</h2>
 Showing the most recent alerts. This stream triggered a total of @totalAlerts alerts.

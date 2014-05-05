@@ -1,4 +1,6 @@
-@(extractor: models.Extractor)
+@(extractor: org.graylog2.restclient.models.Extractor)
+
+@import org.graylog2.restclient.models.Extractor
 
 @if(!extractor.getConditionType().equals(Extractor.ConditionType.NONE)) {
     <div class="extractor-condition-summary">

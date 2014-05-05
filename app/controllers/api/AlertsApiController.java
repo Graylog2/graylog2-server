@@ -24,10 +24,10 @@ import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 import com.google.inject.Inject;
 import controllers.AuthenticatedController;
-import lib.APIException;
-import models.Stream;
-import models.StreamService;
-import models.alerts.Alert;
+import org.graylog2.restclient.lib.APIException;
+import org.graylog2.restclient.models.Stream;
+import org.graylog2.restclient.models.StreamService;
+import org.graylog2.restclient.models.alerts.Alert;
 import play.mvc.Result;
 
 import java.io.IOException;

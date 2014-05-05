@@ -1,5 +1,5 @@
-@(currentUser: User, breadcrumbs: lib.BreadcrumbList, node: Node, input: Input, extractors: List[Extractor])
-
+@(currentUser: org.graylog2.restclient.models.User, breadcrumbs: lib.BreadcrumbList, node: org.graylog2.restclient.models.Node, input: org.graylog2.restclient.models.Input, extractors: List[org.graylog2.restclient.models.Extractor])
+@import org.graylog2.restclient.models.Extractor
 @main("Extractors", views.html.system.sidebar(), "", currentUser) {
 
     @views.html.partials.breadcrumbs(breadcrumbs)

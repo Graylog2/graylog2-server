@@ -18,8 +18,8 @@
  */
 package views.helpers;
 
-import models.User;
-import models.UserService;
+import org.graylog2.restclient.models.User;
+import org.graylog2.restclient.models.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

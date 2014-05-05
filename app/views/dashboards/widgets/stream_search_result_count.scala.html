@@ -1,8 +1,10 @@
-@(widget: models.dashboards.widgets.StreamSearchResultCountWidget)
+@(widget: org.graylog2.restclient.models.dashboards.widgets.StreamSearchResultCountWidget)
+
+@import views.helpers.DashboardWidgetRouteHelper
 
 <div class="search_result_count">
 
-    <a href="@widget.replayRoute()" class="replay-link">
+    <a href="@DashboardWidgetRouteHelper.replayRoute(widget)" class="replay-link">
         <div class="value"><i class="icon icon-refresh"></i></div>
     </a>
 

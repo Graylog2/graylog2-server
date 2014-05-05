@@ -18,8 +18,8 @@
  */
 package views.helpers;
 
-import models.api.responses.SearchResultResponse;
-import models.api.results.SearchResult;
+import org.graylog2.restclient.models.api.responses.SearchResultResponse;
+import org.graylog2.restclient.models.api.results.SearchResult;
 import play.api.templates.HtmlFormat;
 
 public class QueryErrorHelper {

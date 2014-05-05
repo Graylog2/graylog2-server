@@ -19,7 +19,7 @@
 package lib.security;
 
 import models.LocalAdminUser;
-import models.UserService;
+import org.graylog2.restclient.models.UserService;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;

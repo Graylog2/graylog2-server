@@ -1,9 +1,9 @@
 package views.helpers;
 
 import com.google.common.collect.Maps;
-import models.ClusterEntity;
-import models.InputState;
-import models.InputState.InputStateType;
+import org.graylog2.restclient.models.ClusterEntity;
+import org.graylog2.restclient.models.InputState;
+import org.graylog2.restclient.models.InputState.InputStateType;
 
 import java.util.Map;
 

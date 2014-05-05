@@ -1,9 +1,9 @@
 package views.helpers;
 
-import models.ClusterEntity;
-import models.Node;
-import models.NodeService;
-import models.Radio;
+import org.graylog2.restclient.models.ClusterEntity;
+import org.graylog2.restclient.models.Node;
+import org.graylog2.restclient.models.NodeService;
+import org.graylog2.restclient.models.Radio;
 import play.api.templates.Html;
 
 /**

@@ -21,8 +21,8 @@ package controllers;
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 import com.google.inject.Inject;
-import lib.ServerNodes;
-import models.Node;
+import org.graylog2.restclient.lib.ServerNodes;
+import org.graylog2.restclient.models.Node;
 import play.mvc.Http;
 import play.mvc.Result;
 

@@ -20,9 +20,9 @@ package lib.security;
 
 import com.google.inject.Inject;
 import controllers.routes;
-import lib.Graylog2ServerUnavailableException;
-import models.User;
-import models.UserService;
+import org.graylog2.restclient.lib.Graylog2ServerUnavailableException;
+import org.graylog2.restclient.models.User;
+import org.graylog2.restclient.models.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import play.mvc.Http;

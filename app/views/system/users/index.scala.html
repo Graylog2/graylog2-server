@@ -1,5 +1,5 @@
-@(currentUser: User, breadcrumbs: lib.BreadcrumbList, users: List[User], permissions:List[String])
-
+@(currentUser: org.graylog2.restclient.models.User, breadcrumbs: lib.BreadcrumbList, users: List[org.graylog2.restclient.models.User], permissions:List[String])
+@import org.graylog2.restclient.models.User
 @import views.helpers.Permissions._
 @import lib.security.RestPermissions._
 @import controllers.routes

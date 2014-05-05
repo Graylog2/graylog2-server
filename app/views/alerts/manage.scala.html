@@ -1,11 +1,13 @@
-@(currentUser: User, stream: Stream,
-        alertConditions: List[models.alerts.AlertCondition],
+@(currentUser: org.graylog2.restclient.models.User, stream: org.graylog2.restclient.models.Stream,
+        alertConditions: List[org.graylog2.restclient.models.alerts.AlertCondition],
         totalAlerts: Long,
-        alerts: List[models.alerts.Alert],
+        alerts: List[org.graylog2.restclient.models.alerts.Alert],
         users: String,
-        availableAlarmCallbacks: Map[String, models.api.responses.alarmcallbacks.GetSingleAvailableAlarmCallbackResponse],
-        alarmCallbacks: List[AlarmCallback])
+        availableAlarmCallbacks: Map[String, org.graylog2.restclient.models.api.responses.alarmcallbacks.GetSingleAvailableAlarmCallbackResponse],
+        alarmCallbacks: List[org.graylog2.restclient.models.AlarmCallback])
 
+@import org.graylog2.restclient.models.alerts._
+@import org.graylog2.restclient.models.api.responses.alarmcallbacks.GetSingleAvailableAlarmCallbackResponse
 @import lib.security.RestPermissions._
 @import views.helpers.Permissions._
 

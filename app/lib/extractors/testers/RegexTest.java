@@ -20,9 +20,9 @@ package lib.extractors.testers;
 
 import com.google.common.collect.Maps;
 import com.google.inject.Inject;
-import lib.APIException;
-import lib.ApiClient;
-import models.api.responses.RegexTestResponse;
+import org.graylog2.restclient.lib.APIException;
+import org.graylog2.restclient.lib.ApiClient;
+import org.graylog2.restclient.models.api.responses.RegexTestResponse;
 
 import java.io.IOException;
 import java.util.Map;

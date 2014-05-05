@@ -22,10 +22,10 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 import com.google.inject.Inject;
-import lib.APIException;
-import models.MessageCountHistogram;
-import models.MessagesService;
-import models.api.results.DateHistogramResult;
+import org.graylog2.restclient.lib.APIException;
+import org.graylog2.restclient.models.MessageCountHistogram;
+import org.graylog2.restclient.models.MessagesService;
+import org.graylog2.restclient.models.api.results.DateHistogramResult;
 import play.mvc.Result;
 
 import java.io.IOException;

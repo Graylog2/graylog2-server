@@ -20,16 +20,16 @@
 package controllers;
 
 import com.google.inject.Inject;
-import lib.APIException;
-import lib.ApiClient;
+import org.graylog2.restclient.lib.APIException;
+import org.graylog2.restclient.lib.ApiClient;
 import lib.BreadcrumbList;
-import models.NodeService;
-import models.Startpage;
-import models.User;
-import models.api.requests.dashboards.CreateDashboardRequest;
-import models.api.requests.dashboards.UpdateDashboardRequest;
-import models.dashboards.Dashboard;
-import models.dashboards.DashboardService;
+import org.graylog2.restclient.models.NodeService;
+import org.graylog2.restclient.models.Startpage;
+import org.graylog2.restclient.models.User;
+import org.graylog2.restclient.models.api.requests.dashboards.CreateDashboardRequest;
+import org.graylog2.restclient.models.api.requests.dashboards.UpdateDashboardRequest;
+import org.graylog2.restclient.models.dashboards.Dashboard;
+import org.graylog2.restclient.models.dashboards.DashboardService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import play.data.Form;

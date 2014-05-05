@@ -1,4 +1,4 @@
-@(currentUser: User, stream: Stream, streamrules: List[StreamRule], breadcrumbs: lib.BreadcrumbList)
+@(currentUser: org.graylog2.restclient.models.User, stream: org.graylog2.restclient.models.Stream, streamrules: List[org.graylog2.restclient.models.StreamRule], breadcrumbs: lib.BreadcrumbList)
 
 @main("Rules of stream " + stream.getId , views.html.sidebars.standard(currentUser), "", currentUser) {
 

@@ -20,7 +20,9 @@ package lib;
 
 import com.google.common.collect.Maps;
 import com.google.inject.Inject;
-import models.api.responses.NaturalDateTestResponse;
+import org.graylog2.restclient.lib.APIException;
+import org.graylog2.restclient.lib.ApiClient;
+import org.graylog2.restclient.models.api.responses.NaturalDateTestResponse;
 
 import java.io.IOException;
 import java.util.Map;

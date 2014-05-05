@@ -1,13 +1,14 @@
 package controllers;
 
 import com.google.inject.Inject;
-import lib.APIException;
-import lib.ApiClient;
+import org.graylog2.restclient.lib.APIException;
+import org.graylog2.restclient.lib.ApiClient;
 import lib.SearchTools;
-import lib.timeranges.InvalidRangeParametersException;
-import models.*;
-import models.api.results.DateHistogramResult;
-import models.api.results.SearchResult;
+import org.graylog2.restclient.lib.ServerNodes;
+import org.graylog2.restclient.lib.timeranges.InvalidRangeParametersException;
+import org.graylog2.restclient.models.*;
+import org.graylog2.restclient.models.api.results.DateHistogramResult;
+import org.graylog2.restclient.models.api.results.SearchResult;
 import play.mvc.Result;
 
 import java.io.IOException;
@@ -19,6 +20,8 @@ import java.util.Set;
 public class StreamSearchController extends SearchController {
     @Inject
     private StreamService streamService;
+    @Inject
+    private ServerNodes serverNodes;
 
     public Result index(String streamId,
                         String q,
@@ -95,7 +98,7 @@ public class StreamSearchController extends SearchController {
         }
 
         if (searchResult.getTotalResultCount() > 0) {
-            return ok(views.html.search.results.render(currentUser(), search, searchResult, histogramResult, q, page, savedSearch, selectedFields, stream));
+            return ok(views.html.search.results.render(currentUser(), search, searchResult, histogramResult, q, page, savedSearch, selectedFields, serverNodes.asMap(), stream));
         } else {
             return ok(views.html.search.noresults.render(currentUser(), q, searchResult, savedSearch, selectedFields, stream));
         }

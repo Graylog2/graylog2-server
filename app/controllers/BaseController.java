@@ -20,7 +20,7 @@ package controllers;
 
 import com.google.common.collect.Maps;
 import com.google.inject.Inject;
-import lib.ApiClient;
+import org.graylog2.restclient.lib.ApiClient;
 import play.mvc.Controller;
 
 import java.util.Map;

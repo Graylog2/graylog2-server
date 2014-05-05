@@ -1,5 +1,5 @@
-@(currentUser: User, breadcrumbs: lib.BreadcrumbList, node: ClusterEntity, dump: String)
-
+@(currentUser: org.graylog2.restclient.models.User, breadcrumbs: lib.BreadcrumbList, node: org.graylog2.restclient.models.ClusterEntity, dump: String)
+@import org.graylog2.restclient.models._
 @main("Nodes", views.html.system.sidebar(), "", currentUser) {
 
     @views.html.partials.breadcrumbs(breadcrumbs)

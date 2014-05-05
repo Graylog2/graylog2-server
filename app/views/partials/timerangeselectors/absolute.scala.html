@@ -1,10 +1,11 @@
+@import org.graylog2.restclient.lib.DateTools
 <div class="input-prepend">
     <button class="btn set-to-now" type="button">
         <i class="icon icon-magic"></i>
     </button>
 
     <input type="text"
-           placeholder="@lib.DateTools.ES_DATE_FORMAT"
+           placeholder="@DateTools.ES_DATE_FORMAT"
 
            @if(request.getQueryString("rangetype") != null && request.getQueryString("rangetype").equals("absolute")) {
                 value="@request.getQueryString("from")"
@@ -23,7 +24,7 @@
 
 <div class="input-append">
     <input type="text"
-           placeholder="@lib.DateTools.ES_DATE_FORMAT"
+           placeholder="@DateTools.ES_DATE_FORMAT"
 
            @if(request.getQueryString("rangetype") != null && request.getQueryString("rangetype").equals("absolute")) {
                 value="@request.getQueryString("to")"

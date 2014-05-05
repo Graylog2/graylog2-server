@@ -31,8 +31,9 @@ import lib.security.RethrowingFirstSuccessfulStrategy;
 import lib.security.ServerRestInterfaceRealm;
 import models.LocalAdminUser;
 import models.ModelFactoryModule;
-import models.Node;
-import models.UserService;
+import org.graylog2.restclient.lib.*;
+import org.graylog2.restclient.models.Node;
+import org.graylog2.restclient.models.UserService;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationListener;
 import org.apache.shiro.authc.Authenticator;
@@ -126,7 +127,7 @@ public class Global extends GlobalSettings {
             protected void configure() {
                 bind(URI[].class).annotatedWith(Names.named("Initial Nodes")).toInstance(initialNodes);
                 bind(Long.class).annotatedWith(Names.named("Default Timeout"))
-                        .toInstance(lib.Configuration.apiTimeout("DEFAULT"));
+                        .toInstance(org.graylog2.restclient.lib.Configuration.apiTimeout("DEFAULT"));
             }
         });
         modules.add(new ModelFactoryModule());

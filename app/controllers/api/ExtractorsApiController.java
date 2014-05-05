@@ -23,10 +23,10 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 import controllers.AuthenticatedController;
-import lib.APIException;
-import models.ExtractorService;
-import models.InputService;
-import models.NodeService;
+import org.graylog2.restclient.lib.APIException;
+import org.graylog2.restclient.models.ExtractorService;
+import org.graylog2.restclient.models.InputService;
+import org.graylog2.restclient.models.NodeService;
 import play.Logger;
 import play.mvc.Result;
 

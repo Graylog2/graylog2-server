@@ -19,10 +19,10 @@
 package controllers;
 
 import com.google.inject.Inject;
-import lib.APIException;
-import lib.ApiClient;
-import lib.ServerNodes;
-import models.*;
+import org.graylog2.restclient.lib.APIException;
+import org.graylog2.restclient.lib.ApiClient;
+import org.graylog2.restclient.lib.ServerNodes;
+import org.graylog2.restclient.models.*;
 import play.mvc.Result;
 
 import java.io.IOException;

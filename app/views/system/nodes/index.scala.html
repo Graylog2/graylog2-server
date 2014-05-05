@@ -1,10 +1,10 @@
-@(currentUser: User,
+@(currentUser: org.graylog2.restclient.models.User,
     breadcrumbs: lib.BreadcrumbList,
-    jvms: List[NodeJVMStats],
-    nodes: Map[String, Node],
-    radios: Map[String, Radio],
-    buffers: Map[String, BufferInfo])
-
+    jvms: List[org.graylog2.restclient.models.NodeJVMStats],
+    nodes: Map[String, org.graylog2.restclient.models.Node],
+    radios: Map[String, org.graylog2.restclient.models.Radio],
+    buffers: Map[String, org.graylog2.restclient.models.BufferInfo])
+@import org.graylog2.restclient.models._
 @import controllers.routes;
 @import views.helpers.Permissions.isPermitted
 @import lib.security.RestPermissions._

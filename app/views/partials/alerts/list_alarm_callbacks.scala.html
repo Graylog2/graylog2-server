@@ -1,6 +1,6 @@
-@(alarmCallbacks: List[AlarmCallback],
-        availableAlarmCallbacks: Map[String, models.api.responses.alarmcallbacks.GetSingleAvailableAlarmCallbackResponse],
-        stream: Stream)
+@(alarmCallbacks: List[org.graylog2.restclient.models.AlarmCallback],
+        availableAlarmCallbacks: Map[String, org.graylog2.restclient.models.api.responses.alarmcallbacks.GetSingleAvailableAlarmCallbackResponse],
+        stream: org.graylog2.restclient.models.Stream)
 @import lib.security.RestPermissions._
 @import views.helpers.Permissions._
 

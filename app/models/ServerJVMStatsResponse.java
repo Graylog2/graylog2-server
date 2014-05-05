@@ -20,7 +20,7 @@
 package models;
 
 import com.google.gson.annotations.SerializedName;
-import models.api.responses.system.ClusterEntityJVMStatsResponse;
+import org.graylog2.restclient.models.api.responses.system.ClusterEntityJVMStatsResponse;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>

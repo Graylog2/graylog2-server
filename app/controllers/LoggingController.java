@@ -20,14 +20,14 @@ package controllers;
 
 import com.google.common.collect.Maps;
 import com.google.inject.Inject;
-import lib.APIException;
-import lib.ApiClient;
+import org.graylog2.restclient.lib.APIException;
+import org.graylog2.restclient.lib.ApiClient;
 import lib.BreadcrumbList;
-import lib.ServerNodes;
-import models.InternalLogger;
-import models.InternalLoggerSubsystem;
-import models.Node;
-import models.NodeService;
+import org.graylog2.restclient.lib.ServerNodes;
+import org.graylog2.restclient.models.InternalLogger;
+import org.graylog2.restclient.models.InternalLoggerSubsystem;
+import org.graylog2.restclient.models.Node;
+import org.graylog2.restclient.models.NodeService;
 import play.mvc.Result;
 
 import java.io.IOException;

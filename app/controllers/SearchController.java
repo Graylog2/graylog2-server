@@ -24,16 +24,17 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.common.net.MediaType;
 import com.google.inject.Inject;
-import lib.APIException;
-import lib.ApiClient;
-import lib.Field;
-import lib.SearchTools;
+import lib.*;
 import lib.security.RestPermissions;
-import lib.timeranges.InvalidRangeParametersException;
-import lib.timeranges.TimeRange;
-import models.*;
-import models.api.results.DateHistogramResult;
-import models.api.results.SearchResult;
+import org.graylog2.restclient.lib.APIException;
+import org.graylog2.restclient.lib.ApiClient;
+import org.graylog2.restclient.lib.Field;
+import org.graylog2.restclient.lib.ServerNodes;
+import org.graylog2.restclient.lib.timeranges.InvalidRangeParametersException;
+import org.graylog2.restclient.lib.timeranges.TimeRange;
+import org.graylog2.restclient.models.*;
+import org.graylog2.restclient.models.api.results.DateHistogramResult;
+import org.graylog2.restclient.models.api.results.SearchResult;
 import play.mvc.Result;
 import views.helpers.Permissions;
 
@@ -51,6 +52,9 @@ public class SearchController extends AuthenticatedController {
 
     @Inject
     protected SavedSearchService savedSearchService;
+
+    @Inject
+    private ServerNodes serverNodes;
 
     public Result globalSearch() {
         // User would not be allowed to do any global searches anyway, so we can redirect him to the streams page to avoid confusion.
@@ -115,7 +119,7 @@ public class SearchController extends AuthenticatedController {
         }
 
         if (searchResult.getTotalResultCount() > 0) {
-            return ok(views.html.search.results.render(currentUser(), search, searchResult, histogramResult, q, page, savedSearch, selectedFields, null));
+            return ok(views.html.search.results.render(currentUser(), search, searchResult, histogramResult, q, page, savedSearch, selectedFields, serverNodes.asMap(), null));
         } else {
             return ok(views.html.search.noresults.render(currentUser(), q, searchResult, savedSearch, selectedFields, null));
         }

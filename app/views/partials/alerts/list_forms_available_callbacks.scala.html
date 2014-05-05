@@ -1,5 +1,7 @@
-@(availableAlarmCallbacks: Map[String, models.api.responses.alarmcallbacks.GetSingleAvailableAlarmCallbackResponse],
-        stream: Stream)
+@(availableAlarmCallbacks: Map[String, org.graylog2.restclient.models.api.responses.alarmcallbacks.GetSingleAvailableAlarmCallbackResponse],
+        stream: org.graylog2.restclient.models.Stream)
+
+@import org.graylog2.restclient.lib.plugin.configuration.DropdownField
 
 @for((callbackType, details) <- availableAlarmCallbacks) {
     <form action="@routes.AlarmCallbacksController.create(stream.getId)" method="POST" class="alert-destination-form alert-destination-form-value" data-callback-type="@callbackType">
@@ -26,7 +28,7 @@
                 }
 
                 @if(field.getType().equals("dropdown")) {
-                    @views.html.system.inputs.fields.dropdown_field(field.asInstanceOf[lib.plugin.configuration.DropdownField])
+                    @views.html.system.inputs.fields.dropdown_field(field.asInstanceOf[DropdownField])
                 }
             }
 

@@ -1,5 +1,5 @@
-@(currentUser: User, breadcrumbs: lib.BreadcrumbList, node: ClusterEntity, metrics: Map[String, lib.metrics.Metric], preFilter: String)
-
+@(currentUser: org.graylog2.restclient.models.User, breadcrumbs: lib.BreadcrumbList, node: org.graylog2.restclient.models.ClusterEntity, metrics: Map[String, org.graylog2.restclient.lib.metrics.Metric], preFilter: String)
+@import org.graylog2.restclient.lib.metrics.Metric
 @main("Metrics", views.html.system.sidebar(), "", currentUser) {
 
     @views.html.partials.breadcrumbs(breadcrumbs)
@@ -24,19 +24,19 @@
         @if(metric != null) {
             <li data-metricname="@name" @if(!name.matches("^" + preFilter + ".*")){ style="display: none;" }>
                 <div class="name">
-                    @if(metric.getType.equals(lib.metrics.Metric.MetricType.TIMER)) {
+                    @if(metric.getType.equals(Metric.MetricType.TIMER)) {
                         <i class="icon icon-time"></i>
                     }
 
-                    @if(metric.getType.equals(lib.metrics.Metric.MetricType.HISTOGRAM)) {
+                    @if(metric.getType.equals(Metric.MetricType.HISTOGRAM)) {
                         <i class="icon icon-signal"></i>
                     }
 
-                    @if(metric.getType.equals(lib.metrics.Metric.MetricType.METER)) {
+                    @if(metric.getType.equals(Metric.MetricType.METER)) {
                         <i class="icon icon-play-circle"></i>
                     }
 
-                    @if(metric.getType.equals(lib.metrics.Metric.MetricType.GAUGE)) {
+                    @if(metric.getType.equals(Metric.MetricType.GAUGE)) {
                         <i class="icon icon-dashboard"></i>
                     }
 

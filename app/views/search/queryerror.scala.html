@@ -1,7 +1,7 @@
-@(currentUser: User, query: String, searchResult: models.api.results.SearchResult, savedSearch: SavedSearch, fields: String)(implicit stream: Stream)
+@(currentUser: org.graylog2.restclient.models.User, query: String, searchResult: org.graylog2.restclient.models.api.results.SearchResult, savedSearch: org.graylog2.restclient.models.SavedSearch, fields: String)(implicit stream: org.graylog2.restclient.models.Stream)
 
 @import views.helpers.QueryErrorHelper
-@import models.api.responses.SearchResultResponse.GenericError
+@import org.graylog2.restclient.models.api.responses.SearchResultResponse.GenericError
 
 @main("Query error", sidebars.standard(currentUser), query, currentUser) {
 

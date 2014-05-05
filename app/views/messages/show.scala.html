@@ -1,6 +1,7 @@
-@(currentUser: User, message: models.api.results.MessageResult,  messageStreams: List[models.Stream], sourceInput: Input, sourceNode: Node, sourceRadio: Radio, sourceRadioInput: Input)
+@(currentUser: org.graylog2.restclient.models.User, message: org.graylog2.restclient.models.api.results.MessageResult,  messageStreams: List[org.graylog2.restclient.models.Stream], sourceInput: org.graylog2.restclient.models.Input, sourceNode: org.graylog2.restclient.models.Node, sourceRadio: org.graylog2.restclient.models.Radio, sourceRadioInput: org.graylog2.restclient.models.Input)
 
-@import lib.DateTools
+@import org.graylog2.restclient.lib.DateTools
+@import org.graylog2.restclient.lib.Tools
 
 @main("Message " + message.getId, sidebars.standard(currentUser), "", currentUser) {
 
@@ -57,23 +58,23 @@
                     </a>
 
                     <ul class="dropdown-menu">
-                        <li><a href="#" class="search-link" data-field="@key" data-value="@lib.Tools.removeTrailingNewline(value)">Search for value</a></li>
+                        <li><a href="#" class="search-link" data-field="@key" data-value="@Tools.removeTrailingNewline(value)">Search for value</a></li>
 
                         @if(sourceNode != null && sourceInput != null) {
                         <li class="dropdown-submenu">
                             <a href="#">Create extractor</a>
 
                             <ul class="dropdown-menu type-selector">
-                                <li><a href="@routes.ExtractorsController.newExtractor(sourceNode.getNodeId, sourceInput.getId, "regex", key, lib.Tools.removeTrailingNewline(value).toString)">Regular expression</a></li>
-                                <li><a href="@routes.ExtractorsController.newExtractor(sourceNode.getNodeId, sourceInput.getId, "substring", key, lib.Tools.removeTrailingNewline(value).toString)">Substring</a></li>
-                                <li><a href="@routes.ExtractorsController.newExtractor(sourceNode.getNodeId, sourceInput.getId, "split_and_index", key, lib.Tools.removeTrailingNewline(value).toString)">Split &amp; Index</a></li>
+                                <li><a href="@routes.ExtractorsController.newExtractor(sourceNode.getNodeId, sourceInput.getId, "regex", key, Tools.removeTrailingNewline(value).toString)">Regular expression</a></li>
+                                <li><a href="@routes.ExtractorsController.newExtractor(sourceNode.getNodeId, sourceInput.getId, "substring", key, Tools.removeTrailingNewline(value).toString)">Substring</a></li>
+                                <li><a href="@routes.ExtractorsController.newExtractor(sourceNode.getNodeId, sourceInput.getId, "split_and_index", key, Tools.removeTrailingNewline(value).toString)">Split &amp; Index</a></li>
                             </ul>
                         </li>
                     }
                     </ul>
                 </div>
             </dt>
-            <dd style="word-wrap: break-word;"><a href="#" data-field="@key" data-value="@lib.Tools.optionalLongValue(lib.Tools.removeTrailingNewline(message.getFields.get(key)))" class="search-link nolink">@lib.Tools.orNbsp(lib.Tools.removeTrailingNewline(value))</a></dd>
+            <dd style="word-wrap: break-word;"><a href="#" data-field="@key" data-value="@Tools.optionalLongValue(Tools.removeTrailingNewline(message.getFields.get(key)))" class="search-link nolink">@Tools.orNbsp(Tools.removeTrailingNewline(value))</a></dd>
         }
         </dl>
 

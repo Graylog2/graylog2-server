@@ -1,10 +1,12 @@
-@(input: Input,
-        nodeStates: Map[ClusterEntity, InputState],
-        inputTypes: Map[String, models.api.responses.system.InputTypeSummaryResponse],
-        masterNode: Node)
+@(input: org.graylog2.restclient.models.Input,
+        nodeStates: Map[org.graylog2.restclient.models.ClusterEntity, org.graylog2.restclient.models.InputState],
+        inputTypes: Map[String, org.graylog2.restclient.models.api.responses.system.InputTypeSummaryResponse],
+        masterNode: org.graylog2.restclient.models.Node)
+@import org.graylog2.restclient.models._
 @import views.helpers.Permissions._
 @import lib.security.RestPermissions._
 @import controllers.routes
+@import org.graylog2.restclient.lib.Tools
 
 <div class="row-fluid node-row">
     <span class="pull-right node-row-info">
@@ -57,19 +59,19 @@
             Network IO:
                 <span class="global-persec">
                     <i class="icon icon-caret-down channel-direction channel-direction-down"></i>
-                    <span class="rx value">@lib.Tools.byteToHuman(0)</span>
+                    <span class="rx value">@Tools.byteToHuman(0)</span>
 
                     <i class="icon icon-caret-up channel-direction channel-direction-up"></i>
-                    <span class="tx value">@lib.Tools.byteToHuman(0)</span>
+                    <span class="tx value">@Tools.byteToHuman(0)</span>
                 </span>
 
                 <span class="global-total">
                     (total:
                     <i class="icon icon-caret-down channel-direction channel-direction-down"></i>
-                    <span class="rx value">@lib.Tools.byteToHuman(0)</span>
+                    <span class="rx value">@Tools.byteToHuman(0)</span>
 
                     <i class="icon icon-caret-up channel-direction channel-direction-up"></i>
-                    <span class="tx value">@lib.Tools.byteToHuman(0)</span>
+                    <span class="tx value">@Tools.byteToHuman(0)</span>
                     )
                 </span>
 
@@ -87,19 +89,19 @@
                         @node.getShortNodeId / @node.getHostname:
                     <span class="persec">
                         <i class="icon icon-caret-down channel-direction channel-direction-down"></i>
-                        <span class="rx value">@lib.Tools.byteToHuman(nodeState.getInput.getReadBytes)</span>
+                        <span class="rx value">@Tools.byteToHuman(nodeState.getInput.getReadBytes)</span>
 
                         <i class="icon icon-caret-up channel-direction channel-direction-up"></i>
-                        <span class="tx value">@lib.Tools.byteToHuman(nodeState.getInput.getWrittenBytes)</span>
+                        <span class="tx value">@Tools.byteToHuman(nodeState.getInput.getWrittenBytes)</span>
                     </span>
 
                     <span class="total">
                                     (total:
                         <i class="icon icon-caret-down channel-direction channel-direction-down"></i>
-                        <span class="rx value">@lib.Tools.byteToHuman(nodeState.getInput.getTotalReadBytes)</span>
+                        <span class="rx value">@Tools.byteToHuman(nodeState.getInput.getTotalReadBytes)</span>
 
                         <i class="icon icon-caret-up channel-direction channel-direction-up"></i>
-                        <span class="tx value">@lib.Tools.byteToHuman(nodeState.getInput.getTotalWrittenBytes)</span>
+                        <span class="tx value">@Tools.byteToHuman(nodeState.getInput.getTotalWrittenBytes)</span>
                         )
                     </span>
                 </div>

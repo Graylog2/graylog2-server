@@ -19,13 +19,13 @@
 package controllers;
 
 import com.google.inject.Inject;
-import lib.APIException;
-import lib.ApiClient;
-import lib.ServerNodes;
-import models.Node;
-import models.StreamService;
-import models.Stream;
-import models.api.requests.streams.CreateStreamRequest;
+import org.graylog2.restclient.lib.APIException;
+import org.graylog2.restclient.lib.ApiClient;
+import org.graylog2.restclient.lib.ServerNodes;
+import org.graylog2.restclient.models.Node;
+import org.graylog2.restclient.models.StreamService;
+import org.graylog2.restclient.models.Stream;
+import org.graylog2.restclient.models.api.requests.streams.CreateStreamRequest;
 import play.data.Form;
 import play.mvc.Result;
 import views.html.streams.clone_stream;

@@ -1,8 +1,9 @@
-@(title: String, sidebarContent: Html, searchQuery: String = "", currentUser: User, hasSearch: Boolean = true)(content: Html)(implicit stream: Stream = null)
+@(title: String, sidebarContent: Html, searchQuery: String = "", currentUser: org.graylog2.restclient.models.User, hasSearch: Boolean = true)(content: Html)(implicit stream: org.graylog2.restclient.models.Stream = null)
 
 @import views.helpers.Permissions._
 @import lib.security.RestPermissions._
-@import lib.Configuration
+@import org.graylog2.restclient.lib.Configuration
+@import org.graylog2.restclient.lib.Version
 
 <!DOCTYPE html>
 <html lang="en">
@@ -67,7 +68,7 @@
 	   </div>
 
        <div id="footer">
-            graylog2-web-interface v@lib.Version.VERSION
+            graylog2-web-interface v@Version.VERSION
             (@System.getProperty("java.vendor") @System.getProperty("java.version") / @System.getProperty("os.name") @System.getProperty("os.version"))
             on @lib.Localhost.getLocalHostname
        </div>

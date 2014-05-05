@@ -1,11 +1,21 @@
 
-@(currentUser: User, search: UniversalSearch, searchResult: models.api.results.SearchResult, histogram: models.api.results.DateHistogramResult, query: String, page: Integer, savedSearch: SavedSearch, selectedFields: java.util.Set[String])(implicit stream: Stream)
+@(currentUser: org.graylog2.restclient.models.User,
+        search: org.graylog2.restclient.models.UniversalSearch,
+        searchResult: org.graylog2.restclient.models.api.results.SearchResult,
+        histogram: org.graylog2.restclient.models.api.results.DateHistogramResult,
+        query: String,
+        page: Integer,
+        savedSearch: org.graylog2.restclient.models.SavedSearch,
+        selectedFields: java.util.Set[String],
+        nodes: Map[String, org.graylog2.restclient.models.Node])(implicit stream: org.graylog2.restclient.models.Stream)
 
 @import lib.security.RestPermissions
 @import views.helpers.DateHistogramResolutionSelector
 @import views.helpers.Permissions
-@import lib.DateTools
+@import org.graylog2.restclient.lib.DateTools
 @import controllers.routes;
+@import views.helpers.SearchRouteHelper
+@import org.graylog2.restclient.models.UniversalSearch
 
 @paginatorLength() = @{10}
 
@@ -61,9 +71,15 @@
             <span class="caret"></span>
         </a>
         <ul class="dropdown-menu">
-            <li><a href="@search.getCsvRoute(request(), stream)">Download as CSV</a></li>
+            <li><a href="@SearchRouteHelper.getCsvRoute(request(), stream, search)">Download as CSV</a></li>
         </ul>
     </div>
+
+    @if(stream != null) {
+    <div class="btn-group">
+        @views.html.partials.streams.action_menu.render(stream, nodes, currentUser, "btn-small")
+    </div>
+    }
 
     <a href="#" class="btn btn-small clear-pinned-charts" title="Reset/clear all pinned charts." style="display: none;">
         Clear pinned charts

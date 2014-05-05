@@ -1,7 +1,10 @@
-@(currentUser: User, breadcrumbs: lib.BreadcrumbList, dashboard: models.dashboards.Dashboard)
+@(currentUser: org.graylog2.restclient.models.User, breadcrumbs: lib.BreadcrumbList, dashboard: org.graylog2.restclient.models.dashboards.Dashboard)
 
 @import views.helpers.Permissions._
 @import lib.security.RestPermissions._
+@import views.helpers.DashboardWidgetRouteHelper
+@import org.graylog2.restclient.models.dashboards.Dashboard
+@import org.graylog2.restclient.models.dashboards.widgets._
 
 @main(dashboard.getTitle, null, "", currentUser, false) {
 
@@ -80,24 +83,24 @@
                                 </span>
                             </div>
 
-                            @if(widget.getType.equals(models.dashboards.widgets.DashboardWidget.Type.SEARCH_RESULT_COUNT)) {
-                                @views.html.dashboards.widgets.search_result_count(widget.asInstanceOf[models.dashboards.widgets.SearchResultCountWidget])
+                            @if(widget.getType.equals(DashboardWidget.Type.SEARCH_RESULT_COUNT)) {
+                                @views.html.dashboards.widgets.search_result_count(widget.asInstanceOf[SearchResultCountWidget])
                             }
 
-                            @if(widget.getType.equals(models.dashboards.widgets.DashboardWidget.Type.STREAM_SEARCH_RESULT_COUNT)) {
-                                @views.html.dashboards.widgets.stream_search_result_count(widget.asInstanceOf[models.dashboards.widgets.StreamSearchResultCountWidget])
+                            @if(widget.getType.equals(DashboardWidget.Type.STREAM_SEARCH_RESULT_COUNT)) {
+                                @views.html.dashboards.widgets.stream_search_result_count(widget.asInstanceOf[StreamSearchResultCountWidget])
                             }
 
-                            @if(widget.getType.equals(models.dashboards.widgets.DashboardWidget.Type.FIELD_CHART)) {
-                                @views.html.dashboards.widgets.field_chart(widget.asInstanceOf[models.dashboards.widgets.FieldChartWidget])
+                            @if(widget.getType.equals(DashboardWidget.Type.FIELD_CHART)) {
+                                @views.html.dashboards.widgets.field_chart(widget.asInstanceOf[FieldChartWidget])
                             }
 
-                            @if(widget.getType.equals(models.dashboards.widgets.DashboardWidget.Type.QUICKVALUES)) {
-                                @views.html.dashboards.widgets.quickvalues(widget.asInstanceOf[models.dashboards.widgets.QuickvaluesWidget])
+                            @if(widget.getType.equals(DashboardWidget.Type.QUICKVALUES)) {
+                                @views.html.dashboards.widgets.quickvalues(widget.asInstanceOf[QuickvaluesWidget])
                             }
 
-                            @if(widget.getType.equals(models.dashboards.widgets.DashboardWidget.Type.SEARCH_RESULT_CHART)) {
-                                @views.html.dashboards.widgets.search_result_chart(widget.asInstanceOf[models.dashboards.widgets.SearchResultChartWidget])
+                            @if(widget.getType.equals(DashboardWidget.Type.SEARCH_RESULT_CHART)) {
+                                @views.html.dashboards.widgets.search_result_chart(widget.asInstanceOf[SearchResultChartWidget])
                             }
 
                         </div>
@@ -197,7 +200,7 @@
                 <a class="btn" href="@routes.MetricsController.ofMasterNode("org.graylog2.dashboards.widgets.*." + widget.getId)">
                     Show widget metrics
                 </a>
-                <a class="btn btn-success" href="@widget.replayRoute()">
+                <a class="btn btn-success" href="@DashboardWidgetRouteHelper.replayRoute(widget)">
                     Replay search
                 </a>
                 <button class="btn btn-primary" data-dismiss="modal" aria-hidden="true">Close</button>

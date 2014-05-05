@@ -20,11 +20,12 @@
 package controllers;
 
 import com.google.inject.Inject;
-import models.Startpage;
-import models.User;
-import models.UserService;
+import org.graylog2.restclient.models.Startpage;
+import org.graylog2.restclient.models.User;
+import org.graylog2.restclient.models.UserService;
 import play.mvc.Call;
 import play.mvc.Result;
+import views.helpers.StartpageRouteHelper;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
@@ -38,10 +39,10 @@ public class StartpageController extends AuthenticatedController {
         Startpage startpage = currentUser().getStartpage();
 
         Call call;
-        if (startpage == null || startpage.getCall() == null) {
+        if (startpage == null || StartpageRouteHelper.getCall(startpage) == null) {
             call = routes.SearchController.globalSearch();
         } else {
-            call = startpage.getCall();
+            call = StartpageRouteHelper.getCall(startpage);
         }
 
         return redirect(call);

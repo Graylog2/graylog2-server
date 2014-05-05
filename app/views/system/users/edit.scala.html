@@ -1,19 +1,19 @@
-@(form: Form[models.api.requests.ChangeUserRequestForm],
+@(form: Form[org.graylog2.restclient.models.api.requests.ChangeUserRequestForm],
         username: String,
-        currentUser: User,
-        user: User,
+        currentUser: org.graylog2.restclient.models.User,
+        user: org.graylog2.restclient.models.User,
         requiresOldPassword: Boolean,
         permissions: List[String],
         selectedPermissions: Set[String],
         timezones: Map[String, Collection[String]],
-        streams: List[models.Stream],
-        dashboards: List[models.dashboards.Dashboard],
+        streams: List[org.graylog2.restclient.models.Stream],
+        dashboards: List[org.graylog2.restclient.models.dashboards.Dashboard],
         breadcrumbs: lib.BreadcrumbList)
-
 @import com.google.common.collect.ImmutableList
 @import views.helpers.Permissions._
 @import lib.security.RestPermissions._
 @import controllers.routes
+@import views.helpers.StartpageRouteHelper
 
 @main("Users", views.html.system.sidebar(), "", currentUser) {
 
@@ -206,7 +206,7 @@
                 <em>@user.getStartpage.getType.toString.toLowerCase</em> with ID
                 <em>@user.getStartpage.getId</em>.
 
-                <a href="@user.getStartpage.getCall">
+                <a href="@StartpageRouteHelper.getCall(user.getStartpage)">
                     &nbsp;<i class="icon icon-angle-right"></i> Open
                 </a>
 

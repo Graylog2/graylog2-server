@@ -21,7 +21,7 @@ package controllers.api;
 import com.google.gson.Gson;
 import com.google.inject.Inject;
 import controllers.AuthenticatedController;
-import lib.APIException;
+import org.graylog2.restclient.lib.APIException;
 import lib.NaturalDateTest;
 import lib.extractors.testers.RegexTest;
 import lib.extractors.testers.SplitAndIndexTest;

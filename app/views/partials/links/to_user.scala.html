@@ -1,4 +1,4 @@
-@(user: User)
+@(user: org.graylog2.restclient.models.User)
 @if(user != null) {
 <a href="@routes.UsersController.show(user.getName)"><i class="icon icon-user"></i> @user.getFullName</a>
 } else {

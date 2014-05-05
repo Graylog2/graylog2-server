@@ -1,5 +1,4 @@
-@(user: User, currentUser: User, breadcrumbs: lib.BreadcrumbList)
-
+@(user: org.graylog2.restclient.models.User, currentUser: org.graylog2.restclient.models.User, breadcrumbs: lib.BreadcrumbList)
 @main("Users", views.html.system.sidebar(), "", currentUser) {
 
     @views.html.partials.breadcrumbs(breadcrumbs)

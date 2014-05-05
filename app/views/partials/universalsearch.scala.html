@@ -1,4 +1,4 @@
-@(searchQuery: String)(implicit stream: Stream = null)
+@(searchQuery: String)(implicit stream: org.graylog2.restclient.models.Stream = null)
 
 @import views.helpers.Permissions.isPermitted
 @import lib.security.RestPermissions.SAVEDSEARCHES_READ

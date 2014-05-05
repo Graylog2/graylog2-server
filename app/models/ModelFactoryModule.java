@@ -20,9 +20,10 @@ package models;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
-import models.accounts.LdapSettings;
-import models.alerts.AlertCondition;
-import models.dashboards.Dashboard;
+import org.graylog2.restclient.models.*;
+import org.graylog2.restclient.models.accounts.LdapSettings;
+import org.graylog2.restclient.models.alerts.AlertCondition;
+import org.graylog2.restclient.models.dashboards.Dashboard;
 
 /**
  * Provides the bindings for the factories of our models to avoid having lots of static methods everywhere.

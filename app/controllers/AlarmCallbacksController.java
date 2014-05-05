@@ -1,9 +1,9 @@
 package controllers;
 
-import lib.APIException;
-import models.AlarmCallback;
-import models.AlarmCallbackService;
-import models.api.requests.alarmcallbacks.CreateAlarmCallbackRequest;
+import org.graylog2.restclient.lib.APIException;
+import org.graylog2.restclient.models.AlarmCallback;
+import org.graylog2.restclient.models.AlarmCallbackService;
+import org.graylog2.restclient.models.api.requests.alarmcallbacks.CreateAlarmCallbackRequest;
 import play.data.Form;
 import play.mvc.Result;
 

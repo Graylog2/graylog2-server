@@ -1,15 +1,12 @@
 package controllers;
 
 import com.google.inject.Inject;
-import lib.APIException;
-import lib.ApiClient;
+import org.graylog2.restclient.lib.APIException;
+import org.graylog2.restclient.lib.ApiClient;
 import lib.BreadcrumbList;
-import models.Stream;
-import models.StreamRule;
-import models.StreamRuleService;
-import models.StreamService;
-import models.api.requests.streams.CreateStreamRuleRequest;
-import models.api.responses.streams.CreateStreamRuleResponse;
+import org.graylog2.restclient.models.*;
+import org.graylog2.restclient.models.api.requests.streams.CreateStreamRuleRequest;
+import org.graylog2.restclient.models.api.responses.streams.CreateStreamRuleResponse;
 import play.data.Form;
 import play.mvc.Result;
 

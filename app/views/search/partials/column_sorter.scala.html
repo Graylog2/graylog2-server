@@ -1,4 +1,5 @@
-@(field: String, search: UniversalSearch, page: Integer)
+@(field: String, search: org.graylog2.restclient.models.UniversalSearch, page: Integer)
+@import views.helpers.SearchRouteHelper
 
 @if(field.equals(search.getOrder.getField)) {
     @if(search.getOrder.isAscending) {
@@ -12,22 +13,22 @@
     @*** This strange if() construct is necessary for display order reason lol ***@
 
     @if(!search.getOrder.isAscending) {
-        <a href="@search.getRoute(request(), page, field, "asc")">
+        <a href="@SearchRouteHelper.getRoute(search, request(), page, field, "asc")">
             <i class="icon icon-sort-by-attributes-alt icon-flip-vertical sort-order sort-order-asc choose-sort-order" title="Sort ascending" style="display: none;"></i>
         </a>
     }
 
     @if(!search.getOrder.isDescending) {
-        <a href="@search.getRoute(request(), page, field, "desc")">
+        <a href="@SearchRouteHelper.getRoute(search, request(), page, field, "desc")">
             <i class="icon icon-sort-by-attributes-alt sort-order choose-sort-order sort-order-desc" title="Sort descending" style="display: none;"></i>
         </a>
     }
 } else {
-    <a href="@search.getRoute(request(), page, field, "asc")">
+    <a href="@SearchRouteHelper.getRoute(search, request(), page, field, "asc")">
         <i class="icon icon-sort-by-attributes-alt icon-flip-vertical sort-order sort-order-asc choose-sort-order" title="Sort ascending" style="display: none;"></i>
     </a>
 
-    <a href="@search.getRoute(request(), page, field, "desc")">
+    <a href="@SearchRouteHelper.getRoute(search, request(), page, field, "desc")">
         <i class="icon icon-sort-by-attributes-alt sort-order choose-sort-order sort-order-desc" title="Sort descending" style="display: none;"></i>
     </a>
 }

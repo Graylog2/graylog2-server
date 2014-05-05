@@ -1,4 +1,4 @@
-@(currentUser: User, query: String, searchResult: models.api.results.SearchResult, savedSearch: SavedSearch, fields: Set[String])(implicit stream: Stream)
+@(currentUser: org.graylog2.restclient.models.User, query: String, searchResult: org.graylog2.restclient.models.api.results.SearchResult, savedSearch: org.graylog2.restclient.models.SavedSearch, fields: Set[String])(implicit stream: org.graylog2.restclient.models.Stream)
 
 @main("Search results", sidebars.standard(currentUser), query, currentUser) {
 

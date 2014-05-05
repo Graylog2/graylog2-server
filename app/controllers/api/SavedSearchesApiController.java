@@ -26,11 +26,11 @@ import com.google.gson.Gson;
 import com.google.inject.Inject;
 import controllers.*;
 import controllers.routes;
-import lib.APIException;
-import lib.ServerNodes;
-import models.SavedSearch;
-import models.SavedSearchService;
-import models.api.requests.searches.CreateSavedSearchRequest;
+import org.graylog2.restclient.lib.APIException;
+import org.graylog2.restclient.lib.ServerNodes;
+import org.graylog2.restclient.models.SavedSearch;
+import org.graylog2.restclient.models.SavedSearchService;
+import org.graylog2.restclient.models.api.requests.searches.CreateSavedSearchRequest;
 import play.mvc.Result;
 
 import java.io.IOException;

@@ -20,10 +20,10 @@
 package controllers;
 
 import com.google.inject.Inject;
-import lib.APIException;
-import lib.ApiClient;
-import models.SavedSearch;
-import models.SavedSearchService;
+import org.graylog2.restclient.lib.APIException;
+import org.graylog2.restclient.lib.ApiClient;
+import org.graylog2.restclient.models.SavedSearch;
+import org.graylog2.restclient.models.SavedSearchService;
 import play.api.mvc.Call;
 import play.mvc.Result;
 

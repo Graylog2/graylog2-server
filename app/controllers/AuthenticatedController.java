@@ -19,8 +19,8 @@
 package controllers;
 
 import lib.security.RedirectAuthenticator;
-import models.User;
-import models.UserService;
+import org.graylog2.restclient.models.User;
+import org.graylog2.restclient.models.UserService;
 import play.mvc.Security.Authenticated;
 
 @Authenticated(RedirectAuthenticator.class)

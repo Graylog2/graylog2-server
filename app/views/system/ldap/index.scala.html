@@ -1,5 +1,5 @@
-@(currentUser: User, breadcrumbs: lib.BreadcrumbList, ldapForm: Form[models.api.requests.accounts.LdapSettingsRequest])
-
+@(currentUser: org.graylog2.restclient.models.User, breadcrumbs: lib.BreadcrumbList, ldapForm: Form[org.graylog2.restclient.models.api.requests.accounts.LdapSettingsRequest])
+@import org.graylog2.restclient.models._
 @main("LDAP Settings", views.html.system.sidebar(), "", currentUser) {
 
     @views.html.partials.breadcrumbs(breadcrumbs)

@@ -24,12 +24,12 @@ import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 import com.google.inject.Inject;
 import controllers.*;
-import lib.APIException;
-import lib.ApiClient;
-import lib.DateTools;
-import models.ClusterService;
-import models.api.responses.system.indices.IndexerFailureSummary;
-import models.api.responses.system.indices.IndexerFailuresResponse;
+import org.graylog2.restclient.lib.APIException;
+import org.graylog2.restclient.lib.ApiClient;
+import org.graylog2.restclient.lib.DateTools;
+import org.graylog2.restclient.models.ClusterService;
+import org.graylog2.restclient.models.api.responses.system.indices.IndexerFailureSummary;
+import org.graylog2.restclient.models.api.responses.system.indices.IndexerFailuresResponse;
 import org.joda.time.DateTime;
 import play.mvc.Result;
 

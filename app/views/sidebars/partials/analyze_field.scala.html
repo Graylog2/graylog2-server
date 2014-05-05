@@ -1,4 +1,4 @@
-@(f: lib.Field, streamId: String)
+@(f: org.graylog2.restclient.lib.Field, streamId: String)
 <div class="analyze-field" @if(streamId != null) { data-stream-id="@streamId" } style="display: none;">
     <a href="#" class="btn btn-info btn-mini generate-statistics" data-field="@f.getName">Statistics</a>
 

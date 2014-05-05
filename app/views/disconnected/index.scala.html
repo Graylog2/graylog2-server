@@ -1,5 +1,4 @@
-@(context: Http.Context, configuredNodes: List[models.Node], nodesEverConnectedTo: List[models.Node], serverNodes: lib.ServerNodes)
-@import lib.Tools
+@(context: Http.Context, configuredNodes: List[org.graylog2.restclient.models.Node], nodesEverConnectedTo: List[org.graylog2.restclient.models.Node], serverNodes: org.graylog2.restclient.lib.ServerNodes)
 
     @loggedout("Disconnected") {
         <div class="container" id="disconnected-box">

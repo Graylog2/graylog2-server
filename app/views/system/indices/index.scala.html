@@ -1,12 +1,13 @@
-@(currentUser: User,
+@(currentUser: org.graylog2.restclient.models.User,
         breadcrumbs: lib.BreadcrumbList,
-        indices: List[Index],
+        indices: List[org.graylog2.restclient.models.Index],
         closedIndices: List[String],
-        clusterHealth: ESClusterHealth,
+        clusterHealth: org.graylog2.restclient.models.ESClusterHealth,
         deflectorTarget: String,
-        deflectorConfig: models.api.responses.system.indices.DeflectorConfigResponse)
+        deflectorConfig: org.graylog2.restclient.models.api.responses.system.indices.DeflectorConfigResponse)
 
 @import controllers.routes
+@import org.graylog2.restclient.lib.Tools
 
 @main("Indices", views.html.system.sidebar(), "", currentUser) {
 
@@ -88,7 +89,7 @@
                 <span class="starts">
                     Contains messages up to <span class="moment-from-now" title="@index.getRange.getStarts">@index.getRange.getStarts</span>,
                     @if(index.getInfo != null) {
-                        @lib.Tools.byteToHuman(index.getInfo.getStoreSizeBytes) /
+                        @Tools.byteToHuman(index.getInfo.getStoreSizeBytes) /
                         <span class="number-format" data-format="0,0">@index.getInfo.getDocuments.count</span> messages
                     }
 

@@ -20,13 +20,13 @@ package controllers;
 
 import com.google.gson.annotations.SerializedName;
 import com.google.inject.Inject;
-import lib.APIException;
-import lib.ServerNodes;
-import lib.Graylog2ServerUnavailableException;
+import org.graylog2.restclient.lib.APIException;
+import org.graylog2.restclient.lib.ServerNodes;
+import org.graylog2.restclient.lib.Graylog2ServerUnavailableException;
 import lib.security.RedirectAuthenticator;
 import models.LoginRequest;
-import models.UserService;
-import models.api.requests.ApiRequest;
+import org.graylog2.restclient.models.UserService;
+import org.graylog2.restclient.models.api.requests.ApiRequest;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.slf4j.Logger;
