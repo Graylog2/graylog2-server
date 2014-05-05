@@ -82,8 +82,8 @@ public class Configuration {
     @Parameter(value = "amqp_broker_password", required = false)
     private String amqpPassword;
 
-    @Parameter(value = "amqp_prefetch_count", required = false, validator = PositiveIntegerValidator.class)
-    private int amqpPrefetchCount = 0;
+    @Parameter(value = "amqp_broker_vhost", required = false)
+    private String amqpVhost = "/";
 
     @Parameter(value = "ring_size", required = true, validator = PositiveIntegerValidator.class)
     private int ringSize = 1024;
@@ -189,16 +189,16 @@ public class Configuration {
         return amqpUsername;
     }
 
+    public String getAmqpVirtualHost() {
+        return amqpVhost;
+    }
+
     public int getAmqpPort() {
         return amqpPort;
     }
 
     public String getAmqpHostname() {
         return amqpHostname;
-    }
-
-    public int getAmqpPrefetchCount() {
-        return amqpPrefetchCount;
     }
 
 }

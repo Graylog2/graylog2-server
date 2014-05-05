@@ -44,9 +44,9 @@ public class AMQPProducer implements RadioTransport {
         sender = new AMQPSender(
                 radio.getConfiguration().getAmqpHostname(),
                 radio.getConfiguration().getAmqpPort(),
+                radio.getConfiguration().getAmqpVirtualHost(),
                 radio.getConfiguration().getAmqpUsername(),
-                radio.getConfiguration().getAmqpPassword(),
-                radio.getConfiguration().getAmqpPrefetchCount()
+                radio.getConfiguration().getAmqpPassword()
         );
     }
 
