@@ -51,6 +51,7 @@ public class AMQPInput extends MessageInput {
 
     public static final String CK_HOSTNAME = "broker_hostname";
     public static final String CK_PORT = "broker_port";
+    public static final String CK_VHOST = "broker_vhost";
     public static final String CK_USERNAME = "broker_username";
     public static final String CK_PASSWORD = "broker_password";
     public static final String CK_PREFETCH = "prefetch";
@@ -69,6 +70,7 @@ public class AMQPInput extends MessageInput {
         consumer = new Consumer(
                 configuration.getString(CK_HOSTNAME),
                 (int) configuration.getInt(CK_PORT),
+                configuration.getString(CK_VHOST),
                 configuration.getString(CK_USERNAME),
                 configuration.getString(CK_PASSWORD),
                 (int) configuration.getInt(CK_PREFETCH),
@@ -119,6 +121,16 @@ public class AMQPInput extends MessageInput {
                         "Port of the AMQP broker to use",
                         ConfigurationField.Optional.OPTIONAL,
                         NumberField.Attribute.IS_PORT_NUMBER
+                )
+        );
+
+        cr.addField(
+                new TextField(
+                        CK_VHOST,
+                        "Broker virtual host",
+                        "/",
+                        "Virtual host of the AMQP broker to use",
+                        ConfigurationField.Optional.NOT_OPTIONAL
                 )
         );
 

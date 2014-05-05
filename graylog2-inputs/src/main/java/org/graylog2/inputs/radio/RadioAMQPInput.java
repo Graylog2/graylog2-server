@@ -78,6 +78,16 @@ public class RadioAMQPInput extends AMQPInput {
 
         cr.addField(
                 new TextField(
+                        CK_VHOST,
+                        "Broker virtual host",
+                        "/",
+                        "Virtual host of the AMQP broker to use",
+                        ConfigurationField.Optional.NOT_OPTIONAL
+                )
+        );
+
+        cr.addField(
+                new TextField(
                         CK_USERNAME,
                         "Username",
                         "",
