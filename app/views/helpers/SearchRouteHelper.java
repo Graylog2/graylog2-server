@@ -91,7 +91,8 @@ public class SearchRouteHelper {
                     relative,
                     from,
                     to,
-                    keyword
+                    keyword,
+                    fields
             );
         } else {
             return routes.StreamSearchController.exportAsCsv(
@@ -101,7 +102,8 @@ public class SearchRouteHelper {
                     relative,
                     from,
                     to,
-                    keyword
+                    keyword,
+                    fields
             );
         }
     }
