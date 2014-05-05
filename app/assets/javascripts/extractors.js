@@ -292,4 +292,10 @@ $(document).ready(function() {
         }
     });
 
+    // Extractor export formatting.
+    if($("#extractor-export-json").size() > 0) {
+        var formatted = JSON.stringify(JSON.parse($("#extractor-export-json").val()), null, 2);
+        $("#extractor-export-json").val(formatted);
+    }
+
 });
