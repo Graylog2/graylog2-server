@@ -47,18 +47,6 @@ public class Startpage {
         this.id = id;
     }
 
-    // TODO: move to helper
-/*    public Call getCall() {
-        switch (type) {
-            case STREAM:
-                return routes.StreamSearchController.index(id, "*", "relative", 3600, "", "", "", "", 0, "", "", "", ""); // TODO fields
-            case DASHBOARD:
-                return routes.DashboardsController.show(id);
-            default:
-                return null;
-        }
-    }*/
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

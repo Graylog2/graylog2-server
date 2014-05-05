@@ -96,7 +96,6 @@ public class Extractor {
 
     private String id;
     private final String title;
-    private final int order;
     private final CursorStrategy cursorStrategy;
     private final Type extractorType;
     private final String sourceField;
@@ -109,6 +108,8 @@ public class Extractor {
     private final ExtractorMetrics metrics;
     private final long exceptions;
     private final long converterExceptions;
+
+    private int order;
 
     @AssistedInject
     private Extractor(ApiClient api, UserService userService, @Assisted ExtractorSummaryResponse esr) {
@@ -180,7 +181,8 @@ public class Extractor {
         request.extractorConfig = extractorConfig;
         request.converters = converterList;
         request.conditionType = conditionType.toString().toLowerCase();
-        request.conditionValue =  conditionValue;
+        request.conditionValue = conditionValue;
+        request.order = order;
 
         final Map response = api.post(Map.class)
                 .path("/system/inputs/{0}/extractors", input.getId())
@@ -206,12 +208,34 @@ public class Extractor {
         }
     }
 
+    public void loadConfigFromImport(Type type, Map<String, Object> extractorConfig) {
+        // we go the really easy way here.
+        Map<String, String[]> looksLikeForm = Maps.newHashMap();
+
+        for (Map.Entry<String, Object> e : extractorConfig.entrySet()) {
+            looksLikeForm.put(e.getKey(), new String[]{ e.getValue().toString() });
+        }
+
+        loadConfigFromForm(type, looksLikeForm);
+    }
+
     public void loadConvertersFromForm(Map<String,String[]> form) {
         for(String name : extractSelectedConverters(form)) {
             Converter.Type converterType = Converter.Type.valueOf(name.toUpperCase());
             Map<String, Object> converterConfig = extractConverterConfig(converterType, form);
 
             converters.add(new Converter(converterType, converterConfig));
+        }
+    }
+
+    public void loadConvertersFromImport(List<Map<String, Object>> imports) {
+        for (Map<String, Object> imp : imports) {
+            Converter converter = new Converter(
+                    Converter.Type.valueOf(((String) imp.get("type")).toUpperCase()),
+                    (Map<String, Object>) imp.get("config")
+            );
+
+            converters.add(converter);
         }
     }
 
@@ -392,6 +416,37 @@ public class Extractor {
 
     public int getOrder() {
         return order;
+    }
+
+    public void setOrder(int order) {
+        this.order = order;
+    }
+
+    public Map<String, Object> export() {
+        Map<String, Object> export = Maps.newTreeMap();
+
+        List<Map<String, Object>> converterConfigList = Lists.newArrayList();
+        for (Converter converter : converters) {
+            Map<String, Object> converterExport = Maps.newHashMap();
+
+            converterExport.put("config", converter.getConfig());
+            converterExport.put("type", converter.getType());
+
+            converterConfigList.add(converterExport);
+        }
+
+        export.put("title", title);
+        export.put("order", order);
+        export.put("source_field", sourceField);
+        export.put("target_field", targetField);
+        export.put("cursor_strategy", cursorStrategy.toString().toLowerCase());
+        export.put("condition_type", conditionType.toString().toLowerCase());
+        export.put("condition_value", conditionValue);
+        export.put("extractor_type", extractorType.toString().toLowerCase());
+        export.put("extractor_config", extractorConfig);
+        export.put("converters", converterConfigList);
+
+        return export;
     }
 
 }
