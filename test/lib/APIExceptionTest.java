@@ -21,6 +21,7 @@ package lib;
 import com.ning.http.client.Request;
 import com.ning.http.client.RequestBuilder;
 import com.ning.http.client.Response;
+import org.graylog2.restclient.lib.APIException;
 import org.junit.Test;
 import org.mockito.internal.matchers.Contains;
 

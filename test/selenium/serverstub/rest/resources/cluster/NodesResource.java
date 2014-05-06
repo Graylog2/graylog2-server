@@ -22,7 +22,7 @@ package selenium.serverstub.rest.resources.cluster;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import lib.DateTools;
+import org.graylog2.restclient.lib.DateTools;
 import org.joda.time.format.ISODateTimeFormat;
 import selenium.serverstub.ServerStub;
 import selenium.serverstub.rest.resources.RestResource;

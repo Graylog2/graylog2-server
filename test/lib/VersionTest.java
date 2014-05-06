@@ -19,6 +19,7 @@
  */
 package lib;
 
+import org.graylog2.restclient.lib.Version;
 import org.junit.Test;
 
 import static junit.framework.Assert.assertEquals;

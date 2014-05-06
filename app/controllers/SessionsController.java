@@ -19,7 +19,6 @@
 package controllers;
 
 import com.google.gson.annotations.SerializedName;
-import com.google.inject.Inject;
 import org.graylog2.restclient.lib.APIException;
 import org.graylog2.restclient.lib.ServerNodes;
 import org.graylog2.restclient.lib.Graylog2ServerUnavailableException;
@@ -37,6 +36,7 @@ import play.mvc.Http;
 import play.mvc.Result;
 import play.mvc.Security;
 
+import javax.inject.Inject;
 import java.io.IOException;
 import java.util.Date;
 
@@ -47,12 +47,16 @@ public class SessionsController extends BaseController {
 
 	final static Form<LoginRequest> userForm = form(LoginRequest.class);
 
-    @Inject
-    ServerNodes serverNodes;
-	@Inject
-    RedirectAuthenticator authenticator;
+    private final ServerNodes serverNodes;
+    private final RedirectAuthenticator authenticator;
 
-	public Result index(String destination) {
+    @Inject
+    public SessionsController(ServerNodes serverNodes, RedirectAuthenticator authenticator) {
+        this.serverNodes = serverNodes;
+        this.authenticator = authenticator;
+    }
+
+    public Result index(String destination) {
         // Redirect if already logged in.
         String loggedInUserName = authenticator.getUsername(ctx());
         if (loggedInUserName != null) {
