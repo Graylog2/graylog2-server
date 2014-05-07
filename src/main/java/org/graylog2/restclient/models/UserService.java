@@ -28,6 +28,8 @@ import org.graylog2.restclient.models.api.responses.system.UserResponse;
 import org.graylog2.restclient.models.api.responses.system.UsersListResponse;
 import org.apache.shiro.subject.SimplePrincipalCollection;
 import org.apache.shiro.subject.Subject;
+import org.graylog2.restroutes.generated.UsersResource;
+import org.graylog2.restroutes.generated.routes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import play.libs.Crypto;
@@ -42,6 +44,7 @@ public class UserService {
 
     private final ApiClient api;
     private final User.Factory userFactory;
+    private final UsersResource resource = routes.UsersResource();
 
     @Inject
     private UserService(ApiClient api, User.Factory userFactory) {
@@ -94,7 +97,7 @@ public class UserService {
 
     public boolean create(CreateUserRequest request) {
         try {
-            api.post().path("/users").body(request).expect(Http.Status.CREATED).execute();
+            api.path(resource.create()).body(request).expect(Http.Status.CREATED).execute();
             return true;
         } catch (APIException e) {
             log.error("Unable to create user", e);
@@ -112,7 +115,7 @@ public class UserService {
         }
         // a different user was requested, go and fetch it from the server
         try {
-            final UserResponse response = api.get(UserResponse.class).path("/users/{0}", username).execute();
+            final UserResponse response = api.path(resource.get(username), UserResponse.class).execute();
             // TODO this user is not cached locally for now. we should be tracking REST requests.
             // TODO we cache the user for this request, but only for checking permissions. this needs to be cleaned up after 0.20.0
             final User user = userFactory.fromResponse(response, null);
@@ -152,8 +155,7 @@ public class UserService {
 //            }
 //        }
         try {
-            UserResponse response = api.get(UserResponse.class)
-                    .path("/users/{0}", userName)
+            UserResponse response = api.path(resource.get(userName), UserResponse.class)
                     .session(sessionId)
                     .execute();
 
@@ -177,7 +179,7 @@ public class UserService {
 
     public void delete(String username) {
         try {
-            api.delete().path("/users/{0}", username).expect(Http.Status.NO_CONTENT).execute();
+            api.path(resource.deleteUser(username)).expect(Http.Status.NO_CONTENT).execute();
         } catch (APIException e) {
             log.error("Unable to delete user " + username, e);
         } catch (IOException e) {

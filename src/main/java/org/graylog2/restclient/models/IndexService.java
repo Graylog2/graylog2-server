@@ -24,6 +24,7 @@ import com.google.inject.Inject;
 import org.graylog2.restclient.lib.APIException;
 import org.graylog2.restclient.lib.ApiClient;
 import org.graylog2.restclient.models.api.responses.system.indices.*;
+import org.graylog2.restroutes.generated.routes;
 
 import java.io.IOException;
 import java.util.List;
@@ -48,8 +49,7 @@ public class IndexService {
     public List<Index> all() throws APIException, IOException {
         List<Index> indices = Lists.newArrayList();
 
-        IndexRangesResponse rr = api.get(IndexRangesResponse.class)
-                .path("/system/indices/ranges")
+        IndexRangesResponse rr = api.path(routes.IndexRangesResource().list(), IndexRangesResponse.class)
                 .execute();
 
         for (IndexRangeSummary range : rr.ranges) {
@@ -60,32 +60,29 @@ public class IndexService {
     }
 
     public DeflectorInformationResponse getDeflectorInfo() throws APIException, IOException {
-        return api.get(DeflectorInformationResponse.class)
-                .path("/system/deflector")
+        return api.path(routes.DeflectorResource().deflector(), DeflectorInformationResponse.class)
                 .execute();
     }
 
     public DeflectorConfigResponse getDeflectorConfig() throws APIException, IOException {
-        return api.get(DeflectorConfigResponse.class)
+        return api.path(routes.DeflectorResource().config(), DeflectorConfigResponse.class)
                 .onlyMasterNode()
-                .path("/system/deflector/config")
                 .execute();
     }
 
     public ClosedIndicesResponse getClosedIndices() throws APIException, IOException {
-        return api.get(ClosedIndicesResponse.class)
-                .path("/system/indexer/indices/closed")
+        return api.path(routes.IndicesResource().closed(), ClosedIndicesResponse.class)
                 .execute();
     }
 
     public void recalculateRanges() throws APIException, IOException {
-        api.post().path("/system/indices/ranges/rebuild")
+        api.path(routes.IndexRangesResource().rebuild())
                 .expect(202)
                 .execute();
     }
 
     public void cycleDeflector() throws APIException, IOException {
-        api.post().path("/system/deflector/cycle")
+        api.path(routes.DeflectorResource().cycle())
                 .timeout(apiTimeout("cycle_deflector", 60, TimeUnit.SECONDS))
                 .onlyMasterNode()
                 .execute();
@@ -93,7 +90,7 @@ public class IndexService {
 
     // Not part an Index model instance method because opening/closing can be applied to indices without calculated ranges.
     public void close(String index) throws APIException, IOException {
-        api.post().path("/system/indexer/indices/{0}/close", index)
+        api.path(routes.IndicesResource().close(index))
                 .timeout(apiTimeout("index_close", 60, TimeUnit.SECONDS))
                 .expect(204)
                 .execute();
@@ -101,7 +98,7 @@ public class IndexService {
 
     // Not part an Index model instance method because opening/closing can be applied to indices without calculated ranges.
     public void reopen(String index) throws APIException, IOException {
-        api.post().path("/system/indexer/indices/{0}/reopen", index)
+        api.path(routes.IndicesResource().reopen(index))
                 .timeout(apiTimeout("index_reopen", 60, TimeUnit.SECONDS))
                 .expect(204)
                 .execute();
@@ -109,7 +106,7 @@ public class IndexService {
 
     // Not part an Index model instance method because opening/closing can be applied to indices without calculated ranges.
     public void delete(String index) throws APIException, IOException {
-        api.delete().path("/system/indexer/indices/{0}", index)
+        api.path(routes.IndicesResource().single(index))
                 .timeout(apiTimeout("index_delete", 60, TimeUnit.SECONDS))
                 .expect(204)
                 .execute();

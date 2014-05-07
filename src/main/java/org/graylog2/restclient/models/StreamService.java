@@ -31,6 +31,8 @@ import org.graylog2.restclient.models.api.responses.streams.GetStreamsResponse;
 import org.graylog2.restclient.models.api.responses.streams.StreamSummaryResponse;
 import org.graylog2.restclient.models.api.responses.streams.TestMatchResponse;
 import org.graylog2.restclient.models.api.results.StreamsResult;
+import org.graylog2.restroutes.generated.StreamResource;
+import org.graylog2.restroutes.generated.routes;
 import play.mvc.Http;
 
 import java.io.IOException;
@@ -41,6 +43,7 @@ public class StreamService {
 
     private final ApiClient api;
     private final Stream.Factory streamFactory;
+    private final StreamResource resource = routes.StreamResource();
 
     @Inject
     private StreamService(ApiClient api, Stream.Factory streamFactory) {
@@ -50,7 +53,7 @@ public class StreamService {
 
     public List<Stream> all() throws IOException, APIException {
         GetStreamsResponse r = null;
-        r = api.get(GetStreamsResponse.class).path("/streams").execute();
+        r = api.path(resource.get(), GetStreamsResponse.class).execute();
 
         List<Stream> streams = Lists.newArrayList();
 
@@ -64,7 +67,7 @@ public class StreamService {
 
     public List<Stream> allEnabled() throws IOException, APIException {
         GetStreamsResponse r = null;
-        r = api.get(GetStreamsResponse.class).path("/streams/enabled").execute();
+        r = api.path(resource.getEnabled(), GetStreamsResponse.class).execute();
 
         List<Stream> streams = Lists.newArrayList();
 
@@ -77,45 +80,49 @@ public class StreamService {
 
     public Stream get(String streamId) throws IOException, APIException {
         StreamSummaryResponse streamResponse = null;
-        streamResponse = api.get(StreamSummaryResponse.class).path("/streams/"+streamId).execute();
+        streamResponse = api.path(resource.get(streamId), StreamSummaryResponse.class).execute();
 
         return streamFactory.fromSummaryResponse(streamResponse);
     }
 
     public String create(CreateStreamRequest request) throws APIException, IOException {
-        CreateStreamResponse csr = api.post(CreateStreamResponse.class).path("/streams").body(request).expect(Http.Status.CREATED).execute();
+        CreateStreamResponse csr = api.path(resource.create(), CreateStreamResponse.class)
+                .body(request).expect(Http.Status.CREATED).execute();
         return csr.streamId;
     }
 
     public void update(String streamId, CreateStreamRequest request) throws APIException, IOException {
-        api.put().path("/streams/{0}", streamId).body(request).expect(Http.Status.OK).execute();
+        api.path(resource.update(streamId)).body(request).expect(Http.Status.OK).execute();
     }
 
     public void delete(String streamId) throws APIException, IOException {
-        api.delete().path("/streams/" + streamId).expect(Http.Status.NO_CONTENT).execute();
+        api.path(resource.delete(streamId)).expect(Http.Status.NO_CONTENT).execute();
     }
 
     public void pause(String streamId) throws APIException, IOException {
-        api.post().path("/streams/" + streamId + "/pause").expect(Http.Status.OK).execute();
+        api.path(resource.pause(streamId)).expect(Http.Status.OK).execute();
     }
 
     public void resume(String streamId) throws APIException, IOException {
-        api.post().path("/streams/" + streamId + "/resume").expect(Http.Status.OK).execute();
+        api.path(resource.resume(streamId)).expect(Http.Status.OK).execute();
     }
 
     public TestMatchResponse testMatch(String streamId, TestMatchRequest request) throws APIException, IOException {
         TestMatchResponse testMatchResponse = null;
-        testMatchResponse = api.post(TestMatchResponse.class).path("/streams/" + streamId + "/testMatch").body(request).expect(Http.Status.OK).execute();
+        testMatchResponse = api.path(resource.testMatch(streamId), TestMatchResponse.class)
+                .body(request).expect(Http.Status.OK).execute();
         return testMatchResponse;
     }
 
     public String cloneStream(String streamId, CreateStreamRequest request) throws APIException, IOException {
-        CreateStreamResponse csr = api.post(CreateStreamResponse.class).path("/streams/"+streamId+"/clone").body(request).expect(Http.Status.CREATED).execute();
+        CreateStreamResponse csr = api.path(resource.cloneStream(streamId), CreateStreamResponse.class)
+                .body(request).expect(Http.Status.CREATED).execute();
         return csr.streamId;
     }
 
     public void sendDummyAlert(String streamId) throws APIException, IOException {
-        api.get(EmptyResponse.class).path("/streams/"+streamId+"/alerts/sendDummyAlert").expect(Http.Status.NO_CONTENT).execute();
+        api.path(routes.StreamAlertResource().sendDummyAlert(streamId))
+                .expect(Http.Status.NO_CONTENT).execute();
     }
 
     public List<Alert> allowedAlertsSince(int since) throws IOException, APIException {

@@ -32,6 +32,7 @@ import org.graylog2.restclient.models.api.responses.metrics.GaugeResponse;
 import org.graylog2.restclient.models.api.responses.metrics.MetricsListResponse;
 import org.graylog2.restclient.models.api.responses.system.InputSummaryResponse;
 import org.graylog2.restclient.models.api.results.MessageResult;
+import org.graylog2.restroutes.generated.routes;
 import org.slf4j.LoggerFactory;
 import play.mvc.Http;
 
@@ -141,16 +142,14 @@ public class Input {
     }
 
     public void addStaticField(String key, String value) throws APIException, IOException {
-        api.post().clusterEntity(node)
-                .path("/system/inputs/{0}/staticfields", id)
+        api.path(routes.StaticFieldsResource().create(id)).clusterEntity(node)
                 .body(new AddStaticFieldRequest(key, value))
                 .expect(Http.Status.CREATED)
                 .execute();
     }
 
     public void removeStaticField(String key) throws APIException, IOException {
-        api.delete().clusterEntity(node)
-                .path("/system/inputs/{0}/staticfields/{1}", id, key)
+        api.path(routes.StaticFieldsResource().delete(key, id)).clusterEntity(node)
                 .expect(Http.Status.NO_CONTENT)
                 .execute();
     }

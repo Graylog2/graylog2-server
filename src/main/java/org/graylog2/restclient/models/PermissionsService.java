@@ -24,6 +24,7 @@ import org.graylog2.restclient.lib.APIException;
 import org.graylog2.restclient.lib.ApiClient;
 import org.graylog2.restclient.models.api.responses.ReaderPermissionsResponse;
 import org.graylog2.restclient.models.api.responses.RestPermissionsResponse;
+import org.graylog2.restroutes.generated.routes;
 
 import java.io.IOException;
 import java.util.List;
@@ -65,8 +66,7 @@ public class PermissionsService {
 
         try {
             final ReaderPermissionsResponse response = api
-                    .get(ReaderPermissionsResponse.class)
-                    .path("/system/permissions/reader/{0}", username)
+                    .path(routes.SystemResource().readerPermissions(username), ReaderPermissionsResponse.class)
                     .execute();
             permissions.addAll(response.permissions);
         } catch (APIException e) {

@@ -24,6 +24,7 @@ import com.google.inject.Inject;
 import org.graylog2.restclient.lib.APIException;
 import org.graylog2.restclient.lib.ApiClient;
 import org.graylog2.restclient.models.api.responses.SourcesResponse;
+import org.graylog2.restroutes.generated.routes;
 
 import java.io.IOException;
 import java.util.List;
@@ -47,8 +48,7 @@ public class SourcesService {
     public List<Source> all(int range) throws APIException, IOException {
         List<Source> list = Lists.newArrayList();
 
-        SourcesResponse response = api.get(SourcesResponse.class)
-                .path("/sources")
+        SourcesResponse response = api.path(routes.SourcesResource().list(), SourcesResponse.class)
                 .queryParam("range", range)
                 .timeout(apiTimeout("sources_all", 20, TimeUnit.SECONDS))
                 .execute();

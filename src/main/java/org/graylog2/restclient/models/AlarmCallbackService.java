@@ -6,6 +6,8 @@ import org.graylog2.restclient.lib.ApiClient;
 import org.graylog2.restclient.lib.plugin.configuration.RequestedConfigurationField;
 import org.graylog2.restclient.models.api.requests.alarmcallbacks.CreateAlarmCallbackRequest;
 import org.graylog2.restclient.models.api.responses.alarmcallbacks.*;
+import org.graylog2.restroutes.generated.AlarmCallbackResource;
+import org.graylog2.restroutes.generated.routes;
 import play.mvc.Http;
 
 import javax.inject.Inject;
@@ -19,6 +21,7 @@ import java.util.Map;
 public class AlarmCallbackService {
     private final ApiClient apiClient;
     private final AlarmCallback.Factory alarmCallbackFactory;
+    private final AlarmCallbackResource resource = routes.AlarmCallbackResource();
 
     @Inject
     public AlarmCallbackService(ApiClient apiClient,
@@ -28,8 +31,8 @@ public class AlarmCallbackService {
     }
 
     public List<AlarmCallback> all(String streamId) throws IOException, APIException {
-        GetAlarmCallbacksResponse response = apiClient.get(GetAlarmCallbacksResponse.class)
-                .path("/streams/"+streamId+"/alarmcallbacks").expect(Http.Status.OK).execute();
+        GetAlarmCallbacksResponse response = apiClient.path(resource.get(streamId), GetAlarmCallbacksResponse.class)
+                .expect(Http.Status.OK).execute();
 
         List<AlarmCallback> result = Lists.newArrayList();
         for (AlarmCallbackSummaryResponse callbackResponse : response.alarmcallbacks) {
@@ -40,24 +43,24 @@ public class AlarmCallbackService {
     }
 
     public AlarmCallback get(String streamId, String alarmCallbackId) throws IOException, APIException {
-        AlarmCallbackSummaryResponse response = apiClient.get(AlarmCallbackSummaryResponse.class)
-                .path("/streams/"+streamId+"/alarmcallbacks/"+alarmCallbackId).expect(Http.Status.OK).execute();
+        AlarmCallbackSummaryResponse response = apiClient.path(resource.get(streamId, alarmCallbackId), AlarmCallbackSummaryResponse.class)
+                .expect(Http.Status.OK).execute();
 
         return alarmCallbackFactory.fromSummaryResponse(streamId, response);
     }
 
     public CreateAlarmCallbackResponse create(String streamId, CreateAlarmCallbackRequest request) throws IOException, APIException {
-        return apiClient.post(CreateAlarmCallbackResponse.class).path("/streams/"+streamId+"/alarmcallbacks").body(request).expect(Http.Status.CREATED).execute();
+        return apiClient.path(resource.create(streamId), CreateAlarmCallbackResponse.class).body(request).expect(Http.Status.CREATED).execute();
     }
 
     public Map<String, GetSingleAvailableAlarmCallbackResponse> available(String streamId) throws IOException, APIException {
-        GetAvailableAlarmCallbacksResponse response = apiClient.get(GetAvailableAlarmCallbacksResponse.class)
-                .path("/streams/"+streamId+"/alarmcallbacks/available").expect(Http.Status.OK).execute();
+        GetAvailableAlarmCallbacksResponse response = apiClient.path(resource.available(streamId), GetAvailableAlarmCallbacksResponse.class)
+                .expect(Http.Status.OK).execute();
 
         return response.types;
     }
 
     public void delete(String streamId, String alarmCallbackId) throws IOException, APIException {
-        apiClient.delete().path("/streams/"+streamId+"/alarmcallbacks/"+alarmCallbackId).expect(Http.Status.NO_CONTENT).execute();
+        apiClient.path(resource.delete(streamId, alarmCallbackId)).expect(Http.Status.NO_CONTENT).execute();
     }
 }

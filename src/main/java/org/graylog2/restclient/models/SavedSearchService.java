@@ -26,6 +26,7 @@ import org.graylog2.restclient.lib.ApiClient;
 import org.graylog2.restclient.models.api.requests.searches.CreateSavedSearchRequest;
 import org.graylog2.restclient.models.api.responses.searches.SavedSearchSummaryResponse;
 import org.graylog2.restclient.models.api.responses.searches.SavedSearchesResponse;
+import org.graylog2.restroutes.generated.routes;
 
 import java.io.IOException;
 import java.util.List;
@@ -45,7 +46,7 @@ public class SavedSearchService {
     }
 
     public void create(CreateSavedSearchRequest cssr) throws APIException, IOException {
-        api.post().path("/search/saved")
+        api.path(routes.SavedSearchesResource().create())
                 .body(cssr)
                 .expect(201)
                 .execute();
@@ -64,14 +65,13 @@ public class SavedSearchService {
     }
 
     public SavedSearch get(String searchId) throws APIException, IOException {
-        SavedSearchSummaryResponse response = api.get(SavedSearchSummaryResponse.class)
-                .path("/search/saved/{0}", searchId)
+        SavedSearchSummaryResponse response = api.path(routes.SavedSearchesResource().get(searchId), SavedSearchSummaryResponse.class)
                 .execute();
 
         return savedSearchFactory.fromSummaryResponse(response);
     }
 
     public void delete(SavedSearch search) throws APIException, IOException {
-        api.delete().path("/search/saved/{0}", search.getId()).expect(204).execute();
+        api.path(routes.SavedSearchesResource().delete(search.getId())).expect(204).execute();
     }
 }

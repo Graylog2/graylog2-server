@@ -23,6 +23,7 @@ import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import org.graylog2.restclient.lib.ApiClient;
 import org.graylog2.restclient.models.api.responses.system.indices.*;
+import org.graylog2.restroutes.generated.routes;
 import org.joda.time.DateTime;
 import play.Logger;
 
@@ -78,7 +79,7 @@ public class Index {
 
     private void loadIndexInfo() {
         try {
-            this.indexInfo = new Info(api.get(IndexSummaryResponse.class).path("/system/indexer/indices/{0}", getName()).execute());
+            this.indexInfo = new Info(api.path(routes.IndicesResource().single(getName()), IndexSummaryResponse.class).execute());
         } catch (Exception e) {
            Logger.error("Could not get index information for index [{}]", getName(), e);
         }

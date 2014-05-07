@@ -9,6 +9,8 @@ import org.graylog2.restclient.lib.ExclusiveInputException;
 import org.graylog2.restclient.lib.ServerNodes;
 import org.graylog2.restclient.models.api.requests.InputLaunchRequest;
 import org.graylog2.restclient.models.api.responses.system.*;
+import org.graylog2.restroutes.generated.InputsResource;
+import org.graylog2.restroutes.generated.routes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import play.mvc.Http;
@@ -28,6 +30,7 @@ public class InputService {
     private final InputState.Factory inputStateFactory;
     private final NodeService nodeService;
     private final ServerNodes serverNodes;
+    private final InputsResource resource = routes.InputsResource();
 
 
     @Inject
@@ -45,7 +48,7 @@ public class InputService {
 
     protected Map<ClusterEntity, InputsResponse> getInputsFromAllEntities() {
         Map<ClusterEntity, InputsResponse> result = Maps.newHashMap();
-        result.putAll(api.get(InputsResponse.class).fromAllNodes().path("/system/inputs").executeOnAll());
+        result.putAll(api.path(resource.list(), InputsResponse.class).fromAllNodes().executeOnAll());
         try {
             for(Radio radio : nodeService.radios().values()) {
                 result.put(radio, api.get(InputsResponse.class).radio(radio).path("/system/inputs").execute());
@@ -61,7 +64,7 @@ public class InputService {
     protected List<InputStateSummaryResponse> getInputsFromNode(Node node) {
         List<InputStateSummaryResponse> result = Lists.newArrayList();
         try {
-            result = api.get(InputsResponse.class).node(node).path("/system/inputs").execute().inputs;
+            result = api.path(resource.list(), InputsResponse.class).node(node).execute().inputs;
         } catch (APIException e) {
             log.error("Unable to fetch input list: " + e);
         } catch (IOException e) {
@@ -72,7 +75,7 @@ public class InputService {
     }
 
     protected Map<Node, InputsResponse> getInputsFromAllNodes() {
-        return api.get(InputsResponse.class).fromAllNodes().path("/system/inputs").executeOnAll();
+        return api.path(resource.list(), InputsResponse.class).fromAllNodes().executeOnAll();
     }
 
     public List<InputState> loadAllInputStates(Node node) {
@@ -132,8 +135,8 @@ public class InputService {
 
     public Map<Node, Map<String, String>> getAllInputTypes() throws IOException, APIException {
         Map<Node, Map<String, String>> result = Maps.newHashMap();
-        Map<Node, InputTypesResponse> inputTypesResponseMap = api.get(InputTypesResponse.class)
-                .fromAllNodes().path("/system/inputs/types").executeOnAll();
+        Map<Node, InputTypesResponse> inputTypesResponseMap = api.path(resource.types(), InputTypesResponse.class)
+                .fromAllNodes().executeOnAll();
 
         for (Map.Entry<Node, InputTypesResponse> entry : inputTypesResponseMap.entrySet())
             result.put(entry.getKey(), entry.getValue().types);
@@ -142,7 +145,7 @@ public class InputService {
     }
 
     public InputTypeSummaryResponse getInputTypeInformation(Node node, String type) throws IOException, APIException {
-        return api.get(InputTypeSummaryResponse.class).node(node).path("/system/inputs/types/{0}", type).execute();
+        return api.path(resource.info(type), InputTypeSummaryResponse.class).node(node).execute();
     }
 
     public Map<String, InputTypeSummaryResponse> getAllInputTypeInformation() throws IOException, APIException {

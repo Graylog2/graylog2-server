@@ -23,7 +23,10 @@ import com.google.inject.Singleton;
 import org.graylog2.restclient.lib.APIException;
 import org.graylog2.restclient.lib.ApiClient;
 import org.graylog2.restclient.models.api.requests.accounts.LdapSettingsRequest;
+import org.graylog2.restclient.models.api.requests.accounts.LdapTestConnectionRequest;
+import org.graylog2.restclient.models.api.responses.accounts.LdapConnectionTestResponse;
 import org.graylog2.restclient.models.api.responses.accounts.LdapSettingsResponse;
+import org.graylog2.restroutes.generated.routes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,7 +45,7 @@ public class LdapSettingsService {
     public LdapSettings load() {
         LdapSettingsResponse response;
         try {
-            response = api.get(LdapSettingsResponse.class).path("/system/ldap/settings").execute();
+            response = api.path(routes.LdapResource().getLdapSettings(), LdapSettingsResponse.class).execute();
         } catch (APIException e) {
             log.error("Unable to load LDAP settings.", e);
             return null;
@@ -64,5 +67,9 @@ public class LdapSettingsService {
         }
         // otherwise just create the new settings object.
         return ldapSettingsFactory.fromSettingsRequest(request);
+    }
+
+    public LdapConnectionTestResponse testLdapConfiguration(LdapTestConnectionRequest request) throws APIException, IOException {
+        return api.path(routes.LdapResource().testLdapConfiguration(), LdapConnectionTestResponse.class).body(request).execute();
     }
 }

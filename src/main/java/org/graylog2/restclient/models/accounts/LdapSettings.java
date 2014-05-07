@@ -24,6 +24,7 @@ import org.graylog2.restclient.lib.APIException;
 import org.graylog2.restclient.lib.ApiClient;
 import org.graylog2.restclient.models.api.requests.accounts.LdapSettingsRequest;
 import org.graylog2.restclient.models.api.responses.accounts.LdapSettingsResponse;
+import org.graylog2.restroutes.generated.routes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import play.mvc.Http;
@@ -65,7 +66,7 @@ public class LdapSettings {
         LdapSettingsRequest request = toRequest();
 
         try {
-            api.put().path("/system/ldap/settings").body(request).expect(Http.Status.NO_CONTENT).execute();
+            api.path(routes.LdapResource().updateLdapSettings()).body(request).expect(Http.Status.NO_CONTENT).execute();
             return true;
         } catch (APIException e) {
             log.error("Unable to save LDAP settings.", e);

@@ -21,6 +21,7 @@ package org.graylog2.restclient.lib;
 import com.google.inject.ImplementedBy;
 import com.ning.http.client.AsyncHttpClient;
 import org.graylog2.restclient.models.api.responses.EmptyResponse;
+import org.graylog2.restroutes.PathMethod;
 
 /*
   Note: This is an interface to break the cyclic dependency between ServerNodes and ApiClientImpl.
@@ -51,6 +52,10 @@ public interface ApiClient {
     <T> ApiRequestBuilder<T> delete(Class<T> responseClass);
 
     ApiRequestBuilder<EmptyResponse> delete();
+
+    <T> ApiRequestBuilder<T> path(PathMethod pathMethod, Class<T> responseClasse);
+
+    ApiRequestBuilder<EmptyResponse> path(PathMethod pathMethod);
 
     public enum Method {
         GET,

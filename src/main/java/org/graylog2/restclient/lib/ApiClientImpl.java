@@ -32,6 +32,7 @@ import com.ning.http.client.*;
 import org.graylog2.restclient.models.*;
 import org.graylog2.restclient.models.api.requests.ApiRequest;
 import org.graylog2.restclient.models.api.responses.EmptyResponse;
+import org.graylog2.restroutes.PathMethod;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import play.libs.F;
@@ -128,6 +129,35 @@ class ApiClientImpl implements ApiClient {
     @Override
     public org.graylog2.restclient.lib.ApiRequestBuilder<EmptyResponse> delete() {
         return delete(EmptyResponse.class);
+    }
+
+    @Override
+    public <T> org.graylog2.restclient.lib.ApiRequestBuilder<T> path(PathMethod pathMethod, Class<T> responseClasse) {
+        Method httpMethod;
+        switch(pathMethod.getMethod().toUpperCase()) {
+            case "GET":
+                httpMethod = Method.GET;
+                break;
+            case "PUT":
+                httpMethod = Method.PUT;
+                break;
+            case "POST":
+                httpMethod = Method.POST;
+                break;
+            case "DELETE":
+                httpMethod = Method.DELETE;
+                break;
+            default:
+                httpMethod = Method.GET;
+        }
+
+        ApiRequestBuilder<T> builder = new ApiRequestBuilder<>(httpMethod, responseClasse);
+        return builder.path(pathMethod.getPath());
+    }
+
+    @Override
+    public org.graylog2.restclient.lib.ApiRequestBuilder<EmptyResponse> path(PathMethod pathMethod) {
+        return path(pathMethod, EmptyResponse.class);
     }
 
     private static void applyBasicAuthentication(AsyncHttpClient.BoundRequestBuilder requestBuilder, String userInfo) {

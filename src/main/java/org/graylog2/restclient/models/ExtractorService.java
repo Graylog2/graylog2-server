@@ -26,6 +26,8 @@ import org.graylog2.restclient.models.api.requests.ExtractorOrderRequest;
 import org.graylog2.restclient.models.api.responses.EmptyResponse;
 import org.graylog2.restclient.models.api.responses.system.ExtractorSummaryResponse;
 import org.graylog2.restclient.models.api.responses.system.ExtractorsResponse;
+import org.graylog2.restroutes.generated.ExtractorsResource;
+import org.graylog2.restroutes.generated.routes;
 import play.mvc.Http;
 
 import java.io.IOException;
@@ -36,6 +38,7 @@ public class ExtractorService {
 
     private final ApiClient api;
     private final Extractor.Factory extractorFactory;
+    private final ExtractorsResource resource = routes.ExtractorsResource();
 
     @Inject
     private ExtractorService(ApiClient api, Extractor.Factory extractorFactory) {
@@ -44,8 +47,7 @@ public class ExtractorService {
     }
 
     public void delete(Node node, Input input, String extractorId) throws IOException, APIException {
-        api.delete()
-                .path("/system/inputs/{0}/extractors/{1}", input.getId(), extractorId)
+        api.path(resource.terminate(input.getId(), extractorId))
                 .node(node)
                 .expect(Http.Status.NO_CONTENT)
                 .execute();
@@ -55,8 +57,7 @@ public class ExtractorService {
     public List<Extractor> all(Node node, Input input) throws IOException, APIException {
         List<Extractor> extractors = Lists.newArrayList();
 
-        final ExtractorsResponse extractorsResponse = api.get(ExtractorsResponse.class)
-                .path("/system/inputs/{0}/extractors", input.getId())
+        final ExtractorsResponse extractorsResponse = api.path(resource.list(input.getId()), ExtractorsResponse.class)
                 .node(node)
                 .execute();
         for (ExtractorSummaryResponse ex : extractorsResponse.extractors) {
@@ -70,8 +71,7 @@ public class ExtractorService {
         ExtractorOrderRequest req = new ExtractorOrderRequest();
         req.order = order;
 
-        api.post(EmptyResponse.class)
-                .path("/system/inputs/{0}/extractors/order", inputId)
+        api.path(resource.order(inputId))
                 .body(req)
                 .onlyMasterNode()
                 .execute();
