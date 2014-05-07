@@ -70,7 +70,7 @@ public class LdapController extends AuthenticatedController {
         try {
             final LdapTestConnectionRequest request = getLdapTestConnectionRequest(formData);
             request.testConnectOnly = true;
-            result = api().post(LdapConnectionTestResponse.class).path("/system/ldap/test").body(request).execute();
+            result = ldapSettingsService.testLdapConfiguration(request);
         } catch (APIException e) {
             // couldn't connect
             log.error("Unable to test connection: {}", e.getMessage());
@@ -98,7 +98,7 @@ public class LdapController extends AuthenticatedController {
             request.searchPattern = formData.get("searchPattern");
             request.principal = formData.get("principal");
             request.password = formData.get("password");
-            result = api().post(LdapConnectionTestResponse.class).path("/system/ldap/test").body(request).execute();
+            result = ldapSettingsService.testLdapConfiguration(request);
         } catch (APIException e) {
             log.error("Unable to test login: {}", e.getMessage());
             return internalServerError();
