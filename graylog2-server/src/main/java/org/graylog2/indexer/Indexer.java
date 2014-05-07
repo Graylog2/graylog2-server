@@ -48,6 +48,7 @@ import org.elasticsearch.node.Node;
 import org.elasticsearch.node.NodeBuilder;
 import org.graylog2.Configuration;
 import org.graylog2.StartupException;
+import org.graylog2.UI;
 import org.graylog2.indexer.cluster.Cluster;
 import org.graylog2.indexer.counts.Counts;
 import org.graylog2.indexer.indices.Indices;
@@ -155,56 +156,57 @@ public class Indexer {
             client.admin().cluster().health(new ClusterHealthRequest().waitForYellowStatus()).actionGet(configuration.getEsClusterDiscoveryTimeout(), MILLISECONDS);
         } catch(ElasticSearchTimeoutException e) {
             final String hosts = node.settings().get("discovery.zen.ping.unicast.hosts");
-            final Iterable<String> hostList = Splitter.on(',').split(hosts);
 
-            // if no elasticsearch running
-            for (String host : hostList) {
-                // guess that elasticsearch http is listening on port 9200
-                final Iterable<String> hostAndPort = Splitter.on(':').limit(2).split(host);
-                final Iterator<String> it = hostAndPort.iterator();
-                final String ip = it.next();
-                LOG.info("Checking Elasticsearch HTTP API at http://{}:9200/", ip);
+            if (hosts != null && hosts.contains(",")) {
+                final Iterable<String> hostList = Splitter.on(',').split(hosts);
 
-                try {
-                    // Try the HTTP API endpoint
-                    final ListenableFuture<Response> future = httpClient.prepareGet("http://" + ip + ":9200/_nodes").execute();
-                    final Response response = future.get();
+                // if no elasticsearch running
+                for (String host : hostList) {
+                    // guess that elasticsearch http is listening on port 9200
+                    final Iterable<String> hostAndPort = Splitter.on(':').limit(2).split(host);
+                    final Iterator<String> it = hostAndPort.iterator();
+                    final String ip = it.next();
+                    LOG.info("Checking Elasticsearch HTTP API at http://{}:9200/", ip);
 
-                    final JsonNode resultTree = new ObjectMapper().readTree(response.getResponseBody());
-                    final String clusterName = resultTree.get("cluster_name").textValue();
-                    final JsonNode nodesList = resultTree.get("nodes");
+                    try {
+                        // Try the HTTP API endpoint
+                        final ListenableFuture<Response> future = httpClient.prepareGet("http://" + ip + ":9200/_nodes").execute();
+                        final Response response = future.get();
 
-                    final Iterator<String> nodes = nodesList.fieldNames();
-                    while (nodes.hasNext()) {
-                        final String id = nodes.next();
-                        final String version = nodesList.get(id).get("version").textValue();
-                        if (!Version.CURRENT.toString().equals(version)) {
-                            LOG.error("Elasticsearch node is of the wrong version {}, it must be {}! " +
-                                              "Please make sure you are running the correct version of ElasticSearch.",
-                                      version,
-                                      Version.CURRENT.toString());
+                        final JsonNode resultTree = new ObjectMapper().readTree(response.getResponseBody());
+                        final String clusterName = resultTree.get("cluster_name").textValue();
+                        final JsonNode nodesList = resultTree.get("nodes");
+
+                        final Iterator<String> nodes = nodesList.fieldNames();
+                        while (nodes.hasNext()) {
+                            final String id = nodes.next();
+                            final String version = nodesList.get(id).get("version").textValue();
+                            if (!Version.CURRENT.toString().equals(version)) {
+                                LOG.error("Elasticsearch node is of the wrong version {}, it must be {}! " +
+                                                  "Please make sure you are running the correct version of ElasticSearch.",
+                                          version,
+                                          Version.CURRENT.toString());
+                            }
+                            if (!node.settings().get("cluster.name").equals(clusterName)) {
+                                LOG.error("Elasticsearch cluster name is different, Graylog2 uses `{}`, Elasticsearch cluster uses `{}`. " +
+                                                  "Please check the `cluster.name` setting of both Graylog2 and ElasticSearch.",
+                                          node.settings().get("cluster.name"), clusterName);
+                            }
+
                         }
-                        if (!node.settings().get("cluster.name").equals(clusterName)) {
-                            LOG.error("Elasticsearch cluster name is different, Graylog2 uses `{}`, Elasticsearch cluster uses `{}`. " +
-                                              "Please check the `cluster.name` setting of both Graylog2 and ElasticSearch.",
-                                      node.settings().get("cluster.name"), clusterName);
-                        }
-
+                    } catch (IOException ioException) {
+                        LOG.error("Could not connect to Elasticsearch.", ioException);
+                    } catch (InterruptedException ignore) {
+                    } catch (ExecutionException e1) {
+                       // could not find any server on that address
+                       LOG.error("Could not connect to Elasticsearch at http://" + ip + ":9200/, is it running?" , e1.getCause());
                     }
-                } catch (IOException ioException) {
-                    LOG.error("Could not connect to Elasticsearch.", ioException);
-                } catch (InterruptedException ignore) {
-                } catch (ExecutionException e1) {
-                   // could not find any server on that address
-                   LOG.error("Could not connect to Elasticsearch at http://" + ip + ":9200/, is it running? Error was: {}",
-                             e1.getCause().getMessage());
                 }
             }
 
-            node.close();
-            throw new StartupException("Could not successfully connect to ElasticSearch. Check that your cluster state is not RED " +
-                                             "and that ElasticSearch is running properly.",
-                                     new String[]{"graylog2-server/configuring-and-tuning-elasticsearch-for-graylog2-v0200"});
+            UI.exitHardWithWall("Could not successfully connect to ElasticSearch. Check that your cluster state is not RED " +
+                            "and that ElasticSearch is running properly.",
+                    new String[]{"graylog2-server/configuring-and-tuning-elasticsearch-for-graylog2-v0200"});
         }
 
         searches = searchesFactory.create(client);
