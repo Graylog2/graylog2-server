@@ -29,6 +29,8 @@ import org.graylog2.restclient.lib.timeranges.TimeRange;
 import org.graylog2.restclient.models.api.responses.*;
 import org.graylog2.restclient.models.api.results.DateHistogramResult;
 import org.graylog2.restclient.models.api.results.SearchResult;
+import org.graylog2.restroutes.PathMethod;
+import org.graylog2.restroutes.generated.routes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -102,8 +104,21 @@ public class UniversalSearch {
     }
 
     private <T> T doSearch(Class<T> clazz, MediaType mediaType, int pageSize, Set<String> selectedFields) throws APIException, IOException {
-        final ApiRequestBuilder<T> builder =  api.get(clazz)
-                .path("/search/universal/{0}", timeRange.getType().toString().toLowerCase())
+        PathMethod pathMethod;
+        switch (timeRange.getType()) {
+            case ABSOLUTE:
+                pathMethod = routes.AbsoluteSearchResource().searchAbsolute();
+                break;
+            case KEYWORD:
+                pathMethod = routes.KeywordSearchResource().searchKeyword();
+                break;
+            case RELATIVE:
+                pathMethod = routes.RelativeSearchResource().searchRelative();
+                break;
+            default:
+                throw new RuntimeException("Invalid time range type!");
+        }
+        final ApiRequestBuilder<T> builder =  api.path(pathMethod, clazz)
                 .queryParams(timeRange.getQueryParams())
                 .queryParam("query", query)
                 .queryParam("limit", pageSize)
@@ -149,8 +164,21 @@ public class UniversalSearch {
     }
 
     public DateHistogramResult dateHistogram(String interval) throws IOException, APIException {
-        DateHistogramResponse response = api.get(DateHistogramResponse.class)
-                .path("/search/universal/{0}/histogram", timeRange.getType().toString().toLowerCase())
+        PathMethod routePath;
+        switch (timeRange.getType()) {
+            case ABSOLUTE:
+                routePath = routes.AbsoluteSearchResource().histogramAbsolute();
+                break;
+            case KEYWORD:
+                routePath = routes.KeywordSearchResource().histogramKeyword();
+                break;
+            case RELATIVE:
+                routePath = routes.RelativeSearchResource().histogramRelative();
+                break;
+            default:
+                throw new RuntimeException("Invalid time range type!");
+        }
+        DateHistogramResponse response = api.path(routePath, DateHistogramResponse.class)
                 .queryParam("interval", interval)
                 .queryParam("query", query)
                 .queryParams(timeRange.getQueryParams())
@@ -161,8 +189,21 @@ public class UniversalSearch {
     }
 
     public FieldStatsResponse fieldStats(String field) throws IOException, APIException {
-        return api.get(FieldStatsResponse.class)
-                .path("/search/universal/{0}/stats", timeRange.getType().toString().toLowerCase())
+        PathMethod routePath;
+        switch (timeRange.getType()) {
+            case ABSOLUTE:
+                routePath = routes.AbsoluteSearchResource().statsAbsolute();
+                break;
+            case KEYWORD:
+                routePath = routes.KeywordSearchResource().statsKeyword();
+                break;
+            case RELATIVE:
+                routePath = routes.RelativeSearchResource().statsRelative();
+                break;
+            default:
+                throw new RuntimeException("Invalid time range type!");
+        }
+        return api.path(routePath, FieldStatsResponse.class)
                 .queryParam("field", field)
                 .queryParam("query", query)
                 .queryParams(timeRange.getQueryParams())
@@ -172,8 +213,21 @@ public class UniversalSearch {
     }
 
     public FieldTermsResponse fieldTerms(String field) throws IOException, APIException {
-        return api.get(FieldTermsResponse.class)
-                .path("/search/universal/{0}/terms", timeRange.getType().toString().toLowerCase())
+        PathMethod routePath;
+        switch (timeRange.getType()) {
+            case ABSOLUTE:
+                routePath = routes.AbsoluteSearchResource().termsAbsolute();
+                break;
+            case KEYWORD:
+                routePath = routes.KeywordSearchResource().termsKeyword();
+                break;
+            case RELATIVE:
+                routePath = routes.RelativeSearchResource().termsRelative();
+                break;
+            default:
+                throw new RuntimeException("Invalid time range type!");
+        }
+        return api.path(routePath, FieldTermsResponse.class)
                 .queryParam("field", field)
                 .queryParam("query", query)
                 .queryParams(timeRange.getQueryParams())
@@ -183,8 +237,21 @@ public class UniversalSearch {
     }
 
     public FieldHistogramResponse fieldHistogram(String field, String interval) throws IOException, APIException {
-        return api.get(FieldHistogramResponse.class)
-                .path("/search/universal/{0}/fieldhistogram", timeRange.getType().toString().toLowerCase())
+        PathMethod routePath;
+        switch (timeRange.getType()) {
+            case ABSOLUTE:
+                routePath = routes.AbsoluteSearchResource().fieldHistogramAbsolute();
+                break;
+            case KEYWORD:
+                routePath = routes.KeywordSearchResource().fieldHistogramKeyword();
+                break;
+            case RELATIVE:
+                routePath = routes.RelativeSearchResource().fieldHistogramRelative();
+                break;
+            default:
+                throw new RuntimeException("Invalid time range type!");
+        }
+        return api.path(routePath, FieldHistogramResponse.class)
                 .queryParam("field", field)
                 .queryParam("interval", interval)
                 .queryParam("query", query)

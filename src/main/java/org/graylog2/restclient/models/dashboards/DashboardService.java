@@ -26,6 +26,7 @@ import org.graylog2.restclient.lib.ApiClient;
 import org.graylog2.restclient.models.api.requests.dashboards.CreateDashboardRequest;
 import org.graylog2.restclient.models.api.responses.dashboards.DashboardSummaryResponse;
 import org.graylog2.restclient.models.api.responses.dashboards.GetDashboardsResponse;
+import org.graylog2.restroutes.generated.routes;
 import play.mvc.Http;
 
 import java.io.IOException;
@@ -47,18 +48,16 @@ public class DashboardService {
 
 
     public Dashboard get(String id) throws APIException, IOException {
-        DashboardSummaryResponse d = api.get(DashboardSummaryResponse.class)
+        DashboardSummaryResponse d = api.path(routes.DashboardsResource().get(id), DashboardSummaryResponse.class)
                 .onlyMasterNode()
-                .path("/dashboards/{0}", id)
                 .execute();
         return dashboardFactory.fromSummaryResponse(d);
     }
 
     public List<Dashboard> getAll() throws APIException, IOException {
         List<Dashboard> dashboards = Lists.newArrayList();
-        GetDashboardsResponse response = api.get(GetDashboardsResponse.class)
+        GetDashboardsResponse response = api.path(routes.DashboardsResource().list(), GetDashboardsResponse.class)
                 .onlyMasterNode()
-                .path("/dashboards")
                 .execute();
 
         if (response == null || response.dashboards == null) {
@@ -73,7 +72,7 @@ public class DashboardService {
     }
 
     public void create(CreateDashboardRequest request) throws APIException, IOException {
-        api.post().path("/dashboards")
+        api.path(routes.DashboardsResource().create())
                 .onlyMasterNode()
                 .body(request)
                 .expect(Http.Status.CREATED)
@@ -81,7 +80,7 @@ public class DashboardService {
     }
 
     public void delete(String id) throws APIException, IOException {
-        api.delete().path("/dashboards/{0}", id)
+        api.path(routes.DashboardsResource().delete(id))
                 .onlyMasterNode()
                 .expect(Http.Status.NO_CONTENT)
                 .execute();

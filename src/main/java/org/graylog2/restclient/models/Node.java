@@ -38,6 +38,7 @@ import org.graylog2.restclient.models.api.responses.system.loggers.LoggerSubsyst
 import org.graylog2.restclient.models.api.responses.system.loggers.LoggerSubsystemsResponse;
 import org.graylog2.restclient.models.api.responses.system.loggers.LoggerSummary;
 import org.graylog2.restclient.models.api.responses.system.loggers.LoggersResponse;
+import org.graylog2.restroutes.generated.routes;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.slf4j.LoggerFactory;
@@ -122,9 +123,8 @@ public class Node extends ClusterEntity {
     public BufferInfo getBufferInfo() {
         try {
             return new BufferInfo(
-                    api.get(BuffersResponse.class)
+                    api.path(routes.BufferResource().utilization(), BuffersResponse.class)
                     .node(this)
-                    .path("/system/buffers")
                     .execute());
         } catch (APIException e) {
             log.error("Unable to read buffer info from node " + this, e);
@@ -137,9 +137,8 @@ public class Node extends ClusterEntity {
     public Map<String, InternalLoggerSubsystem> allLoggerSubsystems() {
         Map<String, InternalLoggerSubsystem> subsystems = Maps.newHashMap();
         try {
-            LoggerSubsystemsResponse response = api.get(LoggerSubsystemsResponse.class)
+            LoggerSubsystemsResponse response = api.path(routes.LoggersResource().subsytems(), LoggerSubsystemsResponse.class)
                     .node(this)
-                    .path("/system/loggers/subsystems")
                     .execute();
 
             for (Map.Entry<String, LoggerSubsystemSummary> ss : response.subsystems.entrySet()) {
@@ -160,9 +159,8 @@ public class Node extends ClusterEntity {
     public List<InternalLogger> allLoggers() {
         List<InternalLogger> loggers = Lists.newArrayList();
         try {
-            LoggersResponse response = api.get(LoggersResponse.class)
+            LoggersResponse response = api.path(routes.LoggersResource().loggers(), LoggersResponse.class)
                     .node(this)
-                    .path("/system/loggers")
                     .execute();
 
             for (Map.Entry<String, LoggerSummary> logger : response.loggers.entrySet()) {
@@ -177,15 +175,14 @@ public class Node extends ClusterEntity {
     }
 
     public void setSubsystemLoggerLevel(String subsystem, String level) throws APIException, IOException {
-        api.put().node(this)
-                .path("/system/loggers/subsystems/{0}/level/{1}", subsystem, level)
+        api.path(routes.LoggersResource().setSubsystemLoggerLevel(subsystem, level))
+                .node(this)
                 .execute();
     }
 
     public String getThreadDump() throws IOException, APIException {
-        return api.get(String.class)
+        return api.path(routes.SystemResource().threaddump(), String.class)
                 .node(this)
-                .path("/system/threaddump")
                 .accept(MediaType.ANY_TEXT_TYPE)
                 .execute();
     }
@@ -209,7 +206,7 @@ public class Node extends ClusterEntity {
     }
 
     public Input getInput(String inputId) throws IOException, APIException {
-        final InputSummaryResponse inputSummaryResponse = api.get(InputSummaryResponse.class).node(this).path("/system/inputs/{0}", inputId).execute();
+        final InputSummaryResponse inputSummaryResponse = api.path(routes.InputsResource().single(inputId), InputSummaryResponse.class).node(this).execute();
         return inputFactory.fromSummaryResponse(inputSummaryResponse, this);
     }
 
@@ -236,8 +233,7 @@ public class Node extends ClusterEntity {
 
         InputLaunchResponse ilr = null;
         try {
-            ilr = api.post(InputLaunchResponse.class)
-                    .path("/system/inputs")
+            ilr = api.path(routes.InputsResource().create(), InputLaunchResponse.class)
                     .node(this)
                     .body(request)
                     .expect(Http.Status.ACCEPTED)
@@ -252,7 +248,7 @@ public class Node extends ClusterEntity {
 
     public boolean launchExistingInput(String inputId) {
         try {
-            api.get(EmptyResponse.class).path("/system/inputs/{0}/launch", inputId)
+            api.path(routes.InputsResource().launchExisting(inputId))
                     .node(this)
                     .expect(Http.Status.ACCEPTED)
                     .execute();
@@ -269,7 +265,7 @@ public class Node extends ClusterEntity {
     @Override
     public boolean terminateInput(String inputId) {
         try {
-            api.delete().path("/system/inputs/{0}", inputId)
+            api.path(routes.InputsResource().terminate(inputId))
                     .node(this)
                     .expect(Http.Status.ACCEPTED)
                     .execute();
@@ -284,11 +280,11 @@ public class Node extends ClusterEntity {
     }
 
     public Map<String, String> getInputTypes() throws IOException, APIException {
-        return api.get(InputTypesResponse.class).node(this).path("/system/inputs/types").execute().types;
+        return api.path(routes.InputsResource().types(), InputTypesResponse.class).node(this).execute().types;
     }
 
     public InputTypeSummaryResponse getInputTypeInformation(String type) throws IOException, APIException {
-        return api.get(InputTypeSummaryResponse.class).node(this).path("/system/inputs/types/{0}", type).execute();
+        return api.path(routes.InputsResource().info(type), InputTypeSummaryResponse.class).node(this).execute();
     }
 
     public Map<String, InputTypeSummaryResponse> getAllInputTypeInformation() throws IOException, APIException {
@@ -305,7 +301,9 @@ public class Node extends ClusterEntity {
     // TODO nodes should not have state beyond their activity status
     public synchronized void loadSystemInformation() {
         try {
-            this.systemInfo = api.get(SystemOverviewResponse.class).path("/system").node(this).execute();
+            this.systemInfo = api.path(routes.SystemResource().system(), SystemOverviewResponse.class)
+                    .node(this)
+                    .execute();
         } catch (APIException e) {
             log.error("Unable to load system information for node " + this, e);
         } catch (IOException e) {
@@ -315,7 +313,11 @@ public class Node extends ClusterEntity {
 
     public synchronized void loadJVMInformation() {
         try {
-            jvmInfo = new NodeJVMStats(api.get(ClusterEntityJVMStatsResponse.class).path("/system/jvm").node(this).execute());
+            jvmInfo = new NodeJVMStats(
+                    api.path(routes.SystemResource().jvm(), ClusterEntityJVMStatsResponse.class)
+                            .node(this)
+                            .execute()
+            );
         } catch (APIException e) {
             log.error("Unable to load JVM information for node " + this, e);
         } catch (IOException e) {
@@ -396,9 +398,8 @@ public class Node extends ClusterEntity {
     }
 
     public Map<String, Metric> getMetrics(String namespace) throws APIException, IOException {
-        MetricsListResponse response = api.get(MetricsListResponse.class)
+        MetricsListResponse response = api.path(routes.MetricsResource().byNamespace(namespace), MetricsListResponse.class)
                 .node(this)
-                .path("/system/metrics/namespace/{0}", namespace)
                 .expect(200, 404)
                 .execute();
         if (response == null) {
@@ -412,29 +413,26 @@ public class Node extends ClusterEntity {
     }
 
     public void pause() throws IOException, APIException {
-        api.put()
-            .path("/system/processing/pause")
+        api.path(routes.SystemResource().pauseProcessing())
             .node(this)
             .execute();
     }
 
     public void resume() throws IOException, APIException {
-        api.put()
-            .path("/system/processing/resume")
+        api.path(routes.SystemResource().resumeProcessing())
             .node(this)
             .execute();
     }
 
     public void overrideLbStatus(String override) throws APIException, IOException {
-        api.put()
-            .path("/system/lbstatus/override/{0}", override)
+        api.path(routes.LoadBalancerStatusResource().override(override))
             .node(this)
             .execute();
     }
 
     public int getThroughput() {
         try {
-            return api.get(NodeThroughputResponse.class).node(this).path("/system/throughput").execute().throughput;
+            return api.path(routes.ThroughputResource().total(), NodeThroughputResponse.class).node(this).execute().throughput;
         } catch (APIException e) {
             log.error("Could not load throughput for node " + this, e);
         } catch (IOException e) {
@@ -450,7 +448,7 @@ public class Node extends ClusterEntity {
      */
     private InputsResponse inputs() {
         try {
-            return api.get(InputsResponse.class).node(this).path("/system/inputs").execute();
+            return api.path(routes.InputsResource().list(), InputsResponse.class).node(this).execute();
         } catch (Exception e) {
             Logger.error("Could not get inputs.", e);
             throw new RuntimeException("Could not get inputs.", e);
@@ -499,7 +497,7 @@ public class Node extends ClusterEntity {
     }
 
     public void shutdown() throws APIException, IOException {
-        api.post().path("/system/shutdown")
+        api.path(routes.SystemResource().shutdown())
                 .node(this)
                 .expect(Http.Status.ACCEPTED)
                 .execute();

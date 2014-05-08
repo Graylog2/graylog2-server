@@ -32,6 +32,7 @@ import org.graylog2.restclient.models.api.responses.alerts.AlertsResponse;
 import org.graylog2.restclient.models.api.responses.streams.StreamRuleSummaryResponse;
 import org.graylog2.restclient.models.api.responses.streams.StreamSummaryResponse;
 import org.graylog2.restclient.models.api.responses.streams.StreamThroughputResponse;
+import org.graylog2.restroutes.generated.routes;
 import org.joda.time.DateTime;
 
 import java.io.IOException;
@@ -107,7 +108,7 @@ public class Stream {
     }
 
     public void addAlertReceiver(User user) throws APIException, IOException {
-        api.post().path("/streams/{0}/alerts/receivers", getId())
+        api.path(routes.StreamAlertReceiverResource().addReceiver(getId()))
                 .queryParam("entity", user.getName())
                 .queryParam("type", "users")
                 .expect(201)
@@ -115,7 +116,7 @@ public class Stream {
     }
 
     public void addAlertReceiver(String email) throws APIException, IOException {
-        api.post().path("/streams/{0}/alerts/receivers", getId())
+        api.path(routes.StreamAlertReceiverResource().addReceiver(getId()))
                 .queryParam("entity", email)
                 .queryParam("type", "emails")
                 .expect(201)
@@ -123,7 +124,7 @@ public class Stream {
     }
 
     public void removeAlertReceiver(User user) throws APIException, IOException {
-        api.delete().path("/streams/{0}/alerts/receivers", getId())
+        api.path(routes.StreamAlertReceiverResource().removeReceiver(getId()))
                 .queryParam("entity", user.getName())
                 .queryParam("type", "users")
                 .expect(204)
@@ -131,7 +132,7 @@ public class Stream {
     }
 
     public void removeAlertReceiver(String email) throws APIException, IOException {
-        api.delete().path("/streams/{0}/alerts/receivers", getId())
+        api.path(routes.StreamAlertReceiverResource().removeReceiver(getId()))
                 .queryParam("entity", email)
                 .queryParam("type", "emails")
                 .expect(204)
@@ -190,8 +191,7 @@ public class Stream {
 
     private final AlertsResponse getAlertsInformation(int since) throws APIException, IOException {
         if (alertsResponse == null) {
-            ApiRequestBuilder<AlertsResponse> call = api.get(AlertsResponse.class)
-                    .path("/streams/{0}/alerts", getId());
+            ApiRequestBuilder<AlertsResponse> call = api.path(routes.StreamAlertResource().list(getId()), AlertsResponse.class);
 
             if (since > 0) {
                 call.queryParam("since", since);
@@ -204,8 +204,7 @@ public class Stream {
     }
 
     public long getThroughput() throws APIException, IOException {
-        final StreamThroughputResponse throughputResponse = api.get(StreamThroughputResponse.class)
-                .path("/streams/{0}/throughput", getId())
+        final StreamThroughputResponse throughputResponse = api.path(routes.StreamResource().oneStreamThroughput(getId()), StreamThroughputResponse.class)
                 .expect(200, 404)
                 .execute();
 

@@ -46,7 +46,7 @@ public class PermissionsService {
     public List<String> all() {
         List<String> permissions = Lists.newArrayList();
         try {
-            RestPermissionsResponse response = api.get(RestPermissionsResponse.class).path("/system/permissions").execute();
+            RestPermissionsResponse response = api.path(routes.SystemResource().permissions(), RestPermissionsResponse.class).execute();
             for (String group : response.permissions.keySet()) {
                 permissions.add(group + ":*");
                 for (String action : response.permissions.get(group)) {

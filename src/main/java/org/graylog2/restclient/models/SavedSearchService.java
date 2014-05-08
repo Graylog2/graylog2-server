@@ -55,7 +55,7 @@ public class SavedSearchService {
     public List<SavedSearch> all() throws APIException, IOException {
         List<SavedSearch> list = Lists.newArrayList();
 
-        SavedSearchesResponse response = api.get(SavedSearchesResponse.class).path("/search/saved").execute();
+        SavedSearchesResponse response = api.path(routes.SavedSearchesResource().list(), SavedSearchesResponse.class).execute();
 
         for (SavedSearchSummaryResponse search : response.searches) {
             list.add(savedSearchFactory.fromSummaryResponse(search));

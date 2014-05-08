@@ -81,7 +81,7 @@ public class UserService {
     public List<User> all() {
         UsersListResponse response;
         try {
-            response = api.get(UsersListResponse.class).path("/users").execute();
+            response = api.path(routes.UsersResource().listUsers(), UsersListResponse.class).execute();
             List<User> users = Lists.newArrayList();
             for (UserResponse userResponse : response.users) {
                 users.add(new User(api, userResponse, null)); // we don't have password's for the user list, obviously

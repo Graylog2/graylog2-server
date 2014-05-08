@@ -28,6 +28,7 @@ import org.graylog2.restclient.models.api.requests.dashboards.WidgetUpdateReques
 import org.graylog2.restclient.models.api.responses.dashboards.DashboardWidgetResponse;
 import org.graylog2.restclient.models.api.responses.dashboards.DashboardWidgetValueResponse;
 import org.graylog2.restclient.models.dashboards.Dashboard;
+import org.graylog2.restroutes.generated.routes;
 import org.joda.time.DateTime;
 import play.mvc.Call;
 
@@ -104,8 +105,7 @@ public abstract class DashboardWidget {
     }
 
     public DashboardWidgetValueResponse getValue(ApiClient api) throws APIException, IOException {
-        return api.get(DashboardWidgetValueResponse.class)
-                    .path("/dashboards/{0}/widgets/{1}/value", dashboard.getId(), id)
+        return api.path(routes.DashboardsResource().widgetValue(dashboard.getId(), id),  DashboardWidgetValueResponse.class)
                     .onlyMasterNode()
                     .execute();
     }
@@ -114,7 +114,7 @@ public abstract class DashboardWidget {
         WidgetUpdateRequest wur = new WidgetUpdateRequest();
         wur.description = newDescription;
 
-        api.put().path("/dashboards/{0}/widgets/{1}/description", dashboard.getId(), id)
+        api.path(routes.DashboardsResource().updateDescription(dashboard.getId(), id))
                 .body(wur)
                 .onlyMasterNode()
                 .execute();
@@ -124,7 +124,7 @@ public abstract class DashboardWidget {
         WidgetUpdateRequest wur = new WidgetUpdateRequest();
         wur.cacheTime = cacheTime;
 
-        api.put().path("/dashboards/{0}/widgets/{1}/cachetime", dashboard.getId(), id)
+        api.path(routes.DashboardsResource().updateCacheTime(dashboard.getId(), id))
                 .body(wur)
                 .onlyMasterNode()
                 .execute();

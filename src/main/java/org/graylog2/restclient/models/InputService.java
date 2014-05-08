@@ -51,7 +51,8 @@ public class InputService {
         result.putAll(api.path(resource.list(), InputsResponse.class).fromAllNodes().executeOnAll());
         try {
             for(Radio radio : nodeService.radios().values()) {
-                result.put(radio, api.get(InputsResponse.class).radio(radio).path("/system/inputs").execute());
+                result.put(radio,
+                        api.path(routes.radio().InputsResource().list(), InputsResponse.class).radio(radio).execute());
             }
         } catch (APIException e) {
             log.error("Unable to fetch radio list: " + e);

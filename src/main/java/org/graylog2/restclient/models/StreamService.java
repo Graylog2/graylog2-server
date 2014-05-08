@@ -121,7 +121,7 @@ public class StreamService {
     }
 
     public void sendDummyAlert(String streamId) throws APIException, IOException {
-        api.path(routes.StreamAlertResource().sendDummyAlert(streamId))
+        api.path(routes.StreamAlertReceiverResource().sendDummyAlert(streamId))
                 .expect(Http.Status.NO_CONTENT).execute();
     }
 

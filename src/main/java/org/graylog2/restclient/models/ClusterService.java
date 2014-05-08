@@ -32,6 +32,7 @@ import org.graylog2.restclient.models.api.responses.metrics.MetricsListResponse;
 import org.graylog2.restclient.models.api.responses.system.*;
 import org.graylog2.restclient.models.api.responses.system.indices.IndexerFailureCountResponse;
 import org.graylog2.restclient.models.api.responses.system.indices.IndexerFailuresResponse;
+import org.graylog2.restroutes.generated.routes;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.ISODateTimeFormat;
@@ -63,15 +64,14 @@ public class ClusterService {
     }
 
     public void triggerSystemJob(SystemJob.Type type, User user) throws IOException, APIException {
-        api.post()
-                .path("/system/jobs")
+        api.path(routes.SystemJobResource().trigger())
                 .body(new SystemJobTriggerRequest(type, user))
                 .expect(Http.Status.ACCEPTED)
                 .execute();
     }
 
     public List<Notification> allNotifications() throws IOException, APIException {
-        GetNotificationsResponse r = api.get(GetNotificationsResponse.class).path("/system/notifications").execute();
+        GetNotificationsResponse r = api.path(routes.NotificationsResource().listNotifications(), GetNotificationsResponse.class).execute();
 
         List<Notification> notifications = Lists.newArrayList();
         for (NotificationSummaryResponse notification : r.notifications) {
@@ -87,15 +87,13 @@ public class ClusterService {
     }
 
     public void deleteNotification(Notification.Type type) throws APIException, IOException {
-        api.delete()
-                .path("/system/notifications/{0}", type.toString().toLowerCase())
+        api.path(routes.NotificationsResource().deleteNotification(type.toString().toLowerCase()))
                 .expect(204)
                 .execute();
     }
 
     public long getIndexerFailureCountLast24Hours() throws APIException, IOException {
-        IndexerFailureCountResponse r = api.get(IndexerFailureCountResponse.class)
-                .path("/system/indexer/failures/count")
+        IndexerFailureCountResponse r = api.path(routes.FailuresResource().count(), IndexerFailureCountResponse.class)
                 .queryParam("since", ISODateTimeFormat.dateTime().print(new DateTime(DateTimeZone.UTC).minusDays(1)))
                 .execute();
 
@@ -103,16 +101,14 @@ public class ClusterService {
     }
 
     public IndexerFailuresResponse getIndexerFailures(int limit, int offset) throws APIException, IOException {
-        return api.get(IndexerFailuresResponse.class)
-                .path("/system/indexer/failures")
+        return api.path(routes.FailuresResource().single(), IndexerFailuresResponse.class)
                 .queryParam("limit", limit)
                 .queryParam("offset", offset)
                 .execute();
     }
 
     public List<SystemMessage> getSystemMessages(int page) throws IOException, APIException {
-        GetSystemMessagesResponse r = api.get(GetSystemMessagesResponse.class)
-                .path("/system/messages")
+        GetSystemMessagesResponse r = api.path(routes.MessagesResource().all(), GetSystemMessagesResponse.class)
                 .queryParam("page", page)
                 .execute();
         List<SystemMessage> messages = Lists.newArrayList();
@@ -124,14 +120,14 @@ public class ClusterService {
     }
 
     public int getNumberOfSystemMessages() throws IOException, APIException {
-        return api.get(GetSystemMessagesResponse.class).path("/system/messages").execute().total;
+        return api.path(routes.MessagesResource().all(), GetSystemMessagesResponse.class).execute().total;
     }
 
     public List<SystemJob> allSystemJobs() throws IOException, APIException {
         List<SystemJob> jobs = Lists.newArrayList();
 
         for(Node node : serverNodes.all()) {
-            GetSystemJobsResponse r = api.get(GetSystemJobsResponse.class).node(node).path("/system/jobs").execute();
+            GetSystemJobsResponse r = api.path(routes.SystemJobResource().list(), GetSystemJobsResponse.class).node(node).execute();
 
             for (SystemJobSummaryResponse job : r.jobs) {
                 jobs.add(systemJobFactory.fromSummaryResponse(job));
@@ -143,7 +139,7 @@ public class ClusterService {
 
     public ESClusterHealth getESClusterHealth() {
         try {
-            final ESClusterHealthResponse response = api.get(ESClusterHealthResponse.class).path("/system/indexer/cluster/health").execute();
+            final ESClusterHealthResponse response = api.path(routes.IndexerClusterResource().clusterHealth(), ESClusterHealthResponse.class).execute();
             return new ESClusterHealth(response);
         } catch (APIException e) {
             log.error("Could not load es cluster health", e);
@@ -155,7 +151,7 @@ public class ClusterService {
 
     public List<NodeJVMStats> getClusterJvmStats() {
         List<NodeJVMStats> result = Lists.newArrayList();
-        Map<Node, ClusterEntityJVMStatsResponse> rs = api.get(ClusterEntityJVMStatsResponse.class).fromAllNodes().path("/system/jvm").executeOnAll();
+        Map<Node, ClusterEntityJVMStatsResponse> rs = api.path(routes.SystemResource().jvm(), ClusterEntityJVMStatsResponse.class).fromAllNodes().executeOnAll();
 
         for (Map.Entry<Node, ClusterEntityJVMStatsResponse> entry : rs.entrySet()) {
             if (entry.getValue() == null) {
@@ -170,7 +166,9 @@ public class ClusterService {
 
     public F.Tuple<Integer, Integer> getClusterThroughput() {
         final Map<Node, NodeThroughputResponse> responses =
-                api.get(NodeThroughputResponse.class).fromAllNodes().path("/system/throughput").executeOnAll();
+                api.path(routes.ThroughputResource().total(), NodeThroughputResponse.class)
+                        .fromAllNodes()
+                        .executeOnAll();
         int t = 0;
         for (Map.Entry<Node, NodeThroughputResponse> entry : responses.entrySet()) {
             if (entry.getValue() == null) {
@@ -220,9 +218,8 @@ public class ClusterService {
             final String written_bytes_total = qualifiedIOMetricName(type, inputId, "written_bytes", true);
             request.metrics = new String[]{read_bytes, read_bytes_total, written_bytes, written_bytes_total};
 
-            final Map<Node, MetricsListResponse> results = api.post(MetricsListResponse.class)
+            final Map<Node, MetricsListResponse> results = api.path(routes.MetricsResource().multipleMetrics(), MetricsListResponse.class)
                     .body(request)
-                    .path("/system/metrics/multiple")
                     .expect(200, 404)
                     .executeOnAll();
 
@@ -237,10 +234,10 @@ public class ClusterService {
 
             for (Radio radio : nodeService.radios().values()) {
                 try {
-                    final MetricsListResponse radioResponse = api.post(MetricsListResponse.class)
+                    final MetricsListResponse radioResponse = api
+                            .path(routes.radio().MetricsResource().multipleMetrics(), MetricsListResponse.class)
                             .body(request)
                             .radio(radio)
-                            .path("/system/metrics/multiple")
                             .expect(200, 404)
                             .execute();
                     final Map<String, Metric> metrics = radioResponse.getMetrics();

@@ -26,6 +26,7 @@ import org.graylog2.restclient.lib.ApiClient;
 import org.graylog2.restclient.models.api.responses.cluster.NodeSummaryResponse;
 import org.graylog2.restclient.models.api.responses.cluster.RadioSummaryResponse;
 import org.graylog2.restclient.models.api.responses.cluster.RadiosResponse;
+import org.graylog2.restroutes.generated.routes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,8 +48,7 @@ public class NodeService {
     public Node loadNode(String nodeId) throws NodeNotFoundException {
         NodeSummaryResponse r;
         try {
-            r = api.get(NodeSummaryResponse.class)
-                    .path("/system/cluster/nodes/{0}", nodeId)
+            r = api.path(routes.ClusterResource().node(nodeId), NodeSummaryResponse.class)
                     .execute();
             return nodeFactory.fromSummaryResponse(r);
         } catch (IOException e) {
@@ -64,8 +64,7 @@ public class NodeService {
     }
 
     public Node loadMasterNode() throws APIException, IOException {
-        NodeSummaryResponse r = api.get(NodeSummaryResponse.class)
-                .path("/system/cluster/node")
+        NodeSummaryResponse r = api.path(routes.ClusterResource().node(), NodeSummaryResponse.class)
                 .onlyMasterNode()
                 .execute();
 
@@ -76,8 +75,7 @@ public class NodeService {
         RadioSummaryResponse r;
 
         try {
-            r = api.get(RadioSummaryResponse.class)
-                    .path("/system/radios/{0}", radioId)
+            r = api.path(routes.RadiosResource().radio(radioId), RadioSummaryResponse.class)
                     .execute();
             return radioFactory.fromSummaryResponse(r);
         } catch (IOException e) {
@@ -94,7 +92,7 @@ public class NodeService {
     public Map<String, Radio> radios() throws APIException, IOException {
         Map<String, Radio> radios = Maps.newHashMap();
 
-        RadiosResponse r = api.get(RadiosResponse.class).path("/system/radios").execute();
+        RadiosResponse r = api.path(routes.RadiosResource().radios(), RadiosResponse.class).execute();
         for (RadioSummaryResponse radio : r.radios) {
             radios.put(radio.id, radioFactory.fromSummaryResponse(radio));
         }

@@ -18,6 +18,7 @@
  */
 package org.graylog2.restclient.models;
 
+import com.google.common.base.Joiner;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import org.graylog2.restclient.lib.APIException;
@@ -186,9 +187,8 @@ public class Input {
         final String written_bytes_total = qualifiedIOMetricName("written_bytes", true);
         request.metrics = new String[] { read_bytes, read_bytes_total, written_bytes, written_bytes_total };
         try {
-            final MetricsListResponse response = api.post(MetricsListResponse.class)
+            final MetricsListResponse response = api.path(routes.MetricsResource().multipleMetrics(), MetricsListResponse.class)
                     .clusterEntity(node)
-                    .path("/system/metrics/multiple")
                     .body(request)
                     .expect(200, 404)
                     .execute();
@@ -232,9 +232,8 @@ public class Input {
 
     private Long getGaugeValue(String name) {
         try {
-            GaugeResponse response = api.get(GaugeResponse.class)
+            GaugeResponse response = api.path(routes.MetricsResource().singleMetric(Joiner.on(".").join(type, id, name)), GaugeResponse.class)
                 .clusterEntity(node)
-                .path("/system/metrics/{0}.{1}.{2}", type, id, name)
                 .expect(200, 404)
                 .execute();
 

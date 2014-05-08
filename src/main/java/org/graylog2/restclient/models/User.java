@@ -29,6 +29,7 @@ import org.graylog2.restclient.models.api.responses.system.UserResponse;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.SimplePrincipalCollection;
 import org.apache.shiro.subject.Subject;
+import org.graylog2.restroutes.generated.routes;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -99,7 +100,7 @@ public class User {
 
     public boolean update(ChangeUserRequest request) {
         try {
-            api.put().path("/users/{0}", getName()).body(request).expect(Http.Status.NO_CONTENT).execute();
+            api.path(routes.UsersResource().changeUser(getName())).body(request).expect(Http.Status.NO_CONTENT).execute();
             return true;
         } catch (APIException e) {
             log.error("Unable to update user", e);
@@ -143,8 +144,7 @@ public class User {
 
     public boolean updatePassword(ChangePasswordRequest request) {
         try {
-            api.put()
-                .path("/users/{0}/password", getName())
+            api.path(routes.UsersResource().changePassword(getName()))
                 .body(request)
                 .expect(Http.Status.NO_CONTENT)
                 .execute();

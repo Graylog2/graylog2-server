@@ -32,6 +32,7 @@ import org.graylog2.restclient.models.api.responses.dashboards.DashboardSummaryR
 import org.graylog2.restclient.models.api.responses.dashboards.DashboardWidgetResponse;
 import org.graylog2.restclient.models.api.responses.dashboards.WidgetPositionResponse;
 import org.graylog2.restclient.models.dashboards.widgets.DashboardWidget;
+import org.graylog2.restroutes.generated.routes;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -79,7 +80,7 @@ public class Dashboard {
     public void addWidget(DashboardWidget widget, User user) throws APIException, IOException {
         AddWidgetRequest request = new AddWidgetRequest(widget, user);
 
-        api.post().path("/dashboards/{0}/widgets", id)
+        api.path(routes.DashboardsResource().addWidget(id))
                 .onlyMasterNode()
                 .body(request)
                 .expect(Http.Status.CREATED)
@@ -87,14 +88,14 @@ public class Dashboard {
     }
 
     public void removeWidget(String widgetId) throws APIException, IOException {
-        api.delete().path("/dashboards/{0}/widgets/{1}", id, widgetId)
+        api.path(routes.DashboardsResource().remove(id, widgetId))
                 .onlyMasterNode()
                 .expect(Http.Status.NO_CONTENT)
                 .execute();
     }
 
     public void update(UpdateDashboardRequest udr) throws APIException, IOException {
-        api.put().path("/dashboards/{0}", id)
+        api.path(routes.DashboardsResource().update(id))
                 .body(udr)
                 .expect(Http.Status.OK)
                 .execute();
@@ -112,7 +113,7 @@ public class Dashboard {
             req.positions.add(position);
         }
 
-        api.put().path("/dashboards/{0}/positions", id)
+        api.path(routes.DashboardsResource().setPositions(id))
                 .body(req)
                 .expect(Http.Status.OK)
                 .execute();

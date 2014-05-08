@@ -25,6 +25,7 @@ import org.graylog2.restclient.models.api.results.DateHistogramResult;
 
 import java.io.IOException;
 
+// TODO: what is this doing?! remove if unused.
 public class MessageCountHistogram {
 
     private final ApiClient api;
