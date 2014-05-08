@@ -43,9 +43,9 @@ import java.util.Map;
 @RequiresAuthentication
 @Api(value = "Indexer/Cluster", description = "Indexer cluster information")
 @Path("/system/indexer/cluster")
-public class ClusterResource extends RestResource {
+public class IndexerClusterResource extends RestResource {
 
-    private static final Logger LOG = LoggerFactory.getLogger(ClusterResource.class);
+    private static final Logger LOG = LoggerFactory.getLogger(IndexerClusterResource.class);
     @Inject
     private Indexer indexer;
 
