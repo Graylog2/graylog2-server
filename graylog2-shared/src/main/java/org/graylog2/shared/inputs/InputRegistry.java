@@ -78,6 +78,7 @@ public abstract class InputRegistry {
             public void run() {
                 LOG.info("Starting [{}] input with ID <{}>", input.getClass().getCanonicalName(), input.getId());
                 try {
+                    input.checkConfiguration();
                     inputState.setState(InputState.InputStateType.STARTING);
                     input.launch(processBuffer);
                     inputState.setState(InputState.InputStateType.RUNNING);
@@ -174,13 +175,6 @@ public abstract class InputRegistry {
     }
 
     public InputState launchPersisted(MessageInput input) {
-        try {
-            input.checkConfiguration();
-        } catch (ConfigurationException e) {
-            LOG.error("Missing or invalid input input configuration.", e);
-            return null;
-        }
-
         return launch(input);
     }
 

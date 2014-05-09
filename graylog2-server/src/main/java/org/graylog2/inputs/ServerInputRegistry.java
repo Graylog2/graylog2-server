@@ -64,8 +64,6 @@ public class ServerInputRegistry extends InputRegistry {
                 result.add(input);
             } catch (NoSuchInputTypeException e) {
                 LOG.warn("Cannot launch persisted input. No such type [{}].", io.getType());
-            } catch (ConfigurationException e) {
-                LOG.error("Missing or invalid input plugin configuration.", e);
             }
         }
 

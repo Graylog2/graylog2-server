@@ -260,9 +260,6 @@ public class InputsResource extends RestResource {
         } catch (NoSuchInputTypeException e) {
             LOG.info("Cannot launch input. Input not found.");
             throw new WebApplicationException(404);
-        } catch (ConfigurationException e) {
-            LOG.info("Cannot launch input. Configuration is invalid.");
-            throw new WebApplicationException(404);
         } catch (org.graylog2.database.NotFoundException e) {
             throw new WebApplicationException(404);
         }
@@ -298,9 +295,6 @@ public class InputsResource extends RestResource {
             input = inputService.getMessageInput(inputService.findForThisNode(serverStatus.getNodeId().toString(), inputId));
         } catch (NoSuchInputTypeException e) {
             LOG.info("Cannot launch input. Input not found.");
-            throw new WebApplicationException(404);
-        } catch (ConfigurationException e) {
-            LOG.info("Cannot launch input. Configuration is invalid.");
             throw new WebApplicationException(404);
         } catch (NotFoundException e) {
             throw new WebApplicationException(404);

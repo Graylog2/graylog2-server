@@ -226,7 +226,7 @@ public class InputServiceImpl extends PersistedServiceImpl implements InputServi
         removeEmbedded(input, InputImpl.EMBEDDED_STATIC_FIELDS, key);
     }
 
-    public MessageInput getMessageInput(Input io) throws NoSuchInputTypeException, ConfigurationException {
+    public MessageInput getMessageInput(Input io) throws NoSuchInputTypeException {
         MessageInput input = messageInputFactory.create(io.getType());
 
         // Add all standard fields.
@@ -247,8 +247,6 @@ public class InputServiceImpl extends PersistedServiceImpl implements InputServi
         for (Map.Entry<String, String> field : io.getStaticFields().entrySet()) {
             input.addStaticField(field.getKey(), field.getValue());
         }
-
-        input.checkConfiguration();
 
         return input;
     }
