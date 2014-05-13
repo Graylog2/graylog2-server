@@ -16,4 +16,28 @@ public class CreateAlarmCallbackRequest extends ApiRequest {
     public Map<String, String> configuration;
     @SerializedName("creator_user_id")
     public String creatorUserId;
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public Map<String, String> getConfiguration() {
+        return configuration;
+    }
+
+    public void setConfiguration(Map<String, String> configuration) {
+        this.configuration = configuration;
+    }
+
+    public String getCreatorUserId() {
+        return creatorUserId;
+    }
+
+    public void setCreatorUserId(String creatorUserId) {
+        this.creatorUserId = creatorUserId;
+    }
 }

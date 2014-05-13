@@ -77,4 +77,60 @@ public class ChangeUserRequestForm extends ChangeUserRequest {
             }
         }
     }
+
+    public List<String> getStreampermissions() {
+        return streampermissions;
+    }
+
+    public void setStreampermissions(List<String> streampermissions) {
+        this.streampermissions = streampermissions;
+    }
+
+    public List<String> getStreameditpermissions() {
+        return streameditpermissions;
+    }
+
+    public void setStreameditpermissions(List<String> streameditpermissions) {
+        this.streameditpermissions = streameditpermissions;
+    }
+
+    public List<String> getDashboardpermissions() {
+        return dashboardpermissions;
+    }
+
+    public void setDashboardpermissions(List<String> dashboardpermissions) {
+        this.dashboardpermissions = dashboardpermissions;
+    }
+
+    public List<String> getDashboardeditpermissions() {
+        return dashboardeditpermissions;
+    }
+
+    public void setDashboardeditpermissions(List<String> dashboardeditpermissions) {
+        this.dashboardeditpermissions = dashboardeditpermissions;
+    }
+
+    public boolean isSession_timeout_never() {
+        return session_timeout_never;
+    }
+
+    public void setSession_timeout_never(boolean session_timeout_never) {
+        this.session_timeout_never = session_timeout_never;
+    }
+
+    public String getTimeout_unit() {
+        return timeout_unit;
+    }
+
+    public void setTimeout_unit(String timeout_unit) {
+        this.timeout_unit = timeout_unit;
+    }
+
+    public long getTimeout() {
+        return timeout;
+    }
+
+    public void setTimeout(long timeout) {
+        this.timeout = timeout;
+    }
 }

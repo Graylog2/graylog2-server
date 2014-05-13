@@ -55,4 +55,92 @@ public class LdapSettingsRequest extends ApiRequest {
 
     @SerializedName("default_group")
     public String defaultGroup;
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
+
+    public boolean isActiveDirectory() {
+        return activeDirectory;
+    }
+
+    public void setActiveDirectory(boolean activeDirectory) {
+        this.activeDirectory = activeDirectory;
+    }
+
+    public String getLdapUri() {
+        return ldapUri;
+    }
+
+    public void setLdapUri(String ldapUri) {
+        this.ldapUri = ldapUri;
+    }
+
+    public String getSystemUsername() {
+        return systemUsername;
+    }
+
+    public void setSystemUsername(String systemUsername) {
+        this.systemUsername = systemUsername;
+    }
+
+    public String getSystemPassword() {
+        return systemPassword;
+    }
+
+    public void setSystemPassword(String systemPassword) {
+        this.systemPassword = systemPassword;
+    }
+
+    public boolean isUseStartTls() {
+        return useStartTls;
+    }
+
+    public void setUseStartTls(boolean useStartTls) {
+        this.useStartTls = useStartTls;
+    }
+
+    public boolean isTrustAllCertificates() {
+        return trustAllCertificates;
+    }
+
+    public void setTrustAllCertificates(boolean trustAllCertificates) {
+        this.trustAllCertificates = trustAllCertificates;
+    }
+
+    public String getSearchBase() {
+        return searchBase;
+    }
+
+    public void setSearchBase(String searchBase) {
+        this.searchBase = searchBase;
+    }
+
+    public String getSearchPattern() {
+        return searchPattern;
+    }
+
+    public void setSearchPattern(String searchPattern) {
+        this.searchPattern = searchPattern;
+    }
+
+    public String getDisplayNameAttribute() {
+        return displayNameAttribute;
+    }
+
+    public void setDisplayNameAttribute(String displayNameAttribute) {
+        this.displayNameAttribute = displayNameAttribute;
+    }
+
+    public String getDefaultGroup() {
+        return defaultGroup;
+    }
+
+    public void setDefaultGroup(String defaultGroup) {
+        this.defaultGroup = defaultGroup;
+    }
 }
