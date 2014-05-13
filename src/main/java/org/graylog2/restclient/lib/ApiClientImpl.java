@@ -443,7 +443,7 @@ class ApiClientImpl implements ApiClient {
                         log.error("Caught Exception while deserializing JSON request: " + e);
                         log.debug("Response from backend was: " + response.getResponseBody("UTF-8"));
 
-                        throw new APIException(request, response);
+                        throw new APIException(request, response, e);
                     }
                 } else {
                     return null;
