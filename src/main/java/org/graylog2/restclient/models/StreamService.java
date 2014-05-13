@@ -26,6 +26,7 @@ import org.graylog2.restclient.models.alerts.Alert;
 import org.graylog2.restclient.models.api.requests.streams.CreateStreamRequest;
 import org.graylog2.restclient.models.api.requests.streams.TestMatchRequest;
 import org.graylog2.restclient.models.api.responses.EmptyResponse;
+import org.graylog2.restclient.models.api.responses.alerts.CheckConditionResponse;
 import org.graylog2.restclient.models.api.responses.streams.CreateStreamResponse;
 import org.graylog2.restclient.models.api.responses.streams.GetStreamsResponse;
 import org.graylog2.restclient.models.api.responses.streams.StreamSummaryResponse;
@@ -133,5 +134,9 @@ public class StreamService {
         }
 
         return alerts;
+    }
+
+    public CheckConditionResponse activeAlerts(String streamId) throws APIException, IOException {
+        return api.path(routes.StreamAlertResource().checkConditions(streamId), CheckConditionResponse.class).execute();
     }
 }

@@ -49,8 +49,6 @@ public class AlertCondition {
     private final DateTime createdAt;
     private final User creatorUser;
 
-    private final UserService userService;
-
     @AssistedInject
     private AlertCondition(UserService userService, @Assisted AlertConditionSummaryResponse acsr) {
         this.id = acsr.id;
@@ -59,8 +57,6 @@ public class AlertCondition {
         this.inGrace = acsr.inGrace;
         this.createdAt = DateTime.parse(acsr.createdAt);
         this.creatorUser = userService.load(acsr.creatorUserId);
-
-        this.userService = userService;
     }
 
     public String getId() {
