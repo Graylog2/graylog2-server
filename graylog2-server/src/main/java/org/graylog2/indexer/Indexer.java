@@ -308,14 +308,14 @@ public class Indexer {
                 new Object[] { response.getItems().length, response.getTookInMillis(), response.hasFailures() });
 
         if (response.hasFailures()) {
-            propagateFailure(response.getItems(), messages);
+            propagateFailure(response.getItems(), messages, response.buildFailureMessage());
         }
 
         return !response.hasFailures();
     }
 
-    private void propagateFailure(BulkItemResponse[] items, List<Message> messages) {
-        LOG.error("Failed to index [{}] messages. Please check the index error log in your web interface for the reason.", items.length);
+    private void propagateFailure(BulkItemResponse[] items, List<Message> messages, String errorMessage) {
+        LOG.error("Failed to index [{}] messages. Please check the index error log in your web interface for the reason. Error: {}", items.length, errorMessage);
 
         // Get all failed messages.
         List<DeadLetter> deadLetters = Lists.newArrayList();
