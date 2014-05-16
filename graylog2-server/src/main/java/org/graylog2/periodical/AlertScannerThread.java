@@ -19,6 +19,7 @@
 
 package org.graylog2.periodical;
 
+import com.google.common.util.concurrent.Service;
 import com.google.inject.Inject;
 import org.graylog2.alarmcallbacks.AlarmCallbackConfiguration;
 import org.graylog2.alarmcallbacks.AlarmCallbackConfigurationService;
@@ -27,6 +28,7 @@ import org.graylog2.alarmcallbacks.EmailAlarmCallback;
 import org.graylog2.alerts.Alert;
 import org.graylog2.alerts.AlertService;
 import org.graylog2.indexer.Indexer;
+import org.graylog2.initializers.IndexerSetupService;
 import org.graylog2.plugin.alarms.AlertCondition;
 import org.graylog2.plugin.alarms.callbacks.AlarmCallback;
 import org.graylog2.plugin.periodical.Periodical;
@@ -48,6 +50,7 @@ public class AlertScannerThread extends Periodical {
     private final AlarmCallbackConfigurationService alarmCallbackConfigurationService;
     private final AlarmCallbackFactory alarmCallbackFactory;
     private final EmailAlarmCallback emailAlarmCallback;
+    private final IndexerSetupService indexerSetupService;
     private final Indexer indexer;
 
     @Inject
@@ -56,17 +59,23 @@ public class AlertScannerThread extends Periodical {
                               AlarmCallbackConfigurationService alarmCallbackConfigurationService,
                               AlarmCallbackFactory alarmCallbackFactory,
                               EmailAlarmCallback emailAlarmCallback,
+                              IndexerSetupService indexerSetupService,
                               Indexer indexer) {
         this.alertService = alertService;
         this.streamService = streamService;
         this.alarmCallbackConfigurationService = alarmCallbackConfigurationService;
         this.alarmCallbackFactory = alarmCallbackFactory;
         this.emailAlarmCallback = emailAlarmCallback;
+        this.indexerSetupService = indexerSetupService;
         this.indexer = indexer;
     }
 
     @Override
     public void run() {
+        if (indexerSetupService.startAndWait() != Service.State.RUNNING) {
+            LOG.error("Indexer is not running, not checking streams for alerts.");
+            return;
+        }
         LOG.debug("Running alert checks.");
         List<Stream> alertedStreams = streamService.loadAllWithConfiguredAlertConditions();
 
