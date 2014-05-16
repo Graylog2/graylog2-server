@@ -43,7 +43,7 @@ import java.util.concurrent.Executors;
  */
 public class RawTCPInput extends RawInputBase {
 
-    private static final Logger LOG = LoggerFactory.getLogger(RawUDPInput.class);
+    private final Logger LOG = LoggerFactory.getLogger(this.getClass());
 
     public static final String NAME = "Raw/Plaintext TCP";
 
