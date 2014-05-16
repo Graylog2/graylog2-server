@@ -22,6 +22,7 @@ package org.graylog2.buffers.processors;
 import com.codahale.metrics.Histogram;
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.Timer;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -75,6 +76,7 @@ public class OutputBufferProcessor implements EventHandler<MessageEvent> {
 
     private final Meter incomingMessages;
     private final Histogram batchSize;
+    private final Timer processTime;
 
     private final OutputBufferWatermark outputBufferWatermark;
     private final long ordinal;
@@ -108,6 +110,7 @@ public class OutputBufferProcessor implements EventHandler<MessageEvent> {
 
         incomingMessages = metricRegistry.meter(name(OutputBufferProcessor.class, "incomingMessages"));
         batchSize = metricRegistry.histogram(name(OutputBufferProcessor.class, "batchSize"));
+        processTime = metricRegistry.timer(name(OutputBufferProcessor.class, "processTime"));
     }
 
     @Override
@@ -139,7 +142,7 @@ public class OutputBufferProcessor implements EventHandler<MessageEvent> {
                 executor.submit(new Runnable() {
                     @Override
                     public void run() {
-                        try {
+                        try(Timer.Context context = processTime.time()) {
                             output.write(
                                     OutputRouter.getMessagesForOutput(msgBuffer, typeClass),
                                     buildStreamConfigs(msgBuffer, typeClass)

@@ -1,7 +1,7 @@
 package org.graylog2.outputs;
 
 import com.beust.jcommander.internal.Lists;
-import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.*;
 import org.graylog2.Configuration;
 import org.graylog2.indexer.Indexer;
 import org.graylog2.plugin.Message;
@@ -11,6 +11,11 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
+
+import static com.codahale.metrics.MetricRegistry.name;
 
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
@@ -20,12 +25,22 @@ public class BatchedElasticSearchOutput extends ElasticSearchOutput {
 
     private final List<Message> buffer;
     private final int maxBufferSize;
+    private final ExecutorService flushThread;
+    private final Timer processTime;
+    private final Histogram batchSize;
+    private final Meter bufferFlushes;
+    private final Meter bufferFlushesRequested;
 
     @Inject
     public BatchedElasticSearchOutput(MetricRegistry metricRegistry, Indexer indexer, Configuration configuration) {
         super(metricRegistry, indexer);
         this.buffer = Lists.newArrayList();
         this.maxBufferSize = configuration.getOutputBatchSize();
+        this.flushThread = Executors.newSingleThreadExecutor();
+        this.processTime = metricRegistry.timer(name(BatchedElasticSearchOutput.class, "processTime"));
+        this.batchSize = metricRegistry.histogram(name(this.getClass(), "batchSize"));
+        this.bufferFlushes = metricRegistry.meter(name(this.getClass(), "bufferFlushes"));
+        this.bufferFlushesRequested = metricRegistry.meter(name(this.getClass(), "bufferFlushesRequested"));
     }
 
     @Override
@@ -38,10 +53,36 @@ public class BatchedElasticSearchOutput extends ElasticSearchOutput {
         }
     }
 
-    public void flush() throws Exception {
+    public void synchronousFlush(List<Message> mybuffer) {
+        LOG.info("[{}] Starting flushing {} messages", Thread.currentThread(), mybuffer.size());
+
+        try(Timer.Context context = this.processTime.time()) {
+            super.write(mybuffer, null);
+            this.batchSize.update(mybuffer.size());
+            this.bufferFlushes.mark();
+        } catch (Exception e) {
+            LOG.error("Unable to flush message buffer: {} - {}", e, e.getStackTrace());
+        }
+        LOG.info("[{}] Flushing {} messages completed", Thread.currentThread(), mybuffer.size());
+    }
+
+    public void asynchronousFlush(final List<Message> mybuffer) {
+        LOG.info("Submitting new flush thread");
+        flushThread.submit(new Runnable() {
+            @Override
+            public void run() {
+                synchronousFlush(mybuffer);
+            }
+        });
+    }
+
+    public void flush() {
+        this.bufferFlushesRequested.mark();
+        List<Message> mybuffer;
         synchronized (this.buffer) {
-            super.write(this.buffer, null);
+            mybuffer = Lists.newArrayList(this.buffer);
             this.buffer.clear();
         }
+        asynchronousFlush(mybuffer);
     }
 }
