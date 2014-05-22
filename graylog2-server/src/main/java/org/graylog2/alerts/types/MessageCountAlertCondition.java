@@ -97,7 +97,7 @@ public class MessageCountAlertCondition extends AlertCondition {
             if (triggered) {
                 Integer backlogSize = getBacklog();
                 if (backlogSize != null && backlogSize > 0) {
-                    SearchResult backlogResult = core.getIndexer().searches().search("*", filter, new RelativeRange(time * 60), 0, backlogSize, new Sorting("timestamp", Sorting.Direction.DESC));
+                    SearchResult backlogResult = core.getIndexer().searches().search("*", filter, new RelativeRange(time * 60), backlogSize, 0, new Sorting("timestamp", Sorting.Direction.DESC));
                     this.searchHits = backlogResult.getResults();
                 }
 
