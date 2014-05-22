@@ -115,6 +115,10 @@
       <scope>test</scope>
       <exclusions>
         <exclusion>
+          <artifactId>junit</artifactId>
+          <groupId>junit</groupId>
+        </exclusion>
+        <exclusion>
           <artifactId>bsh</artifactId>
           <groupId>org.beanshell</groupId>
         </exclusion>

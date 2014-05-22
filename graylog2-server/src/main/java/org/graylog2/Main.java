@@ -42,16 +42,15 @@ import org.graylog2.inputs.kafka.KafkaInput;
 import org.graylog2.inputs.misc.jsonpath.JsonPathInput;
 import org.graylog2.inputs.misc.metrics.LocalMetricsInput;
 import org.graylog2.inputs.radio.RadioAMQPInput;
-import org.graylog2.inputs.radio.RadioInput;
 import org.graylog2.inputs.radio.RadioKafkaInput;
 import org.graylog2.inputs.random.FakeHttpMessageInput;
 import org.graylog2.inputs.raw.tcp.RawTCPInput;
 import org.graylog2.inputs.raw.udp.RawUDPInput;
 import org.graylog2.inputs.syslog.tcp.SyslogTCPInput;
 import org.graylog2.inputs.syslog.udp.SyslogUDPInput;
+import org.graylog2.outputs.BatchedElasticSearchOutput;
 import org.graylog2.plugin.lifecycles.Lifecycle;
 import org.graylog2.notifications.Notification;
-import org.graylog2.outputs.ElasticSearchOutput;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.initializers.InitializerConfigurationException;
 import org.graylog2.plugin.inputs.MessageInput;
@@ -264,7 +263,7 @@ public final class Main {
         server.registerFilter(new RewriteFilter());
 
         // Register outputs.
-        server.outputs().register(new ElasticSearchOutput(server));
+        server.outputs().register(new BatchedElasticSearchOutput(server));
 
         // Start services.
         server.run();

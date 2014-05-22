@@ -31,7 +31,7 @@ import org.graylog2.streams.StreamImpl;
  */
 public class OutputRouter {
     
-    public static String ES_CLASS_NAME = ElasticSearchOutput.class.getCanonicalName();
+    public static String ES_CLASS_NAME = BatchedElasticSearchOutput.class.getCanonicalName();
     
     public static List<Message> getMessagesForOutput(List<Message> msgs, String outputTypeClass) {
         List<Message> filteredMessages = Lists.newArrayList();
