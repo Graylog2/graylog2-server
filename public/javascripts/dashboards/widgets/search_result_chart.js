@@ -34,10 +34,12 @@ function updateWidget_search_result_chart(widget, data) {
         return;
     }
 
-    graphElem.html("");
+    // we need to replace the entire element that rickshaw touches, otherwise
+    // it will leak event listeners and tons of DOM elements
+    graphElem.html('<div class="graph_chart">');
 
     var graph = new Rickshaw.Graph( {
-        element: graphElem.get()[0],
+        element: $('.graph_chart', graphElem)[0],
         width: 800,
         height: 70,
         renderer: "bar",
