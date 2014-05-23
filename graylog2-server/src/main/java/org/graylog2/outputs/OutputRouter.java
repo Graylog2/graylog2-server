@@ -21,10 +21,11 @@
 package org.graylog2.outputs;
 
 import com.google.common.collect.Lists;
-import java.util.List;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.streams.StreamImpl;
+
+import java.util.List;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>

@@ -35,6 +35,8 @@ public class RadioVersion {
 
     public static final Version v0_20_2_SNAPSHOT = new Version(0, 20, 2, "snapshot");
     public static final Version v0_21_0_SNAPSHOT = new Version(0, 21, 0, "snapshot");
+    public static final Version v0_20_2_RC_1 = new Version(0, 20, 2, "rc.1");
+    public static final Version v0_20_2 = new Version(0, 20, 2);
 
     public static final Version VERSION = v0_21_0_SNAPSHOT;
     public static final String CODENAME = "Moose";

@@ -65,8 +65,6 @@ public class OutputBufferProcessor implements EventHandler<MessageEvent> {
     private static final Logger LOG = LoggerFactory.getLogger(OutputBufferProcessor.class);
 
     private final ExecutorService executor;
-    
-    //private Core server;
 
     private final Configuration configuration;
     private final OutputRegistry outputRegistry;
@@ -159,13 +157,12 @@ public class OutputBufferProcessor implements EventHandler<MessageEvent> {
                             }
                         }
                     });
-
                 } catch (Exception e) {
                     LOG.error("Could not write message batch to output [" + output.getName() +"].", e);
                     doneSignal.countDown();
                 }
             }
-            
+
             // Wait until all writer threads have finished or timeout is reached.
             if (!doneSignal.await(10, TimeUnit.SECONDS)) {
                 LOG.warn("Timeout reached. Not waiting any longer for writer threads to complete.");
@@ -188,18 +185,18 @@ public class OutputBufferProcessor implements EventHandler<MessageEvent> {
     private OutputStreamConfiguration buildStreamConfigs(List<Message> messages, String className) {
         OutputStreamConfiguration configs = new OutputStreamConfigurationImpl();
         Map<ObjectId, Stream> distinctStreams = Maps.newHashMap();
-        
+
         for (Message message : messages) {
             for (Stream stream : message.getStreams()) {
                 distinctStreams.put(new ObjectId(stream.getId()), stream);
             }
         }
-        
+
         for (Map.Entry<ObjectId, Stream> e : distinctStreams.entrySet()) {
             StreamImpl stream = (StreamImpl) e.getValue();
             configs.add(e.getKey(), stream.getOutputConfigurations(className));
         }
-        
+
         return configs;
     }
 
