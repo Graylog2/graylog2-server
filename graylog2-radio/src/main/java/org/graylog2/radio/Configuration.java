@@ -22,7 +22,6 @@ package org.graylog2.radio;
 import com.github.joschi.jadconfig.Parameter;
 import com.github.joschi.jadconfig.validators.InetPortValidator;
 import com.github.joschi.jadconfig.validators.PositiveIntegerValidator;
-import com.lmax.disruptor.*;
 import org.graylog2.plugin.Tools;
 import org.graylog2.shared.BaseConfiguration;
 import org.slf4j.Logger;
@@ -83,8 +82,8 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "amqp_broker_password", required = false)
     private String amqpPassword;
 
-    @Parameter(value = "amqp_prefetch_count", required = false, validator = PositiveIntegerValidator.class)
-    private int amqpPrefetchCount = 0;
+    @Parameter(value = "amqp_broker_vhost", required = false)
+    private String amqpVhost = "/";
 
     @Parameter(value = "ring_size", required = true, validator = PositiveIntegerValidator.class)
     private int ringSize = 1024;
@@ -145,16 +144,16 @@ public class Configuration extends BaseConfiguration {
         return amqpUsername;
     }
 
+    public String getAmqpVirtualHost() {
+        return amqpVhost;
+    }
+
     public int getAmqpPort() {
         return amqpPort;
     }
 
     public String getAmqpHostname() {
         return amqpHostname;
-    }
-
-    public int getAmqpPrefetchCount() {
-        return amqpPrefetchCount;
     }
 
 }
