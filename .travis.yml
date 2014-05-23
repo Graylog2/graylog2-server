@@ -28,11 +28,11 @@ services:
 addons:
   sauce_connect: true
 notifications:
-  campfire:
+  slack:
     on_success: change
     on_failure: always
     rooms:
       secure: |-
-        NwOeFYH729EO9isap7y9rTvxl26Og1HYVMvqzzTpA6x9hI/1VZ78iKYQuaca
-        vX64upgHP+hrNVWqM9mxBmdhctndK/r7mK6/RoMr9x1EFQRtzXOBm8HXSnxk
-        l6Vdx0VAWZylzUkUL+x6GKpa3Lrtg4Bz76xlypLFYOp04C0TCjQ=
+        g6Gpj2n1Bl6hIwWlywEkw8wRjpN2XuFsxFr9KQu/p7mRLYPdF3V5qQPVLBRd
+        KvkjCIM7gZy2DTRNUooQPXdJB3npbnlbQn4jNWqA7/fp434Sw5sdfSUMawGr
+        XvemLvn0KxQxCO9GfN3wfmYxEWJwXO36Q29BnRWWgMQOXpFFD8A=
