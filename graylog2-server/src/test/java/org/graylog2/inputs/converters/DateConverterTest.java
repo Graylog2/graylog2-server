@@ -20,7 +20,10 @@
 package org.graylog2.inputs.converters;
 
 import org.graylog2.ConfigurationException;
+import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.inputs.Converter;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.testng.annotations.Test;
 
 import java.util.HashMap;
@@ -41,8 +44,8 @@ public class DateConverterTest {
 
     @Test
     public void testAnotherBasicConvert() throws Exception {
-        // .startsWith() because of possibly different timezones per test environment.
-        assert(new DateConverter(config("yyyy-MM-dd'T'HH:mm:ss.SSSSSSZZ")).convert("2014-05-19T00:30:43.116847+00:00").toString().startsWith("2014-05-19T02:30:43.116"));
+        DateTime date = (DateTime) new DateConverter(config("yyyy-MM-dd'T'HH:mm:ss.SSSSSSZZ")).convert("2014-05-19T00:30:43.116847+00:00");
+        assertEquals("2014-05-19T00:30:43.116Z", date.toDateTime(DateTimeZone.UTC).toString());
     }
 
     @Test(expectedExceptions = ConfigurationException.class)
