@@ -39,23 +39,23 @@ public class AMQPSender {
 
     private final String hostname;
     private final int port;
-    private final String vHost;
     private final String username;
     private final String password;
+    private final int prefetchCount;
 
     private Connection connection;
     private Channel channel;
 
     private final MessagePack pack;
 
-    public AMQPSender(String hostname, int port, String vHost, String username, String password) {
+    public AMQPSender(String hostname, int port, String username, String password, int prefetchCount) {
         pack = new MessagePack();
 
         this.hostname = hostname;
         this.port = port;
-        this.vHost = vHost;
         this.username = username;
         this.password = password;
+        this.prefetchCount = prefetchCount;
     }
 
     public void send(Message msg) throws IOException {
@@ -73,8 +73,6 @@ public class AMQPSender {
         ConnectionFactory factory = new ConnectionFactory();
         factory.setHost(hostname);
         factory.setPort(port);
-
-        factory.setVirtualHost(vHost);
 
         // Authenticate?
         if(username != null && !username.isEmpty() && password != null && !password.isEmpty()) {

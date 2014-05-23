@@ -22,6 +22,7 @@ import com.codahale.metrics.Gauge;
 import com.codahale.metrics.MetricRegistry;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.graylog2.inputs.raw.RawInputBase;
+import org.graylog2.inputs.raw.udp.RawUDPInput;
 import org.graylog2.plugin.buffers.Buffer;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.configuration.fields.BooleanField;
@@ -42,7 +43,7 @@ import java.util.concurrent.Executors;
  */
 public class RawTCPInput extends RawInputBase {
 
-    private static final Logger LOG = LoggerFactory.getLogger(RawTCPInput.class);
+    private final Logger LOG = LoggerFactory.getLogger(this.getClass());
 
     public static final String NAME = "Raw/Plaintext TCP";
 
