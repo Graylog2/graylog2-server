@@ -66,29 +66,6 @@ public class Notification {
         this.details = x.details;
     }
 
-    public NotificationType get() {
-        switch (type) {
-            case DEFLECTOR_EXISTS_AS_INDEX:
-                return new DeflectorExistsAsIndexNotification();
-            case MULTI_MASTER:
-                return new MultiMasterNotification();
-            case NO_MASTER:
-                return new NoMasterNotification();
-            case ES_OPEN_FILES:
-                return new EsOpenFilesNotification();
-            case NO_INPUT_RUNNING:
-                return new NoInputRunningNotification(getNodeId());
-            case INPUT_FAILED_TO_START:
-                return new InputFailedToStartNotification(this);
-            case CHECK_SERVER_CLOCKS:
-                return new CheckServerClocksNotification();
-            case OUTDATED_VERSION:
-                return new OutdatedVersionNotification(this);
-        }
-
-        throw new RuntimeException("No notification registered for " + type);
-    }
-
     public Type getType() {
         return type;
     }
