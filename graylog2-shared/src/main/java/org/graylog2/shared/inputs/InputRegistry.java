@@ -201,7 +201,11 @@ public abstract class InputRegistry {
         InputState inputState = getRunningInputState(input.getId());
 
         if (inputState != null) {
-            input.stop();
+            try {
+                input.stop();
+            } catch (Exception e) {
+                LOG.warn("Stopping input <{}> failed, removing anyway: {}", input.getId(), e);
+            }
             removeFromRunning(input);
             inputState.setState(InputState.InputStateType.STOPPED);
             finishedStop(inputState);
