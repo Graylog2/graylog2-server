@@ -22,6 +22,7 @@ package org.graylog2.buffers.processors;
 import com.codahale.metrics.Histogram;
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.Timer;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -71,10 +72,11 @@ public class OutputBufferProcessor implements EventHandler<MessageEvent> {
     private final ThroughputStats throughputStats;
     private final ServerStatus serverStatus;
 
-    private List<Message> buffer = Lists.newArrayList();
+    //private List<Message> buffer = Lists.newArrayList();
 
     private final Meter incomingMessages;
     private final Histogram batchSize;
+    private final Timer processTime;
 
     private final OutputBufferWatermark outputBufferWatermark;
     private final long ordinal;
@@ -108,6 +110,7 @@ public class OutputBufferProcessor implements EventHandler<MessageEvent> {
 
         incomingMessages = metricRegistry.meter(name(OutputBufferProcessor.class, "incomingMessages"));
         batchSize = metricRegistry.histogram(name(OutputBufferProcessor.class, "batchSize"));
+        processTime = metricRegistry.timer(name(OutputBufferProcessor.class, "processTime"));
     }
 
     @Override
@@ -123,61 +126,55 @@ public class OutputBufferProcessor implements EventHandler<MessageEvent> {
         Message msg = event.getMessage();
         LOG.debug("Processing message <{}> from OutputBuffer.", msg.getId());
 
-        buffer.add(msg);
+        final List<Message> msgBuffer = Lists.newArrayList();
+        msgBuffer.add(msg);
 
-        if (endOfBatch || buffer.size() >= configuration.getOutputBatchSize()) {
+        final CountDownLatch doneSignal = new CountDownLatch(outputRegistry.count());
+        for (final MessageOutput output : outputRegistry.get()) {
+            final String typeClass = output.getClass().getCanonicalName();
 
-            final CountDownLatch doneSignal = new CountDownLatch(outputRegistry.count());
-            for (final MessageOutput output : outputRegistry.get()) {
-                final String typeClass = output.getClass().getCanonicalName();
-
-                try {
-                    // We must copy the buffer for this output, because it may be cleared before all messages are handled.
-                    final List<Message> myBuffer = Lists.newArrayList(buffer);
-
-                    LOG.debug("Writing message batch to [{}]. Size <{}>", output.getName(), buffer.size());
-                    if (LOG.isTraceEnabled()) {
-                        final List<String> sortedIds = Ordering.natural().sortedCopy(Lists.transform(myBuffer, Message.ID_FUNCTION));
-                        LOG.trace("Message ids in batch of [{}]: <{}>", output.getName(), Joiner.on(", ").join(sortedIds));
-                    }
-                    batchSize.update(buffer.size());
-
-                    executor.submit(new Runnable() {
-                        @Override
-                        public void run() {
-                            try {
-                                output.write(
-                                        OutputRouter.getMessagesForOutput(myBuffer, typeClass),
-                                        buildStreamConfigs(myBuffer, typeClass)
-                                );
-                            } catch (Exception e) {
-                                LOG.error("Error in output [" + output.getName() +"].", e);
-                            } finally {
-                                doneSignal.countDown();
-                            }
-                        }
-                    });
-                } catch (Exception e) {
-                    LOG.error("Could not write message batch to output [" + output.getName() +"].", e);
-                    doneSignal.countDown();
+            try {
+                LOG.debug("Writing message batch to [{}]. Size <{}>", output.getName(), msgBuffer.size());
+                if (LOG.isTraceEnabled()) {
+                    final List<String> sortedIds = Ordering.natural().sortedCopy(Lists.transform(msgBuffer, Message.ID_FUNCTION));
+                    LOG.trace("Message ids in batch of [{}]: <{}>", output.getName(), Joiner.on(", ").join(sortedIds));
                 }
+                executor.submit(new Runnable() {
+                    @Override
+                    public void run() {
+                        try(Timer.Context context = processTime.time()) {
+                            output.write(
+                                    OutputRouter.getMessagesForOutput(msgBuffer, typeClass),
+                                    buildStreamConfigs(msgBuffer, typeClass)
+                            );
+                        } catch (Exception e) {
+                            LOG.error("Error in output [" + output.getName() +"].", e);
+                        } finally {
+                            doneSignal.countDown();
+                        }
+                    }
+                });
+
+            } catch (Exception e) {
+                LOG.error("Could not write message batch to output [" + output.getName() +"].", e);
+                doneSignal.countDown();
             }
-
-            // Wait until all writer threads have finished or timeout is reached.
-            if (!doneSignal.await(10, TimeUnit.SECONDS)) {
-                LOG.warn("Timeout reached. Not waiting any longer for writer threads to complete.");
-            }
-
-            int messagesWritten = buffer.size();
-
-            if (serverStatus.hasCapability(ServerStatus.Capability.STATSMODE)) {
-                throughputStats.getBenchmarkCounter().add(messagesWritten);
-            }
-
-            throughputStats.getThroughputCounter().add(messagesWritten);
-            
-            buffer.clear();
         }
+
+        // Wait until all writer threads have finished or timeout is reached.
+        if (!doneSignal.await(10, TimeUnit.SECONDS)) {
+            LOG.warn("Timeout reached. Not waiting any longer for writer threads to complete.");
+        }
+
+        int messagesWritten = msgBuffer.size();
+
+        if (serverStatus.hasCapability(ServerStatus.Capability.STATSMODE)) {
+            throughputStats.getBenchmarkCounter().add(messagesWritten);
+        }
+
+        throughputStats.getThroughputCounter().add(messagesWritten);
+
+        msgBuffer.clear();
 
         LOG.debug("Wrote message <{}> to all outputs. Finished handling.", msg.getId());
     }
