@@ -32,6 +32,10 @@ import org.graylog2.plugin.periodical.Periodical;
  * @author Dennis Oelkers <dennis@torch.sh>
  */
 public abstract class PluginModule extends AbstractModule {
+    protected void registerPlugin(Class<? extends PluginMetaData> pluginMetaData) {
+        Multibinder<PluginMetaData> pluginMetaDataMultibinder = Multibinder.newSetBinder(binder(), PluginMetaData.class);
+        pluginMetaDataMultibinder.addBinding().to(pluginMetaData);
+    }
     protected void addMessageInput(Class<? extends MessageInput> messageInputClass) {
         TypeLiteral<Class<? extends MessageInput>> typeLiteral = new TypeLiteral<Class<? extends MessageInput>>(){};
         Multibinder<Class<? extends MessageInput>> messageInputs = Multibinder.newSetBinder(binder(), typeLiteral);

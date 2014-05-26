@@ -108,7 +108,7 @@ public class RestApiService extends AbstractIdleService {
         rc.register(ObjectMapperProvider.class)
             .register(JacksonJsonProvider.class)
             .registerFinder(new PackageNamesScanner(new String[]{"org.graylog2.rest.resources",
-                    "org.graylog2.radio.rest.resources"}, true));
+                    "org.graylog2.radio.rest.resources", "org.graylog2.shared.rest.resources"}, true));
 
         if (configuration.isRestEnableGzip())
             EncodingFilter.enableFor(rc, GZipEncoder.class);

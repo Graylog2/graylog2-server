@@ -49,6 +49,7 @@ import org.graylog2.inputs.InputCache;
 import org.graylog2.inputs.OutputCache;
 import org.graylog2.jersey.container.netty.SecurityContextFactory;
 import org.graylog2.outputs.OutputRegistry;
+import org.graylog2.plugin.PluginMetaData;
 import org.graylog2.plugin.RulesEngine;
 import org.graylog2.plugin.indexer.MessageGateway;
 import org.graylog2.rest.RestAccessLogFilter;
@@ -97,6 +98,7 @@ public class ServerBindings extends AbstractModule {
         bindFactoryModules();
         bindDynamicFeatures();
         bindContainerResponseFilters();
+        bindPluginMetaData();
     }
 
     private void bindFactoryModules() {
@@ -163,5 +165,9 @@ public class ServerBindings extends AbstractModule {
         TypeLiteral<Class<? extends ContainerResponseFilter>> type = new TypeLiteral<Class<? extends ContainerResponseFilter>>(){};
         Multibinder<Class<? extends ContainerResponseFilter>> setBinder = Multibinder.newSetBinder(binder(), type);
         setBinder.addBinding().toInstance(RestAccessLogFilter.class);
+    }
+
+    private void bindPluginMetaData() {
+        Multibinder<PluginMetaData> setBinder = Multibinder.newSetBinder(binder(), PluginMetaData.class);
     }
 }
