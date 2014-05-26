@@ -4,7 +4,7 @@
         systemMessages: List[org.graylog2.restclient.models.SystemMessage],
         totalSystemMessages: Integer,
         page: Integer,
-        notifications: List[org.graylog2.restclient.models.Notification],
+        notifications: List[lib.notifications.NotificationType],
         indexFailureCount: Long)
 @import org.graylog2.restclient.models._
 @import lib.security.RestPermissions._
@@ -19,28 +19,28 @@
 
         @for(notification <- notifications) {
             <div class="notification alert alert-error">
-                @if(notification.get().isCloseable() && isPermitted(NOTIFICATIONS_DELETE)) {
-                    <button type="button" class="close delete-notification" data-notificationtype="@notification.getType().toString().toLowerCase()">&times;</button>
+                @if(notification.isCloseable() && isPermitted(NOTIFICATIONS_DELETE)) {
+                    <button type="button" class="close delete-notification" data-notificationtype="@notification.getNotification.getType().toString().toLowerCase()">&times;</button>
                 }
 
                 <h3>
                     <i class="icon icon-bolt"></i>
-                    @notification.get().getTitle
-                    <span class="notification-timestamp moment-from-now" title="@notification.getTimestamp">@notification.getTimestamp</span>
+                    @notification.getTitle
+                    <span class="notification-timestamp moment-from-now" title="@notification.getNotification.getTimestamp">@notification.getNotification.getTimestamp</span>
                 </h3>
 
                 <div class="notification-description">
-                    @Html(notification.get().getDescription)
+                    @Html(notification.getDescription)
                 </div>
 
                 <div class="notification-solutions">
-                    @if(!notification.get().options().isEmpty) {
+                    @if(!notification.options().isEmpty) {
                         <h4>
                             Your options:
                         </h4>
 
                         <form action="@routes.SystemJobsController.trigger()" method="POST">
-                            @for((jobType, description) <- notification.get().options()) {
+                            @for((jobType, description) <- notification.options()) {
                                 <label class="radio">
                                     <input type="radio" value="@jobType" name="job" required="required">
                                     @description

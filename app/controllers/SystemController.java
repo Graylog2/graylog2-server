@@ -18,13 +18,16 @@
  */
 package controllers;
 
-import com.google.inject.Inject;
+import com.google.common.collect.Lists;
+import lib.notifications.NotificationType;
+import lib.notifications.NotificationTypeFactory;
 import org.graylog2.restclient.lib.APIException;
 import org.graylog2.restclient.lib.ApiClient;
 import org.graylog2.restclient.lib.ServerNodes;
 import org.graylog2.restclient.models.*;
 import play.mvc.Result;
 
+import javax.inject.Inject;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
@@ -37,16 +40,26 @@ import static views.helpers.Permissions.isPermitted;
  */
 public class SystemController extends AuthenticatedController {
 
+    private final NodeService nodeService;
+    private final ClusterService clusterService;
+    private final ServerNodes serverNodes;
+    private final NotificationTypeFactory notificationTypeFactory;
+
     @Inject
-    private NodeService nodeService;
-    @Inject
-    private ClusterService clusterService;
-    @Inject
-    private ServerNodes serverNodes;
+    public SystemController(NodeService nodeService, ClusterService clusterService, ServerNodes serverNodes, NotificationTypeFactory notificationTypeFactory) {
+        this.nodeService = nodeService;
+        this.clusterService = clusterService;
+        this.serverNodes = serverNodes;
+        this.notificationTypeFactory = notificationTypeFactory;
+    }
 
     public Result index(Integer page) {
         try {
-            List<Notification> notifications = isPermitted(NOTIFICATIONS_READ) ? clusterService.allNotifications() : Collections.<Notification>emptyList();
+            List<NotificationType> notifications = Lists.newArrayList();
+            if (isPermitted(NOTIFICATIONS_READ)) {
+                for (Notification notification : clusterService.allNotifications())
+                    notifications.add(notificationTypeFactory.get(notification));
+            }
             List<SystemJob> systemJobs = isPermitted(SYSTEMJOBS_READ) ? clusterService.allSystemJobs() : Collections.<SystemJob>emptyList();
             final Boolean permittedSystemMessages = isPermitted(SYSTEMMESSAGES_READ);
             int totalSystemMessages = permittedSystemMessages ? clusterService.getNumberOfSystemMessages() : 0;
