@@ -58,12 +58,14 @@ function updateWidget_field_chart(widget, data) {
         return;
     }
 
-    graphElem.html("");
+    // we need to replace the entire element that rickshaw touches, otherwise
+    // it will leak event listeners and tons of DOM elements
+    graphElem.html('<div class="graph_chart">');
 
     var renderer = graphElem.attr("data-config-renderer");
 
     var graph = new Rickshaw.Graph( {
-        element: graphElem.get()[0],
+        element: $('.graph_chart', graphElem)[0],
         width: 800,
         height: 70,
         interpolation: graphElem.attr("data-config-interpolation"),
