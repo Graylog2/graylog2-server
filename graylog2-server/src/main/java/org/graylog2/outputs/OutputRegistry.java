@@ -21,6 +21,7 @@ package org.graylog2.outputs;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
+import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.outputs.MessageOutput;
 import org.graylog2.plugin.outputs.MessageOutputConfigurationException;
 import org.slf4j.Logger;
@@ -49,7 +50,7 @@ public class OutputRegistry {
     public void initialize() {
         for(MessageOutput o : outputs) {
             try {
-                o.initialize(new HashMap<String, String>());
+                o.initialize(new Configuration(new HashMap<String, Object>()));
                 LOG.info("Initialized output <{}>.", o.getClass().getCanonicalName());
             } catch (MessageOutputConfigurationException e) {
                 LOG.error("Could not initialize output <{}>", o.getClass().getCanonicalName(), e);

@@ -20,6 +20,8 @@
 package org.graylog2.plugin.outputs;
 
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.configuration.Configuration;
+import org.graylog2.plugin.configuration.ConfigurationRequest;
 
 import java.util.List;
 import java.util.Map;
@@ -29,9 +31,9 @@ import java.util.Map;
  */
 public interface MessageOutput {
 
-    public void initialize(Map<String, String> config) throws MessageOutputConfigurationException;
+    public void initialize(Configuration config) throws MessageOutputConfigurationException;
     public void write(List<Message> messages, OutputStreamConfiguration streamConfiguration) throws Exception;
-    public Map<String, String> getRequestedConfiguration();
+    public ConfigurationRequest getRequestedConfiguration();
     public Map<String, String> getRequestedStreamConfiguration();
     public String getName();
     

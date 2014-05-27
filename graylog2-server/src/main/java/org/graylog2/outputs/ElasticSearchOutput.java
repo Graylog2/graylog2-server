@@ -29,6 +29,8 @@ import com.google.common.collect.Ordering;
 import com.google.inject.Inject;
 import org.graylog2.indexer.Indexer;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.configuration.Configuration;
+import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.outputs.MessageOutput;
 import org.graylog2.plugin.outputs.MessageOutputConfigurationException;
 import org.graylog2.plugin.outputs.OutputStreamConfiguration;
@@ -83,14 +85,14 @@ public class ElasticSearchOutput implements MessageOutput {
     }
 
     @Override
-    public void initialize(Map<String, String> config) throws MessageOutputConfigurationException {
+    public void initialize(Configuration config) throws MessageOutputConfigurationException {
         // Built in output. This is just for plugin compat. Nothing to initialize.
     }
 
     @Override
-    public Map<String, String> getRequestedConfiguration() {
+    public ConfigurationRequest getRequestedConfiguration() {
         // Built in output. This is just for plugin compat. No special configuration required.
-        return Maps.newHashMap();
+        return new ConfigurationRequest();
     }
     
     @Override

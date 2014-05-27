@@ -25,6 +25,8 @@ package org.graylog2.buffers.processors.fakeoutputs;
 
 import com.google.common.collect.Maps;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.configuration.Configuration;
+import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.outputs.MessageOutput;
 import org.graylog2.plugin.outputs.MessageOutputConfigurationException;
 import org.graylog2.plugin.outputs.OutputStreamConfiguration;
@@ -42,7 +44,7 @@ public class FakeOutput implements MessageOutput {
     private int writeCount = 0;
     
     @Override
-    public void initialize(Map<String, String> config) throws MessageOutputConfigurationException {
+    public void initialize(Configuration config) throws MessageOutputConfigurationException {
     }
 
     @Override
@@ -52,8 +54,8 @@ public class FakeOutput implements MessageOutput {
     }
 
     @Override
-    public Map<String, String> getRequestedConfiguration() {
-        return Maps.newHashMap();
+    public ConfigurationRequest getRequestedConfiguration() {
+        return new ConfigurationRequest();
     }
 
     @Override
