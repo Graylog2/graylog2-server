@@ -23,6 +23,8 @@ import com.codahale.metrics.MetricRegistry;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.graylog2.inputs.gelf.GELFInputBase;
 import org.graylog2.plugin.buffers.Buffer;
+import org.graylog2.plugin.configuration.ConfigurationRequest;
+import org.graylog2.plugin.configuration.fields.BooleanField;
 import org.graylog2.plugin.inputs.MisfireException;
 import org.jboss.netty.bootstrap.ServerBootstrap;
 import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory;
@@ -97,4 +99,11 @@ public class GELFHttpInput extends GELFInputBase {
         return "http://support.torch.sh/help/kb/graylog2-server/using-the-gelf-http-input";
     }
 
+    @Override
+    public ConfigurationRequest getRequestedConfiguration() {
+        ConfigurationRequest r = super.getRequestedConfiguration();
+        r.addField(new BooleanField("enable_cors", "Enable CORS", true, "Input sends CORS headers to satisfy browser security policies"));
+
+        return r;
+    }
 }
