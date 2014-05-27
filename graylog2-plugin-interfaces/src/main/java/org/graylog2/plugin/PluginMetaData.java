@@ -25,6 +25,7 @@ import java.net.URL;
  * @author Dennis Oelkers <dennis@torch.sh>
  */
 public interface PluginMetaData {
+    String getUniqueId();
     String getName();
     String getAuthor();
     URL getURL();

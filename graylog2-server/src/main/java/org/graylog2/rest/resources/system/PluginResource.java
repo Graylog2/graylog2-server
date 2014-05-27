@@ -29,6 +29,7 @@ public class PluginResource extends RestResource {
     private final Set<PluginMetaData> pluginMetaDataSet;
 
     class PluginMetaDataValue {
+        public final String unique_id;
         public final String name;
         public final String author;
         public final URL url;
@@ -37,6 +38,7 @@ public class PluginResource extends RestResource {
         public final Version required_version;
 
         PluginMetaDataValue(PluginMetaData pluginMetaData) {
+            this.unique_id = pluginMetaData.getUniqueId();
             this.name = pluginMetaData.getName();
             this.author = pluginMetaData.getAuthor();
             this.url = pluginMetaData.getURL();
