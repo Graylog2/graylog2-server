@@ -26,6 +26,7 @@ import com.google.inject.multibindings.Multibinder;
 import org.graylog2.plugin.alarms.callbacks.AlarmCallback;
 import org.graylog2.plugin.filters.MessageFilter;
 import org.graylog2.plugin.inputs.MessageInput;
+import org.graylog2.plugin.outputs.MessageOutput;
 import org.graylog2.plugin.periodical.Periodical;
 
 /**
@@ -61,5 +62,11 @@ public abstract class PluginModule extends AbstractModule {
     protected void addInitializer(Class<? extends Service> initializerClass) {
         Multibinder<Service> serviceBinder = Multibinder.newSetBinder(binder(), Service.class);
         serviceBinder.addBinding().to(initializerClass);
+    }
+
+    protected void addMessageOutput(Class<? extends MessageOutput> messageOutputClass) {
+        TypeLiteral<Class<? extends MessageOutput>> typeLiteral = new TypeLiteral<Class<? extends MessageOutput>>(){};
+        Multibinder<Class<? extends MessageOutput>> messageOutputs = Multibinder.newSetBinder(binder(), typeLiteral);
+        messageOutputs.addBinding().toInstance(messageOutputClass);
     }
 }
