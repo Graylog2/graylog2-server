@@ -1,10 +1,11 @@
 package org.graylog2.alerts;
 
-import com.beust.jcommander.internal.Lists;
+import com.google.common.collect.Lists;
 import edu.emory.mathcs.backport.java.util.Collections;
 import org.graylog2.plugin.Message;
 
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -19,7 +20,7 @@ public class MessageFormatter {
         sb.append("timestamp: ").append(message.getField("timestamp").toString()).append("\n");
         sb.append("source: ").append(message.getSource()).append("\n");
 
-        Map<String, Object> fields = message.getFields();
+        Map<String, Object> fields = new HashMap<>(message.getFields());
         fields.remove("timestamp");
         fields.remove("source");
         fields.remove("_id");
