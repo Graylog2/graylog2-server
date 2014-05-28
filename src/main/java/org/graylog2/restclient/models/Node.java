@@ -28,6 +28,7 @@ import org.graylog2.restclient.lib.ApiClient;
 import org.graylog2.restclient.lib.ExclusiveInputException;
 import org.graylog2.restclient.lib.metrics.Metric;
 import org.graylog2.restclient.models.api.requests.InputLaunchRequest;
+import org.graylog2.restclient.models.api.responses.BufferClassesResponse;
 import org.graylog2.restclient.models.api.responses.BuffersResponse;
 import org.graylog2.restclient.models.api.responses.EmptyResponse;
 import org.graylog2.restclient.models.api.responses.cluster.NodeSummaryResponse;
@@ -128,6 +129,17 @@ public class Node extends ClusterEntity {
                     .execute());
         } catch (APIException e) {
             log.error("Unable to read buffer info from node " + this, e);
+        } catch (IOException e) {
+            log.error("Unexpected exception", e);
+        }
+        return null;
+    }
+
+    public BufferClassesResponse getBufferClasses() {
+        try {
+            return api.path(routes.BufferResource().getBufferClasses(), BufferClassesResponse.class).node(this).execute();
+        } catch (APIException e) {
+            log.error("Unable to read buffer class names from node " + this, e);
         } catch (IOException e) {
             log.error("Unexpected exception", e);
         }
