@@ -19,7 +19,6 @@
 package org.graylog2.restclient.models;
 
 import com.google.inject.Inject;
-import org.graylog2.restclient.lib.notifications.*;
 import org.graylog2.restclient.models.api.responses.system.NotificationSummaryResponse;
 import org.joda.time.DateTime;
 
