@@ -394,6 +394,28 @@ public class Configuration extends BaseConfiguration {
         return Tools.getUriStandard(restListenUri);
     }
 
+    public URI getDefaultRestTransportUri() {
+        URI transportUri;
+        URI listenUri = getRestListenUri();
+
+        if (listenUri.getHost().equals("0.0.0.0")) {
+            String guessedIf;
+            try {
+                guessedIf = Tools.guessPrimaryNetworkAddress().getHostAddress();
+            } catch (Exception e) {
+                LOG.error("Could not guess primary network address for rest_transport_uri. Please configure it in your graylog2.conf.", e);
+                throw new RuntimeException("No rest_transport_uri.");
+            }
+
+            String transportStr = "http://" + guessedIf + ":" + listenUri.getPort();
+            transportUri = Tools.getUriStandard(transportStr);
+        } else {
+            transportUri = listenUri;
+        }
+
+        return transportUri;
+    }
+
     public String getRootUsername() {
         return rootUsername;
     }
