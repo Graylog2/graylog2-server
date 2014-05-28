@@ -52,9 +52,9 @@ public class StreamRuleImpl extends PersistedImpl implements StreamRule {
     /**
      * @return the objectId
      */
-    public ObjectId getObjectId() {
+/*    public ObjectId getObjectId() {
         return (ObjectId) fields.get("_id");
-    }
+    }*/
 
     /**
      * @return the ruleType
