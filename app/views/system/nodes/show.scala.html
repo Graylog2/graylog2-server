@@ -108,7 +108,7 @@
         <h2><i class="icon icon-shield"></i> Buffers</h2>
         <div class="row-fluid">
             <div class="span6">
-                <a href="@routes.MetricsController.ofNode(node.getNodeId, "org.graylog2.buffers.ProcessBuffer")" class="btn btn-info btn-mini pull-right">Metrics</a>
+                <a href="@routes.MetricsController.ofNode(node.getNodeId, node.getBufferClasses.processBufferClass)" class="btn btn-info btn-mini pull-right">Metrics</a>
                 <h3>Input buffer</h3>
 
                 <div class="progress node-buffer-usage">
@@ -119,7 +119,7 @@
             </div>
 
             <div class="span6">
-                <a href="@routes.MetricsController.ofNode(node.getNodeId, "org.graylog2.buffers.OutputBuffer")" class="btn btn-info btn-mini pull-right">Metrics</a>
+                <a href="@routes.MetricsController.ofNode(node.getNodeId, node.getBufferClasses.outputBufferClass)" class="btn btn-info btn-mini pull-right">Metrics</a>
                 <h3>Output buffer</h3>
 
                 <div class="progress node-buffer-usage">
