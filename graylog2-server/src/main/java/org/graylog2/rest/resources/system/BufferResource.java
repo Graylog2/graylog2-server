@@ -23,6 +23,7 @@ import com.google.common.collect.Maps;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.Configuration;
+import org.graylog2.buffers.OutputBuffer;
 import org.graylog2.buffers.OutputBufferWatermark;
 import org.graylog2.inputs.InputCache;
 import org.graylog2.inputs.OutputCache;
@@ -31,6 +32,7 @@ import org.graylog2.rest.documentation.annotations.Api;
 import org.graylog2.rest.documentation.annotations.ApiOperation;
 import org.graylog2.rest.resources.RestResource;
 import org.graylog2.security.RestPermissions;
+import org.graylog2.shared.buffers.ProcessBuffer;
 import org.graylog2.shared.buffers.ProcessBufferWatermark;
 
 import javax.inject.Inject;
@@ -53,18 +55,24 @@ public class BufferResource extends RestResource {
     private final ProcessBufferWatermark processBufferWatermark;
     private final OutputBufferWatermark outputBufferWatermark;
     private final Configuration configuration;
+    private final ProcessBuffer processBuffer;
+    private final OutputBuffer outputBuffer;
 
     @Inject
     public BufferResource(InputCache inputCache,
                           OutputCache outputCache,
                           ProcessBufferWatermark processBufferWatermark,
                           OutputBufferWatermark outputBufferWatermark,
-                          Configuration configuration) {
+                          Configuration configuration,
+                          ProcessBuffer processBuffer,
+                          OutputBuffer outputBuffer) {
         this.inputCache = inputCache;
         this.outputCache = outputCache;
         this.processBufferWatermark = processBufferWatermark;
         this.outputBufferWatermark = outputBufferWatermark;
         this.configuration = configuration;
+        this.processBuffer = processBuffer;
+        this.outputBuffer = outputBuffer;
     }
 
     @GET @Timed
@@ -75,6 +83,19 @@ public class BufferResource extends RestResource {
         Map<String, Object> result = Maps.newHashMap();
         result.put("buffers", buffers());
         result.put("master_caches", masterCaches());
+
+        return json(result);
+    }
+
+    @GET @Timed
+    @Path("/classes")
+    @ApiOperation(value = "Get classnames of current buffer implementations.")
+    @RequiresPermissions(RestPermissions.BUFFERS_READ)
+    @Produces(MediaType.APPLICATION_JSON)
+    public String getBufferClasses() {
+        Map<String, String> result = Maps.newHashMap();
+        result.put("process_buffer", processBuffer.getClass().getCanonicalName());
+        result.put("output_buffer", outputBuffer.getClass().getCanonicalName());
 
         return json(result);
     }
