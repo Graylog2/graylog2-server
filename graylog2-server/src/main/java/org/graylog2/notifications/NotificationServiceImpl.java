@@ -123,7 +123,7 @@ public class NotificationServiceImpl extends PersistedServiceImpl implements Not
 
     @Override
     public boolean fixed(Notification notification) {
-        return destroy(notification) > 0;
+        return fixed(notification.getType(), null);
     }
 
     @Override
