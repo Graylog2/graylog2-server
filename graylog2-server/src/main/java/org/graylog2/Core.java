@@ -197,17 +197,8 @@ public class Core implements GraylogServer, InputHost {
         }
 
         if (this.configuration.getRestTransportUri() == null) {
-                String guessedIf;
-                try {
-                    guessedIf = Tools.guessPrimaryNetworkAddress().getHostAddress();
-                } catch (Exception e) {
-                    LOG.error("Could not guess primary network address for rest_transport_uri. Please configure it in your graylog2.conf.", e);
-                    throw new RuntimeException("No rest_transport_uri.");
-                }
-
-                String transportStr = "http://" + guessedIf + ":" + configuration.getRestListenUri().getPort();
-                LOG.info("No rest_transport_uri set. Falling back to [{}].", transportStr);
-                this.configuration.setRestTransportUri(transportStr);
+            configuration.setRestTransportUri(configuration.getDefaultRestTransportUri().toString());
+            LOG.info("No rest_transport_uri set. Falling back to [{}].", configuration.getRestTransportUri().toString());
         }
 
         mongoConnection = new MongoConnection();    // TODO use dependency injection
