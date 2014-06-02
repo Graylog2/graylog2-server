@@ -209,8 +209,8 @@ public final class Main extends NodeRunner {
                 // Write a notification.
                 final NotificationService notificationService = injector.getInstance(NotificationService.class);
                 Notification notification = notificationService.buildNow()
-                        .addType(NotificationImpl.Type.MULTI_MASTER)
-                        .addSeverity(NotificationImpl.Severity.URGENT);
+                        .addType(Notification.Type.MULTI_MASTER)
+                        .addSeverity(Notification.Severity.URGENT);
                 notificationService.publishIfFirst(notification);
 
                 configuration.setIsMaster(false);
