@@ -25,7 +25,6 @@ import org.graylog2.restclient.lib.APIException;
 import org.graylog2.restclient.lib.ApiClient;
 import lib.BreadcrumbList;
 import org.graylog2.restclient.lib.ServerNodes;
-import models.*;
 import org.graylog2.restclient.models.*;
 import play.mvc.Result;
 

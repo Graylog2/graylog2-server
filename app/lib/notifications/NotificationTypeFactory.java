@@ -24,6 +24,10 @@ public class NotificationTypeFactory {
                 return new CheckServerClocksNotification(notification);
             case OUTDATED_VERSION:
                 return new OutdatedVersionNotification(notification);
+            case EMAIL_TRANSPORT_CONFIGURATION_INVALID:
+                return new EmailTransportConfigurationInvalidNotification(notification);
+            case EMAIL_TRANSPORT_FAILED:
+                return new EmailTransportFailedNotification(notification);
         }
 
         throw new RuntimeException("No notification registered for " + notification.getType());
