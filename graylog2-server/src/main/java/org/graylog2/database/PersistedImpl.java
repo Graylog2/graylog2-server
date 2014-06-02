@@ -82,4 +82,12 @@ public abstract class PersistedImpl implements Persisted {
     public int hashCode() {
         return Objects.hashCode(getObjectId(), fields);
     }
+
+    @Override
+    public String toString() {
+        return this.getClass().getSimpleName() + "{" +
+                "fields=" + fields +
+                ", id=" + id +
+                '}';
+    }
 }
