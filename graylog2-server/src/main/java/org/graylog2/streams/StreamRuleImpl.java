@@ -110,12 +110,16 @@ public class StreamRuleImpl extends PersistedImpl implements StreamRule {
     }*/
 
     public Map<String, Validator> getValidations() {
-        return new HashMap<String, Validator>() {{
+        HashMap<String, Validator> validators = new HashMap<String, Validator>() {{
             put("type", new IntegerValidator());
-            put("value", new FilledStringValidator());
             put("field", new FilledStringValidator());
             put("stream_id", new ObjectIdValidator());
         }};
+
+        if (!this.getType().equals(StreamRuleType.PRESENCE))
+            validators.put("value", new FilledStringValidator());
+
+        return validators;
     }
 
     @Override
