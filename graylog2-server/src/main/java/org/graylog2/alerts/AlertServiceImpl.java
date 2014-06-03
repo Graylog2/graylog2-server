@@ -32,6 +32,7 @@ import org.graylog2.database.PersistedServiceImpl;
 import org.graylog2.indexer.Indexer;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.alarms.AlertCondition;
+import org.graylog2.plugin.database.Persisted;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.rest.resources.streams.alerts.requests.CreateConditionRequest;
 import org.joda.time.DateTime;
@@ -115,6 +116,12 @@ public class AlertServiceImpl extends PersistedServiceImpl implements AlertServi
     @Override
     public long totalCount() {
         return collection(AlertImpl.class).count();
+    }
+
+    @Override
+    public long totalCountForStream(String streamId) {
+        DBObject qry = new BasicDBObject("stream_id", streamId);
+        return collection(AlertImpl.class).count(qry);
     }
 
     public AlertCondition fromPersisted(Map<String, Object> fields, Stream stream) throws AbstractAlertCondition.NoSuchAlertConditionTypeException {

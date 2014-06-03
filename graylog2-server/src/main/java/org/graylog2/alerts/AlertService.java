@@ -40,6 +40,7 @@ public interface AlertService extends PersistedService {
     int triggeredSecondsAgo(String streamId, String conditionId);
 
     long totalCount();
+    long totalCountForStream(String streamId);
 
     AlertCondition fromPersisted(Map<String, Object> conditionFields, Stream stream) throws AbstractAlertCondition.NoSuchAlertConditionTypeException;
     AlertCondition fromRequest(CreateConditionRequest ccr, Stream stream) throws AbstractAlertCondition.NoSuchAlertConditionTypeException;
