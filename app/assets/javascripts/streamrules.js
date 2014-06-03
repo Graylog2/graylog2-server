@@ -13,11 +13,9 @@ $(document).ready(function() {
         if ($(this).attr("id") == "sr-type") {
             if (parseInt(value) == 5) {
                 $("#sr-value", modalBody).hide();
-                $("#sr-value", modalBody).val("placeholder");
                 $("#sr-label-value", modalBody).hide();
                 $("#sr-result-value", modalBody).hide();
             } else {
-                $("#sr-value", modalBody).val("");
                 $("#sr-value", modalBody).show();
                 $("#sr-label-value", modalBody).show();
                 $("#sr-result-value", modalBody).show();
