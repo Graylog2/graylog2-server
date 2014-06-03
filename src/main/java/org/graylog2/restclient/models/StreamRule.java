@@ -72,7 +72,7 @@ public class StreamRule {
     }
 
     public String getValue() {
-        return value;
+        return (type == 5 ? "" : value);
     }
 
     public int getType() {
