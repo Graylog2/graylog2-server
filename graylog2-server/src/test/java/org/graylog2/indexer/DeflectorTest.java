@@ -41,5 +41,9 @@ public class DeflectorTest {
         assertEquals("graylog2_1", d.buildIndexName("graylog2", 1));
         assertEquals("graylog2_9001", d.buildIndexName("graylog2", 9001));
     }
-    
+
+    @Test
+    public void testBuildDeflectorNameWithCustomIndexPrefix() {
+        assertEquals("foo_custom_index_deflector", Deflector.buildName("foo_custom_index"));
+    }
 }

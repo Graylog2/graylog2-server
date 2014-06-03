@@ -279,7 +279,9 @@ public class Indexer {
 
         final BulkRequestBuilder request = client.prepareBulk();
         for (Message msg : messages) {
-            request.add(buildIndexRequest(Deflector.DEFLECTOR_NAME, msg.toElasticSearchObject(), msg.getId())); // Main index.
+            request.add(buildIndexRequest(Deflector.buildName(server.getConfiguration().getElasticSearchIndexPrefix()),
+                                          msg.toElasticSearchObject(),
+                                          msg.getId())); // Main index.
         }
 
         request.setConsistencyLevel(WriteConsistencyLevel.ONE);
