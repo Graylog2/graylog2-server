@@ -74,8 +74,8 @@ public class FixDeflectorByMoveJob extends SystemJob {
 
     @Override
     public void execute() {
-        if (deflector.isUp(indexer) || !indexer.indices().exists(Deflector.DEFLECTOR_NAME)) {
-            LOG.error("There is no index <{}>. No need to run this job. Aborting.", Deflector.DEFLECTOR_NAME);
+        if (deflector.isUp(indexer) || !indexer.indices().exists(deflector.getName())) {
+            LOG.error("There is no index <{}>. No need to run this job. Aborting.", deflector.getName());
             return;
         }
 
@@ -96,8 +96,8 @@ public class FixDeflectorByMoveJob extends SystemJob {
             try {
                 newTarget = Deflector.buildIndexName(configuration.getElasticSearchIndexPrefix(), deflector.getNewestTargetNumber(indexer));
 
-                LOG.info("Starting to move <{}> to <{}>.", Deflector.DEFLECTOR_NAME, newTarget);
-                indexer.indices().move(Deflector.DEFLECTOR_NAME, newTarget);
+                LOG.info("Starting to move <{}> to <{}>.", deflector.getName(), newTarget);
+                indexer.indices().move(deflector.getName(), newTarget);
             } catch(Exception e) {
                 LOG.error("Moving index failed. Rolling back.", e);
                 if (newTarget != null) {
@@ -111,8 +111,8 @@ public class FixDeflectorByMoveJob extends SystemJob {
             progress = 85;
 
             // Delete deflector index.
-            LOG.info("Deleting <{}> index.", Deflector.DEFLECTOR_NAME);
-            indexer.indices().delete(Deflector.DEFLECTOR_NAME);
+            LOG.info("Deleting <{}> index.", deflector.getName());
+            indexer.indices().delete(deflector.getName());
             progress = 90;
 
             // Set up deflector.

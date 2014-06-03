@@ -105,14 +105,14 @@ public class DeflectorManagerThread extends Periodical { // public class Klimper
 
     private void checkAndRepair() {
         if (!deflector.isUp(indexer)) {
-            if (indexer.indices().exists(Deflector.DEFLECTOR_NAME)) {
+            if (indexer.indices().exists(deflector.getName())) {
                 // Publish a notification if there is an *index* called graylog2_deflector
                 Notification notification = notificationService.buildNow()
                         .addType(Notification.Type.DEFLECTOR_EXISTS_AS_INDEX)
                         .addSeverity(Notification.Severity.URGENT);
                 final boolean published = notificationService.publishIfFirst(notification);
                 if (published) {
-                    LOG.warn("There is an index called [" + Deflector.DEFLECTOR_NAME + "]. Cannot fix this automatically and published a notification.");
+                    LOG.warn("There is an index called [" + deflector.getName() + "]. Cannot fix this automatically and published a notification.");
                 }
             } else {
                 deflector.setUp(indexer);

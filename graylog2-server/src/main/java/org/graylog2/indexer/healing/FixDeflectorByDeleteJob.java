@@ -70,8 +70,8 @@ public class FixDeflectorByDeleteJob extends SystemJob {
 
     @Override
     public void execute() {
-        if (deflector.isUp(indexer) || !indexer.indices().exists(Deflector.DEFLECTOR_NAME)) {
-            LOG.error("There is no index <{}>. No need to run this job. Aborting.", Deflector.DEFLECTOR_NAME);
+        if (deflector.isUp(indexer) || !indexer.indices().exists(deflector.getName())) {
+            LOG.error("There is no index <{}>. No need to run this job. Aborting.", deflector.getName());
             return;
         }
 
@@ -86,8 +86,8 @@ public class FixDeflectorByDeleteJob extends SystemJob {
         progress = 25;
 
         // Delete deflector index.
-        LOG.info("Deleting <{}> index.", Deflector.DEFLECTOR_NAME);
-        indexer.indices().delete(Deflector.DEFLECTOR_NAME);
+        LOG.info("Deleting <{}> index.", deflector.getName());
+        indexer.indices().delete(deflector.getName());
         progress = 70;
 
         // Set up deflector.
