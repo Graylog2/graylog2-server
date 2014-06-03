@@ -142,15 +142,11 @@ public class StreamRuleImpl extends Persisted implements StreamRule {
         return StreamImpl.load(getStreamId(), core);
     }*/
 
-    @Override
-    public String getCollectionName() {
-        return COLLECTION;
-    }
-
-    protected Map<String, Validator> getValidations() {
+    public Map<String, Validator> getValidations() {
         return new HashMap<String, Validator>() {{
             put("type", new IntegerValidator());
-            put("value", new FilledStringValidator());
+            if (!getType().equals(StreamRuleType.PRESENCE))
+                put("value", new FilledStringValidator());
             put("field", new FilledStringValidator());
             put("stream_id", new ObjectIdValidator());
         }};
