@@ -18,35 +18,46 @@
  */
 package org.graylog2.restclient.models;
 
-import com.google.common.collect.Lists;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import org.graylog2.restclient.lib.APIException;
 import org.graylog2.restclient.models.api.responses.streams.StreamRuleSummaryResponse;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 public class StreamRule {
+    public enum Type {
+        MATCH_EXACTLY(1, "match exactly", "match exactly"),
+        MATCH_REGEX(2, "match regular expression", "match regular expression"),
+        GREATER_THAN(3, "greater than", "be greater than"),
+        SMALLER_THAN(4, "smaller than", "be smaller than"),
+        FIELD_PRESENCE(5, "field presence", "be present");
+
+        private final int id;
+        private final String shortDesc;
+        private final String longDesc;
+
+        Type(int id, String shortDesc, String longDesc) {
+            this.id = id;
+            this.shortDesc = shortDesc;
+            this.longDesc = longDesc;
+        }
+
+        private static Type fromInt(int id) {
+            for (Type type : Type.values())
+                if (type.id == id)
+                    return type;
+        }
+    }
 
     public interface Factory {
         public StreamRule fromSummaryResponse(StreamRuleSummaryResponse srsr);
     }
 
-    public static final Map<Integer, List<String>> RULES = new HashMap<Integer, List<String>>() {{
-        put(1, Lists.newArrayList("match exactly", "match exactly"));
-        put(2, Lists.newArrayList("match regular expression", "match regular expression"));
-        put(3, Lists.newArrayList("greater than", "be greater than"));
-        put(4, Lists.newArrayList("smaller than", "be smaller than"));
-        put(5, Lists.newArrayList("field presence", "be present"));
-    }};
-
     private final String id;
     private final String field;
     private final String value;
-    private final int type;
+    private final Type type;
     private final Boolean inverted;
     private final String stream_id;
 
@@ -58,7 +69,7 @@ public class StreamRule {
         this.field = srsr.field;
         this.value = srsr.value;
         this.inverted = srsr.inverted;
-        this.type = srsr.type;
+        this.type = Type.fromInt(srsr.type);
         this.stream_id = srsr.stream_id;
         this.streamService = streamService;
     }
@@ -72,10 +83,10 @@ public class StreamRule {
     }
 
     public String getValue() {
-        return (type == 5 ? "" : value);
+        return (type.equals(Type.FIELD_PRESENCE) ? "" : value);
     }
 
-    public int getType() {
+    public Type getType() {
         return type;
     }
 
@@ -86,7 +97,7 @@ public class StreamRule {
     public String getSentenceRepresentation() {
         String sentence;
         try {
-            sentence = RULES.get(this.type).get(1);
+            sentence = getType().longDesc;
         } catch (Exception e) {
             return "unknown";
         }
@@ -108,7 +119,7 @@ public class StreamRule {
         if (this.getInverted())
             inverter = " not ";
 
-        if (this.getType() == 5)
+        if (this.getType().equals(Type.FIELD_PRESENCE))
             return (this.field + " must " + inverter + this.getSentenceRepresentation());
 
         return (this.field + " must " + inverter + this.getSentenceRepresentation() + " " + this.value);
