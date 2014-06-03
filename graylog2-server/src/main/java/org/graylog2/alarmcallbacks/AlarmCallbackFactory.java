@@ -44,7 +44,7 @@ public class AlarmCallbackFactory {
     }
 
     public AlarmCallback create(String type) throws ClassNotFoundException {
-        Class<? extends AlarmCallback> alarmCallbackClass = (Class<? extends AlarmCallback>)Class.forName(type);
+        Class<? extends AlarmCallback> alarmCallbackClass = Class.forName(type).asSubclass(AlarmCallback.class);
         return create(alarmCallbackClass);
     }
 
