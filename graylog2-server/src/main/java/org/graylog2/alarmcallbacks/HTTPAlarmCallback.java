@@ -70,24 +70,28 @@ public class HTTPAlarmCallback implements AlarmCallback {
         event.put("stream", stream);
         event.put("check_result", result);
 
-        String body = null;
+        final String body;
 
         try {
             body = objectMapper.writeValueAsString(event);
         } catch (JsonProcessingException e) {
-            throw new AlarmCallbackException("Unable to serialize alarm: " + e.getMessage());
+            AlarmCallbackException exception = new AlarmCallbackException("Unable to serialize alarm");
+            exception.initCause(e);
+            throw exception;
         }
 
         final URL url;
         try {
              url = new URL(configuration.getString("url"));
         } catch (MalformedURLException e) {
-            throw new AlarmCallbackException("Malformed URL: " + e.getMessage());
+            AlarmCallbackException exception = new AlarmCallbackException("Malformed URL");
+            exception.initCause(e);
+            throw exception;
         }
 
         Response r = null;
         try {
-            r = asyncHttpClient.preparePut(url.toString())
+            r = asyncHttpClient.preparePost(url.toString())
                     .setBody(body)
                     .execute().get();
         } catch (IOException | InterruptedException | ExecutionException e) {
@@ -95,7 +99,7 @@ public class HTTPAlarmCallback implements AlarmCallback {
         }
 
         if (r.getStatusCode() != 200) {
-            throw new RuntimeException("Expected ping HTTP response [200] but got [" + r.getStatusCode() + "].");
+            throw new AlarmCallbackException("Expected ping HTTP response [200] but got [" + r.getStatusCode() + "].");
         }
     }
 
@@ -128,7 +132,9 @@ public class HTTPAlarmCallback implements AlarmCallback {
         try {
             URL url = new URL(configuration.getString("url"));
         } catch (MalformedURLException e) {
-            throw new ConfigurationException("Malformed URL: " + e.getMessage());
+            ConfigurationException exception = new ConfigurationException("Malformed URL");
+            exception.initCause(e);
+            throw exception;
         }
     }
 }
