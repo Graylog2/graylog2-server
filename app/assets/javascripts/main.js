@@ -21,67 +21,119 @@ $(document).ready(function() {
             .tooltip('show');
     });
 
+    Mousetrap.bind('>', function() {
+        if ($(".messages").size() == 0) {
+            return;
+        }
+        if (e.preventDefault) {
+            e.preventDefault();
+        } else {
+            // internet explorer
+            e.returnValue = false;
+        }
+
+        var row = $(".messages tbody > tr.message-highlighted");
+        var nextRow;
+        if (row != undefined && row.size() > 0) {
+            nextRow = row.closest('tr').next();
+        } else {
+            nextRow = $(".messages tbody tr").first();
+        }
+
+
+        $('html,body').animate({ scrollTop: nextRow.offset().top - ( $(window).height() - nextRow.outerHeight(true) ) / 2  }, 200);
+
+        messageId = nextRow.attr("data-message-id");
+        index = nextRow.attr("data-source-index");
+        displayMessageInSidebar(nextRow, messageId, index);
+    });
+
+    Mousetrap.bind('<', function() {
+        if ($(".messages").size() == 0) {
+            return;
+        }
+        if (e.preventDefault) {
+            e.preventDefault();
+        } else {
+            // internet explorer
+            e.returnValue = false;
+        }
+
+        var row = $(".messages tbody > tr.message-highlighted");
+        var prevRow = row.closest('tr').prev();
+
+        $('html,body').animate({ scrollTop: prevRow.offset().top - ( $(window).height() - prevRow.outerHeight(true) ) / 2  }, 200);
+
+        messageId = prevRow.attr("data-message-id");
+        index = prevRow.attr("data-source-index");
+        displayMessageInSidebar(prevRow, messageId, index);
+    });
+
+    function displayMessageInSidebar(row, messageId, index) {
+        // Highlight message.
+        $(".messages tbody > tr").removeClass("message-highlighted");
+        $(row).addClass("message-highlighted");
+
+        // Hide original sidebar and show ours again if it was already hidden before.
+        $("#sidebar-original").hide();
+        $("#sidebar-replacement").show();
+
+        // Show loading spinner. Will be replaced onSuccess.
+        spinner = "<h2><i class='icon-refresh icon-spin'></i> &nbsp;Loading message</h2>";
+        $("#sidebar-replacement").html(spinner);
+
+        $.get(appPrefixed("/messages/" + index + "/" + messageId + "/partial"), function(data) {
+            $("#sidebar-replacement").html(data);
+        })
+
+            .fail(function() { displayFailureInSidebar("Sorry, could not load message."); })
+
+            .complete(function() {
+
+                sizeSidebar();
+
+                // Inject terms of a message when modal is requested.
+                $('.terms-msg-modal').on('show', function() {
+                    messageId = $(this).attr("data-msg-id");
+                    spinner = $("#terms-msg-" + messageId + " .modal-body .spinner");
+                    list = $("#terms-msg-" + messageId + " .modal-body ul");
+                    list_link = $("#terms-msg-" + messageId + "-as-list");
+
+                    if ($(this).attr("data-loaded") != "true") {
+                        $.get(appPrefixed("/a/analyze/" + index + "/" + messageId + "/message"), function(data) {
+                            if (data.length > 0) {
+                                for(var i = 0; i < data.length; i++) {
+                                    list.append("<li>" + data[i] + "</li>");
+                                }
+                            } else {
+                                list.append("<li>No terms extracted</li>")
+                            }
+
+                            // Hide spinner, show list link.
+                            spinner.hide();
+                            list_link.show();
+                        });
+
+                        // Mark as already loaded so we don't add the terms again on next open.
+                        $(this).attr("data-loaded", "true");
+                    }
+
+                    // Show as list link.
+                    list_link.bind("click", function() {
+                        list.addClass("as-list");
+                        $(this).hide();
+                        return false;
+                    });
+                });
+            })
+    }
+
     // Opening messages in sidebar with click in message result table.
 	$(".messages tbody > tr").bind("click", function() {
 		messageId = $(this).attr("data-message-id");
 		index = $(this).attr("data-source-index");
 
-		// Highlight message.
-		$(".messages tbody > tr").removeClass("message-highlighted");
-		$(this).addClass("message-highlighted");
-
-		// Hide original sidebar and show ours again if it was already hidden before.
-		$("#sidebar-original").hide();
-		$("#sidebar-replacement").show();
-
-		// Show loading spinner. Will be replaced onSuccess.
-		spinner = "<h2><i class='icon-refresh icon-spin'></i> &nbsp;Loading message</h2>";
-		$("#sidebar-replacement").html(spinner);
-
-		$.get(appPrefixed("/messages/" + index + "/" + messageId + "/partial"), function(data) {
-			$("#sidebar-replacement").html(data);
-		})
-
-		.fail(function() { displayFailureInSidebar("Sorry, could not load message."); })
-
-		.complete(function() {
-
-            sizeSidebar();
-
-			// Inject terms of a message when modal is requested.
-			$('.terms-msg-modal').on('show', function() {
-                messageId = $(this).attr("data-msg-id");
-                spinner = $("#terms-msg-" + messageId + " .modal-body .spinner");
-                list = $("#terms-msg-" + messageId + " .modal-body ul");
-                list_link = $("#terms-msg-" + messageId + "-as-list");
-
-                if ($(this).attr("data-loaded") != "true") {
-                    $.get(appPrefixed("/a/analyze/" + index + "/" + messageId + "/message"), function(data) {
-                        if (data.length > 0) {
-                            for(var i = 0; i < data.length; i++) {
-                                list.append("<li>" + data[i] + "</li>");
-                            }
-                        } else {
-                            list.append("<li>No terms extracted</li>")
-                        }
-
-                        // Hide spinner, show list link.
-                        spinner.hide();
-                        list_link.show();
-                    });
-
-                    // Mark as already loaded so we don't add the terms again on next open.
-                    $(this).attr("data-loaded", "true");
-                }
-
-				// Show as list link.
-				list_link.bind("click", function() {
-					list.addClass("as-list");
-					$(this).hide();
-                    return false;
-				});
-			});
-		})
+        displayMessageInSidebar(this, messageId, index);
 	});
 
 	// Go back in sidebar history / Show original sidebar.
