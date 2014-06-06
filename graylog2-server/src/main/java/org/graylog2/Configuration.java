@@ -78,10 +78,10 @@ public class Configuration extends BaseConfiguration {
     private int maxNumberOfIndices = 20;
 
     @Parameter(value = "output_batch_size", required = true, validator = PositiveIntegerValidator.class)
-    private int outputBatchSize = 5000;
+    private int outputBatchSize = 25;
 
     @Parameter(value = "outputbuffer_processors", required = true, validator = PositiveIntegerValidator.class)
-    private int outputBufferProcessors = 5;
+    private int outputBufferProcessors = 3;
     
     @Parameter(value = "outputbuffer_processor_threads_max_pool_size", required = true, validator = PositiveIntegerValidator.class)
     private int outputBufferProcessorThreadsMaxPoolSize = 30;
