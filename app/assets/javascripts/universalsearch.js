@@ -183,7 +183,7 @@ $(document).ready(function() {
             var url = "/savedsearches/" + encodeURI(searchId) + "/execute";
         }
 
-        window.location = url;
+        window.location = appPrefixed(url);
     });
 
     // Fill saved searches selector.
