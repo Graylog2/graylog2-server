@@ -19,6 +19,7 @@
  */
 package org.graylog2.indexer.results;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.elasticsearch.common.bytes.BytesReference;
 import org.elasticsearch.common.unit.TimeValue;
@@ -41,11 +42,13 @@ public class TermsStatsResult extends IndexQueryResult {
         this.facet = facet;
     }
 
-    public Map<String, Object> getResults() {
-        Map<String, Object> results = Maps.newTreeMap();
+    public List<Map<String, Object>> getResults() {
+        List<Map<String, Object>> results = Lists.newArrayList();
 
         for (TermsStatsFacet.Entry e : facet.getEntries()) {
             Map<String, Object> resultMap = Maps.newHashMap();
+
+            resultMap.put("key_field", e.getTerm().toString());
 
             resultMap.put("count", e.getCount());
             resultMap.put("min", e.getMin());
@@ -54,7 +57,7 @@ public class TermsStatsResult extends IndexQueryResult {
             resultMap.put("total_count", e.getTotalCount());
             resultMap.put("mean", e.getMean());
 
-            results.put(e.getTerm().toString(), resultMap);
+            results.add(resultMap);
         }
 
         return results;
