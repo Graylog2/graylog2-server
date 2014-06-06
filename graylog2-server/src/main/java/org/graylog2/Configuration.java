@@ -87,6 +87,9 @@ public class Configuration {
     @Parameter(value = "processbuffer_processors", required = true, validator = PositiveIntegerValidator.class)
     private int processBufferProcessors = 5;
 
+    @Parameter(value = "output_flush_interval", required = true, validator = PositiveIntegerValidator.class)
+    private int outputFlushInterval = 1;
+
     @Parameter(value = "outputbuffer_processors", required = true, validator = PositiveIntegerValidator.class)
     private int outputBufferProcessors = 3;
     
@@ -287,11 +290,14 @@ public class Configuration {
     public int getOutputBatchSize() {
         return outputBatchSize;
     }
-    
     public int getProcessBufferProcessors() {
         return processBufferProcessors;
     }
     
+    public int getOutputFlushInterval() {
+        return outputFlushInterval;
+    }
+
     public int getOutputBufferProcessors() {
         return outputBufferProcessors;
     }

@@ -1,5 +1,6 @@
 package org.graylog2.periodical;
 
+import org.graylog2.Configuration;
 import org.graylog2.outputs.BatchedElasticSearchOutput;
 import org.graylog2.plugin.outputs.MessageOutput;
 import org.slf4j.Logger;
@@ -43,7 +44,7 @@ public class BatchedElasticSearchOutputFlushThread extends Periodical {
 
     @Override
     public int getPeriodSeconds() {
-        return 2;
+        return core.getConfiguration().getOutputFlushInterval();
     }
 
     @Override
