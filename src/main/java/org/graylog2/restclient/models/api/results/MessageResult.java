@@ -40,7 +40,8 @@ public class MessageResult {
             "gl2_source_input",
             "gl2_source_node",
             "gl2_source_radio",
-            "gl2_source_radio_input"
+            "gl2_source_radio_input",
+            "g2eid"
     );
 
     private final Map<String, Object> fields;
