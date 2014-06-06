@@ -1,5 +1,6 @@
 package org.graylog2.periodical;
 
+import org.graylog2.Configuration;
 import org.graylog2.outputs.BatchedElasticSearchOutput;
 import org.graylog2.outputs.OutputRegistry;
 import org.graylog2.plugin.outputs.MessageOutput;
@@ -15,10 +16,12 @@ import javax.inject.Inject;
 public class BatchedElasticSearchOutputFlushThread extends Periodical {
     private final Logger LOG = LoggerFactory.getLogger(this.getClass());
     private final OutputRegistry outputRegistry;
+    private final Configuration configuration;
 
     @Inject
-    public BatchedElasticSearchOutputFlushThread(OutputRegistry outputRegistry) {
+    public BatchedElasticSearchOutputFlushThread(OutputRegistry outputRegistry, Configuration configuration) {
         this.outputRegistry = outputRegistry;
+        this.configuration = configuration;
     }
 
     @Override
@@ -53,7 +56,7 @@ public class BatchedElasticSearchOutputFlushThread extends Periodical {
 
     @Override
     public int getPeriodSeconds() {
-        return 2;
+        return configuration.getOutputFlushInterval();
     }
 
     @Override

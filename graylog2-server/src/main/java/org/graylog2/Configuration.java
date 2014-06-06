@@ -80,6 +80,9 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "output_batch_size", required = true, validator = PositiveIntegerValidator.class)
     private int outputBatchSize = 25;
 
+    @Parameter(value = "output_flush_interval", required = true, validator = PositiveIntegerValidator.class)
+    private int outputFlushInterval = 1;
+
     @Parameter(value = "outputbuffer_processors", required = true, validator = PositiveIntegerValidator.class)
     private int outputBufferProcessors = 3;
     
@@ -268,7 +271,11 @@ public class Configuration extends BaseConfiguration {
     public int getOutputBatchSize() {
         return outputBatchSize;
     }
-    
+
+    public int getOutputFlushInterval() {
+        return outputFlushInterval;
+    }
+
     public int getOutputBufferProcessors() {
         return outputBufferProcessors;
     }
