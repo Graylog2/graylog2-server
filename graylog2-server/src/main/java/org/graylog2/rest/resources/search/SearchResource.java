@@ -95,6 +95,13 @@ public class SearchResource extends RestResource {
         }
     }
 
+    protected void checkTermsStatsFields(String keyField, String valueField, String order) {
+        if (keyField == null || keyField.isEmpty() || valueField == null || valueField.isEmpty() || order == null || order.isEmpty()) {
+            LOG.warn("Missing parameters. Returning HTTP 400.");
+            throw new WebApplicationException(400);
+        }
+    }
+
     protected void checkQueryAndInterval(String query, String interval) {
         if (query == null || query.isEmpty() || interval == null || interval.isEmpty()) {
             LOG.warn("Missing parameters. Returning HTTP 400.");
@@ -162,6 +169,15 @@ public class SearchResource extends RestResource {
         result.put("missing", tr.getMissing()); // The number of docs missing a value.
         result.put("other", tr.getOther()); // The count of terms other than the one provided by the entries.
         result.put("total", tr.getTotal()); // The total count of terms.
+        result.put("built_query", tr.getBuiltQuery());
+
+        return result;
+    }
+
+    protected Map<String, Object> buildTermsStatsResult(TermsStatsResult tr) {
+        Map<String, Object> result = Maps.newHashMap();
+        result.put("time", tr.took().millis());
+        result.put("terms", tr.getResults());
         result.put("built_query", tr.getBuiltQuery());
 
         return result;

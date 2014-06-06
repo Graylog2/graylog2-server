@@ -113,6 +113,21 @@ public class Indexer {
         }
     }
 
+    public static enum TermsStatsOrder {
+        TERM,
+        REVERSE_TERM,
+        COUNT,
+        REVERSE_COUNT,
+        TOTAL,
+        REVERSE_TOTAL,
+        MIN,
+        REVERSE_MIN,
+        MAX,
+        REVERSE_MAX,
+        MEAN,
+        REVERSE_MEAN
+    }
+
     public Indexer(Configuration configuration,
                    Searches.Factory searchesFactory,
                    Counts.Factory countsFactory,

@@ -37,6 +37,8 @@ import org.elasticsearch.search.facet.statistical.StatisticalFacet;
 import org.elasticsearch.search.facet.statistical.StatisticalFacetBuilder;
 import org.elasticsearch.search.facet.terms.TermsFacet;
 import org.elasticsearch.search.facet.terms.TermsFacetBuilder;
+import org.elasticsearch.search.facet.termsstats.TermsStatsFacet;
+import org.elasticsearch.search.facet.termsstats.TermsStatsFacetBuilder;
 import org.elasticsearch.search.sort.SortOrder;
 import org.graylog2.Configuration;
 import org.graylog2.indexer.Deflector;
@@ -77,6 +79,7 @@ public class Searches {
 
     private final static String TERMS_FACET_NAME = "gl2_terms";
     private final static String STATS_FACET_NAME = "gl2_stats";
+    private final static String TERMS_STATS_FACET_NAME = "gl2_termsstats";
 
     @AssistedInject
     public Searches(Configuration configuration,
@@ -197,6 +200,42 @@ public class Searches {
 
     public TermsResult terms(String field, int size, String query, TimeRange range) throws IndexHelper.InvalidRangeFormatException {
         return terms(field, size, query, null, range);
+    }
+
+    public TermsStatsResult termsStats(String keyField, String valueField, Indexer.TermsStatsOrder order, int size, String query, String filter, TimeRange range) throws IndexHelper.InvalidRangeFormatException {
+        if (size == 0) {
+            size = 50;
+        }
+
+        SearchRequestBuilder srb;
+        if (filter == null) {
+            srb = standardSearchRequest(query, IndexHelper.determineAffectedIndices(indexer, indexRangeService, deflector, range));
+        } else {
+            srb = filteredSearchRequest(query, filter, IndexHelper.determineAffectedIndices(indexer, indexRangeService, deflector, range));
+        }
+
+        TermsStatsFacetBuilder stats = new TermsStatsFacetBuilder(TERMS_STATS_FACET_NAME);
+        stats.global(false);
+        stats.keyField(keyField);
+        stats.valueField(valueField);
+        stats.order(TermsStatsFacet.ComparatorType.fromString(order.toString().toLowerCase()));
+        stats.size(size);
+
+        srb.addFacet(stats);
+
+        final SearchRequest request = srb.request();
+        SearchResponse r = c.search(request).actionGet();
+
+        return new TermsStatsResult(
+                (TermsStatsFacet) r.getFacets().facet(TERMS_STATS_FACET_NAME),
+                query,
+                request.source(),
+                r.getTook()
+        );
+    }
+
+    public TermsStatsResult termsStats(String keyField, String valueField,Indexer.TermsStatsOrder order, int size, String query, TimeRange range) throws IndexHelper.InvalidRangeFormatException {
+        return termsStats(keyField, valueField, order, size, query, null, range);
     }
 
     public FieldStatsResult fieldStats(String field, String query, TimeRange range) throws FieldTypeException, IndexHelper.InvalidRangeFormatException {
