@@ -45,12 +45,12 @@
                 data-reflect="#sr-result-category"
                 data-validate="defined"
                 required="true">
-                    @for((id, rule) <- StreamRule.RULES) {
-                        <option value="@id"
-                            @if(streamRule != null && streamRule.getType == id) {
+                    @for((rule) <- StreamRule.Type.values()) {
+                        <option value="@rule.getId()"
+                            @if(streamRule != null && streamRule.getType == rule) {
                                 selected="true"
                             }
-                                data-reflect-string="@rule.get(1)">@rule.get(0)</option>
+                                data-reflect-string="@rule.getLongDesc()">@rule.getShortDesc()</option>
                     }
                 </select>
 
@@ -77,7 +77,7 @@
                     <strong>Result:</strong>
                     <span id="sr-result">
                         Field <em id="sr-result-field">user_id</em> must
-                        <em id="sr-result-category">@StreamRule.RULES.get(1).get(1)</em>
+                        <em id="sr-result-category">@StreamRule.Type.fromInt(1).getLongDesc()</em>
                         <em id="sr-result-value">19983</em>
                     </span>
                 </p>
