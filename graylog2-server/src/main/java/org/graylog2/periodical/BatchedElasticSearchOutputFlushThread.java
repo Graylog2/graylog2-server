@@ -43,7 +43,7 @@ public class BatchedElasticSearchOutputFlushThread extends Periodical {
 
     @Override
     public int getPeriodSeconds() {
-        return 1;
+        return 2;
     }
 
     @Override
