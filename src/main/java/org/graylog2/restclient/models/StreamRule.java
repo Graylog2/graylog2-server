@@ -43,7 +43,19 @@ public class StreamRule {
             this.longDesc = longDesc;
         }
 
-        private static Type fromInt(int id) {
+        public int getId() {
+            return id;
+        }
+
+        public String getShortDesc() {
+            return shortDesc;
+        }
+
+        public String getLongDesc() {
+            return longDesc;
+        }
+
+        public static Type fromInt(int id) {
             for (Type type : Type.values())
                 if (type.id == id)
                     return type;
@@ -98,7 +110,7 @@ public class StreamRule {
     public String getSentenceRepresentation() {
         String sentence;
         try {
-            sentence = getType().longDesc;
+            sentence = getType().getLongDesc();
         } catch (Exception e) {
             return "unknown";
         }
