@@ -86,7 +86,7 @@ function updateWidget_field_chart(widget, data) {
     new Rickshaw.Graph.Axis.Time({
         graph: graph,
         ticksTreatment: "glow",
-        timeFixture: new Rickshaw.Fixtures.Graylog2Time() // Cares about correct TZ handling.
+        timeFixture: new Rickshaw.Fixtures.Graylog2Time(gl2UserTimeZoneOffset) // Cares about correct TZ handling.
     });
 
     new Rickshaw.Graph.HoverDetail({

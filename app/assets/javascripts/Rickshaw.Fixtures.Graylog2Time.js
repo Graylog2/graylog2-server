@@ -1,6 +1,6 @@
 Rickshaw.namespace('Rickshaw.Fixtures.Graylog2Time');
 
-Rickshaw.Fixtures.Graylog2Time = function() {
+Rickshaw.Fixtures.Graylog2Time = function(tzOffset) {
 
 	var self = this;
 
@@ -67,11 +67,23 @@ Rickshaw.Fixtures.Graylog2Time = function() {
 	};
 
 	this.formatDate = function(d) {
-		return d3.time.format('%b %e')(d);
+		var dateMoment = moment(d);
+
+		if (tzOffset) {
+			dateMoment = dateMoment.zone(tzOffset);
+		}
+
+		return dateMoment.format('MMM DD');
 	};
 
 	this.formatTime = function(d) {
-		return d.toString().match(/(\d+:\d+):/)[1];
+		var dateMoment = moment(d);
+
+		if (tzOffset) {
+			dateMoment = dateMoment.zone(tzOffset);
+		}
+
+		return dateMoment.format('HH:mm');
 	};
 
 	this.ceil = function(time, unit) {
