@@ -164,17 +164,8 @@ public class Main extends NodeRunner {
         }
 
         if (configuration.getRestTransportUri() == null) {
-            String guessedIf;
-            try {
-                guessedIf = Tools.guessPrimaryNetworkAddress().getHostAddress();
-            } catch (Exception e) {
-                LOG.error("Could not guess primary network address for rest_transport_uri. Please configure it in your graylog2-radio.conf.", e);
-                throw new RuntimeException("No rest_transport_uri.");
-            }
-
-            String transportStr = "http://" + guessedIf + ":" + configuration.getRestListenUri().getPort();
-            LOG.info("No rest_transport_uri set. Falling back to [{}].", transportStr);
-            configuration.setRestTransportUri(transportStr);
+            configuration.setRestTransportUri(configuration.getDefaultRestTransportUri().toString());
+            LOG.info("No rest_transport_uri set. Falling back to [{}].", configuration.getRestTransportUri());
         }
 
         return configuration;
