@@ -54,6 +54,9 @@ public class AlertsController extends AuthenticatedController {
     @Inject
     private AlarmCallbackService alarmCallbackService;
 
+    @Inject
+    private NodeService nodeService;
+
     public Result index(String streamId) {
         try {
             Stream stream = streamService.get(streamId);
@@ -86,7 +89,8 @@ public class AlertsController extends AuthenticatedController {
                     alerts,
                     users.toString(),
                     availableAlarmCallbacks,
-                    alarmCallbacks
+                    alarmCallbacks,
+                    nodeService.loadMasterNode()
             ));
         } catch (IOException e) {
             return status(504, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));

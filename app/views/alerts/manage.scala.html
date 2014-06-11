@@ -4,7 +4,8 @@
         alerts: List[org.graylog2.restclient.models.alerts.Alert],
         users: String,
         availableAlarmCallbacks: Map[String, org.graylog2.restclient.models.api.responses.alarmcallbacks.GetSingleAvailableAlarmCallbackResponse],
-        alarmCallbacks: List[org.graylog2.restclient.models.AlarmCallback])
+        alarmCallbacks: List[org.graylog2.restclient.models.AlarmCallback],
+        node: org.graylog2.restclient.models.Node)
 
 @import org.graylog2.restclient.models.alerts._
 @import org.graylog2.restclient.models.api.responses.alarmcallbacks.GetSingleAvailableAlarmCallbackResponse
@@ -150,5 +151,5 @@
 
     <hr />
 
-    @views.html.partials.alerts.list_triggered_alerts.render(alerts, totalAlerts, stream)
+    @views.html.partials.alerts.list_triggered_alerts.render(alerts, totalAlerts, stream, node)
 }
