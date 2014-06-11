@@ -33,7 +33,6 @@ import org.graylog2.inputs.Cache;
 import org.graylog2.inputs.gelf.gelf.GELFChunkManager;
 import org.graylog2.jersey.container.netty.NettyContainer;
 import org.graylog2.plugin.InputHost;
-import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.Version;
 import org.graylog2.plugin.buffers.Buffer;
 import org.graylog2.plugin.lifecycles.Lifecycle;
@@ -137,17 +136,8 @@ public class Radio implements InputHost {
         this.inputs = new InputRegistry(this);
 
         if (this.configuration.getRestTransportUri() == null) {
-            String guessedIf;
-            try {
-                guessedIf = Tools.guessPrimaryNetworkAddress().getHostAddress();
-            } catch (Exception e) {
-                LOG.error("Could not guess primary network address for rest_transport_uri. Please configure it in your graylog2-radio.conf.", e);
-                throw new RuntimeException("No rest_transport_uri.");
-            }
-
-            String transportStr = "http://" + guessedIf + ":" + configuration.getRestListenUri().getPort();
-            LOG.info("No rest_transport_uri set. Falling back to [{}].", transportStr);
-            this.configuration.setRestTransportUri(transportStr);
+            this.configuration.setRestTransportUri(configuration.getDefaultRestTransportUri().toString());
+            LOG.info("No rest_transport_uri set. Falling back to [{}].", configuration.getRestTransportUri().toString());
         }
 
         pinger = new Ping.Pinger(httpClient, nodeId, configuration.getRestTransportUri(), configuration.getGraylog2ServerUri());
