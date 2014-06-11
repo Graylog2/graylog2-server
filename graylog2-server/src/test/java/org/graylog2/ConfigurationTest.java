@@ -195,35 +195,4 @@ public class ConfigurationTest {
 
         Assert.assertEquals(2, configuration.getMongoReplicaSet().size());
     }
-
-    @Test
-    public void testRestTransportUriLocalhost() throws RepositoryException, ValidationException {
-        validProperties.put("rest_listen_uri", "http://127.0.0.1:12900");
-
-        Configuration configuration = new Configuration();
-        new JadConfig(new InMemoryRepository(validProperties), configuration).process();
-
-        Assert.assertEquals("http://127.0.0.1:12900", configuration.getDefaultRestTransportUri().toString());
-    }
-
-    @Test
-    public void testRestTransportUriWildcard() throws RepositoryException, ValidationException {
-        validProperties.put("rest_listen_uri", "http://0.0.0.0:12900");
-
-        Configuration configuration = new Configuration();
-        new JadConfig(new InMemoryRepository(validProperties), configuration).process();
-
-        Assert.assertNotEquals("http://0.0.0.0:12900", configuration.getDefaultRestTransportUri().toString());
-        Assert.assertNotNull(configuration.getDefaultRestTransportUri());
-    }
-
-    @Test
-    public void testRestTransportUriCustom() throws RepositoryException, ValidationException {
-        validProperties.put("rest_listen_uri", "http://10.0.0.1:12900");
-
-        Configuration configuration = new Configuration();
-        new JadConfig(new InMemoryRepository(validProperties), configuration).process();
-
-        Assert.assertEquals("http://10.0.0.1:12900", configuration.getDefaultRestTransportUri().toString());
-    }
 }
