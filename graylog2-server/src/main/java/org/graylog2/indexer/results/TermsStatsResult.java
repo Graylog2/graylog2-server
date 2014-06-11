@@ -23,9 +23,10 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.elasticsearch.common.bytes.BytesReference;
 import org.elasticsearch.common.unit.TimeValue;
-import org.elasticsearch.search.facet.terms.TermsFacet;
 import org.elasticsearch.search.facet.termsstats.TermsStatsFacet;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -59,6 +60,21 @@ public class TermsStatsResult extends IndexQueryResult {
 
             results.add(resultMap);
         }
+
+        // Sort results by descending mean value
+        Collections.sort(results, new Comparator<Map<String, Object>>() {
+            @Override
+            public int compare(Map<String, Object> o1, Map<String, Object> o2) {
+                double o1Mean = (double)o1.get("mean");
+                double o2Mean = (double)o2.get("mean");
+                if (o1Mean > o2Mean) {
+                    return -1;
+                } else if (o1Mean < o2Mean) {
+                    return 1;
+                }
+                return 0;
+            }
+        });
 
         return results;
     }
