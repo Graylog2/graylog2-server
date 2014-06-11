@@ -47,12 +47,14 @@ public class RadioMessage {
         for(Map.Entry<String, Object> field : msg.getFields().entrySet()) {
             if (field.getValue() instanceof String) {
                 strings.put(field.getKey(), (String) field.getValue());
-            } else if (field.getValue() instanceof Long) {
-                longs.put(field.getKey(), (Long) field.getValue());
-            } else if (field.getValue() instanceof Double) {
-                doubles.put(field.getKey(), (Double) field.getValue());
+            } else if (field.getValue() instanceof Long || field.getValue() instanceof Integer) {
+                longs.put(field.getKey(), ((Number) field.getValue()).longValue());
+            } else if (field.getValue() instanceof Double || field.getValue() instanceof Float) {
+                doubles.put(field.getKey(), ((Number) field.getValue()).doubleValue());
             } else if (field.getValue() instanceof Boolean) {
                 strings.put(field.getKey(), field.getValue().toString());
+            } else if (field.getValue() instanceof Character) {
+                strings.put(field.getKey(), String.valueOf(field.getValue()));
             }
         }
 
