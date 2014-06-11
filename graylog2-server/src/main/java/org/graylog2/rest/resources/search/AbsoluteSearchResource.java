@@ -138,7 +138,7 @@ public class AbsoluteSearchResource extends SearchResource {
         }
     }
 
-        @GET @Path("/terms") @Timed
+    @GET @Path("/terms") @Timed
     @ApiOperation(value = "Most common field terms of a query using an absolute timerange.")
     @ApiResponses(value = {
             @ApiResponse(code = 400, message = "Invalid timerange parameters provided.")
@@ -158,6 +158,36 @@ public class AbsoluteSearchResource extends SearchResource {
         try {
             return json(buildTermsResult(
                     indexer.searches().terms(field, size, query, filter, buildAbsoluteTimeRange(from, to))
+            ));
+        } catch (IndexHelper.InvalidRangeFormatException e) {
+            LOG.warn("Invalid timerange parameters provided. Returning HTTP 400.", e);
+            throw new WebApplicationException(400);
+        }
+    }
+
+    @GET @Path("/termsstats") @Timed
+    @ApiOperation(value = "Ordered field terms of a query computed on another field using an absolute timerange.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 400, message = "Invalid timerange parameters provided.")
+    })
+    @Produces(MediaType.APPLICATION_JSON)
+    public String termsStatsAbsolute(
+            @ApiParam(title = "key_field", description = "Message field of to return terms of", required = true) @QueryParam("key_field") String keyField,
+            @ApiParam(title = "value_field", description = "Value field used for computation", required = true) @QueryParam("value_field") String valueField,
+            @ApiParam(title = "order", description = "What to order on (Allowed values: TERM, REVERSE_TERM, COUNT, REVERSE_COUNT, TOTAL, REVERSE_TOTAL, MIN, REVERSE_MIN, MAX, REVERSE_MAX, MEAN, REVERSE_MEAN)", required = true) @QueryParam("order") String order,
+            @ApiParam(title = "query", description = "Query (Lucene syntax)", required = true) @QueryParam("query") String query,
+            @ApiParam(title = "size", description = "Maximum number of terms to return", required = false) @QueryParam("size") int size,
+            @ApiParam(title = "from", description = "Timerange start. See search method description for date format", required = true) @QueryParam("from") String from,
+            @ApiParam(title = "to", description = "Timerange end. See search method description for date format", required = true) @QueryParam("to") String to,
+            @ApiParam(title = "filter", description = "Filter", required = false) @QueryParam("filter") String filter) throws IndexHelper.InvalidRangeFormatException {
+        checkSearchPermission(filter, RestPermissions.SEARCHES_ABSOLUTE);
+
+        checkTermsStatsFields(keyField, valueField, order);
+        checkQuery(query);
+
+        try {
+            return json(buildTermsStatsResult(
+                    indexer.searches().termsStats(keyField, valueField, Indexer.TermsStatsOrder.valueOf(order.toUpperCase()), size, query, filter, buildAbsoluteTimeRange(from, to))
             ));
         } catch (IndexHelper.InvalidRangeFormatException e) {
             LOG.warn("Invalid timerange parameters provided. Returning HTTP 400.", e);
