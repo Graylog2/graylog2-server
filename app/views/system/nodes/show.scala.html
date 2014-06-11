@@ -38,6 +38,7 @@
         <div class="alert alert-info">
             <i class="icon icon-retweet"></i> &nbsp; Lifecycle state:
             <strong>@node.getLifecycle</strong>
+            <span class="pull-right">@partials.support.head_bubble("graylog2-server/load-balancer-status", 0, 19)</span>
         </div>
     </div>
 
@@ -46,12 +47,14 @@
         <div class="row-fluid">
             <div class="alert alert-success">
                 <i class="icon icon-heart"></i> &nbsp; Marked as <strong>ALIVE</strong> for load balancers.
+                <span class="pull-right">@partials.support.head_bubble("graylog2-server/load-balancer-status", 0, 19)</span>
             </div>
         </div>
     } else {
         <div class="row-fluid">
             <div class="alert alert-error">
                 <i class="icon icon-heart"></i> &nbsp; Marked as <strong>DEAD</strong> for load balancers.
+                <span class="pull-right">@partials.support.head_bubble("graylog2-server/load-balancer-status", 0, 19)</span>
             </div>
         </div>
     }

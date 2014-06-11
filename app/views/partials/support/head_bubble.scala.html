@@ -1,8 +1,8 @@
-@(link: String)
+@(link: String, top: Int = 10, left: Int = 0)
 
 <a href="http://support.torch.sh/help/kb/@link"
     class="pull-right"
-    style="position: relative; top: 10px;"
+    style="position: relative; top: @{top}px; left: @{left}px;"
     target="_blank">
 
         <i class="icon icon-lightbulb"></i>

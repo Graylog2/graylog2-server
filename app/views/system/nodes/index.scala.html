@@ -141,10 +141,13 @@
                     <span class="label label-success node-state" data-toggle="tooltip" title="Marked as ALIVE for load balancers">
                         lb:ALIVE
                     </span>
+                    <span style="margin-left: 4px">@partials.support.bubble("graylog2-server/load-balancer-status")</span>
+
                 } else {
                     <span class="label label-important node-state" data-toggle="tooltip" title="Marked as DEAD for load balancers">
                         lb:DEAD
                     </span>
+                    <span style="margin-left: 4px">@partials.support.bubble("graylog2-server/load-balancer-status")</span>
                 }
             </h3>
 
