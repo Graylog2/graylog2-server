@@ -18,6 +18,9 @@ nbactions.xml
 graylog2-server/dependency-reduced-pom.xml
 graylog2-radio/dependency-reduced-pom.xml
 
+graylog2-rest-routes/src/main/java/org/graylog2/restroutes/generated
+
+
 misc/elasticsearch.yml.2
 misc/elasticsearch.yml.dev
 misc/convert_rsyslog_db_to_mongo.rb
