@@ -37,6 +37,12 @@
             <artifactId>disruptor</artifactId>
             <version>3.1.0</version>
         </dependency>
+        <dependency>
+            <groupId>org.graylog2</groupId>
+            <artifactId>graylog2-deps</artifactId>
+            <version>${project.parent.version}</version>
+            <type>pom</type>
+        </dependency>
     </dependencies>
 
     <build>

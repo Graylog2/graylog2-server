@@ -76,6 +76,12 @@
                         <manifest>
                         </manifest>
                     </archive>
+                    <excludes>
+                        <exclude>**/internal/*</exclude>
+                        <exclude>**/internal/*</exclude>
+                        <exclude>**/GenerateRoutes</exclude>
+                        <exclude>**/PathMethod</exclude>
+                    </excludes>
                 </configuration>
             </plugin>
             <plugin>

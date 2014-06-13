@@ -55,6 +55,12 @@
         </dependency>
         <dependency>
             <groupId>org.graylog2</groupId>
+            <artifactId>graylog2-deps</artifactId>
+            <version>${project.parent.version}</version>
+            <type>pom</type>
+        </dependency>
+        <dependency>
+            <groupId>org.graylog2</groupId>
             <artifactId>graylog2-inputs</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
