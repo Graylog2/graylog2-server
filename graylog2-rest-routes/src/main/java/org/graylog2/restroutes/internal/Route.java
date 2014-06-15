@@ -1,13 +1,8 @@
 package org.graylog2.restroutes.internal;
 
-import com.beust.jcommander.internal.Lists;
-import com.beust.jcommander.internal.Maps;
-
 import javax.ws.rs.PathParam;
 import java.lang.reflect.Method;
-import java.lang.reflect.Type;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
