@@ -29,10 +29,10 @@ import org.graylog2.plugin.buffers.Buffer;
 import org.graylog2.plugin.buffers.BufferOutOfCapacityException;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.inputs.MessageInput;
+import org.graylog2.syslog4j.server.SyslogServerEventIF;
+import org.graylog2.syslog4j.server.impl.event.SyslogServerEvent;
+import org.graylog2.syslog4j.server.impl.event.structured.StructuredSyslogServerEvent;
 import org.joda.time.DateTime;
-import org.productivity.java.syslog4j.server.SyslogServerEventIF;
-import org.productivity.java.syslog4j.server.impl.event.SyslogServerEvent;
-import org.productivity.java.syslog4j.server.impl.event.structured.StructuredSyslogServerEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

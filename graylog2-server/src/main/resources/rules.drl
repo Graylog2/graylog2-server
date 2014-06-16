@@ -1,0 +1,30 @@
+/*
+import org.graylog2.plugin.Message
+import org.graylog2.filters.BlacklistFilter
+
+declare Message
+    @role( event )
+end
+
+rule "more than 40 messages in the last second"
+    when
+       accumulate (
+           $m : Message() over window:time( 1s );
+
+           $cnt : count();
+
+           $cnt > 40
+       )
+    then
+        System.out.println( "sliding window matched: " + $cnt.toString() );
+end
+
+rule "blacklist messages by source host"
+when
+    $m : Message( filterOut == false )
+    BlacklistedHost ( matches($m.source) )
+then
+    modify($m) { setFilterOut(true) }
+end
+
+*/

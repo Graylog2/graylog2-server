@@ -19,9 +19,9 @@
 
 package org.graylog2.alarmcallbacks;
 
-import com.beust.jcommander.internal.Maps;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Maps;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.Response;
 import org.graylog2.plugin.alarms.AlertCondition;

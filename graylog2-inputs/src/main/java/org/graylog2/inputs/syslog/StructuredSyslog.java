@@ -25,7 +25,7 @@ import java.util.Map;
 import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.productivity.java.syslog4j.server.impl.event.structured.StructuredSyslogServerEvent;
+import org.graylog2.syslog4j.server.impl.event.structured.StructuredSyslogServerEvent;
 
 import com.google.common.collect.Maps;
 

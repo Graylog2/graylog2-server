@@ -1,8 +1,8 @@
 package org.graylog2.rest.resources.system;
 
-import com.beust.jcommander.internal.Lists;
-import com.beust.jcommander.internal.Maps;
 import com.codahale.metrics.annotation.Timed;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import org.graylog2.plugin.PluginMetaData;
 import org.graylog2.plugin.Version;
 import org.graylog2.rest.documentation.annotations.Api;

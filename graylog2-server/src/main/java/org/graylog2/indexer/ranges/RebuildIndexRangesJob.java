@@ -18,8 +18,8 @@
  */
 package org.graylog2.indexer.ranges;
 
-import com.beust.jcommander.internal.Lists;
 import com.google.common.base.Stopwatch;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;

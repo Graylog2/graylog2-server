@@ -1,7 +1,10 @@
 package org.graylog2.outputs;
 
-import com.beust.jcommander.internal.Lists;
-import com.codahale.metrics.*;
+import com.codahale.metrics.Histogram;
+import com.codahale.metrics.Meter;
+import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.Timer;
+import com.google.common.collect.Lists;
 import org.graylog2.Configuration;
 import org.graylog2.indexer.Indexer;
 import org.graylog2.plugin.Message;
@@ -13,7 +16,6 @@ import javax.inject.Inject;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadPoolExecutor;
 
 import static com.codahale.metrics.MetricRegistry.name;
 

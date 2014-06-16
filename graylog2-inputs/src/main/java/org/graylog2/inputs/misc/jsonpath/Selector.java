@@ -21,8 +21,6 @@ package org.graylog2.inputs.misc.jsonpath;
 
 import com.google.common.collect.Maps;
 import com.jayway.jsonpath.JsonPath;
-import net.minidev.json.JSONArray;
-import net.minidev.json.JSONObject;
 
 import java.util.List;
 import java.util.Map;

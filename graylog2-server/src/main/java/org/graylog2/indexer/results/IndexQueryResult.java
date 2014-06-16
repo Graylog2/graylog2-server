@@ -19,7 +19,7 @@
  */
 package org.graylog2.indexer.results;
 
-import com.beust.jcommander.internal.Lists;
+import com.google.common.collect.Lists;
 import org.elasticsearch.common.bytes.BytesReference;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.common.xcontent.XContentHelper;

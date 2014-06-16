@@ -19,8 +19,8 @@
 
 package org.graylog2.streams;
 
-import com.beust.jcommander.internal.Lists;
 import com.fasterxml.jackson.annotation.JsonValue;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.bson.types.ObjectId;
 import org.graylog2.database.CollectionName;

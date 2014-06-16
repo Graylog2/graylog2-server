@@ -19,8 +19,8 @@
 
 package org.graylog2.rest.resources.streams.rules;
 
-import com.beust.jcommander.internal.Lists;
 import com.codahale.metrics.annotation.Timed;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.bson.types.ObjectId;

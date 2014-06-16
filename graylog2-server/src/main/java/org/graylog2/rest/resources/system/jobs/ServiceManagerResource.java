@@ -1,6 +1,5 @@
 package org.graylog2.rest.resources.system.jobs;
 
-import com.beust.jcommander.internal.Maps;
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.util.concurrent.Service;
 import com.google.common.util.concurrent.ServiceManager;

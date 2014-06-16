@@ -19,7 +19,7 @@
 
 package org.graylog2.indexer.messages;
 
-import com.beust.jcommander.internal.Lists;
+import com.google.common.collect.Lists;
 import org.elasticsearch.action.admin.indices.analyze.AnalyzeRequestBuilder;
 import org.elasticsearch.action.admin.indices.analyze.AnalyzeResponse;
 import org.elasticsearch.action.admin.indices.analyze.AnalyzeResponse.AnalyzeToken;

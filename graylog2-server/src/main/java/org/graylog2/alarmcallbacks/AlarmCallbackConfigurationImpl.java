@@ -19,7 +19,7 @@
 
 package org.graylog2.alarmcallbacks;
 
-import com.beust.jcommander.internal.Maps;
+import com.google.common.collect.Maps;
 import org.bson.types.ObjectId;
 import org.graylog2.database.CollectionName;
 import org.graylog2.database.PersistedImpl;

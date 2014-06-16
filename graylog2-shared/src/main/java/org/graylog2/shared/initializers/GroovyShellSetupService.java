@@ -19,7 +19,7 @@
 
 package org.graylog2.shared.initializers;
 
-import com.beust.jcommander.internal.Maps;
+import com.google.common.collect.Maps;
 import com.google.common.util.concurrent.AbstractIdleService;
 import com.iterative.groovy.service.GroovyShellService;
 import org.graylog2.shared.BaseConfiguration;

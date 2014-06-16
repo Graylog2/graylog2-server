@@ -18,7 +18,7 @@
  */
 package org.graylog2.alerts.types;
 
-import com.beust.jcommander.internal.Lists;
+import com.google.common.collect.Lists;
 import org.graylog2.alerts.AbstractAlertCondition;
 import org.graylog2.indexer.IndexHelper;
 import org.graylog2.indexer.Indexer;

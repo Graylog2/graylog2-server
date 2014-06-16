@@ -20,8 +20,7 @@
 
 package org.graylog2.indexer.results;
 
-import com.beust.jcommander.internal.Lists;
-import com.beust.jcommander.internal.Sets;
+import com.google.common.collect.Sets;
 import org.elasticsearch.common.bytes.BytesReference;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.search.SearchHit;
