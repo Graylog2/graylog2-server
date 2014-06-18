@@ -263,6 +263,12 @@ public class Configuration {
     @Parameter(value = "rest_enable_gzip", required = false)
     private boolean restEnableGzip = false;
 
+    @Parameter(value = "stream_processing_timeout", required = false)
+    private long streamProcessingTimeout = 2000;
+
+    @Parameter(value = "stream_processing_max_faults", required = false)
+    private int streamProcessingMaxFaults = 3;
+
     public boolean isMaster() {
         return isMaster;
     }
@@ -630,5 +636,12 @@ public class Configuration {
         return loadBalancerRecognitionPeriodSeconds;
     }
 
+    public long getStreamProcessingTimeout() {
+        return streamProcessingTimeout;
+    }
+
+    public int getStreamProcessingMaxFaults() {
+        return streamProcessingMaxFaults;
+    }
 }
 

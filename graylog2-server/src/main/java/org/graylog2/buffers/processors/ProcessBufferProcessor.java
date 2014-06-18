@@ -30,6 +30,8 @@ import org.graylog2.plugin.filters.MessageFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.concurrent.*;
+
 import static com.codahale.metrics.MetricRegistry.name;
 
 /**
@@ -71,11 +73,11 @@ public class ProcessBufferProcessor implements EventHandler<MessageEvent> {
         incomingMessages.mark();
         final Timer.Context tcx = processTime.time();
 
-        Message msg = event.getMessage();
+        final Message msg = event.getMessage();
 
         LOG.debug("Starting to process message <{}>.", msg.getId());
 
-        for (MessageFilter filter : server.getFilters()) {
+        for (final MessageFilter filter : server.getFilters()) {
             Timer timer = server.metrics().timer(name(filter.getClass(), "executionTime"));
             final Timer.Context timerContext = timer.time();
 

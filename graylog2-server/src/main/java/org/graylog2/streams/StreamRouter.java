@@ -28,8 +28,13 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.util.concurrent.SimpleTimeLimiter;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import com.google.common.util.concurrent.TimeLimiter;
+import org.apache.lucene.util.NamedThreadFactory;
 import org.graylog2.Core;
 import org.graylog2.database.NotFoundException;
+import org.graylog2.notifications.Notification;
 import org.graylog2.plugin.GraylogServer;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.streams.Stream;
@@ -40,8 +45,8 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Routes a GELF Message to it's streams.
@@ -58,7 +63,12 @@ public class StreamRouter {
     private final Map<String, Timer> streamExecutionTimers = Maps.newHashMap();
     private final Map<String, Meter> streamExceptionMeters = Maps.newHashMap();
 
+    private final ExecutorService executor;
+    private final TimeLimiter timeLimiter;
+
     private Boolean useCaching = false;
+
+    final private ConcurrentMap<String, AtomicInteger> faultCounter;
 
     public StreamRouter() {
         this(true);
@@ -66,25 +76,65 @@ public class StreamRouter {
 
     public StreamRouter(Boolean useCaching) {
         this.useCaching = useCaching;
+        this.faultCounter = Maps.newConcurrentMap();
+        this.executor = Executors.newCachedThreadPool(
+                new ThreadFactoryBuilder()
+                        .setNameFormat("stream-router-%d")
+                        .setDaemon(true)
+                        .build()
+        );
+        this.timeLimiter = new SimpleTimeLimiter(executor);
     }
 
-    public List<Stream> route(Core server, Message msg) {
+    private AtomicInteger getFaultCount(String streamId) {
+        faultCounter.putIfAbsent(streamId, new AtomicInteger());
+        return faultCounter.get(streamId);
+    }
+
+    public List<Stream> route(final Core server, final Message msg) {
         List<Stream> matches = Lists.newArrayList();
         List<Stream> streams = getStreams(server);
 
-        for (Stream stream : streams) {
+        final long timeout = server.getConfiguration().getStreamProcessingTimeout();
+        final int maxFaultCount = server.getConfiguration().getStreamProcessingMaxFaults();
+
+        for (final Stream stream : streams) {
             Timer timer = getExecutionTimer(stream.getId(), server);
             final Timer.Context timerContext = timer.time();
 
-            Map<StreamRule, Boolean> result = getRuleMatches(server, stream, msg);
+            Callable<Boolean> task = new Callable<Boolean>() {
+                public Boolean call() {
+                    Map<StreamRule, Boolean> result = getRuleMatches(server, stream, msg);
 
-            boolean matched = doesStreamMatch(result);
+                    return doesStreamMatch(result);
+                }
+            };
 
-            // All rules were matched.
-            if (matched) {
-                getIncomingMeter(stream.getId(), server).mark();
-                matches.add(stream);
+            try {
+                boolean matched = timeLimiter.callWithTimeout(task, timeout, TimeUnit.MILLISECONDS, true);
+                if (matched) {
+                    getIncomingMeter(stream.getId(), server).mark();
+                    matches.add(stream);
+                }
+            } catch (Exception e) {
+                AtomicInteger faultCount = getFaultCount(stream.getId());
+                if (maxFaultCount > 0 && faultCount.incrementAndGet() >= maxFaultCount) {
+                    StreamImpl streamImpl = (StreamImpl)stream;
+                    streamImpl.pause();
+                    Integer streamFaultCount = faultCount.getAndSet(0);
+                    LOG.error("Processing of stream <" + stream.getId() + "> failed to return within " + timeout + "ms for more than " + maxFaultCount + " times. Disabling stream.");
+
+                    Notification.buildNow(server)
+                            .addType(Notification.Type.STREAM_PROCESSING_DISABLED)
+                            .addSeverity(Notification.Severity.NORMAL)
+                            .addDetail("stream_id", stream.getId())
+                            .addDetail("fault_count", streamFaultCount)
+                            .publishIfFirst();
+                } else
+                    LOG.warn("Processing of stream <{}> failed to return within {}ms.", stream.getId(), timeout);
             }
+
+
             timerContext.close();
         }
 

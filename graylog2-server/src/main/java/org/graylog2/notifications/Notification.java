@@ -56,7 +56,8 @@ public class Notification extends Persisted {
         NO_INPUT_RUNNING,
         INPUT_FAILED_TO_START,
         CHECK_SERVER_CLOCKS,
-        OUTDATED_VERSION
+        OUTDATED_VERSION,
+        STREAM_PROCESSING_DISABLED
     }
 
     public enum Severity {
