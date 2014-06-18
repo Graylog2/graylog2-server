@@ -343,13 +343,5 @@
                 </configuration>
             </plugin>
         </plugins>
-        <testResources>
-            <testResource>
-                <directory>src/main/resources</directory>
-                <includes>
-                    <include>log4j.xml</include>
-                </includes>
-            </testResource>
-        </testResources>
     </build>
 </project>
