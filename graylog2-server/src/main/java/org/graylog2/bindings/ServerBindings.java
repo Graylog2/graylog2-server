@@ -62,6 +62,7 @@ import org.graylog2.shared.ServerStatus;
 import org.graylog2.shared.bindings.providers.AsyncHttpClientProvider;
 import org.graylog2.shared.inputs.InputRegistry;
 import org.graylog2.shared.metrics.jersey2.MetricsDynamicBinding;
+import org.graylog2.streams.StreamRouter;
 import org.graylog2.system.jobs.SystemJobFactory;
 import org.graylog2.system.jobs.SystemJobManager;
 
@@ -113,6 +114,7 @@ public class ServerBindings extends AbstractModule {
         install(new FactoryModuleBuilder().build(Indices.Factory.class));
         install(new FactoryModuleBuilder().build(FixDeflectorByDeleteJob.Factory.class));
         install(new FactoryModuleBuilder().build(FixDeflectorByMoveJob.Factory.class));
+        install(new FactoryModuleBuilder().build(StreamRouter.Factory.class));
     }
 
     private void bindSingletons() {
