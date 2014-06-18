@@ -1,10 +1,12 @@
 package org.graylog2.streams.matchers;
 
-import junit.framework.Assert;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.streams.StreamRule;
 import org.graylog2.plugin.streams.StreamRuleType;
 import org.testng.annotations.Test;
+
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
 
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
@@ -22,7 +24,7 @@ public class FieldPresenceMatcherTest extends MatcherTest {
         StreamRuleMatcher matcher = getMatcher(rule);
 
         Boolean result = matcher.match(message, rule);
-        Assert.assertTrue(result);
+        assertTrue(result);
     }
 
     @Test
@@ -37,7 +39,7 @@ public class FieldPresenceMatcherTest extends MatcherTest {
         StreamRuleMatcher matcher = getMatcher(rule);
 
         Boolean result = matcher.match(message, rule);
-        Assert.assertFalse(result);
+        assertFalse(result);
     }
 
     @Test
@@ -52,7 +54,7 @@ public class FieldPresenceMatcherTest extends MatcherTest {
         StreamRuleMatcher matcher = getMatcher(rule);
 
         Boolean result = matcher.match(message, rule);
-        Assert.assertFalse(result);
+        assertFalse(result);
     }
 
     @Test
@@ -67,7 +69,7 @@ public class FieldPresenceMatcherTest extends MatcherTest {
         StreamRuleMatcher matcher = getMatcher(rule);
 
         Boolean result = matcher.match(message, rule);
-        Assert.assertTrue(result);
+        assertTrue(result);
     }
 
     @Test
@@ -84,7 +86,7 @@ public class FieldPresenceMatcherTest extends MatcherTest {
         StreamRuleMatcher matcher = getMatcher(rule);
 
         Boolean result = matcher.match(message, rule);
-        Assert.assertFalse(result);
+        assertFalse(result);
     }
 
     @Test
@@ -101,7 +103,7 @@ public class FieldPresenceMatcherTest extends MatcherTest {
         StreamRuleMatcher matcher = getMatcher(rule);
 
         Boolean result = matcher.match(message, rule);
-        Assert.assertTrue(result);
+        assertTrue(result);
     }
 
     @Test
@@ -118,7 +120,7 @@ public class FieldPresenceMatcherTest extends MatcherTest {
         StreamRuleMatcher matcher = getMatcher(rule);
 
         Boolean result = matcher.match(message, rule);
-        Assert.assertFalse(result);
+        assertFalse(result);
     }
 
     @Test
@@ -135,7 +137,7 @@ public class FieldPresenceMatcherTest extends MatcherTest {
         StreamRuleMatcher matcher = getMatcher(rule);
 
         Boolean result = matcher.match(message, rule);
-        Assert.assertTrue(result);
+        assertTrue(result);
     }
 
     @Test
@@ -153,7 +155,7 @@ public class FieldPresenceMatcherTest extends MatcherTest {
         StreamRuleMatcher matcher = getMatcher(rule);
 
         Boolean result = matcher.match(message, rule);
-        Assert.assertTrue(result);
+        assertTrue(result);
     }
 
     @Test
@@ -171,6 +173,6 @@ public class FieldPresenceMatcherTest extends MatcherTest {
         StreamRuleMatcher matcher = getMatcher(rule);
 
         Boolean result = matcher.match(message, rule);
-        Assert.assertFalse(result);
+        assertFalse(result);
     }
 }

@@ -1,6 +1,5 @@
 package org.graylog2.alarmcallbacks;
 
-import junit.framework.Assert;
 import org.graylog2.plugin.alarms.callbacks.AlarmCallback;
 import org.graylog2.shared.bindings.InstantiationService;
 import org.testng.annotations.BeforeMethod;
@@ -8,6 +7,8 @@ import org.testng.annotations.Test;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
 
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
@@ -36,8 +37,8 @@ public class AlarmCallbackFactoryTest {
 
         AlarmCallback alarmCallback = alarmCallbackFactory.create(configuration);
 
-        Assert.assertTrue(alarmCallback instanceof DummyAlarmCallback);
-        Assert.assertEquals(dummyAlarmCallback, alarmCallback);
+        assertTrue(alarmCallback instanceof DummyAlarmCallback);
+        assertEquals(dummyAlarmCallback, alarmCallback);
     }
 
     @Test
@@ -46,15 +47,15 @@ public class AlarmCallbackFactoryTest {
 
         AlarmCallback alarmCallback = alarmCallbackFactory.create(className);
 
-        Assert.assertTrue(alarmCallback instanceof DummyAlarmCallback);
-        Assert.assertEquals(dummyAlarmCallback, alarmCallback);
+        assertTrue(alarmCallback instanceof DummyAlarmCallback);
+        assertEquals(dummyAlarmCallback, alarmCallback);
     }
 
     @Test
     public void testCreateByClass() throws Exception {
         AlarmCallback alarmCallback = alarmCallbackFactory.create(DummyAlarmCallback.class);
 
-        Assert.assertTrue(alarmCallback instanceof DummyAlarmCallback);
-        Assert.assertEquals(dummyAlarmCallback, alarmCallback);
+        assertTrue(alarmCallback instanceof DummyAlarmCallback);
+        assertEquals(dummyAlarmCallback, alarmCallback);
     }
 }
