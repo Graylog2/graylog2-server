@@ -1,13 +1,9 @@
 package org.graylog2.alerts;
 
 import com.google.common.collect.Lists;
-import edu.emory.mathcs.backport.java.util.Collections;
 import org.graylog2.plugin.Message;
 
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
@@ -28,7 +24,7 @@ public class MessageFormatter {
         fields.remove("message");
 
         List<String> fieldKeys = Lists.newArrayList(fields.keySet());
-        Collections.sort(fieldKeys, new Comparator<String>(){
+        Collections.sort(fieldKeys, new Comparator<String>() {
             @Override
             public int compare(String o1, String o2) {
                 return o1.compareTo(o2);
