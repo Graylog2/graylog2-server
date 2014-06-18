@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2014 TORCH GmbH
+ * Copyright 2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -16,35 +16,26 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  */
+package org.graylog2.shared.bindings.providers;
 
-package org.graylog2.initializers;
+import com.google.common.util.concurrent.Service;
+import com.google.common.util.concurrent.ServiceManager;
+import com.google.inject.Inject;
+import com.google.inject.Provider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import com.google.common.util.concurrent.AbstractIdleService;
-import com.google.inject.Singleton;
-import org.graylog2.indexer.Indexer;
+import java.util.Set;
 
-import javax.inject.Inject;
-
-/**
- * @author Dennis Oelkers <dennis@torch.sh>
- */
-@Singleton
-public class IndexerSetupService extends AbstractIdleService {
-    private final Indexer indexer;
+public class ServiceManagerProvider implements Provider<ServiceManager> {
+    private static final Logger log = LoggerFactory.getLogger(ServiceManagerProvider.class);
 
     @Inject
-    public IndexerSetupService(Indexer indexer) {
-        this.indexer = indexer;
-    }
+    Set<Service> services;
 
     @Override
-    protected void startUp() throws Exception {
-        indexer.start();
-    }
-
-    @Override
-    protected void shutDown() throws Exception {
-        // Properly close ElasticSearch node.
-        indexer.getNode().close();
+    public ServiceManager get() {
+        log.debug("Using services: {}", services);
+        return new ServiceManager(services);
     }
 }

@@ -21,14 +21,12 @@ package org.graylog2.shared.bindings;
 
 import com.codahale.metrics.MetricRegistry;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.util.concurrent.ServiceManager;
 import com.google.inject.AbstractModule;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import org.graylog2.inputs.gelf.gelf.GELFChunkManager;
 import org.graylog2.plugin.system.NodeId;
-import org.graylog2.shared.bindings.providers.GELFChunkManagerProvider;
-import org.graylog2.shared.bindings.providers.NodeIdProvider;
-import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
-import org.graylog2.shared.bindings.providers.ProcessBufferProvider;
+import org.graylog2.shared.bindings.providers.*;
 import org.graylog2.shared.buffers.ProcessBuffer;
 import org.graylog2.shared.buffers.ProcessBufferWatermark;
 import org.graylog2.shared.stats.ThroughputStats;
@@ -58,5 +56,7 @@ public class GenericBindings extends AbstractModule {
         bind(GELFChunkManager.class).toProvider(GELFChunkManagerProvider.class);
         bind(NodeId.class).toProvider(NodeIdProvider.class);
         bind(ObjectMapper.class).toProvider(ObjectMapperProvider.class);
+
+        bind(ServiceManager.class).toProvider(ServiceManagerProvider.class);
     }
 }

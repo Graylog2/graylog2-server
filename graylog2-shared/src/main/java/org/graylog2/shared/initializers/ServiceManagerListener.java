@@ -31,7 +31,7 @@ import javax.inject.Inject;
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
  */
-public class ServiceManagerListener implements Listener {
+public class ServiceManagerListener extends Listener {
     private final Logger LOG = LoggerFactory.getLogger(ServiceManagerListener.class);
     private final ServerStatus serverStatus;
 

@@ -105,7 +105,7 @@ public class RebuildIndexRangesJob extends SystemJob {
         }
         indicesToCalculate = indices.length;
 
-        Stopwatch sw = new Stopwatch().start();
+        Stopwatch sw = Stopwatch.createStarted();
         for(String index : indices) {
             if (cancelRequested) {
                 info("Stop requested. Not calculating next index range, not updating ranges.");
@@ -143,7 +143,7 @@ public class RebuildIndexRangesJob extends SystemJob {
     private Map<String, Object> calculateRange(String index) throws EmptyIndexException {
         Map<String, Object> range = Maps.newHashMap();
 
-        Stopwatch x = new Stopwatch().start();
+        Stopwatch x = Stopwatch.createStarted();
         SearchHit doc = indexer.searches().firstOfIndex(index);
         if (doc == null || doc.isSourceEmpty()) {
             x.stop();

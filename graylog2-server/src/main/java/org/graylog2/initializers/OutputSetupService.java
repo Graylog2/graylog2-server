@@ -23,10 +23,12 @@ import com.google.common.util.concurrent.AbstractIdleService;
 import org.graylog2.outputs.OutputRegistry;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
  */
+@Singleton
 public class OutputSetupService extends AbstractIdleService {
     private final OutputRegistry outputRegistry;
 

@@ -38,10 +38,8 @@ import org.graylog2.bindings.*;
 import org.graylog2.cluster.NodeService;
 import org.graylog2.cluster.NodeServiceImpl;
 import org.graylog2.notifications.Notification;
-import org.graylog2.notifications.NotificationImpl;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.outputs.BatchedElasticSearchOutput;
-import org.graylog2.outputs.ElasticSearchOutput;
 import org.graylog2.outputs.OutputRegistry;
 import org.graylog2.plugin.Plugin;
 import org.graylog2.plugin.PluginModule;
@@ -248,6 +246,7 @@ public final class Main extends NodeRunner {
         final ServiceManagerListener serviceManagerListener = injector.getInstance(ServiceManagerListener.class);
         serviceManager.addListener(serviceManagerListener, MoreExecutors.sameThreadExecutor());
         serviceManager.startAsync().awaitHealthy();
+        LOG.info("Services started, startup times in ms: {}", serviceManager.startupTimes());
 
         activityWriter.write(new Activity("Started up.", Main.class));
         LOG.info("Graylog2 up and running.");

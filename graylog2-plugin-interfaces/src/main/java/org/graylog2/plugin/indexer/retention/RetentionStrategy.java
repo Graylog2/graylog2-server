@@ -47,7 +47,7 @@ public abstract class RetentionStrategy {
     protected abstract Art getArt();
 
     public void runStrategy(String indexName) {
-        Stopwatch sw = new Stopwatch().start();
+        Stopwatch sw = Stopwatch.createStarted();
 
         if (iterates()) {
             // TODO: Run per message.

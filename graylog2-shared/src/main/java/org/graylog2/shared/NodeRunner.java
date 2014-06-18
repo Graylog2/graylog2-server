@@ -55,6 +55,10 @@ public class NodeRunner {
         result.add(new GenericBindings(instantiationService));
         Reflections reflections = new Reflections("org.graylog2.shared.bindings");
         for (Class<? extends Module> type : reflections.getSubTypesOf(AbstractModule.class)) {
+            // skip the GenericBindings module, because we have already instantiated it above, avoids a bogus log message
+            if (type.equals(GenericBindings.class)) {
+                continue;
+            }
             try {
                 Constructor<? extends Module> constructor = type.getConstructor();
                 Module module = constructor.newInstance();

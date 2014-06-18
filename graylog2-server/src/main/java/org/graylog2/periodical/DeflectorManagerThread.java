@@ -66,9 +66,10 @@ public class DeflectorManagerThread extends Periodical { // public class Klimper
     public void run() {
         // Point deflector to a new index if required.
         try {
-            indexerSetupService.startAndWait();
-            checkAndRepair();
-            point();
+            if (indexerSetupService.isRunning()) {
+                checkAndRepair();
+                point();
+            }
         } catch (Exception e) {
             LOG.error("Couldn't point deflector to a new index", e);
         }

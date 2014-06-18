@@ -19,7 +19,6 @@
 
 package org.graylog2.periodical;
 
-import com.google.common.util.concurrent.Service;
 import com.google.inject.Inject;
 import org.graylog2.alarmcallbacks.AlarmCallbackConfiguration;
 import org.graylog2.alarmcallbacks.AlarmCallbackConfigurationService;
@@ -72,7 +71,7 @@ public class AlertScannerThread extends Periodical {
 
     @Override
     public void run() {
-        if (indexerSetupService.startAndWait() != Service.State.RUNNING) {
+        if (!indexerSetupService.isRunning()) {
             LOG.error("Indexer is not running, not checking streams for alerts.");
             return;
         }

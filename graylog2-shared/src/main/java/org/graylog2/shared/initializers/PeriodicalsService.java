@@ -87,7 +87,7 @@ public class PeriodicalsService extends AbstractIdleService {
     protected void shutDown() throws Exception {
         for (Periodical periodical : periodicals.getAllStoppedOnGracefulShutdown()) {
             LOG.info("Shutting down periodical [{}].", periodical.getClass().getCanonicalName());
-            Stopwatch s = new Stopwatch().start();
+            Stopwatch s = Stopwatch.createStarted();
 
             // Cancel future executions.
             Map<Periodical,ScheduledFuture> futures = periodicals.getFutures();

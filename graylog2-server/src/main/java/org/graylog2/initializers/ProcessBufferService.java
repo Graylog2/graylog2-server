@@ -28,9 +28,12 @@ import org.graylog2.shared.buffers.ProcessBuffer;
 import org.graylog2.shared.buffers.ProcessBufferWatermark;
 import org.graylog2.shared.buffers.processors.ProcessBufferProcessor;
 
+import javax.inject.Singleton;
+
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
  */
+@Singleton
 public class ProcessBufferService extends AbstractIdleService {
     private final Configuration configuration;
     private final ServerProcessBufferProcessor.Factory processBufferProcessorFactory;

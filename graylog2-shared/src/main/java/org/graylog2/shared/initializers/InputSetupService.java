@@ -54,7 +54,7 @@ public class InputSetupService extends AbstractIdleService {
 
             LOG.info("Attempting to close input <{}> [{}].", input.getUniqueReadableId(), input.getName());
 
-            Stopwatch s = new Stopwatch().start();
+            Stopwatch s = Stopwatch.createStarted();
             try {
                 input.stop();
 

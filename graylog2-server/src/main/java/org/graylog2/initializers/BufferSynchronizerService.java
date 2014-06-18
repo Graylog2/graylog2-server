@@ -24,10 +24,12 @@ import org.graylog2.buffers.Buffers;
 import org.graylog2.caches.Caches;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
  */
+@Singleton
 public class BufferSynchronizerService extends AbstractIdleService {
     private final Buffers bufferSynchronizer;
     private final Caches cacheSynchronizer;

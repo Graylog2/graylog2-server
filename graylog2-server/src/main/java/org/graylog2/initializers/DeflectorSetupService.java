@@ -26,10 +26,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
  */
+@Singleton
 public class DeflectorSetupService extends AbstractIdleService {
     private static final Logger LOG = LoggerFactory.getLogger(DeflectorSetupService.class);
     private final Deflector deflector;
@@ -47,7 +49,7 @@ public class DeflectorSetupService extends AbstractIdleService {
 
     @Override
     protected void startUp() throws Exception {
-        if (indexerSetupService.startAndWait() == State.RUNNING) {
+        if (indexerSetupService.isRunning()) {
             // Set up deflector.
             LOG.info("Setting up deflector.");
             deflector.setUp(indexer);

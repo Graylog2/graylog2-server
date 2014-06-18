@@ -27,11 +27,13 @@ import org.graylog2.metrics.MongoDbMetricsReporter;
 import org.graylog2.shared.ServerStatus;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.util.concurrent.TimeUnit;
 
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
  */
+@Singleton
 public class MetricsReporterService extends AbstractIdleService {
     private final Configuration configuration;
     private final MetricRegistry metricRegistry;

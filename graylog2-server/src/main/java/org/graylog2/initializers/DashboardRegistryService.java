@@ -24,9 +24,12 @@ import com.google.inject.Inject;
 import org.graylog2.dashboards.DashboardRegistry;
 import org.graylog2.shared.ServerStatus;
 
+import javax.inject.Singleton;
+
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
  */
+@Singleton
 public class DashboardRegistryService extends AbstractIdleService {
     private final DashboardRegistry dashboardRegistry;
     private final ServerStatus serverStatus;

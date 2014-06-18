@@ -74,7 +74,7 @@ public class SystemJobManager {
             public void run() {
                 job.markStarted();
 
-                Stopwatch x = new Stopwatch().start();
+                Stopwatch x = Stopwatch.createStarted();
 
                 job.execute();  // ... blocks until it finishes.
                 x.stop();
