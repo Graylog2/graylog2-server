@@ -244,12 +244,6 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "transport_email_web_interface_url", required = false)
     private URI emailTransportWebInterfaceUrl;
 
-    @Parameter(value = "stream_processing_timeout", required = false)
-    private long streamProcessingTimeout = 2000;
-
-    @Parameter(value = "stream_processing_max_faults", required = false)
-    private int streamProcessingMaxFaults = 3;
-
     public boolean isMaster() {
         return isMaster;
     }
@@ -546,12 +540,5 @@ public class Configuration extends BaseConfiguration {
         return loadBalancerRecognitionPeriodSeconds;
     }
 
-    public long getStreamProcessingTimeout() {
-        return streamProcessingTimeout;
-    }
-
-    public int getStreamProcessingMaxFaults() {
-        return streamProcessingMaxFaults;
-    }
 }
 

@@ -19,6 +19,7 @@
 
 package org.graylog2.rest.resources.streams;
 
+import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.annotation.Timed;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.collect.Lists;
@@ -65,17 +66,17 @@ public class StreamResource extends RestResource {
     private final StreamService streamService;
     private final StreamRuleService streamRuleService;
     private final ThroughputStats throughputStats;
-    private final StreamRouter.Factory streamRouterFactory;
+    private final MetricRegistry metricRegistry;
 
     @Inject
     public StreamResource(StreamService streamService,
                           StreamRuleService streamRuleService,
                           ThroughputStats throughputStats,
-                          StreamRouter.Factory streamRouterFactory) {
+                          MetricRegistry metricRegistry) {
         this.streamService = streamService;
         this.streamRuleService = streamRuleService;
         this.throughputStats = throughputStats;
-        this.streamRouterFactory = streamRouterFactory;
+        this.metricRegistry = metricRegistry;
     }
 
     @POST @Timed
@@ -344,7 +345,7 @@ public class StreamResource extends RestResource {
         Stream stream = fetchStream(streamId);
         Message message = new Message(serialisedMessage.get("message"));
 
-        StreamRouter router = streamRouterFactory.create(false);
+        StreamRouter router = new StreamRouter(false, streamService, streamRuleService, metricRegistry);
 
         Map<StreamRule, Boolean> ruleMatches = router.getRuleMatches(stream, message);
         Map<String, Boolean> rules = Maps.newHashMap();

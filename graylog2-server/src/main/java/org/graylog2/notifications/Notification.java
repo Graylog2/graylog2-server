@@ -61,8 +61,7 @@ public interface Notification extends Persisted {
         CHECK_SERVER_CLOCKS,
         OUTDATED_VERSION,
         EMAIL_TRANSPORT_CONFIGURATION_INVALID,
-        EMAIL_TRANSPORT_FAILED,
-        STREAM_PROCESSING_DISABLED
+        EMAIL_TRANSPORT_FAILED
     }
 
     public enum Severity {

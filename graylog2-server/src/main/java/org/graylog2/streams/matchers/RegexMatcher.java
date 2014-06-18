@@ -24,7 +24,6 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.streams.StreamRule;
-import org.graylog2.utilities.InterruptibleCharSequence;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,8 +51,7 @@ public class RegexMatcher implements StreamRuleMatcher {
 
         try {
             Pattern pattern = patternCache.get(rule.getValue());
-            CharSequence charSequence = new InterruptibleCharSequence(msg.getField(rule.getField()).toString());
-            return rule.getInverted() ^ pattern.matcher(charSequence).find();
+            return rule.getInverted() ^ pattern.matcher(msg.getField(rule.getField()).toString()).find();
         } catch (ExecutionException e) {
             LOG.error("Unable to get pattern from regex cache: ", e);
         }
