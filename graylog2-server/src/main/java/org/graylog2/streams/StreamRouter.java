@@ -28,8 +28,16 @@ import com.google.common.cache.LoadingCache;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.inject.Inject;
+import com.google.inject.assistedinject.Assisted;
+import com.google.inject.assistedinject.AssistedInject;
+import org.graylog2.Configuration;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.NotFoundException;
+import com.google.common.util.concurrent.SimpleTimeLimiter;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import com.google.common.util.concurrent.TimeLimiter;
+import org.graylog2.notifications.Notification;
+import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.streams.StreamRule;
@@ -39,8 +47,8 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Routes a GELF Message to it's streams.
@@ -48,6 +56,9 @@ import java.util.concurrent.TimeUnit;
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class StreamRouter {
+    public interface Factory {
+        public StreamRouter create(boolean useCaching);
+    }
 
     private static final Logger LOG = LoggerFactory.getLogger(StreamRouter.class);
     private static LoadingCache<String, List<Stream>> cachedStreams;
@@ -60,42 +71,86 @@ public class StreamRouter {
     private final StreamService streamService;
     private final StreamRuleService streamRuleService;
     private final MetricRegistry metricRegistry;
+    private final Configuration configuration;
+    private final NotificationService notificationService;
+
+    private final ExecutorService executor;
+    private final TimeLimiter timeLimiter;
+
+    final private ConcurrentMap<String, AtomicInteger> faultCounter;
 
     private final Boolean useCaching;
 
-    @Inject
-    public StreamRouter(MongoConnection mongoConnection, MetricRegistry metricRegistry) {
-        this(true, mongoConnection, metricRegistry);
-    }
-
-    public StreamRouter(Boolean useCaching, MongoConnection mongoConnection, MetricRegistry metricRegistry) {
-        this(useCaching, new StreamServiceImpl(mongoConnection), new StreamRuleServiceImpl(mongoConnection), metricRegistry);
-    }
-
-    public StreamRouter(boolean useCaching, StreamService streamService, StreamRuleService streamRuleService, MetricRegistry metricRegistry) {
+    @AssistedInject
+    public StreamRouter(@Assisted boolean useCaching,
+                        StreamService streamService,
+                        StreamRuleService streamRuleService,
+                        MetricRegistry metricRegistry,
+                        Configuration configuration,
+                        NotificationService notificationService) {
         this.useCaching = useCaching;
         this.streamService = streamService;
         this.streamRuleService = streamRuleService;
         this.metricRegistry = metricRegistry;
+        this.configuration = configuration;
+        this.notificationService = notificationService;
+        this.faultCounter = Maps.newConcurrentMap();
+        this.executor = Executors.newCachedThreadPool(
+                new ThreadFactoryBuilder()
+                        .setNameFormat("stream-router-%d")
+                        .setDaemon(true)
+                        .build()
+        );
+        this.timeLimiter = new SimpleTimeLimiter(executor);
     }
 
-    public List<Stream> route(Message msg) {
+    private AtomicInteger getFaultCount(String streamId) {
+        faultCounter.putIfAbsent(streamId, new AtomicInteger());
+        return faultCounter.get(streamId);
+    }
+
+    public List<Stream> route(final Message msg) {
         List<Stream> matches = Lists.newArrayList();
         List<Stream> streams = getStreams();
 
-        for (Stream stream : streams) {
+        final long timeout = configuration.getStreamProcessingTimeout();
+        final int maxFaultCount = configuration.getStreamProcessingMaxFaults();
+
+        for (final Stream stream : streams) {
             Timer timer = getExecutionTimer(stream.getId());
             final Timer.Context timerContext = timer.time();
 
-            Map<StreamRule, Boolean> result = getRuleMatches(stream, msg);
+            Callable<Boolean> task = new Callable<Boolean>() {
+                public Boolean call() {
+                    Map<StreamRule, Boolean> result = getRuleMatches(stream, msg);
+                    return doesStreamMatch(result);
+                }
+            };
 
-            boolean matched = doesStreamMatch(result);
+            try {
+                boolean matched = timeLimiter.callWithTimeout(task, timeout, TimeUnit.MILLISECONDS, true);
+                if (matched) {
+                    getIncomingMeter(stream.getId()).mark();
+                    matches.add(stream);
+                }
+            } catch (Exception e) {
+                AtomicInteger faultCount = getFaultCount(stream.getId());
+                if (maxFaultCount > 0 && faultCount.incrementAndGet() >= maxFaultCount) {
+                    streamService.pause(stream);
+                    Integer streamFaultCount = faultCount.getAndSet(0);
+                    LOG.error("Processing of stream <" + stream.getId() + "> failed to return within " + timeout + "ms for more than " + maxFaultCount + " times. Disabling stream.");
 
-            // All rules were matched.
-            if (matched) {
-                getIncomingMeter(stream.getId()).mark();
-                matches.add(stream);
+                    Notification notification = notificationService.buildNow()
+                            .addType(Notification.Type.STREAM_PROCESSING_DISABLED)
+                            .addSeverity(Notification.Severity.NORMAL)
+                            .addDetail("stream_id", stream.getId())
+                            .addDetail("fault_count", streamFaultCount);
+                    notificationService.publishIfFirst(notification);
+                } else
+                    LOG.warn("Processing of stream <{}> failed to return within {}ms.", stream.getId(), timeout);
             }
+
+
             timerContext.close();
         }
 
