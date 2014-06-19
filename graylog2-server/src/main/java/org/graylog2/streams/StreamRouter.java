@@ -56,20 +56,14 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class StreamRouter {
-    public interface Factory {
-        public StreamRouter create(boolean useCaching);
-    }
-
-    private static final Logger LOG = LoggerFactory.getLogger(StreamRouter.class);
-    private static LoadingCache<String, List<Stream>> cachedStreams;
-    private static LoadingCache<Stream, List<StreamRule>> cachedStreamRules;
+    protected final Logger LOG = LoggerFactory.getLogger(StreamRouter.class);
 
     private final Map<String, Meter> streamIncomingMeters = Maps.newHashMap();
     private final Map<String, Timer> streamExecutionTimers = Maps.newHashMap();
     private final Map<String, Meter> streamExceptionMeters = Maps.newHashMap();
 
-    private final StreamService streamService;
-    private final StreamRuleService streamRuleService;
+    protected final StreamService streamService;
+    protected final StreamRuleService streamRuleService;
     private final MetricRegistry metricRegistry;
     private final Configuration configuration;
     private final NotificationService notificationService;
@@ -79,16 +73,12 @@ public class StreamRouter {
 
     final private ConcurrentMap<String, AtomicInteger> faultCounter;
 
-    private final Boolean useCaching;
-
-    @AssistedInject
-    public StreamRouter(@Assisted boolean useCaching,
-                        StreamService streamService,
+    @Inject
+    public StreamRouter(StreamService streamService,
                         StreamRuleService streamRuleService,
                         MetricRegistry metricRegistry,
                         Configuration configuration,
                         NotificationService notificationService) {
-        this.useCaching = useCaching;
         this.streamService = streamService;
         this.streamRuleService = streamRuleService;
         this.metricRegistry = metricRegistry;
@@ -157,60 +147,16 @@ public class StreamRouter {
         return matches;
     }
 
-    private List<Stream> getStreams() {
-        if (this.useCaching) {
-            if (cachedStreams == null)
-                cachedStreams = CacheBuilder.newBuilder()
-                        .maximumSize(1)
-                        .expireAfterWrite(1, TimeUnit.SECONDS)
-                        .build(
-                                new CacheLoader<String, List<Stream>>() {
-                                    @Override
-                                    public List<Stream> load(String s) throws Exception {
-                                        return streamService.loadAllEnabled();
-                                    }
-                                }
-                        );
-            List<Stream> result = null;
-            try {
-                result = cachedStreams.get("streams");
-            } catch (ExecutionException e) {
-                LOG.error("Caught exception while fetching from cache", e);
-            }
-            return result;
-        } else {
-            return streamService.loadAllEnabled();
-        }
+    List<Stream> getStreams() {
+        return streamService.loadAllEnabled();
     }
 
-    private List<StreamRule> getStreamRules(Stream stream) {
-        if (this.useCaching) {
-            if (cachedStreamRules == null)
-                cachedStreamRules = CacheBuilder.newBuilder()
-                        .expireAfterWrite(1, TimeUnit.SECONDS)
-                        .build(
-                                new CacheLoader<Stream, List<StreamRule>>() {
-                                    @Override
-                                    public List<StreamRule> load(Stream s) throws Exception {
-                                        return streamRuleService.loadForStream(s);
-                                    }
-                                }
-                        );
-            List<StreamRule> result = null;
-            try {
-                result = cachedStreamRules.get(stream);
-            } catch (ExecutionException e) {
-                LOG.error("Caught exception while fetching from cache", e);
-            }
-
-            return result;
-        } else {
-            try {
-                return streamRuleService.loadForStream(stream);
-            } catch (NotFoundException e) {
-                LOG.error("Caught exception while fetching stream rules", e);
-                return null;
-            }
+    List<StreamRule> getStreamRules(Stream stream) {
+        try {
+            return streamRuleService.loadForStream(stream);
+        } catch (NotFoundException e) {
+            LOG.error("Caught exception while fetching stream rules", e);
+            return null;
         }
     }
 

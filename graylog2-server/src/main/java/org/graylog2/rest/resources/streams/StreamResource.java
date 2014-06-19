@@ -65,17 +65,17 @@ public class StreamResource extends RestResource {
     private final StreamService streamService;
     private final StreamRuleService streamRuleService;
     private final ThroughputStats throughputStats;
-    private final StreamRouter.Factory streamRouterFactory;
+    private final StreamRouter streamRouter;
 
     @Inject
     public StreamResource(StreamService streamService,
                           StreamRuleService streamRuleService,
                           ThroughputStats throughputStats,
-                          StreamRouter.Factory streamRouterFactory) {
+                          StreamRouter streamRouter) {
         this.streamService = streamService;
         this.streamRuleService = streamRuleService;
         this.throughputStats = throughputStats;
-        this.streamRouterFactory = streamRouterFactory;
+        this.streamRouter = streamRouter;
     }
 
     @POST @Timed
@@ -344,9 +344,7 @@ public class StreamResource extends RestResource {
         Stream stream = fetchStream(streamId);
         Message message = new Message(serialisedMessage.get("message"));
 
-        StreamRouter router = streamRouterFactory.create(false);
-
-        Map<StreamRule, Boolean> ruleMatches = router.getRuleMatches(stream, message);
+        Map<StreamRule, Boolean> ruleMatches = streamRouter.getRuleMatches(stream, message);
         Map<String, Boolean> rules = Maps.newHashMap();
 
         for (StreamRule ruleMatch : ruleMatches.keySet()) {
@@ -354,7 +352,7 @@ public class StreamResource extends RestResource {
         }
 
         Map<String, Object> result = Maps.newHashMap();
-        result.put("matches", router.doesStreamMatch(ruleMatches));
+        result.put("matches", streamRouter.doesStreamMatch(ruleMatches));
         result.put("rules", rules);
 
         return json(result);

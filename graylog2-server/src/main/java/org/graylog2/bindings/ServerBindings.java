@@ -116,7 +116,6 @@ public class ServerBindings extends AbstractModule {
         install(new FactoryModuleBuilder().build(Indices.Factory.class));
         install(new FactoryModuleBuilder().build(FixDeflectorByDeleteJob.Factory.class));
         install(new FactoryModuleBuilder().build(FixDeflectorByMoveJob.Factory.class));
-        install(new FactoryModuleBuilder().build(StreamRouter.Factory.class));
     }
 
     private void bindSingletons() {
@@ -146,7 +145,6 @@ public class ServerBindings extends AbstractModule {
         bind(SystemJobFactory.class).toProvider(SystemJobFactoryProvider.class);
         bind(DashboardRegistry.class).toProvider(DashboardRegistryProvider.class);
         bind(AsyncHttpClient.class).toProvider(AsyncHttpClientProvider.class);
-        bind(StreamRouter.class).toProvider(StreamRouterProvider.class);
         bind(GracefulShutdown.class).in(Scopes.SINGLETON);
     }
 
