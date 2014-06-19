@@ -27,12 +27,8 @@ import com.google.common.collect.Sets;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresGuest;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.graylog2.Configuration;
 import org.graylog2.ServerVersion;
-import org.graylog2.buffers.Buffers;
-import org.graylog2.caches.Caches;
 import org.graylog2.indexer.Indexer;
-import org.graylog2.periodical.Periodicals;
 import org.graylog2.plugin.Tools;
 import org.graylog2.rest.documentation.annotations.Api;
 import org.graylog2.rest.documentation.annotations.ApiOperation;
@@ -42,8 +38,6 @@ import org.graylog2.rest.resources.system.responses.ReaderPermissionResponse;
 import org.graylog2.security.RestPermissions;
 import org.graylog2.shared.ProcessingPauseLockedException;
 import org.graylog2.shared.ServerStatus;
-import org.graylog2.shared.inputs.InputRegistry;
-import org.graylog2.system.activities.ActivityWriter;
 import org.graylog2.system.shutdown.GracefulShutdown;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -72,32 +66,17 @@ public class SystemResource extends RestResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(SystemResource.class);
 
-    private final Buffers bufferSynchronizer;
     private final ServerStatus serverStatus;
-    private final ActivityWriter activityWriter;
-    private final Configuration configuration;
     private final Indexer indexer;
-    private final Caches cacheSynchronizer;
-    private final InputRegistry inputs;
-    private final Periodicals periodicals;
+    private final GracefulShutdown gracefulShutdown;
 
     @Inject
-    public SystemResource(Buffers bufferSynchronizer,
-                          ServerStatus serverStatus,
-                          ActivityWriter activityWriter,
-                          Configuration configuration,
+    public SystemResource(ServerStatus serverStatus,
                           Indexer indexer,
-                          Caches cacheSynchronizer,
-                          InputRegistry inputs,
-                          Periodicals periodicals) {
-        this.bufferSynchronizer = bufferSynchronizer;
+                          GracefulShutdown gracefulShutdown) {
         this.serverStatus = serverStatus;
-        this.activityWriter = activityWriter;
-        this.configuration = configuration;
         this.indexer = indexer;
-        this.cacheSynchronizer = cacheSynchronizer;
-        this.inputs = inputs;
-        this.periodicals = periodicals;
+        this.gracefulShutdown = gracefulShutdown;
     }
 
     @GET @Timed
@@ -268,8 +247,7 @@ public class SystemResource extends RestResource {
     public Response shutdown() {
         checkPermission(RestPermissions.NODE_SHUTDOWN, serverStatus.getNodeId().toString());
 
-        new Thread(new GracefulShutdown(serverStatus, activityWriter, configuration, bufferSynchronizer,
-                cacheSynchronizer, indexer, periodicals, inputs)).start();
+        new Thread(gracefulShutdown).start();
         return accepted().build();
     }
 

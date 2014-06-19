@@ -21,22 +21,24 @@ package org.graylog2.system.shutdown;
 
 import com.google.inject.Inject;
 import org.graylog2.Configuration;
-import org.graylog2.buffers.Buffers;
-import org.graylog2.caches.Caches;
-import org.graylog2.indexer.Indexer;
-import org.graylog2.periodical.Periodicals;
+import org.graylog2.initializers.BufferSynchronizerService;
+import org.graylog2.initializers.IndexerSetupService;
 import org.graylog2.plugin.lifecycles.Lifecycle;
 import org.graylog2.shared.ProcessingPauseLockedException;
 import org.graylog2.shared.ServerStatus;
-import org.graylog2.shared.inputs.InputRegistry;
+import org.graylog2.shared.initializers.InputSetupService;
+import org.graylog2.shared.initializers.PeriodicalsService;
 import org.graylog2.system.activities.Activity;
 import org.graylog2.system.activities.ActivityWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Singleton;
+
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
+@Singleton
 public class GracefulShutdown implements Runnable {
 
     private static final Logger LOG = LoggerFactory.getLogger(GracefulShutdown.class);
@@ -44,11 +46,10 @@ public class GracefulShutdown implements Runnable {
     public final int SLEEP_SECS = 1;
 
     private final Configuration configuration;
-    private final Buffers bufferSynchronizer;
-    private final Caches cacheSynchronizer;
-    private final Indexer indexer;
-    private final Periodicals periodicals;
-    private final InputRegistry inputs;
+    private final BufferSynchronizerService bufferSynchronizerService;
+    private final IndexerSetupService indexerSetupService;
+    private final PeriodicalsService periodicalsService;
+    private final InputSetupService inputSetupService;
     private final ServerStatus serverStatus;
     private final ActivityWriter activityWriter;
 
@@ -56,19 +57,17 @@ public class GracefulShutdown implements Runnable {
     public GracefulShutdown(ServerStatus serverStatus,
                             ActivityWriter activityWriter,
                             Configuration configuration,
-                            Buffers bufferSynchronizer,
-                            Caches cacheSynchronizer,
-                            Indexer indexer,
-                            Periodicals periodicals,
-                            InputRegistry inputs) {
+                            BufferSynchronizerService bufferSynchronizerService,
+                            IndexerSetupService indexerSetupService,
+                            PeriodicalsService periodicalsService,
+                            InputSetupService inputSetupService) {
         this.serverStatus = serverStatus;
         this.activityWriter = activityWriter;
         this.configuration = configuration;
-        this.bufferSynchronizer = bufferSynchronizer;
-        this.cacheSynchronizer = cacheSynchronizer;
-        this.indexer = indexer;
-        this.periodicals = periodicals;
-        this.inputs = inputs;
+        this.bufferSynchronizerService = bufferSynchronizerService;
+        this.indexerSetupService = indexerSetupService;
+        this.periodicalsService = periodicalsService;
+        this.inputSetupService = inputSetupService;
     }
 
     @Override
@@ -96,6 +95,9 @@ public class GracefulShutdown implements Runnable {
             Thread.sleep(SLEEP_SECS*1000);
         } catch (InterruptedException ignored) { /* nope */ }
 
+        // stop all inputs so no new messages can come in
+        inputSetupService.stopAsync().awaitTerminated();
+
         // Make sure that message processing is enabled. We need it enabled to work on buffered/cached messages.
         serverStatus.unlockProcessingPause();
         try {
@@ -104,8 +106,18 @@ public class GracefulShutdown implements Runnable {
         } catch (ProcessingPauseLockedException e) {
             throw new RuntimeException("Seems like unlocking the processing pause did not succeed.", e);
         }
+
+        // flush all remaining messages from the system
+        bufferSynchronizerService.stopAsync().awaitTerminated();
+
+        // stop all maintenance tasks
+        periodicalsService.stopAsync().awaitTerminated();
+
+        // disconnect from elasticsearch
+        indexerSetupService.stopAsync().awaitTerminated();
+
         // Shut down hard with no shutdown hooks running.
         LOG.info("Goodbye.");
-        Runtime.getRuntime().halt(0);
+        System.exit(0);
     }
 }
