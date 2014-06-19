@@ -60,6 +60,8 @@ import org.slf4j.bridge.SLF4JBridgeHandler;
 
 import java.io.File;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 /**
  * Main class of Graylog2.
@@ -245,7 +247,17 @@ public final class Main extends NodeRunner {
         // Start services.
         final ServiceManagerListener serviceManagerListener = injector.getInstance(ServiceManagerListener.class);
         serviceManager.addListener(serviceManagerListener, MoreExecutors.sameThreadExecutor());
-        serviceManager.startAsync().awaitHealthy();
+        try {
+            serviceManager.startAsync().awaitHealthy();
+        } catch (Exception e) {
+            try {
+                serviceManager.stopAsync().awaitStopped(30, TimeUnit.SECONDS);
+            } catch (TimeoutException timeoutException) {
+                LOG.error("Unable to shutdown properly on time.");
+            }
+            LOG.error("Graylog2 startup failed. Exiting. Exception was: {}", e);
+            System.exit(-1);
+        }
         LOG.info("Services started, startup times in ms: {}", serviceManager.startupTimes());
 
         activityWriter.write(new Activity("Started up.", Main.class));
