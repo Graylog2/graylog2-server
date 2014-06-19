@@ -144,6 +144,7 @@ public class ServerBindings extends AbstractModule {
         bind(SystemJobFactory.class).toProvider(SystemJobFactoryProvider.class);
         bind(DashboardRegistry.class).toProvider(DashboardRegistryProvider.class);
         bind(AsyncHttpClient.class).toProvider(AsyncHttpClientProvider.class);
+        bind(StreamRouter.class).toProvider(StreamRouterProvider.class);
     }
 
     private void bindInterfaces() {
