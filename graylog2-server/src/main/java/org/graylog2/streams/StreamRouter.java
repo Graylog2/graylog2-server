@@ -27,15 +27,13 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.inject.Inject;
-import com.google.inject.assistedinject.Assisted;
-import com.google.inject.assistedinject.AssistedInject;
-import org.graylog2.Configuration;
-import org.graylog2.database.MongoConnection;
-import org.graylog2.database.NotFoundException;
 import com.google.common.util.concurrent.SimpleTimeLimiter;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.common.util.concurrent.TimeLimiter;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import org.graylog2.Configuration;
+import org.graylog2.database.NotFoundException;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.Message;
@@ -48,6 +46,7 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -55,10 +54,8 @@ import java.util.concurrent.atomic.AtomicInteger;
  *
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
+@Singleton
 public class StreamRouter {
-    public interface Factory {
-        public StreamRouter create(boolean useCaching);
-    }
 
     private static final Logger LOG = LoggerFactory.getLogger(StreamRouter.class);
     private static LoadingCache<String, List<Stream>> cachedStreams;
@@ -79,16 +76,14 @@ public class StreamRouter {
 
     final private ConcurrentMap<String, AtomicInteger> faultCounter;
 
-    private final Boolean useCaching;
+    private final AtomicBoolean useCaching = new AtomicBoolean(true);
 
-    @AssistedInject
-    public StreamRouter(@Assisted boolean useCaching,
-                        StreamService streamService,
+    @Inject
+    public StreamRouter(StreamService streamService,
                         StreamRuleService streamRuleService,
                         MetricRegistry metricRegistry,
                         Configuration configuration,
                         NotificationService notificationService) {
-        this.useCaching = useCaching;
         this.streamService = streamService;
         this.streamRuleService = streamRuleService;
         this.metricRegistry = metricRegistry;
@@ -158,7 +153,7 @@ public class StreamRouter {
     }
 
     private List<Stream> getStreams() {
-        if (this.useCaching) {
+        if (useCaching.get()) {
             if (cachedStreams == null)
                 cachedStreams = CacheBuilder.newBuilder()
                         .maximumSize(1)
@@ -184,7 +179,7 @@ public class StreamRouter {
     }
 
     private List<StreamRule> getStreamRules(Stream stream) {
-        if (this.useCaching) {
+        if (this.useCaching.get()) {
             if (cachedStreamRules == null)
                 cachedStreamRules = CacheBuilder.newBuilder()
                         .expireAfterWrite(1, TimeUnit.SECONDS)
@@ -229,6 +224,14 @@ public class StreamRouter {
         }
 
         return result;
+    }
+
+    public boolean isUseCaching() {
+        return useCaching.get();
+    }
+
+    public void setUseCaching(boolean useCaching) {
+        this.useCaching.set(useCaching);
     }
 
     public boolean doesStreamMatch(Map<StreamRule, Boolean> ruleMatches) {
