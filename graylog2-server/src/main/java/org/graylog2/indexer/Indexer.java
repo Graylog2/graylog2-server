@@ -152,7 +152,7 @@ public class Indexer {
         client = node.client();
 
         try {
-            client.admin().cluster().health(new ClusterHealthRequest().waitForYellowStatus()).actionGet(5, SECONDS);
+            client.admin().cluster().health(new ClusterHealthRequest().waitForYellowStatus()).actionGet(30, SECONDS);
         } catch(ElasticSearchTimeoutException e) {
             final String hosts = node.settings().get("discovery.zen.ping.unicast.hosts");
             final Iterable<String> hostList = Splitter.on(',').split(hosts);
