@@ -102,7 +102,7 @@ public class SessionsResource extends RestResource {
             result.validUntil = new DateTime(session.getLastAccessTime()).plus(session.getTimeout()).toDate();
             return result;
         }
-        throw new NotAuthorizedException("Invalid username or password", "Graylog2 Server session");
+        throw new NotAuthorizedException("Invalid username or password", "Basic realm=\"Graylog2 Server session\"");
     }
 
     @DELETE
