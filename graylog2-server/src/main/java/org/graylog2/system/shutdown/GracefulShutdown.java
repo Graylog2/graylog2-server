@@ -19,7 +19,6 @@
 
 package org.graylog2.system.shutdown;
 
-import com.google.common.util.concurrent.ServiceManager;
 import com.google.inject.Inject;
 import org.graylog2.Configuration;
 import org.graylog2.initializers.BufferSynchronizerService;
@@ -35,8 +34,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Singleton;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
@@ -53,7 +50,6 @@ public class GracefulShutdown implements Runnable {
     private final IndexerSetupService indexerSetupService;
     private final PeriodicalsService periodicalsService;
     private final InputSetupService inputSetupService;
-    private final ServiceManager serviceManager;
     private final ServerStatus serverStatus;
     private final ActivityWriter activityWriter;
 
@@ -64,8 +60,7 @@ public class GracefulShutdown implements Runnable {
                             BufferSynchronizerService bufferSynchronizerService,
                             IndexerSetupService indexerSetupService,
                             PeriodicalsService periodicalsService,
-                            InputSetupService inputSetupService,
-                            ServiceManager serviceManager) {
+                            InputSetupService inputSetupService) {
         this.serverStatus = serverStatus;
         this.activityWriter = activityWriter;
         this.configuration = configuration;
@@ -73,7 +68,6 @@ public class GracefulShutdown implements Runnable {
         this.indexerSetupService = indexerSetupService;
         this.periodicalsService = periodicalsService;
         this.inputSetupService = inputSetupService;
-        this.serviceManager = serviceManager;
     }
 
     @Override
@@ -121,13 +115,6 @@ public class GracefulShutdown implements Runnable {
 
         // disconnect from elasticsearch
         indexerSetupService.stopAsync().awaitTerminated();
-
-        // Waiting for the rest of the services to stop.
-        try {
-            serviceManager.stopAsync().awaitStopped(30, TimeUnit.SECONDS);
-        } catch (TimeoutException e) {
-            LOG.warn("Timeout while waiting for services to stop: {}", e);
-        }
 
         // Shut down hard with no shutdown hooks running.
         LOG.info("Goodbye.");
