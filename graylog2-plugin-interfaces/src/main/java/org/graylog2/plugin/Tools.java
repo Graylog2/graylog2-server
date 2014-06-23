@@ -22,9 +22,11 @@
 
 package org.graylog2.plugin;
 
+import com.google.common.base.Charsets;
 import com.google.common.primitives.Ints;
-import org.drools.util.codec.Base64;
 import org.elasticsearch.search.SearchHit;
+import org.jboss.netty.buffer.ChannelBuffers;
+import org.jboss.netty.handler.codec.base64.Base64;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.*;
@@ -225,11 +227,11 @@ public final class Tools {
     }
 
     public static String encodeBase64(String what) {
-        return new String(Base64.encodeBase64(what.getBytes()));
+        return Base64.encode(ChannelBuffers.wrappedBuffer(what.getBytes())).toString(Charsets.UTF_8);
     }
 
     public static String decodeBase64(String what) {
-        return new String(Base64.decodeBase64(what));
+        return Base64.decode(ChannelBuffers.wrappedBuffer(what.getBytes())).toString(Charsets.UTF_8);
     }
 
     public static String rdnsLookup(InetAddress socketAddress) throws UnknownHostException {
