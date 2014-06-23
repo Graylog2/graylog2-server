@@ -45,7 +45,10 @@ public abstract class Buffer {
     }
 
     public long getUsage() {
-        return Long.valueOf(ringBuffer.getBufferSize())-ringBuffer.remainingCapacity();
+        if (ringBuffer == null) {
+            return 0;
+        }
+        return (long) ringBuffer.getBufferSize() -ringBuffer.remainingCapacity();
     }
     
 }
