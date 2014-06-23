@@ -83,7 +83,7 @@
         <apache-directory-version>1.0.0-M20</apache-directory-version>
         <surefire.version>2.13</surefire.version>
         <guice.version>3.0</guice.version>
-
+        <drools.version>6.1.0.CR1</drools.version>
         <slf4j.version>1.7.5</slf4j.version>
     </properties>
 
@@ -175,11 +175,18 @@
                     </exclusion>
                 </exclusions>
             </dependency>
+
+            <dependency>
+                <groupId>org.kie</groupId>
+                <artifactId>kie-api</artifactId>
+                <version>${drools.version}</version>
+            </dependency>
             <dependency>
                 <groupId>org.drools</groupId>
-                <artifactId>drools-core</artifactId>
-                <version>5.5.0.Final</version>
+                <artifactId>drools-compiler</artifactId>
+                <version>${drools.version}</version>
             </dependency>
+
             <dependency>
                 <groupId>com.codahale.metrics</groupId>
                 <artifactId>metrics-core</artifactId>

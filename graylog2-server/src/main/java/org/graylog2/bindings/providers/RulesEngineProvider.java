@@ -20,8 +20,8 @@
 package org.graylog2.bindings.providers;
 
 import org.graylog2.Configuration;
-import org.graylog2.RulesEngineImpl;
 import org.graylog2.plugin.RulesEngine;
+import org.graylog2.rules.DroolsEngine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,10 +41,13 @@ public class RulesEngineProvider implements Provider<RulesEngine> {
     public RulesEngineProvider(Configuration configuration) {
         String rulesFilePath = configuration.getDroolsRulesFile();
         if (rulesFilePath != null && !rulesFilePath.isEmpty()) {
-            RulesEngineImpl drools = new RulesEngineImpl();
-            drools.addRules(rulesFilePath);
-            rulesEngine = drools;
-            LOG.info("Using rules: {}", rulesFilePath);
+            DroolsEngine drools = new DroolsEngine();
+            if (drools.addRulesFromFile(rulesFilePath)) {
+                rulesEngine = drools;
+                LOG.info("Using rules: {}", rulesFilePath);
+            } else {
+                LOG.info("Unable to load rules due to load error: {}", rulesFilePath);
+            }
         } else {
             LOG.info("Not using rules");
         }

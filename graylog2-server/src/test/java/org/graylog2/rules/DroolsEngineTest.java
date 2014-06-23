@@ -1,0 +1,66 @@
+package org.graylog2.rules;
+
+import org.graylog2.Graylog2BaseTest;
+import org.graylog2.plugin.Message;
+import org.joda.time.DateTime;
+import org.testng.annotations.Test;
+
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
+
+public class DroolsEngineTest extends Graylog2BaseTest {
+
+    @Test
+    public void runWithoutRules() {
+        final DroolsEngine engine = new DroolsEngine();
+
+        final int rulesFired = engine.evaluate(new Message("test message", "test", DateTime.now()));
+
+        assertEquals(rulesFired, 0, "No rules should have fired");
+    }
+
+    @Test
+    public void addedRuleIsVisibleInSession() {
+        final DroolsEngine engine = new DroolsEngine();
+
+        String rule1 = "package org.graylog2.rules\n" +
+                "import org.graylog2.plugin.Message\n" +
+                "global org.slf4j.Logger log \n\n" +
+                "declare Message\n" +
+                "    @role( event )\n" +
+                "end\n" +
+                "\n" +
+                "rule \"filter out all messages\"\n" +
+                "when\n" +
+                "    $m : Message( filterOut == false )\n" +
+                "then\n" +
+                "    modify($m) { setFilterOut(true) };\n" +
+                "    log.info(\"filtering out message from \" + $m.getSource());\n" +
+                "end\n";
+        String rule2 = "package org.graylog2.rules\n" +
+                "import org.graylog2.plugin.Message\n" +
+                "global org.slf4j.Logger log \n\n" +
+                "declare Message\n" +
+                "    @role( event )\n" +
+                "end\n" +
+                "\n" +
+                "rule \"print filtered out message source\"\n" +
+                "when\n" +
+                "    $m : Message( filterOut == true )\n" +
+                "then\n" +
+                "    log.info(\"message from \" + $m.getSource() + \" filtered out\");\n" +
+                "end\n";
+
+        final boolean valid1 = engine.addRule(rule1);
+        assertTrue(valid1, "Rule should compile without errors");
+
+        final boolean valid2 = engine.addRule(rule2);
+        assertTrue(valid2, "Rule should compile without errors");
+
+        final Message msg = new Message("test message", "test source", DateTime.now());
+        final int fired = engine.evaluate(msg);
+
+        assertTrue(msg.getFilterOut(), "msg is filtered out");
+        assertEquals(fired, 2, "both rules should have fired");
+    }
+}

@@ -237,9 +237,12 @@
         </dependency>
 
         <dependency>
+            <groupId>org.kie</groupId>
+            <artifactId>kie-api</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.drools</groupId>
-            <artifactId>knowledge-api</artifactId>
-            <version>5.5.0.Final</version>
+            <artifactId>drools-compiler</artifactId>
         </dependency>
 
         <dependency>

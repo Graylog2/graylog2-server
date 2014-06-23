@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2012 Lennart Koopmann <lennart@socketfeed.com>
+ * Copyright (c) 2012-2014 TORCH GmbH
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -27,9 +27,11 @@ package org.graylog2.plugin;
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public interface RulesEngine {
-    
-    public void addRules(String rulesFile);
-	
-    public void evaluate(Message message);
+
+    boolean addRule(String ruleSource);
+
+    public boolean addRulesFromFile(String rulesFile);
+
+    public int evaluate(Message message);
     
 }
