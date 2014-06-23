@@ -152,6 +152,7 @@ public class ServerBindings extends AbstractModule {
         bind(MessageGateway.class).to(MessageGatewayImpl.class);
         bind(SecurityContextFactory.class).to(ShiroSecurityContextFactory.class);
         bind(AlertSender.class).to(FormattedEmailAlertSender.class);
+        bind(StreamRouter.class);
     }
 
     private MongoConnection getMongoConnection() {
