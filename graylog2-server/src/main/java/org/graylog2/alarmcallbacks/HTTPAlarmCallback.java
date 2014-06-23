@@ -34,6 +34,8 @@ import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.configuration.fields.ConfigurationField;
 import org.graylog2.plugin.configuration.fields.TextField;
 import org.graylog2.plugin.streams.Stream;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.io.IOException;
@@ -46,6 +48,7 @@ import java.util.concurrent.ExecutionException;
  * @author Dennis Oelkers <dennis@torch.sh>
  */
 public class HTTPAlarmCallback implements AlarmCallback {
+    private final Logger LOG = LoggerFactory.getLogger(this.getClass());
     private Configuration configuration;
     private final AsyncHttpClient asyncHttpClient;
     private final ObjectMapper objectMapper;
@@ -64,8 +67,6 @@ public class HTTPAlarmCallback implements AlarmCallback {
 
     @Override
     public void call(Stream stream, AlertCondition.CheckResult result) throws AlarmCallbackException {
-        System.out.println("Calling " + configuration.getString("url"));
-
         Map<String, Object> event = Maps.newHashMap();
         event.put("stream", stream);
         event.put("check_result", result);

@@ -32,6 +32,7 @@ import org.graylog2.plugin.alarms.AlertCondition;
 import org.graylog2.plugin.alarms.callbacks.AlarmCallback;
 import org.graylog2.plugin.periodical.Periodical;
 import org.graylog2.plugin.streams.Stream;
+import org.graylog2.shared.utilities.ExceptionStringFormatter;
 import org.graylog2.streams.StreamService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -101,7 +102,11 @@ public class AlertScannerThread extends Periodical {
                         if (callConfigurations.size() > 0)
                             for (AlarmCallbackConfiguration configuration : callConfigurations) {
                                 AlarmCallback alarmCallback = alarmCallbackFactory.create(configuration);
-                                alarmCallback.call(stream, result);
+                                try {
+                                    alarmCallback.call(stream, result);
+                                } catch (Exception e) {
+                                    LOG.warn("Alarm callback <{}> failed. Skipping. Error was: {}", alarmCallback.getName(), new ExceptionStringFormatter(e));
+                                }
                             }
                         else
                             emailAlarmCallback.call(stream, result);

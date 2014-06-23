@@ -38,6 +38,7 @@ import org.graylog2.plugin.configuration.fields.ConfigurationField;
 import org.graylog2.plugin.configuration.fields.TextField;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.system.NodeId;
+import org.graylog2.shared.utilities.ExceptionStringFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -87,17 +88,19 @@ public class EmailAlarmCallback implements AlarmCallback {
             } catch (TransportConfigurationException e) {
                 Notification notification = notificationService.buildNow()
                         .addNode(nodeId.toString())
-                        .addType(NotificationImpl.Type.EMAIL_TRANSPORT_CONFIGURATION_INVALID)
+                        .addType(Notification.Type.EMAIL_TRANSPORT_CONFIGURATION_INVALID)
+                        .addSeverity(Notification.Severity.NORMAL)
                         .addDetail("stream_id", stream.getId())
-                        .addDetail("exception", e);
+                        .addDetail("exception", new ExceptionStringFormatter(e).toString());
                 notificationService.publishIfFirst(notification);
                 LOG.warn("Stream [{}] has alert receivers and is triggered, but email transport is not configured.", stream);
             } catch (Exception e) {
                 Notification notification = notificationService.buildNow()
                         .addNode(nodeId.toString())
-                        .addType(NotificationImpl.Type.EMAIL_TRANSPORT_FAILED)
+                        .addType(Notification.Type.EMAIL_TRANSPORT_FAILED)
+                        .addSeverity(Notification.Severity.NORMAL)
                         .addDetail("stream_id", stream.getId())
-                        .addDetail("exception", e);
+                        .addDetail("exception", e.toString() + " (" + e.getCause().toString() + ")");
                 notificationService.publishIfFirst(notification);
                 LOG.error("Stream [{}] has alert receivers and is triggered, but sending emails failed", stream, e);
             }

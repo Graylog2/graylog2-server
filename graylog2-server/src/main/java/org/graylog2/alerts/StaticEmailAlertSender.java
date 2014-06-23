@@ -74,7 +74,7 @@ public class StaticEmailAlertSender implements AlertSender {
     private void sendEmail(String emailAddress, Stream stream, AlertCondition.CheckResult checkResult, List<Message> backlog) throws TransportConfigurationException, EmailException {
         LOG.debug("Sending mail to " + emailAddress);
         if(!configuration.isEmailTransportEnabled()) {
-            throw new TransportConfigurationException();
+            throw new TransportConfigurationException("Email transport is not enabled!");
         }
 
         Email email = new SimpleEmail();
@@ -191,7 +191,7 @@ public class StaticEmailAlertSender implements AlertSender {
     @Override
     public void sendEmails(Stream stream, AlertCondition.CheckResult checkResult, List<Message> backlog) throws TransportConfigurationException, EmailException {
         if(!configuration.isEmailTransportEnabled()) {
-            throw new TransportConfigurationException();
+            throw new TransportConfigurationException("Email transport is not enabled!");
         }
 
         if (stream.getAlertReceivers() == null || stream.getAlertReceivers().isEmpty()) {
