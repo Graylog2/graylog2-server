@@ -128,19 +128,30 @@ public abstract class MessageInput {
     public Object getAttributesWithMaskedPasswords() {
         Map<String, Object> result = Maps.newHashMap();
 
-        if (getRequestedConfiguration() == null) {
+        final ConfigurationRequest config = getRequestedConfiguration();
+        if (config == null) {
             return result;
         }
 
         for(Map.Entry<String, Object> attribute : getAttributes().entrySet()) {
             Object value = attribute.getValue();
 
-            List<String> attributes = (List<String>) getRequestedConfiguration().asList().get(attribute.getKey()).get("attributes");
-            if(attributes.contains(TextField.Attribute.IS_PASSWORD.toString().toLowerCase())) {
-                value = "********";
+            final Map<String, Map<String, Object>> configAsList = config.asList();
+            final String attributeKey = attribute.getKey();
+            final Map<String, Object> attributesForConfigSetting = configAsList.get(attributeKey);
+            if (attributesForConfigSetting != null) {
+                // we know the config setting, check its attributes
+                final List<String> attributes = (List<String>) attributesForConfigSetting.get("attributes");
+                if (attributes.contains(TextField.Attribute.IS_PASSWORD.toString().toLowerCase())) {
+                    value = "********";
+                }
+            } else {
+                // safety measure, although this is bad.
+                LOG.warn("Unknown input configuration setting {}={} found. Not trying to mask its value," +
+                                 " though this is likely a bug.", attribute, value);
             }
 
-            result.put(attribute.getKey(), value);
+            result.put(attributeKey, value);
         }
 
         return result;
