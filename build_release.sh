@@ -11,7 +11,7 @@ else
 fi  
 
 # move configs around so we have our standard config packaged
-mv conf/graylog2-web-interface.conf /tmp/gl2build-tmp.conf
+mv -f conf/graylog2-web-interface.conf /tmp/gl2build-tmp.conf
 cp misc/graylog2-web-interface.conf.example conf/graylog2-web-interface.conf
 
 # .tar.gz
