@@ -26,7 +26,10 @@ import org.drools.compiler.kie.builder.impl.InternalKieModule;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.RulesEngine;
 import org.kie.api.KieServices;
-import org.kie.api.builder.*;
+import org.kie.api.builder.KieBuilder;
+import org.kie.api.builder.KieFileSystem;
+import org.kie.api.builder.KieModule;
+import org.kie.api.builder.ReleaseId;
 import org.kie.api.io.Resource;
 import org.kie.api.runtime.KieContainer;
 import org.kie.api.runtime.KieSession;
@@ -36,7 +39,7 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Singleton;
 import java.io.File;
 import java.io.IOException;
-import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 @Singleton
@@ -46,47 +49,47 @@ public class DroolsEngine implements RulesEngine {
     private final KieServices kieServices;
     private KieContainer kieContainer;
     private final AtomicReference<KieSession> session = new AtomicReference<>();
-    private int version = 1;
 
-    private final Collection<String> rules = Lists.newArrayList();
+    private final List<String> liveRules = Lists.newArrayList();
+    private int version = 0;
+    private ReleaseId currentReleaseId;
 
     @Inject
     public DroolsEngine() {
         kieServices = KieServices.Factory.get();
+        liveRules.add("// placeholder rule");
+        commitRules();
+    }
+
+    public void stop() {
+        log.debug("Stopping drools session and removing all rules.");
+        final KieSession activeSession = session.getAndSet(null);
+        if (activeSession != null) {
+            activeSession.dispose();
+        }
+        if (currentReleaseId != null) {
+            kieServices.getRepository().removeKieModule(currentReleaseId);
+        }
     }
 
     @Override
-    public boolean addRule(String ruleSource) {
-        rules.add(ruleSource);
-        return deployRules(increaseRulesVersion());
-    }
-
-    private ReleaseId increaseRulesVersion() {
-        return kieServices.newReleaseId("org.graylog2", "dynamic-rules", Integer.toString(version++));
-    }
-
-    private boolean deployRules(ReleaseId newReleaseId) {
-        final KieModule module = createAndDeployJar(kieServices, newReleaseId, rules.toArray(new String[rules.size()]));
-        if (module == null) {
+    public synchronized boolean addRule(String ruleSource) {
+        log.debug("Adding rule {}", ruleSource);
+        liveRules.add(ruleSource);
+        if (!commitRules()) {
+            // adding rule failed, remove the ruleSource from our list of liveRules again.
+            liveRules.remove(ruleSource);
             return false;
         }
-        if (kieContainer == null) {
-            kieContainer = kieServices.newKieContainer(newReleaseId);
-            final KieSession session = kieContainer.newKieSession();
-            this.session.set(session);
-            session.setGlobal("log", log);
-        }
-        kieContainer.updateToVersion(newReleaseId);
-
         return true;
     }
 
     @Override
-    public boolean addRulesFromFile(String rulesFile) {
+    public synchronized boolean addRulesFromFile(String rulesFile) {
+        log.debug("Adding drools rules from file {}", rulesFile);
         try {
             final String rulesSource = Files.toString(new File(rulesFile), Charsets.UTF_8);
-            rules.add(rulesSource);
-            return deployRules(increaseRulesVersion());
+            return addRule(rulesSource);
         } catch (IOException e) {
             log.warn("Could not read drools source file. Not loading rules.", e);
         }
@@ -103,18 +106,67 @@ public class DroolsEngine implements RulesEngine {
         return 0;
     }
 
-    public static KieModule createAndDeployJar( KieServices ks,
-                                                ReleaseId releaseId,
-                                                String... drls ) {
-        byte[] jar = createKJar( ks, releaseId, null, drls );
-        return deployJar( ks, jar );
+    private boolean commitRules() {
+        final ReleaseId previousReleaseId = currentReleaseId;
+        final ReleaseId newReleaseId = nextRulesPackageVersion();
+        log.debug("Committing rules as version {}", newReleaseId);
+        final boolean deployed = deployRules(newReleaseId);
+        if (deployed && previousReleaseId != null) {
+            kieServices.getRepository().removeKieModule(previousReleaseId);
+        }
+        return deployed;
     }
-    public static byte[] createKJar(KieServices ks,
-                                    ReleaseId releaseId,
-                                    String pom,
-                                    String... drls) {
+
+    private boolean deployRules(ReleaseId newReleaseId) {
+        try {
+            // add common header
+            // TODO this will go wrong at some point, use the DRL6Parser to figure what to add,
+            // and potentially also just modify the tree it generates to add the import and globals we want
+            final String[] drls = new String[liveRules.size()];
+            int i = 0;
+            for (String drl : liveRules) {
+                drls[i] = "package org.graylog2.rules\n" +
+                        "import org.graylog2.plugin.*\n" +
+                        "global org.slf4j.Logger log\n" +
+                        "\n" + drl;
+                i++;
+            }
+
+            createAndDeployJar(kieServices,
+                               newReleaseId,
+                               drls);
+            if (kieContainer == null) {
+                kieContainer = kieServices.newKieContainer(newReleaseId);
+                final KieSession session = kieContainer.newKieSession();
+                this.session.set(session);
+                session.setGlobal("log", log);
+            }
+            kieContainer.updateToVersion(newReleaseId);
+            return true;
+        } catch (RulesCompilationException e) {
+            log.warn("Unable to add rules due to compilation errors.", e);
+            return false;
+        }
+    }
+
+    private ReleaseId nextRulesPackageVersion() {
+        currentReleaseId = kieServices.newReleaseId("org.graylog2", "dynamic-rules", Integer.toString(version++));
+        return currentReleaseId;
+    }
+
+    private static KieModule createAndDeployJar(KieServices ks,
+                                                ReleaseId releaseId,
+                                                String... drls) throws RulesCompilationException {
+        byte[] jar = createKJar(ks, releaseId, null, drls);
+        return deployJar(ks, jar);
+    }
+
+    private static byte[] createKJar(KieServices ks,
+                                     ReleaseId releaseId,
+                                     String pom,
+                                     String... drls) throws RulesCompilationException {
         KieFileSystem kfs = ks.newKieFileSystem();
-        if( pom != null ) {
+        if (pom != null) {
             kfs.write("pom.xml", pom);
         } else {
             kfs.generateAndWritePomXML(releaseId);
@@ -125,11 +177,8 @@ public class DroolsEngine implements RulesEngine {
             }
         }
         KieBuilder kb = ks.newKieBuilder(kfs).buildAll();
-        if( kb.getResults().hasMessages( org.kie.api.builder.Message.Level.ERROR ) ) {
-            for( org.kie.api.builder.Message result : kb.getResults().getMessages() ) {
-                log.warn("Compiling rule failed: {}", result.getText());
-            }
-            return null;
+        if (kb.getResults().hasMessages(org.kie.api.builder.Message.Level.ERROR)) {
+            throw new RulesCompilationException(kb.getResults().getMessages());
         }
         InternalKieModule kieModule = (InternalKieModule) ks.getRepository()
                 .getKieModule(releaseId);
@@ -137,7 +186,7 @@ public class DroolsEngine implements RulesEngine {
         return jar;
     }
 
-    public static KieModule deployJar(KieServices ks, byte[] jar) {
+    private static KieModule deployJar(KieServices ks, byte[] jar) {
         // Deploy jar into the repository
         Resource jarRes = ks.getResources().newByteArrayResource(jar);
         KieModule km = ks.getRepository().addKieModule(jarRes);

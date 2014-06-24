@@ -6,6 +6,7 @@ import org.joda.time.DateTime;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
 public class DroolsEngineTest extends Graylog2BaseTest {
@@ -17,15 +18,15 @@ public class DroolsEngineTest extends Graylog2BaseTest {
         final int rulesFired = engine.evaluate(new Message("test message", "test", DateTime.now()));
 
         assertEquals(rulesFired, 0, "No rules should have fired");
+
+        engine.stop();
     }
 
     @Test
     public void addedRuleIsVisibleInSession() {
         final DroolsEngine engine = new DroolsEngine();
 
-        String rule1 = "package org.graylog2.rules\n" +
-                "import org.graylog2.plugin.Message\n" +
-                "global org.slf4j.Logger log \n\n" +
+        String rule1 =
                 "declare Message\n" +
                 "    @role( event )\n" +
                 "end\n" +
@@ -37,9 +38,7 @@ public class DroolsEngineTest extends Graylog2BaseTest {
                 "    modify($m) { setFilterOut(true) };\n" +
                 "    log.info(\"filtering out message from \" + $m.getSource());\n" +
                 "end\n";
-        String rule2 = "package org.graylog2.rules\n" +
-                "import org.graylog2.plugin.Message\n" +
-                "global org.slf4j.Logger log \n\n" +
+        String rule2 =
                 "declare Message\n" +
                 "    @role( event )\n" +
                 "end\n" +
@@ -62,5 +61,34 @@ public class DroolsEngineTest extends Graylog2BaseTest {
 
         assertTrue(msg.getFilterOut(), "msg is filtered out");
         assertEquals(fired, 2, "both rules should have fired");
+
+        engine.stop();
+    }
+
+    @Test
+    public void incorrectRuleIsNotApplied() {
+        final DroolsEngine engine = new DroolsEngine();
+
+        String invalidRule = "rule \"this will not compile\"\n" +
+                "when\n" +
+                "then\n" +
+                "ende";
+
+        String validRule = "rule \"this will compile\"\n" +
+                "when\n" +
+                "  exists (Object())\n" +
+                "then\n" +
+                "  log.info(\"Found some object\");\n" +
+                "end";
+
+        boolean deployed = engine.addRule(invalidRule);
+        assertFalse(deployed, "Should not deploy invalid rule");
+
+        deployed = engine.addRule(validRule);
+        assertTrue(deployed, "Subsequent deployment of valid rule works");
+
+        engine.evaluate(new Message("foo", "source", DateTime.now()));
+
+        engine.stop();
     }
 }
