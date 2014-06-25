@@ -31,6 +31,22 @@ public class CreateUserRequest extends ChangeUserRequest {
 
     public CreateUserRequest() { /* required for data binding */ }
 
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
     public CreateUserRequest(User user) {
         this.username = user.getName();
         this.fullname = user.getFullName();

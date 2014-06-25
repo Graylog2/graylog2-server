@@ -36,6 +36,30 @@ public class ChangeUserRequest extends ApiRequest {
 
     public ChangeStartpageRequest startpage;
 
+    public String getFullname() {
+        return fullname;
+    }
+
+    public void setFullname(String fullname) {
+        this.fullname = fullname;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getTimezone() {
+        return timezone;
+    }
+
+    public void setTimezone(String timezone) {
+        this.timezone = timezone;
+    }
+
     @SerializedName("session_timeout_ms")
     public long sessionTimeoutMs;
 

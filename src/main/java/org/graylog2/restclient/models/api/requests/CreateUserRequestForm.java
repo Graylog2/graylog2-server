@@ -31,6 +31,38 @@ public class CreateUserRequestForm extends CreateUserRequest {
 
     public String timeout_unit = "hours";
 
+    public boolean isAdmin() {
+        return admin;
+    }
+
+    public void setAdmin(boolean admin) {
+        this.admin = admin;
+    }
+
+    public boolean isSession_timeout_never() {
+        return session_timeout_never;
+    }
+
+    public void setSession_timeout_never(boolean session_timeout_never) {
+        this.session_timeout_never = session_timeout_never;
+    }
+
+    public long getTimeout() {
+        return timeout;
+    }
+
+    public void setTimeout(long timeout) {
+        this.timeout = timeout;
+    }
+
+    public String getTimeout_unit() {
+        return timeout_unit;
+    }
+
+    public void setTimeout_unit(String timeout_unit) {
+        this.timeout_unit = timeout_unit;
+    }
+
     public CreateUserRequest toApiRequest() {
         final CreateUserRequest request = new CreateUserRequest(this);
         // -1 is "never"
