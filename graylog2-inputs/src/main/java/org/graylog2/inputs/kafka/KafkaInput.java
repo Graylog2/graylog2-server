@@ -153,8 +153,7 @@ public class KafkaInput extends MessageInput {
         scheduler.scheduleAtFixedRate(new Runnable() {
             @Override
             public void run() {
-                lastSecBytesRead.set(lastSecBytesReadTmp.get());
-                lastSecBytesReadTmp.set(0);
+                lastSecBytesRead.set(lastSecBytesReadTmp.getAndSet(0));
             }
         }, 1, 1, TimeUnit.SECONDS);
     }
