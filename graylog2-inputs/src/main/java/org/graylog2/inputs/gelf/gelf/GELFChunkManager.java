@@ -56,7 +56,7 @@ public class GELFChunkManager extends Thread {
     public void run() {
         while (true) {
             try {
-                if (!chunks.isEmpty()) {
+                if (!chunks.isEmpty() && LOG.isDebugEnabled()) {
                     LOG.debug("Dumping GELF chunk map [{}]:\n{}", chunks.size(), humanReadableChunkMap());
                 }
                 
