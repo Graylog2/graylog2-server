@@ -69,7 +69,7 @@ public class Configuration extends BaseConfiguration {
     private boolean allowOverrideSyslogDate = true;
 
     @Parameter(value = "no_retention")
-    private boolean noRetention;
+    private boolean noRetention = false;
 
     @Parameter(value = "retention_strategy", required = true)
     private String retentionStrategy;
