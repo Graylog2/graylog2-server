@@ -1,6 +1,8 @@
-import org.graylog2.plugin.Message
+// the following header lines are automatically added by graylog2-server
+//package org.graylog2.rules
+//import org.graylog2.plugin.Message
 
-global org.slf4j.Logger log
+//global org.slf4j.Logger log
 
 rule "Rewrite localhost host"
     when

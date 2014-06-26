@@ -18,6 +18,51 @@
  */
 package org.graylog2;
 
-public class Graylog2BaseTest {
+import org.slf4j.MDC;
+import org.testng.ITestContext;
+import org.testng.ITestListener;
+import org.testng.ITestResult;
+import org.testng.annotations.Listeners;
 
+@Listeners(Graylog2BaseTest.class)
+public class Graylog2BaseTest implements ITestListener {
+
+    public Graylog2BaseTest() {
+
+    }
+
+    @Override
+    public void onTestStart(ITestResult result) {
+        MDC.put("testngname", result.getName());
+    }
+
+    @Override
+    public void onTestSuccess(ITestResult result) {
+        MDC.remove("testngname");
+    }
+
+    @Override
+    public void onTestFailure(ITestResult result) {
+        MDC.remove("testngname");
+    }
+
+    @Override
+    public void onTestSkipped(ITestResult result) {
+        MDC.remove("testngname");
+    }
+
+    @Override
+    public void onTestFailedButWithinSuccessPercentage(ITestResult result) {
+        MDC.remove("testngname");
+    }
+
+    @Override
+    public void onStart(ITestContext context) {
+        MDC.clear();
+    }
+
+    @Override
+    public void onFinish(ITestContext context) {
+        MDC.clear();
+    }
 }
