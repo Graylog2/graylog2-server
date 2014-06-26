@@ -1099,7 +1099,8 @@ function generateId() {
 
 // Browsers fail with all kinds of date formats. Passing every part of the date as a constructor parameter seems to be the safest way to go.
 function parseDateFromString(src) {
-    var parts = /(\d+)-(\d+)-(\d+) (\d+):(\d+):(\d+)/.exec(src);
+    // Parses datetimes like 2014-06-26 15:26:17 and 2014-06-25T22:15:26.000Z
+    var parts = /(\d+)-(\d+)-(\d+)[T\s](\d+):(\d+):(\d+)(?:.(\d+)Z)?/.exec(src);
 
     var millis = 0;
     if (parts[7] != "" && parts[7] != undefined) {
