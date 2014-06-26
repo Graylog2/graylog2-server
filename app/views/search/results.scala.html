@@ -216,12 +216,9 @@
 <div class="graph-resolution-selector">
     <i class="icon-time"></i>
     <strong>Resolution:</strong> @Html(DateHistogramResolutionSelector.getOptions(histogram.getInterval(), request()))
-    <div class="result-highlight-control pull-right" style="display: none">
-        <input type="checkbox" class="toggle-result-highlight" id="toggle-highlighting" checked /> <label for="toggle-highlighting">Highlight matches</label>
-    </div>
 </div>
 
-    <hr style="margin-bottom: -20px;" />
+<hr style="margin-bottom: -20px;" />
 
 <div id="field-graphs">
     @****** field graph template. this is copied, filled and appended for every new field graph. ****@
