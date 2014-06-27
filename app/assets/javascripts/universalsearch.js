@@ -86,38 +86,10 @@ $(document).ready(function() {
         $(".result-highlight").toggleClass("result-highlight-colored", $(this).is(":checked"));
     });
 
-    /* TODO figure out if we want to keep it this way */
-    String.prototype.gl2_splice = function( idx, s ) {
-        return (this.slice(0,idx) + s + this.slice(idx));
-    };
-    $(".messages tbody tr").each(function() {
-        var ranges = $(this).data('highlight');
-
-        if (ranges == undefined) {
-            // Search highlighting not enabled in server.
-            $(".explain-result-highlight-control").show();
-        } else {
-            // Search highlighting is enabled in server.
-            for (var field in ranges) {
-                if (! ranges.hasOwnProperty(field) ) {
-                    continue;
-                }
-                var positions = ranges[field];
-                var fieldNameHash = CryptoJS.MD5(field);
-                $(".result-td-" + fieldNameHash, $(this)).each(function(){
-                    var elemText = $(this).text();
-                    for (var idx = positions.length - 1; idx >= 0; idx--) {
-                        var range = positions[idx];
-                        elemText = elemText.gl2_splice(range.start + range.length, "</span>");
-                        elemText = elemText.gl2_splice(range.start, '<span class="result-highlight">');
-                    }
-                    $(this).html(elemText);
-                    $(".result-highlight", $(this)).toggleClass("result-highlight-colored");
-                });
-                $(".result-highlight-control").show();
-            }
-        }
-    });
+    if ($(".messages").find(".result-highlight").length > 0) {
+        $(".messages .result-highlight").toggleClass("result-highlight-colored");
+        $(".result-highlight-control").show();
+    }
 
     // Save a search: Open save dialog.
     $(".save-search").on("click", function(e) {

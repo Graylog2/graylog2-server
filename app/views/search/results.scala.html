@@ -382,12 +382,19 @@
 	</thead>
 	<tbody>
 		@for(r <- searchResult.getMessages()) {
-		<tr data-message-id='@r.getFields.get("_id")' data-source-index="@r.getIndex" @if(r.getHighlightRanges != null) { data-highlight="@HtmlFormat.escape(r.getHighlightRangesAsJson)" }>
+		<tr data-message-id='@r.getFields.get("_id")' data-source-index="@r.getIndex">
 			<td>@DateTools.inUserTimeZoneShortFormat(r.getTimestamp)</td>
 			<td @if(!(selectedFields.contains("source") || search.getOrder.getField.equals("source"))) { style="display: none;" }
                 class="result-td-36cd38f49b9afa08222c0dc9ebfe35eb">@r.getFields.get("source")</td>
 			<td @if(!(selectedFields.contains("message") || search.getOrder.getField.equals("message"))) { style="display: none;" }
-                class="messages-message result-td-78e731027d8fd50ed642340b7c9a63b3">@r.getFields.get("message")</td>
+                class="messages-message result-td-78e731027d8fd50ed642340b7c9a63b3">
+                @if(r.hasHighlightedFields) {
+                    @* Need to use map{} here because a for() loop would produce unwanted newlines and thus extra spaces in the message. *@
+                    @{r.getHighlightedField("message").getChunks.map {x => if(x.avoidHtmlEscape) { Html(x.getString) } else { x.getString }}}
+                } else {
+                    @r.getFields.get("message")
+                }
+            </td>
 			
 			@for(f <- searchResult.getPageFields()) {
                 @if(!f.isStandardSelected) {
