@@ -38,8 +38,6 @@ public class AlarmCallbackFactory {
                                 Set<Class<? extends AlarmCallback>> availableAlarmCallbacks) {
         this.instantiationService = instantiationService;
         this.availableAlarmCallbacks = availableAlarmCallbacks;
-
-        System.out.println("Available alarm callback classes: " + availableAlarmCallbacks);
     }
 
     public AlarmCallback create(AlarmCallbackConfiguration configuration) throws ClassNotFoundException, AlarmCallbackConfigurationException {
@@ -51,7 +49,6 @@ public class AlarmCallbackFactory {
 
     public AlarmCallback create(String type) throws ClassNotFoundException {
         for (Class<? extends AlarmCallback> availableClass : availableAlarmCallbacks) {
-            System.out.println(availableClass.getCanonicalName());
             if (availableClass.getCanonicalName().equals(type))
                 return create(availableClass);
         }
