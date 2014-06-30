@@ -36,7 +36,7 @@ public class MessageFilterBindings extends AbstractModule {
         Multibinder<MessageFilter> messageFilters = Multibinder.newSetBinder(binder(), MessageFilter.class);
         messageFilters.addBinding().to(StaticFieldFilter.class);
         messageFilters.addBinding().to(ExtractorFilter.class);
-        messageFilters.addBinding().to(StreamMatcherFilter.class);
         messageFilters.addBinding().to(RewriteFilter.class);
+        messageFilters.addBinding().to(StreamMatcherFilter.class);
     }
 }
