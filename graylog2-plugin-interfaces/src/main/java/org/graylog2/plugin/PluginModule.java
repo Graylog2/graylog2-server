@@ -54,6 +54,9 @@ public abstract class PluginModule extends AbstractModule {
     }
 
     protected void addAlarmCallback(Class<? extends AlarmCallback> alarmCallbackClass) {
+        Multibinder<AlarmCallback> alarmCallbackInstanceBinder = Multibinder.newSetBinder(binder(), AlarmCallback.class);
+        alarmCallbackInstanceBinder.addBinding().to(alarmCallbackClass);
+
         TypeLiteral<Class<? extends AlarmCallback>> type = new TypeLiteral<Class<? extends AlarmCallback>>(){};
         Multibinder<Class<? extends AlarmCallback>> alarmCallbackBinder = Multibinder.newSetBinder(binder(), type);
         alarmCallbackBinder.addBinding().toInstance(alarmCallbackClass);
