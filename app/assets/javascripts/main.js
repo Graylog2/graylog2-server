@@ -191,6 +191,7 @@ $(document).ready(function() {
             }
         }
     })();
+
     // turn on all pre-selected fields
     $(".field-selector[checked]").each(function() {
         searchViewState.addField($(this).data("field-name"));
@@ -1099,7 +1100,8 @@ function generateId() {
 
 // Browsers fail with all kinds of date formats. Passing every part of the date as a constructor parameter seems to be the safest way to go.
 function parseDateFromString(src) {
-    var parts = /(\d+)-(\d+)-(\d+) (\d+):(\d+):(\d+)/.exec(src);
+    // Parses datetimes like 2014-06-26 15:26:17 and 2014-06-25T22:15:26.000Z
+    var parts = /(\d+)-(\d+)-(\d+)[T\s](\d+):(\d+):(\d+)(?:.(\d+)Z)?/.exec(src);
 
     var millis = 0;
     if (parts[7] != "" && parts[7] != undefined) {
@@ -1141,8 +1143,26 @@ searchViewState = {
     getFields: function() {
         return Object.keys(this.fields);
     },
+    getOrderedFields: function() {
+        // order the fields as shown on the messages table
+        var fields = this.getFields().sort(function(a, b){
+            var tableHeaders = $("table.messages th[id^=result-th]:visible");
+            for (i=0; i < tableHeaders.length; i++) {
+                var content = $(tableHeaders[i]).text();
+                var cleanContent = content.trim().toLowerCase();
+                if (cleanContent == a) {
+                    return -1;
+                }
+                if (cleanContent == b) {
+                    return 1;
+                }
+            }
+            return 0;
+        });
+        return fields;
+    },
     getFieldsString: function() {
-        return this.getFields().sort().join(",");
+        return this.getOrderedFields().join(",");
     },
     updateFragment: function() {
         var uri = new URI();

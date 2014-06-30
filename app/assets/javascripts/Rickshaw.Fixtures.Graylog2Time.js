@@ -69,7 +69,7 @@ Rickshaw.Fixtures.Graylog2Time = function(tzOffset) {
 	this.formatDate = function(d) {
 		var dateMoment = moment(d);
 
-		if (tzOffset) {
+		if (tzOffset != null) {
 			dateMoment = dateMoment.zone(tzOffset);
 		}
 
@@ -79,7 +79,7 @@ Rickshaw.Fixtures.Graylog2Time = function(tzOffset) {
 	this.formatTime = function(d) {
 		var dateMoment = moment(d);
 
-		if (tzOffset) {
+		if (tzOffset != null) {
 			dateMoment = dateMoment.zone(tzOffset);
 		}
 
