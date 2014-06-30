@@ -126,7 +126,7 @@ public class SearchController extends AuthenticatedController {
     }
 
     protected Set<String> getSelectedFields(String fields) {
-        Set<String> selectedFields = Sets.newHashSet();
+        Set<String> selectedFields = Sets.newLinkedHashSet();
         if (fields != null && !fields.isEmpty()) {
             Iterables.addAll(selectedFields, Splitter.on(',').split(fields));
         } else {
