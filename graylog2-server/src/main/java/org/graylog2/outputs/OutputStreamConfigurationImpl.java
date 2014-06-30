@@ -33,13 +33,13 @@ public class OutputStreamConfigurationImpl implements OutputStreamConfiguration 
     Map<ObjectId, Set<Map<String, String>>> config = Maps.newHashMap();
     
     @Override
-    public void add(ObjectId streamId, Set<Map<String, String>> configuration) {
-        config.put(streamId, configuration);
+    public void add(String streamId, Set<Map<String, String>> configuration) {
+        config.put(new ObjectId(streamId), configuration);
     }
 
     @Override
-    public Set<Map<String, String>> get(ObjectId streamId) {
-        return config.get(streamId);
+    public Set<Map<String, String>> get(String streamId) {
+        return config.get(new ObjectId(streamId));
     }
     
 }

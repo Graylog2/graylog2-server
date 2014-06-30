@@ -191,7 +191,7 @@ public class OutputBufferProcessor implements EventHandler<MessageEvent> {
 
         for (Map.Entry<ObjectId, Stream> e : distinctStreams.entrySet()) {
             StreamImpl stream = (StreamImpl) e.getValue();
-            configs.add(e.getKey(), stream.getOutputConfigurations(className));
+            configs.add(e.getKey().toStringMongod(), stream.getOutputConfigurations(className));
         }
 
         return configs;
