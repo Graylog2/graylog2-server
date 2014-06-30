@@ -7,11 +7,10 @@ version := "0.21.0-SNAPSHOT"
 // disable using the Scala version in output paths and artifacts
 crossPaths := false
 
-resolvers in Global ++= Seq( "snapshots" at "http://oss.sonatype.org/content/repositories/snapshots",
-                             "releases" at "http://oss.sonatype.org/content/repositories/releases")
+resolvers in Global ++= Seq( Resolver.sonatypeRepo("snapshots"), Resolver.sonatypeRepo("releases") )
 
 libraryDependencies ++= Seq(
-  "org.graylog2" % "graylog2-rest-routes" % "0.21.0-SNAPSHOT" changing(),
+  "org.graylog2" % "graylog2-rest-routes" % "0.21.0-SNAPSHOT" changing() intransitive(),
   "com.google.inject" % "guice" % "3.0",
   "com.google.inject.extensions" % "guice-assistedinject" % "3.0",
   "com.google.code.gson" % "gson" % "2.2",
