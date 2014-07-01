@@ -23,7 +23,7 @@
         <form id="create-user-form" class="user-form" action="@routes.UsersController.create()" method="POST">
             <label for="username">Username</label>
             <span class="help-block">Select a unique user name used to log in with.</span>
-            <input name="username" id="username" type="text" value="@form("username").value()" required />
+            <input name="username" id="username" type="text" value="@form("username").value()" required maxlength="100" />
 
             <label class="checkbox">
                 <input name="admin" id="admin" type="checkbox"/>
@@ -34,11 +34,11 @@
 
             <label for="fullname">Full Name</label>
             <span class="help-block">Give a descriptive name for this account, e.g. the full name.</span>
-            <input name="fullname" id="fullname" type="text" value="@form("fullname").value()" required/>
+            <input name="fullname" id="fullname" type="text" value="@form("fullname").value()" required maxlength="200" />
 
             <label for="email">Email Address</label>
             <span class="help-block">Give the contact email address.</span>
-            <input name="email" id="email" type="email" value="@form("email").value()" required />
+            <input name="email" id="email" type="email" value="@form("email").value()" required maxlength="254" />
 
             <label for="password">Password</label>
             <span class="help-block"></span>
