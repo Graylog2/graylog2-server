@@ -461,6 +461,22 @@ $(document).ready(function() {
             });
         }, 150 );
     }
+
+    var passwordField = $("form #password");
+    if (passwordField.length) {
+        var passwordDomElement = passwordField[0];
+        delayedAjaxCallOnKeyup(passwordDomElement, function() {
+            var password = passwordField.val();
+            if (password.length < 6) {
+                passwordDomElement.setCustomValidity("Password is too short!");
+                validationFailure(passwordField, "Password is too short!");
+            } else {
+                passwordDomElement.setCustomValidity('');
+                passwordField.popover("destroy");
+            }
+        }, 150);
+    }
+
     var repeatPasswordField = $("form #password-repeat");
     if (repeatPasswordField.length) {
         var domElement1 = repeatPasswordField[0];
@@ -471,7 +487,7 @@ $(document).ready(function() {
                 repeatPasswordField.popover("destroy");
             } else {
                 domElement1.setCustomValidity("Passwords do not match!");
-                validationFailure( repeatPasswordField, "Passwords do not match!");
+                validationFailure(repeatPasswordField, "Passwords do not match!");
             }
         }, 150);
     }
