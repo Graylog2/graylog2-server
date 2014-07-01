@@ -39,5 +39,8 @@ public class AlarmCallbackException extends Exception {
     public AlarmCallbackException(String msg) {
         super(msg);
     }
-    
+
+    public AlarmCallbackException(String message, Throwable cause) {
+        super(message, cause);
+    }
 }
