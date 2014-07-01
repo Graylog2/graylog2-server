@@ -122,10 +122,10 @@ public class SearchResource extends RestResource {
             throw new BadRequestException("Missing required parameter `fields`");
         }
         final Iterable<String> split = Splitter.on(',').omitEmptyStrings().trimResults().split(fields);
-        final ArrayList<String> fieldList = Lists.newArrayList("timestamp", "source");
-        // skip the mandatory fields timestamp and source
+        final ArrayList<String> fieldList = Lists.newArrayList("timestamp");
+        // skip the mandatory field timestamp
         for (String field : split) {
-            if ("timestamp".equals(field) || "source".equals(field)) {
+            if ("timestamp".equals(field)) {
                 continue;
             }
             fieldList.add(field);
