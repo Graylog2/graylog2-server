@@ -44,9 +44,9 @@
                         <i title="LDAP User" class="icon-cloud"></i>
                     }
                     </td>
-                    <td>@user.getFullName</td>
-                    <td>@user.getName</td>
-                    <td>@user.getEmail</td>
+                    <td class="limited">@user.getFullName</td>
+                    <td class="limited">@user.getName</td>
+                    <td class="limited">@user.getEmail</td>
                     <td>@if(hasAdminPermission(user)) {
                         <span class="label label-info">Admin</span>
                     } else {

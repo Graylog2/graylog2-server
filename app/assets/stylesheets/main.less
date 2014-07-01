@@ -42,6 +42,10 @@ h4 {
     line-height: 20px;
 }
 
+h1.username {
+    word-wrap: break-word;
+}
+
 #top {
 	height: 40px;
 	background-image: url(../images/topbg.png);
@@ -1239,6 +1243,12 @@ dl.metric-histogram dd {
 
 table#users-list td.centered {
     text-align: center;
+}
+
+table#users-list td.limited {
+    max-width: 180px;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .dashboard {
