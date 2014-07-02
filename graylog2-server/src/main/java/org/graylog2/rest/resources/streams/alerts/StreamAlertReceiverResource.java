@@ -34,7 +34,7 @@ import java.util.Map;
  * @author Dennis Oelkers <dennis@torch.sh>
  */
 @RequiresAuthentication
-@Api(value = "Alert Receivers", description = "Manage stream alert receivers")
+@Api(value = "AlertReceivers", description = "Manage stream alert receivers")
 @Path("/streams/{streamId}/alerts")
 public class StreamAlertReceiverResource extends RestResource {
     private static final Logger LOG = LoggerFactory.getLogger(StreamAlertReceiverResource.class);
