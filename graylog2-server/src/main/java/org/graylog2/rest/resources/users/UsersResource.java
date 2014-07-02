@@ -25,7 +25,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.apache.shiro.crypto.hash.SimpleHash;
 import org.graylog2.Configuration;
 import org.graylog2.database.ValidationException;
 import org.graylog2.rest.documentation.annotations.*;
@@ -122,7 +121,7 @@ public class UsersResource extends RestResource {
     @ApiResponses({
             @ApiResponse(code = 400, message = "Missing or invalid user details.")
     })
-    public Response create(@ApiParam(title = "JSON body", required = true) String body) {
+    public Response create(@ApiParam(title = "JSON body", description = "Must contain username, fullname, email, password and a list of permissions.", required = true) String body) {
         if (body == null || body.isEmpty()) {
             LOG.error("Missing parameters. Returning HTTP 400.");
             throw new WebApplicationException(400);
@@ -133,8 +132,7 @@ public class UsersResource extends RestResource {
         // Create user.
         User user = userService.create();
         user.setName(cr.username);
-        final String hashedPassword = new SimpleHash("SHA-1", cr.password, configuration.getPasswordSecret()).toString();
-        user.setHashedPassword(hashedPassword);
+        user.setPassword(cr.password, configuration.getPasswordSecret());
         user.setFullName(cr.fullname);
         user.setEmail(cr.email);
         user.setPermissions(cr.permissions);
@@ -299,13 +297,13 @@ public class UsersResource extends RestResource {
     @ApiOperation("Update the password for a user.")
     @ApiResponses({
             @ApiResponse(code = 201, message = "The password was successfully updated. Subsequent requests must be made with the new password."),
-            @ApiResponse(code = 400, message = "If the given old password does not match the password of the given user."),
+            @ApiResponse(code = 400, message = "If the old or new password is missing."),
             @ApiResponse(code = 403, message = "If the requesting user has insufficient privileges to update the password for the given user or the old password was wrong."),
             @ApiResponse(code = 404, message = "If the user does not exist.")
     })
     public Response changePassword(
             @ApiParam(title = "username", description = "The name of the user whose password to change.", required = true) @PathParam("username") String username,
-            @ApiParam(title = "JSON body", description = "The hashed old and new passwords.", required = true) String body) {
+            @ApiParam(title = "JSON body", description = "The old and new passwords.", required = true) String body) {
 
         if (body == null || body.isEmpty()) {
             throw new BadRequestException("Missing request body.");
@@ -345,7 +343,6 @@ public class UsersResource extends RestResource {
             }
         }
 
-        final String currentPasswordHash = user.getHashedPassword();
         boolean changeAllowed = false;
         final String secret = configuration.getPasswordSecret();
         if (checkOldPassword) {
@@ -353,16 +350,14 @@ public class UsersResource extends RestResource {
                 LOG.info("Changing password for user {} must supply the old password.", username);
                 return status(BAD_REQUEST).build();
             }
-            final String oldPasswordHash = new SimpleHash("SHA-1", cr.old_password, secret).toString();
-            if (currentPasswordHash.equals(oldPasswordHash)) {
+            if (user.isUserPassword(cr.old_password, secret)) {
                 changeAllowed = true;
             }
         } else {
             changeAllowed = true;
         }
         if (changeAllowed) {
-            final String newHashedPassword = new SimpleHash("SHA-1", cr.password, secret).toString();
-            user.setHashedPassword(newHashedPassword);
+            user.setPassword(cr.password, secret);
             try {
                 userService.save(user);
             } catch (ValidationException e) {

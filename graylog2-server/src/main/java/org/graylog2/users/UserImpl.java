@@ -20,13 +20,12 @@ package org.graylog2.users;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import org.apache.shiro.crypto.hash.SimpleHash;
 import org.bson.types.ObjectId;
 import org.graylog2.Configuration;
 import org.graylog2.database.CollectionName;
 import org.graylog2.database.PersistedImpl;
-import org.graylog2.database.validators.FilledStringValidator;
-import org.graylog2.database.validators.ListValidator;
-import org.graylog2.database.validators.OptionalStringValidator;
+import org.graylog2.database.validators.*;
 import org.graylog2.plugin.database.validators.Validator;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
@@ -57,6 +56,10 @@ public class UserImpl extends PersistedImpl implements User {
     public static final String EXTERNAL_USER = "external_user";
     public static final String SESSION_TIMEOUT = "session_timeout_ms";
 
+    public static final int MAX_USERNAME_LENGTH = 100;
+    public static final int MAX_EMAIL_LENGTH = 254;
+    public static final int MAX_FULL_NAME_LENGTH = 200;
+
     public UserImpl(Map<String, Object> fields) {
         super(fields);
     }
@@ -72,10 +75,10 @@ public class UserImpl extends PersistedImpl implements User {
 
     public Map<String, Validator> getValidations() {
         return new HashMap<String, Validator>() {{
-            put(USERNAME, new FilledStringValidator());
-            put(PASSWORD, new OptionalStringValidator());
-            put(EMAIL, new OptionalStringValidator());
-            put(FULL_NAME, new FilledStringValidator());
+            put(USERNAME, new LimitedStringValidator(1, MAX_USERNAME_LENGTH));
+            put(PASSWORD, new FilledStringValidator());
+            put(EMAIL, new LimitedStringValidator(1, MAX_EMAIL_LENGTH));
+            put(FULL_NAME, new LimitedStringValidator(1, MAX_FULL_NAME_LENGTH));
             put(PERMISSIONS, new ListValidator());
         }};
     }
@@ -159,9 +162,25 @@ public class UserImpl extends PersistedImpl implements User {
         return firstNonNull(fields.get(PASSWORD), "").toString();
     }
 
-    @Override
     public void setHashedPassword(String hashedPassword) {
         fields.put(PASSWORD, hashedPassword);
+    }
+
+    @Override
+    public void setPassword(String password, String passwordSecret) {
+        if (password == null || password.equals("")) {
+            // If no password is given, we leave the hashed password empty and we fail during validation.
+            setHashedPassword("");
+        } else {
+            final String newPassword = new SimpleHash("SHA-1", password, passwordSecret).toString();
+            setHashedPassword(newPassword);
+        }
+    }
+
+    @Override
+    public boolean isUserPassword(String password, String passwordSecret) {
+        final String oldPasswordHash = new SimpleHash("SHA-1", password, passwordSecret).toString();
+        return getHashedPassword().equals(oldPasswordHash);
     }
 
     @Override
