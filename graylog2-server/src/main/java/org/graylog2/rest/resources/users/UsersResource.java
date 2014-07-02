@@ -130,7 +130,7 @@ public class UsersResource extends RestResource {
         CreateRequest cr = getCreateRequest(body);
 
         if (userService.load(cr.username) != null) {
-            LOG.error("Cannot create user with user {}: username is already taken.", cr.username);
+            LOG.error("Cannot create user {}: username is already taken.", cr.username);
             return status(BAD_REQUEST).build();
         }
 
