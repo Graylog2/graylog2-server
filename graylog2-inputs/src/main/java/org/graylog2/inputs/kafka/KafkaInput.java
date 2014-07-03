@@ -95,14 +95,18 @@ public class KafkaInput extends MessageInput {
         props.put("fetch.min.bytes", String.valueOf(configuration.getInt(CK_FETCH_MIN_BYTES)));
         props.put("fetch.wait.max.ms", String.valueOf(configuration.getInt(CK_FETCH_WAIT_MAX)));
         props.put("zookeeper.connect", configuration.getString(CK_ZOOKEEPER));
+        // Default auto commit interval is 60 seconds. Reduce to 1 second to minimize message duplication
+        // if something breaks.
+        props.put("auto.commit.interval.ms", "1000");
 
+        final int numThreads = (int) configuration.getInt(CK_THREADS);
         ConsumerConfig consumerConfig = new ConsumerConfig(props);
         cc = Consumer.createJavaConsumerConnector(consumerConfig);
 
         TopicFilter filter = new Whitelist(configuration.getString(CK_TOPIC_FILTER));
 
-        List<KafkaStream<byte[], byte[]>> streams = cc.createMessageStreamsByFilter(filter, (int) configuration.getInt(CK_THREADS));
-        ExecutorService executor = Executors.newFixedThreadPool(5);
+        List<KafkaStream<byte[], byte[]>> streams = cc.createMessageStreamsByFilter(filter, numThreads);
+        ExecutorService executor = Executors.newFixedThreadPool(numThreads);
 
         final MessageInput thisInput = this;
 
@@ -207,8 +211,8 @@ public class KafkaInput extends MessageInput {
         cr.addField(new NumberField(
                 CK_THREADS,
                 "Processor threads",
-                10,
-                "Number of processor threads to spawn.",
+                2,
+                "Number of processor threads to spawn. Use one thread per Kafka topic partition.",
                 ConfigurationField.Optional.NOT_OPTIONAL)
         );
 
