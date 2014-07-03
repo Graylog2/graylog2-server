@@ -51,6 +51,8 @@ public class ServerVersion {
 
     public static final Version v0_20_3 = new Version(0, 20, 3);
 
-    public static final Version VERSION = v0_20_3;
+    public static final Version v0_20_4 = new Version(0, 20, 4);
+
+    public static final Version VERSION = v0_20_4;
 
 }
