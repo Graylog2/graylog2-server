@@ -35,8 +35,10 @@ public class GELFChunkManagerProvider implements Provider<GELFChunkManager> {
     @Inject
     public GELFChunkManagerProvider(MetricRegistry metricRegistry,
                                     ProcessBuffer processBuffer) {
-        if (gelfChunkManager == null)
+        if (gelfChunkManager == null) {
             gelfChunkManager = new GELFChunkManager(metricRegistry, processBuffer);
+            gelfChunkManager.setName("gelf-chunk-manager");
+        }
     }
 
     @Override

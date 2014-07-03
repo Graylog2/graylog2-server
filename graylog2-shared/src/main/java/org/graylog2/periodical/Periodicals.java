@@ -56,6 +56,7 @@ public class Periodicals {
 
             Thread t = new Thread(periodical);
             t.setDaemon(periodical.isDaemon());
+            t.setName("periodical-" + periodical.getClass().getCanonicalName());
             t.start();
         } else {
             LOG.info(

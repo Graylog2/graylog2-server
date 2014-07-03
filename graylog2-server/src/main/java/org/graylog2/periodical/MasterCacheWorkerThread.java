@@ -79,14 +79,14 @@ public class MasterCacheWorkerThread extends Periodical {
             public void run() {
                 work(inputCache, processBuffer);
             }
-        }).start();
+        }, "master-cache-worker-input").start();
 
         new Thread(new Runnable() {
             @Override
             public void run() {
                 work(outputCache, outputBuffer);
             }
-        }).start();
+        }, "master-cache-worker-output").start();
     }
 
     private void work(Cache cache, Buffer targetBuffer) {

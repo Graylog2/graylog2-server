@@ -46,7 +46,7 @@ public class SchedulerBindings extends AbstractModule {
 
         final ScheduledExecutorService daemonScheduler = Executors.newScheduledThreadPool(SCHEDULED_THREADS_POOL_SIZE,
                 new ThreadFactoryBuilder()
-                        .setNameFormat("scheduled-%d")
+                        .setNameFormat("scheduled-daemon-%d")
                         .setDaemon(true)
                         .build()
         );
