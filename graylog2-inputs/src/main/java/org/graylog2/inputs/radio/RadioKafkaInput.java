@@ -103,8 +103,8 @@ public class RadioKafkaInput extends KafkaInput {
         cr.addField(new NumberField(
                 CK_THREADS,
                 "Processor threads",
-                10,
-                "Number of processor threads to spawn.",
+                2,
+                "Number of processor threads to spawn. Use one thread per Kafka topic partition.",
                 ConfigurationField.Optional.NOT_OPTIONAL)
         );
 
