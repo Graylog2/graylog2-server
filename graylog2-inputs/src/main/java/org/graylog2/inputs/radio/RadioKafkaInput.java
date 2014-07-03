@@ -39,7 +39,7 @@ import java.util.Map;
  */
 public class RadioKafkaInput extends KafkaInput {
 
-    private static final Logger LOG = LoggerFactory.getLogger(KafkaInput.class);
+    private static final Logger LOG = LoggerFactory.getLogger(RadioKafkaInput.class);
 
     public static final String NAME = "Graylog2 Radio Input (Kafka)";
 
