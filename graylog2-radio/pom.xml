@@ -11,7 +11,7 @@
     <parent>
         <groupId>org.graylog2</groupId>
         <artifactId>graylog2-parent</artifactId>
-        <version>0.20.4</version>
+        <version>0.20.5</version>
     </parent>
 
     <name>graylog2-radio</name>
