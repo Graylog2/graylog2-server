@@ -49,7 +49,6 @@ public class AbstractAlertConditionTest extends AlertConditionTest {
 
     @Test(enabled=false)
     public void testInGracePeriod() throws Exception {
-        System.out.println(alertService);
         alertLastTriggered(-1);
         assertFalse("Should not be in grace period because alert was never fired", alertService.inGracePeriod(alertCondition));
         alertLastTriggered(0);
