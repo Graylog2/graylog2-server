@@ -105,7 +105,6 @@ public class ServerBindings extends AbstractModule {
     }
 
     private void bindFactoryModules() {
-        install(new FactoryModuleBuilder().build(OutputBuffer.Factory.class));
         install(new FactoryModuleBuilder().build(OutputBufferProcessor.Factory.class));
         install(new FactoryModuleBuilder().build(ServerProcessBufferProcessor.Factory.class));
         install(new FactoryModuleBuilder().build(RebuildIndexRangesJob.Factory.class));
@@ -132,18 +131,14 @@ public class ServerBindings extends AbstractModule {
         bind(ServerStatus.class).toInstance(serverStatus);
 
         bind(OutputBufferWatermark.class).toInstance(new OutputBufferWatermark());
-        bind(OutputBuffer.class).toProvider(OutputBufferProvider.class);
         bind(Indexer.class).toProvider(IndexerProvider.class);
         bind(SystemJobManager.class).toProvider(SystemJobManagerProvider.class);
-        bind(InputCache.class).toProvider(InputCacheProvider.class);
-        bind(OutputCache.class).toProvider(OutputCacheProvider.class);
         bind(InputRegistry.class).toProvider(ServerInputRegistryProvider.class);
         bind(RulesEngine.class).toProvider(RulesEngineProvider.class);
         bind(LdapConnector.class).toProvider(LdapConnectorProvider.class);
         bind(LdapUserAuthenticator.class).toProvider(LdapUserAuthenticatorProvider.class);
         bind(DefaultSecurityManager.class).toProvider(DefaultSecurityManagerProvider.class);
         bind(SystemJobFactory.class).toProvider(SystemJobFactoryProvider.class);
-        bind(DashboardRegistry.class).toProvider(DashboardRegistryProvider.class);
         bind(AsyncHttpClient.class).toProvider(AsyncHttpClientProvider.class);
         bind(GracefulShutdown.class).in(Scopes.SINGLETON);
     }

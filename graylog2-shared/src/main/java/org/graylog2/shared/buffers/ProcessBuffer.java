@@ -28,6 +28,7 @@ import com.lmax.disruptor.WaitStrategy;
 import com.lmax.disruptor.dsl.Disruptor;
 import com.lmax.disruptor.dsl.ProducerType;
 import org.graylog2.inputs.Cache;
+import org.graylog2.inputs.InputCache;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.buffers.Buffer;
 import org.graylog2.plugin.buffers.BufferOutOfCapacityException;
@@ -50,7 +51,7 @@ import static com.codahale.metrics.MetricRegistry.name;
  */
 public class ProcessBuffer extends Buffer {
     public interface Factory {
-        public ProcessBuffer create(Cache masterCache, AtomicInteger processBufferWatermark);
+        public ProcessBuffer create(InputCache masterCache, AtomicInteger processBufferWatermark);
     }
 
     private static final Logger LOG = LoggerFactory.getLogger(ProcessBuffer.class);
@@ -64,7 +65,7 @@ public class ProcessBuffer extends Buffer {
                 .build()
     );
 
-    private final Cache masterCache;
+    private final InputCache masterCache;
     private final AtomicInteger processBufferWatermark;
 
     private final Meter incomingMessages;
@@ -77,7 +78,7 @@ public class ProcessBuffer extends Buffer {
     @AssistedInject
     public ProcessBuffer(MetricRegistry metricRegistry,
                          ServerStatus serverStatus,
-                         @Assisted Cache masterCache,
+                         @Assisted InputCache masterCache,
                          @Assisted AtomicInteger processBufferWatermark) {
         this.metricRegistry = metricRegistry;
         this.serverStatus = serverStatus;

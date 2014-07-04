@@ -33,6 +33,8 @@ public class Buffers {
     private final ProcessBuffer processBuffer;
     private final OutputBuffer outputBuffer;
 
+    private final int MAXTRIES = 30;
+
     @Inject
     public Buffers(ProcessBuffer processBuffer, OutputBuffer outputBuffer) {
         this.processBuffer = processBuffer;
@@ -42,7 +44,13 @@ public class Buffers {
     public void waitForEmptyBuffers() {
         // Wait until the buffers are empty. Messages that were already started to be processed must be fully processed.
         LOG.info("Waiting until all buffers are empty.");
+        int tries = 0;
         while(!(processBuffer.isEmpty() && outputBuffer.isEmpty())) {
+            tries++;
+            if (tries >= MAXTRIES) {
+                LOG.info("Waited for {} seconds, giving up.", tries);
+                return;
+            }
             try {
                 LOG.info("Not all buffers are empty. Waiting another second. ({}p/{}o)", processBuffer.getUsage(), outputBuffer.getUsage());
                 Thread.sleep(1000);

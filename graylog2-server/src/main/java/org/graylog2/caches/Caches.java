@@ -34,6 +34,8 @@ public class Caches {
     private final Cache inputCache;
     private final Cache outputCache;
 
+    private final int MAXTRIES = 30;
+
     @Inject
     public Caches(InputCache inputCache, OutputCache outputCache) {
         this.inputCache = inputCache;
@@ -43,7 +45,13 @@ public class Caches {
     public void waitForEmptyCaches() {
         // Wait until the buffers are empty. Messages that were already started to be processed must be fully processed.
         LOG.info("Waiting until all caches are empty.");
+        int tries = 0;
         while(!(inputCache.size() == 0 && outputCache.size() == 0)) {
+            tries++;
+            if (tries >= MAXTRIES) {
+                LOG.info("Waited for {} seconds, giving up.", tries);
+                return;
+            }
             try {
                 LOG.info("Not all caches are empty. Waiting another second. ({}imc/{}omc)", inputCache.size(), outputCache.size());
                 Thread.sleep(1000);

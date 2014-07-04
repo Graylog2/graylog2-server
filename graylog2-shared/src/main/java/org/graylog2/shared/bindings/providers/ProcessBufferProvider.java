@@ -19,7 +19,6 @@
 
 package org.graylog2.shared.bindings.providers;
 
-import org.graylog2.inputs.BasicCache;
 import org.graylog2.inputs.InputCache;
 import org.graylog2.shared.buffers.ProcessBuffer;
 import org.graylog2.shared.buffers.ProcessBufferWatermark;
@@ -34,9 +33,8 @@ public class ProcessBufferProvider implements Provider<ProcessBuffer> {
     private static ProcessBuffer processBuffer = null;
 
     @Inject
-    public ProcessBufferProvider(ProcessBuffer.Factory processBufferFactory, ProcessBufferWatermark processBufferWatermark) {
+    public ProcessBufferProvider(InputCache inputCache, ProcessBuffer.Factory processBufferFactory, ProcessBufferWatermark processBufferWatermark) {
         if (processBuffer == null) {
-            BasicCache inputCache = new InputCache();
             processBuffer = processBufferFactory.create(inputCache, processBufferWatermark);
         }
     }
