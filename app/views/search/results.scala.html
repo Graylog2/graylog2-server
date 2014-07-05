@@ -16,6 +16,7 @@
 @import controllers.routes;
 @import views.helpers.SearchRouteHelper
 @import org.graylog2.restclient.models.UniversalSearch
+@import org.graylog2.restclient.models.api.results.MessageResult
 
 @paginatorLength() = @{10}
 
@@ -54,6 +55,15 @@
         null
     } else {
         stream.getId
+    }
+}
+
+@renderMessageResultField(fieldName: String, fields: Map[String, Object], r: MessageResult) = {
+    @if(r.hasHighlightedField(fieldName)) {
+        @* Need to use map{} here because a for() loop would produce unwanted newlines and thus extra spaces in the message. *@
+        @{r.getHighlightedField(fieldName).getChunks(fields).map {x => if(x.avoidHtmlEscape) { Html(x.getString) } else { x.getString }}}
+    } else {
+        @fields.get(fieldName)
     }
 }
 
@@ -388,19 +398,14 @@
                 class="result-td-36cd38f49b9afa08222c0dc9ebfe35eb">@r.getFields.get("source")</td>
 			<td @if(!(selectedFields.contains("message") || search.getOrder.getField.equals("message"))) { style="display: none;" }
                 class="messages-message result-td-78e731027d8fd50ed642340b7c9a63b3">
-                @if(r.hasHighlightedFields) {
-                    @* Need to use map{} here because a for() loop would produce unwanted newlines and thus extra spaces in the message. *@
-                    @{r.getHighlightedField("message").getChunks.map {x => if(x.avoidHtmlEscape) { Html(x.getString) } else { x.getString }}}
-                } else {
-                    @r.getFields.get("message")
-                }
+                @renderMessageResultField("message", r.getFields, r)
             </td>
 			
 			@for(f <- searchResult.getPageFields()) {
                 @if(!f.isStandardSelected) {
 					<td class="result-td-@f.getHash()"
                         @if(!(selectedFields.contains(f.getName) || search.getOrder.getField.equals(f.getName))) { style="display: none;" }
-                    >@r.getFormattedFields.get(f.getName)</td>
+                    >@renderMessageResultField(f.getName, r.getFormattedFields, r)</td>
 				}
 			}
 		</tr>
