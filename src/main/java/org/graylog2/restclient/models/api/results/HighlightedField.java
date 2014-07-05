@@ -4,6 +4,7 @@ import org.graylog2.restclient.models.api.responses.HighlightRange;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class HighlightedField {
     private final MessageResult messageResult;
@@ -32,8 +33,8 @@ public class HighlightedField {
         this.field = field;
     }
 
-    public List<FieldChunk> getChunks() {
-        final String message = (String) messageResult.getFields().get(field);
+    public List<FieldChunk> getChunks(final Map<String, Object> fields) {
+        final String message = (String) fields.get(field);
         final List<FieldChunk> list = new ArrayList<>();
         final List<HighlightRange> rangesList = messageResult.getHighlightRanges().get(field);
 
