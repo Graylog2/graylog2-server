@@ -26,6 +26,12 @@ $(document).ready(function() {
     $(".edit-alarm-destination").on("click", function(e) {
         var callbackId = $(this).attr("data-callback-id");
     });
+
+    $(".edit-alert-condition").on("click", function(e){
+        var conditionId = $(this).closest(".alert-condition").data("condition-id");
+        $("#alert-condition-" + conditionId).toggle();
+        e.preventDefault();
+    });
 });
 
 function fillAlertAnnotator(chart, annotator) {

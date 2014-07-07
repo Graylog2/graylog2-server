@@ -46,6 +46,7 @@ GET         /streams/:stream_id/csv                                             
 GET         /streams/:stream_id/alerts                                               @controllers.AlertsController.index(stream_id: String)
 POST        /streams/:stream_id/alerts/conditions/add/messagecount                   @controllers.AlertsController.addTypeMessageCount(stream_id: String)
 POST        /streams/:stream_id/alerts/conditions/add/fieldvalue                     @controllers.AlertsController.addTypeFieldValue(stream_id: String)
+POST        /streams/:stream_id/alerts/conditions/:condition_id                      @controllers.AlertsController.updateCondition(stream_id: String, condition_id: String)
 POST        /streams/:stream_id/alerts/conditions/:condition_id/delete               @controllers.AlertsController.removeCondition(stream_id: String, condition_id: String)
 POST        /streams/:stream_id/alerts/receivers/user/add                            @controllers.AlertsController.addReceiverUser(stream_id: String)
 POST        /streams/:stream_id/alerts/receivers/email/add                           @controllers.AlertsController.addReceiverEmail(stream_id: String)

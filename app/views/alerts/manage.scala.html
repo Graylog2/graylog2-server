@@ -7,8 +7,6 @@
         alarmCallbacks: List[org.graylog2.restclient.models.AlarmCallback],
         node: org.graylog2.restclient.models.Node)
 
-@import org.graylog2.restclient.models.alerts._
-@import org.graylog2.restclient.models.api.responses.alarmcallbacks.GetSingleAvailableAlarmCallbackResponse
 @import lib.security.RestPermissions._
 @import views.helpers.Permissions._
 
@@ -30,9 +28,8 @@
 
         <button class="btn btn-success add-alert">Configure new alert condition</button>
 
-        @views.html.partials.alerts.form_message_count.render(stream)
-
-        @views.html.partials.alerts.form_field_value.render(stream)
+        @views.helpers.MessageCountAlertConditionDecorator.loadTemplate(stream, null)
+        @views.helpers.FieldValueAlertConditionDecorator.loadTemplate(stream, null)
     }
 
     <hr />
