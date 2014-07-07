@@ -48,7 +48,7 @@ public class GELFProcessorTest {
 
         gelfProcessor.messageReceived(gelfMessage, messageInput);
 
-        verify(processBuffer).insertCached(any(Message.class), eq(messageInput));
+        verify(processBuffer).insertCached(eq(message), eq(messageInput));
     }
 
     public void testMessageReceivedFailFast() throws Exception {
@@ -56,7 +56,7 @@ public class GELFProcessorTest {
 
         gelfProcessor.messageReceivedFailFast(gelfMessage, messageInput);
 
-        verify(processBuffer).insertFailFast(any(Message.class), eq(messageInput));
+        verify(processBuffer).insertFailFast(eq(message), eq(messageInput));
     }
 
     public void testMessageReceivedIncompleteMessage() throws Exception {
