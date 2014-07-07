@@ -5,7 +5,9 @@ BUILD_NAME=graylog2-radio-$BUILD_NUMBER
 BUILD_DIR=builds/$BUILD_NAME
 BUILD_DATE=`date`
 LOGFILE=`pwd`/logs/$BUILD_NAME
-TAR=`if $(which -s gtar) ; then echo "gtar" ; else echo "tar" ; fi`
+
+# decide whether to use gtar or tar
+command -v gtar >/dev/null && TAR="gtar" || TAR="tar"
 
 # Check if required version parameter is given
 if [ -z $BUILD_NUMBER ]; then
