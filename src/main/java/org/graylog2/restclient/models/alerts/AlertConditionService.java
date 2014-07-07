@@ -59,7 +59,6 @@ public class AlertConditionService {
         return conditions;
     }
 
-    // TODO: not implemented in server yet
     public void delete(Stream stream, String conditionId) throws APIException, IOException {
         api.path(routes.StreamAlertConditionResource().delete(stream.getId(), conditionId)).expect(204).execute();
     }
@@ -68,4 +67,7 @@ public class AlertConditionService {
         api.path(routes.StreamAlertConditionResource().create(stream.getId())).body(r).expect(201).execute();
     }
 
+    public void update(Stream stream, String conditionId, CreateAlertConditionRequest r) throws APIException, IOException {
+        api.path(routes.StreamAlertConditionResource().update(stream.getId(), conditionId)).body(r).expect(204).execute();
+    }
 }
