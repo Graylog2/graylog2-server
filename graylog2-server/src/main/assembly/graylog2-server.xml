@@ -86,5 +86,10 @@
             <outputDirectory>bin/</outputDirectory>
             <fileMode>0755</fileMode>
         </file>
+        <file>
+            <source>misc/graylog2.conf</source>
+            <destName>graylog2.conf.example</destName>
+            <outputDirectory>/</outputDirectory>
+        </file>
     </files>
 </assembly>

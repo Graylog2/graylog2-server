@@ -266,6 +266,43 @@
                     </reportPlugins>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>pl.project13.maven</groupId>
+                <artifactId>git-commit-id-plugin</artifactId>
+                <version>2.1.10</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>revision</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <prefix>git</prefix>
+                    <dateFormat>dd.MM.yyyy '@' HH:mm:ss z</dateFormat>
+                    <verbose>false</verbose>
+                    <useNativeGit>true</useNativeGit>
+                    <dotGitDirectory>${project.parent.relativePath}/.git</dotGitDirectory>
+                    <skipPoms>true</skipPoms>
+                    <failOnNoGitDirectory>false</failOnNoGitDirectory>
+                    <abbrevLength>7</abbrevLength>
+                    <skip>false</skip>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>2.4</version>
+                <configuration>
+                    <attach>false</attach>
+                    <appendAssemblyId>false</appendAssemblyId>
+                    <descriptors>
+                        <descriptor>src/main/assembly/graylog2-radio.xml</descriptor>
+                    </descriptors>
+                    <outputDirectory>${project.build.directory}/assembly</outputDirectory>
+                    <finalName>graylog2-radio-${project.version}-${maven.build.timestamp}</finalName>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 </project>

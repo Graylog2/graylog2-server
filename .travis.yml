@@ -2,7 +2,6 @@ language: java
 jdk:
 - oraclejdk7
 - openjdk7
-before_install: ./install-syslog4j-jar.sh
 notifications:
   slack:
     on_success: change
@@ -14,7 +13,9 @@ notifications:
         XvemLvn0KxQxCO9GfN3wfmYxEWJwXO36Q29BnRWWgMQOXpFFD8A=
 after_success:
   - mkdir assemblies
-  - pushd graylog2-server ; mvn -DskipTests package assembly:single; popd
+  - mvn -DskipTests package
+  - pushd graylog2-server ; mvn assembly:single; popd
+  - pushd graylog2-radio ; mvn assembly:single; popd
   - mv graylog2-server/target/assembly/* assemblies/
 deploy:
   provider: s3
