@@ -23,6 +23,7 @@ import com.google.inject.AbstractModule;
 import com.google.inject.TypeLiteral;
 import com.google.inject.multibindings.Multibinder;
 import org.graylog2.inputs.amqp.AMQPInput;
+import org.graylog2.inputs.gelf.http.GELFHttpInput;
 import org.graylog2.inputs.gelf.tcp.GELFTCPInput;
 import org.graylog2.inputs.gelf.udp.GELFUDPInput;
 import org.graylog2.inputs.kafka.KafkaInput;
@@ -45,6 +46,7 @@ public class MessageInputBindings extends AbstractModule {
         Multibinder<Class<? extends MessageInput>> messageInputs = Multibinder.newSetBinder(binder(), typeLiteral);
         messageInputs.addBinding().toInstance(GELFTCPInput.class);
         messageInputs.addBinding().toInstance(GELFUDPInput.class);
+        messageInputs.addBinding().toInstance(GELFHttpInput.class);
         messageInputs.addBinding().toInstance(RawTCPInput.class);
         messageInputs.addBinding().toInstance(RawUDPInput.class);
         messageInputs.addBinding().toInstance(AMQPInput.class);
