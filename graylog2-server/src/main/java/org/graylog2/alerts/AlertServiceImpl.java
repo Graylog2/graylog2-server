@@ -32,7 +32,6 @@ import org.graylog2.database.PersistedServiceImpl;
 import org.graylog2.indexer.Indexer;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.alarms.AlertCondition;
-import org.graylog2.plugin.database.Persisted;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.rest.resources.streams.alerts.requests.CreateConditionRequest;
 import org.joda.time.DateTime;
@@ -154,10 +153,20 @@ public class AlertServiceImpl extends PersistedServiceImpl implements AlertServi
         throw new AbstractAlertCondition.NoSuchAlertConditionTypeException("Unhandled alert condition type: " + type);
     }
 
+    private AbstractAlertCondition createAlertCondition(AbstractAlertCondition.Type type, Stream stream, String id, DateTime createdAt, String creatorId, Map<String, Object> parameters) throws AbstractAlertCondition.NoSuchAlertConditionTypeException {
+        switch(type) {
+            case MESSAGE_COUNT:
+                return new MessageCountAlertCondition(stream, id, createdAt, creatorId, parameters);
+            case FIELD_VALUE:
+                return new FieldValueAlertCondition(stream, id, createdAt, creatorId, parameters);
+        }
+
+        throw new AbstractAlertCondition.NoSuchAlertConditionTypeException("Unhandled alert condition type: " + type);
+    }
+
     public AbstractAlertCondition fromRequest(CreateConditionRequest ccr, Stream stream) throws AbstractAlertCondition.NoSuchAlertConditionTypeException {
         AbstractAlertCondition.Type type;
         try {
-            Integer Type;
             type = AbstractAlertCondition.Type.valueOf(ccr.type.toUpperCase());
         } catch (IllegalArgumentException e) {
             throw new AbstractAlertCondition.NoSuchAlertConditionTypeException("No such alert condition type: [" + ccr.type + "]");
@@ -165,26 +174,26 @@ public class AlertServiceImpl extends PersistedServiceImpl implements AlertServi
 
         Map<String, Object> parameters = ccr.parameters;
 
-        switch(type) {
-            case MESSAGE_COUNT:
-                return new MessageCountAlertCondition(
-                        stream,
-                        null,
-                        Tools.iso8601(),
-                        ccr.creatorUserId,
-                        parameters
-                );
-            case FIELD_VALUE:
-                return new FieldValueAlertCondition(
-                        stream,
-                        null,
-                        Tools.iso8601(),
-                        ccr.creatorUserId,
-                        parameters
-                );
+        return createAlertCondition(type, stream, null, Tools.iso8601(), ccr.creatorUserId, parameters);
+    }
+
+    public AbstractAlertCondition updateFromRequest(AlertCondition alertCondition, CreateConditionRequest ccr) throws AbstractAlertCondition.NoSuchAlertConditionTypeException {
+        AbstractAlertCondition.Type type = ((AbstractAlertCondition)alertCondition).getType();
+
+        Map<String, Object> parameters = ccr.parameters;
+        for (Map.Entry<String, Object> stringObjectEntry : alertCondition.getParameters().entrySet()) {
+            if (!parameters.containsKey(stringObjectEntry.getKey())) {
+                parameters.put(stringObjectEntry.getKey(), stringObjectEntry.getValue());
+            }
         }
 
-        throw new AbstractAlertCondition.NoSuchAlertConditionTypeException("Unhandled alert condition type: " + type);
+        return createAlertCondition(type,
+                alertCondition.getStream(),
+                alertCondition.getId(),
+                alertCondition.getCreatedAt(),
+                alertCondition.getCreatorUserId(),
+                parameters
+        );
     }
 
     public boolean inGracePeriod(AlertCondition alertCondition) {

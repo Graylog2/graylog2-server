@@ -183,8 +183,35 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
         return conditions;
     }
 
+    @Override
+    public AlertCondition getAlertCondition(Stream stream, String conditionId) throws NotFoundException {
+        if (stream.getFields().containsKey(StreamImpl.EMBEDDED_ALERT_CONDITIONS)) {
+            for (BasicDBObject conditionFields : (List<BasicDBObject>) stream.getFields().get(StreamImpl.EMBEDDED_ALERT_CONDITIONS)) {
+                try {
+                    if (conditionFields.get("id").equals(conditionId)) {
+                        return alertService.fromPersisted(conditionFields, stream);
+                    }
+                } catch (AbstractAlertCondition.NoSuchAlertConditionTypeException e) {
+                    LOG.error("Skipping unknown alert condition type.", e);
+                    continue;
+                } catch (Exception e) {
+                    LOG.error("Skipping alert condition.", e);
+                    continue;
+                }
+            }
+        }
+
+        throw new org.graylog2.database.NotFoundException();
+    }
+
     public void addAlertCondition(Stream stream, AlertCondition condition) throws ValidationException {
         embed(stream, StreamImpl.EMBEDDED_ALERT_CONDITIONS, (EmbeddedPersistable)condition);
+    }
+
+    @Override
+    public void updateAlertCondition(Stream stream, AlertCondition condition) throws ValidationException {
+        removeAlertCondition(stream, condition.getId());
+        addAlertCondition(stream, condition);
     }
 
     public void removeAlertCondition(Stream stream, String conditionId) {

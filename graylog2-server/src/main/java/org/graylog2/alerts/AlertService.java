@@ -45,6 +45,8 @@ public interface AlertService extends PersistedService {
     AlertCondition fromPersisted(Map<String, Object> conditionFields, Stream stream) throws AbstractAlertCondition.NoSuchAlertConditionTypeException;
     AlertCondition fromRequest(CreateConditionRequest ccr, Stream stream) throws AbstractAlertCondition.NoSuchAlertConditionTypeException;
 
+    AlertCondition updateFromRequest(AlertCondition alertCondition, CreateConditionRequest ccr) throws AbstractAlertCondition.NoSuchAlertConditionTypeException;
+
     boolean inGracePeriod(AlertCondition alertCondition);
 
     AlertCondition.CheckResult triggeredNoGrace(AlertCondition alertCondition, Indexer indexer);

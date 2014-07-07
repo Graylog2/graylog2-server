@@ -6,7 +6,7 @@ import com.google.common.collect.Maps;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.alerts.AbstractAlertCondition;
 import org.graylog2.alerts.AlertService;
-import org.graylog2.database.ValidationException;
+import org.graylog2.database.*;
 import org.graylog2.plugin.alarms.AlertCondition;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.rest.documentation.annotations.*;
@@ -90,6 +90,52 @@ public class StreamAlertConditionResource extends RestResource {
         result.put("alert_condition_id", alertCondition.getId());
 
         return Response.status(Response.Status.CREATED).entity(json(result)).build();
+    }
+
+    @PUT
+    @Timed
+    @Path("{conditionId}")
+    @ApiOperation(value = "Modify an alert condition")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "Stream not found."),
+            @ApiResponse(code = 400, message = "Invalid ObjectId.")
+    })
+    public Response update(@ApiParam(title = "streamId", description = "The stream id the alert condition belongs to.", required = true) @PathParam("streamId") String streamid,
+                           @ApiParam(title = "conditionId", description = "The alert condition id.", required = true) @PathParam("conditionId") String conditionid,
+                           @ApiParam(title = "JSON body", required = true) String body) {
+        CreateConditionRequest ccr;
+        checkPermission(RestPermissions.STREAMS_EDIT, streamid);
+
+        try {
+            ccr = objectMapper.readValue(body, CreateConditionRequest.class);
+        } catch(IOException e) {
+            LOG.error("Error while parsing JSON", e);
+            throw new WebApplicationException(e, Response.Status.BAD_REQUEST);
+        }
+
+        Stream stream;
+        AlertCondition alertCondition;
+        try {
+            stream = streamService.load(streamid);
+            alertCondition = streamService.getAlertCondition(stream, conditionid);
+            alertCondition = alertService.updateFromRequest(alertCondition, ccr);
+        } catch (org.graylog2.database.NotFoundException e) {
+            throw new WebApplicationException(404);
+        } catch (AbstractAlertCondition.NoSuchAlertConditionTypeException e) {
+            LOG.error("Invalid alarm condition type.", e);
+            throw new WebApplicationException(e, Response.Status.BAD_REQUEST);
+        }
+
+        try {
+            streamService.updateAlertCondition(stream, alertCondition);
+        } catch (ValidationException e) {
+            LOG.error("Validation error.", e);
+            throw new WebApplicationException(e, Response.Status.BAD_REQUEST);
+        }
+
+        return Response.status(Response.Status.NO_CONTENT).build();
     }
 
     @GET @Timed
