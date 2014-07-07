@@ -12,19 +12,3 @@ notifications:
         g6Gpj2n1Bl6hIwWlywEkw8wRjpN2XuFsxFr9KQu/p7mRLYPdF3V5qQPVLBRd
         KvkjCIM7gZy2DTRNUooQPXdJB3npbnlbQn4jNWqA7/fp434Sw5sdfSUMawGr
         XvemLvn0KxQxCO9GfN3wfmYxEWJwXO36Q29BnRWWgMQOXpFFD8A=
-after_success:
-  - pushd build_script && ./build_radio_release.sh 0.21.0-SNAPSHOT && popd
-  - pushd build_script && ./build_server_release.sh 0.21.0-SNAPSHOT && popd
-deploy:
-  provider: s3
-  access_key_id: AKIAJK5LQJPPVH2EJ74Q
-  secret_access_key:
-    secure: Qz/e6EJCLj7p2k1glnu/ZT1FpZ1TVjptPhIt2vZdz3ouWi+/TZ11NPXyILNPLGri9s/PT3XcqCBRCF3i+TCp3CYuFkv5Evi84x9WrAoZ3KjKqdO4Qu5m0DfBw5Rbz7xgiMgj47Qs7JmnpOLPIHZ54pLpB8Nv31gDqS9vV4GIrEM=
-  bucket: graylog2-nightlies
-  region: eu-west-1
-  skip_cleanup: true
-  local-dir: build_script/builds
-  upload-dir: nightlies
-  on:
-    repo: Graylog2/graylog2-server
-    jdk: oraclejdk7
