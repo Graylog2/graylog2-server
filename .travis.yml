@@ -14,7 +14,7 @@ notifications:
         XvemLvn0KxQxCO9GfN3wfmYxEWJwXO36Q29BnRWWgMQOXpFFD8A=
 after_success:
   - mkdir assemblies
-  - pushd graylog2-server ; mvn package assembly:single; popd
+  - pushd graylog2-server ; mvn -DskipTests package assembly:single; popd
   - mv graylog2-server/target/assembly/* assemblies/
 deploy:
   provider: s3
