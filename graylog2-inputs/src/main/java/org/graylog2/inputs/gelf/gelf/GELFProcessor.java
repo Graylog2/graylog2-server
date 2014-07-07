@@ -43,9 +43,13 @@ public class GELFProcessor {
     private final GELFParser gelfParser;
 
     public GELFProcessor(MetricRegistry metricRegistry, Buffer processBuffer) {
-        this.metricRegistry = metricRegistry;
+        this(metricRegistry, processBuffer, new GELFParser(metricRegistry));
+    }
+
+    public GELFProcessor(MetricRegistry metricRegistry, Buffer processBuffer, GELFParser gelfParser) {
         this.processBuffer = processBuffer;
-        this.gelfParser = new GELFParser(metricRegistry);
+        this.metricRegistry = metricRegistry;
+        this.gelfParser = gelfParser;
     }
 
     public void messageReceived(GELFMessage message, MessageInput sourceInput) throws BufferOutOfCapacityException {
