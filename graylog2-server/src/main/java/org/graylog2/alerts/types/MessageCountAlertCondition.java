@@ -49,7 +49,6 @@ public class MessageCountAlertCondition extends AbstractAlertCondition {
         MORE, LESS
     }
 
-    private final int grace;
     private final int time;
     private final ThresholdType thresholdType;
     private final int threshold;
@@ -58,7 +57,6 @@ public class MessageCountAlertCondition extends AbstractAlertCondition {
     public MessageCountAlertCondition(Stream stream, String id, DateTime createdAt, String creatorUserId, Map<String, Object> parameters) {
         super(stream, id, Type.MESSAGE_COUNT, createdAt, creatorUserId, parameters);
 
-        this.grace = (Integer) parameters.get("grace");
         this.time = (Integer) parameters.get("time");
         this.thresholdType = ThresholdType.valueOf(((String) parameters.get("threshold_type")).toUpperCase());
         this.threshold = (Integer) parameters.get("threshold");

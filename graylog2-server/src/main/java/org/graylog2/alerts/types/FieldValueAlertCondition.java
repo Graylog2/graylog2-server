@@ -53,7 +53,6 @@ public class FieldValueAlertCondition extends AbstractAlertCondition {
         LOWER, HIGHER
     }
 
-    private final int grace;
     private final int time;
     private final ThresholdType thresholdType;
     private final Number threshold;
@@ -63,7 +62,6 @@ public class FieldValueAlertCondition extends AbstractAlertCondition {
     public FieldValueAlertCondition(Stream stream, String id, DateTime createdAt, String creatorUserId, Map<String, Object> parameters) {
         super(stream, id, Type.FIELD_VALUE, createdAt, creatorUserId, parameters);
 
-        this.grace = (Integer) parameters.get("grace");
         this.time = (Integer) parameters.get("time");
         this.thresholdType = ThresholdType.valueOf(((String) parameters.get("threshold_type")).toUpperCase());
         this.threshold = (Number) parameters.get("threshold");
