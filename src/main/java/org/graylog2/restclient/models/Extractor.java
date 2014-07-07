@@ -185,7 +185,7 @@ public class Extractor {
         request.conditionValue = conditionValue;
         request.order = order;
 
-        final Map response = api.path(routes.ExtractorsResource().list(input.getId()), Map.class)
+        final Map response = api.path(routes.ExtractorsResource().create(input.getId()), Map.class)
                 .node(node)
                 .expect(Http.Status.CREATED)
                 .body(request)
