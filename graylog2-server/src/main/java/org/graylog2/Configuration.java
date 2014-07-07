@@ -201,6 +201,9 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "elasticsearch_network_publish_host", required = false)
     private String esNetworkPublishHost;
 
+    @Parameter(value = "elasticsearch_cluster_discovery_timeout", required = false)
+    private long esClusterDiscoveryTimeout = 5000;
+
     @Parameter(value = "versionchecks", required = false)
     private boolean versionchecks = true;
 
@@ -552,6 +555,10 @@ public class Configuration extends BaseConfiguration {
 
     public int getStreamProcessingMaxFaults() {
         return streamProcessingMaxFaults;
+    }
+
+    public long getEsClusterDiscoveryTimeout() {
+        return esClusterDiscoveryTimeout;
     }
 }
 

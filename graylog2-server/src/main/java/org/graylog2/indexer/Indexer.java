@@ -66,6 +66,7 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.LinkedBlockingQueue;
 
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.elasticsearch.node.NodeBuilder.nodeBuilder;
 
@@ -152,7 +153,7 @@ public class Indexer {
         client = node.client();
 
         try {
-            client.admin().cluster().health(new ClusterHealthRequest().waitForYellowStatus()).actionGet(5, SECONDS);
+            client.admin().cluster().health(new ClusterHealthRequest().waitForYellowStatus()).actionGet(configuration.getEsClusterDiscoveryTimeout(), MILLISECONDS);
         } catch(ElasticSearchTimeoutException e) {
             final String hosts = node.settings().get("discovery.zen.ping.unicast.hosts");
             final Iterable<String> hostList = Splitter.on(',').split(hosts);
