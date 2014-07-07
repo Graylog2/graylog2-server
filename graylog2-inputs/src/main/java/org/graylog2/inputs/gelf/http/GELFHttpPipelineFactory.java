@@ -19,6 +19,7 @@
 package org.graylog2.inputs.gelf.http;
 
 import com.codahale.metrics.MetricRegistry;
+import org.graylog2.inputs.gelf.gelf.GELFProcessor;
 import org.graylog2.inputs.network.PacketInformationDumper;
 import org.graylog2.plugin.buffers.Buffer;
 import org.graylog2.plugin.inputs.MessageInput;
@@ -64,7 +65,11 @@ public class GELFHttpPipelineFactory implements ChannelPipelineFactory {
         // only add support for incoming compressed messages, we don't return much (if any) data to the client.
         pipeline.addLast("decompressor", new HttpContentDecompressor());
 
-        pipeline.addLast("handler", new GELFHttpHandler(metricRegistry, processBuffer, sourceInput));
+        pipeline.addLast("handler", new GELFHttpHandler(metricRegistry,
+                sourceInput,
+                new GELFProcessor(metricRegistry, processBuffer),
+                sourceInput.getConfiguration().getBoolean("enable_cors"))
+        );
 
         return pipeline;
     }
