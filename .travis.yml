@@ -15,8 +15,9 @@ after_success:
   - mkdir assemblies
   - mvn -DskipTests package
   - pushd graylog2-server ; mvn assembly:single; popd
-  - pushd graylog2-radio ; mvn assembly:single; popd
   - mv graylog2-server/target/assembly/* assemblies/
+  - pushd graylog2-radio ; mvn assembly:single; popd
+  - mv graylog2-radio/target/assembly/* assemblies/
 deploy:
   provider: s3
   access_key_id: AKIAIGYGO43W76PZMMVA
