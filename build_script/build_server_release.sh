@@ -6,6 +6,9 @@ BUILD_DIR=builds/$BUILD_NAME
 BUILD_DATE=`date`
 LOGFILE=`pwd`/logs/$BUILD_NAME
 
+# decide whether to use gtar or tar
+command -v gtar >/dev/null && TAR="gtar" || TAR="tar"
+
 # Check if required version parameter is given
 if [ -z $BUILD_NUMBER ]; then
   echo "ERROR: Missing parameter. (build number)"
@@ -60,7 +63,7 @@ cd builds/
 
 # tar it
 echo "Building Tarball ..."
-gtar cfz $BUILD_NAME.tar.gz $BUILD_NAME
+$TAR cfz $BUILD_NAME.tar.gz $BUILD_NAME
 rm -rf ./$BUILD_NAME
 mv $BUILD_NAME.tar.gz $BUILD_NAME.tgz
 
