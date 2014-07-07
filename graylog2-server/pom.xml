@@ -388,6 +388,7 @@
                     <descriptors>
                         <descriptor>src/main/assembly/graylog2-server.xml</descriptor>
                     </descriptors>
+                    <outputDirectory>${project.build.outputDirectory}/assembly</outputDirectory>
                     <finalName>graylog2-server-${project.version}-${maven.build.timestamp}</finalName>
                 </configuration>
             </plugin>
