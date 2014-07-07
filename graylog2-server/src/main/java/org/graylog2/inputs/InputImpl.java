@@ -45,6 +45,7 @@ public class InputImpl extends PersistedImpl implements Input {
 
     public static final String EMBEDDED_EXTRACTORS = "extractors";
     public static final String EMBEDDED_STATIC_FIELDS = "static_fields";
+    public static final String EMBEDDED_STATIC_FIELDS_KEY = "key";
     private static final Logger LOG = LoggerFactory.getLogger(InputImpl.class);
 
     public InputImpl(Map<String, Object> fields) {

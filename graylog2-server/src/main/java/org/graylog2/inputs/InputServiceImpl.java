@@ -223,7 +223,7 @@ public class InputServiceImpl extends PersistedServiceImpl implements InputServi
 
     @Override
     public void removeStaticField(Input input, String key) {
-        removeEmbedded(input, InputImpl.EMBEDDED_STATIC_FIELDS, key);
+        removeEmbedded(input, InputImpl.EMBEDDED_STATIC_FIELDS_KEY, InputImpl.EMBEDDED_STATIC_FIELDS, key);
     }
 
     public MessageInput getMessageInput(Input io) throws NoSuchInputTypeException {
