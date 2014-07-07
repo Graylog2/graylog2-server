@@ -35,7 +35,7 @@
     <parent>
         <groupId>org.sonatype.oss</groupId>
         <artifactId>oss-parent</artifactId>
-        <version>7</version>
+        <version>9</version>
     </parent>
 
     <modules>
@@ -75,6 +75,9 @@
     <properties>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+        <maven.build.timestamp.format>yyyyMMddHHmmss</maven.build.timestamp.format>
+        <build.timestamp>${maven.build.timestamp}</build.timestamp> <!-- to work around filtering bug, which makes maven.build.timestamp inaccessible -->
 
         <metrics.version>3.0.2</metrics.version>
         <jackson.version>2.3.0</jackson.version>
@@ -536,6 +539,16 @@
     </dependencies>
 
     <build>
+        <!-- To define the plugin version in your parent POM -->
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-assembly-plugin</artifactId>
+                    <version>2.4</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -603,6 +616,7 @@
                 </dependencies>
             </plugin>
         </plugins>
+
         <testResources>
             <testResource>
                 <directory>src/test/resources</directory>
