@@ -1,5 +1,6 @@
 @(alertConditions: List[org.graylog2.restclient.models.alerts.AlertCondition],
         stream: org.graylog2.restclient.models.Stream)
+@import views.helpers.AlertConditionDecorator
 @import lib.security.RestPermissions._
 @import views.helpers.Permissions._
 
@@ -16,9 +17,11 @@
 
                 @if(isPermitted(STREAMS_EDIT, stream.getId)) {
                         &nbsp;
-                    <form action="@routes.AlertsController.removeCondition(stream.getId, condition.getId)" method="POST" style="position: relative; top: -1px;">
+                    <form action="@routes.AlertsController.removeCondition(stream.getId, condition.getId)" method="POST">
                         <button type="submit" class="btn btn-danger btn-mini" data-confirm="Really delete alarm condition?">Delete</button>
                     </form>
+
+                    <a href="#" class="btn btn-mini edit-alert-condition">Edit</a>
                 }
                 </span>
 
@@ -34,6 +37,10 @@
             <div class="alert-condition">
             @condition.getDescription
             </div>
+
+            @if(isPermitted(STREAMS_EDIT, stream.getId)) {
+                @AlertConditionDecorator.loadTemplate(stream, condition)
+            }
         </div>
     }
 }

@@ -22,15 +22,12 @@ package controllers;
 import com.google.inject.Inject;
 import org.graylog2.restclient.lib.APIException;
 import org.graylog2.restclient.lib.ApiClient;
-import org.graylog2.restclient.lib.plugin.configuration.RequestedConfigurationField;
-import models.*;
 import org.graylog2.restclient.models.*;
 import org.graylog2.restclient.models.alerts.Alert;
 import org.graylog2.restclient.models.alerts.AlertCondition;
 import org.graylog2.restclient.models.alerts.AlertConditionService;
 import org.graylog2.restclient.models.api.requests.alerts.CreateAlertConditionRequest;
 import org.graylog2.restclient.models.api.responses.alarmcallbacks.GetSingleAvailableAlarmCallbackResponse;
-import play.Logger;
 import play.mvc.Result;
 
 import java.io.IOException;
@@ -171,6 +168,45 @@ public class AlertsController extends AuthenticatedController {
         }
 
         flash("success", "Added alert condition.");
+        return redirect(routes.AlertsController.index(streamId));
+    }
+
+    public Result updateCondition(String streamId, String conditionId) {
+        Map<String,String> form = flattenFormUrlEncoded(request().body().asFormUrlEncoded());
+
+        for (String key : form.keySet()) {
+            if (!checkParam(key, form)) {
+                flash("error", "Could not add alert condition: Missing parameters.");
+                return redirect(routes.AlertsController.index(streamId));
+            }
+        }
+
+        try {
+            Stream stream = streamService.get(streamId);
+
+            CreateAlertConditionRequest request = new CreateAlertConditionRequest();
+
+            for (Map.Entry<String, String> entry : form.entrySet()) {
+                try {
+                    request.parameters.put(entry.getKey(), Integer.parseInt(entry.getValue()));
+                } catch (Exception e1) {
+                    try {
+                        request.parameters.put(entry.getKey(), Double.parseDouble(entry.getValue()));
+                    } catch (Exception e2) {
+                        request.parameters.put(entry.getKey(), entry.getValue());
+                    }
+                }
+            }
+
+            alertConditionService.update(stream, conditionId, request);
+        } catch (IOException e) {
+            return status(504, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
+        } catch (APIException e) {
+            String message = "Could not create alert condition. We expected HTTP 200, but got a HTTP " + e.getHttpCode() + ".";
+            return status(504, views.html.errors.error.render(message, e, request()));
+        }
+
+        flash("success", "Updated alert condition.");
         return redirect(routes.AlertsController.index(streamId));
     }
 
