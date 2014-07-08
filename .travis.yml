@@ -12,6 +12,7 @@ notifications:
         XvemLvn0KxQxCO9GfN3wfmYxEWJwXO36Q29BnRWWgMQOXpFFD8A=
 after_success:
   - mvn -DskipTests -B assembly:single
+  - mvn --B --settings build_script/settings.xml deploy
 deploy:
   provider: s3
   access_key_id: AKIAIGYGO43W76PZMMVA
@@ -24,3 +25,7 @@ deploy:
   on:
     repo: Graylog2/graylog2-server
     jdk: oraclejdk7
+env:
+  global:
+  - secure: MYZwUwFkHwWfJ79JKyDK8VrYVcsax4t+7atMLLVNI4CDxTWZzR4qFGUfauf+7fDEmnGYbMHDRSnzzhVtSR0ZSuvWoSkZ+v62ASmSfglzI2GcMD/VBREq+9TlLasSIa+wR60VvgYwxJnawwJlV6sbjmetT6MWug7/icdi5KgfDlQ=
+  - secure: r0enVlGBPjqaGfNrD1b6YxgRaSp/v39ZMKQFs/C0RtRKliZ5LVo7kS4lL0tLQoqMAXJel0NgsVH6j1P6428uLQDxqKmCsNZiX0VS9K3Z0iq5NG4x/5QidxyXjHefSGmpquLmZbM094xhtvdou3NEfkJTKbxHu3ML9i9ScMn5+vA=
