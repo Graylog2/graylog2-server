@@ -110,4 +110,37 @@ public class InputState {
 
         return inputStateMap;
     }
+
+    @Override
+    public String toString() {
+        return "InputState{" +
+                "messageInput=" + messageInput +
+                ", id='" + id + '\'' +
+                ", state=" + state +
+                ", startedAt=" + startedAt +
+                ", detailedMessage='" + detailedMessage + '\'' +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        InputState that = (InputState) o;
+
+        if (!id.equals(that.id)) return false;
+        if (!messageInput.equals(that.messageInput)) return false;
+        if (state != that.state) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = messageInput.hashCode();
+        result = 31 * result + id.hashCode();
+        result = 31 * result + state.hashCode();
+        return result;
+    }
 }

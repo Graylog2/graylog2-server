@@ -65,12 +65,16 @@ public class InputsResource extends RestResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(InputsResource.class);
 
+    private final InputService inputService;
+    private final InputRegistry inputRegistry;
+    private final ActivityWriter activityWriter;
+
     @Inject
-    private InputService inputService;
-    @Inject
-    private InputRegistry inputRegistry;
-    @Inject
-    private ActivityWriter activityWriter;
+    public InputsResource(InputService inputService, InputRegistry inputRegistry, ActivityWriter activityWriter) {
+        this.inputService = inputService;
+        this.inputRegistry = inputRegistry;
+        this.activityWriter = activityWriter;
+    }
 
     @GET @Timed
     @Produces(MediaType.APPLICATION_JSON)
@@ -86,7 +90,7 @@ public class InputsResource extends RestResource {
 
         if (input == null) {
             LOG.info("Input [{}] not found. Returning HTTP 404.", inputId);
-            throw new WebApplicationException(404);
+            throw new WebApplicationException(Response.Status.NOT_FOUND);
         }
 
         return json(input.asMap());
@@ -246,7 +250,7 @@ public class InputsResource extends RestResource {
         return Response.status(Response.Status.ACCEPTED).build();
     }
 
-    @GET @Timed
+    @POST @Timed
     @Path("/{inputId}/launch")
     @ApiOperation(value = "Launch existing input on this node")
     @Produces(MediaType.APPLICATION_JSON)
@@ -254,15 +258,14 @@ public class InputsResource extends RestResource {
             @ApiResponse(code = 404, message = "No such input on this node.")
     })
     public Response launchExisting(@ApiParam(title = "inputId", required = true) @PathParam("inputId") String inputId) {
-        MessageInput input = null;
-        try {
-             input = inputService.getMessageInput(inputService.findForThisNode(serverStatus.getNodeId().toString(), inputId));
-        } catch (NoSuchInputTypeException e) {
+        final InputState inputState = inputRegistry.getInputState(inputId);
+
+        if (inputState == null) {
             LOG.info("Cannot launch input. Input not found.");
             throw new WebApplicationException(404);
-        } catch (org.graylog2.database.NotFoundException e) {
-            throw new WebApplicationException(404);
         }
+
+        final MessageInput input = inputState.getMessageInput();
 
         if (input == null) {
             LOG.info("Cannot launch input. Input not found.");
@@ -273,7 +276,7 @@ public class InputsResource extends RestResource {
         LOG.info(msg);
         activityWriter.write(new Activity(msg, InputsResource.class));
 
-        inputRegistry.launch(input);
+        inputRegistry.launch(inputState);
 
         String msg2 = "Launched existing input [" + input.getName()+ "]. Reason: REST request.";
         LOG.info(msg2);
@@ -282,27 +285,17 @@ public class InputsResource extends RestResource {
         return Response.status(Response.Status.ACCEPTED).build();
     }
 
-    @GET @Timed
+    @POST @Timed
     @Path("/{inputId}/stop")
     @ApiOperation(value = "Stop existing input on this node")
-    @Produces(MediaType.APPLICATION_JSON)
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "No such input on this node.")
     })
     public Response stop(@ApiParam(title = "inputId", required = true) @PathParam("inputId") String inputId) {
-        MessageInput input = null;
-        try {
-            input = inputService.getMessageInput(inputService.findForThisNode(serverStatus.getNodeId().toString(), inputId));
-        } catch (NoSuchInputTypeException e) {
-            LOG.info("Cannot launch input. Input not found.");
-            throw new WebApplicationException(404);
-        } catch (NotFoundException e) {
-            throw new WebApplicationException(404);
-        }
-
+        final MessageInput input = inputRegistry.getRunningInput(inputId);
         if (input == null) {
-            LOG.info("Cannot launch input. Input not found.");
-            throw new WebApplicationException(404);
+            LOG.info("Cannot stop input. Input not found.");
+            throw new WebApplicationException(Response.Status.NOT_FOUND);
         }
 
         String msg = "Stopping input [" + input.getName()+ "]. Reason: REST request.";
@@ -318,10 +311,9 @@ public class InputsResource extends RestResource {
         return Response.status(Response.Status.ACCEPTED).build();
     }
 
-    @GET @Timed
+    @POST @Timed
     @Path("/{inputId}/restart")
     @ApiOperation(value = "Restart existing input on this node")
-    @Produces(MediaType.APPLICATION_JSON)
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "No such input on this node.")
     })

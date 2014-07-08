@@ -50,6 +50,16 @@ public abstract class InputRegistry {
     private final MessageInputFactory messageInputFactory;
     private final ProcessBuffer processBuffer;
 
+    protected abstract void finishedLaunch(InputState state);
+
+    protected abstract void finishedTermination(InputState state);
+
+    protected abstract void finishedStop(InputState inputState);
+
+    protected abstract List<MessageInput> getAllPersisted();
+
+    public abstract void cleanInput(MessageInput input);
+
     public InputRegistry(MessageInputFactory messageInputFactory,
                          ProcessBuffer processBuffer) {
         this.messageInputFactory = messageInputFactory;
@@ -64,32 +74,11 @@ public abstract class InputRegistry {
         return launch(input, id, false);
     }
 
-    protected abstract void finishedLaunch(InputState state);
-
-    protected abstract void finishedTermination(InputState state);
-
     public InputState launch(final MessageInput input, String id, boolean register) {
         final InputState inputState = new InputState(input, id);
         inputStates.add(inputState);
 
-        executor.submit(new Runnable() {
-            @Override
-            public void run() {
-                LOG.info("Starting [{}] input with ID <{}>", input.getClass().getCanonicalName(), input.getId());
-                try {
-                    input.checkConfiguration();
-                    inputState.setState(InputState.InputStateType.STARTING);
-                    input.launch(processBuffer);
-                    inputState.setState(InputState.InputStateType.RUNNING);
-                    String msg = "Completed starting [" + input.getClass().getCanonicalName() + "] input with ID <" + input.getId() + ">";
-                    LOG.info(msg);
-                } catch (MisfireException | Exception e) {
-                    handleLaunchException(e, input, inputState);
-                } finally {
-                    finishedLaunch(inputState);
-                }
-            }
-        });
+        launch(inputState);
 
         return inputState;
     }
@@ -131,8 +120,45 @@ public abstract class InputRegistry {
         return launch(input, UUID.randomUUID().toString());
     }
 
+    public InputState launch(final InputState inputState) {
+        final MessageInput input = inputState.getMessageInput();
+
+        if (input == null)
+            throw new IllegalArgumentException("InputState has no MessageInput!");
+
+        executor.submit(new Runnable() {
+            @Override
+            public void run() {
+                LOG.info("Starting [{}] input with ID <{}>", input.getClass().getCanonicalName(), input.getId());
+                try {
+                    input.checkConfiguration();
+                    inputState.setState(InputState.InputStateType.STARTING);
+                    input.launch(processBuffer);
+                    inputState.setState(InputState.InputStateType.RUNNING);
+                    String msg = "Completed starting [" + input.getClass().getCanonicalName() + "] input with ID <" + input.getId() + ">";
+                    LOG.info(msg);
+                } catch (MisfireException | Exception e) {
+                    handleLaunchException(e, input, inputState);
+                } finally {
+                    finishedLaunch(inputState);
+                }
+            }
+        });
+
+        return inputState;
+    }
+
     public List<InputState> getInputStates() {
         return inputStates;
+    }
+
+    public InputState getInputState(String inputId) {
+        for (InputState inputState : inputStates) {
+            if (inputState.getMessageInput().getPersistId().equals(inputId))
+                return inputState;
+        }
+
+        return null;
     }
 
     public List<InputState> getRunningInputs() {
@@ -177,8 +203,6 @@ public abstract class InputRegistry {
         return launch(input);
     }
 
-    protected abstract List<MessageInput> getAllPersisted();
-
     public void launchAllPersisted() {
         for (MessageInput input : getAllPersisted()) {
             launchPersisted(input);
@@ -205,15 +229,12 @@ public abstract class InputRegistry {
             } catch (Exception e) {
                 LOG.warn("Stopping input <{}> failed, removing anyway: {}", input.getId(), e);
             }
-            removeFromRunning(input);
             inputState.setState(InputState.InputStateType.STOPPED);
             finishedStop(inputState);
         }
 
         return inputState;
     }
-
-    protected abstract void finishedStop(InputState inputState);
 
     public MessageInput getRunningInput(String inputId) {
         for (InputState inputState : inputStates) {
@@ -232,8 +253,6 @@ public abstract class InputRegistry {
 
         return null;
     }
-
-    public abstract void cleanInput(MessageInput input);
 
     public MessageInput getPersisted(String inputId) {
         for (MessageInput input : getAllPersisted()) {
