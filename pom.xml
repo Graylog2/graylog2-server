@@ -617,6 +617,23 @@
                 </dependencies>
             </plugin>
             <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>1.9</version>
+                <executions>
+                    <execution>
+                        <id>parse-version</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>parse-version</goal>
+                        </goals>
+                        <configuration>
+                            <propertyPrefix>maven</propertyPrefix>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <version>2.4</version>

@@ -11,7 +11,7 @@ notifications:
         KvkjCIM7gZy2DTRNUooQPXdJB3npbnlbQn4jNWqA7/fp434Sw5sdfSUMawGr
         XvemLvn0KxQxCO9GfN3wfmYxEWJwXO36Q29BnRWWgMQOXpFFD8A=
 after_success:
-  - mvn -DskipTests package assembly:single
+  - mvn -DskipTests -B assembly:single
 deploy:
   provider: s3
   access_key_id: AKIAIGYGO43W76PZMMVA

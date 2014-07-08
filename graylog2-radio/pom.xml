@@ -272,6 +272,7 @@
                 <version>2.1.10</version>
                 <executions>
                     <execution>
+                        <phase>generate-resources</phase>
                         <goals>
                             <goal>revision</goal>
                         </goals>
@@ -307,6 +308,13 @@
         </plugins>
 
         <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+                <includes>
+                    <include>**/*.properties</include>
+                </includes>
+            </resource>
             <resource>
                 <directory>src/main/resources</directory>
             </resource>

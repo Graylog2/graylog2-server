@@ -277,7 +277,7 @@
                 <directory>src/main/resources</directory>
                 <filtering>true</filtering>
                 <includes>
-                    <include>git.properties</include>
+                    <include>**/*.properties</include>
                 </includes>
             </resource>
             <resource>
