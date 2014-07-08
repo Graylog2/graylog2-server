@@ -1,12 +1,25 @@
 package lib.notifications;
 
+import org.graylog2.restclient.lib.APIException;
 import org.graylog2.restclient.models.Notification;
+import org.graylog2.restclient.models.Stream;
+import org.graylog2.restclient.models.StreamService;
+
+import javax.inject.Inject;
+import java.io.IOException;
 
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
  */
 public class NotificationTypeFactory {
-    public NotificationType get(Notification notification) {
+    private final StreamService streamService;
+
+    @Inject
+    public NotificationTypeFactory(StreamService streamService) {
+        this.streamService = streamService;
+    }
+
+    public NotificationType get(Notification notification) throws APIException, IOException {
         switch (notification.getType()) {
             case DEFLECTOR_EXISTS_AS_INDEX:
                 return new DeflectorExistsAsIndexNotification(notification);
@@ -28,6 +41,10 @@ public class NotificationTypeFactory {
                 return new EmailTransportConfigurationInvalidNotification(notification);
             case EMAIL_TRANSPORT_FAILED:
                 return new EmailTransportFailedNotification(notification);
+            case STREAM_PROCESSING_DISABLED:
+                final Stream stream = streamService.get(notification.getDetail("stream_id").toString());
+                long faultCount = Math.round((double)notification.getDetail("fault_count"));
+                return new StreamProcessingDisabledNotification(notification, stream.getTitle(), faultCount);
         }
 
         throw new RuntimeException("No notification registered for " + notification.getType());
