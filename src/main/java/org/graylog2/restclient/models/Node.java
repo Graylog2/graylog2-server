@@ -30,7 +30,6 @@ import org.graylog2.restclient.lib.metrics.Metric;
 import org.graylog2.restclient.models.api.requests.InputLaunchRequest;
 import org.graylog2.restclient.models.api.responses.BufferClassesResponse;
 import org.graylog2.restclient.models.api.responses.BuffersResponse;
-import org.graylog2.restclient.models.api.responses.EmptyResponse;
 import org.graylog2.restclient.models.api.responses.cluster.NodeSummaryResponse;
 import org.graylog2.restclient.models.api.responses.SystemOverviewResponse;
 import org.graylog2.restclient.models.api.responses.metrics.MetricsListResponse;
@@ -580,6 +579,7 @@ public class Node extends ClusterEntity {
     public void stopInput(String inputId) throws IOException, APIException {
         api.path(routes.InputsResource().stop(inputId))
                 .node(this)
+                .expect(Http.Status.ACCEPTED)
                 .execute();
     }
 
@@ -587,6 +587,7 @@ public class Node extends ClusterEntity {
     public void startInput(String inputId) throws IOException, APIException {
         api.path(routes.InputsResource().launchExisting(inputId))
                 .node(this)
+                .expect(Http.Status.ACCEPTED)
                 .execute();
     }
 }
