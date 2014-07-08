@@ -299,8 +299,9 @@
                     <descriptors>
                         <descriptor>src/main/assembly/graylog2-radio.xml</descriptor>
                     </descriptors>
-                    <outputDirectory>${project.build.directory}/assembly</outputDirectory>
-                    <finalName>graylog2-radio-${project.version}-${maven.build.timestamp}</finalName>
+                    <!-- to make it easier to collect assemblies, we put them into the _parent's_ build directory -->
+                    <outputDirectory>${project.parent.build.directory}/assembly</outputDirectory>
+                    <finalName>${project.artifactId}-${project.version}-${maven.build.timestamp}</finalName>
                 </configuration>
             </plugin>
         </plugins>

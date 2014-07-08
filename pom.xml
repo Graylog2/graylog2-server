@@ -616,6 +616,17 @@
                     </dependency>
                 </dependencies>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>2.4</version>
+                <configuration>
+                    <attach>false</attach>
+                    <appendAssemblyId>false</appendAssemblyId>
+                    <!-- we don't care about assembling the parent, just run the goal on the project, pretty please -->
+                    <ignoreMissingDescriptor>true</ignoreMissingDescriptor>
+                </configuration>
+            </plugin>
         </plugins>
 
         <testResources>
