@@ -575,4 +575,18 @@ public class Node extends ClusterEntity {
     public void requireJVMInfo() {
         loadJVMInformation();
     }
+
+    @Override
+    public void stopInput(String inputId) throws IOException, APIException {
+        api.path(routes.InputsResource().stop(inputId))
+                .node(this)
+                .execute();
+    }
+
+    @Override
+    public void startInput(String inputId) throws IOException, APIException {
+        api.path(routes.InputsResource().launchExisting(inputId))
+                .node(this)
+                .execute();
+    }
 }

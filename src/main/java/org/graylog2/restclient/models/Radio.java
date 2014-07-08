@@ -365,4 +365,11 @@ public class Radio extends ClusterEntity {
         return b.toString();
     }
 
+    @Override
+    public void stopInput(String inputId) throws IOException, APIException {
+    }
+
+    @Override
+    public void startInput(String inputId) throws IOException, APIException {
+    }
 }
