@@ -17,7 +17,7 @@ $(document).ready(function() {
 
         var wizard = $(".xtrc-wizard");
         $(".xtrc-wizard-field", wizard).html(field)
-        $(".xtrc-wizard-example", wizard).html(value);
+        $(".xtrc-wizard-example", wizard).html(htmlEscape(value));
 
         $("input[name=field]", wizard).val(field)
         $("input[name=example]", wizard).val(value);
@@ -141,18 +141,24 @@ $(document).ready(function() {
 
     function highlightMatchResult(result) {
         var example = $("#xtrc-example");
+        var start = result.match.start;
+        var end = result.match.end;
+
         // Set to original content first, so we can do this multiple times.
         example.html($("#xtrc-original-example").html());
 
-        var spanStart = "<span class='xtrc-hl'>";
-        var spanEnd = "</span>";
-
-        var start = result.match.start;
-        var end = result.match.end+spanStart.length;
-
         var exampleContent = $("<div/>").html(example.html()).text(); // ZOMG JS. this is how you unescape HTML entities.
+        var highlightedElement = $("<span/>").addClass("xtrc-hl");
 
-        example.html(exampleContent.splice(start,0,spanStart).splice(end,0,spanEnd));
+        // We ensure all parts of the example are escaped
+        var textBeforeHighlight = htmlEscape(exampleContent.slice(0, start));
+        var highlightedText = htmlEscape(exampleContent.slice(start, end));
+        var textAfterHighlight = htmlEscape(exampleContent.slice(end));
+
+        example.html(textBeforeHighlight);
+        highlightedElement.html(highlightedText);
+        example.append(highlightedElement);
+        example.append(textAfterHighlight);
     }
 
     // Add converter button.
