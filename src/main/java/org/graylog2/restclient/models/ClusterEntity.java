@@ -71,4 +71,5 @@ public abstract class ClusterEntity {
     public abstract InputTypeSummaryResponse getInputTypeInformation(String type) throws IOException, APIException;
     public abstract void stopInput(String inputId) throws IOException, APIException;
     public abstract void startInput(String inputId) throws IOException, APIException;
+    public abstract void restartInput(String inputId) throws IOException, APIException;
 }

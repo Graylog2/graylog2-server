@@ -590,4 +590,12 @@ public class Node extends ClusterEntity {
                 .expect(Http.Status.ACCEPTED)
                 .execute();
     }
+
+    @Override
+    public void restartInput(String inputId) throws IOException, APIException {
+        api.path(routes.InputsResource().restart(inputId))
+                .node(this)
+                .expect(Http.Status.ACCEPTED)
+                .execute();
+    }
 }

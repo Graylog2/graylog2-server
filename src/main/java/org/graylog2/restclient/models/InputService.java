@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import play.mvc.Http;
 
 import java.io.IOException;
+import java.util.AbstractMap;
 import java.util.List;
 import java.util.Map;
 
@@ -212,5 +213,63 @@ public class InputService {
         results.put(master, master.terminateInput(inputId));
 
         return results;
+    }
+
+    public void start(String inputId) throws IOException, APIException {
+        Map.Entry<ClusterEntity, InputState> target = findNodeAndInputStateForInput(inputId);
+
+        List<ClusterEntity> targetNodes = targetNodesForInput(target);
+
+        for (ClusterEntity targetNode : targetNodes)
+            targetNode.startInput(inputId);
+    }
+
+    public void stop(String inputId) throws IOException, APIException {
+        final Map.Entry<ClusterEntity, InputState> target = findNodeAndInputStateForInput(inputId);
+
+        List<ClusterEntity> targetNodes = targetNodesForInput(target);
+
+        for (ClusterEntity targetNode : targetNodes)
+            targetNode.stopInput(inputId);
+    }
+
+    public void restart(String inputId) throws IOException, APIException {
+        final Map.Entry<ClusterEntity, InputState> target = findNodeAndInputStateForInput(inputId);
+
+        List<ClusterEntity> targetNodes = targetNodesForInput(target);
+
+        for (ClusterEntity targetNode : targetNodes)
+            targetNode.restartInput(inputId);
+    }
+
+    protected List<ClusterEntity> targetNodesForInput(Map.Entry<ClusterEntity, InputState> target) {
+        final List<ClusterEntity> targetNodes = Lists.newArrayList();
+        if (target.getValue().getInput().getGlobal()) {
+            targetNodes.addAll(serverNodes.all());
+            try {
+                targetNodes.addAll(nodeService.radios().values());
+            } catch (APIException | IOException e) {
+                log.error("Unable to fetch list of radios: " + e);
+            }
+        } else {
+            targetNodes.add(target.getKey());
+        }
+
+        return targetNodes;
+    }
+
+    protected Map.Entry<ClusterEntity, InputState> findNodeAndInputStateForInput(String inputId) {
+        ClusterEntity targetNode = null;
+        InputState targetInputState = null;
+
+        for (final Map.Entry<ClusterEntity, List<InputState>> entry : loadAllInputStatesByEntity().entrySet()) {
+            for (final InputState inputState : entry.getValue()) {
+                if (inputState.getInput().getPersistId().equals(inputId)) {
+                    return new AbstractMap.SimpleImmutableEntry<ClusterEntity, InputState>(entry.getKey(), inputState);
+                }
+            }
+        }
+
+        return null;
     }
 }

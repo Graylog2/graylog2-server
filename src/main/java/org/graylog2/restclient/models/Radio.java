@@ -371,5 +371,13 @@ public class Radio extends ClusterEntity {
 
     @Override
     public void startInput(String inputId) throws IOException, APIException {
+        api.path(routes.radio().InputsResource().launchExisting(inputId))
+                .radio(this)
+                .expect(Http.Status.ACCEPTED)
+                .execute();
+    }
+
+    @Override
+    public void restartInput(String inputId) throws IOException, APIException {
     }
 }
