@@ -1,0 +1,12 @@
+@(input: org.graylog2.restclient.models.Input,
+        inputTypes: Map[String, org.graylog2.restclient.models.api.responses.system.InputTypeSummaryResponse])
+
+<i class="icon icon-ellipsis-vertical"></i>
+@input.getTitle (@input.getName)
+
+@if(inputTypes.get(input.getType).linkToDocs != null && !inputTypes.get(input.getType).linkToDocs.isEmpty) {
+    <a href="@inputTypes.get(input.getType).linkToDocs" target="_blank">
+        <i class="icon icon-question-sign input-docs"></i>
+    </a>
+}
+
