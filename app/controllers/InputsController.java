@@ -346,23 +346,72 @@ public class InputsController extends AuthenticatedController {
         }
         Map<ClusterEntity, Boolean> results = inputService.terminateGlobal(inputId);
 
-        System.out.println("results: " + results);
-
         if (results.values().contains(false)) {
-            System.out.println("At least one node failed.");
             List<ClusterEntity> failingNodes = Lists.newArrayList();
 
             for (Map.Entry<ClusterEntity, Boolean> entry : results.entrySet())
                 if (!entry.getValue())
                     failingNodes.add(entry.getKey());
 
-            System.out.println("These nodes faield: " + failingNodes);
-
             flash("Could not terminate input on nodes " + Joiner.on(", ").join(failingNodes));
         }
 
         return redirect(routes.InputsController.index());
 
+    }
+
+    public Result stop(String inputId) {
+        if (!Permissions.isPermitted(RestPermissions.INPUTS_STOP)) {
+            flash("You are not permitted to stop this input.");
+            return redirect(routes.InputsController.index());
+        }
+
+        try {
+            inputService.stop(inputId);
+        } catch (IOException e) {
+            return status(500, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
+        } catch (APIException e) {
+            String message = "Could not fetch system information. We expected HTTP 200, but got a HTTP " + e.getHttpCode() + ".";
+            return status(500, views.html.errors.error.render(message, e, request()));
+        }
+
+        return redirect(routes.InputsController.index());
+    }
+
+    public Result start(String inputId) {
+        if (!Permissions.isPermitted(RestPermissions.INPUTS_START)) {
+            flash("You are not permitted to stop this input.");
+            return redirect(routes.InputsController.index());
+        }
+
+        try {
+            inputService.start(inputId);
+        } catch (IOException e) {
+            return status(500, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
+        } catch (APIException e) {
+            String message = "Could not fetch system information. We expected HTTP 200, but got a HTTP " + e.getHttpCode() + ".";
+            return status(500, views.html.errors.error.render(message, e, request()));
+        }
+
+        return redirect(routes.InputsController.index());
+    }
+
+    public Result restart(String inputId) {
+        if (!Permissions.isPermitted(RestPermissions.INPUTS_START) && !Permissions.isPermitted(RestPermissions.INPUTS_STOP)) {
+            flash("You are not permitted to stop this input.");
+            return redirect(routes.InputsController.index());
+        }
+
+        try {
+            inputService.restart(inputId);
+        } catch (IOException e) {
+            return status(500, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
+        } catch (APIException e) {
+            String message = "Could not fetch system information. We expected HTTP 200, but got a HTTP " + e.getHttpCode() + ".";
+            return status(500, views.html.errors.error.render(message, e, request()));
+        }
+
+        return redirect(routes.InputsController.index());
     }
 
     public Result addStaticField(String nodeId, String inputId) {
@@ -425,5 +474,4 @@ public class InputsController extends AuthenticatedController {
             return status(404, views.html.errors.error.render(ApiClient.ERROR_MSG_NODE_NOT_FOUND, e, request()));
         }
     }
-
 }

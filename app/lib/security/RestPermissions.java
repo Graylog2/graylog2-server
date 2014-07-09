@@ -59,6 +59,8 @@ public class RestPermissions {
     public static final String INPUTS_CREATE = "inputs:create";
     public static final String INPUTS_TERMINATE = "inputs:terminate";
     public static final String INPUTS_EDIT = "inputs:edit";
+    public static final String INPUTS_STOP = "inputs:stop";
+    public static final String INPUTS_START = "inputs:start";
     public static final String SYSTEMJOBS_READ = "systemjobs:read";
     public static final String SYSTEMJOBS_CREATE = "systemjobs:create";
     public static final String LDAP_EDIT = "ldap:edit";
