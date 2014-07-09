@@ -12,7 +12,7 @@ notifications:
         XvemLvn0KxQxCO9GfN3wfmYxEWJwXO36Q29BnRWWgMQOXpFFD8A=
 after_success:
   - mvn -DskipTests -B assembly:single
-  - mvn --B --settings build_script/settings.xml deploy
+  - mvn -B --settings build_script/settings.xml deploy
 deploy:
   provider: s3
   access_key_id: AKIAIGYGO43W76PZMMVA
