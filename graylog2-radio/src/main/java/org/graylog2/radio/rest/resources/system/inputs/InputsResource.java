@@ -195,7 +195,7 @@ public class InputsResource extends RestResource {
         return json(result);
     }
 
-    @GET @Timed
+    @POST @Timed
     @Path("/{inputId}/launch")
     @Produces(MediaType.APPLICATION_JSON)
     public Response launchExisting(@PathParam("inputId") String inputId) {
@@ -211,5 +211,33 @@ public class InputsResource extends RestResource {
         result.put("persist_id", inputId);
 
         return Response.status(Response.Status.ACCEPTED).entity(json(result)).build();
+    }
+
+    @POST @Timed
+    @Path("/{inputId}/stop")
+    public Response stop(@PathParam("inputId") String inputId) {
+        final MessageInput input = inputRegistry.getRunningInput(inputId);
+        if (input == null) {
+            LOG.info("Cannot stop input. Input not found.");
+            throw new WebApplicationException(Response.Status.NOT_FOUND);
+        }
+
+        String msg = "Stopping input [" + input.getName()+ "]. Reason: REST request.";
+        LOG.info(msg);
+
+        inputRegistry.stop(input);
+
+        String msg2 = "Stopped input [" + input.getName()+ "]. Reason: REST request.";
+        LOG.info(msg2);
+
+        return Response.status(Response.Status.ACCEPTED).build();
+    }
+
+    @POST @Timed
+    @Path("/{inputId}/restart")
+    public Response restart(@PathParam("inputId") String inputId) {
+        stop(inputId);
+        launchExisting(inputId);
+        return Response.status(Response.Status.ACCEPTED).build();
     }
 }
