@@ -70,7 +70,7 @@ public abstract class AlertConditionDecorator {
         if (isEmptyCondition()) {
             sb.append("Add alert condition");
         } else {
-            sb.append("Edit alert condition");
+            sb.append("Update alert condition");
         }
         sb.append("</button>");
 
