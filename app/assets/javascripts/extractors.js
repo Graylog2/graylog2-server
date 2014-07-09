@@ -88,35 +88,24 @@ $(document).ready(function() {
         });
     }
 
-    $("#begin_index").on("change", function(e) {
-        var elem = $("#begin_index");
-        var endIndex = $("#end_index");
-
-        if (parseInt(elem.val()) < 0) {
-            elem.val(0);
-        }
-        if (parseInt(elem.val()) > parseInt(endIndex.val())) {
-            elem.val(endIndex.val());
-        }
-        trySubstring($(".xtrc-try-substring"));
-    });
-
-    $("#end_index").on("change", function(e) {
-        var elem = $("#end_index");
-        var maxLength = $("#xtrc-example").text().length;
-        var beginIndex = $("#begin_index").val();
-
-        if (parseInt(elem.val()) > maxLength) {
-            elem.val(maxLength);
-        }
-        if (parseInt(beginIndex) > parseInt(elem.val())) {
-            elem.val(beginIndex);
-        }
-        trySubstring($(".xtrc-try-substring"));
-    });
-
     // Try substring against example.
     $(".xtrc-try-substring").on("click", function() {
+        var beginIndex = $("#begin_index");
+        var endIndex = $("#end_index");
+        var maxLength = $("#xtrc-example").text().length;
+
+        if (parseInt(beginIndex.val()) < 0) {
+            beginIndex.val(0);
+        }
+        if (parseInt(endIndex.val()) < 0) {
+            endIndex.val(0);
+        }
+        if (parseInt(beginIndex.val()) > parseInt(endIndex.val())) {
+            beginIndex.val(endIndex.val());
+        }
+        if (parseInt(endIndex.val()) > maxLength) {
+            endIndex.val(maxLength);
+        }
         trySubstring($(this));
     });
 
