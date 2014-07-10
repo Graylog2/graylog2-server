@@ -31,7 +31,7 @@ deploy:
   bucket: graylog2-builds
   region: eu-west-1
   skip_cleanup: true
-  local-dir: target/assembly
+  local-dir: target/universal/package
   on:
     repo: Graylog2/graylog2-web-interface
     jdk: oraclejdk7

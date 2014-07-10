@@ -27,7 +27,9 @@ object ApplicationBuild extends Build {
       // changing the state to use a different package name is not possible, because the artifact name has already been
       // constructed at the time this runs. instead of doing it lazily the native packager does it eagerly, so we can't
       // change it anymore.
-      task._2.renameTo(new File(task._2.getParentFile, task._2.getName.replace(".tgz", "-" + timestamp + ".tgz")))
+      val packageDir: File = new File(task._2.getParentFile, "package")
+      packageDir.mkdir()
+      task._2.renameTo(new File(packageDir, task._2.getName.replace(".tgz", "-" + timestamp + ".tgz")))
     }
 
     task._1
