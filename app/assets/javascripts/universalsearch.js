@@ -10,14 +10,16 @@ $(document).ready(function() {
     $("#universalsearch .timerange-selector-container .absolute .date-select").datepicker({
         format: "yyyy-mm-dd"
     }).on("changeDate", function(ev) {
-        $(this).val($(this).val() + " 00:00:00");
+        var dateString = $(this).val() + " 00:00:00";
+        var date = momentHelper.parseUserLocalFromString(dateString);
+        $(this).val(date.format(momentHelper.DATE_FORMAT_TZ));
     });
 
     $("#universalsearch .timerange-selector-container .absolute .set-to-now").on("click", function() {
         var input = $("input", $(this).parent());
 
-        var date = new Date();
-        input.val(searchDateTimeFormatted(date));
+        var date = momentHelper.toUserTimeZone(null);
+        input.val(date.format(momentHelper.DATE_FORMAT_TZ));
     });
 
     // on submit create the iso8601 timestamps for absolute searches
@@ -25,7 +27,7 @@ $(document).ready(function() {
         $(".timerange-selector-container .absolute input[type='text']").each(function() {
             var dateString = $(this).val();
             if (dateString) {
-                var date = new Date(parseDateFromString(dateString));
+                var date = momentHelper.parseFromString(dateString);
 
                 $("input[type='hidden']", $(this).parent()).val(date.toISOString());
             }
@@ -42,8 +44,9 @@ $(document).ready(function() {
         var input = $("input[type='text']", $(this).parent());
         var dateString = $(this).val();
         if (dateString) {
-            var date = new Date(dateString);
-            input.val(searchDateTimeFormatted(date));
+            var date = momentHelper.parseFromString(dateString);
+            date = momentHelper.toUserTimeZone(date);
+            input.val(date.format(momentHelper.DATE_FORMAT_TZ));
         }
     });
 

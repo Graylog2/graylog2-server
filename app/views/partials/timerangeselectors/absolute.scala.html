@@ -14,7 +14,7 @@
            }
 
            class="validatable date-select absolute-from-human"
-           data-validate="defined" />
+           data-validate="defined datetime_format" />
 
     <!-- set during submit via JS -->
     <input type="hidden" name="from" value="@request.getQueryString("from")" />
@@ -33,7 +33,7 @@
            }
 
            class="validatable date-select absolute-to-human"
-           data-validate="defined timerange_not_empty" />
+           data-validate="defined datetime_format timerange" />
 
     <!-- set during submit via JS -->
     <input type="hidden" name="to" value="@request.getQueryString("to")" />

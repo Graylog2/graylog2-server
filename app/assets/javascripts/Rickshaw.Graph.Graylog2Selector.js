@@ -93,14 +93,14 @@ Rickshaw.Graph.Graylog2Selector = Rickshaw.Class.create({
                 return;
             }
 
-            var fromDate = moment((position.xMin)*1000);
-            var toDate = moment((position.xMax)*1000);
-            fromDate = momentInUserTimeZone(fromDate);
-            toDate = momentInUserTimeZone(toDate);
+            var fromDate = moment.utc((position.xMin)*1000);
+            var toDate = moment.utc((position.xMax)*1000);
+            fromDate = momentHelper.toUserTimeZone(fromDate);
+            toDate = momentHelper.toUserTimeZone(toDate);
 
             activateTimerangeChooser("absolute", $('.timerange-selector-container .dropdown-menu a[data-selector-name="absolute"]'));
-            from.val(fromDate.format("YYYY-MM-DD HH:mm:ss"));
-            to.val(toDate.format("YYYY-MM-DD HH:mm:ss"));
+            from.val(fromDate.format(momentHelper.DATE_FORMAT_TZ));
+            to.val(toDate.format(momentHelper.DATE_FORMAT_TZ));
 
             $(".timerange-selector-container").effect("bounce", { complete: function() {
                 // Submit search directly if alt key is pressed.
