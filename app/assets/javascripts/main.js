@@ -970,6 +970,26 @@ function searchDateTimeFormatted(date) {
     return year + "-" + month + "-" + day + " " + hour + ":" + minute + ":" + second + millis;
 }
 
+/*
+ * Returns a new moment object in the users' timezone. If null is given as an argument, it will
+ * return a moment object with the current time in user's timezone.
+ */
+function momentInUserTimeZone(momentDate) {
+    var date;
+
+    if (momentDate == null) {
+        date = moment();
+    } else {
+        date = moment(momentDate);
+    }
+
+    if (gl2UserTimeZoneOffset != null) {
+        date.zone(gl2UserTimeZoneOffset);
+    }
+
+    return date;
+}
+
 function showError(message) {
     toastr.error(message, "Error", {
         "debug": false,
