@@ -8,6 +8,7 @@
 
 @import controllers.routes
 @import org.graylog2.restclient.lib.Tools
+@import views.helpers.DateHelper
 
 @main("Indices", views.html.system.sidebar(), "", currentUser) {
 
@@ -87,7 +88,7 @@
 
                 @index.getName
                 <span class="starts">
-                    Contains messages up to <span class="moment-from-now" title="@index.getRange.getStarts">@index.getRange.getStarts</span>,
+                    Contains messages up to @DateHelper.readablePeriodFromNow(index.getRange.getStarts),
                     @if(index.getInfo != null) {
                         @Tools.byteToHuman(index.getInfo.getStoreSizeBytes) /
                         <span class="number-format" data-format="0,0">@index.getInfo.getDocuments.count</span> messages
@@ -105,7 +106,7 @@
                 }
             >
                 @if(index.getRange.isProvidesCalculationInfo) {
-                    Range re-calculated <span class="moment-from-now" title="@index.getRange.getCalculatedAt">@index.getRange.getCalculatedAt</span>
+                    Range re-calculated @DateHelper.readablePeriodFromNow(index.getRange.getCalculatedAt)
                     in @(index.getRange.getCalculationTookMs)ms.
                 }
 

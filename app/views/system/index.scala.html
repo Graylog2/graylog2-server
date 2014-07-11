@@ -27,7 +27,7 @@
                 <h3>
                     <i class="icon icon-bolt"></i>
                     @notification.getTitle
-                    <span class="notification-timestamp moment-from-now" title="@notification.getNotification.getTimestamp">@notification.getNotification.getTimestamp</span>
+                    @DateHelper.readablePeriodFromNow(notification.getNotification.getTimestamp, "notification-timestamp")
                 </h3>
 
                 <div class="notification-description">

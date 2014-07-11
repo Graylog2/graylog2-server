@@ -1,6 +1,6 @@
 @(currentUser: org.graylog2.restclient.models.User, breadcrumbs: lib.BreadcrumbList, node: org.graylog2.restclient.models.Node, installedPlugins: List[org.graylog2.restclient.models.Plugin])
-@import org.graylog2.restclient.models._
 @import views.helpers.StringHelper._
+@import views.helpers.DateHelper
 @import controllers.routes;
 @import views.helpers.Permissions.isPermitted
 @import lib.security.RestPermissions._
@@ -166,10 +166,10 @@
                 <dd>@node.getTransportAddressUri</dd>
 
                 <dt>Last reported:</dt>
-                <dd><span class="moment-from-now" title="@node.getLastSeen">@node.getLastSeen</span></dd>
+                <dd>@DateHelper.readablePeriodFromNow(node.getLastSeen)</dd>
 
                 <dt>Last contact:</dt>
-                <dd><span class="moment-from-now" title="@node.getLastContact">@node.getLastContact</span></dd>
+                <dd>@DateHelper.readablePeriodFromNow(node.getLastContact)</dd>
 
                 <dt>Failures:</dt>
                 <dd>@node.getFailureCount</dd>

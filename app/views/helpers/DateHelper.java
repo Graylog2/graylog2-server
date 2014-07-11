@@ -43,4 +43,13 @@ public class DateHelper {
     public static Html timestampShortTZ(DateTime instant) {
         return views.html.partials.dates.instant.render(DateTools.inUserTimeZone(instant), DateTools.SHORT_DATE_FORMAT_TZ);
     }
+
+    public static Html readablePeriodFromNow(DateTime instant) {
+        return readablePeriodFromNow(instant, "");
+    }
+
+    public static Html readablePeriodFromNow(DateTime instant, String classes) {
+        return views.html.partials.dates.readable_period.render(DateTools.inUserTimeZone(instant), classes);
+    }
+
 }

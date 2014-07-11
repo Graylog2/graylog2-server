@@ -1,6 +1,7 @@
 @(currentUser: org.graylog2.restclient.models.User, dashboards: List[org.graylog2.restclient.models.dashboards.Dashboard])
 
 @import views.helpers.Permissions._
+@import views.helpers.DateHelper
 @import lib.security.RestPermissions._
 
 @main("Dashboards", sidebars.standard(currentUser), "", currentUser) {
@@ -28,7 +29,7 @@
         <div class="row-fluid node-row dashboard-row">
             <div class="pull-right">
                 Created by @views.html.partials.links.to_user.render(dashboard.getCreatorUser)
-                <span class="moment-from-now" title="@dashboard.getCreatedAt()">@dashboard.getCreatedAt()</span>
+                @DateHelper.readablePeriodFromNow(dashboard.getCreatedAt)
 
                 @if(isPermitted(DASHBOARDS_EDIT, dashboard.getId)) {
                 @helper.form(action = routes.DashboardsController.delete(dashboard.getId)) {

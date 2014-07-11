@@ -23,7 +23,7 @@ Showing the most recent alerts. This stream triggered a total of <b>@totalAlerts
         @for(alert <- alerts) {
             <tr>
                 <td>
-                    <span class="moment-from-now" title="@alert.getTriggeredAt">@alert.getTriggeredAt</span>
+                    @DateHelper.readablePeriodFromNow(alert.getTriggeredAt)
                 </td>
                 <td style="display:none">@DateHelper.timestampShortTZ(alert.getTriggeredAt)</td>
                 <td>
