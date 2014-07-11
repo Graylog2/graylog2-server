@@ -74,6 +74,12 @@ object ApplicationBuild extends Build {
     resolvers += Resolver.url("Graylog2 Play Snapshot Repository", url("http://graylog2.github.io/play2-graylog2/snapshots/"))(Resolver.ivyStylePatterns),
     resolvers += Resolver.url("Typesafe Maven Releases", url("http://repo.typesafe.com/typesafe/maven-releases"))(Resolver.mavenStylePatterns),
     resolvers += ("Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots"),
-    commands += packageSnapshot
+    commands ++= Seq(packageSnapshot),
+    resourceGenerators in Compile <+= resourceManaged in Compile map { dir =>
+      val propsFile = new File(dir, "git.properties")
+      IO.write(propsFile, "git.sha1=%s\n".format("git rev-parse HEAD" !!))
+      Seq(propsFile)
+    }
+
   ).dependsOn(restClient)
 }
