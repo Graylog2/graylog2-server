@@ -34,17 +34,21 @@ momentHelper = {
         ];
     },
 
+    _cleanDateString: function(dateString) {
+        return dateString.trim();
+    },
+
     /*
      * Parse the given string against the list of accepted formats and return a moment in the timezone
      * included in the date or the browser's local timezone.
      */
     parseFromString: function(dateString) {
-        return moment(dateString, this._getAcceptedFormats(), true);
+        return moment(this._cleanDateString(dateString), this._getAcceptedFormats(), true);
     },
 
     /* Parse the given string against the list of accepted formats and return a UTC moment. */
     parseUTCFromString: function(dateString) {
-        return moment.utc(dateString, this._getAcceptedFormats(), true);
+        return moment.utc(this._cleanDateString(dateString), this._getAcceptedFormats(), true);
     },
 
     /* Parse the given string against the list of accepted formats and return a moment in the users' local timezone. */
