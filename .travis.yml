@@ -1,7 +1,6 @@
----
 language: java
 jdk:
-  - oraclejdk7
+- oraclejdk7
 env:
   global:
   - PLAY_VERSION=2.2.2
@@ -14,20 +13,20 @@ env:
       7SvCgLvni0ewVVs8P2F9dGeG7HZ0WRJ3tcdZCcJG9IBk6xNcWAQveZ2goBKJ
       0Y0YksLljdKHv8mn02KX2tZxLVYjgzq09Dvn0+bGOzQU+TLbkPY=
 before_script:
-  - wget http://downloads.typesafe.com/play/${PLAY_VERSION}/play-${PLAY_VERSION}.zip
-  - unzip -q play-${PLAY_VERSION}.zip
-  - travis/graylog2-server.sh
-  - play-${PLAY_VERSION}/play update
+- wget http://downloads.typesafe.com/play/${PLAY_VERSION}/play-${PLAY_VERSION}.zip
+- unzip -q play-${PLAY_VERSION}.zip
+- travis/graylog2-server.sh
+- play-${PLAY_VERSION}/play update
 script: play-${PLAY_VERSION}/play test
 after_script:
-  - kill `cat $HOME/graylog2-server/graylog2-travis-server.pid`
+- kill `cat $HOME/graylog2-server/graylog2-travis-server.pid`
 after_success:
-  - play-${PLAY_VERSION}/play package-snapshot
+- play-${PLAY_VERSION}/play package-snapshot
 deploy:
   provider: s3
   access_key_id: AKIAIGYGO43W76PZMMVA
   secret_access_key:
-    secure: cYHsMgnAI08sz9G1Qb7ku2HoTaSn/OBBmjBzyYswX0/Kvb2asQcEGZGOEfYNTGOwdN6DP7p3axi5o+FPw2MLGGpBVz3tAtwYWTbzJR8kCEuGwb8N6abpdkGIn4AfifQ+vbn8zJrIB6HfGGRpDM9QnEjJFtpJO+2SjODzbZzkymE=
+    secure: YIOoh0TlzEVkjgayLKSi/a3k+CTuv4rZhouq2rDtdgURgt1D4E/GboTgjVQ76UJRU2R3deLlt9VJo4f2kwyed9p1OFTMPaeX8LU1CPx4chZDzl4a1sZG/uxfrIy/xXgPM3oGjK9X0+fV3oDPhEAqFl2WveMw/8SU06yf8MxrHrM=
   bucket: graylog2-builds
   region: eu-west-1
   skip_cleanup: true
@@ -36,8 +35,8 @@ deploy:
     repo: Graylog2/graylog2-web-interface
     jdk: oraclejdk7
 services:
-  - mongodb
-  - elasticsearch
+- mongodb
+- elasticsearch
 addons:
   sauce_connect: true
 notifications:
