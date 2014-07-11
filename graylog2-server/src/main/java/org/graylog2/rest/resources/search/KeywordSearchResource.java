@@ -25,6 +25,8 @@ import org.glassfish.jersey.server.ChunkedOutput;
 import org.graylog2.indexer.IndexHelper;
 import org.graylog2.indexer.Indexer;
 import org.graylog2.indexer.results.ScrollResult;
+import org.graylog2.indexer.searches.SearchesConfig;
+import org.graylog2.indexer.searches.SearchesConfigBuilder;
 import org.graylog2.indexer.searches.Sorting;
 import org.graylog2.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.indexer.searches.timeranges.KeywordRange;
@@ -68,23 +70,27 @@ public class KeywordSearchResource extends SearchResource {
             @ApiParam(title = "limit", description = "Maximum number of messages to return.", required = false) @QueryParam("limit") int limit,
             @ApiParam(title = "offset", description = "Offset", required = false) @QueryParam("offset") int offset,
             @ApiParam(title = "filter", description = "Filter", required = false) @QueryParam("filter") String filter,
+            @ApiParam(title = "fields", description = "Comma separated list of fields to return", required = false) @QueryParam("fields") String fields,
             @ApiParam(title = "sort", description = "Sorting (field:asc / field:desc)", required = false) @QueryParam("sort") String sort) {
         checkSearchPermission(filter, RestPermissions.SEARCHES_KEYWORD);
 
         checkQueryAndKeyword(query, keyword);
 
+        final List<String> fieldList = parseOptionalFields(fields);
         Sorting sorting = buildSorting(sort);
 
+        final SearchesConfig searchesConfig = SearchesConfigBuilder.newConfig()
+                .setQuery(query)
+                .setFilter(filter)
+                .setFields(fieldList)
+                .setRange(buildKeywordTimeRange(keyword))
+                .setLimit(limit)
+                .setOffset(offset)
+                .setSorting(sorting)
+                .build();
+
         try {
-            if (filter == null) {
-                return buildSearchResponse(
-                        indexer.searches().search(query, buildKeywordTimeRange(keyword), limit, offset, sorting)
-                );
-            } else {
-                return buildSearchResponse(
-                        indexer.searches().search(query, filter, buildKeywordTimeRange(keyword), limit, offset, sorting)
-                );
-            }
+            return buildSearchResponse(indexer.searches().search(searchesConfig));
         } catch (IndexHelper.InvalidRangeFormatException e) {
             LOG.warn("Invalid timerange parameters provided. Returning HTTP 400.", e);
             throw new WebApplicationException(400);
