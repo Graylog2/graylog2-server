@@ -95,11 +95,14 @@ public class RelativeSearchResource extends SearchResource {
         }
     }
 
-    /**
-     * CSV search result, needs to be chunked because these tend to be file exports and would cause heap problems if buffered.
-     */
     @GET @Timed
+    @ApiOperation(value = "Message search with relative timerange.",
+            notes = "Search for messages in a relative timerange, specified as seconds from now. " +
+                    "Example: 300 means search from 5 minutes ago to now.")
     @Produces("text/csv")
+    @ApiResponses(value = {
+            @ApiResponse(code = 400, message = "Invalid timerange parameters provided.")
+    })
     public ChunkedOutput<ScrollResult.ScrollChunk> searchRelativeChunked(
             @ApiParam(title = "query", description = "Query (Lucene syntax)", required = true) @QueryParam("query") String query,
             @ApiParam(title = "range", description = "Relative timeframe to search in. See method description.", required = true) @QueryParam("range") int range,
