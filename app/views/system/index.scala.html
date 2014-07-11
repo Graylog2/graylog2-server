@@ -9,6 +9,7 @@
 @import org.graylog2.restclient.models._
 @import lib.security.RestPermissions._
 @import views.helpers.Permissions._
+@import views.helpers.DateHelper
 
 @main("System", views.html.system.sidebar(), "", currentUser) {
 
@@ -77,7 +78,7 @@
                 <i class="icon icon-cog"></i>
                 Started @job.getName
                 on @partials.links.to_node(job.getNode)
-                at @job.getStartedAt()
+                at @DateHelper.timestampShortTZ(job.getStartedAt())
 
                 <span class="label label-success finished">Finished!</span>
 
@@ -130,7 +131,7 @@
             <tbody>
                 @for(message <- systemMessages) {
                     <tr>
-                        <td>@message.getTimestamp</td>
+                        <td>@DateHelper.timestampShortTZ(message.getTimestamp)</td>
                         <td>
                             <a href="@routes.NodesController.node(message.getNodeId)">
                                 @message.getNodeId

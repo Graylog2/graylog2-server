@@ -40,4 +40,7 @@ public class DateHelper {
         return views.html.partials.dates.instant.render(DateTools.inUserTimeZone(instant), DateTools.SHORT_DATE_FORMAT);
     }
 
+    public static Html timestampShortTZ(DateTime instant) {
+        return views.html.partials.dates.instant.render(DateTools.inUserTimeZone(instant), DateTools.SHORT_DATE_FORMAT_TZ);
+    }
 }
