@@ -42,7 +42,7 @@ public class InputState {
     }
 
     protected MessageInput messageInput;
-    protected String id;
+    protected final String id;
     protected InputStateType state;
     protected DateTime startedAt;
     protected String detailedMessage;
@@ -69,6 +69,10 @@ public class InputState {
 
     public MessageInput getMessageInput() {
         return messageInput;
+    }
+
+    public void setMessageInput(MessageInput messageInput) {
+        this.messageInput = messageInput;
     }
 
     public String getId() {

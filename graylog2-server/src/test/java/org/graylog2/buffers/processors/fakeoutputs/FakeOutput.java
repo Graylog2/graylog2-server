@@ -48,9 +48,9 @@ public class FakeOutput implements MessageOutput {
     }
 
     @Override
-    public void write(List<Message> messages, OutputStreamConfiguration streamConfiguration) throws Exception {
+    public void write(Message message) throws Exception {
         this.callCount++;
-        this.writeCount += messages.size();
+        this.writeCount++;
     }
 
     @Override

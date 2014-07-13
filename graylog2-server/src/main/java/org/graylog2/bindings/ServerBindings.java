@@ -122,7 +122,6 @@ public class ServerBindings extends AbstractModule {
         bind(BaseConfiguration.class).toInstance(configuration);
 
         bind(MongoConnection.class).toInstance(mongoConnection);
-        bind(OutputRegistry.class).toInstance(new OutputRegistry());
 
         ServerStatus serverStatus = new ServerStatus(configuration);
         serverStatus.addCapability(ServerStatus.Capability.SERVER);

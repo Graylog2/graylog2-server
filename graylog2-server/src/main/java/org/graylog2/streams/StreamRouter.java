@@ -50,7 +50,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class StreamRouter {
-    protected final Logger LOG = LoggerFactory.getLogger(StreamRouter.class);
+    protected final Logger LOG = LoggerFactory.getLogger(this.getClass());
 
     private final Map<String, Meter> streamIncomingMeters = Maps.newHashMap();
     private final Map<String, Timer> streamExecutionTimers = Maps.newHashMap();

@@ -61,7 +61,7 @@ public class BatchedElasticSearchOutputFlushThread extends Periodical {
 
     @Override
     public void run() {
-        for (MessageOutput output : outputRegistry.get()) {
+        for (MessageOutput output : outputRegistry.getMessageOutputs()) {
             if (output instanceof BatchedElasticSearchOutput) {
                 BatchedElasticSearchOutput batchedOutput = (BatchedElasticSearchOutput)output;
                 try {

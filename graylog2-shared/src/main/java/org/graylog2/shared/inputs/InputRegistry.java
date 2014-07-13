@@ -20,8 +20,7 @@
 package org.graylog2.shared.inputs;
 
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.graylog2.plugin.inputs.InputState;
 import org.graylog2.plugin.inputs.MessageInput;
@@ -30,9 +29,7 @@ import org.graylog2.shared.buffers.ProcessBuffer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -40,10 +37,8 @@ import java.util.concurrent.Executors;
  * @author Lennart Koopmann <lennart@torch.sh>
  */
 public abstract class InputRegistry {
-
-    protected static final Logger LOG = LoggerFactory.getLogger(InputRegistry.class);
-    protected static final Map<String, ClassLoader> classLoaders = Maps.newHashMap();
-    protected final List<InputState> inputStates = Lists.newArrayList();
+    protected final Logger LOG = LoggerFactory.getLogger(this.getClass());
+    protected final Set<InputState> inputStates = new HashSet<>();
     protected final ExecutorService executor = Executors.newCachedThreadPool(
             new ThreadFactoryBuilder().setNameFormat("inputs-%d").build()
     );
@@ -78,7 +73,37 @@ public abstract class InputRegistry {
         final InputState inputState = new InputState(input, id);
         inputStates.add(inputState);
 
-        launch(inputState);
+        return launch(input, inputState, register);
+    }
+
+    protected InputState launch(final MessageInput input, final InputState inputState, final boolean register) {
+        if (input == null)
+            throw new IllegalArgumentException("InputState has no MessageInput!");
+
+        if (!inputState.getMessageInput().equals(input))
+            throw new IllegalArgumentException("Supplied InputState already has Input which is not the one supplied.");
+
+        if (inputState.getMessageInput() == null)
+            inputState.setMessageInput(input);
+
+        executor.submit(new Runnable() {
+            @Override
+            public void run() {
+                LOG.info("Starting [{}] input with ID <{}>", input.getClass().getCanonicalName(), input.getId());
+                try {
+                    input.checkConfiguration();
+                    inputState.setState(InputState.InputStateType.STARTING);
+                    input.launch(processBuffer);
+                    inputState.setState(InputState.InputStateType.RUNNING);
+                    String msg = "Completed starting [" + input.getClass().getCanonicalName() + "] input with ID <" + input.getId() + ">";
+                    LOG.info(msg);
+                } catch (MisfireException | Exception e) {
+                    handleLaunchException(e, input, inputState);
+                } finally {
+                    finishedLaunch(inputState);
+                }
+            }
+        });
 
         return inputState;
     }
@@ -123,33 +148,11 @@ public abstract class InputRegistry {
     public InputState launch(final InputState inputState) {
         final MessageInput input = inputState.getMessageInput();
 
-        if (input == null)
-            throw new IllegalArgumentException("InputState has no MessageInput!");
-
-        executor.submit(new Runnable() {
-            @Override
-            public void run() {
-                LOG.info("Starting [{}] input with ID <{}>", input.getClass().getCanonicalName(), input.getId());
-                try {
-                    input.checkConfiguration();
-                    inputState.setState(InputState.InputStateType.STARTING);
-                    input.launch(processBuffer);
-                    inputState.setState(InputState.InputStateType.RUNNING);
-                    String msg = "Completed starting [" + input.getClass().getCanonicalName() + "] input with ID <" + input.getId() + ">";
-                    LOG.info(msg);
-                } catch (MisfireException | Exception e) {
-                    handleLaunchException(e, input, inputState);
-                } finally {
-                    finishedLaunch(inputState);
-                }
-            }
-        });
-
-        return inputState;
+        return launch(input, inputState, false);
     }
 
-    public List<InputState> getInputStates() {
-        return inputStates;
+    public Set<InputState> getInputStates() {
+        return ImmutableSet.copyOf(inputStates);
     }
 
     public InputState getInputState(String inputId) {
@@ -161,13 +164,13 @@ public abstract class InputRegistry {
         return null;
     }
 
-    public List<InputState> getRunningInputs() {
-        List<InputState> runningInputs = Lists.newArrayList();
+    public Set<InputState> getRunningInputs() {
+        Set<InputState> runningInputs = new HashSet<>();
         for (InputState inputState : inputStates) {
             if (inputState.getState() == InputState.InputStateType.RUNNING)
                 runningInputs.add(inputState);
         }
-        return inputStates;
+        return ImmutableSet.copyOf(runningInputs);
     }
 
     public boolean hasTypeRunning(Class klazz) {

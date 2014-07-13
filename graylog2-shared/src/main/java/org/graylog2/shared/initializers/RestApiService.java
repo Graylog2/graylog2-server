@@ -30,6 +30,7 @@ import org.glassfish.jersey.server.filter.EncodingFilter;
 import org.glassfish.jersey.server.internal.scanning.PackageNamesScanner;
 import org.graylog2.jersey.container.netty.NettyContainer;
 import org.graylog2.jersey.container.netty.SecurityContextFactory;
+import org.graylog2.plugin.rest.WebApplicationExceptionMapper;
 import org.graylog2.shared.BaseConfiguration;
 import org.graylog2.shared.metrics.jersey2.MetricsDynamicBinding;
 import org.graylog2.plugin.rest.AnyExceptionClassMapper;
@@ -97,7 +98,7 @@ public class RestApiService extends AbstractIdleService {
         ResourceConfig rc = new ResourceConfig()
                 .property(NettyContainer.PROPERTY_BASE_URI, configuration.getRestListenUri())
                 .registerClasses(JacksonPropertyExceptionMapper.class,
-                        AnyExceptionClassMapper.class);
+                        AnyExceptionClassMapper.class, WebApplicationExceptionMapper.class);
 
         for (Class<? extends DynamicFeature> dynamicFeatureClass : dynamicFeatures)
             rc.registerClasses(dynamicFeatureClass);

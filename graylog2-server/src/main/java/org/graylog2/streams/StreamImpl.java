@@ -124,7 +124,7 @@ public class StreamImpl extends PersistedImpl implements Stream {
 	}
 
     @JsonValue
-    private Map<String, Object> asMap() {
+    public Map<String, Object> asMap() {
         // We work on the result a bit to allow correct JSON serializing.
         Map<String, Object> result = Maps.newHashMap(fields);
         result.remove("_id");

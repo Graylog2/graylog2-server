@@ -19,50 +19,100 @@
  */
 package org.graylog2.outputs;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
-import org.graylog2.plugin.configuration.Configuration;
+import com.google.common.collect.ImmutableSet;
+import org.graylog2.database.ValidationException;
 import org.graylog2.plugin.outputs.MessageOutput;
-import org.graylog2.plugin.outputs.MessageOutputConfigurationException;
+import org.graylog2.plugin.streams.Stream;
+import org.graylog2.plugin.streams.StreamOutput;
+import org.graylog2.streams.StreamOutputService;
+import org.graylog2.streams.outputs.CreateStreamOutputRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+import javax.ws.rs.BadRequestException;
 import java.util.HashMap;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
+@Singleton
 public class OutputRegistry {
 
-    private static final Logger LOG = LoggerFactory.getLogger(OutputRegistry.class);
+    private final Logger LOG = LoggerFactory.getLogger(this.getClass());
 
-    private List<MessageOutput> outputs;
+    private final Map<Stream, Set<MessageOutput>> registeredMessageOutputs;
+    private final MessageOutput defaultMessageOutput;
+    private final StreamOutputService streamOutputService;
 
-    public OutputRegistry() {
-        outputs = Lists.newArrayList();
+    @Inject
+    public OutputRegistry(@DefaultMessageOutput MessageOutput defaultMessageOutput,
+                          StreamOutputService streamOutputService) {
+        this.defaultMessageOutput = defaultMessageOutput;
+        this.streamOutputService = streamOutputService;
+        this.registeredMessageOutputs = new HashMap<>();
     }
 
-    public void register(MessageOutput output) {
-        this.outputs.add(output);
-    }
+    public StreamOutput createOutput(StreamOutput request) {
+        final StreamOutput streamOutput = streamOutputService.create(request);
 
-    public void initialize() {
-        for(MessageOutput o : outputs) {
-            try {
-                o.initialize(new Configuration(new HashMap<String, Object>()));
-                LOG.info("Initialized output <{}>.", o.getClass().getCanonicalName());
-            } catch (MessageOutputConfigurationException e) {
-                LOG.error("Could not initialize output <{}>", o.getClass().getCanonicalName(), e);
-            }
+        final String id;
+        try {
+            id = streamOutputService.save(streamOutput);
+        } catch (ValidationException e) {
+            LOG.error("Validation error.", e);
+            throw new BadRequestException(e);
         }
+
+        return streamOutput;
     }
 
-    public List<MessageOutput> get() {
-        return new ImmutableList.Builder<MessageOutput>().addAll(outputs).build();
+    public void registerForStream(Stream stream, MessageOutput messageOutput) {
+        final Set<MessageOutput> messageOutputs;
+        if (this.registeredMessageOutputs.get(stream) == null) {
+            messageOutputs = new HashSet<>();
+        } else {
+            messageOutputs = this.registeredMessageOutputs.get(stream);
+        }
+
+        messageOutputs.add(messageOutput);
     }
 
-    public int count() {
-        return outputs.size();
+    public Set<MessageOutput> getMessageOutputsForStream(Stream stream) {
+        Set<MessageOutput> result = new HashSet<>();
+        result.add(defaultMessageOutput);
+        result.addAll(this.registeredMessageOutputs.get(stream));
+
+        return ImmutableSet.copyOf(result);
+    }
+
+    public Set<MessageOutput> getMessageOutputs() {
+        Set<MessageOutput> result = new HashSet<>();
+        result.add(defaultMessageOutput);
+
+        for (Set<MessageOutput> messageOutputs : this.registeredMessageOutputs.values()) {
+            result.addAll(messageOutputs);
+        }
+
+        return ImmutableSet.copyOf(result);
+    }
+
+    public void removeMessageOutput(MessageOutput messageOutput) {
+        if (messageOutput.equals(defaultMessageOutput))
+            throw new IllegalArgumentException("Cannot remove default message output");
+
+        for (Set<MessageOutput> messageOutputs : registeredMessageOutputs.values())
+            messageOutputs.remove(messageOutput);
+    }
+
+    public void removeMessageOutputFromStream(MessageOutput messageOutput, Stream stream) {
+        if (messageOutput.equals(defaultMessageOutput))
+            throw new IllegalArgumentException("Cannot remove default message output");
+
+        registeredMessageOutputs.get(stream).remove(messageOutput);
     }
 }

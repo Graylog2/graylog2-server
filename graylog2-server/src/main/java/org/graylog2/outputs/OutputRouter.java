@@ -20,46 +20,62 @@
 
 package org.graylog2.outputs;
 
-import com.google.common.collect.Lists;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.outputs.MessageOutput;
 import org.graylog2.plugin.streams.Stream;
-import org.graylog2.streams.StreamImpl;
+import org.graylog2.plugin.streams.StreamOutput;
+import org.graylog2.streams.StreamOutputService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.util.List;
+import javax.inject.Inject;
+import java.util.*;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class OutputRouter {
-    
-    public static String ES_CLASS_NAME = BatchedElasticSearchOutput.class.getCanonicalName();
-    
-    public static List<Message> getMessagesForOutput(List<Message> msgs, String outputTypeClass) {
-        List<Message> filteredMessages = Lists.newArrayList();
-        
-        for (Message msg : msgs) {
-            if (checkRouting(outputTypeClass, msg)) {
-                filteredMessages.add(msg);
+    protected final Logger LOG = LoggerFactory.getLogger(this.getClass());
+
+    private final MessageOutput defaultMessageOutput;
+    private final StreamOutputService streamOutputService;
+    private final MessageOutputFactory messageOutputFactory;
+
+    @Inject
+    public OutputRouter(@DefaultMessageOutput MessageOutput defaultMessageOutput,
+                        StreamOutputService streamOutputService,
+                        MessageOutputFactory messageOutputFactory) {
+        this.defaultMessageOutput = defaultMessageOutput;
+        this.streamOutputService = streamOutputService;
+        this.messageOutputFactory = messageOutputFactory;
+    }
+
+    protected Map<StreamOutput, MessageOutput> getAllConfiguredMessageOutputs() {
+        Map<StreamOutput, MessageOutput> result = new HashMap<>();
+
+        for (StreamOutput streamOutput : streamOutputService.loadAll()) {
+            final MessageOutput messageOutput;
+            try {
+                messageOutput = messageOutputFactory.fromStreamOutput(streamOutput);
+                result.put(streamOutput, messageOutput);
+            } catch (Exception e) {
+                LOG.error("Unable to instantiate MessageOutput: " + e);
             }
         }
-        
-        return filteredMessages;
+
+        return result;
     }
-    
-    private static boolean checkRouting(String outputTypeClass, Message msg) {
-        // ElasticSearch gets all messages.
-        if (outputTypeClass.equals(ES_CLASS_NAME)) {
-            return true;
-        }
-        
-        for (Stream stream : msg.getStreams()) {
-            if (((StreamImpl) stream).hasConfiguredOutputs(outputTypeClass)) {
-                return true;
-            }
-        }
-        
-        // No stream had that output configured.
-        return false;
+
+    public Set<MessageOutput> getOutputsForMessage(Message msg) {
+        Set<MessageOutput> result = new HashSet<>();
+
+        result.add(defaultMessageOutput);
+
+        Map<StreamOutput, MessageOutput> configuredMessageOutputs = getAllConfiguredMessageOutputs();
+        for (Stream stream : msg.getStreams())
+            for (StreamOutput streamOutput : streamOutputService.loadAllForStream(stream))
+                result.add(configuredMessageOutputs.get(streamOutput));
+
+        return result;
     }
-    
 }
