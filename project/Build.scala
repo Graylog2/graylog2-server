@@ -15,6 +15,13 @@ object ApplicationBuild extends Build {
   // use this to potentially add a timestamp to the built package name
   def packageSnapshot = Command.command("package-snapshot") { state =>
     val extracted = Project extract state
+
+    val configFile: File = new File("conf/graylog2-web-interface.conf")
+    val exampleConfigFile: File = new File("misc/graylog2-web-interface.conf.example")
+
+    // this will overwrite the config file with the sample one
+    IO.copyFile(exampleConfigFile, configFile, preserveLastModified = true)
+
     val task: (State, File) = extracted.runTask(packageZipTarball in Universal, state)
 
     val snapshot = extracted.getOpt(isSnapshot).get // getting current version
@@ -31,7 +38,6 @@ object ApplicationBuild extends Build {
       packageDir.mkdir()
       task._2.renameTo(new File(packageDir, task._2.getName.replace(".tgz", "-" + timestamp + ".tgz")))
     }
-
     task._1
   }
 
