@@ -4,6 +4,8 @@
 @import controllers.routes;
 @import views.helpers.Permissions.isPermitted
 @import lib.security.RestPermissions._
+@import org.joda.time.DateTime
+@import org.joda.time.DateTimeZone
 
 @main("Node " + node.getNodeId, views.html.system.sidebar(), "", currentUser) {
 
@@ -155,6 +157,9 @@
 
                 <dt>JVM:</dt>
                 <dd>PID @node.getPid, @node.getJVMDescription</dd>
+
+                <dt>Time:</dt>
+                <dd>@DateHelper.timestampShortTZ(DateTime.now(DateTimeZone.forID(node.getTimezone())), false)</dd>
             </dl>
         </div>
 

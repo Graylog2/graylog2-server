@@ -66,6 +66,7 @@ public class SystemController extends AuthenticatedController {
             List<SystemMessage> systemMessages = permittedSystemMessages ? clusterService.getSystemMessages(page - 1) : Collections.<SystemMessage>emptyList();
             ESClusterHealth clusterHealth = isPermitted(INDEXERCLUSTER_READ) ? clusterService.getESClusterHealth() : null;
             long indexFailureCount = isPermitted(INDICES_FAILURES) ? clusterService.getIndexerFailureCountLast24Hours() : -1;
+            String masterTimezone = nodeService.loadMasterNode().getTimezone();
 
             return ok(views.html.system.index.render(
                     currentUser(),
@@ -75,7 +76,8 @@ public class SystemController extends AuthenticatedController {
                     totalSystemMessages,
                     page,
                     notifications,
-                    indexFailureCount
+                    indexFailureCount,
+                    masterTimezone
             ));
         } catch (IOException e) {
             return status(504, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));

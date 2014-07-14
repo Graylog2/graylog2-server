@@ -41,7 +41,16 @@ public class DateHelper {
     }
 
     public static Html timestampShortTZ(DateTime instant) {
-        return views.html.partials.dates.instant.render(DateTools.inUserTimeZone(instant), DateTools.SHORT_DATE_FORMAT_TZ);
+        return timestampShortTZ(instant, true);
+    }
+
+    public static Html timestampShortTZ(DateTime instant, boolean inUserTZ) {
+        DateTime date = instant;
+
+        if (inUserTZ) {
+            date = DateTools.inUserTimeZone(instant);
+        }
+        return views.html.partials.dates.instant.render(date, DateTools.SHORT_DATE_FORMAT_TZ);
     }
 
     public static Html readablePeriodFromNow(DateTime instant) {

@@ -953,6 +953,16 @@ $(document).ready(function() {
     $('input, textarea').placeholder();
 
     $(".node-state").tooltip();
+
+    datetimeFields = $(".browser-datetime")
+    if(datetimeFields.length > 0) {
+        datetimeFields.each(function() {
+            var currentDatetime = moment();
+            $(this).attr("title", currentDatetime.format(momentHelper.DATE_FORMAT_ISO));
+            $(this).attr("datetime", currentDatetime.format(momentHelper.DATE_FORMAT_ISO));
+            $(this).text(currentDatetime.format(momentHelper.DATE_FORMAT_TZ));
+        });
+    }
 });
 
 function showError(message) {
