@@ -42,4 +42,5 @@ public class SystemOverviewResponse {
     @SerializedName("lb_status")
     public String lbStatus;
 
+    public String timezone;
 }
