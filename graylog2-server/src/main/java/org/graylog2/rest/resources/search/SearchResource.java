@@ -121,6 +121,13 @@ public class SearchResource extends RestResource {
             LOG.warn("Missing fields parameter. Returning HTTP 400");
             throw new BadRequestException("Missing required parameter `fields`");
         }
+        return parseOptionalFields(fields);
+    }
+
+    protected List<String> parseOptionalFields(String fields) {
+        if (fields == null || fields.isEmpty()) {
+            return null;
+        }
         final Iterable<String> split = Splitter.on(',').omitEmptyStrings().trimResults().split(fields);
         final ArrayList<String> fieldList = Lists.newArrayList("timestamp");
         // skip the mandatory field timestamp
