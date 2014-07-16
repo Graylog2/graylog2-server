@@ -30,6 +30,7 @@ import org.glassfish.jersey.server.filter.EncodingFilter;
 import org.glassfish.jersey.server.internal.scanning.PackageNamesScanner;
 import org.graylog2.jersey.container.netty.NettyContainer;
 import org.graylog2.jersey.container.netty.SecurityContextFactory;
+import org.graylog2.plugin.rest.WebApplicationExceptionMapper;
 import org.graylog2.shared.BaseConfiguration;
 import org.graylog2.shared.metrics.jersey2.MetricsDynamicBinding;
 import org.graylog2.plugin.rest.AnyExceptionClassMapper;
@@ -50,6 +51,7 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import javax.ws.rs.container.ContainerResponseFilter;
 import javax.ws.rs.container.DynamicFeature;
+import javax.ws.rs.ext.ExceptionMapper;
 import java.net.InetSocketAddress;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
@@ -64,17 +66,20 @@ public class RestApiService extends AbstractIdleService {
     private final SecurityContextFactory securityContextFactory;
     private final Set<Class<? extends DynamicFeature>> dynamicFeatures;
     private final Set<Class<? extends ContainerResponseFilter>> containerResponseFilters;
+    private final Set<Class<? extends ExceptionMapper>> exceptionMappers;
     private ServerBootstrap bootstrap;
 
     @Inject
     public RestApiService(BaseConfiguration configuration,
                           @$Nullable SecurityContextFactory securityContextFactory,
                           Set<Class<? extends DynamicFeature>> dynamicFeatures,
-                          Set<Class<? extends ContainerResponseFilter>> containerResponseFilters) {
+                          Set<Class<? extends ContainerResponseFilter>> containerResponseFilters,
+                          Set<Class<? extends ExceptionMapper>> exceptionMappers) {
         this.configuration = configuration;
         this.securityContextFactory = securityContextFactory;
         this.dynamicFeatures = dynamicFeatures;
         this.containerResponseFilters = containerResponseFilters;
+        this.exceptionMappers = exceptionMappers;
     }
 
     @Override
@@ -97,7 +102,10 @@ public class RestApiService extends AbstractIdleService {
         ResourceConfig rc = new ResourceConfig()
                 .property(NettyContainer.PROPERTY_BASE_URI, configuration.getRestListenUri())
                 .registerClasses(JacksonPropertyExceptionMapper.class,
-                        AnyExceptionClassMapper.class);
+                        AnyExceptionClassMapper.class, WebApplicationExceptionMapper.class);
+
+        for (Class<? extends ExceptionMapper> exceptionMapper : exceptionMappers)
+            rc.registerClasses(exceptionMapper);
 
         for (Class<? extends DynamicFeature> dynamicFeatureClass : dynamicFeatures)
             rc.registerClasses(dynamicFeatureClass);
@@ -105,8 +113,9 @@ public class RestApiService extends AbstractIdleService {
         for (Class<? extends ContainerResponseFilter> responseFilter : containerResponseFilters)
             rc.registerClasses(responseFilter);
 
+        ObjectMapperProvider objectMapperProvider = new ObjectMapperProvider();
         rc.register(ObjectMapperProvider.class)
-            .register(JacksonJsonProvider.class)
+            .register(new JacksonJsonProvider(objectMapperProvider.getContext(null)))
             .registerFinder(new PackageNamesScanner(new String[]{"org.graylog2.rest.resources",
                     "org.graylog2.radio.rest.resources", "org.graylog2.shared.rest.resources"}, true));
 

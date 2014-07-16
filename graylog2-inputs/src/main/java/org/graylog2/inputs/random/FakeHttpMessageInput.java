@@ -87,6 +87,7 @@ public class FakeHttpMessageInput extends MessageInput {
                         break;
                     }
                 }
+                stopRequested = false;
             }
         });
         t.start();

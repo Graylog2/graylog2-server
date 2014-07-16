@@ -43,6 +43,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.ws.rs.ForbiddenException;
+import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.*;
@@ -57,7 +58,8 @@ public abstract class RestResource {
 	
 	private static final Logger LOG = LoggerFactory.getLogger(RestResource.class);
 
-    protected final ObjectMapper objectMapper = new ObjectMapper();
+    @Inject
+    protected ObjectMapper objectMapper;
 
     @Inject
     protected ServerStatus serverStatus;
@@ -74,10 +76,10 @@ public abstract class RestResource {
           * TODO THIS IS EXTREMELY WRONG AND WILL LEAD TO BUGS. NEED TO HAVE IT INJECTED ONCE, AND THEN REUSED (see ObjectMapperProvider)
           * but everyone and their grandmother are using this directly in resource objects instead of relying on Jackson :(
           */
-        objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        /*objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
         objectMapper.setPropertyNamingStrategy(PropertyNamingStrategy.CAMEL_CASE_TO_LOWER_CASE_WITH_UNDERSCORES);
         objectMapper.registerModule(new JodaModule());
-        objectMapper.registerModule(new GuavaModule());
+        objectMapper.registerModule(new GuavaModule());*/
     }
 
     @QueryParam("pretty")
@@ -154,7 +156,7 @@ public abstract class RestResource {
             }
         } catch (JsonProcessingException e) {
             LOG.error("Error while generating JSON", e);
-            throw new WebApplicationException(e, Response.Status.INTERNAL_SERVER_ERROR);
+            throw new InternalServerErrorException(e);
         }
     }
 

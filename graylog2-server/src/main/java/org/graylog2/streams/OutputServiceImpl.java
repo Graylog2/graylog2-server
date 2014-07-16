@@ -1,0 +1,79 @@
+package org.graylog2.streams;
+
+import com.mongodb.BasicDBObject;
+import com.mongodb.DBObject;
+import org.bson.types.ObjectId;
+import org.graylog2.database.MongoConnection;
+import org.graylog2.database.NotFoundException;
+import org.graylog2.database.PersistedServiceImpl;
+import org.graylog2.database.ValidationException;
+import org.graylog2.plugin.streams.Output;
+import org.graylog2.plugin.streams.Stream;
+import org.graylog2.streams.outputs.CreateOutputRequest;
+import org.joda.time.DateTime;
+
+import javax.inject.Inject;
+import java.util.*;
+
+/**
+ * @author Dennis Oelkers <dennis@torch.sh>
+ */
+public class OutputServiceImpl extends PersistedServiceImpl implements OutputService {
+    @Inject
+    public OutputServiceImpl(MongoConnection mongoConnection) {
+        super(mongoConnection);
+    }
+
+    @Override
+    public Output load(String streamOutputId) throws NotFoundException {
+        DBObject o = get(OutputImpl.class, streamOutputId);
+
+        if (o == null) {
+            throw new NotFoundException("Output <" + streamOutputId + "> not found!");
+        }
+
+        return new OutputImpl((ObjectId)o.get("_id"), o.toMap());
+    }
+
+    @Override
+    public Set<Output> loadAll() {
+        return loadAll(new HashMap<String, Object>());
+    }
+
+    protected Set<Output> loadAll(Map<String, Object> additionalQueryOpts) {
+        Set<Output> outputs = new HashSet<>();
+
+        DBObject query = new BasicDBObject();
+
+        // putAll() is not working with BasicDBObject.
+        for (Map.Entry<String, Object> o : additionalQueryOpts.entrySet()) {
+            query.put(o.getKey(), o.getValue());
+        }
+
+        List<DBObject> results = query(OutputImpl.class, query);
+        for (DBObject o : results)
+            outputs.add(new OutputImpl((ObjectId) o.get("_id"), o.toMap()));
+
+        return outputs;
+    }
+
+    @Override
+    public Set<Output> loadForStream(Stream stream) {
+        return stream.getOutputs();
+    }
+
+    @Override
+    public Output create(Output request) throws ValidationException {
+        final String id = save(request);
+        if (request instanceof OutputImpl) {
+            OutputImpl impl = OutputImpl.class.cast(request);
+            impl.setId(id);
+        }
+        return request;
+    }
+
+    @Override
+    public Output create(CreateOutputRequest request) throws ValidationException {
+        return create(new OutputImpl(request.title, request.type, request.configuration, DateTime.now().toDate(), request.creatorUserId));
+    }
+}

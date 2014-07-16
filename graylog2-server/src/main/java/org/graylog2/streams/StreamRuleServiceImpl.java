@@ -19,6 +19,7 @@
 
 package org.graylog2.streams;
 
+import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
@@ -28,6 +29,7 @@ import org.graylog2.database.NotFoundException;
 import org.graylog2.database.PersistedServiceImpl;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.streams.StreamRule;
+import org.graylog2.rest.resources.streams.rules.requests.CreateStreamRuleRequest;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,7 +54,29 @@ public class StreamRuleServiceImpl extends PersistedServiceImpl implements Strea
 
     @Override
     public List<StreamRule> loadForStream(Stream stream) throws NotFoundException {
-        ObjectId id = new ObjectId(stream.getId());
+        return loadForStreamId(stream.getId());
+    }
+
+    @Override
+    public StreamRule create(Map<String, Object> data) {
+        return new StreamRuleImpl(data);
+    }
+
+    @Override
+    public StreamRule create(String streamid, CreateStreamRuleRequest cr) {
+        Map<String, Object> streamRuleData = Maps.newHashMap();
+        streamRuleData.put("type", cr.type);
+        streamRuleData.put("value", cr.value);
+        streamRuleData.put("field", cr.field);
+        streamRuleData.put("inverted", cr.inverted);
+        streamRuleData.put("stream_id", new ObjectId(streamid));
+
+        return new StreamRuleImpl(streamRuleData);
+    }
+
+    @Override
+    public List<StreamRule> loadForStreamId(String streamId) throws NotFoundException {
+        ObjectId id = new ObjectId(streamId);
         final List<StreamRule> streamRules = new ArrayList<StreamRule>();
         final List<DBObject> respStreamRules = query(StreamRuleImpl.class,
                 new BasicDBObject("stream_id", id)
@@ -63,10 +87,5 @@ public class StreamRuleServiceImpl extends PersistedServiceImpl implements Strea
         }
 
         return streamRules;
-    }
-
-    @Override
-    public StreamRule create(Map<String, Object> data) {
-        return new StreamRuleImpl(data);
     }
 }

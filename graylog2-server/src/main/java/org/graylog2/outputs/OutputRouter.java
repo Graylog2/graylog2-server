@@ -20,46 +20,78 @@
 
 package org.graylog2.outputs;
 
-import com.google.common.collect.Lists;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.outputs.MessageOutput;
+import org.graylog2.plugin.streams.Output;
 import org.graylog2.plugin.streams.Stream;
-import org.graylog2.streams.StreamImpl;
+import org.graylog2.streams.OutputService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.util.List;
+import javax.inject.Inject;
+import java.util.*;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class OutputRouter {
-    
-    public static String ES_CLASS_NAME = BatchedElasticSearchOutput.class.getCanonicalName();
-    
-    public static List<Message> getMessagesForOutput(List<Message> msgs, String outputTypeClass) {
-        List<Message> filteredMessages = Lists.newArrayList();
-        
-        for (Message msg : msgs) {
-            if (checkRouting(outputTypeClass, msg)) {
-                filteredMessages.add(msg);
-            }
-        }
-        
-        return filteredMessages;
+    protected final Logger LOG = LoggerFactory.getLogger(this.getClass());
+
+    private final MessageOutput defaultMessageOutput;
+    private final OutputService outputService;
+    private final MessageOutputFactory messageOutputFactory;
+    private final Map<String, MessageOutput> runningMessageOutputs;
+    private final Map<Stream, List<String>> streamRouteMap;
+
+    @Inject
+    public OutputRouter(@DefaultMessageOutput MessageOutput defaultMessageOutput,
+                        OutputService outputService,
+                        MessageOutputFactory messageOutputFactory) {
+        this.defaultMessageOutput = defaultMessageOutput;
+        this.outputService = outputService;
+        this.messageOutputFactory = messageOutputFactory;
+        this.runningMessageOutputs = new HashMap<>();
+        this.streamRouteMap = new HashMap<>();
     }
-    
-    private static boolean checkRouting(String outputTypeClass, Message msg) {
-        // ElasticSearch gets all messages.
-        if (outputTypeClass.equals(ES_CLASS_NAME)) {
-            return true;
-        }
-        
-        for (Stream stream : msg.getStreams()) {
-            if (((StreamImpl) stream).hasConfiguredOutputs(outputTypeClass)) {
-                return true;
-            }
-        }
-        
-        // No stream had that output configured.
-        return false;
+
+    protected Set<Output> getConfiguredOutputs() {
+        return outputService.loadAll();
     }
-    
+
+    protected Map<String, MessageOutput> getRunningMessageOutputs() {
+        for (Output output : getConfiguredOutputs()) {
+            if (runningMessageOutputs.containsKey(output.getId()))
+                continue;
+
+            runningMessageOutputs.put(output.getId(), launchOutput(output));
+        }
+
+        return runningMessageOutputs;
+    }
+
+    protected MessageOutput launchOutput(Output output) {
+        return messageOutputFactory.fromStreamOutput(output);
+    }
+
+    protected Set<MessageOutput> getMessageOutputsForStream(Stream stream) {
+        Set<MessageOutput> result = new HashSet<>();
+        for (Output output : stream.getOutputs()) {
+            final MessageOutput messageOutput = getRunningMessageOutputs().get(output.getId());
+            if (messageOutput != null)
+                result.add(messageOutput);
+        }
+
+        return result;
+    }
+
+    public Set<MessageOutput> getOutputsForMessage(Message msg) {
+        Set<MessageOutput> result = new HashSet<>();
+
+        result.add(defaultMessageOutput);
+
+        for (Stream stream : msg.getStreams())
+            result.addAll(getMessageOutputsForStream(stream));
+
+        return result;
+    }
 }

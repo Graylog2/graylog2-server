@@ -23,6 +23,7 @@ import org.graylog2.plugin.database.Persisted;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  *
@@ -47,4 +48,8 @@ public interface Stream extends Persisted {
     public Map<String, Object> asMap(List<StreamRule> streamRules);
 
     public String toString();
+
+    public List<StreamRule> getStreamRules();
+
+    public Set<Output> getOutputs();
 }

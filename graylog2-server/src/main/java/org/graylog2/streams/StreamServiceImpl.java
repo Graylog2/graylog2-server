@@ -26,39 +26,35 @@ import com.mongodb.DBObject;
 import org.bson.types.ObjectId;
 import org.graylog2.alerts.AbstractAlertCondition;
 import org.graylog2.alerts.AlertService;
-import org.graylog2.alerts.AlertServiceImpl;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.database.PersistedServiceImpl;
 import org.graylog2.database.ValidationException;
 import org.graylog2.plugin.alarms.AlertCondition;
 import org.graylog2.plugin.database.EmbeddedPersistable;
+import org.graylog2.plugin.streams.Output;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.streams.StreamRule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class StreamServiceImpl extends PersistedServiceImpl implements StreamService {
-    private static final Logger LOG = LoggerFactory.getLogger(StreamServiceImpl.class);
+    private final Logger LOG = LoggerFactory.getLogger(this.getClass());
     private final StreamRuleService streamRuleService;
     private final AlertService alertService;
-
-    public StreamServiceImpl(MongoConnection mongoConnection) {
-        this(mongoConnection,
-                new StreamRuleServiceImpl(mongoConnection),
-                new AlertServiceImpl(mongoConnection));
-    }
+    private final OutputService outputService;
 
     @Inject
-    public StreamServiceImpl(MongoConnection mongoConnection, StreamRuleService streamRuleService, AlertService alertService) {
+    public StreamServiceImpl(MongoConnection mongoConnection,
+                             StreamRuleService streamRuleService,
+                             AlertService alertService,
+                             OutputService outputService) {
         super(mongoConnection);
         this.streamRuleService = streamRuleService;
         this.alertService = alertService;
+        this.outputService = outputService;
     }
 
     @SuppressWarnings("unchecked")
@@ -66,10 +62,20 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
         DBObject o = get(StreamImpl.class, id);
 
         if (o == null) {
-            throw new NotFoundException();
+            throw new NotFoundException("Stream <" + id + "> not found!");
         }
 
-        return new StreamImpl((ObjectId) o.get("_id"), o.toMap());
+        List<StreamRule> streamRules = streamRuleService.loadForStreamId(id.toStringMongod());
+
+        List<ObjectId> outputIds = (List<ObjectId>)o.get("outputs");
+        Set<Output> outputs = loadOutputsForStreamId(outputIds);
+
+        return new StreamImpl((ObjectId) o.get("_id"), o.toMap(), streamRules, outputs);
+    }
+
+    @Override
+    public Stream create(Map<String, Object> fields) {
+        return new StreamImpl(fields);
     }
 
     public Stream load(String id) throws NotFoundException {
@@ -104,7 +110,17 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
 
         List<DBObject> results = query(StreamImpl.class, query);
         for (DBObject o : results) {
-            streams.add(new StreamImpl((ObjectId) o.get("_id"), o.toMap()));
+            String id = o.get("_id").toString();
+            List<StreamRule> streamRules = null;
+            try {
+                streamRules = streamRuleService.loadForStreamId(id);
+            } catch (NotFoundException e) {
+                LOG.info("Exception while loading stream rules: " + e);
+            }
+
+            final Set<Output> outputs = loadOutputsForStreamId((List<ObjectId>)o.get("outputs"));
+
+            streams.add(new StreamImpl((ObjectId) o.get("_id"), o.toMap(), streamRules, outputs));
         }
 
         return streams;
@@ -117,6 +133,20 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
         }};
 
         return loadAll(queryOpts);
+    }
+
+    protected Set<Output> loadOutputsForStreamId(List<ObjectId> outputIds) {
+        Set<Output> result = new HashSet<>();
+        if (outputIds != null)
+            for (ObjectId outputId : outputIds)
+                try {
+                    result.add(outputService.load(outputId.toStringMongod()));
+                } catch (NotFoundException e) {
+                    LOG.warn("Nonexisting output <{}> referenced from stream <{}>!", outputId.toStringMongod());
+                }
+
+        return result;
+
     }
 
     public void destroy(Stream stream) throws NotFoundException {
@@ -229,6 +259,22 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
         collection(stream).update(
                 new BasicDBObject("_id", new ObjectId(stream.getId())),
                 new BasicDBObject("$pull", new BasicDBObject("alert_receivers." + type, name))
+        );
+    }
+
+    @Override
+    public void addOutput(Stream stream, Output output) {
+        collection(stream).update(
+                new BasicDBObject("_id", new ObjectId(stream.getId())),
+                new BasicDBObject("$addToSet", new BasicDBObject("outputs", new ObjectId(output.getId())))
+        );
+    }
+
+    @Override
+    public void removeOutput(Stream stream, Output output) {
+        collection(stream).update(
+                new BasicDBObject("_id", new ObjectId(stream.getId())),
+                new BasicDBObject("$pull", new BasicDBObject("outputs", new ObjectId(output.getId())))
         );
     }
 }

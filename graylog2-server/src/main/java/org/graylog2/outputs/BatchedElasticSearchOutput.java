@@ -46,9 +46,9 @@ public class BatchedElasticSearchOutput extends ElasticSearchOutput {
     }
 
     @Override
-    public void write(List<Message> messages, OutputStreamConfiguration streamConfig) throws Exception {
+    public void write(Message message) throws Exception {
         synchronized (this.buffer) {
-            this.buffer.addAll(messages);
+            this.buffer.add(message);
             if (this.buffer.size() >= maxBufferSize) {
                 flush();
             }
@@ -59,7 +59,8 @@ public class BatchedElasticSearchOutput extends ElasticSearchOutput {
         LOG.debug("[{}] Starting flushing {} messages", Thread.currentThread(), mybuffer.size());
 
         try(Timer.Context context = this.processTime.time()) {
-            super.write(mybuffer, null);
+            for (Message message : mybuffer)
+                super.write(message);
             this.batchSize.update(mybuffer.size());
             this.bufferFlushes.mark();
         } catch (Exception e) {

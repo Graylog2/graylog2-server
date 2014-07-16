@@ -32,4 +32,6 @@ public interface Persisted {
     Map<String, Object> getFields();
     Map<String, Validator> getValidations();
     Map<String, Validator> getEmbeddedValidations(String key);
+
+    Map<String, Object> asMap();
 }

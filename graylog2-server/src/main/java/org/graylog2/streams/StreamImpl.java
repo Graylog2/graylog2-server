@@ -30,6 +30,7 @@ import org.graylog2.database.validators.FilledStringValidator;
 import org.graylog2.database.validators.MapValidator;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.database.validators.Validator;
+import org.graylog2.plugin.streams.Output;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.streams.StreamRule;
 import org.joda.time.DateTime;
@@ -52,26 +53,41 @@ public class StreamImpl extends PersistedImpl implements Stream {
 
     private static final Logger LOG = LoggerFactory.getLogger(StreamImpl.class);
     public static final String EMBEDDED_ALERT_CONDITIONS = "alert_conditions";
+    private final List<StreamRule> streamRules;
+    private final Set<Output> outputs;
 
     public StreamImpl(Map<String, Object> fields) {
     	super(fields);
+        this.streamRules = null;
+        this.outputs = null;
     }
 
     protected StreamImpl(ObjectId id, Map<String, Object> fields) {
     	super(id, fields);
+        this.streamRules = null;
+        this.outputs = null;
     }
 
-    public Set<Map<String, String>> getOutputConfigurations(String className) {
-    	return null;
-    }
-    
-    public boolean hasConfiguredOutputs(String typeClass) {
-    	return false;
+    public StreamImpl(ObjectId id, Map<String, Object> fields, List<StreamRule> streamRules, Set<Output> outputs) {
+        super(id, fields);
+
+        this.streamRules = streamRules;
+        this.outputs = outputs;
     }
 
     @Override
     public String toString() {
         return this.id.toString() + ": \"" + this.getTitle() + "\"";
+    }
+
+    @Override
+    public List<StreamRule> getStreamRules() {
+        return this.streamRules;
+    }
+
+    @Override
+    public Set<Output> getOutputs() {
+        return this.outputs;
     }
 
     @Override
@@ -124,13 +140,15 @@ public class StreamImpl extends PersistedImpl implements Stream {
 	}
 
     @JsonValue
-    private Map<String, Object> asMap() {
+    public Map<String, Object> asMap() {
         // We work on the result a bit to allow correct JSON serializing.
         Map<String, Object> result = Maps.newHashMap(fields);
         result.remove("_id");
         result.put("id", ((ObjectId) fields.get("_id")).toStringMongod());
         result.remove("created_at");
         result.put("created_at", (Tools.getISO8601String((DateTime) fields.get("created_at"))));
+        result.put("rules", streamRules);
+        result.put("outputs", outputs);
         return result;
     }
 

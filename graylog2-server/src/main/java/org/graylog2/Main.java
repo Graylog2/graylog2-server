@@ -139,7 +139,8 @@ public final class Main extends NodeRunner {
                 new ServerMessageInputBindings(),
                 new MessageFilterBindings(),
                 new AlarmCallbackBindings(),
-                new InitializerBindings());
+                new InitializerBindings(),
+                new MessageOutputBindings());
         LOG.debug("Adding plugin modules: " + pluginModules);
         bindingsModules.addAll(pluginModules);
         Injector injector = Guice.createInjector(bindingsModules);
@@ -239,10 +240,6 @@ public final class Main extends NodeRunner {
 
         // propagate default size to input plugins
         MessageInput.setDefaultRecvBufferSize(configuration.getUdpRecvBufferSizes());
-
-        // Register outputs.
-        final OutputRegistry outputRegistry = injector.getInstance(OutputRegistry.class);
-        outputRegistry.register(injector.getInstance(BatchedElasticSearchOutput.class));
 
         // Start services.
         final ServiceManagerListener serviceManagerListener = injector.getInstance(ServiceManagerListener.class);

@@ -19,7 +19,7 @@
 
 package org.graylog2.radio.bindings;
 
-import com.beust.jcommander.internal.Sets;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.AbstractModule;
 import com.google.inject.TypeLiteral;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
@@ -36,10 +36,12 @@ import org.graylog2.radio.transports.amqp.AMQPProducer;
 import org.graylog2.radio.transports.kafka.KafkaProducer;
 import org.graylog2.shared.BaseConfiguration;
 import org.graylog2.shared.ServerStatus;
+import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.shared.inputs.InputRegistry;
 
 import javax.ws.rs.container.ContainerResponseFilter;
 import javax.ws.rs.container.DynamicFeature;
+import javax.ws.rs.ext.ExceptionMapper;
 
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
@@ -61,6 +63,7 @@ public class RadioBindings extends AbstractModule {
         bind(SecurityContextFactory.class).toProvider(Providers.of(instance));
         bindDynamicFeatures();
         bindContainerResponseFilters();
+        bindExceptionMappers();
     }
 
     private void bindSingletons() {
@@ -75,6 +78,7 @@ public class RadioBindings extends AbstractModule {
 
     private void bindProviders() {
         bind(AsyncHttpClient.class).toProvider(AsyncHttpClientProvider.class);
+        bind(ObjectMapper.class).toProvider(ObjectMapperProvider.class);
     }
 
     private void bindTransport() {
@@ -98,5 +102,10 @@ public class RadioBindings extends AbstractModule {
     private void bindContainerResponseFilters() {
         TypeLiteral<Class<? extends ContainerResponseFilter>> type = new TypeLiteral<Class<? extends ContainerResponseFilter>>(){};
         Multibinder<Class<? extends ContainerResponseFilter>> setBinder = Multibinder.newSetBinder(binder(), type);
+    }
+
+    private void bindExceptionMappers() {
+        TypeLiteral<Class<? extends ExceptionMapper>> type = new TypeLiteral<Class<? extends ExceptionMapper>>(){};
+        Multibinder<Class<? extends ExceptionMapper>> setBinder = Multibinder.newSetBinder(binder(), type);
     }
 }
