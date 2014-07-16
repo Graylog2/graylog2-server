@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2014 TORCH GmbH
+ * Copyright 2013 TORCH UG
  *
  * This file is part of Graylog2.
  *
