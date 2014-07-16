@@ -1,8 +1,7 @@
 package org.graylog2.outputs;
 
-import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.outputs.MessageOutput;
-import org.graylog2.plugin.streams.StreamOutput;
+import org.graylog2.plugin.streams.Output;
 import org.graylog2.rest.resources.streams.outputs.AvailableOutputSummary;
 import org.graylog2.shared.bindings.InstantiationService;
 
@@ -25,8 +24,8 @@ public class MessageOutputFactory {
         this.instantiationService = instantiationService;
     }
 
-    public MessageOutput fromStreamOutput(StreamOutput streamOutput) {
-        final Class<? extends MessageOutput> messageOutputClass = findMessageOutputClassForStreamOutput(streamOutput.getType());
+    public MessageOutput fromStreamOutput(Output output) {
+        final Class<? extends MessageOutput> messageOutputClass = findMessageOutputClassForStreamOutput(output.getType());
         final MessageOutput messageOutput = instantiationService.getInstance(messageOutputClass);
 
         return messageOutput;

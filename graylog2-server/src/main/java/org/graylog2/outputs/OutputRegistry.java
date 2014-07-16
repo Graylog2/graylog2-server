@@ -22,10 +22,9 @@ package org.graylog2.outputs;
 import com.google.common.collect.ImmutableSet;
 import org.graylog2.database.ValidationException;
 import org.graylog2.plugin.outputs.MessageOutput;
+import org.graylog2.plugin.streams.Output;
 import org.graylog2.plugin.streams.Stream;
-import org.graylog2.plugin.streams.StreamOutput;
-import org.graylog2.streams.StreamOutputService;
-import org.graylog2.streams.outputs.CreateStreamOutputRequest;
+import org.graylog2.streams.OutputService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,28 +46,28 @@ public class OutputRegistry {
 
     private final Map<Stream, Set<MessageOutput>> registeredMessageOutputs;
     private final MessageOutput defaultMessageOutput;
-    private final StreamOutputService streamOutputService;
+    private final OutputService outputService;
 
     @Inject
     public OutputRegistry(@DefaultMessageOutput MessageOutput defaultMessageOutput,
-                          StreamOutputService streamOutputService) {
+                          OutputService outputService) {
         this.defaultMessageOutput = defaultMessageOutput;
-        this.streamOutputService = streamOutputService;
+        this.outputService = outputService;
         this.registeredMessageOutputs = new HashMap<>();
     }
 
-    public StreamOutput createOutput(StreamOutput request) {
-        final StreamOutput streamOutput = streamOutputService.create(request);
+    public Output createOutput(Output request) throws ValidationException {
+        final Output output = outputService.create(request);
 
         final String id;
         try {
-            id = streamOutputService.save(streamOutput);
+            id = outputService.save(output);
         } catch (ValidationException e) {
             LOG.error("Validation error.", e);
             throw new BadRequestException(e);
         }
 
-        return streamOutput;
+        return output;
     }
 
     public void registerForStream(Stream stream, MessageOutput messageOutput) {

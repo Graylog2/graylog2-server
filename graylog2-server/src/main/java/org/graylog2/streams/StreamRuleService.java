@@ -24,6 +24,7 @@ import org.graylog2.database.NotFoundException;
 import org.graylog2.database.PersistedService;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.streams.StreamRule;
+import org.graylog2.rest.resources.streams.rules.requests.CreateStreamRuleRequest;
 
 import java.util.List;
 import java.util.Map;
@@ -37,4 +38,7 @@ public interface StreamRuleService extends PersistedService {
     List<StreamRule> loadForStream(Stream stream) throws NotFoundException;
 
     StreamRule create(Map<String, Object> data);
+    StreamRule create(String streamid, CreateStreamRuleRequest request);
+
+    List<StreamRule> loadForStreamId(String streamId) throws NotFoundException;
 }

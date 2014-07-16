@@ -21,6 +21,7 @@ public class LoggingOutput implements MessageOutput {
 
     @Override
     public void initialize(Configuration config) throws MessageOutputConfigurationException {
+        LOG.info("Initializing");
         this.configuration = configuration;
     }
 

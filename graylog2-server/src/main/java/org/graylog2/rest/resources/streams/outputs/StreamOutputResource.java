@@ -1,21 +1,17 @@
 package org.graylog2.rest.resources.streams.outputs;
 
 import com.codahale.metrics.annotation.Timed;
-import com.google.common.collect.Maps;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.graylog2.database.*;
-import org.graylog2.outputs.MessageOutputFactory;
-import org.graylog2.plugin.configuration.ConfigurationRequest;
+import org.graylog2.database.ValidationException;
+import org.graylog2.plugin.streams.Output;
 import org.graylog2.plugin.streams.Stream;
-import org.graylog2.plugin.streams.StreamOutput;
 import org.graylog2.rest.documentation.annotations.*;
 import org.graylog2.rest.resources.RestResource;
 import org.graylog2.security.RestPermissions;
-import org.graylog2.streams.StreamOutputImpl;
-import org.graylog2.streams.StreamOutputService;
+import org.graylog2.streams.OutputService;
 import org.graylog2.streams.StreamService;
-import org.graylog2.streams.outputs.CreateStreamOutputRequest;
+import org.graylog2.streams.outputs.AddOutputRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,10 +19,6 @@ import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
@@ -37,15 +29,13 @@ import java.util.Set;
 public class StreamOutputResource extends RestResource {
     private final Logger LOG = LoggerFactory.getLogger(this.getClass());
 
-    private final StreamOutputService streamOutputService;
+    private final OutputService outputService;
     private final StreamService streamService;
-    private final MessageOutputFactory messageOutputFactory;
 
     @Inject
-    public StreamOutputResource(StreamOutputService streamOutputService, StreamService streamService, MessageOutputFactory messageOutputFactory) {
-        this.streamOutputService = streamOutputService;
+    public StreamOutputResource(OutputService outputService, StreamService streamService) {
+        this.outputService = outputService;
         this.streamService = streamService;
-        this.messageOutputFactory = messageOutputFactory;
     }
 
     @GET @Timed
@@ -55,28 +45,24 @@ public class StreamOutputResource extends RestResource {
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "No such stream on this node.")
     })
-    public Set<StreamOutput> get(@ApiParam(title = "streamid", description = "The id of the stream whose outputs we want.", required = true) @PathParam("streamid") String streamid) {
+    public Response get(@ApiParam(title = "streamid", description = "The id of the stream whose outputs we want.", required = true) @PathParam("streamid") String streamid) throws org.graylog2.database.NotFoundException {
         checkPermission(RestPermissions.STREAMS_READ, streamid);
         checkPermission(RestPermissions.STREAM_OUTPUTS_READ);
-        final Stream stream;
-        try {
-            stream = streamService.load(streamid);
-        } catch (org.graylog2.database.NotFoundException e) {
-            throw new javax.ws.rs.NotFoundException("Stream not found!");
-        }
 
-        return streamOutputService.loadAllForStream(stream);
+        final Stream stream = streamService.load(streamid);
+
+        return Response.status(Response.Status.OK).entity(stream.getOutputs()).build();
     }
 
     @GET @Path("/{outputId}")
     @Timed
     @ApiOperation(value = "Get specific output of a stream")
-    @RequiresPermissions(RestPermissions.STREAM_OUTPUTS_CREATE)
+    @RequiresPermissions(RestPermissions.STREAM_OUTPUTS_READ)
     @Produces(MediaType.APPLICATION_JSON)
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "No such stream/output on this node.")
     })
-    public StreamOutput get(@ApiParam(title = "streamid", description = "The id of the stream whose outputs we want.", required = true) @PathParam("streamid") String streamid,
+    public Output get(@ApiParam(title = "streamid", description = "The id of the stream whose outputs we want.", required = true) @PathParam("streamid") String streamid,
                             @ApiParam(title = "outputId", description = "The id of the output we want.", required = true) @PathParam("outputId") String outputId) {
         checkPermission(RestPermissions.STREAMS_READ, streamid);
         checkPermission(RestPermissions.STREAM_OUTPUTS_READ, outputId);
@@ -88,32 +74,32 @@ public class StreamOutputResource extends RestResource {
         }
 
         try {
-            return streamOutputService.load(outputId);
+            return outputService.load(outputId);
         } catch (org.graylog2.database.NotFoundException e) {
             throw new javax.ws.rs.NotFoundException("Stream output not found!");
         }
     }
 
-    @POST @Timed
-    @ApiOperation(value = "Create an alarm callback")
+    @POST
+    @Timed
+    @ApiOperation(value = "Associate outputs with a stream")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @ApiResponses(value = {
-            @ApiResponse(code = 404, message = "No such stream on this node.")
+            @ApiResponse(code = 400, message = "Invalid output specification in input.")
     })
-    public Response create(@ApiParam(title = "streamid", description = "The stream id this new output belongs to.", required = true) @PathParam("streamid") String streamid,
-                           @ApiParam(title = "JSON body", required = true) CreateStreamOutputRequest csor) {
+    public Response add(@ApiParam(title = "streamid", description = "The id of the stream whose outputs we want.", required = true) @PathParam("streamid") String streamid,
+                           @ApiParam(title = "JSON body", required = true) AddOutputRequest request) throws ValidationException, org.graylog2.database.NotFoundException {
         checkPermission(RestPermissions.STREAM_OUTPUTS_CREATE);
-        try {
-            streamService.load(streamid);
-        } catch (org.graylog2.database.NotFoundException e) {
-            throw new javax.ws.rs.NotFoundException("Stream not found!");
+
+        final Stream stream = streamService.load(streamid);
+
+        for (String outputId : request.outputs) {
+            final Output output = outputService.load(outputId);
+            streamService.addOutput(stream, output);
         }
 
-
-        Map<String, Object> result = Maps.newHashMap();
-
-        return Response.status(Response.Status.CREATED).entity(json(result)).build();
+        return Response.status(Response.Status.CREATED).build();
     }
 
     @DELETE @Path("/{outputId}")
@@ -124,30 +110,15 @@ public class StreamOutputResource extends RestResource {
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "No such stream/output on this node.")
     })
-    public Response delete(@ApiParam(title = "streamid", description = "The stream id the output belongs to", required = true) @PathParam("streamid") String streamId,
-                           @ApiParam(title = "outputId", description = "The id of the output that should be deleted", required = true) @PathParam("outputId") String outputId) {
+    public Response remove(@ApiParam(title = "streamid", description = "The id of the stream whose outputs we want.", required = true) @PathParam("streamid") String streamid,
+                           @ApiParam(title = "outputId", description = "The id of the output that should be deleted", required = true) @PathParam("outputId") String outputId) throws org.graylog2.database.NotFoundException {
+        checkPermission(RestPermissions.STREAM_OUTPUTS_DELETE);
+
+        final Stream stream = streamService.load(streamid);
+        final Output output = outputService.load(outputId);
+
+        streamService.removeOutput(stream, output);
 
         return Response.status(Response.Status.OK).build();
-    }
-
-    @GET @Path("/available")
-    @Timed
-    @ApiOperation(value = "Get all available output modules")
-    @RequiresPermissions(RestPermissions.STREAMS_READ)
-    @Produces(MediaType.APPLICATION_JSON)
-    @ApiResponses(value = {
-            @ApiResponse(code = 404, message = "No such stream on this node.")
-    })
-    public Map<String, AvailableOutputSummary> available(@ApiParam(title = "streamid", description = "The stream id for which available outputs should be listed", required = true) @PathParam("streamid") String streamId) {
-        return messageOutputFactory.getAvailableOutputs();
-    }
-
-    @POST @Path("/test")
-    @Timed
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    public StreamOutput create(@ApiParam(title = "streamid", description = "The stream id this new output belongs to.", required = true) @PathParam("streamid") String streamid,
-                           @ApiParam(title = "JSON body", required = true) StreamOutputImpl streamOutput) {
-        return streamOutput;
     }
 }

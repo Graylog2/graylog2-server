@@ -13,6 +13,11 @@ import java.io.IOException;
  */
 public class ObjectIdSerializer extends JsonSerializer<ObjectId> {
     @Override
+    public Class<ObjectId> handledType() {
+        return ObjectId.class;
+    }
+
+    @Override
     public void serialize(ObjectId value, JsonGenerator jgen, SerializerProvider provider)
             throws IOException, JsonProcessingException {
         jgen.writeString(value.toStringMongod());

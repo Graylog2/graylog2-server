@@ -22,9 +22,9 @@ package org.graylog2.outputs;
 
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.outputs.MessageOutput;
+import org.graylog2.plugin.streams.Output;
 import org.graylog2.plugin.streams.Stream;
-import org.graylog2.plugin.streams.StreamOutput;
-import org.graylog2.streams.StreamOutputService;
+import org.graylog2.streams.OutputService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,29 +38,47 @@ public class OutputRouter {
     protected final Logger LOG = LoggerFactory.getLogger(this.getClass());
 
     private final MessageOutput defaultMessageOutput;
-    private final StreamOutputService streamOutputService;
+    private final OutputService outputService;
     private final MessageOutputFactory messageOutputFactory;
+    private final Map<String, MessageOutput> runningMessageOutputs;
+    private final Map<Stream, List<String>> streamRouteMap;
 
     @Inject
     public OutputRouter(@DefaultMessageOutput MessageOutput defaultMessageOutput,
-                        StreamOutputService streamOutputService,
+                        OutputService outputService,
                         MessageOutputFactory messageOutputFactory) {
         this.defaultMessageOutput = defaultMessageOutput;
-        this.streamOutputService = streamOutputService;
+        this.outputService = outputService;
         this.messageOutputFactory = messageOutputFactory;
+        this.runningMessageOutputs = new HashMap<>();
+        this.streamRouteMap = new HashMap<>();
     }
 
-    protected Map<StreamOutput, MessageOutput> getAllConfiguredMessageOutputs() {
-        Map<StreamOutput, MessageOutput> result = new HashMap<>();
+    protected Set<Output> getConfiguredOutputs() {
+        return outputService.loadAll();
+    }
 
-        for (StreamOutput streamOutput : streamOutputService.loadAll()) {
-            final MessageOutput messageOutput;
-            try {
-                messageOutput = messageOutputFactory.fromStreamOutput(streamOutput);
-                result.put(streamOutput, messageOutput);
-            } catch (Exception e) {
-                LOG.error("Unable to instantiate MessageOutput: " + e);
-            }
+    protected Map<String, MessageOutput> getRunningMessageOutputs() {
+        for (Output output : getConfiguredOutputs()) {
+            if (runningMessageOutputs.containsKey(output.getId()))
+                continue;
+
+            runningMessageOutputs.put(output.getId(), launchOutput(output));
+        }
+
+        return runningMessageOutputs;
+    }
+
+    protected MessageOutput launchOutput(Output output) {
+        return messageOutputFactory.fromStreamOutput(output);
+    }
+
+    protected Set<MessageOutput> getMessageOutputsForStream(Stream stream) {
+        Set<MessageOutput> result = new HashSet<>();
+        for (Output output : stream.getOutputs()) {
+            final MessageOutput messageOutput = getRunningMessageOutputs().get(output.getId());
+            if (messageOutput != null)
+                result.add(messageOutput);
         }
 
         return result;
@@ -71,10 +89,8 @@ public class OutputRouter {
 
         result.add(defaultMessageOutput);
 
-        Map<StreamOutput, MessageOutput> configuredMessageOutputs = getAllConfiguredMessageOutputs();
         for (Stream stream : msg.getStreams())
-            for (StreamOutput streamOutput : streamOutputService.loadAllForStream(stream))
-                result.add(configuredMessageOutputs.get(streamOutput));
+            result.addAll(getMessageOutputsForStream(stream));
 
         return result;
     }

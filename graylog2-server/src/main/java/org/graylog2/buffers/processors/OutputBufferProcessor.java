@@ -23,33 +23,23 @@ import com.codahale.metrics.Histogram;
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
-import com.google.common.base.Joiner;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Ordering;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import com.lmax.disruptor.EventHandler;
-import org.bson.types.ObjectId;
 import org.graylog2.Configuration;
 import org.graylog2.buffers.OutputBufferWatermark;
+import org.graylog2.outputs.CachedOutputRouter;
 import org.graylog2.outputs.OutputRegistry;
 import org.graylog2.outputs.OutputRouter;
-import org.graylog2.outputs.OutputStreamConfigurationImpl;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.buffers.MessageEvent;
 import org.graylog2.plugin.outputs.MessageOutput;
-import org.graylog2.plugin.outputs.OutputStreamConfiguration;
-import org.graylog2.plugin.streams.Stream;
 import org.graylog2.shared.ServerStatus;
 import org.graylog2.shared.stats.ThroughputStats;
-import org.graylog2.streams.StreamImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.*;
 
@@ -91,7 +81,7 @@ public class OutputBufferProcessor implements EventHandler<MessageEvent> {
                                  ThroughputStats throughputStats,
                                  ServerStatus serverStatus,
                                  OutputBufferWatermark outputBufferWatermark,
-                                 OutputRouter outputRouter,
+                                 CachedOutputRouter outputRouter,
                                  @Assisted("ordinal") final long ordinal,
                                  @Assisted("numberOfConsumers") final long numberOfConsumers) {
         this.configuration = configuration;
@@ -174,23 +164,4 @@ public class OutputBufferProcessor implements EventHandler<MessageEvent> {
 
         LOG.debug("Wrote message <{}> to all outputs. Finished handling.", msg.getId());
     }
-
-    private OutputStreamConfiguration buildStreamConfigs(List<Message> messages, String className) {
-        OutputStreamConfiguration configs = new OutputStreamConfigurationImpl();
-        Map<ObjectId, Stream> distinctStreams = Maps.newHashMap();
-
-        for (Message message : messages) {
-            for (Stream stream : message.getStreams()) {
-                distinctStreams.put(new ObjectId(stream.getId()), stream);
-            }
-        }
-
-        for (Map.Entry<ObjectId, Stream> e : distinctStreams.entrySet()) {
-            StreamImpl stream = (StreamImpl) e.getValue();
-            configs.add(e.getKey().toStringMongod(), stream.getOutputConfigurations(className));
-        }
-
-        return configs;
-    }
-
 }
