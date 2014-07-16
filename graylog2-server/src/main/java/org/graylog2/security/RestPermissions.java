@@ -63,7 +63,6 @@ public class RestPermissions {
     public static final String STREAMS_CHANGESTATE = "streams:changestate";
     public static final String STREAM_OUTPUTS_CREATE = "stream_outputs:create";
     public static final String STREAM_OUTPUTS_READ = "stream_outputs:read";
-    public static final String STREAM_OUTPUTS_EDIT = "stream_outputs:edit";
     public static final String STREAM_OUTPUTS_DELETE = "stream_outputs:delete";
     public static final String INDEXERCLUSTER_READ = "indexercluster:read";
     public static final String INDICES_READ = "indices:read";
@@ -74,6 +73,10 @@ public class RestPermissions {
     public static final String INPUTS_CREATE = "inputs:create";
     public static final String INPUTS_TERMINATE = "inputs:terminate";
     public static final String INPUTS_EDIT = "inputs:edit";
+    public static final String OUTPUTS_READ = "outputs:read";
+    public static final String OUTPUTS_CREATE = "outputs:create";
+    public static final String OUTPUTS_TERMINATE = "outputs:terminate";
+    public static final String OUTPUTS_EDIT = "outputs:edit";
     public static final String SYSTEMJOBS_READ = "systemjobs:read";
     public static final String SYSTEMJOBS_CREATE = "systemjobs:create";
     public static final String LDAP_EDIT = "ldap:edit";
