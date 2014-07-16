@@ -72,6 +72,10 @@ public class ServerStatus {
         return startedAt;
     }
 
+    public DateTimeZone getTimezone() {
+        return DateTimeZone.getDefault();
+    }
+
     public ServerStatus addCapability(Capability capability) {
         this.capabilitySet.add(capability);
         return this;

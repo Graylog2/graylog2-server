@@ -21,10 +21,12 @@ package org.graylog2.indexer.results;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Range;
 import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.SearchHitField;
 import org.elasticsearch.search.highlight.HighlightField;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,7 +51,18 @@ public class ResultMessage {
 	
 	public static ResultMessage parseFromSource(SearchHit hit) {
 		ResultMessage m = new ResultMessage();
-        m.setMessage(hit.getSource());
+        // There is no _source field if addFields is used for the request. Just use the returned fields in that case.
+        if (hit.getSource() != null) {
+            m.setMessage(hit.getSource());
+        } else {
+            Map<String, Object> map = Maps.newHashMap();
+
+            for (Map.Entry<String, SearchHitField> o : hit.fields().entrySet()) {
+                map.put(o.getKey(), o.getValue().getValue());
+            }
+            m.setMessage(map);
+
+        }
 		m.setIndex(hit.getIndex());
         m.setHighlightRanges(hit.getHighlightFields());
 		return m;

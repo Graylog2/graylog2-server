@@ -94,6 +94,7 @@ public class SystemResource extends RestResource {
         result.put("hostname", Tools.getLocalCanonicalHostname());
         result.put("lifecycle", serverStatus.getLifecycle().getName().toLowerCase());
         result.put("lb_status", serverStatus.getLifecycle().getLoadbalancerStatus().toString().toLowerCase());
+        result.put("timezone", serverStatus.getTimezone().getID());
 
         return json(result);
     }

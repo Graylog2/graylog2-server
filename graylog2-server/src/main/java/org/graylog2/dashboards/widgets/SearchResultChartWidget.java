@@ -42,7 +42,7 @@ public class SearchResultChartWidget extends DashboardWidget {
         super(metricRegistry, Type.SEARCH_RESULT_CHART, id, description, cacheTime, config, creatorUserId);
         this.indexer = indexer;
 
-        this.query = query;
+        this.query = getNonEmptyQuery(query);
         this.timeRange = timeRange;
 
         if (config.containsKey("stream_id")) {
@@ -56,6 +56,14 @@ public class SearchResultChartWidget extends DashboardWidget {
         } else {
             this.interval = Indexer.DateHistogramInterval.MINUTE;
         }
+    }
+
+    // We need to ensure query is not empty, or the histogram calculation will fail
+    private String getNonEmptyQuery(String query) {
+        if (query == null || query.isEmpty()) {
+            return "*";
+        }
+        return query;
     }
 
     public String getQuery() {

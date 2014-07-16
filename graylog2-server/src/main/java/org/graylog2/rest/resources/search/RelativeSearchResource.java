@@ -25,6 +25,8 @@ import org.glassfish.jersey.server.ChunkedOutput;
 import org.graylog2.indexer.IndexHelper;
 import org.graylog2.indexer.Indexer;
 import org.graylog2.indexer.results.ScrollResult;
+import org.graylog2.indexer.searches.SearchesConfig;
+import org.graylog2.indexer.searches.SearchesConfigBuilder;
 import org.graylog2.indexer.searches.Sorting;
 import org.graylog2.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.indexer.searches.timeranges.RelativeRange;
@@ -69,37 +71,40 @@ public class RelativeSearchResource extends SearchResource {
             @ApiParam(title = "limit", description = "Maximum number of messages to return.", required = false) @QueryParam("limit") int limit,
             @ApiParam(title = "offset", description = "Offset", required = false) @QueryParam("offset") int offset,
             @ApiParam(title = "filter", description = "Filter", required = false) @QueryParam("filter") String filter,
+            @ApiParam(title = "fields", description = "Comma separated list of fields to return", required = false) @QueryParam("fields") String fields,
             @ApiParam(title = "sort", description = "Sorting (field:asc / field:desc)", required = false) @QueryParam("sort") String sort) throws IndexHelper.InvalidRangeFormatException {
         checkSearchPermission(filter, RestPermissions.SEARCHES_RELATIVE);
 
         checkQuery(query);
 
+        final List<String> fieldList = parseOptionalFields(fields);
         Sorting sorting = buildSorting(sort);
 
+        final SearchesConfig searchesConfig = SearchesConfigBuilder.newConfig()
+                .setQuery(query)
+                .setFilter(filter)
+                .setFields(fieldList)
+                .setRange(buildRelativeTimeRange(range))
+                .setLimit(limit)
+                .setOffset(offset)
+                .setSorting(sorting)
+                .build();
+
         try {
-            SearchResponse searchResponse;
-
-            if (filter == null) {
-                searchResponse = buildSearchResponse(
-                        indexer.searches().search(query, buildRelativeTimeRange(range), limit, offset, sorting)
-                );
-            } else {
-                searchResponse = buildSearchResponse(
-                        indexer.searches().search(query, filter, buildRelativeTimeRange(range), limit, offset, sorting)
-                );
-            }
-
-            return searchResponse;
+            return buildSearchResponse(indexer.searches().search(searchesConfig));
         } catch (SearchPhaseExecutionException e) {
             throw createRequestExceptionForParseFailure(query, e);
         }
     }
 
-    /**
-     * CSV search result, needs to be chunked because these tend to be file exports and would cause heap problems if buffered.
-     */
     @GET @Timed
+    @ApiOperation(value = "Message search with relative timerange.",
+            notes = "Search for messages in a relative timerange, specified as seconds from now. " +
+                    "Example: 300 means search from 5 minutes ago to now.")
     @Produces("text/csv")
+    @ApiResponses(value = {
+            @ApiResponse(code = 400, message = "Invalid timerange parameters provided.")
+    })
     public ChunkedOutput<ScrollResult.ScrollChunk> searchRelativeChunked(
             @ApiParam(title = "query", description = "Query (Lucene syntax)", required = true) @QueryParam("query") String query,
             @ApiParam(title = "range", description = "Relative timeframe to search in. See method description.", required = true) @QueryParam("range") int range,
