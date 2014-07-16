@@ -19,6 +19,7 @@
 
 package org.graylog2.bindings;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.AbstractModule;
 import com.google.inject.Scopes;
 import com.google.inject.TypeLiteral;
@@ -53,7 +54,9 @@ import org.graylog2.outputs.OutputRegistry;
 import org.graylog2.plugin.PluginMetaData;
 import org.graylog2.plugin.RulesEngine;
 import org.graylog2.plugin.indexer.MessageGateway;
+import org.graylog2.rest.NotFoundExceptionMapper;
 import org.graylog2.rest.RestAccessLogFilter;
+import org.graylog2.rest.ValidationExceptionMapper;
 import org.graylog2.security.ShiroSecurityBinding;
 import org.graylog2.security.ShiroSecurityContextFactory;
 import org.graylog2.security.ldap.LdapConnector;
@@ -70,6 +73,7 @@ import org.graylog2.system.shutdown.GracefulShutdown;
 
 import javax.ws.rs.container.ContainerResponseFilter;
 import javax.ws.rs.container.DynamicFeature;
+import javax.ws.rs.ext.ExceptionMapper;
 
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
@@ -98,10 +102,16 @@ public class ServerBindings extends AbstractModule {
     protected void configure() {
         bindInterfaces();
         bindSingletons();
+        bindProviders();
         bindFactoryModules();
         bindDynamicFeatures();
         bindContainerResponseFilters();
+        bindExceptionMappers();
         bindPluginMetaData();
+    }
+
+    private void bindProviders() {
+        bind(ObjectMapper.class).toProvider(ServerObjectMapperProvider.class);
     }
 
     private void bindFactoryModules() {
@@ -164,6 +174,13 @@ public class ServerBindings extends AbstractModule {
         TypeLiteral<Class<? extends ContainerResponseFilter>> type = new TypeLiteral<Class<? extends ContainerResponseFilter>>(){};
         Multibinder<Class<? extends ContainerResponseFilter>> setBinder = Multibinder.newSetBinder(binder(), type);
         setBinder.addBinding().toInstance(RestAccessLogFilter.class);
+    }
+
+    private void bindExceptionMappers() {
+        TypeLiteral<Class<? extends ExceptionMapper>> type = new TypeLiteral<Class<? extends ExceptionMapper>>(){};
+        Multibinder<Class<? extends ExceptionMapper>> setBinder = Multibinder.newSetBinder(binder(), type);
+        setBinder.addBinding().toInstance(NotFoundExceptionMapper.class);
+        setBinder.addBinding().toInstance(ValidationExceptionMapper.class);
     }
 
     private void bindPluginMetaData() {

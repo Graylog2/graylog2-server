@@ -20,7 +20,6 @@
 package org.graylog2.shared.bindings;
 
 import com.codahale.metrics.MetricRegistry;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.util.concurrent.ServiceManager;
 import com.google.inject.AbstractModule;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
@@ -55,7 +54,6 @@ public class GenericBindings extends AbstractModule {
         bind(ProcessBuffer.class).toProvider(ProcessBufferProvider.class);
         bind(GELFChunkManager.class).toProvider(GELFChunkManagerProvider.class);
         bind(NodeId.class).toProvider(NodeIdProvider.class);
-        bind(ObjectMapper.class).toProvider(ObjectMapperProvider.class);
 
         bind(ServiceManager.class).toProvider(ServiceManagerProvider.class);
     }
