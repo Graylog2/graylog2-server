@@ -33,9 +33,10 @@ import java.util.Map;
  * @author Lennart Koopmann <lennart@torch.sh>
  */
 public class ThroughputCounter extends GlobalTrafficShapingHandler {
+    private static final HashedWheelTimer HASHED_WHEEL_TIMER = new HashedWheelTimer();
 
     public ThroughputCounter() {
-        super(new HashedWheelTimer(), 1000);
+        super(HASHED_WHEEL_TIMER, 1000);
     }
 
     public Map<String, Gauge<Long>> gauges() {
