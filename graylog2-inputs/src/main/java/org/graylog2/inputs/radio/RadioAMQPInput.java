@@ -104,8 +104,8 @@ public class RadioAMQPInput extends AMQPInput {
                 new NumberField(
                         CK_PREFETCH,
                         "Prefetch count",
-                        0,
-                        "For advanced usage: AMQP prefetch count. Default is 0 (unlimited).",
+                        100,
+                        "For advanced usage: AMQP prefetch count. Default is 100.",
                         ConfigurationField.Optional.NOT_OPTIONAL
                 )
         );
