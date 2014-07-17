@@ -49,6 +49,9 @@ import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.indices.jobs.OptimizeIndexJob;
 import org.graylog2.indexer.ranges.RebuildIndexRangesJob;
 import org.graylog2.indexer.searches.Searches;
+import org.graylog2.inputs.BasicCache;
+import org.graylog2.inputs.InputCache;
+import org.graylog2.inputs.OutputCache;
 import org.graylog2.jersey.container.netty.SecurityContextFactory;
 import org.graylog2.plugin.PluginMetaData;
 import org.graylog2.plugin.RulesEngine;
@@ -149,6 +152,9 @@ public class ServerBindings extends AbstractModule {
         bind(SystemJobFactory.class).toProvider(SystemJobFactoryProvider.class);
         bind(AsyncHttpClient.class).toProvider(AsyncHttpClientProvider.class);
         bind(GracefulShutdown.class).in(Scopes.SINGLETON);
+
+        bind(InputCache.class).to(BasicCache.class).in(Scopes.SINGLETON);
+        bind(OutputCache.class).to(BasicCache.class).in(Scopes.SINGLETON);
     }
 
     private void bindInterfaces() {

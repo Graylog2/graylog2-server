@@ -21,11 +21,14 @@ package org.graylog2.radio.bindings;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.AbstractModule;
+import com.google.inject.Scopes;
 import com.google.inject.TypeLiteral;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.multibindings.Multibinder;
 import com.google.inject.util.Providers;
 import com.ning.http.client.AsyncHttpClient;
+import org.graylog2.inputs.BasicCache;
+import org.graylog2.inputs.InputCache;
 import org.graylog2.jersey.container.netty.SecurityContextFactory;
 import org.graylog2.radio.Configuration;
 import org.graylog2.radio.bindings.providers.AsyncHttpClientProvider;
@@ -74,6 +77,7 @@ public class RadioBindings extends AbstractModule {
         serverStatus.addCapability(ServerStatus.Capability.RADIO);
         bind(ServerStatus.class).toInstance(serverStatus);
         bind(InputRegistry.class).toProvider(RadioInputRegistryProvider.class);
+        bind(InputCache.class).to(BasicCache.class).in(Scopes.SINGLETON);
     }
 
     private void bindProviders() {
