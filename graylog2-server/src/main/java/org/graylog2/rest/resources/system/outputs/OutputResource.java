@@ -6,7 +6,9 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.database.ValidationException;
+import org.graylog2.outputs.DefaultMessageOutput;
 import org.graylog2.outputs.MessageOutputFactory;
+import org.graylog2.plugin.outputs.MessageOutput;
 import org.graylog2.plugin.streams.Output;
 import org.graylog2.rest.documentation.annotations.*;
 import org.graylog2.rest.resources.RestResource;
@@ -21,7 +23,9 @@ import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
@@ -36,10 +40,10 @@ public class OutputResource extends RestResource {
     private final MessageOutputFactory messageOutputFactory;
 
     @Inject
-    public OutputResource(OutputService outputService, MessageOutputFactory messageOutputFactory, ObjectMapper objectMapper1) {
+    public OutputResource(OutputService outputService,
+                          MessageOutputFactory messageOutputFactory) {
         this.outputService = outputService;
         this.messageOutputFactory = messageOutputFactory;
-        System.out.println("Constructor ObjectMapper: " + objectMapper1);
     }
 
     @GET
@@ -47,9 +51,16 @@ public class OutputResource extends RestResource {
     @ApiOperation(value = "Get a list of all outputs")
     @RequiresPermissions(RestPermissions.STREAM_OUTPUTS_CREATE)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response get() {
+    public Map<String, Object> get() {
         checkPermission(RestPermissions.OUTPUTS_READ);
-        return Response.status(Response.Status.OK).entity(outputService.loadAll()).build();
+        final Set<Output> outputs = outputService.loadAll();
+
+        return new HashMap<String, Object>() {
+            {
+                put("total", outputs.size());
+                put("outputs", outputs);
+            }
+        };
     }
 
     @GET @Path("/{outputId}")
@@ -104,7 +115,11 @@ public class OutputResource extends RestResource {
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "No such stream on this node.")
     })
-    public Map<String, AvailableOutputSummary> available(@ApiParam(title = "streamid", description = "The stream id for which available outputs should be listed", required = true) @PathParam("streamid") String streamId) {
-        return messageOutputFactory.getAvailableOutputs();
+    public Map<String, Object> available() {
+        return new HashMap<String, Object>() {
+            {
+                put("types", messageOutputFactory.getAvailableOutputs());
+            }
+        };
     }
 }
