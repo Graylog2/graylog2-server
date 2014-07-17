@@ -23,6 +23,7 @@ import com.google.inject.Inject;
 import org.graylog2.restclient.lib.APIException;
 import org.graylog2.restclient.lib.ApiClient;
 import org.graylog2.restclient.models.alerts.Alert;
+import org.graylog2.restclient.models.api.requests.outputs.AddOutputRequest;
 import org.graylog2.restclient.models.api.requests.streams.CreateStreamRequest;
 import org.graylog2.restclient.models.api.requests.streams.TestMatchRequest;
 import org.graylog2.restclient.models.api.responses.EmptyResponse;
@@ -37,8 +38,10 @@ import org.graylog2.restroutes.generated.routes;
 import play.mvc.Http;
 
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class StreamService {
 
@@ -138,5 +141,30 @@ public class StreamService {
 
     public CheckConditionResponse activeAlerts(String streamId) throws APIException, IOException {
         return api.path(routes.StreamAlertResource().checkConditions(streamId), CheckConditionResponse.class).execute();
+    }
+
+    public void addOutput(String streamId, final String outputId) throws APIException, IOException {
+        Set<String> outputs = new HashSet<String>() {
+            {
+                add(outputId);
+            }
+        };
+
+        addOutputs(streamId, outputs);
+    }
+
+    public void addOutputs(String streamId, Set<String> outputIds) throws APIException, IOException {
+        AddOutputRequest request = new AddOutputRequest();
+        request.outputs = outputIds;
+        api.path(routes.StreamOutputResource().add(streamId)).body(request).execute();
+    }
+
+    public void removeOutput(String streamId, String outputId) throws APIException, IOException {
+        api.path(routes.StreamOutputResource().remove(streamId, outputId)).execute();
+    }
+
+    public void removeOutputs(String streamId, Set<String> outputIds) throws APIException, IOException {
+        for (String outputId : outputIds)
+            removeOutput(streamId, outputId);
     }
 }
