@@ -6,10 +6,13 @@ import com.github.joschi.jadconfig.ValidationException;
 import com.github.joschi.jadconfig.repositories.InMemoryRepository;
 import com.google.common.collect.Maps;
 import org.testng.Assert;
-import org.testng.annotations.*;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -194,5 +197,24 @@ public class ConfigurationTest {
         new JadConfig(new InMemoryRepository(validProperties), configuration).process();
 
         Assert.assertEquals(2, configuration.getMongoReplicaSet().size());
+    }
+
+    @Test
+    public void testDefaultCacheSpoolDir() throws RepositoryException, ValidationException {
+        Configuration configuration = new Configuration();
+        new JadConfig(new InMemoryRepository(validProperties), configuration).process();
+
+        Assert.assertEquals(configuration.getCacheSpoolDir(), "spool", "Default cache_spool_dir is not 'spool'");
+    }
+
+    @Test
+    public void testCacheSpoolDir() throws RepositoryException, ValidationException {
+        final HashMap<String, String> properties = Maps.newHashMap(validProperties);
+        properties.put("cache_spool_dir", "wat?/a/spool/dir");
+
+        Configuration configuration = new Configuration();
+        new JadConfig(new InMemoryRepository(properties), configuration).process();
+
+        Assert.assertEquals(configuration.getCacheSpoolDir(), "wat?/a/spool/dir", "Default cache_spool_dir is not 'spool'");
     }
 }

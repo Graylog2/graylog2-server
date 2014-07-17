@@ -256,6 +256,9 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "output_module_timeout", required = false)
     private long outputModuleTimeout = 10000;
 
+    @Parameter(value = "cache_spool_dir", required = false)
+    private String cacheSpoolDir = "spool";
+
     public boolean isMaster() {
         return isMaster;
     }
@@ -566,6 +569,10 @@ public class Configuration extends BaseConfiguration {
 
     public long getEsClusterDiscoveryTimeout() {
         return esClusterDiscoveryTimeout;
+    }
+
+    public String getCacheSpoolDir() {
+        return cacheSpoolDir;
     }
 }
 
