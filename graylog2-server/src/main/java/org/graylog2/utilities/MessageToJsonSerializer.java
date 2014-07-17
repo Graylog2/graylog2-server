@@ -153,6 +153,7 @@ public class MessageToJsonSerializer {
                         new CacheLoader<String, Stream>() {
                             @Override
                             public Stream load(String key) throws Exception {
+                                // TODO This might create lots of Stream instances. Can we avoid this?
                                 LOG.debug("Loading stream {}", key);
                                 return streamService.load(key);
                             }
@@ -169,6 +170,7 @@ public class MessageToJsonSerializer {
 
                                 if (input != null) {
                                     try {
+                                        // TODO This might create lots of MessageInput instances. Can we avoid this?
                                         return inputService.getMessageInput(input);
                                     } catch (NoSuchInputTypeException e) {
                                         return null;
