@@ -30,6 +30,7 @@ import org.graylog2.plugin.inputs.util.ThroughputCounter;
 import org.jboss.netty.bootstrap.Bootstrap;
 import org.jboss.netty.channel.Channel;
 
+import javax.inject.Inject;
 import java.net.InetSocketAddress;
 import java.util.Map;
 
@@ -44,13 +45,13 @@ public abstract class GELFInputBase extends MessageInput {
     protected Bootstrap bootstrap;
     protected Channel channel;
 
-    protected final ThroughputCounter throughputCounter;
+    @Inject
+    protected ThroughputCounter throughputCounter;
     protected final ConnectionCounter connectionCounter;
 
     protected InetSocketAddress socketAddress;
 
     public GELFInputBase() {
-        this.throughputCounter = new ThroughputCounter();
         this.connectionCounter = new ConnectionCounter();
     }
 

@@ -24,11 +24,13 @@ import com.google.common.util.concurrent.ServiceManager;
 import com.google.inject.AbstractModule;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import org.graylog2.inputs.gelf.gelf.GELFChunkManager;
+import org.graylog2.plugin.inputs.util.ThroughputCounter;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.bindings.providers.*;
 import org.graylog2.shared.buffers.ProcessBuffer;
 import org.graylog2.shared.buffers.ProcessBufferWatermark;
 import org.graylog2.shared.stats.ThroughputStats;
+import org.jboss.netty.util.HashedWheelTimer;
 
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
@@ -56,5 +58,8 @@ public class GenericBindings extends AbstractModule {
         bind(NodeId.class).toProvider(NodeIdProvider.class);
 
         bind(ServiceManager.class).toProvider(ServiceManagerProvider.class);
+
+        bind(HashedWheelTimer.class).toInstance(new HashedWheelTimer());
+        bind(ThroughputCounter.class);
     }
 }
