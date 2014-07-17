@@ -64,6 +64,7 @@ import org.graylog2.security.realm.LdapUserAuthenticator;
 import org.graylog2.shared.BaseConfiguration;
 import org.graylog2.shared.ServerStatus;
 import org.graylog2.shared.bindings.providers.AsyncHttpClientProvider;
+import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.shared.inputs.InputRegistry;
 import org.graylog2.shared.metrics.jersey2.MetricsDynamicBinding;
 import org.graylog2.streams.StreamRouter;

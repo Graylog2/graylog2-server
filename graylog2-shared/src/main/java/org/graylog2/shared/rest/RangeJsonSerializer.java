@@ -25,7 +25,7 @@ import com.google.common.collect.Range;
 
 import java.io.IOException;
 
-class RangeJsonSerializer extends JsonSerializer<Range> {
+public class RangeJsonSerializer extends JsonSerializer<Range> {
     @Override
     public Class<Range> handledType() {
         return Range.class;
