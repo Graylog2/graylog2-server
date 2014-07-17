@@ -94,11 +94,11 @@ public class MasterCacheWorkerThread extends Periodical {
 
         while(true) {
             try {
-                if (cache.size() > 0 && serverStatus.isProcessing()) {
+                if (!cache.isEmpty() && serverStatus.isProcessing()) {
                     LOG.debug("{} contains {} messages. Trying to process them.", cacheName, cache.size());
 
                     while (true) {
-                        if (cache.size() <= 0) {
+                        if (cache.isEmpty()) {
                             LOG.debug("Read all messages from {}.", cacheName);
                             break;
                         }

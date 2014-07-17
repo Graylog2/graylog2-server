@@ -67,4 +67,9 @@ public class BasicCache implements Cache {
         q.clear();
     }
 
+    @Override
+    public boolean isEmpty() {
+        return q.isEmpty();
+    }
+
 }

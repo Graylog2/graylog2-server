@@ -31,5 +31,5 @@ public interface Cache {
     public Message pop();
     public int size();
     public void clear();
-    
+    public boolean isEmpty();
 }
