@@ -316,7 +316,7 @@ public class InputsController extends AuthenticatedController {
 
         try {
             if (!nodeService.loadNode(nodeId).terminateInput(inputId)) {
-                flash("Could not terminate input " + inputId);
+                flash("error", "Could not terminate input " + inputId);
             }
         } catch (NodeService.NodeNotFoundException e) {
             return status(404, views.html.errors.error.render(ApiClient.ERROR_MSG_NODE_NOT_FOUND, e, request()));
@@ -331,7 +331,7 @@ public class InputsController extends AuthenticatedController {
         }
         try {
             if (!nodeService.loadRadio(radioId).terminateInput(inputId)) {
-                flash("Could not terminate input " + inputId);
+                flash("error", "Could not terminate input " + inputId);
             }
         } catch (NodeService.NodeNotFoundException e) {
             return status(404, views.html.errors.error.render(ApiClient.ERROR_MSG_NODE_NOT_FOUND, e, request()));
@@ -353,7 +353,7 @@ public class InputsController extends AuthenticatedController {
                 if (!entry.getValue())
                     failingNodes.add(entry.getKey());
 
-            flash("Could not terminate input on nodes " + Joiner.on(", ").join(failingNodes));
+            flash("error", "Could not terminate input on nodes " + Joiner.on(", ").join(failingNodes));
         }
 
         return redirect(routes.InputsController.index());
@@ -362,7 +362,7 @@ public class InputsController extends AuthenticatedController {
 
     public Result stop(String inputId) {
         if (!Permissions.isPermitted(RestPermissions.INPUTS_STOP)) {
-            flash("You are not permitted to stop this input.");
+            flash("error", "You are not permitted to stop this input.");
             return redirect(routes.InputsController.index());
         }
 
@@ -380,7 +380,7 @@ public class InputsController extends AuthenticatedController {
 
     public Result start(String inputId) {
         if (!Permissions.isPermitted(RestPermissions.INPUTS_START)) {
-            flash("You are not permitted to stop this input.");
+            flash("error", "You are not permitted to stop this input.");
             return redirect(routes.InputsController.index());
         }
 
@@ -398,7 +398,7 @@ public class InputsController extends AuthenticatedController {
 
     public Result restart(String inputId) {
         if (!Permissions.isPermitted(RestPermissions.INPUTS_START) && !Permissions.isPermitted(RestPermissions.INPUTS_STOP)) {
-            flash("You are not permitted to stop this input.");
+            flash("error", "You are not permitted to stop this input.");
             return redirect(routes.InputsController.index());
         }
 

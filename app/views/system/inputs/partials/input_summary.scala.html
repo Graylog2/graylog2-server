@@ -20,7 +20,7 @@
 
             @views.html.system.inputs.partials.input_state_controls.render(inputState.getState, input)
 
-            @if(isPermitted(PROCESSING_CHANGESTATE)) {
+            @if(isPermitted(INPUTS_TERMINATE)) {
             <form action="@routes.InputsController.terminate(inputState.getNode.getNodeId, input.getId)" method="POST">
                 <button class="btn btn-danger btn-mini"
                 type="submit"

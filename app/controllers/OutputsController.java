@@ -61,12 +61,26 @@ public class OutputsController extends AuthenticatedController {
         }
 
         final Form<OutputLaunchRequest> outputForm = form(OutputLaunchRequest.class).bindFromRequest();
-        System.out.println(outputForm);
         final OutputLaunchRequest request = outputForm.get();
 
-        System.out.println(request);
+        final Output output = outputService.create(request);
 
-        outputService.create(request);
+        flash("success", "Output " + output.getTitle() + " has been created!");
+        return redirect(routes.OutputsController.index());
+    }
+
+    public Result terminate(String outputId) throws APIException, IOException {
+        if (!Permissions.isPermitted(RestPermissions.OUTPUTS_TERMINATE)) {
+            return redirect(routes.StartpageController.redirect());
+        }
+
+        final Output output = outputService.get(outputId);
+        if (output == null) {
+            flash("error", "No such output!");
+        } else {
+            outputService.delete(outputId);
+            flash("success", "Output " + output.getTitle() + " been deleted!");
+        }
         return redirect(routes.OutputsController.index());
     }
 }
