@@ -44,6 +44,8 @@ public class RadioVersion {
 
     public static final Version v0_20_5 = new Version(0, 20, 5);
 
-    public static final Version VERSION = v0_20_5;
+    public static final Version v0_20_6 = new Version(0, 20, 6);
+
+    public static final Version VERSION = v0_20_6;
 
 }
