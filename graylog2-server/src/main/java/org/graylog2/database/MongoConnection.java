@@ -20,11 +20,11 @@
 
 package org.graylog2.database;
 
-import java.net.UnknownHostException;
-import java.util.List;
-
 import com.mongodb.*;
 import com.mongodb.MongoClientOptions.Builder;
+
+import java.net.UnknownHostException;
+import java.util.List;
 
 /**
  * MongoDB connection singleton

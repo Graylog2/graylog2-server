@@ -1,0 +1,31 @@
+package org.graylog2.rules;
+
+import org.graylog2.plugin.*
+import org.graylog2.filters.*
+import org.graylog2.filters.blacklist.*
+
+global org.slf4j.Logger log
+
+rule "blacklist any field equality"
+    when
+        $f : BlacklistFieldEqualityCondition()
+        $m : Message (filterOut == false, $f.matchesFieldStringValue(getField($f.fieldName)) == true )
+    then
+        modify($m){ setFilterOut(true) }
+end
+
+rule "blacklist any field pattern"
+    when
+        $p : BlacklistPatternCondition()
+        $m : Message( filterOut == false, $p.matchesPattern(getField($p.fieldName)) == true )
+    then
+        modify($m) { setFilterOut(true) }
+end
+
+rule "blacklist hostname inet mask"
+    when
+        $i : BlacklistIpMatcherCondition()
+        $m : Message( isSourceInetAddress == true, filterOut == false, $i.matchesInetAddress(inetAddress))
+    then
+        modify($m) { setFilterOut(true) }
+end

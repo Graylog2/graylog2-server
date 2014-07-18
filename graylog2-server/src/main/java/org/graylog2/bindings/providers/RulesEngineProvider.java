@@ -38,18 +38,18 @@ public class RulesEngineProvider implements Provider<RulesEngine> {
     private static RulesEngine rulesEngine = null;
 
     @Inject
-    public RulesEngineProvider(Configuration configuration) {
+    public RulesEngineProvider(Configuration configuration, DroolsEngine droolsEngine) {
+        rulesEngine = droolsEngine;
         String rulesFilePath = configuration.getDroolsRulesFile();
+
         if (rulesFilePath != null && !rulesFilePath.isEmpty()) {
-            DroolsEngine drools = new DroolsEngine();
-            if (drools.addRulesFromFile(rulesFilePath)) {
-                rulesEngine = drools;
+            if (rulesEngine.addRulesFromFile(rulesFilePath)) {
                 LOG.info("Using rules: {}", rulesFilePath);
             } else {
                 LOG.info("Unable to load rules due to load error: {}", rulesFilePath);
             }
         } else {
-            LOG.info("Not using rules");
+            LOG.info("No static rules file loaded.");
         }
     }
 

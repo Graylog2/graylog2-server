@@ -160,6 +160,13 @@
                 <artifactId>mongo-java-driver</artifactId>
                 <version>2.11.1</version>
             </dependency>
+
+            <dependency>
+                <groupId>org.mongojack</groupId>
+                <artifactId>mongojack</artifactId>
+                <version>2.1.0-SNAPSHOT</version>
+            </dependency>
+
             <dependency>
                 <groupId>org.elasticsearch</groupId>
                 <artifactId>elasticsearch</artifactId>
@@ -493,6 +500,12 @@
             </dependency>
 
             <dependency>
+                <groupId>com.atlassian.ip</groupId>
+                <artifactId>atlassian-ip</artifactId>
+                <version>3.1</version>
+            </dependency>
+
+            <dependency>
                 <groupId>javax.annotation</groupId>
                 <artifactId>javax.annotation-api</artifactId>
                 <version>1.2</version>
@@ -502,6 +515,11 @@
                 <groupId>javax.inject</groupId>
                 <artifactId>javax.inject</artifactId>
                 <version>1</version>
+            </dependency>
+            <dependency>
+                <groupId>javax.persistence</groupId>
+                <artifactId>persistence-api</artifactId>
+                <version>1.0</version>
             </dependency>
 
             <dependency>

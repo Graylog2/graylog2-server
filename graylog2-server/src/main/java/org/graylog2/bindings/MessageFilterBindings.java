@@ -19,13 +19,16 @@
 
 package org.graylog2.bindings;
 
+import com.google.common.io.Resources;
 import com.google.inject.AbstractModule;
 import com.google.inject.multibindings.Multibinder;
 import org.graylog2.filters.ExtractorFilter;
-import org.graylog2.filters.RewriteFilter;
+import org.graylog2.filters.RulesFilter;
 import org.graylog2.filters.StaticFieldFilter;
 import org.graylog2.filters.StreamMatcherFilter;
 import org.graylog2.plugin.filters.MessageFilter;
+
+import java.net.URL;
 
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
@@ -37,6 +40,10 @@ public class MessageFilterBindings extends AbstractModule {
         messageFilters.addBinding().to(StaticFieldFilter.class);
         messageFilters.addBinding().to(ExtractorFilter.class);
         messageFilters.addBinding().to(StreamMatcherFilter.class);
-        messageFilters.addBinding().to(RewriteFilter.class);
+        messageFilters.addBinding().to(RulesFilter.class);
+
+        // built it drools rules
+        final Multibinder<URL> rulesUrls = Multibinder.newSetBinder(binder(), URL.class);
+        rulesUrls.addBinding().toInstance(Resources.getResource("blacklist.drl"));
     }
 }

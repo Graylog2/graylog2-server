@@ -21,17 +21,28 @@
 */
 package org.graylog2.plugin;
 
+import java.io.Closeable;
 
-/**
- *
- * @author Lennart Koopmann <lennart@socketfeed.com>
- */
 public interface RulesEngine {
+
+    public interface RulesSession extends Closeable {
+
+        int evaluate(Message message, boolean retractFacts);
+
+        Object insertFact(Object fact);
+
+        boolean deleteFact(Object fact);
+    }
 
     boolean addRule(String ruleSource);
 
-    public boolean addRulesFromFile(String rulesFile);
+    boolean addRulesFromFile(String rulesFile);
 
-    public int evaluate(Message message);
-    
+    int evaluateInSharedSession(Message message);
+
+    RulesSession createPrivateSession();
+
+    Object insertFact(Object fact);
+
+    boolean deleteFact(Object fact);
 }

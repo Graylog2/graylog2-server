@@ -103,6 +103,10 @@ public class RestPermissions {
     public static final String THREADS_DUMP = "threads:dump";
     public static final String NODE_SHUTDOWN = "node:shutdown";
     public static final String LBSTATUS_CHANGE = "lbstatus:change";
+    public static final String BLACKLISTENTRY_CREATE = "blacklistentry:create";
+    public static final String BLACKLISTENTRY_READ = "blacklistentry:read";
+    public static final String BLACKLISTENTRY_EDIT = "blacklistentry:edit";
+    public static final String BLACKLISTENTRY_DELETE = "blacklistentry:delete";
 
     private static Map<String, Collection<String>> allPermissions;
 

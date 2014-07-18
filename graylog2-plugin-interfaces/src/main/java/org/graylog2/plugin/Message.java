@@ -29,6 +29,8 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -91,12 +93,23 @@ public class Message {
 
     public static final Function<Message, String> ID_FUNCTION = new MessageIdFunction();
 
+    private InetAddress inetAddress;
+
     public Message(String message, String source, DateTime timestamp) {
     	// Adding the fields directly because they would not be accepted as a reserved fields.
         fields.put("_id", new com.eaio.uuid.UUID().toString());
         fields.put("message", message);
         fields.put("source", source);
         fields.put("timestamp", timestamp);
+
+        try {
+            inetAddress = InetAddress.getByName(source);
+            LOG.debug("InetAddress is {} for message source {}", inetAddress, getSource());
+        } catch (IllegalArgumentException ignored) {
+            LOG.debug("No inetaddress", ignored);
+        } catch (UnknownHostException e) {
+            LOG.debug("No such host", e);
+        }
 
         streams = Lists.newArrayList();
     }
@@ -319,6 +332,15 @@ public class Message {
 
     public void setSourceInput(MessageInput input) {
         this.sourceInput = input;
+    }
+
+    // drools seems to need the "get" prefix
+    public boolean getIsSourceInetAddress() {
+        return inetAddress != null;
+    }
+
+    public InetAddress getInetAddress() {
+        return inetAddress;
     }
 
     public static class MessageIdFunction implements Function<Message, String> {

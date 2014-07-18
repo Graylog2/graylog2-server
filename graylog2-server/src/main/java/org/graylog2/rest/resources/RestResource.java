@@ -26,10 +26,6 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
-import com.fasterxml.jackson.databind.PropertyNamingStrategy;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.guava.GuavaModule;
-import com.fasterxml.jackson.datatype.joda.JodaModule;
 import com.fasterxml.jackson.jaxrs.cfg.EndpointConfigBase;
 import com.fasterxml.jackson.jaxrs.cfg.ObjectWriterInjector;
 import com.fasterxml.jackson.jaxrs.cfg.ObjectWriterModifier;
@@ -38,6 +34,8 @@ import org.apache.shiro.subject.Subject;
 import org.bson.types.ObjectId;
 import org.graylog2.security.ShiroSecurityContext;
 import org.graylog2.shared.ServerStatus;
+import org.graylog2.users.User;
+import org.graylog2.users.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,7 +44,10 @@ import javax.ws.rs.ForbiddenException;
 import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.*;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.SecurityContext;
 import java.security.Principal;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -62,6 +63,9 @@ public abstract class RestResource {
     protected ObjectMapper objectMapper;
 
     @Inject
+    protected UserService userService;
+
+    @Inject
     protected ServerStatus serverStatus;
 
     private boolean prettyPrint;
@@ -69,7 +73,7 @@ public abstract class RestResource {
     @Context
     SecurityContext securityContext;
 
-	protected RestResource() {
+    protected RestResource() {
         /*
           * Jackson is serializing java.util.Date (coming out of MongoDB for example) as UNIX epoch by default.
           * Make it write ISO8601 instead.
@@ -280,4 +284,13 @@ public abstract class RestResource {
         }
     }
 
+    protected User getCurrentUser() {
+        final Object principal = getSubject().getPrincipal();
+        final User user = userService.load(principal.toString());
+        if (user == null) {
+            LOG.error("Loading the current user failed, this should not happen. Did you call this method in an unauthenticated REST resource?");
+            return null;
+        }
+        return user;
+    }
 }

@@ -31,15 +31,21 @@ import org.kie.api.builder.KieFileSystem;
 import org.kie.api.builder.KieModule;
 import org.kie.api.builder.ReleaseId;
 import org.kie.api.io.Resource;
+import org.kie.api.io.ResourceType;
 import org.kie.api.runtime.KieContainer;
 import org.kie.api.runtime.KieSession;
+import org.kie.api.runtime.rule.FactHandle;
+import org.kie.internal.io.ResourceFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Singleton;
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
+import java.nio.file.Path;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
 @Singleton
@@ -47,6 +53,7 @@ public class DroolsEngine implements RulesEngine {
     private static final Logger log = LoggerFactory.getLogger(DroolsEngine.class);
 
     private final KieServices kieServices;
+    private final Set<URL> builtinRuleUrls;
     private KieContainer kieContainer;
     private final AtomicReference<KieSession> session = new AtomicReference<>();
 
@@ -55,7 +62,8 @@ public class DroolsEngine implements RulesEngine {
     private ReleaseId currentReleaseId;
 
     @Inject
-    public DroolsEngine() {
+    public DroolsEngine(Set<URL> builtinRuleUrls) {
+        this.builtinRuleUrls = builtinRuleUrls;
         kieServices = KieServices.Factory.get();
         liveRules.add("// placeholder rule");
         commitRules();
@@ -97,13 +105,37 @@ public class DroolsEngine implements RulesEngine {
     }
 
     @Override
-    public int evaluate(Message message) {
+    public int evaluateInSharedSession(Message message) {
         final KieSession kieSession = session.get();
         if (kieSession != null) {
             kieSession.insert(message);
             return kieSession.fireAllRules();
         }
         return 0;
+    }
+
+    @Override
+    public RulesSession createPrivateSession() {
+        final KieSession kieSession = kieContainer.newKieSession();
+//        kieSession.addEventListener(new DebugRuleRuntimeEventListener());
+//        kieSession.addEventListener(new DebugAgendaEventListener());
+        kieSession.setGlobal("log", log);
+        return new DroolsRulesSession(kieSession);
+    }
+
+    @Override
+    public Object insertFact(Object fact) {
+        return session.get().insert(fact);
+    }
+
+    @Override
+    public boolean deleteFact(Object fact) {
+        final FactHandle factHandle = session.get().getFactHandle(fact);
+        if (factHandle == null) {
+            return false;
+        }
+        session.get().delete(factHandle);
+        return true;
     }
 
     private boolean commitRules() {
@@ -154,14 +186,14 @@ public class DroolsEngine implements RulesEngine {
         return currentReleaseId;
     }
 
-    private static KieModule createAndDeployJar(KieServices ks,
+    private KieModule createAndDeployJar(KieServices ks,
                                                 ReleaseId releaseId,
                                                 String... drls) throws RulesCompilationException {
         byte[] jar = createKJar(ks, releaseId, null, drls);
         return deployJar(ks, jar);
     }
 
-    private static byte[] createKJar(KieServices ks,
+    private byte[] createKJar(KieServices ks,
                                      ReleaseId releaseId,
                                      String pom,
                                      String... drls) throws RulesCompilationException {
@@ -176,6 +208,16 @@ public class DroolsEngine implements RulesEngine {
                 kfs.write("src/main/resources/r" + i + ".drl", drls[i]);
             }
         }
+        for (URL builtinRuleUrl : builtinRuleUrls) {
+            final Path rulesPath = new File(builtinRuleUrl.getPath()).toPath();
+            final String path = "src/main/resources/" + rulesPath.getFileName();
+            final Resource resource = ResourceFactory
+                    .newUrlResource(builtinRuleUrl)
+                    .setSourcePath(path)
+                    .setResourceType(ResourceType.DRL);
+            kfs.write(resource);
+        }
+
         KieBuilder kb = ks.newKieBuilder(kfs).buildAll();
         if (kb.getResults().hasMessages(org.kie.api.builder.Message.Level.ERROR)) {
             throw new RulesCompilationException(kb.getResults().getMessages());
@@ -186,7 +228,7 @@ public class DroolsEngine implements RulesEngine {
         return jar;
     }
 
-    private static KieModule deployJar(KieServices ks, byte[] jar) {
+    private KieModule deployJar(KieServices ks, byte[] jar) {
         // Deploy jar into the repository
         Resource jarRes = ks.getResources().newByteArrayResource(jar);
         KieModule km = ks.getRepository().addKieModule(jarRes);

@@ -1,21 +1,22 @@
 package org.graylog2.rules;
 
+import com.google.common.collect.Sets;
 import org.graylog2.Graylog2BaseTest;
 import org.graylog2.plugin.Message;
 import org.joda.time.DateTime;
 import org.testng.annotations.Test;
 
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
+import java.net.URL;
+
+import static org.testng.Assert.*;
 
 public class DroolsEngineTest extends Graylog2BaseTest {
 
     @Test
     public void runWithoutRules() {
-        final DroolsEngine engine = new DroolsEngine();
+        final DroolsEngine engine = new DroolsEngine(Sets.<URL>newHashSet());
 
-        final int rulesFired = engine.evaluate(new Message("test message", "test", DateTime.now()));
+        final int rulesFired = engine.evaluateInSharedSession(new Message("test message", "test", DateTime.now()));
 
         assertEquals(rulesFired, 0, "No rules should have fired");
 
@@ -24,7 +25,7 @@ public class DroolsEngineTest extends Graylog2BaseTest {
 
     @Test
     public void addedRuleIsVisibleInSession() {
-        final DroolsEngine engine = new DroolsEngine();
+        final DroolsEngine engine = new DroolsEngine(Sets.<URL>newHashSet());
 
         String rule1 =
                 "declare Message\n" +
@@ -57,7 +58,7 @@ public class DroolsEngineTest extends Graylog2BaseTest {
         assertTrue(valid2, "Rule should compile without errors");
 
         final Message msg = new Message("test message", "test source", DateTime.now());
-        final int fired = engine.evaluate(msg);
+        final int fired = engine.evaluateInSharedSession(msg);
 
         assertTrue(msg.getFilterOut(), "msg is filtered out");
         assertEquals(fired, 2, "both rules should have fired");
@@ -67,7 +68,7 @@ public class DroolsEngineTest extends Graylog2BaseTest {
 
     @Test
     public void incorrectRuleIsNotApplied() {
-        final DroolsEngine engine = new DroolsEngine();
+        final DroolsEngine engine = new DroolsEngine(Sets.<URL>newHashSet());
 
         String invalidRule = "rule \"this will not compile\"\n" +
                 "when\n" +
@@ -87,7 +88,7 @@ public class DroolsEngineTest extends Graylog2BaseTest {
         deployed = engine.addRule(validRule);
         assertTrue(deployed, "Subsequent deployment of valid rule works");
 
-        engine.evaluate(new Message("foo", "source", DateTime.now()));
+        engine.evaluateInSharedSession(new Message("foo", "source", DateTime.now()));
 
         engine.stop();
     }

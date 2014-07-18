@@ -20,6 +20,8 @@
 package org.graylog2.bindings;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.jaxrs.base.JsonMappingExceptionMapper;
+import com.fasterxml.jackson.jaxrs.base.JsonParseExceptionMapper;
 import com.google.inject.AbstractModule;
 import com.google.inject.Scopes;
 import com.google.inject.TypeLiteral;
@@ -31,12 +33,12 @@ import org.graylog2.Configuration;
 import org.graylog2.alerts.AlertSender;
 import org.graylog2.alerts.FormattedEmailAlertSender;
 import org.graylog2.bindings.providers.*;
-import org.graylog2.buffers.OutputBuffer;
 import org.graylog2.buffers.OutputBufferWatermark;
 import org.graylog2.buffers.processors.OutputBufferProcessor;
 import org.graylog2.buffers.processors.ServerProcessBufferProcessor;
-import org.graylog2.dashboards.DashboardRegistry;
 import org.graylog2.database.MongoConnection;
+import org.graylog2.filters.FilterService;
+import org.graylog2.filters.FilterServiceImpl;
 import org.graylog2.indexer.Indexer;
 import org.graylog2.indexer.MessageGatewayImpl;
 import org.graylog2.indexer.cluster.Cluster;
@@ -47,10 +49,7 @@ import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.indices.jobs.OptimizeIndexJob;
 import org.graylog2.indexer.ranges.RebuildIndexRangesJob;
 import org.graylog2.indexer.searches.Searches;
-import org.graylog2.inputs.InputCache;
-import org.graylog2.inputs.OutputCache;
 import org.graylog2.jersey.container.netty.SecurityContextFactory;
-import org.graylog2.outputs.OutputRegistry;
 import org.graylog2.plugin.PluginMetaData;
 import org.graylog2.plugin.RulesEngine;
 import org.graylog2.plugin.indexer.MessageGateway;
@@ -64,7 +63,6 @@ import org.graylog2.security.realm.LdapUserAuthenticator;
 import org.graylog2.shared.BaseConfiguration;
 import org.graylog2.shared.ServerStatus;
 import org.graylog2.shared.bindings.providers.AsyncHttpClientProvider;
-import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.shared.inputs.InputRegistry;
 import org.graylog2.shared.metrics.jersey2.MetricsDynamicBinding;
 import org.graylog2.streams.StreamRouter;
@@ -158,6 +156,7 @@ public class ServerBindings extends AbstractModule {
         bind(SecurityContextFactory.class).to(ShiroSecurityContextFactory.class);
         bind(AlertSender.class).to(FormattedEmailAlertSender.class);
         bind(StreamRouter.class);
+        bind(FilterService.class).to(FilterServiceImpl.class).in(Scopes.SINGLETON);
     }
 
     private MongoConnection getMongoConnection() {
@@ -182,6 +181,8 @@ public class ServerBindings extends AbstractModule {
         Multibinder<Class<? extends ExceptionMapper>> setBinder = Multibinder.newSetBinder(binder(), type);
         setBinder.addBinding().toInstance(NotFoundExceptionMapper.class);
         setBinder.addBinding().toInstance(ValidationExceptionMapper.class);
+        setBinder.addBinding().toInstance(JsonParseExceptionMapper.class);
+        setBinder.addBinding().toInstance(JsonMappingExceptionMapper.class);
     }
 
     private void bindPluginMetaData() {
