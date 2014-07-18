@@ -53,6 +53,6 @@ public class OutputService {
     }
 
     public OutputTypesResponse available() throws APIException, IOException {
-        return api.path(routes.OutputResource().available(null), OutputTypesResponse.class).execute();
+        return api.path(routes.OutputResource().available(), OutputTypesResponse.class).execute();
     }
 }
