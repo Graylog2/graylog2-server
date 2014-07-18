@@ -1,6 +1,6 @@
 @(currentUser: org.graylog2.restclient.models.User, message: org.graylog2.restclient.models.api.results.MessageResult,  messageStreams: List[org.graylog2.restclient.models.Stream], sourceInput: org.graylog2.restclient.models.Input, sourceNode: org.graylog2.restclient.models.Node, sourceRadio: org.graylog2.restclient.models.Radio, sourceRadioInput: org.graylog2.restclient.models.Input)
 
-@import org.graylog2.restclient.lib.DateTools
+@import views.helpers.DateHelper
 @import org.graylog2.restclient.lib.Tools
 
 @main("Message " + message.getId, sidebars.standard(currentUser), "", currentUser) {
@@ -44,7 +44,7 @@
         }
 
         /
-        Timestamp: @DateTools.inUserTimeZoneShortFormat(message.getTimestamp())
+        Timestamp: @DateHelper.timestampShortTZ(message.getTimestamp())
 
         /
         Index: <em>@message.getIndex()</em>

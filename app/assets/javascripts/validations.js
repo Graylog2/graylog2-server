@@ -57,7 +57,13 @@ function dispatchRuleValidation(ref, validatorType) {
                 errors = true;
             }
             break;
-        case "timerange_not_empty":
+        case "datetime_format":
+            if (!validateDatetimeFormat(ref)) {
+                validationFailure(ref, "is not in a valid format");
+                errors = true;
+            }
+            break;
+        case "timerange":
             if (!validateAbsoluteTimerange(ref)) {
                 validationFailure(ref, "cannot be earlier than 'From'");
                 errors = true;
@@ -102,14 +108,17 @@ function validateNumber(el) {
     return isNumber(el.val());
 }
 
+function validateDatetimeFormat(el) {
+    var dateString = $(el).val();
+    return momentHelper.parseFromString(dateString).isValid();
+}
+
 function validateAbsoluteTimerange(el) {
     var parent = $(el).parent().parent();
     var fromStr = $("input[name='from']", parent).val();
     var toStr = $("input[name='to']", parent).val();
-    var from = parseDateFromString(fromStr);
-    var to = parseDateFromString(toStr);
-
-    // new Date(year, month, day, hours, minutes, seconds, milliseconds)
+    var from = momentHelper.parseFromString(fromStr);
+    var to = momentHelper.parseFromString(toStr);
 
     return (from <= to)
 }

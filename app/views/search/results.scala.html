@@ -12,7 +12,7 @@
 @import lib.security.RestPermissions
 @import views.helpers.DateHistogramResolutionSelector
 @import views.helpers.Permissions
-@import org.graylog2.restclient.lib.DateTools
+@import views.helpers.DateHelper
 @import controllers.routes;
 @import views.helpers.SearchRouteHelper
 @import org.graylog2.restclient.models.UniversalSearch
@@ -393,7 +393,7 @@
 	<tbody>
 		@for(r <- searchResult.getMessages()) {
 		<tr data-message-id='@r.getFields.get("_id")' data-source-index="@r.getIndex">
-			<td>@DateTools.inUserTimeZoneShortFormat(r.getTimestamp)</td>
+			<td>@DateHelper.timestampShort(r.getTimestamp)</td>
 			<td @if(!(selectedFields.contains("source") || search.getOrder.getField.equals("source"))) { style="display: none;" }
                 class="result-td-36cd38f49b9afa08222c0dc9ebfe35eb">@r.getFields.get("source")</td>
 			<td @if(!(selectedFields.contains("message") || search.getOrder.getField.equals("message"))) { style="display: none;" }

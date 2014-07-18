@@ -2,6 +2,7 @@
 
 @import views.helpers.InputStateHelper
 @import views.helpers.Permissions._
+@import views.helpers.DateHelper
 @import lib.security.RestPermissions._
 @import controllers.routes
 @import org.graylog2.restclient.models._
@@ -14,7 +15,7 @@
             @if(input.getGlobal == false) {
                 <span class="text" title="@inputState.getNode.getNodeId">on @views.helpers.ClusterEntityHelper.linkToEntity(inputState.getNode)</span>
             }
-            <span class="text moment-from-now" title="@inputState.getStartedAt">@inputState.getStartedAt</span>
+            @DateHelper.readablePeriodFromNow(inputState.getStartedAt, "text")
                 &nbsp;
 
             @views.html.system.inputs.partials.input_state_controls.render(inputState.getState, input)

@@ -953,22 +953,17 @@ $(document).ready(function() {
     $('input, textarea').placeholder();
 
     $(".node-state").tooltip();
-});
 
-function searchDateTimeFormatted(date) {
-    var day = ('0' + date.getDate()).slice(-2); // wtf javascript. this returns the day.
-    var month = ('0' + (date.getMonth() + 1)).slice(-2);
-    var year = date.getFullYear();
-
-    var hour = ('0' + date.getHours()).slice(-2);
-    var minute = ('0' + date.getMinutes()).slice(-2);
-    var second = ('0' + date.getSeconds()).slice(-2);
-    var millis = "";
-    if (date.getMilliseconds() > 0) {
-        millis = '.' + ('0' + date.getMilliseconds()).slice(-3);
+    datetimeFields = $(".browser-datetime")
+    if(datetimeFields.length > 0) {
+        datetimeFields.each(function() {
+            var currentDatetime = moment();
+            $(this).attr("title", currentDatetime.format(momentHelper.DATE_FORMAT_ISO));
+            $(this).attr("datetime", currentDatetime.format(momentHelper.DATE_FORMAT_ISO));
+            $(this).text(currentDatetime.format(momentHelper.DATE_FORMAT_TZ));
+        });
     }
-    return year + "-" + month + "-" + day + " " + hour + ":" + minute + ":" + second + millis;
-}
+});
 
 function showError(message) {
     toastr.error(message, "Error", {
@@ -1113,20 +1108,6 @@ function generateId() {
         });
     };
 })(jQuery);
-
-// Browsers fail with all kinds of date formats. Passing every part of the date as a constructor parameter seems to be the safest way to go.
-function parseDateFromString(src) {
-    // Parses datetimes like 2014-06-26 15:26:17 and 2014-06-25T22:15:26.000Z
-    var parts = /(\d+)-(\d+)-(\d+)[T\s](\d+):(\d+):(\d+)(?:.(\d+)Z)?/.exec(src);
-
-    var millis = 0;
-    if (parts[7] != "" && parts[7] != undefined) {
-        millis = parts[7];
-    }
-
-    // LOL SRSLY WTF JAVASCRIPT: -1
-    return new Date(parts[1], parts[2]-1, parts[3], parts[4], parts[5], parts[6], millis);
-}
 
 clipBoardClient = {};
 

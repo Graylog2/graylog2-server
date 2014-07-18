@@ -3,6 +3,7 @@
 @import views.helpers.AlertConditionDecorator
 @import lib.security.RestPermissions._
 @import views.helpers.Permissions._
+@import views.helpers.DateHelper
 
 @if(alertConditions.isEmpty) {
     <div style="margin-top: 10px;" class="alert alert-info">
@@ -12,8 +13,8 @@
     @for(condition <- alertConditions) {
         <div class="row-fluid node-row alert-condition" data-condition-id="@condition.getId">
             <span class="pull-right node-row-info">
-                    Created by @views.html.partials.links.to_user.render(condition.getCreatorUser)
-                <span class="moment-from-now" title="@condition.getCreatedAt()">@condition.getCreatedAt()</span>
+                Created by @views.html.partials.links.to_user.render(condition.getCreatorUser)
+                @DateHelper.readablePeriodFromNow(condition.getCreatedAt())
 
                 @if(isPermitted(STREAMS_EDIT, stream.getId)) {
                         &nbsp;

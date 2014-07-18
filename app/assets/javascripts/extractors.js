@@ -17,7 +17,7 @@ $(document).ready(function() {
 
         var wizard = $(".xtrc-wizard");
         $(".xtrc-wizard-field", wizard).html(field)
-        $(".xtrc-wizard-example", wizard).html(value);
+        $(".xtrc-wizard-example", wizard).html(htmlEscape(value));
 
         $("input[name=field]", wizard).val(field)
         $("input[name=example]", wizard).val(value);
@@ -88,35 +88,24 @@ $(document).ready(function() {
         });
     }
 
-    $("#begin_index").on("change", function(e) {
-        var elem = $("#begin_index");
-        var endIndex = $("#end_index");
-
-        if (parseInt(elem.val()) < 0) {
-            elem.val(0);
-        }
-        if (parseInt(elem.val()) > parseInt(endIndex.val())) {
-            elem.val(endIndex.val());
-        }
-        trySubstring($(".xtrc-try-substring"));
-    });
-
-    $("#end_index").on("change", function(e) {
-        var elem = $("#end_index");
-        var maxLength = $("#xtrc-example").text().length;
-        var beginIndex = $("#begin_index").val();
-
-        if (parseInt(elem.val()) > maxLength) {
-            elem.val(maxLength);
-        }
-        if (parseInt(beginIndex) > parseInt(elem.val())) {
-            elem.val(beginIndex);
-        }
-        trySubstring($(".xtrc-try-substring"));
-    });
-
     // Try substring against example.
     $(".xtrc-try-substring").on("click", function() {
+        var beginIndex = $("#begin_index");
+        var endIndex = $("#end_index");
+        var maxLength = $("#xtrc-example").text().length;
+
+        if (parseInt(beginIndex.val()) < 0) {
+            beginIndex.val(0);
+        }
+        if (parseInt(endIndex.val()) < 0) {
+            endIndex.val(0);
+        }
+        if (parseInt(beginIndex.val()) > parseInt(endIndex.val())) {
+            beginIndex.val(endIndex.val());
+        }
+        if (parseInt(endIndex.val()) > maxLength) {
+            endIndex.val(maxLength);
+        }
         trySubstring($(this));
     });
 
@@ -152,18 +141,24 @@ $(document).ready(function() {
 
     function highlightMatchResult(result) {
         var example = $("#xtrc-example");
+        var start = result.match.start;
+        var end = result.match.end;
+
         // Set to original content first, so we can do this multiple times.
         example.html($("#xtrc-original-example").html());
 
-        var spanStart = "<span class='xtrc-hl'>";
-        var spanEnd = "</span>";
-
-        var start = result.match.start;
-        var end = result.match.end+spanStart.length;
-
         var exampleContent = $("<div/>").html(example.html()).text(); // ZOMG JS. this is how you unescape HTML entities.
+        var highlightedElement = $("<span/>").addClass("xtrc-hl");
 
-        example.html(exampleContent.splice(start,0,spanStart).splice(end,0,spanEnd));
+        // We ensure all parts of the example are escaped
+        var textBeforeHighlight = htmlEscape(exampleContent.slice(0, start));
+        var highlightedText = htmlEscape(exampleContent.slice(start, end));
+        var textAfterHighlight = htmlEscape(exampleContent.slice(end));
+
+        example.html(textBeforeHighlight);
+        highlightedElement.html(highlightedText);
+        example.append(highlightedElement);
+        example.append(textAfterHighlight);
     }
 
     // Add converter button.

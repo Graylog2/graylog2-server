@@ -3,6 +3,7 @@
 @import lib.security.RestPermissions._
 @import views.helpers.Permissions._
 @import views.helpers.StringHelper._
+@import views.helpers.DateHelper
 @import controllers.routes
 
 @main("Streams", views.html.sidebars.standard(currentUser), "", currentUser, false) {
@@ -24,7 +25,7 @@
         <div class="row-fluid node-row stream-row" data-stream-id="@stream.getId">
             <span class="pull-right node-row-info">
                 Created by @views.html.partials.links.to_user.render(stream.getCreatorUser)
-                <span class="moment-from-now" title="@stream.getCreatedAt()">@stream.getCreatedAt()</span>
+                @DateHelper.readablePeriodFromNow(stream.getCreatedAt())
 
                 &nbsp;@if(isPermitted(STREAMS_EDIT, stream.getId)) {<button class="btn btn-danger btn-mini remove-stream"
                     type="submit"

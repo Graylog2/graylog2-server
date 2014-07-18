@@ -40,4 +40,25 @@ public class DateHelper {
         return views.html.partials.dates.instant.render(DateTools.inUserTimeZone(instant), DateTools.SHORT_DATE_FORMAT);
     }
 
+    public static Html timestampShortTZ(DateTime instant) {
+        return timestampShortTZ(instant, true);
+    }
+
+    public static Html timestampShortTZ(DateTime instant, boolean inUserTZ) {
+        DateTime date = instant;
+
+        if (inUserTZ) {
+            date = DateTools.inUserTimeZone(instant);
+        }
+        return views.html.partials.dates.instant.render(date, DateTools.SHORT_DATE_FORMAT_TZ);
+    }
+
+    public static Html readablePeriodFromNow(DateTime instant) {
+        return readablePeriodFromNow(instant, "");
+    }
+
+    public static Html readablePeriodFromNow(DateTime instant, String classes) {
+        return views.html.partials.dates.readable_period.render(DateTools.inUserTimeZone(instant), classes);
+    }
+
 }

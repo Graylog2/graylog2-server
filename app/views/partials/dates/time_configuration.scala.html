@@ -1,0 +1,22 @@
+@(currentUser: org.graylog2.restclient.models.User, masterTimezone: String)
+@import views.helpers.DateHelper
+@import org.joda.time.DateTime
+@import org.joda.time.DateTimeZone
+@import org.graylog2.restclient.lib.DateTools
+
+<p>
+    Dealing with timezones can be confusing. Here you can see the timezone applied to different components of your system.
+    You can see time information for each Graylog2 server node in the node information page.
+</p>
+<dl class="system-time">
+    <dt>User @currentUser.getName:</dt>
+    <dd>@DateHelper.timestampShortTZ(DateTime.now)</dd>
+    <dt>Web browser:</dt>
+    <dd><time class="browser-datetime"></time></dd>
+    <dt>Default JDK/JRE:</dt>
+    <dd>@DateHelper.timestampShortTZ(DateTime.now(DateTimeZone.getDefault()), false)</dd>
+    <dt>Graylog2 web interface:</dt>
+    <dd>@DateHelper.timestampShortTZ(DateTime.now(DateTools.getApplicationTimeZone()), false)</dd>
+    <dt>Graylog2 master server:</dt>
+    <dd>@DateHelper.timestampShortTZ(DateTime.now(DateTimeZone.forID(masterTimezone)), false)</dd>
+</dl>

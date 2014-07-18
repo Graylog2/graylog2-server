@@ -3,6 +3,7 @@
         stream: org.graylog2.restclient.models.Stream)
 @import lib.security.RestPermissions._
 @import views.helpers.Permissions._
+@import views.helpers.DateHelper
 
 @if(alarmCallbacks.isEmpty) {
     <div style="margin-top: 10px;" class="alert alert-info">
@@ -12,8 +13,8 @@
     @for(callback <- alarmCallbacks) {
         <div class="row-fluid node-row alert-condition" data-destination-id="@callback">
             <span class="pull-right node-row-info">
-                    Created by @views.html.partials.links.to_user.render(callback.getCreatorUser)
-                <span class="moment-from-now" title="@callback.getCreatedAt()">@callback.getCreatedAt()</span>
+                Created by @views.html.partials.links.to_user.render(callback.getCreatorUser)
+                @DateHelper.readablePeriodFromNow(callback.getCreatedAt())
 
                 @if(isPermitted(STREAMS_EDIT, stream.getId)) {
                         &nbsp;

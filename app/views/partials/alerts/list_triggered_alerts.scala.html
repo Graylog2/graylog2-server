@@ -1,4 +1,5 @@
 @(alerts: List[org.graylog2.restclient.models.alerts.Alert], totalAlerts: Long, stream: org.graylog2.restclient.models.Stream, node: org.graylog2.restclient.models.Node)
+@import views.helpers.DateHelper
 
 <h2><i class="icon icon-bell"></i> Triggered alerts</h2>
 Showing the most recent alerts. This stream triggered a total of <b>@totalAlerts alerts</b>.<br>
@@ -22,9 +23,9 @@ Showing the most recent alerts. This stream triggered a total of <b>@totalAlerts
         @for(alert <- alerts) {
             <tr>
                 <td>
-                    <span class="moment-from-now" title="@alert.getTriggeredAt">@alert.getTriggeredAt</span>
+                    @DateHelper.readablePeriodFromNow(alert.getTriggeredAt)
                 </td>
-                <td style="display:none">@alert.getTriggeredAt</td>
+                <td style="display:none">@DateHelper.timestampShortTZ(alert.getTriggeredAt)</td>
                 <td>
                     <a href="#" class="condition-id" data-condition-id="@alert.getConditionId">@alert.getConditionId</a>
                 </td>

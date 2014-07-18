@@ -1,11 +1,45 @@
 import sbt._
 import Keys._
 import play.Project._
+import java.text.SimpleDateFormat
+import java.util.{Date, TimeZone}
+import com.typesafe.sbt.SbtNativePackager.Universal
+import com.typesafe.sbt.packager.universal.Keys.packageZipTarball
 
 object ApplicationBuild extends Build {
 
   val appName         = "graylog2-web-interface"
-  val appVersion      = "0.21.0-snapshot"
+  val appVersion      = "0.21.0-SNAPSHOT"
+
+
+  // use this to potentially add a timestamp to the built package name
+  def packageSnapshot = Command.command("package-snapshot") { state =>
+    val extracted = Project extract state
+
+    val configFile: File = new File("conf/graylog2-web-interface.conf")
+    val exampleConfigFile: File = new File("misc/graylog2-web-interface.conf.example")
+
+    // this will overwrite the config file with the sample one
+    IO.copyFile(exampleConfigFile, configFile, preserveLastModified = true)
+
+    val task: (State, File) = extracted.runTask(packageZipTarball in Universal, state)
+
+    val snapshot = extracted.getOpt(isSnapshot).get // getting current version
+    if (snapshot) {
+      val dateFormat = { val df = new SimpleDateFormat("yyyyMMddhhmmss");
+        df.setTimeZone(TimeZone.getTimeZone("UTC")); df
+      }
+      val timestamp = dateFormat.format(new Date())
+      // fuck it sbt, really.
+      // changing the state to use a different package name is not possible, because the artifact name has already been
+      // constructed at the time this runs. instead of doing it lazily the native packager does it eagerly, so we can't
+      // change it anymore.
+      val packageDir: File = new File(task._2.getParentFile, "package")
+      packageDir.mkdir()
+      task._2.renameTo(new File(packageDir, task._2.getName.replace(".tgz", "-" + timestamp + ".tgz")))
+    }
+    task._1
+  }
 
   val appDependencies = Seq(
     cache,
@@ -45,7 +79,13 @@ object ApplicationBuild extends Build {
     resolvers += Resolver.url("Graylog2 Play Repository", url("http://graylog2.github.io/play2-graylog2/releases/"))(Resolver.ivyStylePatterns),
     resolvers += Resolver.url("Graylog2 Play Snapshot Repository", url("http://graylog2.github.io/play2-graylog2/snapshots/"))(Resolver.ivyStylePatterns),
     resolvers += Resolver.url("Typesafe Maven Releases", url("http://repo.typesafe.com/typesafe/maven-releases"))(Resolver.mavenStylePatterns),
-    resolvers +=
-      "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots"
+    resolvers += ("Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots"),
+    commands ++= Seq(packageSnapshot),
+    resourceGenerators in Compile <+= resourceManaged in Compile map { dir =>
+      val propsFile = new File(dir, "git.properties")
+      IO.write(propsFile, "git.sha1=%s\n".format("git rev-parse HEAD" !!))
+      Seq(propsFile)
+    }
+
   ).dependsOn(restClient)
 }
