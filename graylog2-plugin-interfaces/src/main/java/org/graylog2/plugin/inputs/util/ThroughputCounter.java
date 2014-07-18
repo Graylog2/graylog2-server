@@ -27,6 +27,7 @@ import org.jboss.netty.handler.traffic.GlobalTrafficShapingHandler;
 import org.jboss.netty.handler.traffic.TrafficCounter;
 import org.jboss.netty.util.HashedWheelTimer;
 
+import javax.inject.Inject;
 import java.util.Map;
 
 /**
@@ -34,8 +35,9 @@ import java.util.Map;
  */
 public class ThroughputCounter extends GlobalTrafficShapingHandler {
 
-    public ThroughputCounter() {
-        super(new HashedWheelTimer(), 1000);
+    @Inject
+    public ThroughputCounter(HashedWheelTimer wheelTimer) {
+        super(wheelTimer, 1000);
     }
 
     public Map<String, Gauge<Long>> gauges() {
