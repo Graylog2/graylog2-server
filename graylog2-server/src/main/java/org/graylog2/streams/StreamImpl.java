@@ -35,6 +35,7 @@ import org.graylog2.database.validators.DateValidator;
 import org.graylog2.database.validators.FilledStringValidator;
 import org.graylog2.database.validators.MapValidator;
 import org.graylog2.database.validators.Validator;
+import org.graylog2.notifications.Notification;
 import org.graylog2.plugin.GraylogServer;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.alarms.AlarmReceiver;
@@ -257,6 +258,17 @@ public class StreamImpl extends Persisted implements Stream {
     public void destroy() {
         for (StreamRule streamRule : getStreamRules()) {
             ((StreamRuleImpl) streamRule).destroy();
+        }
+        for (Notification notification : Notification.all(core)) {
+            Object rawValue = notification.getDetail("stream_id");
+
+            if (rawValue == null)
+                continue;
+
+            if (rawValue.toString().equals(getId())) {
+                LOG.debug("Removing notification that references stream: {}", notification);
+                notification.destroy();
+            }
         }
         super.destroy();
     }

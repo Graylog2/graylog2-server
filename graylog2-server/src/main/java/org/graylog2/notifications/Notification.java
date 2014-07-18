@@ -236,6 +236,14 @@ public class Notification extends Persisted {
         return this;
     }
 
+    public Object getDetail(String key) {
+        Map<String, Object> details = (Map<String, Object>)fields.get("details");
+        if (details == null)
+            return null;
+
+        return details.get(key);
+    }
+
     public Map<String, Object> asMap() {
         Map<String, Object> result = Maps.newHashMap(fields);
         result.remove("_id");
