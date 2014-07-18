@@ -42,9 +42,15 @@ public class NotificationTypeFactory {
             case EMAIL_TRANSPORT_FAILED:
                 return new EmailTransportFailedNotification(notification);
             case STREAM_PROCESSING_DISABLED:
-                final Stream stream = streamService.get(notification.getDetail("stream_id").toString());
+                String streamTitle;
+                try {
+                    final Stream stream = streamService.get(notification.getDetail("stream_id").toString());
+                    streamTitle = stream.getTitle();
+                } catch (APIException | IOException e) {
+                    streamTitle = "(Stream title unavailable)";
+                }
                 long faultCount = Math.round((double)notification.getDetail("fault_count"));
-                return new StreamProcessingDisabledNotification(notification, stream.getTitle(), faultCount);
+                return new StreamProcessingDisabledNotification(notification, streamTitle, faultCount);
         }
 
         throw new RuntimeException("No notification registered for " + notification.getType());
