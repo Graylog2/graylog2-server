@@ -15,7 +15,6 @@
             <li><a href="@routes.ExtractorsController.manage(targetNode.getNodeId, input.getId)">Manage extractors</a></li>
         }
 
-
         @if(!input.getGlobal) {
             <li><a href="@routes.MetricsController.ofNode(targetNode.getNodeId, input.getType + "." + input.getId)">Show metrics</a></li>
         }

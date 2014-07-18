@@ -77,6 +77,10 @@ POST        /system/inputs/:node_id/:input_id/staticfields                      
 POST        /system/inputs/:input_id/staticfields                                    @controllers.InputsController.addStaticFieldGlobal(input_id: String)
 GET         /system/inputs/:node_id/:input_id/staticfields/:key/delete               @controllers.InputsController.removeStaticField(node_id: String, input_id: String, key: String)
 
+# Outputs
+GET         /system/outputs                                                          @controllers.OutputsController.index()
+POST        /system/outputs                                                          @controllers.OutputsController.create()
+
 POST        /system/inputs/:input_id/start                                           @controllers.InputsController.start(input_id: String)
 POST        /system/inputs/:input_id/stop                                            @controllers.InputsController.stop(input_id: String)
 POST        /system/inputs/:input_id/restart                                         @controllers.InputsController.restart(input_id: String)
@@ -112,6 +116,7 @@ POST        /system/inputs/:node_id/:input_id/extractors/:extractor_id/delete   
 GET         /system/inputs/:node_id/:input_id/extractors/export                      @controllers.ExtractorsController.exportExtractors(node_id: String, input_id: String)
 GET         /system/inputs/:node_id/:input_id/extractors/import                      @controllers.ExtractorsController.importExtractorsPage(node_id: String, input_id: String)
 POST        /system/inputs/:node_id/:input_id/extractors/import                      @controllers.ExtractorsController.importExtractors(node_id: String, input_id: String)
+
 
 # Users
 GET         /system/users                                                            @controllers.UsersController.index()

@@ -1,0 +1,53 @@
+@(outputTypes: Map[String, org.graylog2.restclient.models.api.responses.AvailableOutputSummary])
+
+@for((outputType,info) <- outputTypes) {
+    <div class="input-configuration modal hide fade" data-inputtype="@outputType">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            <h2>
+                <i class="icon-signin"></i>
+                Launch new input: <em>@info.name</em>
+            </h2>
+        </div>
+
+        <form action="@routes.OutputsController.create()" method="POST">
+            <input type="hidden" name="type" value="@outputType" />
+
+            <fieldset>
+                <div class="modal-body">
+
+                    <label>Title</label>
+                    <span class="help-block">Select a name of your new input that describes it.</span>
+                    <input name="title" required="true" type="text" class="input-xlarge">
+
+                    @for(field <- info.getRequestedConfiguration) {
+
+                        @if(field.getType().equals("text")) {
+                            @views.html.system.inputs.fields.text_field(field)
+                        }
+
+                        @if(field.getType().equals("number")) {
+                            @views.html.system.inputs.fields.number_field(field)
+                        }
+
+                        @if(field.getType().equals("boolean")) {
+                            @views.html.system.inputs.fields.boolean_field(field)
+                        }
+
+                        @if(field.getType().equals("dropdown")) {
+                            views.html.system.inputs.fields.dropdown_field(field.asInstanceOf[DropdownField])
+                        }
+                    }
+
+                </div>
+                <div class="modal-footer">
+                    <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+                    <button type="submit" class="btn btn-primary launch-input" data-type="@outputType">
+                        <i class="icon icon-rocket"></i>
+                        Launch
+                    </button>
+                </div>
+            </fieldset>
+        </form>
+    </div>
+}

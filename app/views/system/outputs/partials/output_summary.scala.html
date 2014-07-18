@@ -1,0 +1,24 @@
+@(output: org.graylog2.restclient.models.Output)
+
+<div class="row-fluid node-row">
+    <span class="pull-right node-row-info">
+        <span class="text">Started by @views.html.partials.links.to_user(output.getCreatorUser)</span>
+        <span class="text moment-from-now" title="@output.getCreatedAt">@output.getCreatedAt</span>
+            &nbsp;
+    </span>
+    <h3>
+        <i class="icon icon-ellipsis-vertical"></i>
+        @output.getTitle (@output.getType)
+    </h3>
+    <div class="well well-small">
+        <ul>
+        @if(output.getConfiguration == null || output.getConfiguration.isEmpty) {
+            <li>-- no configuration --</li>
+        } else {
+            @for((k,v) <- output.getConfiguration) {
+                <li>@k: @v</li>
+            }
+        }
+        </ul>
+    </div>
+</div>

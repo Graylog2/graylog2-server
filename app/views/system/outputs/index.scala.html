@@ -1,0 +1,42 @@
+@(currentUser: org.graylog2.restclient.models.User,
+        breadcrumbs: lib.BreadcrumbList,
+        outputs: List[org.graylog2.restclient.models.Output],
+        availableOutputs: Map[String, org.graylog2.restclient.models.api.responses.AvailableOutputSummary])
+
+@import lib.security.RestPermissions._;
+@import views.helpers.Permissions._;
+
+@main("Outputs of node", views.html.system.sidebar(), "", currentUser) {
+    @views.html.partials.breadcrumbs(breadcrumbs)
+
+    <div class="row-fluid">
+        <h1>
+            <i class="icon icon-download-alt"></i>
+            Outputs in Cluster
+        </h1>
+        Graylog2 nodes can forward messages via outputs. Launch or terminate as many outputs as you want here.
+    </div>
+
+    @if(isPermitted(OUTPUTS_CREATE)) {
+        <div class="row-fluid input-new">
+
+            <select id="input-type">
+            @for((inputType,info) <- availableOutputs.toSeq.sortBy(_._2.name)) {
+                <option value="@inputType">@info.name</option>
+            }
+            </select>
+
+            <button id="configure-input" class="btn btn-success">Launch new input</button>
+        </div>
+
+        @views.html.system.outputs.partials.output_creation_forms.render(availableOutputs)
+    }
+
+    @if(outputs.size > 0) {
+        @for(output <- outputs) {
+            @views.html.system.outputs.partials.output_summary.render(output)
+        }
+    } else {
+        <div class="alert alert-info">There are no outputs.</div>
+    }
+}
