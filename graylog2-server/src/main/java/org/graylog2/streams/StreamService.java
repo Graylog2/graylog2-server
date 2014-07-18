@@ -36,6 +36,7 @@ import java.util.Map;
 public interface StreamService extends PersistedService {
     Stream create(Map<String, Object> fields);
     Stream load(String id) throws NotFoundException;
+    void destroy(Stream stream) throws NotFoundException;
     List<Stream> loadAll();
     List<Stream> loadAllEnabled();
     void pause(Stream stream);

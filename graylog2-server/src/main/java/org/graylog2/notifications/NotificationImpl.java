@@ -126,6 +126,15 @@ public class NotificationImpl extends PersistedImpl implements Notification {
     }
 
     @Override
+    public Object getDetail(String key) {
+        final Map<String, Object> details = (Map<String, Object>)fields.get("details");
+        if (details == null)
+            return null;
+
+        return details.get(key);
+    }
+
+    @Override
     public Map<String, Object> asMap() {
         Map<String, Object> result = Maps.newHashMap(fields);
         result.remove("_id");

@@ -46,6 +46,7 @@ public interface Notification extends Persisted {
     String getNodeId();
 
     Notification addDetail(String key, Object value);
+    Object getDetail(String key);
 
     Map<String, Object> asMap();
 

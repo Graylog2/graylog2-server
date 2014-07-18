@@ -30,6 +30,8 @@ import org.graylog2.database.MongoConnection;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.database.PersistedServiceImpl;
 import org.graylog2.database.ValidationException;
+import org.graylog2.notifications.Notification;
+import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.alarms.AlertCondition;
 import org.graylog2.plugin.database.EmbeddedPersistable;
 import org.graylog2.plugin.streams.Output;
@@ -45,16 +47,19 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
     private final StreamRuleService streamRuleService;
     private final AlertService alertService;
     private final OutputService outputService;
+    private final NotificationService notificationService;
 
     @Inject
     public StreamServiceImpl(MongoConnection mongoConnection,
                              StreamRuleService streamRuleService,
                              AlertService alertService,
-                             OutputService outputService) {
+                             OutputService outputService,
+                             NotificationService notificationService) {
         super(mongoConnection);
         this.streamRuleService = streamRuleService;
         this.alertService = alertService;
         this.outputService = outputService;
+        this.notificationService = notificationService;
     }
 
     @SuppressWarnings("unchecked")
@@ -151,7 +156,14 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
 
     public void destroy(Stream stream) throws NotFoundException {
         for (StreamRule streamRule : streamRuleService.loadForStream(stream)) {
-            //super.destroy(streamRule);
+            super.destroy(streamRule);
+        }
+        for (Notification notification : notificationService.all()) {
+            Object rawValue = notification.getDetail("stream_id");
+            if ( rawValue != null && rawValue.toString().equals(stream.getId())) {
+                LOG.debug("Removing notification that references stream: {}", notification);
+                notificationService.destroy(notification);
+            }
         }
         super.destroy(stream);
     }
