@@ -1,4 +1,4 @@
-package org.graylog2.restclient.models;
+package org.graylog2.restclient.models.api.responses;
 
 import com.google.common.collect.Lists;
 import com.google.gson.annotations.SerializedName;
@@ -11,7 +11,7 @@ import java.util.Map;
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
  */
-public class OutputTypeSummary {
+public class AvailableOutputSummary {
     public String name;
     @SerializedName("requested_configuration")
     public Map<String, Map<String, Object>> requestedConfiguration;
@@ -49,4 +49,5 @@ public class OutputTypeSummary {
         fields.addAll(tmpBools);
 
         return fields;
-    }}
+    }
+}

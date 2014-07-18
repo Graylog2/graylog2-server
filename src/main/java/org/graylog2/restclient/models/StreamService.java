@@ -156,7 +156,7 @@ public class StreamService {
     public void addOutputs(String streamId, Set<String> outputIds) throws APIException, IOException {
         AddOutputRequest request = new AddOutputRequest();
         request.outputs = outputIds;
-        api.path(routes.StreamOutputResource().add(streamId)).body(request).execute();
+        api.path(routes.StreamOutputResource().add(streamId)).expect(Http.Status.CREATED).body(request).execute();
     }
 
     public void removeOutput(String streamId, String outputId) throws APIException, IOException {
