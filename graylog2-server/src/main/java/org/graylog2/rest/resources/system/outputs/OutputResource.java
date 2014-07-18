@@ -87,6 +87,7 @@ public class OutputResource extends RestResource {
     public Response create(@ApiParam(title = "JSON body", required = true) CreateOutputRequest csor) throws ValidationException {
         checkPermission(RestPermissions.OUTPUTS_CREATE);
 
+        csor.creatorUserId = getSubject().getPrincipal().toString();
         Output output = outputService.create(csor);
 
         return Response.status(Response.Status.CREATED).entity(output).build();

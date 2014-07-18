@@ -47,6 +47,9 @@ public class MessageOutputFactory {
             AvailableOutputSummary availableOutputSummary = new AvailableOutputSummary();
             availableOutputSummary.requestedConfiguration = messageOutput.getRequestedConfiguration();
             availableOutputSummary.name = messageOutput.getName();
+            availableOutputSummary.type = messageOutput.getClass().getCanonicalName();
+            availableOutputSummary.humanName = messageOutput.getHumanName();
+            availableOutputSummary.linkToDocs = messageOutput.getLinkToDocs();
             result.put(messageOutputClass.getCanonicalName(), availableOutputSummary);
         }
 

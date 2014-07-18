@@ -67,7 +67,17 @@ public class FakeOutput implements MessageOutput {
     public String getName() {
         return "FAKE OUTPUT";
     }
-    
+
+    @Override
+    public String getHumanName() {
+        return "A fake only output";
+    }
+
+    @Override
+    public String getLinkToDocs() {
+        return null;
+    }
+
     public int getCallCount() {
         return callCount;
     }

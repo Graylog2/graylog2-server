@@ -44,6 +44,16 @@ public class LoggingOutput implements MessageOutput {
 
     @Override
     public String getName() {
-        return "A logging only output.";
+        return "LoggingOutput";
+    }
+
+    @Override
+    public String getHumanName() {
+        return "A logging only output";
+    }
+
+    @Override
+    public String getLinkToDocs() {
+        return null;
     }
 }

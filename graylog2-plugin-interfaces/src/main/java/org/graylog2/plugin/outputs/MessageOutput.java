@@ -36,4 +36,6 @@ public interface MessageOutput {
     public ConfigurationRequest getRequestedConfiguration();
     public Map<String, String> getRequestedStreamConfiguration();
     public String getName();
+    public String getHumanName();
+    public String getLinkToDocs();
 }

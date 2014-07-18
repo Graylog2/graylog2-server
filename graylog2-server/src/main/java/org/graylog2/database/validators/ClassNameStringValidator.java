@@ -30,9 +30,15 @@ public class ClassNameStringValidator implements Validator {
             return false;
         }
 
-        for (Class<?> intf : classToCheck.getInterfaces()) {
-            if (intf.equals(classConstraint))
-                return true;
+        Class<?> currentClass = classToCheck;
+
+        while(!currentClass.equals(Object.class)) {
+            for (Class<?> intf : currentClass.getInterfaces()) {
+                if (intf.equals(classConstraint))
+                    return true;
+            }
+
+            currentClass = currentClass.getSuperclass();
         }
 
         LOG.error("Class {} does not implement interface {}!", classToCheck.getCanonicalName(), classConstraint.getCanonicalName());

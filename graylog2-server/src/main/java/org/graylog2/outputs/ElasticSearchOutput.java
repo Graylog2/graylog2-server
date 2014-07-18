@@ -102,4 +102,13 @@ public class ElasticSearchOutput implements MessageOutput {
         return Maps.newHashMap();
     }
 
+    @Override
+    public String getHumanName() {
+        return "ElasticSearch Output";
+    }
+
+    @Override
+    public String getLinkToDocs() {
+        return null;
+    }
 }

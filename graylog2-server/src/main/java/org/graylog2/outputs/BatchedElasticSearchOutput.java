@@ -55,6 +55,11 @@ public class BatchedElasticSearchOutput extends ElasticSearchOutput {
         }
     }
 
+    @Override
+    public String getHumanName() {
+        return "ElasticSearch Output with Batching";
+    }
+
     public void synchronousFlush(List<Message> mybuffer) {
         LOG.debug("[{}] Starting flushing {} messages", Thread.currentThread(), mybuffer.size());
 

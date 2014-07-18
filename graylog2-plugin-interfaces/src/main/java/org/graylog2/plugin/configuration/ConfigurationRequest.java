@@ -21,6 +21,7 @@
  */
 package org.graylog2.plugin.configuration;
 
+import com.fasterxml.jackson.annotation.JsonValue;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -50,6 +51,7 @@ public class ConfigurationRequest {
         return ImmutableList.copyOf(fields);
     }
 
+    @JsonValue
     public Map<String, Map<String, Object>> asList() {
         Map<String, Map<String, Object>> configs = Maps.newHashMap();
 
