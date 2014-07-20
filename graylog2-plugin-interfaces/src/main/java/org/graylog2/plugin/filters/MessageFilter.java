@@ -39,4 +39,12 @@ public interface MessageFilter {
      */
     public String getName();
 
+    /**
+     * For determining the runtime order of the filter, specify a priority.
+     * Lower priorty values are run earlier, if two filters have the same priority, their name will be compared to
+     * guarantee a repeatable order.
+     *
+     * @return the priority
+     */
+    int getPriority();
 }

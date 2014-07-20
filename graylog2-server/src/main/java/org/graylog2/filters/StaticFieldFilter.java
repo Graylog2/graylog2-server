@@ -52,4 +52,10 @@ public class StaticFieldFilter implements MessageFilter {
         return NAME;
     }
 
+    @Override
+    public int getPriority() {
+        // runs second of the built-in filters
+        return 20;
+    }
+
 }

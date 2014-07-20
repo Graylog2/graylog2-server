@@ -67,4 +67,10 @@ public class StreamMatcherFilter implements MessageFilter {
         return "StreamMatcher";
     }
 
+    @Override
+    public int getPriority() {
+        // of the built-in filters this gets run last
+        return 40;
+    }
+
 }

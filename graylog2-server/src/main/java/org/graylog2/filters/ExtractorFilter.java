@@ -107,4 +107,10 @@ public class ExtractorFilter implements MessageFilter {
         return NAME;
     }
 
+    @Override
+    public int getPriority() {
+        // runs first of the built-in filters
+        return 10;
+    }
+
 }

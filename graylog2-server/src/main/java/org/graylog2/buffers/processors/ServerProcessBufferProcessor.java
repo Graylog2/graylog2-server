@@ -22,6 +22,8 @@ package org.graylog2.buffers.processors;
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
+import com.google.common.collect.ComparisonChain;
+import com.google.common.collect.Ordering;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import org.graylog2.buffers.OutputBuffer;
@@ -31,6 +33,8 @@ import org.graylog2.shared.buffers.processors.ProcessBufferProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Comparator;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -52,7 +56,7 @@ public class ServerProcessBufferProcessor extends ProcessBufferProcessor {
     private static final Logger LOG = LoggerFactory.getLogger(ServerProcessBufferProcessor.class);
     private final OutputBuffer outputBuffer;
     private final Meter filteredOutMessages;
-    private final Set<MessageFilter> filterRegistry;
+    private final List<MessageFilter> filterRegistry;
 
 
     @AssistedInject
@@ -63,7 +67,18 @@ public class ServerProcessBufferProcessor extends ProcessBufferProcessor {
                                   @Assisted("numberOfConsumers") final long numberOfConsumers,
                                   @Assisted OutputBuffer outputBuffer) {
         super(metricRegistry, processBufferWatermark, ordinal, numberOfConsumers);
-        this.filterRegistry = filterRegistry;
+
+        // we need to keep this sorted properly, so that the filters run in the correct order
+        this.filterRegistry = Ordering.from(new Comparator<MessageFilter>() {
+            @Override
+            public int compare(MessageFilter filter1, MessageFilter filter2) {
+                return ComparisonChain.start()
+                        .compare(filter1.getPriority(), filter2.getPriority())
+                        .compare(filter1.getName(), filter2.getName())
+                        .result();
+            }
+        }).immutableSortedCopy(filterRegistry);
+
         this.outputBuffer = outputBuffer;
         this.filteredOutMessages = metricRegistry.meter(name(ProcessBufferProcessor.class, "filteredOutMessages"));
     }
@@ -95,5 +110,10 @@ public class ServerProcessBufferProcessor extends ProcessBufferProcessor {
 
         LOG.debug("Finished processing message. Writing to output buffer.");
         outputBuffer.insertCached(msg, null);
+    }
+
+    // default visibility for tests
+    List<MessageFilter> getFilterRegistry() {
+        return filterRegistry;
     }
 }

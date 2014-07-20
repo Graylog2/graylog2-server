@@ -109,4 +109,10 @@ public class RulesFilter implements MessageFilter {
         return "Rulesfilter";
     }
 
+    @Override
+    public int getPriority() {
+        // runs third of the built-in filters
+        return 30;
+    }
+
 }
