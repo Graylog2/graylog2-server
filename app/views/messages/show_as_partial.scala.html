@@ -61,13 +61,13 @@
 
     <div class="btn-group actions">
         <a class="btn btn-info btn-mini dropdown-toggle" data-toggle="dropdown" href="#">
-                Actions
+            Actions
             <span class="caret"></span>
         </a>
         <ul class="dropdown-menu">
             <li class="dropdown-submenu">
                 <a href="#">Test against stream</a>
-                <ul class="dropdown-menu">
+                <ul class="dropdown-menu scrollable-menu">
                     @if(streams == null || streams.isEmpty) {
                         <li><a href="@routes.StreamsController.index()">No streams configured</a></li>
                     } else {
@@ -79,7 +79,6 @@
                             </li>
                         }
                     }
-
                 </ul>
             </li>
             <li><a href="#terms-msg-@message.getId()" role="button" data-toggle="modal" data-backdrop="true">Show message terms</a></li>
