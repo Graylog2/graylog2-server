@@ -1,5 +1,5 @@
 /**
- * Copyright 2014 Lennart Koopmann <lennart@torch.sh>
+ * Copyright 2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -24,25 +24,16 @@ import play.Logger;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public class Localhost {
 
-    public static String LOCAL_HOSTNAME = null;
+    public static String NAME;
 
-    public static String getLocalHostname() {
-        if (LOCAL_HOSTNAME != null) {
-            return LOCAL_HOSTNAME;
-        }
-
+    static {
         try {
-            LOCAL_HOSTNAME = InetAddress.getLocalHost().getHostName();
-            return LOCAL_HOSTNAME;
+            NAME = InetAddress.getLocalHost().getHostName();
         } catch (UnknownHostException e) {
             Logger.error("Could not get local hostname.", e);
-            return "unknown";
+            NAME = "unknown";
         }
     }
-
 }
