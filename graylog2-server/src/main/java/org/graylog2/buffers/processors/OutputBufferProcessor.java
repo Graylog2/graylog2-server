@@ -152,7 +152,7 @@ public class OutputBufferProcessor implements EventHandler<MessageEvent> {
         }
 
         // Wait until all writer threads have finished or timeout is reached.
-        if (!doneSignal.await(10, TimeUnit.SECONDS)) {
+        if (!doneSignal.await(configuration.getOutputModuleTimeout(), TimeUnit.MILLISECONDS)) {
             LOG.warn("Timeout reached. Not waiting any longer for writer threads to complete.");
         }
 

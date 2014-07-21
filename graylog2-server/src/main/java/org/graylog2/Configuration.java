@@ -253,6 +253,9 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "stream_processing_max_faults", required = false)
     private int streamProcessingMaxFaults = 3;
 
+    @Parameter(value = "output_module_timeout", required = false)
+    private long outputModuleTimeout = 10000;
+
     public boolean isMaster() {
         return isMaster;
     }
@@ -555,6 +558,10 @@ public class Configuration extends BaseConfiguration {
 
     public int getStreamProcessingMaxFaults() {
         return streamProcessingMaxFaults;
+    }
+
+    public long getOutputModuleTimeout() {
+        return outputModuleTimeout;
     }
 
     public long getEsClusterDiscoveryTimeout() {
