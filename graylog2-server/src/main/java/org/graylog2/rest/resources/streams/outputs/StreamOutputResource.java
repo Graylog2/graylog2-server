@@ -19,6 +19,9 @@ import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
@@ -51,7 +54,13 @@ public class StreamOutputResource extends RestResource {
 
         final Stream stream = streamService.load(streamid);
 
-        return Response.status(Response.Status.OK).entity(stream.getOutputs()).build();
+        final Set<Output> outputs = stream.getOutputs();
+        Map<String, Object> result = new HashMap<String, Object>() {{
+            put("outputs", outputs);
+            put("total", outputs.size());
+        }};
+
+        return Response.status(Response.Status.OK).entity(result).build();
     }
 
     @GET @Path("/{outputId}")

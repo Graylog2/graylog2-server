@@ -20,4 +20,5 @@ public interface OutputService extends PersistedService {
     Set<Output> loadForStream(Stream stream);
     Output create(Output request) throws ValidationException;
     Output create(CreateOutputRequest request) throws ValidationException;
+    void destroy(Output model) throws NotFoundException;
 }
