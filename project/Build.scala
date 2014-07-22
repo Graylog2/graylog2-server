@@ -83,7 +83,20 @@ object ApplicationBuild extends Build {
     commands ++= Seq(packageSnapshot),
     resourceGenerators in Compile <+= resourceManaged in Compile map { dir =>
       val propsFile = new File(dir, "git.properties")
-      IO.write(propsFile, "git.sha1=%s\n".format("git rev-parse HEAD" !!))
+      val currentGitSha = "git.sha1=%s\n".format("git rev-parse HEAD" !!)
+      var writtenGitSha = ""
+
+      if (propsFile.exists()) {
+        writtenGitSha = IO.read(propsFile)
+      }
+
+      // Only write the git.properties file if the content will actually change.
+      // This prevents an issue we have seen where asset delivery in dev mode
+      // takes really long because the git.properties file was overwritten
+      // multiple times and caused file-changed events. (as far as we understood)
+      if (currentGitSha != writtenGitSha) {
+        IO.write(propsFile, currentGitSha)
+      }
       Seq(propsFile)
     }
 
