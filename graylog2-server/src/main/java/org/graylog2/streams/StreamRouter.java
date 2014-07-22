@@ -119,14 +119,15 @@ public class StreamRouter {
                 }
             } catch (Exception e) {
                 AtomicInteger faultCount = getFaultCount(stream.getId());
-                if (maxFaultCount > 0 && faultCount.incrementAndGet() >= maxFaultCount) {
+                Integer streamFaultCount = faultCount.incrementAndGet();
+                if (maxFaultCount > 0 && streamFaultCount >= maxFaultCount) {
                     streamService.pause(stream);
-                    Integer streamFaultCount = faultCount.getAndSet(0);
+                    faultCount.set(0);
                     LOG.error("Processing of stream <" + stream.getId() + "> failed to return within " + timeout + "ms for more than " + maxFaultCount + " times. Disabling stream.");
 
                     Notification notification = notificationService.buildNow()
                             .addType(Notification.Type.STREAM_PROCESSING_DISABLED)
-                            .addSeverity(Notification.Severity.NORMAL)
+                            .addSeverity(Notification.Severity.URGENT)
                             .addDetail("stream_id", stream.getId())
                             .addDetail("fault_count", streamFaultCount);
                     notificationService.publishIfFirst(notification);
