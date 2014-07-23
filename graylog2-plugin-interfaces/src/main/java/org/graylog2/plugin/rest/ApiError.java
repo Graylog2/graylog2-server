@@ -17,22 +17,15 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.graylog2.rest;
-
-import org.graylog2.database.ValidationException;
-import org.graylog2.plugin.rest.ApiError;
-import org.graylog2.plugin.rest.ValidationApiError;
-
-import javax.ws.rs.core.Response;
-import javax.ws.rs.ext.ExceptionMapper;
+package org.graylog2.plugin.rest;
 
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
  */
-public class ValidationExceptionMapper implements ExceptionMapper<ValidationException> {
-    @Override
-    public Response toResponse(ValidationException exception) {
-        ApiError error = new ValidationApiError("Validation failed!", exception.getErrors());
-        return Response.status(Response.Status.BAD_REQUEST).entity(error).build();
+public class ApiError {
+    public final String message;
+
+    public ApiError(String message) {
+        this.message = message;
     }
 }

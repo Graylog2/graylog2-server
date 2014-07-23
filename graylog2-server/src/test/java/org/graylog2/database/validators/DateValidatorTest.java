@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 TORCH GmbH
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -34,15 +34,15 @@ public class DateValidatorTest {
     public void testValidate() throws Exception {
         Validator v = new DateValidator();
 
-        assertFalse(v.validate(null));
-        assertFalse(v.validate(9001));
-        assertFalse(v.validate(""));
-        assertFalse(v.validate(new java.util.Date()));
+        assertFalse(v.validate(null).passed());
+        assertFalse(v.validate(9001).passed());
+        assertFalse(v.validate("").passed());
+        assertFalse(v.validate(new java.util.Date()).passed());
 
         // Only joda datetime.
-        assertTrue(v.validate(new org.joda.time.DateTime(DateTimeZone.UTC)));
+        assertTrue(v.validate(new org.joda.time.DateTime(DateTimeZone.UTC)).passed());
 
         // Only accepts UTC.
-        assertFalse(v.validate(new org.joda.time.DateTime(DateTimeZone.forID("+09:00"))));
+        assertFalse(v.validate(new org.joda.time.DateTime(DateTimeZone.forID("+09:00"))).passed());
     }
 }

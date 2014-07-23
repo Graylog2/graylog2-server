@@ -22,7 +22,6 @@ package org.graylog2.inputs;
 import com.google.common.collect.Lists;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
-import org.graylog2.plugin.configuration.ConfigurationException;
 import org.graylog2.plugin.inputs.InputState;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.shared.ServerStatus;
@@ -97,6 +96,7 @@ public class ServerInputRegistry extends InputRegistry {
 
     @Override
     protected void finishedTermination(InputState state) {
+        removeFromRunning(state);
     }
 
     @Override

@@ -84,7 +84,11 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
     }
 
     public Stream load(String id) throws NotFoundException {
-        return load(new ObjectId(id));
+        try {
+            return load(new ObjectId(id));
+        } catch (IllegalArgumentException e) {
+            throw new NotFoundException("Stream <" + id + "> not found!");
+        }
     }
 
     public List<Stream> loadAllEnabled() {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 TORCH GmbH
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -38,17 +38,17 @@ public class MapValidatorTest {
     public void testValidate() throws Exception {
         Validator v = new MapValidator();
 
-        assertFalse(v.validate(null));
-        assertFalse(v.validate(new LinkedList<Integer>()));
-        assertFalse(v.validate(9001));
-        assertFalse(v.validate("foo"));
+        assertFalse(v.validate(null).passed());
+        assertFalse(v.validate(new LinkedList<Integer>()).passed());
+        assertFalse(v.validate(9001).passed());
+        assertFalse(v.validate("foo").passed());
 
         Map<String, String> actuallyFilledMap = new TreeMap<String, String>();
         actuallyFilledMap.put("foo", "bar");
         actuallyFilledMap.put("lol", "wut");
 
-        assertTrue(v.validate(actuallyFilledMap));
-        assertTrue(v.validate(new HashMap<String, String>()));
+        assertTrue(v.validate(actuallyFilledMap).passed());
+        assertTrue(v.validate(new HashMap<String, String>()).passed());
     }
 
 }

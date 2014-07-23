@@ -1,5 +1,5 @@
-/**
- * Copyright 2013 Kay Roepke <kay@torch.sh>
+/*
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -15,7 +15,6 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 package org.graylog2.database.validators;
 
@@ -31,9 +30,9 @@ public class ListValidatorTest {
     public void testValidate() throws Exception {
         final ListValidator v = new ListValidator();
 
-        assertFalse(v.validate(null));
-        assertFalse(v.validate(Maps.newHashMap()));
-        assertTrue(v.validate(Lists.newArrayList()));
-        assertTrue(v.validate(Lists.newArrayList("a", "string")));
+        assertFalse(v.validate(null).passed());
+        assertFalse(v.validate(Maps.newHashMap()).passed());
+        assertTrue(v.validate(Lists.newArrayList()).passed());
+        assertTrue(v.validate(Lists.newArrayList("a", "string")).passed());
     }
 }

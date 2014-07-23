@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 TORCH GmbH
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -19,6 +19,7 @@
 
 package org.graylog2.database.validators;
 
+import org.graylog2.plugin.database.validators.ValidationResult;
 import org.graylog2.plugin.database.validators.Validator;
 
 /**
@@ -28,11 +29,15 @@ public class IntegerValidator implements Validator {
     /**
      * Validates: Object is not null and of type Integer.
      *
+     *
      * @param value The object to check
      * @return validation result
      */
     @Override
-    public boolean validate(Object value) {
-        return value != null && value instanceof Integer;
+    public ValidationResult validate(Object value) {
+        if (value != null && value instanceof Integer)
+            return new ValidationResult.ValidationPassed();
+        else
+            return new ValidationResult.ValidationFailed("Value \"" + value + "\" is not a valid number!");
     }
 }

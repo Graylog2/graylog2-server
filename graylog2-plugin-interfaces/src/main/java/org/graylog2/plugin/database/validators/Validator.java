@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 TORCH GmbH
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -23,6 +23,6 @@ package org.graylog2.plugin.database.validators;
  */
 public interface Validator {
 
-    public boolean validate(Object value);
+    public ValidationResult validate(Object value);
 
 }

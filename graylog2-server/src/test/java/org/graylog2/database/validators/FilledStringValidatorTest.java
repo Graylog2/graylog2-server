@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 TORCH GmbH
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -32,11 +32,11 @@ public class FilledStringValidatorTest {
     @Test
     public void testValidate() throws Exception {
         Validator v = new FilledStringValidator();
-        assertFalse(v.validate(null));
-        assertFalse(v.validate(534));
-        assertFalse(v.validate(""));
-        assertFalse(v.validate(new String()));
-        assertTrue(v.validate("so valid"));
+        assertFalse(v.validate(null).passed());
+        assertFalse(v.validate(534).passed());
+        assertFalse(v.validate("").passed());
+        assertFalse(v.validate(new String()).passed());
+        assertTrue(v.validate("so valid").passed());
     }
 
 }

@@ -23,7 +23,6 @@ import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.graylog2.database.NotFoundException;
 import org.graylog2.database.ValidationException;
 import org.graylog2.inputs.Input;
 import org.graylog2.inputs.InputImpl;
@@ -122,7 +121,7 @@ public class InputsResource extends RestResource {
             @ApiResponse(code = 400, message = "Missing or invalid configuration"),
             @ApiResponse(code = 400, message = "Type is exclusive and already has input running")
     })
-    public Response create(@ApiParam(title = "JSON body", required = true) String body) {
+    public Response create(@ApiParam(title = "JSON body", required = true) String body) throws ValidationException {
         checkPermission(RestPermissions.INPUTS_CREATE);
 
         InputLaunchRequest lr;
@@ -173,10 +172,6 @@ public class InputsResource extends RestResource {
 
         // ... and check if it would pass validation. We don't need to go on if it doesn't.
         Input mongoInput = new InputImpl(inputData);
-        if (!inputService.validate(mongoInput)) {
-            LOG.error("Validation error.");
-            throw new WebApplicationException(Response.Status.BAD_REQUEST);
-        }
 
         // Don't run if exclusive and another instance is already running.
         if (input.isExclusive() && inputRegistry.hasTypeRunning(input.getClass())) {
@@ -186,13 +181,8 @@ public class InputsResource extends RestResource {
 
         // Persist input.
         String id;
-        try {
-            id = inputService.save(mongoInput);
-            input.setPersistId(id);
-        } catch (ValidationException e) {
-            LOG.error("Validation error.", e);
-            throw new WebApplicationException(e, Response.Status.BAD_REQUEST);
-        }
+        id = inputService.save(mongoInput);
+        input.setPersistId(id);
 
         // Launch input. (this will run async and clean up itself in case of an error.)
         inputRegistry.launch(input, inputId);

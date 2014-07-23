@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 TORCH GmbH
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -79,7 +79,7 @@ public class FilterServiceImpl implements FilterService {
             filter.createdAt = Tools.iso8601();
         }
         if (!validate(filter)) {
-            throw new ValidationException();
+            throw new ValidationException("Validation failed.");
         }
         final WriteResult<FilterDescription, ObjectId> writeResult = dbCollection.save(filter);
         return writeResult.getSavedObject();
