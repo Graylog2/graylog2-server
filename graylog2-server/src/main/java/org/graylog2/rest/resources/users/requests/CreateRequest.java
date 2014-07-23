@@ -31,11 +31,11 @@ public class CreateRequest {
     public String username;
     public String password;
     public String email;
+    @JsonProperty("full_name")
     public String fullname;
     public List<String> permissions;
     public String timezone;
     public StartpageSummary startpage;
-    @JsonProperty("sessionTimeoutMs")
     public Long session_timeout_ms;
 
 }

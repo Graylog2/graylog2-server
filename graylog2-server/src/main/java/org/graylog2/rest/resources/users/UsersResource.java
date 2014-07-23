@@ -121,7 +121,7 @@ public class UsersResource extends RestResource {
     @ApiResponses({
             @ApiResponse(code = 400, message = "Missing or invalid user details.")
     })
-    public Response create(@ApiParam(title = "JSON body", description = "Must contain username, fullname, email, password and a list of permissions.", required = true) String body) {
+    public Response create(@ApiParam(title = "JSON body", description = "Must contain username, full_name, email, password and a list of permissions.", required = true) String body) {
         if (body == null || body.isEmpty()) {
             LOG.error("Missing parameters. Returning HTTP 400.");
             throw new WebApplicationException(400);
