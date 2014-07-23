@@ -39,7 +39,7 @@ public class DateValidator implements Validator {
         if (value != null && (value instanceof org.joda.time.DateTime) && value.toString().endsWith("Z"))
             return new ValidationResult.ValidationPassed();
         else
-            return new ValidationResult.ValidationFailed(value.toString() + " is not a valid date!");
+            return new ValidationResult.ValidationFailed(value + " is not a valid date!");
     }
 
 }
