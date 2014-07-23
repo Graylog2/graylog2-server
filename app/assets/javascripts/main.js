@@ -153,6 +153,10 @@ $(document).ready(function() {
         hideSidebar();
     });
 
+    $(".sidebar-show").live("click", function() {
+        showSidebar();
+    });
+
     // Always do this on first load.
     sizeSidebar();
 
@@ -1030,9 +1034,19 @@ function delayedAjaxCallOnKeyup(el, callback, delay) {
 
 function hideSidebar() {
     $("#sidebar").hide();
+    $("#sidebar-activator").show();
     var mainContentElement = $("#main-content");
     mainContentElement.removeClass("span8");
     mainContentElement.addClass("span12");
+    redrawResultGraph();
+}
+
+function showSidebar() {
+    $("#sidebar-activator").hide();
+    $("#sidebar").show();
+    var mainContentElement = $("#main-content");
+    mainContentElement.removeClass("span12");
+    mainContentElement.addClass("span8");
     redrawResultGraph();
 }
 

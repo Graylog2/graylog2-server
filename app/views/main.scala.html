@@ -53,14 +53,20 @@
                     <div class="span4" id="sidebar">
                         <div id="sidebar-inner" data-spy="affix" data-offset-top="85">
                             <div id="sidebar-original">
-                                <div class="pull-right sidebar-hide">
-                                    <i class="icon-chevron-right" title="Hide sidebar"></i>
+                                <div class="pull-right sidebar-hide" title="Hide sidebar">
+                                    <i class="icon-chevron-right"></i>
                                 </div>
 
                                 @sidebarContent
                             </div>
 
                             <div id="sidebar-replacement"></div>
+                        </div>
+                    </div>
+
+                    <div id="sidebar-activator" style="display: none;">
+                        <div class="sidebar-show" title="Show sidebar">
+                            <i class="icon-chevron-left"></i>
                         </div>
                     </div>
                 }

@@ -241,7 +241,38 @@ h1.username {
 }
 
 .sidebar-back, .sidebar-hide {
-	cursor: pointer;
+    background-color: #F5F5F5;
+    border-radius: 3px;
+    border: 1px solid #DDD;
+    cursor: pointer;
+    padding: 15px 8px;
+}
+
+.sidebar-back:hover, .sidebar-hide:hover {
+    background-color: #F9F9F9;
+}
+
+#sidebar-activator {
+    right: 0px;
+    margin-top: 15px;
+    position: fixed;
+}
+
+.sidebar-show {
+    background-color: #333;
+    border-bottom-left-radius: 3px;
+    border-top-left-radius: 3px;
+    box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.2);
+    color: #FFF;
+    cursor: pointer;
+    opacity: 0.8;
+    padding: 15px 8px;
+}
+
+.sidebar-show:hover {
+    background-color: #222;
+    padding: 15px 40px 15px 8px;
+    opacity: 0.8;
 }
 
 .message-highlighted {
@@ -2037,6 +2068,10 @@ textarea.textarea-xlarge {
 .scrollable-table {
     width: 100%;
     overflow: scroll;
+}
+
+.system-nav-list {
+    margin-right: 30px;
 }
 
 // Classes to modify overflown dropdowns appearance
