@@ -873,9 +873,7 @@ $(document).ready(function() {
     })();
 
     function onResizedWindow(){
-        if(typeof drawResultGraph != "undefined") {
-            drawResultGraph();
-        }
+        redrawResultGraph();
 
         for (var field in fieldGraphs) {
             fieldGraphs[field].configure({ width: $("#main-content").width()-12 });
@@ -1032,12 +1030,15 @@ function delayedAjaxCallOnKeyup(el, callback, delay) {
 
 function hideSidebar() {
     $("#sidebar").hide();
-    $("#main-content").removeClass("span8");
-    $("#main-content").addClass("span12");
+    var mainContentElement = $("#main-content");
+    mainContentElement.removeClass("span8");
+    mainContentElement.addClass("span12");
+    redrawResultGraph();
+}
 
-    // Rebuild search result graph. (only doing something is there is one)
-    if(typeof drawResultGraph != "undefined") {
-        drawResultGraph();
+function redrawResultGraph() {
+    if (typeof resultHistogram != "undefined") {
+        resultHistogram.redrawResultGraph();
     }
 }
 
