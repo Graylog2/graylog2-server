@@ -35,7 +35,6 @@ public class CreateRequest {
     public List<String> permissions;
     public String timezone;
     public StartpageSummary startpage;
-    @JsonProperty("sessionTimeoutMs")
     public Long session_timeout_ms;
 
 }
