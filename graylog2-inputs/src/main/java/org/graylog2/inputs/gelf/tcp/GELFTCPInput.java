@@ -58,7 +58,11 @@ public class GELFTCPInput extends GELFInputBase {
     public void launch(Buffer processBuffer) throws MisfireException {
         // Register throughput counter gauges.
         for(Map.Entry<String,Gauge<Long>> gauge : throughputCounter.gauges().entrySet()) {
-            metricRegistry.register(MetricRegistry.name(getUniqueReadableId(), gauge.getKey()), gauge.getValue());
+            try {
+                metricRegistry.register(MetricRegistry.name(getUniqueReadableId(), gauge.getKey()), gauge.getValue());
+            } catch (IllegalArgumentException e) {
+                LOG.debug("Unable to register throughputCounter gauge: {}", e);
+            }
         }
 
         // Register connection counter gauges.

@@ -135,7 +135,6 @@ public class InputState {
 
         if (!id.equals(that.id)) return false;
         if (!messageInput.equals(that.messageInput)) return false;
-        if (state != that.state) return false;
 
         return true;
     }
@@ -144,7 +143,6 @@ public class InputState {
     public int hashCode() {
         int result = messageInput.hashCode();
         result = 31 * result + id.hashCode();
-        result = 31 * result + state.hashCode();
         return result;
     }
 }

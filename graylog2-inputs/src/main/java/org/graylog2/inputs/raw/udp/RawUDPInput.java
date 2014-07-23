@@ -55,7 +55,11 @@ public class RawUDPInput extends RawInputBase {
     public void launch(Buffer processBuffer) throws MisfireException {
         // Register throughput counter gauges.
         for(Map.Entry<String,Gauge<Long>> gauge : throughputCounter.gauges().entrySet()) {
-            metricRegistry.register(MetricRegistry.name(getUniqueReadableId(), gauge.getKey()), gauge.getValue());
+            try {
+                metricRegistry.register(MetricRegistry.name(getUniqueReadableId(), gauge.getKey()), gauge.getValue());
+            } catch (IllegalArgumentException e) {
+                LOG.debug("Unable to register throughputCounter gauge: {}", e);
+            }
         }
 
         final ExecutorService workerThreadPool = Executors.newCachedThreadPool(

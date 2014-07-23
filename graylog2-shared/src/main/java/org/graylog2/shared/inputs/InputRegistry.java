@@ -202,6 +202,10 @@ public abstract class InputRegistry {
         inputStates.remove(thisInputState);
     }
 
+    public void removeFromRunning(InputState inputState) {
+        inputStates.remove(inputState);
+    }
+
     public InputState launchPersisted(MessageInput input) {
         return launch(input);
     }

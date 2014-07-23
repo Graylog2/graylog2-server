@@ -22,7 +22,6 @@ import com.codahale.metrics.Gauge;
 import com.codahale.metrics.MetricRegistry;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.graylog2.inputs.raw.RawInputBase;
-import org.graylog2.inputs.raw.udp.RawUDPInput;
 import org.graylog2.plugin.buffers.Buffer;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.configuration.fields.BooleanField;
@@ -59,7 +58,11 @@ public class RawTCPInput extends RawInputBase {
     public void launch(Buffer processBuffer) throws MisfireException {
         // Register throughput counter gauges.
         for(Map.Entry<String,Gauge<Long>> gauge : throughputCounter.gauges().entrySet()) {
-            metricRegistry.register(MetricRegistry.name(getUniqueReadableId(), gauge.getKey()), gauge.getValue());
+            try {
+                metricRegistry.register(MetricRegistry.name(getUniqueReadableId(), gauge.getKey()), gauge.getValue());
+            } catch (IllegalArgumentException e) {
+                LOG.debug("Unable to register throughputCounter gauge: {}", e);
+            }
         }
 
         // Register connection counter gauges.
