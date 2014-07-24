@@ -23,16 +23,11 @@
  */
 package org.graylog2.buffers.processors.fakeoutputs;
 
-import com.google.common.collect.Maps;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.outputs.MessageOutput;
 import org.graylog2.plugin.outputs.MessageOutputConfigurationException;
-import org.graylog2.plugin.outputs.OutputStreamConfiguration;
-
-import java.util.List;
-import java.util.Map;
 
 /**
  *
@@ -56,11 +51,6 @@ public class FakeOutput implements MessageOutput {
     @Override
     public ConfigurationRequest getRequestedConfiguration() {
         return new ConfigurationRequest();
-    }
-
-    @Override
-    public Map<String, String> getRequestedStreamConfiguration() {
-        return Maps.newHashMap();
     }
 
     @Override

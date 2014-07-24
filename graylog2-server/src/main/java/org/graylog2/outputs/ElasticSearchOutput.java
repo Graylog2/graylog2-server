@@ -22,24 +22,18 @@ package org.graylog2.outputs;
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
-import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Ordering;
 import com.google.inject.Inject;
 import org.graylog2.indexer.Indexer;
-import org.graylog2.indexer.messages.Messages;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.outputs.MessageOutput;
 import org.graylog2.plugin.outputs.MessageOutputConfigurationException;
-import org.graylog2.plugin.outputs.OutputStreamConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
-import java.util.Map;
 
 import static com.codahale.metrics.MetricRegistry.name;
 
@@ -96,12 +90,6 @@ public class ElasticSearchOutput implements MessageOutput {
         return new ConfigurationRequest();
     }
     
-    @Override
-    public Map<String, String> getRequestedStreamConfiguration() {
-        // Built in output. This is just for plugin compat. No special configuration required.
-        return Maps.newHashMap();
-    }
-
     @Override
     public String getHumanName() {
         return "ElasticSearch Output";
