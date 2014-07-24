@@ -51,12 +51,12 @@ public abstract class SyslogInputBase extends MessageInput {
 
     @Inject
     protected ThroughputCounter throughputCounter;
-    protected final ConnectionCounter connectionCounter;
+    @Inject
+    protected ConnectionCounter connectionCounter;
 
     protected InetSocketAddress socketAddress;
 
     public SyslogInputBase() {
-        this.connectionCounter = new ConnectionCounter();
     }
 
     @Override

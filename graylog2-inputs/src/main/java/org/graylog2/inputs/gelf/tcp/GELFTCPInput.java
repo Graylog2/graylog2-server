@@ -25,6 +25,7 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.graylog2.inputs.gelf.GELFInputBase;
 import org.graylog2.inputs.gelf.gelf.GELFChunkManager;
 import org.graylog2.plugin.buffers.Buffer;
+import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.inputs.MisfireException;
 import org.jboss.netty.bootstrap.ServerBootstrap;
 import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory;
@@ -55,20 +56,21 @@ public class GELFTCPInput extends GELFInputBase {
     }
 
     @Override
-    public void launch(Buffer processBuffer) throws MisfireException {
+    public void initialize(Configuration configuration) {
+        super.initialize(configuration);
+
         // Register throughput counter gauges.
         for(Map.Entry<String,Gauge<Long>> gauge : throughputCounter.gauges().entrySet()) {
-            try {
-                metricRegistry.register(MetricRegistry.name(getUniqueReadableId(), gauge.getKey()), gauge.getValue());
-            } catch (IllegalArgumentException e) {
-                LOG.debug("Unable to register throughputCounter gauge: {}", e);
-            }
+            metricRegistry.register(MetricRegistry.name(getUniqueReadableId(), gauge.getKey()), gauge.getValue());
         }
 
         // Register connection counter gauges.
         metricRegistry.register(MetricRegistry.name(getUniqueReadableId(), "open_connections"), connectionCounter.gaugeCurrent());
         metricRegistry.register(MetricRegistry.name(getUniqueReadableId(), "total_connections"), connectionCounter.gaugeTotal());
+    }
 
+    @Override
+    public void launch(Buffer processBuffer) throws MisfireException {
         final ExecutorService bossThreadPool = Executors.newCachedThreadPool(
                 new ThreadFactoryBuilder()
                         .setNameFormat("input-" + getId() + "-gelftcp-boss-%d")

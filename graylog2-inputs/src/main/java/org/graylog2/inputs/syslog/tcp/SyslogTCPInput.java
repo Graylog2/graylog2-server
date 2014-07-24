@@ -24,6 +24,7 @@ import com.codahale.metrics.MetricRegistry;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.graylog2.inputs.syslog.SyslogInputBase;
 import org.graylog2.plugin.buffers.Buffer;
+import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.configuration.fields.BooleanField;
 import org.graylog2.plugin.inputs.MisfireException;
@@ -56,7 +57,9 @@ public class SyslogTCPInput extends SyslogInputBase {
     }
 
     @Override
-    public void launch(Buffer processBuffer) throws MisfireException {
+    public void initialize(Configuration configuration) {
+        super.initialize(configuration);
+
         // Register throughput counter gauges.
         for(Map.Entry<String,Gauge<Long>> gauge : throughputCounter.gauges().entrySet()) {
             metricRegistry.register(MetricRegistry.name(getUniqueReadableId(), gauge.getKey()), gauge.getValue());
@@ -65,7 +68,10 @@ public class SyslogTCPInput extends SyslogInputBase {
         // Register connection counter gauges.
         metricRegistry.register(MetricRegistry.name(getUniqueReadableId(), "open_connections"), connectionCounter.gaugeCurrent());
         metricRegistry.register(MetricRegistry.name(getUniqueReadableId(), "total_connections"), connectionCounter.gaugeTotal());
+    }
 
+    @Override
+    public void launch(Buffer processBuffer) throws MisfireException {
         final ExecutorService bossThreadPool = Executors.newCachedThreadPool(
                 new ThreadFactoryBuilder()
                         .setNameFormat("input-" + getId() + "-syslogtcp-boss-%d")

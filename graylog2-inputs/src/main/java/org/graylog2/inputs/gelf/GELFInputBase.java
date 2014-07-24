@@ -47,12 +47,12 @@ public abstract class GELFInputBase extends MessageInput {
 
     @Inject
     protected ThroughputCounter throughputCounter;
-    protected final ConnectionCounter connectionCounter;
+    @Inject
+    protected ConnectionCounter connectionCounter;
 
     protected InetSocketAddress socketAddress;
 
     public GELFInputBase() {
-        this.connectionCounter = new ConnectionCounter();
     }
 
     @Override

@@ -94,9 +94,14 @@ public class KafkaInput extends MessageInput {
     public static final String CK_THREADS = "threads";
 
     @Override
-    public void launch(final Buffer processBuffer) throws MisfireException {
-        setupMetrics();
+    public void initialize(Configuration configuration) {
+        super.initialize(configuration);
 
+        setupMetrics();
+    }
+
+    @Override
+    public void launch(final Buffer processBuffer) throws MisfireException {
         Properties props = new Properties();
 
         props.put("group.id", GROUP_ID);

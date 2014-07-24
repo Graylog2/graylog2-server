@@ -23,6 +23,7 @@ import com.codahale.metrics.MetricRegistry;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.graylog2.inputs.gelf.GELFInputBase;
 import org.graylog2.plugin.buffers.Buffer;
+import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.configuration.fields.BooleanField;
 import org.graylog2.plugin.inputs.MisfireException;
@@ -49,24 +50,21 @@ public class GELFHttpInput extends GELFInputBase {
     }
 
     @Override
-    public void launch(Buffer processBuffer) throws MisfireException {
+    public void initialize(Configuration configuration) {
+        super.initialize(configuration);
+
         // Register throughput counter gauges.
         for(Map.Entry<String,Gauge<Long>> gauge : throughputCounter.gauges().entrySet()) {
-            try {
-                metricRegistry.register(MetricRegistry.name(getUniqueReadableId(), gauge.getKey()), gauge.getValue());
-            } catch (IllegalArgumentException e) {
-                LOG.debug("Unable to register throughputCounter gauge: {}", e);
-            }
+            metricRegistry.register(MetricRegistry.name(getUniqueReadableId(), gauge.getKey()), gauge.getValue());
         }
 
         // Register connection counter gauges.
-        try {
-            metricRegistry.register(MetricRegistry.name(getUniqueReadableId(), "open_connections"), connectionCounter.gaugeCurrent());
-            metricRegistry.register(MetricRegistry.name(getUniqueReadableId(), "total_connections"), connectionCounter.gaugeTotal());
-        } catch (IllegalArgumentException e) {
-            LOG.debug("Unable to register gauge: {}", e);
-        }
+        metricRegistry.register(MetricRegistry.name(getUniqueReadableId(), "open_connections"), connectionCounter.gaugeCurrent());
+        metricRegistry.register(MetricRegistry.name(getUniqueReadableId(), "total_connections"), connectionCounter.gaugeTotal());
+    }
 
+    @Override
+    public void launch(Buffer processBuffer) throws MisfireException {
         final ExecutorService bossExecutor = Executors.newCachedThreadPool(
                 new ThreadFactoryBuilder()
                         .setNameFormat("input-" + getId() + "-gelfhttp-boss-%d")

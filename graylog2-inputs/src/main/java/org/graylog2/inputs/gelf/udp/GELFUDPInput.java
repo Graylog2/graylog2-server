@@ -26,6 +26,7 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.graylog2.inputs.gelf.GELFInputBase;
 import org.graylog2.inputs.gelf.gelf.GELFChunkManager;
 import org.graylog2.plugin.buffers.Buffer;
+import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.inputs.MisfireException;
 import org.jboss.netty.bootstrap.ConnectionlessBootstrap;
 import org.jboss.netty.channel.FixedReceiveBufferSizePredictorFactory;
@@ -57,12 +58,17 @@ public class GELFUDPInput extends GELFInputBase {
     }
 
     @Override
-    public void launch(Buffer processBuffer) throws MisfireException {
+    public void initialize(Configuration configuration) {
+        super.initialize(configuration);
+
         // Register throughput counter gauges.
         for(Map.Entry<String,Gauge<Long>> gauge : throughputCounter.gauges().entrySet()) {
             metricRegistry.register(MetricRegistry.name(getUniqueReadableId(), gauge.getKey()), gauge.getValue());
         }
+    }
 
+    @Override
+    public void launch(Buffer processBuffer) throws MisfireException {
         final ExecutorService workerThreadPool = Executors.newCachedThreadPool(
                 new ThreadFactoryBuilder()
                         .setNameFormat("input-" + getId() + "-gelfudp-worker-%d")
