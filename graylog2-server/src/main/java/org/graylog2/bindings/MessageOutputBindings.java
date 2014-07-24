@@ -1,6 +1,7 @@
 package org.graylog2.bindings;
 
 import com.google.inject.AbstractModule;
+import com.google.inject.Scopes;
 import com.google.inject.TypeLiteral;
 import com.google.inject.multibindings.Multibinder;
 import org.graylog2.outputs.BatchedElasticSearchOutput;
@@ -14,7 +15,7 @@ import org.graylog2.plugin.outputs.MessageOutput;
 public class MessageOutputBindings extends AbstractModule {
     @Override
     protected void configure() {
-        bind(MessageOutput.class).annotatedWith(DefaultMessageOutput.class).to(BatchedElasticSearchOutput.class);
+        bind(MessageOutput.class).annotatedWith(DefaultMessageOutput.class).to(BatchedElasticSearchOutput.class).in(Scopes.SINGLETON);
 
         TypeLiteral<Class<? extends MessageOutput>> typeLiteral = new TypeLiteral<Class<? extends MessageOutput>>(){};
         Multibinder<Class<? extends MessageOutput>> messageOutputs = Multibinder.newSetBinder(binder(), typeLiteral);
