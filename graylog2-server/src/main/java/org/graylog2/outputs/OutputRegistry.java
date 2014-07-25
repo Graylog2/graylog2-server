@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014 TORCH GmbH
+ * Copyright 2012-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -13,24 +13,22 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  */
 package org.graylog2.outputs;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import org.graylog2.database.ValidationException;
+import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.outputs.MessageOutput;
 import org.graylog2.plugin.streams.Output;
-import org.graylog2.plugin.streams.Stream;
 import org.graylog2.streams.OutputService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import javax.ws.rs.BadRequestException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -44,74 +42,47 @@ public class OutputRegistry {
 
     private final Logger LOG = LoggerFactory.getLogger(this.getClass());
 
-    private final Map<Stream, Set<MessageOutput>> registeredMessageOutputs;
+    private final Map<String, MessageOutput> runningMessageOutputs;
     private final MessageOutput defaultMessageOutput;
     private final OutputService outputService;
+    private final MessageOutputFactory messageOutputFactory;
 
     @Inject
     public OutputRegistry(@DefaultMessageOutput MessageOutput defaultMessageOutput,
-                          OutputService outputService) {
+                          OutputService outputService,
+                          MessageOutputFactory messageOutputFactory) {
         this.defaultMessageOutput = defaultMessageOutput;
         this.outputService = outputService;
-        this.registeredMessageOutputs = new HashMap<>();
+        this.messageOutputFactory = messageOutputFactory;
+        this.runningMessageOutputs = new HashMap<>();
     }
 
-    public Output createOutput(Output request) throws ValidationException {
-        final Output output = outputService.create(request);
-
-        final String id;
-        try {
-            id = outputService.save(output);
-        } catch (ValidationException e) {
-            LOG.error("Validation error.", e);
-            throw new BadRequestException(e);
-        }
-
-        return output;
+    public MessageOutput getOutputForId(String id) {
+        if (!getRunningMessageOutputs().containsKey(id))
+            try {
+                final Output output = outputService.load(id);
+                register(id, launchOutput(output));
+            } catch (NotFoundException e) {
+                return null;
+            }
+        return getRunningMessageOutputs().get(id);
     }
 
-    public void registerForStream(Stream stream, MessageOutput messageOutput) {
-        final Set<MessageOutput> messageOutputs;
-        if (this.registeredMessageOutputs.get(stream) == null) {
-            messageOutputs = new HashSet<>();
-        } else {
-            messageOutputs = this.registeredMessageOutputs.get(stream);
-        }
-
-        messageOutputs.add(messageOutput);
+    protected void register(String id, MessageOutput output) {
+        this.runningMessageOutputs.put(id, output);
     }
 
-    public Set<MessageOutput> getMessageOutputsForStream(Stream stream) {
-        Set<MessageOutput> result = new HashSet<>();
-        result.add(defaultMessageOutput);
-        result.addAll(this.registeredMessageOutputs.get(stream));
+    protected MessageOutput launchOutput(Output output) {
+        return messageOutputFactory.fromStreamOutput(output);
+    }
 
-        return ImmutableSet.copyOf(result);
+    protected Map<String, MessageOutput> getRunningMessageOutputs() {
+        return ImmutableMap.copyOf(runningMessageOutputs);
     }
 
     public Set<MessageOutput> getMessageOutputs() {
-        Set<MessageOutput> result = new HashSet<>();
-        result.add(defaultMessageOutput);
-
-        for (Set<MessageOutput> messageOutputs : this.registeredMessageOutputs.values()) {
-            result.addAll(messageOutputs);
-        }
-
-        return ImmutableSet.copyOf(result);
-    }
-
-    public void removeMessageOutput(MessageOutput messageOutput) {
-        if (messageOutput.equals(defaultMessageOutput))
-            throw new IllegalArgumentException("Cannot remove default message output");
-
-        for (Set<MessageOutput> messageOutputs : registeredMessageOutputs.values())
-            messageOutputs.remove(messageOutput);
-    }
-
-    public void removeMessageOutputFromStream(MessageOutput messageOutput, Stream stream) {
-        if (messageOutput.equals(defaultMessageOutput))
-            throw new IllegalArgumentException("Cannot remove default message output");
-
-        registeredMessageOutputs.get(stream).remove(messageOutput);
+        Set<MessageOutput> runningOutputs = new HashSet<>(this.runningMessageOutputs.values());
+        runningOutputs.add(defaultMessageOutput);
+        return ImmutableSet.copyOf(this.runningMessageOutputs.values());
     }
 }

@@ -1,3 +1,22 @@
+/*
+ * Copyright 2012-2014 TORCH GmbH
+ *
+ * This file is part of Graylog2.
+ *
+ * Graylog2 is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Graylog2 is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package org.graylog2.periodical;
 
 import org.graylog2.Configuration;
@@ -20,6 +39,7 @@ public class BatchedElasticSearchOutputFlushThread extends Periodical {
 
     @Inject
     public BatchedElasticSearchOutputFlushThread(OutputRegistry outputRegistry, Configuration configuration) {
+        LOG.info("BatchedElasticSearchOutputFlushThread");
         this.outputRegistry = outputRegistry;
         this.configuration = configuration;
     }
@@ -31,7 +51,7 @@ public class BatchedElasticSearchOutputFlushThread extends Periodical {
 
     @Override
     public boolean stopOnGracefulShutdown() {
-        return false;
+        return true;
     }
 
     @Override
@@ -61,10 +81,12 @@ public class BatchedElasticSearchOutputFlushThread extends Periodical {
 
     @Override
     public void run() {
+        LOG.debug("Checking for outputs to flush ...");
         for (MessageOutput output : outputRegistry.getMessageOutputs()) {
             if (output instanceof BatchedElasticSearchOutput) {
                 BatchedElasticSearchOutput batchedOutput = (BatchedElasticSearchOutput)output;
                 try {
+                    LOG.debug("Flushing output <{}>", batchedOutput);
                     batchedOutput.flush();
                 } catch (Exception e) {
                     LOG.error("Caught exception while trying to flush output: {}", e);
