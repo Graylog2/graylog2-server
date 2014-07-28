@@ -102,7 +102,9 @@ public abstract class DiskJournalCache implements InputCache, OutputCache {
 
     @Override
     public void add(final Message message) {
-        LOG.debug("Adding message to cache: {}", message.toString());
+        if (LOG.isTraceEnabled()) {
+            LOG.trace("Adding message to cache: {}", message.toString());
+        }
         try {
             synchronized (modificationLock) {
                 if (queue.offer(serializer.serializeToBytes(message))) {
@@ -117,7 +119,9 @@ public abstract class DiskJournalCache implements InputCache, OutputCache {
 
     @Override
     public Message pop() {
-        LOG.debug("Consuming message from cache");
+        if (LOG.isTraceEnabled()) {
+            LOG.trace("Consuming message from cache");
+        }
         final byte[] bytes;
 
         synchronized (modificationLock) {
