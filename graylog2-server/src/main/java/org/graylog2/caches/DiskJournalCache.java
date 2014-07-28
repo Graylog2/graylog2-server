@@ -95,8 +95,7 @@ public abstract class DiskJournalCache implements InputCache, OutputCache {
         this.commitService.scheduleWithFixedDelay(new Runnable() {
             @Override
             public void run() {
-                LOG.debug("Committing cache");
-                db.commit();
+                commit();
             }
         }, 0, 1000, TimeUnit.MILLISECONDS);
     }
@@ -157,6 +156,13 @@ public abstract class DiskJournalCache implements InputCache, OutputCache {
     @Override
     public boolean isEmpty() {
         return queue.isEmpty();
+    }
+
+    private void commit() {
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Committing {} (size {})", getDbFileName(), size());
+        }
+        db.commit();
     }
 
     private File getDbFile(final Configuration config) {
