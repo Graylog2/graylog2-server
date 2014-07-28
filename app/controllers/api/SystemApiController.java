@@ -25,7 +25,6 @@ import com.google.inject.Inject;
 import controllers.AuthenticatedController;
 import org.graylog2.restclient.lib.APIException;
 import org.graylog2.restclient.lib.metrics.Meter;
-import models.*;
 import org.graylog2.restclient.models.*;
 import play.libs.F;
 import play.mvc.Http;
@@ -158,7 +157,7 @@ public class SystemApiController extends AuthenticatedController {
             Map<String, Object> result = Maps.newHashMap();
             Node node = nodeService.loadNode(nodeId);
 
-            return ok(new Gson().toJson(jvmMap(node.jvm(), node.getBufferInfo().getInputMasterCache().size))).as("application/json");
+            return ok(new Gson().toJson(jvmMap(node.jvm(), node.getBufferInfo()))).as("application/json");
         } catch (NodeService.NodeNotFoundException e) {
             return status(404, "node not found");
         }
@@ -167,7 +166,7 @@ public class SystemApiController extends AuthenticatedController {
     public Result radioHeap(String radioId) {
         try {
             Radio radio = nodeService.loadRadio(radioId);
-            return ok(new Gson().toJson(jvmMap(radio.jvm(), radio.getBuffers().getInputMasterCache().size))).as("application/json");
+            return ok(new Gson().toJson(jvmMap(radio.jvm(), radio.getBuffers()))).as("application/json");
         } catch (NodeService.NodeNotFoundException e) {
             return status(404, "radio not found");
         }
@@ -259,7 +258,7 @@ public class SystemApiController extends AuthenticatedController {
         }
     }
 
-    private Map<String, Object> jvmMap(NodeJVMStats jvm, long inputMasterCacheSize) {
+    private Map<String, Object> jvmMap(NodeJVMStats jvm, BufferInfo bufferInfo) {
         Map<String, Object> result = Maps.newHashMap();
 
         result.put("free", jvm.getFreeMemory().getMegabytes());
@@ -268,7 +267,8 @@ public class SystemApiController extends AuthenticatedController {
         result.put("used", jvm.getUsedMemory().getMegabytes());
         result.put("used_percentage", jvm.usedMemoryPercentage());
         result.put("total_percentage", jvm.totalMemoryPercentage());
-        result.put("input_master_cache", inputMasterCacheSize);
+        result.put("input_master_cache", bufferInfo.getInputMasterCache().size);
+        result.put("output_master_cache", bufferInfo.getOutputMasterCache().size);
 
         return result;
     }
