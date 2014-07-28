@@ -39,8 +39,6 @@ import org.graylog2.cluster.NodeService;
 import org.graylog2.cluster.NodeServiceImpl;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
-import org.graylog2.outputs.BatchedElasticSearchOutput;
-import org.graylog2.outputs.OutputRegistry;
 import org.graylog2.plugin.Plugin;
 import org.graylog2.plugin.PluginModule;
 import org.graylog2.plugin.Tools;
@@ -252,7 +250,7 @@ public final class Main extends NodeRunner {
             } catch (TimeoutException timeoutException) {
                 LOG.error("Unable to shutdown properly on time.");
             }
-            LOG.error("Graylog2 startup failed. Exiting. Exception was: {}", e);
+            LOG.error("Graylog2 startup failed. Exiting. Exception was:", e);
             System.exit(-1);
         }
         LOG.info("Services started, startup times in ms: {}", serviceManager.startupTimes());

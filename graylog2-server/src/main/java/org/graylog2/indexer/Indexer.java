@@ -47,7 +47,7 @@ import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.node.Node;
 import org.elasticsearch.node.NodeBuilder;
 import org.graylog2.Configuration;
-import org.graylog2.UI;
+import org.graylog2.StartupException;
 import org.graylog2.indexer.cluster.Cluster;
 import org.graylog2.indexer.counts.Counts;
 import org.graylog2.indexer.indices.Indices;
@@ -67,7 +67,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.elasticsearch.node.NodeBuilder.nodeBuilder;
 
 // TODO this class blocks for most of its operations, but is called from the main thread for some of them
@@ -197,13 +196,15 @@ public class Indexer {
                 } catch (InterruptedException ignore) {
                 } catch (ExecutionException e1) {
                    // could not find any server on that address
-                   LOG.error("Could not connect to Elasticsearch at http://" + ip + ":9200/, is it running?" , e1.getCause());
+                   LOG.error("Could not connect to Elasticsearch at http://" + ip + ":9200/, is it running? Error was: {}",
+                             e1.getCause().getMessage());
                 }
             }
 
-            UI.exitHardWithWall("Could not successfully connect to ElasticSearch. Check that your cluster state is not RED " +
-                                        "and that ElasticSearch is running properly.",
-                                new String[]{"graylog2-server/configuring-and-tuning-elasticsearch-for-graylog2-v0200"});
+            node.close();
+            throw new StartupException("Could not successfully connect to ElasticSearch. Check that your cluster state is not RED " +
+                                             "and that ElasticSearch is running properly.",
+                                     new String[]{"graylog2-server/configuring-and-tuning-elasticsearch-for-graylog2-v0200"});
         }
 
         searches = searchesFactory.create(client);
