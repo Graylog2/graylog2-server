@@ -67,6 +67,14 @@
     }
 }
 
+@dataAttributes() = @{
+    var string = ""
+    for((attribute,time) <- searchResult.getBuiltQueryTimeRange) {
+        string = string + " data-" + attribute + "='" + time + "'"
+    }
+    string
+}
+
 @main("Search results", sidebars.searchresults(searchResult, streamId, selectedFields), query, currentUser) {
 
 <span id="original-search-query" style="display: none;">@searchResult.getOriginalQuery</span>
@@ -152,7 +160,7 @@
 </div>
 
 <div id="y_axis"></div>
-<div id="result-graph"></div>
+<div id="result-graph" @Html(dataAttributes())></div>
 <div id="result-graph-timeline"></div>
 
 

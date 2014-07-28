@@ -14,8 +14,6 @@ public class DateHistogramResolutionSelector {
 		StringBuilder sb = new StringBuilder();
 		int i = 0;
 		for (String interval : SearchTools.ALLOWED_DATE_HISTOGRAM_INTERVALS) {
-			if (interval.equals(selected)) { sb.append("<strong>"); }
-
             StringBuilder url = new StringBuilder(request.path());
 
             Map<String, String[]> queryParams = Maps.newHashMap(request.queryString());
@@ -35,7 +33,12 @@ public class DateHistogramResolutionSelector {
 
             String finalUrl = url.substring(0, url.length()-1);
 
-            sb.append("<a href='").append(finalUrl).append("' class='date-histogram-res-selector' data-resolution='").append(interval).append("'>");
+            String clazz = "date-histogram-res-selector";
+            if (interval.equals(selected)) {
+                clazz += " selected-resolution";
+            }
+
+            sb.append("<a href='").append(finalUrl).append("' class='").append(clazz).append("' data-resolution='").append(interval).append("'>");
 			sb.append(WordUtils.capitalize(interval));
 			sb.append("</a>");
 			
