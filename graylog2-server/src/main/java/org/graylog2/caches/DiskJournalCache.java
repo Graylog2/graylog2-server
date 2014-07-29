@@ -92,6 +92,14 @@ public abstract class DiskJournalCache implements InputCache, OutputCache {
         );
         this.serializer = serializer;
 
+        /* Commit and compact the database to flush existing data in the transaction log and to reduce the file
+         * size of the database.
+         */
+        LOG.debug("Committing {}", getDbFileName());
+        db.commit();
+        LOG.debug("Compacting {}", getDbFileName());
+        db.compact();
+
         this.commitService.scheduleWithFixedDelay(new Runnable() {
             @Override
             public void run() {
