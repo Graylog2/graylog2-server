@@ -105,6 +105,9 @@ public abstract class DiskJournalCache implements InputCache, OutputCache {
         if (LOG.isTraceEnabled()) {
             LOG.trace("Adding message to cache: {}", message.toString());
         }
+        if (db.isClosed()) {
+            return;
+        }
         try {
             synchronized (modificationLock) {
                 if (queue.offer(serializer.serializeToBytes(message))) {
@@ -122,6 +125,10 @@ public abstract class DiskJournalCache implements InputCache, OutputCache {
         if (LOG.isTraceEnabled()) {
             LOG.trace("Consuming message from cache");
         }
+        if (db.isClosed()) {
+            return null;
+        }
+
         final byte[] bytes;
 
         synchronized (modificationLock) {
@@ -146,11 +153,18 @@ public abstract class DiskJournalCache implements InputCache, OutputCache {
 
     @Override
     public int size() {
-        return counter.intValue();
+        if (db.isClosed()) {
+            return 0;
+        } else {
+            return counter.intValue();
+        }
     }
 
     @Override
     public void clear() {
+        if (db.isClosed()) {
+            return;
+        }
         LOG.debug("Clearing cache");
         synchronized (modificationLock) {
             queue.clear();
@@ -166,6 +180,9 @@ public abstract class DiskJournalCache implements InputCache, OutputCache {
     }
 
     private void commit() {
+        if (db.isClosed()) {
+            return;
+        }
         if (LOG.isDebugEnabled()) {
             LOG.debug("Committing {} (size {})", getDbFileName(), size());
         }
