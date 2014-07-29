@@ -32,27 +32,28 @@ import org.graylog2.restclient.models.api.responses.streams.CreateStreamResponse
 import org.graylog2.restclient.models.api.responses.streams.GetStreamsResponse;
 import org.graylog2.restclient.models.api.responses.streams.StreamSummaryResponse;
 import org.graylog2.restclient.models.api.responses.streams.TestMatchResponse;
+import org.graylog2.restclient.models.api.responses.system.OutputSummaryResponse;
+import org.graylog2.restclient.models.api.responses.system.OutputsResponse;
 import org.graylog2.restclient.models.api.results.StreamsResult;
 import org.graylog2.restroutes.generated.StreamResource;
 import org.graylog2.restroutes.generated.routes;
 import play.mvc.Http;
 
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class StreamService {
 
     private final ApiClient api;
     private final Stream.Factory streamFactory;
+    private final Output.Factory outputFactory;
     private final StreamResource resource = routes.StreamResource();
 
     @Inject
-    private StreamService(ApiClient api, Stream.Factory streamFactory) {
+    private StreamService(ApiClient api, Stream.Factory streamFactory, Output.Factory outputFactory) {
         this.api = api;
         this.streamFactory = streamFactory;
+        this.outputFactory = outputFactory;
     }
 
     public List<Stream> all() throws IOException, APIException {
@@ -141,6 +142,15 @@ public class StreamService {
 
     public CheckConditionResponse activeAlerts(String streamId) throws APIException, IOException {
         return api.path(routes.StreamAlertResource().checkConditions(streamId), CheckConditionResponse.class).execute();
+    }
+
+    public List<Output> getOutputs(String streamId) throws APIException, IOException {
+        OutputsResponse outputsResponse = api.path(routes.StreamOutputResource().get(streamId), OutputsResponse.class).execute();
+        List<Output> result = new ArrayList<>();
+        for(OutputSummaryResponse response : outputsResponse.outputs)
+            result.add(outputFactory.fromSummaryResponse(response));
+
+        return result;
     }
 
     public void addOutput(String streamId, final String outputId) throws APIException, IOException {
