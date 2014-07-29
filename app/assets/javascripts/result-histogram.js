@@ -1,8 +1,41 @@
+// We need to override Rickshaw _frequentInterval detection for bar charts due to this issue:
+// https://github.com/shutterstock/rickshaw/issues/461
+var ResultHistogramRenderer = Rickshaw.Class.create(Rickshaw.Graph.Renderer.Bar, {
+    _frequentInterval: function(data) {
+        var selectedResolution = $(".date-histogram-res-selector.selected-resolution").data("resolution");
+        var resolutionDuration = moment.duration(1, selectedResolution);
+        return { count: 1, magnitude: resolutionDuration.asSeconds() };
+    }
+});
+
 resultHistogram = {
     _histogram: [],
 
+    // Show the whole search time range, even if no data is available
+    _correctDataBoundaries: function(data) {
+        var resultGraphElement = $("#result-graph");
+        var fromMoment = moment.utc(resultGraphElement.data("from"));
+        var toMoment = moment.utc(resultGraphElement.data("to"));
+
+        var selectedResolution = $(".date-histogram-res-selector.selected-resolution").data("resolution");
+        if (selectedResolution == "week") {
+           selectedResolution = "isoWeek"; // Weeks should start on Monday :)
+        }
+        var fromFormatted = fromMoment.startOf(selectedResolution).unix();
+        var toFormatted = toMoment.startOf(selectedResolution).unix();
+
+        if (fromFormatted != data[0].x) {
+            data.unshift({"x": fromFormatted, "y": 0});
+        }
+        if ((toFormatted != data[data.length-1].x) && (toFormatted != fromFormatted)) {
+            data.push({"x": toFormatted, "y": 0});
+        }
+
+        return data;
+    },
+
     setData: function(data) {
-        this._histogram = data;
+        this._histogram = this._correctDataBoundaries(data);
     },
 
     drawResultGraph: function() {
@@ -20,7 +53,7 @@ resultHistogram = {
             element: resultGraphElement.get(0),
             width: graphWidth,
             height: 175,
-            renderer: "bar",
+            renderer: ResultHistogramRenderer,
             series: [ {
                 name: "Messages",
                 data: this._histogram,

@@ -145,6 +145,7 @@ $(document).ready(function() {
                         $(".heap-max", thisHeap).text(data.max);
 
                         $(".input-master-cache", thisHeap).text(data.input_master_cache);
+                        $(".output-master-cache", thisHeap).text(data.output_master_cache);
                     },
                     complete: function() {
                         // Trigger next call of the whole function when we updated the last element.
