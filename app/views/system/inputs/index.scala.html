@@ -52,7 +52,7 @@
         <h2><i class="icon icon-cogs"></i> Running local inputs</h2>
 
         @if(localInputs.size > 0) {
-            @for(inputState <- localInputs.toSeq.sortBy(_.getInput.getTitle)) {
+            @for(inputState <- localInputs.toSeq.sortBy(_.getInput.getTitle.toLowerCase)) {
                 @views.html.system.inputs.partials.input_summary(inputState, inputTypes)
             }
         } else {

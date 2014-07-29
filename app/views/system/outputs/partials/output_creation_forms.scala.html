@@ -1,4 +1,5 @@
-@(outputTypes: Map[String, org.graylog2.restclient.models.api.responses.AvailableOutputSummary])
+@(outputTypes: Map[String, org.graylog2.restclient.models.api.responses.AvailableOutputSummary],
+    formTarget: Call)
 
 @for((outputType,info) <- outputTypes) {
     <div class="input-configuration modal hide fade" data-inputtype="@outputType">
@@ -10,7 +11,7 @@
             </h2>
         </div>
 
-        <form action="@routes.OutputsController.create()" method="POST">
+        <form action="@formTarget" method="POST">
             <input type="hidden" name="type" value="@outputType" />
 
             <fieldset>

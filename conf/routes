@@ -42,6 +42,12 @@ GET         /streams/:stream_id/clone                                           
 POST        /streams/:stream_id/clone                                                @controllers.StreamsController.cloneStream(stream_id: String)
 GET         /streams/:stream_id/csv                                                  @controllers.StreamSearchController.exportAsCsv(q ?= "", stream_id: String, rangetype ?= "", relative:Integer ?= -1, from ?= "", to ?= "", keyword ?= "", fields:String ?="")
 
+# Stream Outputs
+GET         /streams/:stream_id/outputs                                              @controllers.StreamOutputsController.index(stream_id: String)
+POST        /streams/:stream_id/outputs/add                                          @controllers.StreamOutputsController.add(stream_id: String)
+POST        /streams/:stream_id/outputs/:output_id/delete                            @controllers.StreamOutputsController.remove(stream_id: String, output_id: String)
+POST        /streams/:stream_id/outputs                                              @controllers.StreamOutputsController.create(stream_id: String)
+
 # Alerts
 GET         /streams/:stream_id/alerts                                               @controllers.AlertsController.index(stream_id: String)
 POST        /streams/:stream_id/alerts/conditions/add/messagecount                   @controllers.AlertsController.addTypeMessageCount(stream_id: String)

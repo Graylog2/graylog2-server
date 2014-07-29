@@ -1,4 +1,5 @@
-@(output: org.graylog2.restclient.models.Output)
+@(output: org.graylog2.restclient.models.Output,
+    stream: org.graylog2.restclient.models.Stream)
 
 @import lib.security.RestPermissions._;
 @import views.helpers.Permissions._;
@@ -8,6 +9,15 @@
         <span class="text">Started by @views.html.partials.links.to_user(output.getCreatorUser)</span>
         <span class="text moment-from-now" title="@output.getCreatedAt">@output.getCreatedAt</span>
             &nbsp;
+        @if(stream != null && isPermitted(STREAM_OUTPUTS_DELETE)) {
+            <form action="@routes.StreamOutputsController.remove(stream.getId, output.getId)" method="POST">
+                <button class="btn btn-danger btn-mini"
+                type="submit"
+                data-confirm="Really remove output from stream?">
+                    Remove
+                </button>
+            </form>
+        }
         @if(isPermitted(OUTPUTS_TERMINATE)) {
             <form action="@routes.OutputsController.terminate(output.getId)" method="POST">
                 <button class="btn btn-danger btn-mini"

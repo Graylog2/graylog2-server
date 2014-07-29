@@ -14,6 +14,7 @@
     @if(isPermitted(STREAMS_EDIT, stream.getId)) {
         <li><a href="@routes.StreamsController.edit(stream.getId)">Edit stream</a></li>
         <li><a href="@routes.StreamRulesController.index(stream.getId)">Edit rules</a></li>
+        <li><a href="@routes.StreamOutputsController.index(stream.getId)">Manage outputs</a></li>
 
         <li @if(stream.getStreamRules.isEmpty()) { class="disabled" } >
         @if(!stream.getStreamRules.isEmpty()) {
