@@ -111,6 +111,13 @@ public abstract class DiskJournalCache implements InputCache, OutputCache {
         commit();
         compact();
 
+        /* I have seen the counter getting out of sync with the actual entries in the queue. */
+        if (queue.isEmpty() && counter.get() != 0) {
+            LOG.warn("Setting counter from {} to 0 because the queue is empty!", counter.get());
+            counter.set(0);
+            commit();
+        }
+
         this.commitService.scheduleWithFixedDelay(new Runnable() {
             @Override
             public void run() {
