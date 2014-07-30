@@ -53,7 +53,7 @@ public class ServiceManagerListener extends Listener {
 
     @Override
     public void failure(Service service) {
-        LOG.info("Service failure for service {}", service);
+        // do not log the failure here again, the ServiceManager itself does so already on Level ERROR.
         serverStatus.setLifecycle(Lifecycle.FAILED);
     }
 }

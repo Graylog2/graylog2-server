@@ -22,6 +22,7 @@ package org.graylog2.initializers;
 import com.google.common.util.concurrent.AbstractIdleService;
 import com.google.inject.Singleton;
 import org.graylog2.indexer.Indexer;
+import org.graylog2.plugin.Tools;
 
 import javax.inject.Inject;
 
@@ -31,15 +32,23 @@ import javax.inject.Inject;
 @Singleton
 public class IndexerSetupService extends AbstractIdleService {
     private final Indexer indexer;
+    private final BufferSynchronizerService bufferSynchronizerService;
 
     @Inject
-    public IndexerSetupService(Indexer indexer) {
+    public IndexerSetupService(Indexer indexer, BufferSynchronizerService bufferSynchronizerService) {
         this.indexer = indexer;
+        this.bufferSynchronizerService = bufferSynchronizerService;
     }
 
     @Override
     protected void startUp() throws Exception {
-        indexer.start();
+        Tools.silenceUncaughtExceptionsInThisThread();
+        try {
+            indexer.start();
+        } catch (Exception e) {
+            bufferSynchronizerService.setIndexerUnavailable();
+            throw e;
+        }
     }
 
     @Override

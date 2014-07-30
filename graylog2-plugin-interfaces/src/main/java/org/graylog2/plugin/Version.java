@@ -25,9 +25,11 @@ import com.google.common.io.Resources;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.FileReader;
+import java.io.StringReader;
 import java.net.URL;
 import java.util.Properties;
+
+import static com.google.common.base.Charsets.UTF_8;
 
 /**
  * Following semantic versioning.
@@ -51,9 +53,9 @@ public class Version {
         Version tmpVersion;
         try {
             final URL resource = Resources.getResource("version.properties");
-            final FileReader versionProperties = new FileReader(resource.getFile());
+            final String versionProperties = Resources.toString(resource, UTF_8);
             final Properties version = new Properties();
-            version.load(versionProperties);
+            version.load(new StringReader(versionProperties));
 
             final int major = Integer.parseInt(version.getProperty("version.major", "0"));
             final int minor = Integer.parseInt(version.getProperty("version.minor", "0"));
@@ -63,7 +65,9 @@ public class Version {
             String commitSha = null;
             try {
                 final Properties git = new Properties();
-                git.load(new FileReader(Resources.getResource("git.properties").getFile()));
+                final URL gitResource = Resources.getResource("git.properties");
+                final String gitProperties = Resources.toString(gitResource, UTF_8);
+                git.load(new StringReader(gitProperties));
                 commitSha = git.getProperty("git.commit.id.abbrev");
             } catch (Exception e) {
                 log.debug("Git commit details are not available, skipping.", e);

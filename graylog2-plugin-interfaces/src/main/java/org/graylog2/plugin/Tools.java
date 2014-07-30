@@ -398,4 +398,16 @@ public final class Tools {
 
     public static class NoInterfaceFoundException extends Exception {
     }
+
+    /**
+     * The default uncaught exception handler will print to STDERR, which we don't always want for threads.
+     * Using this utility method you can avoid writing to STDERR on a per-thread basis
+     */
+    public static void silenceUncaughtExceptionsInThisThread() {
+        Thread.currentThread().setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+            @Override
+            public void uncaughtException(Thread ignored, Throwable ignored1) {
+            }
+        });
+    }
 }

@@ -40,6 +40,11 @@ public class UI {
     }
 
     public static void exitHardWithWall(String msg, String[] docLinks) {
+        LOG.error(wallString(msg, docLinks));
+        System.exit(1);
+    }
+
+    public static String wallString(String msg, String[] docLinks) {
         StringBuilder sb = new StringBuilder("\n");
 
         sb.append("\n").append(wall("#")).append("\n");
@@ -54,7 +59,7 @@ public class UI {
 
         if (docLinks != null && docLinks.length > 0) {
             sb.append("\n").append("But we also got some specific help " +
-                    "pages that might help you in this case:").append("\n\n");
+                                           "pages that might help you in this case:").append("\n\n");
 
             for (int i = 0; i < docLinks.length; i++) {
                 sb.append("* ").append(docLink(docLinks[i])).append("\n");
@@ -65,8 +70,7 @@ public class UI {
 
         sb.append(wall("#"));
 
-        LOG.error(sb.toString());
-        System.exit(1);
+        return sb.toString();
     }
 
     private static String wall(String symbol) {
