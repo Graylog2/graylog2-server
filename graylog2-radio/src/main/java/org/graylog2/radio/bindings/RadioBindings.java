@@ -21,9 +21,11 @@ package org.graylog2.radio.bindings;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.AbstractModule;
+import com.google.inject.Scopes;
 import com.google.inject.TypeLiteral;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.multibindings.Multibinder;
+import com.google.inject.name.Names;
 import com.google.inject.util.Providers;
 import com.ning.http.client.AsyncHttpClient;
 import org.graylog2.jersey.container.netty.SecurityContextFactory;
@@ -42,6 +44,7 @@ import org.graylog2.shared.inputs.InputRegistry;
 import javax.ws.rs.container.ContainerResponseFilter;
 import javax.ws.rs.container.DynamicFeature;
 import javax.ws.rs.ext.ExceptionMapper;
+import java.net.URI;
 
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
@@ -74,6 +77,9 @@ public class RadioBindings extends AbstractModule {
         serverStatus.addCapability(ServerStatus.Capability.RADIO);
         bind(ServerStatus.class).toInstance(serverStatus);
         bind(InputRegistry.class).toProvider(RadioInputRegistryProvider.class);
+
+        bind(URI.class).annotatedWith(Names.named("ServerUri")).toInstance(configuration.getGraylog2ServerUri());
+        bind(URI.class).annotatedWith(Names.named("OurRadioUri")).toInstance(configuration.getRestTransportUri());
     }
 
     private void bindProviders() {

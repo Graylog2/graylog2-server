@@ -22,6 +22,7 @@ package org.graylog2.radio.inputs;
 import com.beust.jcommander.internal.Lists;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ning.http.client.AsyncHttpClient;
+import com.ning.http.client.Request;
 import com.ning.http.client.Response;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationException;
@@ -37,6 +38,8 @@ import org.graylog2.shared.inputs.MessageInputFactory;
 import org.graylog2.shared.inputs.NoSuchInputTypeException;
 import org.graylog2.shared.rest.resources.system.inputs.requests.RegisterInputRequest;
 import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.core.UriBuilder;
 import java.io.IOException;
@@ -49,6 +52,8 @@ import java.util.concurrent.Future;
  * @author Lennart Koopmann <lennart@torch.sh>
  */
 public class RadioInputRegistry extends InputRegistry {
+    private static final Logger log = LoggerFactory.getLogger(RadioInputRegistry.class);
+
     protected final ObjectMapper mapper = new ObjectMapper();
     protected final AsyncHttpClient httpclient;
     protected final URI serverUrl;
@@ -70,15 +75,17 @@ public class RadioInputRegistry extends InputRegistry {
         try {
             input = this.create(isr.type);
 
+            Configuration inputConfig = new Configuration(isr.configuration);
             // Add all standard fields.
-            input.initialize(new Configuration(isr.configuration));
             input.setTitle(isr.title);
             input.setCreatorUserId(isr.creatorUserId);
             input.setPersistId(isr.id);
             input.setCreatedAt(new DateTime(isr.createdAt));
             input.setGlobal(isr.global);
 
-            input.checkConfiguration();
+            input.checkConfiguration(inputConfig);
+            // initialize must run after all fields have been set. Why oh why isn't this done in the constructor/factory method?
+            input.initialize(inputConfig);
         } catch (NoSuchInputTypeException e) {
             LOG.warn("Cannot launch persisted input. No such type [{}]. Error: {}", isr.type, e);
             return null;
@@ -142,14 +149,19 @@ public class RadioInputRegistry extends InputRegistry {
 
         List<InputSummaryResponse> response;
         try {
-            Future<Response> f = httpclient.prepareGet(uriBuilder.build().toString()).execute();
+            Request request = httpclient.prepareGet(uriBuilder.build().toString()).build();
+            log.debug("API Request {} {}", request.getMethod(), request.getUrl());
+            Future<Response> f = httpclient.executeRequest(request);
 
             Response r = f.get();
 
             if (r.getStatusCode() != 200) {
                 throw new RuntimeException("Expected HTTP response [200] for list of persisted input but got [" + r.getStatusCode() + "].");
             }
-            response = mapper.readValue(r.getResponseBody(), PersistedInputsResponse.class).inputs;
+            String responseBody = r.getResponseBody();
+            PersistedInputsResponse persistedInputsResponse = mapper.readValue(responseBody,
+                                                                               PersistedInputsResponse.class);
+            response = persistedInputsResponse.inputs;
         } catch (IOException e) {
             LOG.error("Unable to get persisted inputs: ", e);
             return result;
@@ -164,7 +176,7 @@ public class RadioInputRegistry extends InputRegistry {
         for (InputSummaryResponse isr : response) {
             final MessageInput messageInput = getMessageInput(isr);
             if (messageInput != null) {
-                messageInput.setPersistId(isr.id);
+                log.debug("Loaded message input {}", messageInput);
                 result.add(messageInput);
             }
         }

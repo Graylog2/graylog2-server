@@ -40,6 +40,7 @@ import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.lifecycles.Lifecycle;
 import org.graylog2.radio.bindings.RadioBindings;
 import org.graylog2.radio.bindings.RadioInitializerBindings;
+import org.graylog2.radio.cluster.Ping;
 import org.graylog2.shared.NodeRunner;
 import org.graylog2.shared.ServerStatus;
 import org.graylog2.shared.bindings.GuiceInstantiationService;
@@ -135,6 +136,10 @@ public class Main extends NodeRunner {
         monkeyPatchHK2(injector);
 
         serverStatus.setLifecycle(Lifecycle.STARTING);
+
+        // register node by initiating first ping. if the node isn't registered, loading persisted inputs will fail silently, for example
+        Ping.Pinger pinger = injector.getInstance(Ping.Pinger.class);
+        pinger.ping();
 
         final ServiceManager serviceManager = injector.getInstance(ServiceManager.class);
         final ServiceManagerListener serviceManagerListener = injector.getInstance(ServiceManagerListener.class);
