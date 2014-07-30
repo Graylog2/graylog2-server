@@ -19,6 +19,8 @@
 
 package org.graylog2.caches;
 
+import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.Timer;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.graylog2.Configuration;
 import org.graylog2.inputs.InputCache;
@@ -59,11 +61,16 @@ public abstract class DiskJournalCache implements InputCache, OutputCache {
     private final Object modificationLock = new Object();
     private final Store store;
     private final float compactSizePercentageWatermark;
+    private final MetricRegistry metricRegistry;
+    private final Timer addTimer;
+    private final Timer popTimer;
+    private final Timer commitTimer;
+    private final Timer compactTimer;
 
     public static class Input extends DiskJournalCache {
         @Inject
-        public Input(Configuration config, MessageToJsonSerializer serializer) throws IOException {
-            super(config, serializer);
+        public Input(Configuration config, MessageToJsonSerializer serializer, MetricRegistry metricRegistry) throws IOException {
+            super(config, serializer, metricRegistry);
         }
 
         @Override
@@ -74,8 +81,8 @@ public abstract class DiskJournalCache implements InputCache, OutputCache {
 
     public static class Output extends DiskJournalCache {
         @Inject
-        public Output(Configuration config, MessageToJsonSerializer serializer) throws IOException {
-            super(config, serializer);
+        public Output(Configuration config, MessageToJsonSerializer serializer, MetricRegistry metricRegistry) throws IOException {
+            super(config, serializer, metricRegistry);
         }
 
         @Override
@@ -85,10 +92,11 @@ public abstract class DiskJournalCache implements InputCache, OutputCache {
     }
 
     @Inject
-    public DiskJournalCache(final Configuration config, final MessageToJsonSerializer serializer) throws IOException {
+    public DiskJournalCache(final Configuration config, final MessageToJsonSerializer serializer, final MetricRegistry metricRegistry) throws IOException {
         // Ensure the spool directory exists.
         Files.createDirectories(new File(config.getMessageCacheSpoolDir()).toPath());
 
+        this.metricRegistry = metricRegistry;
         this.db = DBMaker.newFileDB(getDbFile(config)).mmapFileEnable().checksumEnable().closeOnJvmShutdown().make();
         this.store = Store.forDB(this.db);
         this.queue = db.getQueue("messages");
@@ -98,6 +106,10 @@ public abstract class DiskJournalCache implements InputCache, OutputCache {
         );
         this.serializer = serializer;
         this.compactSizePercentageWatermark = config.getMessageCacheCompactionWatermark();
+        this.addTimer = metricRegistry.timer(MetricRegistry.name(getClass(), getDbFileName(), "add", "executionTime"));
+        this.popTimer = metricRegistry.timer(MetricRegistry.name(getClass(), getDbFileName(), "pop", "executionTime"));
+        this.commitTimer = metricRegistry.timer(MetricRegistry.name(getClass(), getDbFileName(), "commit", "executionTime"));
+        this.compactTimer = metricRegistry.timer(MetricRegistry.name(getClass(), getDbFileName(), "compact", "executionTime"));
 
         /* Commit and compact the database to flush existing data in the transaction log and to reduce the file
          * size of the database.
@@ -122,6 +134,7 @@ public abstract class DiskJournalCache implements InputCache, OutputCache {
         if (db.isClosed()) {
             return;
         }
+        final Timer.Context time = addTimer.time();
         try {
             final byte[] bytes = serializer.serializeToBytes(message);
 
@@ -132,6 +145,8 @@ public abstract class DiskJournalCache implements InputCache, OutputCache {
             }
         } catch (IOException e) {
             LOG.error("Unable to enqueue message", e);
+        } finally {
+            time.stop();
         }
 
     }
@@ -146,6 +161,7 @@ public abstract class DiskJournalCache implements InputCache, OutputCache {
         }
 
         final byte[] bytes;
+        final Timer.Context time = popTimer.time();
 
         synchronized (modificationLock) {
             bytes = queue.poll();
@@ -161,8 +177,11 @@ public abstract class DiskJournalCache implements InputCache, OutputCache {
             } catch (IOException e) {
                 LOG.error("Error deserializing message", e);
                 return null;
+            } finally {
+                time.stop();
             }
         } else {
+            time.stop();
             return null;
         }
     }
@@ -199,16 +218,19 @@ public abstract class DiskJournalCache implements InputCache, OutputCache {
         if (db.isClosed()) {
             return;
         }
+        final Timer.Context time = commitTimer.time();
         if (LOG.isDebugEnabled()) {
             LOG.debug("Committing {} (entries {})", getDbFileName(), size());
         }
         db.commit();
+        time.stop();
     }
 
     private void compact(final float watermark) {
         if (db.isClosed()) {
             return;
         }
+        final Timer.Context time = compactTimer.time();
         final long currSize = store.getCurrSize();
 
         if (isReadyToCompact(store, watermark)) {
@@ -218,6 +240,7 @@ public abstract class DiskJournalCache implements InputCache, OutputCache {
                 LOG.debug("Compacted db {} (freed up {} bytes)", getDbFileName(), (currSize - store.getCurrSize()));
             }
         }
+        time.stop();
     }
 
     private boolean isReadyToCompact(Store dbStore, final float watermark) {
