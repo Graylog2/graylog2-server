@@ -71,4 +71,21 @@ public class Output {
     public String getCreatedAt() {
         return createdAt;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Output)) return false;
+
+        Output output = (Output) o;
+
+        if (!_id.equals(output._id)) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return _id.hashCode();
+    }
 }
