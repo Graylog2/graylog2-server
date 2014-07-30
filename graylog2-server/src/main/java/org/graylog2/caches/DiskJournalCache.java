@@ -120,7 +120,7 @@ public abstract class DiskJournalCache implements InputCache, OutputCache {
                     LOG.error("Commit thread error", e);
                 }
             }
-        }, 0, 1000, TimeUnit.MILLISECONDS);
+        }, 0, config.getMessageCacheCommitInterval(), TimeUnit.MILLISECONDS);
     }
 
     @Override
