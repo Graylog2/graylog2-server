@@ -52,7 +52,7 @@ public class SystemResource extends RestResource {
         result.put("version", RadioVersion.VERSION.toString());
         result.put("started_at", Tools.getISO8601String(serverStatus.getStartedAt()));
         result.put("hostname", Tools.getLocalCanonicalHostname());
-        result.put("lifecycle", serverStatus.getLifecycle().getName().toLowerCase());
+        result.put("lifecycle", serverStatus.getLifecycle().getDescription().toLowerCase());
         result.put("lb_status", serverStatus.getLifecycle().getLoadbalancerStatus().toString().toLowerCase());
 
         return json(result);

@@ -21,24 +21,24 @@ package org.graylog2.plugin.lifecycles;
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-public class Lifecycle {
+public enum Lifecycle {
 
-    public static final Lifecycle UNINITIALIZED = new Lifecycle("Uninitialized", LoadBalancerStatus.DEAD);
-    public static final Lifecycle STARTING = new Lifecycle("Starting", LoadBalancerStatus.DEAD);
-    public static final Lifecycle RUNNING = new Lifecycle("Running", LoadBalancerStatus.ALIVE);
-    public static final Lifecycle PAUSED = new Lifecycle("Paused", LoadBalancerStatus.ALIVE);
-    public static final Lifecycle HALTING = new Lifecycle("Halting", LoadBalancerStatus.DEAD);
-    public static final Lifecycle FAILED = new Lifecycle("Failed", LoadBalancerStatus.DEAD);
+    UNINITIALIZED("Uninitialized", LoadBalancerStatus.DEAD),
+    STARTING("Starting", LoadBalancerStatus.DEAD),
+    RUNNING("Running", LoadBalancerStatus.ALIVE),
+    PAUSED("Paused", LoadBalancerStatus.ALIVE),
+    HALTING("Halting", LoadBalancerStatus.DEAD),
+    FAILED("Failed", LoadBalancerStatus.DEAD),
 
     // Manual lifecycle override, usually set by REST calls.
-    public static final Lifecycle OVERRIDE_LB_DEAD = new Lifecycle("Override lb:DEAD", LoadBalancerStatus.DEAD);
-    public static final Lifecycle OVERRIDE_LB_ALIVE = new Lifecycle("Override lb:ALIVE", LoadBalancerStatus.ALIVE);
+    OVERRIDE_LB_DEAD("Override lb:DEAD", LoadBalancerStatus.DEAD),
+    OVERRIDE_LB_ALIVE("Override lb:ALIVE", LoadBalancerStatus.ALIVE);
 
-    private final String name;
+    private final String description;
     private final LoadBalancerStatus loadBalancerStatus;
 
-    protected Lifecycle(String name, LoadBalancerStatus loadBalancerStatus) {
-        this.name = name;
+    Lifecycle(String description, LoadBalancerStatus loadBalancerStatus) {
+        this.description = description;
         this.loadBalancerStatus = loadBalancerStatus;
     }
 
@@ -46,13 +46,13 @@ public class Lifecycle {
         return loadBalancerStatus;
     }
 
-    public String getName() {
-        return name;
+    public String getDescription() {
+        return description;
     }
 
     @Override
     public String toString() {
-        return name + " [LB:" + getLoadbalancerStatus() + "]";
+        return description + " [LB:" + getLoadbalancerStatus() + "]";
     }
 
 }

@@ -20,6 +20,9 @@ package org.graylog2.inputs.kafka;
 
 import com.codahale.metrics.Gauge;
 import com.codahale.metrics.MetricRegistry;
+import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
+import com.google.common.util.concurrent.Uninterruptibles;
 import com.google.inject.Inject;
 import kafka.consumer.*;
 import kafka.javaapi.consumer.ConsumerConnector;
@@ -27,6 +30,8 @@ import kafka.message.MessageAndMetadata;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.RadioMessage;
 import org.graylog2.plugin.buffers.Buffer;
+import org.graylog2.plugin.buffers.BufferOutOfCapacityException;
+import org.graylog2.plugin.buffers.ProcessingDisabledException;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationException;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
@@ -35,6 +40,7 @@ import org.graylog2.plugin.configuration.fields.NumberField;
 import org.graylog2.plugin.configuration.fields.TextField;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.MisfireException;
+import org.graylog2.plugin.lifecycles.Lifecycle;
 import org.graylog2.plugin.system.NodeId;
 import org.joda.time.DateTime;
 import org.msgpack.MessagePack;
@@ -44,10 +50,7 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -62,20 +65,43 @@ public class KafkaInput extends MessageInput {
     public static final String NAME = "Kafka Input";
     private final MetricRegistry metricRegistry;
     private final NodeId nodeId;
+    private final EventBus serverEventBus;
 
     private ConsumerConnector cc;
 
-    private boolean stopped = false;
+    private volatile boolean stopped = false;
+    private volatile boolean paused = true;
+    private CountDownLatch pausedLatch = new CountDownLatch(1);
 
     private AtomicLong totalBytesRead = new AtomicLong(0);
     private AtomicLong lastSecBytesRead = new AtomicLong(0);
     private AtomicLong lastSecBytesReadTmp = new AtomicLong(0);
 
+    private CountDownLatch stopLatch;
+
     @Inject
     public KafkaInput(MetricRegistry metricRegistry,
-                      NodeId nodeId) {
+                      NodeId nodeId,
+                      EventBus serverEventBus) {
         this.metricRegistry = metricRegistry;
         this.nodeId = nodeId;
+        this.serverEventBus = serverEventBus;
+        // listen for lifecycle changes
+        serverEventBus.register(new Object() {
+            @Subscribe
+            public void lifecycleStateChange(Lifecycle lifecycle) {
+                LOG.debug("Lifecycle changed to {}", lifecycle);
+                switch (lifecycle) {
+                    case RUNNING:
+                        paused = false;
+                        pausedLatch.countDown();
+                        break;
+                    default:
+                        pausedLatch = new CountDownLatch(1);
+                        paused = true;
+                }
+            }
+        });
     }
 
     @Override
@@ -125,46 +151,100 @@ public class KafkaInput extends MessageInput {
 
         final MessageInput thisInput = this;
 
+        // this is being used during shutdown to first stop all submitted jobs before committing the offsets back to zookeeper
+        // and then shutting down the connection.
+        // this is to avoid yanking away the connection from the consumer runnables
+        stopLatch = new CountDownLatch(streams.size());
+
         for (final KafkaStream<byte[], byte[]> stream : streams) {
             executor.submit(new Runnable() {
                 public void run() {
                     MessagePack msgpack = new MessagePack();
 
-                    for(MessageAndMetadata message : stream) {
+                    ConsumerIterator<byte[], byte[]> consumerIterator = stream.iterator();
+
+                    // we have to use hasNext() here instead foreach, because next() marks the message as processed immediately
+                    while (consumerIterator.hasNext()) {
+                        if (paused) {
+                            // we try not to spin here, so we wait until the lifecycle goes back to running.
+                            LOG.debug("Message processing is paused, blocking until message processing is turned back on.");
+                            Uninterruptibles.awaitUninterruptibly(pausedLatch);
+                        }
+                        // check for being stopped before actually getting the message, otherwise we could end up losing that message
                         if (stopped) {
-                            return;
+                            break;
                         }
 
-                        try {
-                            byte[] bytes = (byte[]) message.message();
+                        // process the message, this will immediately mark the message as having been processed. this gets tricky
+                        // if we get an exception about processing it down below.
+                        final MessageAndMetadata<byte[], byte[]> message = consumerIterator.next();
+                        final Message event = decodeMessage(msgpack, message);
+                        if (event == null) return; // TODO should this actually return?
 
-                            totalBytesRead.addAndGet(bytes.length);
-                            lastSecBytesReadTmp.addAndGet(bytes.length);
-
-                            RadioMessage msg = msgpack.read(bytes, RadioMessage.class);
-
-                            if (!msg.strings.containsKey("message") || !msg.strings.containsKey("source") || msg.timestamp <= 0) {
-                                LOG.error("Incomplete radio message. Skipping.");
-                                continue;
+                        // the loop below is like this because we cannot "unsee" the message we've just gotten by calling .next()
+                        // the high level consumer of Kafka marks the message as "processed" immediately after being returned from next.
+                        // thus we need to retry processing it.
+                        boolean retry = false;
+                        int retryCount = 0;
+                        do {
+                            try {
+                                if (retry) {
+                                    // don't try immediately if the buffer was full, try not spin too much
+                                    LOG.debug("Waiting 10ms to retry inserting into buffer, retried {} times", retryCount);
+                                    Uninterruptibles.sleepUninterruptibly(10, TimeUnit.MILLISECONDS); // TODO magic number
+                                }
+                                // try to process the message, if it succeeds, we immediately move on to the next message (retry will be false)
+                                processBuffer.insertFailFast(event, thisInput);
+                                retry = false;
+                            } catch (BufferOutOfCapacityException e) {
+                                LOG.debug("Input buffer full, retrying Kafka message processing");
+                                retry = true;
+                                retryCount++;
+                            } catch (ProcessingDisabledException e) {
+                                LOG.debug("Processing was disabled after we read the message but before we could insert it into " +
+                                                  "the buffer. We cache this one message, and should block on the next iteration.");
+                                processBuffer.insertCached(event, thisInput);
+                                retry = false;
                             }
+                        } while (retry);
+                    }
+                    // explicitly commit our offsets when stopping.
+                    // this might trigger a couple of times, but it won't hurt
+                    cc.commitOffsets();
+                    stopLatch.countDown();
+                }
 
-                            Message event = new Message(
-                                    msg.strings.get("message"),
-                                    msg.strings.get("source"),
-                                    new DateTime(msg.timestamp)
-                            );
+                private Message decodeMessage(MessagePack msgpack,
+                                              MessageAndMetadata<byte[], byte[]> message) {
+                    try {
+                        byte[] bytes = message.message();
 
-                            event.addStringFields(msg.strings);
-                            event.addLongFields(msg.longs);
-                            event.addDoubleFields(msg.doubles);
+                        totalBytesRead.addAndGet(bytes.length);
+                        lastSecBytesReadTmp.addAndGet(bytes.length);
 
-                            processBuffer.insertCached(event, thisInput);
-                        } catch (Exception e) {
-                            LOG.error("Error while trying to process Kafka message.", e);
-                            continue;
+                        RadioMessage msg = msgpack.read(bytes, RadioMessage.class);
+
+                        if (!msg.strings.containsKey("message") || !msg.strings.containsKey("source") || msg.timestamp <= 0) {
+                            LOG.error("Incomplete radio message. Skipping.");
+                            return null;
                         }
+
+                        Message event = new Message(
+                                msg.strings.get("message"),
+                                msg.strings.get("source"),
+                                new DateTime(msg.timestamp)
+                        );
+
+                        event.addStringFields(msg.strings);
+                        event.addLongFields(msg.longs);
+                        event.addDoubleFields(msg.doubles);
+                        return event;
+                    } catch (Exception e) {
+                        LOG.error("Error while processing Kafka radio message", e);
+                        return null;
                     }
                 }
+
             });
         }
 
@@ -181,8 +261,25 @@ public class KafkaInput extends MessageInput {
     public void stop() {
         stopped = true;
 
+        if (stopLatch != null) {
+            try {
+                // unpause the processors if they are blocked. this will cause them to see that we are stopping, even if they were paused.
+                if (pausedLatch != null && pausedLatch.getCount() > 0) {
+                    pausedLatch.countDown();
+                }
+                boolean allStoppedOrderly = stopLatch.await(5, TimeUnit.SECONDS);
+                stopLatch = null;
+                if (!allStoppedOrderly) {
+                    // timed out
+                    LOG.warn("Stopping Kafka input timed out (waited 5 seconds for consumer threads to stop). Forcefully closing connection now.");
+                }
+            } catch (InterruptedException e) {
+                LOG.debug("Interrupted while waiting to stop input.");
+            }
+        }
         if (cc != null) {
             cc.shutdown();
+            cc = null;
         }
     }
 

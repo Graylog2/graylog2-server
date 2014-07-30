@@ -132,11 +132,12 @@ public class ServerBindings extends AbstractModule {
 
         bind(MongoConnection.class).toInstance(mongoConnection);
 
-        ServerStatus serverStatus = new ServerStatus(configuration);
-        serverStatus.addCapability(ServerStatus.Capability.SERVER);
+        Multibinder<ServerStatus.Capability> capabilityBinder =
+                Multibinder.newSetBinder(binder(), ServerStatus.Capability.class);
+        capabilityBinder.addBinding().toInstance(ServerStatus.Capability.SERVER);
         if (configuration.isMaster())
-            serverStatus.addCapability(ServerStatus.Capability.MASTER);
-        bind(ServerStatus.class).toInstance(serverStatus);
+            capabilityBinder.addBinding().toInstance(ServerStatus.Capability.MASTER);
+        bind(ServerStatus.class).in(Scopes.SINGLETON);
 
         bind(OutputBufferWatermark.class).toInstance(new OutputBufferWatermark());
         bind(Indexer.class).toProvider(IndexerProvider.class);

@@ -19,10 +19,13 @@
  */
 package org.graylog2.inputs.amqp;
 
+import com.google.common.util.concurrent.Uninterruptibles;
 import com.rabbitmq.client.*;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.RadioMessage;
 import org.graylog2.plugin.buffers.Buffer;
+import org.graylog2.plugin.buffers.BufferOutOfCapacityException;
+import org.graylog2.plugin.buffers.ProcessingDisabledException;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.joda.time.DateTime;
 import org.msgpack.MessagePack;
@@ -124,13 +127,20 @@ public class Consumer {
                         event.addLongFields(msg.longs);
                         event.addDoubleFields(msg.doubles);
 
-                        processBuffer.insertCached(event, sourceInput);
-
+                        processBuffer.insertFailFast(event, sourceInput);
+                        channel.basicAck(deliveryTag, false);
+                    } catch (BufferOutOfCapacityException e) {
+                        LOG.debug("Input buffer full, requeuing message. Delaying 10 ms until trying next message.");
+                        channel.basicNack(deliveryTag, false, true);
+                        Uninterruptibles.sleepUninterruptibly(10, TimeUnit.MILLISECONDS); // TODO magic number
+                    } catch (ProcessingDisabledException e) {
+                        LOG.debug("Message processing is disabled, requeuing message. Delaying 100 ms until trying next message.");
+                        channel.basicNack(deliveryTag, false, true);
+                        Uninterruptibles.sleepUninterruptibly(100, TimeUnit.MILLISECONDS); // TODO magic number
                     } catch (Exception e) {
-                        LOG.error("Error while trying to process AMQP message.", e);
+                        LOG.error("Error while trying to process AMQP message, requeuing message", e);
+                        channel.basicNack(deliveryTag, false, true);
                     }
-
-                    channel.basicAck(deliveryTag, false);
                 }
             }
         );
@@ -161,6 +171,10 @@ public class Consumer {
         connection.addShutdownListener(new ShutdownListener() {
             @Override
             public void shutdownCompleted(ShutdownSignalException cause) {
+                if (cause.isInitiatedByApplication()) {
+                    LOG.info("Not reconnecting connection, we disconnected explicitely.");
+                    return;
+                }
                 while (true) {
                     try {
                         LOG.error("AMQP connection lost! Trying reconnect in 1 second.");
