@@ -20,6 +20,8 @@ package org.graylog2.inputs.amqp;
 
 import com.codahale.metrics.Gauge;
 import com.codahale.metrics.MetricRegistry;
+import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import org.graylog2.plugin.buffers.Buffer;
 import org.graylog2.plugin.configuration.Configuration;
@@ -30,6 +32,7 @@ import org.graylog2.plugin.configuration.fields.NumberField;
 import org.graylog2.plugin.configuration.fields.TextField;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.MisfireException;
+import org.graylog2.plugin.lifecycles.Lifecycle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,6 +48,7 @@ public class AMQPInput extends MessageInput {
 
     public static final String NAME = "AMQP Input";
     private final MetricRegistry metricRegistry;
+    private final EventBus serverEventBus;
 
     private Consumer consumer;
 
@@ -59,8 +63,38 @@ public class AMQPInput extends MessageInput {
     public static final String CK_ROUTING_KEY = "routing_key";
 
     @Inject
-    public AMQPInput(MetricRegistry metricRegistry) {
+    public AMQPInput(MetricRegistry metricRegistry, EventBus serverEventBus) {
         this.metricRegistry = metricRegistry;
+        this.serverEventBus = serverEventBus;
+        this.serverEventBus.register(new Object() {
+            @Subscribe public void lifecycleChanged(Lifecycle lifecycle) {
+                try {
+                    LOG.debug("Lifecycle changed to {}", lifecycle);
+                    switch (lifecycle) {
+                        case RUNNING:
+                            if (consumer.isConnected()) {
+                                LOG.debug("Consumer is already connected, not running it a second time.");
+                                break;
+                            }
+                            try {
+                                consumer.run();
+                            } catch (IOException e) {
+                                LOG.warn("Unable to resume consumer", e);
+                            }
+                            break;
+                        default:
+                            try {
+                                consumer.stop();
+                            } catch (IOException e) {
+                                LOG.warn("Unable to stop consumer", e);
+                            }
+                            break;
+                    }
+                } catch (Exception e) {
+                    LOG.warn("This should not throw any exceptions", e);
+                }
+            }
+        });
     }
 
     @Override

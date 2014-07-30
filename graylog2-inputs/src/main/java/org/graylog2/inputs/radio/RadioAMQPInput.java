@@ -20,6 +20,7 @@
 package org.graylog2.inputs.radio;
 
 import com.codahale.metrics.MetricRegistry;
+import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
 import org.graylog2.inputs.amqp.AMQPInput;
 import org.graylog2.plugin.configuration.Configuration;
@@ -37,8 +38,8 @@ public class RadioAMQPInput extends AMQPInput {
     public static final String NAME = "Graylog2 Radio Input (AMQP)";
 
     @Inject
-    public RadioAMQPInput(MetricRegistry metricRegistry) {
-        super(metricRegistry);
+    public RadioAMQPInput(MetricRegistry metricRegistry, EventBus eventBus) {
+        super(metricRegistry, eventBus);
     }
 
     @Override
