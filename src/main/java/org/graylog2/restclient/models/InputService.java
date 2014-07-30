@@ -63,10 +63,10 @@ public class InputService {
         return result;
     }
 
-    protected List<InputStateSummaryResponse> getInputsFromNode(Node node) {
+    protected List<InputStateSummaryResponse> getInputsFromNode(ClusterEntity node) {
         List<InputStateSummaryResponse> result = Lists.newArrayList();
         try {
-            result = api.path(resource.list(), InputsResponse.class).node(node).execute().inputs;
+            result = api.path(resource.list(), InputsResponse.class).clusterEntity(node).execute().inputs;
         } catch (APIException e) {
             log.error("Unable to fetch input list: " + e);
         } catch (IOException e) {
@@ -80,7 +80,7 @@ public class InputService {
         return api.path(resource.list(), InputsResponse.class).fromAllNodes().executeOnAll();
     }
 
-    public List<InputState> loadAllInputStates(Node node) {
+    public List<InputState> loadAllInputStates(ClusterEntity node) {
         List<InputState> inputStates = Lists.newArrayList();
 
         for (InputStateSummaryResponse inputsResponse : getInputsFromNode(node)) {
