@@ -49,7 +49,7 @@ public class RadioKafkaInput extends KafkaInput {
     }
 
     @Override
-    public void checkConfiguration() throws ConfigurationException {
+    public void checkConfiguration(Configuration configuration) throws ConfigurationException {
         configuration.setString(CK_TOPIC_FILTER, "^graylog2-radio-messages$");
 
         if (!checkConfig(configuration)) {

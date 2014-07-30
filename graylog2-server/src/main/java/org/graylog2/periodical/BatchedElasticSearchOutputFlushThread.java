@@ -39,7 +39,6 @@ public class BatchedElasticSearchOutputFlushThread extends Periodical {
 
     @Inject
     public BatchedElasticSearchOutputFlushThread(OutputRegistry outputRegistry, Configuration configuration) {
-        LOG.info("BatchedElasticSearchOutputFlushThread");
         this.outputRegistry = outputRegistry;
         this.configuration = configuration;
     }

@@ -22,6 +22,7 @@ import com.codahale.metrics.MetricRegistry;
 import org.graylog2.inputs.misc.metrics.agent.Graylog2Reporter;
 import org.graylog2.inputs.misc.metrics.agent.InProcessMessageWriter;
 import org.graylog2.plugin.buffers.Buffer;
+import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationException;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.configuration.fields.ConfigurationField;
@@ -61,7 +62,7 @@ public class LocalMetricsInput extends MessageInput {
     }
 
     @Override
-    public void checkConfiguration() throws ConfigurationException {
+    public void checkConfiguration(Configuration configuration) throws ConfigurationException {
         builder = Graylog2Reporter.forRegistry(metricRegistry)
                             .useSource(configuration.getString(CK_SOURCE))
                             .convertDurationsTo(TimeUnit.valueOf(configuration.getString(CK_DURATION_UNIT)))

@@ -223,7 +223,7 @@ public class AMQPInput extends MessageInput {
     }
 
     @Override
-    public void checkConfiguration() throws ConfigurationException {
+    public void checkConfiguration(Configuration configuration) throws ConfigurationException {
         if (!checkConfig(configuration)) {
             throw new ConfigurationException(configuration.getSource().toString());
         }

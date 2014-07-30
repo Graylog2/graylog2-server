@@ -129,7 +129,7 @@ public class InputsResource extends RestResource {
             lr = objectMapper.readValue(body, InputLaunchRequest.class);
         } catch(IOException e) {
             LOG.error("Error while parsing JSON", e);
-            throw new WebApplicationException(e, Response.Status.BAD_REQUEST);
+            throw new BadRequestException(e);
         }
 
         // Build a proper configuration from POST data.
@@ -137,22 +137,28 @@ public class InputsResource extends RestResource {
 
         // Build input.
         DateTime createdAt = new DateTime(DateTimeZone.UTC);
-        MessageInput input = null;
+        final MessageInput input;
         try {
             input = inputRegistry.create(lr.type);
-            input.initialize(inputConfig);
             input.setTitle(lr.title);
             input.setGlobal(lr.global);
             input.setCreatorUserId(lr.creatorUserId);
             input.setCreatedAt(createdAt);
 
-            input.checkConfiguration();
+            input.checkConfiguration(inputConfig);
         } catch (NoSuchInputTypeException e) {
             LOG.error("There is no such input type registered.", e);
             throw new WebApplicationException(e, Response.Status.NOT_FOUND);
         } catch (ConfigurationException e) {
             LOG.error("Missing or invalid input configuration.", e);
             throw new WebApplicationException(e, Response.Status.BAD_REQUEST);
+        }
+
+        // Don't run if exclusive and another instance is already running.
+        if (input.isExclusive() && inputRegistry.hasTypeRunning(input.getClass())) {
+            final String error = "Type is exclusive and already has input running.";
+            LOG.error(error);
+            throw new BadRequestException(error);
         }
 
         String inputId = UUID.randomUUID().toString();
@@ -173,16 +179,12 @@ public class InputsResource extends RestResource {
         // ... and check if it would pass validation. We don't need to go on if it doesn't.
         Input mongoInput = new InputImpl(inputData);
 
-        // Don't run if exclusive and another instance is already running.
-        if (input.isExclusive() && inputRegistry.hasTypeRunning(input.getClass())) {
-            LOG.error("Type is exclusive and already has input running.");
-            throw new WebApplicationException(Response.Status.BAD_REQUEST);
-        }
-
         // Persist input.
         String id;
         id = inputService.save(mongoInput);
         input.setPersistId(id);
+
+        input.initialize(inputConfig);
 
         // Launch input. (this will run async and clean up itself in case of an error.)
         inputRegistry.launch(input, inputId);

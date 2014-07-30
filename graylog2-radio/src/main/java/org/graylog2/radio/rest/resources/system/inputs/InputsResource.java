@@ -104,13 +104,12 @@ public class InputsResource extends RestResource {
         MessageInput input;
         try {
             input = inputRegistry.create(lr.type);
-            input.initialize(inputConfig);
             input.setTitle(lr.title);
             input.setCreatorUserId(lr.creatorUserId);
             input.setCreatedAt(createdAt);
             input.setGlobal(lr.global);
 
-            input.checkConfiguration();
+            input.checkConfiguration(inputConfig);
         } catch (NoSuchInputTypeException e) {
             LOG.error("There is no such input type registered.", e);
             throw new WebApplicationException(e, Response.Status.NOT_FOUND);
@@ -127,6 +126,8 @@ public class InputsResource extends RestResource {
             LOG.error("Type is exclusive and already has input running.");
             throw new WebApplicationException(Response.Status.BAD_REQUEST);
         }
+
+        input.initialize(inputConfig);
 
         // Launch input. (this will run async and clean up itself in case of an error.)
         inputRegistry.launch(input, inputId, true);

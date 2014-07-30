@@ -22,6 +22,7 @@ package org.graylog2.filters;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.buffers.Buffer;
+import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationException;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.inputs.MessageInput;
@@ -75,7 +76,7 @@ public class StaticFieldFilterTest {
     private class FakeInput extends MessageInput {
 
         @Override
-        public void checkConfiguration() throws ConfigurationException {
+        public void checkConfiguration(Configuration configuration) throws ConfigurationException {
             //To change body of implemented methods use File | Settings | File Templates.
         }
 
