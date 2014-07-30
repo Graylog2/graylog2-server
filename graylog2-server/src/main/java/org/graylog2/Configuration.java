@@ -259,9 +259,6 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "message_cache_spool_dir", required = false)
     private String messageCacheSpoolDir = "spool";
 
-    @Parameter(value = "message_cache_compaction_watermark", required = false)
-    private float messageCacheCompactionWatermark = 30;
-
     public boolean isMaster() {
         return isMaster;
     }
@@ -576,10 +573,6 @@ public class Configuration extends BaseConfiguration {
 
     public String getMessageCacheSpoolDir() {
         return messageCacheSpoolDir;
-    }
-
-    public float getMessageCacheCompactionWatermark() {
-        return messageCacheCompactionWatermark;
     }
 }
 

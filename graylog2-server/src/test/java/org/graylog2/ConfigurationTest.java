@@ -217,25 +217,4 @@ public class ConfigurationTest {
 
         Assert.assertEquals(configuration.getMessageCacheSpoolDir(), "wat?/a/spool/dir");
     }
-
-    @Test
-    public void testDefaultMessageCacheCompactionWatermark() throws RepositoryException, ValidationException {
-        final HashMap<String, String> properties = Maps.newHashMap(validProperties);
-
-        Configuration configuration = new Configuration();
-        new JadConfig(new InMemoryRepository(properties), configuration).process();
-
-        Assert.assertEquals(configuration.getMessageCacheCompactionWatermark(), 30.0f, "Default message_cache_compaction_watermark is not '30.0f'");
-    }
-
-    @Test
-    public void testMessageCacheCompactionWatermark() throws RepositoryException, ValidationException {
-        final HashMap<String, String> properties = Maps.newHashMap(validProperties);
-        properties.put("message_cache_compaction_watermark", "55");
-
-        Configuration configuration = new Configuration();
-        new JadConfig(new InMemoryRepository(properties), configuration).process();
-
-        Assert.assertEquals(configuration.getMessageCacheCompactionWatermark(), 55.0f);
-    }
 }
