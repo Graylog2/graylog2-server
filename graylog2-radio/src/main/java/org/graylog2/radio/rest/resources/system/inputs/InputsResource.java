@@ -195,12 +195,27 @@ public class InputsResource extends RestResource {
     @POST @Timed
     @Path("/{inputId}/launch")
     public Response launchExisting(@PathParam("inputId") String inputId) {
-        MessageInput isr = inputRegistry.getPersisted(inputId);
-        if (isr == null) {
-            throw new WebApplicationException(404);
+        InputState inputState = inputRegistry.getInputState(inputId);
+
+        if (inputState == null) {
+            throw new NotFoundException("Input <" + inputId + "> not found!");
         }
 
-        inputRegistry.launchPersisted(isr);
+        final MessageInput input = inputState.getMessageInput();
+
+        if (input == null) {
+            final String error = "Cannot launch input <" + inputId + ">. Input not found.";
+            LOG.info(error);
+            throw new NotFoundException(error);
+        }
+
+        String msg = "Launching existing input [" + input.getName()+ "]. Reason: REST request.";
+        LOG.info(msg);
+
+        inputRegistry.launch(inputState);
+
+        String msg2 = "Launched existing input [" + input.getName()+ "]. Reason: REST request.";
+        LOG.info(msg2);
 
         Map<String, Object> result = Maps.newHashMap();
         result.put("input_id", inputId);

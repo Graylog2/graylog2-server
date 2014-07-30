@@ -41,7 +41,9 @@ public interface InputService extends PersistedService {
     Input find(String id);
 
     Input findForThisNode(String nodeId, String id) throws NotFoundException;
+    Input findForThisRadio(String radioId, String id) throws NotFoundException;
     Input findForThisNodeOrGlobal(String nodeId, String id) throws NotFoundException;
+    Input findForThisRadioOrGlobal(String radioId, String id) throws NotFoundException;
 
     void addExtractor(Input input, Extractor extractor) throws ValidationException;
 

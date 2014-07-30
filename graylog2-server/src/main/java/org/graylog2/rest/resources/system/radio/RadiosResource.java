@@ -42,6 +42,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.util.List;
@@ -55,6 +56,8 @@ import static javax.ws.rs.core.Response.ok;
 // @RequiresAuthentication unauthenticated because radios do not have any authentication support yet
 @Api(value = "System/Radios", description = "Management of graylog2-radio nodes.")
 @Path("/system/radios")
+@Consumes(MediaType.APPLICATION_JSON)
+@Produces(MediaType.APPLICATION_JSON)
 public class RadiosResource extends RestResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(RadiosResource.class);
@@ -182,19 +185,20 @@ public class RadiosResource extends RestResource {
             radio = nodeService.byNodeId(radioId);
         } catch (NodeNotFoundException e) {
             LOG.error("Radio <{}> not found.", radioId);
-            throw new WebApplicationException(404);
+            throw new NotFoundException("Radio <" + radioId + "> not found.");
         }
 
         if (radio == null) {
             LOG.error("Radio <{}> not found.", radioId);
-            throw new WebApplicationException(404);
+            throw new NotFoundException("Radio <" + radioId + "> not found.");
         }
 
         try {
-            final Input input = inputService.findForThisNode(radioId, inputId);
-            inputService.destroy(input);
+            final Input input = inputService.findForThisRadioOrGlobal(radioId, inputId);
+            if (!input.isGlobal())
+                inputService.destroy(input);
         } catch (org.graylog2.database.NotFoundException e) {
-            throw new WebApplicationException(404);
+            throw new NotFoundException(e);
         }
 
         return Response.status(Response.Status.NO_CONTENT).build();

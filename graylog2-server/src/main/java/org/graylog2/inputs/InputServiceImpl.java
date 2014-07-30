@@ -21,9 +21,7 @@ package org.graylog2.inputs;
 
 import com.google.common.collect.Lists;
 import com.google.inject.Inject;
-import com.mongodb.BasicDBList;
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBObject;
+import com.mongodb.*;
 import org.bson.types.ObjectId;
 import org.graylog2.cluster.Node;
 import org.graylog2.database.MongoConnection;
@@ -110,6 +108,25 @@ public class InputServiceImpl extends PersistedServiceImpl implements InputServi
     }
 
     @Override
+    public Input findForThisRadioOrGlobal(final String radioId, String id) throws NotFoundException {
+        List<DBObject> query = new ArrayList<>();
+        query.add(new BasicDBObject("_id", new ObjectId(id)));
+        List<DBObject> radioIdOrGlobal = new ArrayList<DBObject>() {{
+            add(new BasicDBObject("radio_id", radioId));
+            add(new BasicDBObject("global", true));
+        }};
+
+        query.add(new BasicDBObject("$or", radioIdOrGlobal));
+
+        DBObject o = findOne(InputImpl.class, new BasicDBObject("$and", query));
+
+        if (o == null)
+            throw new NotFoundException();
+        else
+            return new InputImpl((ObjectId) o.get("_id"), o.toMap());
+    }
+
+    @Override
     public Input findForThisNode(String nodeId, String id) throws NotFoundException, IllegalArgumentException {
         List<BasicDBObject> query = new ArrayList<BasicDBObject>();
         query.add(new BasicDBObject("_id", new ObjectId(id)));
@@ -119,6 +136,26 @@ public class InputServiceImpl extends PersistedServiceImpl implements InputServi
         forThisNode.add(new BasicDBObject("global", false));
 
         query.add(new BasicDBObject("$and", forThisNode));
+
+        DBObject o = findOne(InputImpl.class, new BasicDBObject("$and", query));
+
+        if (o == null)
+            throw new NotFoundException();
+        else
+            return new InputImpl((ObjectId) o.get("_id"), o.toMap());
+    }
+
+    @Override
+    public Input findForThisRadio(String radioId, String id) throws NotFoundException {
+        List<DBObject> query = new ArrayList<>();
+        query.add(new BasicDBObject("_id", new ObjectId(id)));
+        query.add(new BasicDBObject("radio_id", radioId));
+        List<Object> list = new ArrayList<Object>()
+        {{
+            add(false);
+            add(null);
+        }};
+        query.add(QueryBuilder.start("global").in(list).get());
 
         DBObject o = findOne(InputImpl.class, new BasicDBObject("$and", query));
 

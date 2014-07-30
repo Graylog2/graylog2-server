@@ -196,13 +196,16 @@ public class RadioInputRegistry extends InputRegistry {
     protected void finishedTermination(InputState state) {
         MessageInput input = state.getMessageInput();
         try {
-            unregisterInCluster(input);
+            if (!state.getMessageInput().getGlobal())
+                unregisterInCluster(input);
         } catch (Exception e) {
-            LOG.error("Could not unregister input [" + input.getName() + "] on server cluster.", e);
+            LOG.error("Could not unregister input [{}], id <{}> on server cluster: {}", input.getName(), input.getId(), e);
             return;
         }
 
-        LOG.info("Unregistered input [" + input.getName() + "] on server cluster.");
+        LOG.info("Unregistered input [{}], id <{}> on server cluster.", input.getName(), input.getId());
+
+        removeFromRunning(state);
     }
 
     @Override
