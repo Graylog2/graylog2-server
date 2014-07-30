@@ -217,4 +217,42 @@ public class ConfigurationTest {
 
         Assert.assertEquals(configuration.getMessageCacheSpoolDir(), "wat?/a/spool/dir");
     }
+
+    @Test
+    public void testDefaultMessageCacheCommitInterval() throws RepositoryException, ValidationException {
+        Configuration configuration = new Configuration();
+        new JadConfig(new InMemoryRepository(validProperties), configuration).process();
+
+        Assert.assertEquals(configuration.getMessageCacheCommitInterval(), 1000, "Default message_cache_commit_interval is not '1000'");
+    }
+
+    @Test
+    public void testMessageCacheCommitInterval() throws RepositoryException, ValidationException {
+        final HashMap<String, String> properties = Maps.newHashMap(validProperties);
+        properties.put("message_cache_commit_interval", "4000");
+
+        Configuration configuration = new Configuration();
+        new JadConfig(new InMemoryRepository(properties), configuration).process();
+
+        Assert.assertEquals(configuration.getMessageCacheCommitInterval(), 4000);
+    }
+
+    @Test
+    public void testDefaultMessageCacheOffHeap() throws RepositoryException, ValidationException {
+        Configuration configuration = new Configuration();
+        new JadConfig(new InMemoryRepository(validProperties), configuration).process();
+
+        Assert.assertEquals(configuration.isMessageCacheOffHeap(), true, "Default message_cache_off_heap is not 'true'");
+    }
+
+    @Test
+    public void testMessageCacheOffHeap() throws RepositoryException, ValidationException {
+        final HashMap<String, String> properties = Maps.newHashMap(validProperties);
+        properties.put("message_cache_off_heap", "false");
+
+        Configuration configuration = new Configuration();
+        new JadConfig(new InMemoryRepository(properties), configuration).process();
+
+        Assert.assertEquals(configuration.isMessageCacheOffHeap(), false);
+    }
 }
