@@ -24,6 +24,7 @@ import com.google.gson.annotations.SerializedName;
  * @author Lennart Koopmann <lennart@torch.sh>
  */
 public class BufferSummaryResponse {
+    public static final BufferSummaryResponse EMPTY = new BufferSummaryResponse();
 
     public long utilization;
 

@@ -18,12 +18,12 @@
  */
 package org.graylog2.restclient.models.api.responses;
 
-import com.google.gson.annotations.SerializedName;
-
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
 public class MasterCacheSummaryResponse {
+
+    public static final MasterCacheSummaryResponse EMPTY = new MasterCacheSummaryResponse();
 
     public long size;
 
