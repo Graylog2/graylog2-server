@@ -19,9 +19,12 @@
 
 package org.graylog2.plugin.rest;
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
  */
+@JsonTypeInfo(use= JsonTypeInfo.Id.NAME, include= JsonTypeInfo.As.PROPERTY, property="type")
 public class ApiError {
     public final String message;
 
