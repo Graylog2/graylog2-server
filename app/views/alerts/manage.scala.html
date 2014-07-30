@@ -49,6 +49,7 @@
 
     @if(isPermitted(STREAMS_EDIT, stream.getId)) {
         <select class="add-alert-destination-type">
+            <option disabled selected>-- Choose alert destination --</option>
             @for((callbackType, details) <- availableAlarmCallbacks.toArray.sortBy(_._2.name)) {
                 <option value="@callbackType">@details.name</option>
             }

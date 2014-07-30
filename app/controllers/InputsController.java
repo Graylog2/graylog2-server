@@ -152,12 +152,26 @@ public class InputsController extends AuthenticatedController {
         if (!Permissions.isPermitted(RestPermissions.INPUTS_READ)) {
             return redirect(routes.StartpageController.redirect());
         }
+
+        final Map<Input, Map<ClusterEntity, InputState>> globalInputs = Maps.newHashMap();
+        final List<InputState> localInputs = Lists.newArrayList();
+
         try {
             Radio radio = nodeService.loadRadio(radioId);
 
             if (radio == null) {
                 String message = "Did not find radio.";
                 return status(404, views.html.errors.error.render(message, new RuntimeException(), request()));
+            }
+
+            for (InputState inputState : inputService.loadAllInputStates(radio)) {
+                if (!inputState.getInput().getGlobal())
+                    localInputs.add(inputState);
+                else {
+                    Map<ClusterEntity, InputState> clusterEntityInputStateMap = Maps.newHashMap();
+                    clusterEntityInputStateMap.put(radio, inputState);
+                    globalInputs.put(inputState.getInput(), clusterEntityInputStateMap);
+                }
             }
 
             BreadcrumbList bc = new BreadcrumbList();
@@ -170,7 +184,10 @@ public class InputsController extends AuthenticatedController {
                     currentUser(),
                     bc,
                     radio,
-                    radio.getAllInputTypeInformation()
+                    globalInputs,
+                    localInputs,
+                    radio.getAllInputTypeInformation(),
+                    nodeService.loadMasterNode()
             ));
         } catch (IOException e) {
             return status(500, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));

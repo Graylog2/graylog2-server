@@ -1,4 +1,10 @@
-@(currentUser: org.graylog2.restclient.models.User, breadcrumbs: lib.BreadcrumbList, radio: org.graylog2.restclient.models.Radio, inputTypes: Map[String, org.graylog2.restclient.models.api.responses.system.InputTypeSummaryResponse])
+@(currentUser: org.graylog2.restclient.models.User,
+        breadcrumbs: lib.BreadcrumbList,
+        radio: org.graylog2.restclient.models.Radio,
+        globalInputs: Map[org.graylog2.restclient.models.Input, Map[org.graylog2.restclient.models.ClusterEntity, org.graylog2.restclient.models.InputState]],
+        localInputs: List[org.graylog2.restclient.models.InputState],
+        inputTypes: Map[String, org.graylog2.restclient.models.api.responses.system.InputTypeSummaryResponse],
+        masterNode: org.graylog2.restclient.models.Node)
 
 @import controllers.routes;
 @import org.graylog2.restclient.models._
@@ -20,93 +26,29 @@
         possibility to shut down parts of the system while Kafka is buffering the data until Graylog2 server nodes are ready to process data again.
     </div>
 
-    <div class="row-fluid input-new">
-
-        <select id="input-type">
-        @for((inputType,info) <- inputTypes.toSeq.sortBy(_._2.name)) {
-            <option value="@inputType">@info.name</option>
+    <div class="row-fluid input-list">
+        <h2><i class="icon icon-cogs"> Running global inputs</i></h2>
+        @if(globalInputs.size > 0) {
+            @for((input, nodeStates) <- globalInputs.toSeq.sortWith(_._1.getTitle < _._1.getTitle)) {
+                @views.html.system.inputs.partials.global_input_summary(input, nodeStates, inputTypes, masterNode)
+            }
+        } else {
+            <div class="alert alert-info">There are no global inputs.</div>
         }
-        </select>
-
-        <button id="configure-input" class="btn btn-success">Launch new input</button>
     </div>
 
     <div class="row-fluid input-list">
-        <h2><i class="icon icon-cogs"></i> Running inputs</h2>
+        <h2><i class="icon icon-cogs"></i> Running local inputs</h2>
 
-        @if(radio.numberOfInputs > 0) {
-            @for(input <- radio.getInputs) {
-                <div class="row-fluid node-row">
-                    <span class="pull-right node-row-info">
-                        <span class="text">Started by @views.html.partials.links.to_user(input.getCreatorUser)</span>
-                            &nbsp;
-
-                        <form action="@routes.InputsController.terminateRadio(radio.getId, input.getId)" method="POST">
-                            <button class="btn btn-danger btn-mini"
-                            type="submit"
-                            data-confirm="Really terminate input?">
-                                    Terminate
-                            </button>
-                        </form>
-                    </span>
-
-                    <h3>
-                        <i class="icon icon-ellipsis-vertical"></i>
-                        @input.getTitle (@input.getName)
-
-                        @if(inputTypes.get(input.getType).linkToDocs != null && !inputTypes.get(input.getType).linkToDocs.isEmpty) {
-                            <a href="@inputTypes.get(input.getType).linkToDocs" target="_blank">
-                                <i class="icon icon-question-sign input-docs"></i>
-                            </a>
-                        }
-                    </h3>
-
-                    @if(input.getReadBytes >= 0 && input.getWrittenBytes >= 0) {
-                        <div class="input-io focuslimit" data-node-id="@radio.getId" data-input-id="@input.getId">
-                            Network IO:
-
-                            <span class="persec">
-                                <i class="icon icon-caret-down channel-direction channel-direction-down"></i>
-                                <span class="rx value">@Tools.byteToHuman(input.getReadBytes)</span>
-
-                                <i class="icon icon-caret-up channel-direction channel-direction-up"></i>
-                                <span class="tx value">@Tools.byteToHuman(input.getWrittenBytes)</span>
-                            </span>
-
-                            <span class="total">
-                                (total:
-                                <i class="icon icon-caret-down channel-direction channel-direction-down"></i>
-                                <span class="rx value">@Tools.byteToHuman(input.getTotalReadBytes)</span>
-
-                                <i class="icon icon-caret-up channel-direction channel-direction-up"></i>
-                                <span class="tx value">@Tools.byteToHuman(input.getTotalWrittenBytes)</span>
-                                )
-                            </span>
-
-                        </div>
-                    }
-
-                    @if(input.getConnections >= 0 && input.getTotalConnections >= 0) {
-                        <div class="input-connections focuslimit" data-node-id="@radio.getId" data-input-id="@input.getId">
-                            Total connections:
-                            <span class="total">@input.getTotalConnections</span>
-                            (<span class="active">@input.getConnections</span> active)
-                        </div>
-                    }
-
-                    <div class="well well-small">
-                        <ul>
-                        @for((k,v) <- input.getAttributes) {
-                            <li>@k: @v</li>
-                        }
-                        </ul>
-                    </div>
-                </div>
+        @if(localInputs.size > 0) {
+            @for(inputState <- localInputs.toSeq.sortBy(_.getInput.getTitle)) {
+                @views.html.system.inputs.partials.input_summary(inputState, inputTypes)
             }
         } else {
-            <div class="alert alert-danger">This radio has no running inputs.</div>
+            <div class="alert alert-info">There are no local inputs.</div>
         }
     </div>
+
 
     <div class="alert alert-info">
         Newly added input not appearing? You can find information about misfired inputs
