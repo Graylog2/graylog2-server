@@ -36,6 +36,7 @@ import org.graylog2.bindings.providers.*;
 import org.graylog2.buffers.OutputBufferWatermark;
 import org.graylog2.buffers.processors.OutputBufferProcessor;
 import org.graylog2.buffers.processors.ServerProcessBufferProcessor;
+import org.graylog2.caches.DiskJournalCache;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.filters.FilterService;
 import org.graylog2.filters.FilterServiceImpl;
@@ -153,8 +154,13 @@ public class ServerBindings extends AbstractModule {
         bind(AsyncHttpClient.class).toProvider(AsyncHttpClientProvider.class);
         bind(GracefulShutdown.class).in(Scopes.SINGLETON);
 
-        bind(InputCache.class).to(BasicCache.class).in(Scopes.SINGLETON);
-        bind(OutputCache.class).to(BasicCache.class).in(Scopes.SINGLETON);
+        if (configuration.isMessageCacheOffHeap()) {
+            bind(InputCache.class).to(DiskJournalCache.Input.class).in(Scopes.SINGLETON);
+            bind(OutputCache.class).to(DiskJournalCache.Output.class).in(Scopes.SINGLETON);
+        } else {
+            bind(InputCache.class).to(BasicCache.class).in(Scopes.SINGLETON);
+            bind(OutputCache.class).to(BasicCache.class).in(Scopes.SINGLETON);
+        }
     }
 
     private void bindInterfaces() {
