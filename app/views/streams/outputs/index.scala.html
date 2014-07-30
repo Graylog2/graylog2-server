@@ -56,7 +56,7 @@
         <h2><i class="icon icon-cogs"></i> Configured outputs</h2>
 
         @if(outputs.size > 0) {
-            @for(output <- outputs) {
+            @for(output <- outputs.toSeq.sortBy(_.getTitle.toLowerCase)) {
                 @views.html.system.outputs.partials.output_summary.render(output, stream)
             }
         } else {
