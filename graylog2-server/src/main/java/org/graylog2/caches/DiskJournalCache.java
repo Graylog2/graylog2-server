@@ -98,7 +98,7 @@ public abstract class DiskJournalCache implements InputCache, OutputCache {
         this.queue = db.getQueue("messages");
         this.counter = db.getAtomicLong("counter");
         this.commitService = Executors.newSingleThreadScheduledExecutor(
-                new ThreadFactoryBuilder().setNameFormat("disk-journal-cache-%d").build()
+                new ThreadFactoryBuilder().setNameFormat("disk-journal-" + getDbFileName() + "-%d").build()
         );
         this.serializer = serializer;
         this.addTimer = metricRegistry.timer(MetricRegistry.name(getClass(), getDbFileName(), "add", "executionTime"));
