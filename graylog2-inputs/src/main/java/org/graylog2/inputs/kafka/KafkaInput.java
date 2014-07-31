@@ -271,7 +271,8 @@ public class KafkaInput extends MessageInput {
                 stopLatch = null;
                 if (!allStoppedOrderly) {
                     // timed out
-                    LOG.warn("Stopping Kafka input timed out (waited 5 seconds for consumer threads to stop). Forcefully closing connection now.");
+                    LOG.info("Stopping Kafka input timed out (waited 5 seconds for consumer threads to stop). Forcefully closing connection now. " +
+                                     "This is usually harmless when stopping the input.");
                 }
             } catch (InterruptedException e) {
                 LOG.debug("Interrupted while waiting to stop input.");
