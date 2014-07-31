@@ -96,6 +96,6 @@ public class OutputRegistry {
     public Set<MessageOutput> getMessageOutputs() {
         Set<MessageOutput> runningOutputs = new HashSet<>(this.runningMessageOutputs.values());
         runningOutputs.add(defaultMessageOutput);
-        return ImmutableSet.copyOf(this.runningMessageOutputs.values());
+        return ImmutableSet.copyOf(runningOutputs);
     }
 }

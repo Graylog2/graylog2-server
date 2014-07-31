@@ -94,11 +94,11 @@ public class MasterCacheWorkerThread extends Periodical {
 
         while(true) {
             try {
-                if (cache.size() > 0 && serverStatus.isProcessing()) {
+                if (!cache.isEmpty() && serverStatus.isProcessing()) {
                     LOG.debug("{} contains {} messages. Trying to process them.", cacheName, cache.size());
 
                     while (true) {
-                        if (cache.size() <= 0) {
+                        if (cache.isEmpty()) {
                             LOG.debug("Read all messages from {}.", cacheName);
                             break;
                         }
@@ -107,8 +107,10 @@ public class MasterCacheWorkerThread extends Periodical {
                             try {
                                 LOG.debug("Reading message from {}.", cacheName);
                                 Message msg = cache.pop();
-                                targetBuffer.insertFailFast(msg, msg.getSourceInput());
-                                writtenMessages.mark();
+                                if (msg != null) {
+                                    targetBuffer.insertFailFast(msg, msg.getSourceInput());
+                                    writtenMessages.mark();
+                                }
                             } catch (BufferOutOfCapacityException ex) {
                                 outOfCapacity.mark();
                                 LOG.debug("Target buffer out of capacity in {}. Breaking.", cacheName);

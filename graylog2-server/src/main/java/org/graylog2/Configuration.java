@@ -256,6 +256,15 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "output_module_timeout", required = false)
     private long outputModuleTimeout = 10000;
 
+    @Parameter(value = "message_cache_spool_dir", required = false)
+    private String messageCacheSpoolDir = "spool";
+
+    @Parameter(value = "message_cache_commit_interval", required = false)
+    private long messageCacheCommitInterval = 1000;
+
+    @Parameter(value = "message_cache_off_heap", required = false)
+    private boolean messageCacheOffHeap = true;
+
     public boolean isMaster() {
         return isMaster;
     }
@@ -566,6 +575,18 @@ public class Configuration extends BaseConfiguration {
 
     public long getEsClusterDiscoveryTimeout() {
         return esClusterDiscoveryTimeout;
+    }
+
+    public String getMessageCacheSpoolDir() {
+        return messageCacheSpoolDir;
+    }
+
+    public long getMessageCacheCommitInterval() {
+        return messageCacheCommitInterval;
+    }
+
+    public boolean isMessageCacheOffHeap() {
+        return messageCacheOffHeap;
     }
 }
 

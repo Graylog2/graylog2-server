@@ -46,7 +46,7 @@ public class Caches {
         // Wait until the buffers are empty. Messages that were already started to be processed must be fully processed.
         LOG.info("Waiting until all caches are empty.");
         int tries = 0;
-        while(!(inputCache.size() == 0 && outputCache.size() == 0)) {
+        while(!(inputCache.isEmpty() && outputCache.isEmpty())) {
             tries++;
             if (tries >= MAXTRIES) {
                 LOG.info("Waited for {} seconds, giving up.", tries);

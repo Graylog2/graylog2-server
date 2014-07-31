@@ -24,7 +24,6 @@ import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.lmax.disruptor.BlockingWaitStrategy;
-import org.graylog2.inputs.BasicCache;
 import org.graylog2.inputs.InputCache;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.inputs.MessageInput;
@@ -67,7 +66,7 @@ public class ProcessBufferTest {
     }
 
     public void testBasicInsert() throws Exception {
-        ProcessBuffer processBuffer = new ProcessBuffer(metricRegistry, serverStatus, new InputCache(), new AtomicInteger());
+        ProcessBuffer processBuffer = new ProcessBuffer(metricRegistry, serverStatus, mock(InputCache.class), new AtomicInteger());
 
         ProcessBufferProcessor processBufferProcessor = mock(ProcessBufferProcessor.class);
         ProcessBufferProcessor[] processBufferProcessors = new ProcessBufferProcessor[1];
