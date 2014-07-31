@@ -34,3 +34,5 @@ build_script/logs/*
 *.iml
 *.ipr
 *.iws
+
+.vagrant/
