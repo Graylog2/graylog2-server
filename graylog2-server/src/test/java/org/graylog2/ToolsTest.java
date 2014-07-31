@@ -233,6 +233,11 @@ public class ToolsTest {
     }
 
     @Test
+    public void testElasticSearchTimeFormatToISO8601() {
+        assertTrue(Tools.elasticSearchTimeFormatToISO8601("2014-07-31 14:21:02.000").equals("2014-07-31T14:21:02.000Z"));
+    }
+
+    @Test
     public void testTimeFromDouble() {
         assertTrue(Tools.dateTimeFromDouble(1381076986.306509).toString().startsWith("2013-10-06T"));
         assertTrue(Tools.dateTimeFromDouble(1381076986).toString().startsWith("2013-10-06T"));
