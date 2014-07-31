@@ -80,11 +80,7 @@ public class OutputRegistry {
         if (messageOutput == null)
             throw new IllegalArgumentException("Failed to instantiate MessageOutput from Output: " + output);
 
-        try {
-            messageOutput.initialize(new Configuration(output.getConfiguration()));
-        } catch (Exception e) {
-            LOG.error("Exception during output initialization: {}", e.toString());
-        }
+        messageOutput.initialize(new Configuration(output.getConfiguration()));
 
         return messageOutput;
     }
