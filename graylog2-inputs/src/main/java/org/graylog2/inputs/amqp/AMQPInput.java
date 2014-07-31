@@ -66,37 +66,37 @@ public class AMQPInput extends MessageInput {
     public AMQPInput(MetricRegistry metricRegistry, EventBus serverEventBus) {
         this.metricRegistry = metricRegistry;
         this.serverEventBus = serverEventBus;
-        this.serverEventBus.register(new Object() {
-            @Subscribe public void lifecycleChanged(Lifecycle lifecycle) {
-                try {
-                    LOG.debug("Lifecycle changed to {}", lifecycle);
-                    switch (lifecycle) {
-                        case RUNNING:
-                            if (consumer.isConnected()) {
-                                LOG.debug("Consumer is already connected, not running it a second time.");
-                                break;
-                            }
-                            try {
-                                consumer.run();
-                            } catch (IOException e) {
-                                LOG.warn("Unable to resume consumer", e);
-                            }
-                            break;
-                        default:
-                            try {
-                                if (consumer != null) {
-                                    consumer.stop();
-                                }
-                            } catch (IOException e) {
-                                LOG.warn("Unable to stop consumer", e);
-                            }
-                            break;
+    }
+
+    @Subscribe
+    public void lifecycleChanged(Lifecycle lifecycle) {
+        try {
+            LOG.debug("Lifecycle changed to {}", lifecycle);
+            switch (lifecycle) {
+                case RUNNING:
+                    if (consumer.isConnected()) {
+                        LOG.debug("Consumer is already connected, not running it a second time.");
+                        break;
                     }
-                } catch (Exception e) {
-                    LOG.warn("This should not throw any exceptions", e);
-                }
+                    try {
+                        consumer.run();
+                    } catch (IOException e) {
+                        LOG.warn("Unable to resume consumer", e);
+                    }
+                    break;
+                default:
+                    try {
+                        if (consumer != null) {
+                            consumer.stop();
+                        }
+                    } catch (IOException e) {
+                        LOG.warn("Unable to stop consumer", e);
+                    }
+                    break;
             }
-        });
+        } catch (Exception e) {
+            LOG.warn("This should not throw any exceptions", e);
+        }
     }
 
     @Override
@@ -120,7 +120,7 @@ public class AMQPInput extends MessageInput {
                 processBuffer,
                 this
         );
-
+        serverEventBus.register(this);
         try {
             consumer.run();
         } catch(IOException e) {
@@ -137,6 +137,7 @@ public class AMQPInput extends MessageInput {
                 LOG.error("Could not stop AMQP consumer.", e);
             }
         }
+        serverEventBus.unregister(this);
     }
 
     @Override
