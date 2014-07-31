@@ -56,7 +56,6 @@ public abstract class DiskJournalCache implements InputCache, OutputCache {
     private final Atomic.Long counter;
     private final ScheduledExecutorService commitService;
     private final MessageToJsonSerializer serializer;
-    private final Object modificationLock = new Object();
     private final Store store;
     private final MetricRegistry metricRegistry;
     private final Timer addTimer;
@@ -140,19 +139,14 @@ public abstract class DiskJournalCache implements InputCache, OutputCache {
         }
         final Timer.Context time = addTimer.time();
         try {
-            final byte[] bytes = serializer.serializeToBytes(message);
-
-            synchronized (modificationLock) {
-                if (queue.offer(bytes)) {
-                    counter.incrementAndGet();
-                }
+            if (queue.offer(serializer.serializeToBytes(message))) {
+                counter.incrementAndGet();
             }
         } catch (IOException e) {
             LOG.error("Unable to enqueue message", e);
         } finally {
             time.stop();
         }
-
     }
 
     @Override
@@ -164,18 +158,11 @@ public abstract class DiskJournalCache implements InputCache, OutputCache {
             return null;
         }
 
-        final byte[] bytes;
         final Timer.Context time = popTimer.time();
-
-        synchronized (modificationLock) {
-            bytes = queue.poll();
-
-            if (bytes != null) {
-                counter.decrementAndGet();
-            }
-        }
+        final byte[] bytes = queue.poll();
 
         if (bytes != null) {
+            counter.decrementAndGet();
             try {
                 return serializer.deserialize(bytes);
             } catch (IOException e) {
