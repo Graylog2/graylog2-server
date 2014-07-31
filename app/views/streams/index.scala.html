@@ -45,12 +45,6 @@
                     @stream.getTitle
                 </a>
 
-                @if(stream.getActiveAlerts() > 0) {
-                    <span class="label label-important">
-                        @stream.getActiveAlerts() active @pluralize("Alert", stream.getActiveAlerts())!
-                    </span>
-                }
-
                 @if(stream.getDisabled) {
                     <span class="label label-important">Paused</span>
                 }
