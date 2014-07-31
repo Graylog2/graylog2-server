@@ -64,11 +64,6 @@ public class BasicCache implements InputCache, OutputCache {
     }
 
     @Override
-    public void clear() {
-        q.clear();
-    }
-
-    @Override
     public boolean isEmpty() {
         return q.isEmpty();
     }
