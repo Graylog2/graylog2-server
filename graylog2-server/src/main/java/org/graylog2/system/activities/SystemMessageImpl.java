@@ -33,7 +33,7 @@ import java.util.Map;
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-@CollectionName("system_message")
+@CollectionName("system_messages")
 public class SystemMessageImpl extends PersistedImpl implements SystemMessage {
 
     private final String caller;
