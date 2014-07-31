@@ -21,7 +21,9 @@ package org.graylog2.outputs;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import org.graylog2.database.NotFoundException;
+import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.outputs.MessageOutput;
+import org.graylog2.plugin.outputs.MessageOutputConfigurationException;
 import org.graylog2.plugin.streams.Output;
 import org.graylog2.streams.OutputService;
 import org.slf4j.Logger;
@@ -62,7 +64,8 @@ public class OutputRegistry {
             try {
                 final Output output = outputService.load(id);
                 register(id, launchOutput(output));
-            } catch (NotFoundException e) {
+            } catch (NotFoundException | MessageOutputConfigurationException e) {
+                LOG.error("Unable to launch output <{}>: {}", id, e);
                 return null;
             }
         return getRunningMessageOutputs().get(id);
@@ -72,8 +75,15 @@ public class OutputRegistry {
         this.runningMessageOutputs.put(id, output);
     }
 
-    protected MessageOutput launchOutput(Output output) {
-        return messageOutputFactory.fromStreamOutput(output);
+    protected MessageOutput launchOutput(Output output) throws MessageOutputConfigurationException {
+        MessageOutput messageOutput = messageOutputFactory.fromStreamOutput(output);
+        try {
+            messageOutput.initialize(new Configuration(output.getConfiguration()));
+        } catch (Exception e) {
+            LOG.error("Exception during output initialization: {}", e.toString());
+        }
+
+        return messageOutput;
     }
 
     protected Map<String, MessageOutput> getRunningMessageOutputs() {
