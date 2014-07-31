@@ -84,7 +84,9 @@ public class AMQPInput extends MessageInput {
                             break;
                         default:
                             try {
-                                consumer.stop();
+                                if (consumer != null) {
+                                    consumer.stop();
+                                }
                             } catch (IOException e) {
                                 LOG.warn("Unable to stop consumer", e);
                             }
