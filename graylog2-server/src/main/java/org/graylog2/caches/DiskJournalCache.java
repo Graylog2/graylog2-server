@@ -108,6 +108,7 @@ public abstract class DiskJournalCache implements InputCache, OutputCache {
          * size of the database.
          */
         commit();
+        LOG.info("Compacting off-heap message cache database files ({})", getDbFileName());
         compact();
 
         /* I have seen the counter getting out of sync with the actual entries in the queue. */
