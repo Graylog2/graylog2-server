@@ -76,7 +76,10 @@ public class OutputRegistry {
     }
 
     protected MessageOutput launchOutput(Output output) throws MessageOutputConfigurationException {
-        MessageOutput messageOutput = messageOutputFactory.fromStreamOutput(output);
+        final MessageOutput messageOutput = messageOutputFactory.fromStreamOutput(output);
+        if (messageOutput == null)
+            throw new IllegalArgumentException("Failed to instantiate MessageOutput from Output: " + output);
+
         try {
             messageOutput.initialize(new Configuration(output.getConfiguration()));
         } catch (Exception e) {
