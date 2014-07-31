@@ -20,15 +20,16 @@
 package org.graylog2.inputs;
 
 import com.google.common.collect.Queues;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import org.cliffc.high_scale_lib.Counter;
 import org.graylog2.plugin.Message;
+
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
  * 
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
-public class BasicCache implements Cache {
+public class BasicCache implements InputCache, OutputCache {
     
     private final ConcurrentLinkedQueue<Message> q;
     private final Counter counter;
@@ -63,8 +64,8 @@ public class BasicCache implements Cache {
     }
 
     @Override
-    public void clear() {
-        q.clear();
+    public boolean isEmpty() {
+        return q.isEmpty();
     }
 
 }

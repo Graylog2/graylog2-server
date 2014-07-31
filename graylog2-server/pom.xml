@@ -288,6 +288,11 @@
             <groupId>org.graylog2</groupId>
             <artifactId>gelfj</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>org.mapdb</groupId>
+            <artifactId>mapdb</artifactId>
+        </dependency>
     </dependencies>
 
     <build>

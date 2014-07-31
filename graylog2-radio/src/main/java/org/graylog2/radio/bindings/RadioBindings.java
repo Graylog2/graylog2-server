@@ -28,6 +28,8 @@ import com.google.inject.multibindings.Multibinder;
 import com.google.inject.name.Names;
 import com.google.inject.util.Providers;
 import com.ning.http.client.AsyncHttpClient;
+import org.graylog2.inputs.BasicCache;
+import org.graylog2.inputs.InputCache;
 import org.graylog2.jersey.container.netty.SecurityContextFactory;
 import org.graylog2.radio.Configuration;
 import org.graylog2.radio.bindings.providers.AsyncHttpClientProvider;
@@ -82,6 +84,8 @@ public class RadioBindings extends AbstractModule {
 
         bind(URI.class).annotatedWith(Names.named("ServerUri")).toInstance(configuration.getGraylog2ServerUri());
         bind(URI.class).annotatedWith(Names.named("OurRadioUri")).toInstance(configuration.getRestTransportUri());
+
+        bind(InputCache.class).to(BasicCache.class).in(Scopes.SINGLETON);
     }
 
     private void bindProviders() {

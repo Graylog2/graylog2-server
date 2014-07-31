@@ -19,11 +19,8 @@
 
 package org.graylog2.inputs;
 
-import javax.inject.Singleton;
-
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
  */
-@Singleton
-public class OutputCache extends BasicCache {
+public interface OutputCache extends Cache {
 }
