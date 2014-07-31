@@ -39,7 +39,6 @@ public class LoggingOutput implements MessageOutput {
     @Override
     public void initialize(Configuration config) throws MessageOutputConfigurationException {
         LOG.info("Initializing");
-        this.configuration = configuration;
     }
 
     @Override
@@ -50,7 +49,7 @@ public class LoggingOutput implements MessageOutput {
     @Override
     public ConfigurationRequest getRequestedConfiguration() {
         ConfigurationRequest configurationRequest = new ConfigurationRequest();
-        configurationRequest.addField(new TextField("sample_field", "Sample Field", "A default value", "This ist just a sample field", ConfigurationField.Optional.OPTIONAL));
+        configurationRequest.addField(new TextField("prefix", "Prefix", "Writing message: ", "How to prefix the message before logging it", ConfigurationField.Optional.OPTIONAL));
         return configurationRequest;
     }
 
