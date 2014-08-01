@@ -185,7 +185,7 @@ public class UniversalSearch {
                 .queryParam("filter", (filter == null ? "*" : filter))
                 .timeout(apiTimeout("search_universal_histogram", KEITH, TimeUnit.SECONDS))
                 .execute();
-        return new DateHistogramResult(response.query, response.time, response.interval, response.results);
+        return new DateHistogramResult(response.query, response.time, response.interval, response.results, response.getHistogramBoundaries());
     }
 
     public FieldStatsResponse fieldStats(String field) throws IOException, APIException {

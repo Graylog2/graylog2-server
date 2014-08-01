@@ -38,6 +38,14 @@ public class AbsoluteRange extends TimeRange {
         this.to = to;
     }
 
+    public String getFrom() {
+        return from;
+    }
+
+    public String getTo() {
+        return to;
+    }
+
     @Override
     public TimeRange.Type getType() {
         return Type.ABSOLUTE;

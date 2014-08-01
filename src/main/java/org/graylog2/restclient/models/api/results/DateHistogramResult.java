@@ -24,19 +24,22 @@ import java.util.Map;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
+import org.graylog2.restclient.lib.timeranges.AbsoluteRange;
 
 public class DateHistogramResult {
 
 	private final String originalQuery;
 	private final Map<String, Long> results;
+	private final AbsoluteRange histogramBoundaries;
 	private final String interval;
 	private final int tookMs;
 
-	public DateHistogramResult(String originalQuery, int tookMs, String interval, Map<String, Long> results) {
+	public DateHistogramResult(String originalQuery, int tookMs, String interval, Map<String, Long> results, AbsoluteRange boundaries) {
 		this.originalQuery = originalQuery;
 		this.results = results;
 		this.interval = interval;
 		this.tookMs = tookMs;
+        this.histogramBoundaries = boundaries;
 	}
 	
 	public Map<String, Long> getResults() {
@@ -77,5 +80,8 @@ public class DateHistogramResult {
 	public String getInterval() {
 		return interval;
 	}
-	
+
+    public AbsoluteRange getHistogramBoundaries() {
+        return histogramBoundaries;
+    }
 }

@@ -44,7 +44,7 @@ public class MessageCountHistogram {
                 .queryParam("interval", interval)
                 .queryParam("timerange", timerange)
                 .execute();
-		return new DateHistogramResult("match_all", response.time, response.interval, response.results);
+		return new DateHistogramResult("match_all", response.time, response.interval, response.results, response.getHistogramBoundaries());
 	}
 	
 }

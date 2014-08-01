@@ -18,11 +18,7 @@
  */
 package org.graylog2.restclient.models.api.results;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import org.graylog2.restclient.lib.Field;
 import org.graylog2.restclient.lib.timeranges.TimeRange;
 import org.graylog2.restclient.models.FieldMapper;
@@ -30,7 +26,6 @@ import org.graylog2.restclient.models.api.responses.MessageSummaryResponse;
 import org.graylog2.restclient.models.api.responses.SearchResultResponse;
 
 import java.util.List;
-import java.util.Map;
 
 public class SearchResult {
 	
@@ -124,24 +119,6 @@ public class SearchResult {
 
     public String getBuiltQuery() {
         return builtQuery;
-    }
-
-    /*
-     * Extract from and to fields from the built query.
-     */
-    public Map<String, String> getBuiltQueryTimeRange() {
-        Map<String, String> builtQueryRange = Maps.newHashMap();
-
-        try {
-            ObjectMapper mapper = new ObjectMapper();
-            JsonParser jp = mapper.getFactory().createParser(builtQuery);
-            JsonNode rootNode = mapper.readTree(jp);
-            JsonNode timestampNode = rootNode.findValue("range").findValue("timestamp");
-            builtQueryRange.put("from", timestampNode.findValue("from").asText());
-            builtQueryRange.put("to", timestampNode.findValue("to").asText());
-        } catch (Exception e) {}
-
-        return builtQueryRange;
     }
 
     public SearchResultResponse.QueryError getError() {

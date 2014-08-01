@@ -19,6 +19,11 @@
  */
 package org.graylog2.restclient.models.api.responses;
 
+import com.google.gson.annotations.SerializedName;
+import org.graylog2.restclient.lib.timeranges.AbsoluteRange;
+
+import java.util.Map;
+
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
@@ -28,4 +33,17 @@ public class HistogramResponse {
     public String query;
     public String interval;
 
+    @SerializedName("built_query")
+    public String builtQuery;
+
+    @SerializedName("queried_timerange")
+    public Map<String, String> queriedTimerange;
+
+    public AbsoluteRange getHistogramBoundaries() {
+        try {
+            return new AbsoluteRange(queriedTimerange.get("from"), queriedTimerange.get("to"));
+        } catch (Exception e) {}
+
+        return null;
+    }
 }

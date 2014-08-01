@@ -36,4 +36,6 @@ public class DashboardWidgetValueResponse {
     @SerializedName("took_ms")
     public String tookMs;
 
+    @SerializedName("computation_time_range")
+    public Map<String, Object> computationTimeRange;
 }
