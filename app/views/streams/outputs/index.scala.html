@@ -33,7 +33,7 @@
 
         @views.html.system.outputs.partials.output_creation_forms.render(availableOutputs, routes.StreamOutputsController.create(stream.getId))
     }
-    @if(isPermitted(STREAM_OUTPUTS_CREATE)) {
+    @if(isPermitted(STREAM_OUTPUTS_CREATE) && otherOutputs.size > 0) {
         <div class="output-add">
             @helper.form(routes.StreamOutputsController.add(stream.getId)) {
                 <select name="outputId">
