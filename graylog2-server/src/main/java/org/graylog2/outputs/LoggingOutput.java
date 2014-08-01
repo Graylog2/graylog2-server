@@ -55,12 +55,12 @@ public class LoggingOutput implements MessageOutput {
 
     @Override
     public String getName() {
-        return "LoggingOutput";
+        return "STDOUT Output";
     }
 
     @Override
     public String getHumanName() {
-        return "A logging only output";
+        return "An output writing every message to STDOUT.";
     }
 
     @Override
