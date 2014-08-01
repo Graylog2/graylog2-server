@@ -77,9 +77,9 @@ public class SelectorTest {
 
     @Test
     public void testBuildShortMessage() throws Exception {
-        Map<String, Object> fields = Maps.newHashMap();
-        fields.put("foo", "bar");
+        Map<String, Object> fields = Maps.newLinkedHashMap();
         fields.put("baz", 9001);
+        fields.put("foo", "bar");
 
         Selector selector = new Selector(JsonPath.compile("$.download_count"));
         assertEquals("JSON API poll result: $.download_count -> {baz=9001, foo=bar}", selector.buildShortMessage(fields));
@@ -87,9 +87,9 @@ public class SelectorTest {
 
     @Test
     public void testBuildShortMessageThatGetsCut() throws Exception {
-        Map<String, Object> fields = Maps.newHashMap();
-        fields.put("foo", "bargggdzrtdfgfdgldfsjgkfdlgjdflkjglfdjgljslfperitperoujglkdnfkndsbafdofhasdpfoöadjsFOO");
+        Map<String, Object> fields = Maps.newLinkedHashMap();
         fields.put("baz", 9001);
+        fields.put("foo", "bargggdzrtdfgfdgldfsjgkfdlgjdflkjglfdjgljslfperitperoujglkdnfkndsbafdofhasdpfoöadjsFOO");
 
         Selector selector = new Selector(JsonPath.compile("$.download_count"));
         assertEquals("JSON API poll result: $.download_count -> {baz=9001, foo=bargggdzrtdfgfdgldfsjgkfdlgjdflkjgl[...]", selector.buildShortMessage(fields));
