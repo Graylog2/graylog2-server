@@ -44,12 +44,12 @@
     <h2><i class="icon icon-mail-forward"></i> Alert destinations</h2>
 
     <div class="row-fluid" style="margin-bottom: 5px;">
-        The following actions will be taken when an alert is triggered for this stream.
+        The following callbacks will be performed when this stream triggers an alert.
     </div>
 
     @if(isPermitted(STREAMS_EDIT, stream.getId)) {
         <select class="add-alert-destination-type">
-            <option disabled selected>-- Choose alert destination --</option>
+            <option disabled selected>New callback type</option>
             @for((callbackType, details) <- availableAlarmCallbacks.toArray.sortBy(_._2.name)) {
                 <option value="@callbackType">@details.name</option>
             }
