@@ -140,7 +140,7 @@ public class EmailAlarmCallback implements AlarmCallback {
 
     @Override
     public String getName() {
-        return "Email Alerting Callback";
+        return "Email Alert Callback";
     }
 
     @Override
