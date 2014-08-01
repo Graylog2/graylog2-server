@@ -29,6 +29,8 @@ import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.outputs.MessageOutput;
 import org.graylog2.plugin.outputs.MessageOutputConfigurationException;
 
+import java.util.List;
+
 /**
  *
  * @author lennart.koopmann
@@ -46,6 +48,14 @@ public class FakeOutput implements MessageOutput {
     public void write(Message message) throws Exception {
         this.callCount++;
         this.writeCount++;
+    }
+
+    @Override
+    public void write(List<Message> messages) throws Exception {
+        for (Message message : messages) {
+            write(message);
+        }
+
     }
 
     @Override

@@ -23,6 +23,8 @@ import org.graylog2.plugin.Message;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
 
+import java.util.List;
+
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
@@ -30,6 +32,7 @@ public interface MessageOutput {
 
     public void initialize(Configuration config) throws MessageOutputConfigurationException;
     public void write(Message message) throws Exception;
+    public void write(List<Message> messages) throws Exception;
     public ConfigurationRequest getRequestedConfiguration();
     public String getName();
     public String getHumanName();

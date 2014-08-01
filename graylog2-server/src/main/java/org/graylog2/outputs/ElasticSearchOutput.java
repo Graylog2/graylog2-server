@@ -22,7 +22,9 @@ package org.graylog2.outputs;
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
+import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Ordering;
 import com.google.inject.Inject;
 import org.graylog2.indexer.Indexer;
 import org.graylog2.plugin.Message;
@@ -42,12 +44,10 @@ import static com.codahale.metrics.MetricRegistry.name;
  */
 public class ElasticSearchOutput implements MessageOutput {
 
+    private static final String NAME = "ElasticSearch Output";
+    private static final Logger LOG = LoggerFactory.getLogger(ElasticSearchOutput.class);
     private final Meter writes;
     private final Timer processTime;
-
-    private static final String NAME = "ElasticSearch Output";
-    
-    private static final Logger LOG = LoggerFactory.getLogger(ElasticSearchOutput.class);
     private final Indexer indexer;
 
     @Inject
@@ -64,12 +64,19 @@ public class ElasticSearchOutput implements MessageOutput {
         if (LOG.isTraceEnabled()) {
             LOG.trace("Writing message id to [{}]: <{}>", getName(), message.getId());
         }
+        write(Lists.newArrayList(message));
+    }
 
-        writes.mark();
+    @Override
+    public void write(List<Message> messages) throws Exception {
+        if (LOG.isTraceEnabled()) {
+            final List<String> sortedIds = Ordering.natural().sortedCopy(Lists.transform(messages,
+                                                                                         Message.ID_FUNCTION));
+            LOG.trace("Writing message ids to [{}]: <{}>", getName(), Joiner.on(", ").join(sortedIds));
+        }
 
+        writes.mark(messages.size());
         Timer.Context tcx = processTime.time();
-        List<Message> messages = Lists.newArrayList();
-        messages.add(message);
         indexer.bulkIndex(messages);
         tcx.stop();
     }
@@ -89,7 +96,7 @@ public class ElasticSearchOutput implements MessageOutput {
         // Built in output. This is just for plugin compat. No special configuration required.
         return new ConfigurationRequest();
     }
-    
+
     @Override
     public String getHumanName() {
         return "ElasticSearch Output";

@@ -29,6 +29,8 @@ import org.graylog2.plugin.outputs.MessageOutputConfigurationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
+
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
  */
@@ -44,6 +46,14 @@ public class LoggingOutput implements MessageOutput {
     @Override
     public void write(Message message) throws Exception {
         LOG.info("Writing message {}", message);
+    }
+
+    @Override
+    public void write(List<Message> messages) throws Exception {
+        for (Message message : messages) {
+            write(message);
+        }
+
     }
 
     @Override

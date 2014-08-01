@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -61,6 +62,14 @@ public class GelfOutput implements MessageOutput {
         if (gelfSender == null)
             gelfSender = getGelfSender(this.configuration);
         gelfSender.sendMessage(toGELFMessage(message));
+    }
+
+    @Override
+    public void write(List<Message> messages) throws Exception {
+        for (Message message : messages) {
+            write(message);
+        }
+
     }
 
     protected GelfMessage toGELFMessage(Message message) {
