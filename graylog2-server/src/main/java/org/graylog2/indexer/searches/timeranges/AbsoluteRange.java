@@ -77,4 +77,11 @@ public class AbsoluteRange implements TimeRange, FromToRange {
         return to;
     }
 
+    public Map<String, DateTime> getLimits() {
+        return new HashMap<String, DateTime>() {{
+            put("from", getFrom());
+            put("to", getTo());
+        }};
+    }
+
 }

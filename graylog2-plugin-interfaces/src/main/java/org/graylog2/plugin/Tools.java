@@ -264,7 +264,7 @@ public final class Tools {
     /**
      * Accepts our ElasticSearch time formats without milliseconds.
      *
-     * @return A DateTimeFormtter suitable to parse an ES_DATE_FORMAT formatted string to a
+     * @return A DateTimeFormatter suitable to parse an ES_DATE_FORMAT formatted string to a
      *         DateTime Object even if it contains no milliseconds.
      */
     public static DateTimeFormatter timeFormatterWithOptionalMilliseconds() {
@@ -298,6 +298,19 @@ public final class Tools {
 
     public static String getISO8601String(DateTime time) {
         return ISODateTimeFormat.dateTime().print(time);
+    }
+
+    /*
+     * Try to parse a date in ES_DATE_FORMAT format considering it is in UTC and convert it to an ISO8601 date.
+     * If an error is encountered in the process, it will return the original string.
+     */
+    public static String elasticSearchTimeFormatToISO8601(String time) {
+        try {
+            DateTime dt = DateTime.parse(time, ES_DATE_FORMAT_FORMATTER);
+            return getISO8601String(dt);
+        } catch(IllegalArgumentException e) {
+            return time;
+        }
     }
 
     /**

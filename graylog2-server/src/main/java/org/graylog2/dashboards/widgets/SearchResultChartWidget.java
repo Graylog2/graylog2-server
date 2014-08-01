@@ -93,7 +93,7 @@ public class SearchResultChartWidget extends DashboardWidget {
 
         try {
             HistogramResult histogram = indexer.searches().histogram(query, interval, filter, timeRange);
-            return new ComputationResult(histogram.getResults(), histogram.took().millis());
+            return new ComputationResult(histogram.getResults(), histogram.took().millis(), histogram.getHistogramBoundaries());
         } catch (IndexHelper.InvalidRangeFormatException e) {
             throw new RuntimeException("Invalid timerange format.", e);
         }
