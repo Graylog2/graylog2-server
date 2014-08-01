@@ -35,6 +35,12 @@ function updateWidget_search_result_chart(widget, data) {
         return;
     }
 
+    var resolution = graphElem.data("config-interval");
+
+    if (data.time_range != null) {
+        rickshawHelper.correctDataBoundaries(series, data.time_range.from, data.time_range.to, resolution);
+    }
+
     // we need to replace the entire element that rickshaw touches, otherwise
     // it will leak event listeners and tons of DOM elements
     graphElem.html('<div class="graph_chart">');
@@ -43,7 +49,8 @@ function updateWidget_search_result_chart(widget, data) {
         element: $('.graph_chart', graphElem)[0],
         width: 800,
         height: 70,
-        renderer: "bar",
+        renderer: rickshawHelper.getRenderer("bar"),
+        resolution: resolution,
         series: [ {
             name: "Messages",
             data: series,
@@ -69,7 +76,8 @@ function updateWidget_search_result_chart(widget, data) {
     new Rickshaw.Graph.HoverDetail({
         graph: graph,
         formatter: function(series, x, y) {
-            var date = '<span class="date">' + new Date(x * 1000 ).toString() + '</span>';
+            var dateMoment = moment(new Date(x * 1000 )).zone(gl2UserTimeZoneOffset);
+            var date = '<span class="date">' + dateMoment.format('ddd MMM DD YYYY HH:mm:ss ZZ') + '</span>';
             var swatch = '<span class="detail_swatch"></span>';
             var content = parseInt(y) + ' messages<br>' + date;
             return content;

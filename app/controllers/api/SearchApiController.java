@@ -165,9 +165,12 @@ public class SearchApiController extends AuthenticatedController {
             FieldHistogramResponse histo = search.fieldHistogram(field, interval);
 
             Map<String, Object> result = Maps.newHashMap();
+            AbsoluteRange boundaries = histo.getHistogramBoundaries();
             result.put("time", histo.time);
             result.put("interval", histo.interval);
             result.put("values", histo.getFormattedResults(valueType));
+            result.put("from", boundaries.getFrom());
+            result.put("to", boundaries.getTo());
 
             return ok(new Gson().toJson(result)).as("application/json");
         } catch (IOException e) {

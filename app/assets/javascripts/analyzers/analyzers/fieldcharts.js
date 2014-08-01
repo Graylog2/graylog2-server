@@ -147,11 +147,11 @@ $(document).ready(function() {
                     width: $("#main-content").width()-12,
                     height: 175,
                     interpolation: opts.interpolation,
-                    renderer: opts.renderer,
-
+                    renderer: rickshawHelper.getRenderer(opts.renderer),
+                    resolution: data.interval,
                     series: [ {
                         name: "value",
-                        data: data.values,
+                        data: rickshawHelper.correctDataBoundaries(data.values, data.from, data.to, data.interval),
                         color: '#26ADE4',
                         gl2_query: opts.query,
                         valuetype: opts.valuetype,
@@ -174,7 +174,8 @@ $(document).ready(function() {
                 new Rickshaw.Graph.HoverDetail({
                     graph: graph,
                     formatter: function(series, x, y) {
-                        var date = '<span class="date">' + new Date(x * 1000).toString() + '</span>';
+                        var dateMoment = moment(new Date(x * 1000 )).zone(gl2UserTimeZoneOffset);
+                        var date = '<span class="date">' + dateMoment.format('ddd MMM DD YYYY HH:mm:ss ZZ') + '</span>';
                         var swatch = '<span class="detail_swatch" style="background-color: ' + series.color + '"></span>';
                         var content = swatch + '[' + series.valuetype + '] ' + series.field + ': ' + numeral(y).format('0.[000]') + '<br>' + date;
                         return content;

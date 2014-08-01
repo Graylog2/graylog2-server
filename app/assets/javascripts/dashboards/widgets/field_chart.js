@@ -55,7 +55,14 @@ function updateWidget_field_chart(widget, data) {
     }
 
     if(series.length == 0) {
+        graphElem.html("<div class=\"not-available\">N/A</div>");
         return;
+    }
+
+    var resolution = graphElem.data("config-interval");
+
+    if (data.time_range != null) {
+        rickshawHelper.correctDataBoundaries(series, data.time_range.from, data.time_range.to, resolution);
     }
 
     // we need to replace the entire element that rickshaw touches, otherwise
@@ -69,7 +76,8 @@ function updateWidget_field_chart(widget, data) {
         width: 800,
         height: 70,
         interpolation: graphElem.attr("data-config-interpolation"),
-        renderer: renderer,
+        renderer: rickshawHelper.getRenderer(renderer),
+        resolution: resolution,
         series: [ {
             name: "value",
             data: series,
@@ -93,7 +101,8 @@ function updateWidget_field_chart(widget, data) {
         graph: graph,
         formatter: function(series, x, y) {
             field = graphElem.attr("data-config-field");
-            var date = '<span class="date">' + new Date(x * 1000).toString() + '</span>';
+            var dateMoment = moment(new Date(x * 1000 )).zone(gl2UserTimeZoneOffset);
+            var date = '<span class="date">' + dateMoment.format('ddd MMM DD YYYY HH:mm:ss ZZ') + '</span>';
             var swatch = '<span class="detail_swatch"></span>';
             var content = '[' + graphElem.attr("data-config-valuetype") + '] ' + field + ': ' + numeral(y).format('0.[000]') + '<br>' + date;
             return content;
