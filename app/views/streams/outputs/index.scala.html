@@ -22,7 +22,7 @@
     @if(isPermitted(OUTPUTS_CREATE)) {
         <div class="output-new">
             <select id="input-type">
-                <option selected disabled>-- Select new output type --</option>
+                <option selected disabled>Select type of new output</option>
             @for((inputType,info) <- availableOutputs.toSeq.sortBy(_._2.name)) {
                 <option value="@inputType">@info.name</option>
             }
@@ -38,12 +38,12 @@
             @helper.form(routes.StreamOutputsController.add(stream.getId)) {
                 <select name="outputId">
                     @if(otherOutputs.size > 0) {
-                        <option selected disabled>-- Select existing output --</option>
+                        <option selected disabled>Select existing output</option>
                         @for(output <- otherOutputs.toSeq.sortBy(_.getTitle)) {
                             <option value="@output.getId">@output.getTitle</option>
                         }
                     } else {
-                        <option disabled>-- No outputs available --</option>
+                        <option disabled>No outputs available</option>
                     }
                 </select>
 
