@@ -72,6 +72,14 @@ public class GracefulShutdown implements Runnable {
 
     @Override
     public void run() {
+        doRun(true);
+    }
+
+    public void runWithoutExit() {
+        doRun(false);
+    }
+
+    private void doRun(boolean exit) {
         LOG.info("Graceful shutdown initiated.");
         serverStatus.setLifecycle(Lifecycle.HALTING);
 
@@ -118,6 +126,7 @@ public class GracefulShutdown implements Runnable {
 
         // Shut down hard with no shutdown hooks running.
         LOG.info("Goodbye.");
-        System.exit(0);
+        if (exit)
+            System.exit(0);
     }
 }

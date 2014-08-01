@@ -13,6 +13,8 @@ coverage
 build.xml
 nbactions.xml
 
+spool
+
 .DS_Store
 
 graylog2-server/dependency-reduced-pom.xml

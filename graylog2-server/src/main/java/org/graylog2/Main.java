@@ -52,6 +52,7 @@ import org.graylog2.shared.initializers.ServiceManagerListener;
 import org.graylog2.shared.plugins.PluginLoader;
 import org.graylog2.system.activities.Activity;
 import org.graylog2.system.activities.ActivityWriter;
+import org.graylog2.system.shutdown.GracefulShutdown;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
@@ -141,7 +142,7 @@ public final class Main extends NodeRunner {
                 new MessageOutputBindings());
         LOG.debug("Adding plugin modules: " + pluginModules);
         bindingsModules.addAll(pluginModules);
-        Injector injector = Guice.createInjector(bindingsModules);
+        final Injector injector = Guice.createInjector(bindingsModules);
         instantiationService.setInjector(injector);
 
         // This is holding all our metrics.
@@ -181,8 +182,8 @@ public final class Main extends NodeRunner {
                 LOG.info(msg);
                 activityWriter.write(new Activity(msg, Main.class));
 
-                serverStatus.setLifecycle(Lifecycle.HALTING);
-
+                GracefulShutdown shutdown = injector.getInstance(GracefulShutdown.class);
+                shutdown.runWithoutExit();
                 serviceManager.stopAsync().awaitStopped();
             }
         });
