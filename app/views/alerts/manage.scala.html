@@ -60,7 +60,9 @@
         @views.html.partials.alerts.list_forms_available_callbacks.render(availableAlarmCallbacks, stream)
     }
 
-    @views.html.partials.alerts.list_alarm_callbacks.render(alarmCallbacks, availableAlarmCallbacks, stream)
+    <div class="alert-callbacks">
+        @views.html.partials.alerts.list_alarm_callbacks.render(alarmCallbacks, availableAlarmCallbacks, stream)
+    </div>
 
     <hr />
 
