@@ -33,6 +33,7 @@ import org.graylog2.restclient.lib.timeranges.InvalidRangeParametersException;
 import org.graylog2.restclient.lib.timeranges.TimeRange;
 import org.graylog2.restclient.models.User;
 import org.graylog2.restclient.models.api.requests.dashboards.UserSetWidgetPositionsRequest;
+import org.graylog2.restclient.models.api.responses.dashboards.DashboardWidgetValueResponse;
 import org.graylog2.restclient.models.dashboards.Dashboard;
 import org.graylog2.restclient.models.dashboards.DashboardService;
 import org.graylog2.restclient.models.NodeService;
@@ -135,11 +136,13 @@ public class DashboardsApiController extends AuthenticatedController {
         try {
             Dashboard dashboard = dashboardService.get(dashboardId);
             DashboardWidget widget = dashboard.getWidget(widgetId);
+            DashboardWidgetValueResponse widgetValue = widget.getValue(api());
 
             Map<String, Object> result = Maps.newHashMap();
-            result.put("result", widget.getValue(api()).result);
-            result.put("took_ms", widget.getValue(api()).tookMs);
-            result.put("calculated_at", widget.getValue(api()).calculatedAt);
+            result.put("result", widgetValue.result);
+            result.put("took_ms", widgetValue.tookMs);
+            result.put("calculated_at", widgetValue.calculatedAt);
+            result.put("time_range", widgetValue.computationTimeRange);
 
             return ok(new Gson().toJson(result)).as("application/json");
         } catch (APIException e) {

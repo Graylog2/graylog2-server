@@ -67,5 +67,12 @@ momentHelper = {
         userDate.millisecond(parsedDate.millisecond());
 
         return userDate;
+    },
+
+    getFormattedResolution: function(resolution) {
+        if (resolution == "week") {
+            return "isoWeek"; // Weeks should start on Monday :)
+        }
+        return resolution;
     }
 };

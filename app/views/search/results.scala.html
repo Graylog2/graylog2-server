@@ -68,10 +68,10 @@
 }
 
 @dataAttributes() = @{
+    var boundaries = histogram.getHistogramBoundaries
     var string = ""
-    for((attribute,time) <- searchResult.getBuiltQueryTimeRange) {
-        string = string + " data-" + attribute + "='" + time + "'"
-    }
+    string = string + " data-from='" + boundaries.getFrom + "'"
+    string = string + " data-to='" + boundaries.getTo + "'"
     string
 }
 

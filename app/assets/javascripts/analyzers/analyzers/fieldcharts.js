@@ -147,11 +147,11 @@ $(document).ready(function() {
                     width: $("#main-content").width()-12,
                     height: 175,
                     interpolation: opts.interpolation,
-                    renderer: opts.renderer,
-
+                    renderer: rickshawHelper.getRenderer(opts.renderer),
+                    resolution: data.interval,
                     series: [ {
                         name: "value",
-                        data: data.values,
+                        data: rickshawHelper.correctDataBoundaries(data.values, data.from, data.to, data.interval),
                         color: '#26ADE4',
                         gl2_query: opts.query,
                         valuetype: opts.valuetype,

@@ -58,6 +58,12 @@ function updateWidget_field_chart(widget, data) {
         return;
     }
 
+    var resolution = graphElem.data("config-interval");
+
+    if (data.time_range != null) {
+        rickshawHelper.correctDataBoundaries(series, data.time_range.from, data.time_range.to, resolution);
+    }
+
     // we need to replace the entire element that rickshaw touches, otherwise
     // it will leak event listeners and tons of DOM elements
     graphElem.html('<div class="graph_chart">');
@@ -69,7 +75,8 @@ function updateWidget_field_chart(widget, data) {
         width: 800,
         height: 70,
         interpolation: graphElem.attr("data-config-interpolation"),
-        renderer: renderer,
+        renderer: rickshawHelper.getRenderer(renderer),
+        resolution: resolution,
         series: [ {
             name: "value",
             data: series,
