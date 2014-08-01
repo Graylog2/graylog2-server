@@ -100,7 +100,8 @@ function updateWidget_field_chart(widget, data) {
         graph: graph,
         formatter: function(series, x, y) {
             field = graphElem.attr("data-config-field");
-            var date = '<span class="date">' + new Date(x * 1000).toString() + '</span>';
+            var dateMoment = moment(new Date(x * 1000 )).zone(gl2UserTimeZoneOffset);
+            var date = '<span class="date">' + dateMoment.format('ddd MMM DD YYYY HH:mm:ss ZZ') + '</span>';
             var swatch = '<span class="detail_swatch"></span>';
             var content = '[' + graphElem.attr("data-config-valuetype") + '] ' + field + ': ' + numeral(y).format('0.[000]') + '<br>' + date;
             return content;

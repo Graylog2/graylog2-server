@@ -76,7 +76,8 @@ function updateWidget_search_result_chart(widget, data) {
     new Rickshaw.Graph.HoverDetail({
         graph: graph,
         formatter: function(series, x, y) {
-            var date = '<span class="date">' + new Date(x * 1000 ).toString() + '</span>';
+            var dateMoment = moment(new Date(x * 1000 )).zone(gl2UserTimeZoneOffset);
+            var date = '<span class="date">' + dateMoment.format('ddd MMM DD YYYY HH:mm:ss ZZ') + '</span>';
             var swatch = '<span class="detail_swatch"></span>';
             var content = parseInt(y) + ' messages<br>' + date;
             return content;
