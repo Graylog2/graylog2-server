@@ -249,7 +249,7 @@ public final class Main extends NodeRunner {
             try {
                 serviceManager.stopAsync().awaitStopped(30, TimeUnit.SECONDS);
             } catch (TimeoutException timeoutException) {
-                LOG.error("Unable to shutdown properly on time.");
+                LOG.error("Unable to shutdown properly on time. {}", serviceManager.servicesByState());
             }
             LOG.error("Graylog2 startup failed. Exiting. Exception was:", e);
             System.exit(-1);

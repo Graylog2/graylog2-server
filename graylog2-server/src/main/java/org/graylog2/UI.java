@@ -41,7 +41,7 @@ public class UI {
 
     public static void exitHardWithWall(String msg, String[] docLinks) {
         LOG.error(wallString(msg, docLinks));
-        System.exit(1);
+        throw new IllegalStateException();
     }
 
     public static String wallString(String msg, String[] docLinks) {

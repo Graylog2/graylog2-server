@@ -68,6 +68,12 @@ public class InputSetupService extends AbstractExecutionThreadService {
             LOG.info("Triggering launching persisted inputs, node transitioned from {} to {}", previousLifecycle, lifecycle);
             startLatch.countDown();
         }
+
+        // if we failed to start up due to some other service aborting, we need to get over the barrier.
+        if (lifecycle == Lifecycle.FAILED) {
+            startLatch.countDown();
+        }
+
         previousLifecycle = lifecycle;
     }
 
@@ -77,8 +83,10 @@ public class InputSetupService extends AbstractExecutionThreadService {
         LOG.debug("Delaying lauching persisted inputs until the node is in RUNNING state.");
         Uninterruptibles.awaitUninterruptibly(startLatch);
 
-        LOG.debug("Launching persisted inputs now.");
-        inputRegistry.launchAllPersisted();
+        if (previousLifecycle == Lifecycle.RUNNING) {
+            LOG.debug("Launching persisted inputs now.");
+            inputRegistry.launchAllPersisted();
+        }
 
         // next, simply block until we are asked to shutdown, even though we are consuming a thread this way.
         Uninterruptibles.awaitUninterruptibly(stopLatch);
@@ -91,6 +99,7 @@ public class InputSetupService extends AbstractExecutionThreadService {
 
     @Override
     protected void shutDown() throws Exception {
+        LOG.debug("Stopping InputSetupService");
         eventBus.unregister(this);
 
         for (InputState state : inputRegistry.getRunningInputs()) {
@@ -109,5 +118,6 @@ public class InputSetupService extends AbstractExecutionThreadService {
                 s.stop();
             }
         }
+        LOG.debug("Stopped InputSetupService");
     }
 }

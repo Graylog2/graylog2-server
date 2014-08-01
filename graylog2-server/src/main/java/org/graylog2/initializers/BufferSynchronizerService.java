@@ -52,12 +52,14 @@ public class BufferSynchronizerService extends AbstractIdleService {
 
     @Override
     protected void shutDown() throws Exception {
+        log.debug("Stopping BufferSynchronizerService");
         if (indexerAvailable) {
             bufferSynchronizer.waitForEmptyBuffers();
             cacheSynchronizer.waitForEmptyCaches();
         } else {
             log.warn("Indexer is unavailable, not waiting to clear buffers and caches, as we have no connection to Elasticsearch");
         }
+        log.debug("Stopped BufferSynchronizerService");
     }
 
     public void setIndexerUnavailable() {

@@ -23,6 +23,8 @@ import com.google.common.util.concurrent.AbstractIdleService;
 import com.google.inject.Singleton;
 import org.graylog2.indexer.Indexer;
 import org.graylog2.plugin.Tools;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.util.concurrent.Executors;
@@ -32,6 +34,8 @@ import java.util.concurrent.Executors;
  */
 @Singleton
 public class IndexerSetupService extends AbstractIdleService {
+    private static final Logger log = LoggerFactory.getLogger(IndexerSetupService.class);
+
     private final Indexer indexer;
     private final BufferSynchronizerService bufferSynchronizerService;
 
@@ -44,6 +48,7 @@ public class IndexerSetupService extends AbstractIdleService {
         bufferSynchronizerService.addListener(new Listener() {
             @Override
             public void terminated(State from) {
+                log.debug("Shutting down ES client after buffer synchronizer has terminated.");
                 // Properly close ElasticSearch node.
                 IndexerSetupService.this.indexer.getNode().close();
             }
