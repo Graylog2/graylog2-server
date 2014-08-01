@@ -55,6 +55,7 @@ function updateWidget_field_chart(widget, data) {
     }
 
     if(series.length == 0) {
+        graphElem.html("<div class=\"not-available\">N/A</div>");
         return;
     }
 
