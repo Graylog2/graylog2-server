@@ -1,6 +1,8 @@
 @(outputTypes: Map[String, org.graylog2.restclient.models.api.responses.AvailableOutputSummary],
     formTarget: Call)
 
+@import org.graylog2.restclient.lib.plugin.configuration.DropdownField
+
 @for((outputType,info) <- outputTypes) {
     <div class="input-configuration modal hide fade" data-inputtype="@outputType">
         <div class="modal-header">
@@ -36,7 +38,7 @@
                         }
 
                         @if(field.getType().equals("dropdown")) {
-                            views.html.system.inputs.fields.dropdown_field(field.asInstanceOf[DropdownField])
+                            @views.html.system.inputs.fields.dropdown_field(field.asInstanceOf[DropdownField])
                         }
                     }
 
