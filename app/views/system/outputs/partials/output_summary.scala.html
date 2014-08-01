@@ -11,10 +11,11 @@
             &nbsp;
         @if(stream != null && isPermitted(STREAM_OUTPUTS_DELETE)) {
             <form action="@routes.StreamOutputsController.remove(stream.getId, output.getId)" method="POST">
-                <button class="btn btn-danger btn-mini"
+                <button class="btn btn-warning btn-mini"
                 type="submit"
-                data-confirm="Really remove output from stream?">
-                    Remove
+                data-confirm="Really remove output from stream?"
+                >
+                    Remove from stream
                 </button>
             </form>
         }

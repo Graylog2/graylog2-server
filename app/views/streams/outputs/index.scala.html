@@ -15,8 +15,16 @@
             <i class="icon icon-download-alt"></i>
             Outputs for Stream &raquo;@stream.getTitle&laquo;
         </h1>
-        Graylog2 nodes can forward messages of this stream via outputs. Launch or terminate as many outputs as you want here.
-        You can also reuse outputs for other streams. A global view of all configured outputs is <a href="@routes.OutputsController.index()">here</a>.
+        Graylog2 nodes can forward messages of streams via outputs. Launch or terminate as many outputs as you want here.
+        You can also reuse outputs that are already running for other streams.
+
+        A global view of all configured outputs is available <a href="@routes.OutputsController.index()">here</a>.
+
+        <br />
+        <br />
+        <i>Removing</i> an output removes it from this stream but is still in the list of available outputs
+        and <i>terminating</i> will stop it for all streams and remove it from all configurations and lists
+        completely.
     </div>
 
     @if(isPermitted(OUTPUTS_CREATE)) {
@@ -60,7 +68,7 @@
                 @views.html.system.outputs.partials.output_summary.render(output, stream)
             }
         } else {
-            <div class="alert alert-info">There are no outputs for this stream. All messages will go to the default output only</div>
+            <div class="alert alert-info">There are no outputs for this stream. All messages will go to the default output only.</div>
         }
     </div>
 }
