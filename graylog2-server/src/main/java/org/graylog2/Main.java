@@ -24,9 +24,12 @@ import com.codahale.metrics.JmxReporter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.log4j.InstrumentedAppender;
 import com.github.joschi.jadconfig.JadConfig;
+import com.github.joschi.jadconfig.ParameterException;
 import com.github.joschi.jadconfig.RepositoryException;
 import com.github.joschi.jadconfig.ValidationException;
+import com.github.joschi.jadconfig.repositories.EnvironmentRepository;
 import com.github.joschi.jadconfig.repositories.PropertiesRepository;
+import com.github.joschi.jadconfig.repositories.SystemPropertiesRepository;
 import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.ServiceManager;
@@ -65,6 +68,7 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -78,6 +82,8 @@ import java.util.concurrent.TimeoutException;
 public final class Main extends NodeRunner {
 
     private static final Logger LOG = LoggerFactory.getLogger(Main.class);
+    private static final String ENVIRONMENT_PREFIX = "GRAYLOG2_";
+    private static final String PROPERTIES_PREFIX = "graylog2.";
 
     /**
      * @param args the command line arguments
@@ -303,7 +309,11 @@ public final class Main extends NodeRunner {
         final Configuration configuration = new Configuration();
 
         jadConfig.addConfigurationBean(configuration);
-        jadConfig.setRepository(new PropertiesRepository(configFile));
+        jadConfig.setRepositories(Arrays.asList(
+                new EnvironmentRepository(ENVIRONMENT_PREFIX),
+                new SystemPropertiesRepository(PROPERTIES_PREFIX),
+                new PropertiesRepository(configFile)
+        ));
 
         LOG.debug("Loading configuration from config file: {}", configFile);
         try {
@@ -311,7 +321,7 @@ public final class Main extends NodeRunner {
         } catch (RepositoryException e) {
             LOG.error("Couldn't load configuration: {}", e.getMessage());
             System.exit(1);
-        } catch (ValidationException e) {
+        } catch (ParameterException | ValidationException e) {
             LOG.error("Invalid configuration", e);
             System.exit(1);
         }
