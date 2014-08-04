@@ -23,6 +23,7 @@ import com.google.common.collect.Maps;
 import org.elasticsearch.action.admin.indices.stats.IndexStats;
 import org.elasticsearch.indices.InvalidAliasNameException;
 import org.graylog2.Configuration;
+import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.indices.jobs.OptimizeIndexJob;
 import org.graylog2.indexer.ranges.RebuildIndexRangesJob;
 import org.graylog2.system.activities.Activity;
@@ -192,29 +193,34 @@ public class Deflector { // extends Ablenkblech
     }
     
     public String[] getAllDeflectorIndexNames(Indexer indexer) {
-        List<String> indices = Lists.newArrayList();
-        
-        for(Map.Entry<String, IndexStats> e : indexer.indices().getAll().entrySet()) {
-            String name = e.getKey();
-            
-            if (ourIndex(name)) {
-                indices.add(name);
+        List<String> result = Lists.newArrayList();
+
+        final Indices indices = indexer.indices();
+        if (indices != null) {
+            for (Map.Entry<String, IndexStats> e : indices.getAll().entrySet()) {
+                String name = e.getKey();
+
+                if (ourIndex(name)) {
+                    result.add(name);
+                }
             }
         }
-        
-        return indices.toArray(new String[0]);
+
+        return result.toArray(new String[result.size()]);
     }
     
     public Map<String, IndexStats> getAllDeflectorIndices(Indexer indexer) {
         Map<String, IndexStats> result = Maps.newHashMap();
-        for(Map.Entry<String, IndexStats> e : indexer.indices().getAll().entrySet()) {
-            String name = e.getKey();
-            
-            if (ourIndex(name)) {
-                result.put(name, e.getValue());
+        Indices indices = indexer.indices();
+        if (indices != null) {
+            for (Map.Entry<String, IndexStats> e : indices.getAll().entrySet()) {
+                String name = e.getKey();
+
+                if (ourIndex(name)) {
+                    result.put(name, e.getValue());
+                }
             }
         }
-        
         return result;
     }
     
@@ -239,7 +245,7 @@ public class Deflector { // extends Ablenkblech
     }
     
     private boolean ourIndex(String indexName) {
-        return indexName != getName() && indexName.startsWith(configuration.getElasticSearchIndexPrefix() + "_");
+        return !indexName.equals(getName()) && indexName.startsWith(configuration.getElasticSearchIndexPrefix() + "_");
     }
     
     public void pointTo(Indexer indexer, String newIndex, String oldIndex) {

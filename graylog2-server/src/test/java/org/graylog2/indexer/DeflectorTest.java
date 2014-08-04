@@ -23,14 +23,21 @@
  */
 package org.graylog2.indexer;
 
+import org.elasticsearch.action.admin.indices.stats.IndexStats;
 import org.graylog2.Configuration;
 import org.graylog2.indexer.indices.jobs.OptimizeIndexJob;
 import org.graylog2.indexer.ranges.RebuildIndexRangesJob;
 import org.graylog2.system.activities.ActivityWriter;
 import org.graylog2.system.jobs.SystemJobManager;
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import java.util.Map;
+
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.fail;
 import static org.testng.AssertJUnit.assertEquals;
 
 /**
@@ -75,4 +82,42 @@ public class DeflectorTest {
     public void testBuildDeflectorNameWithCustomIndexPrefix() {
         assertEquals("foo_custom_index_deflector", Deflector.buildName("foo_custom_index"));
     }
+
+    @Test
+    public void nullIndexerDoesNotThrow() {
+        Deflector d = new Deflector(mock(SystemJobManager.class),
+                                    mock(Configuration.class),
+                                    mock(ActivityWriter.class),
+                                    mock(RebuildIndexRangesJob.Factory.class),
+                                    mock(OptimizeIndexJob.Factory.class));
+        final Indexer indexer = mock(Indexer.class);
+        when(indexer.indices()).thenReturn(null);
+        try {
+            final Map<String, IndexStats> deflectorIndices = d.getAllDeflectorIndices(indexer);
+            assertNotNull(deflectorIndices);
+            Assert.assertEquals(deflectorIndices.size(), 0);
+        } catch (Exception e) {
+            fail("Should not throw an exception", e);
+        }
+    }
+
+    @Test
+    public void nullIndexerDoesNotThrowOnIndexName() {
+        Deflector d = new Deflector(mock(SystemJobManager.class),
+                                    mock(Configuration.class),
+                                    mock(ActivityWriter.class),
+                                    mock(RebuildIndexRangesJob.Factory.class),
+                                    mock(OptimizeIndexJob.Factory.class));
+        final Indexer indexer = mock(Indexer.class);
+        when(indexer.indices()).thenReturn(null);
+        try {
+            final String[] deflectorIndices = d.getAllDeflectorIndexNames(indexer);
+            assertNotNull(deflectorIndices);
+            Assert.assertEquals(deflectorIndices.length, 0);
+        } catch (Exception e) {
+            fail("Should not throw an exception", e);
+        }
+    }
+
+
 }
