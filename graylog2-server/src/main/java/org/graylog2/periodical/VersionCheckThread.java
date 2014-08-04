@@ -89,9 +89,9 @@ public class VersionCheckThread extends Periodical {
                     .append(")");
             get.setHeader("User-Agent", userAgent.toString());
             final RequestConfig.Builder configBuilder = RequestConfig.custom()
-                    .setConnectTimeout(10000)
-                    .setSocketTimeout(10000)
-                    .setConnectionRequestTimeout(10000);
+                    .setConnectTimeout(configuration.getVersionchecksConnectTimeOut())
+                    .setSocketTimeout(configuration.getVersionchecksSocketTimeOut())
+                    .setConnectionRequestTimeout(configuration.getVersionchecksConnectionRequestTimeOut());
             if (configuration.getHttpProxyUri() != null) {
                 try {
                     final URIBuilder uriBuilder = new URIBuilder(configuration.getHttpProxyUri());

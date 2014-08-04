@@ -210,6 +210,15 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "versionchecks_uri", required = false)
     private String versionchecksUri = "http://versioncheck.torch.sh/check";
 
+    @Parameter(value = "versionchecks_connect_timeout", validator = PositiveIntegerValidator.class)
+    private int versionchecksConnectTimeOut = 10000;
+
+    @Parameter(value = "versionchecks_socket_timeout", validator = PositiveIntegerValidator.class)
+    private int versionchecksSocketTimeOut = 10000;
+
+    @Parameter(value = "versionchecks_connection_request_timeout", validator = PositiveIntegerValidator.class)
+    private int versionchecksConnectionRequestTimeOut = 10000;
+
     @Parameter(value = "http_proxy_uri", required = false)
     private String httpProxyUri;
 
@@ -547,6 +556,18 @@ public class Configuration extends BaseConfiguration {
 
     public String getVersionchecksUri() {
         return versionchecksUri;
+    }
+
+    public int getVersionchecksConnectTimeOut() {
+        return versionchecksConnectTimeOut;
+    }
+
+    public int getVersionchecksSocketTimeOut() {
+        return versionchecksSocketTimeOut;
+    }
+
+    public int getVersionchecksConnectionRequestTimeOut() {
+        return versionchecksConnectionRequestTimeOut;
     }
 
     public String getHttpProxyUri() {
