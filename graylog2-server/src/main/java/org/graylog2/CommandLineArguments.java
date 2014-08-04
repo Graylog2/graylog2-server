@@ -33,22 +33,22 @@ public class CommandLineArguments {
     private static final String FILE_SEPARATOR = System.getProperty("file.separator");
     private static final String TMPDIR = System.getProperty("java.io.tmpdir", "/tmp");
 
-    @Parameter(names = {"-f", "--configfile"}, description = "Configuration file for graylog2")
+    @Parameter(names = {"-f", "--configfile"}, description = "Configuration file for Graylog2")
     private String configFile = "/etc/graylog2.conf";
 
-    @Parameter(names = {"-p", "--pidfile"}, description = "File containing the PID of graylog2")
+    @Parameter(names = {"-p", "--pidfile"}, description = "File containing the PID of Graylog2")
     private String pidFile = TMPDIR + FILE_SEPARATOR + "graylog2.pid";
 
     @Parameter(names = {"-np", "--no-pid-file"}, description = "Do not write a PID file (overrides -p/--pidfile)")
     private boolean noPidFile = false;
 
-    @Parameter(names = {"-t", "--configtest"}, description = "Validate graylog2 configuration and exit")
+    @Parameter(names = {"-t", "--configtest"}, description = "Validate Graylog2 configuration and exit")
     private boolean configTest = false;
 
-    @Parameter(names = {"-d", "--debug"}, description = "Run graylog2 in debug mode")
+    @Parameter(names = {"-d", "--debug"}, description = "Run Graylog2 in debug mode")
     private boolean debug = false;
     
-    @Parameter(names = {"-l", "--local"}, description = "Run graylog2 in local mode. Only interesting for Graylog2 developers.")
+    @Parameter(names = {"-l", "--local"}, description = "Run Graylog2 in local mode. Only interesting for Graylog2 developers.")
     private boolean local = false;
     
     @Parameter(names = {"-s", "--statistics"}, description = "Print utilization statistics to STDOUT")
@@ -71,6 +71,12 @@ public class CommandLineArguments {
 
     @Parameter(names = {"-h", "--help"}, description = "Show usage information and exit")
     private boolean showHelp = false;
+
+    @Parameter(names = "--dump-config", description = "Show the effective Graylog2 configuration and exit")
+    private boolean dumpConfig = false;
+
+    @Parameter(names = "--dump-default-config", description = "Show the default configuration and exit")
+    private boolean dumpDefaultConfig = false;
 
     public String getConfigFile() {
         return configFile;
@@ -155,5 +161,20 @@ public class CommandLineArguments {
     public boolean isForcePlugin() {
         return forcePlugin;
     }
-    
+
+    public boolean isDumpDefaultConfig() {
+        return dumpDefaultConfig;
+    }
+
+    public void setDumpDefaultConfig(boolean dumpDefaultConfig) {
+        this.dumpDefaultConfig = dumpDefaultConfig;
+    }
+
+    public boolean isDumpConfig() {
+        return dumpConfig;
+    }
+
+    public void setDumpConfig(boolean dumpConfig) {
+        this.dumpConfig = dumpConfig;
+    }
 }

@@ -34,7 +34,13 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Module;
 import org.apache.log4j.Level;
-import org.graylog2.bindings.*;
+import org.graylog2.bindings.AlarmCallbackBindings;
+import org.graylog2.bindings.InitializerBindings;
+import org.graylog2.bindings.MessageFilterBindings;
+import org.graylog2.bindings.MessageOutputBindings;
+import org.graylog2.bindings.PersistenceServicesBindings;
+import org.graylog2.bindings.ServerBindings;
+import org.graylog2.bindings.ServerMessageInputBindings;
 import org.graylog2.cluster.NodeService;
 import org.graylog2.cluster.NodeServiceImpl;
 import org.graylog2.notifications.Notification;
@@ -53,12 +59,14 @@ import org.graylog2.shared.plugins.PluginLoader;
 import org.graylog2.system.activities.Activity;
 import org.graylog2.system.activities.ActivityWriter;
 import org.graylog2.system.shutdown.GracefulShutdown;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
 import java.io.File;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
@@ -92,11 +100,21 @@ public final class Main extends NodeRunner {
             System.out.println("JRE: " + Tools.getSystemInformation());
             System.exit(0);
         }
-        
-        String configFile = commandLineArguments.getConfigFile();
-        LOG.info("Using config file: {}", configFile);
 
-        final Configuration configuration = getConfiguration(configFile);
+        if(commandLineArguments.isDumpDefaultConfig()) {
+            final JadConfig jadConfig = new JadConfig();
+            jadConfig.addConfigurationBean(new Configuration());
+            System.out.println(dumpConfiguration(jadConfig.dump()));
+            System.exit(0);
+        }
+
+        final JadConfig jadConfig = new JadConfig();
+        final Configuration configuration = readConfiguration(jadConfig, commandLineArguments.getConfigFile());
+
+        if(commandLineArguments.isDumpConfig()) {
+            System.out.println(dumpConfiguration(jadConfig.dump()));
+            System.exit(0);
+        }
 
         if (configuration.getPasswordSecret().isEmpty()) {
             LOG.error("No password secret set. Please define password_secret in your graylog2.conf.");
@@ -269,15 +287,29 @@ public final class Main extends NodeRunner {
         }
     }
 
-    private static Configuration getConfiguration(String configFile) {
-        final Configuration configuration = new Configuration();
-        JadConfig jadConfig = new JadConfig(new PropertiesRepository(configFile), configuration);
+    private static String dumpConfiguration(final Map<String, String> configMap) {
+        final StringBuilder sb = new StringBuilder();
+        sb.append("# Configuration of graylog2-server ").append(ServerVersion.VERSION).append(System.lineSeparator());
+        sb.append("# Generated on ").append(DateTime.now()).append(System.lineSeparator());
 
-        LOG.info("Loading configuration");
+        for(Map.Entry<String, String> entry:  configMap.entrySet()) {
+            sb.append(entry.getKey()).append('=').append(entry.getValue()).append(System.lineSeparator());
+        }
+
+        return sb.toString();
+    }
+
+    private static Configuration readConfiguration(final JadConfig jadConfig, final String configFile) {
+        final Configuration configuration = new Configuration();
+
+        jadConfig.addConfigurationBean(configuration);
+        jadConfig.setRepository(new PropertiesRepository(configFile));
+
+        LOG.debug("Loading configuration from config file: {}", configFile);
         try {
             jadConfig.process();
         } catch (RepositoryException e) {
-            LOG.error("Couldn't load configuration file: [{}]", configFile, e);
+            LOG.error("Couldn't load configuration: {}", e.getMessage());
             System.exit(1);
         } catch (ValidationException e) {
             LOG.error("Invalid configuration", e);
