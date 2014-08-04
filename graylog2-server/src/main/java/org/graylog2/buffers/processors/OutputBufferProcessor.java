@@ -96,7 +96,7 @@ public class OutputBufferProcessor implements EventHandler<MessageEvent> {
         executor = new ThreadPoolExecutor(
             configuration.getOutputBufferProcessorThreadsCorePoolSize(),
             configuration.getOutputBufferProcessorThreadsMaxPoolSize(),
-            5, TimeUnit.SECONDS,
+            configuration.getOutputBufferProcessorKeepAliveTime(), TimeUnit.MILLISECONDS,
             new LinkedBlockingQueue<Runnable>(),
             new ThreadFactoryBuilder()
             .setNameFormat("outputbuffer-processor-" + ordinal + "-executor-%d")

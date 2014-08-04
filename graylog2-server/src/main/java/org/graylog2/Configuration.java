@@ -92,6 +92,9 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "outputbuffer_processor_threads_core_pool_size", required = true, validator = PositiveIntegerValidator.class)
     private int outputBufferProcessorThreadsCorePoolSize = 3;
 
+    @Parameter(value = "outputbuffer_processor_keep_alive_time", validator = PositiveIntegerValidator.class)
+    private int outputBufferProcessorKeepAliveTime = 5000;
+
     @Parameter(value = "ring_size", required = true, validator = PositiveIntegerValidator.class)
     private int ringSize = 1024;
 
@@ -322,6 +325,10 @@ public class Configuration extends BaseConfiguration {
     
     public int getOutputBufferProcessorThreadsMaxPoolSize() {
         return outputBufferProcessorThreadsMaxPoolSize;
+    }
+
+    public int getOutputBufferProcessorKeepAliveTime() {
+        return outputBufferProcessorKeepAliveTime;
     }
 
     public int getRingSize() {
