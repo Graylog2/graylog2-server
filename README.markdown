@@ -1,8 +1,5 @@
 # graylog2-server
-
-[![Build Status](https://secure.travis-ci.org/Graylog2/graylog2-server.png?branch=020)](http://travis-ci.org/Graylog2/graylog2-server)
-
-0.20.1: [![Build Status](https://secure.travis-ci.org/Graylog2/graylog2-server.png?branch=0.20.1)](http://travis-ci.org/Graylog2/graylog2-server)
+![Release](http://img.shields.io/github/release/Graylog2/graylog2-server.svg) [![Build Status](http://img.shields.io/travis/Graylog2/graylog2-server.svg)](http://travis-ci.org/Graylog2/graylog2-server)
 
 This is Graylog2.
 
