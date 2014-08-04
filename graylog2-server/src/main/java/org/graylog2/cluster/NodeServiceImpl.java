@@ -24,6 +24,7 @@ import com.google.inject.Inject;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import org.bson.types.ObjectId;
+import org.graylog2.Configuration;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PersistedServiceImpl;
 import org.graylog2.database.ValidationException;
@@ -32,14 +33,15 @@ import org.graylog2.plugin.system.NodeId;
 
 import java.net.URI;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 public class NodeServiceImpl extends PersistedServiceImpl implements NodeService {
-    // TODO: should be moved to configuration class
-    public static final int PING_TIMEOUT = 2;
+    private final long pingTimeout;
 
     @Inject
-    public NodeServiceImpl(MongoConnection mongoConnection) {
+    public NodeServiceImpl(final MongoConnection mongoConnection, final Configuration configuration) {
         super(mongoConnection);
+        this.pingTimeout = TimeUnit.MILLISECONDS.toSeconds(configuration.getStaleMasterTimeout());
     }
 
     @Override
@@ -95,7 +97,7 @@ public class NodeServiceImpl extends PersistedServiceImpl implements NodeService
         Map<String, Node> nodes = Maps.newHashMap();
 
         BasicDBObject query = new BasicDBObject();
-        query.put("last_seen", new BasicDBObject("$gte", Tools.getUTCTimestamp() - PING_TIMEOUT));
+        query.put("last_seen", new BasicDBObject("$gte", Tools.getUTCTimestamp() - pingTimeout));
         query.put("type", type.toString());
 
         for (DBObject obj : query(NodeImpl.class, query)) {
@@ -121,7 +123,7 @@ public class NodeServiceImpl extends PersistedServiceImpl implements NodeService
     @Override
     public void dropOutdated() {
         BasicDBObject query = new BasicDBObject();
-        query.put("last_seen", new BasicDBObject("$lt", Tools.getUTCTimestamp() - PING_TIMEOUT));
+        query.put("last_seen", new BasicDBObject("$lt", Tools.getUTCTimestamp() - pingTimeout));
 
         destroyAll(NodeImpl.class, query);
     }
@@ -153,7 +155,7 @@ public class NodeServiceImpl extends PersistedServiceImpl implements NodeService
     public boolean isOnlyMaster(NodeId nodeId) {
         BasicDBObject query = new BasicDBObject();
         query.put("type", NodeImpl.Type.SERVER.toString());
-        query.put("last_seen", new BasicDBObject("$gte", Tools.getUTCTimestamp()-PING_TIMEOUT));
+        query.put("last_seen", new BasicDBObject("$gte", Tools.getUTCTimestamp() - pingTimeout));
         query.put("node_id", new BasicDBObject("$ne", nodeId.toString()));
         query.put("is_master", true);
 
@@ -164,11 +166,9 @@ public class NodeServiceImpl extends PersistedServiceImpl implements NodeService
     public boolean isAnyMasterPresent() {
         BasicDBObject query = new BasicDBObject();
         query.put("type", NodeImpl.Type.SERVER.toString());
-        query.put("last_seen", new BasicDBObject("$gte", Tools.getUTCTimestamp()-PING_TIMEOUT));
+        query.put("last_seen", new BasicDBObject("$gte", Tools.getUTCTimestamp() - pingTimeout));
         query.put("is_master", true);
 
         return query(NodeImpl.class, query).size() > 0;
     }
-
-
 }

@@ -274,6 +274,9 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "message_cache_off_heap", required = false)
     private boolean messageCacheOffHeap = true;
 
+    @Parameter(value = "stale_master_timeout", validator = PositiveIntegerValidator.class)
+    private int staleMasterTimeout = 2000;
+
     public boolean isMaster() {
         return isMaster;
     }
@@ -608,6 +611,10 @@ public class Configuration extends BaseConfiguration {
 
     public boolean isMessageCacheOffHeap() {
         return messageCacheOffHeap;
+    }
+
+    public int getStaleMasterTimeout() {
+        return staleMasterTimeout;
     }
 }
 

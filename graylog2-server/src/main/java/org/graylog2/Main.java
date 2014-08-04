@@ -45,7 +45,6 @@ import org.graylog2.bindings.PersistenceServicesBindings;
 import org.graylog2.bindings.ServerBindings;
 import org.graylog2.bindings.ServerMessageInputBindings;
 import org.graylog2.cluster.NodeService;
-import org.graylog2.cluster.NodeServiceImpl;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.Plugin;
@@ -218,9 +217,9 @@ public final class Main extends NodeRunner {
 
         if (configuration.isMaster() && !nodeService.isOnlyMaster(serverStatus.getNodeId())) {
             LOG.warn("Detected another master in the cluster. Retrying in {} seconds to make sure it is not "
-                    + "an old stale instance.", NodeServiceImpl.PING_TIMEOUT);
+                    + "an old stale instance.", configuration.getStaleMasterTimeout());
             try {
-                Thread.sleep(NodeServiceImpl.PING_TIMEOUT*1000);
+                Thread.sleep(configuration.getStaleMasterTimeout());
             } catch (InterruptedException e) { /* nope */ }
             
             if (!nodeService.isOnlyMaster(serverStatus.getNodeId())) {
