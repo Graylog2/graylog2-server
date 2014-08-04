@@ -43,14 +43,21 @@ import java.util.concurrent.TimeUnit;
 public class LdapConnector {
     private static final Logger log = LoggerFactory.getLogger(LdapConnector.class);
 
+    private final int connectionTimeout;
+
+    public LdapConnector(final int connectionTimeout) {
+        this.connectionTimeout = connectionTimeout;
+    }
+
     public LdapNetworkConnection connect(LdapConnectionConfig config) throws LdapException {
         final LdapNetworkConnection connection = new LdapNetworkConnection(config);
-        connection.setTimeOut(TimeUnit.SECONDS.toMillis(2)); // TODO timeout value
+        connection.setTimeOut(connectionTimeout);
 
         if (log.isTraceEnabled()) {
             log.trace("Connecting to LDAP server {}:{}, binding with user {}",
-                      new Object[]{config.getLdapHost(), config.getLdapPort(), config.getName()});
+                      config.getLdapHost(), config.getLdapPort(), config.getName());
         }
+
         // this will perform an anonymous bind if there were no system credentials
         final SimpleTimeLimiter timeLimiter = new SimpleTimeLimiter(Executors.newSingleThreadExecutor());
         @SuppressWarnings("unchecked")
@@ -61,7 +68,7 @@ public class LdapConnector {
                         return connection.connect();
                     }
                 }, Callable.class,
-                2, TimeUnit.SECONDS); // TODO timeout value
+                connectionTimeout, TimeUnit.MILLISECONDS);
         try {
             final Boolean connected = timeLimitedConnection.call();
             if (!connected) {
@@ -87,7 +94,7 @@ public class LdapConnector {
         final String filter = MessageFormat.format(searchPattern, principal);
         if (log.isTraceEnabled()) {
             log.trace("Search {} for {}, starting at {}",
-                      new Object[]{activeDirectory ? "ActiveDirectory" : "LDAP", filter, searchBase});
+                      activeDirectory ? "ActiveDirectory" : "LDAP", filter, searchBase);
         }
         final EntryCursor entryCursor = connection.search(searchBase,
                                                           filter,
