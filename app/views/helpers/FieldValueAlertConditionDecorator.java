@@ -6,6 +6,8 @@ import org.graylog2.restclient.models.alerts.AlertCondition;
 import play.api.mvc.Call;
 import play.api.templates.Html;
 
+import java.text.DecimalFormat;
+
 public class FieldValueAlertConditionDecorator extends AlertConditionDecorator {
     public enum CheckType {
         MEAN ("mean value"),
@@ -29,8 +31,11 @@ public class FieldValueAlertConditionDecorator extends AlertConditionDecorator {
         LOWER, HIGHER
     }
 
+    private final DecimalFormat decimalFormat;
+
     public FieldValueAlertConditionDecorator(AlertCondition condition) {
         super(condition);
+        decimalFormat = new DecimalFormat("#.##");
     }
 
     public String getField() {
@@ -41,8 +46,9 @@ public class FieldValueAlertConditionDecorator extends AlertConditionDecorator {
         return (int) ((Double) getParameter("time", 0.0)).longValue();
     }
 
-    public Number getThreshold() {
-        return (Number) getParameter("threshold", 0.0);
+    public String getThreshold() {
+        Number threshold = (Number) getParameter("threshold", 0.0);
+        return decimalFormat.format(threshold);
     }
 
     public String getThresholdType() {
