@@ -46,12 +46,14 @@ import org.graylog2.shared.ServerStatus;
 import org.graylog2.shared.bindings.GuiceInstantiationService;
 import org.graylog2.shared.initializers.ServiceManagerListener;
 import org.graylog2.shared.plugins.PluginLoader;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
 import java.io.File;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
@@ -80,10 +82,20 @@ public class Main extends NodeRunner {
             System.exit(0);
         }
 
-        String configFile = commandLineArguments.getConfigFile();
-        LOG.info("Using config file: {}", configFile);
+        if(commandLineArguments.isDumpDefaultConfig()) {
+            final JadConfig jadConfig = new JadConfig();
+            jadConfig.addConfigurationBean(new Configuration());
+            System.out.println(dumpConfiguration(jadConfig.dump()));
+            System.exit(0);
+        }
 
-        final Configuration configuration = getConfiguration(configFile);
+        final JadConfig jadConfig = new JadConfig();
+        final Configuration configuration = readConfiguration(jadConfig, commandLineArguments.getConfigFile());
+
+        if (commandLineArguments.isDumpConfig()) {
+            System.out.println(dumpConfiguration(jadConfig.dump()));
+            System.exit(0);
+        }
 
         // Are we in debug mode?
         Level logLevel = Level.INFO;
@@ -153,15 +165,17 @@ public class Main extends NodeRunner {
         }
     }
 
-    private static Configuration getConfiguration(String configFile) {
+    private static Configuration readConfiguration(final JadConfig jadConfig, final String configFile) {
         final Configuration configuration = new Configuration();
-        JadConfig jadConfig = new JadConfig(new PropertiesRepository(configFile), configuration);
 
-        LOG.info("Loading configuration");
+        jadConfig.addConfigurationBean(configuration);
+        jadConfig.setRepository(new PropertiesRepository(configFile));
+
+        LOG.debug("Loading configuration from config file: {}", configFile);
         try {
             jadConfig.process();
         } catch (RepositoryException e) {
-            LOG.error("Couldn't load configuration file: [{}]", configFile, e);
+            LOG.error("Couldn't load configuration: {}", e.getMessage());
             System.exit(1);
         } catch (ValidationException e) {
             LOG.error("Invalid configuration", e);
@@ -174,5 +188,17 @@ public class Main extends NodeRunner {
         }
 
         return configuration;
+    }
+
+    private static String dumpConfiguration(final Map<String, String> configMap) {
+        final StringBuilder sb = new StringBuilder();
+        sb.append("# Configuration of graylog2-radio ").append(RadioVersion.VERSION).append(System.lineSeparator());
+        sb.append("# Generated on ").append(DateTime.now()).append(System.lineSeparator());
+
+        for (Map.Entry<String, String> entry : configMap.entrySet()) {
+            sb.append(entry.getKey()).append('=').append(entry.getValue()).append(System.lineSeparator());
+        }
+
+        return sb.toString();
     }
 }

@@ -49,6 +49,12 @@ public class CommandLineArguments {
     @Parameter(names = {"-h", "--help"}, description = "Show usage information and exit")
     private boolean showHelp = false;
 
+    @Parameter(names = "--dump-config", description = "Show the effective graylog2-radio configuration and exit")
+    private boolean dumpConfig = false;
+
+    @Parameter(names = "--dump-default-config", description = "Show the default configuration and exit")
+    private boolean dumpDefaultConfig = false;
+
     public String getConfigFile() {
         return configFile;
     }
@@ -89,4 +95,19 @@ public class CommandLineArguments {
         return showHelp;
     }
 
+    public boolean isDumpConfig() {
+        return dumpConfig;
+    }
+
+    public void setDumpConfig(boolean dumpConfig) {
+        this.dumpConfig = dumpConfig;
+    }
+
+    public boolean isDumpDefaultConfig() {
+        return dumpDefaultConfig;
+    }
+
+    public void setDumpDefaultConfig(boolean dumpDefaultConfig) {
+        this.dumpDefaultConfig = dumpDefaultConfig;
+    }
 }
