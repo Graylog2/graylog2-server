@@ -22,11 +22,14 @@ package org.graylog2.periodical;
 import com.google.inject.Inject;
 import org.graylog2.plugin.periodical.Periodical;
 import org.graylog2.shared.stats.ThroughputStats;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
 public class ThroughputCounterManagerThread extends Periodical {
+    private static final Logger LOG = LoggerFactory.getLogger(ThroughputCounterManagerThread.class);
     private final ThroughputStats throughputStats;
 
     @Inject
@@ -35,9 +38,14 @@ public class ThroughputCounterManagerThread extends Periodical {
     }
 
     @Override
-    public void run() {
+    public void doRun() {
         throughputStats.setCurrentThroughput(throughputStats.getThroughputCounter().get());
         throughputStats.getThroughputCounter().set(0);
+    }
+
+    @Override
+    protected Logger getLogger() {
+        return LOG;
     }
 
     @Override
