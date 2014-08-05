@@ -22,12 +22,15 @@ package org.graylog2.periodical;
 import org.cliffc.high_scale_lib.Counter;
 import org.graylog2.plugin.periodical.Periodical;
 import org.graylog2.shared.stats.ThroughputStats;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.util.HashMap;
 import java.util.Map;
 
 public class StreamThroughputCounterManagerThread extends Periodical {
+    private static final Logger LOG = LoggerFactory.getLogger(StreamThroughputCounterManagerThread.class);
     private final ThroughputStats throughputStats;
 
     @Inject
@@ -36,10 +39,15 @@ public class StreamThroughputCounterManagerThread extends Periodical {
     }
 
     @Override
-    public void run() {
+    public void doRun() {
         // cycleStreamThroughput clears the map already.
         final Map<String,Counter> stringCounterMap = throughputStats.cycleStreamThroughput();
         throughputStats.setCurrentStreamThroughput(new HashMap<>(stringCounterMap));
+    }
+
+    @Override
+    protected Logger getLogger() {
+        return LOG;
     }
 
     @Override

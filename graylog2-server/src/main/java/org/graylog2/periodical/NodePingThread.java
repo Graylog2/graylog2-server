@@ -34,8 +34,6 @@ import org.graylog2.system.activities.ActivityWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.ws.rs.HEAD;
-
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
@@ -62,7 +60,7 @@ public class NodePingThread extends Periodical {
     }
 
     @Override
-    public void run() {
+    public void doRun() {
         final boolean isMaster = serverStatus.hasCapability(ServerStatus.Capability.MASTER);
         try {
             Node node = nodeService.byNodeId(serverStatus.getNodeId());
@@ -96,6 +94,11 @@ public class NodePingThread extends Periodical {
         } catch (Exception e) {
             LOG.warn("Caught exception during node ping.", e);
         }
+    }
+
+    @Override
+    protected Logger getLogger() {
+        return LOG;
     }
 
     @Override

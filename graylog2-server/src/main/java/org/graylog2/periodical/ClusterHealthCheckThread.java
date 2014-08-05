@@ -48,7 +48,7 @@ public class ClusterHealthCheckThread extends Periodical {
     }
 
     @Override
-    public void run() {
+    public void doRun() {
         try {
             if (inputRegistry.runningCount() == 0) {
                 LOG.debug("No input running in cluster!");
@@ -60,6 +60,11 @@ public class ClusterHealthCheckThread extends Periodical {
         } catch (NodeNotFoundException e) {
             LOG.error("Unable to find own node: ", e.getMessage(), e);
         }
+    }
+
+    @Override
+    protected Logger getLogger() {
+        return LOG;
     }
 
     protected Notification getNotification() throws NodeNotFoundException {

@@ -49,6 +49,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 
+import static java.util.concurrent.TimeUnit.MINUTES;
+
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
@@ -69,7 +71,7 @@ public class VersionCheckThread extends Periodical {
     }
 
     @Override
-    public void run() {
+    public void doRun() {
         final URIBuilder uri;
         final HttpGet get;
         try {
@@ -78,16 +80,12 @@ public class VersionCheckThread extends Periodical {
             uri.addParameter("version", ServerVersion.VERSION.toString());
 
             get = new HttpGet(uri.build());
-            final StringBuilder userAgent = new StringBuilder("graylog2-server (")
-                    .append(System.getProperty("java.vendor"))
-                    .append(", ")
-                    .append(System.getProperty("java.version"))
-                    .append(", ")
-                    .append(System.getProperty("os.name"))
-                    .append(", ")
-                    .append(System.getProperty("os.version"))
-                    .append(")");
-            get.setHeader("User-Agent", userAgent.toString());
+            get.setHeader("User-Agent",
+                          "graylog2-server ("
+                                  + System.getProperty("java.vendor") + ", "
+                                  + System.getProperty("java.version") + ", "
+                                  + System.getProperty("os.name") + ", "
+                                  + System.getProperty("os.version") + ")");
             final RequestConfig.Builder configBuilder = RequestConfig.custom()
                     .setConnectTimeout(configuration.getVersionchecksConnectTimeOut())
                     .setSocketTimeout(configuration.getVersionchecksSocketTimeOut())
@@ -146,7 +144,6 @@ public class VersionCheckThread extends Periodical {
             EntityUtils.consume(entity);
         } catch (IOException e) {
             LOG.warn("Could not perform version check.", e);
-            return;
         } finally {
             try {
                 if (response != null) {
@@ -156,6 +153,11 @@ public class VersionCheckThread extends Periodical {
                 LOG.warn("Could not close HTTP connection to version check API.", e);
             }
         }
+    }
+
+    @Override
+    protected Logger getLogger() {
+        return LOG;
     }
 
     private VersionCheckResponse parse(String httpBody) throws IOException {
@@ -195,8 +197,7 @@ public class VersionCheckThread extends Periodical {
 
     @Override
     public int getPeriodSeconds() {
-        // 30 minutes.
-        return 1800;
+        return (int) MINUTES.toSeconds(30);
     }
 
 

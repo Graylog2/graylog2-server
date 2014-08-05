@@ -30,6 +30,7 @@ import org.jboss.netty.handler.codec.base64.Base64;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.*;
+import org.slf4j.Logger;
 
 import javax.ws.rs.core.UriBuilder;
 import java.io.ByteArrayInputStream;
@@ -422,5 +423,18 @@ public final class Tools {
             public void uncaughtException(Thread ignored, Throwable ignored1) {
             }
         });
+    }
+
+    public static class LogUncaughtExceptionHandler implements Thread.UncaughtExceptionHandler {
+        private final Logger log;
+
+        public LogUncaughtExceptionHandler(Logger log) {
+            this.log = log;
+        }
+
+        @Override
+        public void uncaughtException(Thread t, Throwable e) {
+            log.error("Thread {} failed by not catching exception: {}.", t.getName(), e);
+        }
     }
 }

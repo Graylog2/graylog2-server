@@ -39,6 +39,8 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 
+import static java.util.concurrent.TimeUnit.MINUTES;
+
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
@@ -69,7 +71,7 @@ public class IndexRetentionThread extends Periodical {
     }
 
     @Override
-    public void run() {
+    public void doRun() {
         Map<String, IndexStats> indices = deflector.getAllDeflectorIndices(indexer);
         int indexCount = indices.size();
         int maxIndices = configuration.getMaxNumberOfIndices();
@@ -99,6 +101,11 @@ public class IndexRetentionThread extends Periodical {
         } catch (NoTargetIndexException e) {
             LOG.error("Could not run index retention. No target index.", e);
         }
+    }
+
+    @Override
+    protected Logger getLogger() {
+        return LOG;
     }
 
     public void runRetention(RetentionStrategy strategy, Map<String, IndexStats> indices, int removeCount) throws NoTargetIndexException {
@@ -170,7 +177,7 @@ public class IndexRetentionThread extends Periodical {
     @Override
     public int getPeriodSeconds() {
         // Five minutes.
-        return 300;
+        return (int) MINUTES.toSeconds(5);
     }
 
 }

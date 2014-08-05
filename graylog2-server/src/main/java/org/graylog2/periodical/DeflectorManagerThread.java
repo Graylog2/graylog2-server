@@ -63,7 +63,7 @@ public class DeflectorManagerThread extends Periodical { // public class Klimper
     }
 
     @Override
-    public void run() {
+    public void doRun() {
         // Point deflector to a new index if required.
         try {
             if (indexerSetupService.isRunning()) {
@@ -74,7 +74,12 @@ public class DeflectorManagerThread extends Periodical { // public class Klimper
             LOG.error("Couldn't point deflector to a new index", e);
         }
     }
-    
+
+    @Override
+    protected Logger getLogger() {
+        return LOG;
+    }
+
     private void point() {
         // Check if message limit of current target is hit. Point to new target if so.
         String currentTarget;
@@ -90,17 +95,13 @@ public class DeflectorManagerThread extends Periodical { // public class Klimper
         
         if (messageCountInTarget > configuration.getElasticSearchMaxDocsPerIndex()) {
             LOG.info("Number of messages in <{}> ({}) is higher than the limit ({}). Pointing deflector to new index now!",
-                    new Object[] {
-                            currentTarget, messageCountInTarget,
-                            configuration.getElasticSearchMaxDocsPerIndex()
-                    });
+                     currentTarget, messageCountInTarget,
+                     configuration.getElasticSearchMaxDocsPerIndex());
             deflector.cycle(indexer);
         } else {
             LOG.debug("Number of messages in <{}> ({}) is lower than the limit ({}). Not doing anything.",
-                    new Object[] {
-                            currentTarget,messageCountInTarget,
-                            configuration.getElasticSearchMaxDocsPerIndex()
-                    });
+                      currentTarget,messageCountInTarget,
+                      configuration.getElasticSearchMaxDocsPerIndex());
         }
     }
 

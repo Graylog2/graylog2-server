@@ -79,7 +79,7 @@ public class BatchedElasticSearchOutputFlushThread extends Periodical {
     }
 
     @Override
-    public void run() {
+    public void doRun() {
         LOG.debug("Checking for outputs to flush ...");
         for (MessageOutput output : outputRegistry.getMessageOutputs()) {
             if (output instanceof BatchedElasticSearchOutput) {
@@ -92,5 +92,10 @@ public class BatchedElasticSearchOutputFlushThread extends Periodical {
                 }
             }
         }
+    }
+
+    @Override
+    protected Logger getLogger() {
+        return LOG;
     }
 }

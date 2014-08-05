@@ -21,6 +21,7 @@ package org.graylog2.periodical;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.periodical.Periodical;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,15 +58,14 @@ public class Periodicals {
             Thread t = new Thread(periodical);
             t.setDaemon(periodical.isDaemon());
             t.setName("periodical-" + periodical.getClass().getCanonicalName());
+            t.setUncaughtExceptionHandler(new Tools.LogUncaughtExceptionHandler(LOG));
             t.start();
         } else {
             LOG.info(
                     "Starting [{}] periodical in [{}s], polling every [{}s].",
-                    new Object[]{ periodical.getClass().getCanonicalName(),
-                            periodical.getInitialDelaySeconds(),
-                            periodical.getPeriodSeconds()
-                    }
-            );
+                    periodical.getClass().getCanonicalName(),
+                    periodical.getInitialDelaySeconds(),
+                    periodical.getPeriodSeconds());
 
             ScheduledExecutorService scheduler = periodical.isDaemon() ? this.daemonScheduler : this.scheduler;
             ScheduledFuture<?> future = scheduler.scheduleAtFixedRate(
@@ -112,4 +112,5 @@ public class Periodicals {
     public Map<Periodical, ScheduledFuture> getFutures() {
         return Maps.newHashMap(futures);
     }
+
 }

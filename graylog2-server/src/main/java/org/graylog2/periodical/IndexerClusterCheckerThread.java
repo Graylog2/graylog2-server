@@ -48,7 +48,7 @@ public class IndexerClusterCheckerThread extends Periodical {
     }
 
     @Override
-    public void run() {
+    public void doRun() {
         if (!notificationService.isFirst(Notification.Type.ES_OPEN_FILES))
             return;
         boolean allHigher = true;
@@ -63,11 +63,9 @@ public class IndexerClusterCheckerThread extends Periodical {
                 final boolean published = notificationService.publishIfFirst(notification);
                 if (published) {
                     LOG.warn("Indexer node <{}> open file limit is too low: [{}]. Set it to at least {}.",
-                             new Object[] {
-                                     node.getNode().getName(),
-                                     node.getProcess().getMaxFileDescriptors(),
-                                     MINIMUM_OPEN_FILES_LIMIT
-                             });
+                             node.getNode().getName(),
+                             node.getProcess().getMaxFileDescriptors(),
+                             MINIMUM_OPEN_FILES_LIMIT);
                 }
                 allHigher = false;
             }
@@ -76,6 +74,11 @@ public class IndexerClusterCheckerThread extends Periodical {
             Notification notification = notificationService.build().addType(Notification.Type.ES_OPEN_FILES);
             notificationService.fixed(notification);
         }
+    }
+
+    @Override
+    protected Logger getLogger() {
+        return LOG;
     }
 
     @Override

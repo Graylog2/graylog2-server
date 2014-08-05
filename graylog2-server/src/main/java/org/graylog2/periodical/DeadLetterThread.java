@@ -69,7 +69,7 @@ public class DeadLetterThread extends Periodical {
     }
 
     @Override
-    public void run() {
+    public void doRun() {
         verifyIndices();
 
         // Poll queue forever.
@@ -116,10 +116,14 @@ public class DeadLetterThread extends Periodical {
                     indexFailureService.saveWithoutValidation(indexFailure);
                 } catch(Exception e) {
                     LOG.error("Could not persist index failure.", e);
-                    continue;
                 }
             }
         }
+    }
+
+    @Override
+    protected Logger getLogger() {
+        return LOG;
     }
 
     // TODO: Move this to the related persisted service classes

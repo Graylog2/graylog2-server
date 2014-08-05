@@ -19,6 +19,8 @@
 
 package org.graylog2.plugin.periodical;
 
+import org.slf4j.Logger;
+
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
@@ -75,4 +77,16 @@ public abstract class Periodical implements Runnable {
     public void initialize() {
     }
 
+    @Override
+    public void run() {
+        try {
+            doRun();
+        } catch (RuntimeException e) {
+            getLogger().error("Uncaught exception in periodical", e);
+        }
+    }
+
+    protected abstract Logger getLogger();
+
+    public abstract void doRun();
 }

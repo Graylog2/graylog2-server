@@ -2,6 +2,7 @@ package org.graylog2.periodical;
 
 import com.google.common.collect.Lists;
 import org.graylog2.plugin.periodical.Periodical;
+import org.slf4j.Logger;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -151,6 +152,66 @@ public class PeriodicalsTest {
 
         assertFalse(periodicals.getFutures().containsKey(periodical2), "getFutures() did not return a copy of the Map");
         assertEquals(periodicals.getFutures().size(), 1);
+    }
+
+    @Test
+    public void testExceptionIsNotUncaught() {
+
+        final Logger logger = mock(Logger.class);
+        final Periodical periodical1 = new Periodical() {
+            @Override
+            public boolean runsForever() {
+                return false;
+            }
+
+            @Override
+            public boolean stopOnGracefulShutdown() {
+                return false;
+            }
+
+            @Override
+            public boolean masterOnly() {
+                return false;
+            }
+
+            @Override
+            public boolean startOnThisNode() {
+                return true;
+            }
+
+            @Override
+            public boolean isDaemon() {
+                return false;
+            }
+
+            @Override
+            public int getInitialDelaySeconds() {
+                return 0;
+            }
+
+            @Override
+            public int getPeriodSeconds() {
+                return 1;
+            }
+
+            @Override
+            protected Logger getLogger() {
+                return logger;
+            }
+
+            @Override
+            public void doRun() {
+                throw new NullPointerException();
+            }
+        };
+
+        try {
+            periodical1.run();
+            // the uncaught exception from doRun should have been logged
+            verify(logger, atLeastOnce()).error(anyString(), any(Throwable.class));
+        } catch (Exception e) {
+            fail("run() should never propagate an unchecked exception!", e);
+        }
     }
 
     private ScheduledFuture<Object> createScheduledFuture() {

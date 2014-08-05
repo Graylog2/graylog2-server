@@ -86,7 +86,7 @@ public class MasterPingPeriodical extends Periodical {
     }
 
     @Override
-    public void run() {
+    public void doRun() {
         try {
             Ping.ping(httpClient,
                     configuration.getGraylog2ServerUri(),
@@ -95,5 +95,10 @@ public class MasterPingPeriodical extends Periodical {
         } catch (IOException | ExecutionException | InterruptedException e) {
             LOG.error("Master ping failed.", e);
         }
+    }
+
+    @Override
+    protected Logger getLogger() {
+        return LOG;
     }
 }

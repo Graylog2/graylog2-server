@@ -75,7 +75,7 @@ public class AlertScannerThread extends Periodical {
     }
 
     @Override
-    public void run() {
+    public void doRun() {
         if (!serverStatus.isProcessing())
             return;
 
@@ -128,6 +128,11 @@ public class AlertScannerThread extends Periodical {
             }
 
         }
+    }
+
+    @Override
+    protected Logger getLogger() {
+        return LOG;
     }
 
     @Override

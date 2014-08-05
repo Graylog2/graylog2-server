@@ -70,7 +70,7 @@ public class MasterCacheWorkerThread extends Periodical {
     }
 
     @Override
-    public void run() {
+    public void doRun() {
         writtenMessages = metricRegistry.meter(name(MasterCacheWorkerThread.class, "writtenMessages"));
         outOfCapacity =  metricRegistry.meter(name(MasterCacheWorkerThread.class, "FailedWritesOutOfCapacity"));
 
@@ -87,6 +87,11 @@ public class MasterCacheWorkerThread extends Periodical {
                 work(outputCache, outputBuffer);
             }
         }, "master-cache-worker-output").start();
+    }
+
+    @Override
+    protected Logger getLogger() {
+        return LOG;
     }
 
     private void work(Cache cache, Buffer targetBuffer) {
