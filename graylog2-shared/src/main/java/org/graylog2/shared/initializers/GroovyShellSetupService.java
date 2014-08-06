@@ -26,11 +26,13 @@ import org.graylog2.shared.BaseConfiguration;
 import org.graylog2.shared.bindings.InstantiationService;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.util.Map;
 
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
  */
+@Singleton
 public class GroovyShellSetupService extends AbstractIdleService {
     private final GroovyShellService groovyShellService = new GroovyShellService();
     private final BaseConfiguration configuration;

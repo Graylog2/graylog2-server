@@ -23,10 +23,12 @@ import com.google.common.util.concurrent.AbstractIdleService;
 import org.graylog2.inputs.gelf.gelf.GELFChunkManager;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
  */
+@Singleton
 public class GelfChunkManagerService extends AbstractIdleService {
     private GELFChunkManager gelfChunkManager;
 

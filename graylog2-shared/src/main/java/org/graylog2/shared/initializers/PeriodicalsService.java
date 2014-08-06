@@ -29,6 +29,7 @@ import org.graylog2.shared.bindings.InstantiationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Singleton;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ScheduledFuture;
@@ -37,6 +38,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
  */
+@Singleton
 public class PeriodicalsService extends AbstractIdleService {
     private final Logger LOG = LoggerFactory.getLogger(PeriodicalsService.class);
 

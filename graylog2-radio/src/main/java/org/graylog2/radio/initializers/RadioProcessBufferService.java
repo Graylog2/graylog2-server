@@ -29,10 +29,12 @@ import org.graylog2.shared.buffers.ProcessBufferWatermark;
 import org.graylog2.shared.buffers.processors.ProcessBufferProcessor;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
  */
+@Singleton
 public class RadioProcessBufferService extends AbstractIdleService {
     private final InputCache inputCache;
     private final RadioProcessBufferProcessor.Factory processBufferProcessorFactory;

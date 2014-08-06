@@ -48,6 +48,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 import javax.ws.rs.container.ContainerResponseFilter;
 import javax.ws.rs.container.DynamicFeature;
 import javax.ws.rs.ext.ExceptionMapper;
@@ -59,6 +60,7 @@ import java.util.concurrent.Executors;
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
  */
+@Singleton
 public class RestApiService extends AbstractIdleService {
     private final Logger LOG = LoggerFactory.getLogger(RestApiService.class);
     private final BaseConfiguration configuration;
