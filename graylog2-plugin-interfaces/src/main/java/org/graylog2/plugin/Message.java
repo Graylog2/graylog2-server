@@ -102,15 +102,6 @@ public class Message {
         fields.put("source", source);
         fields.put("timestamp", timestamp);
 
-        try {
-            inetAddress = InetAddress.getByName(source);
-            LOG.debug("InetAddress is {} for message source {}", inetAddress, getSource());
-        } catch (IllegalArgumentException ignored) {
-            LOG.debug("No inetaddress", ignored);
-        } catch (UnknownHostException e) {
-            LOG.debug("No such host", e);
-        }
-
         streams = Lists.newArrayList();
     }
 
