@@ -30,17 +30,31 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
  */
 public class LoggingOutput implements MessageOutput {
     private final Logger LOG = LoggerFactory.getLogger(this.getClass());
+    private final AtomicBoolean isRunning = new AtomicBoolean(false);
     private Configuration configuration;
 
     @Override
     public void initialize(Configuration config) throws MessageOutputConfigurationException {
         LOG.info("Initializing");
+        isRunning.set(true);
+    }
+
+    @Override
+    public void stop() {
+        isRunning.set(false);
+        LOG.info("Stopping");
+    }
+
+    @Override
+    public boolean isRunning() {
+        return isRunning.get();
     }
 
     @Override

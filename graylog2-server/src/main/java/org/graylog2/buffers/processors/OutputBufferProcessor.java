@@ -127,6 +127,12 @@ public class OutputBufferProcessor implements EventHandler<MessageEvent> {
                 LOG.error("Got null output!");
                 continue;
             }
+            if (!output.isRunning()) {
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("Skipping stopped output {}", output.getClass().getName());
+                }
+                continue;
+            }
             try {
                 LOG.debug("Writing message to [{}].", output.getName());
                 if (LOG.isTraceEnabled()) {

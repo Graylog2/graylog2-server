@@ -31,6 +31,8 @@ import java.util.List;
 public interface MessageOutput {
 
     public void initialize(Configuration config) throws MessageOutputConfigurationException;
+    public void stop();
+    public boolean isRunning();
     public void write(Message message) throws Exception;
     public void write(List<Message> messages) throws Exception;
     public ConfigurationRequest getRequestedConfiguration();

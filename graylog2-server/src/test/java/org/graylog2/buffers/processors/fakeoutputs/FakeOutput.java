@@ -30,18 +30,30 @@ import org.graylog2.plugin.outputs.MessageOutput;
 import org.graylog2.plugin.outputs.MessageOutputConfigurationException;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  *
  * @author lennart.koopmann
  */
 public class FakeOutput implements MessageOutput {
-
+    private final AtomicBoolean isRunning = new AtomicBoolean(false);
     private int callCount = 0;
     private int writeCount = 0;
     
     @Override
     public void initialize(Configuration config) throws MessageOutputConfigurationException {
+        isRunning.set(true);
+    }
+
+    @Override
+    public void stop() {
+        isRunning.set(false);
+    }
+
+    @Override
+    public boolean isRunning() {
+        return isRunning.get();
     }
 
     @Override

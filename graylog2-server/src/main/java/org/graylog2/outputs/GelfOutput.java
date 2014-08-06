@@ -18,12 +18,14 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
  */
 public class GelfOutput implements MessageOutput {
     private final Logger LOG = LoggerFactory.getLogger(this.getClass());
+    private final AtomicBoolean isRunning = new AtomicBoolean(false);
     private Configuration configuration;
     private GelfSender gelfSender;
 
@@ -31,6 +33,23 @@ public class GelfOutput implements MessageOutput {
     public void initialize(Configuration config) throws MessageOutputConfigurationException {
         configuration = config;
         gelfSender = getGelfSender(configuration);
+        isRunning.set(true);
+    }
+
+    @Override
+    public void stop() {
+        LOG.debug("Closing {}", gelfSender.getClass().getName());
+        try {
+            isRunning.set(false);
+            gelfSender.close();
+        } catch (Exception e) {
+            LOG.error("Error closing {}", gelfSender.getClass().getName(), e);
+        }
+    }
+
+    @Override
+    public boolean isRunning() {
+        return isRunning.get();
     }
 
     protected GelfSender getGelfSender(Configuration configuration) throws MessageOutputConfigurationException {
