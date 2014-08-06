@@ -83,22 +83,9 @@ import javax.ws.rs.ext.ExceptionMapper;
  */
 public class ServerBindings extends AbstractModule {
     private final Configuration configuration;
-    private final MongoConnection mongoConnection;
 
     public ServerBindings(Configuration configuration) {
         this.configuration = configuration;
-
-        mongoConnection = new MongoConnection();
-        mongoConnection.setUser(configuration.getMongoUser());
-        mongoConnection.setPassword(configuration.getMongoPassword());
-        mongoConnection.setHost(configuration.getMongoHost());
-        mongoConnection.setPort(configuration.getMongoPort());
-        mongoConnection.setDatabase(configuration.getMongoDatabase());
-        mongoConnection.setUseAuth(configuration.isMongoUseAuth());
-        mongoConnection.setMaxConnections(configuration.getMongoMaxConnections());
-        mongoConnection.setThreadsAllowedToBlockMultiplier(configuration.getMongoThreadsAllowedToBlockMultiplier());
-        mongoConnection.setReplicaSet(configuration.getMongoReplicaSet());
-        mongoConnection.connect();
     }
 
     @Override
@@ -134,7 +121,7 @@ public class ServerBindings extends AbstractModule {
         bind(Configuration.class).toInstance(configuration);
         bind(BaseConfiguration.class).toInstance(configuration);
 
-        bind(MongoConnection.class).toInstance(mongoConnection);
+        bind(MongoConnection.class).toProvider(MongoConnectionProvider.class);
 
         Multibinder<ServerStatus.Capability> capabilityBinder =
                 Multibinder.newSetBinder(binder(), ServerStatus.Capability.class);
@@ -170,10 +157,6 @@ public class ServerBindings extends AbstractModule {
         bind(AlertSender.class).to(FormattedEmailAlertSender.class);
         bind(StreamRouter.class);
         bind(FilterService.class).to(FilterServiceImpl.class).in(Scopes.SINGLETON);
-    }
-
-    private MongoConnection getMongoConnection() {
-        return this.mongoConnection;
     }
 
     private void bindDynamicFeatures() {

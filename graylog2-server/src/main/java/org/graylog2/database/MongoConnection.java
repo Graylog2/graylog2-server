@@ -20,8 +20,18 @@
 
 package org.graylog2.database;
 
-import com.mongodb.*;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import com.mongodb.BasicDBObject;
+import com.mongodb.DB;
+import com.mongodb.DBCollection;
+import com.mongodb.MongoClient;
+import com.mongodb.MongoClientOptions;
 import com.mongodb.MongoClientOptions.Builder;
+import com.mongodb.MongoException;
+import com.mongodb.ServerAddress;
+import com.mongodb.WriteConcern;
+import org.graylog2.Configuration;
 
 import java.net.UnknownHostException;
 import java.util.List;
@@ -31,31 +41,53 @@ import java.util.List;
  *
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
+@Singleton
 public class MongoConnection {
     private MongoClient m;
     private DB db;
-
     private DBCollection messageCountsCollection;
-
     private String username;
-
     private List<ServerAddress> replicaServers;
-
     private int threadsAllowedToBlockMultiplier;
-
     private boolean useAuth;
-
     private int maxConnections;
-
     private String database;
-
     private String password;
-
     private String host;
-
     private int port;
 
-    public MongoConnection() {
+    @Inject
+    public MongoConnection(final Configuration configuration) {
+        this(
+                configuration.getMongoDatabase(),
+                configuration.getMongoHost(),
+                configuration.getMongoPort(),
+                configuration.getMongoReplicaSet(),
+                configuration.isMongoUseAuth(),
+                configuration.getMongoUser(),
+                configuration.getMongoPassword(),
+                configuration.getMongoMaxConnections(),
+                configuration.getMongoThreadsAllowedToBlockMultiplier());
+    }
+
+    public MongoConnection(final String database,
+                           final String host,
+                           final int port,
+                           final List<ServerAddress> replicaServers,
+                           final boolean useAuth,
+                           final String username,
+                           final String password,
+                           final int maxConnections,
+                           final int threadsAllowedToBlockMultiplier) {
+        this.host = host;
+        this.port = port;
+        this.database = database;
+        this.replicaServers = replicaServers;
+        this.useAuth = useAuth;
+        this.username = username;
+        this.password = password;
+        this.maxConnections = maxConnections;
+        this.threadsAllowedToBlockMultiplier = threadsAllowedToBlockMultiplier;
     }
 
     /**
@@ -81,7 +113,7 @@ public class MongoConnection {
 
                 // Try to authenticate if configured.
                 if (useAuth) {
-                    if(!db.authenticate(username, password.toCharArray())) {
+                    if (!db.authenticate(username, password.toCharArray())) {
                         throw new RuntimeException("Could not authenticate to database '" + database + "' with user '" + username + "'.");
                     }
                 }
@@ -96,6 +128,7 @@ public class MongoConnection {
 
     /**
      * Returns the raw database object.
+     *
      * @return database
      */
     public DB getDatabase() {
@@ -132,7 +165,7 @@ public class MongoConnection {
 
     public void setThreadsAllowedToBlockMultiplier(
             int mongoThreadsAllowedToBlockMultiplier) {
-                this.threadsAllowedToBlockMultiplier = mongoThreadsAllowedToBlockMultiplier;
+        this.threadsAllowedToBlockMultiplier = mongoThreadsAllowedToBlockMultiplier;
     }
 
     public void setUseAuth(boolean mongoUseAuth) {
