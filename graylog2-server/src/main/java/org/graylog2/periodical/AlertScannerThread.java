@@ -94,6 +94,11 @@ public class AlertScannerThread extends Periodical {
 
             LOG.debug("Stream [{}] has [{}] configured alert conditions.", stream, streamService.getAlertConditions(stream).size());
 
+            if(stream.isPaused()) {
+                LOG.debug("Stream [{}] has been paused. Skipping alert check.", stream);
+                continue;
+            }
+
             // Check if a threshold is reached.
             for (AlertCondition alertCondition : streamService.getAlertConditions(stream)) {
                 try {
