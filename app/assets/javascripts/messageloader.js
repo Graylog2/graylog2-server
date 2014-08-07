@@ -46,7 +46,7 @@
             $.ajax({
                 url: appPrefixed(url + "/filtered"),
                 success: function(data) {
-                    showMessage(messageContainer, data.fields, data.id);
+                    showMessage(messageContainer, data.fields, data.id, data.index);
                     selector.hide();
                     messageContainer.show();
 
@@ -86,7 +86,7 @@
             element.hide();
         }
 
-        function showMessage(container, msg, messageid) {
+        function showMessage(container, msg, messageid, messageIndex) {
             var oldContainer = jQuery.data(container, "oldMessageContainer");
             if (oldContainer != undefined)
                 container.html(oldContainer);
@@ -108,6 +108,8 @@
             }
 
             placeHolders.remove();
+            container.attr("data-id", messageid);
+            container.attr("data-index", messageIndex);
             container.html(container.html().replace(/\{\{messageId\}\}/g, messageid));
         }
     };

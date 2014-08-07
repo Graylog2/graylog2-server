@@ -127,6 +127,7 @@ public class MessagesController extends AuthenticatedController {
 
             Map<String, Object> result = Maps.newHashMap();
             result.put("id", message.getId());
+            result.put("index", message.getIndex());
             if (filtered)
                 result.put("fields", message.getFilteredFields());
             else

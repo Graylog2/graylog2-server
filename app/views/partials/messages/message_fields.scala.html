@@ -1,0 +1,30 @@
+@(message: org.graylog2.restclient.models.api.results.MessageResult, sourceInput: org.graylog2.restclient.models.Input, sourceNode: org.graylog2.restclient.models.Node)
+@import org.graylog2.restclient.lib.Tools
+
+@for((key, value) <- message.getFormattedFields()) {
+    <dt>
+        <div class="btn-group message-field-dropdown">
+            <a data-toggle="dropdown" href="#" class="key">
+            @key
+            </a>
+
+            <ul class="dropdown-menu">
+                <li><a href="#" class="search-link" data-field="@key" data-value="@Tools.removeTrailingNewline(value)">Search for value</a></li>
+
+                @if(sourceNode != null && sourceInput != null) {
+                    <li class="dropdown-submenu">
+                        <a href="#">Create extractor</a>
+
+                        <ul class="dropdown-menu type-selector">
+                            <li><a href="@routes.ExtractorsController.newExtractor(sourceNode.getNodeId, sourceInput.getId, "regex", key, message.getIndex, message.getId)">Regular expression</a></li>
+                            <li><a href="@routes.ExtractorsController.newExtractor(sourceNode.getNodeId, sourceInput.getId, "substring", key, message.getIndex, message.getId)">Substring</a></li>
+                            <li><a href="@routes.ExtractorsController.newExtractor(sourceNode.getNodeId, sourceInput.getId, "split_and_index", key, message.getIndex, message.getId)">Split &amp; Index</a></li>
+                            <li><a href="@routes.ExtractorsController.newExtractor(sourceNode.getNodeId, sourceInput.getId, "copy_input", key, message.getIndex, message.getId)">Copy Input</a></li>
+                        </ul>
+                    </li>
+                }
+            </ul>
+        </div>
+    </dt>
+    <dd style="word-wrap: break-word;"><a href="#" data-field="@key" data-value="@Tools.optionalLongValue(Tools.removeTrailingNewline(message.getFields.get(key)))" class="search-link nolink">@Tools.orNbsp(Tools.removeTrailingNewline(value))</a></dd>
+}

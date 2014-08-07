@@ -135,6 +135,7 @@ public class InputsApiController extends AuthenticatedController {
 
             Map<String, Object> result = Maps.newHashMap();
             result.put("id", recentlyReceivedMessage.getId());
+            result.put("index", recentlyReceivedMessage.getIndex());
             if (filtered)
                 result.put("fields", recentlyReceivedMessage.getFilteredFields());
             else

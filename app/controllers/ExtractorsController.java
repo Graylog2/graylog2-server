@@ -30,6 +30,7 @@ import org.graylog2.restclient.lib.Version;
 import org.graylog2.restclient.models.*;
 import org.graylog2.restclient.models.api.requests.ExtractorImportRequest;
 import org.graylog2.restclient.models.api.requests.ExtractorListImportRequest;
+import org.graylog2.restclient.models.api.results.MessageResult;
 import play.Logger;
 import play.mvc.Result;
 
@@ -48,6 +49,8 @@ public class ExtractorsController extends AuthenticatedController {
     private ExtractorService extractorService;
     @Inject
     private Extractor.Factory extractorFactory;
+    @Inject
+    private MessagesService messagesService;
 
     public Result manage(String nodeId, String inputId) {
         try {
@@ -91,10 +94,12 @@ public class ExtractorsController extends AuthenticatedController {
         }
     }
 
-    public Result newExtractor(String nodeId, String inputId, String extractorType, String field, String example) {
+    public Result newExtractor(String nodeId, String inputId, String extractorType, String field, String exampleIndex, String exampleId) {
         try {
             Node node = nodeService.loadNode(nodeId);
             Input input = node.getInput(inputId);
+            MessageResult exampleMessage = messagesService.getMessage(exampleIndex, exampleId);
+            String example = (String) exampleMessage.getFields().get(field);
 
             return ok(views.html.system.inputs.extractors.new_extractor.render(
                     currentUser(),
