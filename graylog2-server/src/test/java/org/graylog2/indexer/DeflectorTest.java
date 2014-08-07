@@ -87,7 +87,7 @@ public class DeflectorTest {
 
     @Test
     public void testBuildDeflectorNameWithCustomIndexPrefix() {
-        assertEquals("foo_custom_index_deflector", Deflector.buildName("foo_custom_index"));
+        assertEquals("foo_custom_index_deflector", "foo_custom_index" + "_" + Deflector.DEFLECTOR_SUFFIX);
     }
 
     @Test

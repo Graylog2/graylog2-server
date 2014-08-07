@@ -92,7 +92,7 @@ public class FixDeflectorByMoveJob extends SystemJob {
             // Copy messages to new index.
             String newTarget = null;
             try {
-                newTarget = Deflector.buildIndexName(configuration.getElasticSearchIndexPrefix(), deflector.getNewestTargetNumber());
+                newTarget = deflector.getNewestTargetName();
 
                 LOG.info("Starting to move <{}> to <{}>.", deflector.getName(), newTarget);
                 indexer.indices().move(deflector.getName(), newTarget);

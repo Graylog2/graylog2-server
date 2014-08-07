@@ -315,7 +315,7 @@ public class Indexer {
 
         final BulkRequestBuilder request = client.prepareBulk();
         for (Message msg : messages) {
-            request.add(buildIndexRequest(Deflector.buildName(configuration.getElasticSearchIndexPrefix()),
+            request.add(buildIndexRequest(configuration.getElasticSearchIndexPrefix() + "_" + Deflector.DEFLECTOR_SUFFIX,
                                           msg.toElasticSearchObject(),
                                           msg.getId())); // Main index.
         }
