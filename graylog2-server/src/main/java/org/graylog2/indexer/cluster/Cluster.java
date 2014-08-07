@@ -75,7 +75,7 @@ public class Cluster {
     }
 
     private ClusterHealthResponse health() {
-        String[] indices = deflector.getAllDeflectorIndexNames(indexer);
+        String[] indices = deflector.getAllDeflectorIndexNames();
         return c.admin().cluster().health(new ClusterHealthRequest(indices)).actionGet();
     }
 

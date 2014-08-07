@@ -33,10 +33,7 @@ import java.util.Map;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertNotNull;
-import static org.testng.Assert.assertTrue;
-import static org.testng.Assert.fail;
+import static org.testng.Assert.*;
 import static org.testng.AssertJUnit.assertEquals;
 
 public class DeflectorTest {
@@ -50,7 +47,8 @@ public class DeflectorTest {
                 new Configuration(),
                 mock(ActivityWriter.class),
                 mock(RebuildIndexRangesJob.Factory.class),
-                mock(OptimizeIndexJob.Factory.class));
+                mock(OptimizeIndexJob.Factory.class),
+                mock(Indexer.class));
     }
 
     @Test
@@ -74,9 +72,17 @@ public class DeflectorTest {
 
     @Test
     public void testBuildIndexName() {
-        assertEquals("graylog2_0", Deflector.buildIndexName("graylog2", 0));
-        assertEquals("graylog2_1", Deflector.buildIndexName("graylog2", 1));
-        assertEquals("graylog2_9001", Deflector.buildIndexName("graylog2", 9001));
+
+        Deflector d = new Deflector(mock(SystemJobManager.class),
+                mock(Configuration.class),
+                mock(ActivityWriter.class),
+                mock(RebuildIndexRangesJob.Factory.class),
+                mock(OptimizeIndexJob.Factory.class),
+                mock(Indexer.class));
+
+        assertEquals("graylog2_0", d.buildIndexName("graylog2", 0));
+        assertEquals("graylog2_1", d.buildIndexName("graylog2", 1));
+        assertEquals("graylog2_9001", d.buildIndexName("graylog2", 9001));
     }
 
     @Test
@@ -86,11 +92,17 @@ public class DeflectorTest {
 
     @Test
     public void nullIndexerDoesNotThrow() {
+        Deflector d = new Deflector(mock(SystemJobManager.class),
+                                    mock(Configuration.class),
+                                    mock(ActivityWriter.class),
+                                    mock(RebuildIndexRangesJob.Factory.class),
+                                    mock(OptimizeIndexJob.Factory.class),
+                                    mock(Indexer.class));
         final Indexer indexer = mock(Indexer.class);
         when(indexer.indices()).thenReturn(null);
 
         try {
-            final Map<String, IndexStats> deflectorIndices = deflector.getAllDeflectorIndices(indexer);
+            final Map<String, IndexStats> deflectorIndices = d.getAllDeflectorIndices();
             assertNotNull(deflectorIndices);
             assertEquals(0, deflectorIndices.size());
         } catch (Exception e) {
@@ -100,11 +112,17 @@ public class DeflectorTest {
 
     @Test
     public void nullIndexerDoesNotThrowOnIndexName() {
+        Deflector d = new Deflector(mock(SystemJobManager.class),
+                                    mock(Configuration.class),
+                                    mock(ActivityWriter.class),
+                                    mock(RebuildIndexRangesJob.Factory.class),
+                                    mock(OptimizeIndexJob.Factory.class),
+                                    mock(Indexer.class));
         final Indexer indexer = mock(Indexer.class);
         when(indexer.indices()).thenReturn(null);
 
         try {
-            final String[] deflectorIndices = deflector.getAllDeflectorIndexNames(indexer);
+            final String[] deflectorIndices = d.getAllDeflectorIndexNames();
             assertNotNull(deflectorIndices);
             assertEquals(0, deflectorIndices.length);
         } catch (Exception e) {

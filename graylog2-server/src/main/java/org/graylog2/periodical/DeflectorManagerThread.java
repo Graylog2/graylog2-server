@@ -83,7 +83,7 @@ public class DeflectorManagerThread extends Periodical { // public class Klimper
         long messageCountInTarget = 0;
         
         try {
-            currentTarget = deflector.getNewestTargetName(indexer);
+            currentTarget = deflector.getNewestTargetName();
             messageCountInTarget = indexer.indices().numberOfMessages(currentTarget);
         } catch(Exception e) {
             LOG.error("Tried to check for number of messages in current deflector target but did not find index. Aborting.", e);
@@ -94,7 +94,7 @@ public class DeflectorManagerThread extends Periodical { // public class Klimper
             LOG.info("Number of messages in <{}> ({}) is higher than the limit ({}). Pointing deflector to new index now!",
                      currentTarget, messageCountInTarget,
                      configuration.getElasticSearchMaxDocsPerIndex());
-            deflector.cycle(indexer);
+            deflector.cycle();
         } else {
             LOG.debug("Number of messages in <{}> ({}) is lower than the limit ({}). Not doing anything.",
                       currentTarget,messageCountInTarget,
@@ -103,7 +103,7 @@ public class DeflectorManagerThread extends Periodical { // public class Klimper
     }
 
     private void checkAndRepair() {
-        if (!deflector.isUp(indexer)) {
+        if (!deflector.isUp()) {
             if (indexer.indices().exists(deflector.getName())) {
                 // Publish a notification if there is an *index* called graylog2_deflector
                 Notification notification = notificationService.buildNow()
@@ -114,19 +114,19 @@ public class DeflectorManagerThread extends Periodical { // public class Klimper
                     LOG.warn("There is an index called [" + deflector.getName() + "]. Cannot fix this automatically and published a notification.");
                 }
             } else {
-                deflector.setUp(indexer);
+                deflector.setUp();
             }
         } else {
             try {
-                String currentTarget = deflector.getCurrentActualTargetIndex(indexer);
-                String shouldBeTarget = deflector.getNewestTargetName(indexer);
+                String currentTarget = deflector.getCurrentActualTargetIndex();
+                String shouldBeTarget = deflector.getNewestTargetName();
 
                 if (!currentTarget.equals(shouldBeTarget)) {
                     String msg = "Deflector is pointing to [" + currentTarget + "], not the newest one: [" + shouldBeTarget + "]. Re-pointing.";
                     LOG.warn(msg);
                     activityWriter.write(new Activity(msg, DeflectorManagerThread.class));
 
-                    deflector.pointTo(indexer, shouldBeTarget, currentTarget);
+                    deflector.pointTo(shouldBeTarget, currentTarget);
                 }
             } catch (NoTargetIndexException e) {
                 LOG.warn("Deflector is not up. Not trying to point to another index.");

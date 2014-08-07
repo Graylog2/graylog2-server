@@ -96,7 +96,7 @@ public class RebuildIndexRangesJob extends SystemJob {
         List<Map<String, Object>> ranges = Lists.newArrayList();
         info("Re-calculating index ranges.");
 
-        String[] indices = deflector.getAllDeflectorIndexNames(indexer);
+        String[] indices = deflector.getAllDeflectorIndexNames();
         if (indices == null || indices.length == 0) {
             info("No indices, nothing to calculate.");
             return;
@@ -116,7 +116,7 @@ public class RebuildIndexRangesJob extends SystemJob {
             } catch (EmptyIndexException e) {
                 // if the empty index happens to be the current deflector target, do not skip the index range.
                 // newly created indices have a high likelihood of being empty).
-                if (deflector.getCurrentActualTargetIndex(indexer).equals(index)) {
+                if (deflector.getCurrentActualTargetIndex().equals(index)) {
                     LOG.info("Index [{}] is empty but it is the current deflector target. Inserting dummy index range.", index);
                     Map<String, Object> deflectorIndexRange = Maps.newHashMap();
                     deflectorIndexRange.put("index", index);

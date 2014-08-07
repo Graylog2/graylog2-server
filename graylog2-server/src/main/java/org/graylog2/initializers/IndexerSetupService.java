@@ -70,7 +70,7 @@ public class IndexerSetupService extends AbstractIdleService {
         }
 
         LOG.debug("Setting up deflector");
-        deflector.setUp(indexer);
+        deflector.setUp();
     }
 
     @Override

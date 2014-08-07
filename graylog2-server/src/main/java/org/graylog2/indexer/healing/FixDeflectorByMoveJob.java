@@ -72,7 +72,7 @@ public class FixDeflectorByMoveJob extends SystemJob {
 
     @Override
     public void execute() {
-        if (deflector.isUp(indexer) || !indexer.indices().exists(deflector.getName())) {
+        if (deflector.isUp() || !indexer.indices().exists(deflector.getName())) {
             LOG.error("There is no index <{}>. No need to run this job. Aborting.", deflector.getName());
             return;
         }
@@ -92,7 +92,7 @@ public class FixDeflectorByMoveJob extends SystemJob {
             // Copy messages to new index.
             String newTarget = null;
             try {
-                newTarget = Deflector.buildIndexName(configuration.getElasticSearchIndexPrefix(), deflector.getNewestTargetNumber(indexer));
+                newTarget = Deflector.buildIndexName(configuration.getElasticSearchIndexPrefix(), deflector.getNewestTargetNumber());
 
                 LOG.info("Starting to move <{}> to <{}>.", deflector.getName(), newTarget);
                 indexer.indices().move(deflector.getName(), newTarget);
@@ -114,7 +114,7 @@ public class FixDeflectorByMoveJob extends SystemJob {
             progress = 90;
 
             // Set up deflector.
-            deflector.setUp(indexer);
+            deflector.setUp();
             progress = 95;
         } finally {
             // Start message processing again.

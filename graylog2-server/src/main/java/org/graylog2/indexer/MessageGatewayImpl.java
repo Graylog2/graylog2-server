@@ -64,7 +64,7 @@ public class MessageGatewayImpl implements MessageGateway {
     private int countOnAllIndices(QueryBuilder qb) {
        CountRequestBuilder b = indexer.getClient().prepareCount();
         
-        b.setIndices(deflector.getAllDeflectorIndexNames(indexer));
+        b.setIndices(deflector.getAllDeflectorIndexNames());
         b.setQuery(qb);
         
         ActionFuture<CountResponse> future = indexer.getClient().count(b.request());

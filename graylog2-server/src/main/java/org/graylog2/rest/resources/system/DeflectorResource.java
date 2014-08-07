@@ -74,8 +74,8 @@ public class DeflectorResource extends RestResource {
     public Response deflector() {
         Map<String, Object> result = Maps.newHashMap();
 
-        result.put("is_up", deflector.isUp(indexer));
-        result.put("current_target", deflector.getCurrentActualTargetIndex(indexer));
+        result.put("is_up", deflector.isUp());
+        result.put("current_target", deflector.getCurrentActualTargetIndex());
 
         return Response.ok().entity(json(result)).build();
     }
@@ -107,7 +107,7 @@ public class DeflectorResource extends RestResource {
         LOG.info(msg);
         activityWriter.write(new Activity(msg, DeflectorResource.class));
 
-        deflector.cycle(indexer);
+        deflector.cycle();
         return Response.ok().build();
     }
 }
