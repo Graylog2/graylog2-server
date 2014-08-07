@@ -49,8 +49,15 @@ public class IndexerClusterCheckerThread extends Periodical {
 
     @Override
     public void doRun() {
-        if (!notificationService.isFirst(Notification.Type.ES_OPEN_FILES))
+        if (!notificationService.isFirst(Notification.Type.ES_OPEN_FILES)) {
             return;
+        }
+
+        if(null == indexer.cluster()) {
+            LOG.info("Indexer not fully initialized yet. Skipping periodic cluster check.");
+            return;
+        }
+
         boolean allHigher = true;
         for (NodeInfo node : indexer.cluster().getDataNodes()) {
             // Check number of maximum open files.
@@ -70,6 +77,7 @@ public class IndexerClusterCheckerThread extends Periodical {
                 allHigher = false;
             }
         }
+
         if (allHigher) {
             Notification notification = notificationService.build().addType(Notification.Type.ES_OPEN_FILES);
             notificationService.fixed(notification);
