@@ -35,6 +35,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
@@ -45,9 +46,9 @@ public class InputSetupService extends AbstractExecutionThreadService {
     private final InputRegistry inputRegistry;
     private final EventBus eventBus;
 
-    private CountDownLatch startLatch = new CountDownLatch(1);
-    private CountDownLatch stopLatch = new CountDownLatch(1);
-    private Lifecycle previousLifecycle;
+    private final CountDownLatch startLatch = new CountDownLatch(1);
+    private final CountDownLatch stopLatch = new CountDownLatch(1);
+    private AtomicReference<Lifecycle> previousLifecycle = new AtomicReference<>(Lifecycle.UNINITIALIZED);
 
     @Inject
     public InputSetupService(InputRegistry inputRegistry, EventBus eventBus) {
@@ -66,8 +67,8 @@ public class InputSetupService extends AbstractExecutionThreadService {
         // if we switch to RUNNING from STARTING (or unknown) the server is ready to accept connections on inputs.
         // we want to postpone opening the inputs earlier, so we don't get swamped with messages before
         // we can actually process them.
-        if ((lifecycle == Lifecycle.RUNNING) && (previousLifecycle == Lifecycle.STARTING || previousLifecycle == null)) {
-            LOG.info("Triggering launching persisted inputs, node transitioned from {} to {}", previousLifecycle, lifecycle);
+        if ((lifecycle == Lifecycle.RUNNING) && (previousLifecycle.get() == Lifecycle.STARTING || previousLifecycle.get() == Lifecycle.UNINITIALIZED)) {
+            LOG.info("Triggering launching persisted inputs, node transitioned from {} to {}", previousLifecycle.get(), lifecycle);
             startLatch.countDown();
         }
 
@@ -76,7 +77,7 @@ public class InputSetupService extends AbstractExecutionThreadService {
             startLatch.countDown();
         }
 
-        previousLifecycle = lifecycle;
+        previousLifecycle.set(lifecycle);
     }
 
     @Override
@@ -85,7 +86,7 @@ public class InputSetupService extends AbstractExecutionThreadService {
         LOG.debug("Delaying lauching persisted inputs until the node is in RUNNING state.");
         Uninterruptibles.awaitUninterruptibly(startLatch);
 
-        if (previousLifecycle == Lifecycle.RUNNING) {
+        if (previousLifecycle.get() == Lifecycle.RUNNING) {
             LOG.debug("Launching persisted inputs now.");
             inputRegistry.launchAllPersisted();
         }
