@@ -47,7 +47,6 @@ import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.node.Node;
 import org.elasticsearch.node.NodeBuilder;
 import org.graylog2.Configuration;
-import org.graylog2.StartupException;
 import org.graylog2.UI;
 import org.graylog2.indexer.cluster.Cluster;
 import org.graylog2.indexer.counts.Counts;
@@ -226,6 +225,8 @@ public class Indexer {
         settings.put("node.name", conf.getEsNodeName());
         settings.put("node.master", Boolean.toString(conf.isEsIsMasterEligible()));
         settings.put("node.data", Boolean.toString(conf.isEsStoreData()));
+
+        settings.put("action.auto_create_index", Boolean.toString(false));
 
         settings.put("http.enabled", Boolean.toString(conf.isEsIsHttpEnabled()));
         settings.put("transport.tcp.port", String.valueOf(conf.getEsTransportTcpPort()));

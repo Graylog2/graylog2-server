@@ -84,6 +84,7 @@ public class IndexerTest {
         assertEquals(defaultConfig.getEsInitialStateTimeout(), nodeSettings.get("discovery.initial_state_timeout"));
         assertEquals(Boolean.toString(defaultConfig.isEsMulticastDiscovery()),
                      nodeSettings.get("discovery.zen.ping.multicast.enabled"));
+        assertEquals(Boolean.toString(false), nodeSettings.get("action.auto_create_index"));
 
     }
 
@@ -115,6 +116,7 @@ public class IndexerTest {
                     "discovery.initial_state_timeout",
                     "elasticsearch_discovery_initial_state_timeout",
                     "5s");
+        esPropNames.put("action.auto_create_index", "false");
 
         Configuration config = setupConfig(settings);
 
