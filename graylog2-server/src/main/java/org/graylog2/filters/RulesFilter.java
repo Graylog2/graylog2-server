@@ -96,9 +96,8 @@ public class RulesFilter implements MessageFilter {
             return false;
         }
 
-        if (!filters.isEmpty()) {
-            privateSession.evaluate(msg, true);
-        }
+        // Always run the rules engine to make sure rules from the external rules file will be run.
+        privateSession.evaluate(msg, true);
 
         // false if not explicitly set to true in the rules.
         return msg.getFilterOut();
