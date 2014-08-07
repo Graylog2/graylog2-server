@@ -61,8 +61,7 @@ public class Configuration {
                         LOG.error("Cannot handle type [{}] of plugin configuration key <{}>.", e.getValue().getClass().getCanonicalName(), e.getKey());
                     }
                 } catch(Exception ex) {
-                    LOG.warn("Could not read input configuration key <{}>. Skipping.", e.getKey(), ex);
-                    continue;
+                    LOG.warn("Could not read input configuration key <" + e.getKey() + ">. Skipping.", ex);
                 }
             }
         }

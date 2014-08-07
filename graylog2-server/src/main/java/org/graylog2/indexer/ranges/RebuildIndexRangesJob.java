@@ -127,8 +127,8 @@ public class RebuildIndexRangesJob extends SystemJob {
                 } else {
                     LOG.info("Index [{}] is empty. Not calculating ranges.", index);
                 }
-            } catch (Exception e1) {
-                LOG.info("Could not calculate range of index [{}]. Skipping.", index, e1);
+            } catch (Exception e) {
+                LOG.info("Could not calculate range of index [" + index + "]. Skipping.", e);
             } finally {
                 indicesCalculated++;
             }

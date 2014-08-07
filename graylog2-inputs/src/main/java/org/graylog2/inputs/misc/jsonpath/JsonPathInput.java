@@ -100,7 +100,7 @@ public class JsonPathInput extends MessageInput {
 
                         json = collector.getJson();
                     } catch(Exception e) {
-                        LOG.error("Could not fetch JSON for JsonPathInput <{}>.", getId(), e);
+                        LOG.error("Could not fetch JSON for JsonPathInput <" + getId() + ">.", e);
                         return;
                     }
 
@@ -116,7 +116,7 @@ public class JsonPathInput extends MessageInput {
                     // Add to buffer.
                     processBuffer.insertCached(m, parentInput);
                 } catch(Exception e) {
-                    LOG.error("Could not run collector for JsonPathInput <{}>.", getId(), e);
+                    LOG.error("Could not run collector for JsonPathInput <" + getId() + ">.", e);
                 }
             }
         };

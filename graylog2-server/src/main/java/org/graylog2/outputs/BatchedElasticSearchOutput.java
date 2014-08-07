@@ -89,7 +89,7 @@ public class BatchedElasticSearchOutput extends ElasticSearchOutput {
             this.batchSize.update(mybuffer.size());
             this.bufferFlushes.mark();
         } catch (Exception e) {
-            LOG.error("Unable to flush message buffer: {} - {}", e, e.getStackTrace());
+            LOG.error("Unable to flush message buffer", e);
         }
         LOG.debug("[{}] Flushing {} messages completed", Thread.currentThread(), mybuffer.size());
     }

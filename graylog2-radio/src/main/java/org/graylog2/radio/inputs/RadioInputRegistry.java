@@ -216,7 +216,7 @@ public class RadioInputRegistry extends InputRegistry {
                 if (response != null)
                     input.setPersistId(response.persistId);
             } catch (Exception e) {
-                LOG.error("Could not register input in Graylog2 cluster. It will be lost on next restart of this radio node.");
+                LOG.error("Could not register input in Graylog2 cluster. It will be lost on next restart of this radio node.", e);
                 return null;
             }
         }

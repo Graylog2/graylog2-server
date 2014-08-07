@@ -128,7 +128,7 @@ public class MasterCacheWorkerThread extends Periodical {
                     }
                 }
             } catch(Exception e) {
-                LOG.error("Error while trying to work on MasterCache <{}>.", cacheName, e);
+                LOG.error("Error while trying to work on MasterCache <" + cacheName + ">.", e);
                 Uninterruptibles.sleepUninterruptibly(1, TimeUnit.SECONDS);
             }
 

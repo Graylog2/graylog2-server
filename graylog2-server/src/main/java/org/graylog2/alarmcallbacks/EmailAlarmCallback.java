@@ -24,7 +24,6 @@ import com.google.inject.Inject;
 import org.graylog2.alerts.AlertSender;
 import org.graylog2.alerts.FormattedEmailAlertSender;
 import org.graylog2.notifications.Notification;
-import org.graylog2.notifications.NotificationImpl;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.alarms.AlertCondition;
@@ -102,7 +101,7 @@ public class EmailAlarmCallback implements AlarmCallback {
                         .addDetail("stream_id", stream.getId())
                         .addDetail("exception", e.toString() + " (" + e.getCause().toString() + "");
                 notificationService.publishIfFirst(notification);
-                LOG.error("Stream [{}] has alert receivers and is triggered, but sending emails failed", stream, e);
+                LOG.error("Stream [" + stream + "] has alert receivers and is triggered, but sending emails failed", e);
             }
         }
     }
