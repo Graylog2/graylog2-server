@@ -43,7 +43,7 @@ public class GelfOutput implements MessageOutput {
             isRunning.set(false);
             gelfSender.close();
         } catch (Exception e) {
-            LOG.error("Error closing {}", gelfSender.getClass().getName(), e);
+            LOG.error("Error closing " + gelfSender.getClass().getName(), e);
         }
     }
 
