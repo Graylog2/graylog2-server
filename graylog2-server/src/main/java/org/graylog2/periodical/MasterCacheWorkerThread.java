@@ -21,6 +21,7 @@ package org.graylog2.periodical;
 
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
+import com.google.common.util.concurrent.Uninterruptibles;
 import com.google.inject.Inject;
 import org.graylog2.buffers.OutputBuffer;
 import org.graylog2.inputs.Cache;
@@ -34,6 +35,8 @@ import org.graylog2.shared.ServerStatus;
 import org.graylog2.shared.buffers.ProcessBuffer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.concurrent.TimeUnit;
 
 import static com.codahale.metrics.MetricRegistry.name;
 
@@ -126,14 +129,10 @@ public class MasterCacheWorkerThread extends Periodical {
                 }
             } catch(Exception e) {
                 LOG.error("Error while trying to work on MasterCache <{}>.", cacheName, e);
-                try {
-                    Thread.sleep(1000);
-                } catch(InterruptedException ex) { /* */ }
+                Uninterruptibles.sleepUninterruptibly(1, TimeUnit.SECONDS);
             }
 
-            try {
-                Thread.sleep(100);
-            } catch(InterruptedException ex) { /* */ }
+            Uninterruptibles.sleepUninterruptibly(100, TimeUnit.MILLISECONDS);
         }
     }
 

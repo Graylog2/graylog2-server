@@ -179,7 +179,7 @@ public class Consumer {
                     try {
                         LOG.error("AMQP connection lost! Trying reconnect in 1 second.");
 
-                        Thread.sleep(1000);
+                        Uninterruptibles.sleepUninterruptibly(1, TimeUnit.SECONDS);
 
                         connect();
 
@@ -191,7 +191,6 @@ public class Consumer {
                         break;
                     } catch(IOException e) {
                         LOG.error("Could not re-connect to AMQP broker.", e);
-                    } catch(InterruptedException ignored) {
                     }
                 }
             }

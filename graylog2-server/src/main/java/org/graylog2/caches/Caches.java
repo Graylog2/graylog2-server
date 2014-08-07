@@ -18,12 +18,15 @@
  */
 package org.graylog2.caches;
 
+import com.google.common.util.concurrent.Uninterruptibles;
 import com.google.inject.Inject;
 import org.graylog2.inputs.Cache;
 import org.graylog2.inputs.InputCache;
 import org.graylog2.inputs.OutputCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
@@ -52,10 +55,8 @@ public class Caches {
                 LOG.info("Waited for {} seconds, giving up.", tries);
                 return;
             }
-            try {
-                LOG.info("Not all caches are empty. Waiting another second. ({}imc/{}omc)", inputCache.size(), outputCache.size());
-                Thread.sleep(1000);
-            } catch (InterruptedException e) { /* */ }
+            LOG.info("Not all caches are empty. Waiting another second. ({}imc/{}omc)", inputCache.size(), outputCache.size());
+            Uninterruptibles.sleepUninterruptibly(1, TimeUnit.SECONDS);
         }
 
         LOG.info("All caches are empty. Continuing.");

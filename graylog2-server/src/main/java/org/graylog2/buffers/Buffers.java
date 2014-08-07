@@ -18,11 +18,13 @@
  */
 package org.graylog2.buffers;
 
+import com.google.common.util.concurrent.Uninterruptibles;
 import org.graylog2.shared.buffers.ProcessBuffer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
@@ -51,10 +53,9 @@ public class Buffers {
                 LOG.info("Waited for {} seconds, giving up.", tries);
                 return;
             }
-            try {
-                LOG.info("Not all buffers are empty. Waiting another second. ({}p/{}o)", processBuffer.getUsage(), outputBuffer.getUsage());
-                Thread.sleep(1000);
-            } catch (InterruptedException e) { /* */ }
+
+            LOG.info("Not all buffers are empty. Waiting another second. ({}p/{}o)", processBuffer.getUsage(), outputBuffer.getUsage());
+            Uninterruptibles.sleepUninterruptibly(1, TimeUnit.SECONDS);
         }
 
         LOG.info("All buffers are empty. Continuing.");
