@@ -89,6 +89,7 @@
         <drools.version>6.1.0.Final</drools.version>
         <slf4j.version>1.7.5</slf4j.version>
         <mongojack.version>2.1.0</mongojack.version>
+        <findbugs.version>3.0.0</findbugs.version>
     </properties>
 
     <repositories>
@@ -623,7 +624,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>findbugs-maven-plugin</artifactId>
-                <version>2.5.2</version>
+                <version>${findbugs.version}</version>
                 <configuration>
                     <effort>Max</effort>
                     <threshold>Default</threshold>
