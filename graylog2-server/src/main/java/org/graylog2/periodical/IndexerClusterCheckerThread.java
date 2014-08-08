@@ -46,6 +46,13 @@ public class IndexerClusterCheckerThread extends Periodical {
             return;
         }
 
+        try {
+            cluster.getHealth();
+        } catch (Exception e) {
+            LOG.info("Indexer not fully initialized yet. Skipping periodic cluster check.");
+            return;
+        }
+
         boolean allHigher = true;
         for (NodeInfo node : cluster.getDataNodes()) {
             // Check number of maximum open files.
