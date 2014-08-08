@@ -122,7 +122,7 @@ public class Indices implements IndexManagement {
                 BulkResponse response = c.bulk(request.request()).actionGet();
 
                 LOG.info("Moving index <{}> to <{}>: Bulk indexed {} messages, took {} ms, failures: {}",
-                        new Object[] { source, target, response.getItems().length, response.getTookInMillis(), response.hasFailures() });
+                        source, target, response.getItems().length, response.getTookInMillis(), response.hasFailures());
 
                 if (response.hasFailures()) {
                     throw new RuntimeException("Failed to move a message. Check your indexer log.");
@@ -243,8 +243,7 @@ public class Indices implements IndexManagement {
 
                 fields.addAll(mapping.keySet());
             } catch(Exception e) {
-                LOG.error("Error while trying to get fields of <{}>", m.index, e);
-                continue;
+                LOG.error("Error while trying to get fields of <" + m.index + ">", e);
             }
         }
 

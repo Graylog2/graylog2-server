@@ -329,9 +329,9 @@ public class ExtractorsResource extends RestResource {
             try {
                 converters.add(ConverterFactory.factory(Converter.Type.valueOf(c.getKey().toUpperCase()), c.getValue()));
             } catch (ConverterFactory.NoSuchConverterException e) {
-                LOG.warn("No such converter [{}]. Skipping.", c.getKey(), e);
-            } catch (ConfigurationException e1) {
-                LOG.warn("Missing configuration for [{}]. Skipping.", c.getKey(), e1);
+                LOG.warn("No such converter [" + c.getKey() + "]. Skipping.", e);
+            } catch (ConfigurationException e) {
+                LOG.warn("Missing configuration for [" + c.getKey() + "]. Skipping.", e);
             }
         }
 

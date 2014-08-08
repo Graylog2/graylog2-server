@@ -62,7 +62,7 @@ public class Initializers {
                 i.initialize(new HashMap<String, String>());
                 LOG.info("Initialized initializer <{}>.", i.getClass().getCanonicalName());
             } catch (InitializerConfigurationException e) {
-                LOG.error("Could not initialize initializer <{}>", i.getClass().getCanonicalName(), e);
+                LOG.error("Could not initialize initializer <" + i.getClass().getCanonicalName() + ">", e);
             }
         }
     }

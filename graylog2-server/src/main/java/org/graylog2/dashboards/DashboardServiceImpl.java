@@ -82,13 +82,13 @@ public class DashboardServiceImpl extends PersistedServiceImpl implements Dashbo
                     try {
                         widget = DashboardWidget.fromPersisted(metricRegistry, indexer, widgetFields);
                     } catch (DashboardWidget.NoSuchWidgetTypeException e) {
-                        LOG.error("No such widget type: [{}] - Dashboard: [" + dashboard.getId() + "]", widgetFields.get("type"), e);
+                        LOG.error("No such widget type: [" + widgetFields.get("type") + "] - Dashboard: [" + dashboard.getId() + "]", e);
                         continue;
                     } catch (InvalidRangeParametersException e) {
-                        LOG.error("Invalid range parameters of widget in dashboard: [{}]", dashboard.getId(), e);
+                        LOG.error("Invalid range parameters of widget in dashboard: [" + dashboard.getId() + "]", e);
                         continue;
                     } catch (InvalidWidgetConfigurationException e) {
-                        LOG.error("Invalid configuration of widget in dashboard: [{}]", dashboard.getId(), e);
+                        LOG.error("Invalid configuration of widget in dashboard: [" + dashboard.getId() + "]", e);
                         continue;
                     }
                     dashboard.addPersistedWidget(widget);

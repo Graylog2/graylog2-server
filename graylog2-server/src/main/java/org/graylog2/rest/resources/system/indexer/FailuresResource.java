@@ -65,7 +65,7 @@ public class FailuresResource extends RestResource {
         try {
             sinceDate = DateTime.parse(since);
         } catch(IllegalArgumentException e) {
-            LOG.error("Invalid date parameter provided: [{}]", since, e);
+            LOG.error("Invalid date parameter provided: [" + since + "]", e);
             throw new WebApplicationException(400);
         }
 
