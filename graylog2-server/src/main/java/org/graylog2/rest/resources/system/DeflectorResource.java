@@ -22,7 +22,6 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.Configuration;
 import org.graylog2.indexer.Deflector;
-import org.graylog2.indexer.Indexer;
 import org.graylog2.rest.documentation.annotations.Api;
 import org.graylog2.rest.documentation.annotations.ApiOperation;
 import org.graylog2.rest.resources.RestResource;
@@ -52,17 +51,14 @@ public class DeflectorResource extends RestResource {
     private static final Logger LOG = LoggerFactory.getLogger(DeflectorResource.class);
     
     private final Deflector deflector;
-    private final Indexer indexer;
     private final ActivityWriter activityWriter;
     private final Configuration configuration;
 
     @Inject
     public DeflectorResource(Deflector deflector,
-                             Indexer indexer,
                              ActivityWriter activityWriter,
                              Configuration configuration) {
         this.deflector = deflector;
-        this.indexer = indexer;
         this.activityWriter = activityWriter;
         this.configuration = configuration;
     }

@@ -17,23 +17,18 @@
 package org.graylog2.rest.resources.system.indexer;
 
 import com.codahale.metrics.annotation.Timed;
+import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Sets;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.elasticsearch.action.admin.cluster.node.info.NodeInfo;
 import org.elasticsearch.action.admin.cluster.node.info.NodesInfoRequest;
-import org.elasticsearch.action.admin.cluster.state.ClusterStateRequest;
-import org.elasticsearch.action.admin.indices.close.CloseIndexRequest;
-import org.elasticsearch.action.admin.indices.open.OpenIndexRequest;
-import org.elasticsearch.action.admin.indices.settings.UpdateSettingsRequest;
-import org.elasticsearch.action.admin.indices.stats.*;
-import org.elasticsearch.cluster.ClusterState;
-import org.elasticsearch.cluster.metadata.IndexMetaData;
+import org.elasticsearch.action.admin.indices.stats.CommonStats;
 import org.elasticsearch.cluster.routing.ShardRouting;
-import org.graylog2.Configuration;
 import org.graylog2.indexer.Deflector;
-import org.graylog2.indexer.Indexer;
+import org.graylog2.indexer.cluster.Cluster;
+import org.graylog2.indexer.indices.IndexStatistics;
+import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.ranges.RebuildIndexRangesJob;
 import org.graylog2.rest.documentation.annotations.*;
 import org.graylog2.rest.resources.RestResource;
@@ -48,7 +43,6 @@ import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -63,13 +57,13 @@ public class IndicesResource extends RestResource {
     @Inject
     private RebuildIndexRangesJob.Factory rebuildIndexRangesJobFactory;
     @Inject
-    private Indexer indexer;
+    private Indices indices;
+    @Inject
+    private Cluster cluster;
     @Inject
     private Deflector deflector;
     @Inject
     private SystemJobManager systemJobManager;
-    @Inject
-    private Configuration configuration;
 
     @GET
     @Timed
@@ -87,23 +81,21 @@ public class IndicesResource extends RestResource {
         final ImmutableMap.Builder<String, Object> result = ImmutableMap.builder();
 
         try {
-            final IndicesStatsResponse indicesStatsResponse = indexer.getClient().admin().indices().stats(new IndicesStatsRequest().all()).get();
-            final IndexStats indexStats = indicesStatsResponse.getIndex(index);
-
-            if (indexStats == null) {
-                LOG.warn("Index [{}] not found.", index);
-                return Response.status(Response.Status.NOT_FOUND).build();
+            final IndexStatistics stats = indices.getIndexStats(index);
+            if (stats == null) {
+                LOG.error("Index [{}] not found.", index);
+                return Response.status(404).build();
             }
 
             final ImmutableList.Builder<Map<String, Object>> routing = ImmutableList.builder();
-            for (ShardStats shardStats : indexStats.getShards()) {
-                routing.add(shardRouting(shardStats.getShardRouting()));
+            for (ShardRouting shardRouting : stats.getShardRoutings()) {
+                routing.add(shardRouting(shardRouting));
             }
 
-            result.put("primary_shards", indexStats(indexStats.getPrimaries()));
-            result.put("all_shards", indexStats(indexStats.getTotal()));
+            result.put("primary_shards", indexStats(stats.getPrimaries()));
+            result.put("all_shards", indexStats(stats.getTotal()));
             result.put("routing", routing.build());
-            result.put("is_reopened", indexer.indices().isReopened(index));
+            result.put("is_reopened", indices.isReopened(index));
         } catch (Exception e) {
             LOG.error("Could not get indices information.", e);
             return Response.serverError().build();
@@ -118,38 +110,21 @@ public class IndicesResource extends RestResource {
     @ApiOperation(value = "Get a list of closed indices that can be reopened.")
     @Produces(MediaType.APPLICATION_JSON)
     public Response closed() {
-        final ImmutableSet.Builder<String> closedIndicesBuilder = ImmutableSet.builder();
-
+        Set<String> closedIndices;
         try {
-            // Get a list of all indices and select those that are closed. This is only possible via metadata.
-            final ClusterStateRequest csr = new ClusterStateRequest()
-                    .filterNodes(true)
-                    .filterRoutingTable(true)
-                    .filterBlocks(true)
-                    .filterMetaData(false);
-            final ClusterState state = indexer.getClient().admin().cluster().state(csr).actionGet().getState();
 
-            final Iterator<IndexMetaData> it = state.getMetaData().getIndices().valuesIt();
-            while (it.hasNext()) {
-                final IndexMetaData indexMeta = it.next();
+            closedIndices = Sets.filter(indices.getClosedIndices(), new Predicate<String>() {
+                @Override
+                public boolean apply(String indexName) {
+                    return isPermitted(RestPermissions.INDICES_READ, indexName);
+                }
+            });
 
-                // Only search in our indices.
-                if (!deflector.isGraylog2Index(indexMeta.getIndex())) {
-                    continue;
-                }
-                if (!isPermitted(RestPermissions.INDICES_READ, indexMeta.getIndex())) {
-                    continue;
-                }
-                if (indexMeta.getState().equals(IndexMetaData.State.CLOSE)) {
-                    closedIndicesBuilder.add(indexMeta.getIndex());
-                }
-            }
         } catch (Exception e) {
             LOG.error("Could not get closed indices.", e);
             return Response.serverError().build();
         }
 
-        final Set<String> closedIndices = closedIndicesBuilder.build();
         final Map<String, Object> result = ImmutableMap.of(
                 "indices", closedIndices,
                 "total", closedIndices.size());
@@ -170,13 +145,7 @@ public class IndicesResource extends RestResource {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
 
-        // Mark this index as re-opened. It will never be touched by retention.
-        final UpdateSettingsRequest settings = new UpdateSettingsRequest(index);
-        settings.settings(ImmutableMap.of("graylog2_reopened", true));
-        indexer.getClient().admin().indices().updateSettings(settings).actionGet();
-
-        // Open index.
-        indexer.getClient().admin().indices().open(new OpenIndexRequest(index)).actionGet();
+        indices.reopenIndex(index);
 
         // Trigger index ranges rebuild job.
         final SystemJob rebuildJob = rebuildIndexRangesJobFactory.create(deflector);
@@ -211,7 +180,7 @@ public class IndicesResource extends RestResource {
         }
 
         // Close index.
-        indexer.getClient().admin().indices().close(new CloseIndexRequest(index)).actionGet();
+        indices.close(index);
 
         // Trigger index ranges rebuild job.
         final SystemJob rebuildJob = rebuildIndexRangesJobFactory.create(deflector);
@@ -246,7 +215,7 @@ public class IndicesResource extends RestResource {
         }
 
         // Delete index.
-        indexer.indices().delete(index);
+        indices.delete(index);
 
         // Trigger index ranges rebuild job.
         final SystemJob rebuildJob = rebuildIndexRangesJobFactory.create(deflector);
@@ -268,8 +237,8 @@ public class IndicesResource extends RestResource {
         result.put("active", route.active());
         result.put("primary", route.primary());
         result.put("node_id", route.currentNodeId());
-        result.put("node_name", translateESNodeIdToName(route.currentNodeId()));
-        result.put("node_hostname", translateESNodeIdToHostname(route.currentNodeId()));
+        result.put("node_name", cluster.nodeIdToName(route.currentNodeId()));
+        result.put("node_hostname", cluster.nodeIdToHostName(route.currentNodeId()));
         result.put("relocating_to", nullToEmpty(route.relocatingNodeId()));
 
         return result.build();
@@ -325,21 +294,4 @@ public class IndicesResource extends RestResource {
         return result.build();
     }
 
-    private String translateESNodeIdToName(String id) {
-        final NodeInfo[] result = indexer.getClient().admin().cluster().nodesInfo(new NodesInfoRequest(id)).actionGet().getNodes();
-        if (result == null || result.length == 0) {
-            return "unknown";
-        }
-
-        return result[0].getNode().getName();
-    }
-
-    private String translateESNodeIdToHostname(String id) {
-        final NodeInfo[] result = indexer.getClient().admin().cluster().nodesInfo(new NodesInfoRequest(id)).actionGet().getNodes();
-        if (result == null || result.length == 0) {
-            return "unknown";
-        }
-
-        return result[0].getHostname();
-    }
 }

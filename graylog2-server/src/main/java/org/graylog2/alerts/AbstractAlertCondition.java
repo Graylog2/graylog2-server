@@ -17,7 +17,6 @@
 package org.graylog2.alerts;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.graylog2.indexer.Indexer;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.alarms.AlertCondition;
 import org.graylog2.plugin.database.EmbeddedPersistable;
@@ -70,7 +69,7 @@ public abstract class AbstractAlertCondition implements EmbeddedPersistable, Ale
 
     }
 
-    protected abstract CheckResult runCheck(Indexer indexer);
+    protected abstract CheckResult runCheck();
 
     @Override
     public String getId() {

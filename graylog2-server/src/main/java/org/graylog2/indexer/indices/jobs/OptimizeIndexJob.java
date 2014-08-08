@@ -18,9 +18,7 @@ package org.graylog2.indexer.indices.jobs;
 
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
-import org.elasticsearch.action.admin.indices.optimize.OptimizeRequest;
-import org.graylog2.indexer.Deflector;
-import org.graylog2.indexer.Indexer;
+import org.graylog2.indexer.indices.Indices;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.system.activities.Activity;
 import org.graylog2.system.activities.ActivityWriter;
@@ -33,7 +31,7 @@ import org.slf4j.LoggerFactory;
  */
 public class OptimizeIndexJob extends SystemJob {
     public interface Factory {
-        OptimizeIndexJob create(Deflector deflector, String index);
+        OptimizeIndexJob create(String index);
     }
 
     private static final Logger LOG = LoggerFactory.getLogger(OptimizeIndexJob.class);
@@ -42,18 +40,15 @@ public class OptimizeIndexJob extends SystemJob {
 
     private final ActivityWriter activityWriter;
     private final String index;
-    private final Deflector deflector;
-    private final Indexer indexer;
+    private final Indices indices;
 
     @AssistedInject
-    public OptimizeIndexJob(@Assisted Deflector deflector,
-                            ServerStatus serverStatus,
-                            Indexer indexer,
+    public OptimizeIndexJob(ServerStatus serverStatus,
+                            Indices indices,
                             ActivityWriter activityWriter,
                             @Assisted String index) {
         super(serverStatus);
-        this.deflector = deflector;
-        this.indexer = indexer;
+        this.indices = indices;
         this.activityWriter = activityWriter;
         this.index = index;
     }
@@ -64,15 +59,7 @@ public class OptimizeIndexJob extends SystemJob {
         activityWriter.write(new Activity(msg, OptimizeIndexJob.class));
         LOG.info(msg);
 
-        // http://www.elasticsearch.org/guide/reference/api/admin-indices-optimize/
-        OptimizeRequest or = new OptimizeRequest(index);
-
-        or.maxNumSegments(1);
-        or.onlyExpungeDeletes(false);
-        or.flush(true);
-        or.waitForMerge(true); // This makes us block until the operation finished.
-
-        indexer.getClient().admin().indices().optimize(or).actionGet();
+        indices.optimizeIndex(index);
     }
 
     @Override

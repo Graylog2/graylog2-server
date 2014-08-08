@@ -81,8 +81,7 @@ public class IndexHelper {
         return r;
     }
 
-    public static Set<String> determineAffectedIndices(Indexer indexer,
-                                                       IndexRangeService indexRangeService,
+    public static Set<String> determineAffectedIndices(IndexRangeService indexRangeService,
                                                        Deflector deflector,
                                                        TimeRange range) {
         Set<String> indices = Sets.newHashSet();

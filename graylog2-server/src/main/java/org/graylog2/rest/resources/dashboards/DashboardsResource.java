@@ -29,7 +29,7 @@ import org.graylog2.dashboards.DashboardService;
 import org.graylog2.dashboards.widgets.DashboardWidget;
 import org.graylog2.dashboards.widgets.InvalidWidgetConfigurationException;
 import org.graylog2.database.ValidationException;
-import org.graylog2.indexer.Indexer;
+import org.graylog2.indexer.searches.Searches;
 import org.graylog2.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.rest.documentation.annotations.*;
 import org.graylog2.rest.resources.RestResource;
@@ -64,19 +64,19 @@ public class DashboardsResource extends RestResource {
     private DashboardRegistry dashboardRegistry;
     private ActivityWriter activityWriter;
     private MetricRegistry metricRegistry;
-    private Indexer indexer;
+    private final Searches searches;
 
     @Inject
     public DashboardsResource(DashboardService dashboardService,
                               DashboardRegistry dashboardRegistry,
                               ActivityWriter activityWriter,
                               MetricRegistry metricRegistry,
-                              Indexer indexer) {
+                              Searches searches) {
         this.dashboardService = dashboardService;
         this.dashboardRegistry = dashboardRegistry;
         this.activityWriter = activityWriter;
         this.metricRegistry = metricRegistry;
-        this.indexer = indexer;
+        this.searches = searches;
     }
 
     @POST
@@ -300,7 +300,7 @@ public class DashboardsResource extends RestResource {
 
         DashboardWidget widget;
         try {
-            widget = DashboardWidget.fromRequest(metricRegistry, indexer, awr);
+            widget = DashboardWidget.fromRequest(metricRegistry, searches, awr);
 
             Dashboard dashboard = dashboardRegistry.get(dashboardId);
 

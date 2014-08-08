@@ -26,6 +26,7 @@ import org.graylog2.Configuration;
 import org.graylog2.database.CollectionName;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.indexer.*;
+import org.graylog2.indexer.messages.Messages;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.database.Persisted;
@@ -45,7 +46,7 @@ public class DeadLetterThread extends Periodical {
 
     private final PersistedDeadLetterService persistedDeadLetterService;
     private final IndexFailureService indexFailureService;
-    private final Indexer indexer;
+    private final Messages messages;
     private final Configuration configuration;
     private final MongoConnection mongoConnection;
     private final MetricRegistry metricRegistry;
@@ -53,13 +54,13 @@ public class DeadLetterThread extends Periodical {
     @Inject
     public DeadLetterThread(PersistedDeadLetterService persistedDeadLetterService,
                             IndexFailureService indexFailureService,
-                            Indexer indexer,
+                            Messages messages,
                             Configuration configuration,
                             MongoConnection mongoConnection,
                             MetricRegistry metricRegistry) {
         this.persistedDeadLetterService = persistedDeadLetterService;
         this.indexFailureService = indexFailureService;
-        this.indexer = indexer;
+        this.messages = messages;
         this.configuration = configuration;
         this.mongoConnection = mongoConnection;
         this.metricRegistry = metricRegistry;
@@ -73,7 +74,7 @@ public class DeadLetterThread extends Periodical {
         while(true) {
             List<DeadLetter> items;
             try {
-                items = indexer.getDeadLetterQueue().take();
+                items = messages.getDeadLetterQueue().take();
             } catch (InterruptedException ignored) { continue; /* daemon thread */ }
 
             for (DeadLetter item : items) {
@@ -176,7 +177,7 @@ public class DeadLetterThread extends Periodical {
         metricRegistry.register(MetricRegistry.name(DeadLetterThread.class, "queueSize"), new Gauge<Integer>() {
             @Override
             public Integer getValue() {
-                return indexer.getDeadLetterQueue().size();
+                return messages.getDeadLetterQueue().size();
             }
         });
     }

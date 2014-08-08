@@ -22,7 +22,7 @@ import com.codahale.metrics.Timer;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.mongodb.BasicDBObject;
-import org.graylog2.indexer.Indexer;
+import org.graylog2.indexer.searches.Searches;
 import org.graylog2.indexer.searches.timeranges.*;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.database.EmbeddedPersistable;
@@ -88,7 +88,7 @@ public abstract class DashboardWidget implements EmbeddedPersistable {
                 .build();
     }
 
-    public static DashboardWidget fromRequest(MetricRegistry metricRegistry, Indexer indexer, AddWidgetRequest awr) throws NoSuchWidgetTypeException, InvalidRangeParametersException, InvalidWidgetConfigurationException {
+    public static DashboardWidget fromRequest(MetricRegistry metricRegistry, Searches searches, AddWidgetRequest awr) throws NoSuchWidgetTypeException, InvalidRangeParametersException, InvalidWidgetConfigurationException {
         Type type;
         try {
             type = Type.valueOf(awr.type.toUpperCase());
@@ -119,21 +119,21 @@ public abstract class DashboardWidget implements EmbeddedPersistable {
 
         switch (type) {
             case SEARCH_RESULT_COUNT:
-                return new SearchResultCountWidget(metricRegistry, indexer, id, awr.description, 0, awr.config, (String) awr.config.get("query"), timeRange, awr.creatorUserId);
+                return new SearchResultCountWidget(metricRegistry, searches, id, awr.description, 0, awr.config, (String) awr.config.get("query"), timeRange, awr.creatorUserId);
             case STREAM_SEARCH_RESULT_COUNT:
-                return new StreamSearchResultCountWidget(metricRegistry, indexer, id, awr.description, 0, awr.config, (String) awr.config.get("query"), timeRange, awr.creatorUserId);
+                return new StreamSearchResultCountWidget(metricRegistry, searches, id, awr.description, 0, awr.config, (String) awr.config.get("query"), timeRange, awr.creatorUserId);
             case FIELD_CHART:
-                return new FieldChartWidget(metricRegistry, indexer, id, awr.description, 0, awr.config, (String) awr.config.get("query"), timeRange, awr.creatorUserId);
+                return new FieldChartWidget(metricRegistry, searches, id, awr.description, 0, awr.config, (String) awr.config.get("query"), timeRange, awr.creatorUserId);
             case QUICKVALUES:
-                return new QuickvaluesWidget(metricRegistry, indexer, id, awr.description, 0, awr.config, (String) awr.config.get("query"), timeRange, awr.creatorUserId);
+                return new QuickvaluesWidget(metricRegistry, searches, id, awr.description, 0, awr.config, (String) awr.config.get("query"), timeRange, awr.creatorUserId);
             case SEARCH_RESULT_CHART:
-                return new SearchResultChartWidget(metricRegistry, indexer, id, awr.description, 0, awr.config, (String) awr.config.get("query"), timeRange, awr.creatorUserId);
+                return new SearchResultChartWidget(metricRegistry, searches, id, awr.description, 0, awr.config, (String) awr.config.get("query"), timeRange, awr.creatorUserId);
             default:
                 throw new NoSuchWidgetTypeException();
         }
     }
 
-    public static DashboardWidget fromPersisted(MetricRegistry metricRegistry, Indexer indexer, BasicDBObject fields) throws NoSuchWidgetTypeException, InvalidRangeParametersException, InvalidWidgetConfigurationException {
+    public static DashboardWidget fromPersisted(MetricRegistry metricRegistry, Searches searches, BasicDBObject fields) throws NoSuchWidgetTypeException, InvalidRangeParametersException, InvalidWidgetConfigurationException {
         Type type;
         try {
             type = Type.valueOf(((String) fields.get("type")).toUpperCase());
@@ -182,15 +182,15 @@ public abstract class DashboardWidget implements EmbeddedPersistable {
         // XXX TODO: these long constructors suck and 90% of it can be unified in a step before
         switch (type) {
             case SEARCH_RESULT_COUNT:
-                return new SearchResultCountWidget(metricRegistry, indexer, (String) fields.get("id"), description, cacheTime, config, (String) config.get("query"), timeRange, (String) fields.get("creator_user_id"));
+                return new SearchResultCountWidget(metricRegistry, searches, (String) fields.get("id"), description, cacheTime, config, (String) config.get("query"), timeRange, (String) fields.get("creator_user_id"));
             case STREAM_SEARCH_RESULT_COUNT:
-                return new StreamSearchResultCountWidget(metricRegistry, indexer, (String) fields.get("id"), description, cacheTime, config, (String) config.get("query"), timeRange, (String) fields.get("creator_user_id"));
+                return new StreamSearchResultCountWidget(metricRegistry, searches, (String) fields.get("id"), description, cacheTime, config, (String) config.get("query"), timeRange, (String) fields.get("creator_user_id"));
             case FIELD_CHART:
-                return new FieldChartWidget(metricRegistry, indexer, (String) fields.get("id"), description, cacheTime, config, (String) config.get("query"), timeRange, (String) fields.get("creator_user_id"));
+                return new FieldChartWidget(metricRegistry, searches, (String) fields.get("id"), description, cacheTime, config, (String) config.get("query"), timeRange, (String) fields.get("creator_user_id"));
             case QUICKVALUES:
-                return new QuickvaluesWidget(metricRegistry, indexer, (String) fields.get("id"), description, cacheTime, config, (String) config.get("query"), timeRange, (String) fields.get("creator_user_id"));
+                return new QuickvaluesWidget(metricRegistry, searches, (String) fields.get("id"), description, cacheTime, config, (String) config.get("query"), timeRange, (String) fields.get("creator_user_id"));
             case SEARCH_RESULT_CHART:
-                return new SearchResultChartWidget(metricRegistry, indexer, (String) fields.get("id"), description, cacheTime, config, (String) config.get("query"), timeRange, (String) fields.get("creator_user_id"));
+                return new SearchResultChartWidget(metricRegistry, searches, (String) fields.get("id"), description, cacheTime, config, (String) config.get("query"), timeRange, (String) fields.get("creator_user_id"));
             default:
                 throw new NoSuchWidgetTypeException();
         }

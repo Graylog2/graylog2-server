@@ -19,7 +19,7 @@ package org.graylog2.indexer.healing;
 import com.google.inject.assistedinject.AssistedInject;
 import org.graylog2.buffers.Buffers;
 import org.graylog2.indexer.Deflector;
-import org.graylog2.indexer.Indexer;
+import org.graylog2.indexer.indices.Indices;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.ServerStatus;
@@ -33,15 +33,17 @@ import org.slf4j.LoggerFactory;
  * @author Lennart Koopmann <lennart@torch.sh>
  */
 public class FixDeflectorByDeleteJob extends SystemJob {
+
     public interface Factory {
+
         FixDeflectorByDeleteJob create();
     }
-
     private static final Logger LOG = LoggerFactory.getLogger(FixDeflectorByDeleteJob.class);
 
     public static final int MAX_CONCURRENCY = 1;
+
     private final Deflector deflector;
-    private final Indexer indexer;
+    private final Indices indices;
     private final ServerStatus serverStatus;
     private final ActivityWriter activityWriter;
     private final Buffers bufferSynchronizer;
@@ -51,14 +53,14 @@ public class FixDeflectorByDeleteJob extends SystemJob {
 
     @AssistedInject
     public FixDeflectorByDeleteJob(Deflector deflector,
-                                   Indexer indexer,
+                                   Indices indices,
                                    ServerStatus serverStatus,
                                    ActivityWriter activityWriter,
                                    Buffers bufferSynchronizer,
                                    NotificationService notificationService) {
         super(serverStatus);
         this.deflector = deflector;
-        this.indexer = indexer;
+        this.indices = indices;
         this.serverStatus = serverStatus;
         this.activityWriter = activityWriter;
         this.bufferSynchronizer = bufferSynchronizer;
@@ -67,7 +69,7 @@ public class FixDeflectorByDeleteJob extends SystemJob {
 
     @Override
     public void execute() {
-        if (deflector.isUp() || !indexer.indices().exists(deflector.getName())) {
+        if (deflector.isUp() || !indices.exists(deflector.getName())) {
             LOG.error("There is no index <{}>. No need to run this job. Aborting.", deflector.getName());
             return;
         }
@@ -84,7 +86,7 @@ public class FixDeflectorByDeleteJob extends SystemJob {
 
         // Delete deflector index.
         LOG.info("Deleting <{}> index.", deflector.getName());
-        indexer.indices().delete(deflector.getName());
+        indices.delete(deflector.getName());
         progress = 70;
 
         // Set up deflector.

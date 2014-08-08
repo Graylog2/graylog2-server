@@ -21,8 +21,8 @@ import com.google.common.collect.Maps;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.elasticsearch.indices.IndexMissingException;
-import org.graylog2.indexer.Indexer;
 import org.graylog2.indexer.messages.DocumentNotFoundException;
+import org.graylog2.indexer.messages.Messages;
 import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.plugin.Message;
 import org.graylog2.rest.documentation.annotations.*;
@@ -45,11 +45,12 @@ import java.util.Map;
 @Path("/messages/{index}")
 public class MessageResource extends RestResource {
     private static final Logger LOG = LoggerFactory.getLogger(MessageResource.class);
-    private Indexer indexer;
+
+    private Messages messages;
 
     @Inject
-    public MessageResource(Indexer indexer) {
-        this.indexer = indexer;
+    public MessageResource(Messages messages) {
+        this.messages = messages;
     }
 
     @GET @Path("/{messageId}") @Timed
@@ -68,7 +69,7 @@ public class MessageResource extends RestResource {
         }
         checkPermission(RestPermissions.MESSAGES_READ, messageId);
 		try {
-            ResultMessage resultMessage = indexer.messages().get(messageId, index);
+            ResultMessage resultMessage = messages.get(messageId, index);
             Message message = new Message(resultMessage.getMessage());
             checkMessageReadPermission(message);
 
@@ -115,7 +116,7 @@ public class MessageResource extends RestResource {
         
         List<String> tokens;
         try {
-        	tokens = indexer.messages().analyze(string, index);
+        	tokens = messages.analyze(string, index);
 		} catch (IndexMissingException e) {
         	LOG.error("Index does not exist. Returning HTTP 404.");
         	throw new WebApplicationException(404);

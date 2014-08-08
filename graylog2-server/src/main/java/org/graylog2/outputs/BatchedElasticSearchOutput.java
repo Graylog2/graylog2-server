@@ -24,7 +24,8 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import org.graylog2.Configuration;
-import org.graylog2.indexer.Indexer;
+import org.graylog2.indexer.cluster.Cluster;
+import org.graylog2.indexer.messages.Messages;
 import org.graylog2.plugin.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,10 +47,12 @@ public class BatchedElasticSearchOutput extends ElasticSearchOutput {
     private final Histogram batchSize;
     private final Meter bufferFlushes;
     private final Meter bufferFlushesRequested;
+    private final Cluster cluster;
 
     @Inject
-    public BatchedElasticSearchOutput(MetricRegistry metricRegistry, Indexer indexer, Configuration configuration) {
-        super(metricRegistry, indexer);
+    public BatchedElasticSearchOutput(MetricRegistry metricRegistry, Messages messages, Cluster cluster, Configuration configuration) {
+        super(metricRegistry, messages);
+        this.cluster = cluster;
         this.maxBufferSize = configuration.getOutputBatchSize();
         this.buffer = Lists.newArrayListWithCapacity(maxBufferSize);
         this.processTime = metricRegistry.timer(name(this.getClass(), "processTime"));
@@ -108,7 +111,7 @@ public class BatchedElasticSearchOutput extends ElasticSearchOutput {
         bufferFlushesRequested.mark();
 
         if (!buffer.isEmpty()) {
-            if (indexer.isConnectedAndHealthy()) {
+            if (cluster.isConnectedAndHealthy()) {
                 final List<Message> temporaryBuffer;
                 synchronized (this.buffer) {
                     temporaryBuffer = ImmutableList.copyOf(buffer);

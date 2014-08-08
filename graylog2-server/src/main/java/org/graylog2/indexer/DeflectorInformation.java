@@ -21,6 +21,7 @@ import com.google.common.collect.Maps;
 import org.elasticsearch.action.admin.indices.stats.IndexShardStats;
 import org.elasticsearch.action.admin.indices.stats.IndexStats;
 import org.elasticsearch.action.admin.indices.stats.ShardStats;
+import org.graylog2.indexer.cluster.Cluster;
 import org.graylog2.plugin.Tools;
 
 import java.util.Iterator;
@@ -32,15 +33,15 @@ import java.util.Map;
  */
 public class DeflectorInformation {
 
-    private final Indexer indexer;
+    private final Cluster cluster;
     
     private Map<String, IndexStats> indices = Maps.newHashMap();
     private String deflectorTarget;
     private int maxMessagesPerIndex;
     private String serverId;
     
-    public DeflectorInformation(Indexer indexer) {
-        this.indexer = indexer;
+    public DeflectorInformation(Cluster cluster) {
+        this.cluster = cluster;
     }
     
     public void addIndex(IndexStats index) {
@@ -102,8 +103,8 @@ public class DeflectorInformation {
 
                 Map<String, Object> shard = Maps.newHashMap();
 
-                shard.put("node_hostname", indexer.nodeIdToHostName(ss.getShardRouting().currentNodeId()));
-                shard.put("node_name", indexer.nodeIdToName(ss.getShardRouting().currentNodeId()));
+                shard.put("node_hostname", cluster.nodeIdToHostName(ss.getShardRouting().currentNodeId()));
+                shard.put("node_name", cluster.nodeIdToName(ss.getShardRouting().currentNodeId()));
                 shard.put("id", ss.getShardId());
                 shard.put("node_id", ss.getShardRouting().currentNodeId());
                 shard.put("primary", ss.getShardRouting().primary());
@@ -111,7 +112,7 @@ public class DeflectorInformation {
                 shard.put("is_started", ss.getShardRouting().started());
                 shard.put("is_unassigned", ss.getShardRouting().unassigned());
                 shard.put("is_relocating", ss.getShardRouting().relocating());
-                shard.put("relocating_to", indexer.nodeIdToName(ss.getShardRouting().relocatingNodeId()));
+                shard.put("relocating_to", cluster.nodeIdToName(ss.getShardRouting().relocatingNodeId()));
 
                 shards.add(shard);
             }

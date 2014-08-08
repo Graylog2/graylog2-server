@@ -22,6 +22,7 @@ package org.graylog2.indexer;
 
 import org.elasticsearch.action.admin.indices.stats.IndexStats;
 import org.graylog2.Configuration;
+import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.indices.jobs.OptimizeIndexJob;
 import org.graylog2.indexer.ranges.RebuildIndexRangesJob;
 import org.graylog2.system.activities.ActivityWriter;
@@ -32,7 +33,6 @@ import org.testng.annotations.Test;
 import java.util.Map;
 
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import static org.testng.Assert.*;
 import static org.testng.AssertJUnit.assertEquals;
 
@@ -48,7 +48,7 @@ public class DeflectorTest {
                 mock(ActivityWriter.class),
                 mock(RebuildIndexRangesJob.Factory.class),
                 mock(OptimizeIndexJob.Factory.class),
-                mock(Indexer.class));
+                mock(Indices.class));
     }
 
     @Test
@@ -78,7 +78,7 @@ public class DeflectorTest {
                 mock(ActivityWriter.class),
                 mock(RebuildIndexRangesJob.Factory.class),
                 mock(OptimizeIndexJob.Factory.class),
-                mock(Indexer.class));
+                mock(Indices.class));
 
         assertEquals("graylog2_0", d.buildIndexName("graylog2", 0));
         assertEquals("graylog2_1", d.buildIndexName("graylog2", 1));
@@ -97,10 +97,7 @@ public class DeflectorTest {
                                     mock(ActivityWriter.class),
                                     mock(RebuildIndexRangesJob.Factory.class),
                                     mock(OptimizeIndexJob.Factory.class),
-                                    mock(Indexer.class));
-        final Indexer indexer = mock(Indexer.class);
-        when(indexer.indices()).thenReturn(null);
-
+                                    mock(Indices.class));
         try {
             final Map<String, IndexStats> deflectorIndices = d.getAllDeflectorIndices();
             assertNotNull(deflectorIndices);
@@ -117,10 +114,7 @@ public class DeflectorTest {
                                     mock(ActivityWriter.class),
                                     mock(RebuildIndexRangesJob.Factory.class),
                                     mock(OptimizeIndexJob.Factory.class),
-                                    mock(Indexer.class));
-        final Indexer indexer = mock(Indexer.class);
-        when(indexer.indices()).thenReturn(null);
-
+                                    mock(Indices.class));
         try {
             final String[] deflectorIndices = d.getAllDeflectorIndexNames();
             assertNotNull(deflectorIndices);

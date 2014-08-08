@@ -22,7 +22,7 @@ import com.google.common.collect.Maps;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.database.ValidationException;
-import org.graylog2.indexer.Indexer;
+import org.graylog2.indexer.searches.Searches;
 import org.graylog2.rest.documentation.annotations.*;
 import org.graylog2.rest.resources.search.requests.CreateSavedSearchRequest;
 import org.graylog2.savedsearches.SavedSearch;
@@ -55,9 +55,9 @@ public class SavedSearchesResource extends SearchResource {
     private final SavedSearchService savedSearchService;
 
     @Inject
-    public SavedSearchesResource(Indexer indexer,
+    public SavedSearchesResource(Searches searches,
                                  SavedSearchService savedSearchService) {
-        super(indexer);
+        super(searches);
         this.savedSearchService = savedSearchService;
     }
 

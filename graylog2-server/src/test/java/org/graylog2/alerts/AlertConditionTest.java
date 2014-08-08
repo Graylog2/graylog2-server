@@ -17,8 +17,10 @@
 package org.graylog2.alerts;
 
 import com.google.common.collect.Maps;
+import com.google.inject.assistedinject.Assisted;
+import org.graylog2.alerts.types.FieldValueAlertCondition;
+import org.graylog2.alerts.types.MessageCountAlertCondition;
 import org.graylog2.database.MongoConnection;
-import org.graylog2.indexer.Indexer;
 import org.graylog2.indexer.searches.Searches;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.alarms.AlertCondition;
@@ -37,7 +39,6 @@ import static org.testng.AssertJUnit.*;
  */
 public class AlertConditionTest {
     protected Stream stream;
-    protected Indexer indexer;
     protected Searches searches;
     protected AlertService alertService;
     protected MongoConnection mongoConnection;
@@ -49,13 +50,32 @@ public class AlertConditionTest {
     @BeforeClass
     public void setUp() throws Exception {
         stream = mock(Stream.class);
-        indexer = mock(Indexer.class);
         searches = mock(Searches.class);
         mongoConnection = mock(MongoConnection.class);
-        alertService = new AlertServiceImpl(mongoConnection);
+        // TODO use injection please. this sucks so bad
+        alertService = new AlertServiceImpl(mongoConnection,
+                                            new FieldValueAlertCondition.Factory() {
+                                                @Override
+                                                public FieldValueAlertCondition createAlertCondition(Stream stream,
+                                                                                                     String id,
+                                                                                                     DateTime createdAt,
+                                                                                                     @Assisted("userid") String creatorUserId,
+                                                                                                     Map<String, Object> parameters) {
+                                                    return new FieldValueAlertCondition(searches, stream, id, createdAt, creatorUserId, parameters);
+                                                }
+                                            },
+                                            new MessageCountAlertCondition.Factory() {
+                                                @Override
+                                                public MessageCountAlertCondition createAlertCondition(Stream stream,
+                                                                                                       String id,
+                                                                                                       DateTime createdAt,
+                                                                                                       @Assisted("userid") String creatorUserId,
+                                                                                                       Map<String, Object> parameters) {
+                                                    return new MessageCountAlertCondition(searches, stream, id, createdAt, creatorUserId, parameters);
+                                                }
+                                            });
 
         when(stream.getId()).thenReturn(STREAM_ID);
-        when(indexer.searches()).thenReturn(searches);
     }
 
     protected void assertTriggered(AlertCondition alertCondition, AlertCondition.CheckResult result) {

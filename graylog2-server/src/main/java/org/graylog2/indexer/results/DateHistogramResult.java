@@ -20,7 +20,7 @@ import com.google.common.collect.Maps;
 import org.elasticsearch.common.bytes.BytesReference;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.search.facet.datehistogram.DateHistogramFacet;
-import org.graylog2.indexer.Indexer;
+import org.graylog2.indexer.searches.Searches;
 
 import java.util.Map;
 
@@ -30,9 +30,9 @@ import java.util.Map;
 public class DateHistogramResult extends HistogramResult {
 	
 	private final DateHistogramFacet result;
-	private final Indexer.DateHistogramInterval interval;
+	private final Searches.DateHistogramInterval interval;
 
-	public DateHistogramResult(DateHistogramFacet result, String originalQuery, BytesReference builtQuery, Indexer.DateHistogramInterval interval, TimeValue took) {
+	public DateHistogramResult(DateHistogramFacet result, String originalQuery, BytesReference builtQuery, Searches.DateHistogramInterval interval, TimeValue took) {
         super(originalQuery, builtQuery, took);
 
 		this.result = result;
@@ -40,7 +40,7 @@ public class DateHistogramResult extends HistogramResult {
 	}
 
     @Override
-	public Indexer.DateHistogramInterval getInterval() {
+	public Searches.DateHistogramInterval getInterval() {
 		return interval;
 	}
 

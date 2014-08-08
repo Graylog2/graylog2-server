@@ -19,8 +19,8 @@ package org.graylog2.periodical;
 import com.google.inject.Inject;
 import org.graylog2.Configuration;
 import org.graylog2.indexer.Deflector;
-import org.graylog2.indexer.Indexer;
 import org.graylog2.indexer.NoTargetIndexException;
+import org.graylog2.indexer.indices.Indices;
 import org.graylog2.initializers.IndexerSetupService;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
@@ -38,25 +38,25 @@ public class DeflectorManagerThread extends Periodical { // public class Klimper
     private static final Logger LOG = LoggerFactory.getLogger(DeflectorManagerThread.class);
 
     private NotificationService notificationService;
-    private final Indexer indexer;
     private final Deflector deflector;
     private final Configuration configuration;
     private final ActivityWriter activityWriter;
     private final IndexerSetupService indexerSetupService;
+    private final Indices indices;
 
     @Inject
     public DeflectorManagerThread(NotificationService notificationService,
-                                  Indexer indexer,
+                                  Indices indices,
                                   Deflector deflector,
                                   Configuration configuration,
                                   ActivityWriter activityWriter,
                                   IndexerSetupService indexerSetupService) {
         this.notificationService = notificationService;
-        this.indexer = indexer;
         this.deflector = deflector;
         this.configuration = configuration;
         this.activityWriter = activityWriter;
         this.indexerSetupService = indexerSetupService;
+        this.indices = indices;
     }
 
     @Override
@@ -84,7 +84,7 @@ public class DeflectorManagerThread extends Periodical { // public class Klimper
         
         try {
             currentTarget = deflector.getNewestTargetName();
-            messageCountInTarget = indexer.indices().numberOfMessages(currentTarget);
+            messageCountInTarget = indices.numberOfMessages(currentTarget);
         } catch(Exception e) {
             LOG.error("Tried to check for number of messages in current deflector target but did not find index. Aborting.", e);
             return;
@@ -104,7 +104,7 @@ public class DeflectorManagerThread extends Periodical { // public class Klimper
 
     private void checkAndRepair() {
         if (!deflector.isUp()) {
-            if (indexer.indices().exists(deflector.getName())) {
+            if (indices.exists(deflector.getName())) {
                 // Publish a notification if there is an *index* called graylog2_deflector
                 Notification notification = notificationService.buildNow()
                         .addType(Notification.Type.DEFLECTOR_EXISTS_AS_INDEX)

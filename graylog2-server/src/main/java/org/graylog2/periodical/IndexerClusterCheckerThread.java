@@ -18,7 +18,7 @@ package org.graylog2.periodical;
 
 import com.google.inject.Inject;
 import org.elasticsearch.action.admin.cluster.node.info.NodeInfo;
-import org.graylog2.indexer.Indexer;
+import org.graylog2.indexer.cluster.Cluster;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.periodical.Periodical;
@@ -30,14 +30,14 @@ public class IndexerClusterCheckerThread extends Periodical {
     private static final Logger LOG = LoggerFactory.getLogger(IndexerClusterCheckerThread.class);
     private static final int MINIMUM_OPEN_FILES_LIMIT = 64000;
 
-    private final Indexer indexer;
     private final NotificationService notificationService;
+    private final Cluster cluster;
 
     @Inject
-    public IndexerClusterCheckerThread(final NotificationService notificationService,
-                                       final Indexer indexer) {
+    public IndexerClusterCheckerThread(NotificationService notificationService,
+                                       Cluster cluster) {
         this.notificationService = notificationService;
-        this.indexer = indexer;
+        this.cluster = cluster;
     }
 
     @Override
@@ -46,13 +46,8 @@ public class IndexerClusterCheckerThread extends Periodical {
             return;
         }
 
-        if (null == indexer.cluster()) {
-            LOG.info("Indexer not fully initialized yet. Skipping periodic cluster check.");
-            return;
-        }
-
         boolean allHigher = true;
-        for (NodeInfo node : indexer.cluster().getDataNodes()) {
+        for (NodeInfo node : cluster.getDataNodes()) {
             // Check number of maximum open files.
             final String osName = node.getJvm().getSystemProperties().get("os.name");
             if (null != osName && osName.startsWith("Windows")) {

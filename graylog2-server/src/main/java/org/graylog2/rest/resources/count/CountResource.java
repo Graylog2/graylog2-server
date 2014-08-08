@@ -20,7 +20,7 @@ import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Maps;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.graylog2.indexer.Indexer;
+import org.graylog2.indexer.counts.Counts;
 import org.graylog2.rest.documentation.annotations.Api;
 import org.graylog2.rest.documentation.annotations.ApiOperation;
 import org.graylog2.rest.resources.RestResource;
@@ -41,11 +41,11 @@ import java.util.Map;
 @Path("/count")
 public class CountResource extends RestResource {
 
-    private Indexer indexer;
+    private final Counts counts;
 
     @Inject
-    public CountResource(Indexer indexer) {
-        this.indexer = indexer;
+    public CountResource(Counts counts) {
+        this.counts = counts;
     }
 
     @GET @Path("/total") @Timed
@@ -54,7 +54,7 @@ public class CountResource extends RestResource {
     @Produces(MediaType.APPLICATION_JSON)
     public String total() {
         Map<String, Long> result = Maps.newHashMap();
-        result.put("events", indexer.counts().total());
+        result.put("events", counts.total());
 
         return json(result);
     }

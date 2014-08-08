@@ -16,34 +16,33 @@
  */
 package org.graylog2.indexer.counts;
 
-import com.google.inject.assistedinject.Assisted;
-import com.google.inject.assistedinject.AssistedInject;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import org.elasticsearch.action.count.CountRequest;
 import org.elasticsearch.client.Client;
+import org.elasticsearch.node.Node;
 import org.graylog2.indexer.Deflector;
-import org.graylog2.indexer.Indexer;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
+@Singleton
 public class Counts {
-    public interface Factory {
-        Counts create(Client client);
-    }
-
-	private final Client c;
-    private final Indexer indexer;
+    private final Client c;
     private final Deflector deflector;
 
-    @AssistedInject
-    public Counts(@Assisted Client client, Deflector deflector, Indexer indexer) {
+    @Inject
+    public Counts(Node node, Deflector deflector) {
+        this.c = node.client();
         this.deflector = deflector;
-		this.c = client;
-        this.indexer = indexer;
     }
 
     public long total() {
         return c.count(new CountRequest(deflector.getAllDeflectorIndexNames())).actionGet().getCount();
     }
-	
+
+    public interface Factory {
+        Counts create(Client client);
+    }
+
 }

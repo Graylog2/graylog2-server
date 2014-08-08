@@ -34,7 +34,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.graylog2.Configuration;
 import org.graylog2.ServerVersion;
-import org.graylog2.indexer.Indexer;
+import org.graylog2.indexer.counts.Counts;
 import org.graylog2.metrics.MetricUtils;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.Tools;
@@ -44,7 +44,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -70,19 +69,19 @@ public class TelemetryReporterThread extends Periodical {
 
     private final MetricRegistry metricRegistry;
     private final ServerStatus serverStatus;
-    private final Indexer indexer;
     private final Configuration configuration;
+    private final Counts counts;
     private ThroughputStats throughputStats;
 
     @Inject
     public TelemetryReporterThread(MetricRegistry metricRegistry,
                                    ServerStatus serverStatus,
-                                   Indexer indexer,
+                                   Counts counts,
                                    ThroughputStats throughputStats,
                                    Configuration configuration) {
         this.metricRegistry = metricRegistry;
         this.serverStatus = serverStatus;
-        this.indexer = indexer;
+        this.counts = counts;
         this.throughputStats = throughputStats;
         this.configuration = configuration;
     }
@@ -164,7 +163,7 @@ public class TelemetryReporterThread extends Periodical {
     private Map<String, Object> buildStatistics() {
         Map<String, Object> statistics = Maps.newHashMap();
 
-        statistics.put("total_messages", indexer.counts().total());
+        statistics.put("total_messages", counts.total());
         statistics.put("started_at", serverStatus.getStartedAt());
         statistics.put("lifecycle", serverStatus.getLifecycle());
         statistics.put("lb_status", serverStatus.getLifecycle().getLoadbalancerStatus());

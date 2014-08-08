@@ -18,6 +18,7 @@ package org.graylog2.indexer;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import org.elasticsearch.action.admin.indices.stats.IndexStats;
 import org.elasticsearch.indices.InvalidAliasNameException;
 import org.graylog2.Configuration;
@@ -32,7 +33,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import javax.ws.rs.HEAD;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -54,9 +54,9 @@ public class Deflector { // extends Ablenkblech
     private final ActivityWriter activityWriter;
     private final RebuildIndexRangesJob.Factory rebuildIndexRangesJobFactory;
     private final OptimizeIndexJob.Factory optimizeIndexJobFactory;
-    private final Indexer indexer;
     private final String indexPrefix;
     private final String deflectorName;
+    private final Indices indices;
 
     @Inject
     public Deflector(final SystemJobManager systemJobManager,
@@ -64,19 +64,20 @@ public class Deflector { // extends Ablenkblech
                      final ActivityWriter activityWriter,
                      final RebuildIndexRangesJob.Factory rebuildIndexRangesJobFactory,
                      final OptimizeIndexJob.Factory optimizeIndexJobFactory,
-                     final Indexer indexer) {
+                     final Indices indices) {
+        indexPrefix = configuration.getElasticSearchIndexPrefix() + SEPARATOR;
+
         this.systemJobManager = systemJobManager;
         this.activityWriter = activityWriter;
         this.rebuildIndexRangesJobFactory = rebuildIndexRangesJobFactory;
         this.optimizeIndexJobFactory = optimizeIndexJobFactory;
-        this.indexer = indexer;
 
-        this.indexPrefix = configuration.getElasticSearchIndexPrefix() + SEPARATOR;
         this.deflectorName = buildName(configuration.getElasticSearchIndexPrefix());
+        this.indices = indices;
     }
 
     public boolean isUp() {
-        return indexer.indices().aliasExists(getName());
+        return indices.aliasExists(getName());
     }
 
     public void setUp() {
@@ -128,7 +129,7 @@ public class Deflector { // extends Ablenkblech
 
         // Create new index.
         LOG.info("Creating index target <{}>...", newTarget);
-        if (!indexer.indices().create(newTarget)) {
+        if (!indices.create(newTarget)) {
             LOG.error("Could not properly create new target <{}>", newTarget);
         }
         updateIndexRanges();
@@ -147,14 +148,14 @@ public class Deflector { // extends Ablenkblech
             // Re-pointing from existing old index to the new one.
             pointTo(newTarget, oldTarget);
             LOG.info("Flushing old index <{}>.", oldTarget);
-            indexer.indices().flush(oldTarget);
+            indices.flush(oldTarget);
 
             LOG.info("Setting old index <{}> to read-only.", oldTarget);
-            indexer.indices().setReadOnly(oldTarget);
+            indices.setReadOnly(oldTarget);
             activity.setMessage("Cycled deflector from <" + oldTarget + "> to <" + newTarget + ">");
 
             try {
-                systemJobManager.submit(optimizeIndexJobFactory.create(this, oldTarget));
+                systemJobManager.submit(optimizeIndexJobFactory.create(oldTarget));
             } catch (SystemJobConcurrencyException e) {
                 // The concurrency limit is very high. This should never happen.
                 LOG.error("Cannot optimize index <" + oldTarget + ">.", e);
@@ -167,8 +168,7 @@ public class Deflector { // extends Ablenkblech
     }
 
     public int getNewestTargetNumber() throws NoTargetIndexException {
-        final Map<String, IndexStats> indices = indexer.indices().getAll();
-
+        final Map<String, IndexStats> indices = this.indices.getAll();
         if (indices.isEmpty()) {
             throw new NoTargetIndexException();
         }
@@ -194,12 +194,6 @@ public class Deflector { // extends Ablenkblech
     }
 
     public String[] getAllDeflectorIndexNames() {
-        final Indices indices = indexer.indices();
-
-        if(null == indices) {
-            return new String[0];
-        }
-
         final List<String> result = Lists.newArrayListWithExpectedSize(indices.getAll().size());
         for (String indexName : indices.getAll().keySet()) {
             if (isGraylog2Index(indexName)) {
@@ -212,7 +206,6 @@ public class Deflector { // extends Ablenkblech
 
     public Map<String, IndexStats> getAllDeflectorIndices() {
         final ImmutableMap.Builder<String, IndexStats> result = ImmutableMap.builder();
-        final Indices indices = indexer.indices();
 
         if (indices != null) {
             for (Map.Entry<String, IndexStats> e : indices.getAll().entrySet()) {
@@ -250,11 +243,11 @@ public class Deflector { // extends Ablenkblech
     }
 
     public void pointTo(final String newIndex, final String oldIndex) {
-        indexer.cycleAlias(getName(), newIndex, oldIndex);
+        indices.cycleAlias(getName(), newIndex, oldIndex);
     }
 
     public void pointTo(final String newIndex) {
-        indexer.cycleAlias(getName(), newIndex);
+        indices.cycleAlias(getName(), newIndex);
     }
 
     private void updateIndexRanges() {
@@ -269,7 +262,7 @@ public class Deflector { // extends Ablenkblech
     }
 
     public String getCurrentActualTargetIndex() {
-        return indexer.indices().aliasTarget(getName());
+        return indices.aliasTarget(getName());
     }
 
     public String getName() {
