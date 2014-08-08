@@ -98,10 +98,6 @@ public class Searches {
         }
     }
 
-    public interface Factory {
-        Searches create(Client client);
-    }
-
 
     private final Configuration configuration;
     private final Deflector deflector;

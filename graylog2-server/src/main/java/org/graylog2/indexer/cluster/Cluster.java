@@ -41,10 +41,6 @@ import java.util.List;
 public class Cluster {
     private static final Logger log = LoggerFactory.getLogger(Cluster.class);
 
-    public interface Factory {
-        Cluster create(Client client);
-    }
-
     //private final Core server;
     private final Client c;
     private final Deflector deflector;

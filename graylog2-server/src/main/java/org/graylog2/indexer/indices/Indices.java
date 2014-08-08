@@ -68,7 +68,6 @@ import org.graylog2.plugin.indexer.retention.IndexManagement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.ws.rs.HEAD;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -80,9 +79,6 @@ import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
  */
 @Singleton
 public class Indices implements IndexManagement {
-    public interface Factory {
-        Indices create(Client client);
-    }
 
     private static final Logger LOG = LoggerFactory.getLogger(Indices.class);
 
