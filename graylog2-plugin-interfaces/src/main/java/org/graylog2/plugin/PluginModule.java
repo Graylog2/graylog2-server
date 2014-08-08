@@ -22,12 +22,14 @@ package org.graylog2.plugin;
 import com.google.common.util.concurrent.Service;
 import com.google.inject.AbstractModule;
 import com.google.inject.TypeLiteral;
+import com.google.inject.multibindings.MapBinder;
 import com.google.inject.multibindings.Multibinder;
 import org.graylog2.plugin.alarms.callbacks.AlarmCallback;
 import org.graylog2.plugin.filters.MessageFilter;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.outputs.MessageOutput;
 import org.graylog2.plugin.periodical.Periodical;
+import org.graylog2.plugin.rest.PluginRestResource;
 
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
@@ -71,5 +73,10 @@ public abstract class PluginModule extends AbstractModule {
         TypeLiteral<Class<? extends MessageOutput>> typeLiteral = new TypeLiteral<Class<? extends MessageOutput>>(){};
         Multibinder<Class<? extends MessageOutput>> messageOutputs = Multibinder.newSetBinder(binder(), typeLiteral);
         messageOutputs.addBinding().toInstance(messageOutputClass);
+    }
+
+    protected void addRestResource(Class<? extends PluginRestResource> restResourceClass) {
+        MapBinder<String, PluginRestResource> pluginRestResourceMapBinder = MapBinder.newMapBinder(binder(), String.class, PluginRestResource.class).permitDuplicates();
+        pluginRestResourceMapBinder.addBinding(this.getClass().getPackage().getName()).to(restResourceClass);
     }
 }

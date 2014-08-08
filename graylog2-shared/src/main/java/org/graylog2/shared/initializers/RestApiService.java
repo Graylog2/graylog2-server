@@ -29,8 +29,11 @@ import org.glassfish.jersey.server.ContainerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.filter.EncodingFilter;
 import org.glassfish.jersey.server.internal.scanning.PackageNamesScanner;
+import org.glassfish.jersey.server.model.Resource;
+import org.glassfish.jersey.server.model.ResourceMethod;
 import org.graylog2.jersey.container.netty.NettyContainer;
 import org.graylog2.jersey.container.netty.SecurityContextFactory;
+import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.plugin.rest.WebApplicationExceptionMapper;
 import org.graylog2.shared.BaseConfiguration;
 import org.graylog2.plugin.rest.AnyExceptionClassMapper;
@@ -53,6 +56,7 @@ import javax.ws.rs.container.ContainerResponseFilter;
 import javax.ws.rs.container.DynamicFeature;
 import javax.ws.rs.ext.ExceptionMapper;
 import java.net.InetSocketAddress;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -68,6 +72,7 @@ public class RestApiService extends AbstractIdleService {
     private final Set<Class<? extends DynamicFeature>> dynamicFeatures;
     private final Set<Class<? extends ContainerResponseFilter>> containerResponseFilters;
     private final Set<Class<? extends ExceptionMapper>> exceptionMappers;
+    private final Map<String, Set<PluginRestResource>> pluginRestResources;
     private final ObjectMapper objectMapper;
     private ServerBootstrap bootstrap;
 
@@ -77,12 +82,14 @@ public class RestApiService extends AbstractIdleService {
                           Set<Class<? extends DynamicFeature>> dynamicFeatures,
                           Set<Class<? extends ContainerResponseFilter>> containerResponseFilters,
                           Set<Class<? extends ExceptionMapper>> exceptionMappers,
+                          Map<String, Set<PluginRestResource>> pluginRestResources,
                           ObjectMapper objectMapper) {
         this.configuration = configuration;
         this.securityContextFactory = securityContextFactory;
         this.dynamicFeatures = dynamicFeatures;
         this.containerResponseFilters = containerResponseFilters;
         this.exceptionMappers = exceptionMappers;
+        this.pluginRestResources = pluginRestResources;
         this.objectMapper = objectMapper;
     }
 

@@ -1,4 +1,4 @@
-package org.graylog2.shared.bindings.providers;
+package org.graylog2.shared.bindings;
 
 import com.ning.http.client.AsyncHttpClient;
 

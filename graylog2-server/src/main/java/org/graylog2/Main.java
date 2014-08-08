@@ -62,6 +62,7 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
+import test.restresource.TestResourceModule;
 
 import java.io.File;
 import java.util.Arrays;
@@ -148,6 +149,8 @@ public final class Main extends NodeRunner {
         List<PluginModule> pluginModules = Lists.newArrayList();
         for (Plugin plugin : pluginLoader.loadPlugins())
             pluginModules.addAll(plugin.modules());
+
+        pluginModules.add(new TestResourceModule());
 
         LOG.debug("Loaded modules: " + pluginModules);
 
