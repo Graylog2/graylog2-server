@@ -37,6 +37,8 @@ import java.net.URI;
 import java.net.UnknownHostException;
 import java.util.List;
 
+import static com.google.common.base.Strings.isNullOrEmpty;
+
 /**
  * Helper class to hold configuration of Graylog2
  *
@@ -66,7 +68,7 @@ public class Configuration extends BaseConfiguration {
     private boolean noRetention = false;
 
     @Parameter(value = "retention_strategy", required = true)
-    private String retentionStrategy;
+    private String retentionStrategy = "delete";
     
     @Parameter(value = "elasticsearch_max_number_of_indices", required = true, validator = PositiveIntegerValidator.class)
     private int maxNumberOfIndices = 20;
@@ -95,7 +97,7 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "dead_letters_enabled")
     private boolean deadLettersEnabled = false;
 
-    @Parameter(value = "elasticsearch_config_file", required = false, validator = FileReadableValidator.class)
+    @Parameter(value = "elasticsearch_config_file", validator = FileReadableValidator.class)
     private String elasticSearchConfigFile; // = "/etc/graylog2-elasticsearch.yml";
 
     @Parameter(value = "elasticsearch_index_prefix", required = true)
@@ -140,71 +142,71 @@ public class Configuration extends BaseConfiguration {
     @Parameter("rules_file")
     private String droolsRulesFile;
 
-    @Parameter(value = "node_id_file", required = false)
+    @Parameter(value = "node_id_file")
     private String nodeIdFile = "/etc/graylog2-server-node-id";
 
-    @Parameter(value = "root_username", required = false)
+    @Parameter(value = "root_username")
     private String rootUsername = "admin";
 
     @Parameter(value = "root_password_sha2", required = true)
     private String rootPasswordSha2;
 
-    @Parameter(value = "allow_leading_wildcard_searches", required = false)
+    @Parameter(value = "allow_leading_wildcard_searches")
     private boolean allowLeadingWildcardSearches = false;
 
-    @Parameter(value = "allow_highlighting", required = false)
+    @Parameter(value = "allow_highlighting")
     private boolean allowHighlighting = false;
 
-    @Parameter(value = "enable_metrics_collection", required = false)
+    @Parameter(value = "enable_metrics_collection")
     private boolean metricsCollectionEnabled = false;
 
     @Parameter(value = "lb_recognition_period_seconds", validator = PositiveIntegerValidator.class)
     private int loadBalancerRecognitionPeriodSeconds = 3;
 
     /* Elasticsearch defaults */
-    @Parameter(value = "elasticsearch_cluster_name", required = false)
+    @Parameter(value = "elasticsearch_cluster_name")
     private String esClusterName = "graylog2";
 
-    @Parameter(value = "elasticsearch_node_name", required = false)
+    @Parameter(value = "elasticsearch_node_name")
     private String esNodeName = "graylog2-server";
 
-    @Parameter(value = "elasticsearch_node_master", required = false)
+    @Parameter(value = "elasticsearch_node_master")
     private boolean esIsMasterEligible = false;
 
-    @Parameter(value = "elasticsearch_node_data", required = false)
+    @Parameter(value = "elasticsearch_node_data")
     private boolean esStoreData = false;
 
-    @Parameter(value = "elasticsearch_transport_tcp_port", validator = InetPortValidator.class, required = false)
+    @Parameter(value = "elasticsearch_transport_tcp_port", validator = InetPortValidator.class)
     private int esTransportTcpPort = 9350;
 
-    @Parameter(value = "elasticsearch_http_enabled", required = false)
+    @Parameter(value = "elasticsearch_http_enabled")
     private boolean esIsHttpEnabled = false;
 
-    @Parameter(value = "elasticsearch_discovery_zen_ping_multicast_enabled", required = false)
+    @Parameter(value = "elasticsearch_discovery_zen_ping_multicast_enabled")
     private boolean esMulticastDiscovery = true;
 
-    @Parameter(value = "elasticsearch_discovery_zen_ping_unicast_hosts", required = false, converter = StringListConverter.class)
+    @Parameter(value = "elasticsearch_discovery_zen_ping_unicast_hosts", converter = StringListConverter.class)
     private List<String> esUnicastHosts;
 
-    @Parameter(value = "elasticsearch_discovery_initial_state_timeout", required = false)
+    @Parameter(value = "elasticsearch_discovery_initial_state_timeout")
     private String esInitialStateTimeout = "3s";
 
-    @Parameter(value = "elasticsearch_network_host", required = false)
+    @Parameter(value = "elasticsearch_network_host")
     private String esNetworkHost;
 
-    @Parameter(value = "elasticsearch_network_bind_host", required = false)
+    @Parameter(value = "elasticsearch_network_bind_host")
     private String esNetworkBindHost;
 
-    @Parameter(value = "elasticsearch_network_publish_host", required = false)
+    @Parameter(value = "elasticsearch_network_publish_host")
     private String esNetworkPublishHost;
 
-    @Parameter(value = "elasticsearch_cluster_discovery_timeout", required = false)
+    @Parameter(value = "elasticsearch_cluster_discovery_timeout", validator = PositiveIntegerValidator.class)
     private long esClusterDiscoveryTimeout = 5000;
 
-    @Parameter(value = "versionchecks", required = false)
+    @Parameter(value = "versionchecks")
     private boolean versionchecks = true;
 
-    @Parameter(value = "versionchecks_uri", required = false)
+    @Parameter(value = "versionchecks_uri")
     private String versionchecksUri = "http://versioncheck.torch.sh/check";
 
     @Parameter(value = "versionchecks_connect_timeout", validator = PositiveIntegerValidator.class)
@@ -216,59 +218,59 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "versionchecks_connection_request_timeout", validator = PositiveIntegerValidator.class)
     private int versionchecksConnectionRequestTimeOut = 10000;
 
-    @Parameter(value = "http_proxy_uri", required = false)
+    @Parameter(value = "http_proxy_uri")
     private String httpProxyUri;
 
     // Transport: Email
-    @Parameter(value = "transport_email_enabled", required = false)
+    @Parameter(value = "transport_email_enabled")
     private boolean emailTransportEnabled = false;
 
-    @Parameter(value = "transport_email_hostname", required = false)
+    @Parameter(value = "transport_email_hostname")
     private String emailTransportHostname;
 
-    @Parameter(value = "transport_email_port", validator = InetPortValidator.class, required = false)
-    private int emailTransportPort;
+    @Parameter(value = "transport_email_port", validator = InetPortValidator.class)
+    private int emailTransportPort = 25;
 
-    @Parameter(value = "transport_email_use_auth", required = false)
+    @Parameter(value = "transport_email_use_auth")
     private boolean emailTransportUseAuth = false;
 
-    @Parameter(value = "transport_email_use_tls", required = false)
+    @Parameter(value = "transport_email_use_tls")
     private boolean emailTransportUseTls = false;
 
-    @Parameter(value = "transport_email_use_ssl", required = false)
+    @Parameter(value = "transport_email_use_ssl")
     private boolean emailTransportUseSsl = true;
 
-    @Parameter(value = "transport_email_auth_username", required = false)
+    @Parameter(value = "transport_email_auth_username")
     private String emailTransportUsername;
 
-    @Parameter(value = "transport_email_auth_password", required = false)
+    @Parameter(value = "transport_email_auth_password")
     private String emailTransportPassword;
 
-    @Parameter(value = "transport_email_subject_prefix", required = false)
+    @Parameter(value = "transport_email_subject_prefix")
     private String emailTransportSubjectPrefix;
 
-    @Parameter(value = "transport_email_from_email", required = false)
+    @Parameter(value = "transport_email_from_email")
     private String emailTransportFromEmail;
 
-    @Parameter(value = "transport_email_web_interface_url", required = false)
+    @Parameter(value = "transport_email_web_interface_url")
     private URI emailTransportWebInterfaceUrl;
 
-    @Parameter(value = "stream_processing_timeout", required = false)
+    @Parameter(value = "stream_processing_timeout", validator = PositiveIntegerValidator.class)
     private long streamProcessingTimeout = 2000;
 
-    @Parameter(value = "stream_processing_max_faults", required = false)
+    @Parameter(value = "stream_processing_max_faults", validator = PositiveIntegerValidator.class)
     private int streamProcessingMaxFaults = 3;
 
-    @Parameter(value = "output_module_timeout", required = false)
+    @Parameter(value = "output_module_timeout", validator = PositiveIntegerValidator.class)
     private long outputModuleTimeout = 10000;
 
-    @Parameter(value = "message_cache_spool_dir", required = false)
+    @Parameter(value = "message_cache_spool_dir")
     private String messageCacheSpoolDir = "spool";
 
-    @Parameter(value = "message_cache_commit_interval", required = false)
+    @Parameter(value = "message_cache_commit_interval", validator = PositiveIntegerValidator.class)
     private long messageCacheCommitInterval = 1000;
 
-    @Parameter(value = "message_cache_off_heap", required = false)
+    @Parameter(value = "message_cache_off_heap")
     private boolean messageCacheOffHeap = true;
 
     @Parameter(value = "stale_master_timeout", validator = PositiveIntegerValidator.class)
@@ -392,8 +394,6 @@ public class Configuration extends BaseConfiguration {
         return droolsRulesFile;
     }
 
-
-
     public List<ServerAddress> getMongoReplicaSet() {
         List<ServerAddress> replicaServers = Lists.newArrayList();
 
@@ -432,7 +432,7 @@ public class Configuration extends BaseConfiguration {
     @ValidatorMethod
     public void validate() throws ValidationException {
 
-        if (isMongoUseAuth() && (null == getMongoUser() || null == getMongoPassword())) {
+        if (isMongoUseAuth() && (isNullOrEmpty(getMongoUser()) || isNullOrEmpty(getMongoPassword()))) {
             throw new ValidationException("mongodb_user and mongodb_password have to be set if mongodb_useauth is true");
         }
     }
@@ -632,4 +632,3 @@ public class Configuration extends BaseConfiguration {
         return ldapConnectionTimeout;
     }
 }
-

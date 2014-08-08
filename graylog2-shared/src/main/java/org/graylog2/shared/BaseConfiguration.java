@@ -20,6 +20,7 @@
 package org.graylog2.shared;
 
 import com.github.joschi.jadconfig.Parameter;
+import com.github.joschi.jadconfig.validators.InetPortValidator;
 import com.github.joschi.jadconfig.validators.PositiveIntegerValidator;
 import com.lmax.disruptor.*;
 import org.graylog2.plugin.Tools;
@@ -43,19 +44,19 @@ public abstract class BaseConfiguration {
     @Parameter(value = "processor_wait_strategy", required = true)
     private String processorWaitStrategy = "blocking";
 
-    @Parameter(value = "rest_enable_cors", required = false)
+    @Parameter(value = "rest_enable_cors")
     private boolean restEnableCors = false;
 
-    @Parameter(value = "rest_enable_gzip", required = false)
+    @Parameter(value = "rest_enable_gzip")
     private boolean restEnableGzip = false;
 
-    @Parameter(value = "groovy_shell_enable", required = false)
+    @Parameter(value = "groovy_shell_enable")
     private boolean groovyShellEnable = false;
 
-    @Parameter(value = "groovy_shell_port", required = false)
+    @Parameter(value = "groovy_shell_port", validator = InetPortValidator.class)
     private int groovyShellPort = 6789;
 
-    @Parameter(value = "plugin_dir", required = false)
+    @Parameter(value = "plugin_dir")
     private String pluginDir = "plugin";
 
     public URI getRestTransportUri() {

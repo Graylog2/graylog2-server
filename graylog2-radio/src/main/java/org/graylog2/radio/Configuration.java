@@ -22,7 +22,6 @@ package org.graylog2.radio;
 import com.github.joschi.jadconfig.Parameter;
 import com.github.joschi.jadconfig.validators.InetPortValidator;
 import com.github.joschi.jadconfig.validators.PositiveIntegerValidator;
-import com.lmax.disruptor.*;
 import org.graylog2.plugin.Tools;
 import org.graylog2.shared.BaseConfiguration;
 import org.slf4j.Logger;
@@ -41,7 +40,7 @@ public class Configuration extends BaseConfiguration {
         AMQP, KAFKA
     }
 
-    @Parameter(value = "node_id_file", required = false)
+    @Parameter(value = "node_id_file")
     private String nodeIdFile = "/etc/graylog2-radio-node-id";
 
     @Parameter(value = "transport_type", required = true)
@@ -53,37 +52,37 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "graylog2_server_uri", required = true)
     private String graylog2ServerUri;
 
-    @Parameter(value = "rest_transport_uri", required = false)
+    @Parameter(value = "rest_transport_uri")
     private String restTransportUri;
 
-    @Parameter(value = "kafka_brokers", required = false)
+    @Parameter(value = "kafka_brokers")
     private String kafkaBrokers;
 
-    @Parameter(value = "kafka_required_acks", required = false)
+    @Parameter(value = "kafka_required_acks")
     private int kafkaRequiredAcks = 1;
 
-    @Parameter(value = "kafka_producer_type", required = false)
+    @Parameter(value = "kafka_producer_type")
     private String kafkaProducerType = "async";
 
-    @Parameter(value = "kafka_batch_size", required = false)
+    @Parameter(value = "kafka_batch_size", validator = PositiveIntegerValidator.class)
     private int kafkaBatchSize = 200;
 
-    @Parameter(value = "kafka_batch_max_wait_ms", required = false)
+    @Parameter(value = "kafka_batch_max_wait_ms", validator = PositiveIntegerValidator.class)
     private int kafkaBatchMaxWaitMs = 250;
 
-    @Parameter(value = "amqp_broker_hostname", required = false)
+    @Parameter(value = "amqp_broker_hostname")
     private String amqpHostname = "localhost";
 
-    @Parameter(value = "amqp_broker_port", required = false, validator = InetPortValidator.class)
+    @Parameter(value = "amqp_broker_port", validator = InetPortValidator.class)
     private int amqpPort = 5672;
 
-    @Parameter(value = "amqp_broker_username", required = false)
+    @Parameter(value = "amqp_broker_username")
     private String amqpUsername;
 
-    @Parameter(value = "amqp_broker_password", required = false)
+    @Parameter(value = "amqp_broker_password")
     private String amqpPassword;
 
-    @Parameter(value = "amqp_broker_vhost", required = false)
+    @Parameter(value = "amqp_broker_vhost")
     private String amqpVhost = "/";
 
     @Parameter(value = "ring_size", required = true, validator = PositiveIntegerValidator.class)
