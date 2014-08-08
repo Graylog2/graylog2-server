@@ -9,7 +9,7 @@ import com.typesafe.sbt.packager.universal.Keys.packageZipTarball
 object ApplicationBuild extends Build {
 
   val appName         = "graylog2-web-interface"
-  val appVersion      = "0.21.0-beta2-SNAPSHOT"
+  val appVersion      = "0.21.0-beta2"
 
 
   // use this to potentially add a timestamp to the built package name
