@@ -59,14 +59,8 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "udp_recvbuffer_sizes", required = true, validator = PositiveIntegerValidator.class)
     private int udpRecvBufferSizes = 1048576;
     
-    @Parameter(value = "force_syslog_rdns", required = true)
-    private boolean forceSyslogRdns = false;
-
     @Parameter(value = "mongodb_useauth", required = true)
     private boolean mongoUseAuth = false;
-
-    @Parameter(value = "allow_override_syslog_date", required = true)
-    private boolean allowOverrideSyslogDate = true;
 
     @Parameter(value = "no_retention")
     private boolean noRetention = false;
