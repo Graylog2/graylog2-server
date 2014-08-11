@@ -101,14 +101,12 @@ public class GelfOutput implements MessageOutput {
 
         final String level = (String) message.getField("level");
         final String messageLevel = level == null? "1" : level;
-        final String shortMessage = (String) message.getField("short_message");
-        final String fullMessage = (String) message.getField("message");
-        final String host = (String) message.getField("source");
+        final String fullMessage = (String) message.getField("full_message");
         final String facility = (String) message.getField("facility");
 
         final GelfMessage gelfMessage = new GelfMessage();
 
-        gelfMessage.setShortMessage(shortMessage);
+        gelfMessage.setShortMessage(message.getMessage());
 
         if(fullMessage != null) {
             gelfMessage.setFullMessage(fullMessage);
@@ -116,7 +114,7 @@ public class GelfOutput implements MessageOutput {
 
         gelfMessage.setJavaTimestamp(timestamp.getMillis());
         gelfMessage.setLevel(messageLevel);
-        gelfMessage.setHost(host);
+        gelfMessage.setHost(message.getSource());
 
         if(facility != null) {
             gelfMessage.setFacility(facility);
