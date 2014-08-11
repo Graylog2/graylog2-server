@@ -133,6 +133,9 @@ $(document).ready(function() {
                 callback(data);
 
                 testStreamRulesAndColorize(streamId);
+            },
+            error: function (xhr) {
+                showError(xhr.responseText);
             }
         });
 
