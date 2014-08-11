@@ -1,6 +1,5 @@
 /*
-/*
- * Copyright 2013 TORCH UG
+ * Copyright 2013-2014 TORCH GmbH
  *
  * This file is part of Graylog2.
  *
@@ -26,10 +25,15 @@ import com.google.common.collect.Maps;
 import org.graylog2.restclient.models.FieldMapper;
 import org.graylog2.restclient.models.api.responses.HighlightRange;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 
 import javax.annotation.Nullable;
 import java.text.DecimalFormat;
-import java.util.*;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
 
 public class MessageResult {
     private final static Set<String> HIDDEN_FIELDS = ImmutableSet.of(
@@ -81,14 +85,11 @@ public class MessageResult {
                 return left.compareTo(right);
             }
         });
-        for (Map.Entry<String, Object> f : message.entrySet()) {
-            fields.put(f.getKey(), f.getValue());
-        }
+
+        fields.putAll(message);
 
         this.id = (String) message.get("_id");
-        final Object timestamp1 = message.get("timestamp");
-        this.timestamp = new DateTime(timestamp1);
-
+        this.timestamp = timestampToDateTime(message.get("timestamp"));
         this.sourceNodeId = (String) message.get("gl2_source_node");
         this.sourceInputId = (String) message.get("gl2_source_input");
         this.index = index;
@@ -100,6 +101,16 @@ public class MessageResult {
         } else {
             sourceRadioId = null;
             sourceRadioInputId = null;
+        }
+    }
+
+    private DateTime timestampToDateTime(final Object timestamp) {
+        if (timestamp instanceof Double) {
+            return new DateTime(Math.round((double) timestamp * 1000.0d), DateTimeZone.UTC);
+        } else if (timestamp instanceof Long || timestamp instanceof Integer) {
+            return new DateTime((long) timestamp * 1000l, DateTimeZone.UTC);
+        } else {
+            return new DateTime(timestamp, DateTimeZone.UTC);
         }
     }
 
