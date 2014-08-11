@@ -286,6 +286,10 @@
     </div>
 </div>
 
+@if(stream != null) {
+    @views.html.partials.streamrules.stream_rule_form.render(streamId, null)
+}
+
 <div id="built-query" class="modal hide fade" tabindex="-1" role="dialog">
     <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal">x</button>
