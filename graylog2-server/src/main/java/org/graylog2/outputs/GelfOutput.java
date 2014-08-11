@@ -16,11 +16,13 @@
  */
 package org.graylog2.outputs;
 
-import com.google.common.collect.Maps;
-import org.graylog2.GelfMessage;
-import org.graylog2.GelfSender;
-import org.graylog2.GelfTCPSender;
-import org.graylog2.GelfUDPSender;
+import com.google.common.collect.ImmutableMap;
+import org.graylog2.gelfclient.GelfConfiguration;
+import org.graylog2.gelfclient.GelfMessage;
+import org.graylog2.gelfclient.GelfMessageBuilder;
+import org.graylog2.gelfclient.GelfMessageLevel;
+import org.graylog2.gelfclient.GelfTransports;
+import org.graylog2.gelfclient.transport.GelfTransport;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
@@ -34,8 +36,7 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.util.HashMap;
+import java.net.InetSocketAddress;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -47,24 +48,24 @@ public class GelfOutput implements MessageOutput {
     private static final Logger LOG = LoggerFactory.getLogger(GelfOutput.class);
     private final AtomicBoolean isRunning = new AtomicBoolean(false);
     private Configuration configuration;
-    private GelfSender gelfSender;
+    private GelfTransport transport;
 
     @Override
-    public void initialize(Configuration config) throws MessageOutputConfigurationException {
+    public void initialize(final Configuration config) throws MessageOutputConfigurationException {
         configuration = config;
-        gelfSender = getGelfSender(configuration);
+        transport = buildTransport(configuration);
         isRunning.set(true);
     }
 
     @Override
     public void stop() {
-        LOG.debug("Closing {}", gelfSender.getClass().getName());
+        LOG.debug("Stopping {}", transport.getClass().getName());
         try {
-            isRunning.set(false);
-            gelfSender.close();
+            transport.stop();
         } catch (Exception e) {
-            LOG.error("Error closing " + gelfSender.getClass().getName(), e);
+            LOG.error("Error stopping " + transport.getClass().getName(), e);
         }
+        isRunning.set(false);
     }
 
     @Override
@@ -72,43 +73,41 @@ public class GelfOutput implements MessageOutput {
         return isRunning.get();
     }
 
-    protected GelfSender getGelfSender(Configuration configuration) throws MessageOutputConfigurationException {
+    protected GelfTransport buildTransport(final Configuration configuration) throws MessageOutputConfigurationException {
+        final String protocol = configuration.getString("protocol").toUpperCase();
         final String hostname = configuration.getString("hostname");
         final int port = Integer.parseInt(configuration.getString("port"));
 
-        LOG.debug("Connecting to {}:{}", hostname, port);
+        final GelfConfiguration gelfConfiguration = new GelfConfiguration(new InetSocketAddress(hostname, port))
+                .transport(GelfTransports.valueOf(protocol));
 
-        final GelfSender gelfSender;
+        LOG.debug("Initializing GELF sender and connecting to {}://{}:{}", protocol, hostname, port);
+
+        final GelfTransport gelfTransport;
         try {
-            if (configuration.getString("protocol").toUpperCase().equals("UDP")) {
-                LOG.debug("Initializing UDP sender");
-                gelfSender = new GelfUDPSender(hostname, port);
-            } else {
-                LOG.debug("Initializing TCP sender");
-                gelfSender = new GelfTCPSender(hostname, port);
-            }
-        } catch (IOException e) {
-            final String error = "Error initializing " + this.getClass() + ": " + e;
-            LOG.error(error);
+            gelfTransport = GelfTransports.create(gelfConfiguration);
+        } catch (Exception e) {
+            final String error = "Error initializing " + this.getClass() + ": " + e.getMessage();
+            LOG.error(error, e);
             throw new MessageOutputConfigurationException(error);
         }
 
-        return gelfSender;
+        return gelfTransport;
     }
 
     @Override
-    public void write(Message message) throws Exception {
-        if (gelfSender == null)
-            gelfSender = getGelfSender(this.configuration);
-        gelfSender.sendMessage(toGELFMessage(message));
+    public void write(final Message message) throws Exception {
+        if (transport == null) {
+            transport = buildTransport(this.configuration);
+        }
+        transport.send(toGELFMessage(message));
     }
 
     @Override
-    public void write(List<Message> messages) throws Exception {
-        for (Message message : messages) {
+    public void write(final List<Message> messages) throws Exception {
+        for (final Message message : messages) {
             write(message);
         }
-
     }
 
     protected GelfMessage toGELFMessage(final Message message) {
@@ -120,43 +119,37 @@ public class GelfOutput implements MessageOutput {
         }
 
         final String level = (String) message.getField("level");
-        final String messageLevel = level == null? "1" : level;
-        final String fullMessage = (String) message.getField("full_message");
+        final GelfMessageLevel messageLevel = level == null ?
+                GelfMessageLevel.ALERT : GelfMessageLevel.fromNumericLevel(Integer.parseInt(level));
+        final String fullMessage = (String) message.getField("message");
         final String facility = (String) message.getField("facility");
-
-        final GelfMessage gelfMessage = new GelfMessage();
-
-        gelfMessage.setShortMessage(message.getMessage());
-
-        if(fullMessage != null) {
-            gelfMessage.setFullMessage(fullMessage);
-        }
-
-        gelfMessage.setJavaTimestamp(timestamp.getMillis());
-        gelfMessage.setLevel(messageLevel);
-        gelfMessage.setHost(message.getSource());
-
-        if(facility != null) {
-            gelfMessage.setFacility(facility);
-        }
-
-        gelfMessage.setAdditonalFields(Maps.newHashMap(message.getFields()));
-
         final String forwarder = GelfOutput.class.getCanonicalName();
-        gelfMessage.addField("_forwarder", forwarder);
 
-        return gelfMessage;
+        final GelfMessageBuilder builder = new GelfMessageBuilder(message.getMessage(), message.getSource())
+                .timestamp(timestamp.getMillis())
+                .level(messageLevel)
+                .additionalField("_forwarder", forwarder)
+                .additionalFields(message.getFields());
+
+        if (fullMessage != null) {
+            builder.fullMessage(fullMessage);
+        }
+
+        if (facility != null) {
+            builder.additionalField("_facility", facility);
+        }
+
+        return builder.build();
     }
 
     @Override
     public ConfigurationRequest getRequestedConfiguration() {
-        ConfigurationRequest configurationRequest = new ConfigurationRequest();
+        final ConfigurationRequest configurationRequest = new ConfigurationRequest();
         configurationRequest.addField(new TextField("hostname", "Destination host", "", "This is the hostname of the destination", ConfigurationField.Optional.NOT_OPTIONAL));
         configurationRequest.addField(new NumberField("port", "Destination port", 12201, "This is the port of the destination", ConfigurationField.Optional.NOT_OPTIONAL));
-        Map<String, String> protocols = new HashMap<String, String>() {{
-            put("TCP", "TCP");
-            put("UDP", "UDP");
-        }};
+        final Map<String, String> protocols = ImmutableMap.of(
+                "TCP", "TCP",
+                "UDP", "UDP");
         configurationRequest.addField(new DropdownField("protocol", "Protocol", "TCP", protocols, "The protocol used to connect", ConfigurationField.Optional.OPTIONAL));
         return configurationRequest;
     }
