@@ -29,13 +29,16 @@ import org.glassfish.jersey.server.ContainerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.filter.EncodingFilter;
 import org.glassfish.jersey.server.internal.scanning.PackageNamesScanner;
+import org.glassfish.jersey.server.model.Resource;
 import org.graylog2.jersey.container.netty.NettyContainer;
 import org.graylog2.jersey.container.netty.SecurityContextFactory;
+import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.plugin.rest.WebApplicationExceptionMapper;
 import org.graylog2.shared.BaseConfiguration;
 import org.graylog2.plugin.rest.AnyExceptionClassMapper;
 import org.graylog2.plugin.rest.JacksonPropertyExceptionMapper;
 import org.graylog2.shared.rest.CORSFilter;
+import org.graylog2.shared.rest.PrintModelProcessor;
 import org.jboss.netty.bootstrap.ServerBootstrap;
 import org.jboss.netty.channel.ChannelPipeline;
 import org.jboss.netty.channel.ChannelPipelineFactory;
@@ -49,10 +52,13 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import javax.ws.rs.Path;
 import javax.ws.rs.container.ContainerResponseFilter;
 import javax.ws.rs.container.DynamicFeature;
 import javax.ws.rs.ext.ExceptionMapper;
 import java.net.InetSocketAddress;
+import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -68,6 +74,7 @@ public class RestApiService extends AbstractIdleService {
     private final Set<Class<? extends DynamicFeature>> dynamicFeatures;
     private final Set<Class<? extends ContainerResponseFilter>> containerResponseFilters;
     private final Set<Class<? extends ExceptionMapper>> exceptionMappers;
+    private final Map<String, Set<PluginRestResource>> pluginRestResources;
     private final ObjectMapper objectMapper;
     private ServerBootstrap bootstrap;
 
@@ -77,12 +84,14 @@ public class RestApiService extends AbstractIdleService {
                           Set<Class<? extends DynamicFeature>> dynamicFeatures,
                           Set<Class<? extends ContainerResponseFilter>> containerResponseFilters,
                           Set<Class<? extends ExceptionMapper>> exceptionMappers,
+                          Map<String, Set<PluginRestResource>> pluginRestResources,
                           ObjectMapper objectMapper) {
         this.configuration = configuration;
         this.securityContextFactory = securityContextFactory;
         this.dynamicFeatures = dynamicFeatures;
         this.containerResponseFilters = containerResponseFilters;
         this.exceptionMappers = exceptionMappers;
+        this.pluginRestResources = pluginRestResources;
         this.objectMapper = objectMapper;
     }
 
@@ -130,7 +139,10 @@ public class RestApiService extends AbstractIdleService {
             rc.register(CORSFilter.class);
         }
 
-        /*rc = rc.registerFinder(new PackageNamesScanner(new String[]{"org.graylog2.rest.resources"}, true));*/
+        rc.registerResources(prefixPluginResources("/plugins", pluginRestResources));
+
+        if(LOG.isDebugEnabled())
+            rc.register(PrintModelProcessor.class);
 
         final NettyContainer jerseyHandler = ContainerFactory.createContainer(NettyContainer.class, rc);
         if (securityContextFactory != null) {
@@ -160,6 +172,24 @@ public class RestApiService extends AbstractIdleService {
         ));
 
         LOG.info("Started REST API at <{}>", configuration.getRestListenUri());
+    }
+
+    private Set<Resource> prefixPluginResources(String pluginPrefix, Map<String, Set<PluginRestResource>> pluginResourceMap) {
+        final Set<Resource> result = new HashSet<>();
+        for (Map.Entry<String, Set<PluginRestResource>> entry : pluginResourceMap.entrySet()) {
+            for (PluginRestResource pluginRestResource : entry.getValue()) {
+                StringBuilder resourcePath = new StringBuilder(pluginPrefix).append("/").append(entry.getKey());
+                final Path pathAnnotation = Resource.getPath(pluginRestResource.getClass());
+                final String path = (pathAnnotation.value() == null ? "" : pathAnnotation.value());
+                if (!path.startsWith("/"))
+                    resourcePath.append("/");
+
+                final Resource.Builder resourceBuilder = Resource.builder(pluginRestResource.getClass()).path(resourcePath.append(path).toString());
+                final Resource resource = resourceBuilder.build();
+                result.add(resource);
+            }
+        }
+        return result;
     }
 
     @Override
