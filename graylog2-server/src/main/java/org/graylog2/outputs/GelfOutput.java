@@ -91,23 +91,41 @@ public class GelfOutput implements MessageOutput {
 
     }
 
-    protected GelfMessage toGELFMessage(Message message) {
-        final DateTime curTimestamp;
-        if (message.getField("timestamp") != null || message.getField("timestamp") instanceof DateTime)
-            curTimestamp = (DateTime)message.getField("timestamp");
-        else
-            curTimestamp = DateTime.now();
+    protected GelfMessage toGELFMessage(final Message message) {
+        final DateTime timestamp;
+        if (message.getField("timestamp") != null || message.getField("timestamp") instanceof DateTime) {
+            timestamp = (DateTime) message.getField("timestamp");
+        } else {
+            timestamp = DateTime.now();
+        }
 
-        final long timestamp = curTimestamp.getMillis()/1000;
-        GelfMessage gelfMessage = new GelfMessage((String)message.getField("short_message"),
-                (String)message.getField("message"),
-                timestamp,
-                (String)message.getField("level"));
+        final String level = (String) message.getField("level");
+        final String messageLevel = level == null? "1" : level;
+        final String shortMessage = (String) message.getField("short_message");
+        final String fullMessage = (String) message.getField("message");
+        final String host = (String) message.getField("source");
+        final String facility = (String) message.getField("facility");
 
-        gelfMessage.setHost((String)message.getField("source"));
-        gelfMessage.setFacility(this.getClass().getCanonicalName());
+        final GelfMessage gelfMessage = new GelfMessage();
+
+        gelfMessage.setShortMessage(shortMessage);
+
+        if(fullMessage != null) {
+            gelfMessage.setFullMessage(fullMessage);
+        }
+
+        gelfMessage.setJavaTimestamp(timestamp.getMillis());
+        gelfMessage.setLevel(messageLevel);
+        gelfMessage.setHost(host);
+
+        if(facility != null) {
+            gelfMessage.setFacility(facility);
+        }
 
         gelfMessage.setAdditonalFields(message.getFields());
+
+        final String forwarder = GelfOutput.class.getCanonicalName();
+        gelfMessage.addField("_forwarder", forwarder);
 
         return gelfMessage;
     }
