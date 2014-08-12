@@ -26,6 +26,7 @@ import org.graylog2.plugin.alarms.AlertCondition;
 import org.graylog2.plugin.streams.Output;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.streams.StreamRule;
+import org.graylog2.rest.resources.streams.requests.CreateRequest;
 
 import java.util.List;
 import java.util.Map;
@@ -35,12 +36,13 @@ import java.util.Map;
  */
 public interface StreamService extends PersistedService {
     Stream create(Map<String, Object> fields);
+    Stream create(CreateRequest request);
     Stream load(String id) throws NotFoundException;
     void destroy(Stream stream) throws NotFoundException;
     List<Stream> loadAll();
     List<Stream> loadAllEnabled();
-    void pause(Stream stream);
-    void resume(Stream stream);
+    void pause(Stream stream) throws ValidationException;
+    void resume(Stream stream) throws ValidationException;
     List<StreamRule> getStreamRules(Stream stream) throws NotFoundException;
     List<Stream> loadAllWithConfiguredAlertConditions();
 
