@@ -369,7 +369,15 @@ public final class Tools {
         return Ints.tryParse(x.toString());
     }
 
-    public static InetAddress guessPrimaryNetworkAddress() throws SocketException, NoInterfaceFoundException {
+    /**
+     * Try to get the primary {@link java.net.InetAddress} of the primary network interface with
+     * fallback to the local loopback address (usually {@code 127.0.0.1} or {@link ::1}.
+     *
+     * @return The primary {@link java.net.InetAddress} of the primary network interface
+     * or the loopback address as fallback.
+     * @throws SocketException if the list of network interfaces couldn't be retrieved
+     */
+    public static InetAddress guessPrimaryNetworkAddress() throws SocketException {
         Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
 
         for (NetworkInterface interf : Collections.list(interfaces)) {
@@ -383,7 +391,7 @@ public final class Tools {
             }
         }
 
-        throw new NoInterfaceFoundException();
+        return InetAddress.getLoopbackAddress();
     }
 
     public static URI getUriStandard(String from) {
