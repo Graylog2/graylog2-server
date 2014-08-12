@@ -85,6 +85,7 @@ public class EmailAlarmCallback implements AlarmCallback {
                     alertSender.sendEmails(stream, result);
                 }
             } catch (TransportConfigurationException e) {
+                LOG.warn("Stream [{}] has alert receivers and is triggered, but email transport is not configured.", stream);
                 Notification notification = notificationService.buildNow()
                         .addNode(nodeId.toString())
                         .addType(Notification.Type.EMAIL_TRANSPORT_CONFIGURATION_INVALID)
@@ -92,8 +93,8 @@ public class EmailAlarmCallback implements AlarmCallback {
                         .addDetail("stream_id", stream.getId())
                         .addDetail("exception", new ExceptionStringFormatter(e).toString());
                 notificationService.publishIfFirst(notification);
-                LOG.warn("Stream [{}] has alert receivers and is triggered, but email transport is not configured.", stream);
             } catch (Exception e) {
+                LOG.error("Stream [" + stream + "] has alert receivers and is triggered, but sending emails failed", e);
                 Notification notification = notificationService.buildNow()
                         .addNode(nodeId.toString())
                         .addType(Notification.Type.EMAIL_TRANSPORT_FAILED)
@@ -101,7 +102,6 @@ public class EmailAlarmCallback implements AlarmCallback {
                         .addDetail("stream_id", stream.getId())
                         .addDetail("exception", e.toString() + " (" + e.getCause().toString() + "");
                 notificationService.publishIfFirst(notification);
-                LOG.error("Stream [" + stream + "] has alert receivers and is triggered, but sending emails failed", e);
             }
         }
     }
