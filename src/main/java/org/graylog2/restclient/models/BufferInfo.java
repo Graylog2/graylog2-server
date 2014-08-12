@@ -18,6 +18,7 @@
  */
 package org.graylog2.restclient.models;
 
+import com.google.common.collect.Maps;
 import org.graylog2.restclient.models.api.responses.BufferSummaryResponse;
 import org.graylog2.restclient.models.api.responses.BuffersResponse;
 import org.graylog2.restclient.models.api.responses.MasterCacheSummaryResponse;
@@ -54,5 +55,14 @@ public class BufferInfo {
 
     public MasterCacheSummaryResponse getOutputMasterCache() {
         return firstNonNull(MasterCacheSummaryResponse.EMPTY, outputMasterCache);
+    }
+
+    public static BufferInfo buildEmpty() {
+        final BuffersResponse response = new BuffersResponse();
+
+        response.buffers = Maps.newHashMap();
+        response.masterCaches = Maps.newHashMap();
+
+        return new BufferInfo(response);
     }
 }

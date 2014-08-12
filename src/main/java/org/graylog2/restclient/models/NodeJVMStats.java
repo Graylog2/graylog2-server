@@ -81,4 +81,22 @@ public class NodeJVMStats {
         return Math.round((float) totalMemory.getMegabytes() / maxMemory.getMegabytes() * 100);
     }
 
+    public static NodeJVMStats buildEmpty() {
+        final ByteListing byteListing = new ByteListing();
+        final ClusterEntityJVMStatsResponse clusterEntity = new ClusterEntityJVMStatsResponse();
+
+        byteListing.bytes = 0;
+        byteListing.kilobytes  = 0;
+        byteListing.megabytes = 0;
+
+        clusterEntity.nodeId = "unknown";
+        clusterEntity.info = "unknown";
+        clusterEntity.pid = "unknown";
+        clusterEntity.maxMemory = byteListing;
+        clusterEntity.usedMemory = byteListing;
+        clusterEntity.totalMemory = byteListing;
+        clusterEntity.freeMemory = byteListing;
+
+        return new NodeJVMStats(clusterEntity);
+    }
 }
