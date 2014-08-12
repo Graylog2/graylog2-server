@@ -41,7 +41,6 @@ public class EventBusProvider implements Provider<EventBus> {
 
     @Override
     public EventBus get() {
-        System.out.println(this.getClass().getCanonicalName() + ": get()");
         return new AsyncEventBus("graylog2-eventbus",
                 Executors.newFixedThreadPool(
                         configuration.getAsyncEventbusProcessors(),
