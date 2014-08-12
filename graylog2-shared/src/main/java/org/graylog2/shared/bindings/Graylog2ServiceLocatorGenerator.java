@@ -22,7 +22,6 @@
  */
 package org.graylog2.shared.bindings;
 
-import com.google.inject.Injector;
 import org.glassfish.hk2.api.DynamicConfigurationService;
 import org.glassfish.hk2.api.ServiceLocator;
 import org.glassfish.hk2.extension.ServiceLocatorGenerator;
@@ -30,30 +29,26 @@ import org.glassfish.hk2.utilities.BuilderHelper;
 import org.jvnet.hk2.external.generator.ServiceLocatorGeneratorImpl;
 import org.jvnet.hk2.guice.bridge.api.GuiceBridge;
 import org.jvnet.hk2.guice.bridge.api.GuiceIntoHK2Bridge;
-import org.jvnet.hk2.internal.*;
+import org.jvnet.hk2.internal.DefaultClassAnalyzer;
+import org.jvnet.hk2.internal.DynamicConfigurationImpl;
+import org.jvnet.hk2.internal.DynamicConfigurationServiceImpl;
+import org.jvnet.hk2.internal.ServiceLocatorImpl;
+import org.jvnet.hk2.internal.Utilities;
 
 import javax.inject.Singleton;
 
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
  */
-public class OwnServiceLocatorGenerator extends ServiceLocatorGeneratorImpl implements ServiceLocatorGenerator {
-    private final Injector injector;
-    public OwnServiceLocatorGenerator(Injector injector) {
-        super();
-        this.injector = injector;
-    }
-
-    private ServiceLocator initialize(String name, ServiceLocator parent) {
+public class Graylog2ServiceLocatorGenerator extends ServiceLocatorGeneratorImpl implements ServiceLocatorGenerator {
+    private ServiceLocator initialize(final String name, final ServiceLocator parent) {
         if (parent != null && !(parent instanceof ServiceLocatorImpl)) {
             throw new AssertionError("parent must be a " + ServiceLocatorImpl.class.getName() +
                     " instead it is a " + parent.getClass().getName());
         }
 
-        //ServiceLocatorImpl sli = new OwnServiceLocator(name, (ServiceLocatorImpl) parent, injector);
-        ServiceLocatorImpl sli = new ServiceLocatorImpl(name, (ServiceLocatorImpl) parent);
-
-        DynamicConfigurationImpl dci = new DynamicConfigurationImpl(sli);
+        final ServiceLocatorImpl sli = new ServiceLocatorImpl(name, (ServiceLocatorImpl) parent);
+        final DynamicConfigurationImpl dci = new DynamicConfigurationImpl(sli);
 
         // The service locator itself
         dci.bind(Utilities.getLocatorDescriptor(sli));
@@ -75,7 +70,7 @@ public class OwnServiceLocatorGenerator extends ServiceLocatorGeneratorImpl impl
 
         GuiceBridge.getGuiceBridge().initializeGuiceBridge(sli);
         GuiceIntoHK2Bridge guiceBridge = sli.getService(GuiceIntoHK2Bridge.class);
-        guiceBridge.bridgeGuiceInjector(injector);
+        guiceBridge.bridgeGuiceInjector(GuiceInjectorHolder.getInjector());
 
         return sli;
     }
