@@ -12,6 +12,9 @@ $(document).ready(function() {
     $("div.xtrc-message").on("click", "dt.xtrc-message-field", function() {
         var field = $(this).attr("data-field");
         var value = $(this).attr("data-value");
+        var message = $("div.xtrc-message");
+        var messageId = message.data("id");
+        var messageIndex = message.data("index");
 
         $(".xtrc-select-message").remove();
 
@@ -20,7 +23,8 @@ $(document).ready(function() {
         $(".xtrc-wizard-example", wizard).html(htmlEscape(value));
 
         $("input[name=field]", wizard).val(field)
-        $("input[name=example]", wizard).val(value);
+        $("input[name=example_id]", wizard).val(messageId);
+        $("input[name=example_index]", wizard).val(messageIndex);
         wizard.show();
     });
 

@@ -99,7 +99,7 @@ public class ExtractorsController extends AuthenticatedController {
             Node node = nodeService.loadNode(nodeId);
             Input input = node.getInput(inputId);
             MessageResult exampleMessage = messagesService.getMessage(exampleIndex, exampleId);
-            String example = (String) exampleMessage.getFields().get(field);
+            String example = exampleMessage.getFields().get(field).toString();
 
             return ok(views.html.system.inputs.extractors.new_extractor.render(
                     currentUser(),
