@@ -25,14 +25,12 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.util.concurrent.ServiceManager;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.inject.AbstractModule;
+import com.google.inject.Scopes;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import org.graylog2.inputs.gelf.gelf.GELFChunkManager;
 import org.graylog2.plugin.inputs.util.ThroughputCounter;
 import org.graylog2.plugin.system.NodeId;
-import org.graylog2.shared.bindings.providers.GELFChunkManagerProvider;
-import org.graylog2.shared.bindings.providers.NodeIdProvider;
-import org.graylog2.shared.bindings.providers.ProcessBufferProvider;
-import org.graylog2.shared.bindings.providers.ServiceManagerProvider;
+import org.graylog2.shared.bindings.providers.*;
 import org.graylog2.shared.buffers.ProcessBuffer;
 import org.graylog2.shared.buffers.ProcessBufferWatermark;
 import org.graylog2.shared.stats.ThroughputStats;
@@ -70,15 +68,6 @@ public class GenericBindings extends AbstractModule {
         bind(HashedWheelTimer.class).toInstance(new HashedWheelTimer());
         bind(ThroughputCounter.class);
 
-        AsyncEventBus eventBus = new AsyncEventBus("graylog2-eventbus",
-                                                   Executors.newFixedThreadPool(
-                                                           2, // TODO make configurable
-                                                           new ThreadFactoryBuilder()
-                                                                   .setDaemon(true)
-                                                                   .setNameFormat(
-                                                                           "eventbus-handler-%d")
-                                                                   .build()
-                                                   ));
-        bind(EventBus.class).toInstance(eventBus);
+        bind(EventBus.class).toProvider(EventBusProvider.class).in(Scopes.SINGLETON);
     }
 }
