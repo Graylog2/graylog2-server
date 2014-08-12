@@ -18,6 +18,7 @@
  */
 package org.graylog2.plugin.streams;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import org.graylog2.plugin.database.Persisted;
 
 import java.util.Map;
@@ -26,6 +27,7 @@ import java.util.Map;
  *
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
+@JsonAutoDetect
 public interface StreamRule extends Persisted {
     public String getId();
 

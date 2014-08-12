@@ -202,9 +202,9 @@ public class StreamRuleResource extends RestResource {
                 throw new NotFoundException();
             }
         } catch (org.graylog2.database.NotFoundException e) {
-            throw new javax.ws.rs.NotFoundException("Stream rule not found!");
+            throw new javax.ws.rs.NotFoundException("Stream rule <" + streamRuleId + "> not found!");
         }
 
-        return Response.status(Response.Status.fromStatusCode(204)).build();
+        return Response.status(Response.Status.NO_CONTENT).build();
     }
 }

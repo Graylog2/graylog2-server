@@ -102,6 +102,7 @@ public class OutputResource extends RestResource {
             @ApiResponse(code = 404, message = "No such stream/output on this node.")
     })
     public Response delete(@ApiParam(title = "outputId", description = "The id of the output that should be deleted", required = true) @PathParam("outputId") String outputId) throws org.graylog2.database.NotFoundException {
+        checkPermission(RestPermissions.OUTPUTS_TERMINATE);
         Output output = outputService.load(outputId);
         outputService.destroy(output);
 
@@ -113,9 +114,6 @@ public class OutputResource extends RestResource {
     @ApiOperation(value = "Get all available output modules")
     @RequiresPermissions(RestPermissions.STREAMS_READ)
     @Produces(MediaType.APPLICATION_JSON)
-    @ApiResponses(value = {
-            @ApiResponse(code = 404, message = "No such stream on this node.")
-    })
     public Map<String, Object> available() {
         return new HashMap<String, Object>() {
             {
