@@ -69,6 +69,9 @@ public class InputSetupService extends AbstractExecutionThreadService {
         // we can actually process them.
         if ((lifecycle == Lifecycle.RUNNING) && (previousLifecycle.get() == Lifecycle.STARTING || previousLifecycle.get() == Lifecycle.UNINITIALIZED)) {
             LOG.info("Triggering launching persisted inputs, node transitioned from {} to {}", previousLifecycle.get(), lifecycle);
+
+            // Set lifecycle BEFORE counting down the latch to avoid race conditions!
+            previousLifecycle.set(lifecycle);
             startLatch.countDown();
         }
 
@@ -76,8 +79,6 @@ public class InputSetupService extends AbstractExecutionThreadService {
         if (lifecycle == Lifecycle.FAILED) {
             startLatch.countDown();
         }
-
-        previousLifecycle.set(lifecycle);
     }
 
     @Override
@@ -89,6 +90,8 @@ public class InputSetupService extends AbstractExecutionThreadService {
         if (previousLifecycle.get() == Lifecycle.RUNNING) {
             LOG.debug("Launching persisted inputs now.");
             inputRegistry.launchAllPersisted();
+        } else {
+            LOG.error("Not starting any inputs because lifecycle is: {}", previousLifecycle.get());
         }
 
         // next, simply block until we are asked to shutdown, even though we are consuming a thread this way.

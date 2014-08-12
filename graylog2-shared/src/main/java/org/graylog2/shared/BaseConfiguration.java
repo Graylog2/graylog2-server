@@ -27,6 +27,7 @@ import org.graylog2.plugin.Tools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.net.InetAddress;
 import java.net.URI;
 
 /**
@@ -75,20 +76,23 @@ public abstract class BaseConfiguration {
     }
 
     public URI getDefaultRestTransportUri() {
-        URI transportUri;
-        URI listenUri = getRestListenUri();
+        final URI transportUri;
+        final URI listenUri = getRestListenUri();
 
         if (listenUri.getHost().equals("0.0.0.0")) {
-            String guessedIf;
+            final InetAddress guessedAddress;
             try {
-                guessedIf = Tools.guessPrimaryNetworkAddress().getHostAddress();
+                guessedAddress = Tools.guessPrimaryNetworkAddress();
+
+                if(guessedAddress.isLoopbackAddress()) {
+                    LOG.debug("Using loopback address {}", guessedAddress);
+                }
             } catch (Exception e) {
                 LOG.error("Could not guess primary network address for rest_transport_uri. Please configure it in your graylog2.conf.", e);
-                throw new RuntimeException("No rest_transport_uri.");
+                throw new RuntimeException("No rest_transport_uri.", e);
             }
 
-            String transportStr = "http://" + guessedIf + ":" + listenUri.getPort();
-            transportUri = Tools.getUriStandard(transportStr);
+            transportUri = Tools.getUriStandard("http://" + guessedAddress.getHostAddress() + ":" + listenUri.getPort());
         } else {
             transportUri = listenUri;
         }
