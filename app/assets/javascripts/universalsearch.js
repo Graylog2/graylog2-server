@@ -116,7 +116,7 @@ $(document).ready(function() {
         button.html("<i class='icon icon-spin icon-spinner'></i>&nbsp; Saving");
 
         var params = {};
-        params.query = originalUniversalSearchSettings();
+        params.query = originalUniversalSearchSettings(searchViewState);
         params.title = title
 
         $.ajax({

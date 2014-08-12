@@ -1056,7 +1056,7 @@ function redrawResultGraph() {
     }
 }
 
-function originalUniversalSearchSettings() {
+function originalUniversalSearchSettings(searchViewState) {
     var result = {};
 
     result.query =  $("#universalsearch-query-permanent").text().trim();
@@ -1073,6 +1073,10 @@ function originalUniversalSearchSettings() {
         case "keyword":
             result.keyword = $("#universalsearch-keyword-permanent").text().trim();
             break;
+    }
+
+    if (searchViewState) {
+        result.fields = searchViewState.getFieldsString();
     }
 
     return result;

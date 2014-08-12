@@ -92,6 +92,11 @@ public class SavedSearchesController extends AuthenticatedController {
             keyword = (String) search.getQuery().get("keyword");
         }
 
+        String fields = "";
+        if (search.getQuery().containsKey("fields")) {
+            fields = (String) search.getQuery().get("fields");
+        }
+
         String searchId = "";
         if (includeOriginal) {
             searchId = search.getId();
@@ -110,7 +115,7 @@ public class SavedSearchesController extends AuthenticatedController {
                     searchId,
                     "",
                     "",
-                    ""  // TODO fields
+                    fields
             );
         } else {
             return routes.StreamSearchController.index(
@@ -126,7 +131,7 @@ public class SavedSearchesController extends AuthenticatedController {
                     searchId,
                     "",
                     "",
-                    "" // TODO fields
+                    fields
             );
         }
     }
