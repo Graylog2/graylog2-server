@@ -22,14 +22,18 @@ package org.graylog2.shared;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.common.eventbus.EventBus;
+import com.google.common.util.concurrent.Uninterruptibles;
 import com.google.inject.Inject;
 import org.graylog2.plugin.lifecycles.Lifecycle;
 import org.graylog2.plugin.system.NodeId;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Singleton;
 import java.util.Set;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -37,6 +41,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 @Singleton
 public class ServerStatus {
+    private static final Logger LOG = LoggerFactory.getLogger(ServerStatus.class);
     private final EventBus eventBus;
 
     public enum Capability {
@@ -54,6 +59,7 @@ public class ServerStatus {
 
     private final AtomicBoolean isProcessing = new AtomicBoolean(true);
     private final AtomicBoolean processingPauseLocked = new AtomicBoolean(false);
+    private final CountDownLatch runningLatch = new CountDownLatch(1);
 
     @Inject
     public ServerStatus(BaseConfiguration configuration, Set<Capability> capabilities, EventBus eventBus) {
@@ -78,6 +84,7 @@ public class ServerStatus {
         switch (lifecycle) {
             case RUNNING:
                 isProcessing.set(true);
+                runningLatch.countDown();
                 break;
             case UNINITIALIZED:
             case STARTING:
@@ -87,6 +94,19 @@ public class ServerStatus {
         }
         this.lifecycle = lifecycle;
         eventBus.post(this.lifecycle);
+    }
+
+    public void awaitRunning(final Runnable runnable) {
+        LOG.debug("Waiting for server to enter RUNNING state");
+        Uninterruptibles.awaitUninterruptibly(runningLatch);
+        LOG.debug("Server entered RUNNING state");
+
+        try {
+            LOG.debug("Executing awaitRunning callback");
+            runnable.run();
+        } catch (Exception e) {
+            LOG.error("awaitRunning callback failed", e);
+        }
     }
 
     public DateTime getStartedAt() {

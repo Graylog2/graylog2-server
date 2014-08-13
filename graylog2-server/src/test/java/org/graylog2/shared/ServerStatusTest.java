@@ -31,10 +31,11 @@ import org.testng.annotations.Test;
 
 import java.io.File;
 import java.nio.file.Files;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.testng.Assert.*;
 
 public class ServerStatusTest {
@@ -92,6 +93,62 @@ public class ServerStatusTest {
         status.setLifecycle(Lifecycle.PAUSED);
         assertFalse(status.isProcessing());
         verify(eventBus).post(Lifecycle.PAUSED);
+    }
+
+    @Test
+    public void testAwaitRunning() throws Exception {
+        final Runnable runnable = mock(Runnable.class);
+        final CountDownLatch startLatch = new CountDownLatch(1);
+        final CountDownLatch stopLatch = new CountDownLatch(1);
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    startLatch.countDown();
+                    status.awaitRunning(runnable);
+                } finally {
+                    stopLatch.countDown();
+                }
+            }
+        }).start();
+
+        startLatch.await(5, TimeUnit.SECONDS);
+        verify(runnable, never()).run();
+
+        status.setLifecycle(Lifecycle.RUNNING);
+
+        stopLatch.await(5, TimeUnit.SECONDS);
+        verify(runnable).run();
+    }
+
+    @Test
+    public void testAwaitRunningWithException() throws Exception {
+        final Runnable runnable = mock(Runnable.class);
+        final CountDownLatch startLatch = new CountDownLatch(1);
+        final CountDownLatch stopLatch = new CountDownLatch(1);
+        final AtomicBoolean exceptionCaught = new AtomicBoolean(false);
+
+        doThrow(new RuntimeException()).when(runnable).run();
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    startLatch.countDown();
+                    status.awaitRunning(runnable);
+                    exceptionCaught.set(true);
+                } finally {
+                    stopLatch.countDown();
+                }
+            }
+        }).start();
+
+        startLatch.await(5, TimeUnit.SECONDS);
+        status.setLifecycle(Lifecycle.RUNNING);
+        stopLatch.await(5, TimeUnit.SECONDS);
+
+        assertTrue(exceptionCaught.get());
     }
 
     @Test
