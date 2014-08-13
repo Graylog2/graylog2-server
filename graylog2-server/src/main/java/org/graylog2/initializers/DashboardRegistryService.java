@@ -22,7 +22,7 @@ package org.graylog2.initializers;
 import com.google.common.util.concurrent.AbstractIdleService;
 import com.google.inject.Inject;
 import org.graylog2.dashboards.DashboardRegistry;
-import org.graylog2.shared.ServerStatus;
+import org.graylog2.plugin.ServerStatus;
 
 import javax.inject.Singleton;
 

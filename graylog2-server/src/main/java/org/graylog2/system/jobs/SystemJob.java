@@ -19,7 +19,7 @@
 package org.graylog2.system.jobs;
 
 import org.graylog2.plugin.Tools;
-import org.graylog2.shared.ServerStatus;
+import org.graylog2.plugin.ServerStatus;
 import org.joda.time.DateTime;
 
 import java.util.HashMap;

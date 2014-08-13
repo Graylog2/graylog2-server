@@ -23,7 +23,7 @@ import com.codahale.metrics.annotation.Timed;
 import org.graylog2.plugin.lifecycles.Lifecycle;
 import org.graylog2.plugin.lifecycles.LoadBalancerStatus;
 import org.graylog2.radio.rest.resources.RestResource;
-import org.graylog2.shared.ServerStatus;
+import org.graylog2.plugin.ServerStatus;
 
 import javax.inject.Inject;
 import javax.ws.rs.*;

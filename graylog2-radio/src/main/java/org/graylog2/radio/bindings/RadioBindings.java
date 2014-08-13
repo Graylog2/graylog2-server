@@ -38,8 +38,8 @@ import org.graylog2.radio.buffers.processors.RadioProcessBufferProcessor;
 import org.graylog2.radio.transports.RadioTransport;
 import org.graylog2.radio.transports.amqp.AMQPProducer;
 import org.graylog2.radio.transports.kafka.KafkaProducer;
-import org.graylog2.shared.BaseConfiguration;
-import org.graylog2.shared.ServerStatus;
+import org.graylog2.plugin.BaseConfiguration;
+import org.graylog2.plugin.ServerStatus;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.shared.inputs.InputRegistry;
 

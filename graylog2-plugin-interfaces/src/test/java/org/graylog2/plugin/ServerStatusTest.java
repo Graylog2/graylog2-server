@@ -17,11 +17,10 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.graylog2.shared;
+package org.graylog2.plugin;
 
 import com.google.common.collect.Sets;
 import com.google.common.eventbus.EventBus;
-import org.graylog2.Configuration;
 import org.graylog2.plugin.lifecycles.Lifecycle;
 import org.joda.time.DateTimeZone;
 import org.mockito.Mock;
@@ -39,7 +38,7 @@ import static org.mockito.Mockito.*;
 import static org.testng.Assert.*;
 
 public class ServerStatusTest {
-    @Mock private Configuration config;
+    @Mock private BaseConfiguration config;
     @Mock private EventBus eventBus;
 
     private ServerStatus status;

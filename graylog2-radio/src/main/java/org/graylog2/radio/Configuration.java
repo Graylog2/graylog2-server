@@ -23,7 +23,7 @@ import com.github.joschi.jadconfig.Parameter;
 import com.github.joschi.jadconfig.validators.InetPortValidator;
 import com.github.joschi.jadconfig.validators.PositiveIntegerValidator;
 import org.graylog2.plugin.Tools;
-import org.graylog2.shared.BaseConfiguration;
+import org.graylog2.plugin.BaseConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

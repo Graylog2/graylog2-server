@@ -24,7 +24,7 @@ import com.google.common.collect.Maps;
 import org.graylog2.plugin.Tools;
 import org.graylog2.radio.RadioVersion;
 import org.graylog2.radio.rest.resources.RestResource;
-import org.graylog2.shared.ServerStatus;
+import org.graylog2.plugin.ServerStatus;
 
 import javax.inject.Inject;
 import javax.ws.rs.GET;

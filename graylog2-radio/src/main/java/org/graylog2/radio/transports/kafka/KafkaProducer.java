@@ -25,7 +25,7 @@ import org.graylog2.plugin.Message;
 import org.graylog2.plugin.RadioMessage;
 import org.graylog2.radio.Configuration;
 import org.graylog2.radio.transports.RadioTransport;
-import org.graylog2.shared.ServerStatus;
+import org.graylog2.plugin.ServerStatus;
 import org.msgpack.MessagePack;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

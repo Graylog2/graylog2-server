@@ -1,4 +1,4 @@
-package org.graylog2.shared;
+package org.graylog2.plugin;
 
 import com.github.joschi.jadconfig.JadConfig;
 import com.github.joschi.jadconfig.Parameter;
@@ -6,7 +6,6 @@ import com.github.joschi.jadconfig.RepositoryException;
 import com.github.joschi.jadconfig.ValidationException;
 import com.github.joschi.jadconfig.repositories.InMemoryRepository;
 import com.google.common.collect.Maps;
-import org.graylog2.plugin.Tools;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;

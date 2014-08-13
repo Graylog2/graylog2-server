@@ -17,7 +17,7 @@
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.graylog2.shared;
+package org.graylog2.plugin;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;

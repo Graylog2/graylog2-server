@@ -24,7 +24,7 @@ import com.google.common.util.concurrent.AbstractIdleService;
 import org.graylog2.Configuration;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.metrics.MongoDbMetricsReporter;
-import org.graylog2.shared.ServerStatus;
+import org.graylog2.plugin.ServerStatus;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;

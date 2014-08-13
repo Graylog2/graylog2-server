@@ -33,7 +33,7 @@ import com.google.common.collect.Maps;
 import org.apache.shiro.subject.Subject;
 import org.bson.types.ObjectId;
 import org.graylog2.security.ShiroSecurityContext;
-import org.graylog2.shared.ServerStatus;
+import org.graylog2.plugin.ServerStatus;
 import org.graylog2.users.User;
 import org.graylog2.users.UserService;
 import org.slf4j.Logger;

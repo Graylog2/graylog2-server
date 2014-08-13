@@ -25,7 +25,7 @@ import org.graylog2.periodical.Periodicals;
 import org.graylog2.plugin.initializers.Initializer;
 import org.graylog2.plugin.initializers.InitializerConfigurationException;
 import org.graylog2.plugin.periodical.Periodical;
-import org.graylog2.shared.ServerStatus;
+import org.graylog2.plugin.ServerStatus;
 import org.graylog2.shared.bindings.InstantiationService;
 import org.reflections.Reflections;
 import org.slf4j.Logger;

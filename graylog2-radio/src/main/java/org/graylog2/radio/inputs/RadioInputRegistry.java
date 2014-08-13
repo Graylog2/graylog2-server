@@ -31,7 +31,7 @@ import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.radio.inputs.api.InputSummaryResponse;
 import org.graylog2.radio.inputs.api.PersistedInputsResponse;
 import org.graylog2.radio.inputs.api.RegisterInputResponse;
-import org.graylog2.shared.ServerStatus;
+import org.graylog2.plugin.ServerStatus;
 import org.graylog2.shared.buffers.ProcessBuffer;
 import org.graylog2.shared.inputs.InputRegistry;
 import org.graylog2.shared.inputs.MessageInputFactory;

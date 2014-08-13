@@ -24,7 +24,7 @@ import com.google.common.util.concurrent.AbstractIdleService;
 import com.google.inject.Inject;
 import org.graylog2.periodical.Periodicals;
 import org.graylog2.plugin.periodical.Periodical;
-import org.graylog2.shared.ServerStatus;
+import org.graylog2.plugin.ServerStatus;
 import org.graylog2.shared.bindings.InstantiationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

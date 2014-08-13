@@ -23,7 +23,7 @@ import com.google.inject.assistedinject.AssistedInject;
 import org.elasticsearch.action.admin.indices.optimize.OptimizeRequest;
 import org.graylog2.indexer.Deflector;
 import org.graylog2.indexer.Indexer;
-import org.graylog2.shared.ServerStatus;
+import org.graylog2.plugin.ServerStatus;
 import org.graylog2.system.activities.Activity;
 import org.graylog2.system.activities.ActivityWriter;
 import org.graylog2.system.jobs.SystemJob;

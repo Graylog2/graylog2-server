@@ -121,11 +121,6 @@
         </dependency>
 
         <dependency>
-            <groupId>com.github.joschi</groupId>
-            <artifactId>jadconfig</artifactId>
-        </dependency>
-
-        <dependency>
             <groupId>com.google.inject</groupId>
             <artifactId>guice</artifactId>
         </dependency>

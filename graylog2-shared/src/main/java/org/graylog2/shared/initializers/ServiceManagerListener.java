@@ -22,7 +22,7 @@ package org.graylog2.shared.initializers;
 import com.google.common.util.concurrent.Service;
 import com.google.common.util.concurrent.ServiceManager.Listener;
 import org.graylog2.plugin.lifecycles.Lifecycle;
-import org.graylog2.shared.ServerStatus;
+import org.graylog2.plugin.ServerStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
