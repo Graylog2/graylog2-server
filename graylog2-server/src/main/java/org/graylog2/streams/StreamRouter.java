@@ -29,6 +29,7 @@ import org.graylog2.database.NotFoundException;
 import com.google.common.util.concurrent.SimpleTimeLimiter;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.common.util.concurrent.TimeLimiter;
+import org.graylog2.database.ValidationException;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.Message;
@@ -121,16 +122,20 @@ public class StreamRouter {
                 AtomicInteger faultCount = getFaultCount(stream.getId());
                 Integer streamFaultCount = faultCount.incrementAndGet();
                 if (maxFaultCount > 0 && streamFaultCount >= maxFaultCount) {
-                    streamService.pause(stream);
-                    faultCount.set(0);
-                    LOG.error("Processing of stream <" + stream.getId() + "> failed to return within " + timeout + "ms for more than " + maxFaultCount + " times. Disabling stream.");
+                    try {
+                        streamService.pause(stream);
+                        faultCount.set(0);
+                        LOG.error("Processing of stream <" + stream.getId() + "> failed to return within " + timeout + "ms for more than " + maxFaultCount + " times. Disabling stream.");
 
-                    Notification notification = notificationService.buildNow()
-                            .addType(Notification.Type.STREAM_PROCESSING_DISABLED)
-                            .addSeverity(Notification.Severity.URGENT)
-                            .addDetail("stream_id", stream.getId())
-                            .addDetail("fault_count", streamFaultCount);
-                    notificationService.publishIfFirst(notification);
+                        Notification notification = notificationService.buildNow()
+                                .addType(Notification.Type.STREAM_PROCESSING_DISABLED)
+                                .addSeverity(Notification.Severity.URGENT)
+                                .addDetail("stream_id", stream.getId())
+                                .addDetail("fault_count", streamFaultCount);
+                        notificationService.publishIfFirst(notification);
+                    } catch (ValidationException ex) {
+                        LOG.error("Unable to pause stream: {}", ex);
+                    }
                 } else
                     LOG.warn("Processing of stream <{}> failed to return within {}ms.", stream.getId(), timeout);
             }
