@@ -71,7 +71,7 @@ public class KafkaInput extends MessageInput {
 
     private volatile boolean stopped = false;
     private volatile boolean paused = true;
-    private CountDownLatch pausedLatch = new CountDownLatch(1);
+    private volatile CountDownLatch pausedLatch = new CountDownLatch(1);
 
     private AtomicLong totalBytesRead = new AtomicLong(0);
     private AtomicLong lastSecBytesRead = new AtomicLong(0);
