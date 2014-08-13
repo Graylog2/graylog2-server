@@ -32,6 +32,7 @@ import org.testng.annotations.Test;
 import java.io.File;
 import java.nio.file.Files;
 
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.testng.Assert.*;
@@ -66,19 +67,28 @@ public class ServerStatusTest {
     }
 
     @Test
-    public void testSetLifecycle() throws Exception {
+    public void testSetLifecycleRunning() throws Exception {
         status.setLifecycle(Lifecycle.RUNNING);
         assertTrue(status.isProcessing());
         verify(eventBus).post(Lifecycle.RUNNING);
+    }
 
+    @Test
+    public void testSetLifecycleUninitialized() throws Exception {
         status.setLifecycle(Lifecycle.UNINITIALIZED);
         assertFalse(status.isProcessing());
-        verify(eventBus).post(Lifecycle.UNINITIALIZED);
+        verify(eventBus, times(2)).post(Lifecycle.UNINITIALIZED);
+    }
 
+    @Test
+    public void testSetLifecycleStarting() throws Exception {
         status.setLifecycle(Lifecycle.STARTING);
         assertFalse(status.isProcessing());
         verify(eventBus).post(Lifecycle.STARTING);
+    }
 
+    @Test
+    public void testSetLifecyclePaused() throws Exception {
         status.setLifecycle(Lifecycle.PAUSED);
         assertFalse(status.isProcessing());
         verify(eventBus).post(Lifecycle.PAUSED);
