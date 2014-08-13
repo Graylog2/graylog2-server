@@ -33,7 +33,10 @@
             <div class="well well-small">
                 <dl>
                 @for((k,v) <- callback.getConfiguration) {
-                    <dt>@k:</dt><dd>@Html(v.toString.replaceAll("\n", "<br>"))</dd>
+                    <dt>@k:</dt><dd>@for(line <- v.toString.split("\n")) {
+                        @line
+                        <br/>
+                    }</dd>
                 }
                 </dl>
             </div>
