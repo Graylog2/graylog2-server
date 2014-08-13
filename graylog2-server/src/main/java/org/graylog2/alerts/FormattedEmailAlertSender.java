@@ -28,6 +28,7 @@ import org.graylog2.streams.StreamRuleService;
 import org.graylog2.users.UserService;
 
 import javax.inject.Inject;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -97,8 +98,13 @@ public class FormattedEmailAlertSender extends StaticEmailAlertSender implements
         model.put("check_result", checkResult);
         model.put("stream_url", buildStreamDetailsURL(configuration.getEmailTransportWebInterfaceUrl(),
                 checkResult, stream));
-        model.put("backlog", backlog);
-        model.put("backlog_size", backlog.size());
+        if (backlog != null) {
+            model.put("backlog", backlog);
+            model.put("backlog_size", backlog.size());
+        } else {
+            model.put("backlog", new ArrayList<Message>());
+            model.put("backlog_size", 0);
+        }
         return model;
     }
 }
