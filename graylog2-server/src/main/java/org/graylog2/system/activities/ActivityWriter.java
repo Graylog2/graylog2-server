@@ -22,7 +22,7 @@ import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 import org.graylog2.database.ValidationException;
 import org.graylog2.plugin.Tools;
-import org.graylog2.shared.ServerStatus;
+import org.graylog2.plugin.ServerStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

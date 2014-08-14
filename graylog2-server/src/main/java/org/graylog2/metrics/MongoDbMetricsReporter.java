@@ -26,7 +26,7 @@ import com.mongodb.DBObject;
 import com.mongodb.WriteConcern;
 import org.bson.types.ObjectId;
 import org.graylog2.database.MongoConnection;
-import org.graylog2.shared.ServerStatus;
+import org.graylog2.plugin.ServerStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

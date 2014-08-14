@@ -105,5 +105,10 @@
             <artifactId>slf4j-log4j12</artifactId>
             <scope>test</scope>
         </dependency>
+
+        <dependency>
+            <groupId>com.github.joschi</groupId>
+            <artifactId>jadconfig</artifactId>
+        </dependency>
     </dependencies>
 </project>

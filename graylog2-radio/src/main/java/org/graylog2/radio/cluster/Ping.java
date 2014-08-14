@@ -25,7 +25,7 @@ import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.Response;
-import org.graylog2.shared.ServerStatus;
+import org.graylog2.plugin.ServerStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

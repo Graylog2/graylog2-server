@@ -22,7 +22,7 @@ package org.graylog2.shared.initializers;
 import com.google.common.collect.Maps;
 import com.google.common.util.concurrent.AbstractIdleService;
 import com.iterative.groovy.service.GroovyShellService;
-import org.graylog2.shared.BaseConfiguration;
+import org.graylog2.plugin.BaseConfiguration;
 import org.graylog2.shared.bindings.InstantiationService;
 
 import javax.inject.Inject;

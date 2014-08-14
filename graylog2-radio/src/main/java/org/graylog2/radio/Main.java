@@ -45,7 +45,7 @@ import org.graylog2.radio.bindings.RadioBindings;
 import org.graylog2.radio.bindings.RadioInitializerBindings;
 import org.graylog2.radio.cluster.Ping;
 import org.graylog2.shared.NodeRunner;
-import org.graylog2.shared.ServerStatus;
+import org.graylog2.plugin.ServerStatus;
 import org.graylog2.shared.bindings.GuiceInstantiationService;
 import org.graylog2.shared.initializers.ServiceManagerListener;
 import org.graylog2.shared.plugins.PluginLoader;

@@ -27,7 +27,7 @@ import com.lmax.disruptor.BlockingWaitStrategy;
 import org.graylog2.inputs.InputCache;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.inputs.MessageInput;
-import org.graylog2.shared.ServerStatus;
+import org.graylog2.plugin.ServerStatus;
 import org.graylog2.shared.buffers.processors.ProcessBufferProcessor;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;

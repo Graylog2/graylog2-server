@@ -34,7 +34,7 @@ import org.graylog2.jersey.container.netty.NettyContainer;
 import org.graylog2.jersey.container.netty.SecurityContextFactory;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.plugin.rest.WebApplicationExceptionMapper;
-import org.graylog2.shared.BaseConfiguration;
+import org.graylog2.plugin.BaseConfiguration;
 import org.graylog2.plugin.rest.AnyExceptionClassMapper;
 import org.graylog2.plugin.rest.JacksonPropertyExceptionMapper;
 import org.graylog2.shared.rest.CORSFilter;

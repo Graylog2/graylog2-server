@@ -35,7 +35,7 @@ import org.graylog2.outputs.OutputRouter;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.buffers.MessageEvent;
 import org.graylog2.plugin.outputs.MessageOutput;
-import org.graylog2.shared.ServerStatus;
+import org.graylog2.plugin.ServerStatus;
 import org.graylog2.shared.stats.ThroughputStats;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -35,7 +35,7 @@ import org.graylog2.plugin.buffers.BufferOutOfCapacityException;
 import org.graylog2.plugin.buffers.MessageEvent;
 import org.graylog2.plugin.buffers.ProcessingDisabledException;
 import org.graylog2.plugin.inputs.MessageInput;
-import org.graylog2.shared.ServerStatus;
+import org.graylog2.plugin.ServerStatus;
 import org.graylog2.shared.buffers.processors.ProcessBufferProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

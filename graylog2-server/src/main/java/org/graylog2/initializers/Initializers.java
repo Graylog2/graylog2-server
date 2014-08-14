@@ -22,7 +22,7 @@ package org.graylog2.initializers;
 import com.google.common.collect.Lists;
 import org.graylog2.plugin.initializers.Initializer;
 import org.graylog2.plugin.initializers.InitializerConfigurationException;
-import org.graylog2.shared.ServerStatus;
+import org.graylog2.plugin.ServerStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

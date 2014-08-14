@@ -22,7 +22,7 @@ package org.graylog2.radio.bindings.providers;
 import com.ning.http.client.AsyncHttpClient;
 import org.graylog2.radio.Configuration;
 import org.graylog2.radio.inputs.RadioInputRegistry;
-import org.graylog2.shared.ServerStatus;
+import org.graylog2.plugin.ServerStatus;
 import org.graylog2.shared.buffers.ProcessBuffer;
 import org.graylog2.shared.inputs.InputRegistry;
 import org.graylog2.shared.inputs.MessageInputFactory;

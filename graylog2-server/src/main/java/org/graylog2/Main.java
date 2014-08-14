@@ -51,7 +51,7 @@ import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.lifecycles.Lifecycle;
 import org.graylog2.plugins.PluginInstaller;
 import org.graylog2.shared.NodeRunner;
-import org.graylog2.shared.ServerStatus;
+import org.graylog2.plugin.ServerStatus;
 import org.graylog2.shared.bindings.GuiceInstantiationService;
 import org.graylog2.shared.initializers.ServiceManagerListener;
 import org.graylog2.shared.plugins.PluginLoader;
