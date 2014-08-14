@@ -28,5 +28,4 @@ package org.graylog2.plugin.database.validators;
 public interface Validator {
 
     public ValidationResult validate(Object value);
-
 }

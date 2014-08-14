@@ -37,7 +37,7 @@ public abstract class RetentionStrategy {
     private static final Logger LOG = LoggerFactory.getLogger(RetentionStrategy.class);
     private final IndexManagement indexManagement;
 
-    public enum Art {
+    public enum Type {
         DELETE,
         CLOSE
     }
@@ -48,7 +48,7 @@ public abstract class RetentionStrategy {
 
     protected abstract void onMessage(Map<String, String> message);
     protected abstract boolean iterates();
-    protected abstract Art getArt();
+    protected abstract Type getType();
 
     public void runStrategy(String indexName) {
         Stopwatch sw = Stopwatch.createStarted();
@@ -58,7 +58,7 @@ public abstract class RetentionStrategy {
         }
 
         // Delete or close index.
-        switch (getArt()) {
+        switch (getType()) {
             case DELETE:
                 LOG.info("Strategy is deleting.");
                 indexManagement.delete(indexName);

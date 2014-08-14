@@ -549,6 +549,12 @@
             </dependency>
 
             <dependency>
+                <groupId>com.google.code.findbugs</groupId>
+                <artifactId>jsr305</artifactId>
+                <version>3.0.0</version>
+            </dependency>
+
+            <dependency>
                 <groupId>org.graylog2</groupId>
                 <artifactId>gelfclient</artifactId>
                 <version>1.0.0</version>
@@ -582,6 +588,11 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
+        </dependency>
+        <!-- used for sanity -->
+        <dependency>
+            <groupId>com.google.code.findbugs</groupId>
+            <artifactId>jsr305</artifactId>
         </dependency>
         <!-- our basic test libraries, please only add infrastructure dependencies here -->
         <dependency>

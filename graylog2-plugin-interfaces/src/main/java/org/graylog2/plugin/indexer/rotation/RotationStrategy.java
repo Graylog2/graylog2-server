@@ -1,4 +1,6 @@
-/**
+/*
+ * Copyright 2014 TORCH GmbH
+ *
  * This file is part of Graylog2.
  *
  * Graylog2 is free software: you can redistribute it and/or modify
@@ -14,32 +16,17 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.indexer.retention.strategies;
+package org.graylog2.plugin.indexer.rotation;
 
-import org.graylog2.plugin.indexer.retention.IndexManagement;
-import org.graylog2.plugin.indexer.retention.RetentionStrategy;
+import javax.annotation.Nullable;
 
-import java.util.Map;
+public interface RotationStrategy {
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
-public class DeletionRetentionStrategy extends RetentionStrategy {
-
-    public DeletionRetentionStrategy(IndexManagement indexManagement) {
-        super(indexManagement);
+    interface Result {
+        String getDescription();
+        boolean shouldRotate();
     }
 
-    protected void onMessage(Map<String, String> message) {}
-
-    @Override
-    protected boolean iterates() {
-        return false;
-    }
-
-    @Override
-    protected Type getType() {
-        return Type.DELETE;
-    }
-
+    @Nullable
+    Result shouldRotate(String index);
 }

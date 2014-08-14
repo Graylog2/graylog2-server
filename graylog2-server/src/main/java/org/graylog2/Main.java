@@ -36,13 +36,7 @@ import com.google.inject.ProvisionException;
 import com.google.inject.spi.Message;
 import com.mongodb.MongoException;
 import org.apache.log4j.Level;
-import org.graylog2.bindings.AlarmCallbackBindings;
-import org.graylog2.bindings.InitializerBindings;
-import org.graylog2.bindings.MessageFilterBindings;
-import org.graylog2.bindings.MessageOutputBindings;
-import org.graylog2.bindings.PersistenceServicesBindings;
-import org.graylog2.bindings.ServerBindings;
-import org.graylog2.bindings.ServerMessageInputBindings;
+import org.graylog2.bindings.*;
 import org.graylog2.cluster.NodeService;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
@@ -163,7 +157,8 @@ public final class Main extends NodeRunner {
                 new MessageFilterBindings(),
                 new AlarmCallbackBindings(),
                 new InitializerBindings(),
-                new MessageOutputBindings());
+                new MessageOutputBindings(),
+                new RotationStrategyBindings());
         LOG.debug("Adding plugin modules: " + pluginModules);
         bindingsModules.addAll(pluginModules);
         final Injector injector = GuiceInjectorHolder.createInjector(bindingsModules);

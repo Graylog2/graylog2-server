@@ -51,6 +51,7 @@ import org.graylog2.plugin.BaseConfiguration;
 import org.graylog2.plugin.PluginMetaData;
 import org.graylog2.plugin.RulesEngine;
 import org.graylog2.plugin.ServerStatus;
+import org.graylog2.plugin.indexer.rotation.RotationStrategy;
 import org.graylog2.rest.NotFoundExceptionMapper;
 import org.graylog2.rest.RestAccessLogFilter;
 import org.graylog2.rest.ValidationExceptionMapper;
@@ -95,6 +96,7 @@ public class ServerBindings extends AbstractModule {
 
     private void bindProviders() {
         bind(ObjectMapper.class).toProvider(ServerObjectMapperProvider.class);
+        bind(RotationStrategy.class).toProvider(RotationStrategyProvider.class);
     }
 
     private void bindFactoryModules() {
