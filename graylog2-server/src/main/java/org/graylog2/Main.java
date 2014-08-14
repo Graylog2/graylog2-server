@@ -70,6 +70,8 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import static com.google.common.base.Strings.nullToEmpty;
+
 /**
  * Main class of Graylog2.
  *
@@ -314,7 +316,7 @@ public final class Main extends NodeRunner {
         sb.append("# Generated on ").append(DateTime.now()).append(System.lineSeparator());
 
         for(Map.Entry<String, String> entry:  configMap.entrySet()) {
-            sb.append(entry.getKey()).append('=').append(entry.getValue()).append(System.lineSeparator());
+            sb.append(entry.getKey()).append('=').append(nullToEmpty(entry.getValue())).append(System.lineSeparator());
         }
 
         return sb.toString();

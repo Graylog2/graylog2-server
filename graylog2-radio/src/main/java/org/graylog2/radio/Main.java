@@ -59,6 +59,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import static com.google.common.base.Strings.nullToEmpty;
+
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
@@ -206,7 +208,7 @@ public class Main extends NodeRunner {
         sb.append("# Generated on ").append(DateTime.now()).append(System.lineSeparator());
 
         for (Map.Entry<String, String> entry : configMap.entrySet()) {
-            sb.append(entry.getKey()).append('=').append(entry.getValue()).append(System.lineSeparator());
+            sb.append(entry.getKey()).append('=').append(nullToEmpty(entry.getValue())).append(System.lineSeparator());
         }
 
         return sb.toString();
