@@ -18,17 +18,25 @@
  */
 package lib.security;
 
-import com.google.inject.Inject;
+import com.ning.http.util.Base64;
 import controllers.routes;
+import org.graylog2.restclient.lib.APIException;
 import org.graylog2.restclient.lib.Graylog2ServerUnavailableException;
+import org.graylog2.restclient.models.SessionService;
 import org.graylog2.restclient.models.User;
 import org.graylog2.restclient.models.UserService;
+import org.graylog2.restclient.models.api.responses.SessionCreateResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import play.libs.Crypto;
 import play.mvc.Http;
 import play.mvc.Http.Context;
 import play.mvc.Result;
 import play.mvc.Security.Authenticator;
+
+import javax.inject.Inject;
+import java.io.IOException;
+import java.util.StringTokenizer;
 
 public class RedirectAuthenticator extends Authenticator {
     private static final Logger log = LoggerFactory.getLogger(RedirectAuthenticator.class);
@@ -37,11 +45,13 @@ public class RedirectAuthenticator extends Authenticator {
     // TODO crutch, we need to write out own AuthenticatedAction filter... :(
     @Inject
     public static UserService userService;
+    @Inject
+    public static SessionService sessionService;
 
     @Override
     public String getUsername(Context ctx) {
         try {
-            final User sessionUser = userService.authenticateSessionUser();
+            final User sessionUser = pipelineAuths(authenticateSessionUser(), authenticateBasicAuthUser());
             if (sessionUser == null) {
                 return null;
             }
@@ -83,5 +93,82 @@ public class RedirectAuthenticator extends Authenticator {
         }
         return redirect(controllers.routes.SessionsController.index(destination));
 	}
-	
+
+    public User authenticateSessionUser() {
+        // is there a logged in user at all?
+        final Http.Session session = Http.Context.current().session();
+        final String encryptedSessionId = session.get("sessionid");
+        if (encryptedSessionId == null) {
+            // there is no authenticated user yet.
+            log.info("Accessing the current user failed, there's no sessionid in the cookie.");
+            return null;
+        }
+        final String userAndSessionId = Crypto.decryptAES(encryptedSessionId);
+        final StringTokenizer tokenizer = new StringTokenizer(userAndSessionId, "\t");
+        if (tokenizer.countTokens() != 2) {
+            return null;
+        }
+        final String userName = tokenizer.nextToken();
+        final String sessionId = tokenizer.nextToken();
+        Http.Context.current().args.put("sessionId", sessionId);
+        // special case for the local admin user for the web interface
+//        if (userName != null) {
+//            final LocalAdminUser localAdminUser = LocalAdminUser.getInstance();
+//            if (userName.equals(localAdminUser.getName())) {
+//                setCurrent(localAdminUser);
+//                return localAdminUser;
+//            }
+//        }
+        return userService.retrieveUserWithSessionId(userName, sessionId);
+    }
+
+    protected User authenticateBasicAuthUser() {
+        final Http.Request request = Http.Context.current().request();
+        final String authorizationHeader = request.getHeader("authorization");
+
+        if (authorizationHeader == null)
+            return null;
+
+        final String authToken = authorizationHeader.split(" ")[1];
+
+        if (authToken == null)
+            return null;
+
+        byte[] decodedAuth;
+        String[] credString = null;
+        try {
+            decodedAuth = Base64.decode(authToken);
+            credString = new String(decodedAuth, "UTF-8").split(":");
+        } catch (IOException e) {
+            log.error("Unable to decode basic auth information: ", e);
+            return null;
+        }
+
+        if (credString == null || credString.length != 2)
+            return null;
+
+        final String userName = credString[0];
+        final String password = credString[1];
+
+        try {
+            SessionCreateResponse session = sessionService.create(userName, password, request.remoteAddress());
+            return userService.retrieveUserWithSessionId(userName, session.sessionId);
+        } catch (IOException e) {
+            log.error("Could not reach graylog2 server", e);
+        } catch (APIException e) {
+            log.error("Unauthorized to load user " + userName, e);
+        } catch (Graylog2ServerUnavailableException e) {
+            // this leads to a different return code in RedirectAuthenticator.
+            throw e;
+        }
+
+        return null;
+    }
+
+    protected User pipelineAuths(User... authResults) {
+        for (User user : authResults)
+            if (user != null)
+                return user;
+        return null;
+    }
 }

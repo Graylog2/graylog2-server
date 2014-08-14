@@ -33,6 +33,7 @@ import models.LocalAdminUser;
 import models.ModelFactoryModule;
 import org.graylog2.restclient.lib.*;
 import org.graylog2.restclient.models.Node;
+import org.graylog2.restclient.models.SessionService;
 import org.graylog2.restclient.models.UserService;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationListener;
@@ -141,6 +142,7 @@ public class Global extends GlobalSettings {
         injector.getInstance(ServerNodesRefreshService.class).start();
         // TODO replace with custom AuthenticatedAction filter
         RedirectAuthenticator.userService = injector.getInstance(UserService.class);
+        RedirectAuthenticator.sessionService = injector.getInstance(SessionService.class);
 
         // temporarily disabled for preview to prevent confusion.
 //        LocalAdminUserRealm localAdminRealm = new LocalAdminUserRealm("local-accounts");
