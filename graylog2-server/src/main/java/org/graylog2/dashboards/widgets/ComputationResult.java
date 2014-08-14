@@ -19,13 +19,11 @@
  */
 package org.graylog2.dashboards.widgets;
 
-import com.beust.jcommander.internal.Maps;
+import com.google.common.collect.Maps;
 import org.graylog2.indexer.searches.timeranges.AbsoluteRange;
-import org.graylog2.indexer.searches.timeranges.TimeRange;
 import org.graylog2.plugin.Tools;
 import org.joda.time.DateTime;
 
-import java.util.HashMap;
 import java.util.Map;
 
 /**

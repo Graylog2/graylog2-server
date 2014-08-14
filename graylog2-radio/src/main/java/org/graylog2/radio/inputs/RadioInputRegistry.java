@@ -19,11 +19,12 @@
 
 package org.graylog2.radio.inputs;
 
-import com.beust.jcommander.internal.Lists;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Lists;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.Request;
 import com.ning.http.client.Response;
+import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationException;
 import org.graylog2.plugin.inputs.InputState;
@@ -31,7 +32,6 @@ import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.radio.inputs.api.InputSummaryResponse;
 import org.graylog2.radio.inputs.api.PersistedInputsResponse;
 import org.graylog2.radio.inputs.api.RegisterInputResponse;
-import org.graylog2.plugin.ServerStatus;
 import org.graylog2.shared.buffers.ProcessBuffer;
 import org.graylog2.shared.inputs.InputRegistry;
 import org.graylog2.shared.inputs.MessageInputFactory;

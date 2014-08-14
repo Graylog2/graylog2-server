@@ -1,7 +1,6 @@
 package org.graylog2.streams.matchers;
 
-import com.beust.jcommander.internal.Maps;
-import com.mongodb.BasicDBObject;
+import com.google.common.collect.Maps;
 import org.bson.types.ObjectId;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
@@ -31,7 +30,7 @@ public class MatcherTest {
         StreamRuleMatcher matcher;
         try {
             matcher = StreamRuleMatcherFactory.build(rule.getType());
-        } catch(InvalidStreamRuleTypeException e) {
+        } catch (InvalidStreamRuleTypeException e) {
             return null;
         }
 
