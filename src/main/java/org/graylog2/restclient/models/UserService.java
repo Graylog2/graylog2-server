@@ -32,12 +32,10 @@ import org.graylog2.restroutes.generated.UsersResource;
 import org.graylog2.restroutes.generated.routes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import play.libs.Crypto;
 import play.mvc.Http;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.StringTokenizer;
 
 public class UserService {
     private static final Logger log = LoggerFactory.getLogger(UserService.class);
@@ -129,31 +127,7 @@ public class UserService {
         return null;
 	}
 
-    public User authenticateSessionUser() {
-        // is there a logged in user at all?
-        final Http.Session session = Http.Context.current().session();
-        final String encryptedSessionId = session.get("sessionid");
-        if (encryptedSessionId == null) {
-            // there is no authenticated user yet.
-            log.info("Accessing the current user failed, there's no sessionid in the cookie.");
-            return null;
-        }
-        final String userAndSessionId = Crypto.decryptAES(encryptedSessionId);
-        final StringTokenizer tokenizer = new StringTokenizer(userAndSessionId, "\t");
-        if (tokenizer.countTokens() != 2) {
-            return null;
-        }
-        final String userName = tokenizer.nextToken();
-        final String sessionId = tokenizer.nextToken();
-        Http.Context.current().args.put("sessionId", sessionId);
-        // special case for the local admin user for the web interface
-//        if (userName != null) {
-//            final LocalAdminUser localAdminUser = LocalAdminUser.getInstance();
-//            if (userName.equals(localAdminUser.getName())) {
-//                setCurrent(localAdminUser);
-//                return localAdminUser;
-//            }
-//        }
+    public User retrieveUserWithSessionId(String userName, String sessionId) {
         try {
             UserResponse response = api.path(resource.get(userName), UserResponse.class)
                     .session(sessionId)
