@@ -553,11 +553,10 @@
                 <version>1.0</version>
             </dependency>
 
-            <!-- TODO replace with final version of gelfclient once it has been released -->
             <dependency>
                 <groupId>org.graylog2</groupId>
                 <artifactId>gelfclient</artifactId>
-                <version>1.0.0-SNAPSHOT</version>
+                <version>1.0.0</version>
             </dependency>
 
             <dependency>
