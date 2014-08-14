@@ -21,6 +21,7 @@ package org.graylog2.inputs.radio;
 
 import com.codahale.metrics.MetricRegistry;
 import com.google.common.eventbus.EventBus;
+import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.system.NodeId;
 
 import javax.inject.Inject;
@@ -46,8 +47,8 @@ public class RadioInput extends RadioKafkaInput {
     }
 
     @Inject
-    public RadioInput(MetricRegistry metricRegistry, NodeId nodeId, EventBus eventBus) {
-        super(metricRegistry, nodeId, eventBus);
+    public RadioInput(MetricRegistry metricRegistry, NodeId nodeId, EventBus eventBus, ServerStatus serverStatus) {
+        super(metricRegistry, nodeId, eventBus, serverStatus);
     }
 
 }

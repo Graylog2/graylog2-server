@@ -29,6 +29,7 @@ import kafka.javaapi.consumer.ConsumerConnector;
 import kafka.message.MessageAndMetadata;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.RadioMessage;
+import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.buffers.Buffer;
 import org.graylog2.plugin.buffers.BufferOutOfCapacityException;
 import org.graylog2.plugin.buffers.ProcessingDisabledException;
@@ -66,6 +67,7 @@ public class KafkaInput extends MessageInput {
     private final MetricRegistry metricRegistry;
     private final NodeId nodeId;
     private final EventBus serverEventBus;
+    private final ServerStatus serverStatus;
 
     private ConsumerConnector cc;
 
@@ -82,10 +84,12 @@ public class KafkaInput extends MessageInput {
     @Inject
     public KafkaInput(MetricRegistry metricRegistry,
                       NodeId nodeId,
-                      EventBus serverEventBus) {
+                      EventBus serverEventBus,
+                      ServerStatus serverStatus) {
         this.metricRegistry = metricRegistry;
         this.nodeId = nodeId;
         this.serverEventBus = serverEventBus;
+        this.serverStatus = serverStatus;
     }
 
     @Subscribe
@@ -126,6 +130,13 @@ public class KafkaInput extends MessageInput {
 
     @Override
     public void launch(final Buffer processBuffer) throws MisfireException {
+        serverStatus.awaitRunning(new Runnable() {
+            @Override
+            public void run() {
+                lifecycleStateChange(Lifecycle.RUNNING);
+            }
+        });
+
         // listen for lifecycle changes
         serverEventBus.register(this);
 
