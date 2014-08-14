@@ -30,7 +30,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -96,7 +95,7 @@ public class Message {
     private InetAddress inetAddress;
 
     public Message(String message, String source, DateTime timestamp) {
-    	// Adding the fields directly because they would not be accepted as a reserved fields.
+        // Adding the fields directly because they would not be accepted as a reserved fields.
         fields.put("_id", new com.eaio.uuid.UUID().toString());
         fields.put("message", message);
         fields.put("source", source);
@@ -110,12 +109,12 @@ public class Message {
     }
 
     public boolean isComplete() {
-    	for (String key : REQUIRED_FIELDS) {
-    		if (getField(key) == null || ((String) getField(key)).isEmpty()) {
-    			return false;
-    		}
-    	}
-    	
+        for (String key : REQUIRED_FIELDS) {
+            if (getField(key) == null || ((String) getField(key)).isEmpty()) {
+                return false;
+            }
+        }
+
         return true;
     }
 
@@ -138,7 +137,7 @@ public class Message {
 
     public Map<String, Object> toElasticSearchObject() {
         Map<String, Object> obj = Maps.newHashMap();
-        
+
         // Standard fields.
         obj.put("message", getMessage());
         obj.put("source", this.getSource());
@@ -190,7 +189,7 @@ public class Message {
 
         return sb.toString();
     }
-    
+
     public String getMessage() {
         return (String) getField("message");
     }
@@ -198,7 +197,7 @@ public class Message {
     public String getSource() {
         return (String) getField("source");
     }
-    
+
     public void addField(String key, Object value) {
         if (value == null) {
             return;
@@ -272,9 +271,9 @@ public class Message {
     }
 
     public void removeField(String key) {
-    	if (!RESERVED_FIELDS.contains(key)) {
-    		this.fields.remove(key);
-    	}
+        if (!RESERVED_FIELDS.contains(key)) {
+            this.fields.remove(key);
+        }
     }
 
     public <T> T getFieldAs(Class<T> T, String key) throws ClassCastException{
@@ -282,9 +281,9 @@ public class Message {
 
         return T.cast(rawField);
     }
-    
+
     public Object getField(String key) {
-    	return fields.get(key);
+        return fields.get(key);
     }
 
     public Map<String, Object> getFields() {
@@ -308,11 +307,11 @@ public class Message {
 
         return result;
     }
-    
+
     public void setFilterOut(boolean set) {
         this.filterOut = set;
     }
-    
+
     public boolean getFilterOut() {
         return this.filterOut;
     }
