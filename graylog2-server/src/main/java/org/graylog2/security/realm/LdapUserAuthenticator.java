@@ -39,7 +39,7 @@ import java.io.IOException;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class LdapUserAuthenticator extends AuthenticatingRealm {
-    private static final Logger log = LoggerFactory.getLogger(LdapUserAuthenticator.class);
+    private static final Logger LOG = LoggerFactory.getLogger(LdapUserAuthenticator.class);
 
     private final LdapConnector ldapConnector;
 
@@ -62,7 +62,7 @@ public class LdapUserAuthenticator extends AuthenticatingRealm {
         final LdapConnectionConfig config = new LdapConnectionConfig();
         final LdapSettings ldapSettings = settings.get();
         if (ldapSettings == null || !ldapSettings.isEnabled()) {
-            log.trace("LDAP is disabled, skipping");
+            LOG.trace("LDAP is disabled, skipping");
             return null;
         }
         config.setLdapHost(ldapSettings.getUri().getHost());
@@ -87,7 +87,7 @@ public class LdapUserAuthenticator extends AuthenticatingRealm {
                                                              principal,
                                                              ldapSettings.isActiveDirectory());
             if (userEntry == null) {
-                log.debug("User {} not found in LDAP", principal);
+                LOG.debug("User {} not found in LDAP", principal);
                 return null;
             }
 
@@ -96,28 +96,28 @@ public class LdapUserAuthenticator extends AuthenticatingRealm {
                                                                      userEntry.getDn(),
                                                                      password);
             if (!authenticated) {
-                log.info("Invalid credentials for user {} (DN {})", principal, userEntry.getDn());
+                LOG.info("Invalid credentials for user {} (DN {})", principal, userEntry.getDn());
                 return null;
             }
             // user found and authenticated, sync the user entry with mongodb
             final User user = userService.syncFromLdapEntry(userEntry, ldapSettings, principal);
             if (user == null) {
                 // in case there was an error reading, creating or modifying the user in mongodb, we do not authenticate the user.
-                log.error("Unable to sync LDAP user {}", userEntry.getDn());
+                LOG.error("Unable to sync LDAP user {}", userEntry.getDn());
                 return null;
             }
         } catch (LdapException e) {
-            log.error("LDAP error", e);
+            LOG.error("LDAP error", e);
             return null;
         } catch (CursorException e) {
-            log.error("Unable to read LDAP entry", e);
+            LOG.error("Unable to read LDAP entry", e);
             return null;
         } finally {
             if (connection != null) {
                 try {
                     connection.close();
                 } catch (IOException e) {
-                    log.error("Unable to close LDAP connection", e);
+                    LOG.error("Unable to close LDAP connection", e);
                 }
             }
         }

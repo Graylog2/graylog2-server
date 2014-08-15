@@ -33,7 +33,7 @@ import javax.inject.Singleton;
  */
 @Singleton
 public class BufferSynchronizerService extends AbstractIdleService {
-    private static final Logger log = LoggerFactory.getLogger(BufferSynchronizerService.class);
+    private static final Logger LOG = LoggerFactory.getLogger(BufferSynchronizerService.class);
 
     private final Buffers bufferSynchronizer;
     private final Caches cacheSynchronizer;
@@ -52,14 +52,14 @@ public class BufferSynchronizerService extends AbstractIdleService {
 
     @Override
     protected void shutDown() throws Exception {
-        log.debug("Stopping BufferSynchronizerService");
+        LOG.debug("Stopping BufferSynchronizerService");
         if (indexerAvailable) {
             bufferSynchronizer.waitForEmptyBuffers();
             cacheSynchronizer.waitForEmptyCaches();
         } else {
-            log.warn("Indexer is unavailable, not waiting to clear buffers and caches, as we have no connection to Elasticsearch");
+            LOG.warn("Indexer is unavailable, not waiting to clear buffers and caches, as we have no connection to Elasticsearch");
         }
-        log.debug("Stopped BufferSynchronizerService");
+        LOG.debug("Stopped BufferSynchronizerService");
     }
 
     public void setIndexerUnavailable() {

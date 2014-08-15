@@ -31,7 +31,7 @@ import javax.inject.Inject;
 import java.util.List;
 
 public class LdapSettingsServiceImpl extends PersistedServiceImpl implements LdapSettingsService {
-    private static final Logger log = LoggerFactory.getLogger(LdapSettingsServiceImpl.class);
+    private static final Logger LOG = LoggerFactory.getLogger(LdapSettingsServiceImpl.class);
 
     @Inject
     public LdapSettingsServiceImpl(MongoConnection mongoConnection) {
@@ -46,7 +46,7 @@ public class LdapSettingsServiceImpl extends PersistedServiceImpl implements Lda
             return null;
         }
         if (results.size() > 1) {
-            log.error(
+            LOG.error(
                     "Graylog2 does not yet support multiple LDAP backends, but {} configurations were found. This is a bug, ignoring LDAP config.",
                     results.size());
             return null;

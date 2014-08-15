@@ -46,7 +46,7 @@ import static javax.ws.rs.core.Response.*;
 @Api(value = "Filters", description = "Message blacklist filters")
 @Path("/filters/blacklist")
 public class BlacklistSourceResource extends RestResource {
-    private static final Logger log = LoggerFactory.getLogger(BlacklistSourceResource.class);
+    private static final Logger LOG = LoggerFactory.getLogger(BlacklistSourceResource.class);
 
     private FilterService filterService;
 

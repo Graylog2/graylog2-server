@@ -28,14 +28,14 @@ import org.slf4j.LoggerFactory;
 import java.util.Set;
 
 public class ServiceManagerProvider implements Provider<ServiceManager> {
-    private static final Logger log = LoggerFactory.getLogger(ServiceManagerProvider.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ServiceManagerProvider.class);
 
     @Inject
     Set<Service> services;
 
     @Override
     public ServiceManager get() {
-        log.debug("Using services: {}", services);
+        LOG.debug("Using services: {}", services);
         return new ServiceManager(services);
     }
 }

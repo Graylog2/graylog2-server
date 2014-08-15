@@ -35,7 +35,7 @@ import java.util.Properties;
 import java.util.Set;
 
 public class PluginLoader {
-    private static final Logger log = LoggerFactory.getLogger(PluginLoader.class);
+    private static final Logger LOG = LoggerFactory.getLogger(PluginLoader.class);
 
     public static final String GRAYLOG2_PLUGIN_PROPERTIES = "graylog2-plugin.properties";
 
@@ -72,34 +72,34 @@ public class PluginLoader {
         final HashSet<Plugin> plugins = Sets.newHashSet();
 
         if (!pluginDir.exists()) {
-            log.warn("Plugin directory {} does not exist, not loading plugins.", pluginDir.getAbsolutePath());
+            LOG.warn("Plugin directory {} does not exist, not loading plugins.", pluginDir.getAbsolutePath());
             return plugins;
         }
         if (!pluginDir.isDirectory()) {
-            log.warn("Path {} is not a directory, cannot load plugins.", pluginDir);
+            LOG.warn("Path {} is not a directory, cannot load plugins.", pluginDir);
             return plugins;
         }
 
         final ClassLoader classLoader = getClass().getClassLoader();
 
-        log.debug("Scanning directory <{}> for plugins...", pluginDir.getAbsolutePath());
+        LOG.debug("Scanning directory <{}> for plugins...", pluginDir.getAbsolutePath());
         final File[] files = pluginDir.listFiles();
-        log.debug("Loading [{}] plugins", files.length);
+        LOG.debug("Loading [{}] plugins", files.length);
         for (File jar : files) {
             try {
-                log.debug("Loading <" + jar.getAbsolutePath() + ">");
+                LOG.debug("Loading <" + jar.getAbsolutePath() + ">");
                 final URLClassLoader pluginClassLoader = new URLClassLoader(new URL[]{ jar.toURI().toURL() }, classLoader);
 
                 final Set<Class<? extends Plugin>> pluginClasses = loadPluginClasses(pluginClassLoader);
                 for (Class<? extends Plugin> pluginClass : pluginClasses) {
-                    log.debug("Found plugin " + pluginClass);
+                    LOG.debug("Found plugin " + pluginClass);
                     final Plugin plugin = instantiatePlugin(pluginClass);
                     if (plugin != null) {
                         plugins.add(plugin);
                     }
                 }
             } catch (MalformedURLException e) {
-                log.error("Cannot open jar for discovering plugins", e);
+                LOG.error("Cannot open jar for discovering plugins", e);
             }
         }
 
@@ -113,7 +113,7 @@ public class PluginLoader {
         try {
             urls = cl.getResources(GRAYLOG2_PLUGIN_PROPERTIES);
         } catch (IOException e) {
-            log.error("Unable to read resources from class loader", e);
+            LOG.error("Unable to read resources from class loader", e);
             return pluginClasses;
         }
 
@@ -124,12 +124,12 @@ public class PluginLoader {
                 final InputStream inputStream = url.openStream();
                 properties.load(inputStream);
             } catch (IOException e) {
-                log.error("Unable to read plugin properties file", e);
+                LOG.error("Unable to read plugin properties file", e);
             }
             final String pluginClassName = properties.getProperty("plugin");
-            log.debug("Plugin class name is {}", pluginClassName);
+            LOG.debug("Plugin class name is {}", pluginClassName);
             if (pluginClassName == null) {
-                log.error("Missing plugin property in property descriptor file: {}", url);
+                LOG.error("Missing plugin property in property descriptor file: {}", url);
                 continue;
             }
             Class<? extends Plugin> pluginClass;
@@ -137,7 +137,7 @@ public class PluginLoader {
                 pluginClass = (Class<? extends Plugin>) cl.loadClass(pluginClassName);
                 pluginClasses.add(pluginClass);
             } catch (ClassNotFoundException e) {
-                log.error("Unable to find plugin class {}, skipping.", pluginClasses);
+                LOG.error("Unable to find plugin class {}, skipping.", pluginClasses);
             }
         }
         return pluginClasses;
@@ -148,7 +148,7 @@ public class PluginLoader {
         try {
             plugin = pluginClass.getConstructor().newInstance();
         } catch (Exception e) {
-            log.error("Cannot find constructor for plugin " + pluginClass.getCanonicalName() + ". It must have a public no-args constructor.", e);
+            LOG.error("Cannot find constructor for plugin " + pluginClass.getCanonicalName() + ". It must have a public no-args constructor.", e);
             return null;
         }
         return plugin;

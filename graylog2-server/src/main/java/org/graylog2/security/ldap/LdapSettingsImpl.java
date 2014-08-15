@@ -37,7 +37,7 @@ import java.util.Map;
 
 @CollectionName("ldap_settings")
 public class LdapSettingsImpl extends PersistedImpl implements LdapSettings {
-    private static final Logger log = LoggerFactory.getLogger(LdapSettingsImpl.class);
+    private static final Logger LOG = LoggerFactory.getLogger(LdapSettingsImpl.class);
 
     public static final String ENABLED = "enabled";
     public static final String SYSTEM_USERNAME = "system_username";
@@ -97,7 +97,7 @@ public class LdapSettingsImpl extends PersistedImpl implements LdapSettings {
             // simply return the password, because it's unencrypted.
             // The next time we will generate a salt and then re-use that value.
             // TODO remove this after 0.20 is out, and the RC versions are pulled.
-            log.debug("Old database version does not have salted, encrypted password. Please save the LDAP settings again.");
+            LOG.debug("Old database version does not have salted, encrypted password. Please save the LDAP settings again.");
             return o.toString();
         }
         String encryptedPw = o.toString();
@@ -111,7 +111,7 @@ public class LdapSettingsImpl extends PersistedImpl implements LdapSettings {
     public void setSystemPassword(String systemPassword) {
         // set new salt value, if we didn't have any.
         if (getSystemPasswordSalt().isEmpty()) {
-            log.debug("Generating new salt for LDAP system password.");
+            LOG.debug("Generating new salt for LDAP system password.");
             final SecureRandom random = new SecureRandom();
             byte[] saltBytes = new byte[8];
             random.nextBytes(saltBytes);

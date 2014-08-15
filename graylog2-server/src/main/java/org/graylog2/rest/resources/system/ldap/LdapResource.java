@@ -59,7 +59,7 @@ import static javax.ws.rs.core.Response.ok;
 @Path("/system/ldap")
 public class LdapResource extends RestResource {
 
-    private static final Logger log = LoggerFactory.getLogger(LdapResource.class);
+    private static final Logger LOG = LoggerFactory.getLogger(LdapResource.class);
 
     @Inject
     private LdapSettingsService ldapSettingsService;
@@ -171,7 +171,7 @@ public class LdapResource extends RestResource {
                 try {
                     connection.close();
                 } catch (IOException e) {
-                    log.warn("Unable to close LDAP connection.", e);
+                    LOG.warn("Unable to close LDAP connection.", e);
                 }
             }
         }
@@ -187,7 +187,7 @@ public class LdapResource extends RestResource {
         try {
             request = objectMapper.readValue(body, LdapSettingsRequest.class);
         } catch (IOException e) {
-            log.error("Error while parsing JSON", e);
+            LOG.error("Error while parsing JSON", e);
             throw new WebApplicationException(e, Response.Status.BAD_REQUEST);
         }
         // load the existing config, or create a new one. we only support having one, currently
@@ -210,7 +210,7 @@ public class LdapResource extends RestResource {
         try {
             ldapSettingsService.save(ldapSettings);
         } catch (ValidationException e) {
-            log.error("Invalid LDAP settings, not updated!", e);
+            LOG.error("Invalid LDAP settings, not updated!", e);
             throw new WebApplicationException(e, Response.Status.BAD_REQUEST);
         }
         ldapAuthenticator.applySettings(ldapSettings);

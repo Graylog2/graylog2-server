@@ -41,8 +41,7 @@ import java.util.Set;
  */
 @Singleton
 public class OutputRegistry {
-
-    private final Logger LOG = LoggerFactory.getLogger(this.getClass());
+    private static final Logger LOG = LoggerFactory.getLogger(OutputRegistry.class);
 
     private final Map<String, MessageOutput> runningMessageOutputs;
     private final MessageOutput defaultMessageOutput;

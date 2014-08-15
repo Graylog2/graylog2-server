@@ -52,7 +52,7 @@ import java.util.concurrent.Future;
  * @author Lennart Koopmann <lennart@torch.sh>
  */
 public class RadioInputRegistry extends InputRegistry {
-    private static final Logger log = LoggerFactory.getLogger(RadioInputRegistry.class);
+    private static final Logger LOG = LoggerFactory.getLogger(RadioInputRegistry.class);
 
     protected final ObjectMapper mapper = new ObjectMapper();
     protected final AsyncHttpClient httpclient;
@@ -150,7 +150,7 @@ public class RadioInputRegistry extends InputRegistry {
         List<InputSummaryResponse> response;
         try {
             Request request = httpclient.prepareGet(uriBuilder.build().toString()).build();
-            log.debug("API Request {} {}", request.getMethod(), request.getUrl());
+            LOG.debug("API Request {} {}", request.getMethod(), request.getUrl());
             Future<Response> f = httpclient.executeRequest(request);
 
             Response r = f.get();
@@ -176,7 +176,7 @@ public class RadioInputRegistry extends InputRegistry {
         for (InputSummaryResponse isr : response) {
             final MessageInput messageInput = getMessageInput(isr);
             if (messageInput != null) {
-                log.debug("Loaded message input {}", messageInput);
+                LOG.debug("Loaded message input {}", messageInput);
                 result.add(messageInput);
             }
         }

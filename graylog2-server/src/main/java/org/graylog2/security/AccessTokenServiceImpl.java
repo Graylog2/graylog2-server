@@ -41,7 +41,7 @@ import java.util.List;
 import java.util.Map;
 
 public class AccessTokenServiceImpl extends PersistedServiceImpl implements AccessTokenService {
-    private static final Logger log = LoggerFactory.getLogger(AccessTokenServiceImpl.class);
+    private static final Logger LOG = LoggerFactory.getLogger(AccessTokenServiceImpl.class);
 
     private static final SecureRandom RANDOM = new SecureRandom();
 
@@ -61,7 +61,7 @@ public class AccessTokenServiceImpl extends PersistedServiceImpl implements Acce
             return null;
         }
         if (objects.size() > 1) {
-            log.error("Multiple access tokens found, this is a serious bug.");
+            LOG.error("Multiple access tokens found, this is a serious bug.");
             throw new IllegalStateException("Access tokens collection has no unique index!");
         }
         final DBObject tokenObject = objects.get(0);

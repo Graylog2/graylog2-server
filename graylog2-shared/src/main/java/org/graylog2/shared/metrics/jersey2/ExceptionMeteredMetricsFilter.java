@@ -12,7 +12,7 @@ import javax.ws.rs.container.ResourceInfo;
 import java.io.IOException;
 
 public class ExceptionMeteredMetricsFilter extends AbstractMetricsFilter {
-    private static final Logger log = LoggerFactory.getLogger(ExceptionMeteredMetricsFilter.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ExceptionMeteredMetricsFilter.class);
     private final Meter meter;
     private final Class<? extends Throwable> exceptionClass;
 

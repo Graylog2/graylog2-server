@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory;
  * @author Lennart Koopmann <lennart@torch.sh>
  */
 public class RadioVersion {
-    private static final Logger log = LoggerFactory.getLogger(RadioVersion.class);
+    private static final Logger LOG = LoggerFactory.getLogger(RadioVersion.class);
 
     public static final Version vDEV = new Version(0, 20, 0, "dev");
     public static final Version v0_20_0_PREVIEW_7 = new Version(0, 20, 0, "preview.7");

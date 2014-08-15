@@ -38,7 +38,7 @@ import java.util.SortedMap;
 import java.util.concurrent.TimeUnit;
 
 public class MongoDbMetricsReporter extends ScheduledReporter {
-    private static final Logger log = LoggerFactory.getLogger(MongoDbMetricsReporter.class);
+    private static final Logger LOG = LoggerFactory.getLogger(MongoDbMetricsReporter.class);
 
     private final Clock clock;
     private final String nodeId;
@@ -119,7 +119,7 @@ public class MongoDbMetricsReporter extends ScheduledReporter {
 
             collection.insert(docs, WriteConcern.UNACKNOWLEDGED);
         } catch (Exception e) {
-            log.warn("Unable to write graylog2 metrics to mongodb. Ignoring this error.", e);
+            LOG.warn("Unable to write graylog2 metrics to mongodb. Ignoring this error.", e);
         }
     }
 

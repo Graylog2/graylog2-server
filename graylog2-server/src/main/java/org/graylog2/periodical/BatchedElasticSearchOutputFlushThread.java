@@ -33,7 +33,7 @@ import javax.inject.Inject;
  * @author Dennis Oelkers <dennis@torch.sh>
  */
 public class BatchedElasticSearchOutputFlushThread extends Periodical {
-    private final Logger LOG = LoggerFactory.getLogger(this.getClass());
+    private static final Logger LOG = LoggerFactory.getLogger(BatchedElasticSearchOutputFlushThread.class);
     private final OutputRegistry outputRegistry;
     private final Configuration configuration;
 

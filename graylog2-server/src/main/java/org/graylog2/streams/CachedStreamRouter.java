@@ -8,6 +8,8 @@ import org.graylog2.Configuration;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.streams.StreamRule;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.util.List;
@@ -19,6 +21,7 @@ import java.util.concurrent.atomic.AtomicReference;
  * @author Dennis Oelkers <dennis@torch.sh>
  */
 public class CachedStreamRouter extends StreamRouter {
+    private static final Logger LOG = LoggerFactory.getLogger(CachedStreamRouter.class);
     private static final AtomicReference<LoadingCache<String, List<Stream>>> CACHED_STREAMS = new AtomicReference<>();
     private static final AtomicReference<LoadingCache<Stream, List<StreamRule>>> CACHED_STREAM_RULES = new AtomicReference<>();
     private final LoadingCache<String, List<Stream>> cachedStreams;

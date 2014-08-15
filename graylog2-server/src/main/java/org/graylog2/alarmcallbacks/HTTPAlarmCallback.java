@@ -48,10 +48,10 @@ import java.util.concurrent.ExecutionException;
  * @author Dennis Oelkers <dennis@torch.sh>
  */
 public class HTTPAlarmCallback implements AlarmCallback {
-    private final Logger LOG = LoggerFactory.getLogger(this.getClass());
-    private Configuration configuration;
+    private static final Logger LOG = LoggerFactory.getLogger(HTTPAlarmCallback.class);
     private final AsyncHttpClient asyncHttpClient;
     private final ObjectMapper objectMapper;
+    private Configuration configuration;
 
     @Inject
     public HTTPAlarmCallback(AsyncHttpClient asyncHttpClient,

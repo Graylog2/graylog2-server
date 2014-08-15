@@ -49,7 +49,7 @@ import java.util.concurrent.TimeUnit;
  * @author Bernd Ahlers <bernd@torch.sh>
  */
 public abstract class DiskJournalCache implements InputCache, OutputCache {
-    private final Logger LOG = LoggerFactory.getLogger(DiskJournalCache.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DiskJournalCache.class);
 
     private final DB db;
     private final BlockingQueue<byte[]> queue;

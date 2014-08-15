@@ -39,7 +39,7 @@ import static org.graylog2.plugin.Tools.ES_DATE_FORMAT_FORMATTER;
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class ResultMessage {
-    private static final Logger log = LoggerFactory.getLogger(ResultMessage.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ResultMessage.class);
 
     private Map<String, Object> message;
     private String index;
@@ -84,7 +84,7 @@ public class ResultMessage {
                                  ES_DATE_FORMAT_FORMATTER.parseDateTime(String.valueOf(tsField)));
             } catch (IllegalArgumentException e) {
                 // could not parse date string, this is likely a bug, but we will leave the original value alone
-                log.warn("Could not parse timestamp of message {}", message.get("id"), e);
+                LOG.warn("Could not parse timestamp of message {}", message.get("id"), e);
             }
         }
     }
@@ -110,7 +110,7 @@ public class ResultMessage {
                     highlightRanges.put(hlEntry.getKey(), highlightPosition);
                 }
             }
-            log.debug("Highlight positions for message {}: {}", message.get("_id"), highlightRanges);
+            LOG.debug("Highlight positions for message {}: {}", message.get("_id"), highlightRanges);
         }
     }
 	

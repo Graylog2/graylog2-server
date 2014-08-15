@@ -9,14 +9,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class GraylogSimpleAccountRealm extends SimpleAccountRealm {
-    private static final Logger log = LoggerFactory.getLogger(GraylogSimpleAccountRealm.class);
+    private static final Logger LOG = LoggerFactory.getLogger(GraylogSimpleAccountRealm.class);
 
     public GraylogSimpleAccountRealm() {
         super("graylog2-in-memory-realm");
     }
 
     public void addRootAccount(String username, String password) {
-        log.debug("Adding root account named {}, having all permissions", username);
+        LOG.debug("Adding root account named {}, having all permissions", username);
         add(new SimpleAccount(
                 username,
                 password,

@@ -37,7 +37,7 @@ import java.util.concurrent.Executors;
  * @author Lennart Koopmann <lennart@torch.sh>
  */
 public abstract class InputRegistry {
-    protected final Logger LOG = LoggerFactory.getLogger(this.getClass());
+    private static final Logger LOG = LoggerFactory.getLogger(InputRegistry.class);
     protected final Set<InputState> inputStates = new HashSet<>();
     protected final ExecutorService executor = Executors.newCachedThreadPool(
             new ThreadFactoryBuilder().setNameFormat("inputs-%d").build()

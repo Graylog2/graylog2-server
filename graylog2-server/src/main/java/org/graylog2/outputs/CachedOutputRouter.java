@@ -24,6 +24,8 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import org.graylog2.plugin.outputs.MessageOutput;
 import org.graylog2.plugin.streams.Stream;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.util.Set;
@@ -35,6 +37,7 @@ import java.util.concurrent.atomic.AtomicReference;
  * @author Dennis Oelkers <dennis@torch.sh>
  */
 public class CachedOutputRouter extends OutputRouter {
+    private static final Logger LOG = LoggerFactory.getLogger(CachedOutputRouter.class);
     private static final AtomicReference<LoadingCache<Stream, Set<MessageOutput>>> CACHED_STREAM_OUTPUT_ROUTES = new AtomicReference<>();
     private final LoadingCache<Stream, Set<MessageOutput>> cachedStreamOutputRoutes;
 

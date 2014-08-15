@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
  * @author Dennis Oelkers <dennis@torch.sh>
  */
 public class ClassNameStringValidator implements Validator {
-    private final Logger LOG = LoggerFactory.getLogger(this.getClass());
+    private static final Logger LOG = LoggerFactory.getLogger(ClassNameStringValidator.class);
     private final Class<?> classConstraint;
 
     public ClassNameStringValidator(Class<?> classConstraint) {

@@ -31,7 +31,7 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 
 public class ScrollResult extends IndexQueryResult {
-    private static final Logger log = LoggerFactory.getLogger(ScrollResult.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ScrollResult.class);
 
     private final Client client;
     private final List<String> fields;
@@ -54,7 +54,7 @@ public class ScrollResult extends IndexQueryResult {
         final Md5Hash md5Hash = new Md5Hash(getOriginalQuery());
         queryHash = md5Hash.toHex();
 
-        log.debug("[{}] Starting scroll request for query {}", queryHash, getOriginalQuery());
+        LOG.debug("[{}] Starting scroll request for query {}", queryHash, getOriginalQuery());
     }
 
     public ScrollChunk nextChunk() {
@@ -66,10 +66,10 @@ public class ScrollResult extends IndexQueryResult {
         final SearchHits hits = search.getHits();
         if (hits.getHits().length == 0) {
             // scroll exhausted
-            log.debug("[{}] Reached end of scroll results.", queryHash, getOriginalQuery());
+            LOG.debug("[{}] Reached end of scroll results.", queryHash, getOriginalQuery());
             return null;
         }
-        log.debug("[{}] New scroll id {}", queryHash, search.getScrollId());
+        LOG.debug("[{}] New scroll id {}", queryHash, search.getScrollId());
         scrollId = search.getScrollId(); // save the id for the next request.
 
         return new ScrollChunk(hits, fields, chunkId++);
@@ -85,7 +85,7 @@ public class ScrollResult extends IndexQueryResult {
 
     public void cancel() {
         final ClearScrollResponse clearScrollResponse = client.prepareClearScroll().addScrollId(scrollId).execute().actionGet();
-        log.debug("[{}] clearScroll for query successful: {}", queryHash, clearScrollResponse.isSucceeded());
+        LOG.debug("[{}] clearScroll for query successful: {}", queryHash, clearScrollResponse.isSucceeded());
     }
 
     public class ScrollChunk {

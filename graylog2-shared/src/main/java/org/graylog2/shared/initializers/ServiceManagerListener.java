@@ -32,7 +32,7 @@ import javax.inject.Inject;
  * @author Dennis Oelkers <dennis@torch.sh>
  */
 public class ServiceManagerListener extends Listener {
-    private final Logger LOG = LoggerFactory.getLogger(ServiceManagerListener.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ServiceManagerListener.class);
     private final ServerStatus serverStatus;
 
     @Inject

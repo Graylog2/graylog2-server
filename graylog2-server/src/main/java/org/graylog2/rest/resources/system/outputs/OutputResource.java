@@ -34,7 +34,7 @@ import java.util.Set;
 @Api(value = "Outputs", description = "Manage outputs")
 @Path("/system/outputs")
 public class OutputResource extends RestResource {
-    private final Logger LOG = LoggerFactory.getLogger(this.getClass());
+    private static final Logger LOG = LoggerFactory.getLogger(OutputResource.class);
 
     private final OutputService outputService;
     private final MessageOutputFactory messageOutputFactory;

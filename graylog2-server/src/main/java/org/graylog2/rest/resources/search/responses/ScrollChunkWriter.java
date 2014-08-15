@@ -40,7 +40,7 @@ import java.util.List;
 @Provider
 @Produces("text/csv")
 public class ScrollChunkWriter implements MessageBodyWriter<ScrollResult.ScrollChunk> {
-    private static final Logger log = LoggerFactory.getLogger(ScrollChunkWriter.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ScrollChunkWriter.class);
 
     public static final MediaType TEXT_CSV = new MediaType("text", "csv");
 
@@ -67,8 +67,8 @@ public class ScrollChunkWriter implements MessageBodyWriter<ScrollResult.ScrollC
                         MediaType mediaType,
                         MultivaluedMap<String, Object> httpHeaders,
                         OutputStream entityStream) throws IOException, WebApplicationException {
-        if (log.isDebugEnabled()) {
-            log.debug("[{}] Writing chunk {}", Thread.currentThread().getId(), scrollChunk.getChunkNumber());
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("[{}] Writing chunk {}", Thread.currentThread().getId(), scrollChunk.getChunkNumber());
         }
         final CSVWriter csvWriter = new CSVWriter(new OutputStreamWriter(entityStream));
 
@@ -101,7 +101,7 @@ public class ScrollChunkWriter implements MessageBodyWriter<ScrollResult.ScrollC
             csvWriter.writeNext(fieldValues);
         }
         if (csvWriter.checkError()) {
-            log.error("Encountered unspecified error when writing message result as CSV, result is likely malformed.");
+            LOG.error("Encountered unspecified error when writing message result as CSV, result is likely malformed.");
         }
         csvWriter.close();
     }

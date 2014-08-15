@@ -34,7 +34,6 @@ public class InitializerBindings extends AbstractModule {
         serviceBinder.addBinding().to(MetricsReporterService.class);
         serviceBinder.addBinding().to(DashboardRegistryService.class);
         serviceBinder.addBinding().to(ProcessBufferService.class);
-        serviceBinder.addBinding().to(DeflectorSetupService.class);
         serviceBinder.addBinding().to(IndexerSetupService.class);
         serviceBinder.addBinding().to(BufferSynchronizerService.class);
         serviceBinder.addBinding().to(OutputSetupService.class);

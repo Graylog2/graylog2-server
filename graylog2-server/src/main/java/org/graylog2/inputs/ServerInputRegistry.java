@@ -31,10 +31,13 @@ import org.graylog2.shared.inputs.MessageInputFactory;
 import org.graylog2.shared.inputs.NoSuchInputTypeException;
 import org.graylog2.system.activities.Activity;
 import org.graylog2.system.activities.ActivityWriter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
 public class ServerInputRegistry extends InputRegistry {
+    private static final Logger LOG = LoggerFactory.getLogger(ServerInputRegistry.class);
     protected final InputService inputService;
     protected final NotificationService notificationService;
     private final ServerStatus serverStatus;

@@ -28,7 +28,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * @author Dennis Oelkers <dennis@torch.sh>
  */
 public class GelfOutput implements MessageOutput {
-    private final Logger LOG = LoggerFactory.getLogger(this.getClass());
+    private static final Logger LOG = LoggerFactory.getLogger(GelfOutput.class);
     private final AtomicBoolean isRunning = new AtomicBoolean(false);
     private Configuration configuration;
     private GelfSender gelfSender;

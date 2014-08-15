@@ -27,7 +27,7 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
 public class AESTools {
-    private static final Logger log = LoggerFactory.getLogger(AESTools.class);
+    private static final Logger LOG = LoggerFactory.getLogger(AESTools.class);
 
     public static String encrypt(String plainText, String encryptionKey, String salt) {
         try {
@@ -36,7 +36,7 @@ public class AESTools {
             cipher.init(Cipher.ENCRYPT_MODE, key, new IvParameterSpec(salt.getBytes("UTF-8")));
             return Hex.encodeToString(cipher.doFinal(plainText.getBytes("UTF-8")));
         } catch (Exception e) {
-            log.error("Could not encrypt value.", e);
+            LOG.error("Could not encrypt value.", e);
         }
             return null;
     }
@@ -48,7 +48,7 @@ public class AESTools {
             cipher.init(Cipher.DECRYPT_MODE, key, new IvParameterSpec(salt.getBytes("UTF-8")));
             return new String(cipher.doFinal(Hex.decode(cipherText)), "UTF-8");
         } catch (Exception e) {
-            log.error("Could not decrypt value.", e);
+            LOG.error("Could not decrypt value.", e);
         }
         return null;
     }

@@ -48,7 +48,7 @@ import java.util.Map;
  * @author Dennis Oelkers <dennis@torch.sh>
  */
 public class EmailAlarmCallback implements AlarmCallback {
-    private final Logger LOG = LoggerFactory.getLogger(EmailAlarmCallback.class);
+    private static final Logger LOG = LoggerFactory.getLogger(EmailAlarmCallback.class);
     private final AlertSender alertSender;
     private final NotificationService notificationService;
     private final NodeId nodeId;

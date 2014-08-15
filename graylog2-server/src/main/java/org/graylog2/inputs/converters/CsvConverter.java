@@ -30,7 +30,7 @@ import java.io.IOException;
 import java.util.Map;
 
 public class CsvConverter extends Converter {
-    private static final Logger log = LoggerFactory.getLogger(CsvConverter.class);
+    private static final Logger LOG = LoggerFactory.getLogger(CsvConverter.class);
 
     private final String[] fieldNames;
 
@@ -73,7 +73,7 @@ public class CsvConverter extends Converter {
         try {
             final String[] strings = parser.parseLine(value);
             if (strings.length != fieldNames.length) {
-                log.error("Different number of columns in CSV data ({}) and configured field names ({}). Discarding input.",
+                LOG.error("Different number of columns in CSV data ({}) and configured field names ({}). Discarding input.",
                           strings.length, fieldNames.length);
                 return null;
             }
@@ -81,7 +81,7 @@ public class CsvConverter extends Converter {
                 fields.put(fieldNames[i], strings[i]);
             }
         } catch (IOException e) {
-            log.error("Invalid CSV input, discarding input", e);
+            LOG.error("Invalid CSV input, discarding input", e);
             return null;
         }
         return fields;
