@@ -42,6 +42,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.*;
 
@@ -237,6 +238,7 @@ public class Generator {
         // generate the json schema for the auto-mapped return types
         Map<String, Object> models = Maps.newHashMap();
         for (Class<?> type : modelTypes) {
+
             // skip non-jackson mapped classes (like Response)
             if (!type.isAnnotationPresent(JsonAutoDetect.class)) {
                 continue;
@@ -419,11 +421,19 @@ public class Generator {
         }
 
         public void setType(Type type) {
-            final Class<?> klass = (Class<?>) type;
-            if (klass.isPrimitive()) {
-                type = Primitives.wrap(klass);
+            final Class<?> klass;
+
+            if (type instanceof ParameterizedType) {
+                klass = (Class<?>) ((ParameterizedType) type).getRawType();
+            } else {
+                klass = (Class<?>) type;
             }
-            this.type = (Class) type;
+
+            if (klass.isPrimitive()) {
+                this.type = Primitives.wrap(klass);
+            } else {
+                this.type = klass;
+            }
         }
 
         @JsonIgnore
