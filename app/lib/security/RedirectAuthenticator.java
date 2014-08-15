@@ -129,16 +129,21 @@ public class RedirectAuthenticator extends Authenticator {
         if (authorizationHeader == null)
             return null;
 
-        final String authToken = authorizationHeader.split(" ")[1];
+        final String[] tokens = authorizationHeader.split(" ");
+        final String authToken;
+        if (tokens.length >= 2)
+            authToken = tokens[1];
+        else
+            return null;
 
         if (authToken == null)
             return null;
 
-        byte[] decodedAuth;
-        String[] credString = null;
+        final byte[] decodedAuth;
+        final String[] credString;
         try {
             decodedAuth = Base64.decode(authToken);
-            credString = new String(decodedAuth, "UTF-8").split(":");
+            credString = new String(decodedAuth, "UTF-8").split(":", 2);
         } catch (IOException e) {
             log.error("Unable to decode basic auth information: ", e);
             return null;
