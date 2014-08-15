@@ -38,7 +38,7 @@ services:
 - mongodb
 - elasticsearch
 addons:
-  sauce_connect: true
+  sauce_connect: false
 notifications:
   slack:
     on_success: change
