@@ -181,14 +181,9 @@ public class MessageTest {
 
     @Test
     public void testGetStreamIds() throws Exception {
-        final Stream stream = mock(Stream.class);
+        message.addField("streams", Lists.newArrayList("stream-id"));
 
-        when(stream.getId()).thenReturn("stream-id");
-
-        message.setStreams(Lists.newArrayList(stream));
-
-        // TODO: Fix by fixing getStreamIds() method in Message.
-        //assertEquals(Lists.newArrayList("stream-id"), message.getStreamIds());
+        assertEquals(Lists.newArrayList("stream-id"), message.getStreamIds());
     }
 
     @Test
