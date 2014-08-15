@@ -21,6 +21,7 @@ package org.graylog2.initializers;
 
 import com.google.common.util.concurrent.AbstractIdleService;
 import com.google.inject.Singleton;
+import org.graylog2.indexer.Deflector;
 import org.graylog2.indexer.Indexer;
 import org.graylog2.plugin.Tools;
 import org.slf4j.Logger;
@@ -37,11 +38,15 @@ public class IndexerSetupService extends AbstractIdleService {
     private static final Logger LOG = LoggerFactory.getLogger(IndexerSetupService.class);
 
     private final Indexer indexer;
+    private final Deflector deflector;
     private final BufferSynchronizerService bufferSynchronizerService;
 
     @Inject
-    public IndexerSetupService(Indexer indexer, BufferSynchronizerService bufferSynchronizerService) {
+    public IndexerSetupService(final Indexer indexer,
+                               final Deflector deflector,
+                               final BufferSynchronizerService bufferSynchronizerService) {
         this.indexer = indexer;
+        this.deflector = deflector;
         this.bufferSynchronizerService = bufferSynchronizerService;
 
         // Shutdown after the BufferSynchronizerServer has stopped to avoid shutting down ES too early.
@@ -58,12 +63,17 @@ public class IndexerSetupService extends AbstractIdleService {
     @Override
     protected void startUp() throws Exception {
         Tools.silenceUncaughtExceptionsInThisThread();
+
+        LOG.debug("Starting indexer");
         try {
             indexer.start();
         } catch (Exception e) {
             bufferSynchronizerService.setIndexerUnavailable();
             throw e;
         }
+
+        LOG.debug("Setting up deflector");
+        deflector.setUp(indexer);
     }
 
     @Override
