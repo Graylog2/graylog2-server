@@ -1,6 +1,6 @@
 package org.graylog2.outputs;
 
-import org.joda.time.DateTime;
+import com.google.common.collect.Maps;
 import org.graylog2.GelfMessage;
 import org.graylog2.GelfSender;
 import org.graylog2.GelfTCPSender;
@@ -8,9 +8,13 @@ import org.graylog2.GelfUDPSender;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
-import org.graylog2.plugin.configuration.fields.*;
+import org.graylog2.plugin.configuration.fields.ConfigurationField;
+import org.graylog2.plugin.configuration.fields.DropdownField;
+import org.graylog2.plugin.configuration.fields.NumberField;
+import org.graylog2.plugin.configuration.fields.TextField;
 import org.graylog2.plugin.outputs.MessageOutput;
 import org.graylog2.plugin.outputs.MessageOutputConfigurationException;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -120,7 +124,7 @@ public class GelfOutput implements MessageOutput {
             gelfMessage.setFacility(facility);
         }
 
-        gelfMessage.setAdditonalFields(message.getFields());
+        gelfMessage.setAdditonalFields(Maps.newHashMap(message.getFields()));
 
         final String forwarder = GelfOutput.class.getCanonicalName();
         gelfMessage.addField("_forwarder", forwarder);
