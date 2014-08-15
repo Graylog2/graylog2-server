@@ -34,7 +34,7 @@ import java.util.Set;
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class OutputRouter {
-    protected final Logger LOG = LoggerFactory.getLogger(this.getClass());
+    private static final Logger LOG = LoggerFactory.getLogger(OutputRouter.class);
 
     private final MessageOutput defaultMessageOutput;
     private final OutputRegistry outputRegistry;

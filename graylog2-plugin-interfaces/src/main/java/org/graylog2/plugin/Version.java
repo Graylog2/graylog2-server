@@ -37,7 +37,7 @@ import static com.google.common.base.Charsets.UTF_8;
  * http://semver.org/
  */
 public class Version {
-    private static final Logger log = LoggerFactory.getLogger(Version.class);
+    private static final Logger LOG = LoggerFactory.getLogger(Version.class);
 
     public final int major;
     public final int minor;
@@ -70,13 +70,13 @@ public class Version {
                 git.load(new StringReader(gitProperties));
                 commitSha = git.getProperty("git.commit.id.abbrev");
             } catch (Exception e) {
-                log.debug("Git commit details are not available, skipping.", e);
+                LOG.debug("Git commit details are not available, skipping.", e);
             }
 
             tmpVersion = new Version(major, minor, incremental, qualifier, commitSha);
         } catch (Exception e) {
             tmpVersion = new Version(0, 0, 0, "unknown");
-            log.error("Unable to read version.properties file, this build has no version number. If you get this message during development, you need to run 'Generate Sources' in IDEA or run 'mvn process-resources'.", e);
+            LOG.error("Unable to read version.properties file, this build has no version number. If you get this message during development, you need to run 'Generate Sources' in IDEA or run 'mvn process-resources'.", e);
         }
         CURRENT_CLASSPATH = tmpVersion;
     }

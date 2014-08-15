@@ -34,7 +34,7 @@ import java.io.IOException;
  * @author Kay Roepke <kay@torch.sh>
  */
 public class ShiroAuthenticationFilter implements ContainerRequestFilter {
-    private static final Logger log = LoggerFactory.getLogger(ShiroAuthenticationFilter.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ShiroAuthenticationFilter.class);
 
     public ShiroAuthenticationFilter() {
 
@@ -46,17 +46,17 @@ public class ShiroAuthenticationFilter implements ContainerRequestFilter {
             return;
         }
         final ShiroSecurityContext context = (ShiroSecurityContext) securityContext;
-        log.trace("Authenticating... {}", context.getSubject());
+        LOG.trace("Authenticating... {}", context.getSubject());
         if (!context.getSubject().isAuthenticated()) {
             try {
-                log.trace("Logging in {}", context.getSubject());
+                LOG.trace("Logging in {}", context.getSubject());
                 context.loginSubject();
 
             } catch (LockedAccountException e) {
-                log.debug("Unable to authenticate user, account is locked.", e);
+                LOG.debug("Unable to authenticate user, account is locked.", e);
                 throw new NotAuthorizedException(e, "Basic realm=\"Graylog2 Server\"");
             } catch (AuthenticationException e) {
-                log.debug("Unable to authenticate user.", e);
+                LOG.debug("Unable to authenticate user.", e);
                 throw new NotAuthorizedException(e, "Basic realm=\"Graylog2 Server\"");
             }
         }

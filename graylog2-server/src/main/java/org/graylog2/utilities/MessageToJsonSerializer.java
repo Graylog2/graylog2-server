@@ -53,7 +53,7 @@ import java.util.concurrent.TimeUnit;
  * @author Bernd Ahlers <bernd@torch.sh>
  */
 public class MessageToJsonSerializer {
-    private final Logger LOG = LoggerFactory.getLogger(MessageToJsonSerializer.class);
+    private static final Logger LOG = LoggerFactory.getLogger(MessageToJsonSerializer.class);
 
     private final ObjectMapper mapper;
     private final SimpleModule simpleModule;

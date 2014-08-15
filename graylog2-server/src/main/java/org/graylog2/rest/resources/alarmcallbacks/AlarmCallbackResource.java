@@ -53,7 +53,7 @@ import java.util.Set;
 @Api(value = "AlarmCallbacks", description = "Manage stream alarm callbacks")
 @Path("/streams/{streamid}/alarmcallbacks")
 public class AlarmCallbackResource extends RestResource {
-    private final Logger LOG = LoggerFactory.getLogger(AlarmCallbackResource.class);
+    private static final Logger LOG = LoggerFactory.getLogger(AlarmCallbackResource.class);
     private final AlarmCallbackConfigurationService alarmCallbackConfigurationService;
     private final StreamService streamService;
     private final Set<AlarmCallback> availableAlarmCallbacks;

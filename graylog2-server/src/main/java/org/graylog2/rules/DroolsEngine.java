@@ -50,7 +50,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 @Singleton
 public class DroolsEngine implements RulesEngine {
-    private static final Logger log = LoggerFactory.getLogger(DroolsEngine.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DroolsEngine.class);
 
     private final KieServices kieServices;
     private final Set<URL> builtinRuleUrls;
@@ -70,7 +70,7 @@ public class DroolsEngine implements RulesEngine {
     }
 
     public void stop() {
-        log.debug("Stopping drools session and removing all rules.");
+        LOG.debug("Stopping drools session and removing all rules.");
         final KieSession activeSession = session.getAndSet(null);
         if (activeSession != null) {
             activeSession.dispose();
@@ -82,7 +82,7 @@ public class DroolsEngine implements RulesEngine {
 
     @Override
     public synchronized boolean addRule(String ruleSource) {
-        log.debug("Adding rule {}", ruleSource);
+        LOG.debug("Adding rule {}", ruleSource);
         liveRules.add(ruleSource);
         if (!commitRules()) {
             // adding rule failed, remove the ruleSource from our list of liveRules again.
@@ -94,12 +94,12 @@ public class DroolsEngine implements RulesEngine {
 
     @Override
     public synchronized boolean addRulesFromFile(String rulesFile) {
-        log.debug("Adding drools rules from file {}", rulesFile);
+        LOG.debug("Adding drools rules from file {}", rulesFile);
         try {
             final String rulesSource = Files.toString(new File(rulesFile), Charsets.UTF_8);
             return addRule(rulesSource);
         } catch (IOException e) {
-            log.warn("Could not read drools source file. Not loading rules.", e);
+            LOG.warn("Could not read drools source file. Not loading rules.", e);
         }
         return false;
     }
@@ -119,7 +119,7 @@ public class DroolsEngine implements RulesEngine {
         final KieSession kieSession = kieContainer.newKieSession();
 //        kieSession.addEventListener(new DebugRuleRuntimeEventListener());
 //        kieSession.addEventListener(new DebugAgendaEventListener());
-        kieSession.setGlobal("log", log);
+        kieSession.setGlobal("log", LOG);
         return new DroolsRulesSession(kieSession);
     }
 
@@ -141,7 +141,7 @@ public class DroolsEngine implements RulesEngine {
     private boolean commitRules() {
         final ReleaseId previousReleaseId = currentReleaseId;
         final ReleaseId newReleaseId = nextRulesPackageVersion();
-        log.debug("Committing rules as version {}", newReleaseId);
+        LOG.debug("Committing rules as version {}", newReleaseId);
         final boolean deployed = deployRules(newReleaseId);
         if (deployed && previousReleaseId != null) {
             kieServices.getRepository().removeKieModule(previousReleaseId);
@@ -171,12 +171,12 @@ public class DroolsEngine implements RulesEngine {
                 kieContainer = kieServices.newKieContainer(newReleaseId);
                 final KieSession session = kieContainer.newKieSession();
                 this.session.set(session);
-                session.setGlobal("log", log);
+                session.setGlobal("log", LOG);
             }
             kieContainer.updateToVersion(newReleaseId);
             return true;
         } catch (RulesCompilationException e) {
-            log.warn("Unable to add rules due to compilation errors.", e);
+            LOG.warn("Unable to add rules due to compilation errors.", e);
             return false;
         }
     }

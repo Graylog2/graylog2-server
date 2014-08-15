@@ -41,7 +41,7 @@ import static com.codahale.metrics.MetricRegistry.name;
  * @author Dennis Oelkers <dennis@torch.sh>
  */
 public class BatchedElasticSearchOutput extends ElasticSearchOutput {
-    private final Logger LOG = LoggerFactory.getLogger(this.getClass());
+    private static final Logger LOG = LoggerFactory.getLogger(BatchedElasticSearchOutput.class);
 
     private final List<Message> buffer;
     private final int maxBufferSize;

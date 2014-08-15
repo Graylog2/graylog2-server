@@ -40,7 +40,7 @@ import java.util.concurrent.TimeUnit;
  */
 @Singleton
 public class PeriodicalsService extends AbstractIdleService {
-    private final Logger LOG = LoggerFactory.getLogger(PeriodicalsService.class);
+    private static final Logger LOG = LoggerFactory.getLogger(PeriodicalsService.class);
 
     public static final String NAME = "Periodicals initializer";
     private final InstantiationService instantiationService;

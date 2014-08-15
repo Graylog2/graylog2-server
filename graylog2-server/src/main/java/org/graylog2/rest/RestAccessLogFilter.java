@@ -32,10 +32,10 @@ import java.net.InetSocketAddress;
 import java.util.Date;
 
 public class RestAccessLogFilter implements ContainerResponseFilter {
-    private static final Logger log = LoggerFactory.getLogger("org.graylog2.rest.accesslog");
+    private static final Logger LOG = LoggerFactory.getLogger("org.graylog2.rest.accesslog");
     @Override
     public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext) throws IOException {
-        if (!log.isDebugEnabled()) return;
+        if (!LOG.isDebugEnabled()) return;
         try {
             final InetSocketAddress remoteAddr = (InetSocketAddress) requestContext.getProperty(NettyContainer.REQUEST_PROPERTY_REMOTE_ADDR);
 
@@ -43,7 +43,7 @@ public class RestAccessLogFilter implements ContainerResponseFilter {
 
             final String remoteUser = ((ShiroSecurityContext)requestContext.getSecurityContext()).getUsername();
             final Date requestDate = requestContext.getDate();
-            log.debug("{} {} [{}] \"{} {}{}\" {} {} {}", new Object[]{
+            LOG.debug("{} {} [{}] \"{} {}{}\" {} {} {}", new Object[]{
                     remoteAddr.getAddress().getHostAddress(),
                     (remoteUser == null ? "-" : remoteUser),
                     (requestDate == null ? "-" : requestDate),
@@ -55,7 +55,7 @@ public class RestAccessLogFilter implements ContainerResponseFilter {
                     responseContext.getLength()
             });
         } catch (Exception ignored) {
-            log.error(":(", ignored);
+            LOG.error(":(", ignored);
         }
     }
 

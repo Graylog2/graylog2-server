@@ -55,7 +55,7 @@ import static javax.ws.rs.core.Response.noContent;
 @Path("/system/sessions")
 @Api(value = "System/Sessions", description = "Login for interactive user sessions")
 public class SessionsResource extends RestResource {
-    private static final Logger log = LoggerFactory.getLogger(SessionsResource.class);
+    private static final Logger LOG = LoggerFactory.getLogger(SessionsResource.class);
 
     private final UserService userService;
     private final DefaultSecurityManager securityManager;
@@ -103,7 +103,7 @@ public class SessionsResource extends RestResource {
             ((DefaultSecurityManager) SecurityUtils.getSecurityManager()).getSubjectDAO().save(subject);
 
         } catch (AuthenticationException e) {
-            log.warn("Unable to log in user " + createRequest.username, e);
+            LOG.warn("Unable to log in user " + createRequest.username, e);
         } catch (UnknownSessionException e) {
             subject.logout();
         }

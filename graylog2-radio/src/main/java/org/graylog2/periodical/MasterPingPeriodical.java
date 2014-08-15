@@ -35,7 +35,7 @@ import java.util.concurrent.ExecutionException;
  * @author Dennis Oelkers <dennis@torch.sh>
  */
 public class MasterPingPeriodical extends Periodical {
-    private final Logger LOG = LoggerFactory.getLogger(MasterPingPeriodical.class);
+    private static final Logger LOG = LoggerFactory.getLogger(MasterPingPeriodical.class);
 
     private final ServerStatus serverStatus;
     private final Configuration configuration;

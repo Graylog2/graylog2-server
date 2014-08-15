@@ -62,7 +62,7 @@ import static org.elasticsearch.index.query.QueryBuilders.queryString;
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class Searches {
-    private static final Logger log = LoggerFactory.getLogger(Searches.class);
+    private static final Logger LOG = LoggerFactory.getLogger(Searches.class);
 
     public interface Factory {
         Searches create(Client client);
@@ -131,9 +131,9 @@ public class Searches {
         final SearchRequest request = srb.setSearchType(SearchType.SCAN)
                 .setScroll(new TimeValue(1, TimeUnit.MINUTES))
                 .setSize(500).request(); // TODO magic numbers
-        if (log.isDebugEnabled()) {
+        if (LOG.isDebugEnabled()) {
             try {
-                log.debug("ElasticSearch scroll query: {}", XContentHelper.convertToJson(request.source(), false));
+                LOG.debug("ElasticSearch scroll query: {}", XContentHelper.convertToJson(request.source(), false));
             } catch (IOException ignored) {}
         }
         final SearchResponse r = c.search(request).actionGet();

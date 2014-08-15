@@ -39,7 +39,7 @@ import java.util.concurrent.TimeUnit;
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class RulesFilter implements MessageFilter {
-    private static final Logger log = LoggerFactory.getLogger(RulesFilter.class);
+    private static final Logger LOG = LoggerFactory.getLogger(RulesFilter.class);
 
     private final FilterService filterService;
     private final RulesEngine.RulesSession privateSession;
@@ -71,13 +71,13 @@ public class RulesFilter implements MessageFilter {
                             Sets.symmetricDifference(currentFilterSet, newFilters);
                     if (difference.isEmpty()) {
                         // there wasn't any change, simply return the current filter set
-                        log.debug("Filter sets are identical, not updating rules engine.");
+                        LOG.debug("Filter sets are identical, not updating rules engine.");
                         return currentFilterSet;
                     }
 
                     // something changed, we simply update everything, not trying to do the minimal changes yet
                     // should this become too expensive we need to do something smarter
-                    log.debug("Updating rules engine, filter sets differ: {}", difference);
+                    LOG.debug("Updating rules engine, filter sets differ: {}", difference);
                     // retract all current filter facts
                     for (FilterDescription filterDescription : currentFilterSet) {
                         privateSession.deleteFact(filterDescription);

@@ -16,7 +16,7 @@ import java.lang.reflect.Method;
 
 @Provider
 public class MetricsDynamicBinding implements DynamicFeature {
-    private static final Logger log = LoggerFactory.getLogger(MetricsDynamicBinding.class);
+    private static final Logger LOG = LoggerFactory.getLogger(MetricsDynamicBinding.class);
     private final MetricRegistry metricRegistry;
 
     public MetricsDynamicBinding(@Context MetricRegistry metricRegistry) {
@@ -28,15 +28,15 @@ public class MetricsDynamicBinding implements DynamicFeature {
 
         final Method resourceMethod = resourceInfo.getResourceMethod();
         if (resourceMethod.isAnnotationPresent(Timed.class)) {
-            log.debug("Setting up filter for Timed resource method: {}#{}", resourceInfo.getResourceClass().getCanonicalName(), resourceMethod.getName());
+            LOG.debug("Setting up filter for Timed resource method: {}#{}", resourceInfo.getResourceClass().getCanonicalName(), resourceMethod.getName());
             context.register(new TimedMetricsFilter(metricRegistry, resourceInfo));
         }
         if (resourceMethod.isAnnotationPresent(Metered.class)) {
-            log.debug("Setting up filter for Metered resource method: {}#{}", resourceInfo.getResourceClass().getCanonicalName(), resourceMethod.getName());
+            LOG.debug("Setting up filter for Metered resource method: {}#{}", resourceInfo.getResourceClass().getCanonicalName(), resourceMethod.getName());
             context.register(new MeteredMetricsFilter(metricRegistry, resourceInfo));
         }
         if (resourceMethod.isAnnotationPresent(ExceptionMetered.class)) {
-            log.debug("Setting up filter for ExceptionMetered resource method: {}#{}", resourceInfo.getResourceClass().getCanonicalName(), resourceMethod.getName());
+            LOG.debug("Setting up filter for ExceptionMetered resource method: {}#{}", resourceInfo.getResourceClass().getCanonicalName(), resourceMethod.getName());
             context.register(new ExceptionMeteredMetricsFilter(metricRegistry, resourceInfo));
         }
     }

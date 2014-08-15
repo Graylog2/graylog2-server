@@ -31,7 +31,7 @@ import java.lang.reflect.Modifier;
 import java.util.*;
 
 public class RestPermissions {
-    private static final Logger log = LoggerFactory.getLogger(RestPermissions.class);
+    private static final Logger LOG = LoggerFactory.getLogger(RestPermissions.class);
 
     // These should all be in the form of "group:action", because allPermissions() below depends on it.
     // Should this ever change, you need to adapt the code below, too.
@@ -132,7 +132,7 @@ public class RestPermissions {
     public static Set<String> readerPermissions(String username) {
         final HashSet<String> perms = Sets.newHashSet(readerBasePermissions);
         if (username == null || username.isEmpty()) {
-            log.error("Username cannot be empty or null for creating reader permissions");
+            LOG.error("Username cannot be empty or null for creating reader permissions");
             throw new IllegalArgumentException("Username was null or empty when getting reader permissions.");
         }
         perms.add(perInstance(USERS_EDIT, username));

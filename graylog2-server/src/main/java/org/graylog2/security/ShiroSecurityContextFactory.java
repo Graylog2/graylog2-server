@@ -30,7 +30,7 @@ import javax.inject.Inject;
 import javax.ws.rs.core.SecurityContext;
 
 public class ShiroSecurityContextFactory implements SecurityContextFactory {
-    private static final Logger log = LoggerFactory.getLogger(ShiroSecurityContextFactory.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ShiroSecurityContextFactory.class);
     private final DefaultSecurityManager sm;
 
     @Inject

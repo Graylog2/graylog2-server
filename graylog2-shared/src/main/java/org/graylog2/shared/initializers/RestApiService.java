@@ -68,7 +68,7 @@ import java.util.concurrent.Executors;
  */
 @Singleton
 public class RestApiService extends AbstractIdleService {
-    private final Logger LOG = LoggerFactory.getLogger(RestApiService.class);
+    private static final Logger LOG = LoggerFactory.getLogger(RestApiService.class);
     private final BaseConfiguration configuration;
     private final SecurityContextFactory securityContextFactory;
     private final Set<Class<? extends DynamicFeature>> dynamicFeatures;

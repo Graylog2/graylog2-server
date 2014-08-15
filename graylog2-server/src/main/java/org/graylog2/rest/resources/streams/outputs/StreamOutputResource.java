@@ -30,7 +30,7 @@ import java.util.Set;
 @Api(value = "StreamOutputs", description = "Manage stream outputs for a given stream")
 @Path("/streams/{streamid}/outputs")
 public class StreamOutputResource extends RestResource {
-    private final Logger LOG = LoggerFactory.getLogger(this.getClass());
+    private static final Logger LOG = LoggerFactory.getLogger(StreamOutputResource.class);
 
     private final OutputService outputService;
     private final StreamService streamService;

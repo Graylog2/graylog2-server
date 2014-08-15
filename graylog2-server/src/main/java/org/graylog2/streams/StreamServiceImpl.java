@@ -48,7 +48,7 @@ import org.slf4j.LoggerFactory;
 import java.util.*;
 
 public class StreamServiceImpl extends PersistedServiceImpl implements StreamService {
-    private final Logger LOG = LoggerFactory.getLogger(this.getClass());
+    private static final Logger LOG = LoggerFactory.getLogger(StreamServiceImpl.class);
     private final StreamRuleService streamRuleService;
     private final AlertService alertService;
     private final OutputService outputService;

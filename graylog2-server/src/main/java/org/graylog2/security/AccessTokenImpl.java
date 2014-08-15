@@ -32,7 +32,7 @@ import java.util.Map;
 
 @CollectionName("access_tokens")
 public class AccessTokenImpl extends PersistedImpl implements AccessToken {
-    private static final Logger log = LoggerFactory.getLogger(AccessTokenImpl.class);
+    private static final Logger LOG = LoggerFactory.getLogger(AccessTokenImpl.class);
 
     public static final String USERNAME = "username";
     public static final String TOKEN = "token";

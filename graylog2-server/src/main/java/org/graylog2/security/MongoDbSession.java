@@ -32,7 +32,7 @@ import java.util.Map;
 
 @CollectionName("sessions")
 public class MongoDbSession extends PersistedImpl {
-    private static final Logger log = LoggerFactory.getLogger(MongoDbSession.class);
+    private static final Logger LOG = LoggerFactory.getLogger(MongoDbSession.class);
 
     protected MongoDbSession(Map<String, Object> fields) {
         super(fields);
@@ -64,9 +64,9 @@ public class MongoDbSession extends PersistedImpl {
             final Object o = ois.readObject();
             return (Map<Object, Object>) o;
         } catch (IOException e) {
-            log.error("little io. wow.", e);
+            LOG.error("little io. wow.", e);
         } catch (ClassNotFoundException e) {
-            log.error("wrong thingy in db", e);
+            LOG.error("wrong thingy in db", e);
         }
         return null;
     }
@@ -80,7 +80,7 @@ public class MongoDbSession extends PersistedImpl {
             oos.close();
             fields.put("attributes", bos.toByteArray());
         } catch (IOException e) {
-            log.error("too bad :(", e);
+            LOG.error("too bad :(", e);
         }
     }
 

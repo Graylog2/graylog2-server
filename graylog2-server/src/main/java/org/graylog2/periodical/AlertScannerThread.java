@@ -44,9 +44,7 @@ import java.util.List;
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class AlertScannerThread extends Periodical {
-
-    private final Logger LOG = LoggerFactory.getLogger(AlertScannerThread.class);
-    private AlertService alertService;
+    private static final Logger LOG = LoggerFactory.getLogger(AlertScannerThread.class);
     private final StreamService streamService;
     private final AlarmCallbackConfigurationService alarmCallbackConfigurationService;
     private final AlarmCallbackFactory alarmCallbackFactory;
@@ -54,6 +52,7 @@ public class AlertScannerThread extends Periodical {
     private final IndexerSetupService indexerSetupService;
     private final Indexer indexer;
     private final ServerStatus serverStatus;
+    private AlertService alertService;
 
     @Inject
     public AlertScannerThread(AlertService alertService,

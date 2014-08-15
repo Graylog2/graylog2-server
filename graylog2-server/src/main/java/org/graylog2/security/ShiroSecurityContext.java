@@ -34,7 +34,7 @@ import java.security.Principal;
  * @author Kay Roepke <kay@torch.sh>
  */
 public class ShiroSecurityContext implements HeaderAwareSecurityContext {
-    private static final Logger log = LoggerFactory.getLogger(ShiroSecurityContext.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ShiroSecurityContext.class);
 
     private Subject subject;
     private final AuthenticationToken token;
@@ -80,7 +80,7 @@ public class ShiroSecurityContext implements HeaderAwareSecurityContext {
 
     @Override
     public boolean isUserInRole(String role) {
-        log.info("Checking role {} for user {}.", role, subject.getPrincipal());
+        LOG.info("Checking role {} for user {}.", role, subject.getPrincipal());
         return subject.hasRole(role);
     }
 

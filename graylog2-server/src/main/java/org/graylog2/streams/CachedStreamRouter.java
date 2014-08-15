@@ -8,6 +8,8 @@ import org.graylog2.Configuration;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.streams.StreamRule;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.util.List;
@@ -18,6 +20,7 @@ import java.util.concurrent.TimeUnit;
  * @author Dennis Oelkers <dennis@torch.sh>
  */
 public class CachedStreamRouter extends StreamRouter {
+    private static final Logger LOG = LoggerFactory.getLogger(CachedStreamRouter.class);
     private static LoadingCache<String, List<Stream>> cachedStreams;
     private static LoadingCache<Stream, List<StreamRule>> cachedStreamRules;
 

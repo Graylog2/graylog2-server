@@ -26,7 +26,7 @@ import org.slf4j.LoggerFactory;
 import java.net.InetAddress;
 
 public class BlacklistIpMatcherCondition extends FilterDescription {
-    private static final Logger log = LoggerFactory.getLogger(BlacklistIpMatcherCondition.class);
+    private static final Logger LOG = LoggerFactory.getLogger(BlacklistIpMatcherCondition.class);
 
     private IPMatcher ipMatcher;
 

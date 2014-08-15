@@ -44,7 +44,7 @@ public class SearchResponseCsvWriter implements MessageBodyWriter<SearchResponse
 
     public static final MediaType TEXT_CSV = new MediaType("text", "csv");
 
-    private static final Logger log = LoggerFactory.getLogger(SearchResponseCsvWriter.class);
+    private static final Logger LOG = LoggerFactory.getLogger(SearchResponseCsvWriter.class);
 
     @Override
     public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
@@ -81,7 +81,7 @@ public class SearchResponseCsvWriter implements MessageBodyWriter<SearchResponse
             csvWriter.writeNext(fieldValues);
         }
         if (csvWriter.checkError()) {
-            log.error("Encountered unspecified error when writing message result as CSV, result is likely malformed.");
+            LOG.error("Encountered unspecified error when writing message result as CSV, result is likely malformed.");
         }
         csvWriter.close();
     }

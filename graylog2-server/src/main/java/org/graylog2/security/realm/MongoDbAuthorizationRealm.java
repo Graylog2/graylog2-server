@@ -36,7 +36,7 @@ import java.util.List;
 
 public class MongoDbAuthorizationRealm extends AuthorizingRealm {
 
-    private static final Logger log = LoggerFactory.getLogger(MongoDbAuthorizationRealm.class);
+    private static final Logger LOG = LoggerFactory.getLogger(MongoDbAuthorizationRealm.class);
     private final UserService userService;
 
     @Inject
@@ -46,14 +46,14 @@ public class MongoDbAuthorizationRealm extends AuthorizingRealm {
 
     @Override
     protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
-        log.debug("Retrieving authorization information for {}", principals);
+        LOG.debug("Retrieving authorization information for {}", principals);
         final User user = userService.load(principals.getPrimaryPrincipal().toString());
         final SimpleAuthorizationInfo info = new SimpleAuthorizationInfo();
         final List<String> permissions = user.getPermissions();
         if (permissions != null) {
             info.setStringPermissions(Sets.newHashSet(permissions));
         }
-        log.debug("User {} has permissions: {}", principals, permissions);
+        LOG.debug("User {} has permissions: {}", principals, permissions);
         return info;
     }
 

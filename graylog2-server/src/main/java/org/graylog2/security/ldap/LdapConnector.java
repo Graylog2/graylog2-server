@@ -41,7 +41,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 public class LdapConnector {
-    private static final Logger log = LoggerFactory.getLogger(LdapConnector.class);
+    private static final Logger LOG = LoggerFactory.getLogger(LdapConnector.class);
 
     private final int connectionTimeout;
 
@@ -53,8 +53,8 @@ public class LdapConnector {
         final LdapNetworkConnection connection = new LdapNetworkConnection(config);
         connection.setTimeOut(connectionTimeout);
 
-        if (log.isTraceEnabled()) {
-            log.trace("Connecting to LDAP server {}:{}, binding with user {}",
+        if (LOG.isTraceEnabled()) {
+            LOG.trace("Connecting to LDAP server {}:{}, binding with user {}",
                       config.getLdapHost(), config.getLdapPort(), config.getName());
         }
 
@@ -75,7 +75,7 @@ public class LdapConnector {
                 return null;
             }
         } catch (UncheckedTimeoutException e) {
-            log.error("Timed out connecting to LDAP server", e);
+            LOG.error("Timed out connecting to LDAP server", e);
             throw new LdapException("Could not connect to LDAP server", e.getCause());
         } catch (LdapException e) {
             throw e;
@@ -92,8 +92,8 @@ public class LdapConnector {
         final LdapEntry ldapEntry = new LdapEntry();
 
         final String filter = MessageFormat.format(searchPattern, principal);
-        if (log.isTraceEnabled()) {
-            log.trace("Search {} for {}, starting at {}",
+        if (LOG.isTraceEnabled()) {
+            LOG.trace("Search {} for {}, starting at {}",
                       activeDirectory ? "ActiveDirectory" : "LDAP", filter, searchBase);
         }
         final EntryCursor entryCursor = connection.search(searchBase,
@@ -117,10 +117,10 @@ public class LdapConnector {
                 }
             }
         } else {
-            log.trace("No LDAP entry found for filter {}", filter);
+            LOG.trace("No LDAP entry found for filter {}", filter);
             return null;
         }
-        log.trace("LDAP search found entry for DN {} with search filter {}", ldapEntry.getDn(), filter);
+        LOG.trace("LDAP search found entry for DN {} with search filter {}", ldapEntry.getDn(), filter);
         return ldapEntry;
     }
 
@@ -128,13 +128,13 @@ public class LdapConnector {
         final BindRequestImpl bindRequest = new BindRequestImpl();
         bindRequest.setName(principal);
         bindRequest.setCredentials(credentials);
-        log.trace("Re-binding with DN {} using password", principal);
+        LOG.trace("Re-binding with DN {} using password", principal);
         final BindResponse bind = connection.bind(bindRequest);
         if (!bind.getLdapResult().getResultCode().equals(ResultCodeEnum.SUCCESS)) {
-            log.trace("Re-binding DN {} failed", principal);
+            LOG.trace("Re-binding DN {} failed", principal);
             throw new RuntimeException(bind.toString());
         }
-        log.trace("Binding DN {} did not throw, connection authenticated: {}", principal, connection.isAuthenticated());
+        LOG.trace("Binding DN {} did not throw, connection authenticated: {}", principal, connection.isAuthenticated());
         return connection.isAuthenticated();
     }
 }

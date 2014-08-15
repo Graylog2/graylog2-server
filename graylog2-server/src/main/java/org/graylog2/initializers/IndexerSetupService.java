@@ -34,7 +34,7 @@ import java.util.concurrent.Executors;
  */
 @Singleton
 public class IndexerSetupService extends AbstractIdleService {
-    private static final Logger log = LoggerFactory.getLogger(IndexerSetupService.class);
+    private static final Logger LOG = LoggerFactory.getLogger(IndexerSetupService.class);
 
     private final Indexer indexer;
     private final BufferSynchronizerService bufferSynchronizerService;
@@ -48,7 +48,7 @@ public class IndexerSetupService extends AbstractIdleService {
         bufferSynchronizerService.addListener(new Listener() {
             @Override
             public void terminated(State from) {
-                log.debug("Shutting down ES client after buffer synchronizer has terminated.");
+                LOG.debug("Shutting down ES client after buffer synchronizer has terminated.");
                 // Properly close ElasticSearch node.
                 IndexerSetupService.this.indexer.getNode().close();
             }
