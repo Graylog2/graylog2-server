@@ -321,4 +321,11 @@ public class MessageTest {
         assertEquals(message.getSource(), fields.get("source"));
         assertEquals(message.getField("timestamp"), fields.get("timestamp"));
     }
+
+    @Test(expectedExceptions = UnsupportedOperationException.class)
+    public void testGetFieldsReturnsImmutableMap() throws Exception {
+        final Map<String, Object> fields = message.getFields();
+
+        fields.put("foo", "bar");
+    }
 }

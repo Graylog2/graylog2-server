@@ -20,6 +20,7 @@
 package org.graylog2.plugin;
 
 import com.google.common.base.Function;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -287,7 +288,7 @@ public class Message {
     }
 
     public Map<String, Object> getFields() {
-        return this.fields;
+        return ImmutableMap.copyOf(fields);
     }
 
     public void setStreams(List<Stream> streams) {
