@@ -21,6 +21,7 @@ package org.graylog2.plugin;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.streams.Stream;
 import org.joda.time.DateTime;
 import org.testng.annotations.BeforeMethod;
@@ -184,6 +185,30 @@ public class MessageTest {
         message.addField("streams", Lists.newArrayList("stream-id"));
 
         assertEquals(Lists.newArrayList("stream-id"), message.getStreamIds());
+    }
+
+    @Test
+    public void testGetAndSetFilterOut() throws Exception {
+        assertFalse(message.getFilterOut());
+
+        message.setFilterOut(true);
+
+        assertTrue(message.getFilterOut());
+
+        message.setFilterOut(false);
+
+        assertFalse(message.getFilterOut());
+    }
+
+    @Test
+    public void testGetAndSetSourceInput() throws Exception {
+        assertNull(message.getSourceInput());
+
+        final MessageInput input = mock(MessageInput.class);
+
+        message.setSourceInput(input);
+
+        assertEquals(input, message.getSourceInput());
     }
 
     @Test
