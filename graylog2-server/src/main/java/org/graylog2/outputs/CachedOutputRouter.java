@@ -29,23 +29,29 @@ import javax.inject.Inject;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
  */
 public class CachedOutputRouter extends OutputRouter {
-    private static LoadingCache<Stream, Set<MessageOutput>> cachedStreamOutputRoutes;
+    private static final AtomicReference<LoadingCache<Stream, Set<MessageOutput>>> CACHED_STREAM_OUTPUT_ROUTES = new AtomicReference<>();
+    private final LoadingCache<Stream, Set<MessageOutput>> cachedStreamOutputRoutes;
 
     @Inject
     public CachedOutputRouter(@DefaultMessageOutput MessageOutput defaultMessageOutput,
                               OutputRegistry outputRegistry) {
         super(defaultMessageOutput, outputRegistry);
+
+        CACHED_STREAM_OUTPUT_ROUTES.compareAndSet(null, buildLoadingCache());
+
+        // The getMessageOutputsForStream method might be called multiple times per message. Avoid contention on the
+        // AtomicReference by storing the LoadingCache in a field.
+        cachedStreamOutputRoutes = CACHED_STREAM_OUTPUT_ROUTES.get();
     }
 
-    @Override
-    protected Set<MessageOutput> getMessageOutputsForStream(Stream stream) {
-        if (cachedStreamOutputRoutes == null) {
-            cachedStreamOutputRoutes = CacheBuilder.newBuilder()
+    private LoadingCache<Stream, Set<MessageOutput>> buildLoadingCache() {
+        return CacheBuilder.newBuilder()
                     .maximumSize(100)
                     .expireAfterWrite(1, TimeUnit.SECONDS)
                     .build(
@@ -56,8 +62,10 @@ public class CachedOutputRouter extends OutputRouter {
                                 }
                             }
                     );
-        }
+    }
 
+    @Override
+    protected Set<MessageOutput> getMessageOutputsForStream(Stream stream) {
         try {
             return cachedStreamOutputRoutes.get(stream);
         } catch (ExecutionException e) {

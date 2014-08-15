@@ -13,13 +13,16 @@ import javax.inject.Inject;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
  */
 public class CachedStreamRouter extends StreamRouter {
-    private static LoadingCache<String, List<Stream>> cachedStreams;
-    private static LoadingCache<Stream, List<StreamRule>> cachedStreamRules;
+    private static final AtomicReference<LoadingCache<String, List<Stream>>> CACHED_STREAMS = new AtomicReference<>();
+    private static final AtomicReference<LoadingCache<Stream, List<StreamRule>>> CACHED_STREAM_RULES = new AtomicReference<>();
+    private final LoadingCache<String, List<Stream>> cachedStreams;
+    private final LoadingCache<Stream, List<StreamRule>> cachedStreamRules;
 
     @Inject
     public CachedStreamRouter(StreamService streamService,
@@ -28,22 +31,45 @@ public class CachedStreamRouter extends StreamRouter {
                               Configuration configuration,
                               NotificationService notificationService) {
         super(streamService, streamRuleService, metricRegistry, configuration, notificationService);
+
+        CACHED_STREAMS.compareAndSet(null, buildStreamsLoadingCache());
+        CACHED_STREAM_RULES.compareAndSet(null, buildStreamRulesLoadingCache());
+
+        // The getStreams and getStreamRules methods might be called multiple times per message. Avoid contention on the
+        // AtomicReference by storing the LoadingCaches in a field.
+        cachedStreams = CACHED_STREAMS.get();
+        cachedStreamRules = CACHED_STREAM_RULES.get();
+    }
+
+    private LoadingCache<String, List<Stream>> buildStreamsLoadingCache() {
+        return CacheBuilder.newBuilder()
+                .maximumSize(1)
+                .expireAfterWrite(1, TimeUnit.SECONDS)
+                .build(
+                        new CacheLoader<String, List<Stream>>() {
+                            @Override
+                            public List<Stream> load(final String s) throws Exception {
+                                return superGetStreams();
+                            }
+                        }
+                );
+    }
+
+    private LoadingCache<Stream, List<StreamRule>> buildStreamRulesLoadingCache() {
+        return CacheBuilder.newBuilder()
+                .expireAfterWrite(1, TimeUnit.SECONDS)
+                .build(
+                        new CacheLoader<Stream, List<StreamRule>>() {
+                            @Override
+                            public List<StreamRule> load(final Stream s) throws Exception {
+                                return superGetStreamRules(s);
+                            }
+                        }
+                );
     }
 
     @Override
     protected List<Stream> getStreams() {
-        if (cachedStreams == null)
-            cachedStreams = CacheBuilder.newBuilder()
-                    .maximumSize(1)
-                    .expireAfterWrite(1, TimeUnit.SECONDS)
-                    .build(
-                            new CacheLoader<String, List<Stream>>() {
-                                @Override
-                                public List<Stream> load(String s) throws Exception {
-                                    return superGetStreams();
-                                }
-                            }
-                    );
         List<Stream> result = null;
         try {
             result = cachedStreams.get("streams");
@@ -59,17 +85,6 @@ public class CachedStreamRouter extends StreamRouter {
 
     @Override
     protected List<StreamRule> getStreamRules(Stream stream) {
-        if (cachedStreamRules == null)
-            cachedStreamRules = CacheBuilder.newBuilder()
-                    .expireAfterWrite(1, TimeUnit.SECONDS)
-                    .build(
-                            new CacheLoader<Stream, List<StreamRule>>() {
-                                @Override
-                                public List<StreamRule> load(Stream s) throws Exception {
-                                    return superGetStreamRules(s);
-                                }
-                            }
-                    );
         List<StreamRule> result = null;
         try {
             result = cachedStreamRules.get(stream);
