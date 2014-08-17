@@ -633,6 +633,29 @@
                     <artifactId>git-commit-id-plugin</artifactId>
                     <version>2.1.10</version>
                 </plugin>
+                <plugin>
+                    <groupId>com.mycila</groupId>
+                    <artifactId>license-maven-plugin</artifactId>
+                    <version>2.6</version>
+                    <configuration>
+                        <header>com/mycila/maven/plugin/license/templates/GPL-3.txt</header>
+                        <properties>
+                            <owner>${project.organization.name}</owner>
+                            <project.name>Graylog2</project.name>
+                        </properties>
+                        <includes>
+                            <include>**/src/main/java/**</include>
+                            <include>**/src/test/java/**</include>
+                        </includes>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>check</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
             </plugins>
         </pluginManagement>
 
