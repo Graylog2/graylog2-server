@@ -29,8 +29,9 @@
     <artifactId>graylog2-parent</artifactId>
     <version>0.21.0-beta3-SNAPSHOT</version>
     <packaging>pom</packaging>
-    <name>graylog2</name>
+    <name>Graylog2</name>
     <url>http://graylog2.org/</url>
+    <inceptionYear>2012</inceptionYear>
 
     <parent>
         <groupId>org.sonatype.oss</groupId>
@@ -47,13 +48,10 @@
         <module>graylog2-rest-routes</module>
     </modules>
 
-    <developers>
-        <developer>
-            <id>lennartkoopmann</id>
-            <name>Lennart Koopmann</name>
-            <email>lennart@torch.sh</email>
-        </developer>
-    </developers>
+    <organization>
+        <name>TORCH GmbH</name>
+        <url>https://www.torch.sh/</url>
+    </organization>
 
     <scm>
         <connection>scm:git:git://github.com/Graylog2/graylog2-server.git</connection>
@@ -71,6 +69,19 @@
         <system>Travis CI</system>
         <url>https://travis-ci.org/Graylog2/graylog2-server</url>
     </ciManagement>
+
+    <mailingLists>
+        <mailingList>
+            <name>Graylog2 User List</name>
+            <subscribe>graylog2+subscribe@googlegroups.com</subscribe>
+            <unsubscribe>graylog2+unsubscribe@googlegroups.com</unsubscribe>
+            <post>graylog2@googlegroups.com</post>
+            <archive>https://groups.google.com/forum/#!forum/graylog2</archive>
+            <otherArchives>
+                <otherArchive>http://dir.gmane.org/gmane.comp.sysutils.graylog2.general</otherArchive>
+            </otherArchives>
+        </mailingList>
+    </mailingLists>
 
     <properties>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
