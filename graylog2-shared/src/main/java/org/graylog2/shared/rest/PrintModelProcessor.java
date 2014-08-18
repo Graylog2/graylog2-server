@@ -19,24 +19,25 @@
 
 package org.graylog2.shared.rest;
 
+import com.google.common.base.Joiner;
 import org.glassfish.jersey.server.model.ModelProcessor;
 import org.glassfish.jersey.server.model.Resource;
 import org.glassfish.jersey.server.model.ResourceMethod;
 import org.glassfish.jersey.server.model.ResourceModel;
+import org.glassfish.jersey.uri.PathPattern;
 
 import javax.ws.rs.core.Configuration;
 
-/**
- * @author Dennis Oelkers <dennis@torch.sh>
- */
 public class PrintModelProcessor implements ModelProcessor {
     @Override
     public ResourceModel processResourceModel(ResourceModel resourceModel, Configuration configuration) {
         System.out.println("Map for resource model <" + resourceModel + ">:");
         for (Resource resource : resourceModel.getResources()) {
-            System.out.println(resource.getPathPattern());
             for (ResourceMethod resourceMethod : resource.getAllMethods()) {
-                System.out.println(resourceMethod.getHttpMethod() + " " + resource.getPathPattern());
+                System.out.println(formatEndpoint(
+                        resourceMethod.getHttpMethod(),
+                        resource.getPathPattern(),
+                        resource.getHandlerClasses()));
             }
         }
 
@@ -47,12 +48,19 @@ public class PrintModelProcessor implements ModelProcessor {
     public ResourceModel processSubResource(ResourceModel subResourceModel, Configuration configuration) {
         System.out.println("Map for sub-resource model <" + subResourceModel + ">:");
         for (Resource resource : subResourceModel.getResources()) {
-            System.out.println(resource.getPathPattern());
             for (ResourceMethod resourceMethod : resource.getAllMethods()) {
-                System.out.println(resourceMethod.getHttpMethod() + " " + resource.getPathPattern());
+                System.out.println(formatEndpoint(
+                        resourceMethod.getHttpMethod(),
+                        resource.getPathPattern(),
+                        resource.getHandlerClasses()));
             }
         }
 
         return subResourceModel;
     }
+
+    private String formatEndpoint(final String method, final PathPattern pathPattern, Iterable<Class<?>> handlerClasses) {
+        return String.format("    %-7s %s (%s)", method, pathPattern, Joiner.on(", ").join(handlerClasses));
+    }
+
 }
