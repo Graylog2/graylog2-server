@@ -23,8 +23,8 @@ $(document).ready(function() {
     $(".quickvalues .quickvalues-refresh").on("click", function(e) {
         e.preventDefault();
 
-        var button = $(".analyze-field .show-quickvalues[data-field=" + $(this).attr("data-field") + "]");
-        var quickvalues = $(".quickvalues[data-field=" + $(this).attr("data-field") + "]");
+        var button = $(".analyze-field .show-quickvalues[data-field='" + $(this).attr("data-field") + "']");
+        var quickvalues = $(".quickvalues[data-field='" + $(this).attr("data-field") + "']");
 
         showQuickValues($(this).attr("data-field"), quickvalues.parent(), true, calculateDirection(button), false);
     });
@@ -39,8 +39,8 @@ $(document).ready(function() {
     $(".quickvalues .quickvalues-close").on("click", function(e) {
         e.preventDefault();
 
-        var quickvalues = $(".quickvalues[data-field=" + $(this).attr("data-field") + "]");
-        var button = $(".analyze-field .show-quickvalues[data-field=" + $(this).attr("data-field") + "]");
+        var quickvalues = $(".quickvalues[data-field='" + $(this).attr("data-field") + "']");
+        var button = $(".analyze-field .show-quickvalues[data-field='" + $(this).attr("data-field") + "']");
 
         button.removeAttr("disabled");
 
@@ -50,7 +50,7 @@ $(document).ready(function() {
 
     $(".quickvalues .quickvalues-autorefresh").on("click", function(e) {
         e.preventDefault();
-        var quickvalues = $(".quickvalues[data-field=" + $(this).attr("data-field") + "]");;
+        var quickvalues = $(".quickvalues[data-field='" + $(this).attr("data-field") + "']");;
 
         if ($(this).hasClass("active")) {
             // Disabling autorefresh.
@@ -62,7 +62,7 @@ $(document).ready(function() {
             $(this).addClass("active");
 
             // Load once to trigger reload cycle again.
-            var button = $(".analyze-field .show-quickvalues[data-field=" + $(this).attr("data-field") + "]");
+            var button = $(".analyze-field .show-quickvalues[data-field='" + $(this).attr("data-field") + "']");
             showQuickValues($(this).attr("data-field"), quickvalues.parent(), true, calculateDirection(button), true);
         }
     });
@@ -89,7 +89,7 @@ $(document).ready(function() {
             $(".terms-distribution", quickvalues).hide();
         }
 
-        var button = $(".analyze-field .show-quickvalues[data-field=" + field + "]");
+        var button = $(".analyze-field .show-quickvalues[data-field='" + field + "']");
         updatePosition(button, quickvalues, direction);
 
         switch(direction)  {
@@ -213,7 +213,7 @@ $(document).ready(function() {
     // Updating total event counts;
     (function updateAllPositions() {
         $(".quickvalues:visible").each(function(i) {
-            var button = $(".analyze-field .show-quickvalues[data-field=" + $(this).attr("data-field") + "]");
+            var button = $(".analyze-field .show-quickvalues[data-field='" + $(this).attr("data-field") + "']");
             var direction = calculateDirection(button);
 
             updatePosition(button, $(this), direction);
