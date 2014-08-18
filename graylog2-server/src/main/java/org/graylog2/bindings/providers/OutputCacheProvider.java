@@ -38,7 +38,7 @@ public class OutputCacheProvider implements Provider<OutputCache> {
             System.exit(-1);
         } catch (DiskJournalCacheCorruptSpoolException e) {
             LOG.error("Unable to initialize output journal spool.");
-            LOG.error("This means that your spool files (in directory {}) got corrupted. Please repair or remove them.", configuration.getMessageCacheSpoolDir());
+            LOG.error("This means that your spool files (in directory \"{}\") got corrupted. Please repair or remove them.", configuration.getMessageCacheSpoolDir());
             System.exit(-1);
         }
         return null;
