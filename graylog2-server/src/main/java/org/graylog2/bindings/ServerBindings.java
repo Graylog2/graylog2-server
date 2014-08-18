@@ -143,8 +143,8 @@ public class ServerBindings extends AbstractModule {
         bind(GracefulShutdown.class).in(Scopes.SINGLETON);
 
         if (configuration.isMessageCacheOffHeap()) {
-            bind(InputCache.class).to(DiskJournalCache.Input.class).in(Scopes.SINGLETON);
-            bind(OutputCache.class).to(DiskJournalCache.Output.class).in(Scopes.SINGLETON);
+            bind(InputCache.class).toProvider(InputCacheProvider.class).asEagerSingleton();
+            bind(OutputCache.class).toProvider(OutputCacheProvider.class).asEagerSingleton();
         } else {
             bind(InputCache.class).to(BasicCache.class).in(Scopes.SINGLETON);
             bind(OutputCache.class).to(BasicCache.class).in(Scopes.SINGLETON);
