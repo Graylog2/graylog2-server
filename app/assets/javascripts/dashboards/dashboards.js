@@ -131,39 +131,51 @@ $(document).ready(function() {
 
     // Periodically poll every widget.
     (function updateDashboardWidgets() {
-        var interval = 1000;
+        // do not make expensive calls to server when window does not have focus
+        function assertFocus(callback) {
+            var recheckInterval = 1000;
 
-        if(!focussed) {
-            setTimeout(updateDashboardWidgets, interval);
-            return;
+            if(!focussed) {
+                setTimeout(callback, recheckInterval);
+            }
+            return focussed;
         }
+
+        if (!assertFocus(updateDashboardWidgets)) return;
 
         $(".dashboard .widget[data-widget-type]").each(function() {
             var widget = $(this);
             var dashboardId = widget.attr("data-dashboard-id");
             var widgetId = widget.attr("data-widget-id");
+            var cacheTimeInSecs = parseInt(widget.attr("data-cache-time") || 0);
 
-            $(".reloading", widget).show();
+            function reloadWidget() {
+                if (!assertFocus(reloadWidget)) return;
 
-            $.ajax({
-                url: appPrefixed('/a/dashboards/' + dashboardId + '/widgets/' + widgetId + '/value'),
-                type: 'GET',
-                success: function(data) {
-                    // Pass to widget specific function to display actual value(s).
-                    var funcName = "updateWidget_" + widget.attr("data-widget-type");
-                    window[funcName](widget, data);
+                $(".reloading", widget).show();
 
-                    $(".calculated-at", widget).attr("title", data.calculated_at);
-                    $(".calculated-at", widget).text(moment(data.calculated_at).fromNow());
-                },
-                error: function(data) {
-                    showErrorInWidget(widget);
-                },
-                complete: function(data) {
-                    $(".reloading", widget).hide();
-                }
-            });
-        }).promise().done(function(){ setTimeout(updateDashboardWidgets, interval); });
+                $.ajax({
+                    url: appPrefixed('/a/dashboards/' + dashboardId + '/widgets/' + widgetId + '/value'),
+                    type: 'GET',
+                    success: function(data) {
+                        // Pass to widget specific function to display actual value(s).
+                        var funcName = "updateWidget_" + widget.attr("data-widget-type");
+                        window[funcName](widget, data);
+
+                        $(".calculated-at", widget).attr("title", data.calculated_at);
+                        $(".calculated-at", widget).text(moment(data.calculated_at).fromNow());
+                    },
+                    error: function(data) {
+                        showErrorInWidget(widget);
+                    },
+                    complete: function(data) {
+                        $(".reloading", widget).hide();
+                        setTimeout(reloadWidget, cacheTimeInSecs * 1000);
+                    }
+                });
+            }
+            reloadWidget();
+        });
     })();
 
     // Change dashboard title.
