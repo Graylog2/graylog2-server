@@ -212,6 +212,24 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "versionchecks_connection_request_timeout", validator = PositiveIntegerValidator.class)
     private int versionchecksConnectionRequestTimeOut = 10000;
 
+    @Parameter(value = "monitoring_service")
+    private boolean monitoringServiceEnabled = false;
+
+    @Parameter(value = "monitoring_service_token")
+    private String monitoringServiceToken = null;
+
+    @Parameter(value = "monitoring_service_uri")
+    private String monitoringServiceUri = "https://in.monitor.services.graylog2.io/check";
+
+    @Parameter(value = "monitoring_service_connect_timeout", validator = PositiveIntegerValidator.class)
+    private int monitoringServiceConnectTimeOut = 10000;
+
+    @Parameter(value = "monitoring_service_socket_timeout", validator = PositiveIntegerValidator.class)
+    private int monitoringServiceSocketTimeOut = 20000;
+
+    @Parameter(value = "monitoring_service_connection_request_timeout", validator = PositiveIntegerValidator.class)
+    private int monitoringServiceConnectionRequestTimeOut = 20000;
+
     @Parameter(value = "http_proxy_uri")
     private String httpProxyUri;
 
@@ -576,6 +594,30 @@ public class Configuration extends BaseConfiguration {
 
     public int getVersionchecksConnectionRequestTimeOut() {
         return versionchecksConnectionRequestTimeOut;
+    }
+
+    public boolean isMonitoringServiceEnabled() {
+        return monitoringServiceEnabled;
+    }
+
+    public String getMonitoringServiceToken() {
+        return monitoringServiceToken;
+    }
+
+    public String getMonitoringServiceUri() {
+        return monitoringServiceUri;
+    }
+
+    public int getMonitoringServiceConnectTimeOut() {
+        return monitoringServiceConnectTimeOut;
+    }
+
+    public int getMonitoringServiceSocketTimeOut() {
+        return monitoringServiceSocketTimeOut;
+    }
+
+    public int getMonitoringServiceConnectionRequestTimeOut() {
+        return monitoringServiceConnectionRequestTimeOut;
     }
 
     public String getHttpProxyUri() {
