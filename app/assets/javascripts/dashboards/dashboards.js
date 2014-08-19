@@ -154,8 +154,18 @@ $(document).ready(function() {
 
                 $(".reloading", widget).show();
 
+                // XXX: This is just the fixed resolution of the Rickshaw graph as defined in "search_result_chart.js"
+                var resolution = 800;
+
+                var url;
+                if (resolution) {
+                    url = appPrefixed('/a/dashboards/' + dashboardId + '/widgets/' + widgetId  + '/resolution/' + resolution + '/value');
+                } else {
+                    url = appPrefixed('/a/dashboards/' + dashboardId + '/widgets/' + widgetId + '/value');
+                }
+
                 $.ajax({
-                    url: appPrefixed('/a/dashboards/' + dashboardId + '/widgets/' + widgetId + '/value'),
+                    url: url,
                     type: 'GET',
                     success: function(data) {
                         // Pass to widget specific function to display actual value(s).
