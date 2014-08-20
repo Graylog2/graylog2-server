@@ -24,6 +24,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.datatype.joda.JodaModule;
+import com.google.common.base.Optional;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
@@ -58,7 +59,7 @@ public class MessageToJsonSerializer {
     private final StreamService streamService;
     private final InputService inputService;
     private final LoadingCache<String, Stream> streamCache;
-    private final LoadingCache<String, MessageInput> messageInputCache;
+    private final LoadingCache<String, Optional<MessageInput>> messageInputCache;
 
     private static class SerializeBean {
         private final Message message;
@@ -160,15 +161,15 @@ public class MessageToJsonSerializer {
         this.messageInputCache = CacheBuilder.newBuilder()
                 .expireAfterAccess(1, TimeUnit.SECONDS)
                 .build(
-                        new CacheLoader<String, MessageInput>() {
+                        new CacheLoader<String, Optional<MessageInput>>() {
                             @Override
-                            public MessageInput load(String key) throws Exception {
+                            public Optional<MessageInput> load(String key) throws Exception {
                                 LOG.debug("Loading message input {}", key);
                                 try {
                                     final Input input = inputService.find(key);
-                                    return inputService.buildMessageInput(input);
+                                    return Optional.fromNullable(inputService.buildMessageInput(input));
                                 } catch (NotFoundException | NoSuchInputTypeException e) {
-                                    return null;
+                                    return Optional.absent();
                                 }
                             }
                         }
@@ -206,7 +207,11 @@ public class MessageToJsonSerializer {
 
         message.setStreams(streamList);
 
-        final MessageInput input = getMessageInput(bean.getSourceInput());
+        final MessageInput input;
+        if (bean.getSourceInput() != null)
+            input = getMessageInput(bean.getSourceInput());
+        else
+            input = null;
 
         if (input != null) {
             message.setSourceInput(input);
@@ -230,7 +235,8 @@ public class MessageToJsonSerializer {
 
     private MessageInput getMessageInput(String id) {
         try {
-            return messageInputCache.get(id);
+            final Optional<MessageInput> cacheResult = messageInputCache.get(id);
+            return cacheResult.orNull();
         } catch (ExecutionException e) {
             LOG.error("Message input cache error", e);
             return null;

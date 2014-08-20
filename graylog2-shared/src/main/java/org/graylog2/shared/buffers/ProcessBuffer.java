@@ -127,7 +127,14 @@ public class ProcessBuffer extends Buffer {
     public void insertCached(Message message, MessageInput sourceInput) {
         message.setSourceInput(sourceInput);
 
-        message.addField(SOURCE_INPUT_ATTR_NAME, sourceInput.getPersistId());
+        final String source_input_name;
+
+        if (sourceInput != null)
+            source_input_name = sourceInput.getId();
+        else
+            source_input_name = "<nonexistent input>";
+
+        message.addField(SOURCE_INPUT_ATTR_NAME, source_input_name);
         message.addField(SOURCE_NODE_ATTR_NAME, serverStatus.getNodeId());
 
         if (!serverStatus.isProcessing()) {
@@ -151,7 +158,14 @@ public class ProcessBuffer extends Buffer {
     public void insertFailFast(Message message, MessageInput sourceInput) throws BufferOutOfCapacityException, ProcessingDisabledException {
         message.setSourceInput(sourceInput);
 
-        message.addField(SOURCE_INPUT_ATTR_NAME, sourceInput.getId());
+        final String source_input_name;
+
+        if (sourceInput != null)
+            source_input_name = sourceInput.getId();
+        else
+            source_input_name = "<nonexistent input>";
+
+        message.addField(SOURCE_INPUT_ATTR_NAME, source_input_name);
         message.addField(SOURCE_NODE_ATTR_NAME, serverStatus.getNodeId());
 
         if (!serverStatus.isProcessing()) {
