@@ -17,20 +17,20 @@
 package org.graylog2.plugins;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Stopwatch;
+import com.google.common.io.ByteStreams;
 import org.graylog2.ServerVersion;
-import org.graylog2.plugin.Tools;
 
 import java.io.BufferedReader;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
-/**
- * @author Lennart Koopmann <lennart@socketfeed.com>
- */
 public class PluginInstaller {
     
     // seed mongodb
@@ -126,31 +126,15 @@ public class PluginInstaller {
         
         return result;
     }
-    
-    private void downloadAndCopyJar(String url, String pluginType) throws Exception {        
-        int startTime = Tools.getUTCTimestamp();
 
-        URL jar = new URL(url);
-        jar.openConnection();
-        InputStream reader = jar.openStream();
+    private void downloadAndCopyJar(String url, String pluginType) throws Exception {
+        final Stopwatch stopwatch = Stopwatch.createStarted();
 
-        FileOutputStream writer = new FileOutputStream(jarPath(url, pluginType));
-        byte[] buffer = new byte[153600];
-        int totalBytesRead = 0;
-        int bytesRead = 0;
-
-        while ((bytesRead = reader.read(buffer)) > 0) {  
-            writer.write(buffer, 0, bytesRead);
-            buffer = new byte[153600];
-            totalBytesRead += bytesRead;
+        try (final InputStream reader = new URL(url).openConnection().getInputStream();
+             final OutputStream writer = new FileOutputStream(jarPath(url, pluginType))) {
+            long totalBytesRead = ByteStreams.copy(reader, writer);
+            System.out.println("Done. " + totalBytesRead + " bytes read (took " + stopwatch.elapsed(TimeUnit.SECONDS) + "s).");
         }
-
-        long endTime = Tools.getUTCTimestamp();
-
-        System.out.println("Done. " + totalBytesRead + " bytes read "
-                + "(took " + (endTime - startTime) + "s).");
-        writer.close();
-        reader.close();
     }
     
     public static boolean compatible(Set<String> versions) {
