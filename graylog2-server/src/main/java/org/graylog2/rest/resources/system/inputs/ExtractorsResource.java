@@ -25,7 +25,8 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.ConfigurationException;
-import org.graylog2.database.ValidationException;
+import org.graylog2.database.*;
+import org.graylog2.database.NotFoundException;
 import org.graylog2.inputs.Input;
 import org.graylog2.inputs.InputService;
 import org.graylog2.inputs.converters.ConverterFactory;
@@ -93,7 +94,7 @@ public class ExtractorsResource extends RestResource {
             @ApiResponse(code = 400, message = "Missing or invalid configuration.")
     })
     public Response create(@ApiParam(title = "JSON body", required = true) String body,
-                           @ApiParam(title = "inputId", required = true) @PathParam("inputId") String inputId) {
+                           @ApiParam(title = "inputId", required = true) @PathParam("inputId") String inputId) throws org.graylog2.database.NotFoundException {
         if (inputId == null || inputId.isEmpty()) {
             LOG.error("Missing inputId. Returning HTTP 400.");
             throw new WebApplicationException(400);
@@ -175,7 +176,7 @@ public class ExtractorsResource extends RestResource {
             @ApiResponse(code = 404, message = "No such input on this node.")
     })
     @Produces(MediaType.APPLICATION_JSON)
-    public String list(@ApiParam(title = "inputId", required = true) @PathParam("inputId") String inputId) {
+    public String list(@ApiParam(title = "inputId", required = true) @PathParam("inputId") String inputId) throws NotFoundException {
         if (inputId == null || inputId.isEmpty()) {
             LOG.error("Missing inputId. Returning HTTP 400.");
             throw new WebApplicationException(400);
@@ -212,7 +213,7 @@ public class ExtractorsResource extends RestResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response terminate(
             @ApiParam(title = "inputId", required = true) @PathParam("inputId") String inputId,
-            @ApiParam(title = "extractorId", required = true) @PathParam("extractorId") String extractorId) {
+            @ApiParam(title = "extractorId", required = true) @PathParam("extractorId") String extractorId) throws NotFoundException {
         if (extractorId == null || extractorId.isEmpty()) {
             LOG.error("Missing extractorId. Returning HTTP 400.");
             throw new WebApplicationException(400);
@@ -259,7 +260,7 @@ public class ExtractorsResource extends RestResource {
     })
     @Path("order")
     public Response order(@ApiParam(title = "JSON body", required = true) String body,
-                          @ApiParam(title = "inputId", description = "Persist ID (!) of input.", required = true) @PathParam("inputId") String inputPersistId) {
+                          @ApiParam(title = "inputId", description = "Persist ID (!) of input.", required = true) @PathParam("inputId") String inputPersistId) throws NotFoundException {
         if (inputPersistId == null || inputPersistId.isEmpty()) {
             LOG.error("Missing inputId. Returning HTTP 400.");
             throw new WebApplicationException(400);
