@@ -8,7 +8,7 @@ graylog2-server.uris=""
 # ~~~~~
 # The secret key is used to secure cryptographics functions. Set this to a long and randomly generated string.
 # If you deploy your application to several instances be sure to use the same key!
-# Generate for example with: pwgen -s 96
+# Generate for example with: pwgen -N 1 -s 96
 application.secret=""
 
 # Web interface timezone

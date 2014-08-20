@@ -94,8 +94,8 @@ public class Global extends GlobalSettings {
             throw new IllegalStateException("No application.secret configured.");
         }
         if (appSecret.length() < 16) {
-            log.error("Please configure application.secret in your conf/graylog2-web-interface.conf to be longer than 16 characters. Suggested is using pwgen -s 96 or similar");
-            throw new IllegalStateException("application.secret is too short, use at least 16 characters! Suggested is to use pwgen -s 96 or similar");
+            log.error("Please configure application.secret in your conf/graylog2-web-interface.conf to be longer than 16 characters. Suggested is using pwgen -N 1 -s 96 or similar");
+            throw new IllegalStateException("application.secret is too short, use at least 16 characters! Suggested is to use pwgen -N 1 -s 96 or similar");
         }
 
         final String graylog2ServerUris = app.configuration().getString("graylog2-server.uris", "");
