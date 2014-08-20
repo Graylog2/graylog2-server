@@ -23,7 +23,7 @@ import play.mvc.Result;
 public class OpenSearchController extends BaseController  {
 
     public static Result index() {
-        final String relative = routes.SearchController.index("{searchTerms}", "relative", 3600, "", "", "", "", 1, "", "", "", "").absoluteURL(request());
+        final String relative = routes.SearchController.index("{searchTerms}", "relative", 3600, "", "", "", "", 1, "", "", "", "", -1).absoluteURL(request());
         final String unescaped = relative.replaceAll("%7B", "{").replaceAll("%7D", "}").replaceAll("&", "&amp;");
         String content =
                 "<OpenSearchDescription xmlns=\"http://a9.com/-/spec/opensearch/1.1/\"\n" +

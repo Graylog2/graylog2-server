@@ -33,6 +33,7 @@ public class SearchRouteHelper {
         String keyword = Tools.stringSearchParamOrEmpty(request, "keyword");
         String interval = Tools.stringSearchParamOrEmpty(request, "interval");
         String fields = Tools.stringSearchParamOrEmpty(request, "fields");
+        int width = request.getQueryString("width") == null ? -1 : Integer.valueOf(request.getQueryString("width"));
 
         String filter = search.getFilter();
         String query = search.getQuery();
@@ -53,7 +54,8 @@ public class SearchRouteHelper {
                     "",
                     sortField,
                     sortOrder,
-                    fields
+                    fields,
+                    width
             );
         } else {
             return routes.SearchController.index(
@@ -68,7 +70,8 @@ public class SearchRouteHelper {
                     "",
                     sortField,
                     sortOrder,
-                    fields
+                    fields,
+                    width
             );
         }
     }

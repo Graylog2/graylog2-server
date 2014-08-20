@@ -31,7 +31,8 @@ public class StreamSearchController extends SearchController {
                         int page,
                         String savedSearchId,
                         String sortField, String sortOrder,
-                        String fields) {
+                        String fields,
+                        int displayWidth) {
         SearchSort sort = buildSearchSort(sortField, sortOrder);
 
         Stream stream;
@@ -71,6 +72,8 @@ public class StreamSearchController extends SearchController {
         DateHistogramResult histogramResult;
         SavedSearch savedSearch;
         Set<String> selectedFields = getSelectedFields(fields);
+        String formattedHistogramResults;
+
         try {
             if(savedSearchId != null && !savedSearchId.isEmpty()) {
                 savedSearch = savedSearchService.get(savedSearchId);
@@ -90,6 +93,7 @@ public class StreamSearchController extends SearchController {
             searchResult.setAllFields(getAllFields());
 
             histogramResult = search.dateHistogram(interval);
+            formattedHistogramResults = formatHistogramResults(histogramResult.getResults(), displayWidth);
         } catch (IOException e) {
             return status(504, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
         } catch (APIException e) {
@@ -98,7 +102,7 @@ public class StreamSearchController extends SearchController {
         }
 
         if (searchResult.getTotalResultCount() > 0) {
-            return ok(views.html.search.results.render(currentUser(), search, searchResult, histogramResult, q, page, savedSearch, selectedFields, serverNodes.asMap(), stream));
+            return ok(views.html.search.results.render(currentUser(), search, searchResult, histogramResult, formattedHistogramResults, q, page, savedSearch, selectedFields, serverNodes.asMap(), stream));
         } else {
             return ok(views.html.search.noresults.render(currentUser(), q, searchResult, savedSearch, selectedFields, stream));
         }

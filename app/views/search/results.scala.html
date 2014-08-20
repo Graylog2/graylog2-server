@@ -3,6 +3,7 @@
         search: org.graylog2.restclient.models.UniversalSearch,
         searchResult: org.graylog2.restclient.models.api.results.SearchResult,
         histogram: org.graylog2.restclient.models.api.results.DateHistogramResult,
+        formattedHistogramResults: String,
         query: String,
         page: Integer,
         savedSearch: org.graylog2.restclient.models.SavedSearch,
@@ -166,7 +167,7 @@
 
 <script>
     // Investigate if we can use a data-* attribute to store this data, as it can become **really** big.
-    resultHistogramData = @Html(histogram.asJSONString());
+    resultHistogramData = @Html(formattedHistogramResults);
 </script>
 
 <div class="graph-resolution-selector">
