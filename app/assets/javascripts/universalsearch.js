@@ -44,10 +44,10 @@ $(document).ready(function() {
         $("input[name='width']", $(this)).val(width);
     });
 
-    $(".stream-query-link").on("click", function() {
+    $(".added-width-search-link").on("click", function() {
         var width = $(document).width();
         var href = $(this).attr("href");
-        href += "&width=" + width;
+        href = URI(href).addSearch("width", width).toString();
         $(this).attr("href", href);
     });
 

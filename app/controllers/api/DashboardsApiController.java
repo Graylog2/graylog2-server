@@ -165,6 +165,7 @@ public class DashboardsApiController extends AuthenticatedController {
                     final Map<Object, Object> filteredResults = new LinkedHashMap<>(resolution);
                     int index = 0;
                     for (Map.Entry entry : resultMap.entrySet()) {
+                        // TODO: instead of sampling we might consider interpolation (compare SearchController)
                         if (index % factor == 0) {
                             filteredResults.put(entry.getKey(), entry.getValue());
                         }

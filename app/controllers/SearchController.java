@@ -148,6 +148,7 @@ public class SearchController extends AuthenticatedController {
 
         int index = 0;
         for (Map.Entry<String, Long> result : histogramResults.entrySet()) {
+            // TODO: instead of sampling we might consider interpolation (compare DashboardsApiController)
             if (index % factor == 0) {
                 Map<String, Long> point = Maps.newHashMap();
                 point.put("x", Long.parseLong(result.getKey()));

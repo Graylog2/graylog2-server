@@ -33,7 +33,7 @@ public class DashboardWidgetRouteHelper {
                 "",
                 "",
                 "", // TODO fields
-                -1 // TODO displayWidth
+                -1
         );
     }
 
@@ -52,7 +52,7 @@ public class DashboardWidgetRouteHelper {
                 "",
                 "",
                 "", // TODO fields
-                -1 // TODO displayWidth
+                -1
         );
     }
 }
