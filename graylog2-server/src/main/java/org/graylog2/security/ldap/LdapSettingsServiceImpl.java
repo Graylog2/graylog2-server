@@ -29,10 +29,12 @@ import java.util.List;
 
 public class LdapSettingsServiceImpl extends PersistedServiceImpl implements LdapSettingsService {
     private static final Logger LOG = LoggerFactory.getLogger(LdapSettingsServiceImpl.class);
+    private final LdapSettingsImpl.Factory ldapSettingsFactory;
 
     @Inject
-    public LdapSettingsServiceImpl(MongoConnection mongoConnection) {
+    public LdapSettingsServiceImpl(MongoConnection mongoConnection, LdapSettingsImpl.Factory ldapSettingsFactory) {
         super(mongoConnection);
+        this.ldapSettingsFactory = ldapSettingsFactory;
     }
 
     @Override
@@ -49,7 +51,7 @@ public class LdapSettingsServiceImpl extends PersistedServiceImpl implements Lda
             return null;
         }
         final DBObject settingsObject = results.get(0);
-        return new LdapSettingsImpl((ObjectId) settingsObject.get("_id"), settingsObject.toMap());
+        return ldapSettingsFactory.create((ObjectId) settingsObject.get("_id"), settingsObject.toMap());
     }
 
     @Override

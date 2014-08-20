@@ -33,7 +33,6 @@ import org.graylog2.bindings.providers.*;
 import org.graylog2.buffers.OutputBufferWatermark;
 import org.graylog2.buffers.processors.OutputBufferProcessor;
 import org.graylog2.buffers.processors.ServerProcessBufferProcessor;
-import org.graylog2.caches.DiskJournalCache;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.filters.FilterService;
 import org.graylog2.filters.FilterServiceImpl;
@@ -51,8 +50,10 @@ import org.graylog2.inputs.BasicCache;
 import org.graylog2.inputs.InputCache;
 import org.graylog2.inputs.OutputCache;
 import org.graylog2.jersey.container.netty.SecurityContextFactory;
+import org.graylog2.plugin.BaseConfiguration;
 import org.graylog2.plugin.PluginMetaData;
 import org.graylog2.plugin.RulesEngine;
+import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.indexer.MessageGateway;
 import org.graylog2.rest.NotFoundExceptionMapper;
 import org.graylog2.rest.RestAccessLogFilter;
@@ -60,9 +61,8 @@ import org.graylog2.rest.ValidationExceptionMapper;
 import org.graylog2.security.ShiroSecurityBinding;
 import org.graylog2.security.ShiroSecurityContextFactory;
 import org.graylog2.security.ldap.LdapConnector;
+import org.graylog2.security.ldap.LdapSettingsImpl;
 import org.graylog2.security.realm.LdapUserAuthenticator;
-import org.graylog2.plugin.BaseConfiguration;
-import org.graylog2.plugin.ServerStatus;
 import org.graylog2.shared.bindings.AsyncHttpClientProvider;
 import org.graylog2.shared.inputs.InputRegistry;
 import org.graylog2.shared.metrics.jersey2.MetricsDynamicBinding;
@@ -112,6 +112,7 @@ public class ServerBindings extends AbstractModule {
         install(new FactoryModuleBuilder().build(Indices.Factory.class));
         install(new FactoryModuleBuilder().build(FixDeflectorByDeleteJob.Factory.class));
         install(new FactoryModuleBuilder().build(FixDeflectorByMoveJob.Factory.class));
+        install(new FactoryModuleBuilder().build(LdapSettingsImpl.Factory.class));
     }
 
     private void bindSingletons() {

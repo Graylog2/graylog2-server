@@ -62,6 +62,9 @@ public class LdapResource extends RestResource {
     private LdapSettingsService ldapSettingsService;
 
     @Inject
+    private LdapSettingsImpl.Factory ldapSettingsFactory;
+
+    @Inject
     private LdapConnector ldapConnector;
 
     @Inject
@@ -190,7 +193,7 @@ public class LdapResource extends RestResource {
         // load the existing config, or create a new one. we only support having one, currently
         LdapSettings ldapSettings = ldapSettingsService.load();
         if (ldapSettings == null) {
-            ldapSettings = new LdapSettingsImpl();
+            ldapSettings = ldapSettingsFactory.createEmpty();
         }
         ldapSettings.setSystemUsername(request.systemUsername);
         ldapSettings.setSystemPassword(request.systemPassword);
