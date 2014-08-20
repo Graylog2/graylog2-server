@@ -127,10 +127,4 @@ public class RadioAMQPInput extends AMQPInput {
         return NAME;
     }
 
-    @Override
-    public boolean isExclusive() {
-        return true;
-    }
-
-
 }
