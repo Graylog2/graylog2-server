@@ -51,7 +51,8 @@ public class DateHistogramResult {
 	 * 
 	 * @return A JSON string representation of the result, suitable for Rickshaw data graphing.
 	 */
-	public List<Map<String, Long>> getFormattedResults() {
+    @Deprecated
+    public List<Map<String, Long>> getFormattedResults() {
 		List<Map<String, Long>> points = Lists.newArrayList();
 		
 		for (Map.Entry<String, Long> result : results.entrySet()) {
@@ -64,7 +65,8 @@ public class DateHistogramResult {
 		
 		return points;
 	}
-	
+
+    @Deprecated
 	public String asJSONString() {
 		return new Gson().toJson(getFormattedResults());
 	}
