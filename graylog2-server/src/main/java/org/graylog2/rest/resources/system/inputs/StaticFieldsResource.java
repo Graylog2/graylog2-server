@@ -21,7 +21,8 @@ package org.graylog2.rest.resources.system.inputs;
 
 import com.codahale.metrics.annotation.Timed;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.graylog2.database.ValidationException;
+import org.graylog2.database.*;
+import org.graylog2.database.NotFoundException;
 import org.graylog2.inputs.Input;
 import org.graylog2.inputs.InputService;
 import org.graylog2.plugin.Message;
@@ -70,7 +71,7 @@ public class StaticFieldsResource extends RestResource {
             @ApiResponse(code = 400, message = "Missing or invalid configuration.")
     })
     public Response create(@ApiParam(title = "JSON body", required = true) String body,
-                           @ApiParam(title = "inputId", required = true) @PathParam("inputId") String inputId) {
+                           @ApiParam(title = "inputId", required = true) @PathParam("inputId") String inputId) throws NotFoundException {
         if (inputId == null || inputId.isEmpty()) {
             LOG.error("Missing inputId. Returning HTTP 400.");
             throw new WebApplicationException(400);
@@ -137,7 +138,7 @@ public class StaticFieldsResource extends RestResource {
     })
     @Path("/{key}")
     public Response delete(@ApiParam(title = "Key", required = true) @PathParam("key") String key,
-                           @ApiParam(title = "inputId", required = true) @PathParam("inputId") String inputId) {
+                           @ApiParam(title = "inputId", required = true) @PathParam("inputId") String inputId) throws NotFoundException {
         if (inputId == null || inputId.isEmpty()) {
             LOG.error("Missing inputId. Returning HTTP 400.");
             throw new WebApplicationException(400);

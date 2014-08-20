@@ -37,7 +37,7 @@ public interface InputService extends PersistedService {
 
     List<Input> allOfRadio(Node radio);
 
-    Input find(String id);
+    Input find(String id) throws NotFoundException;
 
     Input findForThisNode(String nodeId, String id) throws NotFoundException;
     Input findForThisRadio(String radioId, String id) throws NotFoundException;

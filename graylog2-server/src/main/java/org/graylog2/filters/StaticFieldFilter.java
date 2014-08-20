@@ -36,6 +36,9 @@ public class StaticFieldFilter implements MessageFilter {
 
     @Override
     public boolean filter(Message msg) {
+        if (msg.getSourceInput() == null || msg.getSourceInput().getStaticFields() == null)
+            return false;
+
         for(Map.Entry<String, String> field : msg.getSourceInput().getStaticFields().entrySet()) {
             if(!msg.getFields().containsKey(field.getKey())) {
                 msg.addField(field.getKey(), field.getValue());

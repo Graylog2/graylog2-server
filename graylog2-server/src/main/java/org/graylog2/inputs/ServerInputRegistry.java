@@ -20,6 +20,7 @@
 package org.graylog2.inputs;
 
 import com.google.common.collect.Lists;
+import org.graylog2.database.NotFoundException;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.inputs.InputState;
@@ -73,8 +74,12 @@ public class ServerInputRegistry extends InputRegistry {
     }
 
     public void cleanInput(MessageInput messageInput) {
-        Input input = inputService.find(messageInput.getPersistId());
-        inputService.destroy(input);
+        try {
+            final Input input = inputService.find(messageInput.getPersistId());
+            inputService.destroy(input);
+        } catch (NotFoundException e) {
+            LOG.error("Unable to clean input <" + messageInput.getPersistId() + ">: ", e);
+        }
     }
 
     @Override
