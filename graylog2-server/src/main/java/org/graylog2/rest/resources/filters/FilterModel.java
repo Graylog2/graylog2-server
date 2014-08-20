@@ -1,6 +1,4 @@
-/*
- * Copyright 2014 TORCH GmbH
- *
+/**
  * This file is part of Graylog2.
  *
  * Graylog2 is free software: you can redistribute it and/or modify

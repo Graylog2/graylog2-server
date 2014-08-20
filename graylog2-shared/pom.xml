@@ -197,4 +197,16 @@
             <artifactId>joda-time</artifactId>
         </dependency>
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>com.mycila</groupId>
+                <artifactId>license-maven-plugin</artifactId>
+                <configuration>
+                    <header>com/mycila/maven/plugin/license/templates/MIT.txt</header>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>

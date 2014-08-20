@@ -251,6 +251,10 @@
                     <finalName>${project.artifactId}-${project.version}-${maven.build.timestamp}</finalName>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>com.mycila</groupId>
+                <artifactId>license-maven-plugin</artifactId>
+            </plugin>
         </plugins>
 
         <resources>
