@@ -18,16 +18,17 @@ package org.graylog2.inputs.gelf;
 
 import org.graylog2.inputs.TestHelper;
 import org.graylog2.inputs.gelf.gelf.GELFMessageChunk;
-import org.graylog2.plugin.Tools;
 import org.testng.annotations.Test;
-import static org.testng.AssertJUnit.*;
+
+import static org.testng.AssertJUnit.assertArrayEquals;
+import static org.testng.AssertJUnit.assertEquals;
+import static org.testng.AssertJUnit.assertNotNull;
+import static org.testng.AssertJUnit.assertTrue;
 
 
 public class GELFMessageChunkTest {
-
     public final static String GELF_JSON = "{\"message\":\"foo\",\"host\":\"bar\",\"_lol_utf8\":\"ü\"}";
 
-    
     private GELFMessageChunk buildChunk() throws Exception {
         String id = "lolwat67";
         int seqNum = 3;
@@ -36,31 +37,30 @@ public class GELFMessageChunkTest {
 
         return new GELFMessageChunk(TestHelper.buildGELFMessageChunk(id, seqNum, seqCnt, data), null);
     }
-    
+
     @Test
     public void testGetArrival() throws Exception {
-        int timestamp = Tools.getUTCTimestamp();
-        GELFMessageChunk chunk = buildChunk();
-        assertTrue((timestamp - chunk.getArrival()) < 5); // delta shmelta
+        final GELFMessageChunk chunk = buildChunk();
+        assertTrue(System.currentTimeMillis() - chunk.getArrival() < 5000l); // delta shmelta
     }
 
     @Test
-    public void testGetId() throws Exception {      
+    public void testGetId() throws Exception {
         assertEquals(TestHelper.toHex("lolwat67"), buildChunk().getId());
     }
 
     @Test
-    public void testGetData() throws Exception  {
+    public void testGetData() throws Exception {
         assertArrayEquals(TestHelper.gzipCompress(GELF_JSON), buildChunk().getData());
     }
 
     @Test
-    public void testGetSequenceCount() throws Exception  {
+    public void testGetSequenceCount() throws Exception {
         assertEquals(4, buildChunk().getSequenceCount());
     }
 
     @Test
-    public void testGetSequenceNumber() throws Exception  {
+    public void testGetSequenceNumber() throws Exception {
         assertEquals(3, buildChunk().getSequenceNumber());
     }
 
