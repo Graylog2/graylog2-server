@@ -30,25 +30,31 @@ import com.github.joschi.jadconfig.repositories.SystemPropertiesRepository;
 import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.ServiceManager;
-import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Module;
 import com.google.inject.ProvisionException;
 import com.google.inject.spi.Message;
 import com.mongodb.MongoException;
 import org.apache.log4j.Level;
-import org.graylog2.bindings.*;
+import org.graylog2.bindings.AlarmCallbackBindings;
+import org.graylog2.bindings.InitializerBindings;
+import org.graylog2.bindings.MessageFilterBindings;
+import org.graylog2.bindings.MessageOutputBindings;
+import org.graylog2.bindings.PersistenceServicesBindings;
+import org.graylog2.bindings.ServerBindings;
+import org.graylog2.bindings.ServerMessageInputBindings;
 import org.graylog2.cluster.NodeService;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.Plugin;
 import org.graylog2.plugin.PluginModule;
+import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.lifecycles.Lifecycle;
 import org.graylog2.plugins.PluginInstaller;
 import org.graylog2.shared.NodeRunner;
-import org.graylog2.plugin.ServerStatus;
+import org.graylog2.shared.bindings.GuiceInjectorHolder;
 import org.graylog2.shared.bindings.GuiceInstantiationService;
 import org.graylog2.shared.initializers.ServiceManagerListener;
 import org.graylog2.shared.plugins.PluginLoader;
@@ -161,7 +167,7 @@ public final class Main extends NodeRunner {
                 new MessageOutputBindings());
         LOG.debug("Adding plugin modules: " + pluginModules);
         bindingsModules.addAll(pluginModules);
-        final Injector injector = Guice.createInjector(bindingsModules);
+        final Injector injector = GuiceInjectorHolder.createInjector(bindingsModules);
         instantiationService.setInjector(injector);
 
         // This is holding all our metrics.
@@ -184,8 +190,6 @@ public final class Main extends NodeRunner {
         if (!commandLineArguments.isNoPidFile()) {
             savePidFile(commandLineArguments.getPidFile());
         }
-
-        monkeyPatchHK2(injector);
 
         // Le server object. This is where all the magic happens.
         final ServerStatus serverStatus = injector.getInstance(ServerStatus.class);
