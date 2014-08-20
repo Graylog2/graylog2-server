@@ -71,7 +71,7 @@ public class StaticFieldsResource extends RestResource {
             @ApiResponse(code = 400, message = "Missing or invalid configuration.")
     })
     public Response create(@ApiParam(title = "JSON body", required = true) String body,
-                           @ApiParam(title = "inputId", required = true) @PathParam("inputId") String inputId) throws org.graylog2.database.NotFoundException {
+                           @ApiParam(title = "inputId", required = true) @PathParam("inputId") String inputId) throws NotFoundException {
         if (inputId == null || inputId.isEmpty()) {
             LOG.error("Missing inputId. Returning HTTP 400.");
             throw new WebApplicationException(400);
