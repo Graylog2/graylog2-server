@@ -19,12 +19,14 @@
  */
 package org.graylog2.indexer.searches.timeranges;
 
+import org.joda.time.DateTime;
+
 import java.util.Map;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-public interface TimeRange extends FromRange {
+public interface TimeRange {
 
     public enum Type {
         RELATIVE,
@@ -35,5 +37,9 @@ public interface TimeRange extends FromRange {
     public Type getType();
 
     public Map<String, Object> getPersistedConfig();
+
+    public DateTime getFrom();
+
+    public DateTime getTo();
 
 }

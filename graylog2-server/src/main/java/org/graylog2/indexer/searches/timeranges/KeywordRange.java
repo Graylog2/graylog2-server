@@ -28,7 +28,7 @@ import java.util.Map;
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-public class KeywordRange implements TimeRange, FromToRange {
+public class KeywordRange implements TimeRange {
 
     private final String keyword;
     private final DateTime from;

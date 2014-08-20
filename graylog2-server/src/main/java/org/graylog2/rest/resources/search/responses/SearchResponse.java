@@ -20,6 +20,7 @@ package org.graylog2.rest.resources.search.responses;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import org.graylog2.indexer.results.ResultMessage;
+import org.joda.time.DateTime;
 
 import java.util.List;
 import java.util.Set;
@@ -33,6 +34,8 @@ public class SearchResponse {
     public Set<String> fields;
     public long time;
     public long totalResults;
+    public DateTime from;
+    public DateTime to;
 
     public QueryParseError error;
     public GenericError genericError;

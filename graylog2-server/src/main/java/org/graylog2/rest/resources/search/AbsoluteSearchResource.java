@@ -81,18 +81,19 @@ public class AbsoluteSearchResource extends SearchResource {
         Sorting sorting = buildSorting(sort);
 
         final List<String> fieldList = parseOptionalFields(fields);
+        TimeRange timeRange = buildAbsoluteTimeRange(from, to);
         final SearchesConfig searchesConfig = SearchesConfigBuilder.newConfig()
                 .setQuery(query)
                 .setFilter(filter)
                 .setFields(fieldList)
-                .setRange(buildAbsoluteTimeRange(from, to))
+                .setRange(timeRange)
                 .setLimit(limit)
                 .setOffset(offset)
                 .setSorting(sorting)
                 .build();
 
         try {
-            return buildSearchResponse(indexer.searches().search(searchesConfig));
+            return buildSearchResponse(indexer.searches().search(searchesConfig), timeRange);
         } catch (IndexHelper.InvalidRangeFormatException e) {
             LOG.warn("Invalid timerange parameters provided. Returning HTTP 400.", e);
             throw new WebApplicationException(400);

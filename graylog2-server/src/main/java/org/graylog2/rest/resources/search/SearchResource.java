@@ -190,7 +190,7 @@ public class SearchResource extends RestResource {
         return result;
     }
 
-    protected SearchResponse buildSearchResponse(SearchResult sr) {
+    protected SearchResponse buildSearchResponse(SearchResult sr, TimeRange timeRange) {
         SearchResponse result = new SearchResponse();
         result.query = sr.getOriginalQuery();
         result.builtQuery = sr.getBuiltQuery();
@@ -199,6 +199,8 @@ public class SearchResource extends RestResource {
         result.fields = sr.getFields();
         result.time = sr.took().millis();
         result.totalResults = sr.getTotalResults();
+        result.from = timeRange.getFrom();
+        result.to = timeRange.getTo();
 
         return result;
     }
