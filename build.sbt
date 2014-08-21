@@ -21,3 +21,5 @@ libraryDependencies ++= Seq(
   "com.sun.jersey" % "jersey-bundle" % "1.17.1"
 )
 
+// No need to generate Javadoc here
+sources in doc in Compile := List()
