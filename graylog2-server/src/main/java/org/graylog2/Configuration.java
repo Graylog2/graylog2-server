@@ -213,22 +213,22 @@ public class Configuration extends BaseConfiguration {
     private int versionchecksConnectionRequestTimeOut = 10000;
 
     @Parameter(value = "monitoring_service")
-    private boolean monitoringServiceEnabled = false;
+    private boolean telemetryServiceEnabled = false;
 
-    @Parameter(value = "monitoring_service_token")
-    private String monitoringServiceToken = null;
+    @Parameter(value = "telemetry_service_token")
+    private String telemetryServiceToken = null;
 
-    @Parameter(value = "monitoring_service_uri")
-    private String monitoringServiceUri = "https://in.monitor.services.graylog2.io/check";
+    @Parameter(value = "telemetry_service_uri")
+    private String telemetryServiceUri = "https://in.monitor.services.graylog2.io/check";
 
-    @Parameter(value = "monitoring_service_connect_timeout", validator = PositiveIntegerValidator.class)
-    private int monitoringServiceConnectTimeOut = 10000;
+    @Parameter(value = "telemetry_service_connect_timeout", validator = PositiveIntegerValidator.class)
+    private int telemetryServiceConnectTimeOut = 10000;
 
-    @Parameter(value = "monitoring_service_socket_timeout", validator = PositiveIntegerValidator.class)
-    private int monitoringServiceSocketTimeOut = 20000;
+    @Parameter(value = "telemetry_service_socket_timeout", validator = PositiveIntegerValidator.class)
+    private int telemetryServiceSocketTimeOut = 20000;
 
-    @Parameter(value = "monitoring_service_connection_request_timeout", validator = PositiveIntegerValidator.class)
-    private int monitoringServiceConnectionRequestTimeOut = 20000;
+    @Parameter(value = "telemetry_service_connection_request_timeout", validator = PositiveIntegerValidator.class)
+    private int telemetryServiceConnectionRequestTimeOut = 20000;
 
     @Parameter(value = "http_proxy_uri")
     private String httpProxyUri;
@@ -596,28 +596,28 @@ public class Configuration extends BaseConfiguration {
         return versionchecksConnectionRequestTimeOut;
     }
 
-    public boolean isMonitoringServiceEnabled() {
-        return monitoringServiceEnabled;
+    public boolean isTelemetryServiceEnabled() {
+        return telemetryServiceEnabled;
     }
 
-    public String getMonitoringServiceToken() {
-        return monitoringServiceToken;
+    public String getTelemetryServiceToken() {
+        return telemetryServiceToken;
     }
 
-    public String getMonitoringServiceUri() {
-        return monitoringServiceUri;
+    public String getTelemetryServiceUri() {
+        return telemetryServiceUri;
     }
 
-    public int getMonitoringServiceConnectTimeOut() {
-        return monitoringServiceConnectTimeOut;
+    public int getTelemetryServiceConnectTimeOut() {
+        return telemetryServiceConnectTimeOut;
     }
 
-    public int getMonitoringServiceSocketTimeOut() {
-        return monitoringServiceSocketTimeOut;
+    public int getTelemetryServiceSocketTimeOut() {
+        return telemetryServiceSocketTimeOut;
     }
 
-    public int getMonitoringServiceConnectionRequestTimeOut() {
-        return monitoringServiceConnectionRequestTimeOut;
+    public int getTelemetryServiceConnectionRequestTimeOut() {
+        return telemetryServiceConnectionRequestTimeOut;
     }
 
     public String getHttpProxyUri() {
