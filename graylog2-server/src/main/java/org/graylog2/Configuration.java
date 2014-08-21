@@ -212,7 +212,7 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "versionchecks_connection_request_timeout", validator = PositiveIntegerValidator.class)
     private int versionchecksConnectionRequestTimeOut = 10000;
 
-    @Parameter(value = "monitoring_service")
+    @Parameter(value = "telemetry_service")
     private boolean telemetryServiceEnabled = false;
 
     @Parameter(value = "telemetry_service_token")
