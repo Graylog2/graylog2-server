@@ -219,7 +219,7 @@ public class Configuration extends BaseConfiguration {
     private String telemetryServiceToken = null;
 
     @Parameter(value = "telemetry_service_uri")
-    private String telemetryServiceUri = "https://in.monitor.services.graylog2.io/check";
+    private String telemetryServiceUri = "https://in.telemetry.services.graylog2.io/submit";
 
     @Parameter(value = "telemetry_service_connect_timeout", validator = PositiveIntegerValidator.class)
     private int telemetryServiceConnectTimeOut = 10000;
