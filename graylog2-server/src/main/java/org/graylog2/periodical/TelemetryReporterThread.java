@@ -134,7 +134,7 @@ public class TelemetryReporterThread extends Periodical {
                 return;
             }
         } catch (IOException e) {
-            LOG.warn("Telemetry is activated: Could not transmit metrics .", e);
+            LOG.warn("Telemetry is activated: Could not transmit metrics.", e);
         } finally {
             try {
                 if (response != null) {
