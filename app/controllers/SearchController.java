@@ -88,9 +88,13 @@ public class SearchController extends AuthenticatedController {
                         int displayWidth) {
         SearchSort sort = buildSearchSort(sortField, sortOrder);
 
+        return renderSearch(q, rangeType, relative, from, to, keyword, interval, page, savedSearchId, fields, displayWidth, sort, null, null);
+    }
+
+    protected Result renderSearch(String q, String rangeType, int relative, String from, String to, String keyword, String interval, int page, String savedSearchId, String fields, int displayWidth, SearchSort sort, Stream stream, String filter) {
         UniversalSearch search;
         try {
-            search = getSearch(q, null, rangeType, relative, from, to, keyword, page, sort);
+            search = getSearch(q, filter, rangeType, relative, from, to, keyword, page, sort);
         } catch(InvalidRangeParametersException e2) {
             return status(400, views.html.errors.error.render("Invalid range parameters provided.", e2, request()));
         } catch(IllegalArgumentException e1) {
@@ -102,6 +106,7 @@ public class SearchController extends AuthenticatedController {
         SavedSearch savedSearch;
         Set<String> selectedFields = getSelectedFields(fields);
         String formattedHistogramResults;
+
         try {
             if(savedSearchId != null && !savedSearchId.isEmpty()) {
                 savedSearch = savedSearchService.get(savedSearchId);
@@ -111,7 +116,7 @@ public class SearchController extends AuthenticatedController {
 
             searchResult = search.search();
             if (searchResult.getError() != null) {
-                return ok(views.html.search.queryerror.render(currentUser(), q, searchResult, savedSearch, fields, null));
+                return ok(views.html.search.queryerror.render(currentUser(), q, searchResult, savedSearch, fields, stream));
             }
             searchResult.setAllFields(getAllFields());
 
@@ -129,11 +134,12 @@ public class SearchController extends AuthenticatedController {
         }
 
         if (searchResult.getTotalResultCount() > 0) {
-            return ok(views.html.search.results.render(currentUser(), search, searchResult, histogramResult, formattedHistogramResults, q, page, savedSearch, selectedFields, serverNodes.asMap(), null));
+            return ok(views.html.search.results.render(currentUser(), search, searchResult, histogramResult, formattedHistogramResults, q, page, savedSearch, selectedFields, serverNodes.asMap(), stream));
         } else {
-            return ok(views.html.search.noresults.render(currentUser(), q, searchResult, savedSearch, selectedFields, null));
+            return ok(views.html.search.noresults.render(currentUser(), q, searchResult, savedSearch, selectedFields, stream));
         }
     }
+
 
     protected String determineHistogramResolution(final SearchResult searchResult) {
         final String interval;

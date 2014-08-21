@@ -59,52 +59,7 @@ public class StreamSearchController extends SearchController {
 
         String filter = "streams:" + streamId;
 
-        UniversalSearch search;
-        try {
-            search = getSearch(q, filter, rangeType, relative, from, to, keyword, page, sort);
-        } catch(InvalidRangeParametersException e2) {
-            return status(400, views.html.errors.error.render("Invalid range parameters provided.", e2, request()));
-        } catch(IllegalArgumentException e1) {
-            return status(400, views.html.errors.error.render("Invalid range type provided.", e1, request()));
-        }
-
-        SearchResult searchResult;
-        DateHistogramResult histogramResult;
-        SavedSearch savedSearch;
-        Set<String> selectedFields = getSelectedFields(fields);
-        String formattedHistogramResults;
-
-        try {
-            if(savedSearchId != null && !savedSearchId.isEmpty()) {
-                savedSearch = savedSearchService.get(savedSearchId);
-            } else {
-                savedSearch = null;
-            }
-
-            searchResult = search.search();
-            if (searchResult.getError() != null) {
-                return ok(views.html.search.queryerror.render(currentUser(), q, searchResult, savedSearch, fields, stream));
-            }
-            searchResult.setAllFields(getAllFields());
-
-            // histogram resolution (strangely aka interval)
-            if (interval == null || interval.isEmpty() || !SearchTools.isAllowedDateHistogramInterval(interval)) {
-                interval = determineHistogramResolution(searchResult);
-            }
-            histogramResult = search.dateHistogram(interval);
-            formattedHistogramResults = formatHistogramResults(histogramResult.getResults(), displayWidth);
-        } catch (IOException e) {
-            return status(504, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
-        } catch (APIException e) {
-            String message = "There was a problem with your search. We expected HTTP 200, but got a HTTP " + e.getHttpCode() + ".";
-            return status(504, views.html.errors.error.render(message, e, request()));
-        }
-
-        if (searchResult.getTotalResultCount() > 0) {
-            return ok(views.html.search.results.render(currentUser(), search, searchResult, histogramResult, formattedHistogramResults, q, page, savedSearch, selectedFields, serverNodes.asMap(), stream));
-        } else {
-            return ok(views.html.search.noresults.render(currentUser(), q, searchResult, savedSearch, selectedFields, stream));
-        }
+        return renderSearch(q, rangeType, relative, from, to, keyword, interval, page, savedSearchId, fields, displayWidth, sort, stream, filter);
     }
 
     @Override
