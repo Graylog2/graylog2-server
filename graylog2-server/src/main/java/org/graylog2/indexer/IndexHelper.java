@@ -60,28 +60,9 @@ public class IndexHelper {
     		return null;
     	}
 
-        switch (range.getType()) {
-            case RELATIVE:
-                return fromRangeBuilder((RelativeRange) range);
-            case ABSOLUTE:
-                return fromToRangeFilterBuilder((AbsoluteRange) range);
-            case KEYWORD:
-                return fromToRangeFilterBuilder((KeywordRange) range);
-            default:
-                throw new RuntimeException("No such range type: [" + range.getType() + "]");
-        }
-    }
-
-    private static FilterBuilder fromToRangeFilterBuilder(FromToRange range) throws InvalidRangeFormatException {
         return FilterBuilders.rangeFilter("timestamp")
                 .gte(Tools.buildElasticSearchTimeFormat(range.getFrom()))
                 .lte(Tools.buildElasticSearchTimeFormat(range.getTo()));
-    }
-
-    private static FilterBuilder fromRangeBuilder(FromRange range) {
-        return FilterBuilders.rangeFilter("timestamp")
-                .gte(Tools.buildElasticSearchTimeFormat(range.getFrom()))
-                .lte(Tools.buildElasticSearchTimeFormat(DateTime.now()));
     }
 
     private static String getPrefix(Set<String> names) {
@@ -114,7 +95,7 @@ public class IndexHelper {
         }
 
         // Always include the most recent index in some cases.
-        if (indices.isEmpty() || !(range instanceof FromToRange)) {
+        if (indices.isEmpty() || range instanceof RelativeRange) {
             indices.add(deflector.getCurrentActualTargetIndex(indexer));
         }
 

@@ -286,7 +286,7 @@
 
         <dependency>
             <groupId>org.graylog2</groupId>
-            <artifactId>gelfj</artifactId>
+            <artifactId>gelfclient</artifactId>
         </dependency>
 
         <dependency>
