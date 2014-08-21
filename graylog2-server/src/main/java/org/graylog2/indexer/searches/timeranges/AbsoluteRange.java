@@ -26,7 +26,7 @@ import java.util.Map;
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-public class AbsoluteRange implements TimeRange, FromToRange {
+public class AbsoluteRange implements TimeRange {
 
     private final DateTime from;
     private final DateTime to;

@@ -77,18 +77,19 @@ public class KeywordSearchResource extends SearchResource {
         final List<String> fieldList = parseOptionalFields(fields);
         Sorting sorting = buildSorting(sort);
 
+        TimeRange timeRange = buildKeywordTimeRange(keyword);
         final SearchesConfig searchesConfig = SearchesConfigBuilder.newConfig()
                 .setQuery(query)
                 .setFilter(filter)
                 .setFields(fieldList)
-                .setRange(buildKeywordTimeRange(keyword))
+                .setRange(timeRange)
                 .setLimit(limit)
                 .setOffset(offset)
                 .setSorting(sorting)
                 .build();
 
         try {
-            return buildSearchResponse(indexer.searches().search(searchesConfig));
+            return buildSearchResponse(indexer.searches().search(searchesConfig), timeRange);
         } catch (IndexHelper.InvalidRangeFormatException e) {
             LOG.warn("Invalid timerange parameters provided. Returning HTTP 400.", e);
             throw new WebApplicationException(400);
