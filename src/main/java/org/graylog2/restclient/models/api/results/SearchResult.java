@@ -24,21 +24,24 @@ import org.graylog2.restclient.lib.timeranges.TimeRange;
 import org.graylog2.restclient.models.FieldMapper;
 import org.graylog2.restclient.models.api.responses.MessageSummaryResponse;
 import org.graylog2.restclient.models.api.responses.SearchResultResponse;
+import org.joda.time.DateTime;
 
 import java.util.List;
 
 public class SearchResult {
-	
-	private final String originalQuery;
+
+    private final String originalQuery;
     private final String builtQuery;
     private final TimeRange timeRange;
-	private final long totalResultCount;
-	private final int tookMs;
-	private final List<MessageResult> results;
+    private final long totalResultCount;
+    private final int tookMs;
+    private final List<MessageResult> results;
     private final SearchResultResponse.QueryError error;
     private final List<Field> fields;
     private final List<String> usedIndices;
     private List<Field> allFields;
+    private final DateTime fromDateTime;
+    private final DateTime toDateTime;
 
     public SearchResult(String originalQuery,
                         String builtQuery,
@@ -49,15 +52,19 @@ public class SearchResult {
                         List<String> fields,
                         List<String> usedIndices,
                         SearchResultResponse.QueryError error,
+                        DateTime fromDateTime,
+                        DateTime toDateTime,
                         FieldMapper fieldMapper) {
         this.originalQuery = originalQuery;
         this.builtQuery = builtQuery;
         this.timeRange = timeRange;
-		this.totalResultCount = totalResultCount;
-		this.tookMs = tookMs;
+        this.totalResultCount = totalResultCount;
+        this.tookMs = tookMs;
         this.error = error;
         this.fields = buildFields(fields);
         this.usedIndices = usedIndices;
+        this.fromDateTime = fromDateTime;
+        this.toDateTime = toDateTime;
 
         // convert MessageSummaryResponses to MessageResult because of the post processing that happens there
         // otherwise we'd have to duplicate it everywhere.
@@ -68,30 +75,30 @@ public class SearchResult {
             }
         }
     }
-	
-	public List<MessageResult> getMessages() {
-		return results;
-	}
-	
-	public String getOriginalQuery() {
-		return originalQuery;
-	}
+
+    public List<MessageResult> getMessages() {
+        return results;
+    }
+
+    public String getOriginalQuery() {
+        return originalQuery;
+    }
 
     public TimeRange getTimeRange() {
         return timeRange;
     }
 
     public int getTookMs() {
-		return tookMs;
-	}
-	
-	public long getTotalResultCount() {
-		return totalResultCount;
-	}
-	
-	public List<Field> getPageFields() {
-		return fields;
-	}
+        return tookMs;
+    }
+
+    public long getTotalResultCount() {
+        return totalResultCount;
+    }
+
+    public List<Field> getPageFields() {
+        return fields;
+    }
 
     public List<String> getUsedIndices() {
         return usedIndices;
@@ -106,16 +113,16 @@ public class SearchResult {
     }
 
     private List<Field> buildFields(List<String> sFields) {
-		List<Field> fields = Lists.newArrayList();
+        List<Field> fields = Lists.newArrayList();
 
         if (sFields != null) {
             for (String field : sFields) {
                 fields.add(new Field(field));
             }
         }
-		
-		return fields;
-	}
+
+        return fields;
+    }
 
     public String getBuiltQuery() {
         return builtQuery;
@@ -125,4 +132,11 @@ public class SearchResult {
         return error;
     }
 
+    public DateTime getFromDateTime() {
+        return fromDateTime;
+    }
+
+    public DateTime getToDateTime() {
+        return toDateTime;
+    }
 }

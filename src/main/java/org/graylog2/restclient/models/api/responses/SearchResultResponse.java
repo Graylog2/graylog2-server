@@ -19,6 +19,7 @@
 package org.graylog2.restclient.models.api.responses;
 
 import com.google.gson.annotations.SerializedName;
+import org.joda.time.DateTime;
 
 import java.util.List;
 
@@ -41,6 +42,16 @@ public class SearchResultResponse {
     @SerializedName("generic_error")
     public GenericError genericError;
 
+    public String from;
+
+    public String to;
+
+    public DateTime getFromDataTime() {
+        return DateTime.parse(from);
+    }
+    public DateTime getToDataTime() {
+        return DateTime.parse(to);
+    }
 
     public abstract static class QueryError {}
 
