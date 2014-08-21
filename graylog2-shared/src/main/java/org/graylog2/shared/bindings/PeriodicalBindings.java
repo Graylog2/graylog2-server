@@ -27,6 +27,8 @@ import com.google.inject.multibindings.Multibinder;
 import org.graylog2.plugin.periodical.Periodical;
 import org.reflections.Reflections;
 
+import java.lang.reflect.Modifier;
+
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
  */
@@ -36,6 +38,7 @@ public class PeriodicalBindings extends AbstractModule {
         Multibinder<Periodical> periodicalBinder = Multibinder.newSetBinder(binder(), Periodical.class);
         Reflections reflections = new Reflections("org.graylog2.periodical");
         for (Class<? extends Periodical> periodicalClass : reflections.getSubTypesOf(Periodical.class))
-            periodicalBinder.addBinding().to(periodicalClass);
+            if (!Modifier.isAbstract(periodicalClass.getModifiers()))
+                periodicalBinder.addBinding().to(periodicalClass);
     }
 }
