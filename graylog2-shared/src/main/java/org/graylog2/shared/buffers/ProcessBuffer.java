@@ -77,7 +77,6 @@ public class ProcessBuffer extends Buffer {
     private final Meter rejectedMessages;
     private final Meter cachedMessages;
 
-    private final MetricRegistry metricRegistry;
     private final ServerStatus serverStatus;
 
     @AssistedInject
@@ -86,7 +85,6 @@ public class ProcessBuffer extends Buffer {
                          BaseConfiguration configuration,
                          @Assisted InputCache inputCache,
                          @Assisted AtomicInteger processBufferWatermark) {
-        this.metricRegistry = metricRegistry;
         this.serverStatus = serverStatus;
         this.configuration = configuration;
         this.inputCache = inputCache;
@@ -157,6 +155,7 @@ public class ProcessBuffer extends Buffer {
             } else {
                 if (LOG.isDebugEnabled())
                     LOG.debug("Out of capacity. Input cache limit reached. Dropping message.");
+                rejectedMessages.mark();
             }
             return;
         }
