@@ -35,18 +35,18 @@ import static com.codahale.metrics.MetricRegistry.name;
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
-public class MasterCacheWorkerThread extends AbstractCacheWorkerThread {
-    private static final Logger LOG = LoggerFactory.getLogger(MasterCacheWorkerThread.class);
+public class InputCacheWorkerThread extends AbstractCacheWorkerThread {
+    private static final Logger LOG = LoggerFactory.getLogger(InputCacheWorkerThread.class);
 
     private final MetricRegistry metricRegistry;
     private final InputCache inputCache;
     private final ProcessBuffer processBuffer;
 
     @Inject
-    public MasterCacheWorkerThread(MetricRegistry metricRegistry,
-                                   InputCache inputCache,
-                                   ProcessBuffer processBuffer,
-                                   ServerStatus serverStatus) {
+    public InputCacheWorkerThread(MetricRegistry metricRegistry,
+                                  InputCache inputCache,
+                                  ProcessBuffer processBuffer,
+                                  ServerStatus serverStatus) {
         super(serverStatus);
         this.metricRegistry = metricRegistry;
         this.inputCache = inputCache;
@@ -55,8 +55,8 @@ public class MasterCacheWorkerThread extends AbstractCacheWorkerThread {
 
     @Override
     public void doRun() {
-        writtenMessages = metricRegistry.meter(name(MasterCacheWorkerThread.class, "writtenMessages"));
-        outOfCapacity =  metricRegistry.meter(name(MasterCacheWorkerThread.class, "FailedWritesOutOfCapacity"));
+        writtenMessages = metricRegistry.meter(name(InputCacheWorkerThread.class, "writtenMessages"));
+        outOfCapacity =  metricRegistry.meter(name(InputCacheWorkerThread.class, "FailedWritesOutOfCapacity"));
 
         new Thread(new Runnable() {
             @Override

@@ -32,6 +32,7 @@ import com.lmax.disruptor.dsl.Disruptor;
 import com.lmax.disruptor.dsl.ProducerType;
 import org.graylog2.inputs.Cache;
 import org.graylog2.inputs.InputCache;
+import org.graylog2.plugin.BaseConfiguration;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.buffers.Buffer;
 import org.graylog2.plugin.buffers.BufferOutOfCapacityException;
@@ -54,7 +55,7 @@ import static com.codahale.metrics.MetricRegistry.name;
  */
 public class ProcessBuffer extends Buffer {
     public interface Factory {
-        public ProcessBuffer create(InputCache masterCache, AtomicInteger processBufferWatermark);
+        public ProcessBuffer create(InputCache inputCache, AtomicInteger processBufferWatermark);
     }
 
     private static final Logger LOG = LoggerFactory.getLogger(ProcessBuffer.class);
@@ -68,7 +69,8 @@ public class ProcessBuffer extends Buffer {
                 .build()
     );
 
-    private final InputCache masterCache;
+    private final BaseConfiguration configuration;
+    private final InputCache inputCache;
     private final AtomicInteger processBufferWatermark;
 
     private final Meter incomingMessages;
@@ -81,11 +83,13 @@ public class ProcessBuffer extends Buffer {
     @AssistedInject
     public ProcessBuffer(MetricRegistry metricRegistry,
                          ServerStatus serverStatus,
-                         @Assisted InputCache masterCache,
+                         BaseConfiguration configuration,
+                         @Assisted InputCache inputCache,
                          @Assisted AtomicInteger processBufferWatermark) {
         this.metricRegistry = metricRegistry;
         this.serverStatus = serverStatus;
-        this.masterCache = masterCache;
+        this.configuration = configuration;
+        this.inputCache = inputCache;
         this.processBufferWatermark = processBufferWatermark;
 
         incomingMessages = metricRegistry.meter(name(ProcessBuffer.class, "incomingMessages"));
@@ -101,8 +105,8 @@ public class ProcessBuffer extends Buffer {
         }
     }
 
-    public Cache getMasterCache() {
-        return masterCache;
+    public Cache getInputCache() {
+        return inputCache;
     }
 
     public void initialize(ProcessBufferProcessor[] processors, int ringBufferSize, WaitStrategy waitStrategy, int processBufferProcessors) {
@@ -140,14 +144,20 @@ public class ProcessBuffer extends Buffer {
         if (!serverStatus.isProcessing()) {
             LOG.debug("Message processing is paused. Writing to cache.");
             cachedMessages.mark();
-            masterCache.add(message);
+            inputCache.add(message);
             return;
         }
 
         if (!hasCapacity()) {
-            LOG.debug("Out of capacity. Writing to cache.");
-            cachedMessages.mark();
-            masterCache.add(message);
+            if (configuration.getInputCacheMaxSize() == 0 || inputCache.size() < configuration.getInputCacheMaxSize()) {
+                if (LOG.isDebugEnabled())
+                    LOG.debug("Out of capacity. Writing to cache.");
+                cachedMessages.mark();
+                inputCache.add(message);
+            } else {
+                if (LOG.isDebugEnabled())
+                    LOG.debug("Out of capacity. Input cache limit reached. Dropping message.");
+            }
             return;
         }
 
