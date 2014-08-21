@@ -37,6 +37,8 @@ import org.graylog2.restclient.lib.timeranges.TimeRange;
 import org.graylog2.restclient.models.*;
 import org.graylog2.restclient.models.api.results.DateHistogramResult;
 import org.graylog2.restclient.models.api.results.SearchResult;
+import org.joda.time.DateTime;
+import org.joda.time.Minutes;
 import play.mvc.Result;
 import views.helpers.Permissions;
 
@@ -107,17 +109,16 @@ public class SearchController extends AuthenticatedController {
                 savedSearch = null;
             }
 
-            // Histogram interval.
-            if (interval == null || interval.isEmpty() || !SearchTools.isAllowedDateHistogramInterval(interval)) {
-                interval = "minute";
-            }
-
             searchResult = search.search();
             if (searchResult.getError() != null) {
                 return ok(views.html.search.queryerror.render(currentUser(), q, searchResult, savedSearch, fields, null));
             }
             searchResult.setAllFields(getAllFields());
 
+            // histogram resolution (strangely aka interval)
+            if (interval == null || interval.isEmpty() || !SearchTools.isAllowedDateHistogramInterval(interval)) {
+                interval = determineHistogramResolution(searchResult);
+            }
             histogramResult = search.dateHistogram(interval);
             formattedHistogramResults = formatHistogramResults(histogramResult.getResults(), displayWidth);
         } catch (IOException e) {
@@ -132,6 +133,33 @@ public class SearchController extends AuthenticatedController {
         } else {
             return ok(views.html.search.noresults.render(currentUser(), q, searchResult, savedSearch, selectedFields, null));
         }
+    }
+
+    protected String determineHistogramResolution(final SearchResult searchResult) {
+        final String interval;
+        final int queryRangeInMinutes = Minutes.minutesBetween(searchResult.getFromDateTime(), searchResult.getToDateTime()).getMinutes();
+        final int HOUR = 60;
+        final int DAY = HOUR * 24;
+        final int WEEK = DAY * 7;
+        final int MONTH = HOUR * 24 * 30;
+        final int YEAR = MONTH * 12;
+
+        if (queryRangeInMinutes < DAY / 2) {
+            interval = "minute";
+        } else if (queryRangeInMinutes < DAY * 2) {
+            interval = "hour";
+        } else if (queryRangeInMinutes < MONTH) {
+            interval = "day";
+        } else if (queryRangeInMinutes < MONTH * 6) {
+            interval = "week";
+        } else if (queryRangeInMinutes < YEAR * 2) {
+            interval = "month";
+        } else if (queryRangeInMinutes < YEAR * 10) {
+            interval = "quarter";
+        } else {
+            interval = "year";
+        }
+        return interval;
     }
 
     /**
