@@ -54,9 +54,9 @@ import static java.util.concurrent.TimeUnit.MINUTES;
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-public class MetricsReporterThread extends Periodical {
+public class TelemetryReporterThread extends Periodical {
 
-    private static final Logger LOG = LoggerFactory.getLogger(MetricsReporterThread.class);
+    private static final Logger LOG = LoggerFactory.getLogger(TelemetryReporterThread.class);
 
     @Inject
     protected ObjectMapper objectMapper;
@@ -66,7 +66,7 @@ public class MetricsReporterThread extends Periodical {
     private final Configuration configuration;
 
     @Inject
-    public MetricsReporterThread(MetricRegistry metricRegistry, ServerStatus serverStatus, Configuration configuration) {
+    public TelemetryReporterThread(MetricRegistry metricRegistry, ServerStatus serverStatus, Configuration configuration) {
         this.metricRegistry = metricRegistry;
         this.serverStatus = serverStatus;
         this.configuration = configuration;
@@ -74,13 +74,13 @@ public class MetricsReporterThread extends Periodical {
 
     @Override
     public void doRun() {
-        LOG.debug("Metric reporting/monitoring activated. Transmitting metrics.");
+        LOG.debug("Telemetry is activated: Transmitting metrics.");
 
         HttpEntity postBody;
         try {
             Map<String,Object> report = Maps.newHashMap();
 
-            report.put("token", configuration.getMonitoringServiceToken());
+            report.put("token", configuration.getTelemetryServiceToken());
             report.put("anon_id", DigestUtils.sha256Hex(serverStatus.getNodeId().toString()));
             report.put("server_version", ServerVersion.VERSION.toString());
             report.put("metrics", metricRegistry.getMetrics());
@@ -89,22 +89,22 @@ public class MetricsReporterThread extends Periodical {
 
             postBody = new GzipCompressingEntity(new StringEntity(json, Charsets.UTF_8));
         } catch (JsonProcessingException e) {
-            LOG.error("Metric reporting/monitoring activated but sending failed.", e);
+            LOG.error("Telemetry is activated but sending failed.", e);
             return;
         }
 
         final HttpPost post;
         try {
-            post = new HttpPost(new URIBuilder(configuration.getMonitoringServiceUri()).build());
+            post = new HttpPost(new URIBuilder(configuration.getTelemetryServiceUri()).build());
             post.setHeader("User-Agent", "graylog2-server");
             post.setHeader("Content-Type", "application/json");
             post.setHeader("Content-Encoding", "gzip");
             post.setEntity(postBody);
 
             final RequestConfig.Builder configBuilder = RequestConfig.custom()
-                    .setConnectTimeout(configuration.getMonitoringServiceConnectTimeOut())
-                    .setSocketTimeout(configuration.getMonitoringServiceSocketTimeOut())
-                    .setConnectionRequestTimeout(configuration.getMonitoringServiceConnectionRequestTimeOut());
+                    .setConnectTimeout(configuration.getTelemetryServiceConnectTimeOut())
+                    .setSocketTimeout(configuration.getTelemetryServiceSocketTimeOut())
+                    .setConnectionRequestTimeout(configuration.getTelemetryServiceConnectionRequestTimeOut());
 
             if (configuration.getHttpProxyUri() != null) {
                 try {
@@ -113,14 +113,14 @@ public class MetricsReporterThread extends Periodical {
 
                     configBuilder.setProxy(new HttpHost(proxyURI.getHost(), proxyURI.getPort(), proxyURI.getScheme()));
                 } catch (Exception e) {
-                    LOG.error("Invalid monitoring service proxy URI: {}", configuration.getHttpProxyUri(), e);
+                    LOG.error("Invalid telemetry service proxy URI: {}", configuration.getHttpProxyUri(), e);
                     return;
                 }
             }
 
             post.setConfig(configBuilder.build());
         } catch (URISyntaxException e) {
-            LOG.error("Invalid monitoring service endpoint URI.", e);
+            LOG.error("Invalid telemetry service endpoint URI.", e);
             return;
         }
 
@@ -130,18 +130,18 @@ public class MetricsReporterThread extends Periodical {
             response = http.execute(post);
 
             if (response.getStatusLine().getStatusCode() != 202) {
-                LOG.error("Metric reporting/monitoring activated. Expected HTTP response status code [202] but got [{}]", response.getStatusLine().getStatusCode());
+                LOG.error("Telemetry is activated: Expected HTTP response status code [202] but got [{}]", response.getStatusLine().getStatusCode());
                 return;
             }
         } catch (IOException e) {
-            LOG.warn("Metric reporting/monitoring activated. Could not transmit metrics .", e);
+            LOG.warn("Telemetry is activated: Could not transmit metrics .", e);
         } finally {
             try {
                 if (response != null) {
                     response.close();
                 }
             } catch (IOException e) {
-                LOG.warn("Metric reporting/monitoring activated. Could not close HTTP connection to monitoring service.", e);
+                LOG.warn("Telemetry is activated: Could not close HTTP connection to monitoring service.", e);
             }
         }
     }
@@ -163,9 +163,9 @@ public class MetricsReporterThread extends Periodical {
 
     @Override
     public boolean startOnThisNode() {
-        return configuration.isMonitoringServiceEnabled()
-                && configuration.getMonitoringServiceToken() != null
-                && !configuration.getMonitoringServiceToken().isEmpty()
+        return configuration.isTelemetryServiceEnabled()
+                && configuration.getTelemetryServiceToken() != null
+                && !configuration.getTelemetryServiceToken().isEmpty()
                 && !serverStatus.hasCapability(ServerStatus.Capability.LOCALMODE);
     }
 
