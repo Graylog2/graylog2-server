@@ -66,7 +66,7 @@ public class GenericBindings extends AbstractModule {
         bind(GELFChunkManager.class).toProvider(GELFChunkManagerProvider.class);
         bind(NodeId.class).toProvider(NodeIdProvider.class);
 
-        bind(ServiceManager.class).toProvider(ServiceManagerProvider.class);
+        bind(ServiceManager.class).toProvider(ServiceManagerProvider.class).asEagerSingleton();
 
         bind(HashedWheelTimer.class).toInstance(new HashedWheelTimer());
         bind(ThroughputCounter.class);
