@@ -11,7 +11,7 @@ public class StartpageRouteHelper {
     public static Call getCall(Startpage startPage) {
         switch (startPage.getType()) {
             case STREAM:
-                return routes.StreamSearchController.index(startPage.getId(), "*", "relative", 3600, "", "", "", "", 0, "", "", "", ""); // TODO fields
+                return routes.StreamSearchController.index(startPage.getId(), "*", "relative", 3600, "", "", "", "", 0, "", "", "", "", -1); // TODO fields and width
             case DASHBOARD:
                 return routes.DashboardsController.show(startPage.getId());
             default:

@@ -39,6 +39,18 @@ $(document).ready(function() {
         $("#universalsearch-fields", $(this)).val(searchViewState.getFieldsString());
     });
 
+    $(".universalsearch-form").on("submit", function() {
+        var width = $(document).width();
+        $("input[name='width']", $(this)).val(width);
+    });
+
+    $(".added-width-search-link").on("click", function() {
+        var width = $(document).width();
+        var href = $(this).attr("href");
+        href = URI(href).addSearch("width", width).toString();
+        $(this).attr("href", href);
+    });
+
     // initialize the user readable dates on page load
     $("#universalsearch .timerange-selector-container .absolute input[type='hidden']").each(function() {
         var input = $("input[type='text']", $(this).parent());
@@ -149,13 +161,14 @@ $(document).ready(function() {
 
     // Saved search selected. Get details and send to page that redirects to the actual search.
     $("#saved-searches-selector").on("change", function(e) {
+        var width = $(document).width();
         var searchId = $("#saved-searches-selector").val();
 
         var container = $(this).closest(".saved-searches-selector-container");
         if(!!container.attr("data-stream-id")) {
-            var url = "/savedsearches/" + encodeURI(searchId) + "/execute?" + "streamId=" + container.attr("data-stream-id");
+            var url = "/savedsearches/" + encodeURI(searchId) + "/execute?" + "streamId=" + container.attr("data-stream-id") + "&width=" + width;
         } else {
-            var url = "/savedsearches/" + encodeURI(searchId) + "/execute";
+            var url = "/savedsearches/" + encodeURI(searchId) + "/execute" + "?width=" + width;
         }
 
         window.location = appPrefixed(url);

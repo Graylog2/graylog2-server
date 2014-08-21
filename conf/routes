@@ -17,7 +17,7 @@ GET         /                                                                   
 GET         /startpage                                                               @controllers.StartpageController.redirect()
 
 # Search
-GET         /search                                                                  @controllers.SearchController.index(q ?= "", rangetype ?= "", relative:Integer ?= -1, from ?= "", to ?= "", keyword ?= "", interval ?= "", page:Integer ?= 1, saved:String ?= "", sortField:String ?= "", sortOrder:String ?= "", fields:String ?= "")
+GET         /search                                                                  @controllers.SearchController.index(q ?= "", rangetype ?= "", relative:Integer ?= -1, from ?= "", to ?= "", keyword ?= "", interval ?= "", page:Integer ?= 1, saved:String ?= "", sortField:String ?= "", sortOrder:String ?= "", fields:String ?= "", width:Integer ?= -1)
 GET         /search/csv                                                              @controllers.SearchController.exportAsCsv(q ?= "", filter ?= "", rangetype ?= "", relative:Integer ?= -1, from ?= "", to ?= "", keyword ?= "", fields:String ?= "")
 
 # Messages
@@ -28,7 +28,7 @@ GET         /messages/:index/:id/partial                                        
 GET         /streams                                                                 @controllers.StreamsController.index()
 GET         /streams/new                                                             @controllers.StreamsController.newStream()
 POST        /streams/new                                                             @controllers.StreamsController.create()
-GET         /streams/:stream_id/messages                                             @controllers.StreamSearchController.index(stream_id: String, q ?= "", rangetype ?= "", relative:Integer ?= -1, from ?= "", to ?= "", keyword ?= "", interval ?= "", page:Integer ?= 1, saved:String ?= "", sortField:String ?= "", sortOrder:String ?= "", fields: String ?= "")
+GET         /streams/:stream_id/messages                                             @controllers.StreamSearchController.index(stream_id: String, q ?= "", rangetype ?= "", relative:Integer ?= -1, from ?= "", to ?= "", keyword ?= "", interval ?= "", page:Integer ?= 1, saved:String ?= "", sortField:String ?= "", sortOrder:String ?= "", fields: String ?= "", width:Integer ?= -1)
 POST        /streams/:stream_id/delete                                               @controllers.StreamsController.delete(stream_id: String)
 POST        /streams/:stream_id/rules/:streamrule_id/delete                          @controllers.StreamRulesController.delete(stream_id: String, streamrule_id: String)
 GET         /streams/:stream_id/rules                                                @controllers.StreamRulesController.index(stream_id: String)
@@ -111,7 +111,7 @@ GET         /system/nodes/:node_id/shutdown                                     
 
 # Saved searches
 GET         /savedsearches                                                           @controllers.api.SavedSearchesApiController.list()
-GET         /savedsearches/:search_id/execute                                        @controllers.SavedSearchesController.execute(search_id: String, streamId ?= "")
+GET         /savedsearches/:search_id/execute                                        @controllers.SavedSearchesController.execute(search_id: String, streamId ?= "", width:Integer ?= -1)
 POST        /savedsearches/create                                                    @controllers.api.SavedSearchesApiController.create()
 GET         /savedsearches/:search_id/delete                                         @controllers.SavedSearchesController.delete(search_id: String)
 
@@ -217,7 +217,8 @@ GET         /a/connection/available                                             
 GET         /a/dashboards                                                            @controllers.api.DashboardsApiController.index()
 GET         /a/dashboards/writable                                                   @controllers.api.DashboardsApiController.listWritable()
 POST        /a/dashboards/:id/positions                                              @controllers.api.DashboardsApiController.setWidgetPositions(id: String)
-GET         /a/dashboards/:dashboard_id/widgets/:widget_id/value                     @controllers.api.DashboardsApiController.widgetValue(dashboard_id: String, widget_id: String)
+GET         /a/dashboards/:dashboard_id/widgets/:widget_id/value                     @controllers.api.DashboardsApiController.widgetValue(dashboard_id: String, widget_id: String, resolution: Integer ?= -1)
+GET         /a/dashboards/:dashboard_id/widgets/:widget_id/resolution/:resolution/value                     @controllers.api.DashboardsApiController.widgetValue(dashboard_id: String, widget_id: String, resolution: Integer)
 POST        /a/dashboards/:dashboard_id/widgets                                      @controllers.api.DashboardsApiController.addWidget(dashboard_id: String)
 POST        /a/dashboards/:dashboard_id/widgets/:widget_id/delete                    @controllers.api.DashboardsApiController.removeWidget(dashboard_id: String, widget_id: String)
 POST        /a/dashboards/:dashboard_id/widgets/:widget_id/description               @controllers.api.DashboardsApiController.updateWidgetDescription(dashboard_id: String, widget_id: String)

@@ -32,7 +32,8 @@ public class DashboardWidgetRouteHelper {
                 "",
                 "",
                 "",
-                "" // TODO fields
+                "", // TODO fields
+                -1
         );
     }
 
@@ -50,7 +51,8 @@ public class DashboardWidgetRouteHelper {
                 "",
                 "",
                 "",
-                "" // TODO fields
+                "", // TODO fields
+                -1
         );
     }
 }

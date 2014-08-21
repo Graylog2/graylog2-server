@@ -21,8 +21,10 @@ package controllers;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.net.MediaType;
+import com.google.gson.Gson;
 import com.google.inject.Inject;
 import lib.*;
 import lib.security.RestPermissions;
@@ -35,14 +37,20 @@ import org.graylog2.restclient.lib.timeranges.TimeRange;
 import org.graylog2.restclient.models.*;
 import org.graylog2.restclient.models.api.results.DateHistogramResult;
 import org.graylog2.restclient.models.api.results.SearchResult;
+import org.joda.time.DateTime;
+import org.joda.time.Minutes;
 import play.mvc.Result;
 import views.helpers.Permissions;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public class SearchController extends AuthenticatedController {
+
+    // guess high, so we never have a bad resolution
+    private static int DEFAULT_ASSUMED_GRAPH_RESOLUTION = 4000;
 
     @Inject
     protected UniversalSearch.Factory searchFactory;
@@ -76,12 +84,17 @@ public class SearchController extends AuthenticatedController {
                         int page,
                         String savedSearchId,
                         String sortField, String sortOrder,
-                        String fields) {
+                        String fields,
+                        int displayWidth) {
         SearchSort sort = buildSearchSort(sortField, sortOrder);
 
+        return renderSearch(q, rangeType, relative, from, to, keyword, interval, page, savedSearchId, fields, displayWidth, sort, null, null);
+    }
+
+    protected Result renderSearch(String q, String rangeType, int relative, String from, String to, String keyword, String interval, int page, String savedSearchId, String fields, int displayWidth, SearchSort sort, Stream stream, String filter) {
         UniversalSearch search;
         try {
-            search = getSearch(q, null, rangeType, relative, from, to, keyword, page, sort);
+            search = getSearch(q, filter, rangeType, relative, from, to, keyword, page, sort);
         } catch(InvalidRangeParametersException e2) {
             return status(400, views.html.errors.error.render("Invalid range parameters provided.", e2, request()));
         } catch(IllegalArgumentException e1) {
@@ -92,6 +105,8 @@ public class SearchController extends AuthenticatedController {
         DateHistogramResult histogramResult;
         SavedSearch savedSearch;
         Set<String> selectedFields = getSelectedFields(fields);
+        String formattedHistogramResults;
+
         try {
             if(savedSearchId != null && !savedSearchId.isEmpty()) {
                 savedSearch = savedSearchService.get(savedSearchId);
@@ -99,18 +114,18 @@ public class SearchController extends AuthenticatedController {
                 savedSearch = null;
             }
 
-            // Histogram interval.
-            if (interval == null || interval.isEmpty() || !SearchTools.isAllowedDateHistogramInterval(interval)) {
-                interval = "minute";
-            }
-
             searchResult = search.search();
             if (searchResult.getError() != null) {
-                return ok(views.html.search.queryerror.render(currentUser(), q, searchResult, savedSearch, fields, null));
+                return ok(views.html.search.queryerror.render(currentUser(), q, searchResult, savedSearch, fields, stream));
             }
             searchResult.setAllFields(getAllFields());
 
+            // histogram resolution (strangely aka interval)
+            if (interval == null || interval.isEmpty() || !SearchTools.isAllowedDateHistogramInterval(interval)) {
+                interval = determineHistogramResolution(searchResult);
+            }
             histogramResult = search.dateHistogram(interval);
+            formattedHistogramResults = formatHistogramResults(histogramResult.getResults(), displayWidth);
         } catch (IOException e) {
             return status(504, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
         } catch (APIException e) {
@@ -119,10 +134,66 @@ public class SearchController extends AuthenticatedController {
         }
 
         if (searchResult.getTotalResultCount() > 0) {
-            return ok(views.html.search.results.render(currentUser(), search, searchResult, histogramResult, q, page, savedSearch, selectedFields, serverNodes.asMap(), null));
+            return ok(views.html.search.results.render(currentUser(), search, searchResult, histogramResult, formattedHistogramResults, q, page, savedSearch, selectedFields, serverNodes.asMap(), stream));
         } else {
-            return ok(views.html.search.noresults.render(currentUser(), q, searchResult, savedSearch, selectedFields, null));
+            return ok(views.html.search.noresults.render(currentUser(), q, searchResult, savedSearch, selectedFields, stream));
         }
+    }
+
+
+    protected String determineHistogramResolution(final SearchResult searchResult) {
+        final String interval;
+        final int queryRangeInMinutes = Minutes.minutesBetween(searchResult.getFromDateTime(), searchResult.getToDateTime()).getMinutes();
+        final int HOUR = 60;
+        final int DAY = HOUR * 24;
+        final int WEEK = DAY * 7;
+        final int MONTH = HOUR * 24 * 30;
+        final int YEAR = MONTH * 12;
+
+        if (queryRangeInMinutes < DAY / 2) {
+            interval = "minute";
+        } else if (queryRangeInMinutes < DAY * 2) {
+            interval = "hour";
+        } else if (queryRangeInMinutes < MONTH) {
+            interval = "day";
+        } else if (queryRangeInMinutes < MONTH * 6) {
+            interval = "week";
+        } else if (queryRangeInMinutes < YEAR * 2) {
+            interval = "month";
+        } else if (queryRangeInMinutes < YEAR * 10) {
+            interval = "quarter";
+        } else {
+            interval = "year";
+        }
+        return interval;
+    }
+
+    /**
+     * [{ x: -1893456000, y: 92228531 }, { x: -1577923200, y: 106021568 }]
+     *
+     * @return A JSON string representation of the result, suitable for Rickshaw data graphing.
+     */
+    protected String formatHistogramResults(Map<String, Long> histogramResults, int displayWidth) {
+        final int saneDisplayWidth = (displayWidth == -1 || displayWidth < 100 || displayWidth > DEFAULT_ASSUMED_GRAPH_RESOLUTION) ? DEFAULT_ASSUMED_GRAPH_RESOLUTION : displayWidth;
+        final List<Map<String, Long>> points = Lists.newArrayList();
+
+        // using the absolute value guarantees, that there will always be enough values for the given resolution
+        final int factor = (saneDisplayWidth != -1 && histogramResults.size() > saneDisplayWidth) ? histogramResults.size() / saneDisplayWidth : 1;
+
+        int index = 0;
+        for (Map.Entry<String, Long> result : histogramResults.entrySet()) {
+            // TODO: instead of sampling we might consider interpolation (compare DashboardsApiController)
+            if (index % factor == 0) {
+                Map<String, Long> point = Maps.newHashMap();
+                point.put("x", Long.parseLong(result.getKey()));
+                point.put("y", result.getValue());
+
+                points.add(point);
+            }
+            index++;
+        }
+
+        return new Gson().toJson(points);
     }
 
     protected Set<String> getSelectedFields(String fields) {

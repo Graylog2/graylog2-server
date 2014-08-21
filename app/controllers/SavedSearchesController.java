@@ -37,14 +37,14 @@ public class SavedSearchesController extends AuthenticatedController {
     @Inject
     private SavedSearchService savedSearchService;
 
-    public Result execute(String searchId, String streamId) {
+    public Result execute(String searchId, String streamId, int displayWidth) {
         try {
             SavedSearch search = savedSearchService.get(searchId);
 
             if(streamId == null || streamId.isEmpty()) {
-                return redirect(callFromSavedSearch(search, streamId, true));
+                return redirect(callFromSavedSearch(search, streamId, true, displayWidth));
             } else {
-                return redirect(callFromSavedSearch(search, streamId, true));
+                return redirect(callFromSavedSearch(search, streamId, true, displayWidth));
             }
 
         } catch (IOException e) {
@@ -71,7 +71,7 @@ public class SavedSearchesController extends AuthenticatedController {
         }
     }
 
-    private Call callFromSavedSearch(SavedSearch search, String streamId, boolean includeOriginal) {
+    private Call callFromSavedSearch(SavedSearch search, String streamId, boolean includeOriginal, int displayWidth) {
         int relative = 0;
         if (search.getQuery().containsKey("relative")) {
             relative = Integer.parseInt((String) search.getQuery().get("relative"));
@@ -115,7 +115,8 @@ public class SavedSearchesController extends AuthenticatedController {
                     searchId,
                     "",
                     "",
-                    fields
+                    fields,
+                    displayWidth
             );
         } else {
             return routes.StreamSearchController.index(
@@ -131,7 +132,8 @@ public class SavedSearchesController extends AuthenticatedController {
                     searchId,
                     "",
                     "",
-                    fields
+                    fields,
+                    displayWidth
             );
         }
     }
