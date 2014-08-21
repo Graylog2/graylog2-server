@@ -1,11 +1,13 @@
 package views.helpers;
 
+import com.google.common.base.Charsets;
 import com.google.common.collect.Maps;
 import org.apache.commons.lang3.text.WordUtils;
 
 import lib.SearchTools;
 import play.mvc.Http;
 
+import java.io.UnsupportedEncodingException;
 import java.util.Map;
 
 public class DateHistogramResolutionSelector {
@@ -23,11 +25,17 @@ public class DateHistogramResolutionSelector {
             url.append("?");
 
             for (Map.Entry<String, String[]> entry : queryParams.entrySet()) {
+
                 for (String value : entry.getValue()) {
-                    url.append(entry.getKey())
-                            .append("=")
-                            .append(value)
-                            .append("&");
+                    try {
+                        url.append(entry.getKey())
+                                .append("=")
+                                .append(java.net.URLEncoder.encode(value, Charsets.UTF_8.name()))
+                                .append("&");
+                    } catch (UnsupportedEncodingException e) {
+                        // UTF-8 *is* supported, but just in case...
+                        throw new RuntimeException(e);
+                    }
                 }
             }
 

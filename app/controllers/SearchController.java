@@ -38,7 +38,6 @@ import org.graylog2.restclient.models.*;
 import org.graylog2.restclient.models.api.results.DateHistogramResult;
 import org.graylog2.restclient.models.api.results.SearchResult;
 import org.joda.time.DateTime;
-import org.joda.time.DateTimeConstants;
 import org.joda.time.Minutes;
 import play.mvc.Result;
 import views.helpers.Permissions;
@@ -139,10 +138,10 @@ public class SearchController extends AuthenticatedController {
     protected String determineHistogramResolution(final SearchResult searchResult) {
         final String interval;
         final int queryRangeInMinutes = Minutes.minutesBetween(searchResult.getFromDateTime(), searchResult.getToDateTime()).getMinutes();
-        final int HOUR = DateTimeConstants.MINUTES_PER_HOUR;
-        final int DAY = DateTimeConstants.MINUTES_PER_DAY;
-        final int WEEK = DateTimeConstants.MINUTES_PER_WEEK;
-        final int MONTH = DAY * 30;
+        final int HOUR = 60;
+        final int DAY = HOUR * 24;
+        final int WEEK = DAY * 7;
+        final int MONTH = HOUR * 24 * 30;
         final int YEAR = MONTH * 12;
 
         if (queryRangeInMinutes < DAY / 2) {
