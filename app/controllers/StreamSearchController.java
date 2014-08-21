@@ -81,17 +81,16 @@ public class StreamSearchController extends SearchController {
                 savedSearch = null;
             }
 
-            // Histogram interval.
-            if (interval == null || interval.isEmpty() || !SearchTools.isAllowedDateHistogramInterval(interval)) {
-                interval = "minute";
-            }
-
             searchResult = search.search();
             if (searchResult.getError() != null) {
                 return ok(views.html.search.queryerror.render(currentUser(), q, searchResult, savedSearch, fields, stream));
             }
             searchResult.setAllFields(getAllFields());
 
+            // histogram resolution (strangely aka interval)
+            if (interval == null || interval.isEmpty() || !SearchTools.isAllowedDateHistogramInterval(interval)) {
+                interval = determineHistogramResolution(searchResult);
+            }
             histogramResult = search.dateHistogram(interval);
             formattedHistogramResults = formatHistogramResults(histogramResult.getResults(), displayWidth);
         } catch (IOException e) {
