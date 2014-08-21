@@ -131,17 +131,8 @@ $(document).ready(function() {
 
     // Periodically poll every widget.
     (function updateDashboardWidgets() {
-        // do not make expensive calls to server when window does not have focus
-        function assertFocus(callback) {
-            var recheckInterval = 1000;
 
-            if(!focussed) {
-                setTimeout(callback, recheckInterval);
-            }
-            return focussed;
-        }
-
-        if (!assertFocus(updateDashboardWidgets)) return;
+        if (!assertUpdateEnabled(updateDashboardWidgets)) return;
 
         $(".dashboard .widget[data-widget-type]").each(function() {
             var widget = $(this);
@@ -150,7 +141,7 @@ $(document).ready(function() {
             var cacheTimeInSecs = parseInt(widget.attr("data-cache-time") || 0);
 
             function reloadWidget() {
-                if (!assertFocus(reloadWidget)) return;
+                if (!assertUpdateEnabled(reloadWidget)) return;
 
                 $(".reloading", widget).show();
 
