@@ -187,6 +187,20 @@ $(document).ready(function() {
         $("form.edit-dashboard-form").show();
     });
 
+    $(".update-onfocussed-on").on("click", function() {
+        $(".update-onfocussed-on").hide();
+        $(".update-onfocussed-off").show();
+        setUpdateUnfocussedMode(true);
+        alert("Window will be updated even when unfocussed");
+    });
+
+    $(".update-onfocussed-off").on("click", function() {
+        $(".update-onfocussed-on").show();
+        $(".update-onfocussed-off").hide();
+        setUpdateUnfocussedMode(false);
+        alert("Window will no longer be updated when unfocussed");
+    });
+
     $(".unlock-dashboard-widgets").on("click", function() {
         dashboardGrid.enable();
         $(".dashboard .gridster .gs-w").css("cursor", "move");

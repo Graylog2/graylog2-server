@@ -9,6 +9,9 @@
 @main(dashboard.getTitle, null, "", currentUser, false) {
 
     <div class="pull-right dashboard-controls">
+        <i class="icon icon-star-empty update-onfocussed-on" title="Update unfocussed"></i>
+        <i class="icon icon-star update-onfocussed-off" title="Do not update when unfocussed" style="display: none;"></i>
+            &nbsp;
         @if(isPermitted(DASHBOARDS_EDIT, dashboard.getId)) {
         <i class="icon icon-lock unlock-dashboard-widgets" title="Unlock widget positions"></i>
         <i class="icon icon-unlock lock-dashboard-widgets" title="Lock widget positions" style="display: none;"></i>
