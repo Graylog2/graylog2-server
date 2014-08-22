@@ -29,8 +29,6 @@ import java.util.Map;
 public class RelativeRange implements TimeRange {
 
     private final int range;
-    private final DateTime to;
-
 
     public RelativeRange(int range) throws InvalidRangeParametersException {
         if (range < 0) {
@@ -38,7 +36,6 @@ public class RelativeRange implements TimeRange {
         }
 
         this.range = range;
-        this.to = DateTime.now();
     }
 
     @Override
@@ -68,6 +65,6 @@ public class RelativeRange implements TimeRange {
 
     @Override
     public DateTime getTo() {
-        return to;
+        return DateTime.now();
     }
 }
