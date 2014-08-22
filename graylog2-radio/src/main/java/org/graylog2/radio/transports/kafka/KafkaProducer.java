@@ -16,6 +16,9 @@
  */
 package org.graylog2.radio.transports.kafka;
 
+import com.codahale.metrics.Meter;
+import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.Timer;
 import kafka.javaapi.producer.Producer;
 import kafka.producer.KeyedMessage;
 import kafka.producer.ProducerConfig;
@@ -32,6 +35,8 @@ import javax.inject.Inject;
 import java.io.IOException;
 import java.util.Properties;
 
+import static com.codahale.metrics.MetricRegistry.name;
+
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
@@ -44,10 +49,12 @@ public class KafkaProducer implements RadioTransport {
     private final Producer<byte[], byte[]> producer;
 
     private final MessagePack pack;
+    private final Meter incomingMessages;
+    private final Meter rejectedMessages;
+    private final Timer processTime;
 
     @Inject
-    public KafkaProducer(ServerStatus serverStatus, Configuration configuration) {
-
+    public KafkaProducer(ServerStatus serverStatus, Configuration configuration, MetricRegistry metricRegistry) {
         pack = new MessagePack();
 
         Properties props = new Properties();
@@ -62,20 +69,25 @@ public class KafkaProducer implements RadioTransport {
 
         ProducerConfig config = new ProducerConfig(props);
         producer = new Producer<byte[], byte[]>(config);
+
+        incomingMessages = metricRegistry.meter(name(KafkaProducer.class, "incomingMessages"));
+        rejectedMessages = metricRegistry.meter(name(KafkaProducer.class, "rejectedMessages"));
+        processTime = metricRegistry.timer(name(KafkaProducer.class, "processTime"));
     }
 
     @Override
     public void send(Message msg) {
         KeyedMessage<byte[], byte[]> data;
 
-        try {
+        try(Timer.Context context = processTime.time()) {
+            incomingMessages.mark();
             data = new KeyedMessage<byte[], byte[]>(KAFKA_TOPIC, msg.getId().getBytes(), RadioMessage.serialize(pack, msg));
-        } catch(IOException e) {
-            LOG.error("Could not serialize message.");
-            return;
-        }
 
-        producer.send(data);
+            producer.send(data);
+        } catch(IOException e) {
+            LOG.error("Could not serialize message.", e);
+            rejectedMessages.mark();
+        }
     }
 
 }
