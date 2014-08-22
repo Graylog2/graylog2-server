@@ -131,7 +131,7 @@ public class ServerBindings extends AbstractModule {
         bind(OutputBufferWatermark.class).toInstance(new OutputBufferWatermark());
         bind(Indexer.class).toProvider(IndexerProvider.class);
         bind(SystemJobManager.class).toProvider(SystemJobManagerProvider.class);
-        bind(InputRegistry.class).toProvider(ServerInputRegistryProvider.class);
+        bind(InputRegistry.class).toProvider(ServerInputRegistryProvider.class).asEagerSingleton();
         bind(RulesEngine.class).toProvider(RulesEngineProvider.class);
         bind(LdapConnector.class).toProvider(LdapConnectorProvider.class);
         bind(LdapUserAuthenticator.class).toProvider(LdapUserAuthenticatorProvider.class);

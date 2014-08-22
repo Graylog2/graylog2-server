@@ -18,6 +18,7 @@ package org.graylog2.radio.bindings.providers;
 
 import com.ning.http.client.AsyncHttpClient;
 import org.graylog2.radio.Configuration;
+import org.graylog2.radio.cluster.InputService;
 import org.graylog2.radio.inputs.RadioInputRegistry;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.shared.buffers.ProcessBuffer;
@@ -38,13 +39,15 @@ public class RadioInputRegistryProvider implements Provider<InputRegistry> {
                                       ProcessBuffer processBuffer,
                                       AsyncHttpClient httpClient,
                                       Configuration configuration,
-                                      ServerStatus serverStatus) {
+                                      ServerStatus serverStatus,
+                                      InputService inputService) {
         if (radioInputRegistry == null)
             radioInputRegistry = new RadioInputRegistry(messageInputFactory,
                     processBuffer,
                     httpClient,
                     configuration.getGraylog2ServerUri(),
-                    serverStatus);
+                    serverStatus,
+                    inputService);
     }
 
     @Override

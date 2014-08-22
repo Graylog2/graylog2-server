@@ -77,7 +77,7 @@ public class RadioBindings extends AbstractModule {
         capabilityBinder.addBinding().toInstance(ServerStatus.Capability.RADIO);
 
         bind(ServerStatus.class).in(Scopes.SINGLETON);
-        bind(InputRegistry.class).toProvider(RadioInputRegistryProvider.class);
+        bind(InputRegistry.class).toProvider(RadioInputRegistryProvider.class).asEagerSingleton();
 
         bind(URI.class).annotatedWith(Names.named("ServerUri")).toInstance(configuration.getGraylog2ServerUri());
         bind(URI.class).annotatedWith(Names.named("OurRadioUri")).toInstance(configuration.getRestTransportUri());

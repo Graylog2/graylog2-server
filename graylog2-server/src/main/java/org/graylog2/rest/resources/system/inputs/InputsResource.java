@@ -20,7 +20,7 @@ import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.graylog2.database.ValidationException;
+import org.graylog2.database.*;
 import org.graylog2.inputs.Input;
 import org.graylog2.inputs.InputImpl;
 import org.graylog2.inputs.InputService;
@@ -44,6 +44,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.ws.rs.*;
+import javax.ws.rs.NotFoundException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
@@ -247,29 +248,37 @@ public class InputsResource extends RestResource {
             @ApiResponse(code = 404, message = "No such input on this node.")
     })
     public Response launchExisting(@ApiParam(title = "inputId", required = true) @PathParam("inputId") String inputId) {
-        final InputState inputState = inputRegistry.getInputState(inputId);
+        InputState inputState = inputRegistry.getInputState(inputId);
+        final MessageInput messageInput;
 
         if (inputState == null) {
+            try {
+                final Input input = inputService.find(inputId);
+                messageInput = inputService.getMessageInput(input);
+            } catch (NoSuchInputTypeException | org.graylog2.database.NotFoundException e) {
+                final String error = "Cannot launch input <" + inputId + ">. Input not found.";
+                LOG.info(error);
+                throw new NotFoundException(error);
+            }
+        } else
+            messageInput = inputState.getMessageInput();
+
+        if (messageInput == null) {
             final String error = "Cannot launch input <" + inputId + ">. Input not found.";
             LOG.info(error);
             throw new NotFoundException(error);
         }
 
-        final MessageInput input = inputState.getMessageInput();
-
-        if (input == null) {
-            final String error = "Cannot launch input <" + inputId + ">. Input not found.";
-            LOG.info(error);
-            throw new NotFoundException(error);
-        }
-
-        String msg = "Launching existing input [" + input.getName()+ "]. Reason: REST request.";
+        String msg = "Launching existing input [" + messageInput.getName()+ "]. Reason: REST request.";
         LOG.info(msg);
         activityWriter.write(new Activity(msg, InputsResource.class));
 
-        inputRegistry.launch(inputState);
+        if (inputState == null)
+            inputRegistry.launchPersisted(messageInput);
+        else
+            inputRegistry.launch(inputState);
 
-        String msg2 = "Launched existing input [" + input.getName()+ "]. Reason: REST request.";
+        String msg2 = "Launched existing input [" + messageInput.getName()+ "]. Reason: REST request.";
         LOG.info(msg2);
         activityWriter.write(new Activity(msg2, InputsResource.class));
 

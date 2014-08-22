@@ -23,6 +23,10 @@ import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationException;
 import org.graylog2.plugin.inputs.InputState;
 import org.graylog2.plugin.inputs.MessageInput;
+import org.graylog2.radio.cluster.InputService;
+import org.graylog2.radio.inputs.RadioInputRegistry;
+import org.graylog2.radio.inputs.api.InputSummaryResponse;
+import org.graylog2.radio.inputs.api.RegisterInputResponse;
 import org.graylog2.radio.rest.resources.RestResource;
 import org.graylog2.shared.inputs.InputRegistry;
 import org.graylog2.shared.inputs.NoSuchInputTypeException;
@@ -59,8 +63,14 @@ public class InputsResource extends RestResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(InputsResource.class);
     
+    private final InputRegistry inputRegistry;
+    private final InputService inputService;
+
     @Inject
-    private InputRegistry inputRegistry;
+    public InputsResource(InputRegistry inputRegistry, InputService inputService) {
+        this.inputRegistry = inputRegistry;
+        this.inputService = inputService;
+    }
 
     @GET @Timed
     public String list() {
@@ -125,7 +135,7 @@ public class InputsResource extends RestResource {
         }
 
         String inputId = UUID.randomUUID().toString();
-        //input.setPersistId(inputId);
+        input.setPersistId(inputId);
 
         // Don't run if exclusive and another instance is already running.
         if (input.isExclusive() && inputRegistry.hasTypeRunning(input.getClass())) {
@@ -202,9 +212,17 @@ public class InputsResource extends RestResource {
     @Path("/{inputId}/launch")
     public Response launchExisting(@PathParam("inputId") String inputId) {
         InputState inputState = inputRegistry.getInputState(inputId);
+        final MessageInput messageInput;
 
         if (inputState == null) {
-            throw new NotFoundException("Input <" + inputId + "> not found!");
+            try {
+                InputSummaryResponse response = inputService.getPersistedInput(inputId);
+                if (response == null)
+                    throw new NotFoundException("Input <" + inputId + "> not found!");
+
+            } catch (IOException e) {
+                throw new NotFoundException("Input <" + inputId + "> not found!");
+            }
         }
 
         final MessageInput input = inputState.getMessageInput();
