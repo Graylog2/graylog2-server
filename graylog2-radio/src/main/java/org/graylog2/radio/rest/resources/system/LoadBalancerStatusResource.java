@@ -17,38 +17,39 @@
 package org.graylog2.radio.rest.resources.system;
 
 import com.codahale.metrics.annotation.Timed;
-import org.graylog2.plugin.lifecycles.Lifecycle;
+import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.lifecycles.LoadBalancerStatus;
 import org.graylog2.radio.rest.resources.RestResource;
-import org.graylog2.plugin.ServerStatus;
 
 import javax.inject.Inject;
-import javax.ws.rs.*;
+import javax.ws.rs.GET;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 @Path("/system/lbstatus")
 public class LoadBalancerStatusResource extends RestResource {
     @Inject
     private ServerStatus serverStatus;
 
     @GET @Timed
-    public javax.ws.rs.core.Response status() {
+    @Produces(MediaType.TEXT_PLAIN)
+    public Response status() {
         /*
          * IMPORTANT!! When implementing permissions for radio: This must be
          *             accessible without authorization. LBs don't do that.
          */
-        LoadBalancerStatus lbStatus = serverStatus.getLifecycle().getLoadbalancerStatus();
+        final LoadBalancerStatus lbStatus = serverStatus.getLifecycle().getLoadbalancerStatus();
 
-        Response.Status status = lbStatus.equals(LoadBalancerStatus.ALIVE)
+        final Response.Status status = lbStatus == LoadBalancerStatus.ALIVE
                 ? Response.Status.OK : Response.Status.SERVICE_UNAVAILABLE;
 
         return Response.status(status)
                 .entity(lbStatus.toString().toUpperCase())
-                .type(MediaType.TEXT_PLAIN)
                 .build();
     }
 
@@ -56,23 +57,23 @@ public class LoadBalancerStatusResource extends RestResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/override/{status}")
     public Response override(@PathParam("status") String status) {
-        LoadBalancerStatus lbStatus;
+        final LoadBalancerStatus lbStatus;
         try {
             lbStatus = LoadBalancerStatus.valueOf(status.toUpperCase());
         } catch(IllegalArgumentException e) {
-            throw new WebApplicationException(Response.Status.BAD_REQUEST);
+            throw new WebApplicationException(e, Response.Status.BAD_REQUEST);
         }
 
         switch (lbStatus) {
             case DEAD:
-                serverStatus.setLifecycle(Lifecycle.OVERRIDE_LB_DEAD);
+                serverStatus.overrideLoadBalancerDead();
                 break;
             case ALIVE:
-                serverStatus.setLifecycle(Lifecycle.OVERRIDE_LB_ALIVE);
+                serverStatus.overrideLoadBalancerAlive();
                 break;
         }
 
-        return Response.status(Response.Status.OK).build();
+        return Response.ok().build();
     }
 
 }

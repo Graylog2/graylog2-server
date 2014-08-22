@@ -24,7 +24,6 @@ package org.graylog2.shared.initializers;
 
 import com.google.common.util.concurrent.Service;
 import com.google.common.util.concurrent.ServiceManager.Listener;
-import org.graylog2.plugin.lifecycles.Lifecycle;
 import org.graylog2.plugin.ServerStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,7 +45,7 @@ public class ServiceManagerListener extends Listener {
     @Override
     public void healthy() {
         LOG.info("Services are healthy");
-        serverStatus.setLifecycle(Lifecycle.RUNNING);
+        serverStatus.start();
     }
 
     @Override
@@ -57,6 +56,6 @@ public class ServiceManagerListener extends Listener {
     @Override
     public void failure(Service service) {
         // do not log the failure here again, the ServiceManager itself does so already on Level ERROR.
-        serverStatus.setLifecycle(Lifecycle.FAILED);
+        serverStatus.fail();
     }
 }

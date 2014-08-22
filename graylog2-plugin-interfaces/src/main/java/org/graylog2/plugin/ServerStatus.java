@@ -22,7 +22,6 @@
  */
 package org.graylog2.plugin;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.common.eventbus.EventBus;
 import com.google.common.util.concurrent.Uninterruptibles;
@@ -35,17 +34,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Singleton;
+import java.util.Arrays;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-/**
- * @author Dennis Oelkers <dennis@torch.sh>
- */
 @Singleton
 public class ServerStatus {
     private static final Logger LOG = LoggerFactory.getLogger(ServerStatus.class);
-    private final EventBus eventBus;
 
     public enum Capability {
         SERVER,
@@ -55,14 +51,16 @@ public class ServerStatus {
         LOCALMODE
     }
 
+    private final EventBus eventBus;
     private final NodeId nodeId;
-    private Lifecycle lifecycle;
     private final DateTime startedAt;
     private final Set<Capability> capabilitySet;
 
-    private final AtomicBoolean isProcessing = new AtomicBoolean(true);
+    private final AtomicBoolean isProcessing = new AtomicBoolean(false);
     private final AtomicBoolean processingPauseLocked = new AtomicBoolean(false);
     private final CountDownLatch runningLatch = new CountDownLatch(1);
+
+    private volatile Lifecycle lifecycle = Lifecycle.UNINITIALIZED;
 
     @Inject
     public ServerStatus(BaseConfiguration configuration, Set<Capability> capabilities, EventBus eventBus) {
@@ -70,8 +68,6 @@ public class ServerStatus {
         this.nodeId = new NodeId(configuration.getNodeIdFile());
         this.startedAt = new DateTime(DateTimeZone.UTC);
         this.capabilitySet = Sets.newHashSet(capabilities); // copy, because we support adding more capabilities later
-
-        setLifecycle(Lifecycle.UNINITIALIZED);
     }
 
     public NodeId getNodeId() {
@@ -82,21 +78,49 @@ public class ServerStatus {
         return lifecycle;
     }
 
-    public void setLifecycle(Lifecycle lifecycle) {
-        // special case the two lifecycle states that influence whether processing is enabled or not.
-        switch (lifecycle) {
-            case RUNNING:
-                isProcessing.set(true);
-                runningLatch.countDown();
-                break;
-            case UNINITIALIZED:
-            case STARTING:
-            case PAUSED:
-                isProcessing.set(false);
-                break;
-        }
+    private void publishLifecycle(final Lifecycle lifecycle) {
+        setLifecycle(lifecycle);
+        eventBus.post(lifecycle);
+    }
+
+    private void setLifecycle(final Lifecycle lifecycle) {
         this.lifecycle = lifecycle;
-        eventBus.post(this.lifecycle);
+    }
+
+    public void initialize() {
+        publishLifecycle(Lifecycle.STARTING);
+    }
+
+    public void start() {
+        isProcessing.set(true);
+        runningLatch.countDown();
+        publishLifecycle(Lifecycle.RUNNING);
+    }
+
+    public void shutdown(boolean forceProcessing) {
+        if (forceProcessing) {
+            unlockProcessingPause();
+            isProcessing.set(true);
+        }
+
+        publishLifecycle(Lifecycle.HALTING);
+    }
+
+    public void shutdown() {
+        shutdown(true);
+    }
+
+    public void fail() {
+        isProcessing.set(false);
+        publishLifecycle(Lifecycle.FAILED);
+    }
+
+    public void overrideLoadBalancerDead() {
+        publishLifecycle(Lifecycle.OVERRIDE_LB_DEAD);
+    }
+
+    public void overrideLoadBalancerAlive() {
+        publishLifecycle(Lifecycle.OVERRIDE_LB_ALIVE);
     }
 
     public void awaitRunning(final Runnable runnable) {
@@ -126,7 +150,7 @@ public class ServerStatus {
     }
 
     public ServerStatus addCapabilities(Capability... capabilities) {
-        this.capabilitySet.addAll(Lists.newArrayList(capabilities));
+        this.capabilitySet.addAll(Arrays.asList(capabilities));
         return this;
     }
 
@@ -135,7 +159,7 @@ public class ServerStatus {
     }
 
     public boolean hasCapabilities(Capability... capabilities) {
-        return this.capabilitySet.containsAll(Lists.newArrayList(capabilities));
+        return this.capabilitySet.containsAll(Arrays.asList(capabilities));
     }
 
     public boolean isProcessing() {
@@ -147,10 +171,11 @@ public class ServerStatus {
     }
 
     public void pauseMessageProcessing(boolean locked) {
-        setLifecycle(Lifecycle.PAUSED);
-
         // Never override pause lock if already locked.
         processingPauseLocked.compareAndSet(false, locked);
+        isProcessing.set(false);
+
+        publishLifecycle(Lifecycle.PAUSED);
     }
 
     public void resumeMessageProcessing() throws ProcessingPauseLockedException {
@@ -159,7 +184,7 @@ public class ServerStatus {
                     "or manually unlock if you know what you are doing.");
         }
 
-        setLifecycle(Lifecycle.RUNNING);
+        start();
     }
 
     public boolean processingPauseLocked() {
@@ -171,12 +196,14 @@ public class ServerStatus {
     }
 
     public void setStatsMode(boolean statsMode) {
-        if (statsMode)
+        if (statsMode) {
             addCapability(Capability.STATSMODE);
+        }
     }
 
     public void setLocalMode(boolean localMode) {
-        if (localMode)
+        if (localMode) {
             addCapability(Capability.LOCALMODE);
+        }
     }
 }

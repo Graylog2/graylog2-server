@@ -51,7 +51,6 @@ import org.graylog2.plugin.PluginModule;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.inputs.MessageInput;
-import org.graylog2.plugin.lifecycles.Lifecycle;
 import org.graylog2.plugins.PluginInstaller;
 import org.graylog2.shared.NodeRunner;
 import org.graylog2.shared.bindings.GuiceInjectorHolder;
@@ -193,7 +192,7 @@ public final class Main extends NodeRunner {
 
         // Le server object. This is where all the magic happens.
         final ServerStatus serverStatus = injector.getInstance(ServerStatus.class);
-        serverStatus.setLifecycle(Lifecycle.STARTING);
+        serverStatus.initialize();
 
         ActivityWriter activityWriter = null;
         ServiceManager serviceManager = null;

@@ -37,7 +37,6 @@ import org.graylog2.plugin.Plugin;
 import org.graylog2.plugin.PluginModule;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.Tools;
-import org.graylog2.plugin.lifecycles.Lifecycle;
 import org.graylog2.radio.bindings.RadioBindings;
 import org.graylog2.radio.bindings.RadioInitializerBindings;
 import org.graylog2.radio.cluster.Ping;
@@ -148,8 +147,8 @@ public class Main extends NodeRunner {
             savePidFile(commandLineArguments.getPidFile());
         }
 
-        ServerStatus serverStatus = injector.getInstance(ServerStatus.class);
-        serverStatus.setLifecycle(Lifecycle.STARTING);
+        final ServerStatus serverStatus = injector.getInstance(ServerStatus.class);
+        serverStatus.initialize();
 
         // register node by initiating first ping. if the node isn't registered, loading persisted inputs will fail silently, for example
         Ping.Pinger pinger = injector.getInstance(Ping.Pinger.class);
