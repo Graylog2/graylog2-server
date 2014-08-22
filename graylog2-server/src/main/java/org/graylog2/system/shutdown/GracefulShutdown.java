@@ -34,10 +34,8 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Singleton;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 @Singleton
 public class GracefulShutdown implements Runnable {
 
@@ -115,8 +113,13 @@ public class GracefulShutdown implements Runnable {
             throw new RuntimeException("Seems like unlocking the processing pause did not succeed.", e);
         }
 
-        // flush all remaining messages from the system
-        bufferSynchronizerService.stopAsync().awaitTerminated();
+        // Try to flush all remaining messages from the system
+        try {
+            bufferSynchronizerService.stopAsync().awaitTerminated(configuration.getShutdownTimeout(), TimeUnit.MILLISECONDS);
+        } catch (TimeoutException e) {
+            LOG.error("BufferSynchronizerService didn't finish within grace period of "
+                    + configuration.getShutdownTimeout() + "ms (shutdown_timeout)", e);
+        }
 
         // stop all maintenance tasks
         periodicalsService.stopAsync().awaitTerminated();
