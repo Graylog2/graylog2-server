@@ -128,15 +128,21 @@ public class Consumer {
                         channel.basicAck(deliveryTag, false);
                     } catch (BufferOutOfCapacityException e) {
                         LOG.debug("Input buffer full, requeuing message. Delaying 10 ms until trying next message.");
-                        channel.basicNack(deliveryTag, false, true);
-                        Uninterruptibles.sleepUninterruptibly(10, TimeUnit.MILLISECONDS); // TODO magic number
+                        if (channel.isOpen()) {
+                            channel.basicNack(deliveryTag, false, true);
+                            Uninterruptibles.sleepUninterruptibly(10, TimeUnit.MILLISECONDS); // TODO magic number
+                        }
                     } catch (ProcessingDisabledException e) {
                         LOG.debug("Message processing is disabled, requeuing message. Delaying 100 ms until trying next message.");
-                        channel.basicNack(deliveryTag, false, true);
-                        Uninterruptibles.sleepUninterruptibly(100, TimeUnit.MILLISECONDS); // TODO magic number
+                        if (channel.isOpen()) {
+                            channel.basicNack(deliveryTag, false, true);
+                            Uninterruptibles.sleepUninterruptibly(100, TimeUnit.MILLISECONDS); // TODO magic number
+                        }
                     } catch (Exception e) {
                         LOG.error("Error while trying to process AMQP message, requeuing message", e);
-                        channel.basicNack(deliveryTag, false, true);
+                        if (channel.isOpen()) {
+                            channel.basicNack(deliveryTag, false, true);
+                        }
                     }
                 }
             }
