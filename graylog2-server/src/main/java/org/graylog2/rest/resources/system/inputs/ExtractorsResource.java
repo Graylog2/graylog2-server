@@ -28,6 +28,7 @@ import org.graylog2.inputs.Input;
 import org.graylog2.inputs.InputService;
 import org.graylog2.inputs.converters.ConverterFactory;
 import org.graylog2.inputs.extractors.ExtractorFactory;
+import org.graylog2.metrics.MetricUtils;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.inputs.Converter;
 import org.graylog2.plugin.inputs.Extractor;
@@ -320,8 +321,8 @@ public class ExtractorsResource extends RestResource {
         map.put("converter_exceptions", extractor.getConverterExceptionCount());
 
         Map<String, Object> metrics = Maps.newHashMap();
-        metrics.put("total",  buildTimerMap(metricRegistry.getTimers().get(extractor.getTotalTimerName())));
-        metrics.put("converters", buildTimerMap(metricRegistry.getTimers().get(extractor.getConverterTimerName())));
+        metrics.put("total", MetricUtils.buildTimerMap(metricRegistry.getTimers().get(extractor.getTotalTimerName())));
+        metrics.put("converters", MetricUtils.buildTimerMap(metricRegistry.getTimers().get(extractor.getConverterTimerName())));
         map.put("metrics", metrics);
 
         return map;
