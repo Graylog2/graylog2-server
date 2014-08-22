@@ -1,6 +1,4 @@
 /**
- * Copyright 2014 TORCH GmbH <lennart@torch.sh>
- *
  * This file is part of Graylog2.
  *
  * Graylog2 is free software: you can redistribute it and/or modify
@@ -15,7 +13,6 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 package org.graylog2.periodical;
 
@@ -48,7 +45,9 @@ import javax.inject.Inject;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import static java.util.concurrent.TimeUnit.MINUTES;
 
@@ -58,6 +57,22 @@ import static java.util.concurrent.TimeUnit.MINUTES;
 public class TelemetryReporterThread extends Periodical {
 
     private static final Logger LOG = LoggerFactory.getLogger(TelemetryReporterThread.class);
+
+    private static final Set<String> REPORTED_METRICS = new HashSet<String>() {{
+        add("org.graylog2.buffers.OutputBuffer.cachedMessages");
+        add("org.graylog2.buffers.OutputBuffer.incomingMessages");
+        add("org.graylog2.buffers.OutputBuffer.rejectedMessages");
+        add("org.graylog2.shared.buffers.ProcessBuffer.cachedMessages");
+        add("org.graylog2.shared.buffers.ProcessBuffer.incomingMessages");
+        add("org.graylog2.shared.buffers.ProcessBuffer.rejectedMessages");
+        add("org.graylog2.buffers.processors.OutputBufferProcessor.batchSize");
+        add("org.graylog2.buffers.processors.OutputBufferProcessor.incomingMessages");
+        add("org.graylog2.buffers.processors.OutputBufferProcessor.processTime");
+        add("org.graylog2.shared.buffers.processors.ProcessBufferProcessor.filteredOutMessages");
+        add("org.graylog2.shared.buffers.processors.ProcessBufferProcessor.incomingMessages");
+        add("org.graylog2.shared.buffers.processors.ProcessBufferProcessor.outgoingMessages");
+        add("org.graylog2.shared.buffers.processors.ProcessBufferProcessor.processTime");
+    }};
 
     @Inject
     protected ObjectMapper objectMapper;
@@ -84,7 +99,7 @@ public class TelemetryReporterThread extends Periodical {
             report.put("token", configuration.getTelemetryServiceToken());
             report.put("anon_id", DigestUtils.sha256Hex(serverStatus.getNodeId().toString()));
             report.put("server_version", ServerVersion.VERSION.toString());
-            report.put("metrics", MetricUtils.mapAll(metricRegistry.getMetrics()));
+            report.put("metrics", MetricUtils.mapAllFiltered(metricRegistry.getMetrics(), REPORTED_METRICS));
 
             String json = objectMapper.writeValueAsString(report);
 

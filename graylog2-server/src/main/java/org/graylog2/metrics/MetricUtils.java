@@ -1,6 +1,4 @@
 /**
- * Copyright 2014 TORCH GmbH <lennart@torch.sh>
- *
  * This file is part of Graylog2.
  *
  * Graylog2 is free software: you can redistribute it and/or modify
@@ -15,7 +13,6 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 package org.graylog2.metrics;
 
@@ -26,6 +23,7 @@ import com.codahale.metrics.Timer;
 import com.google.common.collect.Maps;
 
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -34,6 +32,10 @@ import java.util.concurrent.TimeUnit;
 public class MetricUtils {
 
     public static Map<String, Object> mapAll(Map<String, Metric> metrics) {
+        return mapAllFiltered(metrics, null);
+    }
+
+    public static Map<String, Object> mapAllFiltered(Map<String, Metric> metrics, Set<String> filter) {
         Map<String, Object> result = Maps.newHashMap();
 
         if (metrics == null) {
@@ -41,7 +43,9 @@ public class MetricUtils {
         }
 
         for (Map.Entry<String, Metric> metric : metrics.entrySet()) {
-            result.put(metric.getKey(), map(metric.getKey(), metric.getValue()));
+            if (filter == null || filter.contains(metric.getKey())) {
+                result.put(metric.getKey(), map(metric.getKey(), metric.getValue()));
+            }
         }
 
         return result;
