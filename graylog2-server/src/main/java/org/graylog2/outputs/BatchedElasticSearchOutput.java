@@ -20,6 +20,8 @@ import com.codahale.metrics.Histogram;
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import org.graylog2.Configuration;
 import org.graylog2.indexer.Indexer;
@@ -34,15 +36,12 @@ import java.util.concurrent.Executors;
 
 import static com.codahale.metrics.MetricRegistry.name;
 
-/**
- * @author Dennis Oelkers <dennis@torch.sh>
- */
 public class BatchedElasticSearchOutput extends ElasticSearchOutput {
     private static final Logger LOG = LoggerFactory.getLogger(BatchedElasticSearchOutput.class);
 
     private final List<Message> buffer;
     private final int maxBufferSize;
-    private final ExecutorService flushThread;
+    private final ExecutorService flushThread = Executors.newSingleThreadExecutor();
     private final Timer processTime;
     private final Histogram batchSize;
     private final Meter bufferFlushes;
@@ -51,9 +50,8 @@ public class BatchedElasticSearchOutput extends ElasticSearchOutput {
     @Inject
     public BatchedElasticSearchOutput(MetricRegistry metricRegistry, Indexer indexer, Configuration configuration) {
         super(metricRegistry, indexer);
-        this.buffer = Lists.newArrayList();
         this.maxBufferSize = configuration.getOutputBatchSize();
-        this.flushThread = Executors.newSingleThreadExecutor();
+        this.buffer = Lists.newArrayListWithCapacity(maxBufferSize);
         this.processTime = metricRegistry.timer(name(this.getClass(), "processTime"));
         this.batchSize = metricRegistry.histogram(name(this.getClass(), "batchSize"));
         this.bufferFlushes = metricRegistry.meter(name(this.getClass(), "bufferFlushes"));
@@ -75,23 +73,23 @@ public class BatchedElasticSearchOutput extends ElasticSearchOutput {
 
     @Override
     public String getHumanName() {
-        return "ElasticSearch Output with Batching";
+        return "Elasticsearch Output with Batching";
     }
 
-    public void synchronousFlush(List<Message> mybuffer) {
-        LOG.debug("[{}] Starting flushing {} messages", Thread.currentThread(), mybuffer.size());
+    private void synchronousFlush(List<Message> messageBuffer) {
+        LOG.debug("[{}] Starting flushing {} messages", Thread.currentThread(), messageBuffer.size());
 
         try(Timer.Context context = this.processTime.time()) {
-            write(mybuffer);
-            this.batchSize.update(mybuffer.size());
+            write(messageBuffer);
+            this.batchSize.update(messageBuffer.size());
             this.bufferFlushes.mark();
         } catch (Exception e) {
             LOG.error("Unable to flush message buffer", e);
         }
-        LOG.debug("[{}] Flushing {} messages completed", Thread.currentThread(), mybuffer.size());
+        LOG.debug("[{}] Flushing {} messages completed", Thread.currentThread(), messageBuffer.size());
     }
 
-    public void asynchronousFlush(final List<Message> mybuffer) {
+    private void asynchronousFlush(final List<Message> mybuffer) {
         LOG.debug("Submitting new flush thread");
         flushThread.submit(new Runnable() {
             @Override
@@ -105,19 +103,29 @@ public class BatchedElasticSearchOutput extends ElasticSearchOutput {
         flush(true);
     }
 
-    // used in tests to avoid having to run the executor
-    public void flush(boolean async) {
-        this.bufferFlushesRequested.mark();
-        List<Message> mybuffer;
-        synchronized (this.buffer) {
-            mybuffer = Lists.newArrayList(this.buffer);
-            this.buffer.clear();
-        }
-        if (async) {
-            asynchronousFlush(mybuffer);
+    @VisibleForTesting
+    void flush(boolean async) {
+        bufferFlushesRequested.mark();
+
+        if (!buffer.isEmpty()) {
+            if (indexer.isConnectedAndHealthy()) {
+                final List<Message> temporaryBuffer;
+                synchronized (this.buffer) {
+                    temporaryBuffer = ImmutableList.copyOf(buffer);
+                    buffer.clear();
+                }
+
+                if (async) {
+                    asynchronousFlush(temporaryBuffer);
+                } else {
+                    synchronousFlush(temporaryBuffer);
+                }
+            } else {
+                LOG.warn("Clearing buffer ({} messages) because the Elasticsearch cluster is down.", buffer.size());
+                buffer.clear();
+            }
         } else {
-            synchronousFlush(mybuffer);
+            LOG.debug("Not flushing empty buffer");
         }
     }
-
 }
