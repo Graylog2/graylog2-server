@@ -20,7 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.graylog2.shared.bindings;
+package org.graylog2.shared.bindings.providers;
 
 import com.ning.http.client.AsyncHttpClient;
 
