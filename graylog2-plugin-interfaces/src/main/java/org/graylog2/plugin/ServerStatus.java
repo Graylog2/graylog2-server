@@ -150,9 +150,7 @@ public class ServerStatus {
         setLifecycle(Lifecycle.PAUSED);
 
         // Never override pause lock if already locked.
-        if (!processingPauseLocked.get()) {
-            processingPauseLocked.set(locked);
-        }
+        processingPauseLocked.compareAndSet(false, locked);
     }
 
     public void resumeMessageProcessing() throws ProcessingPauseLockedException {
