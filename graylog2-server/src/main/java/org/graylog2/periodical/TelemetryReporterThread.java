@@ -104,7 +104,6 @@ public class TelemetryReporterThread extends Periodical {
 
             report.put("token", configuration.getTelemetryServiceToken());
             report.put("anon_id", DigestUtils.sha256Hex(serverStatus.getNodeId().toString()));
-            report.put("server_version", ServerVersion.VERSION.toString());
             report.put("metrics", MetricUtils.mapAllFiltered(metricRegistry.getMetrics(), REPORTED_METRICS));
             report.put("statistics", buildStatistics());
 
@@ -176,6 +175,7 @@ public class TelemetryReporterThread extends Periodical {
         statistics.put("started_at", serverStatus.getStartedAt());
         statistics.put("lifecycle", serverStatus.getLifecycle());
         statistics.put("is_processing", serverStatus.isProcessing());
+        statistics.put("server_version", ServerVersion.VERSION.toString());
 
         return statistics;
     }
