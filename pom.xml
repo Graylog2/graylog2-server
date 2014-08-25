@@ -245,7 +245,7 @@
             <dependency>
                 <groupId>org.reflections</groupId>
                 <artifactId>reflections</artifactId>
-                <version>0.9.9-RC1</version>
+                <version>0.9.9-RC2</version>
             </dependency>
             <dependency>
                 <groupId>io.netty</groupId>
