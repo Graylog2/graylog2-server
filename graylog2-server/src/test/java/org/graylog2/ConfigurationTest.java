@@ -203,6 +203,15 @@ public class ConfigurationTest {
     }
 
     @Test
+    public void testGetMongoDBReplicaSetServersMalformedPort() throws RepositoryException, ValidationException {
+        validProperties.put("mongodb_replica_set", "127.0.0.1:HAHA");
+        Configuration configuration = new Configuration();
+        new JadConfig(new InMemoryRepository(validProperties), configuration).process();
+
+        Assert.assertNull(configuration.getMongoReplicaSet());
+    }
+
+    @Test
     public void testGetMongoDBReplicaSetServers() throws RepositoryException, ValidationException {
         validProperties.put("mongodb_replica_set", "127.0.0.1:27017,127.0.0.1:27018");
 

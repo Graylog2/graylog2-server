@@ -30,6 +30,7 @@ import org.graylog2.plugin.BaseConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.net.InetAddress;
 import java.net.URI;
 import java.net.UnknownHostException;
 import java.util.List;
@@ -392,9 +393,8 @@ public class Configuration extends BaseConfiguration {
     }
 
     public List<ServerAddress> getMongoReplicaSet() {
-        List<ServerAddress> replicaServers = Lists.newArrayList();
-
-        List<String> rawSet = mongoReplicaSet;
+        final List<ServerAddress> replicaServers = Lists.newArrayList();
+        final List<String> rawSet = mongoReplicaSet;
 
         if (rawSet == null || rawSet.isEmpty()) {
             return null;
@@ -402,19 +402,24 @@ public class Configuration extends BaseConfiguration {
 
         for (String host : rawSet) {
             // Split host:port.
-            String[] replicaTarget = host.split(":");
+            final String[] replicaTarget = host.split(":");
 
             // Check if valid.
-            if (replicaTarget == null || replicaTarget.length != 2) {
+            if (replicaTarget.length != 2) {
                 LOG.error("Malformed mongodb_replica_set configuration.");
                 return null;
             }
 
             // Get host and port.
             try {
-                replicaServers.add(new ServerAddress(replicaTarget[0], Integer.parseInt(replicaTarget[1])));
+                replicaServers.add(new ServerAddress(
+                        InetAddress.getByName(replicaTarget[0]),
+                        Integer.parseInt(replicaTarget[1])));
             } catch (UnknownHostException e) {
                 LOG.error("Unknown host in mongodb_replica_set: " + e.getMessage(), e);
+                return null;
+            } catch (NumberFormatException e) {
+                LOG.error("Invalid port in mongodb_replica_set: " + e.getMessage(), e);
                 return null;
             }
         }

@@ -62,7 +62,7 @@ public abstract class PersistedImpl implements Persisted {
 
     @Override
     public String getId() {
-        return getObjectId().toStringMongod();
+        return getObjectId().toHexString();
     }
 
     @Override
