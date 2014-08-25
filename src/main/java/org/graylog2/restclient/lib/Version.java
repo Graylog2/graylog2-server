@@ -60,8 +60,9 @@ public class Version {
     public static final Version v0_21_0_BETA1 = new Version(0, 21, 0, "beta1");
     public static final Version v0_21_0_BETA2 = new Version(0, 21, 0, "beta2");
     public static final Version v0_21_0_BETA3 = new Version(0, 21, 0, "beta3");
+    public static final Version v0_21_0_BETA4_SNAPSHOT = new Version(0, 21, 0, "beta4-snapshot");
 
-    public static final Version VERSION = v0_21_0_BETA3;
+    public static final Version VERSION = v0_21_0_BETA4_SNAPSHOT;
 
     public final int major;
     public final int minor;

@@ -6,7 +6,7 @@
 
     <groupId>org.graylog2</groupId>
     <artifactId>graylog2-rest-client</artifactId>
-    <version>0.21.0-beta3</version>
+    <version>0.21.0-beta4-SNAPSHOT</version>
 
     <parent>
         <groupId>org.sonatype.oss</groupId>
