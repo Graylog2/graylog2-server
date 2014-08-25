@@ -67,6 +67,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.elasticsearch.node.NodeBuilder.nodeBuilder;
+import static org.graylog2.UI.wallString;
 
 // TODO this class blocks for most of its operations, but is called from the main thread for some of them
 // TODO figure out how to gracefully deal with failure to connect (or losing connection) to the elastic search cluster!
@@ -180,17 +181,16 @@ public class Indexer {
                             final String id = nodes.next();
                             final String version = nodesList.get(id).get("version").textValue();
                             if (!Version.CURRENT.toString().equals(version)) {
-                                LOG.error("Elasticsearch node is of the wrong version {}, it must be {}! " +
-                                                  "Please make sure you are running the correct version of ElasticSearch.",
-                                          version,
-                                          Version.CURRENT.toString());
+                                final String message =
+                                        String.format("Elasticsearch node is of the wrong version %s, it must be %s!%n", version, Version.CURRENT)
+                                                + "Please make sure you are running the correct version of Elasticsearch.";
+                                LOG.error(wallString(message));
                             }
                             if (!node.settings().get("cluster.name").equals(clusterName)) {
-                                LOG.error("Elasticsearch cluster name is different, Graylog2 uses `{}`, Elasticsearch cluster uses `{}`. " +
-                                                  "Please check the `cluster.name` setting of both Graylog2 and ElasticSearch.",
-                                          node.settings().get("cluster.name"), clusterName);
+                                final String message = String.format("Elasticsearch cluster name is different, Graylog2 uses '%s', Elasticsearch cluster uses '%s'. ", node.settings().get("cluster.name"), clusterName)
+                                        + "Please check the 'cluster.name' setting of both Graylog2 and Elasticsearch.";
+                                LOG.error(wallString(message));
                             }
-
                         }
                     } catch (IOException ioException) {
                         LOG.error("Could not connect to Elasticsearch.", ioException);
