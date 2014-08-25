@@ -91,7 +91,7 @@
         <build.timestamp>${maven.build.timestamp}</build.timestamp> <!-- to work around filtering bug, which makes maven.build.timestamp inaccessible -->
 
         <metrics.version>3.0.2</metrics.version>
-        <jackson.version>2.4.1</jackson.version>
+        <jackson.version>2.4.2</jackson.version>
         <jersey.version>2.11</jersey.version>
         <glassfish-hk2.version>2.3.0</glassfish-hk2.version>
         <apache-directory-version>1.0.0-M20</apache-directory-version>
