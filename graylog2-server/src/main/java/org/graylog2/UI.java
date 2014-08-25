@@ -35,12 +35,12 @@ public class UI {
         exitHardWithWall(msg, new String[]{});
     }
 
-    public static void exitHardWithWall(String msg, String[] docLinks) {
+    public static void exitHardWithWall(String msg, String... docLinks) {
         LOG.error(wallString(msg, docLinks));
         throw new IllegalStateException();
     }
 
-    public static String wallString(String msg, String[] docLinks) {
+    public static String wallString(String msg, String... docLinks) {
         StringBuilder sb = new StringBuilder("\n");
 
         sb.append("\n").append(wall("#")).append("\n");
@@ -57,13 +57,12 @@ public class UI {
             sb.append("\n").append("But we also got some specific help " +
                                            "pages that might help you in this case:").append("\n\n");
 
-            for (int i = 0; i < docLinks.length; i++) {
-                sb.append("* ").append(docLink(docLinks[i])).append("\n");
+            for (final String docLink : docLinks) {
+                sb.append("* ").append(docLink(docLink)).append("\n");
             }
         }
 
         sb.append("\n").append("Terminating. :(").append("\n\n");
-
         sb.append(wall("#"));
 
         return sb.toString();
