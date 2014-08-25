@@ -66,6 +66,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+import static com.google.common.base.Strings.nullToEmpty;
+
 @RequiresAuthentication
 @Api(value = "Indexer/Indices", description = "Index information")
 @Path("/system/indexer/indices")
@@ -282,7 +284,7 @@ public class IndicesResource extends RestResource {
         result.put("node_id", route.currentNodeId());
         result.put("node_name", translateESNodeIdToName(route.currentNodeId()));
         result.put("node_hostname", translateESNodeIdToHostname(route.currentNodeId()));
-        result.put("relocating_to", route.relocatingNodeId());
+        result.put("relocating_to", nullToEmpty(route.relocatingNodeId()));
 
         return result.build();
     }
