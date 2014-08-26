@@ -33,6 +33,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @Provider
@@ -68,7 +69,7 @@ public class ScrollChunkWriter implements MessageBodyWriter<ScrollResult.ScrollC
         if (LOG.isDebugEnabled()) {
             LOG.debug("[{}] Writing chunk {}", Thread.currentThread().getId(), scrollChunk.getChunkNumber());
         }
-        final CSVWriter csvWriter = new CSVWriter(new OutputStreamWriter(entityStream));
+        final CSVWriter csvWriter = new CSVWriter(new OutputStreamWriter(entityStream, StandardCharsets.UTF_8));
 
         final List<String> fields = scrollChunk.getFields();
         final int numberOfFields = fields.size();

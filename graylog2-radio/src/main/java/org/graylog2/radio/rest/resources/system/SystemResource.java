@@ -19,10 +19,10 @@ package org.graylog2.radio.rest.resources.system;
 import com.codahale.metrics.annotation.Timed;
 import com.codahale.metrics.jvm.ThreadDump;
 import com.google.common.collect.Maps;
+import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.Tools;
 import org.graylog2.radio.RadioVersion;
 import org.graylog2.radio.rest.resources.RestResource;
-import org.graylog2.plugin.ServerStatus;
 
 import javax.inject.Inject;
 import javax.ws.rs.GET;
@@ -31,11 +31,9 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import java.io.ByteArrayOutputStream;
 import java.lang.management.ManagementFactory;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 @Path("/system")
 public class SystemResource extends RestResource {
     @Inject
@@ -84,7 +82,7 @@ public class SystemResource extends RestResource {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
 
         threadDump.dump(output);
-        return output.toString();
+        return new String(output.toByteArray(), StandardCharsets.UTF_8);
     }
 
 }

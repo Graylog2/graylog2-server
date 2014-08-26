@@ -24,30 +24,25 @@ import kafka.producer.KeyedMessage;
 import kafka.producer.ProducerConfig;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.RadioMessage;
+import org.graylog2.plugin.ServerStatus;
 import org.graylog2.radio.Configuration;
 import org.graylog2.radio.transports.RadioTransport;
-import org.graylog2.plugin.ServerStatus;
 import org.msgpack.MessagePack;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Properties;
 
 import static com.codahale.metrics.MetricRegistry.name;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public class KafkaProducer implements RadioTransport {
-
     private static final Logger LOG = LoggerFactory.getLogger(KafkaProducer.class);
-
-    public final static String KAFKA_TOPIC = "graylog2-radio-messages";
+    public static final String KAFKA_TOPIC = "graylog2-radio-messages";
 
     private final Producer<byte[], byte[]> producer;
-
     private final MessagePack pack;
     private final Meter incomingMessages;
     private final Meter rejectedMessages;
@@ -68,7 +63,7 @@ public class KafkaProducer implements RadioTransport {
         props.put("batch.num.messages", String.valueOf(configuration.getKafkaBatchSize()));
 
         ProducerConfig config = new ProducerConfig(props);
-        producer = new Producer<byte[], byte[]>(config);
+        producer = new Producer<>(config);
 
         incomingMessages = metricRegistry.meter(name(KafkaProducer.class, "incomingMessages"));
         rejectedMessages = metricRegistry.meter(name(KafkaProducer.class, "rejectedMessages"));
@@ -81,7 +76,8 @@ public class KafkaProducer implements RadioTransport {
 
         try(Timer.Context context = processTime.time()) {
             incomingMessages.mark();
-            data = new KeyedMessage<byte[], byte[]>(KAFKA_TOPIC, msg.getId().getBytes(), RadioMessage.serialize(pack, msg));
+            data = new KeyedMessage<>(
+                    KAFKA_TOPIC, msg.getId().getBytes(StandardCharsets.UTF_8), RadioMessage.serialize(pack, msg));
 
             producer.send(data);
         } catch(IOException e) {
@@ -89,5 +85,4 @@ public class KafkaProducer implements RadioTransport {
             rejectedMessages.mark();
         }
     }
-
 }

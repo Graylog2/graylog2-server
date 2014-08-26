@@ -35,14 +35,12 @@ import org.slf4j.LoggerFactory;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.regex.Pattern;
 
 import static com.codahale.metrics.MetricRegistry.name;
 
-/**
- * @author Lennart Koopmann <lennart@socketfeed.com>
- */
 public class SyslogProcessor {
 
     private static final Logger LOG = LoggerFactory.getLogger(SyslogProcessor.class);
@@ -145,7 +143,7 @@ public class SyslogProcessor {
 
         // Store full message if configured.
         if (config.getBoolean(SyslogInputBase.CK_STORE_FULL_MESSAGE)) {
-            m.addField("full_message", new String(e.getRaw()));
+            m.addField("full_message", new String(e.getRaw(), StandardCharsets.UTF_8));
         }
 
         m.addFields(parseAdditionalData(e));
@@ -196,7 +194,8 @@ public class SyslogProcessor {
                 return Tools.iso8601();
             } else {
                 LOG.warn("Syslog message is missing date or date could not be parsed. (Possibly set {} to true) "
-                        + "Not further handling. Message was: {}", SyslogInputBase.CK_ALLOW_OVERRIDE_DATE, new String(msg.getRaw()));
+                        + "Not further handling. Message was: {}",
+                        SyslogInputBase.CK_ALLOW_OVERRIDE_DATE, new String(msg.getRaw(), StandardCharsets.UTF_8));
                 throw new IllegalStateException();
             }
         }
@@ -214,5 +213,4 @@ public class SyslogProcessor {
     public static boolean isStructuredSyslog(String message) {
         return STRUCTURED_SYSLOG_PATTERN.matcher(message).matches();
     }
-    
 }

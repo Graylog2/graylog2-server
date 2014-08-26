@@ -22,14 +22,16 @@
  */
 package org.graylog2.plugin;
 
-import com.google.common.base.Charsets;
+import com.google.common.io.BaseEncoding;
 import com.google.common.primitives.Ints;
 import org.elasticsearch.search.SearchHit;
-import org.jboss.netty.buffer.ChannelBuffers;
-import org.jboss.netty.handler.codec.base64.Base64;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.joda.time.format.*;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
+import org.joda.time.format.DateTimeFormatterBuilder;
+import org.joda.time.format.DateTimeParser;
+import org.joda.time.format.ISODateTimeFormat;
 import org.slf4j.Logger;
 
 import javax.ws.rs.core.UriBuilder;
@@ -37,15 +39,26 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
-import java.net.*;
-import java.util.*;
+import java.net.Inet4Address;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.UnknownHostException;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.InflaterInputStream;
 
 /**
  * Utilty class for various tool/helper functions.
- *
- * @author Lennart Koopmann <lennart@torch.sh>
  */
 public final class Tools {
 
@@ -227,12 +240,12 @@ public final class Tools {
         return (ts - (days*86400));
     }
 
-    public static String encodeBase64(String what) {
-        return Base64.encode(ChannelBuffers.wrappedBuffer(what.getBytes())).toString(Charsets.UTF_8);
+    public static String encodeBase64(final String what) {
+        return BaseEncoding.base64().encode(what.getBytes(StandardCharsets.UTF_8));
     }
 
-    public static String decodeBase64(String what) {
-        return Base64.decode(ChannelBuffers.wrappedBuffer(what.getBytes())).toString(Charsets.UTF_8);
+    public static String decodeBase64(final String what) {
+        return new String(BaseEncoding.base64().decode(what), StandardCharsets.UTF_8);
     }
 
     public static String rdnsLookup(InetAddress socketAddress) throws UnknownHostException {
