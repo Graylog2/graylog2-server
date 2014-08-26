@@ -175,7 +175,7 @@ public class Consumer {
             @Override
             public void shutdownCompleted(ShutdownSignalException cause) {
                 if (cause.isInitiatedByApplication()) {
-                    LOG.info("Not reconnecting connection, we disconnected explicitely.");
+                    LOG.info("Not reconnecting connection, we disconnected explicitly.");
                     return;
                 }
                 while (true) {
