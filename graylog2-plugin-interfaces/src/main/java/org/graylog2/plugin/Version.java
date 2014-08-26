@@ -28,9 +28,11 @@ import org.slf4j.LoggerFactory;
 
 import java.io.StringReader;
 import java.net.URL;
+import java.util.Objects;
 import java.util.Properties;
 
 import static com.google.common.base.Charsets.UTF_8;
+import static com.google.common.base.Strings.isNullOrEmpty;
 
 /**
  * Following semantic versioning.
@@ -104,11 +106,11 @@ public class Version {
 
         sb.append(major).append(".").append(minor).append(".").append(patch);
 
-        if (additional != null && !additional.isEmpty()) {
+        if (!isNullOrEmpty(additional)) {
             sb.append("-").append(additional);
         }
 
-        if (abbrevCommitSha != null) {
+        if (!isNullOrEmpty(abbrevCommitSha)) {
             sb.append(" (").append(abbrevCommitSha).append(')');
         }
 
@@ -122,29 +124,26 @@ public class Version {
      * @return
      */
     public boolean greaterMinor(Version other) {
-        if (other.major < this.major) {
-            return true;
-        }
-
-        if (other.major == this.major && other.minor < this.minor) {
-            return true;
-        }
-
-        return false;
+        return (other.major < this.major) || (other.major == this.major && other.minor < this.minor);
     }
 
-    public boolean equals(Object obj) {
-        if (obj == null || getClass() != obj.getClass()) {
-            return false;
-        }
 
-        if (this == obj) {
-            return true;
-        }
+    @Override
+    public boolean equals(final Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
 
-        Version version = (Version) obj;
+        Version that = (Version) o;
 
-        return toString().equals(version.toString());
+        return Objects.equals(this.major, that.major)
+                && Objects.equals(this.minor, that.minor)
+                && Objects.equals(this.patch, that.patch)
+                && Objects.equals(this.additional, that.additional)
+                && Objects.equals(this.abbrevCommitSha, that.abbrevCommitSha);
     }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(major, minor, patch, additional, abbrevCommitSha);
+    }
 }
