@@ -76,9 +76,6 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "amqp_broker_vhost")
     private String amqpVhost = "/";
 
-    @Parameter(value = "ring_size", required = true, validator = PositiveIntegerValidator.class)
-    private int ringSize = 1024;
-
     public String getNodeIdFile() {
         return nodeIdFile;
     }
@@ -97,10 +94,6 @@ public class Configuration extends BaseConfiguration {
 
     public URI getGraylog2ServerUri() {
         return graylog2ServerUri == null ? null : Tools.getUriWithPort(graylog2ServerUri, GRAYLOG2_DEFAULT_PORT);
-    }
-
-    public int getRingSize() {
-        return ringSize;
     }
 
     public String getKafkaBrokers() {
