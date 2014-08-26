@@ -89,9 +89,6 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "outputbuffer_processor_keep_alive_time", validator = PositiveIntegerValidator.class)
     private int outputBufferProcessorKeepAliveTime = 5000;
 
-    @Parameter(value = "ring_size", required = true, validator = PositiveIntegerValidator.class)
-    private int ringSize = 1024;
-
     @Parameter(value = "dead_letters_enabled")
     private boolean deadLettersEnabled = false;
 
@@ -328,10 +325,6 @@ public class Configuration extends BaseConfiguration {
         return outputBufferProcessorKeepAliveTime;
     }
 
-    public int getRingSize() {
-        return ringSize;
-    }
-    
     public String getElasticSearchConfigFile() {
         return elasticSearchConfigFile;
     }
