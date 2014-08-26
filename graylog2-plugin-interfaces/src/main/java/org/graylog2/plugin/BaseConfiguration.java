@@ -50,6 +50,9 @@ public abstract class BaseConfiguration {
     @Parameter(value = "processor_wait_strategy", required = true)
     private String processorWaitStrategy = "blocking";
 
+    @Parameter(value = "ring_size", required = true, validator = PositiveIntegerValidator.class)
+    private int ringSize = 1024;
+
     @Parameter(value = "rest_enable_cors")
     private boolean restEnableCors = false;
 
@@ -150,6 +153,10 @@ public abstract class BaseConfiguration {
                         + " Falling back to default: BlockingWaitStrategy.");
                 return new BlockingWaitStrategy();
         }
+    }
+
+    public int getRingSize() {
+        return ringSize;
     }
 
     public boolean isRestEnableCors() {
