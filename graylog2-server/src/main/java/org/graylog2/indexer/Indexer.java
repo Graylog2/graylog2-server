@@ -381,7 +381,8 @@ public class Indexer {
      */
     public boolean isConnectedAndHealthy() {
         try {
-            return !node.isClosed()
+            return node != null
+                    && !node.isClosed()
                     && cluster() != null
                     && cluster().getHealth() != ClusterHealthStatus.RED;
         } catch (ElasticsearchException e) {
