@@ -92,4 +92,8 @@ public abstract class Periodical implements Runnable {
     protected abstract Logger getLogger();
 
     public abstract void doRun();
+
+    public int getParallelism() {
+        return 1;
+    }
 }
