@@ -31,6 +31,7 @@ import org.graylog2.jersey.container.netty.SecurityContextFactory;
 import org.graylog2.radio.Configuration;
 import org.graylog2.radio.bindings.providers.AsyncHttpClientProvider;
 import org.graylog2.radio.bindings.providers.RadioInputRegistryProvider;
+import org.graylog2.radio.bindings.providers.RadioTransportProvider;
 import org.graylog2.radio.buffers.processors.RadioProcessBufferProcessor;
 import org.graylog2.radio.transports.RadioTransport;
 import org.graylog2.radio.transports.amqp.AMQPProducer;
@@ -91,16 +92,7 @@ public class RadioBindings extends AbstractModule {
     }
 
     private void bindTransport() {
-        switch (configuration.getTransportType()) {
-            case AMQP:
-                bind(RadioTransport.class).to(AMQPProducer.class);
-                break;
-            case KAFKA:
-                bind(RadioTransport.class).to(KafkaProducer.class);
-                break;
-            default:
-                throw new RuntimeException("Cannot map transport type to transport.");
-        }
+        bind(RadioTransport.class).toProvider(RadioTransportProvider.class);
     }
 
     private void bindDynamicFeatures() {
