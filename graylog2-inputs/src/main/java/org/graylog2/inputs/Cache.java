@@ -18,13 +18,17 @@ package org.graylog2.inputs;
 
 import org.graylog2.plugin.Message;
 
+import java.util.Collection;
+
 /**
  * 
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public interface Cache {
     public void add(Message m);
+    public void add(Collection<Message> m);
     public Message pop();
+    public int drainTo(Collection<? super Message> c, int limit);
     public int size();
     public boolean isEmpty();
 }

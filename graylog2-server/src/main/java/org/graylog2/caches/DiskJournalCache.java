@@ -35,6 +35,9 @@ import javax.inject.Inject;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -153,6 +156,12 @@ public abstract class DiskJournalCache implements InputCache, OutputCache {
     }
 
     @Override
+    public void add(Collection<Message> m) {
+        for (Message message : m)
+            add(message);
+    }
+
+    @Override
     public Message pop() {
         if (LOG.isTraceEnabled()) {
             LOG.trace("Consuming message from cache");
@@ -178,6 +187,37 @@ public abstract class DiskJournalCache implements InputCache, OutputCache {
             time.stop();
             return null;
         }
+    }
+
+    @Override
+    public int drainTo(Collection<? super Message> c, int n) {
+        if (LOG.isTraceEnabled()) {
+            LOG.trace("Consuming message from cache");
+        }
+        if (db.isClosed()) {
+            return 0;
+        }
+
+        final Timer.Context time = popTimer.time();
+        final List<byte[]> resultList = new ArrayList<>();
+        queue.drainTo(resultList, n);
+
+        int result = 0;
+
+        for (byte[] bytes : resultList) {
+            if (bytes != null) {
+                counter.decrementAndGet();
+                try {
+                    c.add(serializer.deserialize(bytes));
+                    result += 1;
+                } catch (IOException e) {
+                    LOG.error("Error deserializing message", e);
+                }
+            }
+        }
+        time.stop();
+
+        return result;
     }
 
     @Override

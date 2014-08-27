@@ -20,6 +20,7 @@ import com.codahale.metrics.MetricRegistry;
 import com.google.inject.Inject;
 import org.graylog2.buffers.OutputBuffer;
 import org.graylog2.inputs.OutputCache;
+import org.graylog2.plugin.BaseConfiguration;
 import org.graylog2.plugin.ServerStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,8 +41,9 @@ public class OutputCacheWorkerThread extends AbstractCacheWorkerThread {
     public OutputCacheWorkerThread(MetricRegistry metricRegistry,
                                    OutputCache outputCache,
                                    OutputBuffer outputBuffer,
-                                   ServerStatus serverStatus) {
-        super(serverStatus);
+                                   ServerStatus serverStatus,
+                                   BaseConfiguration configuration) {
+        super(serverStatus, configuration);
         this.metricRegistry = metricRegistry;
         this.outputCache = outputCache;
         this.outputBuffer = outputBuffer;

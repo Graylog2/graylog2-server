@@ -26,6 +26,8 @@ import com.lmax.disruptor.RingBuffer;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.inputs.MessageInput;
 
+import java.util.List;
+
 /**
  *
  * @author Lennart Koopmann <lennart@socketfeed.com>
@@ -36,13 +38,19 @@ public abstract class Buffer {
 
     public abstract void insertFailFast(Message message, MessageInput sourceInput) throws BufferOutOfCapacityException, ProcessingDisabledException;
     public abstract void insertCached(Message message, MessageInput sourceInput);
+    public abstract void insertFailFast(List<Message> messages) throws BufferOutOfCapacityException, ProcessingDisabledException;
+    public abstract void insertCached(List<Message> messages);
 
     public boolean isEmpty() {
         return getUsage() == 0;
     }
 
     public boolean hasCapacity() {
-        return ringBuffer.remainingCapacity() > 0;
+        return ringBuffer.hasAvailableCapacity(1);
+    }
+
+    public boolean hasCapacity(int n) {
+        return ringBuffer.hasAvailableCapacity(n);
     }
 
     public long getUsage() {
@@ -51,5 +59,28 @@ public abstract class Buffer {
         }
         return (long) ringBuffer.getBufferSize() -ringBuffer.remainingCapacity();
     }
-    
+
+    protected void insert(Message message) {
+        long sequence = ringBuffer.next();
+        MessageEvent event = ringBuffer.get(sequence);
+        event.setMessage(message);
+        ringBuffer.publish(sequence);
+
+        afterInsert(1);
+
+    }
+
+    protected abstract void afterInsert(int n);
+
+    protected void insert(Message[] messages) {
+        int length = messages.length;
+        long hi = ringBuffer.next(length);
+        long lo = hi - (length - 1);
+        for (long sequence = lo; sequence <= hi; sequence++) {
+            MessageEvent event = ringBuffer.get(sequence);
+            event.setMessage(messages[(int)(sequence - lo)]);
+        }
+        ringBuffer.publish(lo, hi);
+        afterInsert(length);
+    }
 }
