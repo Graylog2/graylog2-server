@@ -36,8 +36,7 @@ public class RadioProcessBufferProcessor extends ProcessBufferProcessor {
         public RadioProcessBufferProcessor create(
                 AtomicInteger processBufferWatermark,
                 @Assisted("ordinal") final long ordinal,
-                @Assisted("numberOfConsumers") final long numberOfConsumers,
-                RadioTransport radioTransport
+                @Assisted("numberOfConsumers") final long numberOfConsumers
         );
     }
 
@@ -48,10 +47,10 @@ public class RadioProcessBufferProcessor extends ProcessBufferProcessor {
     @AssistedInject
     public RadioProcessBufferProcessor(MetricRegistry metricRegistry,
                                        ThroughputStats throughputStats,
+                                       RadioTransport radioTransport,
                                        @Assisted AtomicInteger processBufferWatermark,
                                        @Assisted("ordinal") final long ordinal,
-                                       @Assisted("numberOfConsumers") final long numberOfConsumers,
-                                       @Assisted RadioTransport radioTransport) {
+                                       @Assisted("numberOfConsumers") final long numberOfConsumers) {
         super(metricRegistry, processBufferWatermark, ordinal, numberOfConsumers);
         this.throughputStats = throughputStats;
         this.radioTransport = radioTransport;
@@ -61,6 +60,7 @@ public class RadioProcessBufferProcessor extends ProcessBufferProcessor {
     protected void handleMessage(Message msg) {
         radioTransport.send(msg);
         throughputStats.getThroughputCounter().add(1);
-        LOG.debug("Message <{}> written to RadioTransport.", msg.getId());
+        if (LOG.isDebugEnabled())
+            LOG.debug("Message <{}> written to RadioTransport.", msg.getId());
     }
 }
