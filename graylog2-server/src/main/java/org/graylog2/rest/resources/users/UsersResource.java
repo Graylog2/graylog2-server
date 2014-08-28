@@ -18,6 +18,8 @@ package org.graylog2.rest.resources.users;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.google.common.base.Objects;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -275,6 +277,37 @@ public class UsersResource extends RestResource {
         return Response.noContent().build();
     }
 
+    @PUT
+    @Path("{username}/preferences")
+    @RequiresPermissions(USERS_EDIT)
+    @ApiOperation("Update a user's preferences set.")
+    @ApiResponses({
+            @ApiResponse(code = 400, message = "Missing or invalid permission data.")
+    })
+    public Response savePreferences(
+            @ApiParam(title = "username", description = "The name of the user to modify.", required = true) @PathParam("username") String username,
+            @ApiParam(title = "JSON body", description = "The map of preferences to assign to the user.", required = true) String body) {
+        Map<String, Object> preferencesRequest;
+        try {
+            preferencesRequest = objectMapper.readValue(body, TypeFactory.defaultInstance().constructMapType(Map.class, String.class, Object.class));
+        } catch (IOException e) {
+            throw new BadRequestException(e);
+        }
+
+        final User user = userService.load(username);
+        if (user == null) {
+            return status(NOT_FOUND).build();
+        }
+        user.setPreferences(preferencesRequest);
+        try {
+            userService.save(user);
+        } catch (ValidationException e) {
+            LOG.error("Validation error.", e);
+            throw new BadRequestException("Validation error for " + username, e);
+        }
+        return Response.noContent().build();
+    }
+
     @DELETE
     @Path("{username}/permissions")
     @RequiresPermissions(RestPermissions.USERS_PERMISSIONSEDIT)
@@ -437,6 +470,10 @@ public class UsersResource extends RestResource {
         map.put("full_name", user.getFullName());
         if (includePermissions) {
             map.put("permissions", user.getPermissions());
+        }
+        final Map<String, Object> preferences = user.getPreferences();
+        if (!preferences.isEmpty()) {
+            map.put("preferences", preferences);
         }
         if (user.getTimeZone() != null) {
             map.put("timezone", user.getTimeZone().getID());
