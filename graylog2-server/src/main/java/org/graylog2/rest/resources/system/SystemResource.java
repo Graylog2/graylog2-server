@@ -44,6 +44,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 import java.io.ByteArrayOutputStream;
 import java.lang.management.ManagementFactory;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.Set;
 
@@ -52,10 +53,6 @@ import static javax.ws.rs.core.MediaType.TEXT_PLAIN;
 import static javax.ws.rs.core.Response.accepted;
 import static javax.ws.rs.core.Response.ok;
 
-
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 @RequiresAuthentication
 @Api(value = "System", description = "System information of this node.")
 @Path("/system")
@@ -207,7 +204,7 @@ public class SystemResource extends RestResource {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
 
         threadDump.dump(output);
-        return output.toString();
+        return new String(output.toByteArray(), StandardCharsets.UTF_8);
     }
 
     @GET @Timed

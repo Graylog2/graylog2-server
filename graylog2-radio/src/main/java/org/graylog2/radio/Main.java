@@ -188,8 +188,8 @@ public class Main extends NodeRunner {
         }
 
         if (configuration.getRestTransportUri() == null) {
-            configuration.setRestTransportUri(configuration.getDefaultRestTransportUri().toString());
-            LOG.info("No rest_transport_uri set. Falling back to [{}].", configuration.getRestTransportUri());
+            configuration.setRestTransportUri(configuration.getDefaultRestTransportUri());
+            LOG.debug("No rest_transport_uri set. Using default [{}].", configuration.getRestTransportUri());
         }
 
         return configuration;

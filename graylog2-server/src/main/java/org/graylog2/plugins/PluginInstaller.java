@@ -28,6 +28,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -113,7 +114,7 @@ public class PluginInstaller {
             }
             
             BufferedReader rd = new BufferedReader(
-                    new InputStreamReader(connection.getInputStream())
+                    new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8)
             );
             
             result = objectMapper.readValue(rd.readLine(), PluginApiResponse.class);

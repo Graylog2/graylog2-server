@@ -31,12 +31,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.InetSocketAddress;
+import java.nio.charset.StandardCharsets;
 
 import static com.codahale.metrics.MetricRegistry.name;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public class RawDispatcher extends SimpleChannelHandler {
 
     private static final Logger LOG = LoggerFactory.getLogger(RawDispatcher.class);
@@ -64,7 +62,7 @@ public class RawDispatcher extends SimpleChannelHandler {
         byte[] readable = new byte[buffer.readableBytes()];
         buffer.toByteBuffer().get(readable, buffer.readerIndex(), buffer.readableBytes());
 
-        this.processor.messageReceived(new String(readable), remoteAddress.getAddress());
+        this.processor.messageReceived(new String(readable, StandardCharsets.UTF_8), remoteAddress.getAddress());
     }
 
     @Override

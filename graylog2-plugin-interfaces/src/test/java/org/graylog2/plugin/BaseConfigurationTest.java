@@ -40,7 +40,7 @@ import java.util.Map;
 public class BaseConfigurationTest {
     private class Configuration extends BaseConfiguration {
         @Parameter(value = "rest_listen_uri", required = true)
-        private String restListenUri = "http://127.0.0.1:12900/";
+        private URI restListenUri = URI.create("http://127.0.0.1:12900/");
 
         @Parameter(value = "node_id_file", required = false)
         private String nodeIdFile = "/etc/graylog2-server-node-id";
@@ -52,7 +52,7 @@ public class BaseConfigurationTest {
 
         @Override
         public URI getRestListenUri() {
-            return Tools.getUriStandard(restListenUri);
+            return Tools.getUriWithPort(restListenUri, BaseConfiguration.GRAYLOG2_DEFAULT_PORT);
         }
     }
 

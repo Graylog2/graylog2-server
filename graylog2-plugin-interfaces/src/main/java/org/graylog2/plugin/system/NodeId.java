@@ -27,11 +27,14 @@ import org.graylog2.plugin.Tools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.List;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public class NodeId {
 
     private static final Logger LOG = LoggerFactory.getLogger(NodeId.class);
@@ -63,14 +66,9 @@ public class NodeId {
     }
 
     private String read() throws IOException {
-        BufferedReader br = new BufferedReader(new FileReader(filename));
-        try {
-            return br.readLine();
-        } finally {
-            if (br != null) {
-                br.close();
-            }
-        }
+        final List<String> lines = Files.readAllLines(Paths.get(filename), StandardCharsets.UTF_8);
+
+        return lines.size() > 0 ? lines.get(0) : "";
     }
 
     private String generate() {

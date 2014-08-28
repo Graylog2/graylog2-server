@@ -39,12 +39,8 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 
 /**
  * Helper class to hold configuration of Graylog2
- *
- * @author Lennart Koopmann <lennart@socketfeed.com>
- * @author Jochen Schalanda <jochen@schalanda.name>
  */
 public class Configuration extends BaseConfiguration {
-
     private static final Logger LOG = LoggerFactory.getLogger(Configuration.class);
 
     @Parameter(value = "is_master", required = true)
@@ -54,7 +50,7 @@ public class Configuration extends BaseConfiguration {
     private String passwordSecret;
 
     @Parameter(value = "rest_listen_uri", required = true)
-    private String restListenUri = "http://127.0.0.1:12900/";
+    private URI restListenUri = URI.create("http://127.0.0.1:" + GRAYLOG2_DEFAULT_PORT);
 
     @Parameter(value = "udp_recvbuffer_sizes", required = true, validator = PositiveIntegerValidator.class)
     private int udpRecvBufferSizes = 1048576;
@@ -433,7 +429,7 @@ public class Configuration extends BaseConfiguration {
     }
 
     public URI getRestListenUri() {
-        return Tools.getUriStandard(restListenUri);
+        return Tools.getUriWithPort(restListenUri, GRAYLOG2_DEFAULT_PORT);
     }
 
     public String getRootUsername() {

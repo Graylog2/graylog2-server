@@ -43,14 +43,12 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
-/**
- * @author Bernd Ahlers <bernd@torch.sh>
- */
 public class MessageToJsonSerializer {
     private static final Logger LOG = LoggerFactory.getLogger(MessageToJsonSerializer.class);
 
@@ -221,7 +219,7 @@ public class MessageToJsonSerializer {
     }
 
     public Message deserialize(String string) throws IOException {
-        return deserialize(string.getBytes());
+        return deserialize(string.getBytes(StandardCharsets.UTF_8));
     }
 
     private Stream getStream(String id) {
