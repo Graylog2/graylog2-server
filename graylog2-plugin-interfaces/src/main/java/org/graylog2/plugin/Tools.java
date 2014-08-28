@@ -34,7 +34,6 @@ import org.joda.time.format.DateTimeParser;
 import org.joda.time.format.ISODateTimeFormat;
 import org.slf4j.Logger;
 
-import javax.ws.rs.core.UriBuilder;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -407,18 +406,26 @@ public final class Tools {
         return InetAddress.getLoopbackAddress();
     }
 
-    public static URI getUriStandard(String from) {
-        try {
-            URI uri = new URI(from);
+    public static URI getUriWithPort(final URI uri, final int port) {
+        if(uri == null) {
+            return null;
+        }
 
-            // The port is set to -1 if not defined. Default to 80 here.
+        try {
             if (uri.getPort() == -1) {
-                return UriBuilder.fromUri(uri).port(80).build();
+                return new URI(
+                        uri.getScheme(),
+                        uri.getUserInfo(),
+                        uri.getHost(),
+                        port,
+                        uri.getPath(),
+                        uri.getQuery(),
+                        uri.getFragment());
             }
 
             return uri;
         } catch (URISyntaxException e) {
-            throw new RuntimeException("Could not parse REST listen URI.", e);
+            throw new RuntimeException("Could not parse URI.", e);
         }
     }
 

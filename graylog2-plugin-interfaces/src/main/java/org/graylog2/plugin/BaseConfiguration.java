@@ -25,21 +25,23 @@ package org.graylog2.plugin;
 import com.github.joschi.jadconfig.Parameter;
 import com.github.joschi.jadconfig.validators.InetPortValidator;
 import com.github.joschi.jadconfig.validators.PositiveIntegerValidator;
-import com.lmax.disruptor.*;
+import com.lmax.disruptor.BlockingWaitStrategy;
+import com.lmax.disruptor.BusySpinWaitStrategy;
+import com.lmax.disruptor.SleepingWaitStrategy;
+import com.lmax.disruptor.WaitStrategy;
+import com.lmax.disruptor.YieldingWaitStrategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.InetAddress;
 import java.net.URI;
 
-/**
- * @author Dennis Oelkers <dennis@torch.sh>
- */
 public abstract class BaseConfiguration {
     private static final Logger LOG = LoggerFactory.getLogger(BaseConfiguration.class);
+    protected static final int GRAYLOG2_DEFAULT_PORT = 12900;
 
-    @Parameter(value = "rest_transport_uri", required = false)
-    private String restTransportUri;
+    @Parameter(value = "rest_transport_uri")
+    private URI restTransportUri;
 
     @Parameter(value = "processbuffer_processors", required = true, validator = PositiveIntegerValidator.class)
     private int processBufferProcessors = 5;
@@ -69,14 +71,10 @@ public abstract class BaseConfiguration {
     private long inputCacheMaxSize = 0;
 
     public URI getRestTransportUri() {
-        if (restTransportUri == null || restTransportUri.isEmpty()) {
-            return null;
-        }
-
-        return Tools.getUriStandard(restTransportUri);
+        return Tools.getUriWithPort(restTransportUri, GRAYLOG2_DEFAULT_PORT);
     }
 
-    public void setRestTransportUri(String restTransportUri) {
+    public void setRestTransportUri(final URI restTransportUri) {
         this.restTransportUri = restTransportUri;
     }
 
@@ -84,12 +82,12 @@ public abstract class BaseConfiguration {
         final URI transportUri;
         final URI listenUri = getRestListenUri();
 
-        if (listenUri.getHost().equals("0.0.0.0")) {
+        if ("0.0.0.0".equals(listenUri.getHost())) {
             final InetAddress guessedAddress;
             try {
                 guessedAddress = Tools.guessPrimaryNetworkAddress();
 
-                if(guessedAddress.isLoopbackAddress()) {
+                if (guessedAddress.isLoopbackAddress()) {
                     LOG.debug("Using loopback address {}", guessedAddress);
                 }
             } catch (Exception e) {
@@ -97,7 +95,8 @@ public abstract class BaseConfiguration {
                 throw new RuntimeException("No rest_transport_uri.", e);
             }
 
-            transportUri = Tools.getUriStandard("http://" + guessedAddress.getHostAddress() + ":" + listenUri.getPort());
+            transportUri = Tools.getUriWithPort(
+                    URI.create("http://" + guessedAddress.getHostAddress() + ":" + listenUri.getPort()), GRAYLOG2_DEFAULT_PORT);
         } else {
             transportUri = listenUri;
         }
@@ -160,5 +159,6 @@ public abstract class BaseConfiguration {
     }
 
     public abstract String getNodeIdFile();
+
     public abstract URI getRestListenUri();
 }
