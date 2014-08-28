@@ -166,9 +166,15 @@ $(document).ready(function() {
 
         var container = $(this).closest(".saved-searches-selector-container");
         if(!!container.attr("data-stream-id")) {
-            var url = "/savedsearches/" + encodeURI(searchId) + "/execute?" + "streamId=" + container.attr("data-stream-id") + "&width=" + width;
+            var url = "/savedsearches/" + encodeURI(searchId) + "/execute?" + "streamId=" + container.attr("data-stream-id");
+            if(width != null && width != '') {
+                url += "&width=" + width;
+            }
         } else {
-            var url = "/savedsearches/" + encodeURI(searchId) + "/execute" + "?width=" + width;
+            var url = "/savedsearches/" + encodeURI(searchId) + "/execute";
+            if(width != null && width != '') {
+                url += "?width=" + width;
+            }
         }
 
         window.location = appPrefixed(url);

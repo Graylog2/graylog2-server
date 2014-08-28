@@ -136,7 +136,7 @@ public class DashboardsApiController extends AuthenticatedController {
             DashboardWidget widget = dashboard.getWidget(widgetId);
             DashboardWidgetValueResponse widgetValue = widget.getValue(api());
 
-            Object resultValue = filterValuesByResolution(resolution, widgetValue.result);
+            Object resultValue = (widget instanceof SearchResultChartWidget) ? filterValuesByResolution(resolution, widgetValue.result) : widgetValue.result;
             Map<String, Object> result = Maps.newHashMap();
             result.put("result", resultValue);
             result.put("took_ms", widgetValue.tookMs);

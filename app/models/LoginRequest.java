@@ -27,4 +27,35 @@ public class LoginRequest {
 	@Required public String password;
 	@Required public boolean noStartpage;
 
+    public String getDestination() {
+        return destination;
+    }
+
+    public void setDestination(String destination) {
+        this.destination = destination;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public boolean isNoStartpage() {
+        return noStartpage;
+    }
+
+    public void setNoStartpage(boolean noStartpage) {
+        this.noStartpage = noStartpage;
+    }
 }

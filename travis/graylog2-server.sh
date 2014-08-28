@@ -1,17 +1,19 @@
-#!/bin/bash
+#!/bin/bash -e
+cd $HOME
 
-pushd $HOME
-
-git clone https://github.com/Graylog2/graylog2-server.git
+echo 'Cloning graylog2-server git repository...'
+git clone --quiet --depth 1 https://github.com/Graylog2/graylog2-server.git
 
 pushd graylog2-server
 
 sh install-syslog4j-jar.sh
-mvn clean package -DskipTests
 
-mvn install
+echo 'Building graylog2-server...'
+mvn --batch-mode --fail-fast --quiet -DskipTests=true \
+  -Dmaven.javadoc.skip=true -Dmaven.findbugs.skip=true -Dsource.skip=true \
+  clean install
 
-cp $TRAVIS_BUILD_DIR/travis/server.conf graylog2-travis-server.conf
-nohup java -jar graylog2-server/target/graylog2-server.jar -f graylog2-travis-server.conf -l -p graylog2-travis-server.pid &
+echo 'Starting graylog2-server...'
+nohup java -jar graylog2-server/target/graylog2-server.jar -f $TRAVIS_BUILD_DIR/travis/server.conf -l -p graylog2-travis-server.pid &
 
 popd

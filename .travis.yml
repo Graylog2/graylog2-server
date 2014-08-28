@@ -15,13 +15,10 @@ env:
 before_script:
 - wget http://downloads.typesafe.com/play/${PLAY_VERSION}/play-${PLAY_VERSION}.zip
 - unzip -q play-${PLAY_VERSION}.zip
-- travis/graylog2-server.sh
 - play-${PLAY_VERSION}/play update
 script: play-${PLAY_VERSION}/play test
-after_script:
-- kill `cat $HOME/graylog2-server/graylog2-travis-server.pid`
 after_success:
-- play-${PLAY_VERSION}/play package-snapshot
+- play-${PLAY_VERSION}/play universal:package-zip-tarball
 deploy:
   provider: s3
   access_key_id: AKIAIGYGO43W76PZMMVA
@@ -30,13 +27,10 @@ deploy:
   bucket: graylog2-builds
   region: eu-west-1
   skip_cleanup: true
-  local-dir: target/universal/package
+  local-dir: target/universal
   on:
     repo: Graylog2/graylog2-web-interface
     jdk: oraclejdk7
-services:
-- mongodb
-- elasticsearch
 addons:
 notifications:
   slack:
