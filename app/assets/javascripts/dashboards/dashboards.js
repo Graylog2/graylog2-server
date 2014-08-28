@@ -187,16 +187,25 @@ $(document).ready(function() {
         $("form.edit-dashboard-form").show();
     });
 
+    function displayUpdateUnfocussed(updateUnfocussed) {
+        if (updateUnfocussed) {
+            $(".update-onfocussed-on").hide();
+            $(".update-onfocussed-off").show();
+        } else {
+            $(".update-onfocussed-on").show();
+            $(".update-onfocussed-off").hide();
+        }
+    }
+    displayUpdateUnfocussed(userPreferences && userPreferences.updateUnfocussed);
+
     $(".update-onfocussed-on").on("click", function() {
-        $(".update-onfocussed-on").hide();
-        $(".update-onfocussed-off").show();
+        displayUpdateUnfocussed(true);
         setUpdateUnfocussedMode(true);
         alert("Window will be updated even when unfocussed");
     });
 
     $(".update-onfocussed-off").on("click", function() {
-        $(".update-onfocussed-on").show();
-        $(".update-onfocussed-off").hide();
+        displayUpdateUnfocussed(false);
         setUpdateUnfocussedMode(false);
         alert("Window will no longer be updated when unfocussed");
     });

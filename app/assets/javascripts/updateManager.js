@@ -1,8 +1,8 @@
-(function (exports) {
+(function (exports, userPreferences) {
     'use strict';
 
     var focussed = true;
-    var updateUnfocussed = false;
+    var updateUnfocussed = userPreferences.updateUnfocussed;
 
     $(window).blur(function () {
         setFocus(false);
@@ -35,6 +35,11 @@
         setFocus(focussed);
     }
 
+    function getUpdateUnfocussedMode() {
+        return updateUnfocussed;
+    }
+
     exports.assertUpdateEnabled = assertUpdateEnabled;
     exports.setUpdateUnfocussedMode = setUpdateUnfocussedMode;
-})(window);
+    exports.getUpdateUnfocussedMode = getUpdateUnfocussedMode;
+})(window, userPreferences || {});

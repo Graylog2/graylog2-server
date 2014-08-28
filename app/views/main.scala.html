@@ -4,11 +4,16 @@
 @import lib.security.RestPermissions._
 @import org.graylog2.restclient.lib.Configuration
 @import org.graylog2.restclient.lib.Version
+@import com.google.gson.Gson
 
-<!DOCTYPE html>
+
+    <!DOCTYPE html>
 <html lang="en">
     <head>
         <title>Graylog2 - @title</title>
+        <script type="text/javascript">
+            var userPreferences = @Html(new Gson().toJson(currentUser.getPreferences));
+        </script>
       	@partials.head()
     </head>
     <body>
