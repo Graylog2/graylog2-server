@@ -37,6 +37,7 @@ import play.mvc.Http;
 
 import javax.annotation.Nullable;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -99,7 +100,11 @@ public class User {
         this.readonly = readonly;
         this.external = external;
         this.startpage = startpage;
-        this.preferences = preferences;
+        if (preferences != null) {
+            this.preferences = preferences;
+        } else {
+            this.preferences = Collections.emptyMap();
+        }
     }
 
     public boolean update(ChangeUserRequest request) {
