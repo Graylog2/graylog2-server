@@ -429,6 +429,25 @@ public final class Tools {
         }
     }
 
+    public static URI getUriWithScheme(final URI uri, final String scheme) {
+            if(uri == null) {
+                return null;
+            }
+
+            try {
+                return new URI(
+                        scheme,
+                        uri.getUserInfo(),
+                        uri.getHost(),
+                        uri.getPort(),
+                        uri.getPath(),
+                        uri.getQuery(),
+                        uri.getFragment());
+            } catch (URISyntaxException e) {
+                throw new RuntimeException("Could not parse URI.", e);
+            }
+        }
+
     public static <T, E> T getKeyByValue(Map<T, E> map, E value) {
         for (Map.Entry<T, E> entry : map.entrySet()) {
             if (value.equals(entry.getValue())) {

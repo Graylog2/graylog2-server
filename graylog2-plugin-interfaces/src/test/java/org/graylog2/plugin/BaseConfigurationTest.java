@@ -37,6 +37,8 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.Map;
 
+import static org.testng.AssertJUnit.assertEquals;
+
 public class BaseConfigurationTest {
     private class Configuration extends BaseConfiguration {
         @Parameter(value = "rest_listen_uri", required = true)
@@ -112,5 +114,19 @@ public class BaseConfigurationTest {
         new JadConfig(new InMemoryRepository(validProperties), configuration).process();
 
         Assert.assertEquals("http://10.0.0.1:12900", configuration.getDefaultRestTransportUri().toString());
+    }
+
+    @Test
+    public void testGetRestUriScheme() throws RepositoryException, ValidationException {
+        validProperties.put("rest_enable_tls", "false");
+        final Configuration configWithoutTls = new Configuration();
+        new JadConfig(new InMemoryRepository(validProperties), configWithoutTls).process();
+
+        validProperties.put("rest_enable_tls", "true");
+        final Configuration configWithTls = new Configuration();
+        new JadConfig(new InMemoryRepository(validProperties), configWithTls).process();
+
+        assertEquals("http", configWithoutTls.getRestUriScheme());
+        assertEquals("https", configWithTls.getRestUriScheme());
     }
 }

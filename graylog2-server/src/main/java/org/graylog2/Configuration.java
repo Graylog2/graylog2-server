@@ -38,6 +38,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static org.graylog2.plugin.Tools.getUriWithPort;
+import static org.graylog2.plugin.Tools.getUriWithScheme;
 
 /**
  * Helper class to hold configuration of Graylog2
@@ -456,16 +458,9 @@ public class Configuration extends BaseConfiguration {
         return nodeIdFile;
     }
 
-    @ValidatorMethod
-    public void validate() throws ValidationException {
-
-        if (isMongoUseAuth() && (isNullOrEmpty(getMongoUser()) || isNullOrEmpty(getMongoPassword()))) {
-            throw new ValidationException("mongodb_user and mongodb_password have to be set if mongodb_useauth is true");
-        }
-    }
-
+    @Override
     public URI getRestListenUri() {
-        return Tools.getUriWithPort(restListenUri, GRAYLOG2_DEFAULT_PORT);
+        return getUriWithPort(getUriWithScheme(restListenUri, getRestUriScheme()), GRAYLOG2_DEFAULT_PORT);
     }
 
     public String getRootUsername() {
@@ -735,6 +730,13 @@ public class Configuration extends BaseConfiguration {
         @Override
         public String convertTo(Period value) {
             return null;
+        }
+    }
+
+    @ValidatorMethod
+    public void validate() throws ValidationException {
+        if (isMongoUseAuth() && (isNullOrEmpty(getMongoUser()) || isNullOrEmpty(getMongoPassword()))) {
+            throw new ValidationException("mongodb_user and mongodb_password have to be set if mongodb_useauth is true");
         }
     }
 }
