@@ -50,7 +50,7 @@ public class Configuration extends BaseConfiguration {
     private String passwordSecret;
 
     @Parameter(value = "rest_listen_uri", required = true)
-    private URI restListenUri = URI.create("http://127.0.0.1:" + GRAYLOG2_DEFAULT_PORT);
+    private URI restListenUri = URI.create("http://127.0.0.1:" + GRAYLOG2_DEFAULT_PORT + "/");
 
     @Parameter(value = "udp_recvbuffer_sizes", required = true, validator = PositiveIntegerValidator.class)
     private int udpRecvBufferSizes = 1048576;

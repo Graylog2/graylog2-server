@@ -38,7 +38,7 @@ public class Configuration extends BaseConfiguration {
     private String transportType = "amqp";
 
     @Parameter(value = "rest_listen_uri", required = true)
-    private URI restListenUri = URI.create("http://127.0.0.1:" + RADIO_DEFAULT_PORT);
+    private URI restListenUri = URI.create("http://127.0.0.1:" + RADIO_DEFAULT_PORT + "/");
 
     @Parameter(value = "graylog2_server_uri", required = true)
     private URI graylog2ServerUri;
