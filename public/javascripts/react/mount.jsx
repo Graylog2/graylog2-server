@@ -4,7 +4,7 @@ $(document).ready(function () {
     var editUserPreferencesButton = document.getElementById('react-user-preferences-button');
     if (editUserPreferencesButton) {
         var userName = editUserPreferencesButton.getAttribute('data-user-name');
-        React.renderComponent(<UserPreferencesButton user={userName} />, editUserPreferencesButton);
+        React.renderComponent(<UserPreferencesButton userName={userName} />, editUserPreferencesButton);
     }
 
     var editUserPreferences = document.getElementById('react-user-preferences-modal');
