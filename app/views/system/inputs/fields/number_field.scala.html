@@ -14,7 +14,7 @@
         required
     }
 
-    type="number"
+    type="number" min="@Integer.MIN_VALUE" max="@Integer.MAX_VALUE"
     @if(!field.getDefaultValue().toString().isEmpty()) {
         value="@Math.round(Float.parseFloat(field.getDefaultValue().toString))"
     }
@@ -22,5 +22,4 @@
     @if(!field.getAttributes.isEmpty) {
         data-validate="@field.getAttributesAsJSValidationSpec"
     }
-
     class="input-xlarge validatable">
