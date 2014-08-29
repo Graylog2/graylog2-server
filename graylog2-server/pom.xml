@@ -234,7 +234,6 @@
         <dependency>
             <groupId>org.apache.lucene</groupId>
             <artifactId>lucene-queryparser</artifactId>
-            <version>4.6.0</version>
         </dependency>
 
         <dependency>

@@ -25,7 +25,11 @@ import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.common.xcontent.XContentHelper;
-import org.elasticsearch.index.query.*;
+import org.elasticsearch.index.query.BoolFilterBuilder;
+import org.elasticsearch.index.query.FilterBuilders;
+import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.index.query.QueryStringQueryBuilder;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.facet.FacetBuilders;
 import org.elasticsearch.search.facet.datehistogram.DateHistogramFacet;
@@ -42,7 +46,15 @@ import org.graylog2.indexer.Deflector;
 import org.graylog2.indexer.IndexHelper;
 import org.graylog2.indexer.Indexer;
 import org.graylog2.indexer.ranges.IndexRangeService;
-import org.graylog2.indexer.results.*;
+import org.graylog2.indexer.results.CountResult;
+import org.graylog2.indexer.results.DateHistogramResult;
+import org.graylog2.indexer.results.FieldHistogramResult;
+import org.graylog2.indexer.results.FieldStatsResult;
+import org.graylog2.indexer.results.HistogramResult;
+import org.graylog2.indexer.results.ScrollResult;
+import org.graylog2.indexer.results.SearchResult;
+import org.graylog2.indexer.results.TermsResult;
+import org.graylog2.indexer.results.TermsStatsResult;
 import org.graylog2.indexer.searches.timeranges.TimeRange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,9 +67,6 @@ import java.util.concurrent.TimeUnit;
 import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
 import static org.elasticsearch.index.query.QueryBuilders.queryString;
 
-/**
- * @author Lennart Koopmann <lennart@socketfeed.com>
- */
 public class Searches {
     private static final Logger LOG = LoggerFactory.getLogger(Searches.class);
 
@@ -408,7 +417,7 @@ public class Searches {
         }
 
         if (range != null) {
-            srb.setFilter(IndexHelper.getTimestampRangeFilter(range));
+            srb.setPostFilter(IndexHelper.getTimestampRangeFilter(range));
         }
 
         if (sort != null) {
@@ -435,7 +444,7 @@ public class Searches {
         SearchRequestBuilder srb = standardSearchRequest(query, indices, limit, offset, range, sort);
 
         if (range != null && filter != null) {
-            srb.setFilter(standardFilters(range, filter));
+            srb.setPostFilter(standardFilters(range, filter));
         }
 
         return srb;
