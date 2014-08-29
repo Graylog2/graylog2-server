@@ -27,17 +27,15 @@ import javax.inject.Provider;
  * @author Dennis Oelkers <dennis@torch.sh>
  */
 public class LdapConnectorProvider implements Provider<LdapConnector> {
-    private static LdapConnector ldapConnector = null;
+    private final Configuration configuration;
 
     @Inject
     public LdapConnectorProvider(final Configuration configuration) {
-        if (ldapConnector == null) {
-            ldapConnector = new LdapConnector(configuration.getLdapConnectionTimeout());
-        }
+        this.configuration = configuration;
     }
 
     @Override
     public LdapConnector get() {
-        return ldapConnector;
+        return new LdapConnector(configuration.getLdapConnectionTimeout());
     }
 }

@@ -33,19 +33,20 @@ import javax.inject.Provider;
  * @author Dennis Oelkers <dennis@torch.sh>
  */
 public class GELFChunkManagerProvider implements Provider<GELFChunkManager> {
-    private static GELFChunkManager gelfChunkManager = null;
+    private final MetricRegistry metricRegistry;
+    private final ProcessBuffer processBuffer;
 
     @Inject
     public GELFChunkManagerProvider(MetricRegistry metricRegistry,
                                     ProcessBuffer processBuffer) {
-        if (gelfChunkManager == null) {
-            gelfChunkManager = new GELFChunkManager(metricRegistry, processBuffer);
-            gelfChunkManager.setName("gelf-chunk-manager");
-        }
+        this.metricRegistry = metricRegistry;
+        this.processBuffer = processBuffer;
     }
 
     @Override
     public GELFChunkManager get() {
+        final GELFChunkManager gelfChunkManager = new GELFChunkManager(metricRegistry, processBuffer);
+        gelfChunkManager.setName("gelf-chunk-manager");
         return gelfChunkManager;
     }
 }
