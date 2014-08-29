@@ -21,10 +21,19 @@ package controllers;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import lib.*;
+import lib.BreadcrumbList;
 import lib.security.RestPermissions;
-import org.graylog2.restclient.models.*;
-import org.graylog2.restclient.lib.*;
+import org.graylog2.restclient.lib.APIException;
+import org.graylog2.restclient.lib.ApiClient;
+import org.graylog2.restclient.lib.ExclusiveInputException;
+import org.graylog2.restclient.lib.ServerNodes;
+import org.graylog2.restclient.models.ClusterEntity;
+import org.graylog2.restclient.models.Input;
+import org.graylog2.restclient.models.InputService;
+import org.graylog2.restclient.models.InputState;
+import org.graylog2.restclient.models.Node;
+import org.graylog2.restclient.models.NodeService;
+import org.graylog2.restclient.models.Radio;
 import org.graylog2.restclient.models.api.requests.inputs.LaunchInputRequest;
 import org.graylog2.restclient.models.api.responses.system.InputTypeSummaryResponse;
 import play.data.Form;
@@ -36,9 +45,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public class InputsController extends AuthenticatedController {
 
     public static final Form<LaunchInputRequest> launchInputRequestForm = Form.form(LaunchInputRequest.class);
@@ -199,23 +205,28 @@ public class InputsController extends AuthenticatedController {
         }
     }
 
-    protected Map<String, Object> extractConfiguration(Map<String, Object> form, InputTypeSummaryResponse inputInfo) {
-        Map<String, Object> configuration = Maps.newHashMap();
-        for (Map.Entry<String, Object> entry : form.entrySet()) {
-            Object value;
+    protected Map<String, Object> extractConfiguration(Map<String, Object> form, InputTypeSummaryResponse inputInfo)
+            throws IllegalArgumentException {
+        Map<String, Object> configuration = Maps.newHashMapWithExpectedSize(form.size());
+        for (final Map.Entry<String, Object> entry : form.entrySet()) {
+            final Object value;
             // Decide what to cast to. (string, bool, number)
-            switch((String) inputInfo.requestedConfiguration.get(entry.getKey()).get("type")) {
+            switch ((String) inputInfo.requestedConfiguration.get(entry.getKey()).get("type")) {
                 case "text":
-                    value = entry.getValue().toString();
+                    value = String.valueOf(entry.getValue());
                     break;
                 case "number":
-                    value = Integer.parseInt(entry.getValue().toString());
+                    try {
+                        value = Integer.parseInt(String.valueOf(entry.getValue()));
+                    } catch (NumberFormatException e) {
+                        throw new IllegalArgumentException(e);
+                    }
                     break;
                 case "boolean":
-                    value = entry.getValue().toString().equals("true");
+                    value = "true".equals(String.valueOf(entry.getValue()));
                     break;
                 case "dropdown":
-                    value = entry.getValue().toString();
+                    value = String.valueOf(entry.getValue());
                     break;
                 default:
                     value = entry.getValue();
@@ -240,10 +251,10 @@ public class InputsController extends AuthenticatedController {
             InputTypeSummaryResponse inputInfo = null;
 
             String nodeId = null;
-            if(nodeIdParam != null && !nodeIdParam.isEmpty()) {
+            if (nodeIdParam != null && !nodeIdParam.isEmpty()) {
                 nodeId = nodeIdParam;
             } else {
-                if(request.node != null && !request.node.isEmpty()) {
+                if (request.node != null && !request.node.isEmpty()) {
                     nodeId = request.node;
                 }
             }
@@ -264,7 +275,13 @@ public class InputsController extends AuthenticatedController {
 
             inputInfo = node.getInputTypeInformation(request.type);
 
-            final Map<String, Object> configuration = extractConfiguration(request.configuration, inputInfo);
+            final Map<String, Object> configuration;
+
+            try {
+                configuration = extractConfiguration(request.configuration, inputInfo);
+            } catch (IllegalArgumentException e) {
+                return status(400, views.html.errors.error.render("Invalid input configuration", new RuntimeException("Invalid configuration for input " + request.title, e), request()));
+            }
 
             try {
                 Boolean result;
@@ -302,9 +319,14 @@ public class InputsController extends AuthenticatedController {
 
         try {
             final Radio radio = nodeService.loadRadio(radioId);
-            InputTypeSummaryResponse inputInfo = radio.getInputTypeInformation(request.type);
+            final InputTypeSummaryResponse inputInfo = radio.getInputTypeInformation(request.type);
 
-            Map<String, Object> configuration = extractConfiguration(request.configuration, inputInfo);
+            final Map<String, Object> configuration;
+            try {
+                configuration = extractConfiguration(request.configuration, inputInfo);
+            } catch (IllegalArgumentException e) {
+                return status(400, views.html.errors.error.render("Invalid input configuration", new RuntimeException("Invalid configuration for input " + request.title), request()));
+            }
 
             try {
                 if (radio.launchInput(request.title, request.type, false, configuration, currentUser(), inputInfo.isExclusive) == null) {
@@ -438,7 +460,7 @@ public class InputsController extends AuthenticatedController {
 
         Map<String, String[]> form = request().body().asFormUrlEncoded();
 
-        if(form.get("key") == null || form.get("value") == null) {
+        if (form.get("key") == null || form.get("value") == null) {
             flash("error", "Missing parameters.");
             return redirect(routes.InputsController.index());
         }
