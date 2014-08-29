@@ -60,13 +60,14 @@ public class Consumer {
 
     private final Buffer processBuffer;
     private final MessageInput sourceInput;
+    private final int parallelQueues;
 
     private AtomicLong totalBytesRead = new AtomicLong(0);
     private AtomicLong lastSecBytesRead = new AtomicLong(0);
     private AtomicLong lastSecBytesReadTmp = new AtomicLong(0);
 
     public Consumer(String hostname, int port, String virtualHost, String username, String password,
-                    int prefetchCount, String queue, String exchange, String routingKey,
+                    int prefetchCount, String queue, String exchange, String routingKey, int parallelQueus,
                     Buffer processBuffer, MessageInput sourceInput) {
         this.hostname = hostname;
         this.port = port;
@@ -81,6 +82,7 @@ public class Consumer {
         this.processBuffer = processBuffer;
 
         this.sourceInput = sourceInput;
+        this.parallelQueues = parallelQueus;
 
         ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
         scheduler.scheduleAtFixedRate(new Runnable() {
@@ -98,55 +100,59 @@ public class Consumer {
 
         final MessagePack msgpack = new MessagePack();
 
-        channel.basicConsume(queue, false, new DefaultConsumer(channel) {
-                @Override
-                public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) throws IOException {
-                    long deliveryTag = envelope.getDeliveryTag();
+        for (int i = 0; i < parallelQueues; i++) {
+            final String queueName = String.format(queue, i);
+            channel.queueDeclare(queueName, true, false, false, null);
+            channel.basicConsume(queueName, false, new DefaultConsumer(channel) {
+                    @Override
+                    public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) throws IOException {
+                        long deliveryTag = envelope.getDeliveryTag();
 
-                    try {
-                        totalBytesRead.addAndGet(body.length);
-                        lastSecBytesReadTmp.addAndGet(body.length);
+                        try {
+                            totalBytesRead.addAndGet(body.length);
+                            lastSecBytesReadTmp.addAndGet(body.length);
 
-                        RadioMessage msg = msgpack.read(body, RadioMessage.class);
+                            RadioMessage msg = msgpack.read(body, RadioMessage.class);
 
-                        if (!msg.strings.containsKey("message") || !msg.strings.containsKey("source") || msg.timestamp <= 0) {
-                            LOG.error("Incomplete AMQP message. Skipping.");
+                            if (!msg.strings.containsKey("message") || !msg.strings.containsKey("source") || msg.timestamp <= 0) {
+                                LOG.error("Incomplete AMQP message. Skipping.");
+                                channel.basicAck(deliveryTag, false);
+                            }
+
+                            Message event = new Message(
+                                    msg.strings.get("message"),
+                                    msg.strings.get("source"),
+                                    new DateTime(msg.timestamp)
+                            );
+
+                            event.addStringFields(msg.strings);
+                            event.addLongFields(msg.longs);
+                            event.addDoubleFields(msg.doubles);
+
+                            processBuffer.insertFailFast(event, sourceInput);
                             channel.basicAck(deliveryTag, false);
-                        }
-
-                        Message event = new Message(
-                                msg.strings.get("message"),
-                                msg.strings.get("source"),
-                                new DateTime(msg.timestamp)
-                        );
-
-                        event.addStringFields(msg.strings);
-                        event.addLongFields(msg.longs);
-                        event.addDoubleFields(msg.doubles);
-
-                        processBuffer.insertFailFast(event, sourceInput);
-                        channel.basicAck(deliveryTag, false);
-                    } catch (BufferOutOfCapacityException e) {
-                        LOG.debug("Input buffer full, requeuing message. Delaying 10 ms until trying next message.");
-                        if (channel.isOpen()) {
-                            channel.basicNack(deliveryTag, false, true);
-                            Uninterruptibles.sleepUninterruptibly(10, TimeUnit.MILLISECONDS); // TODO magic number
-                        }
-                    } catch (ProcessingDisabledException e) {
-                        LOG.debug("Message processing is disabled, requeuing message. Delaying 100 ms until trying next message.");
-                        if (channel.isOpen()) {
-                            channel.basicNack(deliveryTag, false, true);
-                            Uninterruptibles.sleepUninterruptibly(100, TimeUnit.MILLISECONDS); // TODO magic number
-                        }
-                    } catch (Exception e) {
-                        LOG.error("Error while trying to process AMQP message, requeuing message", e);
-                        if (channel.isOpen()) {
-                            channel.basicNack(deliveryTag, false, true);
+                        } catch (BufferOutOfCapacityException e) {
+                            LOG.debug("Input buffer full, requeuing message. Delaying 10 ms until trying next message.");
+                            if (channel.isOpen()) {
+                                channel.basicNack(deliveryTag, false, true);
+                                Uninterruptibles.sleepUninterruptibly(10, TimeUnit.MILLISECONDS); // TODO magic number
+                            }
+                        } catch (ProcessingDisabledException e) {
+                            LOG.debug("Message processing is disabled, requeuing message. Delaying 100 ms until trying next message.");
+                            if (channel.isOpen()) {
+                                channel.basicNack(deliveryTag, false, true);
+                                Uninterruptibles.sleepUninterruptibly(100, TimeUnit.MILLISECONDS); // TODO magic number
+                            }
+                        } catch (Exception e) {
+                            LOG.error("Error while trying to process AMQP message, requeuing message", e);
+                            if (channel.isOpen()) {
+                                channel.basicNack(deliveryTag, false, true);
+                            }
                         }
                     }
                 }
-            }
-        );
+            );
+        }
     }
 
     public void connect() throws IOException {

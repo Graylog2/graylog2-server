@@ -40,83 +40,18 @@ public class RadioAMQPInput extends AMQPInput {
     }
 
     @Override
-    public void checkConfiguration(Configuration configuration) throws ConfigurationException {
-        configuration.setString(CK_EXCHANGE, "graylog2");
-        configuration.setString(CK_QUEUE, "graylog2-radio-messages");
-        configuration.setString(CK_ROUTING_KEY, "graylog2-radio-message");
-
-        if (!checkConfig(configuration)) {
-            throw new ConfigurationException(configuration.getSource().toString());
-        }
+    protected String defaultRouttingKey() {
+        return "graylog2-radio-message";
     }
 
     @Override
-    public ConfigurationRequest getRequestedConfiguration() {
-        ConfigurationRequest cr = new ConfigurationRequest();
+    protected String defaultExchangeName() {
+        return "graylog2";
+    }
 
-        cr.addField(
-                new TextField(
-                        CK_HOSTNAME,
-                        "Broker hostname",
-                        "",
-                        "Hostname of the AMQP broker to use",
-                        ConfigurationField.Optional.NOT_OPTIONAL
-                )
-        );
-
-        cr.addField(
-                new NumberField(
-                        CK_PORT,
-                        "Broker port",
-                        5672,
-                        "Port of the AMQP broker to use",
-                        ConfigurationField.Optional.OPTIONAL,
-                        NumberField.Attribute.IS_PORT_NUMBER
-                )
-        );
-
-        cr.addField(
-                new TextField(
-                        CK_VHOST,
-                        "Broker virtual host",
-                        "/",
-                        "Virtual host of the AMQP broker to use",
-                        ConfigurationField.Optional.NOT_OPTIONAL
-                )
-        );
-
-        cr.addField(
-                new TextField(
-                        CK_USERNAME,
-                        "Username",
-                        "",
-                        "Username to connect to AMQP broker",
-                        ConfigurationField.Optional.OPTIONAL
-                )
-        );
-
-        cr.addField(
-                new TextField(
-                        CK_PASSWORD,
-                        "Password",
-                        "",
-                        "Password to connect to AMQP broker",
-                        ConfigurationField.Optional.OPTIONAL,
-                        TextField.Attribute.IS_PASSWORD
-                )
-        );
-
-        cr.addField(
-                new NumberField(
-                        CK_PREFETCH,
-                        "Prefetch count",
-                        100,
-                        "For advanced usage: AMQP prefetch count. Default is 100.",
-                        ConfigurationField.Optional.NOT_OPTIONAL
-                )
-        );
-
-        return cr;
+    @Override
+    protected String defaultQueueName() {
+        return "graylog2-radio-messages";
     }
 
     @Override

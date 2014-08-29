@@ -166,7 +166,7 @@ public class Main extends NodeRunner {
         }
     }
 
-    private static Configuration readConfiguration(final JadConfig jadConfig, final String configFile) {
+    protected static Configuration readConfiguration(final JadConfig jadConfig, final String configFile) {
         final Configuration configuration = new Configuration();
 
         jadConfig.addConfigurationBean(configuration);

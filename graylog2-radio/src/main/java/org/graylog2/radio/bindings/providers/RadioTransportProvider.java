@@ -21,6 +21,7 @@ import org.graylog2.plugin.ServerStatus;
 import org.graylog2.radio.Configuration;
 import org.graylog2.radio.transports.RadioTransport;
 import org.graylog2.radio.transports.amqp.AMQPProducer;
+import org.graylog2.radio.transports.amqp.AMQPSender;
 import org.graylog2.radio.transports.kafka.KafkaProducer;
 
 import javax.inject.Inject;
@@ -33,19 +34,24 @@ public class RadioTransportProvider implements Provider<RadioTransport> {
     private final Configuration configuration;
     private final MetricRegistry metricRegistry;
     private final ServerStatus serverStatus;
+    private final AMQPSender amqpSender;
 
     @Inject
-    public RadioTransportProvider(Configuration configuration, MetricRegistry metricRegistry, ServerStatus serverStatus) {
+    public RadioTransportProvider(Configuration configuration,
+                                  MetricRegistry metricRegistry,
+                                  ServerStatus serverStatus,
+                                  AMQPSender amqpSender) {
         this.configuration = configuration;
         this.metricRegistry = metricRegistry;
         this.serverStatus = serverStatus;
+        this.amqpSender = amqpSender;
     }
 
     @Override
     public RadioTransport get() {
         switch (configuration.getTransportType()) {
             case AMQP:
-                return new AMQPProducer(configuration, metricRegistry);
+                return new AMQPProducer(metricRegistry, configuration);
             case KAFKA:
                 return new KafkaProducer(serverStatus, configuration, metricRegistry);
             default:

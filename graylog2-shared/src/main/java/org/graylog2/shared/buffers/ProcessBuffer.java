@@ -25,8 +25,6 @@ package org.graylog2.shared.buffers;
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import com.google.inject.assistedinject.Assisted;
-import com.google.inject.assistedinject.AssistedInject;
 import com.lmax.disruptor.WaitStrategy;
 import com.lmax.disruptor.dsl.Disruptor;
 import com.lmax.disruptor.dsl.ProducerType;
@@ -45,6 +43,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import javax.inject.Inject;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -55,10 +54,6 @@ import static com.codahale.metrics.MetricRegistry.name;
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class ProcessBuffer extends Buffer {
-    public interface Factory {
-        public ProcessBuffer create(InputCache inputCache, AtomicInteger processBufferWatermark);
-    }
-
     private static final Logger LOG = LoggerFactory.getLogger(ProcessBuffer.class);
 
     public static String SOURCE_INPUT_ATTR_NAME;
@@ -80,12 +75,12 @@ public class ProcessBuffer extends Buffer {
 
     private final ServerStatus serverStatus;
 
-    @AssistedInject
+    @Inject
     public ProcessBuffer(MetricRegistry metricRegistry,
                          ServerStatus serverStatus,
                          BaseConfiguration configuration,
-                         @Assisted InputCache inputCache,
-                         @Assisted AtomicInteger processBufferWatermark) {
+                         InputCache inputCache,
+                         ProcessBufferWatermark processBufferWatermark) {
         this.serverStatus = serverStatus;
         this.configuration = configuration;
         this.inputCache = inputCache;

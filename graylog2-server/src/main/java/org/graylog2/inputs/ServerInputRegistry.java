@@ -32,6 +32,7 @@ import org.graylog2.system.activities.ActivityWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
 import java.util.List;
 
 public class ServerInputRegistry extends InputRegistry {
@@ -41,6 +42,7 @@ public class ServerInputRegistry extends InputRegistry {
     private final ServerStatus serverStatus;
     private final ActivityWriter activityWriter;
 
+    @Inject
     public ServerInputRegistry(MessageInputFactory messageInputFactory,
                                ProcessBuffer processBuffer,
                                ServerStatus serverStatus,
