@@ -54,23 +54,21 @@ public class GenericBindings extends AbstractModule {
     @Override
     protected void configure() {
         // This is holding all our metrics.
-        bind(MetricRegistry.class).toInstance(new MetricRegistry());
-        bind(ThroughputStats.class).toInstance(new ThroughputStats());
-        bind(ProcessBufferWatermark.class).toInstance(new ProcessBufferWatermark());
+        bind(MetricRegistry.class).asEagerSingleton();
+        bind(ThroughputStats.class).asEagerSingleton();
+        bind(ProcessBufferWatermark.class).asEagerSingleton();
 
         bind(InstantiationService.class).toInstance(instantiationService);
 
-        install(new FactoryModuleBuilder().build(ProcessBuffer.Factory.class));
-
-        bind(ProcessBuffer.class).toProvider(ProcessBufferProvider.class);
-        bind(GELFChunkManager.class).toProvider(GELFChunkManagerProvider.class);
+        bind(ProcessBuffer.class).asEagerSingleton();
+        bind(GELFChunkManager.class).toProvider(GELFChunkManagerProvider.class).asEagerSingleton();
         bind(NodeId.class).toProvider(NodeIdProvider.class);
 
         bind(ServiceManager.class).toProvider(ServiceManagerProvider.class).asEagerSingleton();
 
-        bind(HashedWheelTimer.class).toInstance(new HashedWheelTimer());
+        bind(HashedWheelTimer.class).asEagerSingleton();
         bind(ThroughputCounter.class);
 
-        bind(EventBus.class).toProvider(EventBusProvider.class).in(Scopes.SINGLETON);
+        bind(EventBus.class).toProvider(EventBusProvider.class).asEagerSingleton();
     }
 }
