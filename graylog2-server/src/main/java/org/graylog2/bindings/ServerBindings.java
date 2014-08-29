@@ -49,6 +49,7 @@ import org.graylog2.indexer.searches.Searches;
 import org.graylog2.inputs.BasicCache;
 import org.graylog2.inputs.InputCache;
 import org.graylog2.inputs.OutputCache;
+import org.graylog2.inputs.ServerInputRegistry;
 import org.graylog2.jersey.container.netty.SecurityContextFactory;
 import org.graylog2.plugin.BaseConfiguration;
 import org.graylog2.plugin.PluginMetaData;
@@ -63,7 +64,6 @@ import org.graylog2.security.ShiroSecurityContextFactory;
 import org.graylog2.security.ldap.LdapConnector;
 import org.graylog2.security.ldap.LdapSettingsImpl;
 import org.graylog2.security.realm.LdapUserAuthenticator;
-import org.graylog2.shared.bindings.providers.AsyncHttpClientProvider;
 import org.graylog2.shared.inputs.InputRegistry;
 import org.graylog2.shared.metrics.jersey2.MetricsDynamicBinding;
 import org.graylog2.streams.StreamRouter;
@@ -119,7 +119,7 @@ public class ServerBindings extends AbstractModule {
         bind(Configuration.class).toInstance(configuration);
         bind(BaseConfiguration.class).toInstance(configuration);
 
-        bind(MongoConnection.class).toProvider(MongoConnectionProvider.class);
+        bind(MongoConnection.class).toProvider(MongoConnectionProvider.class).asEagerSingleton();
 
         Multibinder<ServerStatus.Capability> capabilityBinder =
                 Multibinder.newSetBinder(binder(), ServerStatus.Capability.class);
@@ -128,16 +128,16 @@ public class ServerBindings extends AbstractModule {
             capabilityBinder.addBinding().toInstance(ServerStatus.Capability.MASTER);
         bind(ServerStatus.class).in(Scopes.SINGLETON);
 
-        bind(OutputBufferWatermark.class).toInstance(new OutputBufferWatermark());
-        bind(Indexer.class).toProvider(IndexerProvider.class);
-        bind(SystemJobManager.class).toProvider(SystemJobManagerProvider.class);
-        bind(InputRegistry.class).toProvider(ServerInputRegistryProvider.class).asEagerSingleton();
+        bind(OutputBufferWatermark.class).asEagerSingleton();
+        bind(Indexer.class).asEagerSingleton();
+        bind(SystemJobManager.class).asEagerSingleton();
+        bind(InputRegistry.class).to(ServerInputRegistry.class).asEagerSingleton();
         bind(RulesEngine.class).toProvider(RulesEngineProvider.class);
-        bind(LdapConnector.class).toProvider(LdapConnectorProvider.class);
+        bind(LdapConnector.class).toProvider(LdapConnectorProvider.class).asEagerSingleton();
         bind(LdapUserAuthenticator.class).toProvider(LdapUserAuthenticatorProvider.class);
         bind(DefaultSecurityManager.class).toProvider(DefaultSecurityManagerProvider.class);
-        bind(SystemJobFactory.class).toProvider(SystemJobFactoryProvider.class);
-        bind(AsyncHttpClient.class).toProvider(AsyncHttpClientProvider.class);
+        bind(SystemJobFactory.class).asEagerSingleton();
+        bind(AsyncHttpClient.class).asEagerSingleton();
         bind(GracefulShutdown.class).in(Scopes.SINGLETON);
 
         if (configuration.isMessageCacheOffHeap()) {
