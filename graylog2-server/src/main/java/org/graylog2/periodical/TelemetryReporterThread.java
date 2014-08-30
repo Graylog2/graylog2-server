@@ -38,6 +38,7 @@ import org.graylog2.indexer.Indexer;
 import org.graylog2.metrics.MetricUtils;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.periodical.Periodical;
+import org.graylog2.shared.stats.ThroughputStats;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -76,21 +77,24 @@ public class TelemetryReporterThread extends Periodical {
     }};
 
     @Inject
-    protected ObjectMapper objectMapper;
+    private ObjectMapper objectMapper;
 
     private final MetricRegistry metricRegistry;
     private final ServerStatus serverStatus;
     private final Indexer indexer;
     private final Configuration configuration;
+    private ThroughputStats throughputStats;
 
     @Inject
     public TelemetryReporterThread(MetricRegistry metricRegistry,
                                    ServerStatus serverStatus,
                                    Indexer indexer,
+                                   ThroughputStats throughputStats,
                                    Configuration configuration) {
         this.metricRegistry = metricRegistry;
         this.serverStatus = serverStatus;
         this.indexer = indexer;
+        this.throughputStats = throughputStats;
         this.configuration = configuration;
     }
 
@@ -176,6 +180,8 @@ public class TelemetryReporterThread extends Periodical {
         statistics.put("lifecycle", serverStatus.getLifecycle());
         statistics.put("is_processing", serverStatus.isProcessing());
         statistics.put("server_version", ServerVersion.VERSION.toString());
+        statistics.put("global_throughput", throughputStats.getCurrentThroughput());
+        statistics.put("stream_throughput", throughputStats.getCurrentStreamThroughputValues());
 
         return statistics;
     }

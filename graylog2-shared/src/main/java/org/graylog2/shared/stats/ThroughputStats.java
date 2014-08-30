@@ -22,6 +22,7 @@
  */
 package org.graylog2.shared.stats;
 
+import com.google.common.collect.Maps;
 import org.cliffc.high_scale_lib.Counter;
 
 import java.util.HashMap;
@@ -92,5 +93,14 @@ public class ThroughputStats {
 
     public HashMap<String, Counter> getCurrentStreamThroughput() {
         return currentStreamThroughput.get();
+    }
+
+    public Map<String, Long> getCurrentStreamThroughputValues() {
+        Map<String, Long> values = Maps.newHashMap();
+        for (Map.Entry<String, Counter> counter : currentStreamThroughput.get().entrySet()) {
+            values.put(counter.getKey(), counter.getValue().longValue());
+        }
+
+        return values;
     }
 }
