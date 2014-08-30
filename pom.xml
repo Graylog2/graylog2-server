@@ -198,16 +198,6 @@
                 <version>4.9.0</version>
             </dependency>
 
-            <!--
-            This is required because natty currently doesn't work with
-            newer antlr-runtime versions, see https://github.com/joestelmach/natty/issues/60
-            -->
-            <dependency>
-                <groupId>org.antlr</groupId>
-                <artifactId>antlr-runtime</artifactId>
-                <version>3.2</version>
-            </dependency>
-
             <dependency>
                 <groupId>org.kie</groupId>
                 <artifactId>kie-api</artifactId>
@@ -515,10 +505,14 @@
                 <version>2.3</version>
             </dependency>
 
+            <!--
+            This is required because natty currently doesn't work with
+            newer antlr-runtime versions, see https://github.com/joestelmach/natty/issues/60
+            -->
             <dependency>
-                <groupId>com.joestelmach</groupId>
+                <groupId>org.graylog2.repackaged</groupId>
                 <artifactId>natty</artifactId>
-                <version>0.8</version>
+                <version>0.8-1</version>
             </dependency>
 
             <dependency>

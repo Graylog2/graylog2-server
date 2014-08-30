@@ -213,7 +213,7 @@
             <artifactId>commons-io</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.joestelmach</groupId>
+            <groupId>org.graylog2.repackaged</groupId>
             <artifactId>natty</artifactId>
         </dependency>
 
