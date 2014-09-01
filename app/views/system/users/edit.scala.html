@@ -16,6 +16,7 @@
 @import views.helpers.StartpageRouteHelper
 
 @main("Users", views.html.system.sidebar(), "", currentUser) {
+    <script src="@routes.Assets.at("javascripts/app.js")" type="text/javascript"></script>
 
     @views.html.partials.breadcrumbs(breadcrumbs)
 

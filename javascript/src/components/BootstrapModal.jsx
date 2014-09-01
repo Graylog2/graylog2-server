@@ -1,5 +1,9 @@
 /** @jsx React.DOM */
 
+'use strict';
+
+var React = require('React');
+
 // adapted from react examples (https://github.com/facebook/react/tree/master/examples/jquery-bootstrap)
 var BootstrapModal = React.createClass({
     componentDidMount: function () {
@@ -56,3 +60,5 @@ var BootstrapModal = React.createClass({
             );
     }
 });
+
+module.exports = BootstrapModal;

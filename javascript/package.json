@@ -1,0 +1,25 @@
+{
+  "name": "graylog2-ui",
+  "version": "0.21.1",
+  "description": "Graylog2 UI",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "GPL",
+  "dependencies": {
+    "bootstrap": "^3.2.0",
+    "jquery": "^2.1.1",
+    "react": "^0.11.1"
+  },
+  "devDependencies": {
+    "gulp": "*",
+    "gulp-browserify": "*",
+    "gulp-concat": "*",
+    "gulp-rename": "*",
+    "gulp-rimraf": "*",
+    "gulp-uglify": "*",
+    "reactify": "*"
+  }
+}

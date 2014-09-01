@@ -1,5 +1,9 @@
 /** @jsx React.DOM */
 
+var React = require('React');
+var UserPreferencesButton = require('./components/UserPreferencesButton');
+var UserPreferencesModal = require('./components/UserPreferencesModal');
+
 $(document).ready(function () {
     var editUserPreferencesButton = document.getElementById('react-user-preferences-button');
     if (editUserPreferencesButton) {

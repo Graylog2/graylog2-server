@@ -1,5 +1,11 @@
 /** @jsx React.DOM */
 
+'use strict';
+
+var React = require('React');
+var PreferencesStore = require('../stores/PreferencesStore');
+var BootstrapModal = require('./BootstrapModal');
+
 var UserPreferencesModal = React.createClass({
     getInitialState: function () {
         return {preferences: []};
@@ -62,3 +68,5 @@ var UserPreferencesModal = React.createClass({
     }
 
 });
+
+module.exports = UserPreferencesModal;

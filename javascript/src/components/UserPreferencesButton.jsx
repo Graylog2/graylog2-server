@@ -1,5 +1,10 @@
 /** @jsx React.DOM */
 
+'use strict';
+
+var React = require('React');
+var PreferencesStore = require('../stores/PreferencesStore');
+
 var UserPreferencesButton = React.createClass({
     _onClick: function (event) {
         PreferencesStore.loadUserPreferences(this.props.userName);
@@ -10,3 +15,5 @@ var UserPreferencesButton = React.createClass({
         );
     }
 });
+
+module.exports = UserPreferencesButton;
