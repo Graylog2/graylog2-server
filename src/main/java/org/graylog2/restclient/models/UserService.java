@@ -19,10 +19,12 @@
 package org.graylog2.restclient.models;
 
 import com.google.common.collect.Lists;
+import com.google.gson.Gson;
 import com.google.inject.Inject;
 import org.graylog2.restclient.lib.APIException;
 import org.graylog2.restclient.lib.ApiClient;
 import org.graylog2.restclient.lib.Graylog2ServerUnavailableException;
+import org.graylog2.restclient.models.api.requests.ApiRequest;
 import org.graylog2.restclient.models.api.requests.CreateUserRequest;
 import org.graylog2.restclient.models.api.responses.system.UserResponse;
 import org.graylog2.restclient.models.api.responses.system.UsersListResponse;
@@ -36,6 +38,7 @@ import play.mvc.Http;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 public class UserService {
     private static final Logger log = LoggerFactory.getLogger(UserService.class);
@@ -106,6 +109,22 @@ public class UserService {
         }
     }
 
+    public boolean savePreferences(String username, Map<String, Object> preferences) {
+        final String body = new Gson().toJson(preferences);
+        try {
+            api.path(resource.savePreferences(username)).body(new ApiRequest() {
+                public String toJson() {
+                    return body;
+                }
+            }).expect(Http.Status.NO_CONTENT).execute();
+        } catch (Exception e) {
+            log.error("Could not save preferences for " + username, e);
+            return false;
+        }
+        return true;
+
+    }
+
     public User load(String username) {
         final User currentUser = current();
         if (username.equals(currentUser.getName())) {
@@ -125,7 +144,7 @@ public class UserService {
             log.info("User " + username + " does not exist", e);
         }
         return null;
-	}
+    }
 
     public User retrieveUserWithSessionId(String userName, String sessionId) {
         try {
