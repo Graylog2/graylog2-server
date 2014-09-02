@@ -15,7 +15,7 @@
         Use dashboards to create specific views on your messages. Create a new dashboard here and add any graph or chart
         you create in other parts of Graylog2 with one click.
 
-        &nbsp;@views.html.partials.support.bubble.render("graylog2-web-interface/the-dashboards-explained")
+        &nbsp;@views.html.partials.support.bubble.render("general/dashboards")
     </div>
 
     @if(dashboards.filter(d => isPermitted(DASHBOARDS_READ, d.getId)).isEmpty) {
