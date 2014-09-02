@@ -68,7 +68,7 @@ public class Configuration extends BaseConfiguration {
     private int maxNumberOfIndices = 20;
 
     @Parameter(value = "output_batch_size", required = true, validator = PositiveIntegerValidator.class)
-    private int outputBatchSize = 25;
+    private int outputBatchSize = 1000;
 
     @Parameter(value = "output_flush_interval", required = true, validator = PositiveIntegerValidator.class)
     private int outputFlushInterval = 1;
