@@ -24,6 +24,7 @@ import org.graylog2.restclient.models.User;
 import play.Play;
 
 import java.util.List;
+import java.util.Collections;
 import java.util.concurrent.atomic.AtomicReference;
 
 
@@ -32,7 +33,7 @@ public class LocalAdminUser extends User {
     private static AtomicReference<models.LocalAdminUser> instance = new AtomicReference<>(null);
 
     LocalAdminUser(ApiClient api, String id, String name, String email, String fullName, List<String> permissions, String passwordHash, String tz) {
-        super(api, id, name, email, fullName, permissions, passwordHash, tz, true, false, null, 0);
+        super(api, id, name, email, fullName, permissions, passwordHash, tz, true, false, null, 0, Collections.emptyMap());
     }
 
     public static void createSharedInstance(ApiClient api, String username, String passwordHash) {

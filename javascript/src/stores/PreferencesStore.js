@@ -4,8 +4,7 @@ var mergeInto = require('../lib/util').mergeInto;
 var AbstractEventSendingStore = require('./AbstractEventSendingStore');
 
 var PreferencesStore = {
-    // TODO
-    URL: '/a/system/inputs',
+    URL: '/a/system/user/',
     DATA_SAVED_EVENT: 'DATA_SAVED_EVENT',
     DATA_LOADED_EVENT: 'DATA_LOADED_EVENT',
 
@@ -23,18 +22,29 @@ var PreferencesStore = {
     },
 
     saveUserPreferences: function (preferences) {
-        // optimistic update
-        this.setPreferences(preferences);
-        this.emit(this.DATA_SAVED_EVENT);
+        if (!this._userName) {
+            throw new Error("Need to load user preferences before you can save them");
+        }
 
-        // TODO: Save to server
-
+        var url = this.URL + this._userName + "/preferences";
+        $.ajax({
+            type: "PUT",
+            url: url,
+            data: preferences
+        }).done(function() {
+            this.setPreferences(preferences);
+            this.emit(this.DATA_SAVED_EVENT);
+        }.bind(this)).fail(function(jqXHR, textStatus, errorThrown) {
+            console.error("Saving of preferences for " + userName + " failed with status: " + textStatus);
+            console.error("Error", errorThrown);
+            alert("Could not save user preferences");
+        });
     },
 
     loadUserPreferences: function (userName) {
         this._userName = userName;
 
-        var url = URI(this.URL).directory(userName);
+        var url = this.URL + userName;
         var postProcessData = function (preferences) {
             // turn map into array
             preferences = Object.keys(preferences).map(function (name) {
@@ -58,29 +68,7 @@ var PreferencesStore = {
             console.error("Error", errorThrown);
             alert("Could not retrieve user preferences from server - try reloading the page");
         }.bind(this);
-//            $.getJSON(url, successCallback).fail(failCallback);
-        // TODO: Dummy data
-        if (!this.getPreferences()) {
-
-            successCallback({
-                preferences: {
-                    updateUnfocussed: true,
-                    autoExecuteQuery: false,
-                    defaultSearch: "S1",
-                    moar: "10",
-                    moar2: "20",
-                    moar3: "30",
-                    moar4: "30",
-                    moar5: "30",
-                    moar6: "30",
-                    moar7: "30",
-                    moar8: "30",
-                    moar9: "30"
-                }
-            });
-        } else {
-            this.emit(this.DATA_LOADED_EVENT);
-        }
+        $.getJSON(url, successCallback).fail(failCallback);
     }
 };
 mergeInto(PreferencesStore, AbstractEventSendingStore);

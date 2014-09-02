@@ -192,6 +192,8 @@ GET         /a/system/radio/:radio_id/heap                                      
 GET         /a/system/internallogs/:node_id                                          @controllers.api.SystemApiController.internalLogsOfNode(node_id: String)
 GET         /a/system/internallogs/:node_id/metrics                                  @controllers.api.SystemApiController.internalLogMetricsOfNode(node_id: String)
 GET         /a/system/users/:username                                                @controllers.UsersController.isUniqueUsername(username: String)
+GET         /a/system/user/:username                                                 @controllers.UsersController.loadUser(username: String)
+PUT         /a/system/user/:username/preferences                                     @controllers.UsersController.saveUserPreferences(username: String)
 
 # API: Inputs
 GET         /a/system/inputs/:node_id/:input_id/recent_message                       @controllers.api.InputsApiController.recentMessage(node_id: String, input_id: String, filtered: Boolean ?= false)

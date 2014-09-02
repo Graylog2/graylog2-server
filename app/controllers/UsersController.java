@@ -18,10 +18,13 @@
  */
 package controllers;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import com.google.gson.Gson;
 import com.google.inject.Inject;
 import lib.*;
 import org.graylog2.restclient.lib.*;
@@ -40,6 +43,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import play.data.DynamicForm;
 import play.data.Form;
+import play.mvc.Http;
 import play.mvc.Result;
 import views.helpers.Permissions;
 import views.html.system.users.edit;
@@ -49,6 +53,7 @@ import views.html.system.users.show;
 import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -140,6 +145,42 @@ public class UsersController extends AuthenticatedController {
             String message = "Could not fetch streams. We expected HTTP 200, but got a HTTP " + e.getHttpCode() + ".";
             return status(504, views.html.errors.error.render(message, e, request()));
         }
+    }
+
+    public Result loadUser(String username) {
+        User user = userService.load(username);
+        if (user != null) {
+            Map<String, Object> result = Maps.newHashMap();
+            result.put("preferences", initDefaultPreferences(user.getPreferences()));
+            // TODO: there is more than preferences
+            return ok(new Gson().toJson(result)).as("application/json");
+        } else {
+            return notFound();
+        }
+    }
+
+    public Result saveUserPreferences(String username) {
+        Map preferences = new Gson().fromJson(request().body().asText(), Map.class);
+        if (userService.savePreferences(username, preferences)) {
+            return ok();
+        } else {
+            // TODO: Really?
+            return notFound();
+        }
+    }
+
+    private Map<String, Object> initDefaultPreferences(Map<String, Object> preferences) {
+        Map<String, Object> effectivePreferences = Maps.newHashMap();
+        effectivePreferences.put("updateUnfocussed", false);
+        effectivePreferences.putAll(preferences);
+        return effectivePreferences;
+    }
+
+    private Map<String, Object> normalizePreferences(Map<String, Object> preferences) {
+        Map<String, Object> effectivePreferences = Maps.newHashMap();
+        effectivePreferences.put("updateUnfocussed", false);
+        effectivePreferences.putAll(preferences);
+        return effectivePreferences;
     }
 
     public Result create() {
