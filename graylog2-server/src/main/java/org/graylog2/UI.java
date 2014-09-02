@@ -24,10 +24,9 @@ import org.slf4j.LoggerFactory;
  */
 public class UI {
 
-    private static final String HELP_DOCS = "http://support.torch.sh/help/kb";
-    private static final String HELP_MAILING_LIST = "http://support.torch.sh/help/kb/general/forums-mailing-list";
-    private static final String HELP_ISSUE_TRACKER = "http://support.torch.sh/help/kb/general/issue-trackers";
-    private static final String HELP_TORCH = "http://www.torch.sh/";
+    private static final String HELP_DOCS = "http://graylog2.org/resources/documentation";
+    private static final String HELP_COMMUNITY = "http://graylog2.org/resources/community-support";
+    private static final String HELP_COMMERCIAL = "http://graylog2.org/products";
 
     private static final Logger LOG = LoggerFactory.getLogger(Main.class);
 
@@ -49,16 +48,15 @@ public class UI {
 
         sb.append("Need help?").append("\n\n");
         sb.append("* Official documentation: ").append(HELP_DOCS).append("\n");
-        sb.append("* Mailing list: ").append(HELP_MAILING_LIST).append("\n");
-        sb.append("* Issue tracker: ").append(HELP_ISSUE_TRACKER).append("\n");
-        sb.append("* Commercial support: ").append(HELP_TORCH).append("\n");
+        sb.append("* Community support: ").append(HELP_COMMUNITY).append("\n");
+        sb.append("* Commercial support: ").append(HELP_COMMERCIAL).append("\n");
 
         if (docLinks != null && docLinks.length > 0) {
             sb.append("\n").append("But we also got some specific help " +
                                            "pages that might help you in this case:").append("\n\n");
 
             for (final String docLink : docLinks) {
-                sb.append("* ").append(docLink(docLink)).append("\n");
+                sb.append("* ").append(docLink).append("\n");
             }
         }
 
@@ -77,13 +75,4 @@ public class UI {
 
         return sb.append("\n").toString();
     }
-
-    private static String docLink(String part) {
-        if (!part.startsWith("/")) {
-            part = "/" + part;
-        }
-
-        return "http://support.torch.sh/help/kb" + part;
-    }
-
 }

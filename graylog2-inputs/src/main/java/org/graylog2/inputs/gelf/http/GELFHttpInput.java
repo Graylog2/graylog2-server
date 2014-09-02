@@ -100,7 +100,7 @@ public class GELFHttpInput extends GELFInputBase {
 
     @Override
     public String linkToDocs() {
-        return "http://support.torch.sh/help/kb/graylog2-server/using-the-gelf-http-input";
+        return "http://graylog2.org/resources/documentation/sending/gelfhttp";
     }
 
     @Override
