@@ -25,20 +25,26 @@ var PreferencesStore = {
         if (!this._userName) {
             throw new Error("Need to load user preferences before you can save them");
         }
+        var preferencesAsMap = preferences.reduce(function (obj, element) {
+            obj[element.name] = element.value;
+            return obj;
+        }, {});
 
         var url = this.URL + this._userName + "/preferences";
         $.ajax({
             type: "PUT",
             url: url,
-            data: preferences
+            data: JSON.stringify(preferencesAsMap),
+            dataType: 'json',
+            contentType: 'application/json'
         }).done(function() {
             this.setPreferences(preferences);
             this.emit(this.DATA_SAVED_EVENT);
         }.bind(this)).fail(function(jqXHR, textStatus, errorThrown) {
-            console.error("Saving of preferences for " + userName + " failed with status: " + textStatus);
+            console.error("Saving of preferences for " + this._userName + " failed with status: " + textStatus);
             console.error("Error", errorThrown);
             alert("Could not save user preferences");
-        });
+        }.bind(this));
     },
 
     loadUserPreferences: function (userName) {

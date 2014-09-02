@@ -45,16 +45,18 @@ var UserPreferencesModal = React.createClass({
             </thead>
             <tbody>
             {this.state.preferences.map(function (preference, index) {
-                return (<tr key={index}><td>{preference.name}</td><td><form className="form-inline" role="form"><div className="form-group"><input onChange={this._onPreferenceChanged.bind(this, preference.name)} className="form-control" value={preference.value}/></div></form></td></tr>);
+                return (<tr key={index}><td>{preference.name}</td><td><div className="form-group"><input onChange={this._onPreferenceChanged.bind(this, preference.name)} className="form-control" value={preference.value}/></div></td></tr>);
             }, this)}
 
             </tbody>
         </table>);
         return (
-            <BootstrapModal ref="modal" onCancel={this._closeModal} onConfirm={this._save} cancel="Cancel" confirm="Save">
-               {header}
-               {body}
-            </BootstrapModal>
+            <form className="form-inline" role="form">
+                <BootstrapModal ref="modal" onCancel={this._closeModal} onConfirm={this._save} cancel="Cancel" confirm="Save">
+                   {header}
+                   {body}
+                </BootstrapModal>
+            </form>
         );
     },
     _closeModal: function () {

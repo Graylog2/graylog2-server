@@ -19,20 +19,20 @@ var BootstrapModal = React.createClass({
     open: function () {
         $(this.getDOMNode()).modal('show');
     },
+    _submit: function(event) {
+        this.props.onConfirm();
+        event.preventDefault();
+    },
     render: function () {
         var confirmButton = null;
         var cancelButton = null;
 
         if (this.props.confirm && this.props.onConfirm) {
-            confirmButton = (
-                <a role="button" className="btn" onClick={this.props.onConfirm}>
-                      {this.props.confirm}
-                </a>
-                );
+            confirmButton = <input role="button" value={this.props.confirm} type="submit" className="btn btn-primary" onClick={this._submit} />;
         }
         if (this.props.cancel && this.props.onCancel) {
             cancelButton = (
-                <a role="button" className="btn btn-primary" onClick={this.props.onCancel}>
+                <a role="button" className="btn" onClick={this.props.onCancel}>
                       {this.props.cancel}
                 </a>
                 );

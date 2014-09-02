@@ -160,8 +160,9 @@ public class UsersController extends AuthenticatedController {
     }
 
     public Result saveUserPreferences(String username) {
-        Map preferences = new Gson().fromJson(request().body().asText(), Map.class);
-        if (userService.savePreferences(username, preferences)) {
+        final String json = request().body().asJson().toString();
+        Map<String, Object> preferences = new Gson().fromJson(json, Map.class);
+        if (userService.savePreferences(username, normalizePreferences(preferences))) {
             return ok();
         } else {
             // TODO: Really?
@@ -171,16 +172,30 @@ public class UsersController extends AuthenticatedController {
 
     private Map<String, Object> initDefaultPreferences(Map<String, Object> preferences) {
         Map<String, Object> effectivePreferences = Maps.newHashMap();
+        // TODO: Move defaults into a static map once we at least have a second preference
         effectivePreferences.put("updateUnfocussed", false);
-        effectivePreferences.putAll(preferences);
+        if (preferences != null) {
+            effectivePreferences.putAll(preferences);
+        }
         return effectivePreferences;
     }
 
     private Map<String, Object> normalizePreferences(Map<String, Object> preferences) {
-        Map<String, Object> effectivePreferences = Maps.newHashMap();
-        effectivePreferences.put("updateUnfocussed", false);
-        effectivePreferences.putAll(preferences);
-        return effectivePreferences;
+        Map<String, Object> normalizedPreferences = Maps.newHashMap();
+        // TODO: Move types into a static map once we at least have a second preference
+        for (Map.Entry<String, Object> preference : preferences.entrySet()) {
+            if (preference.getKey().equals("updateUnfocussed")) {
+                final Object value = preference.getValue();
+                final Object normalizedValue;
+                if (value instanceof Boolean) {
+                    normalizedValue = value;
+                } else {
+                    normalizedValue = Boolean.valueOf(value.toString());
+                }
+                normalizedPreferences.put(preference.getKey(), normalizedValue);
+            }
+        }
+        return normalizedPreferences;
     }
 
     public Result create() {
