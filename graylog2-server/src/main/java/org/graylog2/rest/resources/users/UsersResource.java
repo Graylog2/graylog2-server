@@ -472,7 +472,7 @@ public class UsersResource extends RestResource {
             map.put("permissions", user.getPermissions());
         }
         final Map<String, Object> preferences = user.getPreferences();
-        if (!preferences.isEmpty()) {
+        if (preferences != null && !preferences.isEmpty()) {
             map.put("preferences", preferences);
         }
         if (user.getTimeZone() != null) {
