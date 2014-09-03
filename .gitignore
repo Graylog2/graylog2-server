@@ -19,3 +19,5 @@ conf/graylog2-web-interface.conf
 
 .target
 .DS_Store
+javascript/node_modules
+javascript/dist
