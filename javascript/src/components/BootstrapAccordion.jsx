@@ -4,6 +4,7 @@
 
 var React = require('React');
 var BootstrapAccordionGroup = require('./BootstrapAccordionGroup');
+var SourceType = require('./SourceType');
 
 var BootstrapAccordion = React.createClass({
     render: function () {
@@ -15,26 +16,17 @@ var BootstrapAccordion = React.createClass({
                 <BootstrapAccordionGroup name="Linux">
                     <ul>
                         <li>
-                            <label className="radio">
-                                <input type="radio" name="linuxBundles" id="ubuntuSyslog" value="ubuntuSyslog" defaultChecked/>
-                                Ubuntu Syslog
-                            </label>
+                            <SourceType name="ubuntuSyslog" description="Ubuntu Syslog"/>
                         </li>
                         <li>
-                            <label className="radio">
-                                <input type="radio" name="linuxBundles" id="redHatSyslog" value="redHatSyslog"/>
-                                RedHat Syslog
-                            </label>
+                            <SourceType name="redHatSyslog" description="RedHat Syslog"/>
                         </li>
                     </ul>
                 </BootstrapAccordionGroup>
                 <BootstrapAccordionGroup name="Switches">
                     <ul>
                         <li>
-                            <label className="radio">
-                                <input type="radio" name="linuxBundles" id="ciscoCatalyst3560" value="ciscoCatalyst3560"/>
-                                Cisco Catalyst 3560
-                            </label>
+                            <SourceType name="ciscoCatalyst3560" description="Cisco Catalyst 3560"/>
                         </li>
                     </ul>
                 </BootstrapAccordionGroup>
