@@ -1,6 +1,8 @@
 @(currentUser: org.graylog2.restclient.models.User)
 
 @main("Search", null, "", currentUser) {
+    <script src="@routes.Assets.at("javascripts/app.js")" type="text/javascript"></script>
+
     <div class="card">
         <a class="pull-right close" href="#">&times;</a>
         <h1><i class="icon icon-plane"></i> Quick Start</h1>
@@ -111,8 +113,5 @@
         </div>
     </div>
 
-    <div class="card">
-        <i class="icon icon-lightbulb pull-left"></i>
-        <p>Need help with the search syntax? Take a look at our @views.html.partials.search_query_documentation(). </p>
-    </div>
+    <div id="react-card-list"></div>
 }
