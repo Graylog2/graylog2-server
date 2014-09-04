@@ -5,6 +5,7 @@
 var React = require('React');
 var Card = require('./Card');
 var BootstrapAccordion = require('./BootstrapAccordion');
+var QuickStartPreview = require('./QuickStartPreview');
 
 var CardList = React.createClass({
     render: function () {
@@ -17,6 +18,11 @@ var CardList = React.createClass({
                     <div className="row">
                         <div className="span6">
                             <BootstrapAccordion/>
+                        </div>
+                        <div className="span4 offset1">
+                            <QuickStartPreview>
+                                <p>Select an item in the right list to preview it.</p>
+                            </QuickStartPreview>
                         </div>
                     </div>
                 </Card>

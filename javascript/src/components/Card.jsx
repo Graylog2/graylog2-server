@@ -24,7 +24,7 @@ var Card = React.createClass({
                 {title ? title : icon}
                 {this.props.children}
             </div>
-            );
+        );
     }
 });
 
