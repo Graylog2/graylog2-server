@@ -11,10 +11,12 @@ var Card = React.createClass({
 
         if (this.props.type == "info") {
             icon = <i className="icon icon-lightbulb pull-left"></i>;
+        } else if (this.props.icon) {
+            icon = <i className={"icon pull-left " + this.props.icon}></i>;
         }
 
         if (this.props.title) {
-            title = <h1>{this.props.title}</h1>;
+            title = <h1>{icon ? icon : ""} {this.props.title}</h1>;
         }
 
         return (
