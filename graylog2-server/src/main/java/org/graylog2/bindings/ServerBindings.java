@@ -33,6 +33,7 @@ import org.graylog2.bindings.providers.*;
 import org.graylog2.buffers.OutputBufferWatermark;
 import org.graylog2.buffers.processors.OutputBufferProcessor;
 import org.graylog2.buffers.processors.ServerProcessBufferProcessor;
+import org.graylog2.bundles.BundleService;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.filters.FilterService;
 import org.graylog2.filters.FilterServiceImpl;
@@ -75,9 +76,6 @@ import javax.ws.rs.container.ContainerResponseFilter;
 import javax.ws.rs.container.DynamicFeature;
 import javax.ws.rs.ext.ExceptionMapper;
 
-/**
- * @author Dennis Oelkers <dennis@torch.sh>
- */
 public class ServerBindings extends AbstractModule {
     private final Configuration configuration;
 
@@ -139,6 +137,7 @@ public class ServerBindings extends AbstractModule {
         bind(SystemJobFactory.class).toProvider(SystemJobFactoryProvider.class);
         bind(AsyncHttpClient.class).toProvider(AsyncHttpClientProvider.class);
         bind(GracefulShutdown.class).in(Scopes.SINGLETON);
+        bind(BundleService.class).in(Scopes.SINGLETON);
 
         if (configuration.isMessageCacheOffHeap()) {
             bind(InputCache.class).toProvider(InputCacheProvider.class).asEagerSingleton();
