@@ -4,6 +4,7 @@
 
 var React = require('React');
 var Card = require('./Card');
+var BootstrapAccordion = require('./BootstrapAccordion');
 
 var CardList = React.createClass({
     render: function () {
@@ -11,7 +12,7 @@ var CardList = React.createClass({
         return (
             <div className="card-list">
                 <Card title="Quick Start">
-                    {"I'm a card!!!"}
+                    <BootstrapAccordion/>
                 </Card>
                 <Card type="info">
                     {contentInfo}
