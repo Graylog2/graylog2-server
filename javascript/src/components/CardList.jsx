@@ -9,9 +9,14 @@ var CardList = React.createClass({
     render: function () {
         var contentInfo = <p>Need help with the search syntax? Take a look at our <a href="http://www.graylog2.org/resources/documentation/general/queries" target="_blank">documentation</a>.</p>;
         return (
-            <Card type="info">
-                {contentInfo}
-            </Card>
+            <div className="card-list">
+                <Card title="Quick Start">
+                    {"I'm a card!!!"}
+                </Card>
+                <Card type="info">
+                    {contentInfo}
+                </Card>
+            </div>
         );
     }
 });
