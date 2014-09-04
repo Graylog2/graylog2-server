@@ -21,3 +21,4 @@ conf/graylog2-web-interface.conf
 .DS_Store
 javascript/node_modules
 javascript/dist
+app/assets/javascripts/app.js
