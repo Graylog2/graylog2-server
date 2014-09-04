@@ -35,12 +35,15 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public class Consumer {
 
     private static final Logger LOG = LoggerFactory.getLogger(Consumer.class);
+    private static final ThreadLocal<MessagePack> MSGPACK = new ThreadLocal<MessagePack>() {
+        @Override
+        protected MessagePack initialValue() {
+            return new MessagePack();
+        }
+    };
 
     // Not threadsafe!
 
@@ -98,8 +101,6 @@ public class Consumer {
             connect();
         }
 
-        final MessagePack msgpack = new MessagePack();
-
         for (int i = 0; i < parallelQueues; i++) {
             final String queueName = String.format(queue, i);
             channel.queueDeclare(queueName, true, false, false, null);
@@ -112,7 +113,7 @@ public class Consumer {
                             totalBytesRead.addAndGet(body.length);
                             lastSecBytesReadTmp.addAndGet(body.length);
 
-                            RadioMessage msg = msgpack.read(body, RadioMessage.class);
+                            RadioMessage msg = MSGPACK.get().read(body, RadioMessage.class);
 
                             if (!msg.strings.containsKey("message") || !msg.strings.containsKey("source") || msg.timestamp <= 0) {
                                 LOG.error("Incomplete AMQP message. Skipping.");
