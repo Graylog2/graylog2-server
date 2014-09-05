@@ -43,14 +43,18 @@ public class KafkaProducer implements RadioTransport {
     public static final String KAFKA_TOPIC = "graylog2-radio-messages";
 
     private final Producer<byte[], byte[]> producer;
-    private final MessagePack pack;
+    private final MessagePack messagePack;
     private final Meter incomingMessages;
     private final Meter rejectedMessages;
     private final Timer processTime;
 
     @Inject
-    public KafkaProducer(ServerStatus serverStatus, Configuration configuration, MetricRegistry metricRegistry) {
-        pack = new MessagePack();
+    public KafkaProducer(
+            final ServerStatus serverStatus,
+            final Configuration configuration,
+            final MetricRegistry metricRegistry,
+            final MessagePack messagePack) {
+        this.messagePack = messagePack;
 
         Properties props = new Properties();
         props.put("metadata.broker.list", configuration.getKafkaBrokers());
@@ -74,13 +78,13 @@ public class KafkaProducer implements RadioTransport {
     public void send(Message msg) {
         KeyedMessage<byte[], byte[]> data;
 
-        try(Timer.Context context = processTime.time()) {
+        try (Timer.Context context = processTime.time()) {
             incomingMessages.mark();
             data = new KeyedMessage<>(
-                    KAFKA_TOPIC, msg.getId().getBytes(StandardCharsets.UTF_8), RadioMessage.serialize(pack, msg));
+                    KAFKA_TOPIC, msg.getId().getBytes(StandardCharsets.UTF_8), RadioMessage.serialize(messagePack, msg));
 
             producer.send(data);
-        } catch(IOException e) {
+        } catch (IOException e) {
             LOG.error("Could not serialize message.", e);
             rejectedMessages.mark();
         }

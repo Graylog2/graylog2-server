@@ -28,14 +28,12 @@ import org.graylog2.plugin.configuration.fields.ConfigurationField;
 import org.graylog2.plugin.configuration.fields.NumberField;
 import org.graylog2.plugin.configuration.fields.TextField;
 import org.graylog2.plugin.system.NodeId;
+import org.msgpack.MessagePack;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public class RadioKafkaInput extends KafkaInput {
 
     private static final Logger LOG = LoggerFactory.getLogger(RadioKafkaInput.class);
@@ -43,8 +41,13 @@ public class RadioKafkaInput extends KafkaInput {
     public static final String NAME = "Graylog2 Radio Input (Kafka)";
 
     @Inject
-    public RadioKafkaInput(MetricRegistry metricRegistry, NodeId nodeId, EventBus eventBus, ServerStatus serverStatus) {
-        super(metricRegistry, nodeId, eventBus, serverStatus);
+    public RadioKafkaInput(
+            final MetricRegistry metricRegistry,
+            final NodeId nodeId,
+            final EventBus eventBus,
+            final ServerStatus serverStatus,
+            final MessagePack messagePack) {
+        super(metricRegistry, nodeId, eventBus, serverStatus, messagePack);
     }
 
     @Override
@@ -79,27 +82,27 @@ public class RadioKafkaInput extends KafkaInput {
         ));
 
         cr.addField(new NumberField(
-                CK_FETCH_MIN_BYTES,
-                "Fetch minimum bytes",
-                5,
-                "Wait for a message batch to reach at least this size or the configured maximum wait time before fetching.",
-                ConfigurationField.Optional.NOT_OPTIONAL)
+                        CK_FETCH_MIN_BYTES,
+                        "Fetch minimum bytes",
+                        5,
+                        "Wait for a message batch to reach at least this size or the configured maximum wait time before fetching.",
+                        ConfigurationField.Optional.NOT_OPTIONAL)
         );
 
         cr.addField(new NumberField(
-                CK_FETCH_WAIT_MAX,
-                "Fetch maximum wait time (ms)",
-                100,
-                "Wait for this time or the configured minimum size of a message batch before fetching.",
-                ConfigurationField.Optional.NOT_OPTIONAL)
+                        CK_FETCH_WAIT_MAX,
+                        "Fetch maximum wait time (ms)",
+                        100,
+                        "Wait for this time or the configured minimum size of a message batch before fetching.",
+                        ConfigurationField.Optional.NOT_OPTIONAL)
         );
 
         cr.addField(new NumberField(
-                CK_THREADS,
-                "Processor threads",
-                2,
-                "Number of processor threads to spawn. Use one thread per Kafka topic partition.",
-                ConfigurationField.Optional.NOT_OPTIONAL)
+                        CK_THREADS,
+                        "Processor threads",
+                        2,
+                        "Number of processor threads to spawn. Use one thread per Kafka topic partition.",
+                        ConfigurationField.Optional.NOT_OPTIONAL)
         );
 
         return cr;
@@ -115,7 +118,7 @@ public class RadioKafkaInput extends KafkaInput {
         return config.intIsSet(CK_FETCH_MIN_BYTES)
                 && config.intIsSet(CK_FETCH_WAIT_MAX)
                 && config.stringIsSet(CK_ZOOKEEPER)
-                && config.intIsSet(CK_THREADS)  && config.getInt(CK_THREADS) > 0;
+                && config.intIsSet(CK_THREADS) && config.getInt(CK_THREADS) > 0;
     }
 
 }

@@ -16,7 +16,10 @@
  */
 package org.graylog2.radio.transports.amqp;
 
-import com.rabbitmq.client.*;
+import com.rabbitmq.client.AMQP;
+import com.rabbitmq.client.Channel;
+import com.rabbitmq.client.Connection;
+import com.rabbitmq.client.ConnectionFactory;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.RadioMessage;
 import org.graylog2.radio.Configuration;
@@ -27,9 +30,6 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import java.io.IOException;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public class AMQPSender {
 
     private static final Logger LOG = LoggerFactory.getLogger(AMQPSender.class);
@@ -49,7 +49,7 @@ public class AMQPSender {
     private Connection connection;
     private Channel channel;
 
-    private final MessagePack pack;
+    private final MessagePack messagePack;
 
     public AMQPSender(String hostname,
                       int port,
@@ -59,12 +59,13 @@ public class AMQPSender {
                       String queueName,
                       String queueType,
                       String exchangeName,
-                      String routingKey) {
+                      String routingKey,
+                      final MessagePack messagePack) {
         this.queueName = queueName;
         this.queueType = queueType;
         this.exchangeName = exchangeName;
         this.routingKey = routingKey;
-        pack = new MessagePack();
+        this.messagePack = messagePack;
 
         this.hostname = hostname;
         this.port = port;
@@ -74,7 +75,7 @@ public class AMQPSender {
     }
 
     @Inject
-    public AMQPSender(Configuration configuration) {
+    public AMQPSender(final Configuration configuration, final MessagePack messagePack) {
         this(configuration.getAmqpHostname(),
                 configuration.getAmqpPort(),
                 configuration.getAmqpVirtualHost(),
@@ -83,7 +84,8 @@ public class AMQPSender {
                 configuration.getAmqpQueueName(),
                 configuration.getAmqpQueueType(),
                 configuration.getAmqpExchangeName(),
-                configuration.getAmqpRoutingKey());
+                configuration.getAmqpRoutingKey(),
+                messagePack);
     }
 
     public void send(Message msg) throws IOException {
@@ -91,7 +93,7 @@ public class AMQPSender {
             connect();
         }
 
-        byte[] body = RadioMessage.serialize(pack, msg);
+        byte[] body = RadioMessage.serialize(messagePack, msg);
 
         boolean mandatory = true;
         channel.basicPublish(exchangeName, routingKey, mandatory, new AMQP.BasicProperties(), body);
@@ -105,7 +107,7 @@ public class AMQPSender {
         factory.setVirtualHost(vHost);
 
         // Authenticate?
-        if(username != null && !username.isEmpty() && password != null && !password.isEmpty()) {
+        if (username != null && !username.isEmpty() && password != null && !password.isEmpty()) {
             factory.setUsername(username);
             factory.setPassword(password);
         }

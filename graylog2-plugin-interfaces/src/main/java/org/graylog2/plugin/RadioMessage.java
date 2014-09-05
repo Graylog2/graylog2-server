@@ -29,9 +29,6 @@ import org.msgpack.MessagePack;
 import java.io.IOException;
 import java.util.Map;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 @org.msgpack.annotation.Message
 public class RadioMessage {
 
@@ -40,10 +37,10 @@ public class RadioMessage {
     public Map<String, Double> doubles;
     public long timestamp;
 
-    public static byte[] serialize(MessagePack pack, Message msg) throws IOException {
-        Map<String, Long> longs = Maps.newHashMap();
-        Map<String, String> strings = Maps.newHashMap();
-        Map<String, Double> doubles = Maps.newHashMap();
+    public static byte[] serialize(final MessagePack pack, final Message msg) throws IOException {
+        final Map<String, Long> longs = Maps.newHashMap();
+        final Map<String, String> strings = Maps.newHashMap();
+        final Map<String, Double> doubles = Maps.newHashMap();
 
         for(Map.Entry<String, Object> field : msg.getFields().entrySet()) {
             if (field.getValue() instanceof String) {
@@ -59,7 +56,7 @@ public class RadioMessage {
             }
         }
 
-        RadioMessage radioMessage = new RadioMessage();
+        final RadioMessage radioMessage = new RadioMessage();
         radioMessage.strings = strings;
         radioMessage.longs = longs;
         radioMessage.doubles = doubles;

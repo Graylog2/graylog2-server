@@ -31,6 +31,7 @@ import org.graylog2.plugin.configuration.fields.TextField;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.MisfireException;
 import org.graylog2.plugin.lifecycles.Lifecycle;
+import org.msgpack.MessagePack;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,6 +45,7 @@ public class AMQPInput extends MessageInput {
     public static final String NAME = "AMQP Input";
     private final MetricRegistry metricRegistry;
     private final EventBus serverEventBus;
+    private final MessagePack messagePack;
 
     private Consumer consumer;
 
@@ -59,9 +61,13 @@ public class AMQPInput extends MessageInput {
     public static final String CK_PARALLEL_QUEUES = "parallel_queues";
 
     @Inject
-    public AMQPInput(MetricRegistry metricRegistry, EventBus serverEventBus) {
+    public AMQPInput(
+            final MetricRegistry metricRegistry,
+            final EventBus serverEventBus,
+            final MessagePack messagePack) {
         this.metricRegistry = metricRegistry;
         this.serverEventBus = serverEventBus;
+        this.messagePack = messagePack;
     }
 
     @Subscribe
@@ -115,8 +121,8 @@ public class AMQPInput extends MessageInput {
                 configuration.getString(CK_ROUTING_KEY),
                 (int) configuration.getInt(CK_PARALLEL_QUEUES),
                 processBuffer,
-                this
-        );
+                this,
+                messagePack);
         serverEventBus.register(this);
         try {
             consumer.run();

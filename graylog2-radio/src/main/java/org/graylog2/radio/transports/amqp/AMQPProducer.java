@@ -22,6 +22,7 @@ import com.codahale.metrics.Timer;
 import org.graylog2.plugin.Message;
 import org.graylog2.radio.Configuration;
 import org.graylog2.radio.transports.RadioTransport;
+import org.msgpack.MessagePack;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,7 +41,7 @@ public class AMQPProducer implements RadioTransport {
         private final AMQPSender[] senders;
         private final AtomicInteger pointer;
 
-        private AMQPSenderPool(int count, Configuration configuration) {
+        private AMQPSenderPool(int count, Configuration configuration, MessagePack messagePack) {
             this.count = count;
             this.senders = new AMQPSender[count];
             for (int i = 0; i < count; i++) {
@@ -52,7 +53,8 @@ public class AMQPProducer implements RadioTransport {
                         String.format(configuration.getAmqpQueueName(), i),
                         configuration.getAmqpQueueType(),
                         String.format(configuration.getAmqpExchangeName(), i),
-                        configuration.getAmqpRoutingKey()
+                        configuration.getAmqpRoutingKey(),
+                        messagePack
                 );
             }
 
@@ -73,8 +75,8 @@ public class AMQPProducer implements RadioTransport {
     private final Timer processTime;
 
     @Inject
-    public AMQPProducer(MetricRegistry metricRegistry, Configuration configuration) {
-        senderPool = new AMQPSenderPool(configuration.getAmqpParallelQueues(), configuration);
+    public AMQPProducer(MetricRegistry metricRegistry, Configuration configuration, MessagePack messagePack) {
+        senderPool = new AMQPSenderPool(configuration.getAmqpParallelQueues(), configuration, messagePack);
         incomingMessages = metricRegistry.meter(name(AMQPProducer.class, "incomingMessages"));
         rejectedMessages = metricRegistry.meter(name(AMQPProducer.class, "rejectedMessages"));
         processTime = metricRegistry.timer(name(AMQPProducer.class, "processTime"));

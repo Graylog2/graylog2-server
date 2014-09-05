@@ -17,7 +17,14 @@
 package org.graylog2.inputs.amqp;
 
 import com.google.common.util.concurrent.Uninterruptibles;
-import com.rabbitmq.client.*;
+import com.rabbitmq.client.AMQP;
+import com.rabbitmq.client.Channel;
+import com.rabbitmq.client.Connection;
+import com.rabbitmq.client.ConnectionFactory;
+import com.rabbitmq.client.DefaultConsumer;
+import com.rabbitmq.client.Envelope;
+import com.rabbitmq.client.ShutdownListener;
+import com.rabbitmq.client.ShutdownSignalException;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.RadioMessage;
 import org.graylog2.plugin.buffers.Buffer;
@@ -36,11 +43,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public class Consumer {
-
     private static final Logger LOG = LoggerFactory.getLogger(Consumer.class);
 
     // Not threadsafe!
@@ -62,6 +65,7 @@ public class Consumer {
     private final Buffer processBuffer;
     private final MessageInput sourceInput;
     private final int parallelQueues;
+    private final MessagePack messagePack;
 
     private AtomicLong totalBytesRead = new AtomicLong(0);
     private AtomicLong lastSecBytesRead = new AtomicLong(0);
@@ -69,7 +73,7 @@ public class Consumer {
 
     public Consumer(String hostname, int port, String virtualHost, String username, String password,
                     int prefetchCount, String queue, String exchange, String routingKey, int parallelQueues,
-                    Buffer processBuffer, MessageInput sourceInput) {
+                    Buffer processBuffer, MessageInput sourceInput, final MessagePack messagePack) {
         this.hostname = hostname;
         this.port = port;
         this.virtualHost = virtualHost;
@@ -84,8 +88,9 @@ public class Consumer {
 
         this.sourceInput = sourceInput;
         this.parallelQueues = parallelQueues;
+        this.messagePack = messagePack;
 
-        ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+        final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
         scheduler.scheduleAtFixedRate(new Runnable() {
             @Override
             public void run() {
@@ -99,59 +104,57 @@ public class Consumer {
             connect();
         }
 
-        final MessagePack msgpack = new MessagePack();
-
         for (int i = 0; i < parallelQueues; i++) {
             final String queueName = String.format(queue, i);
             channel.queueDeclare(queueName, true, false, false, null);
             channel.basicConsume(queueName, false, new DefaultConsumer(channel) {
-                    @Override
-                    public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) throws IOException {
-                        long deliveryTag = envelope.getDeliveryTag();
+                        @Override
+                        public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) throws IOException {
+                            long deliveryTag = envelope.getDeliveryTag();
 
-                        try {
-                            totalBytesRead.addAndGet(body.length);
-                            lastSecBytesReadTmp.addAndGet(body.length);
+                            try {
+                                totalBytesRead.addAndGet(body.length);
+                                lastSecBytesReadTmp.addAndGet(body.length);
 
-                            final RadioMessage msg = msgpack.read(body, RadioMessage.class);
+                                final RadioMessage msg = messagePack.read(body, RadioMessage.class);
 
-                            if (!msg.strings.containsKey("message") || !msg.strings.containsKey("source") || msg.timestamp <= 0) {
-                                LOG.error("Incomplete AMQP message. Skipping.");
+                                if (!msg.strings.containsKey("message") || !msg.strings.containsKey("source") || msg.timestamp <= 0) {
+                                    LOG.error("Incomplete AMQP message. Skipping.");
+                                    channel.basicAck(deliveryTag, false);
+                                }
+
+                                final Message event = new Message(
+                                        msg.strings.get("message"),
+                                        msg.strings.get("source"),
+                                        new DateTime(msg.timestamp, DateTimeZone.UTC)
+                                );
+
+                                event.addStringFields(msg.strings);
+                                event.addLongFields(msg.longs);
+                                event.addDoubleFields(msg.doubles);
+
+                                processBuffer.insertFailFast(event, sourceInput);
                                 channel.basicAck(deliveryTag, false);
-                            }
-
-                            final Message event = new Message(
-                                    msg.strings.get("message"),
-                                    msg.strings.get("source"),
-                                    new DateTime(msg.timestamp, DateTimeZone.UTC)
-                            );
-
-                            event.addStringFields(msg.strings);
-                            event.addLongFields(msg.longs);
-                            event.addDoubleFields(msg.doubles);
-
-                            processBuffer.insertFailFast(event, sourceInput);
-                            channel.basicAck(deliveryTag, false);
-                        } catch (BufferOutOfCapacityException e) {
-                            LOG.debug("Input buffer full, requeuing message. Delaying 10 ms until trying next message.");
-                            if (channel.isOpen()) {
-                                channel.basicNack(deliveryTag, false, true);
-                                Uninterruptibles.sleepUninterruptibly(10, TimeUnit.MILLISECONDS); // TODO magic number
-                            }
-                        } catch (ProcessingDisabledException e) {
-                            LOG.debug("Message processing is disabled, requeuing message. Delaying 100 ms until trying next message.");
-                            if (channel.isOpen()) {
-                                channel.basicNack(deliveryTag, false, true);
-                                Uninterruptibles.sleepUninterruptibly(100, TimeUnit.MILLISECONDS); // TODO magic number
-                            }
-                        } catch (Exception e) {
-                            LOG.error("Error while trying to process AMQP message, requeuing message", e);
-                            if (channel.isOpen()) {
-                                channel.basicNack(deliveryTag, false, true);
+                            } catch (BufferOutOfCapacityException e) {
+                                LOG.debug("Input buffer full, requeuing message. Delaying 10 ms until trying next message.");
+                                if (channel.isOpen()) {
+                                    channel.basicNack(deliveryTag, false, true);
+                                    Uninterruptibles.sleepUninterruptibly(10, TimeUnit.MILLISECONDS); // TODO magic number
+                                }
+                            } catch (ProcessingDisabledException e) {
+                                LOG.debug("Message processing is disabled, requeuing message. Delaying 100 ms until trying next message.");
+                                if (channel.isOpen()) {
+                                    channel.basicNack(deliveryTag, false, true);
+                                    Uninterruptibles.sleepUninterruptibly(100, TimeUnit.MILLISECONDS); // TODO magic number
+                                }
+                            } catch (Exception e) {
+                                LOG.error("Error while trying to process AMQP message, requeuing message", e);
+                                if (channel.isOpen()) {
+                                    channel.basicNack(deliveryTag, false, true);
+                                }
                             }
                         }
                     }
-                }
             );
         }
     }
@@ -164,7 +167,7 @@ public class Consumer {
         factory.setVirtualHost(virtualHost);
 
         // Authenticate?
-        if(username != null && !username.isEmpty() && password != null && !password.isEmpty()) {
+        if (username != null && !username.isEmpty() && password != null && !password.isEmpty()) {
             factory.setUsername(username);
             factory.setPassword(password);
         }
@@ -175,7 +178,7 @@ public class Consumer {
         if (prefetchCount > 0) {
             channel.basicQos(prefetchCount);
 
-            LOG.info("AMQP prefetch count overriden to <{}>.", prefetchCount);
+            LOG.info("AMQP prefetch count overridden to <{}>.", prefetchCount);
         }
 
         connection.addShutdownListener(new ShutdownListener() {
@@ -199,7 +202,7 @@ public class Consumer {
 
                         LOG.info("Consumer running.");
                         break;
-                    } catch(IOException e) {
+                    } catch (IOException e) {
                         LOG.error("Could not re-connect to AMQP broker.", e);
                     }
                 }
