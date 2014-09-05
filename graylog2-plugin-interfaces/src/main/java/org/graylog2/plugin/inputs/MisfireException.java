@@ -22,10 +22,7 @@
  */
 package org.graylog2.plugin.inputs;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
-public class MisfireException extends Throwable {
+public class MisfireException extends Exception {
 
     public MisfireException(String msg) {
         super(msg);

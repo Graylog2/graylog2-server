@@ -21,9 +21,6 @@ import org.graylog2.plugin.inputs.Converter;
 
 import java.util.Map;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public class ConverterFactory {
 
     public static Converter factory(Converter.Type type, Map<String, Object> config) throws NoSuchConverterException, ConfigurationException {
@@ -57,6 +54,6 @@ public class ConverterFactory {
         }
     }
 
-    public static class NoSuchConverterException extends Throwable {
+    public static class NoSuchConverterException extends Exception {
     }
 }

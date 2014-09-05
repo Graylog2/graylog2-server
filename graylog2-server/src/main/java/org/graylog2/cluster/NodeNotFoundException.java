@@ -16,10 +16,7 @@
  */
 package org.graylog2.cluster;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
-public class NodeNotFoundException extends Throwable {
+public class NodeNotFoundException extends Exception {
     public NodeNotFoundException(String msg) {
         super(msg);
     }
