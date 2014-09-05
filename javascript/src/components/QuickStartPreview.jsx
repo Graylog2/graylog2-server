@@ -6,10 +6,15 @@ var React = require('React');
 
 var QuickStartPreview = React.createClass({
     render: function () {
+        var preview = "Select an element from the left list to see its preview";
+        if (this.props.sourceType) {
+            preview = this.props.sourceType;
+        }
+
         return (
             <div className="quick-start-preview">
                 <h2>Preview:</h2>
-                {this.props.children}
+                {preview}
             </div>
         );
     }

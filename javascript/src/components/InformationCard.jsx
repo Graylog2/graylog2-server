@@ -3,15 +3,16 @@
 'use strict';
 
 var React = require('React');
+var Card = require('./Card');
 
-var BootstrapAccordion = React.createClass({
+var InformationCard = React.createClass({
     render: function () {
         return (
-            <div id="bundles" className="accordion">
+            <Card type="info">
                 {this.props.children}
-            </div>
+            </Card>
         );
     }
 });
 
-module.exports = BootstrapAccordion;
+module.exports = InformationCard;
