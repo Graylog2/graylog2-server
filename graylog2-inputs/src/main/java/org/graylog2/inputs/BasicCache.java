@@ -16,34 +16,19 @@
  */
 package org.graylog2.inputs;
 
-import com.google.common.collect.Queues;
-import org.cliffc.high_scale_lib.Counter;
 import org.graylog2.plugin.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import scala.actors.threadpool.Arrays;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
-import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
-/**
- * 
- * @author Lennart Koopmann <lennart@socketfeed.com>
- */
-public class BasicCache implements Cache, InputCache, OutputCache {
+public class BasicCache implements InputCache, OutputCache {
     private static final Logger LOG = LoggerFactory.getLogger(BasicCache.class);
 
-    //private final ConcurrentLinkedQueue<Message> q;
-    private final LinkedBlockingQueue<Message> q;
+    private final BlockingQueue<Message> q = new LinkedBlockingQueue<>();
 
-    public BasicCache() {
-        //q = Queues.newConcurrentLinkedQueue();
-        q = Queues.newLinkedBlockingQueue();
-    }
-    
     @Override
     public void add(Message m) {
         q.add(m);
