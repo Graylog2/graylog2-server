@@ -206,7 +206,7 @@ public class Indexer {
 
             UI.exitHardWithWall("Could not successfully connect to ElasticSearch. Check that your cluster state is not RED " +
                             "and that ElasticSearch is running properly.",
-                    new String[]{"graylog2-server/configuring-and-tuning-elasticsearch-for-graylog2-v0200"});
+                    new String[]{"http://graylog2.org/resources/documentation/setup/elasticsearch"});
         }
 
         searches = searchesFactory.create(client);

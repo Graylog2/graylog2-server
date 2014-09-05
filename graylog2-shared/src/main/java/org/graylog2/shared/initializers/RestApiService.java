@@ -155,11 +155,15 @@ public class RestApiService extends AbstractIdleService {
             LOG.info("Not adding security context factory.");
         }
 
+        final int maxInitialLineLength = configuration.getRestMaxInitialLineLength();
+        final int maxHeaderSize = configuration.getRestMaxHeaderSize();
+        final int maxChunkSize = configuration.getRestMaxChunkSize();
+
         bootstrap.setPipelineFactory(new ChannelPipelineFactory() {
             @Override
             public ChannelPipeline getPipeline() throws Exception {
                 ChannelPipeline pipeline = Channels.pipeline();
-                pipeline.addLast("decoder", new HttpRequestDecoder());
+                pipeline.addLast("decoder", new HttpRequestDecoder(maxInitialLineLength, maxHeaderSize, maxChunkSize));
                 pipeline.addLast("encoder", new HttpResponseEncoder());
                 pipeline.addLast("chunks", new ChunkedWriteHandler());
                 pipeline.addLast("jerseyHandler", jerseyHandler);

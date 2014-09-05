@@ -356,7 +356,7 @@ public class KafkaInput extends MessageInput {
 
     @Override
     public String linkToDocs() {
-        return "http://support.torch.sh/help/kb/getting-your-logs-into-graylog2/using-the-kafka-message-input";
+        return "http://graylog2.org/resources/documentation/sending/heroku";
     }
 
     @Override

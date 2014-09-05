@@ -26,39 +26,37 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public class RegexExtractor extends Extractor {
+    private static final String CONFIG_REGEX_VALUE = "regex_value".intern();
 
     private final Pattern pattern;
 
-    public RegexExtractor(MetricRegistry metricRegistry,
-                          String id,
-                          String title,
-                          int order,
-                          CursorStrategy cursorStrategy,
-                          String sourceField,
-                          String targetField,
-                          Map<String, Object> extractorConfig,
-                          String creatorUserId,
-                          List<Converter> converters,
-                          ConditionType conditionType,
-                          String conditionValue) throws ReservedFieldException, ConfigurationException {
+    public RegexExtractor(final MetricRegistry metricRegistry,
+                          final String id,
+                          final String title,
+                          final int order,
+                          final CursorStrategy cursorStrategy,
+                          final String sourceField,
+                          final String targetField,
+                          final Map<String, Object> extractorConfig,
+                          final String creatorUserId,
+                          final List<Converter> converters,
+                          final ConditionType conditionType,
+                          final String conditionValue) throws ReservedFieldException, ConfigurationException {
         super(metricRegistry, id, title, order, Type.REGEX, cursorStrategy, sourceField, targetField, extractorConfig, creatorUserId, converters, conditionType, conditionValue);
 
-        if (extractorConfig == null || extractorConfig.get("regex_value") == null || ((String) extractorConfig.get("regex_value")).isEmpty()) {
+        if (extractorConfig == null || extractorConfig.get(CONFIG_REGEX_VALUE) == null || ((String) extractorConfig.get(CONFIG_REGEX_VALUE)).isEmpty()) {
             throw new ConfigurationException("Missing regex configuration field: regex_value");
         }
 
-        pattern = Pattern.compile((String) extractorConfig.get("regex_value"), Pattern.DOTALL);
+        pattern = Pattern.compile((String) extractorConfig.get(CONFIG_REGEX_VALUE), Pattern.DOTALL);
     }
 
     @Override
     protected Result run(String value) {
         final Matcher matcher = pattern.matcher(value);
 
-        if (!matcher.find() || matcher.groupCount() == 0) {
+        if (!matcher.find() || matcher.groupCount() == 0 || matcher.start(1) == -1 || matcher.end(1) == -1) {
             return null;
         }
 

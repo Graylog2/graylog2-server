@@ -197,7 +197,7 @@ public class JsonPathInput extends MessageInput {
 
     @Override
     public String linkToDocs() {
-        return "http://support.torch.sh/help/kb/graylog2-server/the-json-path-from-http-api-input";
+        return "http://graylog2.org/resources/documentation/sending/jsonpath";
     }
 
     @Override

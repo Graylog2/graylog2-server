@@ -58,6 +58,15 @@ public abstract class BaseConfiguration {
     @Parameter(value = "rest_enable_gzip")
     private boolean restEnableGzip = false;
 
+    @Parameter(value = "rest_max_initial_line_length", required = true, validator = PositiveIntegerValidator.class)
+    private int restMaxInitialLineLength = 4096;
+
+    @Parameter(value = "rest_max_header_size", required = true, validator = PositiveIntegerValidator.class)
+    private int restMaxHeaderSize = 8192;
+
+    @Parameter(value = "rest_max_chunk_size", required = true, validator = PositiveIntegerValidator.class)
+    private int restMaxChunkSize = 8192;
+
     @Parameter(value = "groovy_shell_enable")
     private boolean groovyShellEnable = false;
 
@@ -143,6 +152,18 @@ public abstract class BaseConfiguration {
 
     public boolean isRestEnableGzip() {
         return restEnableGzip;
+    }
+
+    public int getRestMaxInitialLineLength() {
+        return restMaxInitialLineLength;
+    }
+
+    public int getRestMaxHeaderSize() {
+        return restMaxHeaderSize;
+    }
+
+    public int getRestMaxChunkSize() {
+        return restMaxChunkSize;
     }
 
     public boolean isGroovyShellEnable() {
