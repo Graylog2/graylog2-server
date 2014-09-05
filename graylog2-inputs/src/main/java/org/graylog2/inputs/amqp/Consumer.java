@@ -70,7 +70,7 @@ public class Consumer {
     private AtomicLong lastSecBytesReadTmp = new AtomicLong(0);
 
     public Consumer(String hostname, int port, String virtualHost, String username, String password,
-                    int prefetchCount, String queue, String exchange, String routingKey, int parallelQueus,
+                    int prefetchCount, String queue, String exchange, String routingKey, int parallelQueues,
                     Buffer processBuffer, MessageInput sourceInput) {
         this.hostname = hostname;
         this.port = port;
@@ -85,7 +85,7 @@ public class Consumer {
         this.processBuffer = processBuffer;
 
         this.sourceInput = sourceInput;
-        this.parallelQueues = parallelQueus;
+        this.parallelQueues = parallelQueues;
 
         ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
         scheduler.scheduleAtFixedRate(new Runnable() {
