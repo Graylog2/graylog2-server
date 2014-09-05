@@ -27,17 +27,15 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import java.io.IOException;
 
+/**
+ * @author Lennart Koopmann <lennart@torch.sh>
+ */
 public class AMQPSender {
 
     private static final Logger LOG = LoggerFactory.getLogger(AMQPSender.class);
-    private static final ThreadLocal<MessagePack> MSGPACK = new ThreadLocal<MessagePack>() {
-        @Override
-        protected MessagePack initialValue() {
-            return new MessagePack();
-        }
-    };
 
     // Not threadsafe!
+
     private final String hostname;
     private final int port;
     private final String vHost;
@@ -50,6 +48,8 @@ public class AMQPSender {
 
     private Connection connection;
     private Channel channel;
+
+    private final MessagePack pack;
 
     public AMQPSender(String hostname,
                       int port,
@@ -64,6 +64,7 @@ public class AMQPSender {
         this.queueType = queueType;
         this.exchangeName = exchangeName;
         this.routingKey = routingKey;
+        pack = new MessagePack();
 
         this.hostname = hostname;
         this.port = port;
@@ -90,7 +91,7 @@ public class AMQPSender {
             connect();
         }
 
-        byte[] body = RadioMessage.serialize(MSGPACK.get(), msg);
+        byte[] body = RadioMessage.serialize(pack, msg);
 
         boolean mandatory = true;
         channel.basicPublish(exchangeName, routingKey, mandatory, new AMQP.BasicProperties(), body);
