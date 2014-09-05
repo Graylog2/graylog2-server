@@ -25,6 +25,7 @@ import org.graylog2.plugin.buffers.BufferOutOfCapacityException;
 import org.graylog2.plugin.buffers.ProcessingDisabledException;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.msgpack.MessagePack;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -113,17 +114,17 @@ public class Consumer {
                             totalBytesRead.addAndGet(body.length);
                             lastSecBytesReadTmp.addAndGet(body.length);
 
-                            RadioMessage msg = MSGPACK.get().read(body, RadioMessage.class);
+                            final RadioMessage msg = MSGPACK.get().read(body, RadioMessage.class);
 
                             if (!msg.strings.containsKey("message") || !msg.strings.containsKey("source") || msg.timestamp <= 0) {
                                 LOG.error("Incomplete AMQP message. Skipping.");
                                 channel.basicAck(deliveryTag, false);
                             }
 
-                            Message event = new Message(
+                            final Message event = new Message(
                                     msg.strings.get("message"),
                                     msg.strings.get("source"),
-                                    new DateTime(msg.timestamp)
+                                    new DateTime(msg.timestamp, DateTimeZone.UTC)
                             );
 
                             event.addStringFields(msg.strings);
