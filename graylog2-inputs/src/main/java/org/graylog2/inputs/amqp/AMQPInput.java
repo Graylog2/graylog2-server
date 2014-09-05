@@ -37,9 +37,6 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.Map;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public class AMQPInput extends MessageInput {
 
     private static final Logger LOG = LoggerFactory.getLogger(AMQPInput.class);
@@ -123,7 +120,7 @@ public class AMQPInput extends MessageInput {
         serverEventBus.register(this);
         try {
             consumer.run();
-        } catch(IOException e) {
+        } catch (IOException e) {
             throw new MisfireException("Could not launch AMQP consumer.", e);
         }
     }
@@ -230,7 +227,7 @@ public class AMQPInput extends MessageInput {
                 new TextField(
                         CK_ROUTING_KEY,
                         "Routing key",
-                        defaultRouttingKey(),
+                        defaultRoutingKey(),
                         "Routing key to listen for.",
                         ConfigurationField.Optional.NOT_OPTIONAL
                 )
@@ -241,7 +238,7 @@ public class AMQPInput extends MessageInput {
                         CK_PARALLEL_QUEUES,
                         "Number of Queues",
                         1,
-                        "Number of parallel QUeues",
+                        "Number of parallel queues",
                         ConfigurationField.Optional.NOT_OPTIONAL
                 )
         );
@@ -249,7 +246,7 @@ public class AMQPInput extends MessageInput {
         return cr;
     }
 
-    protected String defaultRouttingKey() {
+    protected String defaultRoutingKey() {
         return "#";
     }
 

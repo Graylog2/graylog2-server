@@ -20,16 +20,7 @@ import com.codahale.metrics.MetricRegistry;
 import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
 import org.graylog2.inputs.amqp.AMQPInput;
-import org.graylog2.plugin.configuration.Configuration;
-import org.graylog2.plugin.configuration.ConfigurationException;
-import org.graylog2.plugin.configuration.ConfigurationRequest;
-import org.graylog2.plugin.configuration.fields.ConfigurationField;
-import org.graylog2.plugin.configuration.fields.NumberField;
-import org.graylog2.plugin.configuration.fields.TextField;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public class RadioAMQPInput extends AMQPInput {
 
     public static final String NAME = "Graylog2 Radio Input (AMQP)";
@@ -40,7 +31,7 @@ public class RadioAMQPInput extends AMQPInput {
     }
 
     @Override
-    protected String defaultRouttingKey() {
+    protected String defaultRoutingKey() {
         return "graylog2-radio-message";
     }
 
