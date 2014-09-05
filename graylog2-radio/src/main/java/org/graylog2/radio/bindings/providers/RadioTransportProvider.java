@@ -21,39 +21,36 @@ import org.graylog2.plugin.ServerStatus;
 import org.graylog2.radio.Configuration;
 import org.graylog2.radio.transports.RadioTransport;
 import org.graylog2.radio.transports.amqp.AMQPProducer;
-import org.graylog2.radio.transports.amqp.AMQPSender;
 import org.graylog2.radio.transports.kafka.KafkaProducer;
+import org.msgpack.MessagePack;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-/**
- * @author Dennis Oelkers <dennis@torch.sh>
- */
 public class RadioTransportProvider implements Provider<RadioTransport> {
     private final Configuration configuration;
     private final MetricRegistry metricRegistry;
     private final ServerStatus serverStatus;
-    private final AMQPSender amqpSender;
+    private final MessagePack messagePack;
 
     @Inject
     public RadioTransportProvider(Configuration configuration,
                                   MetricRegistry metricRegistry,
                                   ServerStatus serverStatus,
-                                  AMQPSender amqpSender) {
+                                  final MessagePack messagePack) {
         this.configuration = configuration;
         this.metricRegistry = metricRegistry;
         this.serverStatus = serverStatus;
-        this.amqpSender = amqpSender;
+        this.messagePack = messagePack;
     }
 
     @Override
     public RadioTransport get() {
         switch (configuration.getTransportType()) {
             case AMQP:
-                return new AMQPProducer(metricRegistry, configuration);
+                return new AMQPProducer(metricRegistry, configuration, messagePack);
             case KAFKA:
-                return new KafkaProducer(serverStatus, configuration, metricRegistry);
+                return new KafkaProducer(serverStatus, configuration, metricRegistry, messagePack);
             default:
                 throw new RuntimeException("Cannot map transport type to transport.");
         }

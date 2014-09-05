@@ -29,6 +29,7 @@ import org.graylog2.radio.bindings.RadioBindings;
 import org.graylog2.radio.bindings.RadioInitializerBindings;
 import org.graylog2.radio.transports.amqp.AMQPSender;
 import org.graylog2.shared.bindings.GuiceInstantiationService;
+import org.msgpack.MessagePack;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -36,12 +37,10 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-/**
- * @author Dennis Oelkers <dennis@torch.sh>
- */
 public class AMQPTestSenderRunner extends Main {
     public static class AMQPSenderProvider implements Provider<AMQPSender> {
         private final Configuration configuration;
+        private final MessagePack messagePack;
         private final static AtomicInteger instanceCount;
 
         static {
@@ -49,8 +48,9 @@ public class AMQPTestSenderRunner extends Main {
         }
 
         @Inject
-        public AMQPSenderProvider(Configuration configuration) {
+        public AMQPSenderProvider(Configuration configuration, MessagePack messagePack) {
             this.configuration = configuration;
+            this.messagePack = messagePack;
         }
 
         @Override
@@ -68,8 +68,8 @@ public class AMQPTestSenderRunner extends Main {
                     queueName,
                     configuration.getAmqpQueueType(),
                     exchangeName,
-                    configuration.getAmqpRoutingKey()
-            );
+                    configuration.getAmqpRoutingKey(),
+                    messagePack);
         }
     }
     public static class Bindings extends AbstractModule {
