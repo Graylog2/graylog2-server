@@ -2,7 +2,7 @@
 
 'use strict';
 
-var React = require('React');
+var React = require('react');
 var Card = require('./Card');
 var BootstrapAccordion = require('./BootstrapAccordion');
 var BootstrapAccordionGroup = require('./BootstrapAccordionGroup');

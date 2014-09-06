@@ -2,7 +2,7 @@
 
 'use strict';
 
-var React = require('React');
+var React = require('react');
 var PreferencesStore = require('../stores/PreferencesStore');
 
 var UserPreferencesButton = React.createClass({

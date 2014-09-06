@@ -1,6 +1,6 @@
 /** @jsx React.DOM */
 
-var React = require('React');
+var React = require('react');
 var UserPreferencesButton = require('./components/UserPreferencesButton');
 var UserPreferencesModal = require('./components/UserPreferencesModal');
 var CardList = require('./components/CardList');

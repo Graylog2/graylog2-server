@@ -2,7 +2,7 @@
 
 'use strict';
 
-var React = require('React');
+var React = require('react');
 
 var QuickStartPreview = React.createClass({
     render: function () {

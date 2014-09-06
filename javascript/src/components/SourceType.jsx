@@ -2,7 +2,7 @@
 
 'use strict';
 
-var React = require('React');
+var React = require('react');
 
 var SourceType = React.createClass({
     _onChange: function(event) {
