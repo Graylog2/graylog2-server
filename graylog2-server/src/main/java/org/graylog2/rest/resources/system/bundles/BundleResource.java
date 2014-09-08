@@ -20,7 +20,7 @@ import com.codahale.metrics.annotation.Timed;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.bundles.BundleService;
 import org.graylog2.bundles.ConfigurationBundle;
-import org.graylog2.database.ValidationException;
+import org.graylog2.database.NotFoundException;
 import org.graylog2.rest.documentation.annotations.Api;
 import org.graylog2.rest.documentation.annotations.ApiOperation;
 import org.graylog2.rest.documentation.annotations.ApiParam;
@@ -34,39 +34,129 @@ import javax.inject.Inject;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriBuilder;
+import java.net.URI;
+import java.util.Set;
 
 @RequiresAuthentication
 @Api(value = "System/Bundles", description = "Configuration bundles")
 @Path("/system/bundles")
+@Produces(MediaType.APPLICATION_JSON)
 public class BundleResource extends RestResource {
     private static final Logger LOG = LoggerFactory.getLogger(BundleResource.class);
 
     private final BundleService bundleService;
 
     @Inject
-    public BundleResource(BundleService bundleService) {
+    public BundleResource(final BundleService bundleService) {
         this.bundleService = bundleService;
     }
 
     @POST
     @Timed
     @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    @ApiOperation(value = "Set up entities described by configuration bundle")
+    @ApiOperation(value = "Upload a configuration bundle")
     @ApiResponses(value = {
             @ApiResponse(code = 400, message = "Missing or invalid configuration bundle"),
-            @ApiResponse(code = 500, message = "Error while applying configuration bundle")
+            @ApiResponse(code = 500, message = "Error while saving configuration bundle")
     })
-    public void create(
+    public Response createBundle(
             @ApiParam(title = "Configuration bundle", required = true)
             @NotNull @Valid
-            final ConfigurationBundle configurationBundle)
-            throws ValidationException {
+            final ConfigurationBundle configurationBundle) {
+        final String bundleId = bundleService.insert(configurationBundle);
+        final URI bundleUri = UriBuilder.fromMethod(BundleResource.class, "showBundle").build(bundleId);
 
-        bundleService.applyConfigurationBundle(configurationBundle, getCurrentUser());
+        return Response.created(bundleUri).build();
+    }
+
+    @GET
+    @Timed
+    @ApiOperation(value = "List available configuration bundles")
+    @ApiResponses(value = {
+            @ApiResponse(code = 500, message = "Error loading configuration bundles")
+    })
+    public Set<ConfigurationBundle> listBundles() {
+        return bundleService.loadAll();
+    }
+
+    @GET
+    @Timed
+    @Path("{bundleId}")
+    @ApiOperation(value = "Show configuration bundle")
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "Missing or invalid configuration bundle"),
+            @ApiResponse(code = 500, message = "Error while loading configuration bundle")
+    })
+    public ConfigurationBundle showBundle(
+            @ApiParam(title = "Configuration bundle ID", required = true)
+            @NotNull
+            @PathParam("bundleId")
+            final String bundleId) throws NotFoundException {
+        return bundleService.load(bundleId);
+    }
+
+    @PUT
+    @Timed
+    @Path("{bundleId}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @ApiOperation(value = "Update configuration bundle")
+    @ApiResponses(value = {
+            @ApiResponse(code = 400, message = "Missing or invalid configuration bundle"),
+            @ApiResponse(code = 500, message = "Error while updating configuration bundle")
+    })
+    public void updateBundle(
+            @ApiParam(title = "Configuration bundle ID", required = true)
+            @NotNull
+            @PathParam("bundleId")
+            final String bundleId,
+            @ApiParam(title = "Configuration bundle", required = true)
+            @NotNull @Valid
+            final ConfigurationBundle configurationBundle) {
+
+        bundleService.update(bundleId, configurationBundle);
+    }
+
+    @DELETE
+    @Path("{bundleId}")
+    @Timed
+    @ApiOperation(value = "Delete configuration bundle")
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "Missing or invalid configuration bundle"),
+            @ApiResponse(code = 500, message = "Error while applying configuration bundle")
+    })
+    public void deleteBundle(
+            @ApiParam(title = "Configuration bundle ID", required = true)
+            @NotNull
+            @PathParam("bundleId")
+            final String bundleId) {
+
+        final int deletedBundles = bundleService.delete(bundleId);
+        LOG.debug("Successfully removed {} configuration bundles", deletedBundles);
+    }
+
+    @POST
+    @Path("{bundleId}/apply")
+    @Timed
+    @ApiOperation(value = "Set up entities described by configuration bundle")
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "Missing or invalid configuration bundle"),
+            @ApiResponse(code = 500, message = "Error while applying configuration bundle")
+    })
+    public void applyBundle(
+            @ApiParam(title = "Configuration bundle ID", required = true)
+            @NotNull
+            @PathParam("bundleId")
+            final String bundleId) throws NotFoundException {
+        bundleService.applyConfigurationBundle(bundleId, getCurrentUser());
     }
 }

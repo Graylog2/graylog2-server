@@ -17,13 +17,19 @@
 package org.graylog2.bundles;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.hibernate.validator.constraints.NotBlank;
+import org.mongojack.ObjectId;
 
 import javax.validation.constraints.NotNull;
 import java.util.Collections;
 import java.util.List;
 
 public class ConfigurationBundle {
+    @ObjectId
     @JsonProperty
+    private String _id;
+    @JsonProperty
+    @NotBlank
     private String name;
     @JsonProperty
     private String description;
@@ -39,6 +45,14 @@ public class ConfigurationBundle {
     @JsonProperty
     @NotNull
     private List<Dashboard> dashboards = Collections.emptyList();
+
+    public String getId() {
+        return _id;
+    }
+
+    public void setId(String id) {
+        _id = id;
+    }
 
     public String getName() {
         return name;
