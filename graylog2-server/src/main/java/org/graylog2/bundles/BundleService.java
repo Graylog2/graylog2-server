@@ -24,12 +24,7 @@ import org.bson.types.ObjectId;
 import org.graylog2.dashboards.DashboardImpl;
 import org.graylog2.dashboards.DashboardRegistry;
 import org.graylog2.dashboards.DashboardService;
-import org.graylog2.dashboards.widgets.FieldChartWidget;
 import org.graylog2.dashboards.widgets.InvalidWidgetConfigurationException;
-import org.graylog2.dashboards.widgets.QuickvaluesWidget;
-import org.graylog2.dashboards.widgets.SearchResultChartWidget;
-import org.graylog2.dashboards.widgets.SearchResultCountWidget;
-import org.graylog2.dashboards.widgets.StreamSearchResultCountWidget;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.database.ValidationException;
 import org.graylog2.indexer.Indexer;
@@ -427,56 +422,8 @@ public class BundleService {
         }
 
         final String widgetId = UUID.randomUUID().toString();
-
-        // XXX TODO: these long constructors suck and 90% of it can be unified in a step before
-        switch (type) {
-            case SEARCH_RESULT_COUNT:
-                return new SearchResultCountWidget(metricRegistry, indexer,
-                        widgetId,
-                        dashboardWidget.getDescription(),
-                        dashboardWidget.getCacheTime(),
-                        config,
-                        (String) config.get("query"),
-                        timeRange,
-                        userName);
-            case STREAM_SEARCH_RESULT_COUNT:
-                return new StreamSearchResultCountWidget(metricRegistry, indexer,
-                        widgetId,
-                        dashboardWidget.getDescription(),
-                        dashboardWidget.getCacheTime(),
-                        config,
-                        (String) config.get("query"),
-                        timeRange,
-                        userName);
-            case FIELD_CHART:
-                return new FieldChartWidget(metricRegistry, indexer,
-                        widgetId,
-                        dashboardWidget.getDescription(),
-                        dashboardWidget.getCacheTime(),
-                        config,
-                        (String) config.get("query"),
-                        timeRange,
-                        userName);
-            case QUICKVALUES:
-                return new QuickvaluesWidget(metricRegistry, indexer,
-                        widgetId,
-                        dashboardWidget.getDescription(),
-                        dashboardWidget.getCacheTime(),
-                        config,
-                        (String) config.get("query"),
-                        timeRange,
-                        userName);
-            case SEARCH_RESULT_CHART:
-                return new SearchResultChartWidget(metricRegistry, indexer,
-                        widgetId,
-                        dashboardWidget.getDescription(),
-                        dashboardWidget.getCacheTime(),
-                        config,
-                        (String) config.get("query"),
-                        timeRange,
-                        userName);
-            default:
-                throw new org.graylog2.dashboards.widgets.DashboardWidget.NoSuchWidgetTypeException();
-        }
+        return org.graylog2.dashboards.widgets.DashboardWidget.buildDashboardWidget(type, metricRegistry, indexer,
+                widgetId, dashboardWidget.getDescription(), dashboardWidget.getCacheTime(),
+                config, (String) config.get("query"), timeRange, userName);
     }
 }
