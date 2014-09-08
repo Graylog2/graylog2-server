@@ -40,6 +40,7 @@ import org.graylog2.plugin.rest.AnyExceptionClassMapper;
 import org.graylog2.plugin.rest.JacksonPropertyExceptionMapper;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.plugin.rest.WebApplicationExceptionMapper;
+import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.shared.rest.CORSFilter;
 import org.graylog2.shared.rest.PrintModelProcessor;
 import org.jboss.netty.bootstrap.ServerBootstrap;
@@ -58,9 +59,7 @@ import javax.inject.Singleton;
 import javax.ws.rs.Path;
 import javax.ws.rs.container.ContainerResponseFilter;
 import javax.ws.rs.container.DynamicFeature;
-import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.ExceptionMapper;
-import javax.ws.rs.ext.Provider;
 import java.net.InetSocketAddress;
 import java.util.HashSet;
 import java.util.Map;
@@ -180,7 +179,7 @@ public class RestApiService extends AbstractIdleService {
                         JacksonPropertyExceptionMapper.class,
                         AnyExceptionClassMapper.class,
                         WebApplicationExceptionMapper.class)
-                .register(new JerseyObjectMapperProvider(objectMapper))
+                .register(ObjectMapperProvider.class)
                 .register(JacksonFeature.class)
                 .registerFinder(new PackageNamesScanner(new String[]{
                         "org.graylog2.rest.resources",
@@ -240,19 +239,5 @@ public class RestApiService extends AbstractIdleService {
         LOG.info("Shutting down REST API at <{}>", configuration.getRestListenUri());
         bootstrap.releaseExternalResources();
         bootstrap.shutdown();
-    }
-
-    @Provider
-    private static final class JerseyObjectMapperProvider implements ContextResolver<ObjectMapper> {
-        private final ObjectMapper objectMapper;
-
-        private JerseyObjectMapperProvider(final ObjectMapper objectMapper) {
-            this.objectMapper = objectMapper;
-        }
-
-        @Override
-        public ObjectMapper getContext(Class<?> type) {
-            return objectMapper;
-        }
     }
 }
