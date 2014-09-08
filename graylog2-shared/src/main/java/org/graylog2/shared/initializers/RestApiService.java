@@ -23,10 +23,10 @@
 package org.graylog2.shared.initializers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 import com.google.common.util.concurrent.AbstractIdleService;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.inject.internal.util.$Nullable;
+import org.glassfish.jersey.jackson.JacksonFeature;
 import org.glassfish.jersey.message.GZipEncoder;
 import org.glassfish.jersey.server.ContainerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
@@ -35,11 +35,11 @@ import org.glassfish.jersey.server.internal.scanning.PackageNamesScanner;
 import org.glassfish.jersey.server.model.Resource;
 import org.graylog2.jersey.container.netty.NettyContainer;
 import org.graylog2.jersey.container.netty.SecurityContextFactory;
-import org.graylog2.plugin.rest.PluginRestResource;
-import org.graylog2.plugin.rest.WebApplicationExceptionMapper;
 import org.graylog2.plugin.BaseConfiguration;
 import org.graylog2.plugin.rest.AnyExceptionClassMapper;
 import org.graylog2.plugin.rest.JacksonPropertyExceptionMapper;
+import org.graylog2.plugin.rest.PluginRestResource;
+import org.graylog2.plugin.rest.WebApplicationExceptionMapper;
 import org.graylog2.shared.rest.CORSFilter;
 import org.graylog2.shared.rest.PrintModelProcessor;
 import org.jboss.netty.bootstrap.ServerBootstrap;
@@ -58,7 +58,9 @@ import javax.inject.Singleton;
 import javax.ws.rs.Path;
 import javax.ws.rs.container.ContainerResponseFilter;
 import javax.ws.rs.container.DynamicFeature;
+import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.ExceptionMapper;
+import javax.ws.rs.ext.Provider;
 import java.net.InetSocketAddress;
 import java.util.HashSet;
 import java.util.Map;
@@ -66,12 +68,10 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-/**
- * @author Dennis Oelkers <dennis@torch.sh>
- */
 @Singleton
 public class RestApiService extends AbstractIdleService {
     private static final Logger LOG = LoggerFactory.getLogger(RestApiService.class);
+
     private final BaseConfiguration configuration;
     private final SecurityContextFactory securityContextFactory;
     private final Set<Class<? extends DynamicFeature>> dynamicFeatures;
@@ -79,7 +79,8 @@ public class RestApiService extends AbstractIdleService {
     private final Set<Class<? extends ExceptionMapper>> exceptionMappers;
     private final Map<String, Set<PluginRestResource>> pluginRestResources;
     private final ObjectMapper objectMapper;
-    private ServerBootstrap bootstrap;
+
+    private final ServerBootstrap bootstrap;
 
     @Inject
     public RestApiService(BaseConfiguration configuration,
@@ -89,6 +90,32 @@ public class RestApiService extends AbstractIdleService {
                           Set<Class<? extends ExceptionMapper>> exceptionMappers,
                           Map<String, Set<PluginRestResource>> pluginRestResources,
                           ObjectMapper objectMapper) {
+        this(configuration, securityContextFactory, dynamicFeatures, containerResponseFilters,
+                exceptionMappers, pluginRestResources, objectMapper,
+                Executors.newCachedThreadPool(new ThreadFactoryBuilder().setNameFormat("restapi-boss-%d").build()),
+                Executors.newCachedThreadPool(new ThreadFactoryBuilder().setNameFormat("restapi-worker-%d").build()));
+    }
+
+    private RestApiService(final BaseConfiguration configuration,
+                   final SecurityContextFactory securityContextFactory,
+                   final Set<Class<? extends DynamicFeature>> dynamicFeatures,
+                   final Set<Class<? extends ContainerResponseFilter>> containerResponseFilters,
+                   final Set<Class<? extends ExceptionMapper>> exceptionMappers,
+                   final Map<String, Set<PluginRestResource>> pluginRestResources,
+                   final ObjectMapper objectMapper,
+                   final ExecutorService bossExecutor,
+                   final ExecutorService workerExecutor) {
+        this(configuration, securityContextFactory, dynamicFeatures, containerResponseFilters, exceptionMappers, pluginRestResources, objectMapper, buildServerBootStrap(bossExecutor, workerExecutor));
+    }
+
+    private RestApiService(final BaseConfiguration configuration,
+                   final SecurityContextFactory securityContextFactory,
+                   final Set<Class<? extends DynamicFeature>> dynamicFeatures,
+                   final Set<Class<? extends ContainerResponseFilter>> containerResponseFilters,
+                   final Set<Class<? extends ExceptionMapper>> exceptionMappers,
+                   final Map<String, Set<PluginRestResource>> pluginRestResources,
+                   final ObjectMapper objectMapper,
+                   final ServerBootstrap bootstrap) {
         this.configuration = configuration;
         this.securityContextFactory = securityContextFactory;
         this.dynamicFeatures = dynamicFeatures;
@@ -96,58 +123,21 @@ public class RestApiService extends AbstractIdleService {
         this.exceptionMappers = exceptionMappers;
         this.pluginRestResources = pluginRestResources;
         this.objectMapper = objectMapper;
+        this.bootstrap = bootstrap;
+    }
+
+    private static ServerBootstrap buildServerBootStrap(final ExecutorService bossExecutor, final ExecutorService workerExecutor) {
+        return new ServerBootstrap(new NioServerSocketChannelFactory(bossExecutor, workerExecutor));
     }
 
     @Override
     protected void startUp() throws Exception {
-        final ExecutorService bossExecutor = Executors.newCachedThreadPool(
-                new ThreadFactoryBuilder()
-                        .setNameFormat("restapi-boss-%d")
-                        .build());
-
-        final ExecutorService workerExecutor = Executors.newCachedThreadPool(
-                new ThreadFactoryBuilder()
-                        .setNameFormat("restapi-worker-%d")
-                        .build());
-
-        bootstrap = new ServerBootstrap(new NioServerSocketChannelFactory(
-                bossExecutor,
-                workerExecutor
-        ));
-
-        ResourceConfig rc = new ResourceConfig()
-                .property(NettyContainer.PROPERTY_BASE_URI, configuration.getRestListenUri())
-                .registerClasses(JacksonPropertyExceptionMapper.class,
-                        AnyExceptionClassMapper.class, WebApplicationExceptionMapper.class);
-
-        for (Class<? extends ExceptionMapper> exceptionMapper : exceptionMappers)
-            rc.registerClasses(exceptionMapper);
-
-        for (Class<? extends DynamicFeature> dynamicFeatureClass : dynamicFeatures)
-            rc.registerClasses(dynamicFeatureClass);
-
-        for (Class<? extends ContainerResponseFilter> responseFilter : containerResponseFilters)
-            rc.registerClasses(responseFilter);
-
-        rc
-            .register(new JacksonJsonProvider(objectMapper))
-            .registerFinder(new PackageNamesScanner(new String[]{"org.graylog2.rest.resources",
-                    "org.graylog2.radio.rest.resources", "org.graylog2.shared.rest.resources"}, true));
-
-        if (configuration.isRestEnableGzip())
-            EncodingFilter.enableFor(rc, GZipEncoder.class);
-
-        if (configuration.isRestEnableCors()) {
-            LOG.info("Enabling CORS for REST API");
-            rc.register(CORSFilter.class);
-        }
-
-        rc.registerResources(prefixPluginResources("/plugins", pluginRestResources));
-
-        if(LOG.isDebugEnabled())
-            rc.register(PrintModelProcessor.class);
-
+        final ResourceConfig rc = buildResourceConfig(
+                configuration.isRestEnableGzip(),
+                configuration.isRestEnableCors(),
+                prefixPluginResources("/plugins", pluginRestResources));
         final NettyContainer jerseyHandler = ContainerFactory.createContainer(NettyContainer.class, rc);
+
         if (securityContextFactory != null) {
             LOG.info("Adding security context factory: <{}>", securityContextFactory);
             jerseyHandler.setSecurityContextFactory(securityContextFactory);
@@ -169,7 +159,7 @@ public class RestApiService extends AbstractIdleService {
                 pipeline.addLast("jerseyHandler", jerseyHandler);
                 return pipeline;
             }
-        }) ;
+        });
         bootstrap.setOption("child.tcpNoDelay", true);
         bootstrap.setOption("child.keepAlive", true);
 
@@ -179,6 +169,52 @@ public class RestApiService extends AbstractIdleService {
         ));
 
         LOG.info("Started REST API at <{}>", configuration.getRestListenUri());
+    }
+
+    private ResourceConfig buildResourceConfig(final boolean enableGzip,
+                                               final boolean enableCors,
+                                               final Set<Resource> additionalResources) {
+        ResourceConfig rc = new ResourceConfig()
+                .property(NettyContainer.PROPERTY_BASE_URI, configuration.getRestListenUri())
+                .registerClasses(
+                        JacksonPropertyExceptionMapper.class,
+                        AnyExceptionClassMapper.class,
+                        WebApplicationExceptionMapper.class)
+                .register(new JerseyObjectMapperProvider(objectMapper))
+                .register(JacksonFeature.class)
+                .registerFinder(new PackageNamesScanner(new String[]{
+                        "org.graylog2.rest.resources",
+                        "org.graylog2.radio.rest.resources",
+                        "org.graylog2.shared.rest.resources"
+                }, true))
+                .registerResources(additionalResources);
+
+        for (Class<? extends ExceptionMapper> exceptionMapper : exceptionMappers) {
+            rc.registerClasses(exceptionMapper);
+        }
+
+        for (Class<? extends DynamicFeature> dynamicFeatureClass : dynamicFeatures) {
+            rc.registerClasses(dynamicFeatureClass);
+        }
+
+        for (Class<? extends ContainerResponseFilter> responseFilter : containerResponseFilters) {
+            rc.registerClasses(responseFilter);
+        }
+
+        if (enableGzip) {
+            EncodingFilter.enableFor(rc, GZipEncoder.class);
+        }
+
+        if (enableCors) {
+            LOG.info("Enabling CORS for REST API");
+            rc.register(CORSFilter.class);
+        }
+
+        if (LOG.isDebugEnabled()) {
+            rc.register(PrintModelProcessor.class);
+        }
+
+        return rc;
     }
 
     private Set<Resource> prefixPluginResources(String pluginPrefix, Map<String, Set<PluginRestResource>> pluginResourceMap) {
@@ -204,5 +240,19 @@ public class RestApiService extends AbstractIdleService {
         LOG.info("Shutting down REST API at <{}>", configuration.getRestListenUri());
         bootstrap.releaseExternalResources();
         bootstrap.shutdown();
+    }
+
+    @Provider
+    private static final class JerseyObjectMapperProvider implements ContextResolver<ObjectMapper> {
+        private final ObjectMapper objectMapper;
+
+        private JerseyObjectMapperProvider(final ObjectMapper objectMapper) {
+            this.objectMapper = objectMapper;
+        }
+
+        @Override
+        public ObjectMapper getContext(Class<?> type) {
+            return objectMapper;
+        }
     }
 }
