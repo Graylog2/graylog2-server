@@ -36,6 +36,8 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 import java.util.Map;
 
+import static com.google.common.base.Strings.isNullOrEmpty;
+
 public class UserServiceImpl extends PersistedServiceImpl implements UserService {
     private static final Logger LOG = LoggerFactory.getLogger(UserServiceImpl.class);
 
@@ -100,14 +102,16 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
 
     @Override
     public User syncFromLdapEntry(LdapEntry userEntry, LdapSettings ldapSettings, String username) {
-        User user = load(username);
+        UserImpl user = (UserImpl)load(username);
         // create new user object if necessary
         if (user == null) {
             Map<String, Object> fields = Maps.newHashMap();
             user = new UserImpl(fields);
         }
+
         // update user attributes from ldap entry
         updateFromLdap(user, userEntry, ldapSettings, username);
+
         try {
             save(user);
         } catch (ValidationException e) {
@@ -118,13 +122,18 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
     }
 
     @Override
-    public void updateFromLdap(User user, LdapEntry userEntry, LdapSettings ldapSettings, String username) {
+    public void updateFromLdap(UserImpl user, LdapEntry userEntry, LdapSettings ldapSettings, String username) {
         final String displayNameAttribute = ldapSettings.getDisplayNameAttribute();
         final String fullname = userEntry.get(displayNameAttribute);
         user.setFullName(fullname);
         user.setName(username);
         user.setExternal(true);
         user.setEmail(userEntry.getEmail());
+
+        // TODO This is a crude hack until we have a proper way to distinguish LDAP users from normal users
+        if(isNullOrEmpty(user.getHashedPassword())) {
+            user.setHashedPassword("User synced from LDAP.");
+        }
 
         // only touch the permissions if none existed for this account before
         // i.e. only determine the new permissions for an account on initially importing it.
