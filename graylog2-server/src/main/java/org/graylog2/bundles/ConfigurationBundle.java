@@ -16,6 +16,7 @@
  */
 package org.graylog2.bundles;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.hibernate.validator.constraints.NotBlank;
 import org.mongojack.ObjectId;
@@ -25,6 +26,7 @@ import javax.validation.constraints.NotNull;
 import java.util.Collections;
 import java.util.List;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ConfigurationBundle {
     @Id
     @ObjectId
@@ -35,6 +37,9 @@ public class ConfigurationBundle {
     private String name;
     @JsonProperty
     private String description;
+    @JsonProperty
+    @NotBlank
+    private String category;
     @JsonProperty
     @NotNull
     private List<Input> inputs = Collections.emptyList();
@@ -70,6 +75,14 @@ public class ConfigurationBundle {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
     }
 
     public List<Input> getInputs() {
