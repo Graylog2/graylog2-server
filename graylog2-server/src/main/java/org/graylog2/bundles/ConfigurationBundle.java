@@ -20,14 +20,16 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import org.hibernate.validator.constraints.NotBlank;
 import org.mongojack.ObjectId;
 
+import javax.persistence.Id;
 import javax.validation.constraints.NotNull;
 import java.util.Collections;
 import java.util.List;
 
 public class ConfigurationBundle {
+    @Id
     @ObjectId
     @JsonProperty
-    private String _id;
+    private String id;
     @JsonProperty
     @NotBlank
     private String name;
@@ -47,11 +49,11 @@ public class ConfigurationBundle {
     private List<Dashboard> dashboards = Collections.emptyList();
 
     public String getId() {
-        return _id;
+        return id;
     }
 
     public void setId(String id) {
-        _id = id;
+        this.id = id;
     }
 
     public String getName() {
