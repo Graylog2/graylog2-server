@@ -57,8 +57,11 @@ var QuickStartCard = React.createClass({
                             <BootstrapAccordionGroup name="Windows">
                                 <p>Nothing to see here!</p>
                             </BootstrapAccordionGroup>
-                            <BootstrapAccordionGroup name="More">
-                                <p>Upload your own bundle</p>
+                            <BootstrapAccordionGroup name="Custom">
+                                <form method="POST" action="/a/system/bundles" className="form-inline upload" encType="multipart/form-data">
+                                    <input type="file" name="bundle" />
+                                    <button type="submit" className="btn btn-success">Upload</button>
+                                </form>
                             </BootstrapAccordionGroup>
                         </BootstrapAccordion>
                     </div>
