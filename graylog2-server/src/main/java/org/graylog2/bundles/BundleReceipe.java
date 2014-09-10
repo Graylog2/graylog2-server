@@ -315,7 +315,7 @@ public class BundleReceipe {
             final String userName,
             final DateTime createdAt) {
         final ImmutableMap.Builder<String, Object> inputData = ImmutableMap.builder();
-        inputData.put(MessageInput.FIELD_INPUT_ID, inputId);
+        inputData.put(MessageInput.FIELD_INPUT_ID, inputId.toString());
         inputData.put(MessageInput.FIELD_TITLE, input.getTitle());
         inputData.put(MessageInput.FIELD_TYPE, input.getType());
         inputData.put(MessageInput.FIELD_CREATOR_USER_ID, userName);
@@ -369,12 +369,11 @@ public class BundleReceipe {
         final Map<String, Object> streamData = ImmutableMap.<String, Object>of(
                 "title", streamDescription.getTitle(),
                 "description", streamDescription.getDescription(),
+                "disabled", streamDescription.isDisabled(),
                 "creator_user_id", userName,
                 "created_at", DateTime.now(DateTimeZone.UTC));
 
         final org.graylog2.plugin.streams.Stream stream = streamService.create(streamData);
-        stream.setDisabled(true);
-
         final String streamId = streamService.save(stream);
 
         if (streamDescription.getStreamRules() != null) {
