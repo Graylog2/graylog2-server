@@ -37,6 +37,7 @@ import org.graylog2.ServerVersion;
 import org.graylog2.indexer.Indexer;
 import org.graylog2.metrics.MetricUtils;
 import org.graylog2.plugin.ServerStatus;
+import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.periodical.Periodical;
 import org.graylog2.shared.stats.ThroughputStats;
 import org.slf4j.Logger;
@@ -178,10 +179,13 @@ public class TelemetryReporterThread extends Periodical {
         statistics.put("total_messages", indexer.counts().total());
         statistics.put("started_at", serverStatus.getStartedAt());
         statistics.put("lifecycle", serverStatus.getLifecycle());
+        statistics.put("lb_status", serverStatus.getLifecycle().getLoadbalancerStatus());
         statistics.put("is_processing", serverStatus.isProcessing());
         statistics.put("server_version", ServerVersion.VERSION.toString());
         statistics.put("global_throughput", throughputStats.getCurrentThroughput());
         statistics.put("stream_throughput", throughputStats.getCurrentStreamThroughputValues());
+        statistics.put("hostname", Tools.getLocalCanonicalHostname());
+        statistics.put("timezone", serverStatus.getTimezone().getID());
 
         return statistics;
     }
