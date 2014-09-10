@@ -83,6 +83,7 @@ public class BundleReceipe {
     private final Map<String, org.graylog2.plugin.streams.Output> createdOutputs = new HashMap<>();
     private final Map<String, org.graylog2.plugin.streams.Stream> createdStreams = new HashMap<>();
     private final Map<String, org.graylog2.dashboards.Dashboard> createdDashboards = new HashMap<>();
+    private final Map<String, org.graylog2.plugin.streams.Output> outputsByReferenceId = new HashMap<>();
 
     @Inject
     public BundleReceipe(final InputService inputService,
@@ -340,12 +341,19 @@ public class BundleReceipe {
 
     private OutputImpl createOutput(final Output outputDescription, final String userName)
             throws ValidationException {
-        return (OutputImpl) outputService.create(new OutputImpl(
+        final String referenceId = outputDescription.getId();
+        final OutputImpl output = (OutputImpl) outputService.create(new OutputImpl(
                 outputDescription.getTitle(),
                 outputDescription.getType(),
                 outputDescription.getConfiguration(),
                 DateTime.now(DateTimeZone.UTC).toDate(),
                 userName));
+
+        if(!isNullOrEmpty(referenceId)) {
+            outputsByReferenceId.put(referenceId, output);
+        }
+
+        return output;
     }
 
     private void createStreams(final List<Stream> streams, final String userName)
@@ -382,7 +390,13 @@ public class BundleReceipe {
             }
         }
 
-        // TODO Add Outputs to Streams
+        for(final String outputId : streamDescription.getOutputs()) {
+            if(isNullOrEmpty(outputId))  {
+                LOG.warn("Couldn't find referenced output <{}> for stream <{}>", outputId, streamDescription.getTitle());
+            } else {
+                streamService.addOutput(stream, outputsByReferenceId.get(outputId));
+            }
+        }
 
         return stream;
     }

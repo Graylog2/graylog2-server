@@ -23,11 +23,21 @@ import java.util.Map;
 
 public class Output {
     @JsonProperty
+    private String id;
+    @JsonProperty
     private String title;
     @JsonProperty
     private String type;
     @JsonProperty
     private Map<String, Object> configuration = Collections.emptyMap();
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
 
     public String getTitle() {
         return title;
