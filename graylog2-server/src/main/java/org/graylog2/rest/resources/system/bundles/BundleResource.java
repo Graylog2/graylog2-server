@@ -71,7 +71,7 @@ public class BundleResource extends RestResource {
             @ApiResponse(code = 500, message = "Error while saving configuration bundle")
     })
     public Response createBundle(
-            @ApiParam(title = "Configuration bundle", required = true)
+            @ApiParam(title = "Request body", description = "Configuration bundle", required = true)
             @NotNull @Valid
             final ConfigurationBundle configurationBundle) {
         final ConfigurationBundle bundle = bundleService.insert(configurationBundle);
@@ -107,7 +107,7 @@ public class BundleResource extends RestResource {
             @ApiResponse(code = 500, message = "Error while loading configuration bundle")
     })
     public ConfigurationBundle showBundle(
-            @ApiParam(title = "Configuration bundle ID", required = true)
+            @ApiParam(title = "bundleId", description = "Configuration bundle ID", required = true)
             @NotNull
             @PathParam("bundleId")
             final String bundleId) throws NotFoundException {
@@ -124,11 +124,11 @@ public class BundleResource extends RestResource {
             @ApiResponse(code = 500, message = "Error while updating configuration bundle")
     })
     public void updateBundle(
-            @ApiParam(title = "Configuration bundle ID", required = true)
+            @ApiParam(title = "bundleId", description = "Configuration bundle ID", required = true)
             @NotNull
             @PathParam("bundleId")
             final String bundleId,
-            @ApiParam(title = "Configuration bundle", required = true)
+            @ApiParam(title = "Request body", description = "Configuration bundle", required = true)
             @NotNull @Valid
             final ConfigurationBundle configurationBundle) {
 
@@ -144,7 +144,7 @@ public class BundleResource extends RestResource {
             @ApiResponse(code = 500, message = "Error while applying configuration bundle")
     })
     public void deleteBundle(
-            @ApiParam(title = "Configuration bundle ID", required = true)
+            @ApiParam(title = "bundleId", description = "Configuration bundle ID", required = true)
             @NotNull
             @PathParam("bundleId")
             final String bundleId) {
@@ -162,7 +162,7 @@ public class BundleResource extends RestResource {
             @ApiResponse(code = 500, message = "Error while applying configuration bundle")
     })
     public void applyBundle(
-            @ApiParam(title = "Configuration bundle ID", required = true)
+            @ApiParam(title = "bundleId", description = "Configuration bundle ID", required = true)
             @NotNull
             @PathParam("bundleId")
             final String bundleId) throws NotFoundException {
