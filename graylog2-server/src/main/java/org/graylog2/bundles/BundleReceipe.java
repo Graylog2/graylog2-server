@@ -349,7 +349,7 @@ public class BundleReceipe {
                 DateTime.now(DateTimeZone.UTC).toDate(),
                 userName));
 
-        if(!isNullOrEmpty(referenceId)) {
+        if (!isNullOrEmpty(referenceId)) {
             outputsByReferenceId.put(referenceId, output);
         }
 
@@ -379,7 +379,7 @@ public class BundleReceipe {
         if (streamDescription.getStreamRules() != null) {
             for (StreamRule streamRule : streamDescription.getStreamRules()) {
                 final Map<String, Object> streamRuleData = ImmutableMap.<String, Object>of(
-                        "type", streamRule.getType(),
+                        "type", streamRule.getType().toInteger(),
                         "value", streamRule.getValue(),
                         "field", streamRule.getField(),
                         "inverted", streamRule.isInverted(),
@@ -389,8 +389,8 @@ public class BundleReceipe {
             }
         }
 
-        for(final String outputId : streamDescription.getOutputs()) {
-            if(isNullOrEmpty(outputId))  {
+        for (final String outputId : streamDescription.getOutputs()) {
+            if (isNullOrEmpty(outputId)) {
                 LOG.warn("Couldn't find referenced output <{}> for stream <{}>", outputId, streamDescription.getTitle());
             } else {
                 streamService.addOutput(stream, outputsByReferenceId.get(outputId));
