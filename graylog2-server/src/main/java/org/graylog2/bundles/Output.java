@@ -17,7 +17,9 @@
 package org.graylog2.bundles;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.hibernate.validator.constraints.NotBlank;
 
+import javax.validation.constraints.NotNull;
 import java.util.Collections;
 import java.util.Map;
 
@@ -25,10 +27,13 @@ public class Output {
     @JsonProperty
     private String id;
     @JsonProperty
+    @NotBlank
     private String title;
     @JsonProperty
+    @NotBlank
     private String type;
     @JsonProperty
+    @NotNull
     private Map<String, Object> configuration = Collections.emptyMap();
 
     public String getId() {

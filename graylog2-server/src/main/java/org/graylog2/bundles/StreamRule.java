@@ -18,16 +18,22 @@ package org.graylog2.bundles;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.graylog2.plugin.streams.StreamRuleType;
+import org.hibernate.validator.constraints.NotBlank;
+
+import javax.validation.constraints.NotNull;
 
 public class StreamRule {
     @JsonProperty
+    @NotNull
     private StreamRuleType type;
     @JsonProperty
+    @NotBlank
     private String field;
     @JsonProperty
-    private String value;
+    @NotNull
+    private String value = "";
     @JsonProperty
-    private boolean inverted;
+    private boolean inverted = false;
 
     public StreamRuleType getType() {
         return type;

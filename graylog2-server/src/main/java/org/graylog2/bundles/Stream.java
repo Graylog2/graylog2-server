@@ -17,21 +17,26 @@
 package org.graylog2.bundles;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.hibernate.validator.constraints.NotBlank;
 
+import javax.validation.constraints.NotNull;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
 public class Stream {
     @JsonProperty
+    @NotBlank
     private String title;
     @JsonProperty
     private String description;
     @JsonProperty
-    private boolean disabled;
+    private boolean disabled = false;
     @JsonProperty
+    @NotNull
     private List<StreamRule> streamRules = Collections.emptyList();
     @JsonProperty
+    @NotNull
     private Set<String> outputs = Collections.emptySet();
 
     public String getTitle() {

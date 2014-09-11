@@ -18,21 +18,29 @@ package org.graylog2.bundles;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 import java.util.Collections;
 import java.util.Map;
 
 public class DashboardWidget {
     @JsonProperty
+    @NotNull
     private String description;
     @JsonProperty
+    @NotNull
     private org.graylog2.dashboards.widgets.DashboardWidget.Type type;
     @JsonProperty
-    private int cacheTime;
+    @Min(0)
+    private int cacheTime = 10;
     @JsonProperty
+    @NotNull
     private Map<String, Object> configuration = Collections.emptyMap();
     @JsonProperty
+    @Min(0)
     private int col;
     @JsonProperty
+    @Min(0)
     private int row;
 
     public String getDescription() {

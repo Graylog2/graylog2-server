@@ -17,23 +17,30 @@
 package org.graylog2.bundles;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.hibernate.validator.constraints.NotBlank;
 
+import javax.validation.constraints.NotNull;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 public class Input {
     @JsonProperty
+    @NotBlank
     private String title;
     @JsonProperty
+    @NotNull
     private Map<String, Object> configuration = Collections.emptyMap();
     @JsonProperty
+    @NotNull
     private Map<String, String> staticFields = Collections.emptyMap();
     @JsonProperty
+    @NotBlank
     private String type;
     @JsonProperty
-    private boolean global;
+    private boolean global = false;
     @JsonProperty
+    @NotNull
     private List<Extractor> extractors = Collections.emptyList();
 
     public String getTitle() {
