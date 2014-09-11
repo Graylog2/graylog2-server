@@ -20,6 +20,7 @@ package org.graylog2.restclient.models.api.requests;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.datatype.guava.GuavaModule;
@@ -40,6 +41,7 @@ public class ApiRequest {
     public ApiRequest() {
         this(new ObjectMapper()
                 .setPropertyNamingStrategy(PropertyNamingStrategy.CAMEL_CASE_TO_LOWER_CASE_WITH_UNDERSCORES)
+                .enable(MapperFeature.AUTO_DETECT_FIELDS)
                 .registerModule(new GuavaModule())
                 .registerModule(new JodaModule()));
     }
