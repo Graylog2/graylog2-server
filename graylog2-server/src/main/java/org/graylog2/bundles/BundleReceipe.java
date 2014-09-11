@@ -411,11 +411,11 @@ public class BundleReceipe {
     private org.graylog2.dashboards.Dashboard createDashboard(final Dashboard dashboardDescription, final String userName)
             throws ValidationException, org.graylog2.dashboards.widgets.DashboardWidget.NoSuchWidgetTypeException, InvalidRangeParametersException, InvalidWidgetConfigurationException {
         // Create dashboard.
-        Map<String, Object> dashboardData = ImmutableMap.<String, Object>of(
-                "title", dashboardDescription.getTitle(),
-                "description", dashboardDescription.getDescription(),
-                "creator_user_id", userName,
-                "created_at", DateTime.now(DateTimeZone.UTC));
+        final Map<String, Object> dashboardData = new HashMap<>();
+        dashboardData.put("title", dashboardDescription.getTitle());
+        dashboardData.put("description", dashboardDescription.getDescription());
+        dashboardData.put("creator_user_id", userName);
+        dashboardData.put("created_at", DateTime.now(DateTimeZone.UTC));
 
         final org.graylog2.dashboards.Dashboard dashboard = new DashboardImpl(dashboardData);
         final String dashboardId = dashboardService.save(dashboard);
