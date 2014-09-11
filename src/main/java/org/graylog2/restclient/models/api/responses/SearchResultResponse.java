@@ -18,7 +18,7 @@
  */
 package org.graylog2.restclient.models.api.responses;
 
-import com.google.gson.annotations.SerializedName;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.joda.time.DateTime;
 
 import java.util.List;
@@ -31,15 +31,15 @@ public class SearchResultResponse {
 	public List<MessageSummaryResponse> messages;
 	public List<String> fields;
 
-    @SerializedName("used_indices")
+    @JsonProperty("used_indices")
     public List<String> usedIndices;
 
-    @SerializedName("built_query")
+    @JsonProperty("built_query")
     public String builtQuery;
 
     public ParseError error;
 
-    @SerializedName("generic_error")
+    @JsonProperty("generic_error")
     public GenericError genericError;
 
     public String from;
@@ -56,21 +56,21 @@ public class SearchResultResponse {
     public abstract static class QueryError {}
 
     public static class ParseError extends QueryError {
-        @SerializedName("begin_column")
+        @JsonProperty("begin_column")
         public int beginColumn;
 
-        @SerializedName("begin_line")
+        @JsonProperty("begin_line")
         public int beginLine;
 
-        @SerializedName("end_column")
+        @JsonProperty("end_column")
         public int endColumn;
 
-        @SerializedName("end_line")
+        @JsonProperty("end_line")
         public int endLine;
     }
 
     public static class GenericError extends QueryError {
-        @SerializedName("exception_name")
+        @JsonProperty("exception_name")
         public String exceptionName;
 
         public String message;

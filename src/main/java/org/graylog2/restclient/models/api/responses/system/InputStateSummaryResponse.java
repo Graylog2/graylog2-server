@@ -1,6 +1,6 @@
 package org.graylog2.restclient.models.api.responses.system;
 
-import com.google.gson.annotations.SerializedName;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
@@ -9,12 +9,12 @@ public class InputStateSummaryResponse {
     public String id;
     public String state;
 
-    @SerializedName("message_input")
+    @JsonProperty("message_input")
     public InputSummaryResponse messageinput;
 
-    @SerializedName("started_at")
+    @JsonProperty("started_at")
     public String startedAt;
 
-    @SerializedName("detailed_message")
+    @JsonProperty("detailed_message")
     public String detailedMessage;
 }

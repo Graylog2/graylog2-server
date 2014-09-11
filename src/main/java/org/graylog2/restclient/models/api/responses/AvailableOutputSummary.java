@@ -1,7 +1,7 @@
 package org.graylog2.restclient.models.api.responses;
 
 import com.google.common.collect.Lists;
-import com.google.gson.annotations.SerializedName;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.graylog2.restclient.lib.plugin.configuration.BooleanField;
 import org.graylog2.restclient.lib.plugin.configuration.DropdownField;
 import org.graylog2.restclient.lib.plugin.configuration.NumberField;
@@ -17,7 +17,7 @@ public class AvailableOutputSummary {
     private static final Logger LOG = LoggerFactory.getLogger(AvailableOutputSummary.class);
 
     public String name;
-    @SerializedName("requested_configuration")
+    @JsonProperty("requested_configuration")
     public Map<String, Map<String, Object>> requestedConfiguration;
 
     public List<RequestedConfigurationField> getRequestedConfiguration() {

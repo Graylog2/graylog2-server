@@ -19,7 +19,7 @@
  */
 package org.graylog2.restclient.models.api.responses.system.indices;
 
-import com.google.gson.annotations.SerializedName;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
@@ -29,10 +29,10 @@ public class IndexRangeSummary {
     public String index;
     public String starts;
 
-    @SerializedName("calculation_took_ms")
+    @JsonProperty("calculation_took_ms")
     public long calculationTookMs;
 
-    @SerializedName("calculated_at")
+    @JsonProperty("calculated_at")
     public String calculatedAt;
 
 }

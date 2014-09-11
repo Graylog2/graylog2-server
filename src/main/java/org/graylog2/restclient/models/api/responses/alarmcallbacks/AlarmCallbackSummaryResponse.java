@@ -1,6 +1,6 @@
 package org.graylog2.restclient.models.api.responses.alarmcallbacks;
 
-import com.google.gson.annotations.SerializedName;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.Map;
 
@@ -9,12 +9,12 @@ import java.util.Map;
  */
 public class AlarmCallbackSummaryResponse {
     public String id;
-    @SerializedName("stream_id")
+    @JsonProperty("stream_id")
     public String streamId;
     public String type;
     public Map<String, Object> configuration;
-    @SerializedName("created_at")
+    @JsonProperty("created_at")
     public String createdAt;
-    @SerializedName("creator_user_id")
+    @JsonProperty("creator_user_id")
     public String creatorUserId;
 }

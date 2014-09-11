@@ -18,7 +18,7 @@
  */
 package org.graylog2.restclient.models.api.requests;
 
-import com.google.gson.annotations.SerializedName;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.Map;
 
@@ -29,30 +29,30 @@ public class CreateExtractorRequest extends ApiRequest {
 
     public String title;
 
-    @SerializedName("cut_or_copy")
+    @JsonProperty("cut_or_copy")
     public String cutOrCopy;
 
-    @SerializedName("target_field")
+    @JsonProperty("target_field")
     public String targetField;
 
-    @SerializedName("source_field")
+    @JsonProperty("source_field")
     public String sourceField;
 
-    @SerializedName("extractor_type")
+    @JsonProperty("extractor_type")
     public String extractorType;
 
-    @SerializedName("creator_user_id")
+    @JsonProperty("creator_user_id")
     public String creatorUserId;
 
-    @SerializedName("extractor_config")
+    @JsonProperty("extractor_config")
     public Map<String, Object> extractorConfig;
 
     public Map<String, Map<String, Object>> converters;
 
-    @SerializedName("condition_type")
+    @JsonProperty("condition_type")
     public String conditionType;
 
-    @SerializedName("condition_value")
+    @JsonProperty("condition_value")
     public String conditionValue;
 
     public int order;

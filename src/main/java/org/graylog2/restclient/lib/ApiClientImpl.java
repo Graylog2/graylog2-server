@@ -18,18 +18,31 @@
  */
 package org.graylog2.restclient.lib;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+import com.fasterxml.jackson.datatype.guava.GuavaModule;
+import com.fasterxml.jackson.datatype.joda.JodaModule;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.net.MediaType;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
-import com.ning.http.client.*;
-import org.graylog2.restclient.models.*;
+import com.ning.http.client.AsyncCompletionHandler;
+import com.ning.http.client.AsyncHttpClient;
+import com.ning.http.client.AsyncHttpClientConfig;
+import com.ning.http.client.ListenableFuture;
+import com.ning.http.client.PerRequestConfig;
+import com.ning.http.client.Realm;
+import com.ning.http.client.Request;
+import com.ning.http.client.Response;
+import org.graylog2.restclient.models.ClusterEntity;
+import org.graylog2.restclient.models.Node;
+import org.graylog2.restclient.models.Radio;
+import org.graylog2.restclient.models.User;
+import org.graylog2.restclient.models.UserService;
 import org.graylog2.restclient.models.api.requests.ApiRequest;
 import org.graylog2.restclient.models.api.responses.EmptyResponse;
 import org.graylog2.restroutes.PathMethod;
@@ -40,9 +53,19 @@ import play.mvc.Http;
 
 import javax.ws.rs.core.UriBuilder;
 import java.io.IOException;
-import java.net.*;
+import java.net.ConnectException;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -51,17 +74,27 @@ import static org.graylog2.restclient.lib.Tools.rootCause;
 
 @Singleton
 class ApiClientImpl implements ApiClient {
-    private static final Logger log = LoggerFactory.getLogger(ApiClient.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ApiClient.class);
 
     private AsyncHttpClient client;
     private final ServerNodes serverNodes;
     private final Long defaultTimeout;
+    private final ObjectMapper objectMapper;
     private Thread shutdownHook;
 
     @Inject
     private ApiClientImpl(ServerNodes serverNodes, @Named("Default Timeout") Long defaultTimeout) {
+        this(serverNodes, defaultTimeout,
+                new ObjectMapper()
+                        .setPropertyNamingStrategy(PropertyNamingStrategy.CAMEL_CASE_TO_LOWER_CASE_WITH_UNDERSCORES)
+                        .registerModule(new GuavaModule())
+                        .registerModule(new JodaModule()));
+    }
+
+    private ApiClientImpl(ServerNodes serverNodes, Long defaultTimeout, ObjectMapper objectMapper) {
         this.serverNodes = serverNodes;
         this.defaultTimeout = defaultTimeout;
+        this.objectMapper = objectMapper;
     }
 
     @Override
@@ -134,7 +167,7 @@ class ApiClientImpl implements ApiClient {
     @Override
     public <T> org.graylog2.restclient.lib.ApiRequestBuilder<T> path(PathMethod pathMethod, Class<T> responseClasse) {
         Method httpMethod;
-        switch(pathMethod.getMethod().toUpperCase()) {
+        switch (pathMethod.getMethod().toUpperCase()) {
             case "GET":
                 httpMethod = Method.GET;
                 break;
@@ -174,11 +207,9 @@ class ApiClientImpl implements ApiClient {
         }
     }
 
-    private static <T> T deserializeJson(Response response, Class<T> responseClass) throws IOException {
-        final Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ").create();
-        return gson.fromJson(response.getResponseBody("UTF-8"), responseClass);
+    private <T> T deserializeJson(Response response, Class<T> responseClass) throws IOException {
+        return objectMapper.readValue(response.getResponseBody(StandardCharsets.UTF_8.name()), responseClass);
     }
-
 
     public class ApiRequestBuilder<T> implements org.graylog2.restclient.lib.ApiRequestBuilder<T> {
         private String pathTemplate;
@@ -247,7 +278,7 @@ class ApiClientImpl implements ApiClient {
             } else if (entity instanceof Node) {
                 this.node = (Node) entity;
             } else {
-                log.warn("You passed a ClusterEntity that is not of type Node or Radio. Selected nothing.");
+                LOG.warn("You passed a ClusterEntity that is not of type Node or Radio. Selected nothing.");
             }
             return this;
         }
@@ -368,7 +399,7 @@ class ApiClientImpl implements ApiClient {
             if (radio == null) {
                 if (node == null) {
                     if (nodes != null) {
-                        log.error("Multiple nodes are set, but execute() was called. This is most likely a bug and you meant to call executeOnAll()!", new Throwable());
+                        LOG.error("Multiple nodes are set, but execute() was called. This is most likely a bug and you meant to call executeOnAll()!", new Throwable());
                     }
                     node(serverNodes.any());
                 }
@@ -384,8 +415,8 @@ class ApiClientImpl implements ApiClient {
             requestBuilder.addHeader(Http.HeaderNames.ACCEPT, mediaType.toString());
 
             final Request request = requestBuilder.build();
-            if (log.isDebugEnabled()) {
-                log.debug("API Request: {}", request.toString());
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("API Request: {}", request.toString());
             }
 
             // Set 200 OK as standard if not defined.
@@ -413,7 +444,7 @@ class ApiClientImpl implements ApiClient {
                 }
 
                 if (!responseContentType.is(mediaType.withoutParameters())) {
-                    log.warn("We said we'd accept {} but got {} back, let's see how that's going to work out...", mediaType, responseContentType);
+                    LOG.warn("We said we'd accept {} but got {} back, let's see how that's going to work out...", mediaType, responseContentType);
                 }
                 if (responseClass.equals(String.class)) {
                     return responseClass.cast(response.getResponseBody("UTF-8"));
@@ -430,7 +461,7 @@ class ApiClientImpl implements ApiClient {
                         if (responseContentType.is(MediaType.JSON_UTF_8.withoutParameters())) {
                             result = deserializeJson(response, responseClass);
                         } else {
-                            log.error("Don't know how to deserialize objects with content in {}, expected {}, failing.", responseContentType, mediaType);
+                            LOG.error("Don't know how to deserialize objects with content in {}, expected {}, failing.", responseContentType, mediaType);
                             throw new APIException(request, response);
                         }
 
@@ -440,8 +471,8 @@ class ApiClientImpl implements ApiClient {
 
                         return result;
                     } catch (Exception e) {
-                        log.error("Caught Exception while deserializing JSON request: " + e);
-                        log.debug("Response from backend was: " + response.getResponseBody("UTF-8"));
+                        LOG.error("Caught Exception while deserializing JSON request: " + e);
+                        LOG.debug("Response from backend was: " + response.getResponseBody("UTF-8"));
 
                         throw new APIException(request, response, e);
                     }
@@ -452,23 +483,23 @@ class ApiClientImpl implements ApiClient {
                 // TODO
                 target.markFailure();
             } catch (MalformedURLException e) {
-                log.error("Malformed URL", e);
+                LOG.error("Malformed URL", e);
                 throw new RuntimeException("Malformed URL.", e);
             } catch (ExecutionException e) {
                 if (e.getCause() instanceof ConnectException) {
-                    log.warn("Graylog2 server unavailable. Connection refused.");
+                    LOG.warn("Graylog2 server unavailable. Connection refused.");
                     target.markFailure();
                     throw new Graylog2ServerUnavailableException(e);
                 }
-                log.error("REST call failed", rootCause(e));
+                LOG.error("REST call failed", rootCause(e));
                 throw new APIException(request, e);
             } catch (IOException e) {
                 // TODO
-                log.error("unhandled IOException", rootCause(e));
+                LOG.error("unhandled IOException", rootCause(e));
                 target.markFailure();
                 throw e;
             } catch (TimeoutException e) {
-                log.warn("Timed out requesting {}", request);
+                LOG.warn("Timed out requesting {}", request);
                 target.markFailure();
             }
             throw new APIException(request, new IllegalStateException("Unhandled error condition in API client"));
@@ -480,7 +511,7 @@ class ApiClientImpl implements ApiClient {
                 if (user != null) {
                     session(user.getSessionId());
                 } else {
-                    log.warn("You did not add unauthenticated() nor session() but also don't have a current user. You probably meant unauthenticated(). This is a bug!", new Throwable());
+                    LOG.warn("You did not add unauthenticated() nor session() but also don't have a current user. You probably meant unauthenticated(). This is a bug!", new Throwable());
                 }
             }
         }
@@ -501,8 +532,8 @@ class ApiClientImpl implements ApiClient {
                 try {
                     final AsyncHttpClient.BoundRequestBuilder requestBuilder = requestBuilderForUrl(url);
                     requestBuilder.addHeader(Http.HeaderNames.ACCEPT, mediaType.toString());
-                    if (log.isDebugEnabled()) {
-                        log.debug("API Request: {}", requestBuilder.build().toString());
+                    if (LOG.isDebugEnabled()) {
+                        LOG.debug("API Request: {}", requestBuilder.build().toString());
                     }
                     final ListenableFuture<Response> future = requestBuilder.execute(new AsyncCompletionHandler<Response>() {
                         @Override
@@ -513,7 +544,7 @@ class ApiClientImpl implements ApiClient {
                     });
                     requests.add(new F.Tuple<>(future, currentNode));
                 } catch (IOException e) {
-                    log.error("Cannot execute request", e);
+                    LOG.error("Cannot execute request", e);
                     currentNode.markFailure();
                 }
             }
@@ -525,16 +556,16 @@ class ApiClientImpl implements ApiClient {
                     node.touch();
                     results.put(node, deserializeJson(response, responseClass));
                 } catch (InterruptedException e) {
-                    log.error("API call Interrupted", e);
+                    LOG.error("API call Interrupted", e);
                     node.markFailure();
                 } catch (ExecutionException e) {
-                    log.error("API call failed to execute.", e);
+                    LOG.error("API call failed to execute.", e);
                     node.markFailure();
                 } catch (IOException e) {
-                    log.error("API failed due to IO error", e);
+                    LOG.error("API failed due to IO error", e);
                     node.markFailure();
                 } catch (TimeoutException e) {
-                    log.error("API call timed out", e);
+                    LOG.error("API call timed out", e);
                     node.markFailure();
                 }
             }
@@ -581,7 +612,7 @@ class ApiClientImpl implements ApiClient {
                 requestBuilder.setBodyEncoding("UTF-8");
                 requestBuilder.setBody(body.toJson());
             } else if (method == Method.POST) {
-                log.warn("POST without body, this doesn't make sense,", new IllegalStateException());
+                LOG.warn("POST without body, this doesn't make sense,", new IllegalStateException());
             }
             // TODO: should we always insist on things being wrapped in json?
             if (!responseClass.equals(String.class)) {
@@ -615,7 +646,7 @@ class ApiClientImpl implements ApiClient {
                 }
 
                 if (unauthenticated && sessionId != null) {
-                    log.error("Both session() and unauthenticated() are set for this request, this is a bug, using session id.", new Throwable());
+                    LOG.error("Both session() and unauthenticated() are set for this request, this is a bug, using session id.", new Throwable());
                 }
                 if (sessionId != null) {
                     // pass the current session id via basic auth and special "password"
@@ -625,7 +656,7 @@ class ApiClientImpl implements ApiClient {
                 return builtUrl.toURL();
             } catch (MalformedURLException e) {
                 // TODO handle this properly
-                log.error("Could not build target URL", e);
+                LOG.error("Could not build target URL", e);
                 throw new RuntimeException(e);
             }
         }

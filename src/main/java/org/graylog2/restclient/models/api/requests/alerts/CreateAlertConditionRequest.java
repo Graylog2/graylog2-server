@@ -20,7 +20,7 @@
 package org.graylog2.restclient.models.api.requests.alerts;
 
 import com.google.common.collect.Maps;
-import com.google.gson.annotations.SerializedName;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.graylog2.restclient.models.api.requests.ApiRequest;
 
 import java.util.Map;
@@ -33,7 +33,7 @@ public class CreateAlertConditionRequest extends ApiRequest {
     public String type;
     public Map<String, Object> parameters;
 
-    @SerializedName("creator_user_id")
+    @JsonProperty("creator_user_id")
     public String creatorUserId;
 
     public CreateAlertConditionRequest() {

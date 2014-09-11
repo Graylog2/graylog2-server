@@ -18,7 +18,7 @@
  */
 package org.graylog2.restclient.models.api.responses;
 
-import com.google.gson.annotations.SerializedName;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
@@ -28,7 +28,7 @@ public class BufferSummaryResponse {
 
     public long utilization;
 
-    @SerializedName("utilization_percent")
+    @JsonProperty("utilization_percent")
     public float utilizationPercent;
 
 }

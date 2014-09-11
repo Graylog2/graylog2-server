@@ -18,14 +18,14 @@
  */
 package org.graylog2.restclient.models.api.responses.cluster;
 
-import com.google.gson.annotations.SerializedName;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
 public class NodeSummaryResponse extends ClusterEntitySummaryResponse {
 
-    @SerializedName("is_master")
+    @JsonProperty("is_master")
     public boolean isMaster;
 
 }

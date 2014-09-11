@@ -19,7 +19,7 @@
  */
 package org.graylog2.restclient.models.api.responses.dashboards;
 
-import com.google.gson.annotations.SerializedName;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.Map;
 
@@ -32,10 +32,10 @@ public class DashboardWidgetResponse {
     public String type;
     public String description;
 
-    @SerializedName("cache_time")
+    @JsonProperty("cache_time")
     public int cacheTime;
 
-    @SerializedName("creator_user_id")
+    @JsonProperty("creator_user_id")
     public String creatorUserId;
 
     public Map<String, Object> config;

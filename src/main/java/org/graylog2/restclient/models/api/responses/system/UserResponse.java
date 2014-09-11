@@ -18,7 +18,7 @@
  */
 package org.graylog2.restclient.models.api.responses.system;
 
-import com.google.gson.annotations.SerializedName;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.graylog2.restclient.models.Startpage;
 
 import java.util.List;
@@ -27,7 +27,7 @@ public class UserResponse {
 
 	public String username;
 
-	@SerializedName("full_name")
+	@JsonProperty("full_name")
 	public String fullName;
 
 	public String id;
@@ -38,14 +38,14 @@ public class UserResponse {
 
     public String timezone;
 
-    @SerializedName("read_only")
+    @JsonProperty("read_only")
     public boolean readonly;
 
     public boolean external;
 
     public StartpageResponse startpage;
 
-    @SerializedName("session_timeout_ms")
+    @JsonProperty("session_timeout_ms")
     public long sessionTimeoutMs;
 
     public Startpage getStartpage() {

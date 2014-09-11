@@ -19,7 +19,7 @@
  */
 package org.graylog2.restclient.models.api.responses.metrics;
 
-import com.google.gson.annotations.SerializedName;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.graylog2.restclient.lib.metrics.Gauge;
 import org.graylog2.restclient.lib.metrics.Histogram;
 import org.graylog2.restclient.lib.metrics.Meter;
@@ -36,7 +36,7 @@ public class MetricsListItem {
     public String name;
     public String type;
 
-    @SerializedName("full_name")
+    @JsonProperty("full_name")
     public String fullName;
 
     Map<String, Object> metric;

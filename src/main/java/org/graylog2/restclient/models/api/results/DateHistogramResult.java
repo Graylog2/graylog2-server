@@ -18,13 +18,12 @@
  */
 package org.graylog2.restclient.models.api.results;
 
-import java.util.List;
-import java.util.Map;
-
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.gson.Gson;
 import org.graylog2.restclient.lib.timeranges.AbsoluteRange;
+
+import java.util.List;
+import java.util.Map;
 
 public class DateHistogramResult {
 
@@ -66,11 +65,6 @@ public class DateHistogramResult {
 		return points;
 	}
 
-    @Deprecated
-	public String asJSONString() {
-		return new Gson().toJson(getFormattedResults());
-	}
-	
 	public String getOriginalQuery() {
 		return originalQuery;
 	}

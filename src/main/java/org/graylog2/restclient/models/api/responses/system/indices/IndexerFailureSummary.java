@@ -19,7 +19,7 @@
  */
 package org.graylog2.restclient.models.api.responses.system.indices;
 
-import com.google.gson.annotations.SerializedName;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
@@ -32,7 +32,7 @@ public class IndexerFailureSummary {
     public String type;
     public boolean written;
 
-    @SerializedName("letter_id")
+    @JsonProperty("letter_id")
     public String letterId;
 
 }

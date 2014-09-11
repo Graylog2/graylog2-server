@@ -18,17 +18,17 @@
  */
 package org.graylog2.restclient.models.api.responses.accounts;
 
-import com.google.gson.annotations.SerializedName;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.Map;
 
 public class LdapConnectionTestResponse {
     public boolean connected;
 
-    @SerializedName("system_authenticated")
+    @JsonProperty("system_authenticated")
     public boolean systemAuthenticated;
 
-    @SerializedName("login_authenticated")
+    @JsonProperty("login_authenticated")
     public boolean loginAuthenticated;
 
     public Map<String, String> entry;

@@ -18,17 +18,17 @@
  */
 package org.graylog2.restclient.models.api.requests;
 
-import com.google.gson.annotations.SerializedName;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import static play.data.validation.Constraints.Required;
 
 public class ChangePasswordRequest extends ApiRequest {
 
-    @SerializedName("old_password")
+    @JsonProperty("old_password")
     public String old_password;
 
     @Required
-    @SerializedName("password")
+    @JsonProperty("password")
     public String password;
 
     public String getOld_password() {

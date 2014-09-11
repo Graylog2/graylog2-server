@@ -18,13 +18,13 @@
  */
 package org.graylog2.restclient.models.api.requests.accounts;
 
-import com.google.gson.annotations.SerializedName;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class LdapTestLoginRequest extends LdapSettingsRequest {
 
-    @SerializedName("test_username")
+    @JsonProperty("test_username")
     public String testUsername;
 
-    @SerializedName("test_password")
+    @JsonProperty("test_password")
     public String testPassword;
 }

@@ -18,15 +18,39 @@
  */
 package org.graylog2.restclient.models.api.requests;
 
-import com.google.gson.Gson;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+import com.fasterxml.jackson.datatype.guava.GuavaModule;
+import com.fasterxml.jackson.datatype.joda.JodaModule;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public class ApiRequest {
+    private static final Logger LOG = LoggerFactory.getLogger(ApiRequest.class);
+
+    @JsonIgnore
+    private final ObjectMapper objectMapper;
+
+    public ApiRequest(final ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
+    }
+
+    public ApiRequest() {
+        this(new ObjectMapper()
+                .setPropertyNamingStrategy(PropertyNamingStrategy.CAMEL_CASE_TO_LOWER_CASE_WITH_UNDERSCORES)
+                .registerModule(new GuavaModule())
+                .registerModule(new JodaModule()));
+    }
 
     public String toJson() {
-        return new Gson().toJson(this);
+        try {
+            return objectMapper.writeValueAsString(this);
+        } catch (JsonProcessingException e) {
+            LOG.error("Couldn't serialize API request", e);
+            return null;
+        }
     }
 
 }

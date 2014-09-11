@@ -18,7 +18,7 @@
  */
 package org.graylog2.restclient.models.api.responses.streams;
 
-import com.google.gson.annotations.SerializedName;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.graylog2.restclient.models.api.responses.TimestampResponse;
 
 import java.util.List;
@@ -30,18 +30,18 @@ public class StreamSummaryResponse {
 	public String title;
     public String description;
 	
-	@SerializedName("created_at")
+	@JsonProperty("created_at")
 	public String createdAt;
 	
-	@SerializedName("creator_user_id")
+	@JsonProperty("creator_user_id")
 	public String creatorUserId;
 
-    @SerializedName("rules")
+    @JsonProperty("rules")
     public List<StreamRuleSummaryResponse> streamRules;
 
     public Boolean disabled;
 
-    @SerializedName("alert_receivers")
+    @JsonProperty("alert_receivers")
 	public Map<String, List<String>> alertReceivers;
 	
 }

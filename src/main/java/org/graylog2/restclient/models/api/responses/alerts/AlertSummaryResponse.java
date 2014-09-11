@@ -19,7 +19,7 @@
  */
 package org.graylog2.restclient.models.api.responses.alerts;
 
-import com.google.gson.annotations.SerializedName;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.Map;
 
@@ -31,16 +31,16 @@ public class AlertSummaryResponse {
     public String id;
     public String description;
 
-    @SerializedName("stream_id")
+    @JsonProperty("stream_id")
     public String streamId;
 
-    @SerializedName("condition_id")
+    @JsonProperty("condition_id")
     public String conditionId;
 
-    @SerializedName("condition_parameters")
+    @JsonProperty("condition_parameters")
     public Map<String, Object> conditionParameters;
 
-    @SerializedName("triggered_at")
+    @JsonProperty("triggered_at")
     public String triggeredAt;
 
 }

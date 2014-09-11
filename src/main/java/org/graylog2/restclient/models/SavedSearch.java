@@ -19,7 +19,6 @@
  */
 package org.graylog2.restclient.models;
 
-import com.google.gson.annotations.SerializedName;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import org.graylog2.restclient.models.api.responses.searches.SavedSearchSummaryResponse;
@@ -27,9 +26,6 @@ import org.joda.time.DateTime;
 
 import java.util.Map;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public class SavedSearch {
 
     public interface Factory {

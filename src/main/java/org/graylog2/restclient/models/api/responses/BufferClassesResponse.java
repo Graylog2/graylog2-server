@@ -1,13 +1,13 @@
 package org.graylog2.restclient.models.api.responses;
 
-import com.google.gson.annotations.SerializedName;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
  */
 public class BufferClassesResponse {
-    @SerializedName("process_buffer")
+    @JsonProperty("process_buffer")
     public String processBufferClass;
-    @SerializedName("output_buffer")
+    @JsonProperty("output_buffer")
     public String outputBufferClass;
 }

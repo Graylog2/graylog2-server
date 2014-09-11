@@ -19,7 +19,7 @@
  */
 package org.graylog2.restclient.models.api.responses.searches;
 
-import com.google.gson.annotations.SerializedName;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.Map;
 
@@ -32,10 +32,10 @@ public class SavedSearchSummaryResponse {
     public String title;
     public Map<String, Object> query;
 
-    @SerializedName("created_at")
+    @JsonProperty("created_at")
     public String createdAt;
 
-    @SerializedName("creator_user_id")
+    @JsonProperty("creator_user_id")
     public String creatorUserId;
 
 }

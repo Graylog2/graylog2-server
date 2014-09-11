@@ -19,17 +19,17 @@
  */
 package org.graylog2.restclient.models.api.responses.system.indices;
 
-import com.google.gson.annotations.SerializedName;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
 public class IndexShardsResponse {
 
-    @SerializedName("store_size_bytes")
+    @JsonProperty("store_size_bytes")
     public long storeSizeBytes;
 
-    @SerializedName("open_search_contexts")
+    @JsonProperty("open_search_contexts")
     public int openSearchContexts;
 
     public ShardDocumentsResponse documents;
@@ -40,10 +40,10 @@ public class IndexShardsResponse {
     public ShardMeterResponse merge;
     public ShardMeterResponse refresh;
 
-    @SerializedName("search_fetch")
+    @JsonProperty("search_fetch")
     public ShardMeterResponse searchFetch;
 
-    @SerializedName("search_query")
+    @JsonProperty("search_query")
     public ShardMeterResponse searchQuery;
 
     public long segments;

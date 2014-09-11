@@ -19,7 +19,7 @@
  */
 package org.graylog2.restclient.models.api.responses.alerts;
 
-import com.google.gson.annotations.SerializedName;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.Map;
 
@@ -32,13 +32,13 @@ public class AlertConditionSummaryResponse {
     public String type;
     public Map<String, Object> parameters;
 
-    @SerializedName("in_grace")
+    @JsonProperty("in_grace")
     public boolean inGrace;
 
-    @SerializedName("created_at")
+    @JsonProperty("created_at")
     public String createdAt;
 
-    @SerializedName("creator_user_id")
+    @JsonProperty("creator_user_id")
     public String creatorUserId;
 
 

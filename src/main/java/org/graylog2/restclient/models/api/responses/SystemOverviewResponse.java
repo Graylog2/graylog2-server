@@ -18,7 +18,7 @@
  */
 package org.graylog2.restclient.models.api.responses;
 
-import com.google.gson.annotations.SerializedName;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class SystemOverviewResponse {
 
@@ -26,20 +26,20 @@ public class SystemOverviewResponse {
     public String version;
     public String codename;
 
-    @SerializedName("server_id")
+    @JsonProperty("server_id")
     public String serverId;
 
-    @SerializedName("started_at")
+    @JsonProperty("started_at")
     public String startedAt;
 
     public String hostname;
 
     public String lifecycle;
 
-    @SerializedName("is_processing")
+    @JsonProperty("is_processing")
     public boolean isProcessing;
 
-    @SerializedName("lb_status")
+    @JsonProperty("lb_status")
     public String lbStatus;
 
     public String timezone;

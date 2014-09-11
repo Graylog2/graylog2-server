@@ -18,42 +18,42 @@
  */
 package org.graylog2.restclient.models.api.requests.accounts;
 
-import com.google.gson.annotations.SerializedName;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.graylog2.restclient.models.api.requests.ApiRequest;
 
 public class LdapSettingsRequest extends ApiRequest {
 
-    @SerializedName("enabled")
+    @JsonProperty("enabled")
     public boolean enabled;
 
-    @SerializedName("active_directory")
+    @JsonProperty("active_directory")
     public boolean activeDirectory;
 
-    @SerializedName("ldap_uri")
+    @JsonProperty("ldap_uri")
     public String ldapUri;
 
-    @SerializedName("system_username")
+    @JsonProperty("system_username")
     public String systemUsername;
 
-    @SerializedName("system_password")
+    @JsonProperty("system_password")
     public String systemPassword;
 
-    @SerializedName("use_start_tls")
+    @JsonProperty("use_start_tls")
     public boolean useStartTls;
 
-    @SerializedName("trust_all_certificates")
+    @JsonProperty("trust_all_certificates")
     public boolean trustAllCertificates;
 
-    @SerializedName("search_base")
+    @JsonProperty("search_base")
     public String searchBase;
 
-    @SerializedName("search_pattern")
+    @JsonProperty("search_pattern")
     public String searchPattern;
 
-    @SerializedName("display_name_attribute")
+    @JsonProperty("display_name_attribute")
     public String displayNameAttribute;
 
-    @SerializedName("default_group")
+    @JsonProperty("default_group")
     public String defaultGroup;
 
     public boolean isEnabled() {

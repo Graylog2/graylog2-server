@@ -18,7 +18,7 @@
  */
 package org.graylog2.restclient.models.api.responses.system.loggers;
 
-import com.google.gson.annotations.SerializedName;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
@@ -27,7 +27,7 @@ public class LoggerSummary {
 
     public String level;
 
-    @SerializedName("syslog_level")
+    @JsonProperty("syslog_level")
     public int syslogLevel;
 
 }

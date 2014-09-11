@@ -1,6 +1,6 @@
 package org.graylog2.restclient.models.api.responses;
 
-import com.google.gson.annotations.SerializedName;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.Date;
 
@@ -8,9 +8,9 @@ import java.util.Date;
  * @author Dennis Oelkers <dennis@torch.sh>
  */
 public class SessionCreateResponse {
-    @SerializedName("session_id")
+    @JsonProperty("session_id")
     public String sessionId;
 
-    @SerializedName("valid_until")
+    @JsonProperty("valid_until")
     public Date validUntil;
 }

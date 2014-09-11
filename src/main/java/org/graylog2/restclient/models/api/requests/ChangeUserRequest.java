@@ -19,7 +19,7 @@
 package org.graylog2.restclient.models.api.requests;
 
 import com.google.common.collect.Lists;
-import com.google.gson.annotations.SerializedName;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.graylog2.restclient.models.User;
 import play.data.validation.Constraints;
 
@@ -27,7 +27,7 @@ import java.util.List;
 
 public class ChangeUserRequest extends ApiRequest {
     @Constraints.Required
-    @SerializedName("full_name")
+    @JsonProperty("full_name")
     public String fullname;
     @Constraints.Required
     public String email;
@@ -61,7 +61,7 @@ public class ChangeUserRequest extends ApiRequest {
         this.timezone = timezone;
     }
 
-    @SerializedName("session_timeout_ms")
+    @JsonProperty("session_timeout_ms")
     public long sessionTimeoutMs;
 
     public ChangeUserRequest() { /* for data binding */ }
