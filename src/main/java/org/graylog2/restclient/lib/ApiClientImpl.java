@@ -18,6 +18,7 @@
  */
 package org.graylog2.restclient.lib;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.datatype.guava.GuavaModule;
@@ -87,6 +88,7 @@ class ApiClientImpl implements ApiClient {
         this(serverNodes, defaultTimeout,
                 new ObjectMapper()
                         .setPropertyNamingStrategy(PropertyNamingStrategy.CAMEL_CASE_TO_LOWER_CASE_WITH_UNDERSCORES)
+                        .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
                         .registerModule(new GuavaModule())
                         .registerModule(new JodaModule()));
     }
