@@ -1,16 +1,20 @@
 package org.graylog2.restclient.models.api.responses.alarmcallbacks;
 
 import com.google.common.collect.Lists;
-import org.graylog2.restclient.lib.plugin.configuration.*;
-import play.Logger;
+import org.graylog2.restclient.lib.plugin.configuration.BooleanField;
+import org.graylog2.restclient.lib.plugin.configuration.DropdownField;
+import org.graylog2.restclient.lib.plugin.configuration.NumberField;
+import org.graylog2.restclient.lib.plugin.configuration.RequestedConfigurationField;
+import org.graylog2.restclient.lib.plugin.configuration.TextField;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Map;
 
-/**
- * @author Dennis Oelkers <dennis@torch.sh>
- */
 public class GetSingleAvailableAlarmCallbackResponse {
+    private static final Logger LOG = LoggerFactory.getLogger(GetSingleAvailableAlarmCallbackResponse.class);
+
     public String name;
     public Map<String, Map<String, Object>> requested_configuration;
 
@@ -25,7 +29,7 @@ public class GetSingleAvailableAlarmCallbackResponse {
         for (Map.Entry<String, Map<String, Object>> entry : config.entrySet()) {
             try {
                 String fieldType = (String) entry.getValue().get("type");
-                switch(fieldType) {
+                switch (fieldType) {
                     case "text":
                         result.add(new TextField(entry));
                         continue;
@@ -39,10 +43,10 @@ public class GetSingleAvailableAlarmCallbackResponse {
                         result.add(new DropdownField(entry));
                         continue;
                     default:
-                        Logger.info("Unknown field type [" + fieldType + "].");
+                        LOG.info("Unknown field type [{}].", fieldType);
                 }
             } catch (Exception e) {
-                Logger.error("Skipping invalid configuration field [" + entry.getKey() + "]", e);
+                LOG.error("Skipping invalid configuration field [" + entry.getKey() + "]", e);
             }
         }
 

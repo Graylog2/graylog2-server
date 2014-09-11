@@ -20,15 +20,18 @@
 package org.graylog2.restclient.models.api.responses.metrics;
 
 import com.google.gson.annotations.SerializedName;
-import org.graylog2.restclient.lib.metrics.*;
-import play.Logger;
+import org.graylog2.restclient.lib.metrics.Gauge;
+import org.graylog2.restclient.lib.metrics.Histogram;
+import org.graylog2.restclient.lib.metrics.Meter;
+import org.graylog2.restclient.lib.metrics.Metric;
+import org.graylog2.restclient.lib.metrics.Timer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public class MetricsListItem {
+    private static final Logger LOG = LoggerFactory.getLogger(MetricsListItem.class);
 
     public String name;
     public String type;
@@ -38,6 +41,7 @@ public class MetricsListItem {
 
     Map<String, Object> metric;
 
+    @SuppressWarnings("unchecked")
     public Metric getMetric() {
         Metric.MetricType metricType = Metric.MetricType.valueOf(this.type.toUpperCase());
 
@@ -58,7 +62,7 @@ public class MetricsListItem {
                     return new Histogram(histoTiming, count);
             }
         } catch(Exception e) {
-            Logger.error("Could not parse metric: " + metric.toString(), e);
+            LOG.error("Could not parse metric: " + metric.toString(), e);
             throw new RuntimeException("Could not map metric to type. (more information in log) Type was: [" + this.type + "]", e);
         }
 
