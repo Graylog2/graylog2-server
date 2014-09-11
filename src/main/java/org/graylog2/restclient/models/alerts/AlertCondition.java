@@ -97,9 +97,9 @@ public class AlertCondition {
 
     public String getDescription() {
         StringBuilder sb = new StringBuilder();
-        int grace = (int) ((Double) parameters.get("grace")).longValue();
+        int grace = (int) ((Number) parameters.get("grace")).longValue();
         int backlog = (parameters.get("backlog") != null && parameters.get("backlog") instanceof Number) ?
-                (int) ((Double) parameters.get("backlog")).longValue() : 0;
+                (int) ((Number) parameters.get("backlog")).longValue() : 0;
 
 
         switch (type) {
@@ -138,8 +138,8 @@ public class AlertCondition {
 
     private String buildMessageCountDescription() {
         StringBuilder sb = new StringBuilder();
-        int threshold = (int) ((Double) parameters.get("threshold")).longValue();
-        int time = (int) ((Double) parameters.get("time")).longValue();
+        int threshold = (int) ((Number) parameters.get("threshold")).longValue();
+        int time = (int) ((Number) parameters.get("time")).longValue();
 
         sb.append("Alert is triggered when there");
 
@@ -183,9 +183,9 @@ public class AlertCondition {
 
     private String buildFieldValueDescription() {
         StringBuilder sb = new StringBuilder();
-        double threshold = (Double) parameters.get("threshold");
+        double threshold = ((Number) parameters.get("threshold")).doubleValue();
         String thresholdFormatted = new DecimalFormat("#.###").format(threshold);
-        int time = (int) ((Double) parameters.get("time")).longValue();
+        int time = (int) ((Number) parameters.get("time")).longValue();
 
         sb.append("Alert is triggered when the field ")
                 .append(parameters.get("field")).append(" has a ")

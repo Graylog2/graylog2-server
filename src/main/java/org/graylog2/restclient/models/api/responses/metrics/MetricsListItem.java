@@ -58,7 +58,7 @@ public class MetricsListItem {
                     return new Gauge(metric.get("value"));
                 case HISTOGRAM:
                     Map<String, Object> histoTiming = (Map<String, Object>) metric.get("time");
-                    double count = (double) metric.get("count");
+                    double count = ((Number) metric.get("count")).doubleValue();
                     return new Histogram(histoTiming, count);
             }
         } catch(Exception e) {

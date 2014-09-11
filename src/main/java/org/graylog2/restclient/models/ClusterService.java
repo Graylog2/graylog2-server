@@ -189,7 +189,7 @@ public class ClusterService {
 
     // TODO duplicated
     private long asLong(String read_bytes, Map<String, Metric> metrics) {
-        return ((Double) ((Gauge) metrics.get(read_bytes)).getValue()).longValue();
+        return ((Number) ((Gauge) metrics.get(read_bytes)).getValue()).longValue();
     }
 
     // TODO duplicated
