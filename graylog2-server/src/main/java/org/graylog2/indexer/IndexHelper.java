@@ -22,43 +22,40 @@ import org.elasticsearch.index.query.FilterBuilder;
 import org.elasticsearch.index.query.FilterBuilders;
 import org.graylog2.indexer.ranges.IndexRange;
 import org.graylog2.indexer.ranges.IndexRangeService;
-import org.graylog2.indexer.searches.timeranges.*;
+import org.graylog2.indexer.searches.timeranges.RelativeRange;
+import org.graylog2.indexer.searches.timeranges.TimeRange;
 import org.graylog2.plugin.Tools;
-import org.joda.time.DateTime;
 
 import java.util.List;
 import java.util.Set;
 
-/**
- * @author Lennart Koopmann <lennart@socketfeed.com>
- */
 public class IndexHelper {
 
     public static Set<String> getOldestIndices(Set<String> indexNames, int count) {
         Set<String> r = Sets.newHashSet();
-        
+
         if (count < 0 || indexNames.size() <= count) {
             return r;
         }
-        
+
         Set<Integer> numbers = Sets.newHashSet();
-        
+
         for (String indexName : indexNames) {
             numbers.add(Deflector.extractIndexNumber(indexName));
         }
- 
+
         List<String> sorted = prependPrefixes(getPrefix(indexNames), Tools.asSortedList(numbers));
 
         // Add last x entries to return set.
         r.addAll(sorted.subList(0, count));
-        
+
         return r;
     }
 
     public static FilterBuilder getTimestampRangeFilter(TimeRange range) throws InvalidRangeFormatException {
-    	if (range == null) {
-    		return null;
-    	}
+        if (range == null) {
+            return null;
+        }
 
         return FilterBuilders.rangeFilter("timestamp")
                 .gte(Tools.buildElasticSearchTimeFormat(range.getFrom()))
@@ -69,18 +66,18 @@ public class IndexHelper {
         if (names.isEmpty()) {
             return "";
         }
-        
+
         String name = (String) names.toArray()[0];
         return name.substring(0, name.lastIndexOf("_"));
     }
-    
+
     private static List<String> prependPrefixes(String prefix, List<Integer> numbers) {
         List<String> r = Lists.newArrayList();
-        
+
         for (int number : numbers) {
             r.add(prefix + "_" + number);
         }
-        
+
         return r;
     }
 
@@ -102,6 +99,6 @@ public class IndexHelper {
         return indices;
     }
 
-    public static class InvalidRangeFormatException extends Throwable {
+    public static class InvalidRangeFormatException extends Exception {
     }
 }

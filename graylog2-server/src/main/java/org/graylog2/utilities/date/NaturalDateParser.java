@@ -24,11 +24,11 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
 
-import java.util.*;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.TimeZone;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public class NaturalDateParser {
 
     public static final TimeZone UTC = TimeZone.getTimeZone("UTC");
@@ -98,7 +98,7 @@ public class NaturalDateParser {
 
     }
 
-    public class DateNotParsableException extends Throwable {
+    public class DateNotParsableException extends Exception {
     }
 
 }

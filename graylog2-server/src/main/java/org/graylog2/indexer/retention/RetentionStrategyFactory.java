@@ -21,22 +21,19 @@ import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategy;
 import org.graylog2.plugin.indexer.retention.IndexManagement;
 import org.graylog2.plugin.indexer.retention.RetentionStrategy;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public class RetentionStrategyFactory {
 
     public static RetentionStrategy fromString(String retentionStrategy, IndexManagement indexManagement) throws NoSuchStrategyException {
         if (retentionStrategy.equals("delete")) {
             return new DeletionRetentionStrategy(indexManagement);
-        } else if(retentionStrategy.equals("close")) {
+        } else if (retentionStrategy.equals("close")) {
             return new ClosingRetentionStrategy(indexManagement);
         }
 
         throw new NoSuchStrategyException("No such retention strategy [" + retentionStrategy + "]");
     }
 
-    public static class NoSuchStrategyException extends Throwable {
+    public static class NoSuchStrategyException extends Exception {
         public NoSuchStrategyException(String s) {
             super(s);
         }
