@@ -18,7 +18,7 @@
  */
 package org.graylog2.restclient.models.api.requests;
 
-import com.google.gson.annotations.SerializedName;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.Map;
 
@@ -30,7 +30,7 @@ public class InputLaunchRequest extends ApiRequest {
     public String title;
     public String type;
 
-    @SerializedName("creator_user_id")
+    @JsonProperty("creator_user_id")
     public String creatorUserId;
 
     public Boolean global;

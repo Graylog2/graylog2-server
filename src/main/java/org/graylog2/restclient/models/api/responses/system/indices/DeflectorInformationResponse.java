@@ -19,17 +19,17 @@
  */
 package org.graylog2.restclient.models.api.responses.system.indices;
 
-import com.google.gson.annotations.SerializedName;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
 public class DeflectorInformationResponse {
 
-    @SerializedName("is_up")
+    @JsonProperty("is_up")
     public boolean isUp;
 
-    @SerializedName("current_target")
+    @JsonProperty("current_target")
     public String currentTarget;
 
 }

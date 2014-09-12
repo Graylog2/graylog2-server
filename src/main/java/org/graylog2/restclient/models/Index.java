@@ -22,27 +22,31 @@ package org.graylog2.restclient.models;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import org.graylog2.restclient.lib.ApiClient;
-import org.graylog2.restclient.models.api.responses.system.indices.*;
+import org.graylog2.restclient.models.api.responses.system.indices.IndexRangeSummary;
+import org.graylog2.restclient.models.api.responses.system.indices.IndexShardsResponse;
+import org.graylog2.restclient.models.api.responses.system.indices.IndexSummaryResponse;
+import org.graylog2.restclient.models.api.responses.system.indices.ShardDocumentsResponse;
+import org.graylog2.restclient.models.api.responses.system.indices.ShardMeterResponse;
+import org.graylog2.restclient.models.api.responses.system.indices.ShardRoutingResponse;
 import org.graylog2.restroutes.generated.routes;
 import org.joda.time.DateTime;
-import play.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public class Index {
+    private static final Logger LOG = LoggerFactory.getLogger(Index.class);
 
     public interface Factory {
         Index fromRangeResponse(IndexRangeSummary ir);
     }
 
     private final ApiClient api;
-
     private final Range range;
-    private Info indexInfo;
     private final String name;
+
+    private Info indexInfo;
 
     @AssistedInject
     public Index(ApiClient api, @Assisted IndexRangeSummary ir) {
@@ -63,8 +67,8 @@ public class Index {
     public int getNumber() {
         try {
             return Integer.parseInt(getName().substring(getName().lastIndexOf("_") + 1));
-        } catch(Exception e) {
-            Logger.error("Could not get number of index [{}].", getName(), e);
+        } catch (Exception e) {
+            LOG.error("Could not get number of index [" + getName() + "].", e);
             return -1;
         }
     }
@@ -81,7 +85,7 @@ public class Index {
         try {
             this.indexInfo = new Info(api.path(routes.IndicesResource().single(getName()), IndexSummaryResponse.class).execute());
         } catch (Exception e) {
-           Logger.error("Could not get index information for index [{}]", getName(), e);
+            LOG.error("Could not get index information for index [" + getName() + "]", e);
         }
     }
 
@@ -208,7 +212,7 @@ public class Index {
         public Range(IndexRangeSummary ir) {
             this.starts = new DateTime(ir.starts);
 
-            if (ir.calculatedAt != null && !ir.calculatedAt.isEmpty()  && ir.calculationTookMs >= 0) {
+            if (ir.calculatedAt != null && !ir.calculatedAt.isEmpty() && ir.calculationTookMs >= 0) {
                 this.providesCalculationInfo = true;
                 this.calculationTookMs = ir.calculationTookMs;
                 this.calculatedAt = new DateTime(ir.calculatedAt);

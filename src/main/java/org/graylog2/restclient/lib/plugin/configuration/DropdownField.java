@@ -18,13 +18,8 @@
  */
 package org.graylog2.restclient.lib.plugin.configuration;
 
-import play.Logger;
-
 import java.util.Map;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public class DropdownField extends RequestedConfigurationField {
 
     private final static String TYPE = "dropdown";

@@ -19,31 +19,34 @@
 package org.graylog2.restclient.models.api.responses.system;
 
 import com.google.common.collect.Lists;
-import com.google.gson.annotations.SerializedName;
-import org.graylog2.restclient.lib.plugin.configuration.*;
-import play.Logger;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import org.graylog2.restclient.lib.plugin.configuration.BooleanField;
+import org.graylog2.restclient.lib.plugin.configuration.DropdownField;
+import org.graylog2.restclient.lib.plugin.configuration.NumberField;
+import org.graylog2.restclient.lib.plugin.configuration.RequestedConfigurationField;
+import org.graylog2.restclient.lib.plugin.configuration.TextField;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Map;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public class InputTypeSummaryResponse {
+    private static final Logger LOG = LoggerFactory.getLogger(InputTypeSummaryResponse.class);
 
     public String name;
     public String type;
 
-    @SerializedName("human_name")
+    @JsonProperty("human_name")
     public String humanName;
 
-    @SerializedName("is_exclusive")
+    @JsonProperty("is_exclusive")
     public boolean isExclusive;
 
-    @SerializedName("requested_configuration")
+    @JsonProperty("requested_configuration")
     public Map<String, Map<String, Object>> requestedConfiguration;
 
-    @SerializedName("link_to_docs")
+    @JsonProperty("link_to_docs")
     public String linkToDocs;
 
     public List<RequestedConfigurationField> getRequestedConfiguration() {
@@ -53,7 +56,7 @@ public class InputTypeSummaryResponse {
         for (Map.Entry<String, Map<String, Object>> c : requestedConfiguration.entrySet()) {
             try {
                 String fieldType = (String) c.getValue().get("type");
-                switch(fieldType) {
+                switch (fieldType) {
                     case "text":
                         fields.add(new TextField(c));
                         continue;
@@ -67,11 +70,10 @@ public class InputTypeSummaryResponse {
                         fields.add(new DropdownField(c));
                         continue;
                     default:
-                        Logger.info("Unknown field type [" + fieldType + "].");
+                        LOG.info("Unknown field type [{}].", fieldType);
                 }
             } catch (Exception e) {
-                Logger.error("Skipping invalid configuration field [" + c.getKey() + "]", e);
-                continue;
+                LOG.error("Skipping invalid configuration field [" + c.getKey() + "]", e);
             }
         }
 

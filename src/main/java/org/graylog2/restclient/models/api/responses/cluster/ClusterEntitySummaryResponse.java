@@ -19,23 +19,23 @@
  */
 package org.graylog2.restclient.models.api.responses.cluster;
 
-import com.google.gson.annotations.SerializedName;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
 public class ClusterEntitySummaryResponse {
 
-    @SerializedName("id")
+    @JsonProperty("id")
     public String id;
 
-    @SerializedName("short_node_id")
+    @JsonProperty("short_node_id")
     public String shortNodeId;
 
-    @SerializedName("last_seen")
+    @JsonProperty("last_seen")
     public String lastSeen;
 
-    @SerializedName("transport_address")
+    @JsonProperty("transport_address")
     public String transportAddress;
 
 }

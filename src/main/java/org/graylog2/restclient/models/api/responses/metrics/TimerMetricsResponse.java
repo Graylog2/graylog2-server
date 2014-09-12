@@ -18,7 +18,7 @@
  */
 package org.graylog2.restclient.models.api.responses.metrics;
 
-import com.google.gson.annotations.SerializedName;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
@@ -29,16 +29,16 @@ public class TimerMetricsResponse {
     public double max;
     public double mean;
 
-    @SerializedName("std_dev")
+    @JsonProperty("std_dev")
     public double stdDev;
 
-    @SerializedName("95th_percentile")
+    @JsonProperty("95th_percentile")
     public double percentile95th;
 
-    @SerializedName("98th_percentile")
+    @JsonProperty("98th_percentile")
     public double percentile98th;
 
-    @SerializedName("99th_percentile")
+    @JsonProperty("99th_percentile")
     public double percentile99th;
 
 }

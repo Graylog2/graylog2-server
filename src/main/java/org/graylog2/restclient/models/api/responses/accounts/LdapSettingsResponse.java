@@ -18,42 +18,42 @@
  */
 package org.graylog2.restclient.models.api.responses.accounts;
 
-import com.google.gson.annotations.SerializedName;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.net.URI;
 
 public class LdapSettingsResponse {
-    @SerializedName("enabled")
+    @JsonProperty("enabled")
     private boolean enabled;
 
-    @SerializedName("system_username")
+    @JsonProperty("system_username")
     private String systemUsername;
 
-    @SerializedName("system_password")
+    @JsonProperty("system_password")
     private String systemPassword;
 
-    @SerializedName("ldap_uri")
+    @JsonProperty("ldap_uri")
     private URI ldapUri;
 
-    @SerializedName("search_base")
+    @JsonProperty("search_base")
     private String searchBase;
 
-    @SerializedName("search_pattern")
+    @JsonProperty("search_pattern")
     private String searchPattern;
 
-    @SerializedName("display_name_attribute")
+    @JsonProperty("display_name_attribute")
     private String displayNameAttribute;
 
-    @SerializedName("active_directory")
+    @JsonProperty("active_directory")
     private boolean activeDirectory;
 
-    @SerializedName("use_start_tls")
+    @JsonProperty("use_start_tls")
     private boolean useStartTls;
 
-    @SerializedName("trust_all_certificates")
+    @JsonProperty("trust_all_certificates")
     private boolean trustAllCertificates;
 
-    @SerializedName("default_group")
+    @JsonProperty("default_group")
     private String defaultGroup;
 
     public boolean isEnabled() {

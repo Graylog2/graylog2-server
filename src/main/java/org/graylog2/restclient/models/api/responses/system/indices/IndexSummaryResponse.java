@@ -19,7 +19,7 @@
  */
 package org.graylog2.restclient.models.api.responses.system.indices;
 
-import com.google.gson.annotations.SerializedName;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
 
@@ -28,15 +28,15 @@ import java.util.List;
  */
 public class IndexSummaryResponse {
 
-    @SerializedName("all_shards")
+    @JsonProperty("all_shards")
     public IndexShardsResponse allShards;
 
-    @SerializedName("primary_shards")
+    @JsonProperty("primary_shards")
     public IndexShardsResponse primaryShards;
 
     public List<ShardRoutingResponse> routing;
 
-    @SerializedName("is_reopened")
+    @JsonProperty("is_reopened")
     public boolean isReopened;
 
 }

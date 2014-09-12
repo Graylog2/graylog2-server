@@ -18,20 +18,11 @@
  */
 package org.graylog2.restclient.models.api.requests;
 
-import com.google.gson.Gson;
-import com.google.gson.annotations.SerializedName;
 import org.graylog2.restclient.models.SystemJob;
 import org.graylog2.restclient.models.User;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public class SystemJobTriggerRequest extends ApiRequest {
-
-    @SerializedName("job_name")
     public String jobName;
-
-    @SerializedName("creator_user_id")
     public String creatorUserId;
 
     public SystemJobTriggerRequest(SystemJob.Type type, User user) {

@@ -19,7 +19,7 @@
  */
 package org.graylog2.restclient.models.api.responses.system.indices;
 
-import com.google.gson.annotations.SerializedName;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
@@ -28,7 +28,7 @@ public class ShardMeterResponse {
 
     public long total;
 
-    @SerializedName("time_seconds")
+    @JsonProperty("time_seconds")
     public long timeSeconds;
 
 }

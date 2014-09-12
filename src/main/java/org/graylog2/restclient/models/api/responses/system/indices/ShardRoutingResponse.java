@@ -19,7 +19,7 @@
  */
 package org.graylog2.restclient.models.api.responses.system.indices;
 
-import com.google.gson.annotations.SerializedName;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
@@ -31,16 +31,16 @@ public class ShardRoutingResponse {
     public String state;
     public boolean active;
 
-    @SerializedName("relocating_to")
+    @JsonProperty("relocating_to")
     public String relocatingTo;
 
-    @SerializedName("node_id")
+    @JsonProperty("node_id")
     public String nodeId;
 
-    @SerializedName("node_hostname")
+    @JsonProperty("node_hostname")
     public String nodeHostname;
 
-    @SerializedName("node_name")
+    @JsonProperty("node_name")
     public String nodeName;
 
 }

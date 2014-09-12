@@ -18,7 +18,7 @@
  */
 package org.graylog2.restclient.models.api.responses.system;
 
-import com.google.gson.annotations.SerializedName;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.graylog2.restclient.models.api.responses.metrics.TimerRateMetricsResponse;
 
 import java.util.List;
@@ -34,32 +34,32 @@ public class ExtractorSummaryResponse {
     public String type;
     public int order;
 
-    @SerializedName("target_field")
+    @JsonProperty("target_field")
     public String targetField;
 
-    @SerializedName("source_field")
+    @JsonProperty("source_field")
     public String sourceField;
 
-    @SerializedName("cursor_strategy")
+    @JsonProperty("cursor_strategy")
     public String cursorStrategy;
 
-    @SerializedName("extractor_config")
+    @JsonProperty("extractor_config")
     public Map<String, Object> extractorConfig;
 
-    @SerializedName("creator_user_id")
+    @JsonProperty("creator_user_id")
     public String creatorUserId;
 
     public List<Map<String, Object>> converters;
 
-    @SerializedName("condition_type")
+    @JsonProperty("condition_type")
     public String conditionType;
 
-    @SerializedName("condition_value")
+    @JsonProperty("condition_value")
     public String conditionValue;
 
     public long exceptions;
 
-    @SerializedName("converter_exceptions")
+    @JsonProperty("converter_exceptions")
     public long converterExceptions;
 
     public Map<String, TimerRateMetricsResponse> metrics;

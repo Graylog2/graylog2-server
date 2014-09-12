@@ -22,7 +22,8 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.collect.Lists;
-import play.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import play.Play;
 
 import java.util.List;
@@ -30,6 +31,8 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 public class Configuration {
+    private static final Logger LOG = LoggerFactory.getLogger(Configuration.class);
+
     // Variables that can be overriden. (for example in tests)
     private static String graylog2ServerUris = Play.application().configuration().getString("graylog2-server.uris");
     private static String userName = Play.application().configuration().getString("local-user.name");
@@ -44,7 +47,7 @@ public class Configuration {
             @Override
             public Long load(String key) throws Exception {
                 final Long milliseconds = Play.application().configuration().getMilliseconds("timeout." + key, Long.MIN_VALUE);
-                Logger.debug("Loading timeout value into cache from configuration for key {}: {}",
+                LOG.debug("Loading timeout value into cache from configuration for key {}: {}",
                         key, milliseconds != Long.MIN_VALUE ? milliseconds + " ms" : "Not configured, falling back to default.");
                 return milliseconds;
             }
@@ -81,16 +84,16 @@ public class Configuration {
 
             uris.add(uri);
         }
-		
-		return uris;
-	}
+
+        return uris;
+    }
 
     /**
      * Returns the timeout value in milliseconds to use for the specifed API call.
      *
-     * @param name the name of the API call (configuration key is "timeout." + name
+     * @param name         the name of the API call (configuration key is "timeout." + name
      * @param defaultValue the default value to use if the name wasn't configured explicitely
-     * @param timeUnit the TimeUnit of the default value
+     * @param timeUnit     the TimeUnit of the default value
      * @return the timeout in milliseconds
      */
     public static long apiTimeout(final String name, Integer defaultValue, TimeUnit timeUnit) {
@@ -104,7 +107,7 @@ public class Configuration {
             return configuredMillis;
         } catch (ExecutionException ignored) {
             // we will never reach this
-            Logger.error("Unable to read timeout, this should never happen! Returning default timeout of " + DEFAULT_TIMEOUT + " seconds.");
+            LOG.error("Unable to read timeout, this should never happen! Returning default timeout of " + DEFAULT_TIMEOUT + " seconds.");
             return DEFAULT_TIMEOUT;
         }
     }
@@ -125,17 +128,17 @@ public class Configuration {
 
     public static void setServerRestUris(String URIs) {
         graylog2ServerUris = URIs;
-        Logger.info("graylog2-server.uris overridden with <" + URIs + ">.");
+        LOG.info("graylog2-server.uris overridden with <" + URIs + ">.");
     }
 
     public static void setUserName(String username) {
-        Logger.info("local-user.name overridden with <" + username + ">.");
+        LOG.info("local-user.name overridden with <" + username + ">.");
         userName = username;
     }
 
     public static void setPassword(String password) {
-        Logger.info("local-user.password-sha2 overridden with <" + passwordHash + ">.");
+        LOG.info("local-user.password-sha2 overridden with <" + passwordHash + ">.");
         passwordHash = password;
     }
-	
+
 }

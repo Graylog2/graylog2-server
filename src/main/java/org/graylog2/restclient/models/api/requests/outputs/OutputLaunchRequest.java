@@ -1,7 +1,7 @@
 package org.graylog2.restclient.models.api.requests.outputs;
 
 
-import com.google.gson.annotations.SerializedName;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.graylog2.restclient.models.api.requests.ApiRequest;
 import play.data.validation.Constraints;
 
@@ -17,9 +17,9 @@ public class OutputLaunchRequest extends ApiRequest {
     @Constraints.Required
     public String type;
     public Map<String, Object> configuration;
-    @SerializedName("creator_user_id")
+    @JsonProperty("creator_user_id")
     public String creatorUserId;
-    @SerializedName("streams")
+    @JsonProperty("streams")
     public List<String> streams;
 
     @Override

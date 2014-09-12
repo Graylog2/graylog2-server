@@ -24,9 +24,6 @@ import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public class Meter extends Metric {
 
     DecimalFormat df = new DecimalFormat("#.##");
@@ -40,11 +37,11 @@ public class Meter extends Metric {
     public Meter(Map<String, Object> metric) {
         super(MetricType.METER);
 
-        this.total = (double) metric.get("total");
-        this.mean = (double) metric.get("mean");
-        this.oneMinute = (double) metric.get("one_minute");
-        this.fiveMinute = (double) metric.get("five_minute");
-        this.fifteenMinute = (double) metric.get("fifteen_minute");
+        this.total = ((Number) metric.get("total")).doubleValue();
+        this.mean = ((Number) metric.get("mean")).doubleValue();
+        this.oneMinute = ((Number) metric.get("one_minute")).doubleValue();
+        this.fiveMinute = ((Number) metric.get("five_minute")).doubleValue();
+        this.fifteenMinute = ((Number) metric.get("fifteen_minute")).doubleValue();
     }
 
     public Meter(final RateMetricsResponse rate) {

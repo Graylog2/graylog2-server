@@ -19,17 +19,17 @@
  */
 package org.graylog2.restclient.models.api.responses.system.indices;
 
-import com.google.gson.annotations.SerializedName;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
 public class DeflectorConfigResponse {
 
-    @SerializedName("max_docs_per_index")
+    @JsonProperty("max_docs_per_index")
     public int maxDocsPerIndex;
 
-    @SerializedName("max_number_of_indices")
+    @JsonProperty("max_number_of_indices")
     public int maxNumberOfIndices;
 
 }

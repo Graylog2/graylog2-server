@@ -1,19 +1,23 @@
 package org.graylog2.restclient.models.api.responses;
 
 import com.google.common.collect.Lists;
-import com.google.gson.annotations.SerializedName;
-import org.graylog2.restclient.lib.plugin.configuration.*;
-import play.Logger;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import org.graylog2.restclient.lib.plugin.configuration.BooleanField;
+import org.graylog2.restclient.lib.plugin.configuration.DropdownField;
+import org.graylog2.restclient.lib.plugin.configuration.NumberField;
+import org.graylog2.restclient.lib.plugin.configuration.RequestedConfigurationField;
+import org.graylog2.restclient.lib.plugin.configuration.TextField;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Map;
 
-/**
- * @author Dennis Oelkers <dennis@torch.sh>
- */
 public class AvailableOutputSummary {
+    private static final Logger LOG = LoggerFactory.getLogger(AvailableOutputSummary.class);
+
     public String name;
-    @SerializedName("requested_configuration")
+    @JsonProperty("requested_configuration")
     public Map<String, Map<String, Object>> requestedConfiguration;
 
     public List<RequestedConfigurationField> getRequestedConfiguration() {
@@ -37,11 +41,10 @@ public class AvailableOutputSummary {
                         fields.add(new DropdownField(c));
                         continue;
                     default:
-                        Logger.info("Unknown field type [" + fieldType + "].");
+                        LOG.info("Unknown field type [{}].", fieldType);
                 }
             } catch (Exception e) {
-                Logger.error("Skipping invalid configuration field [" + c.getKey() + "]", e);
-                continue;
+                LOG.error("Skipping invalid configuration field [" + c.getKey() + "]", e);
             }
         }
 
