@@ -55,7 +55,7 @@ public class IndexerClusterCheckerThread extends Periodical {
         for (NodeInfo node : indexer.cluster().getDataNodes()) {
             // Check number of maximum open files.
             final String osName = node.getJvm().getSystemProperties().get("os.name");
-            if (osName.startsWith("Windows")) {
+            if (null != osName && osName.startsWith("Windows")) {
                 LOG.debug("Skipping open file limit check for Indexer node <{}> on Windows", node.getNode().getName());
             } else if (node.getProcess().getMaxFileDescriptors() < MINIMUM_OPEN_FILES_LIMIT) {
                 // Write notification.
