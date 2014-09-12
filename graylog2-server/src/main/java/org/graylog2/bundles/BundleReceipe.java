@@ -116,7 +116,7 @@ public class BundleReceipe {
             createOutputs(bundle.getOutputs(), userName);
             createStreams(bundle.getStreams(), userName);
             createDashboards(bundle.getDashboards(), userName);
-        } catch (NoSuchInputTypeException | Exception e) {
+        } catch (Exception e) {
             rollback();
             LOG.error("Error while creating dashboards but no error handling or rollback yet. Sorry.", e);
             Throwables.propagate(e);
