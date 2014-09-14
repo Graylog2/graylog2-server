@@ -35,7 +35,7 @@ public class MetricUtils {
         return mapAllFiltered(metrics, null);
     }
 
-    public static Map<String, Object> mapAllFiltered(Map<String, Metric> metrics, Set<String> filter) {
+    public static Map<String, Object> mapAllFiltered(Map<String, Metric> metrics, Set<String> blacklist) {
         Map<String, Object> result = Maps.newHashMap();
 
         if (metrics == null) {
@@ -43,9 +43,21 @@ public class MetricUtils {
         }
 
         for (Map.Entry<String, Metric> metric : metrics.entrySet()) {
-            if (filter == null || filter.contains(metric.getKey())) {
-                result.put(metric.getKey(), map(metric.getKey(), metric.getValue()));
+            boolean filtered = false;
+            if (blacklist != null) {
+                for(String x : blacklist) {
+                    if (metric.getKey().startsWith(x)) {
+                        filtered = true;
+                        break;
+                    }
+                }
             }
+
+            if (filtered) {
+                continue;
+            }
+
+            result.put(metric.getKey(), map(metric.getKey(), metric.getValue()));
         }
 
         return result;
