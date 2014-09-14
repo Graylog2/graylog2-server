@@ -61,20 +61,8 @@ public class TelemetryReporterThread extends Periodical {
 
     private static final Logger LOG = LoggerFactory.getLogger(TelemetryReporterThread.class);
 
-    private static final Set<String> REPORTED_METRICS = new HashSet<String>() {{
-        add("org.graylog2.buffers.OutputBuffer.cachedMessages");
-        add("org.graylog2.buffers.OutputBuffer.incomingMessages");
-        add("org.graylog2.buffers.OutputBuffer.rejectedMessages");
-        add("org.graylog2.shared.buffers.ProcessBuffer.cachedMessages");
-        add("org.graylog2.shared.buffers.ProcessBuffer.incomingMessages");
-        add("org.graylog2.shared.buffers.ProcessBuffer.rejectedMessages");
-        add("org.graylog2.buffers.processors.OutputBufferProcessor.batchSize");
-        add("org.graylog2.buffers.processors.OutputBufferProcessor.incomingMessages");
-        add("org.graylog2.buffers.processors.OutputBufferProcessor.processTime");
-        add("org.graylog2.shared.buffers.processors.ProcessBufferProcessor.filteredOutMessages");
-        add("org.graylog2.shared.buffers.processors.ProcessBufferProcessor.incomingMessages");
-        add("org.graylog2.shared.buffers.processors.ProcessBufferProcessor.outgoingMessages");
-        add("org.graylog2.shared.buffers.processors.ProcessBufferProcessor.processTime");
+    private static final Set<String> METRICS_BLACKLIST = new HashSet<String>() {{
+        add("org.graylog2.rest.resources");
     }};
 
     @Inject
@@ -109,7 +97,7 @@ public class TelemetryReporterThread extends Periodical {
 
             report.put("token", configuration.getTelemetryServiceToken());
             report.put("anon_id", DigestUtils.sha256Hex(serverStatus.getNodeId().toString()));
-            report.put("metrics", MetricUtils.mapAllFiltered(metricRegistry.getMetrics(), REPORTED_METRICS));
+            report.put("metrics", MetricUtils.mapAllFiltered(metricRegistry.getMetrics(), METRICS_BLACKLIST));
             report.put("statistics", buildStatistics());
 
             String json = objectMapper.writeValueAsString(report);
