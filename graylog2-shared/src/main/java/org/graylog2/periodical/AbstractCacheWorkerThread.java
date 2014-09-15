@@ -61,9 +61,7 @@ public abstract class AbstractCacheWorkerThread extends Periodical {
         while(true) {
             try {
                 //singleMessageEnqueue(cache, targetBuffer);
-                while (!cache.isEmpty() && serverStatus.isProcessing()) {
-                    drainMessagesEnqueue(cache, targetBuffer);
-                }
+                drainMessagesEnqueue(cache, targetBuffer);
             } catch (BufferOutOfCapacityException ex) {
                 outOfCapacity.mark();
                 LOG.error("Target buffer out of capacity in {}. Breaking.", cacheName);
@@ -72,8 +70,6 @@ public abstract class AbstractCacheWorkerThread extends Periodical {
             } catch (Exception e) {
                 LOG.error("Exception while working on cache: ", e);
             }
-
-            Uninterruptibles.sleepUninterruptibly(100, TimeUnit.MILLISECONDS);
         }
     }
 
