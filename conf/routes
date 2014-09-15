@@ -239,6 +239,7 @@ POST        /a/system/inputs/:input_id/extractors/order                         
 # API: Bundles
 GET         /a/system/bundles                                                        @controllers.api.BundlesApiController.index()
 POST        /a/system/bundles                                                        @controllers.api.BundlesApiController.create()
+POST        /a/system/bundles/:bundle_id/apply                                       @controllers.api.BundlesApiController.apply(bundle_id: String)
 
 # Map static resources from the /public folder to the /assets URL path
 GET         /assets/*file                                                            controllers.Assets.at(path="/public", file)

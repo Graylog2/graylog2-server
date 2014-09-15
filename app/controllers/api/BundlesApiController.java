@@ -55,4 +55,14 @@ public class BundlesApiController extends AuthenticatedController {
             return redirect("/");
         }
     }
+
+    public Result apply(String bundleId) {
+        try {
+            bundleService.apply(bundleId);
+            flash("success", "Bundle applied successfully");
+        } catch (Exception e) {
+            flash("error", "Could not apply bundle: " + e);
+        }
+        return redirect("/");
+    }
 }
