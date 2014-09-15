@@ -1,14 +1,16 @@
 package controllers.api;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Multimap;
 import com.google.common.io.Files;
+import com.google.gson.Gson;
 import com.google.inject.Inject;
 import controllers.AuthenticatedController;
 import org.glassfish.grizzly.utils.Charsets;
 import org.graylog2.restclient.models.BundleService;
+import org.graylog2.restclient.models.ConfigurationBundle;
 import org.graylog2.restclient.models.api.requests.CreateBundleRequest;
 import play.Logger;
-import play.mvc.Http;
 import play.mvc.Http.MultipartFormData;
 import play.mvc.Http.MultipartFormData.FilePart;
 import play.mvc.Result;
@@ -19,6 +21,12 @@ import java.io.IOException;
 public class BundlesApiController extends AuthenticatedController {
     @Inject
     private BundleService bundleService;
+
+    public Result index() {
+        Multimap<String, ConfigurationBundle> bundles = bundleService.all();
+
+        return ok(new Gson().toJson(bundles.asMap())).as("application/json");
+    }
 
     public Result create() {
         MultipartFormData body = request().body().asMultipartFormData();

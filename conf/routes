@@ -237,6 +237,7 @@ GET         /a/system/indices/failures/dynatable                                
 POST        /a/system/inputs/:input_id/extractors/order                              @controllers.api.ExtractorsApiController.order(input_id: String)
 
 # API: Bundles
+GET         /a/system/bundles                                                        @controllers.api.BundlesApiController.index()
 POST        /a/system/bundles                                                        @controllers.api.BundlesApiController.create()
 
 # Map static resources from the /public folder to the /assets URL path
