@@ -11,7 +11,7 @@ var BootstrapAccordionGroup = React.createClass({
 
         if (this.props.name) {
             name = this.props.name;
-            id = name.toLowerCase();
+            id = name.replace(" ", "_").toLowerCase();
         }
 
         return (
