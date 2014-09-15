@@ -12,12 +12,13 @@ var QuickStartPreview = require('./QuickStartPreview');
 var QuickStartCard = React.createClass({
     getInitialState: function() {
         return {
-            sourceType: "",
+            sourceTypeId: "",
+            sourceTypeDescription: "",
             bundles: []
         };
     },
-    handleSourceTypeChange: function(sourceType) {
-        this.setState({sourceType: sourceType});
+    handleSourceTypeChange: function(sourceTypeId, sourceTypeDescription) {
+        this.setState({sourceTypeId: sourceTypeId, sourceTypeDescription: sourceTypeDescription});
     },
     componentDidMount: function() {
         $.get('/a/system/bundles', function(result) {
@@ -37,12 +38,15 @@ var QuickStartCard = React.createClass({
     _getSourceTypeHtml: function(category) {
         var bundles = this.state.bundles[category];
         return (
-            <BootstrapAccordionGroup name={category}>
+            <BootstrapAccordionGroup key={category} name={category}>
                 <ul>
                     {bundles.map(function(bundle){
                         return (
-                            <li>
-                                <SourceType name={bundle.name} description={bundle.description} onSelect={this.handleSourceTypeChange}/>
+                            <li key={bundle.id}>
+                                <SourceType id={bundle.id}
+                                            name={bundle.name}
+                                            description={bundle.description}
+                                            onSelect={this.handleSourceTypeChange}/>
                             </li>
                         );
                     }, this)}
@@ -69,7 +73,7 @@ var QuickStartCard = React.createClass({
                         </BootstrapAccordion>
                     </div>
                     <div className="span4 offset1">
-                        <QuickStartPreview sourceType={this.state.sourceType}>
+                        <QuickStartPreview sourceTypeId={this.state.sourceTypeId} sourceTypeDescription={this.state.sourceTypeDescription}>
                             <p>Select an item in the right list to preview it.</p>
                         </QuickStartPreview>
                     </div>
