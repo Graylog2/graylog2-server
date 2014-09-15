@@ -15,7 +15,7 @@ import play.mvc.Http;
 import java.io.IOException;
 
 public class BundleService {
-    private static final Logger log = LoggerFactory.getLogger(BundleService.class);
+    private static final Logger LOG = LoggerFactory.getLogger(BundleService.class);
 
     private final ApiClient api;
     private final BundleResource resource = routes.BundleResource();
@@ -30,9 +30,9 @@ public class BundleService {
             Multimap<String, ConfigurationBundle> response = api.path(routes.BundleResource().listBundles(), Multimap.class).execute();
             return response;
         } catch (APIException e) {
-            log.error("Unable to get bundle list from server", e);
+            LOG.error("Unable to get bundle list from server", e);
         } catch (IOException e) {
-            log.error("Unable to read from server socket", e);
+            LOG.error("Unable to read from server socket", e);
         }
         return ArrayListMultimap.create();
     }
@@ -42,11 +42,15 @@ public class BundleService {
             api.path(resource.createBundle()).body(request).expect(Http.Status.CREATED).execute();
             return true;
         } catch (APIException e) {
-            log.error("Unable to create bundle", e);
+            LOG.error("Unable to create bundle", e);
             return false;
         } catch (IOException e) {
-            log.error("Unable to create bundle", e);
+            LOG.error("Unable to create bundle", e);
             return false;
         }
+    }
+
+    public void apply(String bundleId) throws APIException, IOException {
+        api.path(resource.applyBundle(bundleId)).expect(Http.Status.NO_CONTENT).execute();
     }
 }
