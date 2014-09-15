@@ -28,25 +28,38 @@ var QuickStartCard = React.createClass({
             }
         }.bind(this));
     },
+    _getCategoriesHtml: function() {
+        var categories = $.map(this.state.bundles, function( bundles, category){ return category; });
+        return categories.map(function (category) {
+                return this._getSourceTypeHtml(category);
+            }, this );
+    },
+    _getSourceTypeHtml: function(category) {
+        var bundles = this.state.bundles[category];
+        return (
+            <BootstrapAccordionGroup name={category}>
+                <ul>
+                    {bundles.map(function(bundle){
+                        return (
+                            <li>
+                                <SourceType name={bundle.name} description={bundle.description} onSelect={this.handleSourceTypeChange}/>
+                            </li>
+                        );
+                    }, this)}
+                </ul>
+            </BootstrapAccordionGroup>
+        );
+    },
     render: function () {
         var quickStartDescription = <p>New to Graylog2? Select one of the preconfigured setups to get you started:</p>;
-        var categories = $.map( this.state.bundles, function( bundles, category){ return category; });
 
         return (
             <Card title="Quick Start" icon="icon-plane">
-                    {quickStartDescription}
+                {quickStartDescription}
                 <div className="row">
                     <div className="span6">
                         <BootstrapAccordion>
-                        { categories.map(function (category) {
-                            var bundles = this.state.bundles[category];
-                            return (
-                                <BootstrapAccordionGroup name={category}>
-                                <ul>
-                                    {bundles.map(function(bundle){ return (<li><SourceType name={bundle.name} description={bundle.description} onSelect={this.handleSourceTypeChange}/></li>); }, this)}
-                                </ul>
-                                </BootstrapAccordionGroup>);
-                        }, this ) }
+                            {this._getCategoriesHtml()}
                             <BootstrapAccordionGroup name="Custom">
                                 <form method="POST" action="/a/system/bundles" className="form-inline upload" encType="multipart/form-data">
                                     <input type="file" name="bundle" />
