@@ -22,18 +22,16 @@ import org.graylog2.security.ldap.LdapSettings;
 
 import java.util.List;
 
-/**
- * @author Dennis Oelkers <dennis@torch.sh>
- */
 public interface UserService extends PersistedService {
     User load(String username);
+
     User create();
 
     List<User> loadAll();
 
     User syncFromLdapEntry(LdapEntry userEntry, LdapSettings ldapSettings, String username);
 
-    void updateFromLdap(User user, LdapEntry userEntry, LdapSettings ldapSettings, String username);
+    void updateFromLdap(UserImpl user, LdapEntry userEntry, LdapSettings ldapSettings, String username);
 
     User getAdminUser();
 }

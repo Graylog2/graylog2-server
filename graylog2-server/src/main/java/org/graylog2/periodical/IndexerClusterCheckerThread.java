@@ -25,21 +25,17 @@ import org.graylog2.plugin.periodical.Periodical;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public class IndexerClusterCheckerThread extends Periodical {
 
     private static final Logger LOG = LoggerFactory.getLogger(IndexerClusterCheckerThread.class);
+    private static final int MINIMUM_OPEN_FILES_LIMIT = 64000;
 
-    public static final int MINIMUM_OPEN_FILES_LIMIT = 64000;
-
-    private NotificationService notificationService;
     private final Indexer indexer;
+    private final NotificationService notificationService;
 
     @Inject
-    public IndexerClusterCheckerThread(NotificationService notificationService,
-                                       Indexer indexer) {
+    public IndexerClusterCheckerThread(final NotificationService notificationService,
+                                       final Indexer indexer) {
         this.notificationService = notificationService;
         this.indexer = indexer;
     }
@@ -50,7 +46,7 @@ public class IndexerClusterCheckerThread extends Periodical {
             return;
         }
 
-        if(null == indexer.cluster()) {
+        if (null == indexer.cluster()) {
             LOG.info("Indexer not fully initialized yet. Skipping periodic cluster check.");
             return;
         }
@@ -58,18 +54,20 @@ public class IndexerClusterCheckerThread extends Periodical {
         boolean allHigher = true;
         for (NodeInfo node : indexer.cluster().getDataNodes()) {
             // Check number of maximum open files.
-            if (node.getProcess().getMaxFileDescriptors() < MINIMUM_OPEN_FILES_LIMIT) {
-
+            final String osName = node.getJvm().getSystemProperties().get("os.name");
+            if (null != osName && osName.startsWith("Windows")) {
+                LOG.debug("Skipping open file limit check for Indexer node <{}> on Windows", node.getNode().getName());
+            } else if (node.getProcess().getMaxFileDescriptors() < MINIMUM_OPEN_FILES_LIMIT) {
                 // Write notification.
-                 Notification notification = notificationService.buildNow()
+                final Notification notification = notificationService.buildNow()
                         .addType(Notification.Type.ES_OPEN_FILES)
                         .addSeverity(Notification.Severity.URGENT);
-                final boolean published = notificationService.publishIfFirst(notification);
-                if (published) {
+
+                if (notificationService.publishIfFirst(notification)) {
                     LOG.warn("Indexer node <{}> open file limit is too low: [{}]. Set it to at least {}.",
-                             node.getNode().getName(),
-                             node.getProcess().getMaxFileDescriptors(),
-                             MINIMUM_OPEN_FILES_LIMIT);
+                            node.getNode().getName(),
+                            node.getProcess().getMaxFileDescriptors(),
+                            MINIMUM_OPEN_FILES_LIMIT);
                 }
                 allHigher = false;
             }

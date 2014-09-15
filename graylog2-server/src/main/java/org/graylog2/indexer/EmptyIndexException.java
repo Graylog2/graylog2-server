@@ -16,10 +16,7 @@
  */
 package org.graylog2.indexer;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
-public class EmptyIndexException extends Throwable {
+public class EmptyIndexException extends Exception {
 
     public EmptyIndexException() {
         super();

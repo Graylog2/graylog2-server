@@ -30,9 +30,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public abstract class AbstractAlertCondition implements EmbeddedPersistable, AlertCondition {
 
     private static final Logger LOG = LoggerFactory.getLogger(AbstractAlertCondition.class);
@@ -53,7 +50,7 @@ public abstract class AbstractAlertCondition implements EmbeddedPersistable, Ale
     private final Map<String, Object> parameters;
 
     protected AbstractAlertCondition(Stream stream, String id, Type type, DateTime createdAt, String creatorUserId, Map<String, Object> parameters) {
-        if(id == null) {
+        if (id == null) {
             this.id = UUID.randomUUID().toString();
         } else {
             this.id = id;
@@ -113,7 +110,7 @@ public abstract class AbstractAlertCondition implements EmbeddedPersistable, Ale
     public Integer getBacklog() {
         Object rawParameter = getParameters().get("backlog");
         if (rawParameter != null && rawParameter instanceof Number)
-            return (Integer)rawParameter;
+            return (Integer) rawParameter;
         else
             return 0;
     }
@@ -143,7 +140,7 @@ public abstract class AbstractAlertCondition implements EmbeddedPersistable, Ale
         return grace;
     }
 
-    public static class NoSuchAlertConditionTypeException extends Throwable {
+    public static class NoSuchAlertConditionTypeException extends Exception {
         public NoSuchAlertConditionTypeException(String msg) {
             super(msg);
         }
