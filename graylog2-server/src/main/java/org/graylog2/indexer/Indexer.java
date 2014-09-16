@@ -26,8 +26,8 @@ import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.ListenableFuture;
 import com.ning.http.client.Response;
 import org.apache.commons.io.FileUtils;
-import org.elasticsearch.ElasticSearchException;
-import org.elasticsearch.ElasticSearchTimeoutException;
+import org.elasticsearch.ElasticsearchException;
+import org.elasticsearch.ElasticsearchTimeoutException;
 import org.elasticsearch.Version;
 import org.elasticsearch.action.WriteConsistencyLevel;
 import org.elasticsearch.action.admin.cluster.health.ClusterHealthRequest;
@@ -153,7 +153,7 @@ public class Indexer {
 
         try {
             client.admin().cluster().health(new ClusterHealthRequest().waitForYellowStatus()).actionGet(configuration.getEsClusterDiscoveryTimeout(), MILLISECONDS);
-        } catch(ElasticSearchTimeoutException e) {
+        } catch(ElasticsearchTimeoutException e) {
             final String hosts = node.settings().get("discovery.zen.ping.unicast.hosts");
 
             if (hosts != null && hosts.contains(",")) {
@@ -384,7 +384,7 @@ public class Indexer {
             return !node.isClosed()
                     && cluster() != null
                     && cluster().getHealth() != ClusterHealthStatus.RED;
-        } catch (ElasticSearchException e) {
+        } catch (ElasticsearchException e) {
             LOG.trace("Couldn't determine Elasticsearch health properly", e);
             return false;
         }

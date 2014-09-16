@@ -24,7 +24,7 @@ import com.google.inject.assistedinject.AssistedInject;
 import org.elasticsearch.action.ActionFuture;
 import org.elasticsearch.action.WriteConsistencyLevel;
 import org.elasticsearch.action.admin.cluster.state.ClusterStateRequest;
-import org.elasticsearch.action.admin.indices.alias.get.IndicesGetAliasesRequest;
+import org.elasticsearch.action.admin.indices.alias.get.GetAliasesRequest;
 import org.elasticsearch.action.admin.indices.close.CloseIndexRequest;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
 import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
@@ -33,7 +33,7 @@ import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsReques
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsResponse;
 import org.elasticsearch.action.admin.indices.flush.FlushRequest;
 import org.elasticsearch.action.admin.indices.mapping.put.PutMappingRequest;
-import org.elasticsearch.action.admin.indices.settings.UpdateSettingsRequest;
+import org.elasticsearch.action.admin.indices.settings.put.UpdateSettingsRequest;
 import org.elasticsearch.action.admin.indices.stats.IndexStats;
 import org.elasticsearch.action.admin.indices.stats.IndicesStatsRequest;
 import org.elasticsearch.action.admin.indices.stats.IndicesStatsResponse;
@@ -68,9 +68,6 @@ import java.util.Set;
 
 import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public class Indices implements IndexManagement {
     public interface Factory {
         Indices create(Client client);
@@ -178,12 +175,12 @@ public class Indices implements IndexManagement {
     }
 
     public boolean aliasExists(String alias) {
-        return c.admin().indices().aliasesExist(new IndicesGetAliasesRequest(alias)).actionGet().exists();
+        return c.admin().indices().aliasesExist(new GetAliasesRequest(alias)).actionGet().exists();
     }
 
     public String aliasTarget(String alias) {
         // The ES return value of this has an awkward format: The first key of the hash is the target index. Thanks.
-        return c.admin().indices().getAliases(new IndicesGetAliasesRequest(alias)).actionGet().getAliases().keysIt().next();
+        return c.admin().indices().getAliases(new GetAliasesRequest(alias)).actionGet().getAliases().keysIt().next();
     }
 
     public boolean create(String indexName) {
@@ -223,7 +220,7 @@ public class Indices implements IndexManagement {
     public Set<String> getAllMessageFields() {
         Set<String> fields = Sets.newHashSet();
 
-        ClusterStateRequest csr = new ClusterStateRequest().filterBlocks(true).filterNodes(true).filteredIndices(allIndicesAlias());
+        ClusterStateRequest csr = new ClusterStateRequest().blocks(true).nodes(true).indices(allIndicesAlias());
         ClusterState cs = c.admin().cluster().state(csr).actionGet().getState();
 
         Iterator<ObjectObjectCursor<String,IndexMetaData>> it = cs.getMetaData().indices().iterator();
