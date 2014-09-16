@@ -8,7 +8,7 @@ import com.typesafe.sbt.packager.universal.Keys.packageZipTarball
 
 object ApplicationBuild extends Build {
   val appName         = "graylog2-web-interface"
-  val appVersion      = "0.21.0-rc.1"
+  val appVersion      = "0.23.0-SNAPSHOT"
   val appDependencies = Seq(
     cache,
     javaCore,
@@ -35,6 +35,7 @@ object ApplicationBuild extends Build {
     "org.codehaus.jackson" % "jackson-core-asl" % "1.9.12" % "test"
   )
   val repositories = Seq(
+    Resolver.url("Local Maven Repository", url("file://"+Path.userHome+"/.m2/repository")),
     Resolver.url("Graylog2 Play Repository", url("http://graylog2.github.io/play2-graylog2/releases/"))(Resolver.ivyStylePatterns),
     Resolver.url("Graylog2 Play Snapshot Repository", url("http://graylog2.github.io/play2-graylog2/snapshots/"))(Resolver.ivyStylePatterns),
     Resolver.sonatypeRepo("releases"),
