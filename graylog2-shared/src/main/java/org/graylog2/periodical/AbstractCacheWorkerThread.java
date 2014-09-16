@@ -81,7 +81,7 @@ public abstract class AbstractCacheWorkerThread extends Periodical {
             topElement = cache.pop();
         }
 
-        messages.add(cache.pop());
+        messages.add(topElement);
         int result = cache.drainTo(messages, batchLimit);
         //LOG.error("Drained {} messages from cache. Remaining: {}", result, cache.size());
         while (!targetBuffer.hasCapacity(result))
