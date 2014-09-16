@@ -19,12 +19,16 @@
  */
 package org.graylog2.restclient.lib.metrics;
 
+import java.text.DecimalFormat;
+
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
 public class Gauge extends Metric {
 
     private final Object value;
+    DecimalFormat df = new DecimalFormat("#.##");
+
 
     public Gauge(Object value) {
         super(MetricType.GAUGE);
@@ -34,5 +38,9 @@ public class Gauge extends Metric {
 
     public Object getValue() {
         return value;
+    }
+
+    public String getFormattedValue() {
+        return df.format(value);
     }
 }
