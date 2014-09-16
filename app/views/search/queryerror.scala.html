@@ -15,9 +15,7 @@
     </h1>
 
     <p>
-        Your search could not be executed. <strong>Take a look at the
-        <a href="http://support.torch.sh/help/kb/graylog2-web-interface/the-search-bar-explained" target="_blank">documentation</a>
-        if you need help with the search syntax.</strong>
+        Your search could not be executed. <strong>Take a look at the @views.html.partials.search_query_documentation() if you need help with the search syntax.</strong>
     </p>
 
     @if(QueryErrorHelper.canMarkupParseError(searchResult.getError)) {

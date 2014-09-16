@@ -141,13 +141,13 @@
                     <span class="label label-success node-state" data-toggle="tooltip" title="Marked as ALIVE for load balancers">
                         lb:ALIVE
                     </span>
-                    <span style="margin-left: 4px">@partials.support.bubble("graylog2-server/load-balancer-status")</span>
+                    <span style="margin-left: 4px">@partials.support.bubble("setup/loadbalancer")</span>
 
                 } else {
                     <span class="label label-important node-state" data-toggle="tooltip" title="Marked as DEAD for load balancers">
                         lb:DEAD
                     </span>
-                    <span style="margin-left: 4px">@partials.support.bubble("graylog2-server/load-balancer-status")</span>
+                    <span style="margin-left: 4px">@partials.support.bubble("setup/loadbalancer")</span>
                 }
             </h3>
 
@@ -187,7 +187,7 @@
                         </a>
                         <ul class="dropdown-menu">
                             <li><a href="@routes.RadiosController.show(radio.getId)">Details</a></li>
-                            <li><a href="@routes.InputsController.manageRadio(radio.getId)">Manage inputs</a></li>
+                            <li><a href="@routes.InputsController.manageRadio(radio.getId)">Inputs</a></li>
                             <li><a href="@routes.MetricsController.ofRadio(radio.getId)">Metrics</a></li>
                             <li><a href="@routes.RadiosController.threadDump(radio.getId)">Get thread dump</a></li>
 
