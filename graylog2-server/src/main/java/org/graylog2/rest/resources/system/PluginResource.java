@@ -30,6 +30,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import java.net.URI;
 import java.net.URL;
 import java.util.List;
 import java.util.Map;
@@ -48,7 +49,7 @@ public class PluginResource extends RestResource {
         public final String unique_id;
         public final String name;
         public final String author;
-        public final URL url;
+        public final URI url;
         public final Version version;
         public final String description;
         public final Version required_version;
