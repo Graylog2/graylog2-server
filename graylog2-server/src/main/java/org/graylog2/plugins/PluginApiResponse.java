@@ -16,26 +16,26 @@
  */
 package org.graylog2.plugins;
 
-import java.util.Set;
 import org.graylog2.plugin.alarms.callbacks.AlarmCallback;
-import org.graylog2.plugin.alarms.transports.Transport;
 import org.graylog2.plugin.filters.MessageFilter;
 import org.graylog2.plugin.initializers.Initializer;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.outputs.MessageOutput;
 
+import java.util.Set;
+
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class PluginApiResponse {
-    
+
     String shortname;
     String version;
     String name;
     int plugin_type;
     String jar;
     Set<String> compatible_versions;
-    
+
     public String getPluginTypeName() {
         switch (plugin_type) {
             case 0:
@@ -46,15 +46,13 @@ public class PluginApiResponse {
                 return "filters";
             case 3:
                 return "outputs";
-            case 4:
-                return "alarm_transports";
             case 5:
                 return "alarm_callbacks";
         }
-        
+
         return "unknown";
     }
-    
+
     public Class<?> getClassOfPlugin() {
         switch (plugin_type) {
             case 0:
@@ -65,15 +63,13 @@ public class PluginApiResponse {
                 return MessageFilter.class;
             case 3:
                 return MessageOutput.class;
-            case 4:
-                return Transport.class;
             case 5:
                 return AlarmCallback.class;
         }
-        
+
         throw new RuntimeException("Unknown plugin type <" + plugin_type + ">.");
     }
-    
+
     public String getRegistryName() {
         switch (plugin_type) {
             case 0:
@@ -84,13 +80,11 @@ public class PluginApiResponse {
                 return "message_filters";
             case 3:
                 return "message_outputs";
-            case 4:
-                return "transports";
             case 5:
                 return "alarm_callbacks";
         }
-        
+
         throw new RuntimeException("Unknown plugin type <" + plugin_type + ">.");
     }
-    
+
 }
