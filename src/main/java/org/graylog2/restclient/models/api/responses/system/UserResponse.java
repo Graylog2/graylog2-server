@@ -22,6 +22,7 @@ import com.google.gson.annotations.SerializedName;
 import org.graylog2.restclient.models.Startpage;
 
 import java.util.List;
+import java.util.Map;
 
 public class UserResponse {
 
@@ -35,6 +36,8 @@ public class UserResponse {
     public String email;
 
 	public List<String> permissions;
+
+    public Map<String, Object> preferences;
 
     public String timezone;
 
