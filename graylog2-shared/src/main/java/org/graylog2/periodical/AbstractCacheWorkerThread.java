@@ -69,6 +69,12 @@ public abstract class AbstractCacheWorkerThread extends Periodical {
 
     protected void drainMessagesEnqueue(Cache cache, Buffer targetBuffer) throws BufferOutOfCapacityException, ProcessingDisabledException {
         List<Message> messages = new ArrayList<>();
+
+        Message topElement = null;
+        while (topElement == null) {
+            topElement = cache.pop();
+        }
+
         messages.add(cache.pop());
         int result = cache.drainTo(messages, batchLimit);
         //LOG.error("Drained {} messages from cache. Remaining: {}", result, cache.size());
