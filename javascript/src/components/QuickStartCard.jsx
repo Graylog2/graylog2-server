@@ -31,12 +31,13 @@ var QuickStartCard = React.createClass({
     },
     _getCategoriesHtml: function() {
         var categories = $.map(this.state.bundles, function( bundles, category){ return category; });
+        categories.sort();
         return categories.map(function (category) {
                 return this._getSourceTypeHtml(category);
             }, this );
     },
     _getSourceTypeHtml: function(category) {
-        var bundles = this.state.bundles[category];
+        var bundles = this._getSortedBundles(category);
         return (
             <BootstrapAccordionGroup key={category} name={category}>
                 <ul>
@@ -53,6 +54,17 @@ var QuickStartCard = React.createClass({
                 </ul>
             </BootstrapAccordionGroup>
         );
+    },
+    _getSortedBundles: function(category) {
+        var bundles = this.state.bundles[category];
+        bundles.sort(function(bundle1, bundle2){
+            if (bundle1.name > bundle2.name)
+                return 1;
+            if (bundle1.name < bundle2.name)
+                return -1;
+            return 0;
+        });
+        return bundles;
     },
     render: function () {
         var quickStartDescription = <p>New to Graylog2? Select one of the preconfigured setups to get you started:</p>;
