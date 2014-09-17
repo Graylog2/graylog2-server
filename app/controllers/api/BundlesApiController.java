@@ -11,12 +11,16 @@ import org.graylog2.restclient.models.bundles.BundleService;
 import org.graylog2.restclient.models.bundles.ConfigurationBundle;
 import org.graylog2.restclient.models.api.requests.CreateBundleRequest;
 import play.Logger;
+import play.Play;
 import play.mvc.Http.MultipartFormData;
 import play.mvc.Http.MultipartFormData.FilePart;
 import play.mvc.Result;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Map;
 
 public class BundlesApiController extends AuthenticatedController {
     @Inject
@@ -29,6 +33,14 @@ public class BundlesApiController extends AuthenticatedController {
     }
 
     public Result create() {
+        String path;
+        try {
+            URL parser = new URL(request().getHeader(REFERER));
+            path = parser.getPath();
+        } catch (MalformedURLException e) {
+            path = "/";
+        }
+
         MultipartFormData body = request().body().asMultipartFormData();
         FilePart bundle = body.getFile("bundle");
         if (bundle != null) {
@@ -41,19 +53,17 @@ public class BundlesApiController extends AuthenticatedController {
             } catch (IOException e) {
                 Logger.error("Could not parse uploaded bundle: " + e);
                 flash("error", "The uploaded bundle could not be applied: does it have the right format?");
-                return redirect("/");
+                return redirect(path);
             }
             if (bundleService.create(cbr)) {
                 flash("success", "Bundle added successfully");
-                return redirect("/");
             } else {
                 flash("error", "There was an error adding the bundle, please try again later");
-                return redirect("/");
             }
         } else {
             flash("error", "You didn't upload any bundle file");
-            return redirect("/");
         }
+        return redirect(path);
     }
 
     public Result apply(String bundleId) {
