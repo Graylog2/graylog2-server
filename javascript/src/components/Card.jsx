@@ -8,8 +8,10 @@ var Card = React.createClass({
     render: function () {
         var icon = null;
         var title = null;
+        var classes = "card";
 
         if (this.props.type == "info") {
+            classes = classes + " info";
             icon = <i className="icon icon-lightbulb pull-left"></i>;
         } else if (this.props.icon) {
             icon = <i className={"icon pull-left " + this.props.icon}></i>;
@@ -20,7 +22,7 @@ var Card = React.createClass({
         }
 
         return (
-            <div className="card">
+            <div className={classes}>
                 {title ? title : icon}
                 {this.props.children}
             </div>
