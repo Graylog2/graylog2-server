@@ -1,4 +1,4 @@
-package org.graylog2.restclient.models;
+package org.graylog2.restclient.models.bundles;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;

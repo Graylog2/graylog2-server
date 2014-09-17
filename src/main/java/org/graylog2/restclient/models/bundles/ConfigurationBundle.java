@@ -1,6 +1,4 @@
-package org.graylog2.restclient.models;
-
-import org.graylog2.restclient.models.dashboards.Dashboard;
+package org.graylog2.restclient.models.bundles;
 
 import java.util.List;
 

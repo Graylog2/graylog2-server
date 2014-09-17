@@ -1,11 +1,10 @@
 package org.graylog2.restclient.models.api.requests;
 
-import org.graylog2.restclient.models.Input;
-import org.graylog2.restclient.models.Output;
-import org.graylog2.restclient.models.Stream;
-import org.graylog2.restclient.models.dashboards.Dashboard;
+import org.graylog2.restclient.models.bundles.Dashboard;
+import org.graylog2.restclient.models.bundles.Input;
+import org.graylog2.restclient.models.bundles.Output;
+import org.graylog2.restclient.models.bundles.Stream;
 
-import java.util.Collections;
 import java.util.List;
 
 public class CreateBundleRequest extends ApiRequest {
