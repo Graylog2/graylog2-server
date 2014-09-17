@@ -82,6 +82,7 @@ POST        /system/inputs/:input_id/terminate                                  
 POST        /system/inputs/:node_id/:input_id/staticfields                           @controllers.InputsController.addStaticField(node_id: String, input_id: String)
 POST        /system/inputs/:input_id/staticfields                                    @controllers.InputsController.addStaticFieldGlobal(input_id: String)
 GET         /system/inputs/:node_id/:input_id/staticfields/:key/delete               @controllers.InputsController.removeStaticField(node_id: String, input_id: String, key: String)
+GET         /system/bundes                                                           @controllers.BundlesController.index()
 
 # Outputs
 GET         /system/outputs                                                          @controllers.OutputsController.index()
