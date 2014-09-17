@@ -79,7 +79,7 @@ var ConfigurationBundles = React.createClass({
                         </BootstrapAccordionGroup>
                     </BootstrapAccordion>
                 </div>
-                <div className="span4 offset1">
+                <div className="span6">
                     <ConfigurationBundlePreview sourceTypeId={this.state.sourceTypeId} sourceTypeDescription={this.state.sourceTypeDescription}>
                         <p>Select an item in the right list to preview it.</p>
                     </ConfigurationBundlePreview>
