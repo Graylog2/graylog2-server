@@ -84,6 +84,7 @@ public class BundleReceipe {
     private final Map<String, org.graylog2.plugin.streams.Stream> createdStreams = new HashMap<>();
     private final Map<String, org.graylog2.dashboards.Dashboard> createdDashboards = new HashMap<>();
     private final Map<String, org.graylog2.plugin.streams.Output> outputsByReferenceId = new HashMap<>();
+    private final Map<String, org.graylog2.plugin.streams.Stream> streamsByReferenceId = new HashMap<>();
 
     @Inject
     public BundleReceipe(final InputService inputService,
@@ -359,8 +360,13 @@ public class BundleReceipe {
     private void createStreams(final List<Stream> streams, final String userName)
             throws ValidationException {
         for (final Stream streamDescription : streams) {
+            final String referenceId = streamDescription.getId();
             final org.graylog2.plugin.streams.Stream stream = createStream(streamDescription, userName);
             createdStreams.put(stream.getId(), stream);
+
+            if (!isNullOrEmpty(referenceId)) {
+                streamsByReferenceId.put(referenceId, stream);
+            }
         }
     }
 
@@ -451,6 +457,17 @@ public class BundleReceipe {
             throws InvalidRangeParametersException, org.graylog2.dashboards.widgets.DashboardWidget.NoSuchWidgetTypeException, InvalidWidgetConfigurationException {
         final org.graylog2.dashboards.widgets.DashboardWidget.Type type = dashboardWidget.getType();
         final Map<String, Object> config = dashboardWidget.getConfiguration();
+
+        // Replace "stream_id" in config if it's set
+        final String streamReference = dashboardWidget.getStream();
+        if(!isNullOrEmpty(streamReference)) {
+            final org.graylog2.plugin.streams.Stream stream = streamsByReferenceId.get(streamReference);
+            if(null != stream) {
+                config.put("stream_id", stream.getId());
+            } else {
+                LOG.warn("Couldn't find referenced stream {}", streamReference);
+            }
+        }
 
         // Build timerange.
         final Map<String, Object> timerangeConfig = (Map<String, Object>) config.get("timerange");
