@@ -38,6 +38,8 @@ public interface User extends Persisted {
 
     List<String> getPermissions();
 
+    Map<String, Object> getPreferences();
+
     Map<String, String> getStartpage();
 
     long getSessionTimeoutMs();
@@ -45,6 +47,8 @@ public interface User extends Persisted {
     void setSessionTimeoutMs(long timeoutValue);
 
     void setPermissions(List<String> permissions);
+
+    void setPreferences(Map<String, Object> preferences);
 
     void setEmail(String email);
 

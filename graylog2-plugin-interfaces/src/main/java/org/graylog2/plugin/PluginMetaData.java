@@ -22,17 +22,20 @@
  */
 package org.graylog2.plugin;
 
-import java.net.URL;
+import java.net.URI;
 
-/**
- * @author Dennis Oelkers <dennis@torch.sh>
- */
 public interface PluginMetaData {
     String getUniqueId();
+
     String getName();
+
     String getAuthor();
-    URL getURL();
+
+    URI getURL();
+
     Version getVersion();
+
     String getDescription();
+
     Version getRequiredVersion();
 }
