@@ -4,7 +4,7 @@
 
 var React = require('react');
 
-var QuickStartPreview = React.createClass({
+var ConfigurationBundlePreview = React.createClass({
     render: function () {
         var preview = "Select an element from the left list to see its preview";
         var action = "";
@@ -17,7 +17,7 @@ var QuickStartPreview = React.createClass({
         }
 
         return (
-            <div className="quick-start-preview">
+            <div className="bundle-preview">
                 <h2>Preview:</h2>
                 <p>{preview}</p>
                 {action}
@@ -26,4 +26,4 @@ var QuickStartPreview = React.createClass({
     }
 });
 
-module.exports = QuickStartPreview;
+module.exports = ConfigurationBundlePreview;
