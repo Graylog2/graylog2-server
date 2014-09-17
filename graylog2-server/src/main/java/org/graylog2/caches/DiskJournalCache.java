@@ -170,23 +170,18 @@ public abstract class DiskJournalCache implements InputCache, OutputCache {
             return null;
         }
 
-        final Timer.Context time = popTimer.time();
-        final byte[] bytes = queue.poll();
-
-        if (bytes != null) {
-            counter.decrementAndGet();
-            try {
+        try (final Timer.Context time = popTimer.time()) {
+            final byte[] bytes = queue.take();
+            if (bytes != null) {
+                counter.decrementAndGet();
                 return serializer.deserialize(bytes);
-            } catch (IOException e) {
-                LOG.error("Error deserializing message", e);
-                return null;
-            } finally {
-                time.stop();
             }
-        } else {
-            time.stop();
-            return null;
+        } catch (InterruptedException e) {
+            LOG.error("Interrupted while dequeueing message: ", e);
+        } catch (IOException e) {
+            LOG.error("Error deserializing message", e);
         }
+        return null;
     }
 
     @Override
