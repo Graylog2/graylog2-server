@@ -1,12 +1,12 @@
 @(currentUser: org.graylog2.restclient.models.User,
     breadcrumbs: lib.BreadcrumbList)
 
-@main("Configuration Bundles", views.html.system.sidebar(), "", currentUser) {
+@main("Bundles", views.html.system.sidebar(), "", currentUser) {
 
     @views.html.partials.breadcrumbs(breadcrumbs)
 
     <div class="row-fluid">
-        <h1><i class="icon icon-sitemap"></i> Configuration Bundles</h1>
+        <h1><i class="icon icon-sitemap"></i> Bundles</h1>
         Set up your Graylog2 easily with configuration bundles.
     </div>
 
