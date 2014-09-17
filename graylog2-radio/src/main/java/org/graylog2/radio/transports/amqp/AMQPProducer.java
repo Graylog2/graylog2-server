@@ -47,13 +47,13 @@ public class AMQPProducer implements RadioTransport {
             for (int i = 0; i < count; i++) {
                 this.senders[i] = new AMQPSender(configuration.getAmqpHostname(),
                         configuration.getAmqpPort(),
-                        configuration.getAmqpVirtualHost(),
+                        String.format(configuration.getAmqpVirtualHost(), i),
                         configuration.getAmqpUsername(),
                         configuration.getAmqpPassword(),
                         String.format(configuration.getAmqpQueueName(), i),
                         configuration.getAmqpQueueType(),
                         String.format(configuration.getAmqpExchangeName(), i),
-                        configuration.getAmqpRoutingKey(),
+                        String.format(configuration.getAmqpRoutingKey(), i),
                         messagePack
                 );
             }
