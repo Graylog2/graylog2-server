@@ -430,7 +430,16 @@ public class BundleReceipe {
             widgetPositions.add(widgetPosition);
         }
 
-        dashboardService.updateWidgetPositions(dashboard, widgetPositions.build());
+        // FML: We need to reload the dashboard because not all fields (I'm looking at you, "widgets") is set in the
+        // Dashboard instance used before.
+        final org.graylog2.dashboards.Dashboard persistedDashboard;
+        try {
+            persistedDashboard = dashboardService.load(dashboardId);
+            dashboardService.updateWidgetPositions(persistedDashboard, widgetPositions.build());
+        } catch (NotFoundException e) {
+            LOG.error("Failed to load dashboard with id " + dashboardId, e);
+        }
+
         dashboardRegistry.add(dashboard);
 
         return dashboard;
