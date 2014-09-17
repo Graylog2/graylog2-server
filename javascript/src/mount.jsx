@@ -1,4 +1,4 @@
-/** @jsx React.DOM */
+'use strict';
 
 var React = require('React');
 var UserPreferencesButton = require('./components/UserPreferencesButton');
@@ -12,5 +12,7 @@ $(document).ready(function () {
     }
 
     var editUserPreferences = document.getElementById('react-user-preferences-modal');
-    if (editUserPreferences) React.renderComponent(<UserPreferencesModal />, editUserPreferences);
+    if (editUserPreferences) {
+        React.renderComponent(<UserPreferencesModal />, editUserPreferences);
+    }
 });

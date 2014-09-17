@@ -1,5 +1,3 @@
-/** @jsx React.DOM */
-
 'use strict';
 
 var React = require('React');
@@ -9,7 +7,7 @@ var BootstrapModal = React.createClass({
     componentDidMount: function () {
         // When the component is added, turn it into a modal
         $(this.getDOMNode())
-            .modal({backdrop: 'static', keyboard: false, show: false})
+            .modal({backdrop: 'static', keyboard: false, show: false});
     },
     componentWillUnmount: function () {
     },

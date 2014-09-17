@@ -65,7 +65,7 @@ var PreferencesStore = {
             return preferences;
         };
         var successCallback = function (data) {
-            var sortedArray = postProcessData(data.preferences || {})
+            var sortedArray = postProcessData(data.preferences || {});
             this.setPreferences(sortedArray);
             this.emit(this.DATA_LOADED_EVENT);
         }.bind(this);
