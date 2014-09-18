@@ -43,8 +43,6 @@ public class Extractor {
     private String conditionValue;
     @JsonProperty
     private int order;
-    @JsonProperty
-    private String regexConditionPattern;
 
     public String getTitle() {
         return title;
@@ -124,13 +122,5 @@ public class Extractor {
 
     public void setOrder(int order) {
         this.order = order;
-    }
-
-    public String getRegexConditionPattern() {
-        return regexConditionPattern;
-    }
-
-    public void setRegexConditionPattern(String regexConditionPattern) {
-        this.regexConditionPattern = regexConditionPattern;
     }
 }
