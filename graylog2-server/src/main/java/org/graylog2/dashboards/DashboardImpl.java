@@ -16,6 +16,7 @@
  */
 package org.graylog2.dashboards;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.bson.types.ObjectId;
@@ -90,6 +91,11 @@ public class DashboardImpl extends PersistedImpl implements Dashboard {
     @Override
     public DashboardWidget removeWidget(DashboardWidget widget) {
         return widgets.remove(widget.getId());
+    }
+
+    @Override
+    public Map<String, DashboardWidget> getWidgets() {
+        return ImmutableMap.copyOf(widgets);
     }
 
     @Override
