@@ -16,35 +16,26 @@
  */
 package org.graylog2.radio.inputs;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 import com.ning.http.client.AsyncHttpClient;
-import com.ning.http.client.Request;
-import com.ning.http.client.Response;
-import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationException;
 import org.graylog2.plugin.inputs.InputState;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.radio.cluster.InputService;
 import org.graylog2.radio.inputs.api.InputSummaryResponse;
-import org.graylog2.radio.inputs.api.PersistedInputsResponse;
 import org.graylog2.radio.inputs.api.RegisterInputResponse;
 import org.graylog2.shared.buffers.ProcessBuffer;
 import org.graylog2.shared.inputs.InputRegistry;
 import org.graylog2.shared.inputs.MessageInputFactory;
 import org.graylog2.shared.inputs.NoSuchInputTypeException;
-import org.graylog2.shared.rest.resources.system.inputs.requests.RegisterInputRequest;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.ws.rs.core.UriBuilder;
 import java.io.IOException;
 import java.net.URI;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
@@ -52,22 +43,18 @@ import java.util.concurrent.Future;
 public class RadioInputRegistry extends InputRegistry {
     private static final Logger LOG = LoggerFactory.getLogger(RadioInputRegistry.class);
 
-    protected final ObjectMapper mapper = new ObjectMapper();
     protected final AsyncHttpClient httpclient;
     protected final URI serverUrl;
-    private final ServerStatus serverStatus;
     private final InputService inputService;
 
     public RadioInputRegistry(MessageInputFactory messageInputFactory,
                               ProcessBuffer processBuffer,
                               AsyncHttpClient httpclient,
                               URI serverUrl,
-                              ServerStatus serverStatus,
                               InputService inputService) {
         super(messageInputFactory, processBuffer);
         this.httpclient = httpclient;
         this.serverUrl = serverUrl;
-        this.serverStatus = serverStatus;
         this.inputService = inputService;
     }
 
@@ -83,10 +70,9 @@ public class RadioInputRegistry extends InputRegistry {
             input.setPersistId(isr.id);
             input.setCreatedAt(new DateTime(isr.createdAt));
             input.setGlobal(isr.global);
+            input.setConfiguration(inputConfig);
 
             input.checkConfiguration(inputConfig);
-            // initialize must run after all fields have been set. Why oh why isn't this done in the constructor/factory method?
-            input.initialize(inputConfig);
         } catch (NoSuchInputTypeException e) {
             LOG.warn("Cannot launch persisted input. No such type [{}]. Error: {}", isr.type, e);
             return null;

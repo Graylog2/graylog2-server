@@ -197,17 +197,6 @@ public abstract class InputRegistry {
         return getRunningInputs().size();
     }
 
-    public void removeFromRunning(MessageInput input) {
-        // Remove from running list.
-        InputState thisInputState = null;
-        for (InputState inputState : inputStates) {
-            if (inputState.getMessageInput().equals(input)) {
-                thisInputState = inputState;
-            }
-        }
-        inputStates.remove(thisInputState);
-    }
-
     public void removeFromRunning(InputState inputState) {
         inputStates.remove(inputState);
     }
@@ -218,6 +207,7 @@ public abstract class InputRegistry {
 
     public void launchAllPersisted() {
         for (MessageInput input : getAllPersisted()) {
+            input.initialize(input.getConfiguration());
             launchPersisted(input);
         }
     }
