@@ -59,7 +59,6 @@ public abstract class MessageInput {
     private Map<String, String> staticFields = Maps.newConcurrentMap();
 
     public void initialize(Configuration configuration) {
-        this.configuration = configuration;
     }
 
     public abstract void checkConfiguration(Configuration configuration) throws ConfigurationException;
@@ -123,6 +122,10 @@ public abstract class MessageInput {
 
     public Configuration getConfiguration() {
         return configuration;
+    }
+
+    public void setConfiguration(Configuration configuration) {
+        this.configuration = configuration;
     }
 
     public Boolean getGlobal() {

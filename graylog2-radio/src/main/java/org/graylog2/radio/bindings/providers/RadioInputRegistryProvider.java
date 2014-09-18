@@ -39,14 +39,12 @@ public class RadioInputRegistryProvider implements Provider<InputRegistry> {
                                       ProcessBuffer processBuffer,
                                       AsyncHttpClient httpClient,
                                       Configuration configuration,
-                                      ServerStatus serverStatus,
                                       InputService inputService) {
         if (radioInputRegistry == null)
             radioInputRegistry = new RadioInputRegistry(messageInputFactory,
                     processBuffer,
                     httpClient,
                     configuration.getGraylog2ServerUri(),
-                    serverStatus,
                     inputService);
     }
 
