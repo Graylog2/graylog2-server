@@ -23,7 +23,10 @@ import org.bson.types.ObjectId;
 import org.graylog2.Configuration;
 import org.graylog2.database.CollectionName;
 import org.graylog2.database.PersistedImpl;
-import org.graylog2.database.validators.*;
+import org.graylog2.database.validators.FilledStringValidator;
+import org.graylog2.database.validators.LimitedOptionalStringValidator;
+import org.graylog2.database.validators.LimitedStringValidator;
+import org.graylog2.database.validators.ListValidator;
 import org.graylog2.plugin.database.validators.Validator;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
@@ -37,13 +40,8 @@ import java.util.concurrent.TimeUnit;
 
 import static com.google.common.base.Objects.firstNonNull;
 
-
-/**
- * @author Lennart Koopmann <lennart@socketfeed.com>
- */
 @CollectionName("users")
 public class UserImpl extends PersistedImpl implements User {
-
     private static final Logger LOG = LoggerFactory.getLogger(UserImpl.class);
 
     public static final String USERNAME = "username";
@@ -60,11 +58,11 @@ public class UserImpl extends PersistedImpl implements User {
     public static final int MAX_EMAIL_LENGTH = 254;
     public static final int MAX_FULL_NAME_LENGTH = 200;
 
-    public UserImpl(Map<String, Object> fields) {
+    public UserImpl(final Map<String, Object> fields) {
         super(fields);
     }
 
-    protected UserImpl(ObjectId id, Map<String, Object> fields) {
+    protected UserImpl(final ObjectId id, final Map<String, Object> fields) {
         super(id, fields);
     }
 
@@ -78,13 +76,13 @@ public class UserImpl extends PersistedImpl implements User {
             put(USERNAME, new LimitedStringValidator(1, MAX_USERNAME_LENGTH));
             put(PASSWORD, new FilledStringValidator());
             put(EMAIL, new LimitedStringValidator(1, MAX_EMAIL_LENGTH));
-            put(FULL_NAME, new LimitedStringValidator(1, MAX_FULL_NAME_LENGTH));
+            put(FULL_NAME, new LimitedOptionalStringValidator(MAX_FULL_NAME_LENGTH));
             put(PERMISSIONS, new ListValidator());
         }};
     }
 
     @Override
-    public Map<String, Validator> getEmbeddedValidations(String key) {
+    public Map<String, Validator> getEmbeddedValidations(final String key) {
         return Maps.newHashMap();
     }
 
@@ -94,12 +92,17 @@ public class UserImpl extends PersistedImpl implements User {
     }
 
     @Override
+    public void setFullName(final String fullname) {
+        fields.put(FULL_NAME, fullname);
+    }
+
+    @Override
     public String getName() {
         return fields.get(USERNAME).toString();
     }
 
     @Override
-    public void setName(String username) {
+    public void setName(final String username) {
         fields.put(USERNAME, username);
     }
 
@@ -110,23 +113,39 @@ public class UserImpl extends PersistedImpl implements User {
     }
 
     @Override
-    public List<String> getPermissions() {
-        final Object o = fields.get(PERMISSIONS);
-        return (List<String>) o;
+    public void setEmail(final String email) {
+        fields.put(EMAIL, email);
     }
 
     @Override
+    @SuppressWarnings("unchecked")
+    public List<String> getPermissions() {
+        return (List<String>) fields.get(PERMISSIONS);
+    }
+
+    @Override
+    public void setPermissions(final List<String> permissions) {
+        fields.put(PERMISSIONS, permissions);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
     public Map<String, Object> getPreferences() {
-        final Object o = fields.get(PREFERENCES);
-        return (Map<String, Object>) o;
+        return (Map<String, Object>) fields.get(PREFERENCES);
+    }
+
+    @Override
+    public void setPreferences(final Map<String, Object> preferences) {
+        fields.put(PREFERENCES, preferences);
     }
 
     @Override
     public Map<String, String> getStartpage() {
-        Map<String, String> startpage = Maps.newHashMap();
+        final Map<String, String> startpage = Maps.newHashMap();
 
         if (fields.containsKey("startpage")) {
-            Map<String, String>  obj = (Map<String, String>) fields.get("startpage");
+            @SuppressWarnings("unchecked")
+            final Map<String, String> obj = (Map<String, String>) fields.get("startpage");
             startpage.put("type", obj.get("type"));
             startpage.put("id", obj.get("id"));
         }
@@ -144,28 +163,8 @@ public class UserImpl extends PersistedImpl implements User {
     }
 
     @Override
-    public void setSessionTimeoutMs(long timeoutValue) {
+    public void setSessionTimeoutMs(final long timeoutValue) {
         fields.put(SESSION_TIMEOUT, timeoutValue);
-    }
-
-    @Override
-    public void setPermissions(List<String> permissions) {
-        fields.put(PERMISSIONS, permissions);
-    }
-
-    @Override
-    public void setPreferences(Map<String, Object> preferences) {
-        fields.put(PREFERENCES, preferences);
-    }
-
-    @Override
-    public void setEmail(String email) {
-        fields.put(EMAIL, email);
-    }
-
-    @Override
-    public void setFullName(String fullname) {
-        fields.put(FULL_NAME, fullname);
     }
 
     @Override
@@ -173,13 +172,13 @@ public class UserImpl extends PersistedImpl implements User {
         return firstNonNull(fields.get(PASSWORD), "").toString();
     }
 
-    public void setHashedPassword(String hashedPassword) {
+    public void setHashedPassword(final String hashedPassword) {
         fields.put(PASSWORD, hashedPassword);
     }
 
     @Override
-    public void setPassword(String password, String passwordSecret) {
-        if (password == null || password.equals("")) {
+    public void setPassword(final String password, final String passwordSecret) {
+        if (password == null || "".equals(password)) {
             // If no password is given, we leave the hashed password empty and we fail during validation.
             setHashedPassword("");
         } else {
@@ -189,7 +188,7 @@ public class UserImpl extends PersistedImpl implements User {
     }
 
     @Override
-    public boolean isUserPassword(String password, String passwordSecret) {
+    public boolean isUserPassword(final String password, final String passwordSecret) {
         final String oldPasswordHash = new SimpleHash("SHA-1", password, passwordSecret).toString();
         return getHashedPassword().equals(oldPasswordHash);
     }
@@ -208,13 +207,13 @@ public class UserImpl extends PersistedImpl implements User {
     }
 
     @Override
-    public void setTimeZone(DateTimeZone timeZone) {
-        fields.put(TIMEZONE, timeZone.getID());
+    public void setTimeZone(final String timeZone) {
+        fields.put(TIMEZONE, timeZone);
     }
 
     @Override
-    public void setTimeZone(String timeZone) {
-        fields.put(TIMEZONE, timeZone);
+    public void setTimeZone(final DateTimeZone timeZone) {
+        fields.put(TIMEZONE, timeZone.getID());
     }
 
     @Override
@@ -223,7 +222,7 @@ public class UserImpl extends PersistedImpl implements User {
     }
 
     @Override
-    public void setExternal(boolean external) {
+    public void setExternal(final boolean external) {
         fields.put(EXTERNAL_USER, external);
     }
 
@@ -233,8 +232,8 @@ public class UserImpl extends PersistedImpl implements User {
     }
 
     @Override
-    public void setStartpage(String type, String id) {
-        Map<String, String> startpage = Maps.newHashMap();
+    public void setStartpage(final String type, final String id) {
+        final Map<String, String> startpage = Maps.newHashMap();
 
         if (type != null && id != null) {
             startpage.put("type", type);
@@ -246,6 +245,7 @@ public class UserImpl extends PersistedImpl implements User {
 
     public static class LocalAdminUser extends UserImpl {
         private final Configuration configuration;
+
         public LocalAdminUser(Configuration configuration) {
             super(null, Maps.<String, Object>newHashMap());
             this.configuration = configuration;
