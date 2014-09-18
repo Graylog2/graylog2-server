@@ -53,6 +53,8 @@ public class StreamRouter {
     private final Map<String, Meter> streamIncomingMeters = Maps.newHashMap();
     private final Map<String, Timer> streamExecutionTimers = Maps.newHashMap();
     private final Map<String, Meter> streamExceptionMeters = Maps.newHashMap();
+    private final Map<String, Meter> streamRuleTimeoutMeters = Maps.newHashMap();
+    private final Map<String, Meter> streamFaultsExceededMeters = Maps.newHashMap();
 
     protected final StreamService streamService;
     protected final StreamRuleService streamRuleService;
@@ -118,10 +120,12 @@ public class StreamRouter {
             } catch (Exception e) {
                 AtomicInteger faultCount = getFaultCount(stream.getId());
                 Integer streamFaultCount = faultCount.incrementAndGet();
+                getStreamRuleTimeoutMeter(stream.getId()).mark();
                 if (maxFaultCount > 0 && streamFaultCount >= maxFaultCount) {
                     try {
                         streamService.pause(stream);
                         faultCount.set(0);
+                        getStreamFaultsExceededMeter(stream.getId()).mark();
                         LOG.error("Processing of stream <" + stream.getId() + "> failed to return within " + timeout + "ms for more than " + maxFaultCount + " times. Disabling stream.");
 
                         Notification notification = notificationService.buildNow()
@@ -218,4 +222,23 @@ public class StreamRouter {
         return meter;
     }
 
+    protected Meter getStreamRuleTimeoutMeter(String streamId) {
+        Meter meter = this.streamRuleTimeoutMeters.get(streamId);
+        if (meter == null) {
+            meter = metricRegistry.meter(MetricRegistry.name(Stream.class, streamId, "ruleTimeouts"));
+            this.streamRuleTimeoutMeters.put(streamId, meter);
+        }
+
+        return meter;
+    }
+
+    protected Meter getStreamFaultsExceededMeter(String streamId) {
+        Meter meter = this.streamFaultsExceededMeters.get(streamId);
+        if (meter == null) {
+            meter = metricRegistry.meter(MetricRegistry.name(Stream.class, streamId, "faultsExceeded"));
+            this.streamFaultsExceededMeters.put(streamId, meter);
+        }
+
+        return meter;
+    }
 }
