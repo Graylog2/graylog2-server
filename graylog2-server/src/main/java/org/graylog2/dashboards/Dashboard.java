@@ -21,11 +21,12 @@ import org.graylog2.plugin.database.Persisted;
 
 import java.util.Map;
 
-/**
- * @author Dennis Oelkers <dennis@torch.sh>
- */
 public interface Dashboard extends Persisted {
+    String getTitle();
+
     void setTitle(String title);
+
+    String getDescription();
 
     void setDescription(String description);
 
