@@ -307,6 +307,10 @@ public abstract class Extractor implements EmbeddedPersistable {
         }};
     }
 
+    public List<Converter> getConverters() {
+        return converters;
+    }
+
     public List<Map<String, Object>> converterConfigMap() {
         final ImmutableList.Builder<Map<String, Object>> listBuilder = ImmutableList.builder();
 
