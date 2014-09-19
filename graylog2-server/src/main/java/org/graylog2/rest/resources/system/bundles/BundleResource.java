@@ -22,6 +22,7 @@ import com.google.common.collect.Multimap;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.bundles.BundleService;
 import org.graylog2.bundles.ConfigurationBundle;
+import org.graylog2.bundles.ExportBundle;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.rest.documentation.annotations.Api;
 import org.graylog2.rest.documentation.annotations.ApiOperation;
@@ -91,7 +92,7 @@ public class BundleResource extends RestResource {
     public Multimap<String, ConfigurationBundle> listBundles() {
         final ImmutableSetMultimap.Builder<String, ConfigurationBundle> categoryBundleMap = ImmutableSetMultimap.builder();
 
-        for(final ConfigurationBundle bundle : bundleService.loadAll()) {
+        for (final ConfigurationBundle bundle : bundleService.loadAll()) {
             categoryBundleMap.put(bundle.getCategory(), bundle);
         }
 
@@ -167,5 +168,19 @@ public class BundleResource extends RestResource {
             @PathParam("bundleId")
             final String bundleId) throws NotFoundException {
         bundleService.applyConfigurationBundle(bundleId, getCurrentUser());
+    }
+
+    @POST
+    @Path("export")
+    @Timed
+    @ApiOperation(value = "Export entities as a configuration bundle")
+    @ApiResponses(value = {
+            @ApiResponse(code = 500, message = "Error while exporting configuration bundle")
+    })
+    public ConfigurationBundle exportBundle(
+            @ApiParam(title = "exportBundle", description = "Export bundle", required = true)
+            @NotNull
+            final ExportBundle exportBundle) throws NotFoundException {
+        return bundleService.exportConfigurationBundle(exportBundle);
     }
 }

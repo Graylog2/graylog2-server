@@ -18,6 +18,7 @@ package org.graylog2.bundles;
 
 import com.google.common.collect.Iterators;
 import org.bson.types.ObjectId;
+import org.graylog2.bindings.providers.BundleExporterProvider;
 import org.graylog2.bindings.providers.BundleReceipeProvider;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
@@ -41,20 +42,25 @@ public class BundleService {
 
     private final JacksonDBCollection<ConfigurationBundle, ObjectId> dbCollection;
     private final BundleReceipeProvider bundleReceipeProvider;
+    private final BundleExporterProvider bundleExporterProvider;
 
     @Inject
     public BundleService(
             final MongoJackObjectMapperProvider mapperProvider,
             final MongoConnection mongoConnection,
-            final BundleReceipeProvider bundleReceipeProvider) {
+            final BundleReceipeProvider bundleReceipeProvider,
+            final BundleExporterProvider bundleExporterProvider) {
         this(JacksonDBCollection.wrap(mongoConnection.getDatabase().getCollection(COLLECTION_NAME),
-                        ConfigurationBundle.class, ObjectId.class, mapperProvider.get()), bundleReceipeProvider);
+                        ConfigurationBundle.class, ObjectId.class, mapperProvider.get()),
+                bundleReceipeProvider, bundleExporterProvider);
     }
 
     public BundleService(final JacksonDBCollection<ConfigurationBundle, ObjectId> dbCollection,
-                         final BundleReceipeProvider bundleReceipeProvider) {
+                         final BundleReceipeProvider bundleReceipeProvider,
+                         final BundleExporterProvider bundleExporterProvider) {
         this.dbCollection = dbCollection;
         this.bundleReceipeProvider = bundleReceipeProvider;
+        this.bundleExporterProvider = bundleExporterProvider;
     }
 
     public ConfigurationBundle load(final String bundleId) throws NotFoundException {
@@ -101,5 +107,10 @@ public class BundleService {
 
         final BundleReceipe bundleReceipe = bundleReceipeProvider.get();
         bundleReceipe.cook(bundle, userName);
+    }
+
+    public ConfigurationBundle exportConfigurationBundle(final ExportBundle exportBundle) {
+        final BundleExporter bundleExporter = bundleExporterProvider.get();
+        return bundleExporter.export(exportBundle);
     }
 }
