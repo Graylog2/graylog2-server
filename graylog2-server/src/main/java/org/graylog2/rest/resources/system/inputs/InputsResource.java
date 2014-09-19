@@ -142,6 +142,7 @@ public class InputsResource extends RestResource {
             input.setGlobal(lr.global);
             input.setCreatorUserId(lr.creatorUserId);
             input.setCreatedAt(createdAt);
+            input.setConfiguration(inputConfig);
 
             input.checkConfiguration(inputConfig);
         } catch (NoSuchInputTypeException e) {
