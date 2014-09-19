@@ -15,7 +15,7 @@
             @if(input.getGlobal == false) {
                 <span class="text" title="@inputState.getNode.getNodeId">on @views.helpers.ClusterEntityHelper.linkToEntity(inputState.getNode)</span>
             }
-            @DateHelper.readablePeriodFromNow(inputState.getStartedAt, "text")
+            @DateHelper.readablePeriodFromNow(input.getCreatedAt, "text")
                 &nbsp;
 
             @views.html.system.inputs.partials.input_state_controls.render(inputState.getState, input)
