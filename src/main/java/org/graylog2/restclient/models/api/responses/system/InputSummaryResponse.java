@@ -44,6 +44,9 @@ public class InputSummaryResponse {
     @SerializedName("started_at")
     public String startedAt;
 
+    @SerializedName("created_at")
+    public String createdAt;
+
     public Boolean global;
 
     @SerializedName("static_fields")
