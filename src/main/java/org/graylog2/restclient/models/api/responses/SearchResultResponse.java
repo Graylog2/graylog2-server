@@ -24,12 +24,12 @@ import org.joda.time.DateTime;
 import java.util.List;
 
 public class SearchResultResponse {
-	
-	public int time;
-	public String query;
-	public long total_results;
-	public List<MessageSummaryResponse> messages;
-	public List<String> fields;
+
+    public int time;
+    public String query;
+    public long total_results;
+    public List<MessageSummaryResponse> messages;
+    public List<String> fields;
 
     @SerializedName("used_indices")
     public List<String> usedIndices;
@@ -47,10 +47,10 @@ public class SearchResultResponse {
     public String to;
 
     public DateTime getFromDataTime() {
-        return DateTime.parse(from);
+        return from != null ? DateTime.parse(from) : null;
     }
     public DateTime getToDataTime() {
-        return DateTime.parse(to);
+        return to != null ? DateTime.parse(to) : null;
     }
 
     public abstract static class QueryError {}
