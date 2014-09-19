@@ -286,13 +286,14 @@ public class InputServiceImpl extends PersistedServiceImpl implements InputServi
             input.addStaticField(field.getKey(), field.getValue());
         }
 
+        input.setConfiguration(new Configuration(io.getConfiguration()));
+
         return input;
     }
 
     @Override
     public MessageInput getMessageInput(Input io) throws NoSuchInputTypeException {
         MessageInput input = buildMessageInput(io);
-        input.initialize(new Configuration(io.getConfiguration()));
 
         return input;
     }
