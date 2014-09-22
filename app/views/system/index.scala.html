@@ -100,7 +100,7 @@
 
     @if(isPermitted(INDEXERCLUSTER_READ)) {
     <div class="row-fluid">
-        @partials.support.head_bubble("graylog2-server/the-elasticsearch-cluster-status-explained")
+        @partials.support.head_bubble("general/elasticsearch-cluster-status-explained")
         <h2><i class="icon icon-tasks"></i> ElasticSearch cluster</h2>
 
         @views.html.partials.es_cluster_health.render(clusterHealth)
