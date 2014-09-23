@@ -177,8 +177,7 @@ public abstract class MessageInput {
         inputMap.put("name", this.getName());
         inputMap.put("title", this.getTitle());
         inputMap.put("creator_user_id", this.getCreatorUserId());
-        inputMap.put("created_at", this.getCreatedAt());
-        inputMap.put("started_at", Tools.getISO8601String(this.getCreatedAt()));
+        inputMap.put("created_at", Tools.getISO8601String(this.getCreatedAt()));
         inputMap.put("attributes", this.getAttributesWithMaskedPasswords());
         inputMap.put("static_fields", this.getStaticFields());
         inputMap.put("global", this.getGlobal());
