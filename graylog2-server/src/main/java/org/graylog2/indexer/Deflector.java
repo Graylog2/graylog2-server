@@ -273,6 +273,6 @@ public class Deflector { // extends Ablenkblech
     }
 
     public boolean isGraylog2Index(final String indexName) {
-        return !isDeflectorAlias(indexName) && indexName.startsWith(indexPrefix);
+        return !isDeflectorAlias(indexName) && indexName.startsWith(indexPrefix + SEPARATOR);
     }
 }
