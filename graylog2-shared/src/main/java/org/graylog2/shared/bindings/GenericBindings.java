@@ -23,23 +23,21 @@
 package org.graylog2.shared.bindings;
 
 import com.codahale.metrics.MetricRegistry;
-import com.google.common.eventbus.AsyncEventBus;
 import com.google.common.eventbus.EventBus;
 import com.google.common.util.concurrent.ServiceManager;
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.inject.AbstractModule;
-import com.google.inject.Scopes;
-import com.google.inject.assistedinject.FactoryModuleBuilder;
 import org.graylog2.inputs.gelf.gelf.GELFChunkManager;
 import org.graylog2.plugin.inputs.util.ThroughputCounter;
 import org.graylog2.plugin.system.NodeId;
-import org.graylog2.shared.bindings.providers.*;
+import org.graylog2.shared.bindings.providers.EventBusProvider;
+import org.graylog2.shared.bindings.providers.GELFChunkManagerProvider;
+import org.graylog2.shared.bindings.providers.NodeIdProvider;
+import org.graylog2.shared.bindings.providers.ServiceManagerProvider;
 import org.graylog2.shared.buffers.ProcessBuffer;
 import org.graylog2.shared.buffers.ProcessBufferWatermark;
 import org.graylog2.shared.stats.ThroughputStats;
 import org.jboss.netty.util.HashedWheelTimer;
-
-import java.util.concurrent.Executors;
+import org.msgpack.MessagePack;
 
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
@@ -54,23 +52,22 @@ public class GenericBindings extends AbstractModule {
     @Override
     protected void configure() {
         // This is holding all our metrics.
-        bind(MetricRegistry.class).toInstance(new MetricRegistry());
-        bind(ThroughputStats.class).toInstance(new ThroughputStats());
-        bind(ProcessBufferWatermark.class).toInstance(new ProcessBufferWatermark());
+        bind(MetricRegistry.class).asEagerSingleton();
+        bind(ThroughputStats.class).asEagerSingleton();
+        bind(ProcessBufferWatermark.class).asEagerSingleton();
 
         bind(InstantiationService.class).toInstance(instantiationService);
 
-        install(new FactoryModuleBuilder().build(ProcessBuffer.Factory.class));
-
-        bind(ProcessBuffer.class).toProvider(ProcessBufferProvider.class);
-        bind(GELFChunkManager.class).toProvider(GELFChunkManagerProvider.class);
+        bind(ProcessBuffer.class).asEagerSingleton();
+        bind(GELFChunkManager.class).toProvider(GELFChunkManagerProvider.class).asEagerSingleton();
         bind(NodeId.class).toProvider(NodeIdProvider.class);
 
         bind(ServiceManager.class).toProvider(ServiceManagerProvider.class).asEagerSingleton();
 
-        bind(HashedWheelTimer.class).toInstance(new HashedWheelTimer());
+        bind(HashedWheelTimer.class).asEagerSingleton();
         bind(ThroughputCounter.class);
 
-        bind(EventBus.class).toProvider(EventBusProvider.class).in(Scopes.SINGLETON);
+        bind(EventBus.class).toProvider(EventBusProvider.class).asEagerSingleton();
+        bind(MessagePack.class).toInstance(new MessagePack());
     }
 }

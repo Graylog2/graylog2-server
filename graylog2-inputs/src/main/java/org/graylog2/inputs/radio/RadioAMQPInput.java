@@ -20,103 +20,30 @@ import com.codahale.metrics.MetricRegistry;
 import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
 import org.graylog2.inputs.amqp.AMQPInput;
-import org.graylog2.plugin.configuration.Configuration;
-import org.graylog2.plugin.configuration.ConfigurationException;
-import org.graylog2.plugin.configuration.ConfigurationRequest;
-import org.graylog2.plugin.configuration.fields.ConfigurationField;
-import org.graylog2.plugin.configuration.fields.NumberField;
-import org.graylog2.plugin.configuration.fields.TextField;
+import org.msgpack.MessagePack;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public class RadioAMQPInput extends AMQPInput {
 
     public static final String NAME = "Graylog2 Radio Input (AMQP)";
 
     @Inject
-    public RadioAMQPInput(MetricRegistry metricRegistry, EventBus eventBus) {
-        super(metricRegistry, eventBus);
+    public RadioAMQPInput(final MetricRegistry metricRegistry, final EventBus eventBus, final MessagePack messagePack) {
+        super(metricRegistry, eventBus, messagePack);
     }
 
     @Override
-    public void checkConfiguration(Configuration configuration) throws ConfigurationException {
-        configuration.setString(CK_EXCHANGE, "graylog2");
-        configuration.setString(CK_QUEUE, "graylog2-radio-messages");
-        configuration.setString(CK_ROUTING_KEY, "graylog2-radio-message");
-
-        if (!checkConfig(configuration)) {
-            throw new ConfigurationException(configuration.getSource().toString());
-        }
+    protected String defaultRoutingKey() {
+        return "graylog2-radio-message";
     }
 
     @Override
-    public ConfigurationRequest getRequestedConfiguration() {
-        ConfigurationRequest cr = new ConfigurationRequest();
+    protected String defaultExchangeName() {
+        return "graylog2";
+    }
 
-        cr.addField(
-                new TextField(
-                        CK_HOSTNAME,
-                        "Broker hostname",
-                        "",
-                        "Hostname of the AMQP broker to use",
-                        ConfigurationField.Optional.NOT_OPTIONAL
-                )
-        );
-
-        cr.addField(
-                new NumberField(
-                        CK_PORT,
-                        "Broker port",
-                        5672,
-                        "Port of the AMQP broker to use",
-                        ConfigurationField.Optional.OPTIONAL,
-                        NumberField.Attribute.IS_PORT_NUMBER
-                )
-        );
-
-        cr.addField(
-                new TextField(
-                        CK_VHOST,
-                        "Broker virtual host",
-                        "/",
-                        "Virtual host of the AMQP broker to use",
-                        ConfigurationField.Optional.NOT_OPTIONAL
-                )
-        );
-
-        cr.addField(
-                new TextField(
-                        CK_USERNAME,
-                        "Username",
-                        "",
-                        "Username to connect to AMQP broker",
-                        ConfigurationField.Optional.OPTIONAL
-                )
-        );
-
-        cr.addField(
-                new TextField(
-                        CK_PASSWORD,
-                        "Password",
-                        "",
-                        "Password to connect to AMQP broker",
-                        ConfigurationField.Optional.OPTIONAL,
-                        TextField.Attribute.IS_PASSWORD
-                )
-        );
-
-        cr.addField(
-                new NumberField(
-                        CK_PREFETCH,
-                        "Prefetch count",
-                        100,
-                        "For advanced usage: AMQP prefetch count. Default is 100.",
-                        ConfigurationField.Optional.NOT_OPTIONAL
-                )
-        );
-
-        return cr;
+    @Override
+    protected String defaultQueueName() {
+        return "graylog2-radio-messages";
     }
 
     @Override

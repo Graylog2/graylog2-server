@@ -14,30 +14,37 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.bindings.providers;
+package org.graylog2.radio;
 
-import org.graylog2.indexer.healing.FixDeflectorByDeleteJob;
-import org.graylog2.indexer.healing.FixDeflectorByMoveJob;
-import org.graylog2.system.jobs.SystemJobFactory;
+import com.codahale.metrics.Meter;
+import com.google.inject.name.Named;
+import org.graylog2.plugin.Message;
+import org.graylog2.radio.transports.RadioTransport;
+import org.joda.time.DateTime;
 
 import javax.inject.Inject;
-import javax.inject.Provider;
 
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
  */
-public class SystemJobFactoryProvider implements Provider<SystemJobFactory> {
-    private static SystemJobFactory systemJobFactory = null;
+public class AMQPTestSender implements Runnable {
+    private final RadioTransport radioTransport;
+    private final Message message;
+    private final Meter meter;
 
     @Inject
-    public SystemJobFactoryProvider(FixDeflectorByDeleteJob.Factory deleteJobFactory,
-                                    FixDeflectorByMoveJob.Factory moveJobFactory) {
-        if (systemJobFactory == null)
-            systemJobFactory = new SystemJobFactory(moveJobFactory, deleteJobFactory);
+    public AMQPTestSender(RadioTransport radioTransport, @Named("throughputMeter") Meter meter) {
+        this.radioTransport = radioTransport;
+        this.meter = meter;
+        this.message = new Message("foobar", "localhost", DateTime.now());
     }
 
     @Override
-    public SystemJobFactory get() {
-        return systemJobFactory;
+    public void run() {
+        int i = 0;
+        while(true) {
+            radioTransport.send(message);
+            meter.mark();
+        }
     }
 }

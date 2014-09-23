@@ -76,6 +76,21 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "amqp_broker_vhost")
     private String amqpVhost = "/";
 
+    @Parameter(value = "amqp_broker_queue_name")
+    private String amqpQueueName = "graylog2-radio-messages";
+
+    @Parameter(value = "amqp_broker_queue_type")
+    private String amqpQueueType = "topic";
+
+    @Parameter(value = "amqp_broker_exchange_name")
+    private String amqpExchangeName = "graylog2";
+
+    @Parameter(value = "amqp_broker_routing_key")
+    private String amqpRoutingKey = "graylog2-radio-message";
+
+    @Parameter(value = "amqp_broker_parallel_queues")
+    private int amqpParallelQueues = 1;
+
     @Parameter(value = "ring_size", required = true, validator = PositiveIntegerValidator.class)
     private int ringSize = 1024;
 
@@ -97,10 +112,6 @@ public class Configuration extends BaseConfiguration {
 
     public URI getGraylog2ServerUri() {
         return graylog2ServerUri == null ? null : Tools.getUriWithPort(graylog2ServerUri, GRAYLOG2_DEFAULT_PORT);
-    }
-
-    public int getRingSize() {
-        return ringSize;
     }
 
     public String getKafkaBrokers() {
@@ -141,5 +152,25 @@ public class Configuration extends BaseConfiguration {
 
     public String getAmqpHostname() {
         return amqpHostname;
+    }
+
+    public String getAmqpQueueName() {
+        return amqpQueueName;
+    }
+
+    public String getAmqpQueueType() {
+        return amqpQueueType;
+    }
+
+    public String getAmqpExchangeName() {
+        return amqpExchangeName;
+    }
+
+    public String getAmqpRoutingKey() {
+        return amqpRoutingKey;
+    }
+
+    public int getAmqpParallelQueues() {
+        return amqpParallelQueues;
     }
 }

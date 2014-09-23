@@ -20,12 +20,10 @@ import com.codahale.metrics.MetricRegistry;
 import com.google.common.eventbus.EventBus;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.system.NodeId;
+import org.msgpack.MessagePack;
 
 import javax.inject.Inject;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public class RadioInput extends RadioKafkaInput {
 
     /*
@@ -44,8 +42,13 @@ public class RadioInput extends RadioKafkaInput {
     }
 
     @Inject
-    public RadioInput(MetricRegistry metricRegistry, NodeId nodeId, EventBus eventBus, ServerStatus serverStatus) {
-        super(metricRegistry, nodeId, eventBus, serverStatus);
+    public RadioInput(
+            final MetricRegistry metricRegistry,
+            final NodeId nodeId,
+            final EventBus eventBus,
+            final ServerStatus serverStatus,
+            final MessagePack messagePack) {
+        super(metricRegistry, nodeId, eventBus, serverStatus, messagePack);
     }
 
 }

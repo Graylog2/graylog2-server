@@ -57,6 +57,7 @@ import org.joda.time.Period;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
 import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
@@ -128,6 +129,7 @@ public class Indexer {
         REVERSE_MEAN
     }
 
+    @Inject
     public Indexer(Configuration configuration,
                    Searches.Factory searchesFactory,
                    Counts.Factory countsFactory,
@@ -381,7 +383,8 @@ public class Indexer {
      */
     public boolean isConnectedAndHealthy() {
         try {
-            return !node.isClosed()
+            return node != null
+                    && !node.isClosed()
                     && cluster() != null
                     && cluster().getHealth() != ClusterHealthStatus.RED;
         } catch (ElasticSearchException e) {

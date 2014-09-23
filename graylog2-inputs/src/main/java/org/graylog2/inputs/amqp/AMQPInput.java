@@ -31,15 +31,13 @@ import org.graylog2.plugin.configuration.fields.TextField;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.MisfireException;
 import org.graylog2.plugin.lifecycles.Lifecycle;
+import org.msgpack.MessagePack;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.Map;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public class AMQPInput extends MessageInput {
 
     private static final Logger LOG = LoggerFactory.getLogger(AMQPInput.class);
@@ -47,6 +45,7 @@ public class AMQPInput extends MessageInput {
     public static final String NAME = "AMQP Input";
     private final MetricRegistry metricRegistry;
     private final EventBus serverEventBus;
+    private final MessagePack messagePack;
 
     private Consumer consumer;
 
@@ -59,11 +58,16 @@ public class AMQPInput extends MessageInput {
     public static final String CK_EXCHANGE = "exchange";
     public static final String CK_QUEUE = "queue";
     public static final String CK_ROUTING_KEY = "routing_key";
+    public static final String CK_PARALLEL_QUEUES = "parallel_queues";
 
     @Inject
-    public AMQPInput(MetricRegistry metricRegistry, EventBus serverEventBus) {
+    public AMQPInput(
+            final MetricRegistry metricRegistry,
+            final EventBus serverEventBus,
+            final MessagePack messagePack) {
         this.metricRegistry = metricRegistry;
         this.serverEventBus = serverEventBus;
+        this.messagePack = messagePack;
     }
 
     @Subscribe
@@ -115,13 +119,14 @@ public class AMQPInput extends MessageInput {
                 configuration.getString(CK_QUEUE),
                 configuration.getString(CK_EXCHANGE),
                 configuration.getString(CK_ROUTING_KEY),
+                (int) configuration.getInt(CK_PARALLEL_QUEUES),
                 processBuffer,
-                this
-        );
+                this,
+                messagePack);
         serverEventBus.register(this);
         try {
             consumer.run();
-        } catch(IOException e) {
+        } catch (IOException e) {
             throw new MisfireException("Could not launch AMQP consumer.", e);
         }
     }
@@ -208,7 +213,7 @@ public class AMQPInput extends MessageInput {
                 new TextField(
                         CK_QUEUE,
                         "Queue",
-                        "log-messages",
+                        defaultQueueName(),
                         "Name of queue that is created.",
                         ConfigurationField.Optional.NOT_OPTIONAL
                 )
@@ -218,7 +223,7 @@ public class AMQPInput extends MessageInput {
                 new TextField(
                         CK_EXCHANGE,
                         "Exchange",
-                        "log-messages",
+                        defaultExchangeName(),
                         "Name of exchange to bind to.",
                         ConfigurationField.Optional.NOT_OPTIONAL
                 )
@@ -228,13 +233,35 @@ public class AMQPInput extends MessageInput {
                 new TextField(
                         CK_ROUTING_KEY,
                         "Routing key",
-                        "#",
+                        defaultRoutingKey(),
                         "Routing key to listen for.",
                         ConfigurationField.Optional.NOT_OPTIONAL
                 )
         );
 
+        cr.addField(
+                new NumberField(
+                        CK_PARALLEL_QUEUES,
+                        "Number of Queues",
+                        1,
+                        "Number of parallel queues",
+                        ConfigurationField.Optional.NOT_OPTIONAL
+                )
+        );
+
         return cr;
+    }
+
+    protected String defaultRoutingKey() {
+        return "#";
+    }
+
+    protected String defaultExchangeName() {
+        return "log-messages";
+    }
+
+    protected String defaultQueueName() {
+        return "log-messages";
     }
 
     @Override

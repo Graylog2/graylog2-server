@@ -25,8 +25,6 @@ package org.graylog2.shared.buffers;
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import com.google.inject.assistedinject.Assisted;
-import com.google.inject.assistedinject.AssistedInject;
 import com.lmax.disruptor.WaitStrategy;
 import com.lmax.disruptor.dsl.Disruptor;
 import com.lmax.disruptor.dsl.ProducerType;
@@ -44,6 +42,8 @@ import org.graylog2.shared.buffers.processors.ProcessBufferProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
+import javax.inject.Inject;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -54,10 +54,6 @@ import static com.codahale.metrics.MetricRegistry.name;
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public class ProcessBuffer extends Buffer {
-    public interface Factory {
-        public ProcessBuffer create(InputCache inputCache, AtomicInteger processBufferWatermark);
-    }
-
     private static final Logger LOG = LoggerFactory.getLogger(ProcessBuffer.class);
 
     public static String SOURCE_INPUT_ATTR_NAME;
@@ -79,12 +75,12 @@ public class ProcessBuffer extends Buffer {
 
     private final ServerStatus serverStatus;
 
-    @AssistedInject
+    @Inject
     public ProcessBuffer(MetricRegistry metricRegistry,
                          ServerStatus serverStatus,
                          BaseConfiguration configuration,
-                         @Assisted InputCache inputCache,
-                         @Assisted AtomicInteger processBufferWatermark) {
+                         InputCache inputCache,
+                         ProcessBufferWatermark processBufferWatermark) {
         this.serverStatus = serverStatus;
         this.configuration = configuration;
         this.inputCache = inputCache;
@@ -127,17 +123,7 @@ public class ProcessBuffer extends Buffer {
     
     @Override
     public void insertCached(Message message, MessageInput sourceInput) {
-        message.setSourceInput(sourceInput);
-
-        final String source_input_name;
-
-        if (sourceInput != null)
-            source_input_name = sourceInput.getId();
-        else
-            source_input_name = "<nonexistent input>";
-
-        message.addField(SOURCE_INPUT_ATTR_NAME, source_input_name);
-        message.addField(SOURCE_NODE_ATTR_NAME, serverStatus.getNodeId());
+        prepareMessage(message, sourceInput);
 
         if (!serverStatus.isProcessing()) {
             LOG.debug("Message processing is paused. Writing to cache.");
@@ -163,8 +149,7 @@ public class ProcessBuffer extends Buffer {
         insert(message);
     }
 
-    @Override
-    public void insertFailFast(Message message, MessageInput sourceInput) throws BufferOutOfCapacityException, ProcessingDisabledException {
+    private void prepareMessage(Message message, MessageInput sourceInput) {
         message.setSourceInput(sourceInput);
 
         final String source_input_name;
@@ -176,6 +161,11 @@ public class ProcessBuffer extends Buffer {
 
         message.addField(SOURCE_INPUT_ATTR_NAME, source_input_name);
         message.addField(SOURCE_NODE_ATTR_NAME, serverStatus.getNodeId());
+    }
+
+    @Override
+    public void insertFailFast(Message message, MessageInput sourceInput) throws BufferOutOfCapacityException, ProcessingDisabledException {
+        prepareMessage(message, sourceInput);
 
         if (!serverStatus.isProcessing()) {
             LOG.debug("Rejecting message, because message processing is paused.");
@@ -190,15 +180,64 @@ public class ProcessBuffer extends Buffer {
 
         insert(message);
     }
-    
-    private void insert(Message message) {
-        long sequence = ringBuffer.next();
-        MessageEvent event = ringBuffer.get(sequence);
-        event.setMessage(message);
-        ringBuffer.publish(sequence);
 
-        this.processBufferWatermark.incrementAndGet();
-        incomingMessages.mark();
+    @Override
+    public void insertFailFast(List<Message> messages) throws BufferOutOfCapacityException, ProcessingDisabledException {
+        int length = messages.size();
+        for (Message message : messages) {
+            MessageInput sourceInput = message.getSourceInput();
+            prepareMessage(message, sourceInput);
+        }
+
+        if (!serverStatus.isProcessing()) {
+            LOG.debug("Rejecting message, because message processing is paused.");
+            throw new ProcessingDisabledException();
+        }
+
+        if (!hasCapacity(length)) {
+            LOG.debug("Rejecting message, because I am full and caching was disabled by input. Raise my size or add more processors.");
+            rejectedMessages.mark();
+            throw new BufferOutOfCapacityException();
+        }
+
+        insert(messages.toArray(new Message[length]));
+        afterInsert(length);
     }
 
+    @Override
+    public void insertCached(List<Message> messages) {
+        int length = messages.size();
+        for (Message message : messages)
+            prepareMessage(message, message.getSourceInput());
+
+        if (!serverStatus.isProcessing()) {
+            LOG.debug("Message processing is paused. Writing to cache.");
+            cachedMessages.mark();
+            inputCache.add(messages);
+            return;
+        }
+
+        if (!hasCapacity(length)) {
+            if (configuration.getInputCacheMaxSize() == 0 || inputCache.size() < configuration.getInputCacheMaxSize()) {
+                if (LOG.isDebugEnabled())
+                    LOG.debug("Out of capacity. Writing to cache.");
+                cachedMessages.mark();
+                inputCache.add(messages);
+            } else {
+                if (LOG.isDebugEnabled())
+                    LOG.debug("Out of capacity. Input cache limit reached. Dropping message.");
+                rejectedMessages.mark();
+            }
+            return;
+        }
+
+        insert(messages.toArray(new Message[length]));
+        afterInsert(length);
+    }
+
+    @Override
+    protected void afterInsert(int n) {
+        this.processBufferWatermark.addAndGet(n);
+        incomingMessages.mark(n);
+    }
 }

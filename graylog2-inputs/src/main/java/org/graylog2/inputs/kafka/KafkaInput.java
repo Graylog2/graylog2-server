@@ -22,7 +22,12 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.common.util.concurrent.Uninterruptibles;
 import com.google.inject.Inject;
-import kafka.consumer.*;
+import kafka.consumer.Consumer;
+import kafka.consumer.ConsumerConfig;
+import kafka.consumer.ConsumerIterator;
+import kafka.consumer.KafkaStream;
+import kafka.consumer.TopicFilter;
+import kafka.consumer.Whitelist;
 import kafka.javaapi.consumer.ConsumerConnector;
 import kafka.message.MessageAndMetadata;
 import org.graylog2.plugin.Message;
@@ -49,12 +54,13 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.concurrent.*;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public class KafkaInput extends MessageInput {
 
     // Kaefer.
@@ -66,6 +72,7 @@ public class KafkaInput extends MessageInput {
     private final NodeId nodeId;
     private final EventBus serverEventBus;
     private final ServerStatus serverStatus;
+    private final MessagePack messagePack;
 
     private ConsumerConnector cc;
 
@@ -80,14 +87,16 @@ public class KafkaInput extends MessageInput {
     private CountDownLatch stopLatch;
 
     @Inject
-    public KafkaInput(MetricRegistry metricRegistry,
-                      NodeId nodeId,
-                      EventBus serverEventBus,
-                      ServerStatus serverStatus) {
+    public KafkaInput(final MetricRegistry metricRegistry,
+                      final NodeId nodeId,
+                      final EventBus serverEventBus,
+                      final ServerStatus serverStatus,
+                      final MessagePack messagePack) {
         this.metricRegistry = metricRegistry;
         this.nodeId = nodeId;
         this.serverEventBus = serverEventBus;
         this.serverStatus = serverStatus;
+        this.messagePack = messagePack;
     }
 
     @Subscribe
@@ -169,8 +178,6 @@ public class KafkaInput extends MessageInput {
         for (final KafkaStream<byte[], byte[]> stream : streams) {
             executor.submit(new Runnable() {
                 public void run() {
-                    MessagePack msgpack = new MessagePack();
-
                     ConsumerIterator<byte[], byte[]> consumerIterator = stream.iterator();
 
                     // we have to use hasNext() here instead foreach, because next() marks the message as processed immediately
@@ -188,7 +195,7 @@ public class KafkaInput extends MessageInput {
                         // process the message, this will immediately mark the message as having been processed. this gets tricky
                         // if we get an exception about processing it down below.
                         final MessageAndMetadata<byte[], byte[]> message = consumerIterator.next();
-                        final Message event = decodeMessage(msgpack, message);
+                        final Message event = decodeMessage(messagePack, message);
                         if (event == null) return; // TODO should this actually return?
 
                         // the loop below is like this because we cannot "unsee" the message we've just gotten by calling .next()
@@ -212,7 +219,7 @@ public class KafkaInput extends MessageInput {
                                 retryCount++;
                             } catch (ProcessingDisabledException e) {
                                 LOG.debug("Processing was disabled after we read the message but before we could insert it into " +
-                                                  "the buffer. We cache this one message, and should block on the next iteration.");
+                                        "the buffer. We cache this one message, and should block on the next iteration.");
                                 processBuffer.insertCached(event, thisInput);
                                 retry = false;
                             }
@@ -284,7 +291,7 @@ public class KafkaInput extends MessageInput {
                 if (!allStoppedOrderly) {
                     // timed out
                     LOG.info("Stopping Kafka input timed out (waited 5 seconds for consumer threads to stop). Forcefully closing connection now. " +
-                                     "This is usually harmless when stopping the input.");
+                            "This is usually harmless when stopping the input.");
                 }
             } catch (InterruptedException e) {
                 LOG.debug("Interrupted while waiting to stop input.");
@@ -318,27 +325,27 @@ public class KafkaInput extends MessageInput {
         ));
 
         cr.addField(new NumberField(
-                CK_FETCH_MIN_BYTES,
-                "Fetch minimum bytes",
-                5,
-                "Wait for a message batch to reach at least this size or the configured maximum wait time before fetching.",
-                ConfigurationField.Optional.NOT_OPTIONAL)
+                        CK_FETCH_MIN_BYTES,
+                        "Fetch minimum bytes",
+                        5,
+                        "Wait for a message batch to reach at least this size or the configured maximum wait time before fetching.",
+                        ConfigurationField.Optional.NOT_OPTIONAL)
         );
 
         cr.addField(new NumberField(
-                CK_FETCH_WAIT_MAX,
-                "Fetch maximum wait time (ms)",
-                100,
-                "Wait for this time or the configured minimum size of a message batch before fetching.",
-                ConfigurationField.Optional.NOT_OPTIONAL)
+                        CK_FETCH_WAIT_MAX,
+                        "Fetch maximum wait time (ms)",
+                        100,
+                        "Wait for this time or the configured minimum size of a message batch before fetching.",
+                        ConfigurationField.Optional.NOT_OPTIONAL)
         );
 
         cr.addField(new NumberField(
-                CK_THREADS,
-                "Processor threads",
-                2,
-                "Number of processor threads to spawn. Use one thread per Kafka topic partition.",
-                ConfigurationField.Optional.NOT_OPTIONAL)
+                        CK_THREADS,
+                        "Processor threads",
+                        2,
+                        "Number of processor threads to spawn. Use one thread per Kafka topic partition.",
+                        ConfigurationField.Optional.NOT_OPTIONAL)
         );
 
         return cr;
@@ -369,7 +376,7 @@ public class KafkaInput extends MessageInput {
                 && config.intIsSet(CK_FETCH_WAIT_MAX)
                 && config.stringIsSet(CK_ZOOKEEPER)
                 && config.stringIsSet(CK_TOPIC_FILTER)
-                && config.intIsSet(CK_THREADS)  && config.getInt(CK_THREADS) > 0;
+                && config.intIsSet(CK_THREADS) && config.getInt(CK_THREADS) > 0;
     }
 
     private void setupMetrics() {

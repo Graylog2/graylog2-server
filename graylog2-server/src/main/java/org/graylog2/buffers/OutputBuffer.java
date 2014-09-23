@@ -35,6 +35,8 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -118,8 +120,9 @@ public class OutputBuffer extends Buffer {
             overflowCache.add(message);
             return;
         }
-        
+
         insert(message);
+        afterInsert(1);
     }
 
     @Override
@@ -131,16 +134,39 @@ public class OutputBuffer extends Buffer {
         }
         
         insert(message);
-    }
-    
-    private void insert(Message message) {
-        long sequence = ringBuffer.next();
-        MessageEvent event = ringBuffer.get(sequence);
-        event.setMessage(message);
-        ringBuffer.publish(sequence);
-
-        outputBufferWatermark.incrementAndGet();
-        incomingMessages.mark();
+        afterInsert(1);
     }
 
+    @Override
+    public void insertCached(List<Message> messages) {
+        int length = messages.size();
+        if (!hasCapacity(length)) {
+            LOG.debug("Out of capacity. Writing to cache.");
+            cachedMessages.mark(length);
+            overflowCache.add(messages);
+            return;
+        }
+
+        insert(messages.toArray(new Message[length]));
+        afterInsert(length);
+    }
+
+    @Override
+    public void insertFailFast(List<Message> messages) throws BufferOutOfCapacityException {
+        int length = messages.size();
+        if (!hasCapacity(length)) {
+            LOG.debug("Rejecting message, because I am full and caching was disabled by input. Raise my size or add more processors.");
+            rejectedMessages.mark(length);
+            throw new BufferOutOfCapacityException();
+        }
+
+        insert(messages.toArray(new Message[length]));
+        afterInsert(length);
+    }
+
+    @Override
+    protected void afterInsert(int n) {
+        outputBufferWatermark.addAndGet(n);
+        incomingMessages.mark(n);
+    }
 }

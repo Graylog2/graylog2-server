@@ -23,19 +23,18 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 
 public class MongoConnectionProvider implements Provider<MongoConnection> {
-    private static MongoConnection mongoConnection = null;
+    private final Configuration configuration;
 
     @Inject
     public MongoConnectionProvider(Configuration configuration) {
-        if (mongoConnection == null) {
-            mongoConnection = new MongoConnection(configuration);
-
-            mongoConnection.connect();
-        }
+        this.configuration = configuration;
     }
 
     @Override
     public MongoConnection get() {
+        final MongoConnection mongoConnection = new MongoConnection(configuration);
+
+        mongoConnection.connect();
         return mongoConnection;
     }
 }
