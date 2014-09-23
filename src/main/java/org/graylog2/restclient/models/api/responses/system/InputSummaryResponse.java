@@ -41,9 +41,6 @@ public class InputSummaryResponse {
     @SerializedName("creator_user_id")
     public String creatorUserId;
 
-    @SerializedName("started_at")
-    public String startedAt;
-
     @SerializedName("created_at")
     public String createdAt;
 
