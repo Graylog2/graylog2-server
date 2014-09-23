@@ -21,8 +21,8 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.elasticsearch.action.search.SearchPhaseExecutionException;
 import org.glassfish.jersey.server.ChunkedOutput;
 import org.graylog2.indexer.IndexHelper;
-import org.graylog2.indexer.Indexer;
 import org.graylog2.indexer.results.ScrollResult;
+import org.graylog2.indexer.searches.Searches;
 import org.graylog2.indexer.searches.SearchesConfig;
 import org.graylog2.indexer.searches.SearchesConfigBuilder;
 import org.graylog2.indexer.searches.Sorting;
@@ -51,8 +51,8 @@ public class KeywordSearchResource extends SearchResource {
     private static final Logger LOG = LoggerFactory.getLogger(KeywordSearchResource.class);
 
     @Inject
-    public KeywordSearchResource(Indexer indexer) {
-        super(indexer);
+    public KeywordSearchResource(Searches searches) {
+        super(searches);
     }
 
     @GET @Timed
@@ -89,7 +89,7 @@ public class KeywordSearchResource extends SearchResource {
                 .build();
 
         try {
-            return buildSearchResponse(indexer.searches().search(searchesConfig), timeRange);
+            return buildSearchResponse(searches.search(searchesConfig), timeRange);
         } catch (IndexHelper.InvalidRangeFormatException e) {
             LOG.warn("Invalid timerange parameters provided. Returning HTTP 400.", e);
             throw new WebApplicationException(400);
@@ -119,7 +119,7 @@ public class KeywordSearchResource extends SearchResource {
         final TimeRange timeRange = buildKeywordTimeRange(keyword);
 
         try {
-            final ScrollResult scroll = indexer.searches()
+            final ScrollResult scroll = searches
                     .scroll(query, timeRange, limit, offset, fieldList, filter);
             final ChunkedOutput<ScrollResult.ScrollChunk> output = new ChunkedOutput<>(ScrollResult.ScrollChunk.class);
 
@@ -155,9 +155,9 @@ public class KeywordSearchResource extends SearchResource {
 
         try {
             return json(buildHistogramResult(
-                    indexer.searches().histogram(
+                    searches.histogram(
                             query,
-                            Indexer.DateHistogramInterval.valueOf(interval),
+                            Searches.DateHistogramInterval.valueOf(interval),
                             filter,
                             buildKeywordTimeRange(keyword)
                     )
@@ -186,7 +186,7 @@ public class KeywordSearchResource extends SearchResource {
 
         try {
             return json(buildTermsResult(
-                    indexer.searches().terms(field, size, query, filter, buildKeywordTimeRange(keyword))
+                    searches.terms(field, size, query, filter, buildKeywordTimeRange(keyword))
             ));
         } catch (IndexHelper.InvalidRangeFormatException e) {
             LOG.warn("Invalid timerange parameters provided. Returning HTTP 400.", e);
@@ -215,7 +215,7 @@ public class KeywordSearchResource extends SearchResource {
 
         try {
             return json(buildTermsStatsResult(
-                    indexer.searches().termsStats(keyField, valueField, Indexer.TermsStatsOrder.valueOf(order.toUpperCase()), size, query, filter, buildKeywordTimeRange(keyword))
+                    searches.termsStats(keyField, valueField, Searches.TermsStatsOrder.valueOf(order.toUpperCase()), size, query, filter, buildKeywordTimeRange(keyword))
             ));
         } catch (IndexHelper.InvalidRangeFormatException e) {
             LOG.warn("Invalid timerange parameters provided. Returning HTTP 400.", e);

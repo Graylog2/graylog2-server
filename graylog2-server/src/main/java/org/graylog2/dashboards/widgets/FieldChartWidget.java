@@ -18,7 +18,6 @@ package org.graylog2.dashboards.widgets;
 
 import com.codahale.metrics.MetricRegistry;
 import org.graylog2.indexer.IndexHelper;
-import org.graylog2.indexer.Indexer;
 import org.graylog2.indexer.results.HistogramResult;
 import org.graylog2.indexer.searches.Searches;
 import org.graylog2.indexer.searches.timeranges.TimeRange;
@@ -39,11 +38,11 @@ public class FieldChartWidget extends DashboardWidget {
     private final TimeRange timeRange;
     private final String streamId;
     private final Map<String, Object> config;
-    private final Indexer indexer;
+    private final Searches searches;
 
-    public FieldChartWidget(MetricRegistry metricRegistry, Indexer indexer, String id, String description, int cacheTime, Map<String, Object> config, String query, TimeRange timeRange, String creatorUserId) throws InvalidWidgetConfigurationException {
+    public FieldChartWidget(MetricRegistry metricRegistry, Searches searches, String id, String description, int cacheTime, Map<String, Object> config, String query, TimeRange timeRange, String creatorUserId) throws InvalidWidgetConfigurationException {
         super(metricRegistry, Type.FIELD_CHART, id, description, cacheTime, config, creatorUserId);
-        this.indexer = indexer;
+        this.searches = searches;
 
         if (!checkConfig(config)) {
             throw new InvalidWidgetConfigurationException("Missing or invalid widget configuration. Provided config was: " + config.toString());
@@ -88,10 +87,10 @@ public class FieldChartWidget extends DashboardWidget {
         }
 
         try {
-            HistogramResult histogramResult = indexer.searches().fieldHistogram(
+            HistogramResult histogramResult = searches.fieldHistogram(
                     query,
                     (String) config.get("field"),
-                    Indexer.DateHistogramInterval.valueOf(((String) config.get("interval")).toUpperCase()),
+                    Searches.DateHistogramInterval.valueOf(((String) config.get("interval")).toUpperCase()),
                     filter,
                     timeRange
             );

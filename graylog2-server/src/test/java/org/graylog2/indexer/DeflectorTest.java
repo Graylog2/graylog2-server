@@ -22,6 +22,7 @@ package org.graylog2.indexer;
 
 import org.elasticsearch.action.admin.indices.stats.IndexStats;
 import org.graylog2.Configuration;
+import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.indices.jobs.OptimizeIndexJob;
 import org.graylog2.indexer.ranges.RebuildIndexRangesJob;
 import org.graylog2.system.activities.ActivityWriter;
@@ -32,11 +33,7 @@ import org.testng.annotations.Test;
 import java.util.Map;
 
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertNotNull;
-import static org.testng.Assert.assertTrue;
-import static org.testng.Assert.fail;
+import static org.testng.Assert.*;
 import static org.testng.AssertJUnit.assertEquals;
 
 public class DeflectorTest {
@@ -50,7 +47,8 @@ public class DeflectorTest {
                 new Configuration(),
                 mock(ActivityWriter.class),
                 mock(RebuildIndexRangesJob.Factory.class),
-                mock(OptimizeIndexJob.Factory.class));
+                mock(OptimizeIndexJob.Factory.class),
+                mock(Indices.class));
     }
 
     @Test
@@ -74,23 +72,34 @@ public class DeflectorTest {
 
     @Test
     public void testBuildIndexName() {
-        assertEquals("graylog2_0", Deflector.buildIndexName("graylog2", 0));
-        assertEquals("graylog2_1", Deflector.buildIndexName("graylog2", 1));
-        assertEquals("graylog2_9001", Deflector.buildIndexName("graylog2", 9001));
+
+        Deflector d = new Deflector(mock(SystemJobManager.class),
+                mock(Configuration.class),
+                mock(ActivityWriter.class),
+                mock(RebuildIndexRangesJob.Factory.class),
+                mock(OptimizeIndexJob.Factory.class),
+                mock(Indices.class));
+
+        assertEquals("graylog2_0", d.buildIndexName("graylog2", 0));
+        assertEquals("graylog2_1", d.buildIndexName("graylog2", 1));
+        assertEquals("graylog2_9001", d.buildIndexName("graylog2", 9001));
     }
 
     @Test
     public void testBuildDeflectorNameWithCustomIndexPrefix() {
-        assertEquals("foo_custom_index_deflector", Deflector.buildName("foo_custom_index"));
+        assertEquals("foo_custom_index_deflector", "foo_custom_index" + "_" + Deflector.DEFLECTOR_SUFFIX);
     }
 
     @Test
     public void nullIndexerDoesNotThrow() {
-        final Indexer indexer = mock(Indexer.class);
-        when(indexer.indices()).thenReturn(null);
-
+        Deflector d = new Deflector(mock(SystemJobManager.class),
+                                    mock(Configuration.class),
+                                    mock(ActivityWriter.class),
+                                    mock(RebuildIndexRangesJob.Factory.class),
+                                    mock(OptimizeIndexJob.Factory.class),
+                                    mock(Indices.class));
         try {
-            final Map<String, IndexStats> deflectorIndices = deflector.getAllDeflectorIndices(indexer);
+            final Map<String, IndexStats> deflectorIndices = d.getAllDeflectorIndices();
             assertNotNull(deflectorIndices);
             assertEquals(0, deflectorIndices.size());
         } catch (Exception e) {
@@ -100,11 +109,14 @@ public class DeflectorTest {
 
     @Test
     public void nullIndexerDoesNotThrowOnIndexName() {
-        final Indexer indexer = mock(Indexer.class);
-        when(indexer.indices()).thenReturn(null);
-
+        Deflector d = new Deflector(mock(SystemJobManager.class),
+                                    mock(Configuration.class),
+                                    mock(ActivityWriter.class),
+                                    mock(RebuildIndexRangesJob.Factory.class),
+                                    mock(OptimizeIndexJob.Factory.class),
+                                    mock(Indices.class));
         try {
-            final String[] deflectorIndices = deflector.getAllDeflectorIndexNames(indexer);
+            final String[] deflectorIndices = d.getAllDeflectorIndexNames();
             assertNotNull(deflectorIndices);
             assertEquals(0, deflectorIndices.length);
         } catch (Exception e) {

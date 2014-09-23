@@ -17,46 +17,44 @@
 package org.graylog2.periodical;
 
 import com.google.inject.Inject;
-import org.graylog2.Configuration;
+import com.google.inject.Provider;
 import org.graylog2.indexer.Deflector;
-import org.graylog2.indexer.Indexer;
 import org.graylog2.indexer.NoTargetIndexException;
+import org.graylog2.indexer.indices.Indices;
 import org.graylog2.initializers.IndexerSetupService;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
+import org.graylog2.plugin.indexer.rotation.RotationStrategy;
 import org.graylog2.plugin.periodical.Periodical;
 import org.graylog2.system.activities.Activity;
 import org.graylog2.system.activities.ActivityWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * @author Lennart Koopmann <lennart@socketfeed.com>
- */
-public class DeflectorManagerThread extends Periodical { // public class Klimperkiste
+public class IndexRotationThread extends Periodical {
     
-    private static final Logger LOG = LoggerFactory.getLogger(DeflectorManagerThread.class);
+    private static final Logger LOG = LoggerFactory.getLogger(IndexRotationThread.class);
 
     private NotificationService notificationService;
-    private final Indexer indexer;
     private final Deflector deflector;
-    private final Configuration configuration;
     private final ActivityWriter activityWriter;
     private final IndexerSetupService indexerSetupService;
+    private final Indices indices;
+    private final Provider<RotationStrategy> rotationStrategyProvider;
 
     @Inject
-    public DeflectorManagerThread(NotificationService notificationService,
-                                  Indexer indexer,
-                                  Deflector deflector,
-                                  Configuration configuration,
-                                  ActivityWriter activityWriter,
-                                  IndexerSetupService indexerSetupService) {
+    public IndexRotationThread(NotificationService notificationService,
+                               Indices indices,
+                               Deflector deflector,
+                               ActivityWriter activityWriter,
+                               IndexerSetupService indexerSetupService,
+                               Provider<RotationStrategy> rotationStrategyProvider) {
         this.notificationService = notificationService;
-        this.indexer = indexer;
         this.deflector = deflector;
-        this.configuration = configuration;
         this.activityWriter = activityWriter;
         this.indexerSetupService = indexerSetupService;
+        this.indices = indices;
+        this.rotationStrategyProvider = rotationStrategyProvider;
     }
 
     @Override
@@ -65,7 +63,7 @@ public class DeflectorManagerThread extends Periodical { // public class Klimper
         try {
             if (indexerSetupService.isRunning()) {
                 checkAndRepair();
-                point();
+                checkForRotation();
             }
         } catch (Exception e) {
             LOG.error("Couldn't point deflector to a new index", e);
@@ -77,34 +75,33 @@ public class DeflectorManagerThread extends Periodical { // public class Klimper
         return LOG;
     }
 
-    private void point() {
-        // Check if message limit of current target is hit. Point to new target if so.
+    protected void checkForRotation() {
+        final RotationStrategy rotationStrategy = rotationStrategyProvider.get();
+
         String currentTarget;
-        long messageCountInTarget = 0;
-        
         try {
-            currentTarget = deflector.getNewestTargetName(indexer);
-            messageCountInTarget = indexer.indices().numberOfMessages(currentTarget);
-        } catch(Exception e) {
-            LOG.error("Tried to check for number of messages in current deflector target but did not find index. Aborting.", e);
+            currentTarget = deflector.getNewestTargetName();
+        } catch (NoTargetIndexException e) {
+            LOG.error("Could not find current deflector target. Aborting.", e);
             return;
         }
-        
-        if (messageCountInTarget > configuration.getElasticSearchMaxDocsPerIndex()) {
-            LOG.info("Number of messages in <{}> ({}) is higher than the limit ({}). Pointing deflector to new index now!",
-                     currentTarget, messageCountInTarget,
-                     configuration.getElasticSearchMaxDocsPerIndex());
-            deflector.cycle(indexer);
+        final RotationStrategy.Result rotate = rotationStrategy.shouldRotate(currentTarget);
+        if (rotate == null) {
+            LOG.error("Cannot perform rotation at this moment.");
+            return;
+        }
+        LOG.info("Rotation strategy result: {}", rotate.getDescription());
+        if (rotate.shouldRotate()) {
+            LOG.info("Deflector index <{}> should be rotated, Pointing deflector to new index now!", currentTarget);
+            deflector.cycle();
         } else {
-            LOG.debug("Number of messages in <{}> ({}) is lower than the limit ({}). Not doing anything.",
-                      currentTarget,messageCountInTarget,
-                      configuration.getElasticSearchMaxDocsPerIndex());
+            LOG.debug("Deflector index <{}> should not be rotated. Not doing anything.", currentTarget);
         }
     }
 
-    private void checkAndRepair() {
-        if (!deflector.isUp(indexer)) {
-            if (indexer.indices().exists(deflector.getName())) {
+    protected void checkAndRepair() {
+        if (!deflector.isUp()) {
+            if (indices.exists(deflector.getName())) {
                 // Publish a notification if there is an *index* called graylog2_deflector
                 Notification notification = notificationService.buildNow()
                         .addType(Notification.Type.DEFLECTOR_EXISTS_AS_INDEX)
@@ -114,19 +111,19 @@ public class DeflectorManagerThread extends Periodical { // public class Klimper
                     LOG.warn("There is an index called [" + deflector.getName() + "]. Cannot fix this automatically and published a notification.");
                 }
             } else {
-                deflector.setUp(indexer);
+                deflector.setUp();
             }
         } else {
             try {
-                String currentTarget = deflector.getCurrentActualTargetIndex(indexer);
-                String shouldBeTarget = deflector.getNewestTargetName(indexer);
+                String currentTarget = deflector.getCurrentActualTargetIndex();
+                String shouldBeTarget = deflector.getNewestTargetName();
 
                 if (!currentTarget.equals(shouldBeTarget)) {
                     String msg = "Deflector is pointing to [" + currentTarget + "], not the newest one: [" + shouldBeTarget + "]. Re-pointing.";
                     LOG.warn(msg);
-                    activityWriter.write(new Activity(msg, DeflectorManagerThread.class));
+                    activityWriter.write(new Activity(msg, IndexRotationThread.class));
 
-                    deflector.pointTo(indexer, shouldBeTarget, currentTarget);
+                    deflector.pointTo(shouldBeTarget, currentTarget);
                 }
             } catch (NoTargetIndexException e) {
                 LOG.warn("Deflector is not up. Not trying to point to another index.");

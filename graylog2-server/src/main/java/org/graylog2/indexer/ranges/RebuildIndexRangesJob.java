@@ -24,7 +24,7 @@ import com.google.inject.assistedinject.AssistedInject;
 import org.elasticsearch.search.SearchHit;
 import org.graylog2.indexer.Deflector;
 import org.graylog2.indexer.EmptyIndexException;
-import org.graylog2.indexer.Indexer;
+import org.graylog2.indexer.searches.Searches;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.system.activities.Activity;
@@ -54,19 +54,19 @@ public class RebuildIndexRangesJob extends SystemJob {
     private int indicesCalculated = 0;
 
     private final Deflector deflector;
-    private final Indexer indexer;
+    private final Searches searches;
     private final ActivityWriter activityWriter;
     private final IndexRangeService indexRangeService;
 
     @AssistedInject
     public RebuildIndexRangesJob(@Assisted Deflector deflector,
                                  ServerStatus serverStatus,
-                                 Indexer indexer,
+                                 Searches searches,
                                  ActivityWriter activityWriter,
                                  IndexRangeService indexRangeService) {
         super(serverStatus);
         this.deflector = deflector;
-        this.indexer = indexer;
+        this.searches = searches;
         this.activityWriter = activityWriter;
         this.indexRangeService = indexRangeService;
     }
@@ -96,7 +96,7 @@ public class RebuildIndexRangesJob extends SystemJob {
         List<Map<String, Object>> ranges = Lists.newArrayList();
         info("Re-calculating index ranges.");
 
-        String[] indices = deflector.getAllDeflectorIndexNames(indexer);
+        String[] indices = deflector.getAllDeflectorIndexNames();
         if (indices == null || indices.length == 0) {
             info("No indices, nothing to calculate.");
             return;
@@ -116,7 +116,7 @@ public class RebuildIndexRangesJob extends SystemJob {
             } catch (EmptyIndexException e) {
                 // if the empty index happens to be the current deflector target, do not skip the index range.
                 // newly created indices have a high likelihood of being empty).
-                if (deflector.getCurrentActualTargetIndex(indexer).equals(index)) {
+                if (deflector.getCurrentActualTargetIndex().equals(index)) {
                     LOG.info("Index [{}] is empty but it is the current deflector target. Inserting dummy index range.", index);
                     Map<String, Object> deflectorIndexRange = Maps.newHashMap();
                     deflectorIndexRange.put("index", index);
@@ -142,7 +142,7 @@ public class RebuildIndexRangesJob extends SystemJob {
         Map<String, Object> range = Maps.newHashMap();
 
         Stopwatch x = Stopwatch.createStarted();
-        SearchHit doc = indexer.searches().firstOfIndex(index);
+        SearchHit doc = searches.firstOfIndex(index);
         if (doc == null || doc.isSourceEmpty()) {
             x.stop();
             throw new EmptyIndexException();

@@ -26,7 +26,6 @@ import org.graylog2.alerts.types.FieldValueAlertCondition;
 import org.graylog2.alerts.types.MessageCountAlertCondition;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PersistedServiceImpl;
-import org.graylog2.indexer.Indexer;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.alarms.AlertCondition;
 import org.graylog2.plugin.streams.Stream;
@@ -44,9 +43,14 @@ import java.util.Map;
 public class AlertServiceImpl extends PersistedServiceImpl implements AlertService {
     private static final Logger LOG = LoggerFactory.getLogger(AlertServiceImpl.class);
 
+    private final FieldValueAlertCondition.Factory fieldValueAlertFactory;
+    private final MessageCountAlertCondition.Factory messageCountAlertFactory;
+
     @Inject
-    public AlertServiceImpl(MongoConnection mongoConnection) {
+    public AlertServiceImpl(MongoConnection mongoConnection, FieldValueAlertCondition.Factory fieldValueAlertFactory, MessageCountAlertCondition.Factory messageCountAlertFactory) {
         super(mongoConnection);
+        this.fieldValueAlertFactory = fieldValueAlertFactory;
+        this.messageCountAlertFactory = messageCountAlertFactory;
     }
 
     @Override
@@ -128,34 +132,20 @@ public class AlertServiceImpl extends PersistedServiceImpl implements AlertServi
             throw new AbstractAlertCondition.NoSuchAlertConditionTypeException("No such alert condition type: [" + fields.get("type") + "]");
         }
 
-        switch(type) {
-            case MESSAGE_COUNT:
-                return new MessageCountAlertCondition(
-                        stream,
-                        (String) fields.get("id"),
-                        DateTime.parse((String) fields.get("created_at")),
-                        (String) fields.get("creator_user_id"),
-                        (Map<String, Object>) fields.get("parameters")
-                );
-            case FIELD_VALUE:
-                return new FieldValueAlertCondition(
-                        stream,
-                        (String) fields.get("id"),
-                        DateTime.parse((String) fields.get("created_at")),
-                        (String) fields.get("creator_user_id"),
-                        (Map<String, Object>) fields.get("parameters")
-                );
-        }
-
-        throw new AbstractAlertCondition.NoSuchAlertConditionTypeException("Unhandled alert condition type: " + type);
+        return createAlertCondition(type,
+                                    stream,
+                                    (String) fields.get("id"),
+                                    DateTime.parse((String) fields.get("created_at")),
+                                    (String) fields.get("creator_user_id"),
+                                    (Map<String, Object>) fields.get("parameters"));
     }
 
     private AbstractAlertCondition createAlertCondition(AbstractAlertCondition.Type type, Stream stream, String id, DateTime createdAt, String creatorId, Map<String, Object> parameters) throws AbstractAlertCondition.NoSuchAlertConditionTypeException {
         switch(type) {
             case MESSAGE_COUNT:
-                return new MessageCountAlertCondition(stream, id, createdAt, creatorId, parameters);
+                return messageCountAlertFactory.createAlertCondition(stream, id, createdAt, creatorId, parameters);
             case FIELD_VALUE:
-                return new FieldValueAlertCondition(stream, id, createdAt, creatorId, parameters);
+                return fieldValueAlertFactory.createAlertCondition(stream, id, createdAt, creatorId, parameters);
         }
 
         throw new AbstractAlertCondition.NoSuchAlertConditionTypeException("Unhandled alert condition type: " + type);
@@ -203,12 +193,12 @@ public class AlertServiceImpl extends PersistedServiceImpl implements AlertServi
         return lastAlertSecondsAgo < alertCondition.getGrace()*60;
     }
 
-    public AlertCondition.CheckResult triggeredNoGrace(AlertCondition alertCondition, Indexer indexer) {
+    public AlertCondition.CheckResult triggeredNoGrace(AlertCondition alertCondition) {
         LOG.debug("Checking alert condition [{}] and not accounting grace time.", this);
-        return ((AbstractAlertCondition)alertCondition).runCheck(indexer);
+        return ((AbstractAlertCondition)alertCondition).runCheck();
     }
 
-    public AlertCondition.CheckResult triggered(AlertCondition alertCondition, Indexer indexer) {
+    public AlertCondition.CheckResult triggered(AlertCondition alertCondition) {
         LOG.debug("Checking alert condition [{}]", this);
 
         if(inGracePeriod(alertCondition)) {
@@ -216,7 +206,7 @@ public class AlertServiceImpl extends PersistedServiceImpl implements AlertServi
             return new AbstractAlertCondition.CheckResult(false);
         }
 
-        return ((AbstractAlertCondition)alertCondition).runCheck(indexer);
+        return ((AbstractAlertCondition)alertCondition).runCheck();
     }
 
     public Map<String, Object> asMap(final AlertCondition alertCondition) {

@@ -21,7 +21,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.elasticsearch.common.bytes.BytesReference;
 import org.elasticsearch.common.unit.TimeValue;
-import org.graylog2.indexer.Indexer;
+import org.graylog2.indexer.searches.Searches;
 import org.graylog2.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.Tools;
 
@@ -38,7 +38,7 @@ public abstract class HistogramResult extends IndexQueryResult {
         super(originalQuery, builtQuery, took);
     }
 
-    public abstract Indexer.DateHistogramInterval getInterval();
+    public abstract Searches.DateHistogramInterval getInterval();
     public abstract Map getResults();
 
     /*

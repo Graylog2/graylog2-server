@@ -17,9 +17,10 @@
 package org.graylog2.alerts.types;
 
 import com.google.common.collect.Lists;
+import com.google.inject.assistedinject.Assisted;
+import com.google.inject.assistedinject.AssistedInject;
 import org.graylog2.alerts.AbstractAlertCondition;
 import org.graylog2.indexer.IndexHelper;
-import org.graylog2.indexer.Indexer;
 import org.graylog2.indexer.results.FieldStatsResult;
 import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.indexer.searches.Searches;
@@ -52,15 +53,21 @@ public class FieldValueAlertCondition extends AbstractAlertCondition {
         LOWER, HIGHER
     }
 
+    public interface Factory {
+        FieldValueAlertCondition createAlertCondition(Stream stream, String id, DateTime createdAt, @Assisted("userid") String creatorUserId, Map<String, Object> parameters);
+    }
     private final int time;
     private final ThresholdType thresholdType;
     private final Number threshold;
     private final CheckType type;
     private final String field;
     private final DecimalFormat decimalFormat;
+    private final Searches searches;
 
-    public FieldValueAlertCondition(Stream stream, String id, DateTime createdAt, String creatorUserId, Map<String, Object> parameters) {
+    @AssistedInject
+    public FieldValueAlertCondition(Searches searches, @Assisted Stream stream, @Assisted String id, @Assisted DateTime createdAt, @Assisted("userid") String creatorUserId, @Assisted Map<String, Object> parameters) {
         super(stream, id, Type.FIELD_VALUE, createdAt, creatorUserId, parameters);
+        this.searches = searches;
 
         this.decimalFormat = new DecimalFormat("#.###");
 
@@ -84,11 +91,14 @@ public class FieldValueAlertCondition extends AbstractAlertCondition {
     }
 
     @Override
-    protected CheckResult runCheck(Indexer indexer) {
+    protected CheckResult runCheck() {
         this.searchHits = null;
         try {
             String filter = "streams:"+stream.getId();
-            FieldStatsResult fieldStatsResult = indexer.searches().fieldStats(field, "*", filter, new RelativeRange(time * 60));
+            FieldStatsResult fieldStatsResult = searches.fieldStats(field,
+                                                                    "*",
+                                                                    filter,
+                                                                    new RelativeRange(time * 60));
             if (getBacklog() != null && getBacklog() > 0) {
                 this.searchHits = Lists.newArrayList();
                 for (ResultMessage resultMessage : fieldStatsResult.getSearchHits()) {

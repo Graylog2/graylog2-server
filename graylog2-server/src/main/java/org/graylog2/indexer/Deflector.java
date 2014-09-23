@@ -50,36 +50,38 @@ public class Deflector { // extends Ablenkblech
     public static final String SEPARATOR = "_";
 
     private final SystemJobManager systemJobManager;
-    private final Configuration configuration;
     private final ActivityWriter activityWriter;
     private final RebuildIndexRangesJob.Factory rebuildIndexRangesJobFactory;
     private final OptimizeIndexJob.Factory optimizeIndexJobFactory;
     private final String indexPrefix;
     private final String deflectorName;
+    private final Indices indices;
 
     @Inject
     public Deflector(final SystemJobManager systemJobManager,
                      final Configuration configuration,
                      final ActivityWriter activityWriter,
                      final RebuildIndexRangesJob.Factory rebuildIndexRangesJobFactory,
-                     final OptimizeIndexJob.Factory optimizeIndexJobFactory) {
+                     final OptimizeIndexJob.Factory optimizeIndexJobFactory,
+                     final Indices indices) {
+        indexPrefix = configuration.getElasticSearchIndexPrefix();
+
         this.systemJobManager = systemJobManager;
-        this.configuration = configuration;
         this.activityWriter = activityWriter;
         this.rebuildIndexRangesJobFactory = rebuildIndexRangesJobFactory;
         this.optimizeIndexJobFactory = optimizeIndexJobFactory;
 
-        this.indexPrefix = configuration.getElasticSearchIndexPrefix() + SEPARATOR;
         this.deflectorName = buildName(configuration.getElasticSearchIndexPrefix());
+        this.indices = indices;
     }
 
-    public boolean isUp(final Indexer indexer) {
-        return indexer.indices().aliasExists(getName());
+    public boolean isUp() {
+        return indices.aliasExists(getName());
     }
 
-    public void setUp(final Indexer indexer) {
+    public void setUp() {
         // Check if there already is an deflector index pointing somewhere.
-        if (isUp(indexer)) {
+        if (isUp()) {
             LOG.info("Found deflector alias <{}>. Using it.", getName());
         } else {
             LOG.info("Did not find an deflector alias. Setting one up now.");
@@ -87,37 +89,36 @@ public class Deflector { // extends Ablenkblech
             try {
                 // Do we have a target index to point to?
                 try {
-                    final String currentTarget = getNewestTargetName(indexer);
+                    String currentTarget = getNewestTargetName();
                     LOG.info("Pointing to already existing index target <{}>", currentTarget);
 
-                    pointTo(indexer, currentTarget);
-                } catch (NoTargetIndexException ex) {
+                    pointTo(currentTarget);
+                } catch(NoTargetIndexException ex) {
                     final String msg = "There is no index target to point to. Creating one now.";
                     LOG.info(msg);
                     activityWriter.write(new Activity(msg, Deflector.class));
 
-                    cycle(indexer); // No index, so automatically cycling to a new one.
-                }
+                    cycle(); // No index, so automatically cycling to a new one.
+            }
             } catch (InvalidAliasNameException e) {
                 LOG.error("Seems like there already is an index called [{}]", getName());
             }
         }
     }
 
-    public void cycle(final Indexer indexer) {
+    public void cycle() {
         LOG.info("Cycling deflector to next index now.");
         int oldTargetNumber;
 
         try {
-            oldTargetNumber = getNewestTargetNumber(indexer);
+            oldTargetNumber = getNewestTargetNumber();
         } catch (NoTargetIndexException ex) {
             oldTargetNumber = -1;
         }
-
         final int newTargetNumber = oldTargetNumber + 1;
 
-        final String newTarget = buildIndexName(configuration.getElasticSearchIndexPrefix(), newTargetNumber);
-        final String oldTarget = buildIndexName(configuration.getElasticSearchIndexPrefix(), oldTargetNumber);
+        final String newTarget = buildIndexName(indexPrefix, newTargetNumber);
+        final String oldTarget = buildIndexName(indexPrefix, oldTargetNumber);
 
         if (oldTargetNumber == -1) {
             LOG.info("Cycling from <none> to <{}>", newTarget);
@@ -127,7 +128,7 @@ public class Deflector { // extends Ablenkblech
 
         // Create new index.
         LOG.info("Creating index target <{}>...", newTarget);
-        if (!indexer.indices().create(newTarget)) {
+        if (!indices.create(newTarget)) {
             LOG.error("Could not properly create new target <{}>", newTarget);
         }
         updateIndexRanges();
@@ -140,20 +141,20 @@ public class Deflector { // extends Ablenkblech
         final Activity activity = new Activity(Deflector.class);
         if (oldTargetNumber == -1) {
             // Only pointing, not cycling.
-            pointTo(indexer, newTarget);
+            pointTo(newTarget);
             activity.setMessage("Cycled deflector from <none> to <" + newTarget + ">");
         } else {
             // Re-pointing from existing old index to the new one.
-            pointTo(indexer, newTarget, oldTarget);
+            pointTo(newTarget, oldTarget);
             LOG.info("Flushing old index <{}>.", oldTarget);
-            indexer.indices().flush(oldTarget);
+            indices.flush(oldTarget);
 
             LOG.info("Setting old index <{}> to read-only.", oldTarget);
-            indexer.indices().setReadOnly(oldTarget);
+            indices.setReadOnly(oldTarget);
             activity.setMessage("Cycled deflector from <" + oldTarget + "> to <" + newTarget + ">");
 
             try {
-                systemJobManager.submit(optimizeIndexJobFactory.create(this, oldTarget));
+                systemJobManager.submit(optimizeIndexJobFactory.create(oldTarget));
             } catch (SystemJobConcurrencyException e) {
                 // The concurrency limit is very high. This should never happen.
                 LOG.error("Cannot optimize index <" + oldTarget + ">.", e);
@@ -165,9 +166,8 @@ public class Deflector { // extends Ablenkblech
         activityWriter.write(activity);
     }
 
-    public int getNewestTargetNumber(final Indexer indexer) throws NoTargetIndexException {
-        final Map<String, IndexStats> indices = indexer.indices().getAll();
-
+    public int getNewestTargetNumber() throws NoTargetIndexException {
+        final Map<String, IndexStats> indices = this.indices.getAll();
         if (indices.isEmpty()) {
             throw new NoTargetIndexException();
         }
@@ -192,13 +192,7 @@ public class Deflector { // extends Ablenkblech
         return Collections.max(indexNumbers);
     }
 
-    public String[] getAllDeflectorIndexNames(final Indexer indexer) {
-        final Indices indices = indexer.indices();
-
-        if(null == indices) {
-            return new String[0];
-        }
-
+    public String[] getAllDeflectorIndexNames() {
         final List<String> result = Lists.newArrayListWithExpectedSize(indices.getAll().size());
         for (String indexName : indices.getAll().keySet()) {
             if (isGraylog2Index(indexName)) {
@@ -209,9 +203,9 @@ public class Deflector { // extends Ablenkblech
         return result.toArray(new String[result.size()]);
     }
 
-    public Map<String, IndexStats> getAllDeflectorIndices(final Indexer indexer) {
+    public Map<String, IndexStats> getAllDeflectorIndices() {
         final ImmutableMap.Builder<String, IndexStats> result = ImmutableMap.builder();
-        final Indices indices = indexer.indices();
+
         if (indices != null) {
             for (Map.Entry<String, IndexStats> e : indices.getAll().entrySet()) {
                 final String name = e.getKey();
@@ -224,8 +218,8 @@ public class Deflector { // extends Ablenkblech
         return result.build();
     }
 
-    public String getNewestTargetName(final Indexer indexer) throws NoTargetIndexException {
-        return buildIndexName(this.configuration.getElasticSearchIndexPrefix(), getNewestTargetNumber(indexer));
+    public String getNewestTargetName() throws NoTargetIndexException {
+        return buildIndexName(indexPrefix, getNewestTargetNumber());
     }
 
     public static String buildIndexName(final String prefix, final int number) {
@@ -247,12 +241,12 @@ public class Deflector { // extends Ablenkblech
         }
     }
 
-    public void pointTo(final Indexer indexer, final String newIndex, final String oldIndex) {
-        indexer.cycleAlias(getName(), newIndex, oldIndex);
+    public void pointTo(final String newIndex, final String oldIndex) {
+        indices.cycleAlias(getName(), newIndex, oldIndex);
     }
 
-    public void pointTo(final Indexer indexer, final String newIndex) {
-        indexer.cycleAlias(getName(), newIndex);
+    public void pointTo(final String newIndex) {
+        indices.cycleAlias(getName(), newIndex);
     }
 
     private void updateIndexRanges() {
@@ -266,8 +260,8 @@ public class Deflector { // extends Ablenkblech
         }
     }
 
-    public String getCurrentActualTargetIndex(final Indexer indexer) {
-        return indexer.indices().aliasTarget(getName());
+    public String getCurrentActualTargetIndex() {
+        return indices.aliasTarget(getName());
     }
 
     public String getName() {
@@ -279,6 +273,6 @@ public class Deflector { // extends Ablenkblech
     }
 
     public boolean isGraylog2Index(final String indexName) {
-        return !isDeflectorAlias(indexName) && indexName.startsWith(indexPrefix);
+        return !isDeflectorAlias(indexName) && indexName.startsWith(indexPrefix + SEPARATOR);
     }
 }

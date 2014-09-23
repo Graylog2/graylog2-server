@@ -18,8 +18,8 @@ package org.graylog2.dashboards.widgets;
 
 import com.codahale.metrics.MetricRegistry;
 import org.graylog2.indexer.IndexHelper;
-import org.graylog2.indexer.Indexer;
 import org.graylog2.indexer.results.CountResult;
+import org.graylog2.indexer.searches.Searches;
 import org.graylog2.indexer.searches.timeranges.TimeRange;
 
 import java.util.HashMap;
@@ -30,13 +30,13 @@ import java.util.Map;
  */
 public class SearchResultCountWidget extends DashboardWidget {
 
-    private final Indexer indexer;
+    private final Searches searches;
     private final String query;
     private final TimeRange timeRange;
 
-    public SearchResultCountWidget(MetricRegistry metricRegistry, Indexer indexer, String id, String description, int cacheTime, Map<String, Object> config, String query, TimeRange timeRange, String creatorUserId) {
+    public SearchResultCountWidget(MetricRegistry metricRegistry, Searches searches, String id, String description, int cacheTime, Map<String, Object> config, String query, TimeRange timeRange, String creatorUserId) {
         super(metricRegistry, Type.SEARCH_RESULT_COUNT, id, description, cacheTime, config, creatorUserId);
-        this.indexer = indexer;
+        this.searches = searches;
 
         this.query = query;
         this.timeRange = timeRange;
@@ -61,7 +61,7 @@ public class SearchResultCountWidget extends DashboardWidget {
     @Override
     protected ComputationResult compute() {
         try {
-            CountResult cr = indexer.searches().count(query, timeRange);
+            CountResult cr = searches.count(query, timeRange);
             return new ComputationResult(cr.getCount(), cr.getTookMs());
         } catch (IndexHelper.InvalidRangeFormatException e) {
             throw new RuntimeException("Invalid timerange format.", e);

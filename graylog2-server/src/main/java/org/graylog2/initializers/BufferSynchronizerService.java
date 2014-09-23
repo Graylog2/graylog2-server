@@ -19,7 +19,7 @@ package org.graylog2.initializers;
 import com.google.common.util.concurrent.AbstractIdleService;
 import org.graylog2.buffers.Buffers;
 import org.graylog2.caches.Caches;
-import org.graylog2.indexer.Indexer;
+import org.graylog2.indexer.cluster.Cluster;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,17 +32,17 @@ public class BufferSynchronizerService extends AbstractIdleService {
 
     private final Buffers bufferSynchronizer;
     private final Caches cacheSynchronizer;
-    private final Indexer indexer;
+    private final Cluster cluster;
 
     private volatile boolean indexerAvailable = true;
 
     @Inject
     public BufferSynchronizerService(final Buffers bufferSynchronizer,
                                      final Caches cacheSynchronizer,
-                                     final Indexer indexer) {
+                                     final Cluster cluster) {
         this.bufferSynchronizer = bufferSynchronizer;
         this.cacheSynchronizer = cacheSynchronizer;
-        this.indexer = indexer;
+        this.cluster = cluster;
     }
 
     @Override
@@ -52,7 +52,7 @@ public class BufferSynchronizerService extends AbstractIdleService {
     @Override
     protected void shutDown() throws Exception {
         LOG.debug("Stopping BufferSynchronizerService");
-        if (indexerAvailable && indexer.isConnectedAndHealthy()) {
+        if (indexerAvailable && cluster.isConnectedAndHealthy()) {
             bufferSynchronizer.waitForEmptyBuffers();
             cacheSynchronizer.waitForEmptyCaches();
         } else {

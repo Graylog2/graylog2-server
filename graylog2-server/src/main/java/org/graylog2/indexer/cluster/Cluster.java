@@ -17,37 +17,38 @@
 package org.graylog2.indexer.cluster;
 
 import com.google.common.collect.Lists;
-import com.google.inject.assistedinject.Assisted;
-import com.google.inject.assistedinject.AssistedInject;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import org.elasticsearch.ElasticSearchException;
 import org.elasticsearch.action.admin.cluster.health.ClusterHealthRequest;
 import org.elasticsearch.action.admin.cluster.health.ClusterHealthResponse;
 import org.elasticsearch.action.admin.cluster.health.ClusterHealthStatus;
 import org.elasticsearch.action.admin.cluster.node.info.NodeInfo;
 import org.elasticsearch.action.admin.cluster.node.info.NodesInfoRequest;
+import org.elasticsearch.action.admin.cluster.node.info.NodesInfoResponse;
 import org.elasticsearch.client.Client;
+import org.elasticsearch.node.Node;
 import org.graylog2.indexer.Deflector;
-import org.graylog2.indexer.Indexer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
+@Singleton
 public class Cluster {
-    public interface Factory {
-        Cluster create(Client client);
-    }
+    private static final Logger log = LoggerFactory.getLogger(Cluster.class);
 
     //private final Core server;
     private final Client c;
     private final Deflector deflector;
-    private final Indexer indexer;
 
-    @AssistedInject
-    public Cluster(@Assisted Client client, Deflector deflector, Indexer indexer) {
-        this.c = client;
+    @Inject
+    public Cluster(Node node, Deflector deflector) {
+        this.c = node.client();
         this.deflector = deflector;
-        this.indexer = indexer;
     }
 
     public String getName() {
@@ -75,7 +76,7 @@ public class Cluster {
     }
 
     private ClusterHealthResponse health() {
-        String[] indices = deflector.getAllDeflectorIndexNames(indexer);
+        String[] indices = deflector.getAllDeflectorIndexNames();
         return c.admin().cluster().health(new ClusterHealthRequest(indices)).actionGet();
     }
 
@@ -106,6 +107,46 @@ public class Cluster {
 
     public List<NodeInfo> getAllNodes() {
         return Lists.newArrayList(c.admin().cluster().nodesInfo(new NodesInfoRequest().all()).actionGet().getNodes());
+    }
+
+    public String nodeIdToName(String nodeId) {
+        final NodeInfo nodeInfo = getNodeInfo(nodeId);
+        return nodeInfo == null ? "UNKNOWN" : nodeInfo.getNode().getName();
+
+    }
+
+    public String nodeIdToHostName(String nodeId) {
+        final NodeInfo nodeInfo = getNodeInfo(nodeId);
+        return nodeInfo == null ? "UNKNOWN" : nodeInfo.getHostname();
+    }
+
+    private NodeInfo getNodeInfo(String nodeId) {
+        if (nodeId == null || nodeId.isEmpty()) {
+            return null;
+        }
+
+        try {
+            NodesInfoResponse r = c.admin().cluster().nodesInfo(new NodesInfoRequest(nodeId).all()).actionGet();
+            return r.getNodesMap().get(nodeId);
+        } catch (Exception e) {
+            log.error("Could not read name of ES node.", e);
+            return null;
+        }
+    }
+
+    /**
+     * Check if the Elasticsearch {@link Node} is connected and that the cluster health status
+     * is not {@link ClusterHealthStatus#RED}.
+     *
+     * @return {@code true} if the Elasticsearch client is up and the cluster is healthy, {@code false} otherwise
+     */
+    public boolean isConnectedAndHealthy() {
+        try {
+            return getHealth() != ClusterHealthStatus.RED;
+        } catch (ElasticSearchException e) {
+            log.trace("Couldn't determine Elasticsearch health properly", e);
+            return false;
+        }
     }
 
 }

@@ -20,7 +20,7 @@ import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Maps;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.graylog2.indexer.Indexer;
+import org.graylog2.indexer.cluster.Cluster;
 import org.graylog2.rest.documentation.annotations.Api;
 import org.graylog2.rest.documentation.annotations.ApiOperation;
 import org.graylog2.rest.resources.RestResource;
@@ -44,8 +44,9 @@ import java.util.Map;
 public class IndexerClusterResource extends RestResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(IndexerClusterResource.class);
+
     @Inject
-    private Indexer indexer;
+    private Cluster cluster;
 
     @GET @Timed
     @Path("/name")
@@ -54,7 +55,7 @@ public class IndexerClusterResource extends RestResource {
     @Produces(MediaType.APPLICATION_JSON)
     public String clusterName() {
         Map<String, Object> result = Maps.newHashMap();
-        result.put("name", indexer.cluster().getName());
+        result.put("name", cluster.getName());
 
         return json(result);
     }
@@ -66,13 +67,13 @@ public class IndexerClusterResource extends RestResource {
     @Produces(MediaType.APPLICATION_JSON)
     public String clusterHealth() {
         Map<String, Integer> shards = Maps.newHashMap();
-        shards.put("active", indexer.cluster().getActiveShards());
-        shards.put("initializing", indexer.cluster().getInitializingShards());
-        shards.put("relocating", indexer.cluster().getRelocatingShards());
-        shards.put("unassigned", indexer.cluster().getUnassignedShards());
+        shards.put("active", cluster.getActiveShards());
+        shards.put("initializing", cluster.getInitializingShards());
+        shards.put("relocating", cluster.getRelocatingShards());
+        shards.put("unassigned", cluster.getUnassignedShards());
 
         Map<String, Object> health = Maps.newHashMap();
-        health.put("status", indexer.cluster().getHealth().toString().toLowerCase());
+        health.put("status", cluster.getHealth().toString().toLowerCase());
         health.put("shards", shards);
 
         return json(health);

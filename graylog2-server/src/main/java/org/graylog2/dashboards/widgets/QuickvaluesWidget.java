@@ -19,8 +19,8 @@ package org.graylog2.dashboards.widgets;
 import com.codahale.metrics.MetricRegistry;
 import com.google.common.collect.Maps;
 import org.graylog2.indexer.IndexHelper;
-import org.graylog2.indexer.Indexer;
 import org.graylog2.indexer.results.TermsResult;
+import org.graylog2.indexer.searches.Searches;
 import org.graylog2.indexer.searches.timeranges.TimeRange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,11 +40,11 @@ public class QuickvaluesWidget extends DashboardWidget {
     private final String streamId;
 
     private final String field;
-    private final Indexer indexer;
+    private final Searches searches;
 
-    public QuickvaluesWidget(MetricRegistry metricRegistry, Indexer indexer, String id, String description, int cacheTime, Map<String, Object> config, String query, TimeRange timeRange, String creatorUserId) throws InvalidWidgetConfigurationException {
+    public QuickvaluesWidget(MetricRegistry metricRegistry, Searches searches, String id, String description, int cacheTime, Map<String, Object> config, String query, TimeRange timeRange, String creatorUserId) throws InvalidWidgetConfigurationException {
         super(metricRegistry, Type.QUICKVALUES, id, description, cacheTime, config, creatorUserId);
-        this.indexer = indexer;
+        this.searches = searches;
 
         if (!checkConfig(config)) {
             throw new InvalidWidgetConfigurationException("Missing or invalid widget configuration. Provided config was: " + config.toString());
@@ -89,7 +89,7 @@ public class QuickvaluesWidget extends DashboardWidget {
         }
 
         try {
-            TermsResult terms = indexer.searches().terms(field, 50, query, filter, timeRange);
+            TermsResult terms = searches.terms(field, 50, query, filter, timeRange);
 
             Map<String, Object> result = Maps.newHashMap();
             result.put("terms", terms.getTerms());

@@ -25,7 +25,7 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresGuest;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.ServerVersion;
-import org.graylog2.indexer.Indexer;
+import org.graylog2.indexer.indices.Indices;
 import org.graylog2.plugin.Tools;
 import org.graylog2.rest.documentation.annotations.Api;
 import org.graylog2.rest.documentation.annotations.ApiOperation;
@@ -61,15 +61,15 @@ public class SystemResource extends RestResource {
     private static final Logger LOG = LoggerFactory.getLogger(SystemResource.class);
 
     private final ServerStatus serverStatus;
-    private final Indexer indexer;
     private final GracefulShutdown gracefulShutdown;
+    private final Indices indices;
 
     @Inject
     public SystemResource(ServerStatus serverStatus,
-                          Indexer indexer,
+                          Indices indices,
                           GracefulShutdown gracefulShutdown) {
         this.serverStatus = serverStatus;
-        this.indexer = indexer;
+        this.indices = indices;
         this.gracefulShutdown = gracefulShutdown;
     }
 
@@ -104,11 +104,11 @@ public class SystemResource extends RestResource {
 
         Set<String> fields;
         if (unlimited) {
-            fields = indexer.indices().getAllMessageFields();
+            fields = indices.getAllMessageFields();
         } else {
             fields = Sets.newHashSet();
             int i = 0;
-            for (String field : indexer.indices().getAllMessageFields()) {
+            for (String field : indices.getAllMessageFields()) {
                 if (i == limit) {
                     break;
                 }

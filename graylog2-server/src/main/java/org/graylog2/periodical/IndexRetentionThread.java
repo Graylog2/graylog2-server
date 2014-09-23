@@ -21,8 +21,9 @@ import org.elasticsearch.action.admin.indices.stats.IndexStats;
 import org.graylog2.Configuration;
 import org.graylog2.indexer.Deflector;
 import org.graylog2.indexer.IndexHelper;
-import org.graylog2.indexer.Indexer;
 import org.graylog2.indexer.NoTargetIndexException;
+import org.graylog2.indexer.cluster.Cluster;
+import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.ranges.RebuildIndexRangesJob;
 import org.graylog2.indexer.retention.RetentionStrategyFactory;
 import org.graylog2.plugin.indexer.retention.RetentionStrategy;
@@ -48,29 +49,36 @@ public class IndexRetentionThread extends Periodical {
     private final Configuration configuration;
     private final RebuildIndexRangesJob.Factory rebuildIndexRangesJobFactory;
     private final Deflector deflector;
-    private final Indexer indexer;
+    private final Cluster cluster;
     private final ActivityWriter activityWriter;
     private final SystemJobManager systemJobManager;
+    private final Indices indices;
 
     @Inject
     public IndexRetentionThread(Configuration configuration,
                                 RebuildIndexRangesJob.Factory rebuildIndexRangesJobFactory,
                                 Deflector deflector,
-                                Indexer indexer,
+                                Indices indices,
+                                Cluster cluster,
                                 ActivityWriter activityWriter,
                                 SystemJobManager systemJobManager) {
         this.configuration = configuration;
         this.rebuildIndexRangesJobFactory = rebuildIndexRangesJobFactory;
         this.deflector = deflector;
-        this.indexer = indexer;
+        this.indices = indices;
+        this.cluster = cluster;
         this.activityWriter = activityWriter;
         this.systemJobManager = systemJobManager;
     }
 
     @Override
     public void doRun() {
-        Map<String, IndexStats> indices = deflector.getAllDeflectorIndices(indexer);
-        int indexCount = indices.size();
+        if (!cluster.isConnectedAndHealthy()) {
+            LOG.info("Elasticsearch cluster not available, skipping index retention checks.");
+            return;
+        }
+        Map<String, IndexStats> deflectorIndices = deflector.getAllDeflectorIndices();
+        int indexCount = deflectorIndices.size();
         int maxIndices = configuration.getMaxNumberOfIndices();
 
         // Do we have more indices than the configured maximum?
@@ -89,8 +97,8 @@ public class IndexRetentionThread extends Periodical {
 
         try {
             runRetention(
-                    RetentionStrategyFactory.fromString(configuration.getRetentionStrategy(), indexer.indices()),
-                    indices,
+                    RetentionStrategyFactory.fromString(configuration.getRetentionStrategy(), indices),
+                    deflectorIndices,
                     removeCount
             );
         } catch (RetentionStrategyFactory.NoSuchStrategyException e) {
@@ -105,10 +113,10 @@ public class IndexRetentionThread extends Periodical {
         return LOG;
     }
 
-    public void runRetention(RetentionStrategy strategy, Map<String, IndexStats> indices, int removeCount) throws NoTargetIndexException {
-        for (String indexName : IndexHelper.getOldestIndices(indices.keySet(), removeCount)) {
+    public void runRetention(RetentionStrategy strategy, Map<String, IndexStats> deflectorIndices, int removeCount) throws NoTargetIndexException {
+        for (String indexName : IndexHelper.getOldestIndices(deflectorIndices.keySet(), removeCount)) {
             // Never run against the current deflector target.
-            if (deflector.getCurrentActualTargetIndex(indexer).equals(indexName)) {
+            if (deflector.getCurrentActualTargetIndex().equals(indexName)) {
                 LOG.info("Not running retention against current deflector target <{}>.", indexName);
                 continue;
             }
@@ -117,7 +125,7 @@ public class IndexRetentionThread extends Periodical {
              * Never run against a re-opened index. Indices are marked as re-opened by storing a setting
              * attribute and we can check for that here.
              */
-            if (indexer.indices().isReopened(indexName)) {
+            if (indices.isReopened(indexName)) {
                 LOG.info("Not running retention against reopened index <{}>.", indexName);
                 continue;
             }

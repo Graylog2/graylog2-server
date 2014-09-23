@@ -63,7 +63,10 @@ public class Configuration extends BaseConfiguration {
 
     @Parameter(value = "retention_strategy", required = true)
     private String retentionStrategy = "delete";
-    
+
+    @Parameter(value = "rotation_strategy")
+    private String rotationStrategy = "count";
+
     @Parameter(value = "elasticsearch_max_number_of_indices", required = true, validator = PositiveIntegerValidator.class)
     private int maxNumberOfIndices = 20;
 
@@ -99,7 +102,10 @@ public class Configuration extends BaseConfiguration {
     
     @Parameter(value = "elasticsearch_max_docs_per_index", validator = PositiveIntegerValidator.class, required = true)
     private int elasticsearchMaxDocsPerIndex = 80000000;
-    
+
+    @Parameter(value = "elasticsearch_max_size_per_index", validator = PositiveIntegerValidator.class, required = true)
+    private long elasticSearchMaxSizePerIndex = 1L * 1024 * 1024 * 1024; // 1GB
+
     @Parameter(value = "elasticsearch_shards", validator = PositiveIntegerValidator.class, required = true)
     private int elasticsearchShards = 4;
     
@@ -671,4 +677,13 @@ public class Configuration extends BaseConfiguration {
     public int getLdapConnectionTimeout() {
         return ldapConnectionTimeout;
     }
+
+    public String getRotationStrategy() {
+        return rotationStrategy;
+    }
+
+    public long getElasticSearchMaxSizePerIndex() {
+        return elasticSearchMaxSizePerIndex;
+    }
+
 }

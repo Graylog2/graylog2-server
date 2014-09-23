@@ -38,8 +38,8 @@ public class ClosingRetentionStrategy extends RetentionStrategy {
     }
 
     @Override
-    protected Art getArt() {
-        return Art.CLOSE;
+    protected Type getType() {
+        return Type.CLOSE;
     }
 
 }

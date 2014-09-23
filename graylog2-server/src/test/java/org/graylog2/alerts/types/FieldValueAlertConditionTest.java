@@ -63,7 +63,7 @@ public class FieldValueAlertConditionTest extends AlertConditionTest {
             fieldStatsShouldReturn(getFieldStatsResult(checkType, higherThanThreshold));
             alertLastTriggered(-1);
 
-            AlertCondition.CheckResult result = alertService.triggered(fieldValueAlertCondition, indexer);
+            AlertCondition.CheckResult result = alertService.triggered(fieldValueAlertCondition);
 
             assertTriggered(fieldValueAlertCondition, result);
         }
@@ -80,7 +80,7 @@ public class FieldValueAlertConditionTest extends AlertConditionTest {
             fieldStatsShouldReturn(getFieldStatsResult(checkType, lowerThanThreshold));
             alertLastTriggered(-1);
 
-            AlertCondition.CheckResult result = alertService.triggered(fieldValueAlertCondition, indexer);
+            AlertCondition.CheckResult result = alertService.triggered(fieldValueAlertCondition);
 
             assertNotTriggered(result);
         }
@@ -97,7 +97,7 @@ public class FieldValueAlertConditionTest extends AlertConditionTest {
             fieldStatsShouldReturn(getFieldStatsResult(checkType, lowerThanThreshold));
             alertLastTriggered(-1);
 
-            AlertCondition.CheckResult result = alertService.triggered(fieldValueAlertCondition, indexer);
+            AlertCondition.CheckResult result = alertService.triggered(fieldValueAlertCondition);
 
             assertTriggered(fieldValueAlertCondition, result);
         }
@@ -114,7 +114,7 @@ public class FieldValueAlertConditionTest extends AlertConditionTest {
             fieldStatsShouldReturn(getFieldStatsResult(checkType, higherThanThreshold));
             alertLastTriggered(-1);
 
-            AlertCondition.CheckResult result = alertService.triggered(fieldValueAlertCondition, indexer);
+            AlertCondition.CheckResult result = alertService.triggered(fieldValueAlertCondition);
 
             assertNotTriggered(result);
         }
@@ -136,6 +136,7 @@ public class FieldValueAlertConditionTest extends AlertConditionTest {
 
     protected FieldValueAlertCondition getFieldValueAlertCondition(Map<String,Object> parameters) {
         return new FieldValueAlertCondition(
+                searches,
                 stream,
                 CONDITION_ID,
                 Tools.iso8601(),

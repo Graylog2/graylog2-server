@@ -16,7 +16,6 @@
  */
 package org.graylog2.alerts;
 
-import org.graylog2.indexer.Indexer;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.alarms.AlertCondition;
@@ -74,7 +73,7 @@ public class AbstractAlertConditionTest extends AlertConditionTest {
             }
 
             @Override
-            protected CheckResult runCheck(Indexer indexer) {
+            protected CheckResult runCheck() {
                 return null;
             }
 

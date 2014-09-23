@@ -27,7 +27,6 @@ import org.elasticsearch.action.search.ShardSearchFailure;
 import org.elasticsearch.search.SearchParseException;
 import org.glassfish.jersey.server.ChunkedOutput;
 import org.graylog2.indexer.IndexHelper;
-import org.graylog2.indexer.Indexer;
 import org.graylog2.indexer.results.*;
 import org.graylog2.indexer.searches.Searches;
 import org.graylog2.indexer.searches.Sorting;
@@ -55,16 +54,16 @@ import java.util.Map;
  */
 public class SearchResource extends RestResource {
     private static final Logger LOG = LoggerFactory.getLogger(SearchResource.class);
-    protected final Indexer indexer;
+    protected final Searches searches;
 
     @Inject
-    public SearchResource(Indexer indexer) {
-        this.indexer = indexer;
+    public SearchResource(Searches searches) {
+        this.searches = searches;
     }
 
     protected void validateInterval(String interval) {
         try {
-            Indexer.DateHistogramInterval.valueOf(interval);
+            Searches.DateHistogramInterval.valueOf(interval);
         } catch (IllegalArgumentException e) {
             LOG.warn("Invalid interval type. Returning HTTP 400.");
             throw new WebApplicationException(400);
@@ -144,7 +143,7 @@ public class SearchResource extends RestResource {
 
     protected FieldStatsResult fieldStats(String field, String query, String filter, TimeRange timeRange) throws IndexHelper.InvalidRangeFormatException {
         try {
-            return indexer.searches().fieldStats(field, query, filter, timeRange);
+            return searches.fieldStats(field, query, filter, timeRange);
         } catch(Searches.FieldTypeException e) {
             LOG.error("Stats query failed. Make sure that field [{}] is a numeric type.", field);
             throw new WebApplicationException(400);
@@ -153,10 +152,10 @@ public class SearchResource extends RestResource {
 
     protected HistogramResult fieldHistogram(String field, String query, String interval, String filter, TimeRange timeRange) throws IndexHelper.InvalidRangeFormatException {
         try {
-            return indexer.searches().fieldHistogram(
+            return searches.fieldHistogram(
                     query,
                     field,
-                    Indexer.DateHistogramInterval.valueOf(interval),
+                    Searches.DateHistogramInterval.valueOf(interval),
                     filter,
                     timeRange
             );

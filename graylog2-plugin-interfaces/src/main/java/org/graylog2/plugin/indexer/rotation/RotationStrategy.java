@@ -20,15 +20,17 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.graylog2.plugin.indexer;
+package org.graylog2.plugin.indexer.rotation;
 
-/**
- *
- * @author lennart.koopmann
- */
-public interface MessageGateway {
-    
-    public int totalMessageCount(int sinceTimestamp);
-    public int streamMessageCount(String streamId, int sinceTimestamp);
-    
+import javax.annotation.Nullable;
+
+public interface RotationStrategy {
+
+    interface Result {
+        String getDescription();
+        boolean shouldRotate();
+    }
+
+    @Nullable
+    Result shouldRotate(String index);
 }

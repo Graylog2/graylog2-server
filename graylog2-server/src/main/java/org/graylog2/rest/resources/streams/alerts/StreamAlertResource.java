@@ -21,29 +21,15 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import org.apache.commons.mail.EmailException;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.graylog2.alarmcallbacks.AlarmCallbackConfiguration;
-import org.graylog2.alarmcallbacks.AlarmCallbackConfigurationService;
-import org.graylog2.alarmcallbacks.AlarmCallbackFactory;
-import org.graylog2.alarmcallbacks.EmailAlarmCallback;
-import org.graylog2.alerts.AbstractAlertCondition;
 import org.graylog2.alerts.Alert;
 import org.graylog2.alerts.AlertImpl;
 import org.graylog2.alerts.AlertService;
-import org.graylog2.alerts.types.DummyAlertCondition;
-import org.graylog2.database.ValidationException;
-import org.graylog2.indexer.Indexer;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.alarms.AlertCondition;
-import org.graylog2.plugin.alarms.callbacks.AlarmCallback;
-import org.graylog2.plugin.alarms.callbacks.AlarmCallbackConfigurationException;
-import org.graylog2.plugin.alarms.callbacks.AlarmCallbackException;
-import org.graylog2.plugin.alarms.transports.TransportConfigurationException;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.rest.documentation.annotations.*;
 import org.graylog2.rest.resources.RestResource;
-import org.graylog2.rest.resources.streams.alerts.requests.CreateConditionRequest;
 import org.graylog2.security.RestPermissions;
 import org.graylog2.streams.StreamService;
 import org.joda.time.DateTime;
@@ -54,7 +40,6 @@ import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -73,7 +58,6 @@ public class StreamAlertResource extends RestResource {
 
     private final StreamService streamService;
     private final AlertService alertService;
-    private final Indexer indexer;
 
     private static final String CACHE_KEY_BASE = "alerts";
 
@@ -83,11 +67,9 @@ public class StreamAlertResource extends RestResource {
 
     @Inject
     public StreamAlertResource(StreamService streamService,
-                               AlertService alertService,
-                               Indexer indexer) {
+                               AlertService alertService) {
         this.streamService = streamService;
         this.alertService = alertService;
-        this.indexer = indexer;
     }
 
     @GET @Timed
@@ -158,7 +140,7 @@ public class StreamAlertResource extends RestResource {
                         Map<String, Object> conditionResult = Maps.newHashMap();
                         conditionResult.put("condition", alertService.asMap(alertCondition));
 
-                        AlertCondition.CheckResult checkResult = alertService.triggeredNoGrace(alertCondition, indexer);
+                        AlertCondition.CheckResult checkResult = alertService.triggeredNoGrace(alertCondition);
                         conditionResult.put("triggered", checkResult.isTriggered());
 
                         if (checkResult.isTriggered()) {

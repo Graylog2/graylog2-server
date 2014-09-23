@@ -23,8 +23,8 @@ import com.google.common.collect.Maps;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.indexer.IndexHelper;
-import org.graylog2.indexer.Indexer;
 import org.graylog2.indexer.results.TermsResult;
+import org.graylog2.indexer.searches.Searches;
 import org.graylog2.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.rest.documentation.annotations.*;
@@ -58,11 +58,11 @@ public class SourcesResource extends RestResource {
             .expireAfterWrite(10, TimeUnit.SECONDS)
             .build();
 
-    private final Indexer indexer;
+    private final Searches searches;
 
     @Inject
-    public SourcesResource(Indexer indexer) {
-        this.indexer = indexer;
+    public SourcesResource(Searches searches) {
+        this.searches = searches;
     }
 
     @GET @Timed
@@ -86,7 +86,7 @@ public class SourcesResource extends RestResource {
                 @Override
                 public TermsResult call() throws Exception {
                     try {
-                        return indexer.searches().terms("source", 5000, "*", new RelativeRange(range));
+                        return searches.terms("source", 5000, "*", new RelativeRange(range));
                     } catch (IndexHelper.InvalidRangeFormatException e) {
                         throw new ExecutionException(e);
                     } catch (InvalidRangeParametersException e) {

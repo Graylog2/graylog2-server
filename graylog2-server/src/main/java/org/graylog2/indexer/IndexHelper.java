@@ -81,8 +81,7 @@ public class IndexHelper {
         return r;
     }
 
-    public static Set<String> determineAffectedIndices(Indexer indexer,
-                                                       IndexRangeService indexRangeService,
+    public static Set<String> determineAffectedIndices(IndexRangeService indexRangeService,
                                                        Deflector deflector,
                                                        TimeRange range) {
         Set<String> indices = Sets.newHashSet();
@@ -93,7 +92,7 @@ public class IndexHelper {
 
         // Always include the most recent index in some cases.
         if (indices.isEmpty() || range instanceof RelativeRange) {
-            indices.add(deflector.getCurrentActualTargetIndex(indexer));
+            indices.add(deflector.getCurrentActualTargetIndex());
         }
 
         return indices;

@@ -16,17 +16,17 @@
  */
 package org.graylog2.indexer;
 
+import com.google.common.collect.Maps;
+import org.elasticsearch.action.admin.indices.mapping.put.PutMappingRequest;
+import org.elasticsearch.action.admin.indices.mapping.put.PutMappingRequestBuilder;
+import org.elasticsearch.client.Client;
+import org.graylog2.indexer.messages.Messages;
+import org.graylog2.plugin.Tools;
+
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-
-import org.elasticsearch.action.admin.indices.mapping.put.PutMappingRequest;
-import org.elasticsearch.action.admin.indices.mapping.put.PutMappingRequestBuilder;
-import org.elasticsearch.client.Client;
-
-import com.google.common.collect.Maps;
-import org.graylog2.plugin.Tools;
 
 
 /**
@@ -40,7 +40,7 @@ public class Mapping {
 
     public static PutMappingRequest getPutMappingRequest(final Client client, final String index, final String analyzer) {
         final PutMappingRequestBuilder builder = client.admin().indices().preparePutMapping(new String[] {index});
-        builder.setType(Indexer.TYPE);
+        builder.setType(Messages.TYPE);
 
         final Map<String, Object> mapping = new HashMap<String, Object>();
         mapping.put("properties", partFieldProperties(analyzer));
@@ -50,7 +50,7 @@ public class Mapping {
 
         // TODO: use multimap?
         final Map<String, Map<String, Object>> completeMapping = Maps.newHashMap();
-        completeMapping.put(Indexer.TYPE, mapping);
+        completeMapping.put(Messages.TYPE, mapping);
 
         builder.setSource(completeMapping);
         return builder.request();

@@ -38,8 +38,8 @@ public class DeletionRetentionStrategy extends RetentionStrategy {
     }
 
     @Override
-    protected Art getArt() {
-        return Art.DELETE;
+    protected Type getType() {
+        return Type.DELETE;
     }
 
 }

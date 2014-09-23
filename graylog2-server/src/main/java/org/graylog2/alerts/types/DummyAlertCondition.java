@@ -17,7 +17,6 @@
 package org.graylog2.alerts.types;
 
 import org.graylog2.alerts.AbstractAlertCondition;
-import org.graylog2.indexer.Indexer;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.streams.Stream;
@@ -42,7 +41,7 @@ public class DummyAlertCondition extends AbstractAlertCondition {
     }
 
     @Override
-    public CheckResult runCheck(Indexer indexer) {
+    public CheckResult runCheck() {
         return new CheckResult(true, this, this.description, Tools.iso8601());
     }
 

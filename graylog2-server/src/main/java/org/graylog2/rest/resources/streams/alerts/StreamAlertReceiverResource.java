@@ -26,7 +26,6 @@ import org.graylog2.alarmcallbacks.AlarmCallbackFactory;
 import org.graylog2.alarmcallbacks.EmailAlarmCallback;
 import org.graylog2.alerts.AbstractAlertCondition;
 import org.graylog2.alerts.types.DummyAlertCondition;
-import org.graylog2.indexer.Indexer;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.alarms.callbacks.AlarmCallback;
 import org.graylog2.plugin.alarms.callbacks.AlarmCallbackConfigurationException;
@@ -59,19 +58,16 @@ public class StreamAlertReceiverResource extends RestResource {
     private final AlarmCallbackConfigurationService alarmCallbackConfigurationService;
     private final EmailAlarmCallback emailAlarmCallback;
     private final AlarmCallbackFactory alarmCallbackFactory;
-    private final Indexer indexer;
 
     @Inject
     public StreamAlertReceiverResource(StreamService streamService,
                                        AlarmCallbackConfigurationService alarmCallbackConfigurationService,
                                        EmailAlarmCallback emailAlarmCallback,
-                                       AlarmCallbackFactory alarmCallbackFactory,
-                                       Indexer indexer) {
+                                       AlarmCallbackFactory alarmCallbackFactory) {
         this.streamService = streamService;
         this.alarmCallbackConfigurationService = alarmCallbackConfigurationService;
         this.emailAlarmCallback = emailAlarmCallback;
         this.alarmCallbackFactory = alarmCallbackFactory;
-        this.indexer = indexer;
     }
 
     @POST
@@ -167,7 +163,7 @@ public class StreamAlertReceiverResource extends RestResource {
         DummyAlertCondition dummyAlertCondition = new DummyAlertCondition(stream, null, Tools.iso8601(), getSubject().getPrincipal().toString(), parameters);
 
         try {
-            AbstractAlertCondition.CheckResult checkResult = dummyAlertCondition.runCheck(indexer);
+            AbstractAlertCondition.CheckResult checkResult = dummyAlertCondition.runCheck();
             List<AlarmCallbackConfiguration> callConfigurations = alarmCallbackConfigurationService.getForStream(stream);
             if (callConfigurations.size() > 0)
                 for (AlarmCallbackConfiguration configuration : callConfigurations) {
