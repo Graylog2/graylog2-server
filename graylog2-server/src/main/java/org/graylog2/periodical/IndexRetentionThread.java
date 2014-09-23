@@ -22,6 +22,7 @@ import org.graylog2.Configuration;
 import org.graylog2.indexer.Deflector;
 import org.graylog2.indexer.IndexHelper;
 import org.graylog2.indexer.NoTargetIndexException;
+import org.graylog2.indexer.cluster.Cluster;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.ranges.RebuildIndexRangesJob;
 import org.graylog2.indexer.retention.RetentionStrategyFactory;
@@ -48,6 +49,7 @@ public class IndexRetentionThread extends Periodical {
     private final Configuration configuration;
     private final RebuildIndexRangesJob.Factory rebuildIndexRangesJobFactory;
     private final Deflector deflector;
+    private final Cluster cluster;
     private final ActivityWriter activityWriter;
     private final SystemJobManager systemJobManager;
     private final Indices indices;
@@ -57,18 +59,24 @@ public class IndexRetentionThread extends Periodical {
                                 RebuildIndexRangesJob.Factory rebuildIndexRangesJobFactory,
                                 Deflector deflector,
                                 Indices indices,
+                                Cluster cluster,
                                 ActivityWriter activityWriter,
                                 SystemJobManager systemJobManager) {
         this.configuration = configuration;
         this.rebuildIndexRangesJobFactory = rebuildIndexRangesJobFactory;
         this.deflector = deflector;
         this.indices = indices;
+        this.cluster = cluster;
         this.activityWriter = activityWriter;
         this.systemJobManager = systemJobManager;
     }
 
     @Override
     public void doRun() {
+        if (!cluster.isConnectedAndHealthy()) {
+            LOG.info("Elasticsearch cluster not available, skipping index retention checks.");
+            return;
+        }
         Map<String, IndexStats> deflectorIndices = deflector.getAllDeflectorIndices();
         int indexCount = deflectorIndices.size();
         int maxIndices = configuration.getMaxNumberOfIndices();

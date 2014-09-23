@@ -20,6 +20,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Splitter;
 import com.google.common.util.concurrent.AbstractIdleService;
+import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.ListenableFuture;
@@ -55,6 +56,7 @@ public class IndexerSetupService extends AbstractIdleService {
     private final BufferSynchronizerService bufferSynchronizerService;
     private final AsyncHttpClient httpClient;
 
+    @Inject
     public IndexerSetupService(final Node node,
                                final Configuration configuration,
                                final BufferSynchronizerService bufferSynchronizerService,

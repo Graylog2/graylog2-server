@@ -18,7 +18,6 @@ package org.graylog2.indexer;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import org.elasticsearch.action.admin.indices.stats.IndexStats;
 import org.elasticsearch.indices.InvalidAliasNameException;
 import org.graylog2.Configuration;
@@ -65,7 +64,7 @@ public class Deflector { // extends Ablenkblech
                      final RebuildIndexRangesJob.Factory rebuildIndexRangesJobFactory,
                      final OptimizeIndexJob.Factory optimizeIndexJobFactory,
                      final Indices indices) {
-        indexPrefix = configuration.getElasticSearchIndexPrefix() + SEPARATOR;
+        indexPrefix = configuration.getElasticSearchIndexPrefix();
 
         this.systemJobManager = systemJobManager;
         this.activityWriter = activityWriter;
