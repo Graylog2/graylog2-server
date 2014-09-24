@@ -170,7 +170,6 @@ GET         /a/search/fieldterms                                                
 GET         /a/search/fieldhistogram                                                 @controllers.api.SearchApiController.fieldHistogram(q ?= "", field ?= "", rangetype ?= "", relative:Integer ?= -1, from ?= "", to ?= "", keyword ?= "", interval ?= "", valueType ?= "", streamId ?= "")
 
 # API: Message counts and histograms
-GET         /a/messagecounts/histogram                                               @controllers.MessageCountsController.histogram(timerange ?= "")
 GET         /a/messagecounts/total                                                   @controllers.MessageCountsController.total()
 
 # API: Message analyzing
