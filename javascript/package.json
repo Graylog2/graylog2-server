@@ -8,16 +8,35 @@
     "build": "./node_modules/.bin/gulp deploy-prod",
     "test": "./node_modules/.bin/jest"
   },
+  "jest": {
+    "scriptPreprocessor": "<rootDir>/jest-preprocessor.js",
+    "unmockedModulePathPatterns": [
+      "<rootDir>/node_modules/react/",
+      "<rootDir>/node_modules/react-bootstrap/",
+      "<rootDir>/node_modules/URIjs/",
+      "<rootDir>/node_modules/joi/"
+    ],
+    "testPathIgnorePatterns": [
+      "node_modules"
+    ],
+    "moduleFileExtensions": [
+      "js",
+      "jsx"
+    ]
+  },
   "dependencies": {
     "joi": "^4.6.2",
-    "react": "^0.11.1"
+    "react": "^0.11.2"
   },
   "devDependencies": {
     "browserify": "*",
-    "es5-shim": "*",
     "gulp": "*",
     "gulp-compile-handlebars": "*",
+    "gulp-concat": "*",
+    "gulp-debug": "*",
+    "gulp-jest": "*",
     "gulp-jshint": "*",
+    "gulp-livereload": "*",
     "gulp-react": "*",
     "gulp-rename": "*",
     "gulp-rev": "*",
@@ -26,9 +45,11 @@
     "gulp-util": "*",
     "jest-cli": "*",
     "jshint-stylish": "*",
+    "react-tools": "*",
     "reactify": "*",
     "rimraf": "*",
     "run-sequence": "*",
-    "vinyl-source-stream": "*"
+    "vinyl-source-stream": "*",
+    "watchify": "*"
   }
 }
