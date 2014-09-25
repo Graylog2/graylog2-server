@@ -50,6 +50,10 @@ public class GelfOutput implements MessageOutput {
     private Configuration configuration;
     private GelfTransport transport;
 
+    private final String CK_PROTOCOL = "protocol";
+    private final String CK_HOSTNAME = "hostname";
+    private final String CK_PORT = "port";
+
     @Override
     public void initialize(final Configuration config) throws MessageOutputConfigurationException {
         configuration = config;
@@ -74,9 +78,9 @@ public class GelfOutput implements MessageOutput {
     }
 
     protected GelfTransport buildTransport(final Configuration configuration) throws MessageOutputConfigurationException {
-        final String protocol = configuration.getString("protocol").toUpperCase();
-        final String hostname = configuration.getString("hostname");
-        final int port = Integer.parseInt(configuration.getString("port"));
+        final String protocol = configuration.getString(CK_PROTOCOL).toUpperCase();
+        final String hostname = configuration.getString(CK_HOSTNAME);
+        final int port = Integer.parseInt(configuration.getString(CK_PORT));
 
         final GelfConfiguration gelfConfiguration = new GelfConfiguration(new InetSocketAddress(hostname, port))
                 .transport(GelfTransports.valueOf(protocol));
@@ -145,12 +149,12 @@ public class GelfOutput implements MessageOutput {
     @Override
     public ConfigurationRequest getRequestedConfiguration() {
         final ConfigurationRequest configurationRequest = new ConfigurationRequest();
-        configurationRequest.addField(new TextField("hostname", "Destination host", "", "This is the hostname of the destination", ConfigurationField.Optional.NOT_OPTIONAL));
-        configurationRequest.addField(new NumberField("port", "Destination port", 12201, "This is the port of the destination", ConfigurationField.Optional.NOT_OPTIONAL));
+        configurationRequest.addField(new TextField(CK_HOSTNAME, "Destination host", "", "This is the hostname of the destination", ConfigurationField.Optional.NOT_OPTIONAL));
+        configurationRequest.addField(new NumberField(CK_PORT, "Destination port", 12201, "This is the port of the destination", ConfigurationField.Optional.NOT_OPTIONAL));
         final Map<String, String> protocols = ImmutableMap.of(
                 "TCP", "TCP",
                 "UDP", "UDP");
-        configurationRequest.addField(new DropdownField("protocol", "Protocol", "TCP", protocols, "The protocol used to connect", ConfigurationField.Optional.OPTIONAL));
+        configurationRequest.addField(new DropdownField(CK_PROTOCOL, "Protocol", "TCP", protocols, "The protocol used to connect", ConfigurationField.Optional.OPTIONAL));
         return configurationRequest;
     }
 
