@@ -33,6 +33,7 @@ import com.lmax.disruptor.YieldingWaitStrategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.net.InetAddress;
 import java.net.URI;
 
@@ -55,6 +56,7 @@ public abstract class BaseConfiguration {
     @Parameter(value = "rest_enable_gzip")
     private boolean restEnableGzip = false;
 
+
     @Parameter(value = "rest_max_initial_line_length", required = true, validator = PositiveIntegerValidator.class)
     private int restMaxInitialLineLength = 4096;
 
@@ -63,6 +65,18 @@ public abstract class BaseConfiguration {
 
     @Parameter(value = "rest_max_chunk_size", required = true, validator = PositiveIntegerValidator.class)
     private int restMaxChunkSize = 8192;
+
+    @Parameter(value = "rest_enable_tls")
+    private boolean restEnableTls = false;
+
+    @Parameter(value = "rest_tls_cert_file")
+    private File restTlsCertFile;
+
+    @Parameter(value = "rest_tls_key_file")
+    private File restTlsKeyFile;
+
+    @Parameter(value = "rest_tls_key_password")
+    private String restTlsKeyPassword;
 
     @Parameter(value = "groovy_shell_enable")
     private boolean groovyShellEnable = false;
@@ -78,6 +92,10 @@ public abstract class BaseConfiguration {
 
     @Parameter(value = "input_cache_max_size")
     private long inputCacheMaxSize = 0;
+
+    public String getRestUriScheme() {
+        return isRestEnableTls() ? "https" : "http";
+    }
 
     public URI getRestTransportUri() {
         return Tools.getUriWithPort(restTransportUri, GRAYLOG2_DEFAULT_PORT);
@@ -118,25 +136,20 @@ public abstract class BaseConfiguration {
     }
 
     public WaitStrategy getProcessorWaitStrategy() {
-        if (processorWaitStrategy.equals("sleeping")) {
-            return new SleepingWaitStrategy();
+        switch (processorWaitStrategy) {
+            case "sleeping":
+                return new SleepingWaitStrategy();
+            case "yielding":
+                return new YieldingWaitStrategy();
+            case "blocking":
+                return new BlockingWaitStrategy();
+            case "busy_spinning":
+                return new BusySpinWaitStrategy();
+            default:
+                LOG.warn("Invalid setting for [processor_wait_strategy]:"
+                        + " Falling back to default: BlockingWaitStrategy.");
+                return new BlockingWaitStrategy();
         }
-
-        if (processorWaitStrategy.equals("yielding")) {
-            return new YieldingWaitStrategy();
-        }
-
-        if (processorWaitStrategy.equals("blocking")) {
-            return new BlockingWaitStrategy();
-        }
-
-        if (processorWaitStrategy.equals("busy_spinning")) {
-            return new BusySpinWaitStrategy();
-        }
-
-        LOG.warn("Invalid setting for [processor_wait_strategy]:"
-                + " Falling back to default: BlockingWaitStrategy.");
-        return new BlockingWaitStrategy();
     }
 
     public boolean isRestEnableCors() {
@@ -157,6 +170,22 @@ public abstract class BaseConfiguration {
 
     public int getRestMaxChunkSize() {
         return restMaxChunkSize;
+    }
+
+    public boolean isRestEnableTls() {
+        return restEnableTls;
+    }
+
+    public File getRestTlsCertFile() {
+        return restTlsCertFile;
+    }
+
+    public File getRestTlsKeyFile() {
+        return restTlsKeyFile;
+    }
+
+    public String getRestTlsKeyPassword() {
+        return restTlsKeyPassword;
     }
 
     public boolean isGroovyShellEnable() {

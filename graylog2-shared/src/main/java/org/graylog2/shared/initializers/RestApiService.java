@@ -1,24 +1,18 @@
 /**
- * The MIT License
- * Copyright (c) 2012 TORCH GmbH
+ * This file is part of Graylog2.
  *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
+ * Graylog2 is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * Graylog2 is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
+ * You should have received a copy of the GNU General Public License
+ * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  */
 package org.graylog2.shared.initializers;
 
@@ -35,11 +29,11 @@ import org.glassfish.jersey.server.internal.scanning.PackageNamesScanner;
 import org.glassfish.jersey.server.model.Resource;
 import org.graylog2.jersey.container.netty.NettyContainer;
 import org.graylog2.jersey.container.netty.SecurityContextFactory;
-import org.graylog2.plugin.rest.PluginRestResource;
-import org.graylog2.plugin.rest.WebApplicationExceptionMapper;
 import org.graylog2.plugin.BaseConfiguration;
 import org.graylog2.plugin.rest.AnyExceptionClassMapper;
 import org.graylog2.plugin.rest.JacksonPropertyExceptionMapper;
+import org.graylog2.plugin.rest.PluginRestResource;
+import org.graylog2.plugin.rest.WebApplicationExceptionMapper;
 import org.graylog2.shared.rest.CORSFilter;
 import org.graylog2.shared.rest.PrintModelProcessor;
 import org.jboss.netty.bootstrap.ServerBootstrap;
@@ -49,26 +43,31 @@ import org.jboss.netty.channel.Channels;
 import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory;
 import org.jboss.netty.handler.codec.http.HttpRequestDecoder;
 import org.jboss.netty.handler.codec.http.HttpResponseEncoder;
+import org.jboss.netty.handler.ssl.SslContext;
+import org.jboss.netty.handler.ssl.SslHandler;
+import org.jboss.netty.handler.ssl.util.SelfSignedCertificate;
 import org.jboss.netty.handler.stream.ChunkedWriteHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import javax.net.ssl.SSLException;
 import javax.ws.rs.Path;
 import javax.ws.rs.container.ContainerResponseFilter;
 import javax.ws.rs.container.DynamicFeature;
 import javax.ws.rs.ext.ExceptionMapper;
+import java.io.File;
 import java.net.InetSocketAddress;
+import java.security.cert.CertificateException;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-/**
- * @author Dennis Oelkers <dennis@torch.sh>
- */
+import static com.google.common.base.Strings.emptyToNull;
+
 @Singleton
 public class RestApiService extends AbstractIdleService {
     private static final Logger LOG = LoggerFactory.getLogger(RestApiService.class);
@@ -115,39 +114,7 @@ public class RestApiService extends AbstractIdleService {
                 workerExecutor
         ));
 
-        ResourceConfig rc = new ResourceConfig()
-                .property(NettyContainer.PROPERTY_BASE_URI, configuration.getRestListenUri())
-                .registerClasses(JacksonPropertyExceptionMapper.class,
-                        AnyExceptionClassMapper.class, WebApplicationExceptionMapper.class);
-
-        for (Class<? extends ExceptionMapper> exceptionMapper : exceptionMappers)
-            rc.registerClasses(exceptionMapper);
-
-        for (Class<? extends DynamicFeature> dynamicFeatureClass : dynamicFeatures)
-            rc.registerClasses(dynamicFeatureClass);
-
-        for (Class<? extends ContainerResponseFilter> responseFilter : containerResponseFilters)
-            rc.registerClasses(responseFilter);
-
-        rc
-            .register(new JacksonJsonProvider(objectMapper))
-            .registerFinder(new PackageNamesScanner(new String[]{"org.graylog2.rest.resources",
-                    "org.graylog2.radio.rest.resources", "org.graylog2.shared.rest.resources"}, true));
-
-        if (configuration.isRestEnableGzip())
-            EncodingFilter.enableFor(rc, GZipEncoder.class);
-
-        if (configuration.isRestEnableCors()) {
-            LOG.info("Enabling CORS for REST API");
-            rc.register(CORSFilter.class);
-        }
-
-        rc.registerResources(prefixPluginResources("/plugins", pluginRestResources));
-
-        if(LOG.isDebugEnabled())
-            rc.register(PrintModelProcessor.class);
-
-        final NettyContainer jerseyHandler = ContainerFactory.createContainer(NettyContainer.class, rc);
+        final NettyContainer jerseyHandler = ContainerFactory.createContainer(NettyContainer.class, buildResourceConfig());
         if (securityContextFactory != null) {
             LOG.info("Adding security context factory: <{}>", securityContextFactory);
             jerseyHandler.setSecurityContextFactory(securityContextFactory);
@@ -159,17 +126,45 @@ public class RestApiService extends AbstractIdleService {
         final int maxHeaderSize = configuration.getRestMaxHeaderSize();
         final int maxChunkSize = configuration.getRestMaxChunkSize();
 
+        final File tlsCertFile;
+        final File tlsKeyFile;
+        if (configuration.getRestTlsCertFile() == null || configuration.getRestTlsKeyFile() == null) {
+            final SelfSignedCertificate ssc = new SelfSignedCertificate(configuration.getRestListenUri().getHost());
+            tlsCertFile = ssc.certificate();
+            tlsKeyFile = ssc.privateKey();
+
+            LOG.info("rest_tls_cert_file or rest_tls_key_file is empty. Using self-signed certificates instead.");
+            LOG.debug("rest_tls_cert_file = {}", tlsCertFile);
+            LOG.debug("rest_tls_key_file = {}", tlsKeyFile);
+        } else {
+            tlsCertFile = configuration.getRestTlsCertFile();
+            tlsKeyFile = configuration.getRestTlsKeyFile();
+        }
+
         bootstrap.setPipelineFactory(new ChannelPipelineFactory() {
             @Override
             public ChannelPipeline getPipeline() throws Exception {
-                ChannelPipeline pipeline = Channels.pipeline();
+                final ChannelPipeline pipeline = Channels.pipeline();
+
+                if (configuration.isRestEnableTls()) {
+                    pipeline.addLast("tls", buildSslHandler());
+                }
+
                 pipeline.addLast("decoder", new HttpRequestDecoder(maxInitialLineLength, maxHeaderSize, maxChunkSize));
                 pipeline.addLast("encoder", new HttpResponseEncoder());
                 pipeline.addLast("chunks", new ChunkedWriteHandler());
                 pipeline.addLast("jerseyHandler", jerseyHandler);
+
                 return pipeline;
             }
-        }) ;
+
+            private SslHandler buildSslHandler() throws CertificateException, SSLException {
+                final SslContext sslCtx = SslContext.newServerContext(
+                        tlsCertFile, tlsKeyFile, emptyToNull(configuration.getRestTlsKeyPassword()));
+
+                return sslCtx.newHandler();
+            }
+        });
         bootstrap.setOption("child.tcpNoDelay", true);
         bootstrap.setOption("child.keepAlive", true);
 
@@ -179,6 +174,52 @@ public class RestApiService extends AbstractIdleService {
         ));
 
         LOG.info("Started REST API at <{}>", configuration.getRestListenUri());
+    }
+
+    private ResourceConfig buildResourceConfig() {
+        final ResourceConfig rc = new ResourceConfig()
+                .property(NettyContainer.PROPERTY_BASE_URI, configuration.getRestListenUri())
+                .registerClasses(
+                        JacksonPropertyExceptionMapper.class,
+                        AnyExceptionClassMapper.class,
+                        WebApplicationExceptionMapper.class);
+
+        for (Class<? extends ExceptionMapper> exceptionMapper : exceptionMappers) {
+            rc.registerClasses(exceptionMapper);
+        }
+
+        for (Class<? extends DynamicFeature> dynamicFeatureClass : dynamicFeatures) {
+            rc.registerClasses(dynamicFeatureClass);
+        }
+
+        for (Class<? extends ContainerResponseFilter> responseFilter : containerResponseFilters) {
+            rc.registerClasses(responseFilter);
+        }
+
+        rc.register(new JacksonJsonProvider(objectMapper));
+        rc.registerFinder(new PackageNamesScanner(new String[]{
+                "org.graylog2.rest.resources",
+                "org.graylog2.radio.rest.resources",
+                "org.graylog2.shared.rest.resources"},
+                true));
+
+        if (configuration.isRestEnableGzip()) {
+            LOG.info("Enabling GZip for REST API");
+            rc.registerClasses(GZipEncoder.class, EncodingFilter.class);
+        }
+
+        if (configuration.isRestEnableCors()) {
+            LOG.info("Enabling CORS for REST API");
+            rc.register(CORSFilter.class);
+        }
+
+        rc.registerResources(prefixPluginResources("/plugins", pluginRestResources));
+
+        if (LOG.isDebugEnabled()) {
+            rc.register(PrintModelProcessor.class);
+        }
+
+        return rc;
     }
 
     private Set<Resource> prefixPluginResources(String pluginPrefix, Map<String, Set<PluginRestResource>> pluginResourceMap) {
