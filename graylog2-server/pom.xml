@@ -213,7 +213,7 @@
             <artifactId>commons-io</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.joestelmach</groupId>
+            <groupId>org.graylog2.repackaged</groupId>
             <artifactId>natty</artifactId>
         </dependency>
 
@@ -234,7 +234,6 @@
         <dependency>
             <groupId>org.apache.lucene</groupId>
             <artifactId>lucene-queryparser</artifactId>
-            <version>4.6.0</version>
         </dependency>
 
         <dependency>

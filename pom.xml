@@ -190,20 +190,12 @@
             <dependency>
                 <groupId>org.elasticsearch</groupId>
                 <artifactId>elasticsearch</artifactId>
-                <version>0.90.10</version>
-                <!-- fuckeria jersey. really. do not repackage stuff under different groupids
-                  TODO we really do not want to do this, because whenever someone decides to use lucene-expressions WE FOOKED.
-                 -->
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.ow2.asm</groupId>
-                        <artifactId>asm</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.ow2.asm</groupId>
-                        <artifactId>asm-commons</artifactId>
-                    </exclusion>
-                </exclusions>
+                <version>1.3.2</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.lucene</groupId>
+                <artifactId>lucene-queryparser</artifactId>
+                <version>4.9.0</version>
             </dependency>
 
             <dependency>
@@ -513,10 +505,14 @@
                 <version>2.3</version>
             </dependency>
 
+            <!--
+            This is required because natty currently doesn't work with
+            newer antlr-runtime versions, see https://github.com/joestelmach/natty/issues/60
+            -->
             <dependency>
-                <groupId>com.joestelmach</groupId>
+                <groupId>org.graylog2.repackaged</groupId>
                 <artifactId>natty</artifactId>
-                <version>0.8</version>
+                <version>0.8-1</version>
             </dependency>
 
             <dependency>

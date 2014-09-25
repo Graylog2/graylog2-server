@@ -25,7 +25,11 @@ import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.common.xcontent.XContentHelper;
-import org.elasticsearch.index.query.*;
+import org.elasticsearch.index.query.BoolFilterBuilder;
+import org.elasticsearch.index.query.FilterBuilders;
+import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.index.query.QueryStringQueryBuilder;
 import org.elasticsearch.node.Node;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.facet.FacetBuilders;
@@ -42,7 +46,15 @@ import org.graylog2.Configuration;
 import org.graylog2.indexer.Deflector;
 import org.graylog2.indexer.IndexHelper;
 import org.graylog2.indexer.ranges.IndexRangeService;
-import org.graylog2.indexer.results.*;
+import org.graylog2.indexer.results.CountResult;
+import org.graylog2.indexer.results.DateHistogramResult;
+import org.graylog2.indexer.results.FieldHistogramResult;
+import org.graylog2.indexer.results.FieldStatsResult;
+import org.graylog2.indexer.results.HistogramResult;
+import org.graylog2.indexer.results.ScrollResult;
+import org.graylog2.indexer.results.SearchResult;
+import org.graylog2.indexer.results.TermsResult;
+import org.graylog2.indexer.results.TermsStatsResult;
 import org.graylog2.indexer.searches.timeranges.TimeRange;
 import org.joda.time.Period;
 import org.slf4j.Logger;
@@ -56,9 +68,6 @@ import java.util.concurrent.TimeUnit;
 import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
 import static org.elasticsearch.index.query.QueryBuilders.queryString;
 
-/**
- * @author Lennart Koopmann <lennart@socketfeed.com>
- */
 @Singleton
 public class Searches {
     private static final Logger LOG = LoggerFactory.getLogger(Searches.class);
@@ -102,7 +111,7 @@ public class Searches {
     private final Configuration configuration;
     private final Deflector deflector;
     private final IndexRangeService indexRangeService;
-	private final Client c;
+    private final Client c;
 
     private final static String TERMS_FACET_NAME = "gl2_terms";
     private final static String STATS_FACET_NAME = "gl2_stats";
@@ -117,7 +126,7 @@ public class Searches {
         this.deflector = deflector;
         this.indexRangeService = indexRangeService;
         this.c = node.client();
-	}
+    }
 
     public CountResult count(String query, TimeRange range) throws IndexHelper.InvalidRangeFormatException {
         return count(query, range, null);
@@ -161,7 +170,8 @@ public class Searches {
         if (LOG.isDebugEnabled()) {
             try {
                 LOG.debug("ElasticSearch scroll query: {}", XContentHelper.convertToJson(request.source(), false));
-            } catch (IOException ignored) {}
+            } catch (IOException ignored) {
+            }
         }
         final SearchResponse r = c.search(request).actionGet();
 
@@ -170,7 +180,7 @@ public class Searches {
 
     public SearchResult search(String query, TimeRange range, int limit, int offset, Sorting sorting) throws IndexHelper.InvalidRangeFormatException {
         return search(query, null, range, limit, offset, sorting);
-	}
+    }
 
     public SearchResult search(String query, String filter, TimeRange range, int limit, int offset, Sorting sorting) throws IndexHelper.InvalidRangeFormatException {
         final SearchesConfig searchesConfig = SearchesConfigBuilder.newConfig()
@@ -264,7 +274,7 @@ public class Searches {
         );
     }
 
-    public TermsStatsResult termsStats(String keyField, String valueField,TermsStatsOrder order, int size, String query, TimeRange range) throws IndexHelper.InvalidRangeFormatException {
+    public TermsStatsResult termsStats(String keyField, String valueField, TermsStatsOrder order, int size, String query, TimeRange range) throws IndexHelper.InvalidRangeFormatException {
         return termsStats(keyField, valueField, order, size, query, null, range);
     }
 
@@ -295,7 +305,7 @@ public class Searches {
         try {
             request = srb.request();
             r = c.search(request).actionGet();
-        }  catch (org.elasticsearch.action.search.SearchPhaseExecutionException e) {
+        } catch (org.elasticsearch.action.search.SearchPhaseExecutionException e) {
             throw new FieldTypeException(e);
         }
 
@@ -314,8 +324,8 @@ public class Searches {
 
     public HistogramResult histogram(String query, DateHistogramInterval interval, String filter, TimeRange range) throws IndexHelper.InvalidRangeFormatException {
         DateHistogramFacetBuilder fb = FacetBuilders.dateHistogramFacet("histogram")
-				.field("timestamp")
-				.interval(interval.toString().toLowerCase());
+                .field("timestamp")
+                .interval(interval.toString().toLowerCase());
 
         fb.facetFilter(standardFilters(range, filter));
 
@@ -323,16 +333,16 @@ public class Searches {
         qs.allowLeadingWildcard(configuration.isAllowLeadingWildcardSearches());
 
         SearchRequestBuilder srb = c.prepareSearch();
-		srb.setIndices(IndexHelper.determineAffectedIndices(indexRangeService, deflector, range).toArray(new String[]{}));
-		srb.setQuery(qs);
-		srb.addFacet(fb);
+        srb.setIndices(IndexHelper.determineAffectedIndices(indexRangeService, deflector, range).toArray(new String[]{}));
+        srb.setQuery(qs);
+        srb.addFacet(fb);
 
         final SearchRequest request = srb.request();
         SearchResponse r = c.search(request).actionGet();
-		return new DateHistogramResult((DateHistogramFacet) r.getFacets().facet("histogram"), query,
-                                       request.source(),
-                                       interval, r.getTook());
-	}
+        return new DateHistogramResult((DateHistogramFacet) r.getFacets().facet("histogram"), query,
+                request.source(),
+                interval, r.getTook());
+    }
 
     public HistogramResult fieldHistogram(String query, String field, DateHistogramInterval interval, String filter, TimeRange range) throws FieldTypeException, IndexHelper.InvalidRangeFormatException {
         DateHistogramFacetBuilder fb = FacetBuilders.dateHistogramFacet("histogram")
@@ -354,12 +364,12 @@ public class Searches {
         final SearchRequest request = srb.request();
         try {
             r = c.search(request).actionGet();
-        }  catch (org.elasticsearch.action.search.SearchPhaseExecutionException e) {
+        } catch (org.elasticsearch.action.search.SearchPhaseExecutionException e) {
             throw new FieldTypeException(e);
         }
 
         return new FieldHistogramResult((DateHistogramFacet) r.getFacets().facet("histogram"), query, request.source(),
-                                        interval, r.getTook());
+                interval, r.getTook());
     }
 
     public SearchHit firstOfIndex(String index) {
@@ -438,7 +448,7 @@ public class Searches {
         }
 
         if (range != null) {
-            srb.setFilter(IndexHelper.getTimestampRangeFilter(range));
+            srb.setPostFilter(IndexHelper.getTimestampRangeFilter(range));
         }
 
         if (sort != null) {
@@ -465,7 +475,7 @@ public class Searches {
         SearchRequestBuilder srb = standardSearchRequest(query, indices, limit, offset, range, sort);
 
         if (range != null && filter != null) {
-            srb.setFilter(standardFilters(range, filter));
+            srb.setPostFilter(standardFilters(range, filter));
         }
 
         return srb;
@@ -496,7 +506,7 @@ public class Searches {
             set = true;
         }
 
-        if(filter != null && !filter.isEmpty() && !filter.equals("*")) {
+        if (filter != null && !filter.isEmpty() && !filter.equals("*")) {
             bfb.must(FilterBuilders.queryFilter(QueryBuilders.queryString(filter)));
             set = true;
         }

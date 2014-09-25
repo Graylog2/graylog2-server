@@ -19,7 +19,7 @@ package org.graylog2.indexer.cluster;
 import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import org.elasticsearch.ElasticSearchException;
+import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.action.admin.cluster.health.ClusterHealthRequest;
 import org.elasticsearch.action.admin.cluster.health.ClusterHealthResponse;
 import org.elasticsearch.action.admin.cluster.health.ClusterHealthStatus;
@@ -34,14 +34,10 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 @Singleton
 public class Cluster {
-    private static final Logger log = LoggerFactory.getLogger(Cluster.class);
+    private static final Logger LOG = LoggerFactory.getLogger(Cluster.class);
 
-    //private final Core server;
     private final Client c;
     private final Deflector deflector;
 
@@ -88,11 +84,9 @@ public class Cluster {
         List<NodeInfo> dataNodes = Lists.newArrayList();
 
         for (NodeInfo nodeInfo : getAllNodes()) {
-
             /*
              * We are setting node.data to false for our graylog2-server nodes.
              * If it's not set or not false it is a data storing node.
-             *
              */
             String isData = nodeInfo.getSettings().get("node.data");
             if (isData != null && isData.equals("false")) {
@@ -129,7 +123,7 @@ public class Cluster {
             NodesInfoResponse r = c.admin().cluster().nodesInfo(new NodesInfoRequest(nodeId).all()).actionGet();
             return r.getNodesMap().get(nodeId);
         } catch (Exception e) {
-            log.error("Could not read name of ES node.", e);
+            LOG.error("Could not read name of ES node.", e);
             return null;
         }
     }
@@ -143,10 +137,9 @@ public class Cluster {
     public boolean isConnectedAndHealthy() {
         try {
             return getHealth() != ClusterHealthStatus.RED;
-        } catch (ElasticSearchException e) {
-            log.trace("Couldn't determine Elasticsearch health properly", e);
+        } catch (ElasticsearchException e) {
+            LOG.trace("Couldn't determine Elasticsearch health properly", e);
             return false;
         }
     }
-
 }

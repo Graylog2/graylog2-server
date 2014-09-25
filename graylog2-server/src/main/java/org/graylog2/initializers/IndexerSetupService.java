@@ -25,7 +25,7 @@ import com.google.inject.Singleton;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.ListenableFuture;
 import com.ning.http.client.Response;
-import org.elasticsearch.ElasticSearchTimeoutException;
+import org.elasticsearch.ElasticsearchTimeoutException;
 import org.elasticsearch.Version;
 import org.elasticsearch.action.admin.cluster.health.ClusterHealthRequest;
 import org.elasticsearch.client.Client;
@@ -43,14 +43,10 @@ import java.util.concurrent.Executors;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
-/**
- * @author Dennis Oelkers <dennis@torch.sh>
- */
 @Singleton
 public class IndexerSetupService extends AbstractIdleService {
     private static final Logger LOG = LoggerFactory.getLogger(IndexerSetupService.class);
 
-    private static final Logger log = LoggerFactory.getLogger(IndexerSetupService.class);
     private final Node node;
     private final Configuration configuration;
     private final BufferSynchronizerService bufferSynchronizerService;
@@ -83,13 +79,12 @@ public class IndexerSetupService extends AbstractIdleService {
 
         LOG.debug("Starting indexer");
         try {
-
             node.start();
-            final Client client = node.client();
 
+            final Client client = node.client();
             try {
                 client.admin().cluster().health(new ClusterHealthRequest().waitForYellowStatus()).actionGet(configuration.getEsClusterDiscoveryTimeout(), MILLISECONDS);
-            } catch(ElasticSearchTimeoutException e) {
+            } catch (ElasticsearchTimeoutException e) {
                 final String hosts = node.settings().get("discovery.zen.ping.unicast.hosts");
 
                 if (hosts != null && hosts.contains(",")) {
@@ -101,7 +96,7 @@ public class IndexerSetupService extends AbstractIdleService {
                         final Iterable<String> hostAndPort = Splitter.on(':').limit(2).split(host);
                         final Iterator<String> it = hostAndPort.iterator();
                         final String ip = it.next();
-                        log.info("Checking Elasticsearch HTTP API at http://{}:9200/", ip);
+                        LOG.info("Checking Elasticsearch HTTP API at http://{}:9200/", ip);
 
                         try {
                             // Try the HTTP API endpoint
@@ -117,13 +112,13 @@ public class IndexerSetupService extends AbstractIdleService {
                                 final String id = nodes.next();
                                 final String version = nodesList.get(id).get("version").textValue();
                                 if (!Version.CURRENT.toString().equals(version)) {
-                                    log.error("Elasticsearch node is of the wrong version {}, it must be {}! " +
-                                                      "Please make sure you are running the correct version of ElasticSearch.",
-                                              version,
-                                              Version.CURRENT.toString());
+                                    LOG.error("Elasticsearch node is of the wrong version {}, it must be {}! " +
+                                                    "Please make sure you are running the correct version of ElasticSearch.",
+                                            version,
+                                            Version.CURRENT.toString());
                                 }
                                 if (!node.settings().get("cluster.name").equals(clusterName)) {
-                                    log.error(
+                                    LOG.error(
                                             "Elasticsearch cluster name is different, Graylog2 uses `{}`, Elasticsearch cluster uses `{}`. " +
                                                     "Please check the `cluster.name` setting of both Graylog2 and ElasticSearch.",
                                             node.settings().get("cluster.name"),
@@ -132,12 +127,12 @@ public class IndexerSetupService extends AbstractIdleService {
 
                             }
                         } catch (IOException ioException) {
-                            log.error("Could not connect to Elasticsearch.", ioException);
+                            LOG.error("Could not connect to Elasticsearch.", ioException);
                         } catch (InterruptedException ignore) {
                         } catch (ExecutionException e1) {
                             // could not find any server on that address
-                            log.error("Could not connect to Elasticsearch at http://" + ip + ":9200/, is it running?",
-                                      e1.getCause());
+                            LOG.error("Could not connect to Elasticsearch at http://" + ip + ":9200/, is it running?",
+                                    e1.getCause());
                         }
                     }
                 }
@@ -145,7 +140,7 @@ public class IndexerSetupService extends AbstractIdleService {
                 UI.exitHardWithWall(
                         "Could not successfully connect to ElasticSearch. Check that your cluster state is not RED " +
                                 "and that ElasticSearch is running properly.",
-                        new String[]{"graylog2-server/configuring-and-tuning-elasticsearch-for-graylog2-v0200"});
+                        "graylog2-server/configuring-and-tuning-elasticsearch-for-graylog2-v0200");
             }
         } catch (Exception e) {
             bufferSynchronizerService.setIndexerUnavailable();
