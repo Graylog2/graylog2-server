@@ -1,6 +1,8 @@
+/** @jsx React.DOM */
+
 'use strict';
 
-var React = require('React');
+var React = require('react/addons');
 
 // adapted from react examples (https://github.com/facebook/react/tree/master/examples/jquery-bootstrap)
 var BootstrapModal = React.createClass({

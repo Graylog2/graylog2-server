@@ -7,7 +7,14 @@ module.exports = {
     assetDir: 'javascripts/users',
     scriptTemplatePath: 'scripts.hbs',
     scriptDestinationName: 'scripts.scala.html',
-    entryPoints: ['./src/mount.jsx']
+    entryPoints: ['./src/mount.jsx'],
+
+    test : {
+        unmockedModulePathPatterns: [
+            "<rootDir>/node_modules/react/",
+            "<rootDir>/node_modules/joi/"
+        ]
+    }
 };
 
 

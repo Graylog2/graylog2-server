@@ -40,12 +40,7 @@ gulp.task('test', function () {
         .pipe(jest({
             scriptPreprocessor: "<rootDir>/jest-preprocessor.js",
             "rootDir": ".",
-            unmockedModulePathPatterns: [
-                "<rootDir>/node_modules/react/",
-                "<rootDir>/node_modules/react-bootstrap/",
-                "<rootDir>/node_modules/URIjs/",
-                "<rootDir>/node_modules/joi/"
-            ],
+            unmockedModulePathPatterns: config.test.unmockedModulePathPatterns,
             testPathIgnorePatterns: [
                 "node_modules"
             ],
