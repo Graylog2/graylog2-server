@@ -20,6 +20,7 @@ import com.google.inject.AbstractModule;
 import com.google.inject.multibindings.MapBinder;
 import org.graylog2.indexer.rotation.MessageCountRotationStrategy;
 import org.graylog2.indexer.rotation.SizeBasedRotationStrategy;
+import org.graylog2.indexer.rotation.TimeBasedRotationStrategy;
 import org.graylog2.plugin.indexer.rotation.RotationStrategy;
 
 public class RotationStrategyBindings extends AbstractModule {
@@ -30,6 +31,7 @@ public class RotationStrategyBindings extends AbstractModule {
                                                                                      RotationStrategy.class);
         mapBinder.addBinding("count").to(MessageCountRotationStrategy.class);
         mapBinder.addBinding("size").to(SizeBasedRotationStrategy.class);
+        mapBinder.addBinding("time").to(TimeBasedRotationStrategy.class);
     }
 
 }

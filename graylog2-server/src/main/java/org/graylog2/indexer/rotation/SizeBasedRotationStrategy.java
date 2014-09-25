@@ -23,8 +23,10 @@ import org.graylog2.indexer.indices.Indices;
 import org.graylog2.plugin.indexer.rotation.RotationStrategy;
 
 import javax.annotation.Nullable;
+import javax.inject.Singleton;
 import java.text.MessageFormat;
 
+@Singleton
 public class SizeBasedRotationStrategy implements RotationStrategy {
 
     private final Indices indices;
