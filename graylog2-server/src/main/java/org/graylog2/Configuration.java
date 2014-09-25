@@ -25,8 +25,8 @@ import com.google.common.collect.Lists;
 import com.mongodb.ServerAddress;
 import org.graylog2.plugin.BaseConfiguration;
 import org.graylog2.plugin.Tools;
+import org.graylog2.shared.JadPeriodConverter;
 import org.joda.time.Period;
-import org.joda.time.PeriodType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,8 +34,6 @@ import java.net.InetAddress;
 import java.net.URI;
 import java.net.UnknownHostException;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static org.graylog2.plugin.Tools.getUriWithPort;
@@ -687,51 +685,6 @@ public class Configuration extends BaseConfiguration {
     }
 
     public Period getElasticSearchMaxTimePerIndex() { return elasticSearchMaxTimePerIndex; }
-
-    /**
-     * Allow durations to be passed in as number + unit:
-     *
-     * 23s -> Period.seconds(23)
-     * 30m -> Period.minutes(30)
-     * 30h -> Period.hours(30)
-     * 30d -> Period.days(30)
-     */
-    public static class JadPeriodConverter implements Converter<Period> {
-        @Override
-        public Period convertFrom(String value) {
-            final Matcher matcher = Pattern.compile("(\\d+?)\\s*([s|m|h|d])").matcher(value.trim());
-            if (matcher.matches()) {
-                final long duration = Long.valueOf(matcher.group(1));
-
-                PeriodType unitType;
-                StringBuilder asIsoFormat = new StringBuilder();
-                asIsoFormat.append('P');
-
-                final String unit = matcher.group(2);
-                switch (unit) {
-                    // time units, format must be prefixed with 'T'
-                    case "s" :
-                    case "m" :
-                    case "h" :
-                        asIsoFormat.append('T');
-                        break;
-                    case "d" :
-                        // no prefix necessary
-                        break;
-                    default : throw new ParameterException("Couldn't convert value \"" + value + "\" to Period object, invalid unit.");
-                }
-                asIsoFormat.append(duration).append(unit.toUpperCase());
-                final Period period = Period.parse(asIsoFormat.toString());
-                return period;
-            }
-            throw new ParameterException("Couldn't convert value \"" + value + "\" to Period object.");
-        }
-
-        @Override
-        public String convertTo(Period value) {
-            return null;
-        }
-    }
 
     @ValidatorMethod
     public void validate() throws ValidationException {
