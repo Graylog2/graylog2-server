@@ -41,8 +41,8 @@
 
     <licenses>
         <license>
-            <name>MIT license</name>
-            <url>http://www.opensource.org/licenses/mit-license.php</url>
+            <name>GNU General Public License (GPL) version 3.0</name>
+            <url>https://www.gnu.org/licenses/gpl-3.0.html</url>
             <distribution>repo</distribution>
         </license>
     </licenses>
@@ -203,9 +203,6 @@
             <plugin>
                 <groupId>com.mycila</groupId>
                 <artifactId>license-maven-plugin</artifactId>
-                <configuration>
-                    <header>com/mycila/maven/plugin/license/templates/MIT.txt</header>
-                </configuration>
             </plugin>
         </plugins>
     </build>
