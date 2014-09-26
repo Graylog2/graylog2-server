@@ -78,4 +78,9 @@ public class QuickvaluesWidget extends DashboardWidget {
     public String getStreamId() {
         return streamId;
     }
+
+    @Override
+    public boolean hasFixedTimeAxis() {
+        return false;
+    }
 }

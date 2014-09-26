@@ -65,4 +65,9 @@ public class SearchResultCountWidget extends DashboardWidget {
     public String getStreamId() {
         return null;
     }
+
+    @Override
+    public boolean hasFixedTimeAxis() {
+        return false;
+    }
 }

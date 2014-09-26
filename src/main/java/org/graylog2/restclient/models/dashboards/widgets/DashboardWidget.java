@@ -220,6 +220,9 @@ public abstract class DashboardWidget {
     public abstract int getHeight();
     public abstract String getStreamId();
 
+    /* Indicate if the representation should contain the whole searched time range */
+    public abstract boolean hasFixedTimeAxis();
+
     public String getCreatorUserId() {
         return creatorUserId;
     }

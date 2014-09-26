@@ -25,21 +25,30 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 import org.graylog2.restclient.lib.timeranges.AbsoluteRange;
+import org.graylog2.restclient.lib.timeranges.RelativeRange;
+import org.graylog2.restclient.lib.timeranges.TimeRange;
 
 public class DateHistogramResult {
 
 	private final String originalQuery;
 	private final Map<String, Long> results;
 	private final AbsoluteRange histogramBoundaries;
+    private final TimeRange timeRange;
 	private final String interval;
 	private final int tookMs;
 
-	public DateHistogramResult(String originalQuery, int tookMs, String interval, Map<String, Long> results, AbsoluteRange boundaries) {
+	public DateHistogramResult(String originalQuery,
+                               int tookMs,
+                               String interval,
+                               Map<String, Long> results,
+                               AbsoluteRange boundaries,
+                               TimeRange timeRange) {
 		this.originalQuery = originalQuery;
 		this.results = results;
 		this.interval = interval;
 		this.tookMs = tookMs;
         this.histogramBoundaries = boundaries;
+        this.timeRange = timeRange;
 	}
 	
 	public Map<String, Long> getResults() {
@@ -85,5 +94,14 @@ public class DateHistogramResult {
 
     public AbsoluteRange getHistogramBoundaries() {
         return histogramBoundaries;
+    }
+
+    public TimeRange getTimeRange() {
+        return timeRange;
+    }
+
+    /* Indicate if the representation should contain the whole searched time range */
+    public boolean hasFixedTimeAxis() {
+        return ((timeRange.getType() != TimeRange.Type.RELATIVE) || !(((RelativeRange)timeRange).isEmptyRange()));
     }
 }

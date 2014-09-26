@@ -20,6 +20,7 @@
 package org.graylog2.restclient.models.dashboards.widgets;
 
 import com.google.common.collect.Maps;
+import org.graylog2.restclient.lib.timeranges.RelativeRange;
 import org.graylog2.restclient.lib.timeranges.TimeRange;
 import org.graylog2.restclient.models.dashboards.Dashboard;
 import play.mvc.Call;
@@ -82,5 +83,11 @@ public class FieldChartWidget extends DashboardWidget {
     @Override
     public String getStreamId() {
         return streamId;
+    }
+
+    @Override
+    public boolean hasFixedTimeAxis() {
+        TimeRange timeRange = getTimerange();
+        return ((timeRange.getType() != TimeRange.Type.RELATIVE) || !(((RelativeRange)timeRange).isEmptyRange()));
     }
 }

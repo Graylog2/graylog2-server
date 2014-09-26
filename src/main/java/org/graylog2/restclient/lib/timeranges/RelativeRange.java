@@ -56,4 +56,9 @@ public class RelativeRange extends TimeRange {
         return sb.toString();
     }
 
+    /* Indicates if the range value is 0 */
+    public boolean isEmptyRange() {
+        return range == 0;
+    }
+
 }
