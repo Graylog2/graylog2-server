@@ -1,6 +1,4 @@
 /*
- * Copyright 2013 TORCH UG
- *
  * This file is part of Graylog2.
  *
  * Graylog2 is free software: you can redistribute it and/or modify
@@ -24,6 +22,7 @@ import org.graylog2.restclient.lib.timeranges.TimeRange;
 import org.graylog2.restclient.models.FieldMapper;
 import org.graylog2.restclient.models.api.responses.MessageSummaryResponse;
 import org.graylog2.restclient.models.api.responses.SearchResultResponse;
+import org.graylog2.restclient.models.api.responses.system.indices.IndexRangeSummary;
 import org.joda.time.DateTime;
 
 import java.util.List;
@@ -38,7 +37,7 @@ public class SearchResult {
     private final List<MessageResult> results;
     private final SearchResultResponse.QueryError error;
     private final List<Field> fields;
-    private final List<String> usedIndices;
+    private final List<IndexRangeSummary> usedIndices;
     private List<Field> allFields;
     private final DateTime fromDateTime;
     private final DateTime toDateTime;
@@ -50,7 +49,7 @@ public class SearchResult {
                         int tookMs,
                         List<MessageSummaryResponse> summaryResponses,
                         List<String> fields,
-                        List<String> usedIndices,
+                        List<IndexRangeSummary> usedIndices,
                         SearchResultResponse.QueryError error,
                         DateTime fromDateTime,
                         DateTime toDateTime,
@@ -100,7 +99,7 @@ public class SearchResult {
         return fields;
     }
 
-    public List<String> getUsedIndices() {
+    public List<IndexRangeSummary> getUsedIndices() {
         return usedIndices;
     }
 

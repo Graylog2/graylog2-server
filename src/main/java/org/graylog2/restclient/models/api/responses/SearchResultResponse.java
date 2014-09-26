@@ -19,6 +19,8 @@
 package org.graylog2.restclient.models.api.responses;
 
 import com.google.gson.annotations.SerializedName;
+import org.graylog2.restclient.models.api.responses.system.indices.IndexRangeSummary;
+import org.graylog2.restclient.models.api.responses.system.indices.IndexSummaryResponse;
 import org.joda.time.DateTime;
 
 import java.util.List;
@@ -32,7 +34,7 @@ public class SearchResultResponse {
     public List<String> fields;
 
     @SerializedName("used_indices")
-    public List<String> usedIndices;
+    public List<IndexRangeSummary> usedIndices;
 
     @SerializedName("built_query")
     public String builtQuery;

@@ -1,6 +1,4 @@
 /**
- * Copyright 2013 Lennart Koopmann <lennart@torch.sh>
- *
  * This file is part of Graylog2.
  *
  * Graylog2 is free software: you can redistribute it and/or modify
@@ -21,9 +19,6 @@ package org.graylog2.restclient.models.api.responses.system.indices;
 
 import com.google.gson.annotations.SerializedName;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public class IndexRangeSummary {
 
     public String index;
