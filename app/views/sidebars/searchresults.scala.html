@@ -85,8 +85,8 @@
         <h4>Indices used for this search:</h4>
 
         <ul class="index-list">
-        @for(index <- searchResult.getUsedIndices().sorted) {
-            <li>@index</li>
+        @for(index <- searchResult.getUsedIndices()) {
+            <li>@index.index</li>
         }
         </ul>
     </div>
