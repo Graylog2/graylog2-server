@@ -59,7 +59,11 @@
                 <ul>
                 @for(widget <- dashboard.getWidgets.values()) {
                     <li data-row="@widget.getRow" data-col="@widget.getCol" data-sizex="@widget.getWidth" data-sizey="@widget.getHeight">
-                        <div class="widget" data-cache-time="@widget.getCacheTime" data-widget-type="@widget.getType.toString.toLowerCase" data-dashboard-id="@widget.getDashboard.getId" data-widget-id="@widget.getId">
+                        <div class="widget" data-cache-time="@widget.getCacheTime"
+                                            data-widget-type="@widget.getType.toString.toLowerCase"
+                                            data-dashboard-id="@widget.getDashboard.getId"
+                                            data-widget-id="@widget.getId"
+                                            data-fixed-time-axis="@widget.hasFixedTimeAxis">
 
                             <div class="pull-left widget-top controls only-unlocked">
                                 <a href="#" class="remove-widget"><i class="icon icon-remove"></i></a>

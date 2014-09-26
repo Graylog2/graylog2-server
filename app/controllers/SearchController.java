@@ -33,8 +33,10 @@ import org.graylog2.restclient.lib.ApiClient;
 import org.graylog2.restclient.lib.Field;
 import org.graylog2.restclient.lib.ServerNodes;
 import org.graylog2.restclient.lib.timeranges.InvalidRangeParametersException;
+import org.graylog2.restclient.lib.timeranges.RelativeRange;
 import org.graylog2.restclient.lib.timeranges.TimeRange;
 import org.graylog2.restclient.models.*;
+import org.graylog2.restclient.models.api.responses.system.indices.IndexRangeSummary;
 import org.graylog2.restclient.models.api.results.DateHistogramResult;
 import org.graylog2.restclient.models.api.results.SearchResult;
 import org.joda.time.DateTime;
@@ -140,15 +142,24 @@ public class SearchController extends AuthenticatedController {
         }
     }
 
-
     protected String determineHistogramResolution(final SearchResult searchResult) {
         final String interval;
-        final int queryRangeInMinutes = Minutes.minutesBetween(searchResult.getFromDateTime(), searchResult.getToDateTime()).getMinutes();
         final int HOUR = 60;
         final int DAY = HOUR * 24;
         final int WEEK = DAY * 7;
         final int MONTH = HOUR * 24 * 30;
         final int YEAR = MONTH * 12;
+
+        int queryRangeInMinutes;
+
+        // We don't want to use fromDateTime coming from the search query if the user asked for all messages
+        if (isEmptyRelativeRange(searchResult.getTimeRange())) {
+            List<IndexRangeSummary> usedIndices = searchResult.getUsedIndices();
+            IndexRangeSummary oldestIndex = usedIndices.get(usedIndices.size() - 1);
+            queryRangeInMinutes = Minutes.minutesBetween(DateTime.parse(oldestIndex.starts), searchResult.getToDateTime()).getMinutes();
+        } else {
+            queryRangeInMinutes = Minutes.minutesBetween(searchResult.getFromDateTime(), searchResult.getToDateTime()).getMinutes();
+        }
 
         if (queryRangeInMinutes < DAY / 2) {
             interval = "minute";
@@ -166,6 +177,10 @@ public class SearchController extends AuthenticatedController {
             interval = "year";
         }
         return interval;
+    }
+
+    private boolean isEmptyRelativeRange(TimeRange timeRange) {
+        return (timeRange.getType() == TimeRange.Type.RELATIVE) && (((RelativeRange)timeRange).isEmptyRange());
     }
 
     /**

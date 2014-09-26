@@ -62,7 +62,12 @@ rickshawHelper = {
 
     // Show the whole search time range on charts, even if no data is available.
     correctDataBoundaries: function (data, from, to, resolution) {
-        var fromMoment = moment.utc(from);
+        var fromMoment;
+        if (from == undefined || from == null) {
+            fromMoment = moment.utc();
+        } else {
+            fromMoment = moment.utc(from);
+        }
         var toMoment = moment.utc(to);
 
         var formattedResolution = momentHelper.getFormattedResolution(resolution);

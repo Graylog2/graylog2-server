@@ -142,6 +142,8 @@ $(document).ready(function() {
                 var graphContainer = $('.field-graph-container[data-chart-id="' + opts.chartid + '"]', $("#field-graphs"));
                 var graphElem = $('.field-graph', graphContainer);
 
+                var resultGraphElement = $("#result-graph");
+
                 var graph = new Rickshaw.Graph( {
                     element: graphElem.get()[0],
                     width: $("#main-content").width()-12,
@@ -151,7 +153,7 @@ $(document).ready(function() {
                     resolution: data.interval,
                     series: [ {
                         name: "value",
-                        data: rickshawHelper.correctDataBoundaries(data.values, data.from, data.to, data.interval),
+                        data: rickshawHelper.correctDataBoundaries(data.values, resultGraphElement.data("from"), resultGraphElement.data("to"), data.interval),
                         color: '#26ADE4',
                         gl2_query: opts.query,
                         valuetype: opts.valuetype,

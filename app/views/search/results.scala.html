@@ -18,6 +18,8 @@
 @import views.helpers.SearchRouteHelper
 @import org.graylog2.restclient.models.UniversalSearch
 @import org.graylog2.restclient.models.api.results.MessageResult
+@import org.graylog2.restclient.lib.timeranges.TimeRange
+@import org.graylog2.restclient.lib.timeranges.RelativeRange
 
 @paginatorLength() = @{10}
 
@@ -71,7 +73,9 @@
 @dataAttributes() = @{
     var boundaries = histogram.getHistogramBoundaries
     var string = ""
-    string = string + " data-from='" + boundaries.getFrom + "'"
+    if(histogram.hasFixedTimeAxis()) {
+        string = string + " data-from='" + boundaries.getFrom + "'"
+    }
     string = string + " data-to='" + boundaries.getTo + "'"
     string
 }

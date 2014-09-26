@@ -36,9 +36,14 @@ function updateWidget_search_result_chart(widget, data) {
     }
 
     var resolution = graphElem.data("config-interval");
+    var fixedTimeAxis = widget.data("fixed-time-axis");
 
     if (data.time_range != null) {
-        rickshawHelper.correctDataBoundaries(series, data.time_range.from, data.time_range.to, resolution);
+        var from;
+        if (fixedTimeAxis) {
+            from = data.time_range.from;
+        }
+        rickshawHelper.correctDataBoundaries(series, from, data.time_range.to, resolution);
     }
 
     // we need to replace the entire element that rickshaw touches, otherwise
