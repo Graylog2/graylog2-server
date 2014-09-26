@@ -1,4 +1,6 @@
-language: java
+language:
+  - java
+  - node_js
 jdk:
 - oraclejdk7
 env:
@@ -16,7 +18,13 @@ before_script:
 - wget http://downloads.typesafe.com/play/${PLAY_VERSION}/play-${PLAY_VERSION}.zip
 - unzip -q play-${PLAY_VERSION}.zip
 - play-${PLAY_VERSION}/play update
-script: play-${PLAY_VERSION}/play test
+script:
+  - pushd javascript
+  - npm install
+  - npm test
+  - node_modules/.bin/gulp
+  - popd
+  - play-${PLAY_VERSION}/play test
 after_success:
 - play-${PLAY_VERSION}/play universal:package-zip-tarball
 deploy:
