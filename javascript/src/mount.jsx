@@ -1,6 +1,6 @@
 'use strict';
 
-var React = require('React');
+var React = require('react/addons');
 var UserPreferencesButton = require('./components/UserPreferencesButton');
 var UserPreferencesModal = require('./components/UserPreferencesModal');
 
