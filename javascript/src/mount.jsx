@@ -3,6 +3,7 @@
 var React = require('react/addons');
 var UserPreferencesButton = require('./components/UserPreferencesButton');
 var UserPreferencesModal = require('./components/UserPreferencesModal');
+var $ = require('jquery'); // excluded and shimed
 
 $(document).ready(function () {
     var editUserPreferencesButton = document.getElementById('react-user-preferences-button');

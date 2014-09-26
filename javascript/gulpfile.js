@@ -113,7 +113,7 @@ gulp.task('lint-strict', ['prepare-lint'], function () {
 });
 
 function browserifyCall(debug) {
-    return browserify({
+    var b = browserify({
         cache: {}, packageCache: {}, fullPaths: true,
         entries: config.entryPoints,
         extensions: ['.jsx', '.js'],
@@ -122,6 +122,12 @@ function browserifyCall(debug) {
         ],
         debug: debug
     });
+    config.browserifyExcludes && config.browserifyExcludes.forEach(function(exclude) {
+        b.exclude(exclude);
+        //b.ignore('jquery');
+        //b.external('jquery');
+    });
+    return b;
 }
 
 function browserifyIt(debug) {

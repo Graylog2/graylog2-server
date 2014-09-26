@@ -3,6 +3,7 @@
 'use strict';
 
 var React = require('react/addons');
+var $ = require('jquery'); // excluded and shimed
 
 // adapted from react examples (https://github.com/facebook/react/tree/master/examples/jquery-bootstrap)
 var BootstrapModal = React.createClass({

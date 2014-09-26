@@ -8,6 +8,7 @@ module.exports = {
     scriptTemplatePath: 'scripts.hbs',
     scriptDestinationName: 'scripts.scala.html',
     entryPoints: ['./src/mount.jsx'],
+    browserifyExcludes: ['jquery'],
 
     test : {
         unmockedModulePathPatterns: [

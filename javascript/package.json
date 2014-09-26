@@ -42,6 +42,7 @@
     "gulp-uglify": "*",
     "gulp-util": "*",
     "jest-cli": "*",
+    "jquery": "*",
     "jshint-stylish": "*",
     "react-tools": "*",
     "reactify": "*",

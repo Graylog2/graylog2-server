@@ -2,6 +2,7 @@
 
 var mergeInto = require('../lib/util').mergeInto;
 var AbstractEventSendingStore = require('./AbstractEventSendingStore');
+var $ = require('jquery'); // excluded and shimed
 
 var PreferencesStore = {
     URL: '/a/system/user/',
