@@ -20,6 +20,7 @@ import com.google.common.collect.Sets;
 import org.elasticsearch.common.bytes.BytesReference;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.search.SearchHits;
+import org.graylog2.indexer.ranges.IndexRange;
 import org.graylog2.plugin.Message;
 
 import java.util.Iterator;
@@ -35,9 +36,9 @@ public class SearchResult extends IndexQueryResult {
 	private final long totalResults;
 	private final List<ResultMessage> results;
 	private final Set<String> fields;
-    private final Set<String> usedIndices;
+    private final Set<IndexRange> usedIndices;
 
-	public SearchResult(SearchHits searchHits, Set<String> usedIndices, String originalQuery, BytesReference builtQuery, TimeValue took) {
+	public SearchResult(SearchHits searchHits, Set<IndexRange> usedIndices, String originalQuery, BytesReference builtQuery, TimeValue took) {
         super(originalQuery, builtQuery, took);
 
 		this.results = buildResults(searchHits);
@@ -88,7 +89,7 @@ public class SearchResult extends IndexQueryResult {
         return filteredFields;
     }
 
-    public Set<String> getUsedIndices() {
+    public Set<IndexRange> getUsedIndices() {
         return usedIndices;
     }
 
