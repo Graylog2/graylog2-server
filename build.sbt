@@ -2,7 +2,7 @@ organization := "org.graylog2"
 
 name := "graylog2-rest-client"
 
-version := "0.21.0-rc2-SNAPSHOT"
+version := "0.92.0-SNAPSHOT"
 
 // disable using the Scala version in output paths and artifacts
 crossPaths := false
