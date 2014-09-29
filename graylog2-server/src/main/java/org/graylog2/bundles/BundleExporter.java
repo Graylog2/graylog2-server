@@ -213,6 +213,7 @@ public class BundleExporter {
         }
 
         final Stream streamDescription = new Stream();
+        streamDescription.setId(stream.getId());
         streamDescription.setTitle(stream.getTitle());
         streamDescription.setDescription(stream.getDescription());
         streamDescription.setDisabled(stream.getDisabled());
