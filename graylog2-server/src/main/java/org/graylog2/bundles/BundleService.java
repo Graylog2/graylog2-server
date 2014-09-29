@@ -19,7 +19,7 @@ package org.graylog2.bundles;
 import com.google.common.collect.Iterators;
 import org.bson.types.ObjectId;
 import org.graylog2.bindings.providers.BundleExporterProvider;
-import org.graylog2.bindings.providers.BundleReceipeProvider;
+import org.graylog2.bindings.providers.BundleImporterProvider;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.NotFoundException;
@@ -41,25 +41,25 @@ public class BundleService {
     private static final String COLLECTION_NAME = "config_bundles";
 
     private final JacksonDBCollection<ConfigurationBundle, ObjectId> dbCollection;
-    private final BundleReceipeProvider bundleReceipeProvider;
+    private final BundleImporterProvider bundleImporterProvider;
     private final BundleExporterProvider bundleExporterProvider;
 
     @Inject
     public BundleService(
             final MongoJackObjectMapperProvider mapperProvider,
             final MongoConnection mongoConnection,
-            final BundleReceipeProvider bundleReceipeProvider,
+            final BundleImporterProvider bundleImporterProvider,
             final BundleExporterProvider bundleExporterProvider) {
         this(JacksonDBCollection.wrap(mongoConnection.getDatabase().getCollection(COLLECTION_NAME),
                         ConfigurationBundle.class, ObjectId.class, mapperProvider.get()),
-                bundleReceipeProvider, bundleExporterProvider);
+                bundleImporterProvider, bundleExporterProvider);
     }
 
     public BundleService(final JacksonDBCollection<ConfigurationBundle, ObjectId> dbCollection,
-                         final BundleReceipeProvider bundleReceipeProvider,
+                         final BundleImporterProvider bundleImporterProvider,
                          final BundleExporterProvider bundleExporterProvider) {
         this.dbCollection = dbCollection;
-        this.bundleReceipeProvider = bundleReceipeProvider;
+        this.bundleImporterProvider = bundleImporterProvider;
         this.bundleExporterProvider = bundleExporterProvider;
     }
 
@@ -105,8 +105,8 @@ public class BundleService {
     public void applyConfigurationBundle(final ConfigurationBundle bundle, User actingUser) {
         final String userName = actingUser.getName();
 
-        final BundleReceipe bundleReceipe = bundleReceipeProvider.get();
-        bundleReceipe.cook(bundle, userName);
+        final BundleImporter bundleImporter = bundleImporterProvider.get();
+        bundleImporter.runImport(bundle, userName);
     }
 
     public ConfigurationBundle exportConfigurationBundle(final ExportBundle exportBundle) {

@@ -64,8 +64,8 @@ import java.util.UUID;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 
-public class BundleReceipe {
-    private static final Logger LOG = LoggerFactory.getLogger(BundleReceipe.class);
+public class BundleImporter {
+    private static final Logger LOG = LoggerFactory.getLogger(BundleImporter.class);
 
     private final InputService inputService;
     private final InputRegistry inputRegistry;
@@ -87,17 +87,17 @@ public class BundleReceipe {
     private final Map<String, org.graylog2.plugin.streams.Stream> streamsByReferenceId = new HashMap<>();
 
     @Inject
-    public BundleReceipe(final InputService inputService,
-                         final InputRegistry inputRegistry,
-                         final ExtractorFactory extractorFactory,
-                         final StreamService streamService,
-                         final StreamRuleService streamRuleService,
-                         final OutputService outputService,
-                         final DashboardService dashboardService,
-                         final DashboardRegistry dashboardRegistry,
-                         final ServerStatus serverStatus,
-                         final MetricRegistry metricRegistry,
-                         final Indexer indexer) {
+    public BundleImporter(final InputService inputService,
+                          final InputRegistry inputRegistry,
+                          final ExtractorFactory extractorFactory,
+                          final StreamService streamService,
+                          final StreamRuleService streamRuleService,
+                          final OutputService outputService,
+                          final DashboardService dashboardService,
+                          final DashboardRegistry dashboardRegistry,
+                          final ServerStatus serverStatus,
+                          final MetricRegistry metricRegistry,
+                          final Indexer indexer) {
         this.inputService = inputService;
         this.inputRegistry = inputRegistry;
         this.extractorFactory = extractorFactory;
@@ -111,7 +111,7 @@ public class BundleReceipe {
         this.indexer = indexer;
     }
 
-    public void cook(final ConfigurationBundle bundle, final String userName) {
+    public void runImport(final ConfigurationBundle bundle, final String userName) {
         try {
             createInputs(bundle.getInputs(), userName);
             createOutputs(bundle.getOutputs(), userName);

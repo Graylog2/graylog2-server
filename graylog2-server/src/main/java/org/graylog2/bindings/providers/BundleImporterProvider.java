@@ -17,7 +17,7 @@
 package org.graylog2.bindings.providers;
 
 import com.codahale.metrics.MetricRegistry;
-import org.graylog2.bundles.BundleReceipe;
+import org.graylog2.bundles.BundleImporter;
 import org.graylog2.dashboards.DashboardRegistry;
 import org.graylog2.dashboards.DashboardService;
 import org.graylog2.indexer.Indexer;
@@ -32,7 +32,7 @@ import org.graylog2.streams.StreamService;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-public class BundleReceipeProvider implements Provider<BundleReceipe> {
+public class BundleImporterProvider implements Provider<BundleImporter> {
 
     private final InputService inputService;
     private final InputRegistry inputRegistry;
@@ -47,17 +47,17 @@ public class BundleReceipeProvider implements Provider<BundleReceipe> {
     private final Indexer indexer;
 
     @Inject
-    public BundleReceipeProvider(final InputService inputService,
-                                 final InputRegistry inputRegistry,
-                                 final ExtractorFactory extractorFactory,
-                                 final StreamService streamService,
-                                 final StreamRuleService streamRuleService,
-                                 final OutputService outputService,
-                                 final DashboardService dashboardService,
-                                 final DashboardRegistry dashboardRegistry,
-                                 final ServerStatus serverStatus,
-                                 final MetricRegistry metricRegistry,
-                                 final Indexer indexer) {
+    public BundleImporterProvider(final InputService inputService,
+                                  final InputRegistry inputRegistry,
+                                  final ExtractorFactory extractorFactory,
+                                  final StreamService streamService,
+                                  final StreamRuleService streamRuleService,
+                                  final OutputService outputService,
+                                  final DashboardService dashboardService,
+                                  final DashboardRegistry dashboardRegistry,
+                                  final ServerStatus serverStatus,
+                                  final MetricRegistry metricRegistry,
+                                  final Indexer indexer) {
         this.inputService = inputService;
         this.inputRegistry = inputRegistry;
         this.extractorFactory = extractorFactory;
@@ -72,8 +72,8 @@ public class BundleReceipeProvider implements Provider<BundleReceipe> {
     }
 
     @Override
-    public BundleReceipe get() {
-        return new BundleReceipe(inputService, inputRegistry, extractorFactory,
+    public BundleImporter get() {
+        return new BundleImporter(inputService, inputRegistry, extractorFactory,
                 streamService, streamRuleService, outputService, dashboardService,
                 dashboardRegistry, serverStatus, metricRegistry, indexer);
     }

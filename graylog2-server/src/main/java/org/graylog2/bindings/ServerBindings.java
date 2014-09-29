@@ -138,7 +138,7 @@ public class ServerBindings extends AbstractModule {
         bind(AsyncHttpClient.class).toProvider(AsyncHttpClientProvider.class);
         bind(GracefulShutdown.class).in(Scopes.SINGLETON);
         bind(BundleService.class).in(Scopes.SINGLETON);
-        bind(BundleReceipeProvider.class).in(Scopes.SINGLETON);
+        bind(BundleImporterProvider.class).in(Scopes.SINGLETON);
         bind(BundleExporterProvider.class).in(Scopes.SINGLETON);
 
         if (configuration.isMessageCacheOffHeap()) {
