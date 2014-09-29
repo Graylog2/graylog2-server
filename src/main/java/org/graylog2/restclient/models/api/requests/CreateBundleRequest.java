@@ -8,6 +8,7 @@ import org.graylog2.restclient.models.bundles.Stream;
 import java.util.List;
 
 public class CreateBundleRequest extends ApiRequest {
+    public String id;
     public String name;
     public String description;
     public String category;
