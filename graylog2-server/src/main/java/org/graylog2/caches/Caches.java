@@ -16,7 +16,12 @@
  */
 package org.graylog2.caches;
 
-import com.google.common.util.concurrent.Uninterruptibles;
+import com.github.rholder.retry.RetryException;
+import com.github.rholder.retry.Retryer;
+import com.github.rholder.retry.RetryerBuilder;
+import com.github.rholder.retry.StopStrategies;
+import com.github.rholder.retry.WaitStrategies;
+import com.google.common.base.Predicates;
 import com.google.inject.Inject;
 import org.graylog2.inputs.Cache;
 import org.graylog2.inputs.InputCache;
@@ -24,40 +29,58 @@ import org.graylog2.inputs.OutputCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public class Caches {
-
     private static final Logger LOG = LoggerFactory.getLogger(Caches.class);
+    private static final long DEFAULT_MAX_WAIT = 30l;
+
     private final Cache inputCache;
     private final Cache outputCache;
 
-    private final int MAXTRIES = 30;
-
     @Inject
-    public Caches(InputCache inputCache, OutputCache outputCache) {
+    public Caches(final InputCache inputCache, final OutputCache outputCache) {
         this.inputCache = inputCache;
         this.outputCache = outputCache;
     }
 
     public void waitForEmptyCaches() {
-        // Wait until the buffers are empty. Messages that were already started to be processed must be fully processed.
+        waitForEmptyCaches(DEFAULT_MAX_WAIT, TimeUnit.SECONDS);
+    }
+
+    public void waitForEmptyCaches(final long maxWait, final TimeUnit timeUnit) {
         LOG.info("Waiting until all caches are empty.");
-        int tries = 0;
-        while(!(inputCache.isEmpty() && outputCache.isEmpty())) {
-            tries++;
-            if (tries >= MAXTRIES) {
-                LOG.info("Waited for {} seconds, giving up.", tries);
-                return;
+        final Callable<Boolean> checkForEmptyCaches = new Callable<Boolean>() {
+            @Override
+            public Boolean call() throws Exception {
+                if (inputCache.isEmpty() && outputCache.isEmpty()) {
+                    return true;
+                } else {
+                    LOG.info("Waiting for caches to drain ({} imc/{} omc).", inputCache.size(), outputCache.size());
+                }
+
+                return false;
             }
-            LOG.info("Not all caches are empty. Waiting another second. ({}imc/{}omc)", inputCache.size(), outputCache.size());
-            Uninterruptibles.sleepUninterruptibly(1, TimeUnit.SECONDS);
+        };
+
+        final Retryer<Boolean> retryer = RetryerBuilder.<Boolean>newBuilder()
+                .retryIfResult(Predicates.not(Predicates.equalTo(Boolean.TRUE)))
+                .withWaitStrategy(WaitStrategies.fixedWait(1, TimeUnit.SECONDS))
+                .withStopStrategy(StopStrategies.stopAfterDelay(timeUnit.toMillis(maxWait)))
+                .build();
+
+        try {
+            retryer.call(checkForEmptyCaches);
+        } catch (RetryException e) {
+            LOG.info("Caches not empty after {} {}. Giving up.", maxWait, timeUnit.name().toLowerCase());
+            return;
+        } catch (ExecutionException e) {
+            LOG.error("Error while waiting for empty caches.", e);
+            return;
         }
 
         LOG.info("All caches are empty. Continuing.");
     }
-
 }
