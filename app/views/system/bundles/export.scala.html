@@ -1,0 +1,114 @@
+@(currentUser: org.graylog2.restclient.models.User,
+        breadcrumbs: lib.BreadcrumbList,
+        inputs: List[org.graylog2.restclient.models.Input],
+        outputs: List[org.graylog2.restclient.models.Output],
+        streams: List[org.graylog2.restclient.models.Stream],
+        dashboards: List[org.graylog2.restclient.models.dashboards.Dashboard])
+
+@main("Export Bundle", views.html.system.sidebar(), "", currentUser) {
+    @views.html.partials.breadcrumbs(breadcrumbs)
+
+    <div class="row-fluid">
+        <h1><i class="icon icon-sitemap"></i> Export Bundle</h1>
+        Export your inputs, outputs, streams and dashboards as a configuration bundle.
+    </div>
+
+    @helper.form(action = routes.BundlesController.export(), 'class -> "form-horizontal") {
+        <div class="control-group">
+            <label class="control-label" for="name">Name</label>
+            <div class="controls">
+                <input type="text" id="name" name="name" required/>
+                <span class="help-block">Write a name for your configuration bundle.</span>
+            </div>
+        </div>
+
+        <div class="control-group">
+            <label class="control-label" for="description">Description</label>
+            <div class="controls">
+                <textarea rows="3" id="description" name="description" required></textarea>
+                <span class="help-block">Write a description of what your bundle does.</span>
+            </div>
+        </div>
+
+        <div class="control-group">
+            <label class="control-label" for="category">Category</label>
+            <div class="controls">
+                <input type="text" id="category" name="category" required/>
+                <span class="help-block">Write a category for your bundle, e.g. Linux, Firewall, Switch.</span>
+            </div>
+        </div>
+
+        <div class="control-group">
+            <label class="control-label" for="inputs">Inputs</label>
+            <div class="controls">
+                @if(inputs.isEmpty) {
+                    <span class="help-block help-standalone">There are no inputs to export.</span>
+                } else {
+                    <select id="inputs" name="inputs" multiple="multiple">
+                        @for(i <- inputs) {
+                            <option value="@i.getId">@i.getName</option>
+                        }
+                    </select>
+                    <span class="help-block">Select the inputs that will be included in the bundle.</span>
+                }
+            </div>
+        </div>
+
+        <div class="control-group">
+            <label class="control-label" for="outputs">Outputs</label>
+            <div class="controls">
+                @if(outputs.isEmpty) {
+                    <span class="help-block help-standalone">There are no outputs to export.</span>
+                } else {
+                    <select id="outputs" name="outputs" multiple="multiple">
+                        @for(o <- outputs) {
+                            <option value="@o.getId">@o.getTitle</option>
+                        }
+                    </select>
+                    <span class="help-block">Select the outputs that will be included in the bundle.</span>
+                }
+            </div>
+        </div>
+
+        <div class="control-group">
+            <label class="control-label" for="streams">Streams</label>
+            <div class="controls">
+                @if(streams.isEmpty) {
+                    <span class="help-block help-standalone">>There are no streams to export.</span>
+                } else {
+                    <select id="streams" name="streams" multiple="multiple">
+                        @for(s <- streams) {
+                            <option value="@s.getId">@s.getTitle</option>
+                        }
+                    </select>
+                    <span class="help-block">Select the streams that will be included in the bundle.</span>
+                }
+            </div>
+        </div>
+
+        <div class="control-group">
+            <label class="control-label" for="dashboards">Dashboards</label>
+            <div class="controls">
+                @if(dashboards.isEmpty) {
+                    <span class="help-block help-standalone">>There are no dashboards to export.</span>
+                } else {
+                    <select id="dashboards" name="dashboards" multiple="multiple">
+                        @for(d <- dashboards) {
+                            <option value="@d.getId">@d.getTitle</option>
+                        }
+                    </select>
+                    <span class="help-block">Select the dashboards that will be included in the bundle.</span>
+                }
+            </div>
+        </div>
+
+        <div class="control-group">
+            <div class="controls">
+                <button type="submit" class="btn btn-primary">
+                    <i class="icon icon-rocket"></i>
+                    Export bundle
+                </button>
+            </div>
+        </div>
+    }
+}

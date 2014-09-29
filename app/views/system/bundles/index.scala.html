@@ -3,6 +3,14 @@
 
 @main("Bundles", views.html.system.sidebar(), "", currentUser) {
 
+    <div class="pull-right">
+        <div class="btn-group">
+            <a class="btn btn-info btn-small" href="@routes.BundlesController.export()">
+                Export bundle
+            </a>
+        </div>
+    </div>
+
     @views.html.partials.breadcrumbs(breadcrumbs)
 
     <div class="row-fluid">
