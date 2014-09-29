@@ -17,6 +17,7 @@
 package org.graylog2.initializers;
 
 import com.google.common.util.concurrent.AbstractIdleService;
+import org.graylog2.Configuration;
 import org.graylog2.buffers.Buffers;
 import org.graylog2.caches.Caches;
 import org.graylog2.indexer.cluster.Cluster;
@@ -25,6 +26,9 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 @Singleton
 public class BufferSynchronizerService extends AbstractIdleService {
@@ -33,16 +37,19 @@ public class BufferSynchronizerService extends AbstractIdleService {
     private final Buffers bufferSynchronizer;
     private final Caches cacheSynchronizer;
     private final Cluster cluster;
+    private final Configuration configuration;
 
     private volatile boolean indexerAvailable = true;
 
     @Inject
     public BufferSynchronizerService(final Buffers bufferSynchronizer,
                                      final Caches cacheSynchronizer,
-                                     final Cluster cluster) {
+                                     final Cluster cluster,
+                                     final Configuration configuration) {
         this.bufferSynchronizer = bufferSynchronizer;
         this.cacheSynchronizer = cacheSynchronizer;
         this.cluster = cluster;
+        this.configuration = configuration;
     }
 
     @Override
@@ -53,8 +60,24 @@ public class BufferSynchronizerService extends AbstractIdleService {
     protected void shutDown() throws Exception {
         LOG.debug("Stopping BufferSynchronizerService");
         if (indexerAvailable && cluster.isConnectedAndHealthy()) {
-            bufferSynchronizer.waitForEmptyBuffers();
-            cacheSynchronizer.waitForEmptyCaches();
+            final ExecutorService executorService = Executors.newFixedThreadPool(2);
+
+            executorService.submit(new Runnable() {
+                @Override
+                public void run() {
+                    bufferSynchronizer.waitForEmptyBuffers(configuration.getShutdownTimeout(), TimeUnit.MILLISECONDS);
+                }
+            });
+
+            executorService.submit(new Runnable() {
+                @Override
+                public void run() {
+                    cacheSynchronizer.waitForEmptyCaches(configuration.getShutdownTimeout(), TimeUnit.MILLISECONDS);
+                }
+            });
+
+            executorService.shutdown();
+            executorService.awaitTermination(configuration.getShutdownTimeout(), TimeUnit.MILLISECONDS);
         } else {
             LOG.warn("Elasticsearch is unavailable. Not waiting to clear buffers and caches, as we have no healthy cluster.");
         }

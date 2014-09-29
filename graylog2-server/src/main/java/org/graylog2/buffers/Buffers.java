@@ -16,47 +16,69 @@
  */
 package org.graylog2.buffers;
 
-import com.google.common.util.concurrent.Uninterruptibles;
+import com.github.rholder.retry.RetryException;
+import com.github.rholder.retry.Retryer;
+import com.github.rholder.retry.RetryerBuilder;
+import com.github.rholder.retry.StopStrategies;
+import com.github.rholder.retry.WaitStrategies;
+import com.google.common.base.Predicates;
 import org.graylog2.shared.buffers.ProcessBuffer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public class Buffers {
-
     private static final Logger LOG = LoggerFactory.getLogger(Buffers.class);
+    private static final long DEFAULT_MAX_WAIT = 30l;
+
     private final ProcessBuffer processBuffer;
     private final OutputBuffer outputBuffer;
 
-    private final int MAXTRIES = 30;
-
     @Inject
-    public Buffers(ProcessBuffer processBuffer, OutputBuffer outputBuffer) {
+    public Buffers(final ProcessBuffer processBuffer, final OutputBuffer outputBuffer) {
         this.processBuffer = processBuffer;
         this.outputBuffer = outputBuffer;
     }
 
     public void waitForEmptyBuffers() {
-        // Wait until the buffers are empty. Messages that were already started to be processed must be fully processed.
-        LOG.info("Waiting until all buffers are empty.");
-        int tries = 0;
-        while(!(processBuffer.isEmpty() && outputBuffer.isEmpty())) {
-            tries++;
-            if (tries >= MAXTRIES) {
-                LOG.info("Waited for {} seconds, giving up.", tries);
-                return;
-            }
+        waitForEmptyBuffers(DEFAULT_MAX_WAIT, TimeUnit.SECONDS);
+    }
 
-            LOG.info("Not all buffers are empty. Waiting another second. ({}p/{}o)", processBuffer.getUsage(), outputBuffer.getUsage());
-            Uninterruptibles.sleepUninterruptibly(1, TimeUnit.SECONDS);
+    public void waitForEmptyBuffers(final long maxWait, final TimeUnit timeUnit) {
+        LOG.info("Waiting until all buffers are empty.");
+        final Callable<Boolean> checkForEmptyBuffers = new Callable<Boolean>() {
+            @Override
+            public Boolean call() throws Exception {
+                if (processBuffer.isEmpty() && outputBuffer.isEmpty()) {
+                    return true;
+                } else {
+                    LOG.info("Waiting for buffers to drain. ({}p/{}o)", processBuffer.getUsage(), outputBuffer.getUsage());
+                }
+
+                return false;
+            }
+        };
+
+        final Retryer<Boolean> retryer = RetryerBuilder.<Boolean>newBuilder()
+                .retryIfResult(Predicates.not(Predicates.equalTo(Boolean.TRUE)))
+                .withWaitStrategy(WaitStrategies.fixedWait(1, TimeUnit.SECONDS))
+                .withStopStrategy(StopStrategies.stopAfterDelay(timeUnit.toMillis(maxWait)))
+                .build();
+
+        try {
+            retryer.call(checkForEmptyBuffers);
+        } catch (RetryException e) {
+            LOG.info("Buffers not empty after {} {}. Giving up.", maxWait, timeUnit.name().toLowerCase());
+            return;
+        } catch (ExecutionException e) {
+            LOG.error("Error while waiting for empty buffers.", e);
+            return;
         }
 
         LOG.info("All buffers are empty. Continuing.");
     }
-
 }
