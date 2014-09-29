@@ -92,7 +92,7 @@ public class OutputImpl implements Output {
 
     @Override
     public String getId() {
-        return _id.toStringMongod();
+        return _id.toHexString();
     }
 
     public void setId(String id) {

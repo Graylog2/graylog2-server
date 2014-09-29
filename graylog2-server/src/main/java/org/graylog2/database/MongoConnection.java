@@ -24,7 +24,6 @@ import com.mongodb.DBCollection;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientOptions;
 import com.mongodb.MongoClientOptions.Builder;
-import com.mongodb.MongoException;
 import com.mongodb.ServerAddress;
 import com.mongodb.WriteConcern;
 import org.graylog2.Configuration;
@@ -34,8 +33,6 @@ import java.util.List;
 
 /**
  * MongoDB connection singleton
- *
- * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 @Singleton
 public class MongoConnection {
@@ -113,8 +110,6 @@ public class MongoConnection {
                         throw new RuntimeException("Could not authenticate to database '" + database + "' with user '" + username + "'.");
                     }
                 }
-            } catch (MongoException.Network e) {
-                throw e;
             } catch (UnknownHostException e) {
                 throw new RuntimeException("Cannot resolve host name for MongoDB", e);
             }
@@ -145,7 +140,7 @@ public class MongoConnection {
         // Collection has not been cached yet. Do it now.
         DBCollection coll = getDatabase().getCollection("message_counts");
 
-        coll.ensureIndex(new BasicDBObject("timestamp", 1));
+        coll.createIndex(new BasicDBObject("timestamp", 1));
 
         this.messageCountsCollection = coll;
         return coll;

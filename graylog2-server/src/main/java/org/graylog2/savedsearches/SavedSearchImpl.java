@@ -61,7 +61,7 @@ public class SavedSearchImpl extends PersistedImpl implements SavedSearch {
 
     public Map<String, Object> asMap() {
         return new HashMap<String, Object>() {{
-            put("id", ((ObjectId) fields.get("_id")).toStringMongod());
+            put("id", ((ObjectId) fields.get("_id")).toHexString());
             put("title", fields.get("title"));
             put("query", fields.get("query"));
             put("created_at", (Tools.getISO8601String((DateTime) fields.get("created_at"))));

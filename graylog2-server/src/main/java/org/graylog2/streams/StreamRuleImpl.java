@@ -100,7 +100,7 @@ public class StreamRuleImpl extends PersistedImpl implements StreamRule {
     }
 
     public String getStreamId() {
-        return ((ObjectId) fields.get("stream_id")).toStringMongod();
+        return ((ObjectId) fields.get("stream_id")).toHexString();
     }
 
     /*public StreamImpl getStream() throws NotFoundException {

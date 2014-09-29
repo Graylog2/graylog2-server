@@ -141,7 +141,7 @@ public class StreamImpl extends PersistedImpl implements Stream {
         // We work on the result a bit to allow correct JSON serializing.
         Map<String, Object> result = Maps.newHashMap(fields);
         result.remove("_id");
-        result.put("id", ((ObjectId) fields.get("_id")).toStringMongod());
+        result.put("id", ((ObjectId) fields.get("_id")).toHexString());
         result.remove("created_at");
         result.put("created_at", (Tools.getISO8601String((DateTime) fields.get("created_at"))));
         result.put("rules", streamRules);

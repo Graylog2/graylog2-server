@@ -26,9 +26,6 @@ import com.google.common.collect.Lists;
 
 import java.util.List;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public class TextField extends AbstractConfigurationField implements ConfigurationField {
     public static final String FIELD_TYPE = "text";
 
@@ -42,7 +39,7 @@ public class TextField extends AbstractConfigurationField implements Configurati
     private final List<String> attributes;
 
     public TextField(String name, String humanName, String defaultValue, String description, Optional isOptional) {
-        this(name, humanName, defaultValue, description, isOptional, null);
+        this(name, humanName, defaultValue, description, isOptional, new Attribute[0]);
     }
 
     public TextField(String name, String humanName, String defaultValue, String description, Attribute... attributes) {

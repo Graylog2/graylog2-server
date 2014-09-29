@@ -33,6 +33,7 @@ import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.QueryStringQueryBuilder;
 import org.elasticsearch.node.Node;
 import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogram;
 import org.elasticsearch.search.facet.FacetBuilders;
 import org.elasticsearch.search.facet.datehistogram.DateHistogramFacet;
 import org.elasticsearch.search.facet.datehistogram.DateHistogramFacetBuilder;
@@ -340,7 +341,8 @@ public class Searches {
         qs.allowLeadingWildcard(configuration.isAllowLeadingWildcardSearches());
 
         SearchRequestBuilder srb = c.prepareSearch();
-        srb.setIndices(IndexHelper.determineAffectedIndices(indexRangeService, deflector, range).toArray(new String[]{}));
+        final Set<String> affectedIndices = IndexHelper.determineAffectedIndices(indexRangeService, deflector, range);
+        srb.setIndices(affectedIndices.toArray(new String[affectedIndices.size()]));
         srb.setQuery(qs);
         srb.addFacet(fb);
 
@@ -363,7 +365,8 @@ public class Searches {
         qs.allowLeadingWildcard(configuration.isAllowLeadingWildcardSearches());
 
         SearchRequestBuilder srb = c.prepareSearch();
-        srb.setIndices(IndexHelper.determineAffectedIndices(indexRangeService, deflector, range).toArray(new String[]{}));
+        final Set<String> affectedIndices = IndexHelper.determineAffectedIndices(indexRangeService, deflector, range);
+        srb.setIndices(affectedIndices.toArray(new String[affectedIndices.size()]));
         srb.setQuery(qs);
         srb.addFacet(fb);
 
@@ -438,7 +441,7 @@ public class Searches {
         }
 
         SearchRequestBuilder srb = c.prepareSearch();
-        srb.setIndices(indices.toArray(new String[]{}));
+        srb.setIndices(indices.toArray(new String[indices.size()]));
 
         if (query.trim().equals("*")) {
             srb.setQuery(matchAllQuery());

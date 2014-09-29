@@ -105,7 +105,7 @@ public class DashboardImpl extends PersistedImpl implements Dashboard {
 
         // TODO this sucks and should be done somewhere globally.
         result.remove("_id");
-        result.put("id", ((ObjectId) fields.get("_id")).toStringMongod());
+        result.put("id", ((ObjectId) fields.get("_id")).toHexString());
         result.remove("created_at");
         result.put("created_at", (Tools.getISO8601String((DateTime) fields.get("created_at"))));
 
