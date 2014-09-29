@@ -42,8 +42,6 @@ public class DashboardWidget {
     @JsonProperty
     @Min(0)
     private int row = -1;
-    @JsonProperty
-    private String stream;
 
     public String getDescription() {
         return description;
@@ -91,13 +89,5 @@ public class DashboardWidget {
 
     public void setRow(int row) {
         this.row = row;
-    }
-
-    public String getStream() {
-        return stream;
-    }
-
-    public void setStream(String stream) {
-        this.stream = stream;
     }
 }

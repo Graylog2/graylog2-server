@@ -337,7 +337,6 @@ public class BundleExporter {
                 dashboardWidgetDescription.setType(widget.getType());
                 dashboardWidgetDescription.setConfiguration(widgetConfig);
                 dashboardWidgetDescription.setCacheTime(widget.getCacheTime());
-                dashboardWidgetDescription.setStream((String) widgetConfig.get("stream_id"));
 
                 @SuppressWarnings("unchecked")
                 final Map<String, Integer> widgetPosition = (Map<String, Integer>) positions.get(widget.getId());
