@@ -118,23 +118,45 @@ public class BundleImporter {
             createStreams(bundle.getStreams(), userName);
             createDashboards(bundle.getDashboards(), userName);
         } catch (Exception e) {
-            rollback();
-            LOG.error("Error while creating dashboards but no error handling or rollback yet. Sorry.", e);
+            LOG.error("Error while creating dashboards. Starting rollback.", e);
+            if (!rollback()) {
+                LOG.error("Rollback unsuccessful.");
+            }
             Throwables.propagate(e);
         }
     }
 
     private boolean rollback() {
+        boolean success = true;
         try {
             deleteCreatedDashboards();
-            deleteCreatedStreams();
-            deleteCreatedOutputs();
-            deleteCreatedInputs();
         } catch (Exception e) {
-            return false;
+            LOG.error("Error while removing dashboards during rollback.", e);
+            success = false;
         }
 
-        return true;
+        try {
+            deleteCreatedStreams();
+        } catch (Exception e) {
+            LOG.error("Error while removing streams during rollback.", e);
+            success = false;
+        }
+
+        try {
+            deleteCreatedOutputs();
+        } catch (Exception e) {
+            LOG.error("Error while removing outputs during rollback.", e);
+            success = false;
+        }
+
+        try {
+            deleteCreatedInputs();
+        } catch (Exception e) {
+            LOG.error("Error while removing inputs during rollback.", e);
+            success = false;
+        }
+
+        return success;
     }
 
     private void deleteCreatedInputs() throws NotFoundException {
@@ -460,9 +482,9 @@ public class BundleImporter {
 
         // Replace "stream_id" in config if it's set
         final String streamReference = (String) config.get("stream_id");
-        if(!isNullOrEmpty(streamReference)) {
+        if (!isNullOrEmpty(streamReference)) {
             final org.graylog2.plugin.streams.Stream stream = streamsByReferenceId.get(streamReference);
-            if(null != stream) {
+            if (null != stream) {
                 config.put("stream_id", stream.getId());
             } else {
                 LOG.warn("Couldn't find referenced stream {}", streamReference);
