@@ -16,88 +16,49 @@
  */
 package org.graylog2.bundles;
 
-import com.codahale.metrics.MetricRegistry;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.mongodb.BasicDBObject;
 import org.graylog2.dashboards.DashboardImpl;
-import org.graylog2.dashboards.DashboardRegistry;
 import org.graylog2.dashboards.DashboardService;
 import org.graylog2.database.NotFoundException;
-import org.graylog2.indexer.Indexer;
 import org.graylog2.inputs.InputService;
-import org.graylog2.inputs.extractors.ExtractorFactory;
-import org.graylog2.plugin.ServerStatus;
-import org.graylog2.plugin.inputs.MessageInput;
-import org.graylog2.shared.inputs.InputRegistry;
 import org.graylog2.streams.OutputService;
-import org.graylog2.streams.StreamRuleService;
 import org.graylog2.streams.StreamService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 public class BundleExporter {
-
-
     private static final Logger LOG = LoggerFactory.getLogger(BundleExporter.class);
 
     private final InputService inputService;
-    private final InputRegistry inputRegistry;
-    private final ExtractorFactory extractorFactory;
     private final StreamService streamService;
-    private final StreamRuleService streamRuleService;
     private final OutputService outputService;
     private final DashboardService dashboardService;
-    private final DashboardRegistry dashboardRegistry;
-    private final ServerStatus serverStatus;
-    private final MetricRegistry metricRegistry;
-    private final Indexer indexer;
-
-    private final Map<String, MessageInput> createdInputs = new HashMap<>();
-    private final Map<String, org.graylog2.plugin.streams.Output> createdOutputs = new HashMap<>();
-    private final Map<String, org.graylog2.plugin.streams.Stream> createdStreams = new HashMap<>();
-    private final Map<String, org.graylog2.dashboards.Dashboard> createdDashboards = new HashMap<>();
-    private final Map<String, org.graylog2.plugin.streams.Output> outputsByReferenceId = new HashMap<>();
-    private final Map<String, org.graylog2.plugin.streams.Stream> streamsByReferenceId = new HashMap<>();
 
     @Inject
     public BundleExporter(final InputService inputService,
-                          final InputRegistry inputRegistry,
-                          final ExtractorFactory extractorFactory,
                           final StreamService streamService,
-                          final StreamRuleService streamRuleService,
                           final OutputService outputService,
-                          final DashboardService dashboardService,
-                          final DashboardRegistry dashboardRegistry,
-                          final ServerStatus serverStatus,
-                          final MetricRegistry metricRegistry,
-                          final Indexer indexer) {
+                          final DashboardService dashboardService) {
         this.inputService = inputService;
-        this.inputRegistry = inputRegistry;
-        this.extractorFactory = extractorFactory;
         this.streamService = streamService;
-        this.streamRuleService = streamRuleService;
         this.outputService = outputService;
         this.dashboardService = dashboardService;
-        this.dashboardRegistry = dashboardRegistry;
-        this.serverStatus = serverStatus;
-        this.metricRegistry = metricRegistry;
-        this.indexer = indexer;
     }
 
     public ConfigurationBundle export(final ExportBundle exportBundle) {
         final ConfigurationBundle configurationBundle = new ConfigurationBundle();
 
-        List<Input> inputs = exportInputs(exportBundle.getInputs());
-        List<Stream> streams = exportStreams(exportBundle.getStreams());
-        List<Output> outputs = exportOutputs(exportBundle.getOutputs());
-        List<Dashboard> dashboards = exportDashboards(exportBundle.getDashboards());
+        final List<Input> inputs = exportInputs(exportBundle.getInputs());
+        final List<Stream> streams = exportStreams(exportBundle.getStreams());
+        final List<Output> outputs = exportOutputs(exportBundle.getOutputs());
+        final List<Dashboard> dashboards = exportDashboards(exportBundle.getDashboards());
 
         configurationBundle.setName(exportBundle.getName());
         configurationBundle.setCategory(exportBundle.getCategory());

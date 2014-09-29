@@ -16,17 +16,10 @@
  */
 package org.graylog2.bindings.providers;
 
-import com.codahale.metrics.MetricRegistry;
 import org.graylog2.bundles.BundleExporter;
-import org.graylog2.dashboards.DashboardRegistry;
 import org.graylog2.dashboards.DashboardService;
-import org.graylog2.indexer.Indexer;
 import org.graylog2.inputs.InputService;
-import org.graylog2.inputs.extractors.ExtractorFactory;
-import org.graylog2.plugin.ServerStatus;
-import org.graylog2.shared.inputs.InputRegistry;
 import org.graylog2.streams.OutputService;
-import org.graylog2.streams.StreamRuleService;
 import org.graylog2.streams.StreamService;
 
 import javax.inject.Inject;
@@ -35,46 +28,23 @@ import javax.inject.Provider;
 public class BundleExporterProvider implements Provider<BundleExporter> {
 
     private final InputService inputService;
-    private final InputRegistry inputRegistry;
-    private final ExtractorFactory extractorFactory;
     private final StreamService streamService;
-    private final StreamRuleService streamRuleService;
     private final OutputService outputService;
     private final DashboardService dashboardService;
-    private final DashboardRegistry dashboardRegistry;
-    private final ServerStatus serverStatus;
-    private final MetricRegistry metricRegistry;
-    private final Indexer indexer;
 
     @Inject
     public BundleExporterProvider(final InputService inputService,
-                                  final InputRegistry inputRegistry,
-                                  final ExtractorFactory extractorFactory,
                                   final StreamService streamService,
-                                  final StreamRuleService streamRuleService,
                                   final OutputService outputService,
-                                  final DashboardService dashboardService,
-                                  final DashboardRegistry dashboardRegistry,
-                                  final ServerStatus serverStatus,
-                                  final MetricRegistry metricRegistry,
-                                  final Indexer indexer) {
+                                  final DashboardService dashboardService) {
         this.inputService = inputService;
-        this.inputRegistry = inputRegistry;
-        this.extractorFactory = extractorFactory;
         this.streamService = streamService;
-        this.streamRuleService = streamRuleService;
         this.outputService = outputService;
         this.dashboardService = dashboardService;
-        this.dashboardRegistry = dashboardRegistry;
-        this.serverStatus = serverStatus;
-        this.metricRegistry = metricRegistry;
-        this.indexer = indexer;
     }
 
     @Override
     public BundleExporter get() {
-        return new BundleExporter(inputService, inputRegistry, extractorFactory,
-                streamService, streamRuleService, outputService, dashboardService,
-                dashboardRegistry, serverStatus, metricRegistry, indexer);
+        return new BundleExporter(inputService, streamService, outputService, dashboardService);
     }
 }
