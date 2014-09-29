@@ -17,8 +17,6 @@
 package org.graylog2.bindings;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.jaxrs.base.JsonMappingExceptionMapper;
-import com.fasterxml.jackson.jaxrs.base.JsonParseExceptionMapper;
 import com.google.inject.AbstractModule;
 import com.google.inject.Scopes;
 import com.google.inject.TypeLiteral;
@@ -32,10 +30,25 @@ import org.graylog2.alerts.AlertSender;
 import org.graylog2.alerts.FormattedEmailAlertSender;
 import org.graylog2.alerts.types.FieldValueAlertCondition;
 import org.graylog2.alerts.types.MessageCountAlertCondition;
-import org.graylog2.bindings.providers.*;
+import org.graylog2.bindings.providers.BundleExporterProvider;
+import org.graylog2.bindings.providers.BundleImporterProvider;
+import org.graylog2.bindings.providers.DefaultSecurityManagerProvider;
+import org.graylog2.bindings.providers.EsNodeProvider;
+import org.graylog2.bindings.providers.InputCacheProvider;
+import org.graylog2.bindings.providers.LdapConnectorProvider;
+import org.graylog2.bindings.providers.LdapUserAuthenticatorProvider;
+import org.graylog2.bindings.providers.MongoConnectionProvider;
+import org.graylog2.bindings.providers.OutputCacheProvider;
+import org.graylog2.bindings.providers.RotationStrategyProvider;
+import org.graylog2.bindings.providers.RulesEngineProvider;
+import org.graylog2.bindings.providers.ServerInputRegistryProvider;
+import org.graylog2.bindings.providers.ServerObjectMapperProvider;
+import org.graylog2.bindings.providers.SystemJobFactoryProvider;
+import org.graylog2.bindings.providers.SystemJobManagerProvider;
 import org.graylog2.buffers.OutputBufferWatermark;
 import org.graylog2.buffers.processors.OutputBufferProcessor;
 import org.graylog2.buffers.processors.ServerProcessBufferProcessor;
+import org.graylog2.bundles.BundleService;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.filters.FilterService;
 import org.graylog2.filters.FilterServiceImpl;
@@ -72,9 +85,6 @@ import javax.ws.rs.container.ContainerResponseFilter;
 import javax.ws.rs.container.DynamicFeature;
 import javax.ws.rs.ext.ExceptionMapper;
 
-/**
- * @author Dennis Oelkers <dennis@torch.sh>
- */
 public class ServerBindings extends AbstractModule {
     private final Configuration configuration;
 
@@ -135,6 +145,9 @@ public class ServerBindings extends AbstractModule {
         bind(SystemJobFactory.class).toProvider(SystemJobFactoryProvider.class);
         bind(AsyncHttpClient.class).toProvider(AsyncHttpClientProvider.class);
         bind(GracefulShutdown.class).in(Scopes.SINGLETON);
+        bind(BundleService.class).in(Scopes.SINGLETON);
+        bind(BundleImporterProvider.class).in(Scopes.SINGLETON);
+        bind(BundleExporterProvider.class).in(Scopes.SINGLETON);
 
         if (configuration.isMessageCacheOffHeap()) {
             bind(InputCache.class).toProvider(InputCacheProvider.class).asEagerSingleton();
@@ -170,8 +183,6 @@ public class ServerBindings extends AbstractModule {
         Multibinder<Class<? extends ExceptionMapper>> setBinder = Multibinder.newSetBinder(binder(), type);
         setBinder.addBinding().toInstance(NotFoundExceptionMapper.class);
         setBinder.addBinding().toInstance(ValidationExceptionMapper.class);
-        setBinder.addBinding().toInstance(JsonParseExceptionMapper.class);
-        setBinder.addBinding().toInstance(JsonMappingExceptionMapper.class);
     }
 
     private void bindPluginMetaData() {
