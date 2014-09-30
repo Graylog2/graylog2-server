@@ -221,7 +221,7 @@ public class ExtractorsResource extends RestResource {
             @ApiResponse(code = 404, message = "Extractor not found.")
     })
     @Produces(MediaType.APPLICATION_JSON)
-    public void removeExtractor(
+    public void terminate(
             @ApiParam(title = "inputId", required = true) @PathParam("inputId") String inputId,
             @ApiParam(title = "extractorId", required = true) @PathParam("extractorId") String extractorId) throws NotFoundException {
         if (isNullOrEmpty(extractorId)) {
