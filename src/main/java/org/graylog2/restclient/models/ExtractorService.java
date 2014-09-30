@@ -47,7 +47,7 @@ public class ExtractorService {
     }
 
     public void delete(Node node, Input input, String extractorId) throws IOException, APIException {
-        api.path(resource.terminate(input.getId(), extractorId))
+        api.path(resource.removeExtractor(input.getId(), extractorId))
                 .node(node)
                 .expect(Http.Status.NO_CONTENT)
                 .execute();
