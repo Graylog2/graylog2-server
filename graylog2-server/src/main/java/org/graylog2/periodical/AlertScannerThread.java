@@ -17,6 +17,7 @@
 package org.graylog2.periodical;
 
 import com.google.inject.Inject;
+import org.graylog2.Configuration;
 import org.graylog2.alarmcallbacks.AlarmCallbackConfiguration;
 import org.graylog2.alarmcallbacks.AlarmCallbackConfigurationService;
 import org.graylog2.alarmcallbacks.AlarmCallbackFactory;
@@ -36,11 +37,9 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
-/**
- * @author Lennart Koopmann <lennart@socketfeed.com>
- */
 public class AlertScannerThread extends Periodical {
     private static final Logger LOG = LoggerFactory.getLogger(AlertScannerThread.class);
+
     private final StreamService streamService;
     private final AlarmCallbackConfigurationService alarmCallbackConfigurationService;
     private final AlarmCallbackFactory alarmCallbackFactory;
@@ -48,15 +47,17 @@ public class AlertScannerThread extends Periodical {
     private final IndexerSetupService indexerSetupService;
     private final Indexer indexer;
     private final AlertService alertService;
+    private final Configuration configuration;
 
     @Inject
-    public AlertScannerThread(AlertService alertService,
-                              StreamService streamService,
-                              AlarmCallbackConfigurationService alarmCallbackConfigurationService,
-                              AlarmCallbackFactory alarmCallbackFactory,
-                              EmailAlarmCallback emailAlarmCallback,
-                              IndexerSetupService indexerSetupService,
-                              Indexer indexer) {
+    public AlertScannerThread(final AlertService alertService,
+                              final StreamService streamService,
+                              final AlarmCallbackConfigurationService alarmCallbackConfigurationService,
+                              final AlarmCallbackFactory alarmCallbackFactory,
+                              final EmailAlarmCallback emailAlarmCallback,
+                              final IndexerSetupService indexerSetupService,
+                              final Indexer indexer,
+                              final Configuration configuration) {
         this.alertService = alertService;
         this.streamService = streamService;
         this.alarmCallbackConfigurationService = alarmCallbackConfigurationService;
@@ -64,6 +65,7 @@ public class AlertScannerThread extends Periodical {
         this.emailAlarmCallback = emailAlarmCallback;
         this.indexerSetupService = indexerSetupService;
         this.indexer = indexer;
+        this.configuration = configuration;
     }
 
     @Override
@@ -72,14 +74,14 @@ public class AlertScannerThread extends Periodical {
             LOG.error("Indexer is not running, not checking streams for alerts.");
             return;
         }
+
         LOG.debug("Running alert checks.");
-        List<Stream> alertedStreams = streamService.loadAllWithConfiguredAlertConditions();
+        final List<Stream> alertedStreams = streamService.loadAllWithConfiguredAlertConditions();
 
         LOG.debug("There are {} streams with configured alert conditions.", alertedStreams.size());
 
         // Load all streams that have configured alert conditions.
         for (Stream stream : alertedStreams) {
-
             LOG.debug("Stream [{}] has [{}] configured alert conditions.", stream, streamService.getAlertConditions(stream).size());
 
             if(stream.isPaused()) {
@@ -90,27 +92,28 @@ public class AlertScannerThread extends Periodical {
             // Check if a threshold is reached.
             for (AlertCondition alertCondition : streamService.getAlertConditions(stream)) {
                 try {
-                    AlertCondition.CheckResult result = alertService.triggered(alertCondition, indexer);
+                    final AlertCondition.CheckResult result = alertService.triggered(alertCondition, indexer);
                     if (result.isTriggered()) {
                         // Alert is triggered!
                         LOG.debug("Alert condition [{}] is triggered. Sending alerts.", alertCondition);
 
                         // Persist alert.
-                        Alert alert = alertService.factory(result);
+                        final Alert alert = alertService.factory(result);
                         alertService.save(alert);
 
-                        List<AlarmCallbackConfiguration> callConfigurations = alarmCallbackConfigurationService.getForStream(stream);
+                        final List<AlarmCallbackConfiguration> callConfigurations = alarmCallbackConfigurationService.getForStream(stream);
                         if (callConfigurations.size() > 0)
                             for (AlarmCallbackConfiguration configuration : callConfigurations) {
-                                AlarmCallback alarmCallback = alarmCallbackFactory.create(configuration);
+                                final AlarmCallback alarmCallback = alarmCallbackFactory.create(configuration);
                                 try {
                                     alarmCallback.call(stream, result);
                                 } catch (Exception e) {
                                     LOG.warn("Alarm callback <{}> failed. Skipping. Error was: {}", alarmCallback.getName(), new ExceptionStringFormatter(e));
                                 }
                             }
-                        else
+                        else {
                             emailAlarmCallback.call(stream, result);
+                        }
                     } else {
                         // Alert not triggered.
                         LOG.debug("Alert condition [{}] is triggered.", alertCondition);
@@ -119,7 +122,6 @@ public class AlertScannerThread extends Periodical {
                     LOG.error("Skipping alert check that threw an exception.", e);
                 }
             }
-
         }
     }
 
@@ -160,6 +162,6 @@ public class AlertScannerThread extends Periodical {
 
     @Override
     public int getPeriodSeconds() {
-        return 60;
+        return configuration.getAlertCheckInterval();
     }
 }

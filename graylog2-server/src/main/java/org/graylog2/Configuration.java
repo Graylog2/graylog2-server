@@ -294,6 +294,9 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "ldap_connection_timeout", validator = PositiveIntegerValidator.class)
     private int ldapConnectionTimeout = 2000;
 
+    @Parameter(value = "alert_check_interval", validator = PositiveIntegerValidator.class)
+    private int alertCheckInterval = 60;
+
     public boolean isMaster() {
         return isMaster;
     }
@@ -670,5 +673,9 @@ public class Configuration extends BaseConfiguration {
 
     public int getLdapConnectionTimeout() {
         return ldapConnectionTimeout;
+    }
+
+    public int getAlertCheckInterval() {
+        return alertCheckInterval;
     }
 }
