@@ -1,6 +1,4 @@
 /*
- * Copyright 2013 TORCH UG
- *
  * This file is part of Graylog2.
  *
  * Graylog2 is free software: you can redistribute it and/or modify
@@ -22,9 +20,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.Map;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public class InputSummaryResponse {
 
     public String type;
@@ -44,7 +39,7 @@ public class InputSummaryResponse {
     @JsonProperty("started_at")
     public String startedAt;
 
-    @SerializedName("created_at")
+    @JsonProperty("created_at")
     public String createdAt;
 
     public Boolean global;

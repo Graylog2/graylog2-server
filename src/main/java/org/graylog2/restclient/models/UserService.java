@@ -1,6 +1,4 @@
 /*
- * Copyright 2013 TORCH UG
- *
  * This file is part of Graylog2.
  *
  * Graylog2 is free software: you can redistribute it and/or modify
@@ -18,8 +16,8 @@
  */
 package org.graylog2.restclient.models;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
-import com.google.gson.Gson;
 import com.google.inject.Inject;
 import org.graylog2.restclient.lib.APIException;
 import org.graylog2.restclient.lib.ApiClient;
@@ -110,8 +108,9 @@ public class UserService {
     }
 
     public boolean savePreferences(String username, Map<String, Object> preferences) {
-        final String body = new Gson().toJson(preferences);
         try {
+            ObjectMapper m = new ObjectMapper();
+            final String body = m.writeValueAsString(preferences);
             api.path(resource.savePreferences(username)).body(new ApiRequest() {
                 public String toJson() {
                     return body;
