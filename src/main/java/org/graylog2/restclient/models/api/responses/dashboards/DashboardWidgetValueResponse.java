@@ -19,7 +19,7 @@
  */
 package org.graylog2.restclient.models.api.responses.dashboards;
 
-import com.google.gson.annotations.SerializedName;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.Map;
 
@@ -30,12 +30,12 @@ public class DashboardWidgetValueResponse {
 
     public Object result;
 
-    @SerializedName("calculated_at")
+    @JsonProperty("calculated_at")
     public String calculatedAt;
 
-    @SerializedName("took_ms")
+    @JsonProperty("took_ms")
     public String tookMs;
 
-    @SerializedName("computation_time_range")
+    @JsonProperty("computation_time_range")
     public Map<String, Object> computationTimeRange;
 }

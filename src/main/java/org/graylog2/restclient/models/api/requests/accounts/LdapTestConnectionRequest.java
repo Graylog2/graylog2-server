@@ -18,41 +18,41 @@
  */
 package org.graylog2.restclient.models.api.requests.accounts;
 
-import com.google.gson.annotations.SerializedName;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.graylog2.restclient.models.api.requests.ApiRequest;
 
 public class LdapTestConnectionRequest extends ApiRequest {
 
-    @SerializedName("active_directory")
+    @JsonProperty("active_directory")
     public boolean isActiveDirectory;
 
-    @SerializedName("ldap_uri")
+    @JsonProperty("ldap_uri")
     public String ldapUri;
 
-    @SerializedName("system_username")
+    @JsonProperty("system_username")
     public String systemUsername;
 
-    @SerializedName("system_password")
+    @JsonProperty("system_password")
     public String systemPassword;
 
-    @SerializedName("use_start_tls")
+    @JsonProperty("use_start_tls")
     public boolean useStartTls;
 
-    @SerializedName("trust_all_certificates")
+    @JsonProperty("trust_all_certificates")
     public boolean trustAllCertificates;
 
-    @SerializedName("test_connect_only")
+    @JsonProperty("test_connect_only")
     public boolean testConnectOnly;
 
-    @SerializedName("search_base")
+    @JsonProperty("search_base")
     public String searchBase;
 
-    @SerializedName("search_pattern")
+    @JsonProperty("search_pattern")
     public String searchPattern;
 
-    @SerializedName("principal")
+    @JsonProperty("principal")
     public String principal;
 
-    @SerializedName("password")
+    @JsonProperty("password")
     public String password;
 }

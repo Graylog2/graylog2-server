@@ -18,7 +18,7 @@
  */
 package org.graylog2.restclient.models.api.responses.metrics;
 
-import com.google.gson.annotations.SerializedName;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
@@ -28,13 +28,13 @@ public class RateMetricsResponse {
     public double total;
     public double mean;
 
-    @SerializedName("one_minute")
+    @JsonProperty("one_minute")
     public double oneMinute;
 
-    @SerializedName("five_minute")
+    @JsonProperty("five_minute")
     public double fiveMinute;
 
-    @SerializedName("fifteen_minute")
+    @JsonProperty("fifteen_minute")
     public double fifteenMinute;
 
 }

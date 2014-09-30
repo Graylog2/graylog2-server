@@ -19,7 +19,7 @@
  */
 package org.graylog2.restclient.models.api.responses.dashboards;
 
-import com.google.gson.annotations.SerializedName;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
 import java.util.Map;
@@ -36,10 +36,10 @@ public class DashboardSummaryResponse {
     public List<DashboardWidgetResponse> widgets;
     public Map<String, WidgetPositionResponse> positions;
 
-    @SerializedName("created_at")
+    @JsonProperty("created_at")
     public String createdAt;
 
-    @SerializedName("creator_user_id")
+    @JsonProperty("creator_user_id")
     public String creatorUserId;
 
 }

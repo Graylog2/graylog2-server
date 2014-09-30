@@ -18,7 +18,7 @@
  */
 package org.graylog2.restclient.models.api.responses;
 
-import com.google.gson.annotations.SerializedName;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.Map;
 
@@ -29,7 +29,7 @@ public class BuffersResponse {
 
     public Map<String, BufferSummaryResponse> buffers;
 
-    @SerializedName("master_caches")
+    @JsonProperty("master_caches")
     public Map<String, MasterCacheSummaryResponse> masterCaches;
 
 }

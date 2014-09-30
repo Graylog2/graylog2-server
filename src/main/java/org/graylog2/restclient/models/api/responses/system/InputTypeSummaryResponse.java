@@ -19,7 +19,7 @@
 package org.graylog2.restclient.models.api.responses.system;
 
 import com.google.common.collect.Lists;
-import com.google.gson.annotations.SerializedName;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.graylog2.restclient.lib.plugin.configuration.BooleanField;
 import org.graylog2.restclient.lib.plugin.configuration.DropdownField;
 import org.graylog2.restclient.lib.plugin.configuration.NumberField;
@@ -37,16 +37,16 @@ public class InputTypeSummaryResponse {
     public String name;
     public String type;
 
-    @SerializedName("human_name")
+    @JsonProperty("human_name")
     public String humanName;
 
-    @SerializedName("is_exclusive")
+    @JsonProperty("is_exclusive")
     public boolean isExclusive;
 
-    @SerializedName("requested_configuration")
+    @JsonProperty("requested_configuration")
     public Map<String, Map<String, Object>> requestedConfiguration;
 
-    @SerializedName("link_to_docs")
+    @JsonProperty("link_to_docs")
     public String linkToDocs;
 
     public List<RequestedConfigurationField> getRequestedConfiguration() {

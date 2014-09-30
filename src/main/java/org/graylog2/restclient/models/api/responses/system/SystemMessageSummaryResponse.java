@@ -18,7 +18,7 @@
  */
 package org.graylog2.restclient.models.api.responses.system;
 
-import com.google.gson.annotations.SerializedName;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
@@ -29,7 +29,7 @@ public class SystemMessageSummaryResponse {
     public String content;
     public String caller;
 
-    @SerializedName("node_id")
+    @JsonProperty("node_id")
     public String nodeId;
 
 }

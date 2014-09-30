@@ -19,7 +19,7 @@
  */
 package org.graylog2.restclient.models.api.requests.dashboards;
 
-import com.google.gson.annotations.SerializedName;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.graylog2.restclient.models.api.requests.ApiRequest;
 
 /**
@@ -29,7 +29,7 @@ public class WidgetUpdateRequest extends ApiRequest {
 
     public String description;
 
-    @SerializedName("cache_time")
+    @JsonProperty("cache_time")
     public int cacheTime;
 
 }

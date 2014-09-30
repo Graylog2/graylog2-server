@@ -42,9 +42,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public class Input {
 
     private static final org.slf4j.Logger log = LoggerFactory.getLogger(Input.class);
@@ -214,7 +211,7 @@ public class Input {
     }
 
     private long asLong(String read_bytes, Map<String, Metric> metrics) {
-        return ((Double)((Gauge)metrics.get(read_bytes)).getValue()).longValue();
+        return ((Number)((Gauge)metrics.get(read_bytes)).getValue()).longValue();
     }
 
     private String qualifiedIOMetricName(String base, boolean total) {

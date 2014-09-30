@@ -19,7 +19,7 @@
  */
 package org.graylog2.restclient.models.api.requests.searches;
 
-import com.google.gson.annotations.SerializedName;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.graylog2.restclient.models.api.requests.ApiRequest;
 
 import java.util.Map;
@@ -32,7 +32,7 @@ public class CreateSavedSearchRequest extends ApiRequest {
     public String title;
     public Map<String, Object> query;
 
-    @SerializedName("creator_user_id")
+    @JsonProperty("creator_user_id")
     public String creatorUserId;
 
 }

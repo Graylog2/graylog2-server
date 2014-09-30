@@ -18,7 +18,7 @@
  */
 package org.graylog2.restclient.models.api.responses;
 
-import com.google.gson.annotations.SerializedName;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
@@ -30,7 +30,7 @@ public class MessageSummaryResponse {
 	public Map<String, Object> message;
 	public String index;
 	public String nodeId;
-    @SerializedName("highlight_ranges")
+    @JsonProperty("highlight_ranges")
     public Map<String, List<HighlightRange>> highlightRanges;
 
     public DateTime getTimestamp() {

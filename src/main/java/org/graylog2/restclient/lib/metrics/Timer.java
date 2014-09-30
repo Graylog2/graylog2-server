@@ -47,13 +47,13 @@ public class Timer extends Metric {
             throw new RuntimeException("Timings must be in microseconds.");
         }
 
-        this.standardDeviation = (double) timing.get("std_dev");
-        this.minimum = (double) timing.get("min");
-        this.maximum = (double) timing.get("max");
-        this.mean = (double) timing.get("mean");
-        this.percentile95th = (double) timing.get("95th_percentile");
-        this.percentile98th = (double) timing.get("98th_percentile");
-        this.percentile99th = (double) timing.get("99th_percentile");
+        this.standardDeviation = ((Number) timing.get("std_dev")).doubleValue();
+        this.minimum = ((Number) timing.get("min")).doubleValue();
+        this.maximum = ((Number) timing.get("max")).doubleValue();
+        this.mean = ((Number) timing.get("mean")).doubleValue();
+        this.percentile95th = ((Number) timing.get("95th_percentile")).doubleValue();
+        this.percentile98th = ((Number) timing.get("98th_percentile")).doubleValue();
+        this.percentile99th = ((Number) timing.get("99th_percentile")).doubleValue();
     }
 
     public Timer(final TimerMetricsResponse t, Unit durationUnit) {

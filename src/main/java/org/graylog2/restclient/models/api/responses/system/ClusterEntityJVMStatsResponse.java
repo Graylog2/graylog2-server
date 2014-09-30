@@ -18,7 +18,7 @@
  */
 package org.graylog2.restclient.models.api.responses.system;
 
-import com.google.gson.annotations.SerializedName;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.graylog2.restclient.models.api.responses.ByteListing;
 
 /**
@@ -26,22 +26,22 @@ import org.graylog2.restclient.models.api.responses.ByteListing;
  */
 public class ClusterEntityJVMStatsResponse {
 
-    @SerializedName("node_id")
+    @JsonProperty("node_id")
     public String nodeId;
 
     public String info;
     public String pid;
 
-    @SerializedName("max_memory")
+    @JsonProperty("max_memory")
     public ByteListing maxMemory;
 
-    @SerializedName("used_memory")
+    @JsonProperty("used_memory")
     public ByteListing usedMemory;
 
-    @SerializedName("total_memory")
+    @JsonProperty("total_memory")
     public ByteListing totalMemory;
 
-    @SerializedName("free_memory")
+    @JsonProperty("free_memory")
     public ByteListing freeMemory;
 
 }

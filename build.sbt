@@ -13,12 +13,16 @@ libraryDependencies ++= Seq(
   "org.graylog2" % "graylog2-rest-routes" % version.value changing() intransitive(),
   "com.google.inject" % "guice" % "3.0",
   "com.google.inject.extensions" % "guice-assistedinject" % "3.0",
-  "com.google.code.gson" % "gson" % "2.2",
   "com.typesafe.play" %% "play-java" % "2.2.2",
   "com.typesafe.play" %% "play-cache" % "2.2.2",
   "org.apache.shiro" % "shiro-core" % "1.2.2",
   "javax.ws.rs" % "jsr311-api" % "0.11",
-  "com.sun.jersey" % "jersey-bundle" % "1.17.1"
+  "com.sun.jersey" % "jersey-bundle" % "1.17.1",
+  "com.fasterxml.jackson.core" % "jackson-databind" % "2.4.2",
+  "com.fasterxml.jackson.datatype" % "jackson-datatype-guava" % "2.4.2",
+  "com.fasterxml.jackson.datatype" % "jackson-datatype-joda" % "2.4.2",
+  "com.google.guava" % "guava" % "18.0",
+  "joda-time" % "joda-time" % "2.4"
 )
 
 // No need to generate Javadoc here

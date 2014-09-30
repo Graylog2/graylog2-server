@@ -18,7 +18,7 @@
  */
 package org.graylog2.restclient.models.api.responses.metrics;
 
-import com.google.gson.annotations.SerializedName;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
@@ -28,10 +28,10 @@ public class TimerRateMetricsResponse {
     public TimerMetricsResponse time;
     public RateMetricsResponse rate;
 
-    @SerializedName("duration_unit")
+    @JsonProperty("duration_unit")
     public String durationUnit;
 
-    @SerializedName("rate_unit")
+    @JsonProperty("rate_unit")
     public String rateUnit;
 
 }

@@ -20,9 +20,6 @@ package org.graylog2.restclient.lib.timeranges;
 
 import java.util.Map;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public abstract class TimeRange {
 
     public enum Type {
@@ -85,7 +82,7 @@ public abstract class TimeRange {
 
         switch (Type.valueOf(rangeType.toUpperCase())) {
             case RELATIVE:
-                return new RelativeRange(((Double) timerangeConfig.get("range")).intValue());
+                return new RelativeRange(((Number) timerangeConfig.get("range")).intValue());
             case ABSOLUTE:
                 return new AbsoluteRange((String) timerangeConfig.get("from"), (String) timerangeConfig.get("to"));
             case KEYWORD:

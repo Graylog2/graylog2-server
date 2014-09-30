@@ -42,13 +42,13 @@ public class Histogram extends Metric {
 
         this.count = count;
 
-        this.standardDeviation = (double) histo.get("std_dev");
-        this.minimum = (double) histo.get("min");
-        this.maximum = (double) histo.get("max");
-        this.mean = (double) histo.get("mean");
-        this.percentile95th = (double) histo.get("95th_percentile");
-        this.percentile98th = (double) histo.get("98th_percentile");
-        this.percentile99th = (double) histo.get("99th_percentile");
+        this.standardDeviation = ((Number) histo.get("std_dev")).doubleValue();
+        this.minimum = ((Number) histo.get("min")).doubleValue();
+        this.maximum = ((Number) histo.get("max")).doubleValue();
+        this.mean = ((Number) histo.get("mean")).doubleValue();
+        this.percentile95th = ((Number) histo.get("95th_percentile")).doubleValue();
+        this.percentile98th = ((Number) histo.get("98th_percentile")).doubleValue();
+        this.percentile99th = ((Number) histo.get("99th_percentile")).doubleValue();
     }
 
     public double getCount() {

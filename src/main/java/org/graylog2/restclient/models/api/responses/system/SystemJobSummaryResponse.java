@@ -18,7 +18,7 @@
  */
 package org.graylog2.restclient.models.api.responses.system;
 
-import com.google.gson.annotations.SerializedName;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
@@ -29,21 +29,21 @@ public class SystemJobSummaryResponse {
     public String description;
     public String name;
 
-    @SerializedName("node_id")
+    @JsonProperty("node_id")
     public String nodeId;
 
-    @SerializedName("started_at")
+    @JsonProperty("started_at")
     public String startedAt;
 
-    @SerializedName("started_by")
+    @JsonProperty("started_by")
     public String startedBy;
 
-    @SerializedName("percent_complete")
+    @JsonProperty("percent_complete")
     public int percentComplete;
 
-    @SerializedName("is_cancelable")
+    @JsonProperty("is_cancelable")
     public boolean isCancelable;
 
-    @SerializedName("provides_progress")
+    @JsonProperty("provides_progress")
     public boolean providesProgress;
 }

@@ -19,7 +19,7 @@
  */
 package org.graylog2.restclient.models.api.requests.dashboards;
 
-import com.google.gson.annotations.SerializedName;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.graylog2.restclient.models.api.requests.ApiRequest;
 import play.data.validation.Constraints;
 
@@ -33,7 +33,7 @@ public class CreateDashboardRequest extends ApiRequest {
     @Constraints.Required
     public String description;
 
-    @SerializedName("creator_user_id")
+    @JsonProperty("creator_user_id")
     public String creatorUserId;
 
     public String getTitle() {
