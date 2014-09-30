@@ -1,0 +1,28 @@
+@(currentUser: org.graylog2.restclient.models.User,
+    breadcrumbs: lib.BreadcrumbList)
+
+@main("Bundles", views.html.system.sidebar(), "", currentUser) {
+
+    <div class="pull-right">
+        <div class="btn-group">
+            <a class="btn btn-info btn-small" href="@routes.BundlesController.export()">
+                Export bundle
+            </a>
+        </div>
+    </div>
+
+    @views.html.partials.breadcrumbs(breadcrumbs)
+
+    <div class="row-fluid">
+        <h1><i class="icon icon-sitemap"></i> Bundles</h1>
+        Set up your Graylog2 easily with configuration bundles.
+    </div>
+
+    <script src="@routes.Assets.at("javascripts/app.js")" type="text/javascript"></script>
+
+    <div class="row-fluid">
+        <h2><i class="icon icon-cogs"></i> Apply a configuration bundle</h2>
+        Select a configuration bundle from the list to get you started.
+    </div>
+    <div id="react-configuration-bundles"></div>
+}

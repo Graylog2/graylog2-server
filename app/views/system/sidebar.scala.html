@@ -19,11 +19,11 @@
     </li>
 
     @if(Permissions.isPermitted(RestPermissions.INPUTS_READ)) {
-    <li>
-        <a href="@routes.InputsController.index()">
-            Inputs
-        </a>
-    </li>
+        <li>
+            <a href="@routes.InputsController.index()">
+                Inputs
+            </a>
+        </li>
     }
 
     @if(Permissions.isPermitted(RestPermissions.OUTPUTS_READ)) {
@@ -35,19 +35,19 @@
     }
 
     @if(Permissions.isPermitted(RestPermissions.INDICES_READ)) {
-    <li>
-        <a href="@routes.IndicesController.index()">
-            Indices
-        </a>
-    </li>
+        <li>
+            <a href="@routes.IndicesController.index()">
+                Indices
+            </a>
+        </li>
     }
 
     @if(Permissions.isPermitted(RestPermissions.LOGGERS_READ)) {
-    <li>
-        <a href="@routes.LoggingController.index()">
-            Logging
-        </a>
-    </li>
+        <li>
+            <a href="@routes.LoggingController.index()">
+                Logging
+            </a>
+        </li>
     }
 
     <li>
@@ -56,4 +56,9 @@
         </a>
     </li>
 
+    <li>
+        <a href="@routes.BundlesController.index()">
+            Bundles
+        </a>
+    </li>
 </ul>

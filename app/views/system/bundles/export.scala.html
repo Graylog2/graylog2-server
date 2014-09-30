@@ -1,0 +1,132 @@
+@(form: Form[org.graylog2.restclient.models.api.requests.ExportBundleRequest],
+        currentUser: org.graylog2.restclient.models.User,
+        breadcrumbs: lib.BreadcrumbList,
+        inputs: List[org.graylog2.restclient.models.Input],
+        outputs: List[org.graylog2.restclient.models.Output],
+        streams: List[org.graylog2.restclient.models.Stream],
+        dashboards: List[org.graylog2.restclient.models.dashboards.Dashboard])
+
+@values(field: Field) = @{
+    if(field.indexes.size == 0) {
+        Seq(field.value)
+    } else {
+        field.indexes.map { v => field("[" + v + "]").value}
+    }
+}
+
+@main("Export Bundle", views.html.system.sidebar(), "", currentUser) {
+    @views.html.partials.breadcrumbs(breadcrumbs)
+
+    <div class="row-fluid">
+        <h1><i class="icon icon-sitemap"></i> Export Bundle</h1>
+        Export your inputs, outputs, streams and dashboards as a configuration bundle.
+    </div>
+
+    @helper.form(action = routes.BundlesController.export(), 'class -> "form-horizontal") {
+        <div class="control-group @if(form("name").hasErrors) {error}">
+            <label class="control-label" for="name">Name</label>
+            <div class="controls">
+                <input type="text" id="name" name="name" value="@form("name").value()" required/>
+                <span class="help-block">Write a name for your configuration bundle.</span>
+
+            </div>
+        </div>
+
+        <div class="control-group @if(form("description").hasErrors) {error}">
+            <label class="control-label" for="description">Description</label>
+            <div class="controls">
+                <textarea rows="3" id="description" name="description" required>@form("description").value()</textarea>
+                <span class="help-block">Write a description of what your bundle does.</span>
+            </div>
+        </div>
+
+        <div class="control-group @if(form("category").hasErrors) {error}">
+            <label class="control-label" for="category">Category</label>
+            <div class="controls">
+                <input type="text" id="category" name="category" value="@form("category").value()" required/>
+                <span class="help-block">Write a category for your bundle, e.g. Linux, Firewall, Switch.</span>
+            </div>
+        </div>
+
+        @defining(values(form("inputs"))) { listValues =>
+            <div class="control-group">
+                <label class="control-label" for="inputs">Inputs</label>
+                <div class="controls">
+                    @if(inputs.isEmpty) {
+                        <span class="help-block help-standalone">There are no inputs to export.</span>
+                    } else {
+                        @for(i <- inputs.sortBy(_.getName)) {
+                            <label class="checkbox">
+                                <input type="checkbox" name="inputs" id="input_@i.getId" value="@i.getId" @if(listValues.contains(Some(i.getId))) {checked=""}>
+                                @i.getName
+                            </label>
+                        }
+                    }
+                </div>
+            </div>
+        }
+
+        @defining(values(form("outputs"))) { listValues =>
+            <div class="control-group">
+                <label class="control-label" for="outputs">Outputs</label>
+                <div class="controls">
+                @if(outputs.isEmpty) {
+                    <span class="help-block help-standalone">There are no outputs to export.</span>
+                } else {
+                    @for(o <- outputs.sortBy(_.getTitle)) {
+                        <label class="checkbox">
+                            <input type="checkbox" name="outputs" id="output_@o.getId" value="@o.getId" @if(listValues.contains(Some(o.getId))) {checked=""}>
+                            @o.getTitle
+                        </label>
+                    }
+                }
+                </div>
+            </div>
+        }
+
+        @defining(values(form("streams"))) { listValues =>
+            <div class="control-group">
+                <label class="control-label" for="streams">Streams</label>
+                <div class="controls">
+                @if(streams.isEmpty) {
+                    <span class="help-block help-standalone">There are no streams to export.</span>
+                } else {
+                    @for(s <- streams.sortBy(_.getTitle)) {
+                        <label class="checkbox">
+                            <input type="checkbox" name="streams" id="stream_@s.getId" value="@s.getId" @if(listValues.contains(Some(s.getId))) {checked=""}>
+                            @s.getTitle
+                        </label>
+                    }
+                }
+                </div>
+            </div>
+        }
+
+        @defining(values(form("dashboards"))) { listValues =>
+            <div class="control-group">
+                <label class="control-label" for="dashboards">Dashboards</label>
+                <div class="controls">
+                @if(dashboards.isEmpty) {
+                    <span class="help-block help-standalone">There are no dashboards to export.</span>
+                } else {
+                    @for(d <- dashboards.sortBy(_.getTitle)) {
+                        <label class="checkbox">
+                            <input type="checkbox" name="dashboards" id="dashboard_@d.getId" value="@d.getId" @if(listValues.contains(Some(d.getId))) {checked=""}>
+                            @d.getTitle
+                        </label>
+                    }
+                }
+                </div>
+            </div>
+        }
+
+        <div class="control-group">
+            <div class="controls">
+                <button type="submit" class="btn btn-primary">
+                    <i class="icon icon-rocket"></i>
+                    Export bundle
+                </button>
+            </div>
+        </div>
+    }
+}

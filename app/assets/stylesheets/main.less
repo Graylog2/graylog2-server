@@ -46,6 +46,11 @@ h1.username {
     word-wrap: break-word;
 }
 
+/* Remove boostrap outline */
+a:focus, select:focus, input[type="file"]:focus, input[type="radio"]:focus, input[type="checkbox"]:focus {
+  outline: none;
+}
+
 #top {
 	height: 40px;
 	background-image: url(../images/topbg.png);
@@ -2148,4 +2153,91 @@ textarea.textarea-xlarge {
 .alert-callback dl {
   margin: 0;
   padding: 0;
+}
+
+.card {
+  padding: 12px 20px;
+  font-size: 15px;
+  font-weight: 300;
+  background-color: #fafafa;
+  border: 1px solid #ececec;
+  border-radius: 2px;
+  margin: 10px;
+}
+
+.card h1 {
+  margin-bottom: 5px;
+  font-size: 28px;
+  line-height: 1;
+  letter-spacing: -1;
+}
+
+.card label {
+  font-weight: inherit;
+}
+
+.card div {
+  margin-left: 0;
+}
+
+.card ul li {
+  margin-bottom: 5px;
+}
+
+.card.info p {
+  margin: 0;
+}
+
+.card .configuration-bundles .bundle-preview {
+  border: 1px solid #ececec;
+  border-radius: 2px;
+  background-color: #ffffff;
+  padding: 20px;
+}
+
+.configuration-bundles .accordion {
+  background-color: #ffffff;
+  border: 1px solid #ececec;
+  border-radius: 2px;
+}
+
+.configuration-bundles .accordion-group {
+  margin: 0;
+  border: 0;
+  border-bottom: 1px solid #ececec;
+  border-radius: 0px;
+  -webkit-border-radius: 0px;
+  -moz-border-radius: 0px;
+}
+
+.configuration-bundles .accordion-inner {
+  padding-left: 30px;
+}
+
+.configuration-bundles .accordion-inner .upload input[type="file"] {
+  height: 32px;
+}
+
+.configuration-bundles .bundle-preview {
+  background-color: #f5f5f5;
+  border: 1px solid #e3e3e3;
+  border-radius: 3px;
+  box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.05) inset;
+  padding: 20px;
+}
+
+.configuration-bundles .bundle-preview dd {
+  margin-bottom: 10px;
+}
+
+#react-configuration-bundles {
+  font-size: 14px;
+  font-weight: normal;
+  line-height: 20px;
+}
+
+.form-horizontal .help-block.help-standalone {
+  vertical-align: middle;
+  padding-top: 5px;
+  line-height: 20px;
 }

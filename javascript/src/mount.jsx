@@ -3,6 +3,8 @@
 var React = require('react/addons');
 var UserPreferencesButton = require('./components/UserPreferencesButton');
 var UserPreferencesModal = require('./components/UserPreferencesModal');
+var CardList = require('./components/CardList');
+var ConfigurationBundles = require('./components/ConfigurationBundles');
 var $ = require('jquery'); // excluded and shimed
 
 $(document).ready(function () {
@@ -16,4 +18,10 @@ $(document).ready(function () {
     if (editUserPreferences) {
         React.renderComponent(<UserPreferencesModal />, editUserPreferences);
     }
+
+    var cardList = document.getElementById('react-card-list');
+    if (cardList) React.renderComponent(<CardList />, cardList);
+
+    var configurationBundles = document.getElementById('react-configuration-bundles');
+    if (configurationBundles) React.renderComponent(<ConfigurationBundles />, configurationBundles);
 });
