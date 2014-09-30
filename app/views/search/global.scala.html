@@ -1,7 +1,7 @@
 @(currentUser: org.graylog2.restclient.models.User)
 
 @main("Search", null, "", currentUser) {
-    <script src="@routes.Assets.at("javascripts/app.js")" type="text/javascript"></script>
+    @views.html.system.users.scripts()
 
     <div id="react-card-list"></div>
 }

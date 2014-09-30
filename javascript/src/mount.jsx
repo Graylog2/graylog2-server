@@ -20,8 +20,12 @@ $(document).ready(function () {
     }
 
     var cardList = document.getElementById('react-card-list');
-    if (cardList) React.renderComponent(<CardList />, cardList);
+    if (cardList) {
+        React.renderComponent(<CardList />, cardList);
+    }
 
     var configurationBundles = document.getElementById('react-configuration-bundles');
-    if (configurationBundles) React.renderComponent(<ConfigurationBundles />, configurationBundles);
+    if (configurationBundles) {
+        React.renderComponent(<ConfigurationBundles />, configurationBundles);
+    }
 });

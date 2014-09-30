@@ -10,7 +10,7 @@ var Card = React.createClass({
         var title = null;
         var classes = "card";
 
-        if (this.props.type == "info") {
+        if (this.props.type === "info") {
             classes = classes + " info";
             icon = <i className="icon icon-lightbulb pull-left"></i>;
         } else if (this.props.icon) {

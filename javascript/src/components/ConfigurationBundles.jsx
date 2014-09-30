@@ -7,6 +7,7 @@ var BootstrapAccordion = require('./BootstrapAccordion');
 var BootstrapAccordionGroup = require('./BootstrapAccordionGroup');
 var SourceType = require('./SourceType');
 var ConfigurationBundlePreview = require('./ConfigurationBundlePreview');
+var $ = require('jquery'); // excluded and shimed
 
 var ConfigurationBundles = React.createClass({
     getInitialState: function() {
@@ -29,6 +30,7 @@ var ConfigurationBundles = React.createClass({
         }.bind(this));
     },
     _getCategoriesHtml: function() {
+        // TODO: the mocking framework will mock the $.map function, replace with foreach.
         var categories = $.map(this.state.bundles, function( bundles, category){ return category; });
         categories.sort();
         return categories.map(function (category) {
@@ -57,10 +59,12 @@ var ConfigurationBundles = React.createClass({
     _getSortedBundles: function(category) {
         var bundles = this.state.bundles[category];
         bundles.sort(function(bundle1, bundle2){
-            if (bundle1.name > bundle2.name)
+            if (bundle1.name > bundle2.name) {
                 return 1;
-            if (bundle1.name < bundle2.name)
+            }
+            if (bundle1.name < bundle2.name) {
                 return -1;
+            }
             return 0;
         });
         return bundles;
