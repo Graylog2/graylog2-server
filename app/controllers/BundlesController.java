@@ -16,11 +16,10 @@
  */
 package controllers;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.net.MediaType;
 import com.google.inject.Inject;
 import lib.BreadcrumbList;
@@ -34,14 +33,12 @@ import org.graylog2.restclient.models.dashboards.Dashboard;
 import org.graylog2.restclient.models.dashboards.DashboardService;
 import play.Logger;
 import play.data.Form;
-import play.mvc.Http;
 import play.mvc.Result;
 
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.List;
+import java.util.Map;
 
-import static play.data.Form.form;
 
 public class BundlesController extends AuthenticatedController {
     private BundleService bundleService;
@@ -49,6 +46,8 @@ public class BundlesController extends AuthenticatedController {
     private OutputService outputService;
     private StreamService streamService;
     private DashboardService dashboardService;
+
+    final Form<ExportBundleRequest> exportBundleForm = Form.form(ExportBundleRequest.class);
 
     @Inject
     public BundlesController(BundleService bundleService,
@@ -74,34 +73,42 @@ public class BundlesController extends AuthenticatedController {
         BreadcrumbList bc = new BreadcrumbList();
         bc.addCrumb("System", routes.SystemController.index(0));
         bc.addCrumb("Bundles", routes.BundlesController.index());
-        bc.addCrumb("Export", routes.BundlesController.export());
+        bc.addCrumb("Export", routes.BundlesController.exportForm());
 
-        final List<Input> inputs = Lists.newArrayList();
-        List<Output> outputs = Lists.newArrayList();
-        List<Stream> streams = Lists.newArrayList();
-        List<Dashboard> dashboards = Lists.newArrayList();
-        try {
-            for (InputState inputState : inputService.loadAllInputStates()) {
-                inputs.add(inputState.getInput());
-            }
-            outputs = outputService.list();
-            streams = streamService.all();
-            dashboards = dashboardService.getAll();
-        } catch (APIException e) {
-            Logger.error("Could not fetch data. We expected HTTP 200, but got a HTTP " + e.getHttpCode());
-        } catch (IOException e) {
-            Logger.error("Could not connect to Graylog2 server. " + e);
-        }
+        final Map<String, List> data = getListData();
 
-        return ok(views.html.system.bundles.export.render(currentUser(), bc, inputs, outputs, streams, dashboards));
+        return ok(views.html.system.bundles.export.render(
+                exportBundleForm,
+                currentUser(),
+                bc,
+                (List<Input>) data.get("inputs"),
+                (List<Output>) data.get("outputs"),
+                (List<Stream>) data.get("streams"),
+                (List<Dashboard>) data.get("dashboards")
+        ));
     }
 
     public Result export() {
         final Form<ExportBundleRequest> form = Tools.bindMultiValueFormFromRequest(ExportBundleRequest.class);
 
         if (form.hasErrors()) {
-            flash("Alles scheisse oida");
-            return redirect(routes.BundlesController.exportForm());
+            BreadcrumbList bc = new BreadcrumbList();
+            bc.addCrumb("System", routes.SystemController.index(0));
+            bc.addCrumb("Bundles", routes.BundlesController.index());
+            bc.addCrumb("Export", routes.BundlesController.exportForm());
+
+            Map<String, List> data = getListData();
+
+            flash("error", "Please correct the fields marked in red to export the bundle");
+            return badRequest(views.html.system.bundles.export.render(
+                    form,
+                    currentUser(),
+                    bc,
+                    (List<Input>) data.get("inputs"),
+                    (List<Output>) data.get("outputs"),
+                    (List<Stream>) data.get("streams"),
+                    (List<Dashboard>) data.get("dashboards")
+            ));
         }
 
         try {
@@ -109,7 +116,7 @@ public class BundlesController extends AuthenticatedController {
             ConfigurationBundle bundle = bundleService.export(exportBundleRequest);
 
             response().setContentType(MediaType.JSON_UTF_8.toString());
-            response().setHeader("Content-Disposition", "attachment; filename=exported_bundle.json");
+            response().setHeader("Content-Disposition", "attachment; filename=configuration_bundle.json");
             ObjectMapper m = new ObjectMapper();
             ObjectWriter ow = m.writer().withDefaultPrettyPrinter();
             return ok(ow.writeValueAsString(bundle));
@@ -120,5 +127,26 @@ public class BundlesController extends AuthenticatedController {
         }
 
         return redirect(routes.BundlesController.exportForm());
+    }
+
+    private Map<String, List> getListData() {
+        final Map<String, List> data = Maps.newHashMap();
+
+        try {
+            final List<Input> inputs = Lists.newArrayList();
+            for (InputState inputState : inputService.loadAllInputStates()) {
+                inputs.add(inputState.getInput());
+            }
+            data.put("inputs", inputs);
+            data.put("outputs", outputService.list());
+            data.put("streams", streamService.all());
+            data.put("dashboards", dashboardService.getAll());
+        } catch (APIException e) {
+            Logger.error("Could not fetch data. We expected HTTP 200, but got a HTTP " + e.getHttpCode());
+        } catch (IOException e) {
+            Logger.error("Could not connect to Graylog2 server. " + e);
+        }
+
+        return data;
     }
 }
