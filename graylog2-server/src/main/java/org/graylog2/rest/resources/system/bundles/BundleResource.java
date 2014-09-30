@@ -30,6 +30,7 @@ import org.graylog2.rest.documentation.annotations.ApiParam;
 import org.graylog2.rest.documentation.annotations.ApiResponse;
 import org.graylog2.rest.documentation.annotations.ApiResponses;
 import org.graylog2.rest.resources.RestResource;
+import org.graylog2.security.RestPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -75,6 +76,7 @@ public class BundleResource extends RestResource {
             @ApiParam(title = "Request body", description = "Configuration bundle", required = true)
             @NotNull @Valid
             final ConfigurationBundle configurationBundle) {
+        checkPermission(RestPermissions.BUNDLE_CREATE);
         final ConfigurationBundle bundle = bundleService.insert(configurationBundle);
         final URI bundleUri = UriBuilder.fromResource(BundleResource.class)
                 .path("{bundleId}")
@@ -93,6 +95,7 @@ public class BundleResource extends RestResource {
         final ImmutableSetMultimap.Builder<String, ConfigurationBundle> categoryBundleMap = ImmutableSetMultimap.builder();
 
         for (final ConfigurationBundle bundle : bundleService.loadAll()) {
+            checkPermission(RestPermissions.BUNDLE_READ, bundle.getId());
             categoryBundleMap.put(bundle.getCategory(), bundle);
         }
 
@@ -112,6 +115,7 @@ public class BundleResource extends RestResource {
             @NotNull
             @PathParam("bundleId")
             final String bundleId) throws NotFoundException {
+        checkPermission(RestPermissions.BUNDLE_READ, bundleId);
         return bundleService.load(bundleId);
     }
 
@@ -132,7 +136,7 @@ public class BundleResource extends RestResource {
             @ApiParam(title = "Request body", description = "Configuration bundle", required = true)
             @NotNull @Valid
             final ConfigurationBundle configurationBundle) {
-
+        checkPermission(RestPermissions.BUNDLE_UPDATE, bundleId);
         bundleService.update(bundleId, configurationBundle);
     }
 
@@ -149,7 +153,7 @@ public class BundleResource extends RestResource {
             @NotNull
             @PathParam("bundleId")
             final String bundleId) {
-
+        checkPermission(RestPermissions.BUNDLE_DELETE, bundleId);
         final int deletedBundles = bundleService.delete(bundleId);
         LOG.debug("Successfully removed {} configuration bundles", deletedBundles);
     }
@@ -167,6 +171,7 @@ public class BundleResource extends RestResource {
             @NotNull
             @PathParam("bundleId")
             final String bundleId) throws NotFoundException {
+        checkPermission(RestPermissions.BUNDLE_IMPORT);
         bundleService.applyConfigurationBundle(bundleId, getCurrentUser());
     }
 
@@ -181,6 +186,7 @@ public class BundleResource extends RestResource {
             @ApiParam(title = "exportBundle", description = "Export bundle", required = true)
             @NotNull
             final ExportBundle exportBundle) throws NotFoundException {
+        checkPermission(RestPermissions.BUNDLE_EXPORT);
         return bundleService.exportConfigurationBundle(exportBundle);
     }
 }
