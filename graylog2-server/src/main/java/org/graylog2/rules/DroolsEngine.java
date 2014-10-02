@@ -40,11 +40,15 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Singleton;
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.logging.Level;
 
 @Singleton
 public class DroolsEngine implements RulesEngine {
@@ -176,6 +180,9 @@ public class DroolsEngine implements RulesEngine {
         } catch (RulesCompilationException e) {
             LOG.warn("Unable to add rules due to compilation errors.", e);
             return false;
+        } catch (URISyntaxException ex) {
+            LOG.warn("Unable to add rules due to compilation errors.", ex);
+            return false;
         }
     }
 
@@ -186,7 +193,7 @@ public class DroolsEngine implements RulesEngine {
 
     private KieModule createAndDeployJar(KieServices ks,
                                                 ReleaseId releaseId,
-                                                String... drls) throws RulesCompilationException {
+                                                String... drls) throws RulesCompilationException, URISyntaxException {
         byte[] jar = createKJar(ks, releaseId, null, drls);
         return deployJar(ks, jar);
     }
@@ -194,7 +201,7 @@ public class DroolsEngine implements RulesEngine {
     private byte[] createKJar(KieServices ks,
                                      ReleaseId releaseId,
                                      String pom,
-                                     String... drls) throws RulesCompilationException {
+                                     String... drls) throws RulesCompilationException, URISyntaxException {
         KieFileSystem kfs = ks.newKieFileSystem();
         if (pom != null) {
             kfs.write("pom.xml", pom);
@@ -207,7 +214,9 @@ public class DroolsEngine implements RulesEngine {
             }
         }
         for (URL builtinRuleUrl : builtinRuleUrls) {
-            final Path rulesPath = new File(builtinRuleUrl.getPath()).toPath();
+            
+            URI uri = builtinRuleUrl.toURI();
+            final Path rulesPath = Paths.get(uri);
             final String path = "src/main/resources/" + rulesPath.getFileName();
             final Resource resource = ResourceFactory
                     .newUrlResource(builtinRuleUrl)
