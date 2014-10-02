@@ -52,9 +52,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 @RequiresAuthentication
 @Api(value = "System/Inputs", description = "Message inputs of this node")
 @Path("/system/inputs")
@@ -164,16 +161,17 @@ public class InputsResource extends RestResource {
 
         // Build MongoDB data
         Map<String, Object> inputData = Maps.newHashMap();
-        inputData.put("input_id", inputId);
-        inputData.put("title", lr.title);
-        inputData.put("type", lr.type);
-        inputData.put("creator_user_id", lr.creatorUserId);
-        inputData.put("configuration", lr.configuration);
-        inputData.put("created_at", createdAt);
-        if (lr.global)
-            inputData.put("global", true);
-        else
-            inputData.put("node_id", serverStatus.getNodeId().toString());
+        inputData.put(MessageInput.FIELD_INPUT_ID, inputId);
+        inputData.put(MessageInput.FIELD_TITLE, lr.title);
+        inputData.put(MessageInput.FIELD_TYPE, lr.type);
+        inputData.put(MessageInput.FIELD_CREATOR_USER_ID, lr.creatorUserId);
+        inputData.put(MessageInput.FIELD_CONFIGURATION, lr.configuration);
+        inputData.put(MessageInput.FIELD_CREATED_AT, createdAt);
+        if (lr.global) {
+            inputData.put(MessageInput.FIELD_GLOBAL, true);
+        } else {
+            inputData.put(MessageInput.FIELD_NODE_ID, serverStatus.getNodeId().toString());
+        }
 
         // ... and check if it would pass validation. We don't need to go on if it doesn't.
         Input mongoInput = new InputImpl(inputData);

@@ -16,6 +16,7 @@
  */
 package org.graylog2.dashboards;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.bson.types.ObjectId;
@@ -33,15 +34,13 @@ import org.slf4j.LoggerFactory;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 @CollectionName("dashboards")
 public class DashboardImpl extends PersistedImpl implements Dashboard {
-
     private static final Logger LOG = LoggerFactory.getLogger(DashboardImpl.class);
 
     public static final String EMBEDDED_WIDGETS = "widgets";
+    private static final String TITLE = "title";
+    private static final String DESCRIPTION = "description";
 
     private Map<String, DashboardWidget> widgets = Maps.newHashMap();
 
@@ -54,13 +53,24 @@ public class DashboardImpl extends PersistedImpl implements Dashboard {
     }
 
     @Override
+    public String getTitle() {
+        return (String) fields.get(TITLE);
+    }
+
+
+    @Override
     public void setTitle(String title) {
-        this.fields.put("title", title);
+        this.fields.put(TITLE, title);
+    }
+
+    @Override
+    public String getDescription() {
+        return (String) fields.get(DESCRIPTION);
     }
 
     @Override
     public void setDescription(String description) {
-        this.fields.put("description", description);
+        this.fields.put(DESCRIPTION, description);
     }
 
     @Override
@@ -84,10 +94,15 @@ public class DashboardImpl extends PersistedImpl implements Dashboard {
     }
 
     @Override
+    public Map<String, DashboardWidget> getWidgets() {
+        return ImmutableMap.copyOf(widgets);
+    }
+
+    @Override
     public Map<String, Validator> getValidations() {
         return new HashMap<String, Validator>() {{
-            put("title", new FilledStringValidator());
-            put("description", new FilledStringValidator());
+            put(TITLE, new FilledStringValidator());
+            put(DESCRIPTION, new FilledStringValidator());
             put("creator_user_id", new FilledStringValidator());
             put("created_at", new DateValidator());
         }};
@@ -105,7 +120,7 @@ public class DashboardImpl extends PersistedImpl implements Dashboard {
 
         // TODO this sucks and should be done somewhere globally.
         result.remove("_id");
-        result.put("id", ((ObjectId) fields.get("_id")).toStringMongod());
+        result.put("id", ((ObjectId) fields.get("_id")).toHexString());
         result.remove("created_at");
         result.put("created_at", (Tools.getISO8601String((DateTime) fields.get("created_at"))));
 

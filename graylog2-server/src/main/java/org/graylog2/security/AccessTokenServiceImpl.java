@@ -21,7 +21,7 @@ import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
-import com.mongodb.MongoException;
+import com.mongodb.DuplicateKeyException;
 import org.bson.types.ObjectId;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PersistedServiceImpl;
@@ -99,7 +99,7 @@ public class AccessTokenServiceImpl extends PersistedServiceImpl implements Acce
             accessToken = new AccessTokenImpl(fields);
             try {
                 id = saveWithoutValidation(accessToken);
-            } catch (MongoException.DuplicateKey ignore) {
+            } catch (DuplicateKeyException ignore) {
             }
         } while (iterations++ < 10 && id == null);
         if (id == null) {
@@ -117,7 +117,7 @@ public class AccessTokenServiceImpl extends PersistedServiceImpl implements Acce
     @Override
     public String save(AccessToken accessToken) throws ValidationException {
         // make sure we cannot overwrite an existing access token
-        collection(AccessTokenImpl.class).ensureIndex(new BasicDBObject(AccessTokenImpl.TOKEN, 1), null, true);
+        collection(AccessTokenImpl.class).createIndex(new BasicDBObject(AccessTokenImpl.TOKEN, 1), new BasicDBObject("unique", true));
         return super.save(accessToken);
     }
 }

@@ -28,6 +28,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -58,6 +60,13 @@ public class IndexRangeServiceImpl extends PersistedServiceImpl implements Index
         for (DBObject dbo : query(IndexRangeImpl.class, query)) {
             ranges.add(new IndexRangeImpl((ObjectId) dbo.get("_id"), dbo.toMap()));
         }
+
+        Collections.sort(ranges, new Comparator<IndexRange>() {
+            @Override
+            public int compare(IndexRange o1, IndexRange o2) {
+                return o2.getStart().compareTo(o1.getStart());
+            }
+        });
 
         return ranges;
     }

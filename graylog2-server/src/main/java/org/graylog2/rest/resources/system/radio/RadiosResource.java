@@ -144,7 +144,7 @@ public class RadiosResource extends RestResource {
         if (rir.inputId != null)
             inputData.put("input_id", rir.inputId);
         else
-            inputData.put("input_id", new ObjectId().toStringMongod());
+            inputData.put("input_id", new ObjectId().toHexString());
         inputData.put("title", rir.title);
         inputData.put("type", rir.type);
         inputData.put("creator_user_id", rir.creatorUserId);

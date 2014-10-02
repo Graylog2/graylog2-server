@@ -104,6 +104,12 @@ public class RestPermissions {
     public static final String BLACKLISTENTRY_READ = "blacklistentry:read";
     public static final String BLACKLISTENTRY_EDIT = "blacklistentry:edit";
     public static final String BLACKLISTENTRY_DELETE = "blacklistentry:delete";
+    public static final String BUNDLE_CREATE = "bundle:create";
+    public static final String BUNDLE_READ = "bundle:read";
+    public static final String BUNDLE_UPDATE = "bundle:update";
+    public static final String BUNDLE_DELETE = "bundle:delete";
+    public static final String BUNDLE_IMPORT = "bundle:import";
+    public static final String BUNDLE_EXPORT = "bundle:export";
 
     private static Map<String, Collection<String>> allPermissions;
 

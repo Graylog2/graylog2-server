@@ -16,7 +16,9 @@
  */
 package org.graylog2;
 
-import com.github.joschi.jadconfig.*;
+import com.github.joschi.jadconfig.Parameter;
+import com.github.joschi.jadconfig.ValidationException;
+import com.github.joschi.jadconfig.ValidatorMethod;
 import com.github.joschi.jadconfig.converters.StringListConverter;
 import com.github.joschi.jadconfig.validators.FileReadableValidator;
 import com.github.joschi.jadconfig.validators.InetPortValidator;
@@ -24,7 +26,6 @@ import com.github.joschi.jadconfig.validators.PositiveIntegerValidator;
 import com.google.common.collect.Lists;
 import com.mongodb.ServerAddress;
 import org.graylog2.plugin.BaseConfiguration;
-import org.graylog2.plugin.Tools;
 import org.graylog2.shared.JadPeriodConverter;
 import org.joda.time.Period;
 import org.slf4j.Logger;
@@ -304,6 +305,9 @@ public class Configuration extends BaseConfiguration {
 
     @Parameter(value = "ldap_connection_timeout", validator = PositiveIntegerValidator.class)
     private int ldapConnectionTimeout = 2000;
+
+    @Parameter(value = "alert_check_interval", validator = PositiveIntegerValidator.class)
+    private int alertCheckInterval = 60;
 
     public boolean isMaster() {
         return isMaster;
@@ -685,6 +689,10 @@ public class Configuration extends BaseConfiguration {
     }
 
     public Period getElasticSearchMaxTimePerIndex() { return elasticSearchMaxTimePerIndex; }
+
+    public int getAlertCheckInterval() {
+        return alertCheckInterval;
+    }
 
     @ValidatorMethod
     public void validate() throws ValidationException {

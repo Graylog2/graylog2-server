@@ -113,7 +113,7 @@ public class MongoDbMetricsReporter extends ScheduledReporter {
             // don't hang on to the data for too long.
             final BasicDBObject indexField = new BasicDBObject("timestamp", 1);
             final BasicDBObject indexOptions = new BasicDBObject("expireAfterSeconds", 5 * 60);
-            collection.ensureIndex(indexField, indexOptions);
+            collection.createIndex(indexField, indexOptions);
 
             collection.insert(docs, WriteConcern.UNACKNOWLEDGED);
         } catch (Exception e) {

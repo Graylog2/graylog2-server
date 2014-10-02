@@ -197,7 +197,7 @@ public final class Main extends NodeRunner {
         } catch (ProvisionException e) {
             for (Message message : e.getErrorMessages()) {
                 if (message.getCause() instanceof MongoException) {
-                    LOG.error(UI.wallString("Unable to connect to MongoDB. Is it running and the configuration correct?", null));
+                    LOG.error(UI.wallString("Unable to connect to MongoDB. Is it running and the configuration correct?"));
                     System.exit(-1);
                 }
             }

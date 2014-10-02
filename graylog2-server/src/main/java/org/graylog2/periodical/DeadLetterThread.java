@@ -126,11 +126,11 @@ public class DeadLetterThread extends Periodical {
 
     // TODO: Move this to the related persisted service classes
     private void verifyIndices() {
-        mongoConnection.getDatabase().getCollection(getCollectionName(IndexFailureImpl.class)).ensureIndex(new BasicDBObject("timestamp", 1));
-        mongoConnection.getDatabase().getCollection(getCollectionName(IndexFailureImpl.class)).ensureIndex(new BasicDBObject("letter_id", 1));
+        mongoConnection.getDatabase().getCollection(getCollectionName(IndexFailureImpl.class)).createIndex(new BasicDBObject("timestamp", 1));
+        mongoConnection.getDatabase().getCollection(getCollectionName(IndexFailureImpl.class)).createIndex(new BasicDBObject("letter_id", 1));
 
-        mongoConnection.getDatabase().getCollection(getCollectionName(PersistedDeadLetterImpl.class)).ensureIndex(new BasicDBObject("timestamp", 1));
-        mongoConnection.getDatabase().getCollection(getCollectionName(PersistedDeadLetterImpl.class)).ensureIndex(new BasicDBObject("letter_id", 1));
+        mongoConnection.getDatabase().getCollection(getCollectionName(PersistedDeadLetterImpl.class)).createIndex(new BasicDBObject("timestamp", 1));
+        mongoConnection.getDatabase().getCollection(getCollectionName(PersistedDeadLetterImpl.class)).createIndex(new BasicDBObject("letter_id", 1));
     }
 
     private String getCollectionName(Class<? extends Persisted> modelClass) {

@@ -26,6 +26,7 @@ import org.graylog2.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.indexer.searches.timeranges.TimeRange;
 import org.graylog2.plugin.Tools;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 
@@ -93,6 +94,29 @@ public class IndexHelper {
         // Always include the most recent index in some cases.
         if (indices.isEmpty() || range instanceof RelativeRange) {
             indices.add(deflector.getCurrentActualTargetIndex());
+        }
+
+        return indices;
+    }
+
+    public static Set<IndexRange> determineAffectedIndicesWithRanges(IndexRangeService indexRangeService,
+                                                                     Deflector deflector,
+                                                                     TimeRange range) {
+        Set<IndexRange> indices = Sets.newTreeSet(new Comparator<IndexRange>() {
+            @Override
+            public int compare(IndexRange o1, IndexRange o2) {
+                return o2.getStart().compareTo(o1.getStart());
+            }
+        });
+
+        for (IndexRange indexRange : indexRangeService.getFrom((int) (range.getFrom().getMillis() / 1000))) {
+            indices.add(indexRange);
+        }
+
+        // Always include the most recent index in some cases.
+        if (indices.isEmpty() || range instanceof RelativeRange) {
+            IndexRange deflectorIndexRange = indexRangeService.get(deflector.getCurrentActualTargetIndex());
+            indices.add(deflectorIndexRange);
         }
 
         return indices;

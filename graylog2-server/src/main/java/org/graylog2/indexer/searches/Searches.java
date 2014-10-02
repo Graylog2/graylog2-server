@@ -16,6 +16,7 @@
  */
 package org.graylog2.indexer.searches;
 
+import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import org.elasticsearch.action.search.SearchRequest;
@@ -32,6 +33,7 @@ import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.QueryStringQueryBuilder;
 import org.elasticsearch.node.Node;
 import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogram;
 import org.elasticsearch.search.facet.FacetBuilders;
 import org.elasticsearch.search.facet.datehistogram.DateHistogramFacet;
 import org.elasticsearch.search.facet.datehistogram.DateHistogramFacetBuilder;
@@ -45,6 +47,7 @@ import org.elasticsearch.search.sort.SortOrder;
 import org.graylog2.Configuration;
 import org.graylog2.indexer.Deflector;
 import org.graylog2.indexer.IndexHelper;
+import org.graylog2.indexer.ranges.IndexRange;
 import org.graylog2.indexer.ranges.IndexRangeService;
 import org.graylog2.indexer.results.CountResult;
 import org.graylog2.indexer.results.DateHistogramResult;
@@ -196,9 +199,14 @@ public class Searches {
     }
 
     public SearchResult search(SearchesConfig config) throws IndexHelper.InvalidRangeFormatException {
-        Set<String> indices = IndexHelper.determineAffectedIndices(indexRangeService, deflector, config.range());
+        Set<IndexRange> indices = IndexHelper.determineAffectedIndicesWithRanges(indexRangeService, deflector, config.range());
 
-        SearchRequest request = searchRequest(config, indices).request();
+        Set<String> indexNames = Sets.newHashSet();
+        for (IndexRange index : indices) {
+            indexNames.add(index.getIndexName());
+        }
+
+        SearchRequest request = searchRequest(config, indexNames).request();
 
         SearchResponse r = c.search(request).actionGet();
         return new SearchResult(r.getHits(), indices, config.query(), request.source(), r.getTook());
@@ -333,7 +341,8 @@ public class Searches {
         qs.allowLeadingWildcard(configuration.isAllowLeadingWildcardSearches());
 
         SearchRequestBuilder srb = c.prepareSearch();
-        srb.setIndices(IndexHelper.determineAffectedIndices(indexRangeService, deflector, range).toArray(new String[]{}));
+        final Set<String> affectedIndices = IndexHelper.determineAffectedIndices(indexRangeService, deflector, range);
+        srb.setIndices(affectedIndices.toArray(new String[affectedIndices.size()]));
         srb.setQuery(qs);
         srb.addFacet(fb);
 
@@ -356,7 +365,8 @@ public class Searches {
         qs.allowLeadingWildcard(configuration.isAllowLeadingWildcardSearches());
 
         SearchRequestBuilder srb = c.prepareSearch();
-        srb.setIndices(IndexHelper.determineAffectedIndices(indexRangeService, deflector, range).toArray(new String[]{}));
+        final Set<String> affectedIndices = IndexHelper.determineAffectedIndices(indexRangeService, deflector, range);
+        srb.setIndices(affectedIndices.toArray(new String[affectedIndices.size()]));
         srb.setQuery(qs);
         srb.addFacet(fb);
 
@@ -431,7 +441,7 @@ public class Searches {
         }
 
         SearchRequestBuilder srb = c.prepareSearch();
-        srb.setIndices(indices.toArray(new String[]{}));
+        srb.setIndices(indices.toArray(new String[indices.size()]));
 
         if (query.trim().equals("*")) {
             srb.setQuery(matchAllQuery());

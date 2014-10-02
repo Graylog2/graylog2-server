@@ -16,6 +16,7 @@
  */
 package org.graylog2.indexer.ranges;
 
+import com.fasterxml.jackson.annotation.JsonValue;
 import com.google.common.collect.Maps;
 import org.bson.types.ObjectId;
 import org.graylog2.database.CollectionName;
@@ -26,6 +27,7 @@ import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -84,6 +86,24 @@ public class IndexRangeImpl extends PersistedImpl implements IndexRange {
     @Override
     public Map<String, Validator> getEmbeddedValidations(String key) {
         return com.google.common.collect.Maps.newHashMap();
+    }
+
+    @JsonValue
+    public Map<String, Object> asMap() {
+        HashMap<String, Object> fields = Maps.newHashMap();
+        fields.put("index", getIndexName());
+        fields.put("starts", getStart());
+        // Calculated at and the calculation time in ms are not always set, depending on how/why the entry was created.
+        DateTime calculatedAt = getCalculatedAt();
+        if (calculatedAt != null) {
+            fields.put("calculated_at", calculatedAt);
+        }
+
+        int calculationTookMs = getCalculationTookMs();
+        if (calculationTookMs >= 0) {
+            fields.put("calculation_took_ms", calculationTookMs);
+        }
+        return fields;
     }
 
 }

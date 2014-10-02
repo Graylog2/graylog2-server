@@ -33,7 +33,11 @@ import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.inputs.Converter;
 import org.graylog2.plugin.inputs.Extractor;
 import org.graylog2.plugin.inputs.MessageInput;
-import org.graylog2.rest.documentation.annotations.*;
+import org.graylog2.rest.documentation.annotations.Api;
+import org.graylog2.rest.documentation.annotations.ApiOperation;
+import org.graylog2.rest.documentation.annotations.ApiParam;
+import org.graylog2.rest.documentation.annotations.ApiResponse;
+import org.graylog2.rest.documentation.annotations.ApiResponses;
 import org.graylog2.rest.resources.RestResource;
 import org.graylog2.rest.resources.system.inputs.requests.CreateExtractorRequest;
 import org.graylog2.rest.resources.system.inputs.requests.OrderExtractorsRequest;
@@ -45,12 +49,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
-import javax.ws.rs.POST;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
@@ -59,14 +64,12 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
+import static com.google.common.base.Strings.isNullOrEmpty;
+
 @RequiresAuthentication
 @Api(value = "Extractors", description = "Extractors of an input")
 @Path("/system/inputs/{inputId}/extractors")
 public class ExtractorsResource extends RestResource {
-
     private static final Logger LOG = LoggerFactory.getLogger(ExtractorsResource.class);
 
     private final InputService inputService;
@@ -76,11 +79,11 @@ public class ExtractorsResource extends RestResource {
     private final ExtractorFactory extractorFactory;
 
     @Inject
-    public ExtractorsResource(InputService inputService,
-                              ActivityWriter activityWriter,
-                              InputRegistry inputs,
-                              MetricRegistry metricRegistry,
-                              ExtractorFactory extractorFactory) {
+    public ExtractorsResource(final InputService inputService,
+                              final ActivityWriter activityWriter,
+                              final InputRegistry inputs,
+                              final MetricRegistry metricRegistry,
+                              final ExtractorFactory extractorFactory) {
         this.inputService = inputService;
         this.activityWriter = activityWriter;
         this.inputs = inputs;
@@ -88,7 +91,8 @@ public class ExtractorsResource extends RestResource {
         this.extractorFactory = extractorFactory;
     }
 
-    @POST @Timed
+    @POST
+    @Timed
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Add an extractor to an input")
@@ -117,7 +121,7 @@ public class ExtractorsResource extends RestResource {
         CreateExtractorRequest cer;
         try {
             cer = objectMapper.readValue(body, CreateExtractorRequest.class);
-        } catch(IOException e) {
+        } catch (IOException e) {
             LOG.error("Error while parsing JSON", e);
             throw new WebApplicationException(e, Response.Status.BAD_REQUEST);
         }
@@ -175,7 +179,8 @@ public class ExtractorsResource extends RestResource {
         return Response.status(Response.Status.CREATED).entity(json(result)).build();
     }
 
-    @GET @Timed
+    @GET
+    @Timed
     @ApiOperation(value = "List all extractors of an input")
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "No such input on this node.")
@@ -208,56 +213,56 @@ public class ExtractorsResource extends RestResource {
         return json(result);
     }
 
-    @DELETE @Timed
+    @DELETE
+    @Timed
     @ApiOperation(value = "Delete an extractor")
     @Path("/{extractorId}")
     @ApiResponses(value = {
-            @ApiResponse(code = 404, message = "No such input on this node."),
+            @ApiResponse(code = 400, message = "Invalid request."),
+            @ApiResponse(code = 404, message = "Input not found."),
             @ApiResponse(code = 404, message = "Extractor not found.")
     })
     @Produces(MediaType.APPLICATION_JSON)
-    public Response terminate(
+    public void terminate(
             @ApiParam(title = "inputId", required = true) @PathParam("inputId") String inputId,
             @ApiParam(title = "extractorId", required = true) @PathParam("extractorId") String extractorId) throws NotFoundException {
-        if (extractorId == null || extractorId.isEmpty()) {
-            LOG.error("Missing extractorId. Returning HTTP 400.");
-            throw new WebApplicationException(400);
+        if (isNullOrEmpty(extractorId)) {
+            LOG.error("extractorId is missing.");
+            throw new BadRequestException("extractorId is missing.");
         }
 
-        if (inputId == null || inputId.isEmpty()) {
-            LOG.error("Missing inputId. Returning HTTP 400.");
-            throw new WebApplicationException(400);
+        if (isNullOrEmpty(inputId)) {
+            LOG.error("inputId is missing.");
+            throw new BadRequestException("inputId is missing.");
         }
         checkPermission(RestPermissions.INPUTS_EDIT, inputId);
 
-        MessageInput input = inputs.getRunningInput(inputId);
-
+        final MessageInput input = inputs.getPersisted(inputId);
         if (input == null) {
             LOG.error("Input <{}> not found.", inputId);
-            throw new WebApplicationException(404);
+            throw new javax.ws.rs.NotFoundException("Couldn't find input " + inputId);
         }
 
         if (input.getExtractors().get(extractorId) == null) {
             LOG.error("Extractor <{}> not found.", extractorId);
-            throw new WebApplicationException(404);
+            throw new javax.ws.rs.NotFoundException("Couldn't find extractor " + extractorId);
         }
 
         // Remove from Mongo.
-        Input mongoInput = inputService.find(input.getPersistId());
+        final Input mongoInput = inputService.find(input.getPersistId());
         inputService.removeExtractor(mongoInput, extractorId);
 
-        Extractor extractor = input.getExtractors().get(extractorId);
+        final Extractor extractor = input.getExtractors().get(extractorId);
         input.getExtractors().remove(extractorId);
 
-        String msg = "Deleted extractor <" + extractorId + "> of type [" + extractor.getType() + "] " +
-                "from input <" + inputId + ">. Reason: REST request.";
+        final String msg = "Deleted extractor <" + extractorId + "> of type [" + extractor.getType() + "] " +
+                "from input <" + inputId + ">.";
         LOG.info(msg);
         activityWriter.write(new Activity(msg, InputsResource.class));
-
-        return Response.status(Response.Status.NO_CONTENT).build();
     }
 
-    @POST @Timed
+    @POST
+    @Timed
     @Consumes(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Update extractor order of an input")
     @ApiResponses(value = {
@@ -277,7 +282,7 @@ public class ExtractorsResource extends RestResource {
         OrderExtractorsRequest oer;
         try {
             oer = objectMapper.readValue(body, OrderExtractorsRequest.class);
-        } catch(IOException e) {
+        } catch (IOException e) {
             LOG.error("Error while parsing JSON", e);
             throw new WebApplicationException(e, Response.Status.BAD_REQUEST);
         }
@@ -304,18 +309,18 @@ public class ExtractorsResource extends RestResource {
     private Map<String, Object> toMap(Extractor extractor) {
         Map<String, Object> map = Maps.newHashMap();
 
-        map.put("id", extractor.getId());
-        map.put("title", extractor.getTitle());
-        map.put("type", extractor.getType().toString().toLowerCase());
-        map.put("cursor_strategy", extractor.getCursorStrategy().toString().toLowerCase());
-        map.put("source_field", extractor.getSourceField());
-        map.put("target_field", extractor.getTargetField());
-        map.put("extractor_config", extractor.getExtractorConfig());
-        map.put("creator_user_id", extractor.getCreatorUserId());
-        map.put("converters", extractor.converterConfigMap());
-        map.put("condition_type", extractor.getConditionType().toString().toLowerCase());
-        map.put("condition_value", extractor.getConditionValue());
-        map.put("order", extractor.getOrder());
+        map.put(Extractor.FIELD_ID, extractor.getId());
+        map.put(Extractor.FIELD_TITLE, extractor.getTitle());
+        map.put(Extractor.FIELD_TYPE, extractor.getType().toString().toLowerCase());
+        map.put(Extractor.FIELD_CURSOR_STRATEGY, extractor.getCursorStrategy().toString().toLowerCase());
+        map.put(Extractor.FIELD_SOURCE_FIELD, extractor.getSourceField());
+        map.put(Extractor.FIELD_TARGET_FIELD, extractor.getTargetField());
+        map.put(Extractor.FIELD_EXTRACTOR_CONFIG, extractor.getExtractorConfig());
+        map.put(Extractor.FIELD_CREATOR_USER_ID, extractor.getCreatorUserId());
+        map.put(Extractor.FIELD_CONVERTERS, extractor.converterConfigMap());
+        map.put(Extractor.FIELD_CONDITION_TYPE, extractor.getConditionType().toString().toLowerCase());
+        map.put(Extractor.FIELD_CONDITION_VALUE, extractor.getConditionValue());
+        map.put(Extractor.FIELD_ORDER, extractor.getOrder());
 
         map.put("exceptions", extractor.getExceptionCount());
         map.put("converter_exceptions", extractor.getConverterExceptionCount());

@@ -17,6 +17,7 @@
 package org.graylog2.rest.resources.search.responses;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import org.graylog2.indexer.ranges.IndexRange;
 import org.graylog2.indexer.results.ResultMessage;
 import org.joda.time.DateTime;
 
@@ -27,7 +28,7 @@ import java.util.Set;
 public class SearchResponse {
     public String query;
     public String builtQuery;
-    public Set<String> usedIndices;
+    public Set<IndexRange> usedIndices;
     public List<ResultMessage> messages;
     public Set<String> fields;
     public long time;

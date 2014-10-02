@@ -24,8 +24,8 @@ package org.graylog2.plugin.inputs;
 
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.database.EmbeddedPersistable;
 import org.slf4j.Logger;
@@ -39,12 +39,23 @@ import java.util.regex.Pattern;
 
 import static com.codahale.metrics.MetricRegistry.name;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public abstract class Extractor implements EmbeddedPersistable {
-
     private static final Logger LOG = LoggerFactory.getLogger(Extractor.class);
+
+    public static final String FIELD_ID = "id";
+    public static final String FIELD_TITLE = "title";
+    public static final String FIELD_ORDER = "order";
+    public static final String FIELD_TYPE = "type";
+    public static final String FIELD_CURSOR_STRATEGY = "cursor_strategy";
+    public static final String FIELD_TARGET_FIELD = "target_field";
+    public static final String FIELD_SOURCE_FIELD = "source_field";
+    public static final String FIELD_CREATOR_USER_ID = "creator_user_id";
+    public static final String FIELD_EXTRACTOR_CONFIG = "extractor_config";
+    public static final String FIELD_CONDITION_TYPE = "condition_type";
+    public static final String FIELD_CONDITION_VALUE = "condition_value";
+    public static final String FIELD_CONVERTERS = "converters";
+    public static final String FIELD_CONVERTER_TYPE = "type";
+    public static final String FIELD_CONVERTER_CONFIG = "config";
 
     public enum Type {
         SUBSTRING,
@@ -151,8 +162,7 @@ public abstract class Extractor implements EmbeddedPersistable {
             }
         }
 
-        Timer timer = metricRegistry.timer(getTotalTimerName());
-        final Timer.Context timerContext = timer.time();
+        final Timer.Context timerContext = metricRegistry.timer(getTotalTimerName()).time();
 
         Result result = run(field);
 
@@ -171,7 +181,7 @@ public abstract class Extractor implements EmbeddedPersistable {
 
             String finalResult = sb.toString();
 
-            if(finalResult.isEmpty()) {
+            if (finalResult.isEmpty()) {
                 finalResult = "fullyCutByExtractor";
             }
 
@@ -185,8 +195,7 @@ public abstract class Extractor implements EmbeddedPersistable {
     }
 
     public void runConverters(Message msg) {
-        Timer cTimer = metricRegistry.timer(getConverterTimerName());
-        final Timer.Context cTimerContext = cTimer.time();
+        final Timer.Context timerContext = metricRegistry.timer(getConverterTimerName()).time();
 
         for (Converter converter : converters) {
             try {
@@ -195,7 +204,7 @@ public abstract class Extractor implements EmbeddedPersistable {
                 }
 
                 if (!converter.buildsMultipleFields()) {
-                    Object converted = converter.convert((String) msg.getFields().get(targetField));
+                    final Object converted = converter.convert((String) msg.getFields().get(targetField));
 
                     // We have arrived here if no exception was thrown and can safely replace the original field.
                     msg.removeField(targetField);
@@ -209,7 +218,7 @@ public abstract class Extractor implements EmbeddedPersistable {
                             if (LOG.isDebugEnabled()) {
                                 LOG.debug(
                                         "Not setting reserved field {} from converter {} on message {}, rest of the message is being processed",
-                                        new Object[]{reservedField, converter.getType(), msg.getId()});
+                                        reservedField, converter.getType(), msg.getId());
                             }
                             converterExceptions.incrementAndGet();
                             convert.remove(reservedField);
@@ -224,7 +233,7 @@ public abstract class Extractor implements EmbeddedPersistable {
             }
         }
 
-        cTimerContext.stop();
+        timerContext.stop();
     }
 
     public class ReservedFieldException extends Exception {
@@ -283,34 +292,37 @@ public abstract class Extractor implements EmbeddedPersistable {
 
     public Map<String, Object> getPersistedFields() {
         return new HashMap<String, Object>() {{
-            put("id", id);
-            put("title", title);
-            put("order", order);
-            put("type", superType.toString().toLowerCase());
-            put("cursor_strategy", cursorStrategy.toString().toLowerCase());
-            put("target_field", targetField);
-            put("source_field", sourceField);
-            put("creator_user_id", creatorUserId);
-            put("extractor_config", extractorConfig);
-            put("condition_type", conditionType.toString().toLowerCase());
-            put("condition_value", conditionValue);
-            put("converters", converterConfigMap());
+            put(FIELD_ID, id);
+            put(FIELD_TITLE, title);
+            put(FIELD_ORDER, order);
+            put(FIELD_TYPE, superType.toString().toLowerCase());
+            put(FIELD_CURSOR_STRATEGY, cursorStrategy.toString().toLowerCase());
+            put(FIELD_TARGET_FIELD, targetField);
+            put(FIELD_SOURCE_FIELD, sourceField);
+            put(FIELD_CREATOR_USER_ID, creatorUserId);
+            put(FIELD_EXTRACTOR_CONFIG, extractorConfig);
+            put(FIELD_CONDITION_TYPE, conditionType.toString().toLowerCase());
+            put(FIELD_CONDITION_VALUE, conditionValue);
+            put(FIELD_CONVERTERS, converterConfigMap());
         }};
     }
 
+    public List<Converter> getConverters() {
+        return converters;
+    }
+
     public List<Map<String, Object>> converterConfigMap() {
-        List<Map<String, Object>> converterConfig = Lists.newArrayList();
+        final ImmutableList.Builder<Map<String, Object>> listBuilder = ImmutableList.builder();
 
         for (Converter converter : converters) {
-            Map<String, Object> config = Maps.newHashMap();
-
-            config.put("type", converter.getType().toLowerCase());
-            config.put("config", converter.getConfig());
-
-            converterConfig.add(config);
+            final Map<String, Object> config = ImmutableMap.of(
+                    FIELD_CONVERTER_TYPE, converter.getType().toLowerCase(),
+                    FIELD_CONVERTER_CONFIG, converter.getConfig()
+            );
+            listBuilder.add(config);
         }
 
-        return converterConfig;
+        return listBuilder.build();
     }
 
     public String getTotalTimerName() {
@@ -358,5 +370,4 @@ public abstract class Extractor implements EmbeddedPersistable {
         }
 
     }
-
 }

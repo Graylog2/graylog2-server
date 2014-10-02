@@ -31,6 +31,7 @@ import org.graylog2.rest.documentation.annotations.ApiOperation;
 import org.graylog2.rest.documentation.annotations.ApiResponse;
 import org.graylog2.rest.documentation.annotations.ApiResponses;
 import org.graylog2.rest.resources.RestResource;
+import org.graylog2.rest.resources.system.responses.IndexRangesResponse;
 import org.graylog2.security.RestPermissions;
 import org.graylog2.system.jobs.SystemJob;
 import org.graylog2.system.jobs.SystemJobConcurrencyException;
@@ -75,37 +76,21 @@ public class IndexRangesResource extends RestResource {
     @GET @Timed
     @ApiOperation(value = "Get a list of all index ranges")
     @Produces(MediaType.APPLICATION_JSON)
-    public String list() {
-        Map<String, Object> result = Maps.newHashMap();
-        List<Map<String, Object>> ranges = Lists.newArrayList();
+    public IndexRangesResponse list() {
+        IndexRangesResponse irp = new IndexRangesResponse();
+        List<IndexRange> ranges = Lists.newArrayList();
 
         for (IndexRange range : indexRangeService.getFrom(0)) {
             if (!isPermitted(RestPermissions.INDEXRANGES_READ, range.getIndexName())) {
                 continue;
             }
-            Map<String, Object> rangeInfo = Maps.newHashMap();
-
-            // Calculated at and the calculation time in ms are not always set, depending on how/why the entry was created.
-            DateTime calculatedAt = range.getCalculatedAt();
-            if (calculatedAt != null) {
-                rangeInfo.put("calculated_at", Tools.getISO8601String(calculatedAt));
-            }
-
-            int calculationTookMs = range.getCalculationTookMs();
-            if (calculationTookMs >= 0) {
-                rangeInfo.put("calculation_took_ms", calculationTookMs);
-            }
-
-            rangeInfo.put("starts", Tools.getISO8601String(range.getStart()));
-            rangeInfo.put("index", range.getIndexName());
-
-            ranges.add(rangeInfo);
+            ranges.add(range);
         }
 
-        result.put("ranges", ranges);
-        result.put("total", ranges.size());
+        irp.ranges = ranges;
+        irp.total = ranges.size();
 
-        return json(result);
+        return irp;
     }
 
     @POST @Timed

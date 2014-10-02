@@ -59,7 +59,7 @@ public class AlarmCallbackConfigurationImpl extends PersistedImpl implements Ala
     }
 
     public String getStreamId() {
-        return stream_id.toStringMongod();
+        return stream_id.toHexString();
     }
 
     public String getType() {

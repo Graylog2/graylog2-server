@@ -36,6 +36,6 @@ public class ObjectIdSerializer extends JsonSerializer<ObjectId> {
     @Override
     public void serialize(ObjectId value, JsonGenerator jgen, SerializerProvider provider)
             throws IOException, JsonProcessingException {
-        jgen.writeString(value.toStringMongod());
+        jgen.writeString(value.toHexString());
     }
 }

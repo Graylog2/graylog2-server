@@ -26,9 +26,6 @@ import com.google.common.collect.Lists;
 
 import java.util.List;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public class NumberField extends AbstractConfigurationField implements ConfigurationField {
 
     public static final String FIELD_TYPE = "number";
@@ -44,7 +41,7 @@ public class NumberField extends AbstractConfigurationField implements Configura
     private final List<String> attributes;
 
     public NumberField(String name, String humanName, int defaultValue, String description, Optional isOptional) {
-        this(name, humanName, defaultValue, description, isOptional, null);
+        this(name, humanName, defaultValue, description, isOptional, new Attribute[0]);
     }
 
     public NumberField(String name, String humanName, int defaultValue, String description, Attribute... attributes) {
