@@ -46,6 +46,7 @@
         <module>graylog2-inputs</module>
         <module>graylog2-radio</module>
         <module>graylog2-rest-routes</module>
+        <module>graylog2-rest-client</module>
     </modules>
 
     <organization>
