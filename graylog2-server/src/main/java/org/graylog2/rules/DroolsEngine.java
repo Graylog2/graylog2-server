@@ -48,7 +48,6 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.logging.Level;
 
 @Singleton
 public class DroolsEngine implements RulesEngine {
