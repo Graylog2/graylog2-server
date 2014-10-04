@@ -21,7 +21,7 @@ package lib
 
 import play.api.mvc._
 import scala.concurrent.{ExecutionContext, Future}
-import play.api.mvc.SimpleResult
+import play.api.mvc.Result
 import ExecutionContext.Implicits.global
 
 /**
@@ -32,8 +32,8 @@ import ExecutionContext.Implicits.global
  */
 class NoCacheHeader extends Filter {
 
-  def apply(nextFilter: (RequestHeader) => Future[SimpleResult])
-           (requestHeader: RequestHeader): Future[SimpleResult] = {
+  def apply(nextFilter: (RequestHeader) => Future[Result])
+           (requestHeader: RequestHeader): Future[Result] = {
     if (requestHeader.headers.get("X-Requested-With").getOrElse("").equalsIgnoreCase("xmlhttprequest")) {
       nextFilter(requestHeader).map { result =>
         if (! result.header.headers.contains("Cache-Control")) {

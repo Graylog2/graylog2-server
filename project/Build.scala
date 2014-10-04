@@ -1,6 +1,7 @@
 import sbt._
 import Keys._
-import play.Project._
+import play.Play.autoImport._
+import PlayKeys._
 import java.text.SimpleDateFormat
 import java.util.{Date, TimeZone}
 import com.typesafe.sbt.SbtNativePackager.Universal
@@ -52,7 +53,10 @@ object ApplicationBuild extends Build {
     df.format(new Date())
   }
 
-  val main = play.Project(appName, appVersion, appDependencies).settings(
+  val main = Project(appName, file(".")).enablePlugins(play.PlayJava).settings(
+    scalaVersion := "2.10.4",
+    version := appVersion,
+    libraryDependencies ++= appDependencies,
     resolvers ++= repositories,
     resourceGenerators in Compile <+= resourceManaged in Compile map { dir =>
       val propsFile = new File(dir, "git.properties")

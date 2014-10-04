@@ -54,7 +54,7 @@ import play.GlobalSettings;
 import play.api.mvc.EssentialFilter;
 import play.libs.F;
 import play.mvc.Http;
-import play.mvc.SimpleResult;
+import play.mvc.Result;
 
 import java.io.File;
 import java.net.URI;
@@ -191,13 +191,13 @@ public class Global extends GlobalSettings {
     }
 
     @Override
-    public F.Promise<SimpleResult> onError(Http.RequestHeader request, Throwable t) {
+    public F.Promise<Result> onError(Http.RequestHeader request, Throwable t) {
         if (t.getCause() instanceof Graylog2MasterUnavailableException) {
             final ServerNodes serverNodes = injector.getInstance(ServerNodes.class);
             final List<Node> configuredNodes = serverNodes.getConfiguredNodes();
             final List<Node> nodesEverConnectedTo = serverNodes.all(true);
 
-            return F.Promise.<SimpleResult>pure(internalServerError(
+            return F.Promise.<Result>pure(internalServerError(
                     views.html.disconnected.no_master.render(Http.Context.current(), configuredNodes, nodesEverConnectedTo, serverNodes))
             );
         }

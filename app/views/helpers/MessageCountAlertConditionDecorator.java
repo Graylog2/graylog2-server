@@ -4,7 +4,7 @@ import controllers.routes;
 import org.graylog2.restclient.models.Stream;
 import org.graylog2.restclient.models.alerts.AlertCondition;
 import play.api.mvc.Call;
-import play.api.templates.Html;
+import play.twirl.api.Html;
 
 public class MessageCountAlertConditionDecorator extends AlertConditionDecorator {
     public enum ThresholdType {

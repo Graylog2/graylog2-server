@@ -4,7 +4,7 @@ import org.graylog2.restclient.models.ClusterEntity;
 import org.graylog2.restclient.models.Node;
 import org.graylog2.restclient.models.NodeService;
 import org.graylog2.restclient.models.Radio;
-import play.api.templates.Html;
+import play.twirl.api.Html;
 
 /**
  * @author Dennis Oelkers <dennis@torch.sh>

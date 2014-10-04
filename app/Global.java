@@ -25,7 +25,7 @@ import play.api.mvc.Handler;
 import play.libs.F;
 import play.mvc.Action;
 import play.mvc.Http;
-import play.mvc.SimpleResult;
+import play.mvc.Result;
 
 import java.io.File;
 import java.lang.reflect.Method;
@@ -71,17 +71,17 @@ public class Global extends GlobalSettings {
     }
 
     @Override
-    public F.Promise<SimpleResult> onHandlerNotFound(Http.RequestHeader request) {
+    public F.Promise<Result> onHandlerNotFound(Http.RequestHeader request) {
         return global.onHandlerNotFound(request);
     }
 
     @Override
-    public F.Promise<SimpleResult> onError(Http.RequestHeader request, Throwable t) {
+    public F.Promise<Result> onError(Http.RequestHeader request, Throwable t) {
         return global.onError(request, t);
     }
 
     @Override
-    public F.Promise<SimpleResult> onBadRequest(Http.RequestHeader request, String error) {
+    public F.Promise<Result> onBadRequest(Http.RequestHeader request, String error) {
         return global.onBadRequest(request, error);
     }
 

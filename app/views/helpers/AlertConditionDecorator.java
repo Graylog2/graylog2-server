@@ -3,7 +3,7 @@ package views.helpers;
 import org.graylog2.restclient.models.Stream;
 import org.graylog2.restclient.models.alerts.AlertCondition;
 import play.api.mvc.Call;
-import play.api.templates.Html;
+import play.twirl.api.Html;
 
 public abstract class AlertConditionDecorator {
     private final AlertCondition alertCondition;

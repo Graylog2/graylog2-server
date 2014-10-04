@@ -20,7 +20,7 @@ package views.helpers;
 
 import org.graylog2.restclient.models.api.responses.SearchResultResponse;
 import org.graylog2.restclient.models.api.results.SearchResult;
-import play.api.templates.HtmlFormat;
+import play.twirl.api.HtmlFormat;
 
 public class QueryErrorHelper {
 
