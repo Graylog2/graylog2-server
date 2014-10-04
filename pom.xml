@@ -258,7 +258,7 @@
             <dependency>
                 <groupId>com.ning</groupId>
                 <artifactId>async-http-client</artifactId>
-                <version>1.7.24</version>
+                <version>1.8.14</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.httpcomponents</groupId>
