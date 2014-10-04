@@ -1,3 +1,0 @@
-[submodule "modules/graylog2-rest-client"]
-	path = modules/graylog2-rest-client
-	url = git://github.com/Graylog2/graylog2-rest-client.git
