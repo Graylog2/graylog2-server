@@ -16,7 +16,7 @@ object ApplicationBuild extends Build {
     javaEbean,
     "com.google.code.gson" % "gson" % "2.2",
     "com.google.guava" % "guava" % "14.0",
-    "com.ning" % "async-http-client" % "1.7.17",
+    "com.ning" % "async-http-client" % "1.8.14",
     "org.apache.shiro" % "shiro-core" % "1.2.2",
     "com.google.inject" % "guice" % "3.0",
     "com.google.inject.extensions" % "guice-assistedinject" % "3.0",
