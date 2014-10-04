@@ -20,7 +20,16 @@ package lib;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import com.ning.http.client.*;
+import com.ning.http.client.AsyncHandler;
+import com.ning.http.client.AsyncHttpProvider;
+import com.ning.http.client.FluentCaseInsensitiveStringsMap;
+import com.ning.http.client.HttpResponseBodyPart;
+import com.ning.http.client.HttpResponseHeaders;
+import com.ning.http.client.HttpResponseStatus;
+import com.ning.http.client.ListenableFuture;
+import com.ning.http.client.Request;
+import com.ning.http.client.Response;
+import com.ning.http.client.cookie.Cookie;
 import com.ning.http.client.listenable.AbstractListenableFuture;
 
 import java.io.IOException;
@@ -34,7 +43,12 @@ import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 public class StubHttpProvider implements AsyncHttpProvider {
 
@@ -139,6 +153,11 @@ public class StubHttpProvider implements AsyncHttpProvider {
                 @Override
                 public boolean closeUnderlyingConnection() {
                     return true;
+                }
+
+                @Override
+                public int length() {
+                    return getBodyPartBytes().length;
                 }
             });
             t = handler.onCompleted();
@@ -316,7 +335,7 @@ public class StubHttpProvider implements AsyncHttpProvider {
         }
 
         @Override
-        public void done(Callable callable) {
+        public void done() {
         }
 
         @Override
