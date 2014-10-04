@@ -1,0 +1,4 @@
+target/*
+graylog2-rest-client.iml
+.idea
+.DS_Store
