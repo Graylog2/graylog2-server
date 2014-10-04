@@ -6,6 +6,9 @@ import java.text.SimpleDateFormat
 import java.util.{Date, TimeZone}
 import com.typesafe.sbt.SbtNativePackager.Universal
 import com.typesafe.sbt.packager.universal.Keys.packageZipTarball
+import com.typesafe.sbt.web.SbtWeb
+import com.typesafe.sbt.web.SbtWeb.autoImport._
+import com.typesafe.sbt.less.Import.LessKeys
 
 object ApplicationBuild extends Build {
   val appName         = "graylog2-web-interface"
@@ -53,7 +56,7 @@ object ApplicationBuild extends Build {
     df.format(new Date())
   }
 
-  val main = Project(appName, file(".")).enablePlugins(play.PlayJava).settings(
+  val main = Project(appName, file(".")).enablePlugins(play.PlayJava).enablePlugins(SbtWeb).settings(
     scalaVersion := "2.10.4",
     version := appVersion,
     libraryDependencies ++= appDependencies,
@@ -77,6 +80,7 @@ object ApplicationBuild extends Build {
       Seq(propsFile)
     },
     sources in doc in Compile := List(),
+    includeFilter in (Assets, LessKeys.less) := "*.less",
     mappings in Universal in packageZipTarball += file("misc/graylog2-web-interface.conf.example") -> "conf/graylog2-web-interface.conf",
     name in Universal := {
       val originalName = (name in Universal).value
