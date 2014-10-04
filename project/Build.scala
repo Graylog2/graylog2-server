@@ -8,7 +8,7 @@ import com.typesafe.sbt.packager.universal.Keys.packageZipTarball
 
 object ApplicationBuild extends Build {
   val appName         = "graylog2-web-interface"
-  val appVersion      = "0.92.0-SNAPSHOT"
+  val appVersion      = "0.92.0+play23-SNAPSHOT"
   val appDependencies = Seq(
     cache,
     javaCore,
@@ -21,6 +21,7 @@ object ApplicationBuild extends Build {
     "com.google.inject.extensions" % "guice-assistedinject" % "3.0",
     "javax.inject" % "javax.inject" % "1",
     "org.graylog2" % "play2-graylog2_2.10" % "1.0",
+    "org.graylog2" % "graylog2-rest-client" % appVersion,
 
     // TODO this is stupid, just to get that UriBuilder...
     "javax.ws.rs" % "jsr311-api" % "0.11",
@@ -35,15 +36,13 @@ object ApplicationBuild extends Build {
     "org.codehaus.jackson" % "jackson-core-asl" % "1.9.12" % "test"
   )
   val repositories = Seq(
-    Resolver.url("Local Maven Repository", url("file://"+Path.userHome+"/.m2/repository")),
+    ("Local Maven Repository" at "file:///"+Path.userHome.absolutePath+"/.m2/repository"),
     Resolver.url("Graylog2 Play Repository", url("http://graylog2.github.io/play2-graylog2/releases/"))(Resolver.ivyStylePatterns),
     Resolver.url("Graylog2 Play Snapshot Repository", url("http://graylog2.github.io/play2-graylog2/snapshots/"))(Resolver.ivyStylePatterns),
     Resolver.sonatypeRepo("releases"),
-    ("Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots")
+    ("Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots"),
+    ("Typesafe Releases" at "http://repo.typesafe.com/typesafe/releases/")
   )
-
-  // Submodule
-  lazy val restClient = Project("graylog2-rest-client", file("modules/graylog2-rest-client"))
 
   // Helper
   val isSnapshot: Boolean = appVersion.endsWith("SNAPSHOT")
@@ -83,5 +82,5 @@ object ApplicationBuild extends Build {
         originalName
       }
     }
-  ).dependsOn(restClient)
+  )
 }
