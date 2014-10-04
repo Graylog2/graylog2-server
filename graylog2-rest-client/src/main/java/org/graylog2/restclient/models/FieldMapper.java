@@ -19,13 +19,10 @@ package org.graylog2.restclient.models;
 import com.google.common.collect.Lists;
 import org.graylog2.restclient.lib.Tools;
 import org.apache.commons.lang3.StringEscapeUtils;
-import play.api.templates.Html;
+import play.twirl.api.Html;
 
 import java.util.List;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public class FieldMapper {
 
     public enum Type {
