@@ -20,6 +20,7 @@ package org.graylog2.inputs.syslog.udp;
 import com.codahale.metrics.MetricRegistry;
 import org.graylog2.inputs.network.PacketInformationDumper;
 import org.graylog2.inputs.syslog.SyslogDispatcher;
+import org.graylog2.inputs.syslog.SyslogUDPDispatcher;
 import org.graylog2.plugin.buffers.Buffer;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.inputs.MessageInput;
@@ -27,6 +28,8 @@ import org.graylog2.plugin.inputs.util.ThroughputCounter;
 import org.jboss.netty.channel.ChannelPipeline;
 import org.jboss.netty.channel.ChannelPipelineFactory;
 import org.jboss.netty.channel.Channels;
+import org.jboss.netty.handler.execution.ExecutionHandler;
+import org.jboss.netty.handler.execution.OrderedMemoryAwareThreadPoolExecutor;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
@@ -56,7 +59,9 @@ public class SyslogUDPPipelineFactory implements ChannelPipelineFactory {
 
         p.addLast("packet-meta-dumper", new PacketInformationDumper(sourceInput));
         p.addLast("traffic-counter", throughputCounter);
-        p.addLast("handler", new SyslogDispatcher(metricRegistry, processBuffer, config, sourceInput));
+        p.addLast("executionHandler", new ExecutionHandler(
+                new OrderedMemoryAwareThreadPoolExecutor(16, 1048576, 1048576)));
+        p.addLast("handler", new SyslogUDPDispatcher(metricRegistry, processBuffer, config, sourceInput));
         
         return p;
     }

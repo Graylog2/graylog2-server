@@ -18,7 +18,7 @@ package org.graylog2.inputs.gelf.udp;
 
 
 import com.codahale.metrics.MetricRegistry;
-import org.graylog2.inputs.gelf.GELFDispatcher;
+import org.graylog2.inputs.gelf.GELFUDPDispatcher;
 import org.graylog2.inputs.gelf.gelf.GELFChunkManager;
 import org.graylog2.inputs.network.PacketInformationDumper;
 import org.graylog2.plugin.buffers.Buffer;
@@ -27,6 +27,8 @@ import org.graylog2.plugin.inputs.util.ThroughputCounter;
 import org.jboss.netty.channel.ChannelPipeline;
 import org.jboss.netty.channel.ChannelPipelineFactory;
 import org.jboss.netty.channel.Channels;
+import org.jboss.netty.handler.execution.ExecutionHandler;
+import org.jboss.netty.handler.execution.OrderedMemoryAwareThreadPoolExecutor;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
@@ -56,7 +58,9 @@ public class GELFUDPPipelineFactory implements ChannelPipelineFactory {
         ChannelPipeline p = Channels.pipeline();
         p.addLast("packet-meta-dumper", new PacketInformationDumper(sourceInput));
         p.addLast("traffic-counter", throughputCounter);
-        p.addLast("handler", new GELFDispatcher(metricRegistry, gelfChunkManager, processBuffer, sourceInput));
+        p.addLast("executionHandler", new ExecutionHandler(
+                new OrderedMemoryAwareThreadPoolExecutor(16, 1048576, 1048576)));
+        p.addLast("handler", new GELFUDPDispatcher(metricRegistry, gelfChunkManager, processBuffer, sourceInput));
 
         return p;
     }

@@ -22,6 +22,7 @@ import org.graylog2.inputs.gelf.gelf.GELFChunkManager;
 import org.graylog2.inputs.gelf.gelf.GELFMessage;
 import org.graylog2.inputs.gelf.gelf.GELFProcessor;
 import org.graylog2.plugin.buffers.Buffer;
+import org.graylog2.plugin.buffers.BufferOutOfCapacityException;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.channel.ChannelHandlerContext;
@@ -39,7 +40,7 @@ import static com.codahale.metrics.MetricRegistry.name;
  */
 public class GELFDispatcher extends SimpleChannelHandler {
 
-    private static final Logger LOG = LoggerFactory.getLogger(GELFDispatcher.class);
+    protected static final Logger LOG = LoggerFactory.getLogger(GELFDispatcher.class);
 
     private GELFProcessor processor;
     private final MessageInput sourceInput;
@@ -64,6 +65,10 @@ public class GELFDispatcher extends SimpleChannelHandler {
 
     @Override
     public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
+        processMessage(e);
+    }
+
+    void processMessage(MessageEvent e) throws BufferOutOfCapacityException {
         receivedMessages.mark();
         ChannelBuffer buffer = (ChannelBuffer) e.getMessage();
 
