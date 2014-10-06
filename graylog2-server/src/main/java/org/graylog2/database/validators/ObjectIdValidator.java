@@ -20,22 +20,21 @@ import org.bson.types.ObjectId;
 import org.graylog2.plugin.database.validators.ValidationResult;
 import org.graylog2.plugin.database.validators.Validator;
 
-/**
- * @author Dennis Oelkers <dennis@torch.sh>
- */
+import javax.annotation.Nullable;
+
 public class ObjectIdValidator implements Validator {
     /**
-     * Validates: Object is not null and of type ObjectId.
-     *
+     * Validates: Object is not {@code null} and of type {@link ObjectId}.
      *
      * @param value The object to check
      * @return validation result
      */
     @Override
-    public ValidationResult validate(Object value) {
-        if (value != null && value instanceof ObjectId)
+    public ValidationResult validate(@Nullable final Object value) {
+        if (value instanceof ObjectId) {
             return new ValidationResult.ValidationPassed();
-        else
-            return new ValidationResult.ValidationFailed(value.toString() + " is not a valid ObjectId!");
+        } else {
+            return new ValidationResult.ValidationFailed(String.valueOf(value) + " is not a valid ObjectId!");
+        }
     }
 }
