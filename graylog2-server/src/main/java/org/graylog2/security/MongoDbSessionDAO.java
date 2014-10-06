@@ -89,11 +89,17 @@ public class MongoDbSessionDAO extends CachingSessionDAO {
     @Override
     protected void doUpdate(Session session) {
         final MongoDbSession dbSession = mongoDBSessionService.load(session.getId().toString());
+
+        if(null == dbSession) {
+            throw new RuntimeException("Couldn't load session <" + session.getId() + ">");
+        }
+
         LOG.debug("Updating session {}", session);
         dbSession.setHost(session.getHost());
         dbSession.setTimeout(session.getTimeout());
         dbSession.setStartTimestamp(session.getStartTimestamp());
         dbSession.setLastAccessTime(session.getLastAccessTime());
+
         if (session instanceof SimpleSession) {
             final SimpleSession simpleSession = (SimpleSession) session;
             dbSession.setAttributes(simpleSession.getAttributes());
@@ -101,6 +107,7 @@ public class MongoDbSessionDAO extends CachingSessionDAO {
         } else {
             throw new RuntimeException("Unsupported session type: " + session.getClass().getCanonicalName());
         }
+
         mongoDBSessionService.saveWithoutValidation(dbSession);
     }
 
