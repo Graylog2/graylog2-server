@@ -21,11 +21,11 @@ import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import org.graylog2.Configuration;
-import org.graylog2.database.NotFoundException;
 import com.google.common.util.concurrent.SimpleTimeLimiter;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.common.util.concurrent.TimeLimiter;
+import org.graylog2.Configuration;
+import org.graylog2.database.NotFoundException;
 import org.graylog2.database.ValidationException;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
@@ -37,15 +37,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Routes a GELF Message to it's streams.
- *
- * @author Lennart Koopmann <lennart@socketfeed.com>
+ * Routes a GELF message to its streams.
  */
 public class StreamRouter {
     private static final Logger LOG = LoggerFactory.getLogger(StreamRouter.class);
@@ -101,8 +104,7 @@ public class StreamRouter {
         final int maxFaultCount = configuration.getStreamProcessingMaxFaults();
 
         for (final Stream stream : streams) {
-            Timer timer = getExecutionTimer(stream.getId());
-            final Timer.Context timerContext = timer.time();
+            final Timer timer = getExecutionTimer(stream.getId());
 
             Callable<Boolean> task = new Callable<Boolean>() {
                 public Boolean call() {
@@ -111,7 +113,7 @@ public class StreamRouter {
                 }
             };
 
-            try {
+            try (final Timer.Context timerContext = timer.time()) {
                 boolean matched = timeLimiter.callWithTimeout(task, timeout, TimeUnit.MILLISECONDS, true);
                 if (matched) {
                     getIncomingMeter(stream.getId()).mark();
@@ -119,7 +121,7 @@ public class StreamRouter {
                 }
             } catch (Exception e) {
                 AtomicInteger faultCount = getFaultCount(stream.getId());
-                Integer streamFaultCount = faultCount.incrementAndGet();
+                int streamFaultCount = faultCount.incrementAndGet();
                 getStreamRuleTimeoutMeter(stream.getId()).mark();
                 if (maxFaultCount > 0 && streamFaultCount >= maxFaultCount) {
                     try {
@@ -140,9 +142,6 @@ public class StreamRouter {
                 } else
                     LOG.warn("Processing of stream <{}> failed to return within {}ms.", stream.getId(), timeout);
             }
-
-
-            timerContext.close();
         }
 
         return matches;
@@ -157,7 +156,7 @@ public class StreamRouter {
             return streamRuleService.loadForStream(stream);
         } catch (NotFoundException e) {
             LOG.error("Caught exception while fetching stream rules", e);
-            return null;
+            return Collections.emptyList();
         }
     }
 
