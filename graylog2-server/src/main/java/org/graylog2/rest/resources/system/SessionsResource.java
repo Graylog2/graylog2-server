@@ -145,7 +145,7 @@ public class SessionsResource extends RestResource {
     }
 
     @JsonAutoDetect
-    public class Session {
+    public static class Session {
         @JsonProperty(required = true)
         public Date validUntil;
 

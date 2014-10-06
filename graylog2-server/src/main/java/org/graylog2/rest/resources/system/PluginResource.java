@@ -31,21 +31,17 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import java.net.URI;
-import java.net.URL;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-/**
- * @author Dennis Oelkers <dennis@torch.sh>
- */
 @Api(value = "System/Plugin", description = "Plugin information")
 @Path("/system/plugins")
 @Produces(MediaType.APPLICATION_JSON)
 public class PluginResource extends RestResource {
     private final Set<PluginMetaData> pluginMetaDataSet;
 
-    class PluginMetaDataValue {
+    static class PluginMetaDataValue {
         public final String unique_id;
         public final String name;
         public final String author;

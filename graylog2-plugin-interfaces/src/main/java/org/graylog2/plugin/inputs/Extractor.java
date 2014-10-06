@@ -236,7 +236,7 @@ public abstract class Extractor implements EmbeddedPersistable {
         timerContext.stop();
     }
 
-    public class ReservedFieldException extends Exception {
+    public static class ReservedFieldException extends Exception {
         public ReservedFieldException(String msg) {
             super(msg);
         }
@@ -345,7 +345,7 @@ public abstract class Extractor implements EmbeddedPersistable {
         exceptions.incrementAndGet();
     }
 
-    public class Result {
+    public static class Result {
 
         private final String value;
         private final int beginIndex;

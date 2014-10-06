@@ -30,17 +30,16 @@ import java.util.Map;
 import java.util.TimeZone;
 
 public class NaturalDateParser {
-
     public static final TimeZone UTC = TimeZone.getTimeZone("UTC");
 
-    public Result parse(String string) throws DateNotParsableException {
+    public Result parse(final String string) throws DateNotParsableException {
         Date from = null;
         Date to = null;
 
-        Parser parser = new Parser(UTC);
-        List<DateGroup> groups = parser.parse(string);
+        final Parser parser = new Parser(UTC);
+        final List<DateGroup> groups = parser.parse(string);
         if (!groups.isEmpty()) {
-            List<Date> dates = groups.get(0).getDates();
+            final List<Date> dates = groups.get(0).getDates();
 
             if (dates.size() >= 1) {
                 from = dates.get(0);
@@ -56,12 +55,11 @@ public class NaturalDateParser {
         return new Result(from, to);
     }
 
-    public class Result {
+    public static class Result {
+        private final DateTime from;
+        private final DateTime to;
 
-        private DateTime from;
-        private DateTime to;
-
-        public Result(Date from, Date to) {
+        public Result(final Date from, final Date to) {
             if (from != null) {
                 this.from = new DateTime(from, DateTimeZone.UTC);
             } else {
@@ -92,13 +90,12 @@ public class NaturalDateParser {
             return result;
         }
 
-        private String dateFormat(DateTime x) {
+        private String dateFormat(final DateTime x) {
             return x.toString(DateTimeFormat.forPattern(Tools.ES_DATE_FORMAT_NO_MS).withZoneUTC());
         }
-
     }
 
-    public class DateNotParsableException extends Exception {
+    public static class DateNotParsableException extends Exception {
     }
 
 }

@@ -24,8 +24,6 @@ import org.graylog2.restclient.models.api.responses.cluster.NodeSummaryResponse;
 import org.graylog2.restclient.models.api.responses.cluster.RadioSummaryResponse;
 import org.graylog2.restclient.models.api.responses.cluster.RadiosResponse;
 import org.graylog2.restroutes.generated.routes;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.Map;
@@ -97,6 +95,6 @@ public class NodeService {
         return radios;
     }
 
-    public class NodeNotFoundException extends Exception {
+    public static class NodeNotFoundException extends Exception {
     }
 }
