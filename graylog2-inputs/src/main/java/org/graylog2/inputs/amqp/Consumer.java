@@ -35,11 +35,9 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
-public class Consumer {
+import static com.google.common.base.Strings.isNullOrEmpty;
 
+public class Consumer {
     private static final Logger LOG = LoggerFactory.getLogger(Consumer.class);
 
     // Not threadsafe!
@@ -150,14 +148,13 @@ public class Consumer {
     }
 
     public void connect() throws IOException {
-        ConnectionFactory factory = new ConnectionFactory();
+        final ConnectionFactory factory = new ConnectionFactory();
         factory.setHost(hostname);
         factory.setPort(port);
-
         factory.setVirtualHost(virtualHost);
 
         // Authenticate?
-        if(username != null && !username.isEmpty() && password != null && !password.isEmpty()) {
+        if(!isNullOrEmpty(username) && !isNullOrEmpty(password)) {
             factory.setUsername(username);
             factory.setPassword(password);
         }
@@ -165,7 +162,11 @@ public class Consumer {
         connection = factory.newConnection();
         channel = connection.createChannel();
 
-        if (prefetchCount > 0) {
+        if(null == channel) {
+            LOG.error("No channel descriptor available!");
+        }
+
+        if (null != channel && prefetchCount > 0) {
             channel.basicQos(prefetchCount);
 
             LOG.info("AMQP prefetch count overriden to <{}>.", prefetchCount);
@@ -175,7 +176,7 @@ public class Consumer {
             @Override
             public void shutdownCompleted(ShutdownSignalException cause) {
                 if (cause.isInitiatedByApplication()) {
-                    LOG.info("Not reconnecting connection, we disconnected explicitely.");
+                    LOG.info("Not reconnecting connection, we disconnected explicitly.");
                     return;
                 }
                 while (true) {
