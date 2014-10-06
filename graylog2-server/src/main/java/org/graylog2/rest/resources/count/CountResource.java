@@ -17,7 +17,7 @@
 package org.graylog2.rest.resources.count;
 
 import com.codahale.metrics.annotation.Timed;
-import com.google.common.collect.Maps;
+import com.google.common.collect.ImmutableMap;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.indexer.counts.Counts;
@@ -33,9 +33,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import java.util.Map;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 @RequiresAuthentication
 @Api(value = "Counts", description = "Message counts")
 @Path("/count")
@@ -48,15 +45,13 @@ public class CountResource extends RestResource {
         this.counts = counts;
     }
 
-    @GET @Path("/total") @Timed
+    @GET
+    @Path("/total")
+    @Timed
     @RequiresPermissions(RestPermissions.MESSAGECOUNT_READ)
     @ApiOperation(value = "Total number of messages in all your indices.")
     @Produces(MediaType.APPLICATION_JSON)
-    public String total() {
-        Map<String, Long> result = Maps.newHashMap();
-        result.put("events", counts.total());
-
-        return json(result);
+    public Map<String, Long> total() {
+        return ImmutableMap.of("events", counts.total());
     }
-
 }

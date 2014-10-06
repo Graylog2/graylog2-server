@@ -17,14 +17,17 @@
 package org.graylog2.rest.resources.streams.rules;
 
 import com.codahale.metrics.annotation.Timed;
-import com.google.common.collect.Lists;
+import com.wordnik.swagger.annotations.Api;
+import com.wordnik.swagger.annotations.ApiOperation;
+import com.wordnik.swagger.annotations.ApiParam;
+import com.wordnik.swagger.annotations.ApiResponse;
+import com.wordnik.swagger.annotations.ApiResponses;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.database.ValidationException;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.streams.StreamRule;
 import org.graylog2.plugin.streams.StreamRuleType;
-import com.wordnik.swagger.annotations.*;
 import org.graylog2.rest.resources.RestResource;
 import org.graylog2.rest.resources.streams.responses.SingleStreamRuleSummaryResponse;
 import org.graylog2.rest.resources.streams.responses.StreamRuleListResponse;
@@ -32,19 +35,26 @@ import org.graylog2.rest.resources.streams.rules.requests.CreateStreamRuleReques
 import org.graylog2.security.RestPermissions;
 import org.graylog2.streams.StreamRuleService;
 import org.graylog2.streams.StreamService;
+import org.hibernate.validator.constraints.NotEmpty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import javax.ws.rs.*;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+import javax.ws.rs.BadRequestException;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.util.List;
-import java.util.Map;
+import javax.ws.rs.core.UriBuilder;
+import java.net.URI;
 
-/**
- * @author Dennis Oelkers <dennis@torch.sh>
- */
 @RequiresAuthentication
 @Api(value = "StreamRules", description = "Manage stream rules")
 @Path("/streams/{streamid}/rules")
@@ -65,33 +75,29 @@ public class StreamRuleResource extends RestResource {
     @ApiOperation(value = "Create a stream rule")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response create(@ApiParam(name = "streamid", value = "The stream id this new rule belongs to.", required = true) @PathParam("streamid") String streamid,
-                           @ApiParam(name = "JSON body", required = true) CreateStreamRuleRequest cr) {
+    public Response create(@ApiParam(name = "streamid", value = "The stream id this new rule belongs to.", required = true)
+                           @PathParam("streamid") String streamid,
+                           @ApiParam(name = "JSON body", required = true)
+                           @Valid @NotNull CreateStreamRuleRequest cr) throws NotFoundException, ValidationException {
         checkPermission(RestPermissions.STREAMS_EDIT, streamid);
 
-        try {
-            streamService.load(streamid);
-        } catch (NotFoundException e) {
-            throw new javax.ws.rs.NotFoundException("Stream not found!");
-        }
-
+        final Stream stream = streamService.load(streamid);
         final StreamRule streamRule = streamRuleService.create(streamid, cr);
+        final String id = streamService.save(streamRule);
 
-        final String id;
-        try {
-            id = streamService.save(streamRule);
-        } catch (ValidationException e) {
-            LOG.error("Validation error.", e);
-            throw new BadRequestException(e);
-        }
-
-        SingleStreamRuleSummaryResponse response = new SingleStreamRuleSummaryResponse();
+        final SingleStreamRuleSummaryResponse response = new SingleStreamRuleSummaryResponse();
         response.streamRuleId = id;
 
-        return Response.status(Response.Status.CREATED).entity(response).build();
+        final URI streamRuleUri = UriBuilder.fromResource(StreamRuleResource.class)
+                .path("{streamRuleId}")
+                .build(id);
+
+        return Response.created(streamRuleUri).entity(response).build();
     }
 
-    @POST @Path("/{streamRuleId}")
+    // TODO Change to @PUT
+    @POST
+    @Path("/{streamRuleId}")
     @Timed
     @ApiOperation(value = "Update a stream rule")
     @ApiResponses(value = {
@@ -100,23 +106,22 @@ public class StreamRuleResource extends RestResource {
     })
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public SingleStreamRuleSummaryResponse update(@ApiParam(name = "streamid", value = "The stream id this rule belongs to.", required = true) @PathParam("streamid") String streamid,
-                           @ApiParam(name = "streamRuleId", value = "The stream rule id we are updating", required = true) @PathParam("streamRuleId") String streamRuleId,
-                           @ApiParam(name = "JSON body", required = true) CreateStreamRuleRequest cr) {
+    public SingleStreamRuleSummaryResponse update(@ApiParam(name = "streamid", value = "The stream id this rule belongs to.", required = true)
+                                                  @PathParam("streamid") String streamid,
+                                                  @ApiParam(name = "streamRuleId", value = "The stream rule id we are updating", required = true)
+                                                  @PathParam("streamRuleId") String streamRuleId,
+                                                  @ApiParam(name = "JSON body", required = true) CreateStreamRuleRequest cr) throws NotFoundException, ValidationException {
         checkPermission(RestPermissions.STREAMS_EDIT, streamid);
 
         final StreamRule streamRule;
-        try {
-            streamRule = streamRuleService.load(loadObjectId(streamRuleId));
-            if (!streamRule.getStreamId().equals(streamid)) {
-                throw new NotFoundException();
-            }
-        } catch (org.graylog2.database.NotFoundException e) {
-            throw new javax.ws.rs.NotFoundException(e);
+        streamRule = streamRuleService.load(loadObjectId(streamRuleId));
+
+        if (!streamRule.getStreamId().equals(streamid)) {
+            throw new NotFoundException();
         }
 
         final StreamRuleType streamRuleType = StreamRuleType.fromInteger(cr.type);
-        if(null == streamRuleType) {
+        if (null == streamRuleType) {
             throw new BadRequestException("Unknown stream rule type " + cr.type);
         }
 
@@ -125,88 +130,63 @@ public class StreamRuleResource extends RestResource {
         streamRule.setInverted(cr.inverted);
         streamRule.setValue(cr.value);
 
-        String id;
-        try {
-            streamRuleService.save(streamRule);
-            id = streamRule.getId();
-        } catch (ValidationException e) {
-            LOG.error("Validation error.", e);
-            throw new BadRequestException(e);
-        }
+        streamRuleService.save(streamRule);
+        final String id = streamRule.getId();
 
-        SingleStreamRuleSummaryResponse response = new SingleStreamRuleSummaryResponse();
+        final SingleStreamRuleSummaryResponse response = new SingleStreamRuleSummaryResponse();
         response.streamRuleId = id;
+
         return response;
     }
 
-    @GET @Timed
+    @GET
+    @Timed
     @ApiOperation(value = "Get a list of all stream rules")
     @Produces(MediaType.APPLICATION_JSON)
-    public StreamRuleListResponse get(@ApiParam(name = "streamid", value = "The id of the stream whose stream rules we want.", required = true) @PathParam("streamid") String streamid) {
-        List<Map<String, Object>> streamRules = Lists.newArrayList();
+    public StreamRuleListResponse get(@ApiParam(name = "streamid", value = "The id of the stream whose stream rules we want.", required = true)
+                                      @PathParam("streamid") String streamid) throws NotFoundException {
         checkPermission(RestPermissions.STREAMS_READ, streamid);
 
-        final Stream stream;
-        try {
-            stream = streamService.load(streamid);
-        } catch (NotFoundException e) {
-            throw new javax.ws.rs.NotFoundException("Stream not found!");
-        }
+        final Stream stream = streamService.load(streamid);
 
-        StreamRuleListResponse response = new StreamRuleListResponse();
-        try {
-            response.streamRules = streamRuleService.loadForStream(stream);
-        } catch (NotFoundException e) {
-            throw new javax.ws.rs.NotFoundException("Stream not found!");
-        }
+        final StreamRuleListResponse response = new StreamRuleListResponse();
+        response.streamRules = streamRuleService.loadForStream(stream);
         response.total = response.streamRules.size();
 
         return response;
     }
 
-    @GET @Path("/{streamRuleId}")
+    @GET
+    @Path("/{streamRuleId}")
     @Timed
     @ApiOperation(value = "Get a single stream rules")
     @Produces(MediaType.APPLICATION_JSON)
     public StreamRule get(@ApiParam(name = "streamid", value = "The id of the stream whose stream rule we want.", required = true) @PathParam("streamid") String streamid,
-                      @ApiParam(name = "streamRuleId", value = "The stream rule id we are getting", required = true) @PathParam("streamRuleId") String streamRuleId) {
+                          @ApiParam(name = "streamRuleId", value = "The stream rule id we are getting", required = true) @PathParam("streamRuleId") String streamRuleId) throws NotFoundException {
         checkPermission(RestPermissions.STREAMS_READ, streamid);
 
-        final StreamRule streamRule;
-        try {
-            streamRule = streamRuleService.load(loadObjectId(streamRuleId));
-        } catch (org.graylog2.database.NotFoundException e) {
-            throw new WebApplicationException(404);
-        }
-
-        return streamRule;
+        return streamRuleService.load(loadObjectId(streamRuleId));
     }
 
-    @DELETE @Path("/{streamRuleId}") @Timed
+    @DELETE
+    @Path("/{streamRuleId}")
+    @Timed
     @ApiOperation(value = "Delete a stream rule")
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "Stream rule not found."),
             @ApiResponse(code = 400, message = "Invalid ObjectId.")
     })
-    public Response delete(@ApiParam(name = "streamid", value = "The stream id this new rule belongs to.", required = true) @PathParam("streamid") String streamid,
-                         @ApiParam(name = "streamRuleId", required = true) @PathParam("streamRuleId") String streamRuleId) {
-        if (streamRuleId == null || streamRuleId.isEmpty()) {
-            LOG.error("Missing streamRuleId. Returning HTTP 400.");
-            throw new WebApplicationException(400);
-        }
+    public void delete(@ApiParam(name = "streamid", value = "The stream id this new rule belongs to.", required = true)
+                       @PathParam("streamid") String streamid,
+                       @ApiParam(name = "streamRuleId", required = true)
+                       @PathParam("streamRuleId") @NotEmpty String streamRuleId) throws NotFoundException {
         checkPermission(RestPermissions.STREAMS_EDIT, streamid);
 
-        try {
-            StreamRule streamRule = streamRuleService.load(loadObjectId(streamRuleId));
-            if (streamRule.getStreamId().equals(streamid)) {
-                streamRuleService.destroy(streamRule);
-            } else {
-                throw new NotFoundException();
-            }
-        } catch (org.graylog2.database.NotFoundException e) {
-            throw new javax.ws.rs.NotFoundException("Stream rule <" + streamRuleId + "> not found!");
+        final StreamRule streamRule = streamRuleService.load(loadObjectId(streamRuleId));
+        if (streamRule.getStreamId().equals(streamid)) {
+            streamRuleService.destroy(streamRule);
+        } else {
+            throw new NotFoundException();
         }
-
-        return Response.status(Response.Status.NO_CONTENT).build();
     }
 }

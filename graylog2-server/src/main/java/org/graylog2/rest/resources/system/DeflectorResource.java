@@ -17,13 +17,13 @@
 package org.graylog2.rest.resources.system;
 
 import com.codahale.metrics.annotation.Timed;
-import com.google.common.collect.Maps;
+import com.google.common.collect.ImmutableMap;
+import com.wordnik.swagger.annotations.Api;
+import com.wordnik.swagger.annotations.ApiOperation;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.indexer.Deflector;
-import com.wordnik.swagger.annotations.Api;
-import com.wordnik.swagger.annotations.ApiOperation;
 import org.graylog2.rest.resources.RestResource;
 import org.graylog2.security.RestPermissions;
 import org.graylog2.shared.system.activities.Activity;
@@ -37,19 +37,15 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 import java.util.Map;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 @RequiresAuthentication
 @Api(value = "System/Deflector", description = "Index deflector management")
 @Path("/system/deflector")
 public class DeflectorResource extends RestResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(DeflectorResource.class);
-    
+
     private final Deflector deflector;
     private final ActivityWriter activityWriter;
     private final ElasticsearchConfiguration configuration;
@@ -63,47 +59,43 @@ public class DeflectorResource extends RestResource {
         this.configuration = configuration;
     }
 
-    @GET @Timed
+    @GET
+    @Timed
     @ApiOperation(value = "Get current deflector status")
     @RequiresPermissions(RestPermissions.DEFLECTOR_READ)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response deflector() {
-        Map<String, Object> result = Maps.newHashMap();
-
-        result.put("is_up", deflector.isUp());
-        result.put("current_target", deflector.getCurrentActualTargetIndex());
-
-        return Response.ok().entity(json(result)).build();
+    public Map<String, Object> deflector() {
+        return ImmutableMap.<String, Object>of(
+                "is_up", deflector.isUp(),
+                "current_target", deflector.getCurrentActualTargetIndex());
     }
 
-    @GET @Timed
+    @GET
+    @Timed
     @ApiOperation(value = "Get deflector configuration. Only available on master nodes.")
     @RequiresPermissions(RestPermissions.DEFLECTOR_READ)
     @Path("/config")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response config() {
+    public Map<String, Integer> config() {
         restrictToMaster();
 
-        Map<String, Object> result = Maps.newHashMap();
-
-        result.put("max_docs_per_index", configuration.getMaxDocsPerIndex());
-        result.put("max_number_of_indices", configuration.getMaxNumberOfIndices());
-
-        return Response.ok().entity(json(result)).build();
+        return ImmutableMap.of(
+                "max_docs_per_index", configuration.getMaxDocsPerIndex(),
+                "max_number_of_indices", configuration.getMaxNumberOfIndices());
     }
 
-    @POST @Timed
+    @POST
+    @Timed
     @ApiOperation(value = "Cycle deflector to new/next index")
     @RequiresPermissions(RestPermissions.DEFLECTOR_CYCLE)
     @Path("/cycle")
-    public Response cycle() {
+    public void cycle() {
         restrictToMaster();
 
-        String msg = "Cycling deflector. Reason: REST request.";
+        final String msg = "Cycling deflector. Reason: REST request.";
         LOG.info(msg);
         activityWriter.write(new Activity(msg, DeflectorResource.class));
 
         deflector.cycle();
-        return Response.ok().build();
     }
 }

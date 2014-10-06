@@ -17,7 +17,7 @@
 package org.graylog2.rest.resources.system.indexer;
 
 import com.codahale.metrics.annotation.Timed;
-import com.google.common.collect.Maps;
+import com.google.common.collect.ImmutableMap;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.indexer.cluster.Cluster;
@@ -35,9 +35,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import java.util.Map;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 @RequiresAuthentication
 @Api(value = "Indexer/Cluster", description = "Indexer cluster information")
 @Path("/system/indexer/cluster")
@@ -48,35 +45,31 @@ public class IndexerClusterResource extends RestResource {
     @Inject
     private Cluster cluster;
 
-    @GET @Timed
+    @GET
+    @Timed
     @Path("/name")
     @RequiresPermissions(RestPermissions.INDEXERCLUSTER_READ)
     @ApiOperation(value = "Get the cluster name")
     @Produces(MediaType.APPLICATION_JSON)
-    public String clusterName() {
-        Map<String, Object> result = Maps.newHashMap();
-        result.put("name", cluster.getName());
-
-        return json(result);
+    public Map<String, String> clusterName() {
+        return ImmutableMap.of("name", cluster.getName());
     }
 
-    @GET @Timed
+    @GET
+    @Timed
     @Path("/health")
     @ApiOperation(value = "Get cluster and shard health overview")
     @RequiresPermissions(RestPermissions.INDEXERCLUSTER_READ)
     @Produces(MediaType.APPLICATION_JSON)
-    public String clusterHealth() {
-        Map<String, Integer> shards = Maps.newHashMap();
-        shards.put("active", cluster.getActiveShards());
-        shards.put("initializing", cluster.getInitializingShards());
-        shards.put("relocating", cluster.getRelocatingShards());
-        shards.put("unassigned", cluster.getUnassignedShards());
+    public Map<String, Object> clusterHealth() {
+        final Map<String, Integer> shards = ImmutableMap.of(
+                "active", cluster.getActiveShards(),
+                "initializing", cluster.getInitializingShards(),
+                "relocating", cluster.getRelocatingShards(),
+                "unassigned", cluster.getUnassignedShards());
 
-        Map<String, Object> health = Maps.newHashMap();
-        health.put("status", cluster.getHealth().toString().toLowerCase());
-        health.put("shards", shards);
-
-        return json(health);
+        return ImmutableMap.of(
+                "status", cluster.getHealth().toString().toLowerCase(),
+                "shards", shards);
     }
-
 }

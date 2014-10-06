@@ -20,52 +20,47 @@ import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Maps;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.rest.resources.RestResource;
+import org.hibernate.validator.constraints.NotEmpty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.ws.rs.*;
+import javax.validation.constraints.NotNull;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 @RequiresAuthentication
 @Path("/tools/regex_tester")
 public class RegexTesterResource extends RestResource {
-
     private static final Logger LOG = LoggerFactory.getLogger(RegexTesterResource.class);
 
     @GET
     @Timed
     @Produces(MediaType.APPLICATION_JSON)
-    public String regexTester(@QueryParam("regex") String regex, @QueryParam("string") String string) {
-        if (string == null || regex == null || regex.isEmpty()) {
-            LOG.info("Missing parameters for regex test.");
-            throw new WebApplicationException(Response.Status.BAD_REQUEST);
-        }
-
+    public Map<String, Object> regexTester(@QueryParam("regex") @NotEmpty String regex,
+                                           @QueryParam("string") @NotNull String string) {
         final Matcher matcher = Pattern.compile(regex, Pattern.DOTALL).matcher(string);
         boolean matched = matcher.find();
 
         // Get the first matched group.
-        Map<String,Object> match = Maps.newHashMap();
+        final Map<String,Object> match = Maps.newHashMap();
         if (matcher.groupCount() > 0) {
             match.put("match", matcher.group(1));
             match.put("start", matcher.start(1));
             match.put("end", matcher.end(1));
         }
 
-        Map<String, Object> result = Maps.newHashMap();
+        final Map<String, Object> result = Maps.newHashMap();
         result.put("matched", matched);
         result.put("match", match);
         result.put("regex", regex);
         result.put("string", string);
 
-        return json(result);
+        return result;
     }
-
 }

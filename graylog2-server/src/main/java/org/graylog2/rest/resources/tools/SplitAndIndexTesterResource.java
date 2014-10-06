@@ -24,14 +24,14 @@ import org.graylog2.rest.resources.RestResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.ws.rs.*;
+import javax.validation.constraints.NotNull;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 import java.util.Map;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 @RequiresAuthentication
 @Path("/tools/split_and_index_tester")
 public class SplitAndIndexTesterResource extends RestResource {
@@ -41,23 +41,19 @@ public class SplitAndIndexTesterResource extends RestResource {
     @GET
     @Timed
     @Produces(MediaType.APPLICATION_JSON)
-    public String splitAndIndexTester(@QueryParam("split_by") String splitBy, @QueryParam("index") int index, @QueryParam("string") String string) {
-        if (string == null) {
-            LOG.info("Missing parameters for split&index test.");
-            throw new WebApplicationException(Response.Status.BAD_REQUEST);
-        }
+    public Map<String, Object> splitAndIndexTester(@QueryParam("split_by") @NotNull String splitBy,
+                                                   @QueryParam("index") int index,
+                                                   @QueryParam("string") @NotNull String string) {
+        final String cut = SplitAndIndexExtractor.cut(string, splitBy, index - 1);
+        int[] positions = SplitAndIndexExtractor.getCutIndices(string, splitBy, index - 1);
 
-        String cut = SplitAndIndexExtractor.cut(string, splitBy, index-1);
-        int[] positions = SplitAndIndexExtractor.getCutIndices(string, splitBy, index-1);
-        boolean successful = (cut != null);
-
-        Map<String, Object> result = Maps.newHashMap();
-        result.put("successful", successful);
+        final Map<String, Object> result = Maps.newHashMap();
+        result.put("successful", cut != null);
         result.put("cut", cut);
         result.put("begin_index", positions[0]);
         result.put("end_index", positions[1]);
 
-        return json(result);
+        return result;
     }
 
 }

@@ -16,13 +16,11 @@
  */
 package org.graylog2.rest.resources.system.radio.requests;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
+@JsonAutoDetect
 public class PingRequest {
-
     @JsonProperty("rest_transport_address")
     public String restTransportAddress;
 

@@ -14,13 +14,17 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.rest.resources.streams.responses;
+package org.graylog2.rest.resources.tools.responses;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 @JsonAutoDetect
-public class SingleStreamRuleSummaryResponse {
-    @JsonProperty("streamrule_id")
-    public String streamRuleId;
+public class SubstringTesterResponse {
+    public boolean successful;
+    public String cut;
+    @JsonProperty("begin_index")
+    public int beginIndex;
+    @JsonProperty("end_index")
+    public int endIndex;
 }

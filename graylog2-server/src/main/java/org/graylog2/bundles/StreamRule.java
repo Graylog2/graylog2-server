@@ -16,12 +16,14 @@
  */
 package org.graylog2.bundles;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.graylog2.plugin.streams.StreamRuleType;
 import org.hibernate.validator.constraints.NotBlank;
 
 import javax.validation.constraints.NotNull;
 
+@JsonAutoDetect
 public class StreamRule {
     @JsonProperty
     @NotNull

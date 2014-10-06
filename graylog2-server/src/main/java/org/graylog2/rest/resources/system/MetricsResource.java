@@ -16,18 +16,24 @@
  */
 package org.graylog2.rest.resources.system;
 
-import com.codahale.metrics.*;
+import com.codahale.metrics.Metric;
+import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.annotation.Timed;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
+import com.wordnik.swagger.annotations.Api;
+import com.wordnik.swagger.annotations.ApiOperation;
+import com.wordnik.swagger.annotations.ApiParam;
+import com.wordnik.swagger.annotations.ApiResponse;
+import com.wordnik.swagger.annotations.ApiResponses;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.metrics.MetricUtils;
-import com.wordnik.swagger.annotations.*;
 import org.graylog2.rest.resources.RestResource;
 import org.graylog2.rest.resources.system.requests.MetricsReadRequest;
 import org.graylog2.security.RestPermissions;
@@ -35,16 +41,24 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import javax.ws.rs.*;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+import javax.ws.rs.BadRequestException;
+import javax.ws.rs.DefaultValue;
+import javax.ws.rs.GET;
+import javax.ws.rs.NotFoundException;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedSet;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 @RequiresAuthentication
 @Api(value = "System/Metrics", description = "Internal Graylog2 metrics")
 @Path("/system/metrics")
@@ -61,60 +75,59 @@ public class MetricsResource extends RestResource {
         this.mongoConnection = mongoConnection;
     }
 
-    @GET @Timed
+    @GET
+    @Timed
     @RequiresPermissions(RestPermissions.METRICS_READALL)
     @ApiOperation(value = "Get all metrics",
-                  notes = "Note that this might return a huge result set.")
+            notes = "Note that this might return a huge result set.")
     @Produces(MediaType.APPLICATION_JSON)
-    public String metrics() {
-        Map<String, Object> result = Maps.newHashMap();
-
-        result.put("metrics", metricRegistry.getMetrics());
-
-        return json(result);
+    public Map<String, Map<String, Metric>> metrics() {
+        return ImmutableMap.of("metrics", metricRegistry.getMetrics());
     }
 
-    @GET @Timed
+    @GET
+    @Timed
     @Path("/names")
     @ApiOperation(value = "Get all metrics keys/names")
     @RequiresPermissions(RestPermissions.METRICS_ALLKEYS)
     @Produces(MediaType.APPLICATION_JSON)
-    public String metricNames() {
-        Map<String, Object> result = Maps.newHashMap();
-        result.put("names", metricRegistry.getNames());
-
-        return json(result);
+    public Map<String, SortedSet<String>> metricNames() {
+        return ImmutableMap.of("names", metricRegistry.getNames());
     }
 
-    @GET @Timed
+    @GET
+    @Timed
     @Path("/{metricName}")
     @ApiOperation(value = "Get a single metric")
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "No such metric")
     })
     @Produces(MediaType.APPLICATION_JSON)
-    public String singleMetric(@ApiParam(name = "metricName", required = true) @PathParam("metricName") String metricName) {
+    public Metric singleMetric(@ApiParam(name = "metricName", required = true)
+                               @PathParam("metricName") String metricName) {
         checkPermission(RestPermissions.METRICS_READ, metricName);
-        Metric metric = metricRegistry.getMetrics().get(metricName);
 
+        final Metric metric = metricRegistry.getMetrics().get(metricName);
         if (metric == null) {
             LOG.debug("I do not have a metric called [{}], returning 404.", metricName);
-            throw new WebApplicationException(404);
+            throw new NotFoundException();
         }
 
-        return json(metric);
+        return metric;
     }
 
-    @POST @Timed
+    @POST
+    @Timed
     @Path("/multiple")
     @ApiOperation("Get the values of multiple metrics at once")
     @ApiResponses(value = {
             @ApiResponse(code = 400, message = "Malformed body")
     })
-    public String multipleMetrics(@ApiParam(name = "Requested metrics", required = true) MetricsReadRequest request) {
+    public Map<String, Object> multipleMetrics(@ApiParam(name = "Requested metrics", required = true)
+                                               @Valid @NotNull MetricsReadRequest request) {
         final Map<String, Metric> metrics = metricRegistry.getMetrics();
 
-        List<Map<String, Object>> metricsList = Lists.newArrayList();
+        final List<Map<String, Object>> metricsList = Lists.newArrayList();
         if (request.metrics == null) {
             throw new BadRequestException("Metrics cannot be empty");
         }
@@ -130,47 +143,42 @@ public class MetricsResource extends RestResource {
             }
         }
 
-        Map<String, Object> result = Maps.newHashMap();
-        result.put("metrics", metricsList);
-        result.put("total", metricsList.size());
-        return json(result);
+        return ImmutableMap.of(
+                "metrics", metricsList,
+                "total", metricsList.size());
     }
 
-    @GET @Timed
+    @GET
+    @Timed
     @Path("/namespace/{namespace}")
     @ApiOperation(value = "Get all metrics of a namespace")
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "No such metric namespace")
     })
     @Produces(MediaType.APPLICATION_JSON)
-    public String byNamespace(@ApiParam(name = "namespace", required = true) @PathParam("namespace") String namespace) {
-        List<Map<String, Object>> metrics = Lists.newArrayList();
-
-        for(Map.Entry<String, Metric> e : metricRegistry.getMetrics().entrySet()) {
+    public Map<String, Object> byNamespace(@ApiParam(name = "namespace", required = true)
+                                           @PathParam("namespace") String namespace) {
+        final List<Map<String, Object>> metrics = Lists.newArrayList();
+        for (Map.Entry<String, Metric> e : metricRegistry.getMetrics().entrySet()) {
             final String metricName = e.getKey();
             if (metricName.startsWith(namespace) && isPermitted(RestPermissions.METRICS_READ, metricName)) {
                 try {
                     final Metric metric = e.getValue();
-                    Map<String, Object> metricMap = MetricUtils.map(metricName, metric);
-
-                    metrics.add(metricMap);
-                } catch(Exception ex) {
+                    metrics.add(MetricUtils.map(metricName, metric));
+                } catch (Exception ex) {
                     LOG.warn("Could not read metric in namespace list.", ex);
-                    continue;
                 }
             }
         }
 
         if (metrics.isEmpty()) {
             LOG.debug("No metrics with namespace [{}] found, returning 404.", namespace);
-            throw new WebApplicationException(404);
+            throw new NotFoundException();
         }
 
-        Map<String, Object> result = Maps.newHashMap();
-        result.put("metrics", metrics);
-        result.put("total", metrics.size());
-
-        return json(result);
+        return ImmutableMap.of(
+                "metrics", metrics,
+                "total", metrics.size());
     }
 
     enum MetricType {
@@ -185,24 +193,29 @@ public class MetricsResource extends RestResource {
     @Timed
     @Path("/{metricName}/history")
     @ApiOperation(value = "Get history of a single metric", notes = "The maximum retention time is currently only 5 minutes.")
-    public String historicSingleMetric(
-            @ApiParam(name = "metricName", required = true) @PathParam("metricName") String metricName,
-            @ApiParam(name = "after", value = "Only values for after this UTC timestamp (1970 epoch)") @QueryParam("after") @DefaultValue("-1") long after
+    public Map<String, Object> historicSingleMetric(
+            @ApiParam(name = "metricName", required = true)
+            @PathParam("metricName") String metricName,
+            @ApiParam(name = "after", value = "Only values for after this UTC timestamp (1970 epoch)")
+            @QueryParam("after") @DefaultValue("-1") long after
     ) {
         checkPermission(RestPermissions.METRICS_READHISTORY, metricName);
+
         BasicDBObject andQuery = new BasicDBObject();
-        List<BasicDBObject> obj = new ArrayList<BasicDBObject>();
+
+        final List<BasicDBObject> obj = new ArrayList<BasicDBObject>();
         obj.add(new BasicDBObject("name", metricName));
         if (after != -1) {
-            obj.add(new BasicDBObject("$gt",  new BasicDBObject("$gt", new Date(after))));
+            obj.add(new BasicDBObject("$gt", new BasicDBObject("$gt", new Date(after))));
         }
         andQuery.put("$and", obj);
 
         final DBCursor cursor = mongoConnection.getDatabase().getCollection("graylog2_metrics")
                 .find(andQuery).sort(new BasicDBObject("timestamp", 1));
-        Map<String, Object> metricsData = Maps.newHashMap();
+
+        final Map<String, Object> metricsData = Maps.newHashMap();
         metricsData.put("name", metricName);
-        List<Object> values = Lists.newArrayList();
+        final List<Object> values = Lists.newArrayList();
         metricsData.put("values", values);
 
         while (cursor.hasNext()) {
@@ -266,6 +279,6 @@ public class MetricsResource extends RestResource {
 
         }
 
-        return json(metricsData);
+        return metricsData;
     }
 }

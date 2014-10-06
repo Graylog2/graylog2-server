@@ -17,6 +17,7 @@
 package org.graylog2.rest.resources.system.inputs;
 
 import com.codahale.metrics.annotation.Timed;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.wordnik.swagger.annotations.Api;
@@ -29,11 +30,11 @@ import org.graylog2.database.ValidationException;
 import org.graylog2.inputs.Input;
 import org.graylog2.inputs.InputImpl;
 import org.graylog2.inputs.InputService;
+import org.graylog2.plugin.IOState;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationException;
-import org.graylog2.plugin.IOState;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.rest.resources.RestResource;
 import org.graylog2.security.RestPermissions;
@@ -47,6 +48,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -56,10 +59,10 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.io.IOException;
+import javax.ws.rs.core.UriBuilder;
+import java.net.URI;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -82,44 +85,47 @@ public class InputsResource extends RestResource {
         this.activityWriter = activityWriter;
     }
 
-    @GET @Timed
+    @GET
+    @Timed
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Get information of a single input on this node")
     @Path("/{inputId}")
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "No such input on this node.")
     })
-    public String single(@ApiParam(name = "inputId", required = true) @PathParam("inputId") String inputId) {
+    public Map<String, Object> single(@ApiParam(name = "inputId", required = true)
+                                      @PathParam("inputId") String inputId) {
         checkPermission(RestPermissions.INPUTS_READ, inputId);
 
-        MessageInput input = inputRegistry.getRunningInput(inputId);
-
+        final MessageInput input = inputRegistry.getRunningInput(inputId);
         if (input == null) {
             LOG.info("Input [{}] not found. Returning HTTP 404.", inputId);
-            throw new WebApplicationException(Response.Status.NOT_FOUND);
+            throw new NotFoundException();
         }
 
-        return json(input.asMap());
+        return input.asMap();
 
     }
 
-    @GET @Timed
+    @GET
+    @Timed
     @ApiOperation(value = "Get all inputs of this node")
     @Produces(MediaType.APPLICATION_JSON)
-    public String list() {
+    public Map<String, Object> list() {
         List<IOState<MessageInput>> inputStates = Lists.newArrayList();
         Map<String, Object> result = Maps.newHashMap();
         for (IOState<MessageInput> inputState : inputRegistry.getInputStates()) {
-			checkPermission(RestPermissions.INPUTS_READ, inputState.getStoppable().getId());
+            checkPermission(RestPermissions.INPUTS_READ, inputState.getStoppable().getId());
             inputStates.add(inputState);
-		}
-        result.put("inputs", inputStates);
-        result.put("total", inputStates.size());
+        }
 
-        return json(result);
+        return ImmutableMap.of(
+                "inputs", inputStates,
+                "total", inputStates.size());
     }
 
-    @POST @Timed
+    @POST
+    @Timed
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Launch input on this node")
@@ -128,19 +134,12 @@ public class InputsResource extends RestResource {
             @ApiResponse(code = 400, message = "Missing or invalid configuration"),
             @ApiResponse(code = 400, message = "Type is exclusive and already has input running")
     })
-    public Response create(@ApiParam(name = "JSON body", required = true) String body) throws ValidationException {
+    public Response create(@ApiParam(name = "JSON body", required = true)
+                           @Valid @NotNull InputLaunchRequest lr) throws ValidationException {
         checkPermission(RestPermissions.INPUTS_CREATE);
 
-        InputLaunchRequest lr;
-        try {
-            lr = objectMapper.readValue(body, InputLaunchRequest.class);
-        } catch(IOException e) {
-            LOG.error("Error while parsing JSON", e);
-            throw new BadRequestException(e);
-        }
-
         // Build a proper configuration from POST data.
-        Configuration inputConfig = new Configuration(lr.configuration);
+        final Configuration inputConfig = new Configuration(lr.configuration);
 
         // Build input.
         final MessageInput input;
@@ -155,10 +154,10 @@ public class InputsResource extends RestResource {
             input.checkConfiguration();
         } catch (NoSuchInputTypeException e) {
             LOG.error("There is no such input type registered.", e);
-            throw new WebApplicationException(e, Response.Status.NOT_FOUND);
+            throw new NotFoundException(e);
         } catch (ConfigurationException e) {
             LOG.error("Missing or invalid input configuration.", e);
-            throw new WebApplicationException(e, Response.Status.BAD_REQUEST);
+            throw new BadRequestException(e);
         }
 
         // Don't run if exclusive and another instance is already running.
@@ -168,16 +167,17 @@ public class InputsResource extends RestResource {
             throw new BadRequestException(error);
         }
 
-        String inputId = UUID.randomUUID().toString();
+        final String inputId = UUID.randomUUID().toString();
 
         // Build MongoDB data
-        Map<String, Object> inputData = Maps.newHashMap();
+        final Map<String, Object> inputData = Maps.newHashMap();
         inputData.put(MessageInput.FIELD_INPUT_ID, inputId);
         inputData.put(MessageInput.FIELD_TITLE, lr.title);
         inputData.put(MessageInput.FIELD_TYPE, lr.type);
         inputData.put(MessageInput.FIELD_CREATOR_USER_ID, getCurrentUser().getName());
         inputData.put(MessageInput.FIELD_CONFIGURATION, lr.configuration);
         inputData.put(MessageInput.FIELD_CREATED_AT, Tools.iso8601());
+
         if (lr.global) {
             inputData.put(MessageInput.FIELD_GLOBAL, true);
         } else {
@@ -185,11 +185,10 @@ public class InputsResource extends RestResource {
         }
 
         // ... and check if it would pass validation. We don't need to go on if it doesn't.
-        Input mongoInput = new InputImpl(inputData);
+        final Input mongoInput = new InputImpl(inputData);
 
         // Persist input.
-        String id;
-        id = inputService.save(mongoInput);
+        String id = inputService.save(mongoInput);
         input.setPersistId(id);
 
         input.initialize();
@@ -197,48 +196,44 @@ public class InputsResource extends RestResource {
         // Launch input. (this will run async and clean up itself in case of an error.)
         inputRegistry.launch(input, inputId);
 
-        Map<String, Object> result = Maps.newHashMap();
-        result.put("input_id", inputId);
-        result.put("persist_id", id);
+        final Map<String, String> result = ImmutableMap.of(
+                "input_id", inputId,
+                "persist_id", id);
+        final URI inputUri = UriBuilder.fromResource(InputsResource.class)
+                .path("{inputId}")
+                .build(inputId);
 
-        return Response.status(Response.Status.ACCEPTED).entity(json(result)).build();
+        return Response.created(inputUri).entity(result).build();
     }
 
-    @GET @Timed
+    @GET
+    @Timed
     @Path("/types")
     @ApiOperation(value = "Get all available input types of this node")
     @Produces(MediaType.APPLICATION_JSON)
-    public String types() {
-        final Map<String, Object> result = Maps.newHashMap();
-        final Map<String, InputDescription> availableInputs = inputRegistry.getAvailableInputs();
-        final Map<String, String> inputs = Maps.newHashMap();
-        for (final String key : availableInputs.keySet()) {
-            inputs.put(key, availableInputs.get(key).getName());
-        }
-
-        result.put("types", inputs);
-
-        return json(result);
+    public Map<String, Map<String, InputDescription>> types() {
+        return ImmutableMap.of("types", inputRegistry.getAvailableInputs());
     }
 
-    @DELETE @Timed
+    @DELETE
+    @Timed
     @Path("/{inputId}")
     @ApiOperation(value = "Terminate input on this node")
     @Produces(MediaType.APPLICATION_JSON)
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "No such input on this node.")
     })
-    public Response terminate(@ApiParam(name = "inputId", required = true) @PathParam("inputId") String inputId) {
+    public void terminate(@ApiParam(name = "inputId", required = true) @PathParam("inputId") String inputId) {
         checkPermission(RestPermissions.INPUTS_TERMINATE, inputId);
 
         MessageInput input = inputRegistry.getRunningInput(inputId);
 
         if (input == null) {
             LOG.info("Cannot terminate input. Input not found.");
-            throw new WebApplicationException(404);
+            throw new NotFoundException();
         }
 
-        String msg = "Attempting to terminate input [" + input.getName()+ "]. Reason: REST request.";
+        final String msg = "Attempting to terminate input [" + input.getName() + "]. Reason: REST request.";
         LOG.info(msg);
         activityWriter.write(new Activity(msg, InputsResource.class));
 
@@ -249,22 +244,21 @@ public class InputsResource extends RestResource {
             inputRegistry.cleanInput(input);
         }
 
-        String msg2 = "Terminated input [" + input.getName()+ "]. Reason: REST request.";
+        final String msg2 = "Terminated input [" + input.getName() + "]. Reason: REST request.";
         LOG.info(msg2);
         activityWriter.write(new Activity(msg2, InputsResource.class));
-
-        return Response.status(Response.Status.ACCEPTED).build();
     }
 
-    @POST @Timed
+    @POST
+    @Timed
     @Path("/{inputId}/launch")
     @ApiOperation(value = "Launch existing input on this node")
     @Produces(MediaType.APPLICATION_JSON)
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "No such input on this node.")
     })
-    public Response launchExisting(@ApiParam(name = "inputId", required = true) @PathParam("inputId") String inputId) {
-        IOState<MessageInput> inputState = inputRegistry.getInputState(inputId);
+    public void launchExisting(@ApiParam(name = "inputId", required = true) @PathParam("inputId") String inputId) {
+        final IOState<MessageInput> inputState = inputRegistry.getInputState(inputId);
         final MessageInput messageInput;
 
         if (inputState == null) {
@@ -286,49 +280,48 @@ public class InputsResource extends RestResource {
             throw new NotFoundException(error);
         }
 
-        String msg = "Launching existing input [" + messageInput.getName()+ "]. Reason: REST request.";
+        final String msg = "Launching existing input [" + messageInput.getName() + "]. Reason: REST request.";
         LOG.info(msg);
         activityWriter.write(new Activity(msg, InputsResource.class));
 
-        if (inputState == null)
+        if (inputState == null) {
             inputRegistry.launchPersisted(messageInput);
-        else
+        } else {
             inputRegistry.launch(inputState);
+        }
 
-        String msg2 = "Launched existing input [" + messageInput.getName()+ "]. Reason: REST request.";
+        final String msg2 = "Launched existing input [" + messageInput.getName() + "]. Reason: REST request.";
         LOG.info(msg2);
         activityWriter.write(new Activity(msg2, InputsResource.class));
-
-        return Response.status(Response.Status.ACCEPTED).build();
     }
 
-    @POST @Timed
+    @POST
+    @Timed
     @Path("/{inputId}/stop")
     @ApiOperation(value = "Stop existing input on this node")
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "No such input on this node.")
     })
-    public Response stop(@ApiParam(name = "inputId", required = true) @PathParam("inputId") String inputId) {
+    public void stop(@ApiParam(name = "inputId", required = true) @PathParam("inputId") String inputId) {
         final MessageInput input = inputRegistry.getRunningInput(inputId);
         if (input == null) {
             LOG.info("Cannot stop input. Input not found.");
-            throw new WebApplicationException(Response.Status.NOT_FOUND);
+            throw new NotFoundException();
         }
 
-        String msg = "Stopping input [" + input.getName()+ "]. Reason: REST request.";
+        final String msg = "Stopping input [" + input.getName() + "]. Reason: REST request.";
         LOG.info(msg);
         activityWriter.write(new Activity(msg, InputsResource.class));
 
         inputRegistry.stop(input);
 
-        String msg2 = "Stopped input [" + input.getName()+ "]. Reason: REST request.";
+        final String msg2 = "Stopped input [" + input.getName() + "]. Reason: REST request.";
         LOG.info(msg2);
         activityWriter.write(new Activity(msg2, InputsResource.class));
-
-        return Response.status(Response.Status.ACCEPTED).build();
     }
 
-    @POST @Timed
+    @POST
+    @Timed
     @Path("/{inputId}/restart")
     @ApiOperation(value = "Restart existing input on this node")
     @ApiResponses(value = {
@@ -340,28 +333,27 @@ public class InputsResource extends RestResource {
         return Response.status(Response.Status.ACCEPTED).build();
     }
 
-    @GET @Timed
+    @GET
+    @Timed
     @Path("/types/{inputType}")
     @ApiOperation(value = "Get information about a single input type")
     @Produces(MediaType.APPLICATION_JSON)
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "No such input type registered.")
     })
-    public String info(@ApiParam(name = "inputType", required = true) @PathParam("inputType") String inputType) {
-        final Map<String, InputDescription> availableInputs = inputRegistry.getAvailableInputs();
-        if (!availableInputs.containsKey(inputType)) {
-            LOG.error("Unknown input type {} requested.", inputType);
-            throw new WebApplicationException(Response.Status.NOT_FOUND);
+    public Map<String, Object> info(@ApiParam(name = "inputType", required = true) @PathParam("inputType") String inputType) {
+        final InputDescription description = inputRegistry.getAvailableInputs().get(inputType);
+        if (description == null) {
+            final String message = "Unknown input type " + inputType + " requested.";
+            LOG.error(message);
+            throw new NotFoundException(message);
         }
-        final InputDescription description = availableInputs.get(inputType);
-        final Map<String, Object> result = Maps.newHashMap();
-        result.put("type", inputType);
-        result.put("name", description.getName());
-        result.put("is_exclusive", description.isExclusive());
-        result.put("requested_configuration", description.getRequestedConfiguration());
-        result.put("link_to_docs", description.getLinkToDocs());
 
-        return json(result);
+        return ImmutableMap.of(
+                "type", inputType,
+                "name", description.getName(),
+                "is_exclusive", description.isExclusive(),
+                "requested_configuration", description.getRequestedConfiguration(),
+                "link_to_docs", description.getLinkToDocs());
     }
-
 }

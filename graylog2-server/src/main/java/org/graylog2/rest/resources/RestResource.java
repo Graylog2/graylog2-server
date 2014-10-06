@@ -16,11 +16,7 @@
  */
 package org.graylog2.rest.resources;
 
-import com.codahale.metrics.Histogram;
-import com.codahale.metrics.Meter;
-import com.codahale.metrics.Timer;
 import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.jaxrs.cfg.EndpointConfigBase;
@@ -29,8 +25,8 @@ import com.fasterxml.jackson.jaxrs.cfg.ObjectWriterModifier;
 import com.google.common.collect.Maps;
 import org.apache.shiro.subject.Subject;
 import org.bson.types.ObjectId;
-import org.graylog2.security.ShiroSecurityContext;
 import org.graylog2.plugin.ServerStatus;
+import org.graylog2.security.ShiroSecurityContext;
 import org.graylog2.users.User;
 import org.graylog2.users.UserService;
 import org.slf4j.Logger;
@@ -38,7 +34,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.ws.rs.ForbiddenException;
-import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
@@ -47,7 +42,6 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.SecurityContext;
 import java.security.Principal;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
@@ -65,23 +59,8 @@ public abstract class RestResource {
     @Inject
     protected ServerStatus serverStatus;
 
-    private boolean prettyPrint;
-
     @Context
     SecurityContext securityContext;
-
-    protected RestResource() {
-        /*
-          * Jackson is serializing java.util.Date (coming out of MongoDB for example) as UNIX epoch by default.
-          * Make it write ISO8601 instead.
-          * TODO THIS IS EXTREMELY WRONG AND WILL LEAD TO BUGS. NEED TO HAVE IT INJECTED ONCE, AND THEN REUSED (see ObjectMapperProvider)
-          * but everyone and their grandmother are using this directly in resource objects instead of relying on Jackson :(
-          */
-        /*objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-        objectMapper.setPropertyNamingStrategy(PropertyNamingStrategy.CAMEL_CASE_TO_LOWER_CASE_WITH_UNDERSCORES);
-        objectMapper.registerModule(new JodaModule());
-        objectMapper.registerModule(new GuavaModule());*/
-    }
 
     @QueryParam("pretty")
     public void setPrettyPrint(boolean prettyPrint) {
@@ -94,7 +73,6 @@ public abstract class RestResource {
                 }
             });
         }
-        this.prettyPrint = prettyPrint;
     }
 
     protected int page(int page) {
@@ -147,19 +125,6 @@ public abstract class RestResource {
         	throw new WebApplicationException(400);
 		}
 	}
-
-    protected String json(Object x) {
-        try {
-            if (this.prettyPrint) {
-                return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(x);
-            } else {
-                return objectMapper.writeValueAsString(x);
-            }
-        } catch (JsonProcessingException e) {
-            LOG.error("Error while generating JSON", e);
-            throw new InternalServerErrorException(e);
-        }
-    }
 
     protected Map<String, Long> bytesToValueMap(long bytes) {
         Map<String, Long> r = Maps.newHashMap();

@@ -27,7 +27,12 @@ import org.elasticsearch.action.search.ShardSearchFailure;
 import org.elasticsearch.search.SearchParseException;
 import org.glassfish.jersey.server.ChunkedOutput;
 import org.graylog2.indexer.IndexHelper;
-import org.graylog2.indexer.results.*;
+import org.graylog2.indexer.results.FieldStatsResult;
+import org.graylog2.indexer.results.HistogramResult;
+import org.graylog2.indexer.results.ScrollResult;
+import org.graylog2.indexer.results.SearchResult;
+import org.graylog2.indexer.results.TermsResult;
+import org.graylog2.indexer.results.TermsStatsResult;
 import org.graylog2.indexer.searches.Searches;
 import org.graylog2.indexer.searches.Sorting;
 import org.graylog2.indexer.searches.timeranges.TimeRange;
@@ -42,18 +47,15 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.ForbiddenException;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
-public class SearchResource extends RestResource {
+public abstract class SearchResource extends RestResource {
     private static final Logger LOG = LoggerFactory.getLogger(SearchResource.class);
+
     protected final Searches searches;
 
     @Inject
@@ -66,49 +68,49 @@ public class SearchResource extends RestResource {
             Searches.DateHistogramInterval.valueOf(interval);
         } catch (IllegalArgumentException e) {
             LOG.warn("Invalid interval type. Returning HTTP 400.");
-            throw new WebApplicationException(400);
+            throw new BadRequestException(e);
         }
     }
 
     protected void checkQuery(String query) {
         if (query == null || query.isEmpty()) {
             LOG.error("Missing parameters. Returning HTTP 400.");
-            throw new WebApplicationException(400);
+            throw new BadRequestException();
         }
     }
 
     protected void checkQueryAndKeyword(String query, String keyword) {
         if (keyword == null || keyword.isEmpty() || query == null || query.isEmpty()) {
             LOG.warn("Missing parameters. Returning HTTP 400.");
-            throw new WebApplicationException(400);
+            throw new BadRequestException();
         }
     }
 
     protected void checkQueryAndField(String query, String field) {
         if (field == null || field.isEmpty() || query == null || query.isEmpty()) {
             LOG.warn("Missing parameters. Returning HTTP 400.");
-            throw new WebApplicationException(400);
+            throw new BadRequestException();
         }
     }
 
     protected void checkTermsStatsFields(String keyField, String valueField, String order) {
         if (keyField == null || keyField.isEmpty() || valueField == null || valueField.isEmpty() || order == null || order.isEmpty()) {
             LOG.warn("Missing parameters. Returning HTTP 400.");
-            throw new WebApplicationException(400);
+            throw new BadRequestException();
         }
     }
 
     protected void checkQueryAndInterval(String query, String interval) {
         if (query == null || query.isEmpty() || interval == null || interval.isEmpty()) {
             LOG.warn("Missing parameters. Returning HTTP 400.");
-            throw new WebApplicationException(400);
+            throw new BadRequestException();
         }
     }
 
     protected void checkStringSet(String string) {
         if (string == null || string.isEmpty()) {
             LOG.warn("Missing parameters. Returning HTTP 400.");
-            throw new WebApplicationException(400);
+            throw new BadRequestException();
         }
     }
 
@@ -144,9 +146,9 @@ public class SearchResource extends RestResource {
     protected FieldStatsResult fieldStats(String field, String query, String filter, TimeRange timeRange) throws IndexHelper.InvalidRangeFormatException {
         try {
             return searches.fieldStats(field, query, filter, timeRange);
-        } catch(Searches.FieldTypeException e) {
+        } catch (Searches.FieldTypeException e) {
             LOG.error("Stats query failed. Make sure that field [{}] is a numeric type.", field);
-            throw new WebApplicationException(400);
+            throw new BadRequestException();
         }
     }
 
@@ -159,9 +161,9 @@ public class SearchResource extends RestResource {
                     filter,
                     timeRange
             );
-        } catch(Searches.FieldTypeException e) {
+        } catch (Searches.FieldTypeException e) {
             LOG.error("Field histogram query failed. Make sure that field [{}] is a numeric type.", field);
-            throw new WebApplicationException(400);
+            throw new BadRequestException();
         }
     }
 
@@ -235,7 +237,7 @@ public class SearchResource extends RestResource {
 
         try {
             return Sorting.fromApiParam(sort);
-        } catch(Exception e) {
+        } catch (Exception e) {
             LOG.error("Falling back to default sorting.", e);
             return Sorting.DEFAULT;
         }
@@ -271,14 +273,14 @@ public class SearchResource extends RestResource {
                         currentToken = currentToken.next;
                     }
                 }
-                return new BadRequestException(Response.status(Response.Status.BAD_REQUEST).entity(json(sr)).build());
-            } else if(rootCause instanceof NumberFormatException) {
+                return new BadRequestException(Response.status(Response.Status.BAD_REQUEST).entity(sr).build());
+            } else if (rootCause instanceof NumberFormatException) {
                 final SearchResponse sr = new SearchResponse();
                 sr.query = query;
                 sr.genericError = new GenericError();
                 sr.genericError.exceptionName = rootCause.getClass().getCanonicalName();
                 sr.genericError.message = rootCause.getMessage();
-                return new BadRequestException(Response.status(Response.Status.BAD_REQUEST).entity(json(sr)).build());
+                return new BadRequestException(Response.status(Response.Status.BAD_REQUEST).entity(sr).build());
             } else {
                 LOG.info("Root cause of SearchParseException has unexpected, generic type!" + rootCause.getClass());
                 final SearchResponse sr = new SearchResponse();
@@ -286,7 +288,7 @@ public class SearchResource extends RestResource {
                 sr.genericError = new GenericError();
                 sr.genericError.exceptionName = rootCause.getClass().getCanonicalName();
                 sr.genericError.message = rootCause.getMessage();
-                return new BadRequestException(Response.status(Response.Status.BAD_REQUEST).entity(json(sr)).build());
+                return new BadRequestException(Response.status(Response.Status.BAD_REQUEST).entity(sr).build());
             }
         }
 
@@ -297,7 +299,7 @@ public class SearchResource extends RestResource {
         if (filter == null || filter.equals("*") || filter.isEmpty()) {
             checkPermission(searchPermission);
         } else {
-            if(!filter.startsWith("streams:")) {
+            if (!filter.startsWith("streams:")) {
                 throw new ForbiddenException("Not allowed to search with filter: [" + filter + "]");
             }
 
@@ -305,14 +307,14 @@ public class SearchResource extends RestResource {
             if (parts.length <= 1) {
                 throw new ForbiddenException("Not allowed to search with filter: [" + filter + "]");
             }
-            
+
             String streamList = parts[1];
             String[] streams = streamList.split(",");
-            if (streams.length == 0 ) {
+            if (streams.length == 0) {
                 throw new ForbiddenException("Not allowed to search with filter: [" + filter + "]");
             }
 
-            for(String streamId : streams) {
+            for (String streamId : streams) {
                 if (!isPermitted(RestPermissions.STREAMS_READ, streamId)) {
                     LOG.warn("Not allowed to search with filter: [" + filter + "]. (Forbidden stream: " + streamId + ")");
                     throw new ForbiddenException();
@@ -333,11 +335,11 @@ public class SearchResource extends RestResource {
                     ScrollResult.ScrollChunk chunk = scroll.nextChunk();
                     while (chunk != null) {
                         LOG.debug("[{}] Writing scroll chunk with {} messages",
-                                  scroll.getQueryHash(),
-                                  chunk.getMessages().size());
+                                scroll.getQueryHash(),
+                                chunk.getMessages().size());
                         if (output.isClosed()) {
                             LOG.debug("[{}] Client connection is closed, client disconnected. Aborting scroll.",
-                                      scroll.getQueryHash());
+                                    scroll.getQueryHash());
                             scroll.cancel();
                             return;
                         }

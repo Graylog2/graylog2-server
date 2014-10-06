@@ -17,28 +17,33 @@
 package org.graylog2.rest.resources.system.indexer;
 
 import com.codahale.metrics.annotation.Timed;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
+import com.wordnik.swagger.annotations.Api;
+import com.wordnik.swagger.annotations.ApiOperation;
+import com.wordnik.swagger.annotations.ApiParam;
+import com.wordnik.swagger.annotations.ApiResponse;
+import com.wordnik.swagger.annotations.ApiResponses;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.indexer.IndexFailure;
 import org.graylog2.indexer.IndexFailureService;
-import com.wordnik.swagger.annotations.*;
 import org.graylog2.rest.resources.RestResource;
 import org.graylog2.security.RestPermissions;
+import org.hibernate.validator.constraints.NotEmpty;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import javax.ws.rs.*;
+import javax.ws.rs.BadRequestException;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 import java.util.List;
 import java.util.Map;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 @RequiresAuthentication
 @Api(value = "Indexer/Failures", description = "Indexer failures")
 @Path("/system/indexer/failures")
@@ -49,48 +54,44 @@ public class FailuresResource extends RestResource {
     @Inject
     private IndexFailureService indexFailureService;
 
-    @GET @Timed
+    @GET
+    @Timed
     @ApiOperation(value = "Total count of failed index operations since the given date.")
     @ApiResponses(value = {
             @ApiResponse(code = 400, message = "Invalid date parameter provided.")
     })
     @Produces(MediaType.APPLICATION_JSON)
     @Path("count")
-    public Response count(@ApiParam(name = "since", value = "ISO8601 date", required = false) @QueryParam("since") String since) {
+    public Map<String, Long> count(@ApiParam(name = "since", value = "ISO8601 date", required = true)
+                                   @QueryParam("since") @NotEmpty String since) {
         checkPermission(RestPermissions.INDICES_FAILURES);
 
         DateTime sinceDate;
         try {
             sinceDate = DateTime.parse(since);
-        } catch(IllegalArgumentException e) {
+        } catch (IllegalArgumentException e) {
             LOG.error("Invalid date parameter provided: [" + since + "]", e);
-            throw new WebApplicationException(400);
+            throw new BadRequestException();
         }
 
-        Map<String, Long> result = Maps.newHashMap();
-        result.put("count", indexFailureService.countSince(sinceDate));
-
-        return Response.ok().entity(json(result)).build();
+        return ImmutableMap.of("count", indexFailureService.countSince(sinceDate));
     }
 
-    @GET @Timed
+    @GET
+    @Timed
     @ApiOperation(value = "Get a list of failed index operations.")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response single(@ApiParam(name = "limit", value = "Limit", required = true) @QueryParam("limit") int limit,
-                           @ApiParam(name = "offset", value = "Offset", required = true) @QueryParam("offset") int offset) {
+    public Map<String, Object> single(@ApiParam(name = "limit", value = "Limit", required = true) @QueryParam("limit") int limit,
+                                      @ApiParam(name = "offset", value = "Offset", required = true) @QueryParam("offset") int offset) {
         checkPermission(RestPermissions.INDICES_FAILURES);
 
-        Map<String, Object> result = Maps.newHashMap();
-
-        List<Map<String, Object>> failures = Lists.newArrayList();
+        final List<Map<String, Object>> failures = Lists.newArrayList();
         for (IndexFailure failure : indexFailureService.all(limit, offset)) {
             failures.add(failure.asMap());
         }
 
-        result.put("failures", failures);
-        result.put("total", indexFailureService.totalCount());
-
-        return Response.ok().entity(json(result)).build();
+        return ImmutableMap.of(
+                "failures", failures,
+                "total", indexFailureService.totalCount());
     }
-
 }

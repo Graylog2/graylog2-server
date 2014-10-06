@@ -38,18 +38,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import javax.ws.rs.ForbiddenException;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.List;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 @RequiresAuthentication
 @Api(value = "System/IndexRanges", description = "Index timeranges")
 @Path("/system/indices/ranges")
@@ -73,13 +70,12 @@ public class IndexRangesResource extends RestResource {
         this.systemJobManager = systemJobManager;
     }
 
-    @GET @Timed
+    @GET
+    @Timed
     @ApiOperation(value = "Get a list of all index ranges")
     @Produces(MediaType.APPLICATION_JSON)
     public IndexRangesResponse list() {
-        IndexRangesResponse irp = new IndexRangesResponse();
-        List<IndexRange> ranges = Lists.newArrayList();
-
+        final List<IndexRange> ranges = Lists.newArrayList();
         for (IndexRange range : indexRangeService.getFrom(0)) {
             if (!isPermitted(RestPermissions.INDEXRANGES_READ, range.getIndexName())) {
                 continue;
@@ -87,33 +83,35 @@ public class IndexRangesResource extends RestResource {
             ranges.add(range);
         }
 
+        final IndexRangesResponse irp = new IndexRangesResponse();
         irp.ranges = ranges;
         irp.total = ranges.size();
 
         return irp;
     }
 
-    @POST @Timed
+    @POST
+    @Timed
     @Path("/rebuild")
     @RequiresPermissions(RestPermissions.INDEXRANGES_REBUILD)
     @ApiOperation(value = "Rebuild/sync index range information.",
-                  notes = "This triggers a systemjob that scans every index and stores meta information " +
-                          "about what indices contain messages in what timeranges. It atomically overwrites " +
-                          "already existing meta information.")
+            notes = "This triggers a systemjob that scans every index and stores meta information " +
+                    "about what indices contain messages in what timeranges. It atomically overwrites " +
+                    "already existing meta information.")
     @ApiResponses(value = {
             @ApiResponse(code = 202, message = "Rebuild/sync systemjob triggered.")
     })
     @Produces(MediaType.APPLICATION_JSON)
     public Response rebuild() {
-        SystemJob rebuildJob = rebuildIndexRangesJobFactory.create(this.deflector);
+        final SystemJob rebuildJob = rebuildIndexRangesJobFactory.create(this.deflector);
         try {
             this.systemJobManager.submit(rebuildJob);
         } catch (SystemJobConcurrencyException e) {
             LOG.error("Concurrency level of this job reached: " + e.getMessage());
-            throw new WebApplicationException(403);
+            throw new ForbiddenException();
         }
 
-        return Response.status(Response.Status.ACCEPTED).build();
+        return Response.accepted().build();
     }
 
 }

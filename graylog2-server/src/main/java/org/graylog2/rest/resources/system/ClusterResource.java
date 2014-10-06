@@ -17,27 +17,33 @@
 package org.graylog2.rest.resources.system;
 
 import com.codahale.metrics.annotation.Timed;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.wordnik.swagger.annotations.Api;
+import com.wordnik.swagger.annotations.ApiOperation;
+import com.wordnik.swagger.annotations.ApiParam;
+import com.wordnik.swagger.annotations.ApiResponse;
+import com.wordnik.swagger.annotations.ApiResponses;
 import org.graylog2.cluster.Node;
 import org.graylog2.cluster.NodeNotFoundException;
 import org.graylog2.cluster.NodeService;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.system.NodeId;
-import com.wordnik.swagger.annotations.*;
 import org.graylog2.rest.resources.RestResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import javax.ws.rs.*;
+import javax.ws.rs.BadRequestException;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import java.util.List;
 import java.util.Map;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 @Api(value = "System/Cluster", description = "Node discovery")
 @Path("/system/cluster")
 @Produces(MediaType.APPLICATION_JSON)
@@ -55,25 +61,25 @@ public class ClusterResource extends RestResource {
         this.nodeId = nodeId;
     }
 
-    @GET @Timed
+    @GET
+    @Timed
     @Path("/nodes")
     @ApiOperation(value = "List all active nodes in this cluster.")
-    public String nodes() {
-        List<Map<String, Object>> nodeList = Lists.newArrayList();
-        Map<String, Node> nodes = nodeService.allActive(Node.Type.SERVER);
+    public Map<String, Object> nodes() {
+        final List<Map<String, Object>> nodeList = Lists.newArrayList();
 
-        for(Map.Entry<String, Node> e : nodes.entrySet()) {
+        final Map<String, Node> nodes = nodeService.allActive(Node.Type.SERVER);
+        for (Map.Entry<String, Node> e : nodes.entrySet()) {
             nodeList.add(nodeSummary(e.getValue()));
         }
 
-        Map<String, Object> result = Maps.newHashMap();
-        result.put("total", nodes.size());
-        result.put("nodes", nodeList);
-
-        return json(result);
+        return ImmutableMap.of(
+                "total", nodes.size(),
+                "nodes", nodeList);
     }
 
-    @GET @Timed
+    @GET
+    @Timed
     @Path("/node")
     @ApiOperation(value = "Information about this node.",
             notes = "This is returning information of this node in context to its state in the cluster. " +
@@ -94,14 +100,14 @@ public class ClusterResource extends RestResource {
     public Node node(@ApiParam(name = "nodeId", required = true) @PathParam("nodeId") String nodeId) throws NodeNotFoundException {
         if (nodeId == null || nodeId.isEmpty()) {
             LOG.error("Missing nodeId. Returning HTTP 400.");
-            throw new WebApplicationException(400);
+            throw new BadRequestException();
         }
 
         return nodeService.byNodeId(nodeId);
     }
 
     private Map<String, Object> nodeSummary(Node node) {
-        Map<String, Object> m  = Maps.newHashMap();
+        Map<String, Object> m = Maps.newHashMap();
 
         m.put("node_id", node.getNodeId());
         m.put("type", node.getType().toString().toLowerCase());

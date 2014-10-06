@@ -17,46 +17,40 @@
 package org.graylog2.rest.resources.tools;
 
 import com.codahale.metrics.annotation.Timed;
-import com.google.common.collect.Maps;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.plugin.Tools;
 import org.graylog2.rest.resources.RestResource;
+import org.graylog2.rest.resources.tools.responses.SubstringTesterResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.ws.rs.*;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import java.util.Map;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 @RequiresAuthentication
 @Path("/tools/substring_tester")
 public class SubstringTesterResource extends RestResource {
-
     private static final Logger LOG = LoggerFactory.getLogger(SubstringTesterResource.class);
 
     @GET
     @Timed
     @Produces(MediaType.APPLICATION_JSON)
-    public String substringTester(@QueryParam("begin_index") int beginIndex, @QueryParam("end_index") int endIndex, @QueryParam("string") String string) {
-        if (string == null) {
-            LOG.info("Missing parameters for substring test.");
-            throw new WebApplicationException(Response.Status.BAD_REQUEST);
-        }
+    public SubstringTesterResponse substringTester(@QueryParam("begin_index") @Min(0) int beginIndex,
+                                                   @QueryParam("end_index") @Min(0) int endIndex,
+                                                   @QueryParam("string") @NotNull String string) {
+        final String cut = Tools.safeSubstring(string, beginIndex, endIndex);
 
-        String cut = Tools.safeSubstring(string, beginIndex, endIndex);
-        boolean successful = (cut != null);
+        final SubstringTesterResponse result = new SubstringTesterResponse();
+        result.successful = (cut != null);
+        result.cut = cut;
+        result.beginIndex = beginIndex;
+        result.endIndex = endIndex;
 
-        Map<String, Object> result = Maps.newHashMap();
-        result.put("successful", successful);
-        result.put("cut", cut);
-        result.put("begin_index", beginIndex);
-        result.put("end_index", endIndex);
-
-        return json(result);
+        return result;
     }
-
 }

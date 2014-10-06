@@ -16,6 +16,7 @@
  */
 package org.graylog2.bundles;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.hibernate.validator.constraints.NotBlank;
 
@@ -24,6 +25,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
+@JsonAutoDetect
 public class Stream {
     @JsonProperty
     private String id;

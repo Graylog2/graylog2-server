@@ -16,11 +16,13 @@
  */
 package org.graylog2.bundles;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.Collections;
 import java.util.Map;
 
+@JsonAutoDetect
 public class Converter {
     @JsonProperty
     private org.graylog2.plugin.inputs.Converter.Type type;

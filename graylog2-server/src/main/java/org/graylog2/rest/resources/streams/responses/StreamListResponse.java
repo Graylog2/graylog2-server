@@ -21,9 +21,6 @@ import org.graylog2.plugin.streams.Stream;
 
 import java.util.Collection;
 
-/**
- * @author Dennis Oelkers <dennis@torch.sh>
- */
 @JsonAutoDetect
 public class StreamListResponse {
     public long total;

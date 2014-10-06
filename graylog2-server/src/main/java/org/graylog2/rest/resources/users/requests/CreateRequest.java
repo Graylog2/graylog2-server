@@ -16,23 +16,27 @@
  */
 package org.graylog2.rest.resources.users.requests;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.hibernate.validator.constraints.Email;
+import org.hibernate.validator.constraints.NotEmpty;
 
 import java.util.List;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
+@JsonAutoDetect
 public class CreateRequest {
-
+    @NotEmpty
     public String username;
+    @NotEmpty
     public String password;
+    @Email
     public String email;
     @JsonProperty("full_name")
     public String fullname;
     public List<String> permissions;
     public String timezone;
     public StartpageSummary startpage;
-    public Long session_timeout_ms;
+    @JsonProperty("session_timeout_ms")
+    public Long sessionTimeoutMs;
 
 }

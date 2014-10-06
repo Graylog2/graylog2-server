@@ -18,6 +18,9 @@ package org.graylog2.rest.resources.system;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.wordnik.swagger.annotations.Api;
+import com.wordnik.swagger.annotations.ApiOperation;
+import com.wordnik.swagger.annotations.ApiParam;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.UsernamePasswordToken;
@@ -26,9 +29,6 @@ import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.apache.shiro.session.UnknownSessionException;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.ThreadContext;
-import com.wordnik.swagger.annotations.Api;
-import com.wordnik.swagger.annotations.ApiOperation;
-import com.wordnik.swagger.annotations.ApiParam;
 import org.graylog2.rest.resources.RestResource;
 import org.graylog2.security.ShiroSecurityContext;
 import org.graylog2.users.User;
@@ -39,16 +39,21 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import javax.ws.rs.*;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.InternalServerErrorException;
+import javax.ws.rs.NotAuthorizedException;
+import javax.ws.rs.NotFoundException;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
-
-import static javax.ws.rs.core.Response.noContent;
 
 @Path("/system/sessions")
 @Api(value = "System/Sessions", description = "Login for interactive user sessions")
@@ -68,7 +73,8 @@ public class SessionsResource extends RestResource {
     @POST
     @ApiOperation(value = "Create a new session", notes = "This request creates a new session for a user or reactivates an existing session: the equivalent of logging in.")
     public Session newSession(@Context ContainerRequestContext requestContext,
-            @ApiParam(name = "Login request", value = "Username and credentials", required = true) SessionCreateRequest createRequest) {
+                              @ApiParam(name = "Login request", value = "Username and credentials", required = true)
+                              @Valid @NotNull SessionCreateRequest createRequest) {
         final Session result = new Session();
         final SecurityContext securityContext = requestContext.getSecurityContext();
         if (!(securityContext instanceof ShiroSecurityContext)) {
@@ -120,21 +126,20 @@ public class SessionsResource extends RestResource {
     @ApiOperation(value = "Terminate an existing session", notes = "Destroys the session with the given ID: the equivalent of logging out.")
     @Path("/{sessionId}")
     @RequiresAuthentication
-    public Response terminateSession(@ApiParam(name = "sessionId", required = true) @PathParam("sessionId") String sessionId) {
+    public void terminateSession(@ApiParam(name = "sessionId", required = true) @PathParam("sessionId") String sessionId) {
         final Subject subject = getSubject();
         securityManager.logout(subject);
 
         final org.apache.shiro.session.Session session = subject.getSession(false);
         if (session == null || !session.getId().equals(sessionId)) {
-            return Response.status(Response.Status.NOT_FOUND).build();
+            throw new NotFoundException();
         }
-
-        return noContent().build();
     }
 
     @JsonAutoDetect
     public static class SessionCreateRequest {
-        public SessionCreateRequest(){}
+        public SessionCreateRequest() {
+        }
 
         @JsonProperty(required = true)
         public String username;

@@ -16,13 +16,11 @@
  */
 package org.graylog2.rest.resources.dashboards.requests;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+
 import java.util.List;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
+@JsonAutoDetect
 public class UpdateWidgetPositionsRequest {
-
     public List<WidgetPositionRequest> positions;
-
 }

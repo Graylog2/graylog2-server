@@ -16,8 +16,11 @@
  */
 package org.graylog2.rest.resources.search.requests;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+
 import java.util.Map;
 
+@JsonAutoDetect
 public class CreateSavedSearchRequest {
     public String title;
     public Map<String, Object> query;

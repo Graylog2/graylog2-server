@@ -16,6 +16,9 @@
  */
 package org.graylog2.rest.resources.users.requests;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+
+@JsonAutoDetect
 public class ChangePasswordRequest {
     public String old_password;
     public String password;

@@ -22,6 +22,11 @@ import com.google.common.base.Function;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.wordnik.swagger.annotations.Api;
+import com.wordnik.swagger.annotations.ApiOperation;
+import com.wordnik.swagger.annotations.ApiParam;
+import com.wordnik.swagger.annotations.ApiResponse;
+import com.wordnik.swagger.annotations.ApiResponses;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.ConfigurationException;
 import org.graylog2.database.NotFoundException;
@@ -34,7 +39,6 @@ import org.graylog2.metrics.MetricUtils;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.inputs.Converter;
 import org.graylog2.plugin.inputs.Extractor;
-import com.wordnik.swagger.annotations.*;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.rest.resources.RestResource;
 import org.graylog2.rest.resources.system.inputs.requests.CreateExtractorRequest;
@@ -47,14 +51,22 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import javax.ws.rs.*;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+import javax.ws.rs.BadRequestException;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.io.IOException;
+import javax.ws.rs.core.UriBuilder;
+import java.net.URI;
 import java.util.List;
 import java.util.Map;
-
-import static com.google.common.base.Strings.isNullOrEmpty;
 
 @RequiresAuthentication
 @Api(value = "Extractors", description = "Extractors of an input")
@@ -92,36 +104,26 @@ public class ExtractorsResource extends RestResource {
             @ApiResponse(code = 400, message = "Field the extractor should write on is reserved."),
             @ApiResponse(code = 400, message = "Missing or invalid configuration.")
     })
-    public Response create(@ApiParam(name = "JSON body", required = true) String body,
-                           @ApiParam(name = "inputId", required = true) @PathParam("inputId") String inputId) throws NotFoundException {
-        if (inputId == null || inputId.isEmpty()) {
-            LOG.error("Missing inputId. Returning HTTP 400.");
-            throw new WebApplicationException(400);
-        }
+    public Response create(@ApiParam(name = "inputId", required = true)
+                           @PathParam("inputId") String inputId,
+                           @ApiParam(name = "JSON body", required = true)
+                           @Valid @NotNull CreateExtractorRequest cer) throws NotFoundException {
         checkPermission(RestPermissions.INPUTS_EDIT, inputId);
 
-        MessageInput input = inputs.getRunningInput(inputId);
+        final MessageInput input = inputs.getRunningInput(inputId);
 
         if (input == null) {
             LOG.error("Input <{}> not found.", inputId);
-            throw new WebApplicationException(404);
+            throw new javax.ws.rs.NotFoundException();
         }
 
         // Build extractor.
-        CreateExtractorRequest cer;
-        try {
-            cer = objectMapper.readValue(body, CreateExtractorRequest.class);
-        } catch (IOException e) {
-            LOG.error("Error while parsing JSON", e);
-            throw new WebApplicationException(e, Response.Status.BAD_REQUEST);
-        }
-
         if (cer.sourceField.isEmpty() || cer.targetField.isEmpty()) {
             LOG.error("Missing parameters. Returning HTTP 400.");
-            throw new WebApplicationException(Response.Status.BAD_REQUEST);
+            throw new BadRequestException();
         }
 
-        String id = new com.eaio.uuid.UUID().toString();
+        final String id = new com.eaio.uuid.UUID().toString();
         Extractor extractor;
         try {
             extractor = extractorFactory.factory(
@@ -140,13 +142,13 @@ public class ExtractorsResource extends RestResource {
             );
         } catch (ExtractorFactory.NoSuchExtractorException e) {
             LOG.error("No such extractor type.", e);
-            throw new WebApplicationException(e, Response.Status.BAD_REQUEST);
+            throw new BadRequestException(e);
         } catch (Extractor.ReservedFieldException e) {
             LOG.error("Cannot create extractor. Field is reserved.", e);
-            throw new WebApplicationException(e, Response.Status.BAD_REQUEST);
+            throw new BadRequestException(e);
         } catch (ConfigurationException e) {
             LOG.error("Cannot create extractor. Missing configuration.", e);
-            throw new WebApplicationException(e, Response.Status.BAD_REQUEST);
+            throw new BadRequestException(e);
         }
 
         Input mongoInput = inputService.find(input.getPersistId());
@@ -154,17 +156,19 @@ public class ExtractorsResource extends RestResource {
             inputService.addExtractor(mongoInput, extractor);
         } catch (ValidationException e) {
             LOG.error("Extractor persist validation failed.", e);
-            throw new WebApplicationException(e, Response.Status.BAD_REQUEST);
+            throw new BadRequestException(e);
         }
 
-        String msg = "Added extractor <" + id + "> of type [" + cer.extractorType + "] to input <" + inputId + ">.";
+        final String msg = "Added extractor <" + id + "> of type [" + cer.extractorType + "] to input <" + inputId + ">.";
         LOG.info(msg);
         activityWriter.write(new Activity(msg, ExtractorsResource.class));
 
-        Map<String, Object> result = Maps.newHashMap();
-        result.put("extractor_id", id);
+        final Map<String, String> result = ImmutableMap.of("extractor_id", id);
+        final URI extractorUri = UriBuilder.fromResource(ExtractorsResource.class)
+                .path("{extractorId}")
+                .build(id);
 
-        return Response.status(Response.Status.CREATED).entity(json(result)).build();
+        return Response.created(extractorUri).entity(result).build();
     }
 
     @GET
@@ -174,31 +178,24 @@ public class ExtractorsResource extends RestResource {
             @ApiResponse(code = 404, message = "No such input on this node.")
     })
     @Produces(MediaType.APPLICATION_JSON)
-    public String list(@ApiParam(name = "inputId", required = true) @PathParam("inputId") String inputId) throws NotFoundException {
-        if (inputId == null || inputId.isEmpty()) {
-            LOG.error("Missing inputId. Returning HTTP 400.");
-            throw new WebApplicationException(400);
-        }
+    public Map<String, Object> list(@ApiParam(name = "inputId", required = true)
+                                    @PathParam("inputId") String inputId) throws NotFoundException {
         checkPermission(RestPermissions.INPUTS_READ, inputId);
 
-        Input input = inputService.find(inputId);
-
+        final Input input = inputService.find(inputId);
         if (input == null) {
             LOG.error("Input <{}> not found.", inputId);
-            throw new WebApplicationException(404);
+            throw new javax.ws.rs.NotFoundException();
         }
 
-        List<Map<String, Object>> extractors = Lists.newArrayList();
-
+        final List<Map<String, Object>> extractors = Lists.newArrayList();
         for (Extractor extractor : inputService.getExtractors(input)) {
             extractors.add(toMap(extractor));
         }
 
-        Map<String, Object> result = Maps.newHashMap();
-        result.put("extractors", extractors);
-        result.put("total", inputService.getExtractors(input).size());
-
-        return json(result);
+        return ImmutableMap.of(
+                "extractors", extractors,
+                "total", inputService.getExtractors(input).size());
     }
 
     @DELETE
@@ -212,17 +209,10 @@ public class ExtractorsResource extends RestResource {
     })
     @Produces(MediaType.APPLICATION_JSON)
     public void terminate(
-            @ApiParam(name = "inputId", required = true) @PathParam("inputId") String inputId,
-            @ApiParam(name = "extractorId", required = true) @PathParam("extractorId") String extractorId) throws NotFoundException {
-        if (isNullOrEmpty(extractorId)) {
-            LOG.error("extractorId is missing.");
-            throw new BadRequestException("extractorId is missing.");
-        }
-
-        if (isNullOrEmpty(inputId)) {
-            LOG.error("inputId is missing.");
-            throw new BadRequestException("inputId is missing.");
-        }
+            @ApiParam(name = "inputId", required = true)
+            @PathParam("inputId") String inputId,
+            @ApiParam(name = "extractorId", required = true)
+            @PathParam("extractorId") String extractorId) throws NotFoundException {
         checkPermission(RestPermissions.INPUTS_EDIT, inputId);
 
         final MessageInput input = inputs.getPersisted(inputId);
@@ -262,23 +252,12 @@ public class ExtractorsResource extends RestResource {
             @ApiResponse(code = 404, message = "No such input on this node.")
     })
     @Path("order")
-    public Response order(@ApiParam(name = "JSON body", required = true) String body,
-                          @ApiParam(name = "inputId", value = "Persist ID (!) of input.", required = true) @PathParam("inputId") String inputPersistId) throws NotFoundException {
-        if (inputPersistId == null || inputPersistId.isEmpty()) {
-            LOG.error("Missing inputId. Returning HTTP 400.");
-            throw new WebApplicationException(400);
-        }
+    public void order(@ApiParam(name = "inputId", value = "Persist ID (!) of input.", required = true)
+                      @PathParam("inputId") String inputPersistId,
+                      @ApiParam(name = "JSON body", required = true) OrderExtractorsRequest oer) throws NotFoundException {
         checkPermission(RestPermissions.INPUTS_EDIT, inputPersistId);
 
-        Input mongoInput = inputService.find(inputPersistId);
-
-        OrderExtractorsRequest oer;
-        try {
-            oer = objectMapper.readValue(body, OrderExtractorsRequest.class);
-        } catch (IOException e) {
-            LOG.error("Error while parsing JSON", e);
-            throw new WebApplicationException(e, Response.Status.BAD_REQUEST);
-        }
+        final Input mongoInput = inputService.find(inputPersistId);
 
         for (Extractor extractor : inputService.getExtractors(mongoInput)) {
             if (oer.order.containsValue(extractor.getId())) {
@@ -295,8 +274,6 @@ public class ExtractorsResource extends RestResource {
         }
 
         LOG.info("Updated extractor ordering of input <persist:{}>.", inputPersistId);
-
-        return Response.ok().build();
     }
 
     private Map<String, Object> toMap(Extractor extractor) {
@@ -341,5 +318,4 @@ public class ExtractorsResource extends RestResource {
 
         return converters;
     }
-
 }

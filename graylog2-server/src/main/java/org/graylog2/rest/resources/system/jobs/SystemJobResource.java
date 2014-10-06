@@ -17,28 +17,43 @@
 package org.graylog2.rest.resources.system.jobs;
 
 import com.codahale.metrics.annotation.Timed;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
+import com.wordnik.swagger.annotations.Api;
+import com.wordnik.swagger.annotations.ApiOperation;
+import com.wordnik.swagger.annotations.ApiParam;
+import com.wordnik.swagger.annotations.ApiResponse;
+import com.wordnik.swagger.annotations.ApiResponses;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import com.wordnik.swagger.annotations.*;
 import org.graylog2.rest.resources.RestResource;
 import org.graylog2.rest.resources.system.jobs.requests.TriggerRequest;
 import org.graylog2.security.RestPermissions;
-import org.graylog2.system.jobs.*;
+import org.graylog2.system.jobs.NoSuchJobException;
+import org.graylog2.system.jobs.SystemJob;
+import org.graylog2.system.jobs.SystemJobConcurrencyException;
+import org.graylog2.system.jobs.SystemJobFactory;
+import org.graylog2.system.jobs.SystemJobManager;
+import org.hibernate.validator.constraints.NotEmpty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import javax.ws.rs.*;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+import javax.ws.rs.BadRequestException;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.ForbiddenException;
+import javax.ws.rs.GET;
+import javax.ws.rs.NotFoundException;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 @RequiresAuthentication
 @Api(value = "System/Jobs", description = "Systemjobs")
 @Path("/system/jobs")
@@ -56,11 +71,12 @@ public class SystemJobResource extends RestResource {
         this.systemJobManager = systemJobManager;
     }
 
-    @GET @Timed
+    @GET
+    @Timed
     @ApiOperation(value = "List currently running jobs")
     @Produces(MediaType.APPLICATION_JSON)
-    public String list() {
-        List<Map<String, Object>> jobs = Lists.newArrayList();
+    public Map<String, List<Map<String, Object>>> list() {
+        final List<Map<String, Object>> jobs = Lists.newArrayList();
 
         for (Map.Entry<String, SystemJob> entry : systemJobManager.getRunningJobs().entrySet()) {
             // TODO jobId is ephemeral, this is not a good key for permission checks. we should use the name of the job type (but there is no way to get it yet)
@@ -69,37 +85,33 @@ public class SystemJobResource extends RestResource {
             }
         }
 
-        Map<String, Object> result = Maps.newHashMap();
-        result.put("jobs", jobs);
-
-        return json(result);
+        return ImmutableMap.of("jobs", jobs);
     }
 
-    @GET @Timed
+    @GET
+    @Timed
     @Path("/{jobId}")
     @ApiOperation(value = "Get information of a specific currently running job")
     @Produces(MediaType.APPLICATION_JSON)
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "Job not found.")
     })
-    public String get(@ApiParam(name = "jobId", required = true) @PathParam("jobId") String jobId) {
-        if (jobId == null || jobId.isEmpty()) {
-            LOG.error("Missing jobId. Returning HTTP 400.");
-            throw new WebApplicationException(400);
-        }
+    public Map<String, Object> get(@ApiParam(name = "jobId", required = true)
+                                   @PathParam("jobId") @NotEmpty String jobId) {
         // TODO jobId is ephemeral, this is not a good key for permission checks. we should use the name of the job type (but there is no way to get it yet)
         checkPermission(RestPermissions.SYSTEMJOBS_READ, jobId);
 
         SystemJob job = systemJobManager.getRunningJobs().get(jobId);
         if (job == null) {
             LOG.error("No system job with ID <{}> found.", jobId);
-            throw new WebApplicationException(404);
+            throw new NotFoundException();
         }
 
-        return json(job.toMap());
+        return job.toMap();
     }
 
-    @POST @Timed
+    @POST
+    @Timed
     @ApiOperation(value = "Trigger new job")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
@@ -108,40 +120,28 @@ public class SystemJobResource extends RestResource {
             @ApiResponse(code = 400, message = "There is no such systemjob type."),
             @ApiResponse(code = 403, message = "Maximum concurrency level of this systemjob type reached.")
     })
-    public Response trigger(@ApiParam(name = "JSON body", required = true) String body) {
-        if (body == null || body.isEmpty()) {
-            LOG.error("Missing parameters. Returning HTTP 400.");
-            throw new WebApplicationException(400);
-        }
-
-        TriggerRequest tr;
-        try {
-            tr = objectMapper.readValue(body, TriggerRequest.class);
-        } catch(IOException e) {
-            LOG.error("Error while parsing JSON", e);
-            throw new WebApplicationException(e, Response.Status.BAD_REQUEST);
-        }
+    public Response trigger(@ApiParam(name = "JSON body", required = true)
+                            @Valid @NotNull TriggerRequest tr) {
         // TODO cleanup jobId vs jobName checking in permissions
         checkPermission(RestPermissions.SYSTEMJOBS_CREATE, tr.jobName);
 
         SystemJob job;
         try {
             job = systemJobFactory.build(tr.jobName);
-        } catch(NoSuchJobException e) {
+        } catch (NoSuchJobException e) {
             LOG.error("Such a system job type does not exist. Returning HTTP 400.");
-            throw new WebApplicationException(400);
+            throw new BadRequestException(e);
         }
 
         try {
             systemJobManager.submit(job);
         } catch (SystemJobConcurrencyException e) {
             LOG.error("Maximum concurrency level of this job reached. ", e);
-            throw new WebApplicationException(403);
+            throw new ForbiddenException(e);
         }
 
-        return Response.status(Response.Status.ACCEPTED).build();
+        return Response.accepted().build();
     }
 
     // TODO: DELETE: attempt to stop/cancel job
-
 }

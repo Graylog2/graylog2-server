@@ -16,12 +16,10 @@
  */
 package org.graylog2.rest.resources.dashboards.requests;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
-public class UpdateRequest {
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 
+@JsonAutoDetect
+public class UpdateRequest {
     public String title;
     public String description;
-
 }
