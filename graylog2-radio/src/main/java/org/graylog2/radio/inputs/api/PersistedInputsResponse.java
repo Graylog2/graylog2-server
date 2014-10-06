@@ -16,14 +16,10 @@
  */
 package org.graylog2.radio.inputs.api;
 
+import java.util.Collections;
 import java.util.List;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public class PersistedInputsResponse {
-
-    public List<InputSummaryResponse> inputs;
-    public int total;
-
+    public List<InputSummaryResponse> inputs = Collections.emptyList();
+    public int total = 0;
 }
