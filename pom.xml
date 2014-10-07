@@ -90,7 +90,8 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <maven.build.timestamp.format>yyyyMMddHHmmss</maven.build.timestamp.format>
-        <build.timestamp>${maven.build.timestamp}</build.timestamp> <!-- to work around filtering bug, which makes maven.build.timestamp inaccessible -->
+        <!-- to work around filtering bug, which makes maven.build.timestamp inaccessible -->
+        <build.timestamp>${maven.build.timestamp}</build.timestamp>
 
         <metrics.version>3.1.0</metrics.version>
         <jackson.version>2.4.3</jackson.version>
@@ -597,6 +598,13 @@
             </dependency>
 
             <dependency>
+                <groupId>com.google.auto.value</groupId>
+                <artifactId>auto-value</artifactId>
+                <version>1.0-rc1</version>
+                <scope>provided</scope>
+            </dependency>
+
+            <dependency>
                 <groupId>org.testng</groupId>
                 <artifactId>testng</artifactId>
                 <version>6.8.8</version>
@@ -623,6 +631,10 @@
         <dependency>
             <groupId>com.google.code.findbugs</groupId>
             <artifactId>jsr305</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.google.auto.value</groupId>
+            <artifactId>auto-value</artifactId>
         </dependency>
         <!-- our basic test libraries, please only add infrastructure dependencies here -->
         <dependency>
@@ -704,6 +716,9 @@
                     <source>1.7</source>
                     <target>1.7</target>
                     <useIncrementalCompilation>false</useIncrementalCompilation>
+                    <annotationProcessors>
+                        <annotationProcessor>com.google.auto.value.processor.AutoValueProcessor</annotationProcessor>
+                    </annotationProcessors>
                 </configuration>
             </plugin>
             <plugin>
