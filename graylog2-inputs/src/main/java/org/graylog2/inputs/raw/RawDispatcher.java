@@ -19,6 +19,7 @@ package org.graylog2.inputs.raw;
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import org.graylog2.plugin.buffers.Buffer;
+import org.graylog2.plugin.buffers.BufferOutOfCapacityException;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.jboss.netty.buffer.ChannelBuffer;
@@ -37,7 +38,7 @@ import static com.codahale.metrics.MetricRegistry.name;
 
 public class RawDispatcher extends SimpleChannelHandler {
 
-    private static final Logger LOG = LoggerFactory.getLogger(RawDispatcher.class);
+    protected static final Logger LOG = LoggerFactory.getLogger(RawDispatcher.class);
 
     private final RawProcessor processor;
     private final Meter receivedMessages;
@@ -53,6 +54,10 @@ public class RawDispatcher extends SimpleChannelHandler {
 
     @Override
     public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
+        processMessage(e);
+    }
+
+    void processMessage(MessageEvent e) throws BufferOutOfCapacityException {
         receivedMessages.mark();
 
         InetSocketAddress remoteAddress = (InetSocketAddress) e.getRemoteAddress();
