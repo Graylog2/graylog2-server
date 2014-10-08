@@ -17,11 +17,32 @@
 package org.graylog2.rest.resources.search.responses;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.auto.value.AutoValue;
 
 @JsonAutoDetect
-public class QueryParseError {
-    public int beginColumn;
-    public int beginLine;
-    public int endColumn;
-    public int endLine;
+@AutoValue
+public abstract class QueryParseError {
+    @JsonProperty
+    public abstract String query();
+
+    @JsonProperty
+    public abstract int beginColumn();
+
+    @JsonProperty
+    public abstract int beginLine();
+
+    @JsonProperty
+    public abstract int endColumn();
+
+    @JsonProperty
+    public abstract int endLine();
+
+    public static QueryParseError create(String query, int beginColumn, int beginLine, int endColumn, int endLine) {
+        return new AutoValue_QueryParseError(query, beginColumn, beginLine, endColumn, endLine);
+    }
+
+    public static QueryParseError create(String query) {
+        return new AutoValue_QueryParseError(query, 0, 0, 0, 0);
+    }
 }

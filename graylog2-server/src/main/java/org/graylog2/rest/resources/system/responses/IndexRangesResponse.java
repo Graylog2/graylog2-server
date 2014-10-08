@@ -17,12 +17,22 @@
 package org.graylog2.rest.resources.system.responses;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.auto.value.AutoValue;
 import org.graylog2.indexer.ranges.IndexRange;
 
 import java.util.List;
 
 @JsonAutoDetect
-public class IndexRangesResponse {
-    public int total;
-    public List<IndexRange> ranges;
+@AutoValue
+public abstract class IndexRangesResponse {
+    @JsonProperty
+    public abstract int total();
+
+    @JsonProperty
+    public abstract List<IndexRange> ranges();
+
+    public static IndexRangesResponse create(int total, List<IndexRange> ranges) {
+        return new AutoValue_IndexRangesResponse(total, ranges);
+    }
 }

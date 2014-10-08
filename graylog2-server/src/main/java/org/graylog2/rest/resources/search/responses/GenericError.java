@@ -17,9 +17,22 @@
 package org.graylog2.rest.resources.search.responses;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.auto.value.AutoValue;
 
 @JsonAutoDetect
-public class GenericError {
-    public String exceptionName;
-    public String message;
+@AutoValue
+public abstract class GenericError {
+    @JsonProperty
+    public abstract String exceptionName();
+
+    @JsonProperty
+    public abstract String message();
+
+    @JsonProperty
+    public abstract String query();
+
+    public static GenericError create(String exceptionName, String message, String query) {
+        return new AutoValue_GenericError(exceptionName, message, query);
+    }
 }

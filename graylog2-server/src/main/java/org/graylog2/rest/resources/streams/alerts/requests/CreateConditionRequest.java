@@ -17,11 +17,24 @@
 package org.graylog2.rest.resources.streams.alerts.requests;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.auto.value.AutoValue;
 
 import java.util.Map;
 
 @JsonAutoDetect
-public class CreateConditionRequest {
-    public String type;
-    public Map<String, Object> parameters;
+@AutoValue
+public abstract class CreateConditionRequest {
+    @JsonProperty
+    public abstract String type();
+
+    @JsonProperty
+    public abstract Map<String, Object> parameters();
+
+    @JsonCreator
+    public static CreateConditionRequest create(@JsonProperty("type") String type,
+                                                @JsonProperty("parameters") Map<String, Object> parameters) {
+        return new AutoValue_CreateConditionRequest(type, parameters);
+    }
 }

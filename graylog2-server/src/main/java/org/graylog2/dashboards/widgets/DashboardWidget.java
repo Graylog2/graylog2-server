@@ -94,9 +94,9 @@ public abstract class DashboardWidget implements EmbeddedPersistable {
     public static DashboardWidget fromRequest(MetricRegistry metricRegistry, Searches searches, AddWidgetRequest awr, String userId) throws NoSuchWidgetTypeException, InvalidRangeParametersException, InvalidWidgetConfigurationException {
         Type type;
         try {
-            type = Type.valueOf(awr.type.toUpperCase());
+            type = Type.valueOf(awr.type().toUpperCase());
         } catch (IllegalArgumentException e) {
-            throw new NoSuchWidgetTypeException("No such widget type <" + awr.type + ">");
+            throw new NoSuchWidgetTypeException("No such widget type <" + awr.type() + ">");
         }
 
         String id = UUID.randomUUID().toString();
@@ -104,23 +104,23 @@ public abstract class DashboardWidget implements EmbeddedPersistable {
         // Build timerange.
         TimeRange timeRange;
 
-        if (!awr.config.containsKey("range_type")) {
+        if (!awr.config().containsKey("range_type")) {
             throw new InvalidRangeParametersException("range_type not set");
         }
 
-        String rangeType = (String) awr.config.get("range_type");
+        String rangeType = (String) awr.config().get("range_type");
         if (rangeType.equals("relative")) {
-            timeRange = new RelativeRange(Integer.parseInt((String) awr.config.get("range")));
+            timeRange = new RelativeRange(Integer.parseInt((String) awr.config().get("range")));
         } else if (rangeType.equals("keyword")) {
-            timeRange = new KeywordRange((String) awr.config.get("keyword"));
+            timeRange = new KeywordRange((String) awr.config().get("keyword"));
         } else if (rangeType.equals("absolute")) {
-            timeRange = new AbsoluteRange((String) awr.config.get("from"), (String) awr.config.get("to"));
+            timeRange = new AbsoluteRange((String) awr.config().get("from"), (String) awr.config().get("to"));
         } else {
             throw new InvalidRangeParametersException("range_type not recognized");
         }
 
-        return buildDashboardWidget(type, metricRegistry, searches, id, awr.description, 0, awr.config,
-                (String) awr.config.get("query"), timeRange, userId);
+        return buildDashboardWidget(type, metricRegistry, searches, id, awr.description(), 0, awr.config(),
+                (String) awr.config().get("query"), timeRange, userId);
     }
 
     public static DashboardWidget fromPersisted(MetricRegistry metricRegistry, Searches searches, BasicDBObject fields) throws NoSuchWidgetTypeException, InvalidRangeParametersException, InvalidWidgetConfigurationException {

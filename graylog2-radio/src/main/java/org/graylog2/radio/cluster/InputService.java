@@ -92,7 +92,7 @@ public class InputService {
         final UriBuilder uriBuilder = UriBuilder.fromUri(serverUrl);
         uriBuilder.path("/system/radios/" + serverStatus.getNodeId().toString() + "/inputs");
 
-        RegisterInputRequest rir = new RegisterInputRequest(input, serverStatus.getNodeId().toString());
+        RegisterInputRequest rir = RegisterInputRequest.create(input, serverStatus.getNodeId().toString());
 
         String json;
         try {

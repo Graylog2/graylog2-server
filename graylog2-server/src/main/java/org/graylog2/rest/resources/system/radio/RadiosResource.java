@@ -36,6 +36,7 @@ import org.graylog2.inputs.InputService;
 import org.graylog2.plugin.Tools;
 import org.graylog2.rest.resources.RestResource;
 import org.graylog2.rest.resources.system.radio.requests.PingRequest;
+import org.graylog2.rest.resources.system.radio.responses.RadioSummary;
 import org.graylog2.shared.rest.resources.system.inputs.requests.RegisterInputRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -77,7 +78,7 @@ public class RadiosResource extends RestResource {
     @Timed
     @ApiOperation(value = "List all active radios in this cluster.")
     public Map<String, Object> radios() {
-        final List<Map<String, Object>> radioList = Lists.newArrayList();
+        final List<RadioSummary> radioList = Lists.newArrayList();
 
         final Map<String, Node> radios = nodeService.allActive(Node.Type.RADIO);
         for (Map.Entry<String, Node> radio : radios.entrySet()) {
@@ -98,8 +99,8 @@ public class RadiosResource extends RestResource {
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "Radio not found.")
     })
-    public Map<String, Object> radio(@ApiParam(name = "radioId", required = true)
-                                     @PathParam("radioId") String radioId) {
+    public RadioSummary radio(@ApiParam(name = "radioId", required = true)
+                              @PathParam("radioId") String radioId) {
         final Node radio;
         try {
             radio = nodeService.byNodeId(radioId);
@@ -144,16 +145,17 @@ public class RadiosResource extends RestResource {
         }
 
         final Map<String, Object> inputData = Maps.newHashMap();
-        if (rir.inputId != null) {
-            inputData.put("input_id", rir.inputId);
+        if (rir.inputId() != null) {
+            inputData.put("input_id", rir.inputId());
         } else {
             inputData.put("input_id", new ObjectId().toHexString());
-            inputData.put("title", rir.title);
-            inputData.put("type", rir.type);
-            inputData.put("creator_user_id", rir.creatorUserId);
-            inputData.put("configuration", rir.configuration);
+
+            inputData.put("title", rir.title());
+            inputData.put("type", rir.type());
+            inputData.put("creator_user_id", rir.creatorUserId());
+            inputData.put("configuration", rir.configuration());
             inputData.put("created_at", Tools.iso8601());
-            inputData.put("radio_id", rir.radioId);
+            inputData.put("radio_id", rir.radioId());
         }
 
         final Input mongoInput = new InputImpl(inputData);
@@ -260,26 +262,19 @@ public class RadiosResource extends RestResource {
         }
 
         if (node != null) {
-            nodeService.markAsAlive(node, false, pr.restTransportAddress);
+            nodeService.markAsAlive(node, false, pr.restTransportAddress());
             LOG.debug("Updated state of graylog2-radio node [{}].", radioId);
         } else {
-            nodeService.registerRadio(radioId, pr.restTransportAddress);
+            nodeService.registerRadio(radioId, pr.restTransportAddress());
         }
     }
 
-    private Map<String, Object> radioSummary(Node node) {
-        final Map<String, Object> m = Maps.newHashMap();
-
-        // TODO: Remove "id" in future versions
-        m.put("id", node.getNodeId());
-        m.put("node_id", node.getNodeId());
-        m.put("type", node.getType().toString().toLowerCase());
-        m.put("transport_address", node.getTransportAddress());
-        m.put("last_seen", Tools.getISO8601String(node.getLastSeen()));
-
-        // Only meant to be used for representation. Not a real ID.
-        m.put("short_node_id", node.getShortNodeId());
-
-        return m;
+    private RadioSummary radioSummary(Node node) {
+        return RadioSummary.create(
+                node.getNodeId(),
+                node.getType().toString().toLowerCase(),
+                node.getTransportAddress(),
+                Tools.getISO8601String(node.getLastSeen()),
+                node.getShortNodeId());
     }
 }

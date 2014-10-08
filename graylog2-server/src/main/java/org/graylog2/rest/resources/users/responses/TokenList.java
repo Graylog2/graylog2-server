@@ -14,12 +14,21 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.rest.resources.dashboards.requests;
+package org.graylog2.rest.resources.users.responses;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.auto.value.AutoValue;
+
+import java.util.List;
 
 @JsonAutoDetect
-public class UpdateRequest {
-    public String title;
-    public String description;
+@AutoValue
+public abstract class TokenList {
+    @JsonProperty
+    public abstract List<Token> tokens();
+
+    public static TokenList create(List<Token> tokens) {
+        return new AutoValue_TokenList(tokens);
+    }
 }

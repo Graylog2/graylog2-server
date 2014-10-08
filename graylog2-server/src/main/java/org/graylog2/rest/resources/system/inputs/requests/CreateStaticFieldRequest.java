@@ -17,9 +17,23 @@
 package org.graylog2.rest.resources.system.inputs.requests;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.auto.value.AutoValue;
+import org.hibernate.validator.constraints.NotEmpty;
 
 @JsonAutoDetect
-public class CreateStaticFieldRequest {
-    public String key;
-    public String value;
+@AutoValue
+public abstract class CreateStaticFieldRequest {
+    @JsonProperty
+    public abstract String key();
+
+    @JsonProperty
+    public abstract String value();
+
+    @JsonCreator
+    public static CreateStaticFieldRequest create(@JsonProperty("key") @NotEmpty String key,
+                                                  @JsonProperty("value") @NotEmpty String value) {
+        return new AutoValue_CreateStaticFieldRequest(key, value);
+    }
 }

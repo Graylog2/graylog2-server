@@ -17,12 +17,12 @@
 package org.graylog2.rest.resources.system;
 
 import com.codahale.metrics.annotation.Timed;
-import com.google.common.collect.ImmutableMap;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import org.graylog2.rest.resources.RestResource;
+import org.graylog2.rest.resources.system.responses.Throughput;
 import org.graylog2.security.RestPermissions;
 import org.graylog2.shared.stats.ThroughputStats;
 
@@ -31,14 +31,12 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
-import java.util.Map;
 
 @RequiresAuthentication
 @Api(value = "System/Throughput", description = "Message throughput of this node")
 @Path("/system/throughput")
 public class ThroughputResource extends RestResource {
-
-    private ThroughputStats throughputStats;
+    private final ThroughputStats throughputStats;
 
     @Inject
     public ThroughputResource(ThroughputStats throughputStats) {
@@ -50,7 +48,7 @@ public class ThroughputResource extends RestResource {
     @RequiresPermissions(RestPermissions.THROUGHPUT_READ)
     @ApiOperation(value = "Current throughput of this node in messages per second")
     @Produces(MediaType.APPLICATION_JSON)
-    public Map<String, Long> total() {
-        return ImmutableMap.of("throughput", throughputStats.getCurrentThroughput());
+    public Throughput total() {
+        return Throughput.create(throughputStats.getCurrentThroughput());
     }
 }

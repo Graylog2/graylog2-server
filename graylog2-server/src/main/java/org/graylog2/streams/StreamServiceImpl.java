@@ -36,7 +36,7 @@ import org.graylog2.plugin.database.EmbeddedPersistable;
 import org.graylog2.plugin.streams.Output;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.streams.StreamRule;
-import org.graylog2.rest.resources.streams.requests.CreateRequest;
+import org.graylog2.rest.resources.streams.requests.CreateStreamRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -88,13 +88,13 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
     }
 
     @Override
-    public Stream create(CreateRequest cr, String userId) {
+    public Stream create(CreateStreamRequest cr, String userId) {
         Map<String, Object> streamData = Maps.newHashMap();
-        streamData.put(StreamImpl.FIELD_TITLE, cr.title);
-        streamData.put(StreamImpl.FIELD_DESCRIPTION, cr.description);
+        streamData.put(StreamImpl.FIELD_TITLE, cr.title());
+        streamData.put(StreamImpl.FIELD_DESCRIPTION, cr.description());
         streamData.put(StreamImpl.FIELD_CREATOR_USER_ID, userId);
         streamData.put(StreamImpl.FIELD_CREATED_AT, Tools.iso8601());
-        streamData.put(StreamImpl.FIELD_CONTENT_PACK, cr.contentPack);
+        streamData.put(StreamImpl.FIELD_CONTENT_PACK, cr.contentPack());
 
         return create(streamData);
     }

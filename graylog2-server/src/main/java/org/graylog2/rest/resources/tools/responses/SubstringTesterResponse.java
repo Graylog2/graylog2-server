@@ -18,13 +18,27 @@ package org.graylog2.rest.resources.tools.responses;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.auto.value.AutoValue;
+
+import javax.annotation.Nullable;
 
 @JsonAutoDetect
-public class SubstringTesterResponse {
-    public boolean successful;
-    public String cut;
+@AutoValue
+public abstract class SubstringTesterResponse {
+    @JsonProperty
+    public abstract boolean successful();
+
+    @JsonProperty
+    @Nullable
+    public abstract String cut();
+
     @JsonProperty("begin_index")
-    public int beginIndex;
+    public abstract int beginIndex();
+
     @JsonProperty("end_index")
-    public int endIndex;
+    public abstract int endIndex();
+
+    public static SubstringTesterResponse create(boolean successful, @Nullable String cut, int beginIndex, int endIndex) {
+        return new AutoValue_SubstringTesterResponse(successful, cut, beginIndex, endIndex);
+    }
 }

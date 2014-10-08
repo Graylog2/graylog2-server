@@ -18,14 +18,21 @@ package org.graylog2.rest.resources.streams.responses;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.auto.value.AutoValue;
 import org.graylog2.plugin.streams.StreamRule;
 
 import java.util.Collection;
 
 @JsonAutoDetect
-public class StreamRuleListResponse {
-    public long total;
+@AutoValue
+public abstract class StreamRuleListResponse {
+    @JsonProperty
+    public abstract int total();
 
     @JsonProperty(value = "stream_rules")
-    public Collection<StreamRule> streamRules;
+    public abstract Collection<StreamRule> streamRules();
+
+    public static StreamRuleListResponse create(int total, Collection<StreamRule> streamRules) {
+        return new AutoValue_StreamRuleListResponse(total, streamRules);
+    }
 }

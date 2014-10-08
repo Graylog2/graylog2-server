@@ -117,16 +117,21 @@ public class OutputResource extends RestResource {
     })
     public Response create(@ApiParam(name = "JSON body", required = true) CreateOutputRequest csor) throws ValidationException {
         checkPermission(RestPermissions.OUTPUTS_CREATE);
-        final AvailableOutputSummary outputSummary = messageOutputFactory.getAvailableOutputs().get(csor.type);
+        final AvailableOutputSummary outputSummary = messageOutputFactory.getAvailableOutputs().get(csor.type());
 
         if (outputSummary == null) {
             throw new ValidationException("type", "Invalid output type");
         }
 
         // Make sure the config values will be stored with the correct type.
-        csor.configuration = ConfigurationMapConverter.convertValues(csor.configuration, outputSummary.requestedConfiguration);
+        final CreateOutputRequest createOutputRequest = CreateOutputRequest.create(
+                csor.title(),
+                csor.type(),
+                ConfigurationMapConverter.convertValues(csor.configuration(), outputSummary.requestedConfiguration()),
+                csor.streams()
+        );
 
-        final Output output = outputService.create(csor, getCurrentUser().getName());
+        final Output output = outputService.create(createOutputRequest, getCurrentUser().getName());
         final URI outputUri = UriBuilder.fromResource(OutputResource.class)
                 .path("{outputId}")
                 .build(output.getId());

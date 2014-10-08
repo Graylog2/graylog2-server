@@ -17,12 +17,28 @@
 package org.graylog2.rest.resources.dashboards.requests;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.auto.value.AutoValue;
 
 import java.util.Map;
 
 @JsonAutoDetect
-public class AddWidgetRequest {
-    public String description;
-    public String type;
-    public Map<String, Object> config;
+@AutoValue
+public abstract class AddWidgetRequest {
+    @JsonProperty
+    public abstract String description();
+
+    @JsonProperty
+    public abstract String type();
+
+    @JsonProperty
+    public abstract Map<String, Object> config();
+
+    @JsonCreator
+    public static AddWidgetRequest create(@JsonProperty("description") String description,
+                                          @JsonProperty("type") String type,
+                                          @JsonProperty("config") Map<String, Object> config) {
+        return new AutoValue_AddWidgetRequest(description, type, config);
+    }
 }

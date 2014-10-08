@@ -14,17 +14,19 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.rest.resources.streams.requests;
+package org.graylog2.rest.resources.system.indexer.responses;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import org.graylog2.rest.resources.streams.rules.requests.CreateStreamRuleRequest;
-
-import java.util.List;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.auto.value.AutoValue;
 
 @JsonAutoDetect
-public class CreateRequest {
-    public String title;
-    public String description;
-    public List<CreateStreamRuleRequest> rules;
-    public String contentPack;
+@AutoValue
+public abstract class ClusterName {
+    @JsonProperty
+    public abstract String name();
+
+    public static ClusterName create(String name) {
+        return new AutoValue_ClusterName(name);
+    }
 }

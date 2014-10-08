@@ -17,10 +17,21 @@
 package org.graylog2.rest.resources.users.requests;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.auto.value.AutoValue;
 
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @JsonAutoDetect
-public class PermissionEditRequest {
-    public List<String> permissions;
+@AutoValue
+public abstract class PermissionEditRequest {
+    @JsonProperty
+    public abstract List<String> permissions();
+
+    @JsonCreator
+    public static PermissionEditRequest create(@JsonProperty @NotNull List<String> permissions) {
+        return new AutoValue_PermissionEditRequest(permissions);
+    }
 }

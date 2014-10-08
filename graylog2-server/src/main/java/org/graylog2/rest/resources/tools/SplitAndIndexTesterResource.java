@@ -17,43 +17,32 @@
 package org.graylog2.rest.resources.tools;
 
 import com.codahale.metrics.annotation.Timed;
-import com.google.common.collect.Maps;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.inputs.extractors.SplitAndIndexExtractor;
 import org.graylog2.rest.resources.RestResource;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.graylog2.rest.resources.tools.responses.SplitAndIndexTesterResponse;
 
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
-import java.util.Map;
 
 @RequiresAuthentication
 @Path("/tools/split_and_index_tester")
 public class SplitAndIndexTesterResource extends RestResource {
-
-    private static final Logger LOG = LoggerFactory.getLogger(SplitAndIndexTesterResource.class);
-
     @GET
     @Timed
     @Produces(MediaType.APPLICATION_JSON)
-    public Map<String, Object> splitAndIndexTester(@QueryParam("split_by") @NotNull String splitBy,
-                                                   @QueryParam("index") int index,
-                                                   @QueryParam("string") @NotNull String string) {
+    public SplitAndIndexTesterResponse splitAndIndexTester(@QueryParam("split_by") @NotNull String splitBy,
+                                                           @QueryParam("index") @Min(0) int index,
+                                                           @QueryParam("string") @NotNull String string) {
         final String cut = SplitAndIndexExtractor.cut(string, splitBy, index - 1);
         int[] positions = SplitAndIndexExtractor.getCutIndices(string, splitBy, index - 1);
 
-        final Map<String, Object> result = Maps.newHashMap();
-        result.put("successful", cut != null);
-        result.put("cut", cut);
-        result.put("begin_index", positions[0]);
-        result.put("end_index", positions[1]);
-
-        return result;
+        return SplitAndIndexTesterResponse.create((cut != null), cut, positions[0], positions[1]);
     }
 
 }

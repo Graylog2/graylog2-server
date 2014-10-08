@@ -51,7 +51,6 @@ import java.util.List;
 @Api(value = "System/IndexRanges", description = "Index timeranges")
 @Path("/system/indices/ranges")
 public class IndexRangesResource extends RestResource {
-
     private static final Logger LOG = LoggerFactory.getLogger(IndexRangesResource.class);
 
     private final IndexRangeService indexRangeService;
@@ -83,11 +82,7 @@ public class IndexRangesResource extends RestResource {
             ranges.add(range);
         }
 
-        final IndexRangesResponse irp = new IndexRangesResponse();
-        irp.ranges = ranges;
-        irp.total = ranges.size();
-
-        return irp;
+        return IndexRangesResponse.create(ranges.size(), ranges);
     }
 
     @POST
@@ -113,5 +108,4 @@ public class IndexRangesResource extends RestResource {
 
         return Response.accepted().build();
     }
-
 }

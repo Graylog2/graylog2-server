@@ -139,14 +139,14 @@ public class InputsResource extends RestResource {
         checkPermission(RestPermissions.INPUTS_CREATE);
 
         // Build a proper configuration from POST data.
-        final Configuration inputConfig = new Configuration(lr.configuration);
+        final Configuration inputConfig = new Configuration(lr.configuration());
 
         // Build input.
         final MessageInput input;
         try {
-            input = inputRegistry.create(lr.type, inputConfig);
-            input.setTitle(lr.title);
-            input.setGlobal(lr.global);
+            input = inputRegistry.create(lr.type(), inputConfig);
+            input.setTitle(lr.title());
+            input.setGlobal(lr.global());
             input.setCreatorUserId(getCurrentUser().getName());
             input.setCreatedAt(Tools.iso8601());
             input.setConfiguration(inputConfig);
@@ -172,13 +172,13 @@ public class InputsResource extends RestResource {
         // Build MongoDB data
         final Map<String, Object> inputData = Maps.newHashMap();
         inputData.put(MessageInput.FIELD_INPUT_ID, inputId);
-        inputData.put(MessageInput.FIELD_TITLE, lr.title);
-        inputData.put(MessageInput.FIELD_TYPE, lr.type);
+        inputData.put(MessageInput.FIELD_TITLE, lr.title());
+        inputData.put(MessageInput.FIELD_TYPE, lr.type());
         inputData.put(MessageInput.FIELD_CREATOR_USER_ID, getCurrentUser().getName());
-        inputData.put(MessageInput.FIELD_CONFIGURATION, lr.configuration);
+        inputData.put(MessageInput.FIELD_CONFIGURATION, lr.configuration());
         inputData.put(MessageInput.FIELD_CREATED_AT, Tools.iso8601());
 
-        if (lr.global) {
+        if (lr.global()) {
             inputData.put(MessageInput.FIELD_GLOBAL, true);
         } else {
             inputData.put(MessageInput.FIELD_NODE_ID, serverStatus.getNodeId().toString());

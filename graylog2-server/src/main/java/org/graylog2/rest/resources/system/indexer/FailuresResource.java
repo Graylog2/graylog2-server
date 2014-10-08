@@ -25,9 +25,11 @@ import com.wordnik.swagger.annotations.ApiParam;
 import com.wordnik.swagger.annotations.ApiResponse;
 import com.wordnik.swagger.annotations.ApiResponses;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.indexer.IndexFailure;
 import org.graylog2.indexer.IndexFailureService;
 import org.graylog2.rest.resources.RestResource;
+import org.graylog2.rest.resources.system.indexer.responses.FailureCount;
 import org.graylog2.security.RestPermissions;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.joda.time.DateTime;
@@ -35,6 +37,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import javax.validation.constraints.Min;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -48,7 +51,6 @@ import java.util.Map;
 @Api(value = "Indexer/Failures", description = "Indexer failures")
 @Path("/system/indexer/failures")
 public class FailuresResource extends RestResource {
-
     private static final Logger LOG = LoggerFactory.getLogger(FailuresResource.class);
 
     @Inject
@@ -60,31 +62,32 @@ public class FailuresResource extends RestResource {
     @ApiResponses(value = {
             @ApiResponse(code = 400, message = "Invalid date parameter provided.")
     })
+    @RequiresPermissions(RestPermissions.INDICES_FAILURES)
     @Produces(MediaType.APPLICATION_JSON)
     @Path("count")
-    public Map<String, Long> count(@ApiParam(name = "since", value = "ISO8601 date", required = true)
-                                   @QueryParam("since") @NotEmpty String since) {
-        checkPermission(RestPermissions.INDICES_FAILURES);
-
-        DateTime sinceDate;
+    public FailureCount count(@ApiParam(name = "since", value = "ISO8601 date", required = true)
+                              @QueryParam("since") @NotEmpty String since) {
+        final DateTime sinceDate;
         try {
             sinceDate = DateTime.parse(since);
         } catch (IllegalArgumentException e) {
-            LOG.error("Invalid date parameter provided: [" + since + "]", e);
-            throw new BadRequestException();
+            final String msg = "Invalid date parameter provided: [" + since + "]";
+            LOG.error(msg, e);
+            throw new BadRequestException(msg);
         }
 
-        return ImmutableMap.of("count", indexFailureService.countSince(sinceDate));
+        return FailureCount.create(indexFailureService.countSince(sinceDate));
     }
 
     @GET
     @Timed
     @ApiOperation(value = "Get a list of failed index operations.")
+    @RequiresPermissions(RestPermissions.INDICES_FAILURES)
     @Produces(MediaType.APPLICATION_JSON)
-    public Map<String, Object> single(@ApiParam(name = "limit", value = "Limit", required = true) @QueryParam("limit") int limit,
-                                      @ApiParam(name = "offset", value = "Offset", required = true) @QueryParam("offset") int offset) {
-        checkPermission(RestPermissions.INDICES_FAILURES);
-
+    public Map<String, Object> single(@ApiParam(name = "limit", value = "Limit", required = true)
+                                      @QueryParam("limit") @Min(0) int limit,
+                                      @ApiParam(name = "offset", value = "Offset", required = true)
+                                      @QueryParam("offset") @Min(0) int offset) {
         final List<Map<String, Object>> failures = Lists.newArrayList();
         for (IndexFailure failure : indexFailureService.all(limit, offset)) {
             failures.add(failure.asMap());

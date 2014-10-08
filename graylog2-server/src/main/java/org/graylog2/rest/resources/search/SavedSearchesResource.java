@@ -19,7 +19,6 @@ package org.graylog2.rest.resources.search;
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
@@ -36,8 +35,6 @@ import org.graylog2.savedsearches.SavedSearch;
 import org.graylog2.savedsearches.SavedSearchImpl;
 import org.graylog2.savedsearches.SavedSearchService;
 import org.graylog2.security.RestPermissions;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
@@ -59,8 +56,6 @@ import java.util.Map;
 @Api(value = "Search/Saved", description = "Saved searches")
 @Path("/search/saved")
 public class SavedSearchesResource extends SearchResource {
-    private static final Logger LOG = LoggerFactory.getLogger(SavedSearchesResource.class);
-
     private final SavedSearchService savedSearchService;
 
     @Inject
@@ -79,21 +74,20 @@ public class SavedSearchesResource extends SearchResource {
     public Response create(@ApiParam(name = "JSON body", required = true)
                            @Valid CreateSavedSearchRequest cr) throws ValidationException {
         // Create saved search
-        final Map<String, Object> searchData = Maps.newHashMap();
-        searchData.put("title", cr.title);
-        searchData.put("query", cr.query);
-        searchData.put("creator_user_id", getCurrentUser().getName());
-        searchData.put("created_at", Tools.iso8601());
+        final Map<String, Object> searchData = ImmutableMap.of(
+                "title", cr.title(),
+                "query", cr.query(),
+                "creator_user_id", getCurrentUser().getName(),
+                "created_at", Tools.iso8601());
 
         final SavedSearch search = new SavedSearchImpl(searchData);
         final String id = savedSearchService.save(search);
 
-        final Map<String, String> result = ImmutableMap.of("search_id", id);
         final URI searchUri = UriBuilder.fromResource(SavedSearchesResource.class)
                 .path("{searchId}")
                 .build(id);
 
-        return Response.created(searchUri).entity(result).build();
+        return Response.created(searchUri).build();
     }
 
     @GET

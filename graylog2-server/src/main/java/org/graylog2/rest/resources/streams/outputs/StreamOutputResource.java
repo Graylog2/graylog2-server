@@ -17,7 +17,6 @@
 package org.graylog2.rest.resources.streams.outputs;
 
 import com.codahale.metrics.annotation.Timed;
-import com.google.common.collect.ImmutableMap;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
@@ -33,7 +32,6 @@ import org.graylog2.rest.resources.RestResource;
 import org.graylog2.security.RestPermissions;
 import org.graylog2.streams.OutputService;
 import org.graylog2.streams.StreamService;
-import org.graylog2.streams.outputs.AddOutputRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,7 +47,6 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.util.Map;
 import java.util.Set;
 
 @RequiresAuthentication
@@ -75,7 +72,7 @@ public class StreamOutputResource extends RestResource {
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "No such stream on this node.")
     })
-    public Map<String, Object> get(@ApiParam(name = "streamid", value = "The id of the stream whose outputs we want.", required = true)
+    public OutputListResponse get(@ApiParam(name = "streamid", value = "The id of the stream whose outputs we want.", required = true)
                                    @PathParam("streamid") String streamid) throws org.graylog2.database.NotFoundException {
         checkPermission(RestPermissions.STREAMS_READ, streamid);
         checkPermission(RestPermissions.STREAM_OUTPUTS_READ);
@@ -83,9 +80,7 @@ public class StreamOutputResource extends RestResource {
         final Stream stream = streamService.load(streamid);
         final Set<Output> outputs = stream.getOutputs();
 
-        return ImmutableMap.of(
-                "outputs", outputs,
-                "total", outputs.size());
+        return OutputListResponse.create(outputs.size(), outputs);
     }
 
     @GET
@@ -110,6 +105,7 @@ public class StreamOutputResource extends RestResource {
     @ApiOperation(value = "Associate outputs with a stream")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
+    @RequiresPermissions(RestPermissions.STREAM_OUTPUTS_CREATE)
     @ApiResponses(value = {
             @ApiResponse(code = 400, message = "Invalid output specification in input.")
     })
@@ -117,10 +113,8 @@ public class StreamOutputResource extends RestResource {
                         @PathParam("streamid") String streamid,
                         @ApiParam(name = "JSON body", required = true)
                         @Valid @NotNull AddOutputRequest request) throws ValidationException, NotFoundException {
-        checkPermission(RestPermissions.STREAM_OUTPUTS_CREATE);
-
         final Stream stream = streamService.load(streamid);
-        for (String outputId : request.outputs) {
+        for (String outputId : request.outputs()) {
             final Output output = outputService.load(outputId);
             streamService.addOutput(stream, output);
         }
@@ -131,9 +125,9 @@ public class StreamOutputResource extends RestResource {
     @DELETE
     @Path("/{outputId}")
     @Timed
-    @ApiOperation(value = "Delete output of a stream")
     @RequiresPermissions(RestPermissions.STREAM_OUTPUTS_DELETE)
     @Produces(MediaType.APPLICATION_JSON)
+    @ApiOperation(value = "Delete output of a stream")
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "No such stream/output on this node.")
     })
@@ -141,8 +135,6 @@ public class StreamOutputResource extends RestResource {
                        @PathParam("streamid") String streamid,
                        @ApiParam(name = "outputId", value = "The id of the output that should be deleted", required = true)
                        @PathParam("outputId") String outputId) throws org.graylog2.database.NotFoundException {
-        checkPermission(RestPermissions.STREAM_OUTPUTS_DELETE);
-
         final Stream stream = streamService.load(streamid);
         final Output output = outputService.load(outputId);
 

@@ -91,27 +91,24 @@ public class StaticFieldsResource extends RestResource {
         }
 
         // Check if key is a valid message key.
-        if (!Message.validKey(csfr.key)) {
-            LOG.error("Invalid key: [{}]", csfr.key);
-            throw new BadRequestException();
+        if (!Message.validKey(csfr.key())) {
+            final String msg = "Invalid key: [" + csfr.key() + "]";
+            LOG.error(msg);
+            throw new BadRequestException(msg);
         }
 
-        if (csfr.key == null || csfr.value == null || csfr.key.isEmpty() || csfr.value.isEmpty()) {
-            LOG.error("Missing parameters. Returning HTTP 400.");
-            throw new BadRequestException();
+        if (Message.RESERVED_FIELDS.contains(csfr.key()) && !Message.RESERVED_SETTABLE_FIELDS.contains(csfr.key())) {
+            final String message = "Cannot add static field. Field [" + csfr.key() + "] is reserved.";
+            LOG.error(message);
+            throw new BadRequestException(message);
         }
 
-        if (Message.RESERVED_FIELDS.contains(csfr.key) && !Message.RESERVED_SETTABLE_FIELDS.contains(csfr.key)) {
-            LOG.error("Cannot add static field. Field [{}] is reserved.", csfr.key);
-            throw new BadRequestException();
-        }
-
-        input.addStaticField(csfr.key, csfr.value);
+        input.addStaticField(csfr.key(), csfr.value());
 
         final Input mongoInput = inputService.find(input.getPersistId());
-        inputService.addStaticField(mongoInput, csfr.key, csfr.value);
+        inputService.addStaticField(mongoInput, csfr.key(), csfr.value());
 
-        final String msg = "Added static field [" + csfr.key + "] to input <" + inputId + ">.";
+        final String msg = "Added static field [" + csfr.key() + "] to input <" + inputId + ">.";
         LOG.info(msg);
         activityWriter.write(new Activity(msg, StaticFieldsResource.class));
 

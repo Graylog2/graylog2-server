@@ -43,7 +43,6 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
-import javax.ws.rs.BadRequestException;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.NotFoundException;
@@ -128,11 +127,8 @@ public class MetricsResource extends RestResource {
         final Map<String, Metric> metrics = metricRegistry.getMetrics();
 
         final List<Map<String, Object>> metricsList = Lists.newArrayList();
-        if (request.metrics == null) {
-            throw new BadRequestException("Metrics cannot be empty");
-        }
 
-        for (String name : request.metrics) {
+        for (String name : request.metrics()) {
             if (!isPermitted(RestPermissions.METRICS_READ, name)) {
                 continue;
             }

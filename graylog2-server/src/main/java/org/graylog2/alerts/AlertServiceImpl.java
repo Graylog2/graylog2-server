@@ -156,12 +156,12 @@ public class AlertServiceImpl extends PersistedServiceImpl implements AlertServi
     public AbstractAlertCondition fromRequest(CreateConditionRequest ccr, Stream stream, String userId) throws AbstractAlertCondition.NoSuchAlertConditionTypeException {
         AbstractAlertCondition.Type type;
         try {
-            type = AbstractAlertCondition.Type.valueOf(ccr.type.toUpperCase());
+            type = AbstractAlertCondition.Type.valueOf(ccr.type().toUpperCase());
         } catch (IllegalArgumentException e) {
-            throw new AbstractAlertCondition.NoSuchAlertConditionTypeException("No such alert condition type: [" + ccr.type + "]");
+            throw new AbstractAlertCondition.NoSuchAlertConditionTypeException("No such alert condition type: [" + ccr.type() + "]");
         }
 
-        Map<String, Object> parameters = ccr.parameters;
+        Map<String, Object> parameters = ccr.parameters();
 
         return createAlertCondition(type, stream, null, Tools.iso8601(), userId, parameters);
     }
@@ -170,7 +170,7 @@ public class AlertServiceImpl extends PersistedServiceImpl implements AlertServi
     public AbstractAlertCondition updateFromRequest(AlertCondition alertCondition, CreateConditionRequest ccr) throws AbstractAlertCondition.NoSuchAlertConditionTypeException {
         AbstractAlertCondition.Type type = ((AbstractAlertCondition) alertCondition).getType();
 
-        Map<String, Object> parameters = ccr.parameters;
+        Map<String, Object> parameters = ccr.parameters();
         for (Map.Entry<String, Object> stringObjectEntry : alertCondition.getParameters().entrySet()) {
             if (!parameters.containsKey(stringObjectEntry.getKey())) {
                 parameters.put(stringObjectEntry.getKey(), stringObjectEntry.getValue());

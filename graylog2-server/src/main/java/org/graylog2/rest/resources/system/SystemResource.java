@@ -236,9 +236,8 @@ public class SystemResource extends RestResource {
     public ReaderPermissionResponse readerPermissions(
             @ApiParam(name = "username", required = true)
             @PathParam("username") String username) {
-        final ReaderPermissionResponse response = new ReaderPermissionResponse();
-        response.permissions = Ordering.natural().sortedCopy(RestPermissions.readerPermissions(username));
-        return response;
+        return ReaderPermissionResponse.create(
+                Ordering.natural().sortedCopy(RestPermissions.readerPermissions(username)));
     }
 
     @POST

@@ -17,12 +17,26 @@
 package org.graylog2.rest.resources.dashboards.requests;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.auto.value.AutoValue;
+
+import javax.annotation.Nullable;
+import javax.validation.constraints.Min;
 
 @JsonAutoDetect
-public class UpdateWidgetRequest {
-    public String description;
+@AutoValue
+public abstract class UpdateWidgetRequest {
+    @Nullable
+    @JsonProperty
+    public abstract String description();
 
     @JsonProperty("cache_time")
-    public int cacheTime;
+    public abstract int cacheTime();
+
+    @JsonCreator
+    public static UpdateWidgetRequest create(@JsonProperty("description") @Nullable String description,
+                                             @JsonProperty("cache_time") @Min(0) int cacheTime) {
+        return new AutoValue_UpdateWidgetRequest(description, cacheTime);
+    }
 }

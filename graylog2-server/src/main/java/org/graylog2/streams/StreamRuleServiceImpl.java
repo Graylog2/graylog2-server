@@ -62,10 +62,10 @@ public class StreamRuleServiceImpl extends PersistedServiceImpl implements Strea
     @Override
     public StreamRule create(String streamid, CreateStreamRuleRequest cr) {
         Map<String, Object> streamRuleData = Maps.newHashMap();
-        streamRuleData.put("type", cr.type);
-        streamRuleData.put("value", cr.value);
-        streamRuleData.put("field", cr.field);
-        streamRuleData.put("inverted", cr.inverted);
+        streamRuleData.put("type", cr.type());
+        streamRuleData.put("value", cr.value());
+        streamRuleData.put("field", cr.field());
+        streamRuleData.put("inverted", cr.inverted());
         streamRuleData.put("stream_id", new ObjectId(streamid));
 
         return new StreamRuleImpl(streamRuleData);

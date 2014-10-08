@@ -17,31 +17,62 @@
 package org.graylog2.rest.resources.system.ldap.requests;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.auto.value.AutoValue;
+import org.hibernate.validator.constraints.NotEmpty;
 
 import java.net.URI;
 
 @JsonAutoDetect
-public class LdapSettingsRequest {
+@AutoValue
+public abstract class LdapSettingsRequest {
+    @JsonProperty
+    public abstract boolean enabled();
 
-    public boolean enabled;
+    @JsonProperty
+    public abstract String systemUsername();
 
-    public String systemUsername;
+    @JsonProperty
+    public abstract String systemPassword();
 
-    public String systemPassword;
+    @JsonProperty
+    public abstract URI ldapUri();
 
-    public URI ldapUri;
+    @JsonProperty
+    public abstract boolean useStartTls();
 
-    public boolean useStartTls;
+    @JsonProperty
+    public abstract boolean trustAllCertificates();
 
-    public boolean trustAllCertificates;
+    @JsonProperty
+    public abstract boolean activeDirectory();
 
-    public boolean activeDirectory;
+    @JsonProperty
+    public abstract String searchBase();
 
-    public String searchBase;
+    @JsonProperty
+    public abstract String searchPattern();
 
-    public String searchPattern;
+    @JsonProperty
+    public abstract String displayNameAttribute();
 
-    public String displayNameAttribute;
+    @JsonProperty
+    public abstract String defaultGroup();
 
-    public String defaultGroup;
+
+    @JsonCreator
+    public static LdapSettingsRequest create(@JsonProperty("enabled") boolean enabled,
+                                             @JsonProperty("system_username") @NotEmpty String systemUsername,
+                                             @JsonProperty("system_password") @NotEmpty String systemPassword,
+                                             @JsonProperty("ldap_uri") URI ldapUri,
+                                             @JsonProperty("use_start_tls") boolean useStartTls,
+                                             @JsonProperty("trust_all_certificates") boolean trustAllCertificates,
+                                             @JsonProperty("active_directory") boolean activeDirectory,
+                                             @JsonProperty("search_base") @NotEmpty String searchBase,
+                                             @JsonProperty("search_pattern") @NotEmpty String searchPattern,
+                                             @JsonProperty("display_name_attribute") @NotEmpty String displayNameAttribute,
+                                             @JsonProperty("default_group") @NotEmpty String defaultGroup) {
+        return new AutoValue_LdapSettingsRequest(enabled, systemUsername, systemPassword, ldapUri, useStartTls, trustAllCertificates, activeDirectory, searchBase, searchPattern, displayNameAttribute, defaultGroup);
+    }
 }

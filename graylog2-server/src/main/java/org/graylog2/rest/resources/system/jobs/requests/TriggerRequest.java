@@ -16,9 +16,19 @@
  */
 package org.graylog2.rest.resources.system.jobs.requests;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.auto.value.AutoValue;
 
-public class TriggerRequest {
+@JsonAutoDetect
+@AutoValue
+public abstract class TriggerRequest {
     @JsonProperty("job_name")
-    public String jobName;
+    public abstract String jobName();
+
+    @JsonCreator
+    public static TriggerRequest create(@JsonProperty("job_name") String jobName) {
+        return new AutoValue_TriggerRequest(jobName);
+    }
 }

@@ -32,6 +32,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -44,10 +46,10 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriBuilder;
+import java.net.URI;
 import java.util.Collections;
 import java.util.Set;
-
-import static javax.ws.rs.core.Response.accepted;
 
 @RequiresAuthentication
 @Api(value = "Filters", description = "Message blacklist filters")
@@ -67,7 +69,8 @@ public class BlacklistSourceResource extends RestResource {
     @ApiOperation(value = "Create a blacklist filter", notes = "It can take up to a second until the change is applied")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response create(@ApiParam(name = "filterEntry", required = true) FilterDescription filterDescription) throws ValidationException {
+    public Response create(@ApiParam(name = "filterEntry", required = true)
+                           @Valid @NotNull FilterDescription filterDescription) throws ValidationException {
         checkPermission(RestPermissions.BLACKLISTENTRY_CREATE);
 
         // force the user name to be consistent with the requesting user
@@ -79,7 +82,13 @@ public class BlacklistSourceResource extends RestResource {
         filterDescription.creatorUserId = currentUser.getName();
 
         final FilterDescription savedFilter = filterService.save(filterDescription);
-        return accepted().entity(savedFilter).build();
+
+        final URI filterUri = UriBuilder.fromResource(BlacklistSourceResource.class)
+                .path("{filterId}")
+                .build(savedFilter._id);
+
+        return Response.created(filterUri).entity(savedFilter).build();
+
     }
 
     @GET

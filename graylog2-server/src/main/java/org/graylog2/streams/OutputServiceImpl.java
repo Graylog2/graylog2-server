@@ -95,8 +95,8 @@ public class OutputServiceImpl extends PersistedServiceImpl implements OutputSer
 
     @Override
     public Output create(CreateOutputRequest request, String userId) throws ValidationException {
-        return create(new OutputImpl(request.title, request.type, request.configuration,
-                Tools.iso8601().toDate(), userId, request.contentPack));
+        return create(new OutputImpl(request.title(), request.type(), request.configuration(),
+                Tools.iso8601().toDate(), userId, request.contentPack()));
     }
 
     @Override

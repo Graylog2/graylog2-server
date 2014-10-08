@@ -17,18 +17,42 @@
 package org.graylog2.rest.resources.system.ldap.responses;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.auto.value.AutoValue;
 
+import javax.annotation.Nullable;
 import java.util.Map;
 
 @JsonAutoDetect
-public class LdapTestConfigResponse {
-    public boolean connected;
+@AutoValue
+public abstract class LdapTestConfigResponse {
+    @JsonProperty
+    public abstract boolean connected();
 
-    public boolean systemAuthenticated;
+    @JsonProperty
+    public abstract boolean systemAuthenticated();
 
-    public boolean loginAuthenticated;
+    @JsonProperty
+    public abstract boolean loginAuthenticated();
 
-    public Map<String, String> entry;
+    @JsonProperty
+    public abstract Map<String, String> entry();
 
-    public String exception;
+    @JsonProperty
+    @Nullable
+    public abstract String exception();
+
+    public static LdapTestConfigResponse create(boolean connected,
+                                                boolean systemAuthenticated,
+                                                boolean loginAuthenticated,
+                                                Map<String, String> entry,
+                                                @Nullable String exception) {
+        return new AutoValue_LdapTestConfigResponse(connected, systemAuthenticated, loginAuthenticated, entry, exception);
+    }
+    public static LdapTestConfigResponse create(boolean connected,
+                                                boolean systemAuthenticated,
+                                                boolean loginAuthenticated,
+                                                Map<String, String> entry) {
+        return new AutoValue_LdapTestConfigResponse(connected, systemAuthenticated, loginAuthenticated, entry, null);
+    }
 }

@@ -19,7 +19,6 @@ package org.graylog2.rest.resources.sources;
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-import com.google.common.collect.Maps;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
@@ -33,6 +32,7 @@ import org.graylog2.indexer.searches.Searches;
 import org.graylog2.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.rest.resources.RestResource;
+import org.graylog2.rest.resources.sources.responses.SourcesList;
 import org.graylog2.security.RestPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,7 +46,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
-import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -81,7 +80,7 @@ public class SourcesResource extends RestResource {
     })
 
     @Produces(MediaType.APPLICATION_JSON)
-    public Map<String, Object> list(
+    public SourcesList list(
             @ApiParam(name = "range", value = "Relative timeframe to search in. See method description.", required = true)
             @QueryParam("range") @Min(0) final int range) {
         final TermsResult sources;
@@ -106,12 +105,6 @@ public class SourcesResource extends RestResource {
             }
         }
 
-        final Map<String, Object> result = Maps.newHashMap();
-        result.put("total", sources.getTerms().size());
-        result.put("sources", sources.getTerms());
-        result.put("took_ms", sources.took().millis());
-        result.put("range", range);
-
-        return result;
+        return SourcesList.create(sources.getTerms().size(), sources.getTerms(), sources.took().millis(), range);
     }
 }

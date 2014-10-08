@@ -17,11 +17,25 @@
 package org.graylog2.rest.resources.search.requests;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.auto.value.AutoValue;
+import org.hibernate.validator.constraints.NotEmpty;
 
 import java.util.Map;
 
 @JsonAutoDetect
-public class CreateSavedSearchRequest {
-    public String title;
-    public Map<String, Object> query;
+@AutoValue
+public abstract class CreateSavedSearchRequest {
+    @JsonProperty
+    public abstract String title();
+
+    @JsonProperty
+    public abstract Map<String, Object> query();
+
+    @JsonCreator
+    public static CreateSavedSearchRequest create(@JsonProperty("title") @NotEmpty String title,
+                                                  @JsonProperty("query") @NotEmpty Map<String, Object> query) {
+        return new AutoValue_CreateSavedSearchRequest(title, query);
+    }
 }

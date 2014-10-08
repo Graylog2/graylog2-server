@@ -14,29 +14,36 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.rest.resources.users.requests;
+package org.graylog2.rest.resources.search.responses;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.hibernate.validator.constraints.Email;
-import org.hibernate.validator.constraints.NotEmpty;
+import com.google.auto.value.AutoValue;
 
-import java.util.List;
+import java.util.Map;
 
 @JsonAutoDetect
-public class CreateRequest {
-    @NotEmpty
-    public String username;
-    @NotEmpty
-    public String password;
-    @Email
-    public String email;
-    @JsonProperty("full_name")
-    public String fullname;
-    public List<String> permissions;
-    public String timezone;
-    public StartpageSummary startpage;
-    @JsonProperty("session_timeout_ms")
-    public Long sessionTimeoutMs;
+@AutoValue
+public abstract class HistogramResult {
+    @JsonProperty
+    public abstract String interval();
+
+    @JsonProperty
+    public abstract Map results();
+
+    @JsonProperty
+    public abstract long time();
+
+    @JsonProperty
+    public abstract String builtQuery();
+
+    @JsonProperty
+    public abstract TimeRange queriedTimerange();
+
+    public static HistogramResult create(String interval, Map results, long time, String builtQuery,
+                                         TimeRange queriedTimerange) {
+        return new AutoValue_HistogramResult(interval, results, time, builtQuery, queriedTimerange);
+    }
+
 
 }

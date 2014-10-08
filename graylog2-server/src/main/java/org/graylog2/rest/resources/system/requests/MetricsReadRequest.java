@@ -17,8 +17,21 @@
 package org.graylog2.rest.resources.system.requests;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.auto.value.AutoValue;
+
+import java.util.List;
 
 @JsonAutoDetect
-public class MetricsReadRequest {
-    public String[] metrics;
+@AutoValue
+public abstract class MetricsReadRequest {
+    @JsonProperty
+    public abstract List<String> metrics();
+
+    @JsonCreator
+    public static MetricsReadRequest create(@JsonProperty("metrics") List<String> metrics) {
+        return new AutoValue_MetricsReadRequest(metrics);
+    }
+
 }

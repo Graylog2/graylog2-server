@@ -104,7 +104,7 @@ public class SystemJobResource extends RestResource {
         SystemJob job = systemJobManager.getRunningJobs().get(jobId);
         if (job == null) {
             LOG.error("No system job with ID <{}> found.", jobId);
-            throw new NotFoundException();
+            throw new NotFoundException("No system job with ID <" + jobId + "> found");
         }
 
         return job.toMap();
@@ -123,11 +123,11 @@ public class SystemJobResource extends RestResource {
     public Response trigger(@ApiParam(name = "JSON body", required = true)
                             @Valid @NotNull TriggerRequest tr) {
         // TODO cleanup jobId vs jobName checking in permissions
-        checkPermission(RestPermissions.SYSTEMJOBS_CREATE, tr.jobName);
+        checkPermission(RestPermissions.SYSTEMJOBS_CREATE, tr.jobName());
 
         SystemJob job;
         try {
-            job = systemJobFactory.build(tr.jobName);
+            job = systemJobFactory.build(tr.jobName());
         } catch (NoSuchJobException e) {
             LOG.error("Such a system job type does not exist. Returning HTTP 400.");
             throw new BadRequestException(e);
@@ -137,7 +137,7 @@ public class SystemJobResource extends RestResource {
             systemJobManager.submit(job);
         } catch (SystemJobConcurrencyException e) {
             LOG.error("Maximum concurrency level of this job reached. ", e);
-            throw new ForbiddenException(e);
+            throw new ForbiddenException("Maximum concurrency level of this job reached", e);
         }
 
         return Response.accepted().build();

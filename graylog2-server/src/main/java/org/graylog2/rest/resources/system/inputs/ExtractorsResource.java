@@ -111,34 +111,28 @@ public class ExtractorsResource extends RestResource {
         checkPermission(RestPermissions.INPUTS_EDIT, inputId);
 
         final MessageInput input = inputs.getRunningInput(inputId);
-
         if (input == null) {
             LOG.error("Input <{}> not found.", inputId);
             throw new javax.ws.rs.NotFoundException();
         }
 
         // Build extractor.
-        if (cer.sourceField.isEmpty() || cer.targetField.isEmpty()) {
-            LOG.error("Missing parameters. Returning HTTP 400.");
-            throw new BadRequestException();
-        }
-
         final String id = new com.eaio.uuid.UUID().toString();
         Extractor extractor;
         try {
             extractor = extractorFactory.factory(
                     id,
-                    cer.title,
-                    cer.order,
-                    Extractor.CursorStrategy.valueOf(cer.cutOrCopy.toUpperCase()),
-                    Extractor.Type.valueOf(cer.extractorType.toUpperCase()),
-                    cer.sourceField,
-                    cer.targetField,
-                    cer.extractorConfig,
+                    cer.title(),
+                    cer.order(),
+                    Extractor.CursorStrategy.valueOf(cer.cutOrCopy().toUpperCase()),
+                    Extractor.Type.valueOf(cer.extractorType().toUpperCase()),
+                    cer.sourceField(),
+                    cer.targetField(),
+                    cer.extractorConfig(),
                     getCurrentUser().getName(),
-                    loadConverters(cer.converters),
-                    Extractor.ConditionType.valueOf(cer.conditionType.toUpperCase()),
-                    cer.conditionValue
+                    loadConverters(cer.converters()),
+                    Extractor.ConditionType.valueOf(cer.conditionType().toUpperCase()),
+                    cer.conditionValue()
             );
         } catch (ExtractorFactory.NoSuchExtractorException e) {
             LOG.error("No such extractor type.", e);
@@ -151,7 +145,7 @@ public class ExtractorsResource extends RestResource {
             throw new BadRequestException(e);
         }
 
-        Input mongoInput = inputService.find(input.getPersistId());
+        final Input mongoInput = inputService.find(input.getPersistId());
         try {
             inputService.addExtractor(mongoInput, extractor);
         } catch (ValidationException e) {
@@ -159,7 +153,7 @@ public class ExtractorsResource extends RestResource {
             throw new BadRequestException(e);
         }
 
-        final String msg = "Added extractor <" + id + "> of type [" + cer.extractorType + "] to input <" + inputId + ">.";
+        final String msg = "Added extractor <" + id + "> of type [" + cer.extractorType() + "] to input <" + inputId + ">.";
         LOG.info(msg);
         activityWriter.write(new Activity(msg, ExtractorsResource.class));
 
@@ -260,8 +254,8 @@ public class ExtractorsResource extends RestResource {
         final Input mongoInput = inputService.find(inputPersistId);
 
         for (Extractor extractor : inputService.getExtractors(mongoInput)) {
-            if (oer.order.containsValue(extractor.getId())) {
-                extractor.setOrder(Tools.getKeyByValue(oer.order, extractor.getId()));
+            if (oer.order().containsValue(extractor.getId())) {
+                extractor.setOrder(Tools.getKeyByValue(oer.order(), extractor.getId()));
             }
 
             // Docs embedded in MongoDB array cannot be updated atomically... :/

@@ -14,22 +14,21 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.rest.resources.dashboards.requests;
+package org.graylog2.rest.resources.messages.responses;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.auto.value.AutoValue;
+
+import java.util.List;
 
 @JsonAutoDetect
-public class WidgetPositionRequest {
-    public String id;
-    public int col;
-    public int row;
+@AutoValue
+public abstract class MessageTokens {
+    @JsonProperty
+    public abstract List<String> tokens();
 
-    public WidgetPositionRequest(String id, int col, int row) {
-        this.id = id;
-        this.col = col;
-        this.row = row;
-    }
-
-    public WidgetPositionRequest() {
+    public static MessageTokens create(List<String> tokens) {
+        return new AutoValue_MessageTokens(tokens);
     }
 }

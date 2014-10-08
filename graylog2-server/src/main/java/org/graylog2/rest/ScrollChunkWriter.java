@@ -14,13 +14,11 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.rest.resources.search.responses;
+package org.graylog2.rest;
 
 import au.com.bytecode.opencsv.CSVWriter;
-import com.google.common.collect.ImmutableSortedSet;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
 import org.graylog2.indexer.results.ResultMessage;
+import org.graylog2.indexer.results.ScrollResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,46 +34,68 @@ import java.io.OutputStreamWriter;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 @Provider
 @Produces("text/csv")
-public class SearchResponseCsvWriter implements MessageBodyWriter<SearchResponse> {
+public class ScrollChunkWriter implements MessageBodyWriter<ScrollResult.ScrollChunk> {
+    private static final Logger LOG = LoggerFactory.getLogger(ScrollChunkWriter.class);
 
     public static final MediaType TEXT_CSV = new MediaType("text", "csv");
 
-    private static final Logger LOG = LoggerFactory.getLogger(SearchResponseCsvWriter.class);
-
     @Override
     public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
-        return SearchResponse.class.equals(type) && TEXT_CSV.isCompatible(mediaType);
+        return ScrollResult.ScrollChunk.class.equals(type) && TEXT_CSV.isCompatible(mediaType);
+
     }
 
     @Override
-    public long getSize(SearchResponse searchResponse, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
+    public long getSize(ScrollResult.ScrollChunk scrollChunk,
+                        Class<?> type,
+                        Type genericType,
+                        Annotation[] annotations,
+                        MediaType mediaType) {
         return -1;
     }
 
     @Override
-    public void writeTo(SearchResponse searchResponse, Class<?> type, Type genericType, Annotation[] annotations,
-            MediaType mediaType, MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream)
-            throws IOException, WebApplicationException {
+    public void writeTo(ScrollResult.ScrollChunk scrollChunk,
+                        Class<?> type,
+                        Type genericType,
+                        Annotation[] annotations,
+                        MediaType mediaType,
+                        MultivaluedMap<String, Object> httpHeaders,
+                        OutputStream entityStream) throws IOException, WebApplicationException {
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("[{}] Writing chunk {}", Thread.currentThread().getId(), scrollChunk.getChunkNumber());
+        }
         final CSVWriter csvWriter = new CSVWriter(new OutputStreamWriter(entityStream, StandardCharsets.UTF_8));
-        final ImmutableSortedSet<String> sortedFields = ImmutableSortedSet.copyOf(
-                Iterables.concat(searchResponse.fields, Lists.newArrayList("source", "timestamp")));
 
-        // write field headers
-        csvWriter.writeNext(sortedFields.toArray(new String[sortedFields.size()]));
+        final List<String> fields = scrollChunk.getFields();
+        final int numberOfFields = fields.size();
 
+        if (scrollChunk.isFirstChunk()) {
+            // write field headers only on first chunk
+            csvWriter.writeNext(fields.toArray(new String[numberOfFields]));
+        }
         // write result set in same order as the header row
-        final String[] fieldValues = new String[sortedFields.size()];
-        for (ResultMessage message : searchResponse.messages) {
+        final String[] fieldValues = new String[numberOfFields];
+        for (ResultMessage message : scrollChunk.getMessages()) {
             int idx = 0;
             // first collect all values from the current message
-            for (String fieldName : sortedFields) {
+            for (String fieldName : fields) {
                 final Object val = message.getMessage().get(fieldName);
-                fieldValues[idx++] = ((val == null) ? null : val.toString().replaceAll("\n", "\\\\n"));
-                fieldValues[idx++] = ((val == null) ? null : val.toString().replaceAll("\r", "\\\\r"));
+                if (val == null) {
+                    fieldValues[idx] = null;
+                } else {
+                    String stringVal = val.toString();
+                    fieldValues[idx] = stringVal
+                            .replaceAll("\n", "\\\\n")
+                            .replaceAll("\r", "\\\\r");
+                }
+                idx++;
             }
+
             // write the complete line, some fields might not be present in the message, so there might be null values
             csvWriter.writeNext(fieldValues);
         }

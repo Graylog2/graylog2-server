@@ -21,8 +21,6 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.plugin.Tools;
 import org.graylog2.rest.resources.RestResource;
 import org.graylog2.rest.resources.tools.responses.SubstringTesterResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
@@ -35,22 +33,14 @@ import javax.ws.rs.core.MediaType;
 @RequiresAuthentication
 @Path("/tools/substring_tester")
 public class SubstringTesterResource extends RestResource {
-    private static final Logger LOG = LoggerFactory.getLogger(SubstringTesterResource.class);
-
     @GET
     @Timed
     @Produces(MediaType.APPLICATION_JSON)
     public SubstringTesterResponse substringTester(@QueryParam("begin_index") @Min(0) int beginIndex,
-                                                   @QueryParam("end_index") @Min(0) int endIndex,
+                                                   @QueryParam("end_index") @Min(1) int endIndex,
                                                    @QueryParam("string") @NotNull String string) {
         final String cut = Tools.safeSubstring(string, beginIndex, endIndex);
 
-        final SubstringTesterResponse result = new SubstringTesterResponse();
-        result.successful = (cut != null);
-        result.cut = cut;
-        result.beginIndex = beginIndex;
-        result.endIndex = endIndex;
-
-        return result;
+        return SubstringTesterResponse.create((cut != null), cut, beginIndex, endIndex);
     }
 }

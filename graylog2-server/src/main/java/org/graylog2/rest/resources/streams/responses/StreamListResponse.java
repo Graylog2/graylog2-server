@@ -17,12 +17,22 @@
 package org.graylog2.rest.resources.streams.responses;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.auto.value.AutoValue;
 import org.graylog2.plugin.streams.Stream;
 
 import java.util.Collection;
 
 @JsonAutoDetect
-public class StreamListResponse {
-    public long total;
-    public Collection<Stream> streams;
+@AutoValue
+public abstract class StreamListResponse {
+    @JsonProperty
+    public abstract long total();
+
+    @JsonProperty
+    public abstract Collection<Stream> streams();
+
+    public static StreamListResponse create(long total, Collection<Stream> streams) {
+        return new AutoValue_StreamListResponse(total, streams);
+    }
 }
