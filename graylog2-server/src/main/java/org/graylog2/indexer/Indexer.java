@@ -20,12 +20,12 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.ListenableFuture;
 import com.ning.http.client.Response;
-import org.apache.commons.io.FileUtils;
 import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.ElasticsearchTimeoutException;
 import org.elasticsearch.Version;
@@ -57,14 +57,16 @@ import org.joda.time.Period;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.LinkedBlockingQueue;
 
+import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.elasticsearch.node.NodeBuilder.nodeBuilder;
 import static org.graylog2.UI.wallString;
@@ -84,7 +86,7 @@ public class Indexer {
     private Client client;
     private Node node;
     public static final String TYPE = "message";
-    
+
     private Searches searches;
     private Counts counts;
     private Messages messages;
@@ -145,7 +147,7 @@ public class Indexer {
 
     public void start() {
         final NodeBuilder builder = nodeBuilder().client(true);
-        Map<String, String> settings = readNodeSettings(configuration);
+        final Map<String, String> settings = readNodeSettings(configuration);
 
         builder.settings().put(settings);
         node = builder.node();
@@ -153,15 +155,15 @@ public class Indexer {
 
         try {
             client.admin().cluster().health(new ClusterHealthRequest().waitForYellowStatus()).actionGet(configuration.getEsClusterDiscoveryTimeout(), MILLISECONDS);
-        } catch(ElasticsearchTimeoutException e) {
+        } catch (ElasticsearchTimeoutException e) {
             final String hosts = node.settings().get("discovery.zen.ping.unicast.hosts");
 
-            if (hosts != null && hosts.contains(",")) {
-                final Iterable<String> hostList = Splitter.on(',').split(hosts);
+            if (!isNullOrEmpty(hosts)) {
+                final Iterable<String> hostList = Splitter.on(',').omitEmptyStrings().trimResults().split(hosts);
 
-                // if no elasticsearch running
+                // if no Elasticsearch running
                 for (String host : hostList) {
-                    // guess that elasticsearch http is listening on port 9200
+                    // guess that Elasticsearch http is listening on port 9200
                     final Iterable<String> hostAndPort = Splitter.on(':').limit(2).split(host);
                     final Iterator<String> it = hostAndPort.iterator();
                     final String ip = it.next();
@@ -196,15 +198,14 @@ public class Indexer {
                         LOG.error("Could not connect to Elasticsearch.", ioException);
                     } catch (InterruptedException ignore) {
                     } catch (ExecutionException e1) {
-                       // could not find any server on that address
-                       LOG.error("Could not connect to Elasticsearch at http://" + ip + ":9200/, is it running?" , e1.getCause());
+                        // could not find any server on that address
+                        LOG.error("Could not connect to Elasticsearch at http://" + ip + ":9200/, is it running?", e1.getCause());
                     }
                 }
             }
 
             UI.exitHardWithWall("Could not successfully connect to ElasticSearch. Check that your cluster state is not RED " +
-                            "and that ElasticSearch is running properly.",
-                    new String[]{"http://graylog2.org/resources/documentation/setup/elasticsearch"});
+                    "and that ElasticSearch is running properly.", "http://www.graylog2.org/resources/documentation/setup/elasticsearch");
         }
 
         searches = searchesFactory.create(client);
@@ -216,7 +217,7 @@ public class Indexer {
 
     // default visibility for tests
     Map<String, String> readNodeSettings(Configuration conf) {
-        Map<String, String> settings = Maps.newHashMap();
+        final Map<String, String> settings = Maps.newHashMap();
 
         // Standard Configuration.
         settings.put("cluster.name", conf.getEsClusterName());
@@ -233,29 +234,34 @@ public class Indexer {
         settings.put("discovery.initial_state_timeout", conf.getEsInitialStateTimeout());
         settings.put("discovery.zen.ping.multicast.enabled", Boolean.toString(conf.isEsMulticastDiscovery()));
 
-        if (conf.getEsUnicastHosts() != null) {
-            settings.put("discovery.zen.ping.unicast.hosts", Joiner.on(",").join(conf.getEsUnicastHosts()));
+        if (conf.getEsUnicastHosts() != null && !conf.getEsUnicastHosts().isEmpty()) {
+            final ImmutableList.Builder<String> trimmedHosts = ImmutableList.builder();
+            for (String host : conf.getEsUnicastHosts()) {
+                trimmedHosts.add(host.trim());
+            }
+
+            settings.put("discovery.zen.ping.unicast.hosts", Joiner.on(",").join(trimmedHosts.build()));
         }
 
-        if (conf.getEsNetworkHost() != null) {
+        if (!isNullOrEmpty(conf.getEsNetworkHost())) {
             settings.put("network.host", conf.getEsNetworkHost());
         }
-        if (conf.getEsNetworkBindHost() != null) {
+        if (!isNullOrEmpty(conf.getEsNetworkBindHost())) {
             settings.put("network.bind_host", conf.getEsNetworkBindHost());
         }
-        if (conf.getEsNetworkPublishHost() != null) {
+        if (!isNullOrEmpty(conf.getEsNetworkPublishHost())) {
             settings.put("network.publish_host", conf.getEsNetworkPublishHost());
         }
 
-        // Overwrite from a custom ElasticSearch config file.
-        try {
-            final String esConfigFilePath = conf.getElasticSearchConfigFile();
-            if (esConfigFilePath != null) {
-                String esSettings = FileUtils.readFileToString(new File(esConfigFilePath));
+        // Overwrite from a custom Elasticsearch config file.
+        final String esConfigFilePath = conf.getElasticSearchConfigFile();
+        if (!isNullOrEmpty(esConfigFilePath)) {
+            try {
+                final byte[] esSettings = Files.readAllBytes(Paths.get(esConfigFilePath));
                 settings.putAll(new YamlSettingsLoader().load(esSettings));
+            } catch (IOException e) {
+                LOG.warn("Cannot read Elasticsearch configuration.", e);
             }
-        } catch (IOException e) {
-            LOG.warn("Cannot read elasticsearch configuration.");
         }
 
         return settings;
@@ -266,25 +272,24 @@ public class Indexer {
     }
 
     public String nodeIdToName(String nodeId) {
-        if (nodeId == null || nodeId.isEmpty()) {
+        if (isNullOrEmpty(nodeId)) {
             return null;
         }
-        
+
         try {
             NodesInfoResponse r = client.admin().cluster().nodesInfo(new NodesInfoRequest(nodeId).all()).actionGet();
             return r.getNodesMap().get(nodeId).getNode().getName();
         } catch (Exception e) {
-            LOG.error("Could not read name of ES node.", e);
+            LOG.error("Could not read name of Elasticsearch node.", e);
             return "UNKNOWN";
         }
-        
     }
-    
+
     public String nodeIdToHostName(String nodeId) {
-        if (nodeId == null || nodeId.isEmpty()) {
+        if (isNullOrEmpty(nodeId)) {
             return null;
         }
-        
+
         try {
             NodesInfoResponse r = client.admin().cluster().nodesInfo(new NodesInfoRequest(nodeId).all()).actionGet();
             return r.getNodesMap().get(nodeId).getHostname();
@@ -292,7 +297,7 @@ public class Indexer {
             LOG.error("Could not read name of ES node.", e);
             return "UNKNOWN";
         }
-        
+
     }
 
     public boolean cycleAlias(String aliasName, String targetIndex) {
@@ -300,7 +305,7 @@ public class Indexer {
                 .addAlias(targetIndex, aliasName)
                 .execute().actionGet().isAcknowledged();
     }
-    
+
     public boolean cycleAlias(String aliasName, String targetIndex, String oldIndex) {
         return client.admin().indices().prepareAliases()
                 .removeAlias(oldIndex, aliasName)
@@ -316,17 +321,17 @@ public class Indexer {
         final BulkRequestBuilder request = client.prepareBulk();
         for (Message msg : messages) {
             request.add(buildIndexRequest(Deflector.buildName(configuration.getElasticSearchIndexPrefix()),
-                                          msg.toElasticSearchObject(),
-                                          msg.getId())); // Main index.
+                    msg.toElasticSearchObject(),
+                    msg.getId())); // Main index.
         }
 
         request.setConsistencyLevel(WriteConsistencyLevel.ONE);
         request.setReplicationType(ReplicationType.ASYNC);
-        
+
         final BulkResponse response = client.bulk(request.request()).actionGet();
-        
+
         LOG.debug("Deflector index: Bulk indexed {} messages, took {} ms, failures: {}",
-                new Object[] { response.getItems().length, response.getTookInMillis(), response.hasFailures() });
+                response.getItems().length, response.getTookInMillis(), response.hasFailures());
 
         if (response.hasFailures()) {
             propagateFailure(response.getItems(), messages, response.buildFailureMessage());
@@ -348,23 +353,23 @@ public class Indexer {
 
         boolean r = this.deadLetterQueue.offer(deadLetters);
 
-        if(!r) {
+        if (!r) {
             LOG.debug("Could not propagate failure to failure queue. Queue is full.");
         }
     }
 
     public Searches searches() {
-    	return searches;
+        return searches;
     }
-    
+
     public Counts counts() {
-    	return counts;
+        return counts;
     }
-    
+
     public Messages messages() {
-    	return messages;
+        return messages;
     }
-    
+
     public Cluster cluster() {
         return cluster;
     }
@@ -385,7 +390,7 @@ public class Indexer {
                     && cluster() != null
                     && cluster().getHealth() != ClusterHealthStatus.RED;
         } catch (ElasticsearchException e) {
-            LOG.trace("Couldn't determine Elasticsearch health properly", e);
+            LOG.debug("Couldn't determine Elasticsearch health properly", e);
             return false;
         }
     }
