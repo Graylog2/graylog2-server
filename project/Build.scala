@@ -18,7 +18,7 @@ object ApplicationBuild extends Build {
     javaCore,
     javaEbean,
     "com.google.code.gson" % "gson" % "2.2",
-    "com.google.guava" % "guava" % "14.0",
+    "com.google.guava" % "guava" % "18.0",
     "com.ning" % "async-http-client" % "1.8.14",
     "org.apache.shiro" % "shiro-core" % "1.2.2",
     "com.google.inject" % "guice" % "3.0",
@@ -33,11 +33,7 @@ object ApplicationBuild extends Build {
     "com.sun.jersey" % "jersey-grizzly2" % "1.17.1",
     "com.sun.jersey" % "jersey-bundle" % "1.17.1",
 
-    "org.mockito" % "mockito-all" % "1.9.5" % "test",
-    "org.elasticsearch" % "elasticsearch" % "0.90.5" % "test",
-    "org.fluentlenium" % "fluentlenium-core" % "0.9.0" % "test",
-    "org.fluentlenium" % "fluentlenium-festassert" % "0.9.0" % "test",
-    "org.codehaus.jackson" % "jackson-core-asl" % "1.9.12" % "test"
+    "org.mockito" % "mockito-all" % "1.9.5" % "test"
   )
   val repositories = Seq(
     ("Local Maven Repository" at "file:///"+Path.userHome.absolutePath+"/.m2/repository"),
