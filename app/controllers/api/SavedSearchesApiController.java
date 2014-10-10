@@ -73,7 +73,6 @@ public class SavedSearchesApiController extends AuthenticatedController {
         CreateSavedSearchRequest request;
         try {
             request = mapper.readValue(json, CreateSavedSearchRequest.class);
-            request.creatorUserId = currentUser().getName();
         } catch (IOException e) {
             return internalServerError("Could not parse JSON into request.");
         }

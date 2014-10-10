@@ -31,7 +31,6 @@ public class AlarmCallbacksController extends AuthenticatedController {
         Map<String, GetSingleAvailableAlarmCallbackResponse> availableAlarmCallbacks = alarmCallbackService.available(streamId);
 
         request.configuration = extractConfiguration(request.configuration, availableAlarmCallbacks.get(request.type));
-        request.creatorUserId = currentUser().getName();
 
         alarmCallbackService.create(streamId, request);
 

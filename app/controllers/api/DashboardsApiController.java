@@ -248,7 +248,7 @@ public class DashboardsApiController extends AuthenticatedController {
                 return badRequest();
             }
 
-            dashboard.addWidget(widget, currentUser());
+            dashboard.addWidget(widget);
 
             return created();
         } catch (APIException e) {

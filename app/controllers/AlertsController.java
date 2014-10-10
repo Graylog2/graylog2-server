@@ -112,7 +112,6 @@ public class AlertsController extends AuthenticatedController {
             Stream stream = streamService.get(streamId);
 
             CreateAlertConditionRequest request = new CreateAlertConditionRequest();
-            request.creatorUserId = currentUser().getName();
             request.type = "message_count";
             request.parameters.put("grace", Integer.parseInt(form.get("grace")));
             request.parameters.put("time", Integer.parseInt(form.get("time")));
@@ -149,7 +148,6 @@ public class AlertsController extends AuthenticatedController {
             Stream stream = streamService.get(streamId);
 
             CreateAlertConditionRequest request = new CreateAlertConditionRequest();
-            request.creatorUserId = currentUser().getName();
             request.type = "field_value";
             request.parameters.put("grace", Integer.parseInt(form.get("grace")));
             request.parameters.put("time", Integer.parseInt(form.get("time")));

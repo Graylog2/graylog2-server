@@ -112,7 +112,6 @@ public class DashboardsController extends AuthenticatedController {
 
         try {
             CreateDashboardRequest cdr = form.get();
-            cdr.creatorUserId = currentUser().getName();
             dashboardService.create(cdr);
         } catch (APIException e) {
             String message = "Could not create dashboard. We expected HTTP 201, but got a HTTP " + e.getHttpCode() + ".";
