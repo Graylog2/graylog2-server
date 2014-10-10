@@ -14,23 +14,6 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  */
-/**
- *
- * This file is part of Graylog2.
- *
- * Graylog2 is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * Graylog2 is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
- */
 package org.graylog2.inputs.transports;
 
 import com.codahale.metrics.MetricRegistry;
@@ -45,16 +28,11 @@ import org.graylog2.plugin.configuration.fields.BooleanField;
 import org.graylog2.plugin.configuration.fields.ConfigurationField;
 import org.graylog2.plugin.configuration.fields.NumberField;
 import org.graylog2.plugin.inputs.MessageInput2;
-import org.graylog2.plugin.inputs.transports.NettyTransport;
 import org.graylog2.plugin.inputs.transports.TransportFactory;
 import org.graylog2.plugin.inputs.util.ConnectionCounter;
 import org.graylog2.plugin.inputs.util.ThroughputCounter;
-import org.jboss.netty.bootstrap.Bootstrap;
-import org.jboss.netty.bootstrap.ServerBootstrap;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.channel.ChannelHandler;
-import org.jboss.netty.channel.FixedReceiveBufferSizePredictorFactory;
-import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory;
 import org.jboss.netty.handler.codec.frame.DelimiterBasedFrameDecoder;
 
 import javax.inject.Named;
@@ -62,20 +40,15 @@ import javax.inject.Provider;
 import java.util.List;
 import java.util.concurrent.Executor;
 
-import static com.codahale.metrics.MetricRegistry.name;
 import static org.jboss.netty.handler.codec.frame.Delimiters.lineDelimiter;
 import static org.jboss.netty.handler.codec.frame.Delimiters.nulDelimiter;
 
-public class TcpTransport extends NettyTransport {
+public class TcpTransport extends AbstractTcpTransport {
 
     public static final String CK_USE_NULL_DELIMITER = "use_null_delimiter";
     public static final String CK_MAX_MESSAGE_SIZE = "max_message_size";
-
-    private final Executor bossExecutor;
-    private final Executor workerExecutor;
-    private final ChannelBuffer[] delimiter;
-    private final ConnectionCounter connectionCounter;
-    private final int maxFrameLength;
+    protected final ChannelBuffer[] delimiter;
+    protected final int maxFrameLength;
 
     @AssistedInject
     public TcpTransport(@Assisted Configuration configuration,
@@ -85,10 +58,7 @@ public class TcpTransport extends NettyTransport {
                         ConnectionCounter connectionCounter,
                         MetricRegistry metricRegistry,
                         ObjectMapper mapper) {
-        super(configuration, throughputCounter, metricRegistry, mapper);
-        this.bossExecutor = bossPool;
-        this.workerExecutor = workerPoolProvider.get();
-        this.connectionCounter = connectionCounter;
+        super(configuration, throughputCounter, metricRegistry, mapper, bossPool, workerPoolProvider, connectionCounter);
 
         final boolean nulDelimiter = configuration.getBoolean(CK_USE_NULL_DELIMITER);
         this.delimiter = nulDelimiter ? nulDelimiter() : lineDelimiter();
@@ -101,36 +71,13 @@ public class TcpTransport extends NettyTransport {
     }
 
     @Override
-    protected Bootstrap getBootstrap() {
-        final ServerBootstrap bootstrap =
-                new ServerBootstrap(new NioServerSocketChannelFactory(bossExecutor, workerExecutor));
-
-        bootstrap.setOption("receiveBufferSizePredictorFactory", new FixedReceiveBufferSizePredictorFactory(8192));
-        bootstrap.setOption("child.receiveBufferSize", getRecvBufferSize());
-
-        return bootstrap;
-    }
-
-    @Override
-    protected List<Pair<String, ? extends ChannelHandler>> getBaseChannelHandlers(MessageInput2 input) {
-        final List<Pair<String, ? extends ChannelHandler>> baseChannelHandlers = super.getBaseChannelHandlers(input);
-        baseChannelHandlers.add(Pair.of("connection-counter", connectionCounter));
-        return baseChannelHandlers;
-    }
-
-    @Override
     protected List<Pair<String, ? extends ChannelHandler>> getFinalChannelHandlers(MessageInput2 input) {
         final List<Pair<String, ? extends ChannelHandler>> finalChannelHandlers = Lists.newArrayList();
-        finalChannelHandlers.add(Pair.of("framer",  new DelimiterBasedFrameDecoder(maxFrameLength, delimiter)));
-        finalChannelHandlers.addAll(super.getFinalChannelHandlers(input));
-        return finalChannelHandlers;
-    }
 
-    @Override
-    public void setupMetrics(MessageInput2 input) {
-        super.setupMetrics(input);
-        metricRegistry.register(name(input.getUniqueReadableId(), "open_connections"), connectionCounter.gaugeCurrent());
-        metricRegistry.register(name(input.getUniqueReadableId(), "total_connections"), connectionCounter.gaugeTotal());
+        finalChannelHandlers.add(Pair.of("framer", new DelimiterBasedFrameDecoder(maxFrameLength, delimiter)));
+        finalChannelHandlers.addAll(super.getFinalChannelHandlers(input));
+
+        return finalChannelHandlers;
     }
 
     @Override

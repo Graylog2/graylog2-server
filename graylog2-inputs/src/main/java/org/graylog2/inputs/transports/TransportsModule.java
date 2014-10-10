@@ -35,6 +35,7 @@ public class TransportsModule extends AbstractModule {
 
         install(new FactoryModuleBuilder().implement(Transport.class, UdpTransport.class).build(UdpTransport.Factory.class));
         install(new FactoryModuleBuilder().implement(Transport.class, TcpTransport.class).build(TcpTransport.Factory.class));
+        install(new FactoryModuleBuilder().implement(Transport.class, HttpTransport.class).build(HttpTransport.Factory.class));
         install(new FactoryModuleBuilder().implement(Transport.class, RandomMessageTransport.class).build(RandomMessageTransport.Factory.class));
 
         // lol generics
@@ -46,6 +47,7 @@ public class TransportsModule extends AbstractModule {
 
         mapBinder.addBinding("udp").to(Key.get(UdpTransport.Factory.class));
         mapBinder.addBinding("tcp").to(Key.get(TcpTransport.Factory.class));
+        mapBinder.addBinding("http").to(Key.get(HttpTransport.Factory.class));
         mapBinder.addBinding("randomhttp").to(Key.get(RandomMessageTransport.Factory.class));
 
         bind(Executor.class)

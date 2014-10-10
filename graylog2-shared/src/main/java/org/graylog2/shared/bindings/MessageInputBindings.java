@@ -25,6 +25,7 @@ import com.google.inject.multibindings.Multibinder;
 import org.graylog2.inputs.amqp.AMQPInput;
 import org.graylog2.inputs.codecs.CodecsModule;
 import org.graylog2.inputs.gelf.http.GELFHttpInput;
+import org.graylog2.inputs.gelf.http.GELFHttpInput2;
 import org.graylog2.inputs.gelf.tcp.GELFTCPInput;
 import org.graylog2.inputs.gelf.tcp.GELFTCPInput2;
 import org.graylog2.inputs.gelf.udp.GELFUDPInput;
@@ -83,9 +84,8 @@ public class MessageInputBindings extends AbstractModule {
         installInput(inputMapBinder, SyslogUDPInput2.class, SyslogUDPInput2.Factory.class);
         installInput(inputMapBinder, FakeHttpMessageInput2.class, FakeHttpMessageInput2.Factory.class);
         installInput(inputMapBinder, GELFTCPInput2.class, GELFTCPInput2.Factory.class);
+        installInput(inputMapBinder, GELFHttpInput2.class, GELFHttpInput2.Factory.class);
         installInput(inputMapBinder, GELFUDPInput2.class, GELFUDPInput2.Factory.class);
-
-
     }
 
     private <T extends MessageInput2> void installInput(MapBinder<String, MessageInput2.Factory<? extends MessageInput2>> inputMapBinder,
