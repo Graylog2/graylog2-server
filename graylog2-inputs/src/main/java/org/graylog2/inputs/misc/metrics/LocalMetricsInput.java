@@ -32,7 +32,6 @@ import org.graylog2.plugin.inputs.MisfireException;
 import org.graylog2.plugin.system.NodeId;
 
 import javax.inject.Inject;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -148,11 +147,6 @@ public class LocalMetricsInput extends MessageInput {
     @Override
     public String linkToDocs() {
         return "";
-    }
-
-    @Override
-    public Map<String, Object> getAttributes() {
-        return configuration.getSource();
     }
 
     @Override

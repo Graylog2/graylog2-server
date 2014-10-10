@@ -266,7 +266,8 @@ public class InputServiceImpl extends PersistedServiceImpl implements InputServi
 
     @Override
     public MessageInput buildMessageInput(Input io) throws NoSuchInputTypeException {
-        final MessageInput input = messageInputFactory.create(io.getType());
+        final Configuration configuration = new Configuration(io.getConfiguration());
+        final MessageInput input = messageInputFactory.create(io.getType(), configuration);
 
         // Add all standard fields.
         input.setTitle(io.getTitle());
@@ -277,15 +278,10 @@ public class InputServiceImpl extends PersistedServiceImpl implements InputServi
             input.setGlobal(true);
         }
 
-        // Add extractors.
-        for (Extractor extractor : this.getExtractors(io)) {
-            input.addExtractor(extractor.getId(), extractor);
-        }
-
         // Add static fields.
         input.addStaticFields(io.getStaticFields());
 
-        input.setConfiguration(new Configuration(io.getConfiguration()));
+        input.setConfiguration(configuration);
 
         return input;
     }

@@ -61,9 +61,9 @@ public class RadioInputRegistry extends InputRegistry {
     private MessageInput getMessageInput(InputSummaryResponse isr) {
         MessageInput input;
         try {
-            input = this.create(isr.type);
-
             Configuration inputConfig = new Configuration(isr.configuration);
+            input = this.create(isr.type, inputConfig);
+
             // Add all standard fields.
             input.setTitle(isr.title);
             input.setCreatorUserId(isr.creatorUserId);

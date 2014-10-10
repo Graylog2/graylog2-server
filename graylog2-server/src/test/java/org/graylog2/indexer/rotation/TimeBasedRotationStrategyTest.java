@@ -17,7 +17,7 @@
 package org.graylog2.indexer.rotation;
 
 import org.graylog2.Graylog2BaseTest;
-import org.graylog2.InstantMillisProvider;
+import org.graylog2.plugin.InstantMillisProvider;
 import org.graylog2.plugin.indexer.rotation.RotationStrategy;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeUtils;

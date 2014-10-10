@@ -50,6 +50,26 @@ public class FakeHttpMessageGenerator {
         this.source = source;
     }
 
+    public static int deviation(int val, int maxDeviation, Random rand) {
+        int deviationPercent = rand.nextInt(maxDeviation);
+
+        double x = val/100.0*deviationPercent;
+
+        // Add or substract?
+        double result = 0;
+        if (rand.nextBoolean()) {
+            result = val-x;
+        } else {
+            result = val+x;
+        }
+
+        if (result < 0) {
+            return 1;
+        } else {
+            return Math.round((int) result);
+        }
+    }
+
     public Message generate() {
         int x = rand.nextInt(100);
         int y = rand.nextInt(100);
@@ -109,7 +129,7 @@ public class FakeHttpMessageGenerator {
             msBase = 400;
         }
 
-        long tookMs = org.graylog2.inputs.random.generators.Tools.deviation(msBase, deviation, rand);
+        long tookMs = deviation(msBase, deviation, rand);
         UserId userId = getWeighted(USER_IDS);
 
         Message msg = new Message(shortMessage("GET", resource.getResource(), code, tookMs), source, Tools.iso8601());

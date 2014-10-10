@@ -26,8 +26,6 @@ import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.MisfireException;
 import org.testng.annotations.Test;
 
-import java.util.Map;
-
 import static org.testng.Assert.assertEquals;
 
 /**
@@ -104,11 +102,6 @@ public class StaticFieldFilterTest {
 
         @Override
         public String linkToDocs() {
-            return null;  //To change body of implemented methods use File | Settings | File Templates.
-        }
-
-        @Override
-        public Map<String, Object> getAttributes() {
             return null;  //To change body of implemented methods use File | Settings | File Templates.
         }
     }

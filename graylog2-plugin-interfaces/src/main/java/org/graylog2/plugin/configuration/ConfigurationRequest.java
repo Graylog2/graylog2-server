@@ -38,10 +38,16 @@ import java.util.Map;
  */
 public class ConfigurationRequest {
 
-    private final List<ConfigurationField> fields;
+    private final List<ConfigurationField> fields = Lists.newArrayList();
 
-    public ConfigurationRequest() {
-        this.fields = Lists.newArrayList();
+    public ConfigurationRequest() {}
+
+    public ConfigurationRequest(List<ConfigurationField> fields) {
+        addAll(fields);
+    }
+
+    public boolean addAll(List<ConfigurationField> fields) {
+        return this.fields.addAll(fields);
     }
 
     public void addField(ConfigurationField f) {

@@ -19,17 +19,14 @@ package org.graylog2.shared.inputs;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.inputs.InputState;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.shared.buffers.ProcessBuffer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -61,8 +58,8 @@ public abstract class InputRegistry {
         this.processBuffer = processBuffer;
     }
 
-    public MessageInput create(String inputClass) throws NoSuchInputTypeException {
-        return messageInputFactory.create(inputClass);
+    public MessageInput create(String inputClass, Configuration configuration) throws NoSuchInputTypeException {
+        return messageInputFactory.create(inputClass, configuration);
     }
 
     public InputState launch(final MessageInput input, String id) {

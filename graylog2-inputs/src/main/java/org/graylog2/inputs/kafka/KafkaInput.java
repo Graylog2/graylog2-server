@@ -363,11 +363,6 @@ public class KafkaInput extends MessageInput {
         return "http://graylog2.org/resources/documentation/sending/heroku";
     }
 
-    @Override
-    public Map<String, Object> getAttributes() {
-        return configuration.getSource();
-    }
-
     protected boolean checkConfig(Configuration config) {
         return config.intIsSet(CK_FETCH_MIN_BYTES)
                 && config.intIsSet(CK_FETCH_WAIT_MAX)

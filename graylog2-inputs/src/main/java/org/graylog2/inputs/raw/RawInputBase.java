@@ -31,7 +31,6 @@ import org.jboss.netty.channel.Channel;
 
 import javax.inject.Inject;
 import java.net.InetSocketAddress;
-import java.util.Map;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
@@ -102,11 +101,6 @@ public abstract class RawInputBase extends MessageInput {
     @Override
     public boolean isExclusive() {
         return false;
-    }
-
-    @Override
-    public Map<String, Object> getAttributes() {
-        return configuration.getSource();
     }
 
     protected boolean checkConfig(Configuration config) {

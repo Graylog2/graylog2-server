@@ -134,7 +134,7 @@ public class InputsResource extends RestResource {
         DateTime createdAt = new DateTime(DateTimeZone.UTC);
         final MessageInput input;
         try {
-            input = inputRegistry.create(lr.type);
+            input = inputRegistry.create(lr.type, inputConfig);
             input.setTitle(lr.title);
             input.setGlobal(lr.global);
             input.setCreatorUserId(lr.creatorUserId);
@@ -334,7 +334,7 @@ public class InputsResource extends RestResource {
 
         MessageInput input;
         try {
-            input = inputRegistry.create(inputType);
+            input = inputRegistry.create(inputType, new Configuration(Maps.<String, Object>newHashMap()));
         } catch (NoSuchInputTypeException e) {
             LOG.error("There is no such input type registered.", e);
             throw new WebApplicationException(e, Response.Status.NOT_FOUND);

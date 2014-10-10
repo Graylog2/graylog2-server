@@ -17,7 +17,6 @@
 package org.graylog2.inputs.random;
 
 import org.graylog2.inputs.random.generators.FakeHttpMessageGenerator;
-import org.graylog2.inputs.random.generators.Tools;
 import org.graylog2.plugin.buffers.Buffer;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationException;
@@ -31,7 +30,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import java.util.Map;
 import java.util.Random;
 
 /**
@@ -80,7 +78,7 @@ public class FakeHttpMessageInput extends MessageInput {
                     processBuffer.insertCached(generator.generate(), thisInput);
 
                     try {
-                        Thread.sleep(Tools.deviation(sleepMs, maxSleepDeviation, rand));
+                        Thread.sleep(FakeHttpMessageGenerator.deviation(sleepMs, maxSleepDeviation, rand));
                     } catch (InterruptedException e) {
                         break;
                     }
@@ -142,11 +140,6 @@ public class FakeHttpMessageInput extends MessageInput {
     @Override
     public String linkToDocs() {
         return "";
-    }
-
-    @Override
-    public Map<String, Object> getAttributes() {
-        return configuration.getSource();
     }
 
     private boolean checkConfig(Configuration config) {
