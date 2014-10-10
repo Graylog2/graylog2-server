@@ -39,6 +39,7 @@ import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.inputs.NoSuchInputTypeException;
 import org.graylog2.streams.StreamService;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -197,7 +198,7 @@ public class MessageToJsonSerializer {
         final Message message = new Message(
                 (String) fields.get("message"),
                 (String) fields.get("source"),
-                new DateTime((long) fields.get("timestamp"))
+                new DateTime((long) fields.get("timestamp"), DateTimeZone.UTC)
         );
         final List<Stream> streamList = Lists.newArrayList();
 
