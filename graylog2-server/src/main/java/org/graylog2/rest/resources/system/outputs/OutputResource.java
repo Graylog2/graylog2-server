@@ -32,6 +32,7 @@ import org.graylog2.rest.resources.streams.outputs.AvailableOutputSummary;
 import org.graylog2.security.RestPermissions;
 import org.graylog2.streams.OutputService;
 import org.graylog2.streams.outputs.CreateOutputRequest;
+import org.graylog2.utilities.ConfigurationMapConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -102,6 +103,14 @@ public class OutputResource extends RestResource {
     })
     public Response create(@ApiParam(title = "JSON body", required = true) CreateOutputRequest csor) throws ValidationException {
         checkPermission(RestPermissions.OUTPUTS_CREATE);
+        final AvailableOutputSummary outputSummary = messageOutputFactory.getAvailableOutputs().get(csor.type);
+
+        if (outputSummary == null) {
+            throw new ValidationException("type", "Invalid output type");
+        }
+
+        // Make sure the config values will be stored with the correct type.
+        csor.configuration = ConfigurationMapConverter.convertValues(csor.configuration, outputSummary.requestedConfiguration);
 
         csor.creatorUserId = getSubject().getPrincipal().toString();
         Output output = outputService.create(csor);
