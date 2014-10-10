@@ -48,7 +48,7 @@ import java.util.Set;
  * @author Dennis Oelkers <dennis@torch.sh>
  */
 @RequiresAuthentication
-@Api(value = "Outputs", description = "Manage outputs")
+@Api(value = "System/Outputs", description = "Manage outputs")
 @Path("/system/outputs")
 public class OutputResource extends RestResource {
     private static final Logger LOG = LoggerFactory.getLogger(OutputResource.class);
