@@ -17,18 +17,18 @@
 package org.graylog2.rest.resources.system.outputs;
 
 import com.codahale.metrics.annotation.Timed;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.database.ValidationException;
-import org.graylog2.outputs.DefaultMessageOutput;
 import org.graylog2.outputs.MessageOutputFactory;
-import org.graylog2.plugin.outputs.MessageOutput;
 import org.graylog2.plugin.streams.Output;
-import org.graylog2.rest.documentation.annotations.*;
+import org.graylog2.rest.documentation.annotations.Api;
+import org.graylog2.rest.documentation.annotations.ApiOperation;
+import org.graylog2.rest.documentation.annotations.ApiParam;
+import org.graylog2.rest.documentation.annotations.ApiResponse;
+import org.graylog2.rest.documentation.annotations.ApiResponses;
 import org.graylog2.rest.resources.RestResource;
-import org.graylog2.rest.resources.streams.outputs.AvailableOutputSummary;
 import org.graylog2.security.RestPermissions;
 import org.graylog2.streams.OutputService;
 import org.graylog2.streams.outputs.CreateOutputRequest;
@@ -37,7 +37,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import javax.ws.rs.*;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.HashMap;
@@ -112,8 +118,7 @@ public class OutputResource extends RestResource {
         // Make sure the config values will be stored with the correct type.
         csor.configuration = ConfigurationMapConverter.convertValues(csor.configuration, outputSummary.requestedConfiguration);
 
-        csor.creatorUserId = getSubject().getPrincipal().toString();
-        Output output = outputService.create(csor);
+        Output output = outputService.create(csor, getCurrentUser().getName());
 
         return Response.status(Response.Status.CREATED).entity(output).build();
     }

@@ -74,8 +74,8 @@ public class Dashboard {
         this.widgets = parseWidgets(dsr.widgets);
     }
 
-    public void addWidget(DashboardWidget widget, User user) throws APIException, IOException {
-        AddWidgetRequest request = new AddWidgetRequest(widget, user);
+    public void addWidget(DashboardWidget widget) throws APIException, IOException {
+        AddWidgetRequest request = new AddWidgetRequest(widget);
 
         api.path(routes.DashboardsResource().addWidget(id))
                 .onlyMasterNode()

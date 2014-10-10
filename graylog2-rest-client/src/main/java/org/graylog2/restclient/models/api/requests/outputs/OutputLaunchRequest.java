@@ -24,17 +24,12 @@ import play.data.validation.Constraints;
 import java.util.List;
 import java.util.Map;
 
-/**
- * @author Dennis Oelkers <dennis@torch.sh>
- */
 public class OutputLaunchRequest extends ApiRequest {
     @Constraints.Required
     public String title;
     @Constraints.Required
     public String type;
     public Map<String, Object> configuration;
-    @JsonProperty("creator_user_id")
-    public String creatorUserId;
     @JsonProperty("streams")
     public List<String> streams;
 
@@ -44,7 +39,6 @@ public class OutputLaunchRequest extends ApiRequest {
                 "title='" + title + '\'' +
                 ", type='" + type + '\'' +
                 ", configuration=" + configuration +
-                ", creatorUserId='" + creatorUserId + '\'' +
                 ", streams=" + streams +
                 '}';
     }
@@ -71,14 +65,6 @@ public class OutputLaunchRequest extends ApiRequest {
 
     public void setConfiguration(Map<String, Object> configuration) {
         this.configuration = configuration;
-    }
-
-    public String getCreatorUserId() {
-        return creatorUserId;
-    }
-
-    public void setCreatorUserId(String creatorUserId) {
-        this.creatorUserId = creatorUserId;
     }
 
     public List<String> getStreams() {

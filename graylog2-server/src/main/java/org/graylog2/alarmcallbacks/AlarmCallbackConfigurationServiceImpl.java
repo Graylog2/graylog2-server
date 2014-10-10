@@ -65,13 +65,13 @@ public class AlarmCallbackConfigurationServiceImpl extends PersistedServiceImpl 
     }
 
     @Override
-    public AlarmCallbackConfiguration create(String streamId, CreateAlarmCallbackRequest request) {
+    public AlarmCallbackConfiguration create(String streamId, CreateAlarmCallbackRequest request, String userId) {
         Map<String, Object> fields = Maps.newHashMap();
         fields.put("stream_id", new ObjectId(streamId));
         fields.put("type", request.type);
         fields.put("configuration", request.configuration);
         fields.put("created_at", DateTime.now());
-        fields.put("creator_user_id", request.creatorUserId);
+        fields.put("creator_user_id", userId);
 
         return new AlarmCallbackConfigurationImpl(fields);
     }

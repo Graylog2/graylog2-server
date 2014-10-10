@@ -16,25 +16,12 @@
  */
 package org.graylog2.restclient.models.api.requests.alerts;
 
-import com.google.common.collect.Maps;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import org.graylog2.restclient.models.api.requests.ApiRequest;
 
+import java.util.HashMap;
 import java.util.Map;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public class CreateAlertConditionRequest extends ApiRequest {
-
     public String type;
-    public Map<String, Object> parameters;
-
-    @JsonProperty("creator_user_id")
-    public String creatorUserId;
-
-    public CreateAlertConditionRequest() {
-        this.parameters = Maps.newHashMap();
-    }
-
+    public Map<String, Object> parameters = new HashMap<>();
 }

@@ -124,6 +124,7 @@ public class AlertServiceImpl extends PersistedServiceImpl implements AlertServi
         return collection(AlertImpl.class).count(qry);
     }
 
+    @Override
     public AlertCondition fromPersisted(Map<String, Object> fields, Stream stream) throws AbstractAlertCondition.NoSuchAlertConditionTypeException {
         AbstractAlertCondition.Type type;
         try {
@@ -151,7 +152,8 @@ public class AlertServiceImpl extends PersistedServiceImpl implements AlertServi
         throw new AbstractAlertCondition.NoSuchAlertConditionTypeException("Unhandled alert condition type: " + type);
     }
 
-    public AbstractAlertCondition fromRequest(CreateConditionRequest ccr, Stream stream) throws AbstractAlertCondition.NoSuchAlertConditionTypeException {
+    @Override
+    public AbstractAlertCondition fromRequest(CreateConditionRequest ccr, Stream stream, String userId) throws AbstractAlertCondition.NoSuchAlertConditionTypeException {
         AbstractAlertCondition.Type type;
         try {
             type = AbstractAlertCondition.Type.valueOf(ccr.type.toUpperCase());
@@ -161,9 +163,10 @@ public class AlertServiceImpl extends PersistedServiceImpl implements AlertServi
 
         Map<String, Object> parameters = ccr.parameters;
 
-        return createAlertCondition(type, stream, null, Tools.iso8601(), ccr.creatorUserId, parameters);
+        return createAlertCondition(type, stream, null, Tools.iso8601(), userId, parameters);
     }
 
+    @Override
     public AbstractAlertCondition updateFromRequest(AlertCondition alertCondition, CreateConditionRequest ccr) throws AbstractAlertCondition.NoSuchAlertConditionTypeException {
         AbstractAlertCondition.Type type = ((AbstractAlertCondition)alertCondition).getType();
 
@@ -183,6 +186,7 @@ public class AlertServiceImpl extends PersistedServiceImpl implements AlertServi
         );
     }
 
+    @Override
     public boolean inGracePeriod(AlertCondition alertCondition) {
         int lastAlertSecondsAgo = triggeredSecondsAgo(alertCondition.getStream().getId(), alertCondition.getId());
 
@@ -193,11 +197,13 @@ public class AlertServiceImpl extends PersistedServiceImpl implements AlertServi
         return lastAlertSecondsAgo < alertCondition.getGrace()*60;
     }
 
+    @Override
     public AlertCondition.CheckResult triggeredNoGrace(AlertCondition alertCondition) {
         LOG.debug("Checking alert condition [{}] and not accounting grace time.", this);
         return ((AbstractAlertCondition)alertCondition).runCheck();
     }
 
+    @Override
     public AlertCondition.CheckResult triggered(AlertCondition alertCondition) {
         LOG.debug("Checking alert condition [{}]", this);
 
@@ -209,6 +215,7 @@ public class AlertServiceImpl extends PersistedServiceImpl implements AlertServi
         return ((AbstractAlertCondition)alertCondition).runCheck();
     }
 
+    @Override
     public Map<String, Object> asMap(final AlertCondition alertCondition) {
         return new HashMap<String, Object>() {{
             put("id", alertCondition.getId());

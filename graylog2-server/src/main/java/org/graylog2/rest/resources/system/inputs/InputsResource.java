@@ -137,7 +137,7 @@ public class InputsResource extends RestResource {
             input = inputRegistry.create(lr.type, inputConfig);
             input.setTitle(lr.title);
             input.setGlobal(lr.global);
-            input.setCreatorUserId(lr.creatorUserId);
+            input.setCreatorUserId(getCurrentUser().getName());
             input.setCreatedAt(createdAt);
             input.setConfiguration(inputConfig);
 
@@ -164,7 +164,7 @@ public class InputsResource extends RestResource {
         inputData.put(MessageInput.FIELD_INPUT_ID, inputId);
         inputData.put(MessageInput.FIELD_TITLE, lr.title);
         inputData.put(MessageInput.FIELD_TYPE, lr.type);
-        inputData.put(MessageInput.FIELD_CREATOR_USER_ID, lr.creatorUserId);
+        inputData.put(MessageInput.FIELD_CREATOR_USER_ID, getCurrentUser().getName());
         inputData.put(MessageInput.FIELD_CONFIGURATION, lr.configuration);
         inputData.put(MessageInput.FIELD_CREATED_AT, createdAt);
         if (lr.global) {

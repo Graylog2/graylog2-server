@@ -81,7 +81,7 @@ public class SavedSearchesResource extends SearchResource {
         Map<String, Object> searchData = Maps.newHashMap();
         searchData.put("title", cr.title);
         searchData.put("query", cr.query);
-        searchData.put("creator_user_id", cr.creatorUserId);
+        searchData.put("creator_user_id", getCurrentUser().getName());
         searchData.put("created_at", new DateTime(DateTimeZone.UTC));
 
         SavedSearch search = new SavedSearchImpl(searchData);

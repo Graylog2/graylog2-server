@@ -103,7 +103,7 @@ public class DashboardsResource extends RestResource {
         Map<String, Object> dashboardData = Maps.newHashMap();
         dashboardData.put("title", cr.title);
         dashboardData.put("description", cr.description);
-        dashboardData.put("creator_user_id", cr.creatorUserId);
+        dashboardData.put("creator_user_id", getCurrentUser().getName());
         dashboardData.put("created_at", new DateTime(DateTimeZone.UTC));
 
         Dashboard dashboard = new DashboardImpl(dashboardData);
@@ -300,7 +300,7 @@ public class DashboardsResource extends RestResource {
 
         DashboardWidget widget;
         try {
-            widget = DashboardWidget.fromRequest(metricRegistry, searches, awr);
+            widget = DashboardWidget.fromRequest(metricRegistry, searches, awr, getCurrentUser().getName());
 
             Dashboard dashboard = dashboardRegistry.get(dashboardId);
 

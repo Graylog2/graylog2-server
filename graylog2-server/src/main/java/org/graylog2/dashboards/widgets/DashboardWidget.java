@@ -89,7 +89,7 @@ public abstract class DashboardWidget implements EmbeddedPersistable {
                 .build();
     }
 
-    public static DashboardWidget fromRequest(MetricRegistry metricRegistry, Searches searches, AddWidgetRequest awr) throws NoSuchWidgetTypeException, InvalidRangeParametersException, InvalidWidgetConfigurationException {
+    public static DashboardWidget fromRequest(MetricRegistry metricRegistry, Searches searches, AddWidgetRequest awr, String userId) throws NoSuchWidgetTypeException, InvalidRangeParametersException, InvalidWidgetConfigurationException {
         Type type;
         try {
             type = Type.valueOf(awr.type.toUpperCase());
@@ -118,7 +118,7 @@ public abstract class DashboardWidget implements EmbeddedPersistable {
         }
 
         return buildDashboardWidget(type, metricRegistry, searches, id, awr.description, 0, awr.config,
-                (String) awr.config.get("query"), timeRange, awr.creatorUserId);
+                (String) awr.config.get("query"), timeRange, userId);
     }
 
     public static DashboardWidget fromPersisted(MetricRegistry metricRegistry, Searches searches, BasicDBObject fields) throws NoSuchWidgetTypeException, InvalidRangeParametersException, InvalidWidgetConfigurationException {

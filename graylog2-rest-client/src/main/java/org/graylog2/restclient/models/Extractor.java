@@ -176,7 +176,6 @@ public class Extractor {
         request.extractorType = extractorType.toString().toLowerCase();
         request.sourceField = sourceField;
         request.targetField = targetField;
-        request.creatorUserId = creatorUser.getId();
         request.extractorConfig = extractorConfig;
         request.converters = converterList;
         request.conditionType = conditionType.toString().toLowerCase();

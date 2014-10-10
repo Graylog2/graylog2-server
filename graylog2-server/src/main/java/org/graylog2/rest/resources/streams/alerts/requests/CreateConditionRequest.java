@@ -16,20 +16,9 @@
  */
 package org.graylog2.rest.resources.streams.alerts.requests;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 import java.util.Map;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public class CreateConditionRequest {
-
     public String type;
-
-    @JsonProperty("creator_user_id")
-    public String creatorUserId;
-
     public Map<String, Object> parameters;
-
 }

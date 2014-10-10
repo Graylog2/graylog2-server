@@ -16,20 +16,11 @@
  */
 package org.graylog2.restclient.models.api.requests.searches;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import org.graylog2.restclient.models.api.requests.ApiRequest;
 
 import java.util.Map;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public class CreateSavedSearchRequest extends ApiRequest {
-
     public String title;
     public Map<String, Object> query;
-
-    @JsonProperty("creator_user_id")
-    public String creatorUserId;
-
 }

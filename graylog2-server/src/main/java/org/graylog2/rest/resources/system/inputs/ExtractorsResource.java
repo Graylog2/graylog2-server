@@ -133,7 +133,7 @@ public class ExtractorsResource extends RestResource {
                     cer.sourceField,
                     cer.targetField,
                     cer.extractorConfig,
-                    cer.creatorUserId,
+                    getCurrentUser().getName(),
                     loadConverters(cer.converters),
                     Extractor.ConditionType.valueOf(cer.conditionType.toUpperCase()),
                     cer.conditionValue
