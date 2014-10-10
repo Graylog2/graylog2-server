@@ -90,7 +90,7 @@ public class IndexRotationThread extends Periodical {
             LOG.error("Cannot perform rotation at this moment.");
             return;
         }
-        LOG.info("Rotation strategy result: {}", rotate.getDescription());
+        LOG.debug("Rotation strategy result: {}", rotate.getDescription());
         if (rotate.shouldRotate()) {
             LOG.info("Deflector index <{}> should be rotated, Pointing deflector to new index now!", currentTarget);
             deflector.cycle();
