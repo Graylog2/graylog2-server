@@ -29,6 +29,7 @@ import org.graylog2.rest.documentation.annotations.ApiParam;
 import org.graylog2.rest.documentation.annotations.ApiResponse;
 import org.graylog2.rest.documentation.annotations.ApiResponses;
 import org.graylog2.rest.resources.RestResource;
+import org.graylog2.rest.resources.streams.outputs.AvailableOutputSummary;
 import org.graylog2.security.RestPermissions;
 import org.graylog2.streams.OutputService;
 import org.graylog2.streams.outputs.CreateOutputRequest;
