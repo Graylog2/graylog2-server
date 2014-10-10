@@ -120,6 +120,8 @@ public class OutputImpl implements Output {
     @Override
     @JsonValue
     public Map<String, Object> asMap() {
-        return getFields();
+        final Map<String, Object> fields = getFields();
+        fields.put("id", ((ObjectId)fields.remove("_id")).toHexString());
+        return fields;
     }
 }
