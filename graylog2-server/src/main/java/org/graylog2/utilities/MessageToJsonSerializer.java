@@ -38,6 +38,7 @@ import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.inputs.NoSuchInputTypeException;
 import org.graylog2.streams.StreamService;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -192,7 +193,12 @@ public class MessageToJsonSerializer {
 
     public Message deserialize(byte[] bytes) throws IOException {
         final DeserializeBean bean = mapper.readValue(bytes, DeserializeBean.class);
-        final Message message = new Message(bean.getFields());
+        final Map<String, Object> fields = bean.getFields();
+        final Message message = new Message(
+                (String) fields.get("message"),
+                (String) fields.get("source"),
+                new DateTime((long) fields.get("timestamp"))
+        );
         final List<Stream> streamList = Lists.newArrayList();
 
         for (String id : bean.getStreams()) {
