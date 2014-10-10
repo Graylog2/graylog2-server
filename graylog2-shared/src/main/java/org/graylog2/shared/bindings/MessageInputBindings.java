@@ -26,7 +26,9 @@ import org.graylog2.inputs.amqp.AMQPInput;
 import org.graylog2.inputs.codecs.CodecsModule;
 import org.graylog2.inputs.gelf.http.GELFHttpInput;
 import org.graylog2.inputs.gelf.tcp.GELFTCPInput;
+import org.graylog2.inputs.gelf.tcp.GELFTCPInput2;
 import org.graylog2.inputs.gelf.udp.GELFUDPInput;
+import org.graylog2.inputs.gelf.udp.GELFUDPInput2;
 import org.graylog2.inputs.kafka.KafkaInput;
 import org.graylog2.inputs.misc.jsonpath.JsonPathInput;
 import org.graylog2.inputs.misc.metrics.LocalMetricsInput;
@@ -74,11 +76,15 @@ public class MessageInputBindings extends AbstractModule {
                                        TypeLiteral.get(String.class),
                                        new TypeLiteral<MessageInput2.Factory<? extends MessageInput2>>() {
                                        });
+        // new style inputs, using transports and codecs
         installInput(inputMapBinder, RawTCPInput2.class, RawTCPInput2.Factory.class);
         installInput(inputMapBinder, RawUDPInput2.class, RawUDPInput2.Factory.class);
         installInput(inputMapBinder, SyslogTCPInput2.class, SyslogTCPInput2.Factory.class);
         installInput(inputMapBinder, SyslogUDPInput2.class, SyslogUDPInput2.Factory.class);
         installInput(inputMapBinder, FakeHttpMessageInput2.class, FakeHttpMessageInput2.Factory.class);
+        installInput(inputMapBinder, GELFTCPInput2.class, GELFTCPInput2.Factory.class);
+        installInput(inputMapBinder, GELFUDPInput2.class, GELFUDPInput2.Factory.class);
+
 
     }
 

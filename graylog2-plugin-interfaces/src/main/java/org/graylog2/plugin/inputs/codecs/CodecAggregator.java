@@ -22,30 +22,27 @@
  */
 package org.graylog2.plugin.inputs.codecs;
 
-import org.graylog2.plugin.inputs.MessageInput2;
-import org.graylog2.plugin.journal.RawMessage;
 import org.jboss.netty.buffer.ChannelBuffer;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.net.SocketAddress;
 
 public interface CodecAggregator {
 
     @Nonnull
-    public Result addChunk(ChannelBuffer buf, SocketAddress remoteAddress, MessageInput2 input);
+    public Result addChunk(ChannelBuffer buf);
 
     public class Result {
-        private final RawMessage message;
+        private final ChannelBuffer message;
         private final boolean valid;
 
-        public Result(RawMessage message, boolean valid) {
+        public Result(ChannelBuffer message, boolean valid) {
             this.message = message;
             this.valid = valid;
         }
 
         @Nullable
-        public RawMessage getMessage() {
+        public ChannelBuffer getMessage() {
             return message;
         }
 

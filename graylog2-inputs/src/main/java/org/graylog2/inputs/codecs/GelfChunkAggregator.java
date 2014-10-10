@@ -16,24 +16,20 @@
  */
 package org.graylog2.inputs.codecs;
 
-import com.codahale.metrics.MetricRegistry;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 import org.graylog2.inputs.gelf.gelf.GELFMessage;
 import org.graylog2.inputs.gelf.gelf.GELFMessageChunk;
-import org.graylog2.plugin.inputs.MessageInput2;
 import org.graylog2.plugin.inputs.codecs.CodecAggregator;
-import org.graylog2.plugin.journal.RawMessage;
 import org.jboss.netty.buffer.ChannelBuffer;
+import org.jboss.netty.buffer.ChannelBuffers;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.inject.Named;
-import java.net.InetSocketAddress;
-import java.net.SocketAddress;
 import java.util.Map;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ConcurrentSkipListSet;
@@ -50,35 +46,28 @@ public class GelfChunkAggregator implements CodecAggregator {
     public static final int VALIDITY_PERIOD = 5000; // millis
     private static final long CHECK_PERIOD = 1000;
 
-    private final MetricRegistry metricRegistry;
-
-    private ConcurrentMap<String, ChunkEntry> chunks = Maps.newConcurrentMap();
-    private ConcurrentSkipListSet<ChunkEntry> sortedEvictionSet = new ConcurrentSkipListSet();
+    private final ConcurrentMap<String, ChunkEntry> chunks = Maps.newConcurrentMap();
+    private final ConcurrentSkipListSet<ChunkEntry> sortedEvictionSet = new ConcurrentSkipListSet();
 
     @Inject
-    public GelfChunkAggregator(MetricRegistry metricRegistry,
-                               @Named("daemonScheduler") ScheduledExecutorService scheduler) {
-        this.metricRegistry = metricRegistry;
+    public GelfChunkAggregator(@Named("daemonScheduler") ScheduledExecutorService scheduler) {
         scheduler.scheduleAtFixedRate(new ChunkEvictionTask(), VALIDITY_PERIOD, CHECK_PERIOD, TimeUnit.MILLISECONDS);
     }
 
     @Nonnull
     @Override
-    public Result addChunk(ChannelBuffer buffer, SocketAddress socketAddress, MessageInput2 input) {
-        final InetSocketAddress remoteAddress = (socketAddress instanceof InetSocketAddress)
-                ? ((InetSocketAddress) socketAddress)
-                : null;
-        byte[] readable = new byte[buffer.readableBytes()];
+    public Result addChunk(ChannelBuffer buffer) {
+        final byte[] readable = new byte[buffer.readableBytes()];
         buffer.toByteBuffer().get(readable, buffer.readerIndex(), buffer.readableBytes());
 
         final GELFMessage msg = new GELFMessage(readable);
 
-        final RawMessage rawMessage;
+        final ChannelBuffer aggregatedBuffer;
         switch (msg.getGELFType()) {
             case CHUNKED:
                 try {
-                    rawMessage = checkForCompletion(input, remoteAddress, msg);
-                    if (rawMessage == null) {
+                    aggregatedBuffer = checkForCompletion(msg);
+                    if (aggregatedBuffer == null) {
                         return VALID_EMPTY_RESULT;
                     }
                 } catch (IllegalArgumentException e) {
@@ -89,14 +78,14 @@ public class GelfChunkAggregator implements CodecAggregator {
             case ZLIB:
             case GZIP:
             case UNCOMPRESSED:
-                rawMessage = new RawMessage("gelf", input.getUniqueReadableId(), remoteAddress, msg.getPayload());
+                aggregatedBuffer = buffer;
                 break;
             case UNSUPPORTED:
                 return INVALID_RESULT;
             default:
                 return INVALID_RESULT;
         }
-        return new Result(rawMessage, true);
+        return new Result(aggregatedBuffer, true);
     }
 
     /**
@@ -104,18 +93,14 @@ public class GelfChunkAggregator implements CodecAggregator {
      * If the message isn't complete, it adds the chunk to the internal buffer and waits for more incoming messages.
      * Outdated chunks are being purged regularly.
      *
-     * @param input         the message input that accepted the gelf message chunk
-     * @param remoteAddress the remote address of the sender or null if it wasn't received via a network connection
      * @param gelfMessage   the gelf message chunk
      * @return null or a {@link org.graylog2.plugin.journal.RawMessage raw message} object
      */
-    private RawMessage checkForCompletion(MessageInput2 input,
-                                          InetSocketAddress remoteAddress,
-                                          GELFMessage gelfMessage) {
+    private ChannelBuffer checkForCompletion(GELFMessage gelfMessage) {
         if (!chunks.isEmpty() && log.isDebugEnabled()) {
             log.debug("Dumping GELF chunk map [chunks for {} messages]:\n{}", chunks.size(), humanReadableChunkMap());
         }
-        final GELFMessageChunk chunk = new GELFMessageChunk(gelfMessage, input);
+        final GELFMessageChunk chunk = new GELFMessageChunk(gelfMessage, null); // TODO second parameter
         final int sequenceCount = chunk.getSequenceCount();
 
         final String messageId = chunk.getId();
@@ -131,7 +116,6 @@ public class GelfChunkAggregator implements CodecAggregator {
         }
 
         final int chunkWatermark = entry.chunkSlotsWritten.incrementAndGet();
-        final int totalDataSize = entry.totalPayloadSize.addAndGet(chunk.getData().length);
         entry.payloadArray.set(chunk.getSequenceNumber(), chunk);
 
         if (chunkWatermark == sequenceCount) {
@@ -140,17 +124,13 @@ public class GelfChunkAggregator implements CodecAggregator {
             // remove before operating on it, to avoid racing too much with the clean up job, some race is inevitable, though.
             entry = getAndCleanupEntry(messageId);
 
-            byte[] payload = new byte[totalDataSize];
-            int pos = 0;
+            final byte[] allChunks[] = new byte[sequenceCount][];
             for (int i = 0; i < entry.payloadArray.length(); i++) {
                 final GELFMessageChunk messageChunk = entry.payloadArray.get(i);
-                final byte[] data = messageChunk.getData();
-                final int length = data.length;
+                allChunks[i] = messageChunk.getData();
 
-                System.arraycopy(data, 0, payload, pos, length); // TODO improve performance (cpu/memory) by not copying
-                pos += length;
             }
-            return new RawMessage("gelf", input.getUniqueReadableId(), remoteAddress, payload);
+            return ChannelBuffers.wrappedBuffer(allChunks);
         }
 
         // message isn't complete yet, check if we should remove the other parts as well
@@ -175,7 +155,7 @@ public class GelfChunkAggregator implements CodecAggregator {
     private String humanReadableChunkMap() {
         final StringBuilder sb = new StringBuilder();
 
-        for (Map.Entry<String, ChunkEntry> entry : chunks.entrySet()) {
+        for (final Map.Entry<String, ChunkEntry> entry : chunks.entrySet()) {
             sb.append("Message <").append(entry.getKey()).append("> ");
             sb.append("\tChunks:\n");
             for (int i = 0; i < entry.getValue().payloadArray.length(); i++) {
@@ -189,10 +169,9 @@ public class GelfChunkAggregator implements CodecAggregator {
 
     private static class ChunkEntry implements Comparable<ChunkEntry> {
         private final AtomicInteger chunkSlotsWritten = new AtomicInteger(0);
-        private final AtomicInteger totalPayloadSize = new AtomicInteger(0);
         private final long firstTimestamp;
         private final AtomicReferenceArray<GELFMessageChunk> payloadArray;
-        private String id;
+        private final String id;
 
         private ChunkEntry(int chunkCount, long firstTimestamp, String id) {
             this.payloadArray = new AtomicReferenceArray<>(chunkCount);
@@ -205,12 +184,12 @@ public class GelfChunkAggregator implements CodecAggregator {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
 
-            ChunkEntry that = (ChunkEntry) o;
+            final ChunkEntry that = (ChunkEntry) o;
 
             if (firstTimestamp != that.firstTimestamp) return false;
             if (!chunkSlotsWritten.equals(that.chunkSlotsWritten)) return false;
+            //noinspection RedundantIfStatement
             if (!payloadArray.equals(that.payloadArray)) return false;
-            if (!totalPayloadSize.equals(that.totalPayloadSize)) return false;
 
             return true;
         }
@@ -218,14 +197,13 @@ public class GelfChunkAggregator implements CodecAggregator {
         @Override
         public int hashCode() {
             int result = chunkSlotsWritten.hashCode();
-            result = 31 * result + totalPayloadSize.hashCode();
             result = 31 * result + (int) (firstTimestamp ^ (firstTimestamp >>> 32));
             result = 31 * result + payloadArray.hashCode();
             return result;
         }
 
         @Override
-        public int compareTo(ChunkEntry o) {
+        public int compareTo(@Nonnull ChunkEntry o) {
             if (equals(o)) {
                 return 0;
             }
@@ -241,7 +219,7 @@ public class GelfChunkAggregator implements CodecAggregator {
                 // loop until we've either evicted all outdated chunk entries, or the set is completely empty.
                 // this task will run every second by default (see constant in constructor)
                 while (true) {
-                    ChunkEntry oldestChunkEntry = sortedEvictionSet.first();
+                    final ChunkEntry oldestChunkEntry = sortedEvictionSet.first();
                     if (isOutdated(oldestChunkEntry)) {
                         getAndCleanupEntry(oldestChunkEntry.id);
                     } else {

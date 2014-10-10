@@ -243,9 +243,9 @@ public abstract class NettyTransport implements Transport {
                 final ChannelBuffer buf = (ChannelBuffer) message;
                 final CodecAggregator.Result result;
                 try (Timer.Context ignored = aggregationTimer.time()) {
-                    result = aggregator.addChunk(buf, e.getRemoteAddress(), input);
+                    result = aggregator.addChunk(buf);
                 }
-                final RawMessage completeMessage = result.getMessage();
+                final ChannelBuffer completeMessage = result.getMessage();
                 if (completeMessage != null) {
                     log.debug("Message aggregation completion, forwarding {}", completeMessage);
                     fireMessageReceived(ctx, completeMessage);
@@ -280,7 +280,7 @@ public abstract class NettyTransport implements Transport {
                 return;
 
             }
-            ChannelBuffer buffer = (ChannelBuffer) msg;
+            final ChannelBuffer buffer = (ChannelBuffer) msg;
             final byte[] payload = new byte[buffer.readableBytes()];
             buffer.toByteBuffer().get(payload, buffer.readerIndex(), buffer.readableBytes());
 

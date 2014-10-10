@@ -34,6 +34,7 @@ public class CodecsModule extends AbstractModule {
         install(new FactoryModuleBuilder().implement(Codec.class, RawCodec.class).build(RawCodec.Factory.class));
         install(new FactoryModuleBuilder().implement(Codec.class, SyslogCodec.class).build(SyslogCodec.Factory.class));
         install(new FactoryModuleBuilder().implement(Codec.class, RandomHttpMessageCodec.class).build(RandomHttpMessageCodec.Factory.class));
+        install(new FactoryModuleBuilder().implement(Codec.class, GelfCodec.class).build(GelfCodec.Factory.class));
 
         final MapBinder<String, Codec.Factory<? extends Codec>> mapBinder =
                 MapBinder.newMapBinder(binder(),
@@ -44,5 +45,6 @@ public class CodecsModule extends AbstractModule {
         mapBinder.addBinding("raw").to(Key.get(RawCodec.Factory.class));
         mapBinder.addBinding("syslog").to(Key.get(SyslogCodec.Factory.class));
         mapBinder.addBinding("randomhttp").to(Key.get(RandomHttpMessageCodec.Factory.class));
+        mapBinder.addBinding("gelf").to(Key.get(GelfCodec.Factory.class));
     }
 }
