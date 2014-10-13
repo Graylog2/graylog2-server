@@ -29,7 +29,7 @@ import org.graylog2.indexer.searches.Sorting;
 import org.graylog2.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.indexer.searches.timeranges.KeywordRange;
 import org.graylog2.indexer.searches.timeranges.TimeRange;
-import org.graylog2.rest.documentation.annotations.*;
+import com.wordnik.swagger.annotations.*;
 import org.graylog2.rest.resources.search.responses.SearchResponse;
 import org.graylog2.security.RestPermissions;
 import org.slf4j.Logger;
@@ -63,13 +63,13 @@ public class KeywordSearchResource extends SearchResource {
             @ApiResponse(code = 400, message = "Invalid keyword provided.")
     })
     public SearchResponse searchKeyword(
-            @ApiParam(title = "query", description = "Query (Lucene syntax)", required = true) @QueryParam("query") String query,
-            @ApiParam(title = "keyword", description = "Range keyword", required = true) @QueryParam("keyword") String keyword,
-            @ApiParam(title = "limit", description = "Maximum number of messages to return.", required = false) @QueryParam("limit") int limit,
-            @ApiParam(title = "offset", description = "Offset", required = false) @QueryParam("offset") int offset,
-            @ApiParam(title = "filter", description = "Filter", required = false) @QueryParam("filter") String filter,
-            @ApiParam(title = "fields", description = "Comma separated list of fields to return", required = false) @QueryParam("fields") String fields,
-            @ApiParam(title = "sort", description = "Sorting (field:asc / field:desc)", required = false) @QueryParam("sort") String sort) {
+            @ApiParam(name = "query", value = "Query (Lucene syntax)", required = true) @QueryParam("query") String query,
+            @ApiParam(name = "keyword", value = "Range keyword", required = true) @QueryParam("keyword") String keyword,
+            @ApiParam(name = "limit", value = "Maximum number of messages to return.", required = false) @QueryParam("limit") int limit,
+            @ApiParam(name = "offset", value = "Offset", required = false) @QueryParam("offset") int offset,
+            @ApiParam(name = "filter", value = "Filter", required = false) @QueryParam("filter") String filter,
+            @ApiParam(name = "fields", value = "Comma separated list of fields to return", required = false) @QueryParam("fields") String fields,
+            @ApiParam(name = "sort", value = "Sorting (field:asc / field:desc)", required = false) @QueryParam("sort") String sort) {
         checkSearchPermission(filter, RestPermissions.SEARCHES_KEYWORD);
 
         checkQueryAndKeyword(query, keyword);
@@ -106,12 +106,12 @@ public class KeywordSearchResource extends SearchResource {
             @ApiResponse(code = 400, message = "Invalid keyword provided.")
     })
     public ChunkedOutput<ScrollResult.ScrollChunk> searchKeywordChunked(
-            @ApiParam(title = "query", description = "Query (Lucene syntax)", required = true) @QueryParam("query") String query,
-            @ApiParam(title = "keyword", description = "Range keyword", required = true) @QueryParam("keyword") String keyword,
-            @ApiParam(title = "limit", description = "Maximum number of messages to return.", required = false) @QueryParam("limit") int limit,
-            @ApiParam(title = "offset", description = "Offset", required = false) @QueryParam("offset") int offset,
-            @ApiParam(title = "filter", description = "Filter", required = false) @QueryParam("filter") String filter,
-            @ApiParam(title = "fields", description = "Comma separated list of fields to return", required = true) @QueryParam("fields") String fields) {
+            @ApiParam(name = "query", value = "Query (Lucene syntax)", required = true) @QueryParam("query") String query,
+            @ApiParam(name = "keyword", value = "Range keyword", required = true) @QueryParam("keyword") String keyword,
+            @ApiParam(name = "limit", value = "Maximum number of messages to return.", required = false) @QueryParam("limit") int limit,
+            @ApiParam(name = "offset", value = "Offset", required = false) @QueryParam("offset") int offset,
+            @ApiParam(name = "filter", value = "Filter", required = false) @QueryParam("filter") String filter,
+            @ApiParam(name = "fields", value = "Comma separated list of fields to return", required = true) @QueryParam("fields") String fields) {
         checkSearchPermission(filter, RestPermissions.SEARCHES_KEYWORD);
 
         checkQuery(query);
@@ -143,10 +143,10 @@ public class KeywordSearchResource extends SearchResource {
     })
     @Produces(MediaType.APPLICATION_JSON)
     public String histogramKeyword(
-            @ApiParam(title = "query", description = "Query (Lucene syntax)", required = true) @QueryParam("query") String query,
-            @ApiParam(title = "interval", description = "Histogram interval / bucket size. (year, quarter, month, week, day, hour or minute)", required = true) @QueryParam("interval") String interval,
-            @ApiParam(title = "keyword", description = "Range keyword", required = true) @QueryParam("keyword") String keyword,
-            @ApiParam(title = "filter", description = "Filter", required = false) @QueryParam("filter") String filter) {
+            @ApiParam(name = "query", value = "Query (Lucene syntax)", required = true) @QueryParam("query") String query,
+            @ApiParam(name = "interval", value = "Histogram interval / bucket size. (year, quarter, month, week, day, hour or minute)", required = true) @QueryParam("interval") String interval,
+            @ApiParam(name = "keyword", value = "Range keyword", required = true) @QueryParam("keyword") String keyword,
+            @ApiParam(name = "filter", value = "Filter", required = false) @QueryParam("filter") String filter) {
         checkSearchPermission(filter, RestPermissions.SEARCHES_KEYWORD);
 
         checkQueryAndInterval(query, interval);
@@ -175,11 +175,11 @@ public class KeywordSearchResource extends SearchResource {
     })
     @Produces(MediaType.APPLICATION_JSON)
     public String termsKeyword(
-            @ApiParam(title = "field", description = "Message field of to return terms of", required = true) @QueryParam("field") String field,
-            @ApiParam(title = "query", description = "Query (Lucene syntax)", required = true) @QueryParam("query") String query,
-            @ApiParam(title = "size", description = "Maximum number of terms to return", required = false) @QueryParam("size") int size,
-            @ApiParam(title = "keyword", description = "Range keyword", required = true) @QueryParam("keyword") String keyword,
-            @ApiParam(title = "filter", description = "Filter", required = false) @QueryParam("filter") String filter) {
+            @ApiParam(name = "field", value = "Message field of to return terms of", required = true) @QueryParam("field") String field,
+            @ApiParam(name = "query", value = "Query (Lucene syntax)", required = true) @QueryParam("query") String query,
+            @ApiParam(name = "size", value = "Maximum number of terms to return", required = false) @QueryParam("size") int size,
+            @ApiParam(name = "keyword", value = "Range keyword", required = true) @QueryParam("keyword") String keyword,
+            @ApiParam(name = "filter", value = "Filter", required = false) @QueryParam("filter") String filter) {
         checkSearchPermission(filter, RestPermissions.SEARCHES_KEYWORD);
 
         checkQueryAndField(query, field);
@@ -201,13 +201,13 @@ public class KeywordSearchResource extends SearchResource {
     })
     @Produces(MediaType.APPLICATION_JSON)
     public String termsStatsRelative(
-            @ApiParam(title = "key_field", description = "Message field of to return terms of", required = true) @QueryParam("key_field") String keyField,
-            @ApiParam(title = "value_field", description = "Value field used for computation", required = true) @QueryParam("value_field") String valueField,
-            @ApiParam(title = "order", description = "What to order on (Allowed values: TERM, REVERSE_TERM, COUNT, REVERSE_COUNT, TOTAL, REVERSE_TOTAL, MIN, REVERSE_MIN, MAX, REVERSE_MAX, MEAN, REVERSE_MEAN)", required = true) @QueryParam("order") String order,
-            @ApiParam(title = "query", description = "Query (Lucene syntax)", required = true) @QueryParam("query") String query,
-            @ApiParam(title = "size", description = "Maximum number of terms to return", required = false) @QueryParam("size") int size,
-            @ApiParam(title = "keyword", description = "Keyword timeframe", required = true) @QueryParam("keyword") String keyword,
-            @ApiParam(title = "filter", description = "Filter", required = false) @QueryParam("filter") String filter) throws IndexHelper.InvalidRangeFormatException {
+            @ApiParam(name = "key_field", value = "Message field of to return terms of", required = true) @QueryParam("key_field") String keyField,
+            @ApiParam(name = "value_field", value = "Value field used for computation", required = true) @QueryParam("value_field") String valueField,
+            @ApiParam(name = "order", value = "What to order on (Allowed values: TERM, REVERSE_TERM, COUNT, REVERSE_COUNT, TOTAL, REVERSE_TOTAL, MIN, REVERSE_MIN, MAX, REVERSE_MAX, MEAN, REVERSE_MEAN)", required = true) @QueryParam("order") String order,
+            @ApiParam(name = "query", value = "Query (Lucene syntax)", required = true) @QueryParam("query") String query,
+            @ApiParam(name = "size", value = "Maximum number of terms to return", required = false) @QueryParam("size") int size,
+            @ApiParam(name = "keyword", value = "Keyword timeframe", required = true) @QueryParam("keyword") String keyword,
+            @ApiParam(name = "filter", value = "Filter", required = false) @QueryParam("filter") String filter) throws IndexHelper.InvalidRangeFormatException {
         checkSearchPermission(filter, RestPermissions.SEARCHES_KEYWORD);
 
         checkTermsStatsFields(keyField, valueField, order);
@@ -233,10 +233,10 @@ public class KeywordSearchResource extends SearchResource {
             @ApiResponse(code = 400, message = "Field is not of numeric type.")
     })
     public String statsKeyword(
-            @ApiParam(title = "field", description = "Message field of numeric type to return statistics for", required = true) @QueryParam("field") String field,
-            @ApiParam(title = "query", description = "Query (Lucene syntax)", required = true) @QueryParam("query") String query,
-            @ApiParam(title = "keyword", description = "Range keyword", required = true) @QueryParam("keyword") String keyword,
-            @ApiParam(title = "filter", description = "Filter", required = false) @QueryParam("filter") String filter) {
+            @ApiParam(name = "field", value = "Message field of numeric type to return statistics for", required = true) @QueryParam("field") String field,
+            @ApiParam(name = "query", value = "Query (Lucene syntax)", required = true) @QueryParam("query") String query,
+            @ApiParam(name = "keyword", value = "Range keyword", required = true) @QueryParam("keyword") String keyword,
+            @ApiParam(name = "filter", value = "Filter", required = false) @QueryParam("filter") String filter) {
         checkSearchPermission(filter, RestPermissions.SEARCHES_KEYWORD);
 
         checkQueryAndField(query, field);
@@ -260,11 +260,11 @@ public class KeywordSearchResource extends SearchResource {
     })
     @Produces(MediaType.APPLICATION_JSON)
     public String fieldHistogramKeyword(
-            @ApiParam(title = "query", description = "Query (Lucene syntax)", required = true) @QueryParam("query") String query,
-            @ApiParam(title = "field", description = "Field of whose values to get the histogram of", required = true) @QueryParam("field") String field,
-            @ApiParam(title = "interval", description = "Histogram interval / bucket size. (year, quarter, month, week, day, hour or minute)", required = true) @QueryParam("interval") String interval,
-            @ApiParam(title = "keyword", description = "Range keyword", required = true) @QueryParam("keyword") String keyword,
-            @ApiParam(title = "filter", description = "Filter", required = false) @QueryParam("filter") String filter) {
+            @ApiParam(name = "query", value = "Query (Lucene syntax)", required = true) @QueryParam("query") String query,
+            @ApiParam(name = "field", value = "Field of whose values to get the histogram of", required = true) @QueryParam("field") String field,
+            @ApiParam(name = "interval", value = "Histogram interval / bucket size. (year, quarter, month, week, day, hour or minute)", required = true) @QueryParam("interval") String interval,
+            @ApiParam(name = "keyword", value = "Range keyword", required = true) @QueryParam("keyword") String keyword,
+            @ApiParam(name = "filter", value = "Filter", required = false) @QueryParam("filter") String filter) {
         checkSearchPermission(filter, RestPermissions.SEARCHES_KEYWORD);
 
         checkQueryAndInterval(query, interval);

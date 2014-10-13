@@ -18,34 +18,34 @@ package org.graylog2.rest.resources.system;
 
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
+import com.wordnik.swagger.annotations.Api;
+import com.wordnik.swagger.annotations.ApiOperation;
+import com.wordnik.swagger.annotations.ApiResponse;
+import com.wordnik.swagger.annotations.ApiResponses;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.indexer.Deflector;
 import org.graylog2.indexer.ranges.IndexRange;
 import org.graylog2.indexer.ranges.IndexRangeService;
 import org.graylog2.indexer.ranges.RebuildIndexRangesJob;
-import org.graylog2.plugin.Tools;
-import org.graylog2.rest.documentation.annotations.Api;
-import org.graylog2.rest.documentation.annotations.ApiOperation;
-import org.graylog2.rest.documentation.annotations.ApiResponse;
-import org.graylog2.rest.documentation.annotations.ApiResponses;
 import org.graylog2.rest.resources.RestResource;
 import org.graylog2.rest.resources.system.responses.IndexRangesResponse;
 import org.graylog2.security.RestPermissions;
 import org.graylog2.system.jobs.SystemJob;
 import org.graylog2.system.jobs.SystemJobConcurrencyException;
 import org.graylog2.system.jobs.SystemJobManager;
-import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import javax.ws.rs.*;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>

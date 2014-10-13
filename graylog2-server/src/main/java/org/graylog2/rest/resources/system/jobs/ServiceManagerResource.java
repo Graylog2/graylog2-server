@@ -20,8 +20,8 @@ import com.codahale.metrics.annotation.Timed;
 import com.google.common.util.concurrent.Service;
 import com.google.common.util.concurrent.ServiceManager;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.graylog2.rest.documentation.annotations.Api;
-import org.graylog2.rest.documentation.annotations.ApiOperation;
+import com.wordnik.swagger.annotations.Api;
+import com.wordnik.swagger.annotations.ApiOperation;
 import org.graylog2.rest.resources.RestResource;
 
 import javax.inject.Inject;

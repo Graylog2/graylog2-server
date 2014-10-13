@@ -22,7 +22,7 @@ import com.google.common.collect.Maps;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.indexer.IndexFailure;
 import org.graylog2.indexer.IndexFailureService;
-import org.graylog2.rest.documentation.annotations.*;
+import com.wordnik.swagger.annotations.*;
 import org.graylog2.rest.resources.RestResource;
 import org.graylog2.security.RestPermissions;
 import org.joda.time.DateTime;
@@ -56,7 +56,7 @@ public class FailuresResource extends RestResource {
     })
     @Produces(MediaType.APPLICATION_JSON)
     @Path("count")
-    public Response count(@ApiParam(title = "since", description = "ISO8601 date", required = false) @QueryParam("since") String since) {
+    public Response count(@ApiParam(name = "since", value = "ISO8601 date", required = false) @QueryParam("since") String since) {
         checkPermission(RestPermissions.INDICES_FAILURES);
 
         DateTime sinceDate;
@@ -76,8 +76,8 @@ public class FailuresResource extends RestResource {
     @GET @Timed
     @ApiOperation(value = "Get a list of failed index operations.")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response single(@ApiParam(title = "limit", description = "Limit", required = true) @QueryParam("limit") int limit,
-                           @ApiParam(title = "offset", description = "Offset", required = true) @QueryParam("offset") int offset) {
+    public Response single(@ApiParam(name = "limit", value = "Limit", required = true) @QueryParam("limit") int limit,
+                           @ApiParam(name = "offset", value = "Offset", required = true) @QueryParam("offset") int offset) {
         checkPermission(RestPermissions.INDICES_FAILURES);
 
         Map<String, Object> result = Maps.newHashMap();

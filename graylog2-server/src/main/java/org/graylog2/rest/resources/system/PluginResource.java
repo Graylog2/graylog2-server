@@ -21,8 +21,8 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.graylog2.plugin.PluginMetaData;
 import org.graylog2.plugin.Version;
-import org.graylog2.rest.documentation.annotations.Api;
-import org.graylog2.rest.documentation.annotations.ApiOperation;
+import com.wordnik.swagger.annotations.Api;
+import com.wordnik.swagger.annotations.ApiOperation;
 import org.graylog2.rest.resources.RestResource;
 
 import javax.inject.Inject;

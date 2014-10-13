@@ -23,11 +23,11 @@ import org.graylog2.database.NotFoundException;
 import org.graylog2.database.ValidationException;
 import org.graylog2.outputs.MessageOutputFactory;
 import org.graylog2.plugin.streams.Output;
-import org.graylog2.rest.documentation.annotations.Api;
-import org.graylog2.rest.documentation.annotations.ApiOperation;
-import org.graylog2.rest.documentation.annotations.ApiParam;
-import org.graylog2.rest.documentation.annotations.ApiResponse;
-import org.graylog2.rest.documentation.annotations.ApiResponses;
+import com.wordnik.swagger.annotations.Api;
+import com.wordnik.swagger.annotations.ApiOperation;
+import com.wordnik.swagger.annotations.ApiParam;
+import com.wordnik.swagger.annotations.ApiResponse;
+import com.wordnik.swagger.annotations.ApiResponses;
 import org.graylog2.rest.resources.RestResource;
 import org.graylog2.rest.resources.streams.outputs.AvailableOutputSummary;
 import org.graylog2.security.RestPermissions;
@@ -95,7 +95,7 @@ public class OutputResource extends RestResource {
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "No such output on this node.")
     })
-    public Output get(@ApiParam(title = "outputId", description = "The id of the output we want.", required = true) @PathParam("outputId") String outputId) throws NotFoundException {
+    public Output get(@ApiParam(name = "outputId", value = "The id of the output we want.", required = true) @PathParam("outputId") String outputId) throws NotFoundException {
         checkPermission(RestPermissions.OUTPUTS_READ, outputId);
         return outputService.load(outputId);
     }
@@ -108,7 +108,7 @@ public class OutputResource extends RestResource {
     @ApiResponses(value = {
             @ApiResponse(code = 400, message = "Invalid output specification in input.")
     })
-    public Response create(@ApiParam(title = "JSON body", required = true) CreateOutputRequest csor) throws ValidationException {
+    public Response create(@ApiParam(name = "JSON body", required = true) CreateOutputRequest csor) throws ValidationException {
         checkPermission(RestPermissions.OUTPUTS_CREATE);
         final AvailableOutputSummary outputSummary = messageOutputFactory.getAvailableOutputs().get(csor.type);
 
@@ -132,7 +132,7 @@ public class OutputResource extends RestResource {
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "No such stream/output on this node.")
     })
-    public Response delete(@ApiParam(title = "outputId", description = "The id of the output that should be deleted", required = true) @PathParam("outputId") String outputId) throws org.graylog2.database.NotFoundException {
+    public Response delete(@ApiParam(name = "outputId", value = "The id of the output that should be deleted", required = true) @PathParam("outputId") String outputId) throws org.graylog2.database.NotFoundException {
         checkPermission(RestPermissions.OUTPUTS_TERMINATE);
         Output output = outputService.load(outputId);
         outputService.destroy(output);

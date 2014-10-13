@@ -27,9 +27,9 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.ServerVersion;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.plugin.Tools;
-import org.graylog2.rest.documentation.annotations.Api;
-import org.graylog2.rest.documentation.annotations.ApiOperation;
-import org.graylog2.rest.documentation.annotations.ApiParam;
+import com.wordnik.swagger.annotations.Api;
+import com.wordnik.swagger.annotations.ApiOperation;
+import com.wordnik.swagger.annotations.ApiParam;
 import org.graylog2.rest.resources.RestResource;
 import org.graylog2.rest.resources.system.responses.ReaderPermissionResponse;
 import org.graylog2.security.RestPermissions;
@@ -99,7 +99,7 @@ public class SystemResource extends RestResource {
     @Path("/fields")
     @RequiresPermissions(RestPermissions.FIELDNAMES_READ)
     @Produces(APPLICATION_JSON)
-    public String fields(@ApiParam(title = "limit", description = "Maximum number of fields to return. Set to 0 for all fields.", required = false) @QueryParam("limit") int limit) {
+    public String fields(@ApiParam(name = "limit", value = "Maximum number of fields to return. Set to 0 for all fields.", required = false) @QueryParam("limit") int limit) {
         boolean unlimited = limit <= 0;
 
         Set<String> fields;
@@ -224,7 +224,7 @@ public class SystemResource extends RestResource {
     @Path("/permissions/reader/{username}")
     @Produces(APPLICATION_JSON)
     public ReaderPermissionResponse readerPermissions(
-            @ApiParam(title = "username", required = true)
+            @ApiParam(name = "username", required = true)
             @PathParam("username") String username) {
         if (username == null || username.isEmpty()) {
             throw new BadRequestException("Username cannot be null or empty");

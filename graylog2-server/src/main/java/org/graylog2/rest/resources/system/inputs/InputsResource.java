@@ -28,7 +28,7 @@ import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationException;
 import org.graylog2.plugin.inputs.InputState;
 import org.graylog2.plugin.inputs.MessageInput;
-import org.graylog2.rest.documentation.annotations.*;
+import com.wordnik.swagger.annotations.*;
 import org.graylog2.rest.resources.RestResource;
 import org.graylog2.security.RestPermissions;
 import org.graylog2.plugin.ServerStatus;
@@ -77,7 +77,7 @@ public class InputsResource extends RestResource {
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "No such input on this node.")
     })
-    public String single(@ApiParam(title = "inputId", required = true) @PathParam("inputId") String inputId) {
+    public String single(@ApiParam(name = "inputId", required = true) @PathParam("inputId") String inputId) {
         checkPermission(RestPermissions.INPUTS_READ, inputId);
 
         MessageInput input = inputRegistry.getRunningInput(inputId);
@@ -116,7 +116,7 @@ public class InputsResource extends RestResource {
             @ApiResponse(code = 400, message = "Missing or invalid configuration"),
             @ApiResponse(code = 400, message = "Type is exclusive and already has input running")
     })
-    public Response create(@ApiParam(title = "JSON body", required = true) String body) throws ValidationException {
+    public Response create(@ApiParam(name = "JSON body", required = true) String body) throws ValidationException {
         checkPermission(RestPermissions.INPUTS_CREATE);
 
         InputLaunchRequest lr;
@@ -211,7 +211,7 @@ public class InputsResource extends RestResource {
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "No such input on this node.")
     })
-    public Response terminate(@ApiParam(title = "inputId", required = true) @PathParam("inputId") String inputId) {
+    public Response terminate(@ApiParam(name = "inputId", required = true) @PathParam("inputId") String inputId) {
         checkPermission(RestPermissions.INPUTS_TERMINATE, inputId);
 
         MessageInput input = inputRegistry.getRunningInput(inputId);
@@ -246,7 +246,7 @@ public class InputsResource extends RestResource {
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "No such input on this node.")
     })
-    public Response launchExisting(@ApiParam(title = "inputId", required = true) @PathParam("inputId") String inputId) {
+    public Response launchExisting(@ApiParam(name = "inputId", required = true) @PathParam("inputId") String inputId) {
         InputState inputState = inputRegistry.getInputState(inputId);
         final MessageInput messageInput;
 
@@ -291,7 +291,7 @@ public class InputsResource extends RestResource {
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "No such input on this node.")
     })
-    public Response stop(@ApiParam(title = "inputId", required = true) @PathParam("inputId") String inputId) {
+    public Response stop(@ApiParam(name = "inputId", required = true) @PathParam("inputId") String inputId) {
         final MessageInput input = inputRegistry.getRunningInput(inputId);
         if (input == null) {
             LOG.info("Cannot stop input. Input not found.");
@@ -317,7 +317,7 @@ public class InputsResource extends RestResource {
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "No such input on this node.")
     })
-    public Response restart(@ApiParam(title = "inputId", required = true) @PathParam("inputId") String inputId) {
+    public Response restart(@ApiParam(name = "inputId", required = true) @PathParam("inputId") String inputId) {
         stop(inputId);
         launchExisting(inputId);
         return Response.status(Response.Status.ACCEPTED).build();
@@ -330,7 +330,7 @@ public class InputsResource extends RestResource {
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "No such input type registered.")
     })
-    public String info(@ApiParam(title = "inputType", required = true) @PathParam("inputType") String inputType) {
+    public String info(@ApiParam(name = "inputType", required = true) @PathParam("inputType") String inputType) {
 
         MessageInput input;
         try {

@@ -27,7 +27,7 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.metrics.MetricUtils;
-import org.graylog2.rest.documentation.annotations.*;
+import com.wordnik.swagger.annotations.*;
 import org.graylog2.rest.resources.RestResource;
 import org.graylog2.rest.resources.system.requests.MetricsReadRequest;
 import org.graylog2.security.RestPermissions;
@@ -93,7 +93,7 @@ public class MetricsResource extends RestResource {
             @ApiResponse(code = 404, message = "No such metric")
     })
     @Produces(MediaType.APPLICATION_JSON)
-    public String singleMetric(@ApiParam(title = "metricName", required = true) @PathParam("metricName") String metricName) {
+    public String singleMetric(@ApiParam(name = "metricName", required = true) @PathParam("metricName") String metricName) {
         checkPermission(RestPermissions.METRICS_READ, metricName);
         Metric metric = metricRegistry.getMetrics().get(metricName);
 
@@ -111,7 +111,7 @@ public class MetricsResource extends RestResource {
     @ApiResponses(value = {
             @ApiResponse(code = 400, message = "Malformed body")
     })
-    public String multipleMetrics(@ApiParam(title = "Requested metrics", required = true) MetricsReadRequest request) {
+    public String multipleMetrics(@ApiParam(name = "Requested metrics", required = true) MetricsReadRequest request) {
         final Map<String, Metric> metrics = metricRegistry.getMetrics();
 
         List<Map<String, Object>> metricsList = Lists.newArrayList();
@@ -143,7 +143,7 @@ public class MetricsResource extends RestResource {
             @ApiResponse(code = 404, message = "No such metric namespace")
     })
     @Produces(MediaType.APPLICATION_JSON)
-    public String byNamespace(@ApiParam(title = "namespace", required = true) @PathParam("namespace") String namespace) {
+    public String byNamespace(@ApiParam(name = "namespace", required = true) @PathParam("namespace") String namespace) {
         List<Map<String, Object>> metrics = Lists.newArrayList();
 
         for(Map.Entry<String, Metric> e : metricRegistry.getMetrics().entrySet()) {
@@ -186,8 +186,8 @@ public class MetricsResource extends RestResource {
     @Path("/{metricName}/history")
     @ApiOperation(value = "Get history of a single metric", notes = "The maximum retention time is currently only 5 minutes.")
     public String historicSingleMetric(
-            @ApiParam(title = "metricName", required = true) @PathParam("metricName") String metricName,
-            @ApiParam(title = "after", description = "Only values for after this UTC timestamp (1970 epoch)") @QueryParam("after") @DefaultValue("-1") long after
+            @ApiParam(name = "metricName", required = true) @PathParam("metricName") String metricName,
+            @ApiParam(name = "after", value = "Only values for after this UTC timestamp (1970 epoch)") @QueryParam("after") @DefaultValue("-1") long after
     ) {
         checkPermission(RestPermissions.METRICS_READHISTORY, metricName);
         BasicDBObject andQuery = new BasicDBObject();

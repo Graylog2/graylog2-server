@@ -25,9 +25,9 @@ import org.apache.directory.ldap.client.api.LdapNetworkConnection;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.database.ValidationException;
-import org.graylog2.rest.documentation.annotations.Api;
-import org.graylog2.rest.documentation.annotations.ApiOperation;
-import org.graylog2.rest.documentation.annotations.ApiParam;
+import com.wordnik.swagger.annotations.Api;
+import com.wordnik.swagger.annotations.ApiOperation;
+import com.wordnik.swagger.annotations.ApiParam;
 import org.graylog2.rest.resources.RestResource;
 import org.graylog2.rest.resources.system.ldap.requests.LdapSettingsRequest;
 import org.graylog2.rest.resources.system.ldap.requests.LdapTestConfigRequest;
@@ -113,7 +113,7 @@ public class LdapResource extends RestResource {
     @Path("/test")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public LdapTestConfigResponse testLdapConfiguration(@ApiParam(title = "Configuration to test", required = true) LdapTestConfigRequest request) {
+    public LdapTestConfigResponse testLdapConfiguration(@ApiParam(name = "Configuration to test", required = true) LdapTestConfigRequest request) {
         LdapTestConfigResponse response = new LdapTestConfigResponse();
 
         final LdapConnectionConfig config = new LdapConnectionConfig();
@@ -197,7 +197,7 @@ public class LdapResource extends RestResource {
     @ApiOperation("Update the LDAP configuration")
     @Path("/settings")
     @Consumes(MediaType.APPLICATION_JSON)
-    public void updateLdapSettings(@ApiParam(title = "JSON body", required = true) String body) {
+    public void updateLdapSettings(@ApiParam(name = "JSON body", required = true) String body) {
         LdapSettingsRequest request;
         try {
             request = objectMapper.readValue(body, LdapSettingsRequest.class);

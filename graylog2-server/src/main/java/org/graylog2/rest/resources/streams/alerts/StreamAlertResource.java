@@ -28,7 +28,7 @@ import org.graylog2.alerts.AlertService;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.alarms.AlertCondition;
 import org.graylog2.plugin.streams.Stream;
-import org.graylog2.rest.documentation.annotations.*;
+import com.wordnik.swagger.annotations.*;
 import org.graylog2.rest.resources.RestResource;
 import org.graylog2.security.RestPermissions;
 import org.graylog2.streams.StreamService;
@@ -79,8 +79,8 @@ public class StreamAlertResource extends RestResource {
             @ApiResponse(code = 404, message = "Stream not found."),
             @ApiResponse(code = 400, message = "Invalid ObjectId.")
     })
-    public Response list(@ApiParam(title = "streamId", description = "The stream id this new alert condition belongs to.", required = true) @PathParam("streamId") String streamid,
-                         @ApiParam(title = "since", description = "Optional parameter to define a lower date boundary. (UNIX timestamp)", required = false) @QueryParam("since") int sinceTs) {
+    public Response list(@ApiParam(name = "streamId", value = "The stream id this new alert condition belongs to.", required = true) @PathParam("streamId") String streamid,
+                         @ApiParam(name = "since", value = "Optional parameter to define a lower date boundary. (UNIX timestamp)", required = false) @QueryParam("since") int sinceTs) {
         checkPermission(RestPermissions.STREAMS_READ, streamid);
 
         Stream stream;
@@ -119,7 +119,7 @@ public class StreamAlertResource extends RestResource {
             @ApiResponse(code = 404, message = "Stream not found."),
             @ApiResponse(code = 400, message = "Invalid ObjectId.")
     })
-    public Response checkConditions(@ApiParam(title = "streamId", description = "The ID of the stream to check.", required = true) @PathParam("streamId") String streamid) {
+    public Response checkConditions(@ApiParam(name = "streamId", value = "The ID of the stream to check.", required = true) @PathParam("streamId") String streamid) {
         checkPermission(RestPermissions.STREAMS_READ, streamid);
 
         final Stream stream;

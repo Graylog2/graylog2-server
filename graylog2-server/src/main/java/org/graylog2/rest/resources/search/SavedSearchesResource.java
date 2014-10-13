@@ -23,7 +23,7 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.database.ValidationException;
 import org.graylog2.indexer.searches.Searches;
-import org.graylog2.rest.documentation.annotations.*;
+import com.wordnik.swagger.annotations.*;
 import org.graylog2.rest.resources.search.requests.CreateSavedSearchRequest;
 import org.graylog2.savedsearches.SavedSearch;
 import org.graylog2.savedsearches.SavedSearchImpl;
@@ -67,7 +67,7 @@ public class SavedSearchesResource extends SearchResource {
     @RequiresPermissions(RestPermissions.SAVEDSEARCHES_CREATE)
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response create(@ApiParam(title = "JSON body", required = true) String body) {
+    public Response create(@ApiParam(name = "JSON body", required = true) String body) {
         CreateSavedSearchRequest cr;
 
         try {
@@ -123,7 +123,7 @@ public class SavedSearchesResource extends SearchResource {
             @ApiResponse(code = 404, message = "Saved search not found."),
             @ApiResponse(code = 400, message = "Invalid ObjectId.")
     })
-    public String get(@ApiParam(title = "searchId", required = true) @PathParam("searchId") String searchId) {
+    public String get(@ApiParam(name = "searchId", required = true) @PathParam("searchId") String searchId) {
         if (searchId == null || searchId.isEmpty()) {
             LOG.error("Missing searchId. Returning HTTP 400.");
             throw new WebApplicationException(400);
@@ -144,7 +144,7 @@ public class SavedSearchesResource extends SearchResource {
             @ApiResponse(code = 404, message = "Saved search not found."),
             @ApiResponse(code = 400, message = "Invalid ObjectId.")
     })
-    public Response delete(@ApiParam(title = "searchId", required = true) @PathParam("searchId") String searchId) {
+    public Response delete(@ApiParam(name = "searchId", required = true) @PathParam("searchId") String searchId) {
         if (searchId == null || searchId.isEmpty()) {
             LOG.error("Missing searchId. Returning HTTP 400.");
             throw new WebApplicationException(400);

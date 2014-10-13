@@ -22,7 +22,7 @@ import com.google.common.collect.Maps;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
-import org.graylog2.rest.documentation.annotations.*;
+import com.wordnik.swagger.annotations.*;
 import org.graylog2.rest.resources.RestResource;
 import org.graylog2.security.RestPermissions;
 import org.slf4j.Logger;
@@ -86,7 +86,7 @@ public class NotificationsResource extends RestResource {
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "No such notification type.")
     })
-    public Response deleteNotification(@ApiParam(title = "notificationType") @PathParam("notificationType") String notificationType) {
+    public Response deleteNotification(@ApiParam(name = "notificationType") @PathParam("notificationType") String notificationType) {
         Notification.Type type;
         checkPermission(RestPermissions.NOTIFICATIONS_DELETE, notificationType);
         try {

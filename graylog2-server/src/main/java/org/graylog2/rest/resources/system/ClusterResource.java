@@ -24,7 +24,7 @@ import org.graylog2.cluster.NodeNotFoundException;
 import org.graylog2.cluster.NodeService;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.system.NodeId;
-import org.graylog2.rest.documentation.annotations.*;
+import com.wordnik.swagger.annotations.*;
 import org.graylog2.rest.resources.RestResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -96,7 +96,7 @@ public class ClusterResource extends RestResource {
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "Node not found.")
     })
-    public String node(@ApiParam(title = "nodeId", required = true) @PathParam("nodeId") String nodeId) {
+    public String node(@ApiParam(name = "nodeId", required = true) @PathParam("nodeId") String nodeId) {
         if (nodeId == null || nodeId.isEmpty()) {
             LOG.error("Missing nodeId. Returning HTTP 400.");
             throw new WebApplicationException(400);

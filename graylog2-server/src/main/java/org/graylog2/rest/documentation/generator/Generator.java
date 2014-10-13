@@ -30,19 +30,35 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.primitives.Primitives;
+import com.wordnik.swagger.annotations.Api;
+import com.wordnik.swagger.annotations.ApiOperation;
+import com.wordnik.swagger.annotations.ApiParam;
+import com.wordnik.swagger.annotations.ApiResponse;
+import com.wordnik.swagger.annotations.ApiResponses;
 import org.graylog2.ServerVersion;
-import org.graylog2.rest.documentation.annotations.*;
 import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.ws.rs.*;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.HeaderParam;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.*;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * This is generating API information in Swagger format.
@@ -273,11 +289,11 @@ public class Generator {
             for (Annotation annotation : annotations) {
                 if (annotation instanceof ApiParam) {
                     ApiParam apiParam = (ApiParam) annotation;
-                    parameter.put("name", apiParam.title());
-                    parameter.put("description", apiParam.description());
+                    parameter.put("name", apiParam.name());
+                    parameter.put("description", apiParam.value());
                     parameter.put("required", apiParam.required());
-                    param.setName(apiParam.title());
-                    param.setDescription(apiParam.description());
+                    param.setName(apiParam.name());
+                    param.setDescription(apiParam.value());
                     param.setIsRequired(apiParam.required());
 
                     Type parameterClass = method.getGenericParameterTypes()[i];

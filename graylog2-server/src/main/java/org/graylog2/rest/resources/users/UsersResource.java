@@ -27,7 +27,7 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.Configuration;
 import org.graylog2.database.ValidationException;
-import org.graylog2.rest.documentation.annotations.*;
+import com.wordnik.swagger.annotations.*;
 import org.graylog2.rest.resources.RestResource;
 import org.graylog2.rest.resources.users.requests.ChangePasswordRequest;
 import org.graylog2.rest.resources.users.requests.CreateRequest;
@@ -88,7 +88,7 @@ public class UsersResource extends RestResource {
     @ApiResponses({
             @ApiResponse(code = 404, message = "The user could not be found.")
     })
-    public Response get(@ApiParam(title = "username", description = "The username to return information for.", required = true) @PathParam("username") String username) {
+    public Response get(@ApiParam(name = "username", value = "The username to return information for.", required = true) @PathParam("username") String username) {
         final User user = userService.load(username);
         if (user == null) {
             return status(NOT_FOUND).build();
@@ -121,7 +121,7 @@ public class UsersResource extends RestResource {
     @ApiResponses({
             @ApiResponse(code = 400, message = "Missing or invalid user details.")
     })
-    public Response create(@ApiParam(title = "JSON body", description = "Must contain username, full_name, email, password and a list of permissions.", required = true) String body) {
+    public Response create(@ApiParam(name = "JSON body", value = "Must contain username, full_name, email, password and a list of permissions.", required = true) String body) {
         if (body == null || body.isEmpty()) {
             LOG.error("Missing parameters. Returning HTTP 400.");
             throw new WebApplicationException(400);
@@ -168,8 +168,8 @@ public class UsersResource extends RestResource {
             @ApiResponse(code = 400, message = "Attempted to modify a read only user account (e.g. built-in or LDAP users)."),
             @ApiResponse(code = 400, message = "Missing or invalid user details.")
     })
-    public Response changeUser(@ApiParam(title = "username", description = "The name of the user to modify.", required = true) @PathParam("username") String username,
-                               @ApiParam(title = "JSON body", description = "Updated user information.", required = true) String body) {
+    public Response changeUser(@ApiParam(name = "username", value = "The name of the user to modify.", required = true) @PathParam("username") String username,
+                               @ApiParam(name = "JSON body", value = "Updated user information.", required = true) String body) {
         if (body == null || body.isEmpty()) {
             throw new BadRequestException("Missing request body.");
         }
@@ -233,7 +233,7 @@ public class UsersResource extends RestResource {
     @RequiresPermissions(USERS_EDIT)
     @ApiOperation("Removes a user account.")
     @ApiResponses({@ApiResponse(code = 400, message = "When attempting to remove a read only user (e.g. built-in or LDAP user).")})
-    public Response deleteUser(@ApiParam(title = "username", description = "The name of the user to delete.", required = true) @PathParam("username") String username) {
+    public Response deleteUser(@ApiParam(name = "username", value = "The name of the user to delete.", required = true) @PathParam("username") String username) {
         final User user = userService.load(username);
         if (user == null) {
             return status(NOT_FOUND).build();
@@ -254,8 +254,8 @@ public class UsersResource extends RestResource {
             @ApiResponse(code = 400, message = "Missing or invalid permission data.")
     })
     public Response editPermissions(
-            @ApiParam(title = "username", description = "The name of the user to modify.", required = true) @PathParam("username") String username,
-            @ApiParam(title = "JSON body", description = "The list of permissions to assign to the user.", required = true) String body) {
+            @ApiParam(name = "username", value = "The name of the user to modify.", required = true) @PathParam("username") String username,
+            @ApiParam(name = "JSON body", value = "The list of permissions to assign to the user.", required = true) String body) {
         PermissionEditRequest permissionRequest;
         try {
             permissionRequest = objectMapper.readValue(body, PermissionEditRequest.class);
@@ -285,8 +285,8 @@ public class UsersResource extends RestResource {
             @ApiResponse(code = 400, message = "Missing or invalid permission data.")
     })
     public Response savePreferences(
-            @ApiParam(title = "username", description = "The name of the user to modify.", required = true) @PathParam("username") String username,
-            @ApiParam(title = "JSON body", description = "The map of preferences to assign to the user.", required = true) String body) {
+            @ApiParam(name = "username", value = "The name of the user to modify.", required = true) @PathParam("username") String username,
+            @ApiParam(name = "JSON body", value = "The map of preferences to assign to the user.", required = true) String body) {
         Map<String, Object> preferencesRequest;
         try {
             preferencesRequest = objectMapper.readValue(body, TypeFactory.defaultInstance().constructMapType(Map.class, String.class, Object.class));
@@ -315,7 +315,7 @@ public class UsersResource extends RestResource {
     @ApiResponses({
             @ApiResponse(code = 500, message = "When saving the user failed.")
     })
-    public Response deletePermissions(@ApiParam(title = "username", description = "The name of the user to modify.", required = true) @PathParam("username") String username) {
+    public Response deletePermissions(@ApiParam(name = "username", value = "The name of the user to modify.", required = true) @PathParam("username") String username) {
         final User user = userService.load(username);
         if (user == null) {
             return status(NOT_FOUND).build();
@@ -339,8 +339,8 @@ public class UsersResource extends RestResource {
             @ApiResponse(code = 404, message = "If the user does not exist.")
     })
     public Response changePassword(
-            @ApiParam(title = "username", description = "The name of the user whose password to change.", required = true) @PathParam("username") String username,
-            @ApiParam(title = "JSON body", description = "The old and new passwords.", required = true) String body) {
+            @ApiParam(name = "username", value = "The name of the user whose password to change.", required = true) @PathParam("username") String username,
+            @ApiParam(name = "JSON body", value = "The old and new passwords.", required = true) String body) {
 
         if (body == null || body.isEmpty()) {
             throw new BadRequestException("Missing request body.");
@@ -409,7 +409,7 @@ public class UsersResource extends RestResource {
     @Path("{username}/tokens")
     @RequiresPermissions(RestPermissions.USERS_TOKENLIST)
     @ApiOperation("Retrieves the list of access tokens for a user")
-    public TokenList listTokens(@ApiParam(title = "username", required = true) @PathParam("username") String username) {
+    public TokenList listTokens(@ApiParam(name = "username", required = true) @PathParam("username") String username) {
         final User user = _tokensCheckAndLoadUser(username);
         final TokenList tokenList = new TokenList();
         List<AccessToken>  tokens = accessTokenService.loadAll(user.getName());
@@ -424,8 +424,8 @@ public class UsersResource extends RestResource {
     @RequiresPermissions(RestPermissions.USERS_TOKENCREATE)
     @ApiOperation("Generates a new access token for a user")
     public Token generateNewToken(
-            @ApiParam(title = "username", required = true) @PathParam("username") String username,
-            @ApiParam(title = "name", description = "Descriptive name for this token (e.g. 'cronjob') ", required = true) @PathParam("name") String name) {
+            @ApiParam(name = "username", required = true) @PathParam("username") String username,
+            @ApiParam(name = "name", value = "Descriptive name for this token (e.g. 'cronjob') ", required = true) @PathParam("name") String name) {
         final User user = _tokensCheckAndLoadUser(username);
         final AccessToken accessToken = accessTokenService.create(user.getName(), name);
         return new Token(accessToken);
@@ -436,8 +436,8 @@ public class UsersResource extends RestResource {
     @Path("{username}/tokens/{token}")
     @ApiOperation("Removes a token for a user")
     public Response revokeToken(
-            @ApiParam(title = "username", required = true) @PathParam("username") String username,
-            @ApiParam(title = "access token", required = true) @PathParam("token") String token) {
+            @ApiParam(name = "username", required = true) @PathParam("username") String username,
+            @ApiParam(name = "access token", required = true) @PathParam("token") String token) {
         final User user = _tokensCheckAndLoadUser(username);
         final AccessToken accessToken = accessTokenService.load(token);
         if (accessToken != null) {

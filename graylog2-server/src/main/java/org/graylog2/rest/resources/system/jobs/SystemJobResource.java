@@ -20,7 +20,7 @@ import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.graylog2.rest.documentation.annotations.*;
+import com.wordnik.swagger.annotations.*;
 import org.graylog2.rest.resources.RestResource;
 import org.graylog2.rest.resources.system.jobs.requests.TriggerRequest;
 import org.graylog2.security.RestPermissions;
@@ -82,7 +82,7 @@ public class SystemJobResource extends RestResource {
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "Job not found.")
     })
-    public String get(@ApiParam(title = "jobId", required = true) @PathParam("jobId") String jobId) {
+    public String get(@ApiParam(name = "jobId", required = true) @PathParam("jobId") String jobId) {
         if (jobId == null || jobId.isEmpty()) {
             LOG.error("Missing jobId. Returning HTTP 400.");
             throw new WebApplicationException(400);
@@ -108,7 +108,7 @@ public class SystemJobResource extends RestResource {
             @ApiResponse(code = 400, message = "There is no such systemjob type."),
             @ApiResponse(code = 403, message = "Maximum concurrency level of this systemjob type reached.")
     })
-    public Response trigger(@ApiParam(title = "JSON body", required = true) String body) {
+    public Response trigger(@ApiParam(name = "JSON body", required = true) String body) {
         if (body == null || body.isEmpty()) {
             LOG.error("Missing parameters. Returning HTTP 400.");
             throw new WebApplicationException(400);
