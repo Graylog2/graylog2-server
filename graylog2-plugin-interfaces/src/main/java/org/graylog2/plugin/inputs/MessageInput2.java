@@ -27,6 +27,8 @@ import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.buffers.Buffer;
+import org.graylog2.plugin.buffers.BufferOutOfCapacityException;
+import org.graylog2.plugin.buffers.ProcessingDisabledException;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationException;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
@@ -154,6 +156,48 @@ public abstract class MessageInput2 extends MessageInput {
         processedMessages.mark();
         processBuffer.insertCached(message, this);
     }
+
+    /**
+     * Basically a reordered version of {@link #processRawMessage(org.graylog2.plugin.journal.RawMessage)} that only records a message
+     * as processed when adding it to processbuffer has worked.
+     * @param rawMessage
+     * @return true if the message was malformed and discarded. do not try to re-insert the message in that case but discard it.
+     *          false if the message was successfully processed, exception is raised otherwise
+     */
+    public boolean processRawMessageFailFast(RawMessage rawMessage) throws BufferOutOfCapacityException, ProcessingDisabledException {
+        final Message message;
+
+        try (Timer.Context ignored = parseTime.time()){
+            message = codec.decode(rawMessage);
+        } catch (RuntimeException e) {
+            log.warn("Codec " + codec + " threw exception", e);
+            incomingMessages.mark();
+            failures.mark();
+            return false;
+        }
+
+        if (message == null) {
+            incomingMessages.mark();
+            failures.mark();
+            log.warn("Could not decode message. Dropping message {}", rawMessage.getId());
+            return false;
+        }
+        if (!message.isComplete()) {
+            incomingMessages.mark();
+            incompleteMessages.mark();
+            if (log.isDebugEnabled()) {
+                log.debug("Dropping incomplete message. Parsed fields: [{}]", message.getFields());
+            }
+            return false;
+        }
+
+        processBuffer.insertFailFast(message, this);
+        // the following statements are only executed if insertFailFail does not throw!
+        incomingMessages.mark();
+        processedMessages.mark();
+        return true;
+    }
+
 
     public String getUniqueReadableId() {
         return getClass().getCanonicalName() + "." + getId();

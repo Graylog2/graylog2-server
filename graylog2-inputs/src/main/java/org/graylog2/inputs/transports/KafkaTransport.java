@@ -1,4 +1,5 @@
 /**
+ *
  * This file is part of Graylog2.
  *
  * Graylog2 is free software: you can redistribute it and/or modify
@@ -14,80 +15,84 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.inputs.kafka;
+package org.graylog2.inputs.transports;
 
 import com.codahale.metrics.Gauge;
 import com.codahale.metrics.MetricRegistry;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.common.util.concurrent.Uninterruptibles;
-import com.google.inject.Inject;
+import com.google.inject.assistedinject.Assisted;
+import com.google.inject.assistedinject.AssistedInject;
 import kafka.consumer.*;
 import kafka.javaapi.consumer.ConsumerConnector;
 import kafka.message.MessageAndMetadata;
-import org.graylog2.plugin.Message;
-import org.graylog2.plugin.RadioMessage;
 import org.graylog2.plugin.ServerStatus;
-import org.graylog2.plugin.buffers.Buffer;
 import org.graylog2.plugin.buffers.BufferOutOfCapacityException;
 import org.graylog2.plugin.buffers.ProcessingDisabledException;
 import org.graylog2.plugin.configuration.Configuration;
-import org.graylog2.plugin.configuration.ConfigurationException;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.configuration.fields.ConfigurationField;
 import org.graylog2.plugin.configuration.fields.NumberField;
 import org.graylog2.plugin.configuration.fields.TextField;
-import org.graylog2.plugin.inputs.MessageInput;
+import org.graylog2.plugin.inputs.MessageInput2;
 import org.graylog2.plugin.inputs.MisfireException;
+import org.graylog2.plugin.inputs.codecs.CodecAggregator;
+import org.graylog2.plugin.inputs.transports.ThrottleableTransport;
+import org.graylog2.plugin.inputs.transports.TransportFactory;
+import org.graylog2.plugin.journal.RawMessage;
 import org.graylog2.plugin.lifecycles.Lifecycle;
 import org.graylog2.plugin.system.NodeId;
-import org.joda.time.DateTime;
-import org.msgpack.MessagePack;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Named;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicLong;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
-public class KafkaInput extends MessageInput {
-
-    // Kaefer.
-
-    private static final Logger LOG = LoggerFactory.getLogger(KafkaInput.class);
-
-    public static final String NAME = "Kafka Input";
-    private final MetricRegistry metricRegistry;
-    private final NodeId nodeId;
-    private final EventBus serverEventBus;
-    private final ServerStatus serverStatus;
-
-    private ConsumerConnector cc;
+public class KafkaTransport extends ThrottleableTransport {
+    public static final String GROUP_ID = "graylog2";
+    public static final String CK_FETCH_MIN_BYTES = "fetch_min_bytes";
+    public static final String CK_FETCH_WAIT_MAX = "fetch_wait_max";
+    public static final String CK_ZOOKEEPER = "zookeeper";
+    public static final String CK_TOPIC_FILTER = "topic_filter";
+    public static final String CK_THREADS = "threads";
+    private static final Logger LOG = LoggerFactory.getLogger(KafkaTransport.class);
 
     private volatile boolean stopped = false;
     private volatile boolean paused = true;
     private volatile CountDownLatch pausedLatch = new CountDownLatch(1);
 
-    private AtomicLong totalBytesRead = new AtomicLong(0);
-    private AtomicLong lastSecBytesRead = new AtomicLong(0);
-    private AtomicLong lastSecBytesReadTmp = new AtomicLong(0);
-
     private CountDownLatch stopLatch;
 
-    @Inject
-    public KafkaInput(MetricRegistry metricRegistry,
-                      NodeId nodeId,
-                      EventBus serverEventBus,
-                      ServerStatus serverStatus) {
+    private ConsumerConnector cc;
+
+    private final Configuration configuration;
+    private final MetricRegistry metricRegistry;
+    private final NodeId nodeId;
+    private final EventBus serverEventBus;
+    private final ServerStatus serverStatus;
+    private final ScheduledExecutorService scheduler;
+
+    private final AtomicLong totalBytesRead = new AtomicLong(0);
+    private final AtomicLong lastSecBytesRead = new AtomicLong(0);
+    private final AtomicLong lastSecBytesReadTmp = new AtomicLong(0);
+
+    @AssistedInject
+    public KafkaTransport(@Assisted Configuration configuration,
+                          MetricRegistry metricRegistry,
+                          NodeId nodeId,
+                          EventBus serverEventBus,
+                          ServerStatus serverStatus,
+                          @Named("daemonScheduler") ScheduledExecutorService scheduler) {
+        this.configuration = configuration;
         this.metricRegistry = metricRegistry;
         this.nodeId = nodeId;
         this.serverEventBus = serverEventBus;
         this.serverStatus = serverStatus;
+        this.scheduler = scheduler;
     }
 
     @Subscribe
@@ -105,29 +110,11 @@ public class KafkaInput extends MessageInput {
     }
 
     @Override
-    public void checkConfiguration(Configuration configuration) throws ConfigurationException {
-        if (!checkConfig(configuration)) {
-            throw new ConfigurationException(configuration.getSource().toString());
-        }
-    }
-
-    public static final String GROUP_ID = "graylog2";
-
-    public static final String CK_FETCH_MIN_BYTES = "fetch_min_bytes";
-    public static final String CK_FETCH_WAIT_MAX = "fetch_wait_max";
-    public static final String CK_ZOOKEEPER = "zookeeper";
-    public static final String CK_TOPIC_FILTER = "topic_filter";
-    public static final String CK_THREADS = "threads";
-
-    @Override
-    public void initialize(Configuration configuration) {
-        super.initialize(configuration);
-
-        setupMetrics();
+    public void setMessageAggregator(CodecAggregator ignored) {
     }
 
     @Override
-    public void launch(final Buffer processBuffer) throws MisfireException {
+    public void launch(final MessageInput2 input) throws MisfireException {
         serverStatus.awaitRunning(new Runnable() {
             @Override
             public void run() {
@@ -138,10 +125,10 @@ public class KafkaInput extends MessageInput {
         // listen for lifecycle changes
         serverEventBus.register(this);
 
-        Properties props = new Properties();
+        final Properties props = new Properties();
 
         props.put("group.id", GROUP_ID);
-        props.put("client.id", "gl2-" + nodeId + "-" + getId());
+        props.put("client.id", "gl2-" + nodeId + "-" + input.getId());
 
         props.put("fetch.min.bytes", String.valueOf(configuration.getInt(CK_FETCH_MIN_BYTES)));
         props.put("fetch.wait.max.ms", String.valueOf(configuration.getInt(CK_FETCH_WAIT_MAX)));
@@ -151,15 +138,13 @@ public class KafkaInput extends MessageInput {
         props.put("auto.commit.interval.ms", "1000");
 
         final int numThreads = (int) configuration.getInt(CK_THREADS);
-        ConsumerConfig consumerConfig = new ConsumerConfig(props);
+        final ConsumerConfig consumerConfig = new ConsumerConfig(props);
         cc = Consumer.createJavaConsumerConnector(consumerConfig);
 
-        TopicFilter filter = new Whitelist(configuration.getString(CK_TOPIC_FILTER));
+        final TopicFilter filter = new Whitelist(configuration.getString(CK_TOPIC_FILTER));
 
-        List<KafkaStream<byte[], byte[]>> streams = cc.createMessageStreamsByFilter(filter, numThreads);
-        ExecutorService executor = Executors.newFixedThreadPool(numThreads);
-
-        final MessageInput thisInput = this;
+        final List<KafkaStream<byte[], byte[]>> streams = cc.createMessageStreamsByFilter(filter, numThreads);
+        final ExecutorService executor = Executors.newFixedThreadPool(numThreads);
 
         // this is being used during shutdown to first stop all submitted jobs before committing the offsets back to zookeeper
         // and then shutting down the connection.
@@ -169,11 +154,10 @@ public class KafkaInput extends MessageInput {
         for (final KafkaStream<byte[], byte[]> stream : streams) {
             executor.submit(new Runnable() {
                 public void run() {
-                    MessagePack msgpack = new MessagePack();
-
-                    ConsumerIterator<byte[], byte[]> consumerIterator = stream.iterator();
+                    final ConsumerIterator<byte[], byte[]> consumerIterator = stream.iterator();
 
                     // we have to use hasNext() here instead foreach, because next() marks the message as processed immediately
+                    //noinspection WhileLoopReplaceableByForEach
                     while (consumerIterator.hasNext()) {
                         if (paused) {
                             // we try not to spin here, so we wait until the lifecycle goes back to running.
@@ -188,8 +172,15 @@ public class KafkaInput extends MessageInput {
                         // process the message, this will immediately mark the message as having been processed. this gets tricky
                         // if we get an exception about processing it down below.
                         final MessageAndMetadata<byte[], byte[]> message = consumerIterator.next();
-                        final Message event = decodeMessage(msgpack, message);
-                        if (event == null) return; // TODO should this actually return?
+
+                        final byte[] bytes = message.message();
+                        totalBytesRead.addAndGet(bytes.length);
+                        lastSecBytesReadTmp.addAndGet(bytes.length);
+
+                        final RawMessage rawMessage = new RawMessage("radio-msgpack",
+                                                                     input.getId(),
+                                                                     null,
+                                                                     bytes);
 
                         // the loop below is like this because we cannot "unsee" the message we've just gotten by calling .next()
                         // the high level consumer of Kafka marks the message as "processed" immediately after being returned from next.
@@ -204,7 +195,12 @@ public class KafkaInput extends MessageInput {
                                     Uninterruptibles.sleepUninterruptibly(10, TimeUnit.MILLISECONDS); // TODO magic number
                                 }
                                 // try to process the message, if it succeeds, we immediately move on to the next message (retry will be false)
-                                processBuffer.insertFailFast(event, thisInput);
+                                // if parsing the message failed, this will return 'true' (sorry for the stupid return value handling, amqp needs to know
+                                // whether to ack or nack the message)
+                                final boolean discardMalformedMessage = input.processRawMessageFailFast(rawMessage);
+                                if (discardMalformedMessage) {
+                                    LOG.debug("Message {} was malformed, skipping message.", rawMessage.getId());
+                                }
                                 retry = false;
                             } catch (BufferOutOfCapacityException e) {
                                 LOG.debug("Input buffer full, retrying Kafka message processing");
@@ -213,7 +209,7 @@ public class KafkaInput extends MessageInput {
                             } catch (ProcessingDisabledException e) {
                                 LOG.debug("Processing was disabled after we read the message but before we could insert it into " +
                                                   "the buffer. We cache this one message, and should block on the next iteration.");
-                                processBuffer.insertCached(event, thisInput);
+                                input.processRawMessage(rawMessage);
                                 retry = false;
                             }
                         } while (retry);
@@ -223,46 +219,8 @@ public class KafkaInput extends MessageInput {
                     cc.commitOffsets();
                     stopLatch.countDown();
                 }
-
-                private Message decodeMessage(MessagePack msgpack, MessageAndMetadata<byte[], byte[]> message) {
-                    try {
-                        byte[] bytes = message.message();
-
-                        if(null == bytes) {
-                            LOG.error("Received message was null!");
-                            return null;
-                        }
-
-                        totalBytesRead.addAndGet(bytes.length);
-                        lastSecBytesReadTmp.addAndGet(bytes.length);
-
-                        RadioMessage msg = msgpack.read(bytes, RadioMessage.class);
-
-                        if (!msg.strings.containsKey("message") || !msg.strings.containsKey("source") || msg.timestamp <= 0) {
-                            LOG.error("Incomplete radio message. Skipping.");
-                            return null;
-                        }
-
-                        Message event = new Message(
-                                msg.strings.get("message"),
-                                msg.strings.get("source"),
-                                new DateTime(msg.timestamp)
-                        );
-
-                        event.addStringFields(msg.strings);
-                        event.addLongFields(msg.longs);
-                        event.addDoubleFields(msg.doubles);
-                        return event;
-                    } catch (Exception e) {
-                        LOG.error("Error while processing Kafka radio message", e);
-                        return null;
-                    }
-                }
-
             });
         }
-
-        ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
         scheduler.scheduleAtFixedRate(new Runnable() {
             @Override
             public void run() {
@@ -283,7 +241,7 @@ public class KafkaInput extends MessageInput {
                 if (pausedLatch != null && pausedLatch.getCount() > 0) {
                     pausedLatch.countDown();
                 }
-                boolean allStoppedOrderly = stopLatch.await(5, TimeUnit.SECONDS);
+                final boolean allStoppedOrderly = stopLatch.await(5, TimeUnit.SECONDS);
                 stopLatch = null;
                 if (!allStoppedOrderly) {
                     // timed out
@@ -302,107 +260,79 @@ public class KafkaInput extends MessageInput {
 
     @Override
     public ConfigurationRequest getRequestedConfiguration() {
-        ConfigurationRequest cr = new ConfigurationRequest();
+        final ConfigurationRequest cr = new ConfigurationRequest();
 
         cr.addField(new TextField(
                 CK_ZOOKEEPER,
                 "ZooKeeper address",
                 "192.168.1.1:2181",
                 "Host and port of the ZooKeeper that is managing your Kafka cluster.",
-                ConfigurationField.Optional.NOT_OPTIONAL
-        ));
+                ConfigurationField.Optional.NOT_OPTIONAL));
 
         cr.addField(new TextField(
                 CK_TOPIC_FILTER,
                 "Topic filter regex",
                 "^your-topic$",
                 "Every topic that matches this regular expression will be consumed.",
-                ConfigurationField.Optional.NOT_OPTIONAL
-
-        ));
+                ConfigurationField.Optional.NOT_OPTIONAL));
 
         cr.addField(new NumberField(
                 CK_FETCH_MIN_BYTES,
                 "Fetch minimum bytes",
                 5,
                 "Wait for a message batch to reach at least this size or the configured maximum wait time before fetching.",
-                ConfigurationField.Optional.NOT_OPTIONAL)
-        );
+                ConfigurationField.Optional.NOT_OPTIONAL));
 
         cr.addField(new NumberField(
                 CK_FETCH_WAIT_MAX,
                 "Fetch maximum wait time (ms)",
                 100,
                 "Wait for this time or the configured minimum size of a message batch before fetching.",
-                ConfigurationField.Optional.NOT_OPTIONAL)
-        );
+                ConfigurationField.Optional.NOT_OPTIONAL));
 
         cr.addField(new NumberField(
                 CK_THREADS,
                 "Processor threads",
                 2,
                 "Number of processor threads to spawn. Use one thread per Kafka topic partition.",
-                ConfigurationField.Optional.NOT_OPTIONAL)
-        );
+                ConfigurationField.Optional.NOT_OPTIONAL));
 
         return cr;
     }
 
     @Override
-    public boolean isExclusive() {
-        return false;
-    }
-
-    @Override
-    public String getName() {
-        return NAME;
-    }
-
-    @Override
-    public String linkToDocs() {
-        return "http://www.graylog2.org/resources/documentation/sending/kafka";
-    }
-
-    protected boolean checkConfig(Configuration config) {
-        return config.intIsSet(CK_FETCH_MIN_BYTES)
-                && config.intIsSet(CK_FETCH_WAIT_MAX)
-                && config.stringIsSet(CK_ZOOKEEPER)
-                && config.stringIsSet(CK_TOPIC_FILTER)
-                && config.intIsSet(CK_THREADS)  && config.getInt(CK_THREADS) > 0;
-    }
-
-    private void setupMetrics() {
-        metricRegistry.register(MetricRegistry.name(getUniqueReadableId(), "read_bytes_1sec"), new Gauge<Long>() {
+    public void setupMetrics(MessageInput2 input) {
+        metricRegistry.register(MetricRegistry.name(input.getUniqueReadableId(), "read_bytes_1sec"), new Gauge<Long>() {
             @Override
             public Long getValue() {
-                // TODO
                 return lastSecBytesRead.get();
             }
         });
 
-        metricRegistry.register(MetricRegistry.name(getUniqueReadableId(), "written_bytes_1sec"), new Gauge<Long>() {
+        metricRegistry.register(MetricRegistry.name(input.getUniqueReadableId(), "written_bytes_1sec"), new Gauge<Long>() {
             @Override
             public Long getValue() {
-                // TODO
                 return 0L;
             }
         });
 
-        metricRegistry.register(MetricRegistry.name(getUniqueReadableId(), "read_bytes_total"), new Gauge<Long>() {
+        metricRegistry.register(MetricRegistry.name(input.getUniqueReadableId(), "read_bytes_total"), new Gauge<Long>() {
             @Override
             public Long getValue() {
                 return totalBytesRead.get();
             }
         });
 
-        metricRegistry.register(MetricRegistry.name(getUniqueReadableId(), "written_bytes_total"), new Gauge<Long>() {
+        metricRegistry.register(MetricRegistry.name(input.getUniqueReadableId(), "written_bytes_total"), new Gauge<Long>() {
             @Override
             public Long getValue() {
-                // TODO
                 return 0L;
             }
         });
-
     }
 
+    public interface Factory extends TransportFactory<KafkaTransport> {
+        @Override
+        KafkaTransport create(Configuration configuration);
+    }
 }

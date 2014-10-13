@@ -26,6 +26,7 @@ import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.configuration.fields.BooleanField;
 import org.graylog2.plugin.inputs.MessageInput2;
+import org.graylog2.plugin.inputs.transports.AbstractTcpTransport;
 import org.graylog2.plugin.inputs.transports.TransportFactory;
 import org.graylog2.plugin.inputs.util.ConnectionCounter;
 import org.graylog2.plugin.inputs.util.ThroughputCounter;
@@ -62,7 +63,6 @@ public class HttpTransport extends AbstractTcpTransport {
         super(configuration,
               throughputCounter,
               metricRegistry,
-              mapper,
               bossPool,
               workerPoolProvider,
               connectionCounter);

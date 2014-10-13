@@ -28,6 +28,7 @@ import org.graylog2.plugin.configuration.fields.BooleanField;
 import org.graylog2.plugin.configuration.fields.ConfigurationField;
 import org.graylog2.plugin.configuration.fields.NumberField;
 import org.graylog2.plugin.inputs.MessageInput2;
+import org.graylog2.plugin.inputs.transports.AbstractTcpTransport;
 import org.graylog2.plugin.inputs.transports.TransportFactory;
 import org.graylog2.plugin.inputs.util.ConnectionCounter;
 import org.graylog2.plugin.inputs.util.ThroughputCounter;
@@ -58,7 +59,7 @@ public class TcpTransport extends AbstractTcpTransport {
                         ConnectionCounter connectionCounter,
                         MetricRegistry metricRegistry,
                         ObjectMapper mapper) {
-        super(configuration, throughputCounter, metricRegistry, mapper, bossPool, workerPoolProvider, connectionCounter);
+        super(configuration, throughputCounter, metricRegistry, bossPool, workerPoolProvider, connectionCounter);
 
         final boolean nulDelimiter = configuration.getBoolean(CK_USE_NULL_DELIMITER);
         this.delimiter = nulDelimiter ? nulDelimiter() : lineDelimiter();

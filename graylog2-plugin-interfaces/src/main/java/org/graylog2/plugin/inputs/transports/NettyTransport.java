@@ -22,8 +22,10 @@
  */
 package org.graylog2.plugin.inputs.transports;
 
-import com.codahale.metrics.*;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.codahale.metrics.Gauge;
+import com.codahale.metrics.Meter;
+import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.Timer;
 import com.google.common.collect.Lists;
 import org.graylog2.plugin.collections.Pair;
 import org.graylog2.plugin.configuration.Configuration;
@@ -63,7 +65,6 @@ public abstract class NettyTransport implements Transport {
 
     private final InetSocketAddress socketAddress;
     protected final ThroughputCounter throughputCounter;
-    private final ObjectMapper mapper;
     private final long recvBufferSize;
 
     @Nullable
@@ -74,10 +75,8 @@ public abstract class NettyTransport implements Transport {
 
     public NettyTransport(Configuration configuration,
                           ThroughputCounter throughputCounter,
-                          MetricRegistry metricRegistry,
-                          ObjectMapper mapper) {
+                          MetricRegistry metricRegistry) {
         this.throughputCounter = throughputCounter;
-        this.mapper = mapper;
 
         if (configuration.stringIsSet(CK_BIND_ADDRESS) && configuration.intIsSet(CK_PORT)) {
             this.socketAddress = new InetSocketAddress(

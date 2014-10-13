@@ -101,7 +101,7 @@ public class RandomMessageTransport extends GeneratorTransport {
             final FakeHttpRawMessageGenerator.GeneratorState state = generator.generateState();
             payload = objectMapper.writeValueAsBytes(state);
 
-            RawMessage raw = new RawMessage("randomhttp", input.getUniqueReadableId(), null, payload);
+            final RawMessage raw = new RawMessage("randomhttp", input.getId(), null, payload);
 
             sleepUninterruptibly(deviation(sleepMs, maxSleepDeviation, rand), MILLISECONDS);
             return raw;
