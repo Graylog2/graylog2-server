@@ -5,7 +5,7 @@
   <link href='//fonts.googleapis.com/css?family=Droid+Sans:400,700' rel='stylesheet' type='text/css'/>
   <link href='/api-browser/css/highlight.default.css' media='screen' rel='stylesheet' type='text/css'/>
   <link href='/api-browser/css/screen.css' media='screen' rel='stylesheet' type='text/css'/>
-  <script src='/api-browser/lib/shred.bundle.js' type='text/javascript' /></script>
+  <script src='/api-browser/lib/shred.bundle.js' type='text/javascript'></script>
   <script src='/api-browser/lib/jquery-1.8.0.min.js' type='text/javascript'></script>
   <script src='/api-browser/lib/jquery.slideto.min.js' type='text/javascript'></script>
   <script src='/api-browser/lib/jquery.wiggle.min.js' type='text/javascript'></script>
@@ -18,7 +18,15 @@
   <script src='/api-browser/lib/highlight.7.3.pack.js' type='text/javascript'></script>
   <script src='/api-browser/lib/sha256.js'></script>
   <script type="text/javascript">
-    var apiTarget = window.location.protocol+"//"+window.location.hostname+":"+window.location.port;
+    var port = window.location.port;
+    if (port == '') {
+      if (window.location.protocol == 'http') {
+        port = 80;
+      } else if (window.location.protocol == 'https') {
+        port = 443;
+      }
+    }
+    var apiTarget = window.location.protocol + "//" + window.location.hostname + ":" + port;
     $(function () {
       window.swaggerUi = new SwaggerUi({
       url: apiTarget+"/api-docs",
