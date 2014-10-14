@@ -14,15 +14,15 @@ var SourcesStore = require('../../stores/sources/SourcesStore');
 
 var daysToSeconds = (days) => moment.duration(days, 'days').as('seconds');
 
+var othersThreshold = 5;
+
 var SourceOverview = React.createClass({
     getInitialState() {
         this.sourcesData = crossfilter();
-        this.nameDimension = this.sourcesData.dimension(function (d) {
-            return d.name;
-        });
-        this.messageCountGroup = this.nameDimension.group().reduceSum(function (d) {
-            return d.messageCount;
-        });
+        this.nameDimension = this.sourcesData.dimension((d) => d.name);
+        this.messageGroup = this.nameDimension.group().reduceSum((d) => d.messageCount);
+        this.othersDimension = this.sourcesData.dimension((d) => d.percentage > othersThreshold ? d.name : 'Others');
+        this.othersMessageGroup = this.othersDimension.group().reduceSum((d) => d.messageCount);
 
         return {
             range: daysToSeconds(1),
@@ -37,17 +37,14 @@ var SourceOverview = React.createClass({
             .height(250)
             .radius(100)
             .innerRadius(40)
-            .dimension(this.nameDimension)
-            .group(this.messageCountGroup);
-
+            .dimension(this.othersDimension)
+            .group(this.othersMessageGroup);
     },
     renderDataTable() {
         var dataTableDomNode = $("#dc-sources-result")[0];
         dc.dataTable(dataTableDomNode)
-            .dimension(this.nameDimension)
-            .group(function (d) {
-                return "Top Sources";
-            })
+            .dimension(this.othersDimension)
+            .group((d) => d.percentage > othersThreshold ? "Top Sources" : "Others")
             .size(50)
             .columns([
                 function (d) {
@@ -61,17 +58,12 @@ var SourceOverview = React.createClass({
 
                     return d.name;
                 },
-                function (d) {
-                    return d.messageCount;
-                }
+                (d) => d.percentage.toFixed(2) + "%",
+                (d) => d.messageCount
             ])
-            .sortBy(function (d) {
-                return d.messageCount;
-            })
+            .sortBy((d) => d.messageCount)
             .order(d3.descending)
-            .renderlet(function (table) {
-                table.selectAll(".dc-table-group").classed("info", true);
-            });
+            .renderlet((table) => table.selectAll(".dc-table-group").classed("info", true));
     },
     componentDidMount() {
         SourcesStore.addChangeListener(this._onSourcesChanged);
@@ -86,7 +78,13 @@ var SourceOverview = React.createClass({
     _onSourcesChanged() {
         // TODO: save filters once we have some
         this.sourcesData.remove();
-        this.sourcesData.add(SourcesStore.getSources());
+        var sources = SourcesStore.getSources();
+        var total = 0;
+        sources.forEach((d) => total += d.messageCount);
+        sources.forEach((d) => {
+            d.percentage = d.messageCount / total * 100;
+        });
+        this.sourcesData.add(sources);
         dc.redrawAll();
         this.setState({renderResultTable: this.sourcesData.size() !== 0});
     },
@@ -100,6 +98,7 @@ var SourceOverview = React.createClass({
             <thead>
                 <tr>
                     <th>Source name</th>
+                    <th>Percentage</th>
                     <th>Message count</th>
                 </tr>
             </thead>
