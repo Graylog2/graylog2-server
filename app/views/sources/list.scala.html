@@ -7,56 +7,5 @@
     <div id="react-sources">
 
     </div>
-    <div class="row-fluid">
-        <div>
-            <select class="sources-range pull-right" name="range">
-                <option value="@DAYS.toSeconds(1)" @if(DAYS.toSeconds(1) == range) {selected}>Last Day</option>
-                <option value="@DAYS.toSeconds(7)" @if(DAYS.toSeconds(7) == range) {selected}>Last Week</option>
-                <option value="@DAYS.toSeconds(31)" @if(DAYS.toSeconds(31) == range) {selected}>Last Month</option>
-                <option value="@DAYS.toSeconds(365)" @if(DAYS.toSeconds(365) == range) {selected}>Last Year</option>
-                <option value="0" @if(0 == range) {selected}>All</option>
-            </select>
-            <h1><i class="icon icon-download-alt"></i> Sources</h1>
-        </div>
-        <div style="margin-top: 15px">
-        This is a list of all sources that sent in messages to Graylog2. Use it to quickly search for all
-        messages of a specific source or get an overview of what systems are sending in how many messages.
-
-        <strong>
-            Click on source name to prepare a query for it. Hold the Alt key while clicking to search right
-            away.
-        </strong>
-
-        Note that the list is cached for a few seconds so you might have to wait a bit until a new source
-        appears.
-        </div>
-    </div>
-
-    @if(sources.isEmpty) {
-        <div class="alert alert-info">
-            No message sources found. Looks like you did not send in any messages yet.
-        </div>
-    } else {
-        <table class="sources table table-striped table-hover table-condensed">
-            <thead>
-                <tr>
-                    <th>Source name</th>
-                    <th>Message count</th>
-                </tr>
-            </thead>
-            <tbody>
-                @for(source <- sources.sortBy(-_.getMessageCount)) {
-                    <tr>
-                        <td>
-                            <a href="#" class="search-link" data-field="source" data-search-link-operator="OR" data-value="@source.getName">
-                                @source.getName
-                            </a>
-                        </td>
-                        <td>@source.getMessageCount</td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-    }
 
 }

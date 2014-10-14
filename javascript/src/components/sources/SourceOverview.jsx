@@ -8,7 +8,7 @@ var $ = require('jquery');
 
 var crossfilter = require('crossfilter');
 var d3 = require('d3');
-var dc = require('dc/dc');
+var dc = require('dc');
 
 var SourcesStore = require('../../stores/sources/SourcesStore');
 
@@ -17,6 +17,13 @@ var daysToSeconds = (days) => moment.duration(days, 'days').as('seconds');
 var SourceOverview = React.createClass({
     getInitialState() {
         this.sourcesData = crossfilter();
+        this.nameDimension = this.sourcesData.dimension(function (d) {
+            return d.name;
+        });
+        this.messageCountGroup = this.nameDimension.group().reduceSum(function (d) {
+            return d.messageCount;
+        });
+
         return {
             range: daysToSeconds(1),
             filter: '',
@@ -24,16 +31,20 @@ var SourceOverview = React.createClass({
         };
     },
     renderPieChart() {
+        var pieChartDomNode = $("#dc-sources-pie-chart")[0];
+        dc.pieChart(pieChartDomNode)
+            .width(250)
+            .height(250)
+            .radius(100)
+            .innerRadius(40)
+            .dimension(this.nameDimension)
+            .group(this.messageCountGroup);
 
     },
     renderDataTable() {
-        var nameDimension = this.sourcesData.dimension(function (d) {
-            return d.name;
-        });
-
         var dataTableDomNode = $("#dc-sources-result")[0];
-        var dataTable = dc.dataTable(dataTableDomNode)
-            .dimension(nameDimension)
+        dc.dataTable(dataTableDomNode)
+            .dimension(this.nameDimension)
             .group(function (d) {
                 return "Top Sources";
             })
@@ -61,13 +72,12 @@ var SourceOverview = React.createClass({
             .renderlet(function (table) {
                 table.selectAll(".dc-table-group").classed("info", true);
             });
-
-        dc.renderAll();
     },
     componentDidMount() {
         SourcesStore.addChangeListener(this._onSourcesChanged);
         this.renderDataTable();
         this.renderPieChart();
+        dc.renderAll();
         SourcesStore.loadSources(this.state.range);
     },
     componentWillUnmount() {
@@ -124,7 +134,13 @@ var SourceOverview = React.createClass({
                     </div>
                 </div>
                 {this.state.renderResultTable ? null : emptySources}
-                {resultTable}
+                <div className="row-fluid">
+                    <div className="span10">
+                    {resultTable}
+                    </div>
+                    <div id="dc-sources-pie-chart" className="span2">
+                    </div>
+                </div>
             </div>
         );
     }
