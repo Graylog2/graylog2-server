@@ -23,7 +23,7 @@
     ]
   },
   "dependencies": {
-    "dc": "2.0.x",
+    "dc": "dc-js/dc.js",
     "crossfilter": "1.x",
     "d3": "3.x",
     "joi": "^4.6.2",
