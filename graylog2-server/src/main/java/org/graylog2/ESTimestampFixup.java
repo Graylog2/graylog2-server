@@ -27,6 +27,7 @@ import com.github.joschi.jadconfig.repositories.EnvironmentRepository;
 import com.github.joschi.jadconfig.repositories.InMemoryRepository;
 import com.github.joschi.jadconfig.repositories.PropertiesRepository;
 import com.github.joschi.jadconfig.repositories.SystemPropertiesRepository;
+import com.google.common.collect.ImmutableMap;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
@@ -47,12 +48,12 @@ import org.graylog2.bindings.providers.EsNodeProvider;
 import org.graylog2.plugin.Tools;
 import org.graylog2.shared.bindings.GuiceInstantiationService;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -212,7 +213,7 @@ public class ESTimestampFixup {
             // Make sure there is a _id field with the ES document id.
             // https://github.com/Graylog2/graylog2-server/issues/728
             // https://github.com/Graylog2/graylog2-server/commit/18c471e7117472baa07d42011e0a11b48ff1b625
-            source.put("timestamp", Tools.buildElasticSearchTimeFormat(new DateTime(timestamp)));
+            source.put("timestamp", Tools.buildElasticSearchTimeFormat(new DateTime(timestamp, DateTimeZone.UTC)));
             if (hit.field("_id") == null) {
                 source.put("_id", hit.getId());
             }
@@ -258,13 +259,7 @@ public class ESTimestampFixup {
 
     private static Configuration readConfiguration(final JadConfig jadConfig, final CommandLineOptions options) {
         final Configuration configuration = new Configuration();
-
-        final Map<String, String> config = new HashMap<String, String>() {
-            {
-                put("elasticsearch_transport_tcp_port", String.valueOf(options.getPort()));
-            }
-        };
-
+        final Map<String, String> config = ImmutableMap.of("elasticsearch_transport_tcp_port", String.valueOf(options.getPort()));
 
         jadConfig.addConfigurationBean(configuration);
         jadConfig.setRepositories(Arrays.asList(
