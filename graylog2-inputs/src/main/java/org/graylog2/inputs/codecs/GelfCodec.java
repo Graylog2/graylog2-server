@@ -28,6 +28,7 @@ import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.inputs.codecs.Codec;
 import org.graylog2.plugin.inputs.codecs.CodecAggregator;
+import org.graylog2.plugin.inputs.transports.NettyTransport;
 import org.graylog2.plugin.journal.RawMessage;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -202,6 +203,13 @@ public class GelfCodec implements Codec {
     @Override
     public ConfigurationRequest getRequestedConfiguration() {
         return new ConfigurationRequest();
+    }
+
+    @Override
+    public void overrideDefaultValues(@Nonnull ConfigurationRequest cr) {
+        if (cr.containsField(NettyTransport.CK_PORT)) {
+            cr.getField(NettyTransport.CK_PORT).setDefaultValue(12201);
+        }
     }
 
     public interface Factory extends Codec.Factory<GelfCodec> {

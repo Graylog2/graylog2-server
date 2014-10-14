@@ -114,8 +114,8 @@ public abstract class MessageInput2 extends MessageInput {
         final ConfigurationRequest transportConfig = transport.getRequestedConfiguration();
         final ConfigurationRequest codecConfig = codec.getRequestedConfiguration();
         final ConfigurationRequest r = new ConfigurationRequest();
-        r.addAll(transportConfig.getFields());
-        r.addAll(codecConfig.getFields());
+        r.putAll(transportConfig.getFields());
+        r.putAll(codecConfig.getFields());
 
         r.addField(new TextField(
                 CK_OVERRIDE_SOURCE,
@@ -125,6 +125,11 @@ public abstract class MessageInput2 extends MessageInput {
                         "it with a custom string.",
                 ConfigurationField.Optional.OPTIONAL
         ));
+
+        // give the codec the opportunity to override default values for certain configuration fields,
+        // this is commonly being used to default to some well known port for protocols such as GELF or syslog
+        codec.overrideDefaultValues(r);
+
         return r;
     }
 

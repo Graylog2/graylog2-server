@@ -88,6 +88,10 @@ public class RadioMessageCodec implements Codec {
         return new ConfigurationRequest();
     }
 
+    @Override
+    public void overrideDefaultValues(@Nonnull ConfigurationRequest cr) {
+    }
+
     public interface Factory extends Codec.Factory<RadioMessageCodec> {
         @Override
         public RadioMessageCodec create(Configuration configuration);

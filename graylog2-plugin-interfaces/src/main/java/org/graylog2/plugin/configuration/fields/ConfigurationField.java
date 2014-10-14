@@ -30,15 +30,6 @@ import java.util.Map;
  */
 public interface ConfigurationField {
 
-    /*
-     *  OHAI!
-     *
-     *  Make ConfigurationField an abstract class instead of an interface
-     *  https://github.com/Graylog2/graylog2-server/issues/211
-     *
-     *  ... if you find some time.
-     */
-
     public enum Optional {
         OPTIONAL,
         NOT_OPTIONAL
@@ -50,6 +41,7 @@ public interface ConfigurationField {
     public String getHumanName();
     public String getDescription();
     public Object getDefaultValue();
+    public void setDefaultValue(Object defaultValue);
     public Optional isOptional();
     public List<String> getAttributes();
     public Map<String, Map<String, String>> getAdditionalInformation();

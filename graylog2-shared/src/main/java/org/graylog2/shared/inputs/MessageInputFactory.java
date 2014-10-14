@@ -124,6 +124,9 @@ public class MessageInputFactory {
                             return new ConfigurationRequest();
                         }
 
+                        @Override
+                        public void overrideDefaultValues(@Nonnull ConfigurationRequest cr) {}
+
                     });
             result.put(s.getKey(), input2.getName());
         }

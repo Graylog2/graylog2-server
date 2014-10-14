@@ -25,11 +25,11 @@ package org.graylog2.plugin.configuration.fields;
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-public class BooleanField extends AbstractConfigurationField implements ConfigurationField {
+public class BooleanField extends AbstractConfigurationField {
 
     public static final String FIELD_TYPE = "boolean";
 
-    private final boolean defaultValue;
+    private boolean defaultValue;
 
     public BooleanField(String name, String humanName, boolean defaultValue, String description) {
         super(FIELD_TYPE, name, humanName, description, Optional.OPTIONAL);
@@ -39,5 +39,12 @@ public class BooleanField extends AbstractConfigurationField implements Configur
     @Override
     public Object getDefaultValue() {
         return this.defaultValue;
+    }
+
+    @Override
+    public void setDefaultValue(Object defaultValue) {
+        if (defaultValue instanceof Boolean) {
+            this.defaultValue = (boolean) defaultValue;
+        }
     }
 }

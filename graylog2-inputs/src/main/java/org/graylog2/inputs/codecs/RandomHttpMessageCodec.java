@@ -77,6 +77,11 @@ public class RandomHttpMessageCodec implements Codec {
         return new ConfigurationRequest();
     }
 
+    @Override
+    public void overrideDefaultValues(@Nonnull ConfigurationRequest cr) {
+
+    }
+
     public interface Factory extends Codec.Factory<RandomHttpMessageCodec> {
         @Override
         RandomHttpMessageCodec create(Configuration configuration);

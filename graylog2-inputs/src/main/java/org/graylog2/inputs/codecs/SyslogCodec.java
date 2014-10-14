@@ -45,6 +45,7 @@ import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.configuration.fields.BooleanField;
 import org.graylog2.plugin.inputs.codecs.Codec;
 import org.graylog2.plugin.inputs.codecs.CodecAggregator;
+import org.graylog2.plugin.inputs.transports.NettyTransport;
 import org.graylog2.plugin.journal.RawMessage;
 import org.graylog2.syslog4j.server.SyslogServerEventIF;
 import org.graylog2.syslog4j.server.impl.event.SyslogServerEvent;
@@ -233,6 +234,13 @@ public class SyslogCodec implements Codec {
         );
 
         return r;
+    }
+
+    @Override
+    public void overrideDefaultValues(@Nonnull ConfigurationRequest cr) {
+        if (cr.containsField(NettyTransport.CK_PORT)) {
+            cr.getField(NettyTransport.CK_PORT).setDefaultValue(514);
+        }
     }
 
     public interface Factory extends Codec.Factory<SyslogCodec> {

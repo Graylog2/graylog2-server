@@ -42,6 +42,8 @@ public interface Codec {
 
     ConfigurationRequest getRequestedConfiguration();
 
+    void overrideDefaultValues(@Nonnull ConfigurationRequest cr);
+
     public interface Factory<C> {
         C create(Configuration configuration);
     }
