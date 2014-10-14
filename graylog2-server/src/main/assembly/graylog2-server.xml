@@ -32,49 +32,6 @@
                 <exclude>*/**</exclude>
             </excludes>
         </fileSet>
-        <fileSet>
-            <directory>./</directory>
-            <outputDirectory>plugin/alarm_callbacks</outputDirectory>
-            <excludes>
-                <exclude>*/**</exclude>
-            </excludes>
-        </fileSet>
-        <fileSet>
-            <directory>./</directory>
-            <outputDirectory>plugin/filters</outputDirectory>
-            <excludes>
-                <exclude>*/**</exclude>
-            </excludes>
-        </fileSet>
-        <fileSet>
-            <directory>./</directory>
-            <outputDirectory>plugin/initializers</outputDirectory>
-            <excludes>
-                <exclude>*/**</exclude>
-            </excludes>
-        </fileSet>
-        <fileSet>
-            <directory>./</directory>
-            <outputDirectory>plugin/inputs</outputDirectory>
-            <excludes>
-                <exclude>*/**</exclude>
-            </excludes>
-        </fileSet>
-        <fileSet>
-            <directory>./</directory>
-            <outputDirectory>plugin/outputs</outputDirectory>
-            <excludes>
-                <exclude>*/**</exclude>
-            </excludes>
-        </fileSet>
-        <fileSet>
-            <directory>./</directory>
-            <outputDirectory>plugin/transports</outputDirectory>
-            <excludes>
-                <exclude>*/**</exclude>
-            </excludes>
-        </fileSet>
-
     </fileSets>
     <files>
         <file>
