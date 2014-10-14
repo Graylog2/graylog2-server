@@ -24,6 +24,7 @@ import com.github.joschi.jadconfig.JadConfig;
 import com.github.joschi.jadconfig.ParameterException;
 import com.github.joschi.jadconfig.RepositoryException;
 import com.github.joschi.jadconfig.ValidationException;
+import com.github.joschi.jadconfig.jodatime.JodaTimeConverterFactory;
 import com.github.joschi.jadconfig.repositories.EnvironmentRepository;
 import com.github.joschi.jadconfig.repositories.PropertiesRepository;
 import com.github.joschi.jadconfig.repositories.SystemPropertiesRepository;
@@ -109,12 +110,14 @@ public final class Main extends NodeRunner {
 
         if(commandLineArguments.isDumpDefaultConfig()) {
             final JadConfig jadConfig = new JadConfig();
+            jadConfig.addConverterFactory(new JodaTimeConverterFactory());
             jadConfig.addConfigurationBean(new Configuration());
             System.out.println(dumpConfiguration(jadConfig.dump()));
             System.exit(0);
         }
 
         final JadConfig jadConfig = new JadConfig();
+        jadConfig.addConverterFactory(new JodaTimeConverterFactory());
         final Configuration configuration = readConfiguration(jadConfig, commandLineArguments.getConfigFile());
 
         if(commandLineArguments.isDumpConfig()) {

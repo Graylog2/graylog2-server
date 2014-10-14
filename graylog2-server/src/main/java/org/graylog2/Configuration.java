@@ -102,7 +102,7 @@ public class Configuration extends BaseConfiguration {
     
     @Parameter(value = "elasticsearch_max_docs_per_index", validator = PositiveIntegerValidator.class, required = true)
     private int elasticsearchMaxDocsPerIndex = 80000000;
-    
+
     @Parameter(value = "elasticsearch_shards", validator = PositiveIntegerValidator.class, required = true)
     private int elasticsearchShards = 4;
     
