@@ -4,7 +4,7 @@
 
 var React = require('react');
 var Card = require('./Card');
-var ConfigurationBundles = require('./ConfigurationBundles');
+var ConfigurationBundles = require('../source-tagging/ConfigurationBundles');
 
 var QuickStartCard = React.createClass({
     render: function () {

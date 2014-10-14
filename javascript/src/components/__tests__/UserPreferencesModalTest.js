@@ -3,16 +3,16 @@
 'use strict';
 
 jest.dontMock('../../lib/util');
-jest.dontMock('../UserPreferencesButton');
-jest.dontMock('../UserPreferencesModal');
+jest.dontMock('../users/UserPreferencesButton');
+jest.dontMock('../users/UserPreferencesModal');
 
 describe('UserPreferencesModal', function () {
     it('should properly register to store upon creation', function () {
         var React = require('react/addons');
         var ReactTestUtils = React.addons.TestUtils;
-        var UserPreferencesButton = require('../UserPreferencesButton');
-        var UserPreferencesModal = require('../UserPreferencesModal');
-        var PreferencesStore = require('../../stores/PreferencesStore'); // mocked
+        var UserPreferencesButton = require('../users/UserPreferencesButton');
+        var UserPreferencesModal = require('../users/UserPreferencesModal');
+        var PreferencesStore = require('../../stores/users/PreferencesStore'); // mocked
         var $ = require('jquery');
         $.mockReturnValue({
             modal: function () {

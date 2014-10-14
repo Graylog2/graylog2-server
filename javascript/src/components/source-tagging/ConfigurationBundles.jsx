@@ -3,8 +3,8 @@
 'use strict';
 
 var React = require('react');
-var BootstrapAccordion = require('./BootstrapAccordion');
-var BootstrapAccordionGroup = require('./BootstrapAccordionGroup');
+var BootstrapAccordion = require('../bootstrap/BootstrapAccordion');
+var BootstrapAccordionGroup = require('../bootstrap/BootstrapAccordionGroup');
 var SourceType = require('./SourceType');
 var ConfigurationBundlePreview = require('./ConfigurationBundlePreview');
 var $ = require('jquery'); // excluded and shimed

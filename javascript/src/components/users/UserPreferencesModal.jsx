@@ -3,8 +3,8 @@
 'use strict';
 
 var React = require('react/addons');
-var PreferencesStore = require('../stores/PreferencesStore');
-var BootstrapModal = require('./BootstrapModal');
+var PreferencesStore = require('../../stores/users/PreferencesStore');
+var BootstrapModal = require('../bootstrap/BootstrapModal');
 
 var UserPreferencesModal = React.createClass({
     getInitialState: function () {

@@ -2,14 +2,14 @@
 
 'use strict';
 
-jest.dontMock('../UserPreferencesButton');
+jest.dontMock('../users/UserPreferencesButton');
 
 describe('UserPreferencesButton', function () {
     it('should load user data when user clicks edit button', function () {
         var React = require('react/addons');
         var ReactTestUtils = React.addons.TestUtils;
-        var UserPreferencesButton = require('../UserPreferencesButton');
-        var PreferencesStore = require('../../stores/PreferencesStore'); // mocked
+        var UserPreferencesButton = require('../users/UserPreferencesButton');
+        var PreferencesStore = require('../../stores/users/PreferencesStore'); // mocked
         var userName = "Full";
 
         var instance = ReactTestUtils.renderIntoDocument(

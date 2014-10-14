@@ -744,19 +744,19 @@ $(document).ready(function() {
         window.location.href = loc.href();
     });
 
-    $(".sources").dynatable({
-        readers: {
-            'messageCount': function(el, record) {
-                return Number(el.innerHTML) || 0;
-            }
-        },
-        inputs: {
-            perPageText: "Per page: "
-        },
-        dataset: {
-            perPageDefault: 50
-        }
-    });
+    //$(".sources").dynatable({
+    //    readers: {
+    //        'messageCount': function(el, record) {
+    //            return Number(el.innerHTML) || 0;
+    //        }
+    //    },
+    //    inputs: {
+    //        perPageText: "Per page: "
+    //    },
+    //    dataset: {
+    //        perPageDefault: 50
+    //    }
+    //});
 
     $('table.indexer-failures').dynatable({
         dataset: {

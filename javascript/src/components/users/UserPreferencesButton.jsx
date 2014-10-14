@@ -3,7 +3,7 @@
 'use strict';
 
 var React = require('react/addons');
-var PreferencesStore = require('../stores/PreferencesStore');
+var PreferencesStore = require('../../stores/users/PreferencesStore');
 
 var UserPreferencesButton = React.createClass({
     _onClick: function (event) {

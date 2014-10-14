@@ -10,6 +10,6 @@
     "esnext": true,
 
 	"predef": [
-		"require", "module", "setInterval", "setTimeout", "window", "alert", "console", "document", "exports", "jest", "expect", "describe", "it"
+		"moment", "require", "module", "setInterval", "setTimeout", "window", "alert", "console", "document", "exports", "jest", "expect", "describe", "it"
 	]
 }
