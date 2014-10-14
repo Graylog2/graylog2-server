@@ -23,6 +23,9 @@ var SourceOverview = React.createClass({
             renderResultTable: false
         };
     },
+    renderPieChart() {
+
+    },
     renderDataTable() {
         var nameDimension = this.sourcesData.dimension(function (d) {
             return d.name;
@@ -64,6 +67,7 @@ var SourceOverview = React.createClass({
     componentDidMount() {
         SourcesStore.addChangeListener(this._onSourcesChanged);
         this.renderDataTable();
+        this.renderPieChart();
         SourcesStore.loadSources(this.state.range);
     },
     componentWillUnmount() {

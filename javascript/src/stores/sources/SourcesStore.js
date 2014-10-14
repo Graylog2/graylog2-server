@@ -9,16 +9,16 @@ var $ = require('jquery'); // excluded and shimed
 var SourcesStore = {
     URL: '/a/sources',
 
-    setSources: function (sources) {
+    setSources(sources) {
         this._sources = sources;
         this._emitChange();
     },
 
-    getSources: function () {
+    getSources() {
         return this._sources && JSON.parse(JSON.stringify(this._sources));
     },
 
-    loadSources: function (range) {
+    loadSources(range) {
         var url = this.URL;
         if (typeof range !== 'undefined') {
             url += "?range="+range;
