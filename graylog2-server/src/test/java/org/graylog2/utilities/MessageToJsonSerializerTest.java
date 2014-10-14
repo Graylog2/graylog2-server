@@ -22,6 +22,7 @@ import org.graylog2.inputs.InputService;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.streams.Stream;
+import org.graylog2.shared.inputs.NoSuchInputTypeException;
 import org.graylog2.streams.StreamService;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -42,7 +43,7 @@ public class MessageToJsonSerializerTest {
     @Mock private Stream stream;
 
     @BeforeMethod
-    public void setUp() throws Exception {
+    public void setUp() throws Exception, NoSuchInputTypeException {
         MockitoAnnotations.initMocks(this);
 
         when(stream.getId()).thenReturn("stream-id");
