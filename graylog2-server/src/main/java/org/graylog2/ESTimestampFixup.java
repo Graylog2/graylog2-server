@@ -19,6 +19,7 @@ package org.graylog2;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
+import com.beust.jcommander.internal.Lists;
 import com.github.joschi.jadconfig.JadConfig;
 import com.github.joschi.jadconfig.ParameterException;
 import com.github.joschi.jadconfig.RepositoryException;
@@ -74,8 +75,8 @@ public class ESTimestampFixup {
         @Parameter(names = {"-f", "--configfile"}, description = "Configuration file for Graylog2")
         private String configFile = "/etc/graylog2.conf";
 
-        @Parameter(names = {"-i", "--indices"}, description = "Indices to process", variableArity = true, required = true)
-        private List<String> indices;
+        @Parameter(names = {"-i", "--indices"}, description = "Indices to process (required)", variableArity = true)
+        private List<String> indices = Lists.newArrayList();
 
         @Parameter(names = {"-h", "--help"}, description = "Show usage")
         private boolean help = false;
@@ -153,6 +154,12 @@ public class ESTimestampFixup {
         if (commandLineOptions.isHelp()) {
             jCommander.usage();
             System.exit(0);
+        }
+
+        if (commandLineOptions.getIndicesArray().length == 0) {
+            System.out.println("No indices given. Use '-i graylog2_0 graylog2_1 graylog2_2' command line option.");
+            jCommander.usage();
+            System.exit(1);
         }
 
         final JadConfig jadConfig = new JadConfig();
