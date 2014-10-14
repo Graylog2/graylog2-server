@@ -22,7 +22,7 @@ script:
   - pushd javascript
   - npm install
   - npm test
-  - node_modules/.bin/gulp
+  - node_modules/.bin/gulp deploy-prod
   - popd
   - activator-${ACTIVATOR_VERSION}-minimal/activator test
 after_success:

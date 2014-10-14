@@ -18,3 +18,13 @@ $ activator run
 (Server started, use Ctrl+D to stop and go back to the console...)
 
 ```
+
+### Javascript
+
+* Install [node.js](http://nodejs.org/) and npm.
+* cd javascript/
+* npm install
+* node_modules/.bin/gulp watch
+
+When using IntelliJ or WebStorm, be sure to enable `JSX harmony` (available in IntelliJ 14 and WebStorm 9)
+as JavaScript language version to properly support react templates.

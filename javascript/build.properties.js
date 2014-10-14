@@ -1,10 +1,10 @@
 module.exports = {
-    deployDir: '../app/views/system/users/',
-    deployDirJs: '../app/assets/javascripts/users',
+    deployDir: '../app/views/build/',
+    deployDirJs: '../app/assets/javascripts/build',
     targetDir: null,
     targetDirJs: null,
 
-    assetDir: 'javascripts/users',
+    assetDir: 'javascripts/build',
     scriptTemplatePath: 'scripts.hbs',
     scriptDestinationName: 'scripts.scala.html',
     entryPoints: ['./src/mount.jsx'],

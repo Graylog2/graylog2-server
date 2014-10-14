@@ -179,7 +179,7 @@ gulp.task('build-test', function (callback) {
 
 gulp.task('default', ['deploy-prod']);
 
-gulp.task('watch', function () {
+gulp.task('watch', ['prepare-dev'], function () {
     var bundler = watchify(browserifyCall(true));
 
     bundler.on('update', rebundle);
