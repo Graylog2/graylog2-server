@@ -28,11 +28,13 @@ import com.github.joschi.jadconfig.repositories.EnvironmentRepository;
 import com.github.joschi.jadconfig.repositories.InMemoryRepository;
 import com.github.joschi.jadconfig.repositories.PropertiesRepository;
 import com.github.joschi.jadconfig.repositories.SystemPropertiesRepository;
+import com.google.common.base.Joiner;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-import com.google.inject.Scopes;
 import org.apache.log4j.Level;
 import org.elasticsearch.action.admin.cluster.health.ClusterHealthRequest;
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
@@ -43,11 +45,12 @@ import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.client.Client;
+import org.elasticsearch.common.settings.loader.YamlSettingsLoader;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.node.Node;
+import org.elasticsearch.node.NodeBuilder;
 import org.elasticsearch.search.SearchHit;
-import org.graylog2.bindings.providers.EsNodeProvider;
 import org.graylog2.plugin.Tools;
 import org.graylog2.shared.bindings.GuiceInstantiationService;
 import org.joda.time.DateTime;
@@ -56,10 +59,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+
+import static com.google.common.base.Strings.isNullOrEmpty;
 
 public class ESTimestampFixup {
     private static final Logger LOG = LoggerFactory.getLogger(ESTimestampFixup.class);
@@ -136,7 +144,67 @@ public class ESTimestampFixup {
         @Override
         protected void configure() {
             bind(Configuration.class).toInstance(configuration);
-            bind(Node.class).toProvider(EsNodeProvider.class).in(Scopes.SINGLETON);
+            bind(Node.class).toInstance(createEsNode());
+        }
+
+        private Node createEsNode() {
+            final NodeBuilder builder = NodeBuilder.nodeBuilder().client(true);
+
+            builder.settings().put(readNodeSettings(configuration));
+
+            return builder.build();
+        }
+
+        // Copied from the Indexer class to avoid creating a full Indexer instance to get the Node.
+        private Map<String, String> readNodeSettings(Configuration conf) {
+            final Map<String, String> settings = Maps.newHashMap();
+
+            // Standard Configuration.
+            settings.put("cluster.name", conf.getEsClusterName());
+
+            settings.put("node.name", conf.getEsNodeName());
+            settings.put("node.master", Boolean.toString(conf.isEsIsMasterEligible()));
+            settings.put("node.data", Boolean.toString(conf.isEsStoreData()));
+
+            settings.put("action.auto_create_index", Boolean.toString(false));
+
+            settings.put("http.enabled", Boolean.toString(conf.isEsIsHttpEnabled()));
+            settings.put("transport.tcp.port", String.valueOf(conf.getEsTransportTcpPort()));
+
+            settings.put("discovery.initial_state_timeout", conf.getEsInitialStateTimeout());
+            settings.put("discovery.zen.ping.multicast.enabled", Boolean.toString(conf.isEsMulticastDiscovery()));
+
+            if (conf.getEsUnicastHosts() != null && !conf.getEsUnicastHosts().isEmpty()) {
+                final ImmutableList.Builder<String> trimmedHosts = ImmutableList.builder();
+                for (String host : conf.getEsUnicastHosts()) {
+                    trimmedHosts.add(host.trim());
+                }
+
+                settings.put("discovery.zen.ping.unicast.hosts", Joiner.on(",").join(trimmedHosts.build()));
+            }
+
+            if (!isNullOrEmpty(conf.getEsNetworkHost())) {
+                settings.put("network.host", conf.getEsNetworkHost());
+            }
+            if (!isNullOrEmpty(conf.getEsNetworkBindHost())) {
+                settings.put("network.bind_host", conf.getEsNetworkBindHost());
+            }
+            if (!isNullOrEmpty(conf.getEsNetworkPublishHost())) {
+                settings.put("network.publish_host", conf.getEsNetworkPublishHost());
+            }
+
+            // Overwrite from a custom Elasticsearch config file.
+            final String esConfigFilePath = conf.getElasticSearchConfigFile();
+            if (!isNullOrEmpty(esConfigFilePath)) {
+                try {
+                    final byte[] esSettings = Files.readAllBytes(Paths.get(esConfigFilePath));
+                    settings.putAll(new YamlSettingsLoader().load(esSettings));
+                } catch (IOException e) {
+                    LOG.warn("Cannot read Elasticsearch configuration.", e);
+                }
+            }
+
+            return settings;
         }
     }
 
