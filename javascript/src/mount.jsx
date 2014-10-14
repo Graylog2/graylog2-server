@@ -6,4 +6,5 @@ $(document).ready(function () {
     require('./components/users/mount');
     require('./components/source-tagging/mount');
     require('./components/start-page/mount');
+    require('./components/sources/mount');
 });
