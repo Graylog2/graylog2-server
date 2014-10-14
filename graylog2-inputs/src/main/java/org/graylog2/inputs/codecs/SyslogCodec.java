@@ -87,14 +87,14 @@ public class SyslogCodec implements Codec {
         final String msg = new String(rawMessage.getPayload(), Charsets.UTF_8);
         try {
             final InetSocketAddress remoteAddress = rawMessage.getRemoteAddress();
-            return parse(msg, remoteAddress.getAddress());
+            return parse(msg, remoteAddress.getAddress(), rawMessage.getTimestamp());
         } catch (ClassCastException e) {
             propagate(e);
         }
         return null;
     }
 
-    private Message parse(String msg, InetAddress remoteAddress) {
+    private Message parse(String msg, InetAddress remoteAddress, DateTime receivedTimestamp) {
         /*
          * ZOMG funny 80s neckbeard protocols. We are now deciding if to parse
          * structured (RFC5424) or unstructured (classic BSD, RFC3164) syslog
@@ -126,7 +126,7 @@ public class SyslogCodec implements Codec {
 
         }
 
-        Message m = new Message(e.getMessage(), parseHost(e, remoteAddress), parseDate(e));
+        final Message m = new Message(e.getMessage(), parseHost(e, remoteAddress), parseDate(e, receivedTimestamp));
         m.addField("facility", Tools.syslogFacilityToReadable(e.getFacility()));
         m.addField("level", e.getLevel());
 
@@ -145,7 +145,7 @@ public class SyslogCodec implements Codec {
 
         // Structured syslog has more data we can parse.
         if (msg instanceof StructuredSyslogServerEvent) {
-            StructuredSyslogServerEvent sMsg = (StructuredSyslogServerEvent) msg;
+            final StructuredSyslogServerEvent sMsg = (StructuredSyslogServerEvent) msg;
 
             structuredData = StructuredSyslog.extractFields(sMsg);
 
@@ -173,13 +173,13 @@ public class SyslogCodec implements Codec {
         return msg.getHost();
     }
 
-    private DateTime parseDate(SyslogServerEventIF msg) throws IllegalStateException {
+    private DateTime parseDate(SyslogServerEventIF msg, DateTime receivedTimestamp) throws IllegalStateException {
         // Check if date could be parsed.
         if (msg.getDate() == null) {
             if (configuration.getBoolean(CK_ALLOW_OVERRIDE_DATE)) {
                 log.debug("Date could not be parsed. Was set to NOW because {} is true.",
                           CK_ALLOW_OVERRIDE_DATE);
-                return Tools.iso8601();
+                return receivedTimestamp;
             } else {
                 log.warn("Syslog message is missing date or date could not be parsed. (Possibly set {} to true) "
                                  + "Not further handling. Message was: {}",
@@ -202,6 +202,7 @@ public class SyslogCodec implements Codec {
         return "syslog";
     }
 
+    @Nonnull
     @Override
     public ConfigurationRequest getRequestedConfiguration() {
         final ConfigurationRequest r = new ConfigurationRequest();

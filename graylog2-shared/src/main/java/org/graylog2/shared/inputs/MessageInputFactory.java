@@ -119,6 +119,7 @@ public class MessageInputFactory {
                             return null;
                         }
 
+                        @Nonnull
                         @Override
                         public ConfigurationRequest getRequestedConfiguration() {
                             return new ConfigurationRequest();

@@ -39,6 +39,7 @@ public class TransportsModule extends AbstractModule {
         install(new FactoryModuleBuilder().implement(Transport.class, RandomMessageTransport.class).build(RandomMessageTransport.Factory.class));
         install(new FactoryModuleBuilder().implement(Transport.class, KafkaTransport.class).build(KafkaTransport.Factory.class));
         install(new FactoryModuleBuilder().implement(Transport.class, AmqpTransport.class).build(AmqpTransport.Factory.class));
+        install(new FactoryModuleBuilder().implement(Transport.class, HttpPollTransport.class).build(HttpPollTransport.Factory.class));
 
         // lol generics
         final MapBinder<String, TransportFactory<? extends Transport>> mapBinder =
@@ -53,6 +54,7 @@ public class TransportsModule extends AbstractModule {
         mapBinder.addBinding("randomhttp").to(Key.get(RandomMessageTransport.Factory.class));
         mapBinder.addBinding("kafka").to(Key.get(KafkaTransport.Factory.class));
         mapBinder.addBinding("amqp").to(Key.get(AmqpTransport.Factory.class));
+        mapBinder.addBinding("httppoll").to(Key.get(HttpPollTransport.Factory.class));
 
         bind(Executor.class)
                 .annotatedWith(Names.named("bossPool"))

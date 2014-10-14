@@ -40,6 +40,7 @@ public interface Codec {
 
     String getName();
 
+    @Nonnull
     ConfigurationRequest getRequestedConfiguration();
 
     void overrideDefaultValues(@Nonnull ConfigurationRequest cr);
