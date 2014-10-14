@@ -71,6 +71,7 @@ public abstract class MessageInput2 extends MessageInput {
         setupMetrics();
     }
 
+    // TODO convert to returning a metric set for use with prefix
     public void setupMetrics() {
         if (getId() == null) {
             log.error("Unable to register metrics, id has not been set! This will lead to errors and is a bug.");

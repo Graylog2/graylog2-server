@@ -64,6 +64,7 @@ public class RawCodec implements Codec {
     @Nullable
     @Override
     public Message decode(@Nonnull RawMessage raw) {
+        // TODO fix remote address, use raw message
         String source;
         if (raw.getMetaData() != null) {
             try {
