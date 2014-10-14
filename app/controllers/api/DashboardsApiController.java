@@ -64,7 +64,7 @@ public class DashboardsApiController extends AuthenticatedController {
 
                 dashboard.put("title", d.getTitle());
                 dashboard.put("description", d.getDescription());
-                dashboard.put("created_by", d.getCreatorUser().getName());
+                dashboard.put("created_by", (d.getCreatorUser() == null) ? null : d.getCreatorUser().getName());
 
                 result.put(d.getId(), dashboard);
             }
@@ -86,7 +86,7 @@ public class DashboardsApiController extends AuthenticatedController {
 
                 dashboard.put("title", d.getTitle());
                 dashboard.put("description", d.getDescription());
-                dashboard.put("created_by", d.getCreatorUser().getName());
+                dashboard.put("created_by", (d.getCreatorUser() == null) ? null : d.getCreatorUser().getName());
 
                 result.put(d.getId(), dashboard);
             }
