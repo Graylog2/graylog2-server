@@ -85,7 +85,7 @@ var SourceOverview = React.createClass({
         dc.dataTable(dataTableDomNode)
             .dimension(this.othersDimension)
             .group((d) => d.percentage > othersThreshold ? "Top Sources" : "Others")
-            .size(50)
+            .size(Infinity)
             .columns([
                 function (d) {
                     // TODO
