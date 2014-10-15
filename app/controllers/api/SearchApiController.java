@@ -244,6 +244,8 @@ public class SearchApiController extends AuthenticatedController {
     }
 
     /**
+     * Create a list with histogram results that would be serialized to JSON like this
+     *
      * [{ x: -1893456000, y: 92228531 }, { x: -1577923200, y: 106021568 }]
      *
      */

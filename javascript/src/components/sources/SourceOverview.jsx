@@ -20,8 +20,6 @@ var othersThreshold = 5;
 var SourceOverview = React.createClass({
     getInitialState() {
         this.sourcesData = crossfilter();
-        this.nameDimension = this.sourcesData.dimension((d) => d.name);
-        this.messageGroup = this.nameDimension.group().reduceSum((d) => d.messageCount);
         this.othersDimension = this.sourcesData.dimension((d) => d.percentage > othersThreshold ? d.name : 'Others');
         this.othersMessageGroup = this.othersDimension.group().reduceSum((d) => d.messageCount);
 
@@ -52,13 +50,19 @@ var SourceOverview = React.createClass({
 
     renderPieChart() {
         var pieChartDomNode = $("#dc-sources-pie-chart")[0];
-        dc.pieChart(pieChartDomNode)
-            .width(250)
+        var pieChart = dc.pieChart(pieChartDomNode);
+        pieChart.width(250)
             .height(250)
             .radius(100)
             .innerRadius(40)
             .dimension(this.othersDimension)
-            .group(this.othersMessageGroup);
+            .group(this.othersMessageGroup)
+            .renderlet((chart) => {
+                chart.selectAll("#dc-sources-pie-chart .pie-slice").on("click", (d, index) => {
+                    var filters = this.othersDimension.top(Infinity).map((source) => source.name);
+                    HistogramDataStore.loadHistogramData(this.state.range, filters);
+                });
+            });
     },
 
     renderLineChart() {
@@ -66,21 +70,15 @@ var SourceOverview = React.createClass({
         dc.lineChart(lineChartDomNode)
             .width($(lineChartDomNode).width())
             .height(200)
-            .margins({left: 50, right: 20, top: 10, bottom: 20})
+            .margins({left: 50, right: 20, top: 20, bottom: 20})
             //.renderArea(true)
             .dimension(this.valueDimension)
             .group(this.valueGroup)
             .x(d3.time.scale().domain([new Date(2014, 9, 14), new Date(2014, 9, 16)]))
             .xUnits(d3.time.minutes)
-            //.valueAccessor(function (d) {
-            //    return d.y;
-            //})
+            //.brushOn(false)
             .renderHorizontalGridLines(true)
-            .elasticY(true)
-            //.xAxis().tickFormat(function (v) {
-            //    return v;
-            //})
-        ;
+            .elasticY(true);
     },
     renderDataTable() {
         var dataTableDomNode = $("#dc-sources-result")[0];

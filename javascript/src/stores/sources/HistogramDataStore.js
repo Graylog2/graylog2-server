@@ -18,10 +18,14 @@ var HistogramDataStore = {
         return this._histogramData && JSON.parse(JSON.stringify(this._histogramData));
     },
 
-    loadHistogramData(range) {
+    loadHistogramData(range, sourceNames) {
         var url = this.HISTOGRAM_URL;
+        var q = "";
+        if (typeof sourceNames !== 'undefined' && sourceNames instanceof Array) {
+            q = encodeURIComponent(sourceNames.map((source) => "source:" + source).join(" OR "));
+        }
         if (typeof range !== 'undefined') {
-            url += "?&rangetype=relative&relative="+range;
+            url += `?q=${q}&rangetype=relative&relative=${ range }`;
         }
         var successCallback = (data) => this.setHistogramData(data);
         var failCallback = (jqXHR, textStatus, errorThrown) => {
