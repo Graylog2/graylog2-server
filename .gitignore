@@ -37,3 +37,7 @@ build_script/logs/*
 *.iws
 
 .vagrant/
+
+pom.xml.versionsBackup
+*/pom.xml.versionsBackup
+
