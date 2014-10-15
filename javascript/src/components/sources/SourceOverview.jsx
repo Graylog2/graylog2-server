@@ -50,11 +50,11 @@ var SourceOverview = React.createClass({
 
     renderPieChart() {
         var pieChartDomNode = $("#dc-sources-pie-chart")[0];
+        var pieChartWidth = $(pieChartDomNode).width();
         var pieChart = dc.pieChart(pieChartDomNode);
-        pieChart.width(250)
-            .height(250)
-            .radius(100)
-            .innerRadius(40)
+        pieChart.width(pieChartWidth)
+            .height(pieChartWidth)
+            .innerRadius(pieChartWidth / 5)
             .dimension(this.othersDimension)
             .group(this.othersMessageGroup)
             .renderlet((chart) => {
@@ -171,10 +171,10 @@ var SourceOverview = React.createClass({
                 </div>
                 {this.state.renderResultTable ? null : emptySources}
                 <div className="row-fluid">
-                    <div className="span10">
+                    <div className="span9">
                     {resultTable}
                     </div>
-                    <div id="dc-sources-pie-chart" className="span2">
+                    <div id="dc-sources-pie-chart" className="span3">
                     </div>
                 </div>
             </div>
