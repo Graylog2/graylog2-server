@@ -49,6 +49,8 @@ import org.jboss.netty.channel.Channels;
 import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory;
 import org.jboss.netty.handler.codec.http.HttpRequestDecoder;
 import org.jboss.netty.handler.codec.http.HttpResponseEncoder;
+import org.jboss.netty.handler.execution.ExecutionHandler;
+import org.jboss.netty.handler.execution.OrderedMemoryAwareThreadPoolExecutor;
 import org.jboss.netty.handler.stream.ChunkedWriteHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -166,6 +168,8 @@ public class RestApiService extends AbstractIdleService {
                 pipeline.addLast("decoder", new HttpRequestDecoder(maxInitialLineLength, maxHeaderSize, maxChunkSize));
                 pipeline.addLast("encoder", new HttpResponseEncoder());
                 pipeline.addLast("chunks", new ChunkedWriteHandler());
+                pipeline.addLast("executor", new ExecutionHandler(
+                        new OrderedMemoryAwareThreadPoolExecutor(16, 1048576, 1048576)));
                 pipeline.addLast("jerseyHandler", jerseyHandler);
                 return pipeline;
             }
