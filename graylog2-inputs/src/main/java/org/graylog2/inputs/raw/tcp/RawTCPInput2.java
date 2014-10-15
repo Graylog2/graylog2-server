@@ -38,6 +38,7 @@ import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import org.graylog2.inputs.codecs.RawCodec;
 import org.graylog2.inputs.transports.TcpTransport;
+import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.inputs.MessageInput2;
 import org.graylog2.plugin.inputs.codecs.Codec;
@@ -49,16 +50,20 @@ public class RawTCPInput2 extends MessageInput2 {
     public RawTCPInput2(@Assisted final Configuration configuration,
                         @Assisted final Transport transport,
                         @Assisted final Codec codec,
-                        final MetricRegistry metricRegistry) {
-        super(metricRegistry, transport, codec);
+                        final MetricRegistry metricRegistry,  LocalMetricRegistry localRegistry) {
+        super(metricRegistry, transport, codec, localRegistry);
     }
 
     @AssistedInject
     public RawTCPInput2(@Assisted final Configuration configuration,
                         final TcpTransport.Factory tcpTransportFactory,
                         final RawCodec.Factory rawCodecFactory,
-                        final MetricRegistry metricRegistry) {
-        super(metricRegistry, tcpTransportFactory.create(configuration), rawCodecFactory.create(configuration));
+                        final MetricRegistry metricRegistry,  LocalMetricRegistry localRegistry) {
+        super(metricRegistry,
+              tcpTransportFactory.create(configuration),
+              rawCodecFactory.create(configuration),
+              localRegistry
+        );
     }
 
     @Override
@@ -78,6 +83,7 @@ public class RawTCPInput2 extends MessageInput2 {
 
     public interface Factory extends MessageInput2.Factory<RawTCPInput2> {
         RawTCPInput2 create(Configuration configuration);
+
         RawTCPInput2 create(Configuration configuration, Transport transport, Codec codec);
     }
 }

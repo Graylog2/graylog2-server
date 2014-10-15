@@ -21,6 +21,7 @@ import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import org.graylog2.inputs.codecs.GelfCodec;
 import org.graylog2.inputs.transports.TcpTransport;
+import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.inputs.MessageInput2;
 import org.graylog2.plugin.inputs.codecs.Codec;
@@ -32,16 +33,16 @@ public class GELFTCPInput2 extends MessageInput2 {
     public GELFTCPInput2(MetricRegistry metricRegistry,
                          @Assisted Configuration configuration,
                          TcpTransport.Factory tcpFactory,
-                         GelfCodec.Factory gelfCodecFactory) {
-        super(metricRegistry, tcpFactory.create(configuration), gelfCodecFactory.create(configuration));
+                         GelfCodec.Factory gelfCodecFactory, LocalMetricRegistry localRegistry) {
+        super(metricRegistry, tcpFactory.create(configuration), gelfCodecFactory.create(configuration), localRegistry);
     }
 
     @AssistedInject
     public GELFTCPInput2(MetricRegistry metricRegistry,
                          @Assisted Configuration configuration,
                          @Assisted Transport transport,
-                         @Assisted Codec codec) {
-        super(metricRegistry, transport, codec);
+                         @Assisted Codec codec, LocalMetricRegistry localRegistry) {
+        super(metricRegistry, transport, codec, localRegistry);
     }
 
     @Override

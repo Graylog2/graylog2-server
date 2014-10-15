@@ -21,6 +21,7 @@ import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import org.graylog2.inputs.codecs.RadioMessageCodec;
 import org.graylog2.inputs.transports.AmqpTransport;
+import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.inputs.MessageInput2;
 import org.graylog2.plugin.inputs.codecs.Codec;
@@ -32,16 +33,16 @@ public class AMQPInput2 extends MessageInput2 {
     public AMQPInput2(@Assisted Configuration configuration,
                        MetricRegistry metricRegistry,
                        @Assisted Transport transport,
-                       @Assisted Codec codec) {
-        super(metricRegistry, transport, codec);
+                       @Assisted Codec codec, LocalMetricRegistry localRegistry) {
+        super(metricRegistry, transport, codec, localRegistry);
     }
 
     @AssistedInject
     public AMQPInput2(@Assisted Configuration configuration,
                        MetricRegistry metricRegistry,
                        AmqpTransport.Factory transport,
-                       RadioMessageCodec.Factory codec) {
-        super(metricRegistry, transport.create(configuration), codec.create(configuration));
+                       RadioMessageCodec.Factory codec, LocalMetricRegistry localRegistry) {
+        super(metricRegistry, transport.create(configuration), codec.create(configuration), localRegistry);
     }
     @Override
     public boolean isExclusive() {

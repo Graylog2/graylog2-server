@@ -26,6 +26,7 @@ import com.google.inject.assistedinject.AssistedInject;
 import kafka.consumer.*;
 import kafka.javaapi.consumer.ConsumerConnector;
 import kafka.message.MessageAndMetadata;
+import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.buffers.BufferOutOfCapacityException;
 import org.graylog2.plugin.buffers.ProcessingDisabledException;
@@ -59,39 +60,59 @@ public class KafkaTransport extends ThrottleableTransport {
     public static final String CK_TOPIC_FILTER = "topic_filter";
     public static final String CK_THREADS = "threads";
     private static final Logger LOG = LoggerFactory.getLogger(KafkaTransport.class);
-
-    private volatile boolean stopped = false;
-    private volatile boolean paused = true;
-    private volatile CountDownLatch pausedLatch = new CountDownLatch(1);
-
-    private CountDownLatch stopLatch;
-
-    private ConsumerConnector cc;
-
     private final Configuration configuration;
-    private final MetricRegistry metricRegistry;
+    private final MetricRegistry localRegistry;
     private final NodeId nodeId;
     private final EventBus serverEventBus;
     private final ServerStatus serverStatus;
     private final ScheduledExecutorService scheduler;
-
     private final AtomicLong totalBytesRead = new AtomicLong(0);
     private final AtomicLong lastSecBytesRead = new AtomicLong(0);
     private final AtomicLong lastSecBytesReadTmp = new AtomicLong(0);
+    private volatile boolean stopped = false;
+    private volatile boolean paused = true;
+    private volatile CountDownLatch pausedLatch = new CountDownLatch(1);
+    private CountDownLatch stopLatch;
+    private ConsumerConnector cc;
 
     @AssistedInject
     public KafkaTransport(@Assisted Configuration configuration,
-                          MetricRegistry metricRegistry,
+                          LocalMetricRegistry localRegistry,
                           NodeId nodeId,
                           EventBus serverEventBus,
                           ServerStatus serverStatus,
                           @Named("daemonScheduler") ScheduledExecutorService scheduler) {
         this.configuration = configuration;
-        this.metricRegistry = metricRegistry;
+        this.localRegistry = localRegistry;
         this.nodeId = nodeId;
         this.serverEventBus = serverEventBus;
         this.serverStatus = serverStatus;
         this.scheduler = scheduler;
+
+        localRegistry.register("read_bytes_1sec", new Gauge<Long>() {
+            @Override
+            public Long getValue() {
+                return lastSecBytesRead.get();
+            }
+        });
+        localRegistry.register("written_bytes_1sec", new Gauge<Long>() {
+            @Override
+            public Long getValue() {
+                return 0L;
+            }
+        });
+        localRegistry.register("read_bytes_total", new Gauge<Long>() {
+            @Override
+            public Long getValue() {
+                return totalBytesRead.get();
+            }
+        });
+        localRegistry.register("written_bytes_total", new Gauge<Long>() {
+            @Override
+            public Long getValue() {
+                return 0L;
+            }
+        });
     }
 
     @Subscribe
@@ -160,7 +181,8 @@ public class KafkaTransport extends ThrottleableTransport {
                     while (consumerIterator.hasNext()) {
                         if (paused) {
                             // we try not to spin here, so we wait until the lifecycle goes back to running.
-                            LOG.debug("Message processing is paused, blocking until message processing is turned back on.");
+                            LOG.debug(
+                                    "Message processing is paused, blocking until message processing is turned back on.");
                             Uninterruptibles.awaitUninterruptibly(pausedLatch);
                         }
                         // check for being stopped before actually getting the message, otherwise we could end up losing that message
@@ -190,8 +212,10 @@ public class KafkaTransport extends ThrottleableTransport {
                             try {
                                 if (retry) {
                                     // don't try immediately if the buffer was full, try not spin too much
-                                    LOG.debug("Waiting 10ms to retry inserting into buffer, retried {} times", retryCount);
-                                    Uninterruptibles.sleepUninterruptibly(10, TimeUnit.MILLISECONDS); // TODO magic number
+                                    LOG.debug("Waiting 10ms to retry inserting into buffer, retried {} times",
+                                              retryCount);
+                                    Uninterruptibles.sleepUninterruptibly(10,
+                                                                          TimeUnit.MILLISECONDS); // TODO magic number
                                 }
                                 // try to process the message, if it succeeds, we immediately move on to the next message (retry will be false)
                                 // if parsing the message failed, this will return 'true' (sorry for the stupid return value handling, amqp needs to know
@@ -206,8 +230,9 @@ public class KafkaTransport extends ThrottleableTransport {
                                 retry = true;
                                 retryCount++;
                             } catch (ProcessingDisabledException e) {
-                                LOG.debug("Processing was disabled after we read the message but before we could insert it into " +
-                                                  "the buffer. We cache this one message, and should block on the next iteration.");
+                                LOG.debug(
+                                        "Processing was disabled after we read the message but before we could insert it into " +
+                                                "the buffer. We cache this one message, and should block on the next iteration.");
                                 input.processRawMessage(rawMessage);
                                 retry = false;
                             }
@@ -244,8 +269,9 @@ public class KafkaTransport extends ThrottleableTransport {
                 stopLatch = null;
                 if (!allStoppedOrderly) {
                     // timed out
-                    LOG.info("Stopping Kafka input timed out (waited 5 seconds for consumer threads to stop). Forcefully closing connection now. " +
-                                     "This is usually harmless when stopping the input.");
+                    LOG.info(
+                            "Stopping Kafka input timed out (waited 5 seconds for consumer threads to stop). Forcefully closing connection now. " +
+                                    "This is usually harmless when stopping the input.");
                 }
             } catch (InterruptedException e) {
                 LOG.debug("Interrupted while waiting to stop input.");
@@ -300,34 +326,8 @@ public class KafkaTransport extends ThrottleableTransport {
     }
 
     @Override
-    public void setupMetrics(MessageInput2 input) {
-        metricRegistry.register(MetricRegistry.name(input.getUniqueReadableId(), "read_bytes_1sec"), new Gauge<Long>() {
-            @Override
-            public Long getValue() {
-                return lastSecBytesRead.get();
-            }
-        });
-
-        metricRegistry.register(MetricRegistry.name(input.getUniqueReadableId(), "written_bytes_1sec"), new Gauge<Long>() {
-            @Override
-            public Long getValue() {
-                return 0L;
-            }
-        });
-
-        metricRegistry.register(MetricRegistry.name(input.getUniqueReadableId(), "read_bytes_total"), new Gauge<Long>() {
-            @Override
-            public Long getValue() {
-                return totalBytesRead.get();
-            }
-        });
-
-        metricRegistry.register(MetricRegistry.name(input.getUniqueReadableId(), "written_bytes_total"), new Gauge<Long>() {
-            @Override
-            public Long getValue() {
-                return 0L;
-            }
-        });
+    public com.codahale.metrics.MetricSet getMetricSet() {
+        return localRegistry;
     }
 
     public interface Factory extends TransportFactory<KafkaTransport> {

@@ -22,6 +22,7 @@
  */
 package org.graylog2.plugin.inputs.transports;
 
+import com.codahale.metrics.MetricSet;
 import com.google.common.util.concurrent.AbstractExecutionThreadService;
 import com.google.common.util.concurrent.Service;
 import org.graylog2.plugin.inputs.MessageInput2;
@@ -73,7 +74,7 @@ public abstract class GeneratorTransport implements Transport {
     }
 
     @Override
-    public void setupMetrics(MessageInput2 input) {
-
+    public MetricSet getMetricSet() {
+        return null;
     }
 }

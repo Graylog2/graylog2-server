@@ -38,6 +38,7 @@ import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import org.graylog2.inputs.codecs.RawCodec;
 import org.graylog2.inputs.transports.UdpTransport;
+import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.inputs.MessageInput2;
 import org.graylog2.plugin.inputs.codecs.Codec;
@@ -49,16 +50,16 @@ public class RawUDPInput2 extends MessageInput2 {
     public RawUDPInput2(MetricRegistry metricRegistry,
                         @Assisted final Configuration configuration,
                         @Assisted final Transport transport,
-                        @Assisted final Codec codec) {
-        super(metricRegistry, transport, codec);
+                        @Assisted final Codec codec,  LocalMetricRegistry localRegistry) {
+        super(metricRegistry, transport, codec, localRegistry);
     }
 
     @AssistedInject
     public RawUDPInput2(MetricRegistry metricRegistry,
                         @Assisted final Configuration configuration,
                         final UdpTransport.Factory udpTransportFactory,
-                        final RawCodec.Factory rawCodecFactory) {
-        super(metricRegistry, udpTransportFactory.create(configuration), rawCodecFactory.create(configuration));
+                        final RawCodec.Factory rawCodecFactory,  LocalMetricRegistry localRegistry) {
+        super(metricRegistry, udpTransportFactory.create(configuration), rawCodecFactory.create(configuration), localRegistry);
     }
 
     @Override

@@ -22,11 +22,13 @@
  */
 package org.graylog2.plugin.inputs.transports;
 
-import com.codahale.metrics.Gauge;
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.MetricSet;
 import com.codahale.metrics.Timer;
 import com.google.common.collect.Lists;
+import org.graylog2.plugin.LocalMetricRegistry;
+import org.graylog2.plugin.MetricSets;
 import org.graylog2.plugin.collections.Pair;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
@@ -48,9 +50,7 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nullable;
 import java.net.InetSocketAddress;
 import java.util.List;
-import java.util.Map;
 
-import static com.codahale.metrics.MetricRegistry.name;
 import static org.jboss.netty.channel.Channels.fireMessageReceived;
 
 public abstract class NettyTransport implements Transport {
@@ -60,8 +60,8 @@ public abstract class NettyTransport implements Transport {
 
     private static final Logger log = LoggerFactory.getLogger(NettyTransport.class);
 
-    public static int DEFAULT_RECV_BUFFER_SIZE = 1024 * 1024;
-    protected final MetricRegistry metricRegistry;
+    public static final int DEFAULT_RECV_BUFFER_SIZE = 1024 * 1024;
+    protected final MetricRegistry localRegistry;
 
     private final InetSocketAddress socketAddress;
     protected final ThroughputCounter throughputCounter;
@@ -75,7 +75,7 @@ public abstract class NettyTransport implements Transport {
 
     public NettyTransport(Configuration configuration,
                           ThroughputCounter throughputCounter,
-                          MetricRegistry metricRegistry) {
+                          LocalMetricRegistry localRegistry) {
         this.throughputCounter = throughputCounter;
 
         if (configuration.stringIsSet(CK_BIND_ADDRESS) && configuration.intIsSet(CK_PORT)) {
@@ -89,7 +89,9 @@ public abstract class NettyTransport implements Transport {
         this.recvBufferSize = configuration.intIsSet(CK_RECV_BUFFER_SIZE)
                 ? configuration.getInt(CK_RECV_BUFFER_SIZE)
                 : DEFAULT_RECV_BUFFER_SIZE;
-        this.metricRegistry = metricRegistry;
+
+        this.localRegistry = localRegistry;
+        localRegistry.registerAll(MetricSets.of(throughputCounter.gauges()));
     }
 
     private ChannelPipelineFactory getPipelineFactory(final List<Pair<String, ? extends ChannelHandler>> handlerList) {
@@ -214,11 +216,8 @@ public abstract class NettyTransport implements Transport {
     }
 
     @Override
-    public void setupMetrics(MessageInput2 input) {
-        // Register throughput counter gauges.
-        for(Map.Entry<String,Gauge<Long>> gauge : throughputCounter.gauges().entrySet()) {
-            metricRegistry.register(name(input.getUniqueReadableId(), gauge.getKey()), gauge.getValue());
-        }
+    public MetricSet getMetricSet() {
+        return localRegistry;
     }
 
     private class MessageAggregationHandler extends SimpleChannelHandler {
@@ -230,8 +229,8 @@ public abstract class NettyTransport implements Transport {
         public MessageAggregationHandler(MessageInput2 input, CodecAggregator aggregator) {
             this.input = input;
             this.aggregator = aggregator;
-            aggregationTimer = metricRegistry.timer(name(input.getUniqueReadableId(), "aggregationTime"));
-            invalidChunksMeter = metricRegistry.meter(name(input.getUniqueReadableId(), "invalidMessages"));
+            aggregationTimer = localRegistry.timer("aggregationTime");
+            invalidChunksMeter = localRegistry.meter("invalidMessages");
         }
 
         @Override

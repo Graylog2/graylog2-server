@@ -24,6 +24,7 @@ package org.graylog2.plugin.inputs;
 
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.MetricSet;
 import com.codahale.metrics.Timer;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.buffers.Buffer;
@@ -40,8 +41,6 @@ import org.graylog2.plugin.journal.RawMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static com.codahale.metrics.MetricRegistry.name;
-
 public abstract class MessageInput2 extends MessageInput {
     private static final Logger log = LoggerFactory.getLogger(MessageInput2.class);
 
@@ -50,42 +49,39 @@ public abstract class MessageInput2 extends MessageInput {
     private final MetricRegistry metricRegistry;
     private final Transport transport;
     private final Codec codec;
+    private final MetricRegistry localRegistry;
     private Buffer processBuffer;
 
-    private Meter failures;
-    private Meter incompleteMessages;
-    private Meter incomingMessages;
-    private Meter processedMessages;
-    private Timer parseTime;
-    private Meter rawSize;
+    private final Meter failures;
+    private final Meter incompleteMessages;
+    private final Meter incomingMessages;
+    private final Meter processedMessages;
+    private final Timer parseTime;
+    private final Meter rawSize;
 
-    public MessageInput2(MetricRegistry metricRegistry, Transport transport, Codec codec) {
+    public MessageInput2(MetricRegistry metricRegistry, Transport transport, Codec codec, MetricRegistry localRegistry) {
         this.metricRegistry = metricRegistry;
         this.transport = transport;
         this.codec = codec;
+
+        this.localRegistry = localRegistry;
+        incomingMessages = localRegistry.meter("incomingMessages");
+        failures = localRegistry.meter("failures");
+        incompleteMessages = localRegistry.meter("incompleteMessages");
+        processedMessages = localRegistry.meter("processedMessages");
+        parseTime = localRegistry.timer("parseTime");
+        rawSize = localRegistry.meter("rawSize");
     }
 
     @Override
     public void initialize(Configuration configuration) {
         super.initialize(configuration);
-        transport.setupMetrics(this);
-        setupMetrics();
-    }
+        final MetricSet transportMetrics = transport.getMetricSet();
 
-    // TODO convert to returning a metric set for use with prefix
-    public void setupMetrics() {
-        if (getId() == null) {
-            log.error("Unable to register metrics, id has not been set! This will lead to errors and is a bug.");
-            throw new IllegalStateException("Missing input id.");
+        if (transportMetrics != null) {
+            metricRegistry.register(getUniqueReadableId(), transportMetrics);
         }
-        final String metricsId = getUniqueReadableId();
-
-        incomingMessages = metricRegistry.meter(name(metricsId, "incomingMessages"));
-        failures = metricRegistry.meter(name(metricsId, "failures"));
-        incompleteMessages = metricRegistry.meter(name(metricsId, "incompleteMessages"));
-        processedMessages = metricRegistry.meter(name(metricsId, "processedMessages"));
-        parseTime = metricRegistry.timer(name(metricsId, "parseTime"));
-        rawSize = metricRegistry.meter(name(metricsId, "rawSize"));
+        metricRegistry.register(getUniqueReadableId(), localRegistry);
     }
 
     @Override

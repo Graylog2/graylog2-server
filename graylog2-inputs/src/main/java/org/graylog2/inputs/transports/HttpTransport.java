@@ -16,11 +16,10 @@
  */
 package org.graylog2.inputs.transports;
 
-import com.codahale.metrics.MetricRegistry;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
+import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.collections.Pair;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
@@ -58,11 +57,10 @@ public class HttpTransport extends AbstractTcpTransport {
                          @Named("cached") Provider<Executor> workerPoolProvider,
                          ThroughputCounter throughputCounter,
                          ConnectionCounter connectionCounter,
-                         MetricRegistry metricRegistry,
-                         ObjectMapper mapper) {
+                         LocalMetricRegistry localRegistry) {
         super(configuration,
               throughputCounter,
-              metricRegistry,
+              localRegistry,
               bossPool,
               workerPoolProvider,
               connectionCounter);

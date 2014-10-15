@@ -21,6 +21,7 @@ import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import org.graylog2.inputs.codecs.RandomHttpMessageCodec;
 import org.graylog2.inputs.transports.RandomMessageTransport;
+import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.inputs.MessageInput2;
 import org.graylog2.plugin.inputs.codecs.Codec;
@@ -30,16 +31,23 @@ public class FakeHttpMessageInput2 extends MessageInput2 {
 
     @AssistedInject
     public FakeHttpMessageInput2(@Assisted Configuration configuration,
-                                 @Assisted Transport transport, @Assisted Codec codec, MetricRegistry metricRegistry) {
-        super(metricRegistry, transport, codec);
+                                 @Assisted Transport transport,
+                                 @Assisted Codec codec,
+                                 MetricRegistry metricRegistry,
+                                 LocalMetricRegistry localRegistry) {
+        super(metricRegistry, transport, codec, localRegistry);
     }
 
     @AssistedInject
     public FakeHttpMessageInput2(@Assisted Configuration configuration,
                                  RandomMessageTransport.Factory transportFactory,
                                  RandomHttpMessageCodec.Factory codecFactory,
-                                 MetricRegistry metricRegistry) {
-        super(metricRegistry, transportFactory.create(configuration), codecFactory.create(configuration));
+                                 MetricRegistry metricRegistry, LocalMetricRegistry localRegistry) {
+        super(metricRegistry,
+              transportFactory.create(configuration),
+              codecFactory.create(configuration),
+              localRegistry
+        );
     }
 
     @Override
@@ -59,6 +67,7 @@ public class FakeHttpMessageInput2 extends MessageInput2 {
 
     public interface Factory extends MessageInput2.Factory<FakeHttpMessageInput2> {
         FakeHttpMessageInput2 create(Configuration configuration);
+
         FakeHttpMessageInput2 create(Configuration configuration, Transport transport, Codec codec);
     }
 }

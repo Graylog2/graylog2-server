@@ -20,23 +20,21 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.graylog2.plugin.inputs.transports;
+package org.graylog2.plugin;
 
+import com.codahale.metrics.Metric;
 import com.codahale.metrics.MetricSet;
-import org.graylog2.plugin.configuration.ConfigurationRequest;
-import org.graylog2.plugin.inputs.MessageInput2;
-import org.graylog2.plugin.inputs.MisfireException;
-import org.graylog2.plugin.inputs.codecs.CodecAggregator;
+import com.google.common.collect.ImmutableMap;
 
-public interface Transport {
+import java.util.Map;
 
-    void setMessageAggregator(CodecAggregator aggregator);
-
-    void launch(MessageInput2 input) throws MisfireException;
-
-    void stop();
-
-    ConfigurationRequest getRequestedConfiguration();
-
-    MetricSet getMetricSet();
+public class MetricSets {
+    public static MetricSet of(final Map<String, ? extends Metric> gauges) {
+        return new MetricSet(){
+            @Override
+            public Map<String, Metric> getMetrics() {
+                return ImmutableMap.copyOf(gauges);
+            }
+        };
+    }
 }

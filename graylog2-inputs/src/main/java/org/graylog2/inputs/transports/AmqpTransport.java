@@ -22,6 +22,7 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
+import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.configuration.fields.ConfigurationField;
@@ -55,7 +56,7 @@ public class AmqpTransport extends ThrottleableTransport {
 
     private final Configuration configuration;
     private final EventBus eventBus;
-    private final MetricRegistry metricRegistry;
+    private final MetricRegistry localRegistry;
     private final ScheduledExecutorService scheduler;
 
     private AmqpConsumer consumer;
@@ -63,12 +64,33 @@ public class AmqpTransport extends ThrottleableTransport {
     @AssistedInject
     public AmqpTransport(@Assisted Configuration configuration,
                          EventBus eventBus,
-                         MetricRegistry metricRegistry,
+                         LocalMetricRegistry localRegistry,
                          @Named("daemonScheduler") ScheduledExecutorService scheduler) {
         this.configuration = configuration;
         this.eventBus = eventBus;
-        this.metricRegistry = metricRegistry;
+        this.localRegistry = localRegistry;
         this.scheduler = scheduler;
+
+        localRegistry.register("read_bytes_1sec", new Gauge<Long>() {
+            @Override
+            public Long getValue() { return consumer.getLastSecBytesRead().get();
+            }
+        });
+        localRegistry.register("written_bytes_1sec", new Gauge<Long>() {
+                                    @Override
+                                    public Long getValue() { return 0L;
+                                    }
+                                });
+        localRegistry.register("read_bytes_total", new Gauge<Long>() {
+                                    @Override
+                                    public Long getValue() { return consumer.getTotalBytesRead().get();
+                                    }
+                                });
+        localRegistry.register("written_bytes_total", new Gauge<Long>() {
+                                    @Override
+                                    public Long getValue() { return 0L;
+                                    }
+                                });
     }
 
     @Subscribe
@@ -242,38 +264,8 @@ public class AmqpTransport extends ThrottleableTransport {
     }
 
     @Override
-    public void setupMetrics(MessageInput2 input) {
-        metricRegistry.register(MetricRegistry.name(input.getUniqueReadableId(), "read_bytes_1sec"), new Gauge<Long>() {
-            @Override
-            public Long getValue() {
-                return consumer.getLastSecBytesRead().get();
-            }
-        });
-
-        metricRegistry.register(MetricRegistry.name(input.getUniqueReadableId(), "written_bytes_1sec"),
-                                new Gauge<Long>() {
-                                    @Override
-                                    public Long getValue() {
-                                        return 0L;
-                                    }
-                                });
-
-        metricRegistry.register(MetricRegistry.name(input.getUniqueReadableId(), "read_bytes_total"),
-                                new Gauge<Long>() {
-                                    @Override
-                                    public Long getValue() {
-                                        return consumer.getTotalBytesRead().get();
-                                    }
-                                });
-
-        metricRegistry.register(MetricRegistry.name(input.getUniqueReadableId(), "written_bytes_total"),
-                                new Gauge<Long>() {
-                                    @Override
-                                    public Long getValue() {
-                                        return 0L;
-                                    }
-                                });
-
+    public com.codahale.metrics.MetricSet getMetricSet() {
+        return localRegistry;
     }
 
     public interface Factory extends TransportFactory<AmqpTransport> {

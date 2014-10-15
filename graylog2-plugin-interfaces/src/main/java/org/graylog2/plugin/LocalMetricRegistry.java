@@ -20,23 +20,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.graylog2.plugin.inputs.transports;
+package org.graylog2.plugin;
 
-import com.codahale.metrics.MetricSet;
-import org.graylog2.plugin.configuration.ConfigurationRequest;
-import org.graylog2.plugin.inputs.MessageInput2;
-import org.graylog2.plugin.inputs.MisfireException;
-import org.graylog2.plugin.inputs.codecs.CodecAggregator;
+import com.codahale.metrics.MetricRegistry;
 
-public interface Transport {
-
-    void setMessageAggregator(CodecAggregator aggregator);
-
-    void launch(MessageInput2 input) throws MisfireException;
-
-    void stop();
-
-    ConfigurationRequest getRequestedConfiguration();
-
-    MetricSet getMetricSet();
+// TODO this is a stupid workaround to have both a Singleton MetricRegistry and be able to inject new instances for local usage.
+public class LocalMetricRegistry extends MetricRegistry {
 }
