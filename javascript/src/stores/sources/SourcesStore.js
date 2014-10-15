@@ -6,8 +6,17 @@ var mergeInto = require('../../lib/util').mergeInto;
 var AbstractEventSendingStore = require('../AbstractEventSendingStore');
 var $ = require('jquery'); // excluded and shimed
 
+var processSourcesData = (sources) => {
+    var total = 0;
+    sources.forEach((d) => total += d.messageCount);
+    sources.forEach((d) => {
+        d.percentage = d.messageCount / total * 100;
+    });
+    return sources;
+};
+
 var SourcesStore = {
-    URL: '/a/sources',
+    SOURCES_URL: '/a/sources',
 
     setSources(sources) {
         this._sources = sources;
@@ -19,11 +28,11 @@ var SourcesStore = {
     },
 
     loadSources(range) {
-        var url = this.URL;
+        var url = this.SOURCES_URL;
         if (typeof range !== 'undefined') {
             url += "?range="+range;
         }
-        var successCallback = (data) => this.setSources(data);
+        var successCallback = (data) => this.setSources(processSourcesData(data));
         var failCallback = (jqXHR, textStatus, errorThrown) => {
             console.error("Loading of user sources failed with status: " + textStatus);
             console.error("Error", errorThrown);

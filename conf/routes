@@ -171,6 +171,7 @@ POST        /dashboards/:id/delete                                              
 GET         /a/search/fieldstats                                                     @controllers.api.SearchApiController.fieldStats(q ?= "", field ?= "", rangetype ?= "", relative:Integer ?= -1, from ?= "", to ?= "", keyword ?= "", stream_id ?= "")
 GET         /a/search/fieldterms                                                     @controllers.api.SearchApiController.fieldTerms(q ?= "", field ?= "", rangetype ?= "", relative:Integer ?= -1, from ?= "", to ?= "", keyword ?= "", stream_id ?= "")
 GET         /a/search/fieldhistogram                                                 @controllers.api.SearchApiController.fieldHistogram(q ?= "", field ?= "", rangetype ?= "", relative:Integer ?= -1, from ?= "", to ?= "", keyword ?= "", interval ?= "", valueType ?= "", streamId ?= "")
+GET         /a/search/histogram                                                      @controllers.api.SearchApiController.histogram(q ?= "", rangetype ?= "", relative:Integer ?= -1, from ?= "", to ?= "", keyword ?= "", interval ?= "", streamId ?= "", maxDataPoints:Integer ?= -1)
 
 # API: Message counts and histograms
 GET         /a/messagecounts/total                                                   @controllers.MessageCountsController.total()

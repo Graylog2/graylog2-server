@@ -11,6 +11,7 @@ var d3 = require('d3');
 var dc = require('dc');
 
 var SourcesStore = require('../../stores/sources/SourcesStore');
+var HistogramDataStore = require('../../stores/sources/HistogramDataStore');
 
 var daysToSeconds = (days) => moment.duration(days, 'days').as('seconds');
 
@@ -24,12 +25,31 @@ var SourceOverview = React.createClass({
         this.othersDimension = this.sourcesData.dimension((d) => d.percentage > othersThreshold ? d.name : 'Others');
         this.othersMessageGroup = this.othersDimension.group().reduceSum((d) => d.messageCount);
 
+        this.histogramData = crossfilter();
+        this.valueDimension = this.histogramData.dimension((d) => new Date(d.x * 1000));
+        this.valueGroup = this.valueDimension.group().reduceSum((d) => d.y);
+
         return {
             range: daysToSeconds(1),
             filter: '',
             renderResultTable: false
         };
     },
+    componentDidMount() {
+        SourcesStore.addChangeListener(this._onSourcesChanged);
+        HistogramDataStore.addChangeListener(this._onHistogramDataChanged);
+        this.renderDataTable();
+        this.renderPieChart();
+        this.renderLineChart();
+        dc.renderAll();
+        SourcesStore.loadSources(this.state.range);
+        HistogramDataStore.loadHistogramData(this.state.range);
+    },
+    componentWillUnmount() {
+        SourcesStore.removeChangeListener(this._onSourcesChanged);
+        HistogramDataStore.removeChangeListener(this._onHistogramDataChanged);
+    },
+
     renderPieChart() {
         var pieChartDomNode = $("#dc-sources-pie-chart")[0];
         dc.pieChart(pieChartDomNode)
@@ -39,6 +59,28 @@ var SourceOverview = React.createClass({
             .innerRadius(40)
             .dimension(this.othersDimension)
             .group(this.othersMessageGroup);
+    },
+
+    renderLineChart() {
+        var lineChartDomNode = $("#dc-sources-line-chart")[0];
+        dc.lineChart(lineChartDomNode)
+            .width($(lineChartDomNode).width())
+            .height(200)
+            .margins({left: 50, right: 20, top: 10, bottom: 20})
+            //.renderArea(true)
+            .dimension(this.valueDimension)
+            .group(this.valueGroup)
+            .x(d3.time.scale().domain([new Date(2014, 9, 14), new Date(2014, 9, 16)]))
+            .xUnits(d3.time.minutes)
+            //.valueAccessor(function (d) {
+            //    return d.y;
+            //})
+            .renderHorizontalGridLines(true)
+            .elasticY(true)
+            //.xAxis().tickFormat(function (v) {
+            //    return v;
+            //})
+        ;
     },
     renderDataTable() {
         var dataTableDomNode = $("#dc-sources-result")[0];
@@ -65,28 +107,21 @@ var SourceOverview = React.createClass({
             .order(d3.descending)
             .renderlet((table) => table.selectAll(".dc-table-group").classed("info", true));
     },
-    componentDidMount() {
-        SourcesStore.addChangeListener(this._onSourcesChanged);
-        this.renderDataTable();
-        this.renderPieChart();
-        dc.renderAll();
-        SourcesStore.loadSources(this.state.range);
-    },
-    componentWillUnmount() {
-        SourcesStore.removeChangeListener(this._onSourcesChanged);
-    },
-    _onSourcesChanged() {
+     _onSourcesChanged() {
         // TODO: save filters once we have some
-        this.sourcesData.remove();
         var sources = SourcesStore.getSources();
-        var total = 0;
-        sources.forEach((d) => total += d.messageCount);
-        sources.forEach((d) => {
-            d.percentage = d.messageCount / total * 100;
-        });
+        this.sourcesData.remove();
         this.sourcesData.add(sources);
         dc.redrawAll();
         this.setState({renderResultTable: this.sourcesData.size() !== 0});
+    },
+    _onHistogramDataChanged() {
+        // TODO: save filters once we have some
+        var histogramData = HistogramDataStore.getHistogramData();
+        // TODO do something with the rest of the data
+        this.histogramData.remove();
+        this.histogramData.add(histogramData.values);
+        dc.redrawAll();
     },
     render() {
         var emptySources = <div className="alert alert-info">
@@ -130,6 +165,10 @@ var SourceOverview = React.createClass({
 
                     &nbsp;Note that the list is cached for a few seconds so you might have to wait a bit until a new source
                     appears.
+                    </div>
+                </div>
+                <div className="row-fluid">
+                    <div id="dc-sources-line-chart" className="span12">
                     </div>
                 </div>
                 {this.state.renderResultTable ? null : emptySources}
