@@ -74,10 +74,10 @@ var SourceOverview = React.createClass({
             //.renderArea(true)
             .dimension(this.valueDimension)
             .group(this.valueGroup)
-            .x(d3.time.scale().domain([new Date(2014, 9, 14), new Date(2014, 9, 16)]))
+            .x(d3.time.scale())
             .xUnits(d3.time.minutes)
-            //.brushOn(false)
             .renderHorizontalGridLines(true)
+            .elasticX(true)
             .elasticY(true);
     },
     renderDataTable() {
