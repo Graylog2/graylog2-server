@@ -31,7 +31,7 @@ import java.util.Map;
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
  */
-public class AbstractConfigurationField {
+public abstract class AbstractConfigurationField implements ConfigurationField {
     protected final String field_type;
     protected final String name;
     protected final String humanName;

@@ -18,9 +18,9 @@ package org.graylog2.rest.resources.documentation;
 
 import com.codahale.metrics.annotation.Timed;
 import org.graylog2.Configuration;
-import org.graylog2.rest.documentation.annotations.Api;
-import org.graylog2.rest.documentation.annotations.ApiOperation;
-import org.graylog2.rest.documentation.annotations.ApiParam;
+import com.wordnik.swagger.annotations.Api;
+import com.wordnik.swagger.annotations.ApiOperation;
+import com.wordnik.swagger.annotations.ApiParam;
 import org.graylog2.rest.documentation.generator.Generator;
 import org.graylog2.rest.resources.RestResource;
 
@@ -63,7 +63,7 @@ public class DocumentationResource extends RestResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/{route: .+}")
     public Response route(
-            @ApiParam(title = "route", description = "Route to fetch. For example /system", required = true) @PathParam("route") String route) {        return buildSuccessfulCORSResponse(
+            @ApiParam(name = "route", value = "Route to fetch. For example /system", required = true) @PathParam("route") String route) {        return buildSuccessfulCORSResponse(
                 new Generator(RESOURCE_PACKAGE, objectMapper).generateForRoute(route, configuration.getRestTransportUri().toString())
         );
     }

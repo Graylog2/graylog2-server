@@ -33,7 +33,7 @@ import java.util.Map;
  */
 public interface StreamService extends PersistedService {
     Stream create(Map<String, Object> fields);
-    Stream create(CreateRequest request);
+    Stream create(CreateRequest request, String userId);
     Stream load(String id) throws NotFoundException;
     void destroy(Stream stream) throws NotFoundException;
     List<Stream> loadAll();

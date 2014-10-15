@@ -27,7 +27,7 @@ import org.graylog2.indexer.results.TermsResult;
 import org.graylog2.indexer.searches.Searches;
 import org.graylog2.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.indexer.searches.timeranges.RelativeRange;
-import org.graylog2.rest.documentation.annotations.*;
+import com.wordnik.swagger.annotations.*;
 import org.graylog2.rest.resources.RestResource;
 import org.graylog2.security.RestPermissions;
 import org.slf4j.Logger;
@@ -77,7 +77,7 @@ public class SourcesResource extends RestResource {
 
     @Produces(MediaType.APPLICATION_JSON)
     public String list(
-            @ApiParam(title = "range", description = "Relative timeframe to search in. See method description.", required = true)
+            @ApiParam(name = "range", value = "Relative timeframe to search in. See method description.", required = true)
             @QueryParam("range")
             final int range) {
         TermsResult sources;

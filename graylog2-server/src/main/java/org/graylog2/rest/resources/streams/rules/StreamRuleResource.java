@@ -24,7 +24,7 @@ import org.graylog2.database.ValidationException;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.streams.StreamRule;
 import org.graylog2.plugin.streams.StreamRuleType;
-import org.graylog2.rest.documentation.annotations.*;
+import com.wordnik.swagger.annotations.*;
 import org.graylog2.rest.resources.RestResource;
 import org.graylog2.rest.resources.streams.responses.SingleStreamRuleSummaryResponse;
 import org.graylog2.rest.resources.streams.responses.StreamRuleListResponse;
@@ -65,8 +65,8 @@ public class StreamRuleResource extends RestResource {
     @ApiOperation(value = "Create a stream rule")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response create(@ApiParam(title = "streamid", description = "The stream id this new rule belongs to.", required = true) @PathParam("streamid") String streamid,
-                           @ApiParam(title = "JSON body", required = true) CreateStreamRuleRequest cr) {
+    public Response create(@ApiParam(name = "streamid", value = "The stream id this new rule belongs to.", required = true) @PathParam("streamid") String streamid,
+                           @ApiParam(name = "JSON body", required = true) CreateStreamRuleRequest cr) {
         checkPermission(RestPermissions.STREAMS_EDIT, streamid);
 
         try {
@@ -100,9 +100,9 @@ public class StreamRuleResource extends RestResource {
     })
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public SingleStreamRuleSummaryResponse update(@ApiParam(title = "streamid", description = "The stream id this rule belongs to.", required = true) @PathParam("streamid") String streamid,
-                           @ApiParam(title = "streamRuleId", description = "The stream rule id we are updating", required = true) @PathParam("streamRuleId") String streamRuleId,
-                           @ApiParam(title = "JSON body", required = true) CreateStreamRuleRequest cr) {
+    public SingleStreamRuleSummaryResponse update(@ApiParam(name = "streamid", value = "The stream id this rule belongs to.", required = true) @PathParam("streamid") String streamid,
+                           @ApiParam(name = "streamRuleId", value = "The stream rule id we are updating", required = true) @PathParam("streamRuleId") String streamRuleId,
+                           @ApiParam(name = "JSON body", required = true) CreateStreamRuleRequest cr) {
         checkPermission(RestPermissions.STREAMS_EDIT, streamid);
 
         final StreamRule streamRule;
@@ -115,8 +115,13 @@ public class StreamRuleResource extends RestResource {
             throw new javax.ws.rs.NotFoundException(e);
         }
 
+        final StreamRuleType streamRuleType = StreamRuleType.fromInteger(cr.type);
+        if(null == streamRuleType) {
+            throw new BadRequestException("Unknown stream rule type " + cr.type);
+        }
+
         streamRule.setField(cr.field);
-        streamRule.setType(StreamRuleType.fromInteger(cr.type));
+        streamRule.setType(streamRuleType);
         streamRule.setInverted(cr.inverted);
         streamRule.setValue(cr.value);
 
@@ -137,7 +142,7 @@ public class StreamRuleResource extends RestResource {
     @GET @Timed
     @ApiOperation(value = "Get a list of all stream rules")
     @Produces(MediaType.APPLICATION_JSON)
-    public StreamRuleListResponse get(@ApiParam(title = "streamid", description = "The id of the stream whose stream rules we want.", required = true) @PathParam("streamid") String streamid) {
+    public StreamRuleListResponse get(@ApiParam(name = "streamid", value = "The id of the stream whose stream rules we want.", required = true) @PathParam("streamid") String streamid) {
         List<Map<String, Object>> streamRules = Lists.newArrayList();
         checkPermission(RestPermissions.STREAMS_READ, streamid);
 
@@ -163,8 +168,8 @@ public class StreamRuleResource extends RestResource {
     @Timed
     @ApiOperation(value = "Get a single stream rules")
     @Produces(MediaType.APPLICATION_JSON)
-    public StreamRule get(@ApiParam(title = "streamid", description = "The id of the stream whose stream rule we want.", required = true) @PathParam("streamid") String streamid,
-                      @ApiParam(title = "streamRuleId", description = "The stream rule id we are getting", required = true) @PathParam("streamRuleId") String streamRuleId) {
+    public StreamRule get(@ApiParam(name = "streamid", value = "The id of the stream whose stream rule we want.", required = true) @PathParam("streamid") String streamid,
+                      @ApiParam(name = "streamRuleId", value = "The stream rule id we are getting", required = true) @PathParam("streamRuleId") String streamRuleId) {
         checkPermission(RestPermissions.STREAMS_READ, streamid);
 
         final StreamRule streamRule;
@@ -183,8 +188,8 @@ public class StreamRuleResource extends RestResource {
             @ApiResponse(code = 404, message = "Stream rule not found."),
             @ApiResponse(code = 400, message = "Invalid ObjectId.")
     })
-    public Response delete(@ApiParam(title = "streamid", description = "The stream id this new rule belongs to.", required = true) @PathParam("streamid") String streamid,
-                         @ApiParam(title = "streamRuleId", required = true) @PathParam("streamRuleId") String streamRuleId) {
+    public Response delete(@ApiParam(name = "streamid", value = "The stream id this new rule belongs to.", required = true) @PathParam("streamid") String streamid,
+                         @ApiParam(name = "streamRuleId", required = true) @PathParam("streamRuleId") String streamRuleId) {
         if (streamRuleId == null || streamRuleId.isEmpty()) {
             LOG.error("Missing streamRuleId. Returning HTTP 400.");
             throw new WebApplicationException(400);

@@ -89,11 +89,11 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
     }
 
     @Override
-    public Stream create(CreateRequest cr) {
+    public Stream create(CreateRequest cr, String userId) {
         Map<String, Object> streamData = Maps.newHashMap();
         streamData.put("title", cr.title);
         streamData.put("description", cr.description);
-        streamData.put("creator_user_id", cr.creatorUserId);
+        streamData.put("creator_user_id", userId);
         streamData.put("created_at", new DateTime(DateTimeZone.UTC));
 
         return create(streamData);

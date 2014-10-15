@@ -22,7 +22,7 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.database.ValidationException;
 import org.graylog2.plugin.streams.Output;
 import org.graylog2.plugin.streams.Stream;
-import org.graylog2.rest.documentation.annotations.*;
+import com.wordnik.swagger.annotations.*;
 import org.graylog2.rest.resources.RestResource;
 import org.graylog2.security.RestPermissions;
 import org.graylog2.streams.OutputService;
@@ -64,7 +64,7 @@ public class StreamOutputResource extends RestResource {
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "No such stream on this node.")
     })
-    public Response get(@ApiParam(title = "streamid", description = "The id of the stream whose outputs we want.", required = true) @PathParam("streamid") String streamid) throws org.graylog2.database.NotFoundException {
+    public Response get(@ApiParam(name = "streamid", value = "The id of the stream whose outputs we want.", required = true) @PathParam("streamid") String streamid) throws org.graylog2.database.NotFoundException {
         checkPermission(RestPermissions.STREAMS_READ, streamid);
         checkPermission(RestPermissions.STREAM_OUTPUTS_READ);
 
@@ -87,8 +87,8 @@ public class StreamOutputResource extends RestResource {
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "No such stream/output on this node.")
     })
-    public Output get(@ApiParam(title = "streamid", description = "The id of the stream whose outputs we want.", required = true) @PathParam("streamid") String streamid,
-                            @ApiParam(title = "outputId", description = "The id of the output we want.", required = true) @PathParam("outputId") String outputId) {
+    public Output get(@ApiParam(name = "streamid", value = "The id of the stream whose outputs we want.", required = true) @PathParam("streamid") String streamid,
+                            @ApiParam(name = "outputId", value = "The id of the output we want.", required = true) @PathParam("outputId") String outputId) {
         checkPermission(RestPermissions.STREAMS_READ, streamid);
         checkPermission(RestPermissions.STREAM_OUTPUTS_READ, outputId);
 
@@ -113,8 +113,8 @@ public class StreamOutputResource extends RestResource {
     @ApiResponses(value = {
             @ApiResponse(code = 400, message = "Invalid output specification in input.")
     })
-    public Response add(@ApiParam(title = "streamid", description = "The id of the stream whose outputs we want.", required = true) @PathParam("streamid") String streamid,
-                           @ApiParam(title = "JSON body", required = true) AddOutputRequest request) throws ValidationException, org.graylog2.database.NotFoundException {
+    public Response add(@ApiParam(name = "streamid", value = "The id of the stream whose outputs we want.", required = true) @PathParam("streamid") String streamid,
+                           @ApiParam(name = "JSON body", required = true) AddOutputRequest request) throws ValidationException, org.graylog2.database.NotFoundException {
         checkPermission(RestPermissions.STREAM_OUTPUTS_CREATE);
 
         final Stream stream = streamService.load(streamid);
@@ -135,8 +135,8 @@ public class StreamOutputResource extends RestResource {
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "No such stream/output on this node.")
     })
-    public Response remove(@ApiParam(title = "streamid", description = "The id of the stream whose outputs we want.", required = true) @PathParam("streamid") String streamid,
-                           @ApiParam(title = "outputId", description = "The id of the output that should be deleted", required = true) @PathParam("outputId") String outputId) throws org.graylog2.database.NotFoundException {
+    public Response remove(@ApiParam(name = "streamid", value = "The id of the stream whose outputs we want.", required = true) @PathParam("streamid") String streamid,
+                           @ApiParam(name = "outputId", value = "The id of the output that should be deleted", required = true) @PathParam("outputId") String outputId) throws org.graylog2.database.NotFoundException {
         checkPermission(RestPermissions.STREAM_OUTPUTS_DELETE);
 
         final Stream stream = streamService.load(streamid);

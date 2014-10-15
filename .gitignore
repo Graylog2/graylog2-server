@@ -13,24 +13,23 @@ coverage
 build.xml
 nbactions.xml
 
-spool
+/spool
 
 .DS_Store
 
-graylog2-server/dependency-reduced-pom.xml
-graylog2-radio/dependency-reduced-pom.xml
+dependency-reduced-pom.xml
 
-graylog2-rest-routes/src/main/java/org/graylog2/restroutes/generated
+/graylog2-rest-routes/src/main/java/org/graylog2/restroutes/generated
 
-misc/elasticsearch.yml.2
-misc/elasticsearch.yml.dev
-misc/convert_rsyslog_db_to_mongo.rb
+/misc/elasticsearch.yml.2
+/misc/elasticsearch.yml.dev
+/misc/convert_rsyslog_db_to_mongo.rb
 
-plugin/
+/plugin/
 *_gl2plugin.jar
 
-build_script/builds/*
-build_script/logs/*
+/build_script/builds/*
+/build_script/logs/*
 
 *.iml
 *.ipr

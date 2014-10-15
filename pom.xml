@@ -46,6 +46,7 @@
         <module>graylog2-inputs</module>
         <module>graylog2-radio</module>
         <module>graylog2-rest-routes</module>
+        <module>graylog2-rest-client</module>
     </modules>
 
     <organization>
@@ -101,6 +102,7 @@
         <slf4j.version>1.7.7</slf4j.version>
         <mongojack.version>2.1.0</mongojack.version>
         <findbugs.version>3.0.0</findbugs.version>
+        <swagger.version>1.3.10</swagger.version>
     </properties>
 
     <repositories>
@@ -257,7 +259,7 @@
             <dependency>
                 <groupId>com.ning</groupId>
                 <artifactId>async-http-client</artifactId>
-                <version>1.7.24</version>
+                <version>1.8.14</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.httpcomponents</groupId>
@@ -332,7 +334,7 @@
             <dependency>
                 <groupId>com.github.joschi</groupId>
                 <artifactId>jadconfig</artifactId>
-                <version>0.7.0</version>
+                <version>0.8.0</version>
             </dependency>
 
             <!-- Jersey and Glassfish -->
@@ -801,15 +803,6 @@
                 </executions>
             </plugin>
         </plugins>
-
-        <testResources>
-            <testResource>
-                <directory>src/test/resources</directory>
-                <includes>
-                    <include>test-log4j.xml</include>
-                </includes>
-            </testResource>
-        </testResources>
     </build>
 
     <reporting>

@@ -31,8 +31,6 @@ import org.graylog2.plugin.system.NodeId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Map;
-
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
@@ -103,11 +101,6 @@ public class RadioKafkaInput extends KafkaInput {
         );
 
         return cr;
-    }
-
-    @Override
-    public Map<String, Object> getAttributes() {
-        return configuration.getSource();
     }
 
     @Override

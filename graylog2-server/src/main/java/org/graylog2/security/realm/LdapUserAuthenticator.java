@@ -77,6 +77,12 @@ public class LdapUserAuthenticator extends AuthenticatingRealm {
         LdapNetworkConnection connection = null;
         try {
             connection = ldapConnector.connect(config);
+
+            if(null == connection) {
+                LOG.error("Couldn't connect to LDAP directory");
+                return null;
+            }
+
             final String password = String.valueOf(token.getPassword());
 
             final LdapEntry userEntry = ldapConnector.search(connection,

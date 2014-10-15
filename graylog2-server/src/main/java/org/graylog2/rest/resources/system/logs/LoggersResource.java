@@ -21,7 +21,7 @@ import com.google.common.collect.Maps;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.graylog2.rest.documentation.annotations.*;
+import com.wordnik.swagger.annotations.*;
 import org.graylog2.rest.resources.RestResource;
 import org.graylog2.security.RestPermissions;
 import org.slf4j.LoggerFactory;
@@ -119,8 +119,8 @@ public class LoggersResource extends RestResource {
     })
     @Path("/subsystems/{subsystem}/level/{level}")
     public Response setSubsystemLoggerLevel(
-            @ApiParam(title = "subsystem", required = true) @PathParam("subsystem") String subsystemTitle,
-            @ApiParam(title = "level", required = true) @PathParam("level") String level) {
+            @ApiParam(name = "subsystem", required = true) @PathParam("subsystem") String subsystemTitle,
+            @ApiParam(name = "level", required = true) @PathParam("level") String level) {
         if (!SUBSYSTEMS.containsKey(subsystemTitle)) {
             LOG.warn("No such subsystem: [{}]. Returning 404.", subsystemTitle);
             return Response.status(404).build();
@@ -143,8 +143,8 @@ public class LoggersResource extends RestResource {
             notes = "Provided level is falling back to DEBUG if it does not exist")
     @Path("/{loggerName}/level/{level}")
     public Response setSingleLoggerLevel(
-            @ApiParam(title = "loggerName", required = true) @PathParam("loggerName") String loggerName,
-            @ApiParam(title = "level", required = true) @PathParam("level") String level) {
+            @ApiParam(name = "loggerName", required = true) @PathParam("loggerName") String loggerName,
+            @ApiParam(name = "level", required = true) @PathParam("level") String level) {
         checkPermission(RestPermissions.LOGGERS_EDIT, loggerName);
         // This is never null. Worst case is a logger that does not exist.
         Logger logger = Logger.getLogger(loggerName);

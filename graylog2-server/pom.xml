@@ -300,6 +300,12 @@
             <groupId>org.mapdb</groupId>
             <artifactId>mapdb</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>com.wordnik</groupId>
+            <artifactId>swagger-annotations</artifactId>
+            <version>${swagger.version}</version>
+        </dependency>
     </dependencies>
 
     <dependencyManagement>
@@ -322,14 +328,13 @@
     <build>
         <resources>
             <resource>
+                <!-- git-commit-id-plugin depends on resource filtering to write the
+                    git.properties and version.properties files-->
                 <directory>src/main/resources</directory>
                 <filtering>true</filtering>
                 <includes>
                     <include>**/*.properties</include>
                 </includes>
-            </resource>
-            <resource>
-                <directory>src/main/resources</directory>
             </resource>
         </resources>
 

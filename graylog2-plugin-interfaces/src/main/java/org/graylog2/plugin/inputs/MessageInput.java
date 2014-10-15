@@ -69,7 +69,6 @@ public abstract class MessageInput {
 
     protected Configuration configuration;
 
-    private Map<String, Extractor> extractors = Maps.newHashMap(); // access is synchronized.
     private Map<String, String> staticFields = Maps.newConcurrentMap();
 
     public void initialize(Configuration configuration) {
@@ -99,8 +98,6 @@ public abstract class MessageInput {
     public abstract String getName();
 
     public abstract String linkToDocs();
-
-    public abstract Map<String, Object> getAttributes();
 
     public void setPersistId(String id) {
         this.persistId = id;
@@ -161,8 +158,9 @@ public abstract class MessageInput {
             return Collections.emptyMap();
         }
 
-        final Map<String, Object> result = Maps.newHashMapWithExpectedSize(getAttributes().size());
-        for (Map.Entry<String, Object> attribute : getAttributes().entrySet()) {
+        final Map<String, Object> attributes = configuration.getSource();
+        final Map<String, Object> result = Maps.newHashMapWithExpectedSize(attributes.size());
+        for (Map.Entry<String, Object> attribute : attributes.entrySet()) {
             Object value = attribute.getValue();
 
             final Map<String, Map<String, Object>> configAsList = config.asList();
@@ -170,8 +168,8 @@ public abstract class MessageInput {
 
             if (attributesForConfigSetting != null) {
                 // we know the config setting, check its attributes
-                final List<String> attributes = (List<String>) attributesForConfigSetting.get("attributes");
-                if (attributes.contains(TextField.Attribute.IS_PASSWORD.toString().toLowerCase())) {
+                final List<String> attrs = (List<String>) attributesForConfigSetting.get("attributes");
+                if (attrs.contains(TextField.Attribute.IS_PASSWORD.toString().toLowerCase())) {
                     value = "********";
                 }
             } else {
@@ -201,18 +199,6 @@ public abstract class MessageInput {
         inputMap.put(FIELD_GLOBAL, this.getGlobal());
 
         return inputMap;
-    }
-
-    public synchronized void addExtractor(String id, Extractor extractor) {
-        this.extractors.put(id, extractor);
-    }
-
-    public synchronized void addExtractors(Map<String, Extractor> extractors) {
-        this.extractors.putAll(extractors);
-    }
-
-    public Map<String, Extractor> getExtractors() {
-        return this.extractors;
     }
 
     public void addStaticField(String key, String value) {

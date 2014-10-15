@@ -17,22 +17,13 @@
 package org.graylog2.rest.resources.streams.requests;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import org.graylog2.rest.resources.streams.rules.requests.CreateStreamRuleRequest;
 
 import java.util.List;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 @JsonAutoDetect
 public class CreateRequest {
-
-	public String title;
+    public String title;
     public String description;
-
-	@JsonProperty("creator_user_id")
-	public String creatorUserId;
-
     public List<CreateStreamRuleRequest> rules;
 }

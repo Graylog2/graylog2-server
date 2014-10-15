@@ -41,6 +41,7 @@ import java.util.Iterator;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 
+import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 @Singleton
@@ -87,12 +88,12 @@ public class IndexerSetupService extends AbstractIdleService {
             } catch (ElasticsearchTimeoutException e) {
                 final String hosts = node.settings().get("discovery.zen.ping.unicast.hosts");
 
-                if (hosts != null && hosts.contains(",")) {
-                    final Iterable<String> hostList = Splitter.on(',').split(hosts);
+                if (!isNullOrEmpty(hosts)) {
+                    final Iterable<String> hostList = Splitter.on(',').omitEmptyStrings().trimResults().split(hosts);
 
                     // if no elasticsearch running
                     for (String host : hostList) {
-                        // guess that elasticsearch http is listening on port 9200
+                        // guess that Elasticsearch http is listening on port 9200
                         final Iterable<String> hostAndPort = Splitter.on(':').limit(2).split(host);
                         final Iterator<String> it = hostAndPort.iterator();
                         final String ip = it.next();
@@ -113,14 +114,14 @@ public class IndexerSetupService extends AbstractIdleService {
                                 final String version = nodesList.get(id).get("version").textValue();
                                 if (!Version.CURRENT.toString().equals(version)) {
                                     LOG.error("Elasticsearch node is of the wrong version {}, it must be {}! " +
-                                                    "Please make sure you are running the correct version of ElasticSearch.",
+                                                    "Please make sure you are running the correct version of Elasticsearch.",
                                             version,
                                             Version.CURRENT.toString());
                                 }
                                 if (!node.settings().get("cluster.name").equals(clusterName)) {
                                     LOG.error(
                                             "Elasticsearch cluster name is different, Graylog2 uses `{}`, Elasticsearch cluster uses `{}`. " +
-                                                    "Please check the `cluster.name` setting of both Graylog2 and ElasticSearch.",
+                                                    "Please check the `cluster.name` setting of both Graylog2 and Elasticsearch.",
                                             node.settings().get("cluster.name"),
                                             clusterName);
                                 }
@@ -138,9 +139,8 @@ public class IndexerSetupService extends AbstractIdleService {
                 }
 
                 UI.exitHardWithWall(
-                        "Could not successfully connect to ElasticSearch. Check that your cluster state is not RED " +
-                                "and that ElasticSearch is running properly.",
-                        "graylog2-server/configuring-and-tuning-elasticsearch-for-graylog2-v0200");
+                        "Could not successfully connect to Elasticsearch. Check that your cluster state is not RED " +
+                                "and that Elasticsearch is running properly.", "http://www.graylog2.org/resources/documentation/setup/elasticsearch");
             }
         } catch (Exception e) {
             bufferSynchronizerService.setIndexerUnavailable();

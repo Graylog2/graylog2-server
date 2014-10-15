@@ -57,7 +57,7 @@ import java.util.zip.GZIPInputStream;
 import java.util.zip.InflaterInputStream;
 
 /**
- * Utilty class for various tool/helper functions.
+ * Utility class for various tool/helper functions.
  */
 public final class Tools {
 
@@ -168,7 +168,7 @@ public final class Tools {
         for (int bytesRead = 0; bytesRead != -1; bytesRead = in.read(buffer)) {
             out.write(buffer, 0, bytesRead);
         }
-        return new String(out.toByteArray(), "UTF-8");
+        return new String(out.toByteArray(), StandardCharsets.UTF_8);
     }
 
     /**
@@ -183,7 +183,7 @@ public final class Tools {
         for (int bytesRead = 0; bytesRead != -1; bytesRead = in.read(buffer)) {
             out.write(buffer, 0, bytesRead);
         }
-        return new String(out.toByteArray(), "UTF-8");
+        return new String(out.toByteArray(), StandardCharsets.UTF_8);
     }
 
     /**
@@ -265,7 +265,7 @@ public final class Tools {
         return timestamp.toString(DateTimeFormat.forPattern(ES_DATE_FORMAT).withZoneUTC());
     }
 
-    /*
+    /**
      * The double representation of a UNIX timestamp with milliseconds is a strange, human readable format.
      *
      * This sucks and no format should use the double representation. Change GELF to use long. (zomg)
@@ -313,7 +313,7 @@ public final class Tools {
         return ISODateTimeFormat.dateTime().print(time);
     }
 
-    /*
+    /**
      * Try to parse a date in ES_DATE_FORMAT format considering it is in UTC and convert it to an ISO8601 date.
      * If an error is encountered in the process, it will return the original string.
      */
@@ -390,14 +390,16 @@ public final class Tools {
      * @throws SocketException if the list of network interfaces couldn't be retrieved
      */
     public static InetAddress guessPrimaryNetworkAddress() throws SocketException {
-        Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
+        final Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
 
-        for (NetworkInterface interf : Collections.list(interfaces)) {
-            if (!interf.isLoopback() && interf.isUp()) {
-                // Interface is not loopback and up. Try to get the first address.
-                for(InetAddress addr : Collections.list(interf.getInetAddresses())) {
-                    if (addr instanceof Inet4Address) {
-                        return addr;
+        if (interfaces != null) {
+            for (NetworkInterface interf : Collections.list(interfaces)) {
+                if (!interf.isLoopback() && interf.isUp()) {
+                    // Interface is not loopback and up. Try to get the first address.
+                    for (InetAddress addr : Collections.list(interf.getInetAddresses())) {
+                        if (addr instanceof Inet4Address) {
+                            return addr;
+                        }
                     }
                 }
             }
@@ -455,9 +457,6 @@ public final class Tools {
             }
         }
         return null;
-    }
-
-    public static class NoInterfaceFoundException extends Exception {
     }
 
     /**

@@ -34,13 +34,11 @@ import javax.inject.Named;
 import javax.ws.rs.core.UriBuilder;
 import java.io.IOException;
 import java.net.URI;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
-/**
- * @author Dennis Oelkers <dennis@torch.sh>
- */
 public class InputService {
     private static final Logger LOG = LoggerFactory.getLogger(InputService.class);
 
@@ -60,22 +58,22 @@ public class InputService {
         final UriBuilder uriBuilder = UriBuilder.fromUri(serverUrl);
         uriBuilder.path("/system/radios/" + serverStatus.getNodeId().toString() + "/inputs");
 
-        Request request = httpclient.prepareGet(uriBuilder.build().toString()).build();
+        final Request request = httpclient.prepareGet(uriBuilder.build().toString()).build();
         LOG.debug("API Request {} {}", request.getMethod(), request.getUrl());
-        Future<Response> f = httpclient.executeRequest(request);
+        final Future<Response> f = httpclient.executeRequest(request);
 
-        Response r = null;
+        final Response r;
         try {
             r = f.get();
         } catch (InterruptedException | ExecutionException e) {
             LOG.error("Unable to fetch inputs from master: ", e);
-            return null;
+            return Collections.emptyList();
         }
 
         if (r.getStatusCode() != 200) {
             throw new RuntimeException("Expected HTTP response [200] for list of persisted input but got [" + r.getStatusCode() + "].");
         }
-        String responseBody = r.getResponseBody();
+        final String responseBody = r.getResponseBody();
         PersistedInputsResponse persistedInputsResponse = mapper.readValue(responseBody,
                 PersistedInputsResponse.class);
         return persistedInputsResponse.inputs;
@@ -126,12 +124,9 @@ public class InputService {
         uriBuilder.path("/system/radios/" + serverStatus.getNodeId().toString() + "/inputs/" + input.getPersistId());
 
         Future<Response> f = httpclient.prepareDelete(uriBuilder.build().toString()).execute();
-
         Response r = f.get();
-
         if (r.getStatusCode() != 204) {
             throw new RuntimeException("Expected HTTP response [204] for input unregistration but got [" + r.getStatusCode() + "].");
         }
     }
-
 }

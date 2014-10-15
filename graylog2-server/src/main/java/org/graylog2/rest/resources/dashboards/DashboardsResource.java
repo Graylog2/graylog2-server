@@ -20,6 +20,11 @@ import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.wordnik.swagger.annotations.Api;
+import com.wordnik.swagger.annotations.ApiOperation;
+import com.wordnik.swagger.annotations.ApiParam;
+import com.wordnik.swagger.annotations.ApiResponse;
+import com.wordnik.swagger.annotations.ApiResponses;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.dashboards.Dashboard;
@@ -31,9 +36,12 @@ import org.graylog2.dashboards.widgets.InvalidWidgetConfigurationException;
 import org.graylog2.database.ValidationException;
 import org.graylog2.indexer.searches.Searches;
 import org.graylog2.indexer.searches.timeranges.InvalidRangeParametersException;
-import org.graylog2.rest.documentation.annotations.*;
 import org.graylog2.rest.resources.RestResource;
-import org.graylog2.rest.resources.dashboards.requests.*;
+import org.graylog2.rest.resources.dashboards.requests.AddWidgetRequest;
+import org.graylog2.rest.resources.dashboards.requests.CreateRequest;
+import org.graylog2.rest.resources.dashboards.requests.UpdateRequest;
+import org.graylog2.rest.resources.dashboards.requests.UpdateWidgetPositionsRequest;
+import org.graylog2.rest.resources.dashboards.requests.UpdateWidgetRequest;
 import org.graylog2.security.RestPermissions;
 import org.graylog2.system.activities.Activity;
 import org.graylog2.system.activities.ActivityWriter;
@@ -43,7 +51,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import javax.ws.rs.*;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
@@ -88,7 +104,7 @@ public class DashboardsResource extends RestResource {
     @ApiResponses(value = {
             @ApiResponse(code = 403, message = "Request must be performed against master node.")
     })
-    public Response create(@ApiParam(title = "JSON body", required = true) String body) {
+    public Response create(@ApiParam(required = true) String body) {
         restrictToMaster();
 
         CreateRequest cr;
@@ -103,7 +119,7 @@ public class DashboardsResource extends RestResource {
         Map<String, Object> dashboardData = Maps.newHashMap();
         dashboardData.put("title", cr.title);
         dashboardData.put("description", cr.description);
-        dashboardData.put("creator_user_id", cr.creatorUserId);
+        dashboardData.put("creator_user_id", getCurrentUser().getName());
         dashboardData.put("created_at", new DateTime(DateTimeZone.UTC));
 
         Dashboard dashboard = new DashboardImpl(dashboardData);
@@ -154,7 +170,7 @@ public class DashboardsResource extends RestResource {
             @ApiResponse(code = 403, message = "Request must be performed against master node.")
     })
     @Produces(MediaType.APPLICATION_JSON)
-    public String get(@ApiParam(title = "dashboardId", required = true) @PathParam("dashboardId") String dashboardId) {
+    public String get(@ApiParam(name= "dashboardId", required = true) @PathParam("dashboardId") String dashboardId) {
         restrictToMaster();
         checkPermission(RestPermissions.DASHBOARDS_READ, dashboardId);
 
@@ -174,7 +190,7 @@ public class DashboardsResource extends RestResource {
             @ApiResponse(code = 404, message = "Dashboard not found."),
             @ApiResponse(code = 403, message = "Request must be performed against master node.")
     })
-    public Response delete(@ApiParam(title = "dashboardId", required = true) @PathParam("dashboardId") String dashboardId) {
+    public Response delete(@ApiParam(name = "dashboardId", required = true) @PathParam("dashboardId") String dashboardId) {
         restrictToMaster();
         checkPermission(RestPermissions.DASHBOARDS_EDIT, dashboardId);
 
@@ -200,8 +216,8 @@ public class DashboardsResource extends RestResource {
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "Dashboard not found.")
     })
-    public Response update(@ApiParam(title = "JSON body", required = true) String body,
-                           @ApiParam(title = "dashboardId", required = true) @PathParam("dashboardId") String dashboardId) {
+    public Response update(@ApiParam(name = "JSON body", required = true) String body,
+                           @ApiParam(name = "dashboardId", required = true) @PathParam("dashboardId") String dashboardId) {
         checkPermission(RestPermissions.DASHBOARDS_EDIT, dashboardId);
         try {
             UpdateRequest cr;
@@ -241,8 +257,8 @@ public class DashboardsResource extends RestResource {
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "Dashboard not found.")
     })
-    public Response setPositions(@ApiParam(title = "JSON body", required = true) String body,
-                           @ApiParam(title = "dashboardId", required = true) @PathParam("dashboardId") String dashboardId) {
+    public Response setPositions(@ApiParam(name = "JSON body", required = true) String body,
+                           @ApiParam(name = "dashboardId", required = true) @PathParam("dashboardId") String dashboardId) {
         checkPermission(RestPermissions.DASHBOARDS_EDIT, dashboardId);
         try {
             UpdateWidgetPositionsRequest uwpr;
@@ -276,8 +292,8 @@ public class DashboardsResource extends RestResource {
             @ApiResponse(code = 403, message = "Request must be performed against master node.")
     })
     @Path("/{dashboardId}/widgets")
-    public Response addWidget(@ApiParam(title = "JSON body", required = true) String body,
-                              @ApiParam(title = "dashboardId", required = true) @PathParam("dashboardId") String dashboardId) {
+    public Response addWidget(@ApiParam(name = "JSON body", required = true) String body,
+                              @ApiParam(name = "dashboardId", required = true) @PathParam("dashboardId") String dashboardId) {
         restrictToMaster();
         checkPermission(RestPermissions.DASHBOARDS_EDIT, dashboardId);
 
@@ -300,7 +316,7 @@ public class DashboardsResource extends RestResource {
 
         DashboardWidget widget;
         try {
-            widget = DashboardWidget.fromRequest(metricRegistry, searches, awr);
+            widget = DashboardWidget.fromRequest(metricRegistry, searches, awr, getCurrentUser().getName());
 
             Dashboard dashboard = dashboardRegistry.get(dashboardId);
 
@@ -340,8 +356,8 @@ public class DashboardsResource extends RestResource {
     })
     @Produces(MediaType.APPLICATION_JSON)
     public Response remove(
-            @ApiParam(title = "dashboardId", required = true) @PathParam("dashboardId") String dashboardId,
-            @ApiParam(title = "widgetId", required = true) @PathParam("widgetId") String widgetId) {
+            @ApiParam(name = "dashboardId", required = true) @PathParam("dashboardId") String dashboardId,
+            @ApiParam(name = "widgetId", required = true) @PathParam("widgetId") String widgetId) {
         restrictToMaster();
         checkPermission(RestPermissions.DASHBOARDS_EDIT, dashboardId);
 
@@ -383,8 +399,8 @@ public class DashboardsResource extends RestResource {
             @ApiResponse(code = 504, message = "Computation failed on indexer side.")
     })
     @Produces(MediaType.APPLICATION_JSON)
-    public Response widgetValue(@ApiParam(title = "dashboardId", required = true) @PathParam("dashboardId") String dashboardId,
-                              @ApiParam(title = "widgetId", required = true) @PathParam("widgetId") String widgetId) {
+    public Response widgetValue(@ApiParam(name = "dashboardId", required = true) @PathParam("dashboardId") String dashboardId,
+                              @ApiParam(name = "widgetId", required = true) @PathParam("widgetId") String widgetId) {
         restrictToMaster();
         checkPermission(RestPermissions.DASHBOARDS_READ, dashboardId);
 
@@ -420,9 +436,9 @@ public class DashboardsResource extends RestResource {
     })
     @Produces(MediaType.APPLICATION_JSON)
     public Response updateDescription(
-            @ApiParam(title = "JSON body", required = true) String body,
-            @ApiParam(title = "dashboardId", required = true) @PathParam("dashboardId") String dashboardId,
-            @ApiParam(title = "widgetId", required = true) @PathParam("widgetId") String widgetId) {
+            @ApiParam(name = "JSON body", required = true) String body,
+            @ApiParam(name = "dashboardId", required = true) @PathParam("dashboardId") String dashboardId,
+            @ApiParam(name = "widgetId", required = true) @PathParam("widgetId") String widgetId) {
         restrictToMaster();
         checkPermission(RestPermissions.DASHBOARDS_EDIT, dashboardId);
 
@@ -479,9 +495,9 @@ public class DashboardsResource extends RestResource {
     })
     @Produces(MediaType.APPLICATION_JSON)
     public Response updateCacheTime(
-            @ApiParam(title = "JSON body", required = true) String body,
-            @ApiParam(title = "dashboardId", required = true) @PathParam("dashboardId") String dashboardId,
-            @ApiParam(title = "widgetId", required = true) @PathParam("widgetId") String widgetId) {
+            @ApiParam(name = "JSON body", required = true) String body,
+            @ApiParam(name = "dashboardId", required = true) @PathParam("dashboardId") String dashboardId,
+            @ApiParam(name = "widgetId", required = true) @PathParam("widgetId") String widgetId) {
         restrictToMaster();
         checkPermission(RestPermissions.DASHBOARDS_EDIT, dashboardId);
 

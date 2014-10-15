@@ -47,15 +47,10 @@ cp ../misc/graylog2.conf $BUILD_DIR/graylog2.conf.example
 # Copy control script
 mkdir -p $BUILD_DIR/bin
 cp -R copy/bin/graylog2ctl $BUILD_DIR/bin
+cp copy/bin/graylog2-es-timestamp-fixup $BUILD_DIR/bin
 
-# Create empty plugin directories.
+# Create empty plugin directory.
 mkdir -p $BUILD_DIR/plugin
-mkdir -p $BUILD_DIR/plugin/filters
-mkdir -p $BUILD_DIR/plugin/outputs
-mkdir -p $BUILD_DIR/plugin/inputs
-mkdir -p $BUILD_DIR/plugin/initializers
-mkdir -p $BUILD_DIR/plugin/transports
-mkdir -p $BUILD_DIR/plugin/alarm_callbacks
 
 mkdir -p $BUILD_DIR/log
 

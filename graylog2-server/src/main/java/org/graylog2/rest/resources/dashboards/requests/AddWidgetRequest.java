@@ -16,20 +16,10 @@
  */
 package org.graylog2.rest.resources.dashboards.requests;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 import java.util.Map;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public class AddWidgetRequest {
-
     public String description;
     public String type;
     public Map<String, Object> config;
-
-    @JsonProperty("creator_user_id")
-    public String creatorUserId;
-
 }

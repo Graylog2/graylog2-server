@@ -26,7 +26,7 @@ import com.google.common.collect.Lists;
 
 import java.util.List;
 
-public class TextField extends AbstractConfigurationField implements ConfigurationField {
+public class TextField extends AbstractConfigurationField {
     public static final String FIELD_TYPE = "text";
 
     public enum Attribute {
@@ -34,7 +34,7 @@ public class TextField extends AbstractConfigurationField implements Configurati
         TEXTAREA
     }
 
-    private final String defaultValue;
+    private String defaultValue;
 
     private final List<String> attributes;
 
@@ -61,6 +61,13 @@ public class TextField extends AbstractConfigurationField implements Configurati
     @Override
     public Object getDefaultValue() {
         return defaultValue;
+    }
+
+    @Override
+    public void setDefaultValue(Object defaultValue) {
+        if (defaultValue instanceof String) {
+            this.defaultValue = (String) defaultValue;
+        }
     }
 
     @Override

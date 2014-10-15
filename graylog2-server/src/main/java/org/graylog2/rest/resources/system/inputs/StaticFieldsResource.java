@@ -24,7 +24,7 @@ import org.graylog2.inputs.Input;
 import org.graylog2.inputs.InputService;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.inputs.MessageInput;
-import org.graylog2.rest.documentation.annotations.*;
+import com.wordnik.swagger.annotations.*;
 import org.graylog2.rest.resources.RestResource;
 import org.graylog2.rest.resources.system.inputs.requests.CreateStaticFieldRequest;
 import org.graylog2.security.RestPermissions;
@@ -67,8 +67,8 @@ public class StaticFieldsResource extends RestResource {
             @ApiResponse(code = 400, message = "Field/Key is reserved."),
             @ApiResponse(code = 400, message = "Missing or invalid configuration.")
     })
-    public Response create(@ApiParam(title = "JSON body", required = true) String body,
-                           @ApiParam(title = "inputId", required = true) @PathParam("inputId") String inputId) throws NotFoundException {
+    public Response create(@ApiParam(name = "JSON body", required = true) String body,
+                           @ApiParam(name = "inputId", required = true) @PathParam("inputId") String inputId) throws NotFoundException {
         if (inputId == null || inputId.isEmpty()) {
             LOG.error("Missing inputId. Returning HTTP 400.");
             throw new WebApplicationException(400);
@@ -134,8 +134,8 @@ public class StaticFieldsResource extends RestResource {
             @ApiResponse(code = 404, message = "No such static field.")
     })
     @Path("/{key}")
-    public Response delete(@ApiParam(title = "Key", required = true) @PathParam("key") String key,
-                           @ApiParam(title = "inputId", required = true) @PathParam("inputId") String inputId) throws NotFoundException {
+    public Response delete(@ApiParam(name = "Key", required = true) @PathParam("key") String key,
+                           @ApiParam(name = "inputId", required = true) @PathParam("inputId") String inputId) throws NotFoundException {
         if (inputId == null || inputId.isEmpty()) {
             LOG.error("Missing inputId. Returning HTTP 400.");
             throw new WebApplicationException(400);

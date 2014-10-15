@@ -25,22 +25,33 @@ import org.apache.directory.ldap.client.api.LdapNetworkConnection;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.database.ValidationException;
-import org.graylog2.rest.documentation.annotations.Api;
-import org.graylog2.rest.documentation.annotations.ApiOperation;
-import org.graylog2.rest.documentation.annotations.ApiParam;
+import com.wordnik.swagger.annotations.Api;
+import com.wordnik.swagger.annotations.ApiOperation;
+import com.wordnik.swagger.annotations.ApiParam;
 import org.graylog2.rest.resources.RestResource;
 import org.graylog2.rest.resources.system.ldap.requests.LdapSettingsRequest;
 import org.graylog2.rest.resources.system.ldap.requests.LdapTestConfigRequest;
 import org.graylog2.rest.resources.system.ldap.responses.LdapTestConfigResponse;
 import org.graylog2.security.RestPermissions;
 import org.graylog2.security.TrustAllX509TrustManager;
-import org.graylog2.security.ldap.*;
+import org.graylog2.security.ldap.LdapConnector;
+import org.graylog2.security.ldap.LdapEntry;
+import org.graylog2.security.ldap.LdapSettings;
+import org.graylog2.security.ldap.LdapSettingsImpl;
+import org.graylog2.security.ldap.LdapSettingsService;
 import org.graylog2.security.realm.LdapUserAuthenticator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import javax.ws.rs.*;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
@@ -51,11 +62,11 @@ import static javax.ws.rs.core.Response.noContent;
 import static javax.ws.rs.core.Response.ok;
 
 @RequiresAuthentication
-@RequiresPermissions(RestPermissions.LDAP_EDIT) // TODO even viewing the settings needs this permission, because it contains a password
+@RequiresPermissions(RestPermissions.LDAP_EDIT)
+// TODO even viewing the settings needs this permission, because it contains a password
 @Api(value = "System/LDAP", description = "LDAP settings")
 @Path("/system/ldap")
 public class LdapResource extends RestResource {
-
     private static final Logger LOG = LoggerFactory.getLogger(LdapResource.class);
 
     @Inject
@@ -102,9 +113,8 @@ public class LdapResource extends RestResource {
     @Path("/test")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public LdapTestConfigResponse testLdapConfiguration(@ApiParam(title = "Configuration to test", required = true) LdapTestConfigRequest request) {
+    public LdapTestConfigResponse testLdapConfiguration(@ApiParam(name = "Configuration to test", required = true) LdapTestConfigRequest request) {
         LdapTestConfigResponse response = new LdapTestConfigResponse();
-
 
         final LdapConnectionConfig config = new LdapConnectionConfig();
         final URI ldapUri = request.ldapUri;
@@ -130,6 +140,14 @@ public class LdapResource extends RestResource {
                 response.systemAuthenticated = false;
                 return response;
             }
+
+            if (null == connection) {
+                response.connected = false;
+                response.systemAuthenticated = false;
+                response.exception = "Could not connect to LDAP server";
+                return response;
+            }
+
             response.connected = connection.isConnected();
             response.systemAuthenticated = connection.isAuthenticated();
 
@@ -150,16 +168,13 @@ public class LdapResource extends RestResource {
                     userPrincipalName = entry.getDn();
                     response.entry = entry.getAttributes();
                 }
-            } catch (LdapException e) {
-                response.entry = null;
-                response.exception = e.getMessage();
-            } catch (CursorException e) {
+            } catch (CursorException | LdapException e) {
                 response.entry = null;
                 response.exception = e.getMessage();
             }
+
             try {
-                response.loginAuthenticated = ldapConnector.authenticate(connection,
-                                                                         userPrincipalName, request.password);
+                response.loginAuthenticated = ldapConnector.authenticate(connection, userPrincipalName, request.password);
             } catch (Exception e) {
                 response.loginAuthenticated = false;
                 response.exception = e.getMessage();
@@ -182,7 +197,7 @@ public class LdapResource extends RestResource {
     @ApiOperation("Update the LDAP configuration")
     @Path("/settings")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response updateLdapSettings(@ApiParam(title = "JSON body", required = true) String body) {
+    public void updateLdapSettings(@ApiParam(name = "JSON body", required = true) String body) {
         LdapSettingsRequest request;
         try {
             request = objectMapper.readValue(body, LdapSettingsRequest.class);
@@ -214,18 +229,14 @@ public class LdapResource extends RestResource {
             throw new WebApplicationException(e, Response.Status.BAD_REQUEST);
         }
         ldapAuthenticator.applySettings(ldapSettings);
-
-        return noContent().build();
     }
 
     @DELETE
     @Timed
     @ApiOperation("Remove the LDAP configuration")
     @Path("/settings")
-    public Response deleteLdapSettings() {
+    public void deleteLdapSettings() {
         ldapSettingsService.delete();
         ldapAuthenticator.applySettings(null);
-        return noContent().build();
     }
-
 }

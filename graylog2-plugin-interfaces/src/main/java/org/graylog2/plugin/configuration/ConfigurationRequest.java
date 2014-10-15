@@ -23,14 +23,11 @@
 package org.graylog2.plugin.configuration;
 
 import com.fasterxml.jackson.annotation.JsonValue;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.graylog2.plugin.configuration.fields.ConfigurationField;
 import org.graylog2.plugin.configuration.fields.NumberField;
 import org.graylog2.plugin.configuration.fields.TextField;
 
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -38,26 +35,36 @@ import java.util.Map;
  */
 public class ConfigurationRequest {
 
-    private final List<ConfigurationField> fields;
+    private final Map<String, ConfigurationField> fields = Maps.newHashMap();
 
-    public ConfigurationRequest() {
-        this.fields = Lists.newArrayList();
+    public ConfigurationRequest() {}
+
+    public void putAll(Map<String, ConfigurationField> fields) {
+        this.fields.putAll(fields);
     }
 
     public void addField(ConfigurationField f) {
-        fields.add(f);
+        fields.put(f.getName(), f);
     }
 
-    public List<ConfigurationField> getFields() {
-        return ImmutableList.copyOf(fields);
+    public boolean containsField(String fieldName) {
+        return fields.containsKey(fieldName);
+    }
+
+    public ConfigurationField getField(String fieldName) {
+        return fields.get(fieldName);
+    }
+
+    public Map<String, ConfigurationField> getFields() {
+        return fields;
     }
 
     @JsonValue
     public Map<String, Map<String, Object>> asList() {
-        Map<String, Map<String, Object>> configs = Maps.newHashMap();
+        final Map<String, Map<String, Object>> configs = Maps.newHashMap();
 
-        for (ConfigurationField f : fields) {
-            Map<String, Object> config = Maps.newHashMap();
+        for (ConfigurationField f : fields.values()) {
+            final Map<String, Object> config = Maps.newHashMap();
             config.put("type", f.getFieldType());
             config.put("human_name", f.getHumanName());
             config.put("description", f.getDescription());

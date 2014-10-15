@@ -213,7 +213,7 @@ public class BundleImporter {
         final Configuration inputConfig = new Configuration(inputDescription.getConfiguration());
         final DateTime createdAt = DateTime.now(DateTimeZone.UTC);
 
-        final MessageInput messageInput = inputRegistry.create(inputDescription.getType());
+        final MessageInput messageInput = inputRegistry.create(inputDescription.getType(), inputConfig);
         messageInput.setTitle(inputDescription.getTitle());
         messageInput.setGlobal(inputDescription.isGlobal());
         messageInput.setCreatorUserId(userName);
@@ -275,8 +275,6 @@ public class BundleImporter {
                 extractorDescription.getConditionType(),
                 extractorDescription.getConditionValue()
         );
-
-        messageInput.addExtractor(extractorId, extractor);
 
         org.graylog2.inputs.Input mongoInput = inputService.find(messageInput.getPersistId());
         inputService.addExtractor(mongoInput, extractor);

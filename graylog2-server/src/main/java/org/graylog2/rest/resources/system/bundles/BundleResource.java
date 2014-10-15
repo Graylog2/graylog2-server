@@ -24,11 +24,11 @@ import org.graylog2.bundles.BundleService;
 import org.graylog2.bundles.ConfigurationBundle;
 import org.graylog2.bundles.ExportBundle;
 import org.graylog2.database.NotFoundException;
-import org.graylog2.rest.documentation.annotations.Api;
-import org.graylog2.rest.documentation.annotations.ApiOperation;
-import org.graylog2.rest.documentation.annotations.ApiParam;
-import org.graylog2.rest.documentation.annotations.ApiResponse;
-import org.graylog2.rest.documentation.annotations.ApiResponses;
+import com.wordnik.swagger.annotations.Api;
+import com.wordnik.swagger.annotations.ApiOperation;
+import com.wordnik.swagger.annotations.ApiParam;
+import com.wordnik.swagger.annotations.ApiResponse;
+import com.wordnik.swagger.annotations.ApiResponses;
 import org.graylog2.rest.resources.RestResource;
 import org.graylog2.security.RestPermissions;
 import org.slf4j.Logger;
@@ -73,7 +73,7 @@ public class BundleResource extends RestResource {
             @ApiResponse(code = 500, message = "Error while saving configuration bundle")
     })
     public Response createBundle(
-            @ApiParam(title = "Request body", description = "Configuration bundle", required = true)
+            @ApiParam(name = "Request body", value = "Configuration bundle", required = true)
             @NotNull @Valid
             final ConfigurationBundle configurationBundle) {
         checkPermission(RestPermissions.BUNDLE_CREATE);
@@ -111,7 +111,7 @@ public class BundleResource extends RestResource {
             @ApiResponse(code = 500, message = "Error while loading configuration bundle")
     })
     public ConfigurationBundle showBundle(
-            @ApiParam(title = "bundleId", description = "Configuration bundle ID", required = true)
+            @ApiParam(name = "bundleId", value = "Configuration bundle ID", required = true)
             @NotNull
             @PathParam("bundleId")
             final String bundleId) throws NotFoundException {
@@ -129,11 +129,11 @@ public class BundleResource extends RestResource {
             @ApiResponse(code = 500, message = "Error while updating configuration bundle")
     })
     public void updateBundle(
-            @ApiParam(title = "bundleId", description = "Configuration bundle ID", required = true)
+            @ApiParam(name = "bundleId", value = "Configuration bundle ID", required = true)
             @NotNull
             @PathParam("bundleId")
             final String bundleId,
-            @ApiParam(title = "Request body", description = "Configuration bundle", required = true)
+            @ApiParam(name = "Request body", value = "Configuration bundle", required = true)
             @NotNull @Valid
             final ConfigurationBundle configurationBundle) {
         checkPermission(RestPermissions.BUNDLE_UPDATE, bundleId);
@@ -149,7 +149,7 @@ public class BundleResource extends RestResource {
             @ApiResponse(code = 500, message = "Error while applying configuration bundle")
     })
     public void deleteBundle(
-            @ApiParam(title = "bundleId", description = "Configuration bundle ID", required = true)
+            @ApiParam(name = "bundleId", value = "Configuration bundle ID", required = true)
             @NotNull
             @PathParam("bundleId")
             final String bundleId) {
@@ -167,7 +167,7 @@ public class BundleResource extends RestResource {
             @ApiResponse(code = 500, message = "Error while applying configuration bundle")
     })
     public void applyBundle(
-            @ApiParam(title = "bundleId", description = "Configuration bundle ID", required = true)
+            @ApiParam(name = "bundleId", value = "Configuration bundle ID", required = true)
             @NotNull
             @PathParam("bundleId")
             final String bundleId) throws NotFoundException {
@@ -183,7 +183,7 @@ public class BundleResource extends RestResource {
             @ApiResponse(code = 500, message = "Error while exporting configuration bundle")
     })
     public ConfigurationBundle exportBundle(
-            @ApiParam(title = "exportBundle", description = "Export bundle", required = true)
+            @ApiParam(name = "exportBundle", value = "Export bundle", required = true)
             @NotNull
             final ExportBundle exportBundle) throws NotFoundException {
         checkPermission(RestPermissions.BUNDLE_EXPORT);

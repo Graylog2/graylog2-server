@@ -12,7 +12,7 @@
 
     <!-- Application Loggers -->
     <logger name="org.graylog2">
-        <level value="info"/>
+        <level value="debug"/>
     </logger>
     <!-- this emits a harmless warning for ActiveDirectory every time which we can't work around :( -->
     <logger name="org.apache.directory.api.ldap.model.message.BindRequestImpl">

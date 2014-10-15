@@ -200,11 +200,6 @@ public class JsonPathInput extends MessageInput {
         return "http://graylog2.org/resources/documentation/sending/jsonpath";
     }
 
-    @Override
-    public Map<String, Object> getAttributes() {
-        return configuration.getSource();
-    }
-
     protected boolean checkConfig(Configuration config) {
         return config.stringIsSet(CK_URL)
                 && config.stringIsSet(CK_PATH)

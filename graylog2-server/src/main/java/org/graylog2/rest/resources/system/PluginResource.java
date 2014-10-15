@@ -21,8 +21,8 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.graylog2.plugin.PluginMetaData;
 import org.graylog2.plugin.Version;
-import org.graylog2.rest.documentation.annotations.Api;
-import org.graylog2.rest.documentation.annotations.ApiOperation;
+import com.wordnik.swagger.annotations.Api;
+import com.wordnik.swagger.annotations.ApiOperation;
 import org.graylog2.rest.resources.RestResource;
 
 import javax.inject.Inject;
@@ -31,21 +31,17 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import java.net.URI;
-import java.net.URL;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-/**
- * @author Dennis Oelkers <dennis@torch.sh>
- */
 @Api(value = "System/Plugin", description = "Plugin information")
 @Path("/system/plugins")
 @Produces(MediaType.APPLICATION_JSON)
 public class PluginResource extends RestResource {
     private final Set<PluginMetaData> pluginMetaDataSet;
 
-    class PluginMetaDataValue {
+    static class PluginMetaDataValue {
         public final String unique_id;
         public final String name;
         public final String author;

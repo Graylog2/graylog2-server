@@ -26,7 +26,7 @@ import com.google.common.collect.Lists;
 
 import java.util.List;
 
-public class NumberField extends AbstractConfigurationField implements ConfigurationField {
+public class NumberField extends AbstractConfigurationField {
 
     public static final String FIELD_TYPE = "number";
 
@@ -36,7 +36,7 @@ public class NumberField extends AbstractConfigurationField implements Configura
         IS_PORT_NUMBER
     }
 
-    private final int defaultValue;
+    private int defaultValue;
 
     private final List<String> attributes;
 
@@ -63,6 +63,13 @@ public class NumberField extends AbstractConfigurationField implements Configura
     @Override
     public Object getDefaultValue() {
         return defaultValue;
+    }
+
+    @Override
+    public void setDefaultValue(Object defaultValue) {
+        if (defaultValue instanceof Integer) {
+            this.defaultValue = (int) defaultValue;
+        }
     }
 
     @Override

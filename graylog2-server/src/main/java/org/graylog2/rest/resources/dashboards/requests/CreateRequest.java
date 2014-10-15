@@ -16,17 +16,7 @@
  */
 package org.graylog2.rest.resources.dashboards.requests;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public class CreateRequest {
-
     public String title;
     public String description;
-
-    @JsonProperty("creator_user_id")
-    public String creatorUserId;
-
 }

@@ -25,7 +25,7 @@ import org.graylog2.indexer.messages.DocumentNotFoundException;
 import org.graylog2.indexer.messages.Messages;
 import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.plugin.Message;
-import org.graylog2.rest.documentation.annotations.*;
+import com.wordnik.swagger.annotations.*;
 import org.graylog2.rest.resources.RestResource;
 import org.graylog2.security.RestPermissions;
 import org.slf4j.Logger;
@@ -61,8 +61,8 @@ public class MessageResource extends RestResource {
             @ApiResponse(code = 404, message = "Message does not exist.")
     })
     public String search(
-            @ApiParam(title = "index", description = "The index this message is stored in.", required = true) @PathParam("index") String index,
-            @ApiParam(title = "messageId", required = true) @PathParam("messageId") String messageId) {
+            @ApiParam(name = "index", value = "The index this message is stored in.", required = true) @PathParam("index") String index,
+            @ApiParam(name = "messageId", required = true) @PathParam("messageId") String messageId) {
         if (messageId == null || messageId.isEmpty()) {
         	LOG.error("Missing parameters. Returning HTTP 400.");
         	throw new WebApplicationException(400);
@@ -107,8 +107,8 @@ public class MessageResource extends RestResource {
             @ApiResponse(code = 404, message = "Specified index does not exist."),
     })
     public String analyze(
-            @ApiParam(title = "index", description = "The index the message containing the string is stored in.", required = true) @PathParam("index") String index,
-            @ApiParam(title = "string", description = "The string to analyze.", required = true) @QueryParam("string") String string) {
+            @ApiParam(name = "index", value = "The index the message containing the string is stored in.", required = true) @PathParam("index") String index,
+            @ApiParam(name = "string", value = "The string to analyze.", required = true) @QueryParam("string") String string) {
         if (string == null || string.isEmpty()) {
         	LOG.error("Missing parameters. Returning HTTP 400.");
         	throw new WebApplicationException(400);

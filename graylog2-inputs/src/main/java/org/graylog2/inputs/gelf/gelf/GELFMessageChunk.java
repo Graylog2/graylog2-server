@@ -17,6 +17,7 @@
 package org.graylog2.inputs.gelf.gelf;
 
 import org.graylog2.plugin.inputs.MessageInput;
+import org.joda.time.DateTime;
 
 public final class GELFMessageChunk {
 
@@ -112,7 +113,7 @@ public final class GELFMessageChunk {
         extractSequenceCount();
         extractSequenceNumber();
         extractData();
-        this.arrival = System.currentTimeMillis();
+        this.arrival = DateTime.now().getMillis();
     }
 
     private String extractId() {

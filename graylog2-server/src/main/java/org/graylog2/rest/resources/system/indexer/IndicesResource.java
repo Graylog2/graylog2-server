@@ -29,11 +29,11 @@ import org.graylog2.indexer.cluster.Cluster;
 import org.graylog2.indexer.indices.IndexStatistics;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.ranges.RebuildIndexRangesJob;
-import org.graylog2.rest.documentation.annotations.Api;
-import org.graylog2.rest.documentation.annotations.ApiOperation;
-import org.graylog2.rest.documentation.annotations.ApiParam;
-import org.graylog2.rest.documentation.annotations.ApiResponse;
-import org.graylog2.rest.documentation.annotations.ApiResponses;
+import com.wordnik.swagger.annotations.Api;
+import com.wordnik.swagger.annotations.ApiOperation;
+import com.wordnik.swagger.annotations.ApiParam;
+import com.wordnik.swagger.annotations.ApiResponse;
+import com.wordnik.swagger.annotations.ApiResponses;
 import org.graylog2.rest.resources.RestResource;
 import org.graylog2.security.RestPermissions;
 import org.graylog2.system.jobs.SystemJob;
@@ -79,7 +79,7 @@ public class IndicesResource extends RestResource {
     @Path("/{index}")
     @ApiOperation(value = "Get information of an index and its shards.")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response single(@ApiParam(title = "index") @PathParam("index") String index) {
+    public Response single(@ApiParam(name = "index") @PathParam("index") String index) {
         checkPermission(RestPermissions.INDICES_READ, index);
 
         if(!deflector.isGraylog2Index(index)) {
@@ -146,7 +146,7 @@ public class IndicesResource extends RestResource {
     @Path("/{index}/reopen")
     @ApiOperation(value = "Reopen a closed index. This will also trigger an index ranges rebuild job.")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response reopen(@ApiParam(title = "index") @PathParam("index") String index) {
+    public Response reopen(@ApiParam(name = "index") @PathParam("index") String index) {
         checkPermission(RestPermissions.INDICES_CHANGESTATE, index);
 
         if (!deflector.isGraylog2Index(index)) {
@@ -176,7 +176,7 @@ public class IndicesResource extends RestResource {
     @ApiResponses(value = {
             @ApiResponse(code = 403, message = "You cannot close the current deflector target index.")
     })
-    public Response close(@ApiParam(title = "index") @PathParam("index") String index) {
+    public Response close(@ApiParam(name = "index") @PathParam("index") String index) {
         checkPermission(RestPermissions.INDICES_CHANGESTATE, index);
 
         if(!deflector.isGraylog2Index(index)) {
@@ -211,7 +211,7 @@ public class IndicesResource extends RestResource {
     @ApiResponses(value = {
             @ApiResponse(code = 403, message = "You cannot delete the current deflector target index.")
     })
-    public Response delete(@ApiParam(title = "index") @PathParam("index") String index) {
+    public Response delete(@ApiParam(name = "index") @PathParam("index") String index) {
         checkPermission(RestPermissions.INDICES_DELETE, index);
 
         if(!deflector.isGraylog2Index(index)) {

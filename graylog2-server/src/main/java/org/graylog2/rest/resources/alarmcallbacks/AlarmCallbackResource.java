@@ -27,7 +27,7 @@ import org.graylog2.database.NotFoundException;
 import org.graylog2.database.ValidationException;
 import org.graylog2.plugin.alarms.callbacks.AlarmCallback;
 import org.graylog2.plugin.streams.Stream;
-import org.graylog2.rest.documentation.annotations.*;
+import com.wordnik.swagger.annotations.*;
 import org.graylog2.rest.resources.RestResource;
 import org.graylog2.security.RestPermissions;
 import org.graylog2.streams.StreamService;
@@ -71,7 +71,7 @@ public class AlarmCallbackResource extends RestResource {
     @Timed
     @ApiOperation(value = "Get a list of all alarm callbacks for this stream")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response get(@ApiParam(title = "streamid", description = "The id of the stream whose alarm callbacks we want.", required = true) @PathParam("streamid") String streamid) {
+    public Response get(@ApiParam(name = "streamid", value = "The id of the stream whose alarm callbacks we want.", required = true) @PathParam("streamid") String streamid) {
         Stream stream = null;
         try {
             stream = streamService.load(streamid);
@@ -94,8 +94,8 @@ public class AlarmCallbackResource extends RestResource {
     @Timed
     @ApiOperation(value = "Get a single specified alarm callback for this stream")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response get(@ApiParam(title = "streamid", description = "The id of the stream whose alarm callbacks we want.", required = true) @PathParam("streamid") String streamid,
-                        @ApiParam(title = "alarmCallbackId", description = "The alarm callback id we are getting", required = true) @PathParam("alarmCallbackId") String alarmCallbackId) {
+    public Response get(@ApiParam(name = "streamid", value = "The id of the stream whose alarm callbacks we want.", required = true) @PathParam("streamid") String streamid,
+                        @ApiParam(name = "alarmCallbackId", value = "The alarm callback id we are getting", required = true) @PathParam("alarmCallbackId") String alarmCallbackId) {
         Stream stream = null;
         try {
             stream = streamService.load(streamid);
@@ -114,8 +114,8 @@ public class AlarmCallbackResource extends RestResource {
     @ApiOperation(value = "Create an alarm callback")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response create(@ApiParam(title = "streamid", description = "The stream id this new alarm callback belongs to.", required = true) @PathParam("streamid") String streamid,
-                           @ApiParam(title = "JSON body", required = true) String body) {
+    public Response create(@ApiParam(name = "streamid", value = "The stream id this new alarm callback belongs to.", required = true) @PathParam("streamid") String streamid,
+                           @ApiParam(name = "JSON body", required = true) String body) {
         CreateAlarmCallbackRequest cr;
         checkPermission(RestPermissions.STREAMS_EDIT, streamid);
 
@@ -133,7 +133,7 @@ public class AlarmCallbackResource extends RestResource {
             throw new WebApplicationException(404);
         }
 
-        final AlarmCallbackConfiguration alarmCallbackConfiguration = alarmCallbackConfigurationService.create(streamid, cr);
+        final AlarmCallbackConfiguration alarmCallbackConfiguration = alarmCallbackConfigurationService.create(streamid, cr, getCurrentUser().getName());
         alarmCallbackConfiguration.setStream(stream);
 
         String id;
@@ -154,7 +154,7 @@ public class AlarmCallbackResource extends RestResource {
     @Timed
     @ApiOperation(value = "Get a list of all alarm callback types")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response available(@ApiParam(title = "streamid", description = "The id of the stream whose alarm callbacks we want.", required = true) @PathParam("streamid") String streamid) {
+    public Response available(@ApiParam(name = "streamid", value = "The id of the stream whose alarm callbacks we want.", required = true) @PathParam("streamid") String streamid) {
         Map<String, Object> result = Maps.newHashMap();
         Map<String, Object> types = Maps.newHashMap();
 
@@ -176,8 +176,8 @@ public class AlarmCallbackResource extends RestResource {
             @ApiResponse(code = 404, message = "Alarm callback not found."),
             @ApiResponse(code = 400, message = "Invalid ObjectId.")
     })
-    public Response delete(@ApiParam(title = "streamid", description = "The stream id this new rule belongs to.", required = true) @PathParam("streamid") String streamid,
-                           @ApiParam(title = "alarmCallbackId", required = true) @PathParam("alarmCallbackId") String alarmCallbackId) {
+    public Response delete(@ApiParam(name = "streamid", value = "The stream id this new rule belongs to.", required = true) @PathParam("streamid") String streamid,
+                           @ApiParam(name = "alarmCallbackId", required = true) @PathParam("alarmCallbackId") String alarmCallbackId) {
 
         Stream stream = null;
         try {

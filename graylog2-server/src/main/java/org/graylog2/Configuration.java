@@ -26,7 +26,6 @@ import com.github.joschi.jadconfig.validators.PositiveIntegerValidator;
 import com.google.common.collect.Lists;
 import com.mongodb.ServerAddress;
 import org.graylog2.plugin.BaseConfiguration;
-import org.graylog2.shared.JadPeriodConverter;
 import org.joda.time.Period;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -109,7 +108,7 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "elasticsearch_max_size_per_index", validator = PositiveIntegerValidator.class, required = true)
     private long elasticSearchMaxSizePerIndex = 1L * 1024 * 1024 * 1024; // 1GB
 
-    @Parameter(value = "elasticsearch_max_time_per_index", converter = JadPeriodConverter.class, required = true)
+    @Parameter(value = "elasticsearch_max_time_per_index", required = true)
     private Period elasticSearchMaxTimePerIndex= Period.days(1);
 
     @Parameter(value = "elasticsearch_shards", validator = PositiveIntegerValidator.class, required = true)

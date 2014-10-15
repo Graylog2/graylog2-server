@@ -32,7 +32,7 @@ import org.graylog2.plugin.alarms.callbacks.AlarmCallbackConfigurationException;
 import org.graylog2.plugin.alarms.callbacks.AlarmCallbackException;
 import org.graylog2.plugin.alarms.transports.TransportConfigurationException;
 import org.graylog2.plugin.streams.Stream;
-import org.graylog2.rest.documentation.annotations.*;
+import com.wordnik.swagger.annotations.*;
 import org.graylog2.rest.resources.RestResource;
 import org.graylog2.security.RestPermissions;
 import org.graylog2.streams.StreamService;
@@ -79,9 +79,9 @@ public class StreamAlertReceiverResource extends RestResource {
             @ApiResponse(code = 400, message = "Invalid ObjectId.")
     })
     public Response addReceiver(
-            @ApiParam(title = "streamId", description = "The stream id this new alert condition belongs to.", required = true) @PathParam("streamId") String streamid,
-            @ApiParam(title = "entity", description = "Name/ID of user or email address to add as alert receiver.", required = true) @QueryParam("entity") String entity,
-            @ApiParam(title = "type", description = "Type: users or emails", required = true) @QueryParam("type") String type
+            @ApiParam(name = "streamId", value = "The stream id this new alert condition belongs to.", required = true) @PathParam("streamId") String streamid,
+            @ApiParam(name = "entity", value = "Name/ID of user or email address to add as alert receiver.", required = true) @QueryParam("entity") String entity,
+            @ApiParam(name = "type", value = "Type: users or emails", required = true) @QueryParam("type") String type
     ) {
         checkPermission(RestPermissions.STREAMS_EDIT, streamid);
 
@@ -117,9 +117,9 @@ public class StreamAlertReceiverResource extends RestResource {
             @ApiResponse(code = 400, message = "Invalid ObjectId.")
     })
     public Response removeReceiver(
-            @ApiParam(title = "streamId", description = "The stream id this new alert condition belongs to.", required = true) @PathParam("streamId") String streamid,
-            @ApiParam(title = "entity", description = "Name/ID of user or email address to remove from alert receivers.", required = true) @QueryParam("entity") String entity,
-            @ApiParam(title = "type", description = "Type: users or emails", required = true) @QueryParam("type") String type) {
+            @ApiParam(name = "streamId", value = "The stream id this new alert condition belongs to.", required = true) @PathParam("streamId") String streamid,
+            @ApiParam(name = "entity", value = "Name/ID of user or email address to remove from alert receivers.", required = true) @QueryParam("entity") String entity,
+            @ApiParam(name = "type", value = "Type: users or emails", required = true) @QueryParam("type") String type) {
         checkPermission(RestPermissions.STREAMS_EDIT, streamid);
 
         if(!type.equals("users") && !type.equals("emails")) {
@@ -146,8 +146,8 @@ public class StreamAlertReceiverResource extends RestResource {
             @ApiResponse(code = 404, message = "Stream not found."),
             @ApiResponse(code = 400, message = "Invalid ObjectId.")
     })
-    public Response sendDummyAlert(@ApiParam(title = "streamId",
-            description = "The stream id this new alert condition belongs to.",
+    public Response sendDummyAlert(@ApiParam(name = "streamId",
+            value = "The stream id this new alert condition belongs to.",
             required = true) @PathParam("streamId") String streamid)
             throws TransportConfigurationException, EmailException {
         checkPermission(RestPermissions.STREAMS_EDIT, streamid);

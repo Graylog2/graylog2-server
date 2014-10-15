@@ -29,7 +29,7 @@ import org.graylog2.inputs.Input;
 import org.graylog2.inputs.InputImpl;
 import org.graylog2.inputs.InputService;
 import org.graylog2.plugin.Tools;
-import org.graylog2.rest.documentation.annotations.*;
+import com.wordnik.swagger.annotations.*;
 import org.graylog2.rest.resources.RestResource;
 import org.graylog2.rest.resources.system.radio.requests.PingRequest;
 import org.graylog2.shared.rest.resources.system.inputs.requests.RegisterInputRequest;
@@ -91,7 +91,7 @@ public class RadiosResource extends RestResource {
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "Radio not found.")
     })
-    public String radio(@ApiParam(title = "radioId", required = true) @PathParam("radioId") String radioId) {
+    public String radio(@ApiParam(name = "radioId", required = true) @PathParam("radioId") String radioId) {
         Node radio = null;
         try {
             radio = nodeService.byNodeId(radioId);
@@ -117,8 +117,8 @@ public class RadiosResource extends RestResource {
             @ApiResponse(code = 404, message = "Radio not found."),
             @ApiResponse(code = 400, message = "Missing or invalid configuration")
     })
-    public Response registerInput(@ApiParam(title = "JSON body", required = true) String body,
-                                @ApiParam(title = "radioId", required = true) @PathParam("radioId") String radioId) {
+    public Response registerInput(@ApiParam(name = "JSON body", required = true) String body,
+                                @ApiParam(name = "radioId", required = true) @PathParam("radioId") String radioId) {
         Node radio = null;
         try {
             radio = nodeService.byNodeId(radioId);
@@ -176,8 +176,8 @@ public class RadiosResource extends RestResource {
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "Radio not found.")
     })
-    public Response unregisterInput(@ApiParam(title = "radioId", required = true) @PathParam("radioId") String radioId,
-                                    @ApiParam(title = "inputId", required = true) @PathParam("inputId") String inputId) {
+    public Response unregisterInput(@ApiParam(name = "radioId", required = true) @PathParam("radioId") String radioId,
+                                    @ApiParam(name = "inputId", required = true) @PathParam("inputId") String inputId) {
         final Node radio;
         try {
             radio = nodeService.byNodeId(radioId);
@@ -210,7 +210,7 @@ public class RadiosResource extends RestResource {
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "Radio not found.")
     })
-    public String persistedInputs(@ApiParam(title = "radioId", required = true) @PathParam("radioId") String radioId) {
+    public String persistedInputs(@ApiParam(name = "radioId", required = true) @PathParam("radioId") String radioId) {
         Node radio = null;
         Map<String, Object> result = Maps.newHashMap();
         List<Map<String, Object>> inputs = Lists.newArrayList();
@@ -247,8 +247,8 @@ public class RadiosResource extends RestResource {
     @ApiOperation(value = "Ping - Accepts pings of graylog2-radio nodes.",
             notes = "Every graylog2-radio node is regularly pinging to announce that it is active.")
     @Path("/{radioId}/ping")
-    public Response ping(@ApiParam(title = "JSON body", required = true) String body,
-                         @ApiParam(title = "radioId", required = true) @PathParam("radioId") String radioId) {
+    public Response ping(@ApiParam(name = "JSON body", required = true) String body,
+                         @ApiParam(name = "radioId", required = true) @PathParam("radioId") String radioId) {
         PingRequest pr;
 
         try {

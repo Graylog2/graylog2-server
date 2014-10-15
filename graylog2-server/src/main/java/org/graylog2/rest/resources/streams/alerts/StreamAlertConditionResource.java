@@ -25,7 +25,7 @@ import org.graylog2.alerts.AlertService;
 import org.graylog2.database.*;
 import org.graylog2.plugin.alarms.AlertCondition;
 import org.graylog2.plugin.streams.Stream;
-import org.graylog2.rest.documentation.annotations.*;
+import com.wordnik.swagger.annotations.*;
 import org.graylog2.rest.resources.RestResource;
 import org.graylog2.rest.resources.streams.alerts.requests.CreateConditionRequest;
 import org.graylog2.security.RestPermissions;
@@ -68,8 +68,8 @@ public class StreamAlertConditionResource extends RestResource {
             @ApiResponse(code = 404, message = "Stream not found."),
             @ApiResponse(code = 400, message = "Invalid ObjectId.")
     })
-    public Response create(@ApiParam(title = "streamId", description = "The stream id this new alert condition belongs to.", required = true) @PathParam("streamId") String streamid,
-                           @ApiParam(title = "JSON body", required = true) String body) {
+    public Response create(@ApiParam(name = "streamId", value = "The stream id this new alert condition belongs to.", required = true) @PathParam("streamId") String streamid,
+                           @ApiParam(name = "JSON body", required = true) String body) {
         CreateConditionRequest ccr;
         checkPermission(RestPermissions.STREAMS_EDIT, streamid);
 
@@ -89,7 +89,7 @@ public class StreamAlertConditionResource extends RestResource {
 
         final AlertCondition alertCondition;
         try {
-            alertCondition = alertService.fromRequest(ccr, stream);
+            alertCondition = alertService.fromRequest(ccr, stream, getCurrentUser().getName());
         } catch (AbstractAlertCondition.NoSuchAlertConditionTypeException e) {
             LOG.error("Invalid alarm condition type.", e);
             throw new WebApplicationException(e, Response.Status.BAD_REQUEST);
@@ -118,9 +118,9 @@ public class StreamAlertConditionResource extends RestResource {
             @ApiResponse(code = 404, message = "Stream not found."),
             @ApiResponse(code = 400, message = "Invalid ObjectId.")
     })
-    public Response update(@ApiParam(title = "streamId", description = "The stream id the alert condition belongs to.", required = true) @PathParam("streamId") String streamid,
-                           @ApiParam(title = "conditionId", description = "The alert condition id.", required = true) @PathParam("conditionId") String conditionid,
-                           @ApiParam(title = "JSON body", required = true) String body) {
+    public Response update(@ApiParam(name = "streamId", value = "The stream id the alert condition belongs to.", required = true) @PathParam("streamId") String streamid,
+                           @ApiParam(name = "conditionId", value = "The alert condition id.", required = true) @PathParam("conditionId") String conditionid,
+                           @ApiParam(name = "JSON body", required = true) String body) {
         CreateConditionRequest ccr;
         checkPermission(RestPermissions.STREAMS_EDIT, streamid);
 
@@ -161,7 +161,7 @@ public class StreamAlertConditionResource extends RestResource {
             @ApiResponse(code = 404, message = "Stream not found."),
             @ApiResponse(code = 400, message = "Invalid ObjectId.")
     })
-    public Response list(@ApiParam(title = "streamId", description = "The stream id this new alert condition belongs to.", required = true) @PathParam("streamId") String streamid) {
+    public Response list(@ApiParam(name = "streamId", value = "The stream id this new alert condition belongs to.", required = true) @PathParam("streamId") String streamid) {
         checkPermission(RestPermissions.STREAMS_READ, streamid);
 
         Stream stream;
@@ -191,8 +191,8 @@ public class StreamAlertConditionResource extends RestResource {
             @ApiResponse(code = 404, message = "Stream not found."),
             @ApiResponse(code = 400, message = "Invalid ObjectId.")
     })
-    public Response delete(@ApiParam(title = "streamId", description = "The stream id this new alert condition belongs to.", required = true) @PathParam("streamId") String streamid,
-                         @ApiParam(title = "conditionId", description = "The stream id this new alert condition belongs to.", required = true) @PathParam("conditionId") String conditionId) {
+    public Response delete(@ApiParam(name = "streamId", value = "The stream id this new alert condition belongs to.", required = true) @PathParam("streamId") String streamid,
+                         @ApiParam(name = "conditionId", value = "The stream id this new alert condition belongs to.", required = true) @PathParam("conditionId") String conditionId) {
         checkPermission(RestPermissions.STREAMS_READ, streamid);
 
         Stream stream;

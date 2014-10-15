@@ -18,15 +18,7 @@ package org.graylog2.rest.resources.system.jobs.requests;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public class TriggerRequest {
-
     @JsonProperty("job_name")
     public String jobName;
-
-    @JsonProperty("creator_user_id")
-    public String creatorUserId;
-
 }

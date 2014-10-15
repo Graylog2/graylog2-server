@@ -17,26 +17,34 @@
 package org.graylog2.rest.resources.system.outputs;
 
 import com.codahale.metrics.annotation.Timed;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.database.ValidationException;
-import org.graylog2.outputs.DefaultMessageOutput;
 import org.graylog2.outputs.MessageOutputFactory;
-import org.graylog2.plugin.outputs.MessageOutput;
 import org.graylog2.plugin.streams.Output;
-import org.graylog2.rest.documentation.annotations.*;
+import com.wordnik.swagger.annotations.Api;
+import com.wordnik.swagger.annotations.ApiOperation;
+import com.wordnik.swagger.annotations.ApiParam;
+import com.wordnik.swagger.annotations.ApiResponse;
+import com.wordnik.swagger.annotations.ApiResponses;
 import org.graylog2.rest.resources.RestResource;
 import org.graylog2.rest.resources.streams.outputs.AvailableOutputSummary;
 import org.graylog2.security.RestPermissions;
 import org.graylog2.streams.OutputService;
 import org.graylog2.streams.outputs.CreateOutputRequest;
+import org.graylog2.utilities.ConfigurationMapConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import javax.ws.rs.*;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.HashMap;
@@ -47,7 +55,7 @@ import java.util.Set;
  * @author Dennis Oelkers <dennis@torch.sh>
  */
 @RequiresAuthentication
-@Api(value = "Outputs", description = "Manage outputs")
+@Api(value = "System/Outputs", description = "Manage outputs")
 @Path("/system/outputs")
 public class OutputResource extends RestResource {
     private static final Logger LOG = LoggerFactory.getLogger(OutputResource.class);
@@ -87,7 +95,7 @@ public class OutputResource extends RestResource {
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "No such output on this node.")
     })
-    public Output get(@ApiParam(title = "outputId", description = "The id of the output we want.", required = true) @PathParam("outputId") String outputId) throws NotFoundException {
+    public Output get(@ApiParam(name = "outputId", value = "The id of the output we want.", required = true) @PathParam("outputId") String outputId) throws NotFoundException {
         checkPermission(RestPermissions.OUTPUTS_READ, outputId);
         return outputService.load(outputId);
     }
@@ -100,11 +108,18 @@ public class OutputResource extends RestResource {
     @ApiResponses(value = {
             @ApiResponse(code = 400, message = "Invalid output specification in input.")
     })
-    public Response create(@ApiParam(title = "JSON body", required = true) CreateOutputRequest csor) throws ValidationException {
+    public Response create(@ApiParam(name = "JSON body", required = true) CreateOutputRequest csor) throws ValidationException {
         checkPermission(RestPermissions.OUTPUTS_CREATE);
+        final AvailableOutputSummary outputSummary = messageOutputFactory.getAvailableOutputs().get(csor.type);
 
-        csor.creatorUserId = getSubject().getPrincipal().toString();
-        Output output = outputService.create(csor);
+        if (outputSummary == null) {
+            throw new ValidationException("type", "Invalid output type");
+        }
+
+        // Make sure the config values will be stored with the correct type.
+        csor.configuration = ConfigurationMapConverter.convertValues(csor.configuration, outputSummary.requestedConfiguration);
+
+        Output output = outputService.create(csor, getCurrentUser().getName());
 
         return Response.status(Response.Status.CREATED).entity(output).build();
     }
@@ -117,7 +132,7 @@ public class OutputResource extends RestResource {
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "No such stream/output on this node.")
     })
-    public Response delete(@ApiParam(title = "outputId", description = "The id of the output that should be deleted", required = true) @PathParam("outputId") String outputId) throws org.graylog2.database.NotFoundException {
+    public Response delete(@ApiParam(name = "outputId", value = "The id of the output that should be deleted", required = true) @PathParam("outputId") String outputId) throws org.graylog2.database.NotFoundException {
         checkPermission(RestPermissions.OUTPUTS_TERMINATE);
         Output output = outputService.load(outputId);
         outputService.destroy(output);

@@ -30,7 +30,6 @@ import org.jboss.netty.channel.Channel;
 
 import javax.inject.Inject;
 import java.net.InetSocketAddress;
-import java.util.Map;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
@@ -119,11 +118,6 @@ public abstract class SyslogInputBase extends MessageInput {
         r.addField(ConfigurationRequest.Templates.recvBufferSize(CK_RECV_BUFFER_SIZE, 1024 * 1024));
 
         return r;
-    }
-
-    @Override
-    public Map<String, Object> getAttributes() {
-        return configuration.getSource();
     }
 
     @Override

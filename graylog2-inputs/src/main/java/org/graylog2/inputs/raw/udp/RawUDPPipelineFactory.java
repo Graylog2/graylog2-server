@@ -17,7 +17,7 @@
 package org.graylog2.inputs.raw.udp;
 
 import com.codahale.metrics.MetricRegistry;
-import org.graylog2.inputs.network.PacketInformationDumper;
+import org.graylog2.plugin.inputs.util.PacketInformationDumper;
 import org.graylog2.inputs.raw.RawDispatcher;
 import org.graylog2.plugin.buffers.Buffer;
 import org.graylog2.plugin.configuration.Configuration;

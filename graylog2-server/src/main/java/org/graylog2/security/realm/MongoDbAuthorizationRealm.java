@@ -30,6 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import java.util.Collections;
 import java.util.List;
 
 public class MongoDbAuthorizationRealm extends AuthorizingRealm {
@@ -45,12 +46,21 @@ public class MongoDbAuthorizationRealm extends AuthorizingRealm {
     @Override
     protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
         LOG.debug("Retrieving authorization information for {}", principals);
-        final User user = userService.load(principals.getPrimaryPrincipal().toString());
         final SimpleAuthorizationInfo info = new SimpleAuthorizationInfo();
-        final List<String> permissions = user.getPermissions();
-        if (permissions != null) {
-            info.setStringPermissions(Sets.newHashSet(permissions));
+        final User user = userService.load(principals.getPrimaryPrincipal().toString());
+
+        final List<String> permissions;
+        if (null == user) {
+            permissions = Collections.emptyList();
+        } else {
+            permissions = user.getPermissions();
+
+            if (permissions != null) {
+                info.setStringPermissions(Sets.newHashSet(permissions));
+            }
+
         }
+
         LOG.debug("User {} has permissions: {}", principals, permissions);
         return info;
     }

@@ -18,7 +18,7 @@ package org.graylog2.inputs.gelf.http;
 
 import com.codahale.metrics.MetricRegistry;
 import org.graylog2.inputs.gelf.gelf.GELFProcessor;
-import org.graylog2.inputs.network.PacketInformationDumper;
+import org.graylog2.plugin.inputs.util.PacketInformationDumper;
 import org.graylog2.plugin.buffers.Buffer;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.util.ConnectionCounter;
