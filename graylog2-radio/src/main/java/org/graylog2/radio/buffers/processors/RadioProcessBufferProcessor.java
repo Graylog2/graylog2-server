@@ -16,10 +16,13 @@
  */
 package org.graylog2.radio.buffers.processors;
 
+import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.ServerStatus;
+import org.graylog2.radio.Configuration;
 import org.graylog2.radio.transports.RadioTransport;
 import org.graylog2.shared.buffers.processors.ProcessBufferProcessor;
 import org.graylog2.shared.stats.ThroughputStats;
@@ -27,6 +30,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.atomic.AtomicInteger;
+
+import static com.codahale.metrics.MetricRegistry.name;
 
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
@@ -41,26 +46,43 @@ public class RadioProcessBufferProcessor extends ProcessBufferProcessor {
     }
 
     private static final Logger LOG = LoggerFactory.getLogger(RadioProcessBufferProcessor.class);
+    private static final AtomicInteger errorCount = new AtomicInteger(0);
     private final ThroughputStats throughputStats;
     private final RadioTransport radioTransport;
+    private final ServerStatus serverStatus;
+    private final int radioTransportMaxErrors;
+    private final Meter erroredMessages;
 
     @AssistedInject
     public RadioProcessBufferProcessor(MetricRegistry metricRegistry,
                                        ThroughputStats throughputStats,
                                        RadioTransport radioTransport,
+                                       ServerStatus serverStatus,
+                                       Configuration configuration,
                                        @Assisted AtomicInteger processBufferWatermark,
                                        @Assisted("ordinal") final long ordinal,
                                        @Assisted("numberOfConsumers") final long numberOfConsumers) {
         super(metricRegistry, processBufferWatermark, ordinal, numberOfConsumers);
         this.throughputStats = throughputStats;
         this.radioTransport = radioTransport;
+        this.serverStatus = serverStatus;
+        this.radioTransportMaxErrors = configuration.getRadioTransportMaxErrors();
+        this.erroredMessages = metricRegistry.meter(name(RadioProcessBufferProcessor.class, "erroredMessages"));
     }
 
     @Override
     protected void handleMessage(Message msg) {
-        radioTransport.send(msg);
-        throughputStats.getThroughputCounter().add(1);
-        if (LOG.isDebugEnabled())
-            LOG.debug("Message <{}> written to RadioTransport.", msg.getId());
+        try {
+            radioTransport.send(msg);
+            throughputStats.getThroughputCounter().add(1);
+            errorCount.set(0);
+            if (LOG.isDebugEnabled())
+                LOG.debug("Message <{}> written to RadioTransport.", msg.getId());
+        } catch (Exception e) {
+            int errors = errorCount.addAndGet(1);
+            if (radioTransportMaxErrors > 0 &&  errors >= radioTransportMaxErrors)
+                serverStatus.overrideLoadBalancerDead();
+            erroredMessages.mark();
+        }
     }
 }

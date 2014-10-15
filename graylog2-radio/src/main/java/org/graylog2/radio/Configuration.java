@@ -97,6 +97,9 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "ring_size", required = true, validator = PositiveIntegerValidator.class)
     private int ringSize = 1024;
 
+    @Parameter(value = "radio_transport_max_errors")
+    private int radioTransportMaxErrors = 0;
+
     public String getNodeIdFile() {
         return nodeIdFile;
     }
@@ -176,5 +179,9 @@ public class Configuration extends BaseConfiguration {
 
     public int getAmqpParallelQueues() {
         return amqpParallelQueues;
+    }
+
+    public int getRadioTransportMaxErrors() {
+        return radioTransportMaxErrors;
     }
 }

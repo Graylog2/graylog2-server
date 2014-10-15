@@ -23,6 +23,6 @@ import org.graylog2.plugin.Message;
  */
 public interface RadioTransport {
 
-    public void send(Message msg);
+    public void send(Message msg) throws Exception;
 
 }

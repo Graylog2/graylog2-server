@@ -20,6 +20,7 @@ import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.ServerStatus;
 import org.graylog2.radio.Configuration;
 import org.graylog2.radio.transports.RadioTransport;
 import org.slf4j.Logger;
@@ -35,6 +36,8 @@ import static com.codahale.metrics.MetricRegistry.name;
  * @author Lennart Koopmann <lennart@torch.sh>
  */
 public class AMQPProducer implements RadioTransport {
+    private final ServerStatus serverStatus;
+
     private class AMQPSenderPool {
         private final int count;
         private final AMQPSender[] senders;
@@ -72,7 +75,8 @@ public class AMQPProducer implements RadioTransport {
     private final Timer processTime;
 
     @Inject
-    public AMQPProducer(Configuration configuration, MetricRegistry metricRegistry) {
+    public AMQPProducer(MetricRegistry metricRegistry, Configuration configuration, ServerStatus serverStatus) {
+        this.serverStatus = serverStatus;
         senderPool = new AMQPSenderPool(configuration.getAmqpParallelQueues(), configuration);
         incomingMessages = metricRegistry.meter(name(AMQPProducer.class, "incomingMessages"));
         rejectedMessages = metricRegistry.meter(name(AMQPProducer.class, "rejectedMessages"));
@@ -80,13 +84,14 @@ public class AMQPProducer implements RadioTransport {
     }
 
     @Override
-    public void send(Message msg) {
+    public void send(Message msg) throws IOException {
         try (Timer.Context context = processTime.time()) {
             incomingMessages.mark();
             senderPool.send(msg);
         } catch (IOException e) {
             LOG.error("Could not write to AMQP.", e);
             rejectedMessages.mark();
+            throw e;
         }
     }
 
