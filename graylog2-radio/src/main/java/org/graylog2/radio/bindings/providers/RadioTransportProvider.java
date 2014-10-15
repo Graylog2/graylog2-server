@@ -48,7 +48,7 @@ public class RadioTransportProvider implements Provider<RadioTransport> {
     public RadioTransport get() {
         switch (configuration.getTransportType()) {
             case AMQP:
-                return new AMQPProducer(metricRegistry, configuration, messagePack);
+                return new AMQPProducer(metricRegistry, configuration, messagePack, serverStatus);
             case KAFKA:
                 return new KafkaProducer(serverStatus, configuration, metricRegistry, messagePack);
             default:

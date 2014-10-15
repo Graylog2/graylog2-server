@@ -43,8 +43,12 @@ public class AMQPTestSender implements Runnable {
     public void run() {
         int i = 0;
         while(true) {
-            radioTransport.send(message);
-            meter.mark();
+            try {
+                radioTransport.send(message);
+                meter.mark();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 }
