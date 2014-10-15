@@ -256,5 +256,17 @@
                 <artifactId>license-maven-plugin</artifactId>
             </plugin>
         </plugins>
+
+        <resources>
+            <resource>
+                <!-- git-commit-id-plugin depends on resource filtering to write the
+                    git.properties and version.properties files-->
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+                <includes>
+                    <include>**/*.properties</include>
+                </includes>
+            </resource>
+        </resources>
     </build>
 </project>
