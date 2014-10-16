@@ -67,9 +67,9 @@ public class Version {
 
     public static final Version v0_90_0 = new Version(0, 90, 0);
     public static final Version v0_91_0 = new Version(0, 91, 0);
-    public static final Version v0_91_1_SNAPSHOT = new Version(0, 91, 1, "snapshot");
+    public static final Version v0_91_1 = new Version(0, 91, 1);
 
-    public static final Version VERSION = v0_91_1_SNAPSHOT;
+    public static final Version VERSION = v0_91_1;
 
     public final int major;
     public final int minor;
