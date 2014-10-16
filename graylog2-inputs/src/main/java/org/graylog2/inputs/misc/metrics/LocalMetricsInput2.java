@@ -47,7 +47,7 @@ public class LocalMetricsInput2 extends MessageInput2 {
 
     @Override
     public boolean isExclusive() {
-        return false;
+        return true;
     }
 
     @Override
