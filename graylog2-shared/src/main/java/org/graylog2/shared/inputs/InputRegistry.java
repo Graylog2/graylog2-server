@@ -198,7 +198,7 @@ public abstract class InputRegistry {
 
     public void launchAllPersisted() {
         for (MessageInput input : getAllPersisted()) {
-            input.initialize(input.getConfiguration());
+            input.initialize();
             launchPersisted(input);
         }
     }

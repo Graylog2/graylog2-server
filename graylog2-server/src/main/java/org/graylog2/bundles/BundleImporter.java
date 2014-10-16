@@ -219,7 +219,8 @@ public class BundleImporter {
         messageInput.setCreatorUserId(userName);
         messageInput.setCreatedAt(createdAt);
 
-        messageInput.checkConfiguration(inputConfig);
+        messageInput.setConfiguration(inputConfig);
+        messageInput.checkConfiguration();
 
         // Don't run if exclusive and another instance is already running.
         if (messageInput.isExclusive() && inputRegistry.hasTypeRunning(messageInput.getClass())) {
@@ -233,7 +234,7 @@ public class BundleImporter {
         // Persist input.
         final String persistId = inputService.save(mongoInput);
         messageInput.setPersistId(persistId);
-        messageInput.initialize(inputConfig);
+        messageInput.initialize();
 
         addStaticFields(messageInput, inputDescription.getStaticFields());
         addExtractors(messageInput, inputDescription.getExtractors(), userName);

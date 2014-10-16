@@ -72,7 +72,7 @@ public class RadioInputRegistry extends InputRegistry {
             input.setGlobal(isr.global);
             input.setConfiguration(inputConfig);
 
-            input.checkConfiguration(inputConfig);
+            input.checkConfiguration();
         } catch (NoSuchInputTypeException e) {
             LOG.warn("Cannot launch persisted input. No such type [{}]. Error: {}", isr.type, e);
             return null;

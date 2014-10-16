@@ -20,7 +20,6 @@ import com.codahale.metrics.MetricRegistry;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.buffers.Buffer;
-import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.MisfireException;
@@ -83,10 +82,6 @@ public class StaticFieldFilterTest {
             super(metricRegistry, transport, localRegistry, codec);
         }
 
-        @Override
-        public void checkConfiguration(Configuration configuration) {
-            //To change body of implemented methods use File | Settings | File Templates.
-        }
 
         @Override
         public void launch(Buffer processBuffer) throws MisfireException {

@@ -90,6 +90,9 @@ public class Configuration {
 
         return bools.get(key);
     }
+    public boolean booleanIsSet(String key) {
+        return bools.containsKey(key);
+    }
 
     public Map<String, Object> getSource() {
         return source;

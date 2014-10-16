@@ -125,7 +125,7 @@ public class InputsResource extends RestResource {
 
             input.setConfiguration(inputConfig);
 
-            input.checkConfiguration(inputConfig);
+            input.checkConfiguration();
         } catch (NoSuchInputTypeException e) {
             LOG.error("There is no such input type registered.", e);
             throw new BadRequestException(e);
@@ -143,7 +143,7 @@ public class InputsResource extends RestResource {
             throw new BadRequestException();
         }
 
-        input.initialize(inputConfig);
+        input.initialize();
 
         // Launch input. (this will run async and clean up itself in case of an error.)
         inputRegistry.launch(input, inputId, true);
@@ -224,7 +224,7 @@ public class InputsResource extends RestResource {
         }
 
         LOG.info("Launching existing input [" + input.getName() + "]. Reason: REST request.");
-        input.initialize(input.getConfiguration());
+        input.initialize();
         if (inputState != null) {
             inputRegistry.launch(inputState);
         } else {

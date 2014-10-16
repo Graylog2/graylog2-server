@@ -141,7 +141,7 @@ public class InputsResource extends RestResource {
             input.setCreatedAt(createdAt);
             input.setConfiguration(inputConfig);
 
-            input.checkConfiguration(inputConfig);
+            input.checkConfiguration();
         } catch (NoSuchInputTypeException e) {
             LOG.error("There is no such input type registered.", e);
             throw new WebApplicationException(e, Response.Status.NOT_FOUND);
@@ -181,7 +181,7 @@ public class InputsResource extends RestResource {
         id = inputService.save(mongoInput);
         input.setPersistId(id);
 
-        input.initialize(inputConfig);
+        input.initialize();
 
         // Launch input. (this will run async and clean up itself in case of an error.)
         inputRegistry.launch(input, inputId);
@@ -254,7 +254,7 @@ public class InputsResource extends RestResource {
             try {
                 final Input input = inputService.find(inputId);
                 messageInput = inputService.getMessageInput(input);
-                messageInput.initialize(messageInput.getConfiguration());
+                messageInput.initialize();
             } catch (NoSuchInputTypeException | org.graylog2.database.NotFoundException e) {
                 final String error = "Cannot launch input <" + inputId + ">. Input not found.";
                 LOG.info(error);

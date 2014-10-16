@@ -109,7 +109,7 @@ public abstract class MessageInput {
         incomingMessages = localRegistry.meter("incomingMessages");
     }
 
-    public void initialize(Configuration configuration) {
+    public void initialize() {
         final MetricSet transportMetrics = transport.getMetricSet();
 
         if (transportMetrics != null) {
@@ -118,13 +118,9 @@ public abstract class MessageInput {
         metricRegistry.register(getUniqueReadableId(), localRegistry);
     }
 
-    public void checkConfiguration(Configuration configuration) throws ConfigurationException {
-        final ConfigurationRequest cr = getRequestedConfiguration();
-        // TODO perform check on configuration
-    }
-
     public void checkConfiguration() throws ConfigurationException {
-        checkConfiguration(getConfiguration());
+        final ConfigurationRequest cr = getRequestedConfiguration();
+        cr.check(getConfiguration());
     }
 
     public void launch(final Buffer buffer) throws MisfireException {

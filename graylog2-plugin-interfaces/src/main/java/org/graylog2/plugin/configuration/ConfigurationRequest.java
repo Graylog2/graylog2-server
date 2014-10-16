@@ -24,9 +24,9 @@ package org.graylog2.plugin.configuration;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.google.common.collect.Maps;
-import org.graylog2.plugin.configuration.fields.ConfigurationField;
-import org.graylog2.plugin.configuration.fields.NumberField;
-import org.graylog2.plugin.configuration.fields.TextField;
+import org.graylog2.plugin.configuration.fields.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 
@@ -34,6 +34,7 @@ import java.util.Map;
  * @author Lennart Koopmann <lennart@torch.sh>
  */
 public class ConfigurationRequest {
+    private static final Logger log = LoggerFactory.getLogger(ConfigurationRequest.class);
 
     private final Map<String, ConfigurationField> fields = Maps.newHashMap();
 
@@ -80,6 +81,36 @@ public class ConfigurationRequest {
         }
 
         return configs;
+    }
+
+    public void check(Configuration configuration) throws ConfigurationException {
+        for (ConfigurationField field : fields.values()) {
+            if (field.isOptional().equals(ConfigurationField.Optional.NOT_OPTIONAL)) {
+                final String type = field.getFieldType();
+                log.debug("Checking for non-optional field {} of type {} in configuration", field.getName(), type);
+                switch (type) {
+                    case BooleanField.FIELD_TYPE:
+                        if (!configuration.booleanIsSet(field.getName())) {
+                            throw new ConfigurationException("Mandatory configuration field " + field.getName() + " is missing");
+                        }
+                        break;
+                    case NumberField.FIELD_TYPE:
+                        if (!configuration.intIsSet(field.getName())) {
+                            throw new ConfigurationException("Mandatory configuration field " + field.getName() + " is missing");
+                        }
+                        break;
+                    case TextField.FIELD_TYPE:
+                        if (!configuration.stringIsSet(field.getName())) {
+                            throw new ConfigurationException("Mandatory configuration field " + field.getName() + " is missing");
+                        }
+                        break;
+                    case DropdownField.FIELD_TYPE:
+                        break;
+                    default:
+                        throw new IllegalStateException("Unknown field type " + type + ". This is a bug.");
+                }
+            }
+        }
     }
 
     public static class Templates {
