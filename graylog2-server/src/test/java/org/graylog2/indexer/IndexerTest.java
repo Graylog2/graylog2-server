@@ -20,11 +20,11 @@ import com.github.joschi.jadconfig.JadConfig;
 import com.github.joschi.jadconfig.RepositoryException;
 import com.github.joschi.jadconfig.ValidationException;
 import com.github.joschi.jadconfig.repositories.InMemoryRepository;
-import com.google.common.base.Charsets;
 import com.google.common.base.Splitter;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.common.io.Files;
+import com.google.common.io.Resources;
 import org.graylog2.Configuration;
 import org.graylog2.indexer.cluster.Cluster;
 import org.graylog2.indexer.counts.Counts;
@@ -34,39 +34,34 @@ import org.testng.annotations.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.Map;
 
 import static org.graylog2.AssertNotEquals.assertNotEquals;
 import static org.mockito.Mockito.mock;
-import static org.testng.AssertJUnit.*;
+import static org.testng.AssertJUnit.assertEquals;
+import static org.testng.AssertJUnit.assertTrue;
 
 public class IndexerTest {
-
-
-    private Configuration setupConfig(Map<String, String> settings) {
+    private Configuration setupConfig(Map<String, String> settings) throws ValidationException, RepositoryException {
         // required params we don't care about in this test, so we set them to dummy values for all test cases
         settings.put("password_secret", "thisisatest");
         settings.put("retention_strategy", "delete");
         settings.put("root_password_sha2", "thisisatest");
 
-        Configuration configuration = new Configuration();
-        try {
-            new JadConfig(new InMemoryRepository(settings), configuration).process();
-        } catch (RepositoryException e) {
-            fail(e.getMessage());
-        } catch (ValidationException e) {
-            fail(e.getMessage());
-        }
+        final Configuration configuration = new Configuration();
+        new JadConfig(new InMemoryRepository(settings), configuration).process();
+
         return configuration;
     }
 
     @Test
-    public void defaultConfigNoEsFile() {
+    public void defaultConfigNoEsFile() throws ValidationException, RepositoryException {
         // check that all ES settings will be taken from the default values in Configuration.java if nothing is specified.
-        Map<String,String> minimalSettings = Maps.newHashMap();
+        Map<String, String> minimalSettings = Maps.newHashMap();
         Configuration defaultConfig = setupConfig(minimalSettings);
 
-        Map<String,String> settings = Maps.newHashMap();
+        Map<String, String> settings = Maps.newHashMap();
         Configuration config = setupConfig(settings);
 
         Indexer indexer = new Indexer(config, mock(Searches.Factory.class),
@@ -81,15 +76,15 @@ public class IndexerTest {
         assertEquals(String.valueOf(defaultConfig.getEsTransportTcpPort()), nodeSettings.get("transport.tcp.port"));
         assertEquals(defaultConfig.getEsInitialStateTimeout(), nodeSettings.get("discovery.initial_state_timeout"));
         assertEquals(Boolean.toString(defaultConfig.isEsMulticastDiscovery()),
-                     nodeSettings.get("discovery.zen.ping.multicast.enabled"));
+                nodeSettings.get("discovery.zen.ping.multicast.enabled"));
         assertEquals(Boolean.toString(false), nodeSettings.get("action.auto_create_index"));
 
     }
 
     @Test
-    public void noEsFileValuesFromGraylog2Config() {
+    public void noEsFileValuesFromGraylog2Config() throws ValidationException, RepositoryException {
         // checks that all values in the node settings are from the graylog2 conf and that no extra settings remain untested
-        Map<String,String> settings = Maps.newHashMap();
+        Map<String, String> settings = Maps.newHashMap();
         Map<String, String> esPropNames = Maps.newHashMap();
 
         // add all ES settings here that are configurable via graylog2.conf
@@ -100,20 +95,20 @@ public class IndexerTest {
         addEsConfig(esPropNames, settings, "transport.tcp.port", "elasticsearch_transport_tcp_port", "9999");
         addEsConfig(esPropNames, settings, "http.enabled", "elasticsearch_http_enabled", "true");
         addEsConfig(esPropNames,
-                    settings,
-                    "discovery.zen.ping.multicast.enabled",
-                    "elasticsearch_discovery_zen_ping_multicast_enabled",
-                    "false");
+                settings,
+                "discovery.zen.ping.multicast.enabled",
+                "elasticsearch_discovery_zen_ping_multicast_enabled",
+                "false");
         addEsConfig(esPropNames,
-                    settings,
-                    "discovery.zen.ping.unicast.hosts",
-                    "elasticsearch_discovery_zen_ping_unicast_hosts",
-                    "192.168.1.1,192.168.2.1");
+                settings,
+                "discovery.zen.ping.unicast.hosts",
+                "elasticsearch_discovery_zen_ping_unicast_hosts",
+                "192.168.1.1,192.168.2.1");
         addEsConfig(esPropNames,
-                    settings,
-                    "discovery.initial_state_timeout",
-                    "elasticsearch_discovery_initial_state_timeout",
-                    "5s");
+                settings,
+                "discovery.initial_state_timeout",
+                "elasticsearch_discovery_initial_state_timeout",
+                "5s");
         esPropNames.put("action.auto_create_index", "false");
 
         Configuration config = setupConfig(settings);
@@ -132,26 +127,13 @@ public class IndexerTest {
     }
 
     @Test
-    public void testEsConfFileOverride() throws IOException {
-        Map<String,String> settings = Maps.newHashMap();
+    public void testEsConfFileOverride() throws IOException, URISyntaxException, ValidationException, RepositoryException {
+        Map<String, String> settings = Maps.newHashMap();
 
-        File tempFile = File.createTempFile("gl2es", "config");
-        tempFile.deleteOnExit();
-        String esContent =
-                "cluster.name: fromfile\n" +
-                "discovery.initial_state_timeout: 10s\n" +
-                "discovery.zen.ping.multicast.enabled: false\n" +
-                "discovery.zen.ping.unicast.hosts: 127.0.0.1,123.3.3.3\n" +
-                "http.enabled: true\n" +
-                "node.data: true\n" +
-                "node.master: true\n" +
-                "node.name: filenode\n" +
-                "transport.tcp.port: 1111";
+        final String esConfigFilePath = new File(Resources.getResource("org/graylog2/indexer/elasticsearch.yml").toURI()).getAbsolutePath();
+        settings.put("elasticsearch_config_file", esConfigFilePath);
 
-        Files.write(esContent, tempFile, Charsets.UTF_8);
-        settings.put("elasticsearch_config_file", tempFile.getAbsolutePath());
-
-        Configuration config = setupConfig(settings);
+        final Configuration config = setupConfig(settings);
 
         Indexer indexer = new Indexer(config, mock(Searches.Factory.class),
                 mock(Counts.Factory.class), mock(Cluster.Factory.class), mock(Indices.Factory.class), null);
@@ -165,10 +147,46 @@ public class IndexerTest {
         assertNotEquals("transport.tcp.port", String.valueOf(config.getEsTransportTcpPort()), nodeSettings.get("transport.tcp.port"));
         assertNotEquals("discovery.initial_state_timeout", config.getEsInitialStateTimeout(), nodeSettings.get("discovery.initial_state_timeout"));
         assertNotEquals("discovery.zen.ping.multicast.enabled", Boolean.toString(config.isEsMulticastDiscovery()),
-                        nodeSettings.get("discovery.zen.ping.multicast.enabled"));
+                nodeSettings.get("discovery.zen.ping.multicast.enabled"));
         assertNotEquals("discovery.zen.ping.unicast.hosts",
-                        config.getEsUnicastHosts(),
-                        Lists.newArrayList(Splitter.on(",").split(nodeSettings.get("discovery.zen.ping.unicast.hosts"))));
+                config.getEsUnicastHosts(),
+                Lists.newArrayList(Splitter.on(",").split(nodeSettings.get("discovery.zen.ping.unicast.hosts"))));
+    }
+
+    @Test
+    public void singletonListZenUnicastHostsWorks() throws IOException, ValidationException, RepositoryException {
+        final Map<String, String> settings = ImmutableMap.of(
+                "password_secret", "thisisatest",
+                "retention_strategy", "delete",
+                "root_password_sha2", "thisisatest",
+                "elasticsearch_discovery_zen_ping_unicast_hosts", "example.com");
+
+        final Configuration config = new Configuration();
+        new JadConfig(new InMemoryRepository(settings), config).process();
+
+        final Indexer indexer = new Indexer(config, mock(Searches.Factory.class),
+                mock(Counts.Factory.class), mock(Cluster.Factory.class), mock(Indices.Factory.class), null);
+        final Map<String, String> nodeSettings = indexer.readNodeSettings(config);
+
+        assertEquals("discovery.zen.ping.unicast.hosts", nodeSettings.get("discovery.zen.ping.unicast.hosts"), "example.com");
+    }
+
+    @Test
+    public void zenUnicastHostsAreTrimmed() throws IOException, ValidationException, RepositoryException {
+        final Map<String, String> settings = ImmutableMap.of(
+                "password_secret", "thisisatest",
+                "retention_strategy", "delete",
+                "root_password_sha2", "thisisatest",
+                "elasticsearch_discovery_zen_ping_unicast_hosts", " example.com,   example.net ");
+
+        final Configuration config = new Configuration();
+        new JadConfig(new InMemoryRepository(settings), config).process();
+
+        final Indexer indexer = new Indexer(config, mock(Searches.Factory.class),
+                mock(Counts.Factory.class), mock(Cluster.Factory.class), mock(Indices.Factory.class), null);
+        final Map<String, String> nodeSettings = indexer.readNodeSettings(config);
+
+        assertEquals("discovery.zen.ping.unicast.hosts", nodeSettings.get("discovery.zen.ping.unicast.hosts"), "example.com,example.net");
     }
 
     private void addEsConfig(Map<String, String> esProps, Map<String, String> settings, String esName, String confName, String value) {

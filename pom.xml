@@ -27,7 +27,7 @@
 
     <groupId>org.graylog2</groupId>
     <artifactId>graylog2-parent</artifactId>
-    <version>0.91.0-rc.1+perfFixes</version>
+    <version>0.91.1+perfFixes</version>
     <packaging>pom</packaging>
     <name>Graylog2</name>
     <url>http://graylog2.org/</url>
@@ -781,15 +781,6 @@
                 </executions>
             </plugin>
         </plugins>
-
-        <testResources>
-            <testResource>
-                <directory>src/test/resources</directory>
-                <includes>
-                    <include>test-log4j.xml</include>
-                </includes>
-            </testResource>
-        </testResources>
     </build>
 
     <reporting>

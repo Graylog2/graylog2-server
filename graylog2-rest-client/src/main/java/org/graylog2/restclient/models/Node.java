@@ -132,10 +132,8 @@ public class Node extends ClusterEntity {
                     api.path(routes.BufferResource().utilization(), BuffersResponse.class)
                             .node(this)
                             .execute());
-        } catch (APIException e) {
+        } catch (Exception e) {
             LOG.error("Unable to read buffer info from node " + this, e);
-        } catch (IOException e) {
-            LOG.error("Unexpected exception", e);
         }
         return null;
     }
@@ -143,10 +141,8 @@ public class Node extends ClusterEntity {
     public BufferClassesResponse getBufferClasses() {
         try {
             return api.path(routes.BufferResource().getBufferClasses(), BufferClassesResponse.class).node(this).execute();
-        } catch (APIException e) {
+        } catch (Exception e) {
             LOG.error("Unable to read buffer class names from node " + this, e);
-        } catch (IOException e) {
-            LOG.error("Unexpected exception", e);
         }
         return null;
     }
@@ -165,7 +161,7 @@ public class Node extends ClusterEntity {
                         ss.getValue().levelSyslog
                 ));
             }
-        } catch (APIException|IOException e) {
+        } catch (Exception e) {
             LOG.error("Unable to load subsystems for node " + this, e);
         }
         return subsystems;
@@ -181,7 +177,7 @@ public class Node extends ClusterEntity {
             for (Map.Entry<String, LoggerSummary> logger : response.loggers.entrySet()) {
                 loggers.add(new InternalLogger(logger.getKey(), logger.getValue().level, logger.getValue().syslogLevel));
             }
-        } catch (APIException|IOException e) {
+        } catch (Exception e) {
             LOG.error("Unable to load loggers for node " + this, e);
         }
         return loggers;
@@ -242,7 +238,7 @@ public class Node extends ClusterEntity {
         request.type = type;
         request.global = global;
         request.configuration = configuration;
-        request.creatorUserId = creator.getId();
+        request.creatorUserId = creator.getName();
 
         InputLaunchResponse ilr = null;
         try {
@@ -251,7 +247,7 @@ public class Node extends ClusterEntity {
                     .body(request)
                     .expect(Http.Status.ACCEPTED)
                     .execute();
-        } catch (APIException|IOException e) {
+        } catch (Exception e) {
             LOG.error("Could not launch input " + title, e);
         }
         return ilr;
@@ -264,7 +260,7 @@ public class Node extends ClusterEntity {
                     .expect(Http.Status.ACCEPTED)
                     .execute();
             return true;
-        } catch (APIException|IOException e) {
+        } catch (Exception e) {
             LOG.error("Could not launch input " + inputId, e);
         }
 
@@ -279,7 +275,7 @@ public class Node extends ClusterEntity {
                     .expect(Http.Status.ACCEPTED)
                     .execute();
             return true;
-        } catch (APIException|IOException e) {
+        } catch (Exception e) {
             LOG.error("Could not terminate input " + inputId, e);
         }
 
@@ -311,7 +307,7 @@ public class Node extends ClusterEntity {
             this.systemInfo = api.path(routes.SystemResource().system(), SystemOverviewResponse.class)
                     .node(this)
                     .execute();
-        } catch (APIException | IOException e) {
+        } catch (Exception e) {
             LOG.error("Unable to load system information for node " + this, e);
         }
     }
@@ -323,7 +319,7 @@ public class Node extends ClusterEntity {
                             .node(this)
                             .execute()
             );
-        } catch (APIException | IOException e) {
+        } catch (Exception e) {
             LOG.error("Unable to load JVM information for node " + this, e);
         }
     }
@@ -441,7 +437,7 @@ public class Node extends ClusterEntity {
     public int getThroughput() {
         try {
             return api.path(routes.ThroughputResource().total(), NodeThroughputResponse.class).node(this).execute().throughput;
-        } catch (APIException | IOException e) {
+        } catch (Exception e) {
             LOG.error("Could not load throughput for node " + this, e);
         }
         return 0;

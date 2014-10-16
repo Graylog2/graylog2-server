@@ -32,49 +32,6 @@
                 <exclude>*/**</exclude>
             </excludes>
         </fileSet>
-        <fileSet>
-            <directory>./</directory>
-            <outputDirectory>plugin/alarm_callbacks</outputDirectory>
-            <excludes>
-                <exclude>*/**</exclude>
-            </excludes>
-        </fileSet>
-        <fileSet>
-            <directory>./</directory>
-            <outputDirectory>plugin/filters</outputDirectory>
-            <excludes>
-                <exclude>*/**</exclude>
-            </excludes>
-        </fileSet>
-        <fileSet>
-            <directory>./</directory>
-            <outputDirectory>plugin/initializers</outputDirectory>
-            <excludes>
-                <exclude>*/**</exclude>
-            </excludes>
-        </fileSet>
-        <fileSet>
-            <directory>./</directory>
-            <outputDirectory>plugin/inputs</outputDirectory>
-            <excludes>
-                <exclude>*/**</exclude>
-            </excludes>
-        </fileSet>
-        <fileSet>
-            <directory>./</directory>
-            <outputDirectory>plugin/outputs</outputDirectory>
-            <excludes>
-                <exclude>*/**</exclude>
-            </excludes>
-        </fileSet>
-        <fileSet>
-            <directory>./</directory>
-            <outputDirectory>plugin/transports</outputDirectory>
-            <excludes>
-                <exclude>*/**</exclude>
-            </excludes>
-        </fileSet>
-
     </fileSets>
     <files>
         <file>
@@ -90,6 +47,11 @@
             <source>${project.basedir}/../misc/graylog2.conf</source>
             <destName>graylog2.conf.example</destName>
             <outputDirectory>/</outputDirectory>
+        </file>
+        <file>
+            <source>${project.basedir}/../build_script/copy/bin/graylog2-es-timestamp-fixup</source>
+            <outputDirectory>bin/</outputDirectory>
+            <fileMode>0755</fileMode>
         </file>
     </files>
 </assembly>
