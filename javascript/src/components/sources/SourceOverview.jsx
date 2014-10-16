@@ -33,6 +33,10 @@ var SourceOverview = React.createClass({
             renderResultTable: false
         };
     },
+    loadData() {
+        SourcesStore.loadSources(this.state.range);
+        HistogramDataStore.loadHistogramData(this.state.range);
+    },
     componentDidMount() {
         SourcesStore.addChangeListener(this._onSourcesChanged);
         HistogramDataStore.addChangeListener(this._onHistogramDataChanged);
@@ -40,14 +44,12 @@ var SourceOverview = React.createClass({
         this.renderPieChart();
         this.renderLineChart();
         dc.renderAll();
-        SourcesStore.loadSources(this.state.range);
-        HistogramDataStore.loadHistogramData(this.state.range);
+        this.loadData();
     },
     componentWillUnmount() {
         SourcesStore.removeChangeListener(this._onSourcesChanged);
         HistogramDataStore.removeChangeListener(this._onHistogramDataChanged);
     },
-
     renderPieChart() {
         var pieChartDomNode = $("#dc-sources-pie-chart")[0];
         var pieChartWidth = $(pieChartDomNode).width();
@@ -64,7 +66,6 @@ var SourceOverview = React.createClass({
                 });
             });
     },
-
     renderLineChart() {
         var lineChartDomNode = $("#dc-sources-line-chart")[0];
         dc.lineChart(lineChartDomNode)
@@ -85,7 +86,7 @@ var SourceOverview = React.createClass({
         dc.dataTable(dataTableDomNode)
             .dimension(this.othersDimension)
             .group((d) => d.percentage > othersThreshold ? "Top Sources" : "Others")
-            .size(Infinity)
+            .size(500)
             .columns([
                 function (d) {
                     // TODO
@@ -121,6 +122,9 @@ var SourceOverview = React.createClass({
         this.histogramData.add(histogramData.values);
         dc.redrawAll();
     },
+    _onRangeChanged(event){
+        this.setState({range: event.target.value}, () => this.loadData());
+    },
     render() {
         var emptySources = <div className="alert alert-info">
         No message sources found. Looks like you did not send in any messages yet.
@@ -141,7 +145,7 @@ var SourceOverview = React.createClass({
             <div>
                 <div className="row-fluid">
                     <div>
-                        <select className="sources-range pull-right" value={this.state.range}>
+                        <select className="sources-range pull-right" value={this.state.range} onChange={this._onRangeChanged}>
                             <option value={daysToSeconds(1)}>Last Day</option>
                             <option value={daysToSeconds(7)}>Last Week</option>
                             <option value={daysToSeconds(31)}>Last Month</option>

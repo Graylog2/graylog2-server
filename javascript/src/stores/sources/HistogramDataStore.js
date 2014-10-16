@@ -25,7 +25,15 @@ var HistogramDataStore = {
             q = encodeURIComponent(sourceNames.map((source) => "source:" + source).join(" OR "));
         }
         if (typeof range !== 'undefined') {
-            url += `?q=${q}&rangetype=relative&relative=${ range }`;
+            var interval = 'minute';
+            if (range >= 365 * 24 * 60 * 60 || range === 0) {
+                // for years and all interval will be day
+                interval = 'day';
+            } else if (range >= 31 * 24 * 60 * 60) {
+                // for months interval will be day
+                interval = 'hour';
+            }
+            url += `?q=${q}&rangetype=relative&relative=${ range }&interval=${interval}`;
         }
         var successCallback = (data) => this.setHistogramData(data);
         var failCallback = (jqXHR, textStatus, errorThrown) => {
