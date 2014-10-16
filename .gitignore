@@ -36,3 +36,6 @@ dependency-reduced-pom.xml
 *.iws
 
 .vagrant/
+
+**/pom.xml.versionsBackup
+
