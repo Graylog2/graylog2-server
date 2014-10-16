@@ -121,7 +121,7 @@ public class OutputImpl implements Output {
     @JsonValue
     public Map<String, Object> asMap() {
         final Map<String, Object> fields = getFields();
-        fields.put("id", ((ObjectId)fields.remove("_id")).toHexString());
+        fields.put("_id", ((ObjectId)fields.get("_id")).toHexString());
         return fields;
     }
 }
