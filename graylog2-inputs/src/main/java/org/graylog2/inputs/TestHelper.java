@@ -17,7 +17,7 @@
 package org.graylog2.inputs;
 
 import com.google.common.io.ByteStreams;
-import org.graylog2.inputs.gelf.gelf.GELFMessageChunk;
+import org.graylog2.inputs.codecs.gelf.GELFMessageChunk;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
 

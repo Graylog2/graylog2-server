@@ -21,37 +21,23 @@ import com.google.inject.Key;
 import com.google.inject.TypeLiteral;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.multibindings.MapBinder;
-import com.google.inject.multibindings.Multibinder;
 import org.graylog2.inputs.amqp.AMQPInput;
-import org.graylog2.inputs.amqp.AMQPInput2;
 import org.graylog2.inputs.codecs.CodecsModule;
 import org.graylog2.inputs.gelf.http.GELFHttpInput;
-import org.graylog2.inputs.gelf.http.GELFHttpInput2;
 import org.graylog2.inputs.gelf.tcp.GELFTCPInput;
-import org.graylog2.inputs.gelf.tcp.GELFTCPInput2;
 import org.graylog2.inputs.gelf.udp.GELFUDPInput;
-import org.graylog2.inputs.gelf.udp.GELFUDPInput2;
 import org.graylog2.inputs.kafka.KafkaInput;
-import org.graylog2.inputs.kafka.KafkaInput2;
 import org.graylog2.inputs.misc.jsonpath.JsonPathInput;
-import org.graylog2.inputs.misc.jsonpath.JsonPathInput2;
 import org.graylog2.inputs.misc.metrics.LocalMetricsInput;
-import org.graylog2.inputs.misc.metrics.LocalMetricsInput2;
-import org.graylog2.inputs.radio.RadioAMQPInput2;
-import org.graylog2.inputs.radio.RadioKafkaInput2;
+import org.graylog2.inputs.radio.RadioAMQPInput;
+import org.graylog2.inputs.radio.RadioKafkaInput;
 import org.graylog2.inputs.random.FakeHttpMessageInput;
-import org.graylog2.inputs.random.FakeHttpMessageInput2;
 import org.graylog2.inputs.raw.tcp.RawTCPInput;
-import org.graylog2.inputs.raw.tcp.RawTCPInput2;
 import org.graylog2.inputs.raw.udp.RawUDPInput;
-import org.graylog2.inputs.raw.udp.RawUDPInput2;
 import org.graylog2.inputs.syslog.tcp.SyslogTCPInput;
-import org.graylog2.inputs.syslog.tcp.SyslogTCPInput2;
 import org.graylog2.inputs.syslog.udp.SyslogUDPInput;
-import org.graylog2.inputs.syslog.udp.SyslogUDPInput2;
 import org.graylog2.inputs.transports.TransportsModule;
 import org.graylog2.plugin.inputs.MessageInput;
-import org.graylog2.plugin.inputs.MessageInput2;
 
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
@@ -59,51 +45,35 @@ import org.graylog2.plugin.inputs.MessageInput2;
 public class MessageInputBindings extends AbstractModule {
     @Override
     protected void configure() {
-        TypeLiteral<Class<? extends MessageInput>> typeLiteral = new TypeLiteral<Class<? extends MessageInput>>() {
-        };
-        Multibinder<Class<? extends MessageInput>> messageInputs = Multibinder.newSetBinder(binder(), typeLiteral);
-        messageInputs.addBinding().toInstance(GELFTCPInput.class);
-        messageInputs.addBinding().toInstance(GELFUDPInput.class);
-        messageInputs.addBinding().toInstance(GELFHttpInput.class);
-        messageInputs.addBinding().toInstance(RawTCPInput.class);
-        messageInputs.addBinding().toInstance(RawUDPInput.class);
-        messageInputs.addBinding().toInstance(AMQPInput.class);
-        messageInputs.addBinding().toInstance(KafkaInput.class);
-        messageInputs.addBinding().toInstance(JsonPathInput.class);
-        messageInputs.addBinding().toInstance(LocalMetricsInput.class);
-        messageInputs.addBinding().toInstance(FakeHttpMessageInput.class);
-        messageInputs.addBinding().toInstance(SyslogTCPInput.class);
-        messageInputs.addBinding().toInstance(SyslogUDPInput.class);
-
         install(new TransportsModule());
         install(new CodecsModule());
 
-        final MapBinder<String, MessageInput2.Factory<? extends MessageInput2>> inputMapBinder =
+        final MapBinder<String, MessageInput.Factory<? extends MessageInput>> inputMapBinder =
                 MapBinder.newMapBinder(binder(),
                                        TypeLiteral.get(String.class),
-                                       new TypeLiteral<MessageInput2.Factory<? extends MessageInput2>>() {
+                                       new TypeLiteral<MessageInput.Factory<? extends MessageInput>>() {
                                        });
         // new style inputs, using transports and codecs
-        installInput(inputMapBinder, RawTCPInput2.class, RawTCPInput2.Factory.class);
-        installInput(inputMapBinder, RawUDPInput2.class, RawUDPInput2.Factory.class);
-        installInput(inputMapBinder, SyslogTCPInput2.class, SyslogTCPInput2.Factory.class);
-        installInput(inputMapBinder, SyslogUDPInput2.class, SyslogUDPInput2.Factory.class);
-        installInput(inputMapBinder, FakeHttpMessageInput2.class, FakeHttpMessageInput2.Factory.class);
-        installInput(inputMapBinder, GELFTCPInput2.class, GELFTCPInput2.Factory.class);
-        installInput(inputMapBinder, GELFHttpInput2.class, GELFHttpInput2.Factory.class);
-        installInput(inputMapBinder, GELFUDPInput2.class, GELFUDPInput2.Factory.class);
-        installInput(inputMapBinder, KafkaInput2.class, KafkaInput2.Factory.class);
-        installInput(inputMapBinder, RadioKafkaInput2.class, RadioKafkaInput2.Factory.class);
-        installInput(inputMapBinder, AMQPInput2.class, AMQPInput2.Factory.class);
-        installInput(inputMapBinder, RadioAMQPInput2.class, RadioAMQPInput2.Factory.class);
-        installInput(inputMapBinder, JsonPathInput2.class, JsonPathInput2.Factory.class);
-        installInput(inputMapBinder, LocalMetricsInput2.class, LocalMetricsInput2.Factory.class);
+        installInput(inputMapBinder, RawTCPInput.class, RawTCPInput.Factory.class);
+        installInput(inputMapBinder, RawUDPInput.class, RawUDPInput.Factory.class);
+        installInput(inputMapBinder, SyslogTCPInput.class, SyslogTCPInput.Factory.class);
+        installInput(inputMapBinder, SyslogUDPInput.class, SyslogUDPInput.Factory.class);
+        installInput(inputMapBinder, FakeHttpMessageInput.class, FakeHttpMessageInput.Factory.class);
+        installInput(inputMapBinder, GELFTCPInput.class, GELFTCPInput.Factory.class);
+        installInput(inputMapBinder, GELFHttpInput.class, GELFHttpInput.Factory.class);
+        installInput(inputMapBinder, GELFUDPInput.class, GELFUDPInput.Factory.class);
+        installInput(inputMapBinder, KafkaInput.class, KafkaInput.Factory.class);
+        installInput(inputMapBinder, RadioKafkaInput.class, RadioKafkaInput.Factory.class);
+        installInput(inputMapBinder, AMQPInput.class, AMQPInput.Factory.class);
+        installInput(inputMapBinder, RadioAMQPInput.class, RadioAMQPInput.Factory.class);
+        installInput(inputMapBinder, JsonPathInput.class, JsonPathInput.Factory.class);
+        installInput(inputMapBinder, LocalMetricsInput.class, LocalMetricsInput.Factory.class);
     }
 
-    private <T extends MessageInput2> void installInput(MapBinder<String, MessageInput2.Factory<? extends MessageInput2>> inputMapBinder,
+    private <T extends MessageInput> void installInput(MapBinder<String, MessageInput.Factory<? extends MessageInput>> inputMapBinder,
                                                         Class<T> target,
-                                                        Class<? extends MessageInput2.Factory<T>> targetFactory) {
-        install(new FactoryModuleBuilder().implement(MessageInput2.class, target).build(targetFactory));
+                                                        Class<? extends MessageInput.Factory<T>> targetFactory) {
+        install(new FactoryModuleBuilder().implement(MessageInput.class, target).build(targetFactory));
         inputMapBinder.addBinding(target.getCanonicalName()).to(Key.get(targetFactory));
     }
 

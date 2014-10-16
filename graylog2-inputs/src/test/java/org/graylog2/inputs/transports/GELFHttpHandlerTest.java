@@ -14,23 +14,18 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.inputs.gelf.http;
+package org.graylog2.inputs.transports;
 
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
-import org.graylog2.inputs.gelf.gelf.GELFMessage;
-import org.graylog2.inputs.gelf.gelf.GELFProcessor;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.buffer.ChannelBuffers;
-import org.jboss.netty.channel.Channel;
-import org.jboss.netty.channel.ChannelFuture;
-import org.jboss.netty.channel.ChannelHandlerContext;
-import org.jboss.netty.channel.MessageEvent;
+import org.jboss.netty.channel.*;
 import org.jboss.netty.handler.codec.http.*;
 import org.mockito.ArgumentCaptor;
-import org.mockito.MockitoAnnotations;
 import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -38,16 +33,14 @@ import java.nio.charset.Charset;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
-import static org.testng.Assert.*;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNull;
 
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
  */
 public class GELFHttpHandlerTest {
-    private GELFHttpHandler handler;
-    @Mock private GELFProcessor gelfProcessor;
     @Mock private MessageInput messageInput;
     @Mock private MetricRegistry metricRegistry;
     @Mock private ChannelHandlerContext ctx;
@@ -72,33 +65,36 @@ public class GELFHttpHandlerTest {
         when(request.getContent()).thenReturn(channelBuffer);
         when(request.getUri()).thenReturn("/gelf");
 
+        when(ctx.getChannel()).thenReturn(mock(Channel.class));
+
         ChannelFuture channelFuture = mock(ChannelFuture.class);
 
         when(channel.write(any())).thenReturn(channelFuture);
 
         when(evt.getMessage()).thenReturn(request);
-        when(evt.getChannel()).thenReturn(channel);    }
+        when(evt.getChannel()).thenReturn(channel);
+    }
 
     @Test
     public void testBasicMessageReceived() throws Exception {
-        this.handler = new GELFHttpHandler(metricRegistry, messageInput, gelfProcessor, true);
+        final HttpTransport.Handler handler = new HttpTransport.Handler(true);
 
         handler.messageReceived(ctx, evt);
 
         verify(channel).write(any(HttpResponse.class));
-        verify(this.gelfProcessor).messageReceived(any(GELFMessage.class), eq(this.messageInput));
+        verify(ctx, atMost(1)).sendUpstream(any(ChannelEvent.class));
     }
 
     @Test
     public void testWithKeepalive() throws Exception {
         when(headers.get(HttpHeaders.Names.CONNECTION)).thenReturn(HttpHeaders.Values.KEEP_ALIVE);
-        this.handler = new GELFHttpHandler(metricRegistry, messageInput, gelfProcessor, true);
+        HttpTransport.Handler handler = new HttpTransport.Handler(true);
 
         handler.messageReceived(ctx, evt);
 
         ArgumentCaptor<HttpResponse> argument = ArgumentCaptor.forClass(HttpResponse.class);
         verify(channel).write(argument.capture());
-        verify(this.gelfProcessor).messageReceived(any(GELFMessage.class), any(MessageInput.class));
+        verify(ctx, atMost(1)).sendUpstream(any(ChannelEvent.class));
 
         HttpResponse response = argument.getValue();
         assertEquals(response.headers().get(HttpHeaders.Names.CONNECTION), HttpHeaders.Values.KEEP_ALIVE);
@@ -107,13 +103,13 @@ public class GELFHttpHandlerTest {
     @Test
     public void testWithoutKeepalive() throws Exception {
         when(headers.get(HttpHeaders.Names.CONNECTION)).thenReturn(HttpHeaders.Values.CLOSE);
-        this.handler = new GELFHttpHandler(metricRegistry, messageInput, gelfProcessor, true);
+        HttpTransport.Handler handler = new HttpTransport.Handler(true);
 
         handler.messageReceived(ctx, evt);
 
         ArgumentCaptor<HttpResponse> argument = ArgumentCaptor.forClass(HttpResponse.class);
         verify(channel).write(argument.capture());
-        verify(this.gelfProcessor, times(1)).messageReceived(any(GELFMessage.class), any(MessageInput.class));
+        verify(ctx, atMost(1)).sendUpstream(any(ChannelEvent.class));
 
         HttpResponse response = argument.getValue();
         assertEquals(response.headers().get(HttpHeaders.Names.CONNECTION), HttpHeaders.Values.CLOSE);
@@ -121,14 +117,14 @@ public class GELFHttpHandlerTest {
 
     @Test
     public void testNotReactToNonPost() throws Exception {
-        this.handler = new GELFHttpHandler(metricRegistry, messageInput, gelfProcessor, true);
+        HttpTransport.Handler handler = new HttpTransport.Handler(true);
         when(request.getMethod()).thenReturn(HttpMethod.GET);
 
         handler.messageReceived(ctx, evt);
 
         ArgumentCaptor<HttpResponse> argument = ArgumentCaptor.forClass(HttpResponse.class);
         verify(channel).write(argument.capture());
-        verify(this.gelfProcessor, never()).messageReceived(any(GELFMessage.class), any(MessageInput.class));
+        verify(ctx, never()).sendUpstream(any(ChannelEvent.class));
 
         HttpResponse response = argument.getValue();
         assertEquals(response.getStatus(), HttpResponseStatus.METHOD_NOT_ALLOWED);
@@ -136,14 +132,14 @@ public class GELFHttpHandlerTest {
 
     @Test
     public void testNotReactToOtherPath() throws Exception {
-        this.handler = new GELFHttpHandler(metricRegistry, messageInput, gelfProcessor, true);
+        HttpTransport.Handler handler = new HttpTransport.Handler(true);
         when(request.getUri()).thenReturn("/notgelf");
 
         handler.messageReceived(ctx, evt);
 
         ArgumentCaptor<HttpResponse> argument = ArgumentCaptor.forClass(HttpResponse.class);
         verify(channel).write(argument.capture());
-        verify(this.gelfProcessor, never()).messageReceived(any(GELFMessage.class), any(MessageInput.class));
+        verify(ctx, never()).sendUpstream(any(ChannelEvent.class));
 
         HttpResponse response = argument.getValue();
         assertEquals(response.getStatus(), HttpResponseStatus.NOT_FOUND);
@@ -151,13 +147,13 @@ public class GELFHttpHandlerTest {
 
     @Test
     public void testNoCorsHeadersWithoutOrigin() throws Exception {
-        this.handler = new GELFHttpHandler(metricRegistry, messageInput, gelfProcessor, true);
+        HttpTransport.Handler handler = new HttpTransport.Handler(true);
 
         handler.messageReceived(ctx, evt);
 
         ArgumentCaptor<HttpResponse> argument = ArgumentCaptor.forClass(HttpResponse.class);
         verify(channel).write(argument.capture());
-        verify(this.gelfProcessor).messageReceived(any(GELFMessage.class), eq(this.messageInput));
+        verify(ctx, atMost(1)).sendUpstream(any(ChannelEvent.class));
 
         HttpResponse response = argument.getValue();
         assertNull(response.headers().get(HttpHeaders.Names.ACCESS_CONTROL_ALLOW_ORIGIN));
@@ -167,7 +163,7 @@ public class GELFHttpHandlerTest {
 
     @Test
     public void testAddCorsHeadersForOrigin() throws Exception {
-        this.handler = new GELFHttpHandler(metricRegistry, messageInput, gelfProcessor, true);
+        HttpTransport.Handler handler = new HttpTransport.Handler(true);
         String origin = "localhost";
         when(this.headers.get(HttpHeaders.Names.ORIGIN)).thenReturn(origin);
 
@@ -175,7 +171,7 @@ public class GELFHttpHandlerTest {
 
         ArgumentCaptor<HttpResponse> argument = ArgumentCaptor.forClass(HttpResponse.class);
         verify(channel).write(argument.capture());
-        verify(this.gelfProcessor).messageReceived(any(GELFMessage.class), eq(this.messageInput));
+        verify(ctx, atMost(1)).sendUpstream(any(ChannelEvent.class));
 
         HttpResponse response = argument.getValue();
         assertEquals(response.headers().get(HttpHeaders.Names.ACCESS_CONTROL_ALLOW_ORIGIN), origin);
@@ -185,7 +181,7 @@ public class GELFHttpHandlerTest {
 
     @Test
     public void testAddCorsHeadersForDifferentOrigin() throws Exception {
-        this.handler = new GELFHttpHandler(metricRegistry, messageInput, gelfProcessor, true);
+        HttpTransport.Handler handler = new HttpTransport.Handler(true);
         String origin = "www.google.com";
         when(this.headers.get(HttpHeaders.Names.ORIGIN)).thenReturn(origin);
 
@@ -193,7 +189,7 @@ public class GELFHttpHandlerTest {
 
         ArgumentCaptor<HttpResponse> argument = ArgumentCaptor.forClass(HttpResponse.class);
         verify(channel).write(argument.capture());
-        verify(this.gelfProcessor).messageReceived(any(GELFMessage.class), eq(this.messageInput));
+        verify(ctx, atMost(1)).sendUpstream(any(ChannelEvent.class));
 
         HttpResponse response = argument.getValue();
         assertEquals(response.headers().get(HttpHeaders.Names.ACCESS_CONTROL_ALLOW_ORIGIN), origin);
@@ -203,7 +199,7 @@ public class GELFHttpHandlerTest {
 
     @Test
     public void testNoCorsHeadersForOriginIfDisabled() throws Exception {
-        this.handler = new GELFHttpHandler(metricRegistry, messageInput, gelfProcessor, false);
+        HttpTransport.Handler handler = new HttpTransport.Handler(false);
         String origin = "localhost";
         when(this.headers.get(HttpHeaders.Names.ORIGIN)).thenReturn(origin);
 
@@ -211,7 +207,7 @@ public class GELFHttpHandlerTest {
 
         ArgumentCaptor<HttpResponse> argument = ArgumentCaptor.forClass(HttpResponse.class);
         verify(channel).write(argument.capture());
-        verify(this.gelfProcessor).messageReceived(any(GELFMessage.class), eq(this.messageInput));
+        verify(ctx, atMost(1)).sendUpstream(any(ChannelEvent.class));
 
         HttpResponse response = argument.getValue();
         assertNull(response.headers().get(HttpHeaders.Names.ACCESS_CONTROL_ALLOW_ORIGIN));

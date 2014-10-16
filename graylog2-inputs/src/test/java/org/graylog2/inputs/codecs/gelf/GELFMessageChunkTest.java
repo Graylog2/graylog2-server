@@ -14,16 +14,14 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.inputs.gelf;
+package org.graylog2.inputs.codecs.gelf;
 
 import org.graylog2.inputs.TestHelper;
-import org.graylog2.inputs.gelf.gelf.GELFMessageChunk;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.testng.annotations.Test;
 
-import static org.testng.AssertJUnit.assertArrayEquals;
-import static org.testng.AssertJUnit.assertEquals;
-import static org.testng.AssertJUnit.assertNotNull;
-import static org.testng.AssertJUnit.assertTrue;
+import static org.testng.AssertJUnit.*;
 
 
 public class GELFMessageChunkTest {
@@ -41,7 +39,9 @@ public class GELFMessageChunkTest {
     @Test
     public void testGetArrival() throws Exception {
         final GELFMessageChunk chunk = buildChunk();
-        assertTrue(System.currentTimeMillis() - chunk.getArrival() < 5000l); // delta shmelta
+        final long l = DateTime.now(DateTimeZone.UTC).getMillis();
+        final long arrival = chunk.getArrival();
+        assertTrue(l - arrival < 5000l); // delta shmelta
     }
 
     @Test

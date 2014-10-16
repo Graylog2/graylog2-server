@@ -14,107 +14,75 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  */
+/**
+ *
+ * This file is part of Graylog2.
+ *
+ * Graylog2 is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Graylog2 is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package org.graylog2.inputs.raw.tcp;
 
-import com.codahale.metrics.Gauge;
 import com.codahale.metrics.MetricRegistry;
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import org.graylog2.inputs.raw.RawInputBase;
-import org.graylog2.plugin.buffers.Buffer;
+import com.google.inject.assistedinject.Assisted;
+import com.google.inject.assistedinject.AssistedInject;
+import org.graylog2.inputs.codecs.RawCodec;
+import org.graylog2.inputs.transports.TcpTransport;
+import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.configuration.Configuration;
-import org.graylog2.plugin.configuration.ConfigurationRequest;
-import org.graylog2.plugin.configuration.fields.BooleanField;
-import org.graylog2.plugin.inputs.MisfireException;
-import org.jboss.netty.bootstrap.ServerBootstrap;
-import org.jboss.netty.channel.ChannelException;
-import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.graylog2.plugin.inputs.MessageInput;
+import org.graylog2.plugin.inputs.codecs.Codec;
+import org.graylog2.plugin.inputs.transports.Transport;
 
-import javax.inject.Inject;
-import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+public class RawTCPInput extends MessageInput {
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
-public class RawTCPInput extends RawInputBase {
-    public static final String NAME = "Raw/Plaintext TCP";
-    public static final String CK_USE_NULL_DELIMITER = "use_null_delimiter";
-
-    private static final Logger LOG = LoggerFactory.getLogger(RawTCPInput.class);
-
-    private final MetricRegistry metricRegistry;
-
-    @Inject
-    public RawTCPInput(MetricRegistry metricRegistry) {
-        this.metricRegistry = metricRegistry;
+    @AssistedInject
+    public RawTCPInput(@Assisted final Configuration configuration,
+                       @Assisted final Transport transport,
+                       @Assisted final Codec codec,
+                       final MetricRegistry metricRegistry, LocalMetricRegistry localRegistry) {
+        super(metricRegistry, transport, localRegistry, codec);
     }
 
-    @Override
-    public void initialize(Configuration configuration) {
-        super.initialize(configuration);
-
-        // Register throughput counter gauges.
-        for(Map.Entry<String,Gauge<Long>> gauge : throughputCounter.gauges().entrySet()) {
-            metricRegistry.register(MetricRegistry.name(getUniqueReadableId(), gauge.getKey()), gauge.getValue());
-        }
-
-        // Register connection counter gauges.
-        metricRegistry.register(MetricRegistry.name(getUniqueReadableId(), "open_connections"), connectionCounter.gaugeCurrent());
-        metricRegistry.register(MetricRegistry.name(getUniqueReadableId(), "total_connections"), connectionCounter.gaugeTotal());
-    }
-
-    @Override
-    public void launch(Buffer processBuffer) throws MisfireException {
-        final ExecutorService bossThreadPool = Executors.newCachedThreadPool(
-                new ThreadFactoryBuilder()
-                        .setNameFormat("input-" + getId() + "-rawtcp-boss-%d")
-                        .build());
-
-        final ExecutorService workerThreadPool = Executors.newCachedThreadPool(
-                new ThreadFactoryBuilder()
-                        .setNameFormat("input-" + getId() + "-rawtcp-worker-%d")
-                        .build());
-
-        bootstrap = new ServerBootstrap(
-                new NioServerSocketChannelFactory(bossThreadPool, workerThreadPool)
+    @AssistedInject
+    public RawTCPInput(@Assisted final Configuration configuration,
+                       final TcpTransport.Factory tcpTransportFactory,
+                       final RawCodec.Factory rawCodecFactory,
+                       final MetricRegistry metricRegistry, LocalMetricRegistry localRegistry) {
+        super(metricRegistry,
+              tcpTransportFactory.create(configuration),
+              localRegistry, rawCodecFactory.create(configuration)
         );
-
-        bootstrap.setPipelineFactory(new RawTCPPipelineFactory(metricRegistry, processBuffer, configuration, this, throughputCounter, connectionCounter));
-        bootstrap.setOption("child.receiveBufferSize", getRecvBufferSize());
-
-        try {
-            channel = ((ServerBootstrap) bootstrap).bind(socketAddress);
-            LOG.info("Started raw TCP input on {}", socketAddress);
-        } catch (ChannelException e) {
-            String msg = "Could not bind raw TCP input to address " + socketAddress;
-            LOG.error(msg, e);
-            throw new MisfireException(msg, e);
-        }
     }
 
     @Override
-    public ConfigurationRequest getRequestedConfiguration() {
-        ConfigurationRequest x = super.getRequestedConfiguration();
-
-        x.addField(
-                new BooleanField(
-                        CK_USE_NULL_DELIMITER,
-                        "Null frame delimiter?",
-                        false,
-                        "Use null byte as frame delimiter? Default is newline."
-                )
-        );
-
-        return x;
+    public boolean isExclusive() {
+        return false;
     }
-
 
     @Override
     public String getName() {
-        return NAME;
+        return "Raw/Plaintext TCP (transport based)";
     }
 
+    @Override
+    public String linkToDocs() {
+        return "";
+    }
+
+    public interface Factory extends MessageInput.Factory<RawTCPInput> {
+        RawTCPInput create(Configuration configuration);
+
+        RawTCPInput create(Configuration configuration, Transport transport, Codec codec);
+    }
 }

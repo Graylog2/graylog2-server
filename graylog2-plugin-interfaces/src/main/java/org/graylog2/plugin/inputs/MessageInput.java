@@ -22,13 +22,24 @@
  */
 package org.graylog2.plugin.inputs;
 
+import com.codahale.metrics.Meter;
+import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.MetricSet;
+import com.codahale.metrics.Timer;
 import com.google.common.collect.Maps;
+import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.buffers.Buffer;
+import org.graylog2.plugin.buffers.BufferOutOfCapacityException;
+import org.graylog2.plugin.buffers.ProcessingDisabledException;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationException;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
+import org.graylog2.plugin.configuration.fields.ConfigurationField;
 import org.graylog2.plugin.configuration.fields.TextField;
+import org.graylog2.plugin.inputs.codecs.Codec;
+import org.graylog2.plugin.inputs.transports.Transport;
+import org.graylog2.plugin.journal.RawMessage;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,11 +48,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import static com.google.common.base.Objects.firstNonNull;
-
 public abstract class MessageInput {
     private static final Logger LOG = LoggerFactory.getLogger(MessageInput.class);
 
+    public static final String CK_OVERRIDE_SOURCE = "override_source";
     public static final String CK_RECV_BUFFER_SIZE = "recv_buffer_size";
 
     public static final String FIELD_TYPE = "type";
@@ -61,6 +71,17 @@ public abstract class MessageInput {
 
     private static long defaultRecvBufferSize = 1024 * 1024;
 
+    private final MetricRegistry metricRegistry;
+    private final Transport transport;
+    private final MetricRegistry localRegistry;
+    private final Codec codec;
+    private final Meter failures;
+    private final Meter incompleteMessages;
+    private final Meter incomingMessages;
+    private final Meter processedMessages;
+    private final Timer parseTime;
+    private final Meter rawSize;
+
     protected String title;
     protected String creatorUserId;
     protected String persistId;
@@ -68,30 +89,82 @@ public abstract class MessageInput {
     protected Boolean global = false;
 
     protected Configuration configuration;
+    protected Buffer processBuffer;
 
     private Map<String, String> staticFields = Maps.newConcurrentMap();
 
-    public void initialize(Configuration configuration) {
+    public MessageInput(MetricRegistry metricRegistry,
+                        Transport transport,
+                        MetricRegistry localRegistry, Codec codec) {
+        this.metricRegistry = metricRegistry;
+        this.transport = transport;
+        this.localRegistry = localRegistry;
+        this.codec = codec;
+
+        parseTime = localRegistry.timer("parseTime");
+        processedMessages = localRegistry.meter("processedMessages");
+        failures = localRegistry.meter("failures");
+        incompleteMessages = localRegistry.meter("incompleteMessages");
+        rawSize = localRegistry.meter("rawSize");
+        incomingMessages = localRegistry.meter("incomingMessages");
     }
 
-    public abstract void checkConfiguration(Configuration configuration) throws ConfigurationException;
+    public void initialize(Configuration configuration) {
+        final MetricSet transportMetrics = transport.getMetricSet();
+
+        if (transportMetrics != null) {
+            metricRegistry.register(getUniqueReadableId(), transportMetrics);
+        }
+        metricRegistry.register(getUniqueReadableId(), localRegistry);
+    }
+
+    public void checkConfiguration(Configuration configuration) throws ConfigurationException {
+        final ConfigurationRequest cr = getRequestedConfiguration();
+        // TODO perform check on configuration
+    }
 
     public void checkConfiguration() throws ConfigurationException {
         checkConfiguration(getConfiguration());
     }
 
-    public abstract void launch(Buffer processBuffer) throws MisfireException;
+    public void launch(final Buffer buffer) throws MisfireException {
+        this.processBuffer = buffer;
+        try {
+            transport.setMessageAggregator(codec.getAggregator());
 
-    public abstract void stop();
+            transport.launch(this);
+        } catch (Exception e) {
+            processBuffer = null;
+            throw new MisfireException(e);
+        }
+    }
 
-    /**
-     * Description of the config settings this input needs.
-     * <p/>
-     * Must not be null.
-     *
-     * @return a possibly empty ConfigurationRequest object
-     */
-    public abstract ConfigurationRequest getRequestedConfiguration();
+    public void stop() {
+        transport.stop();
+    }
+
+    public ConfigurationRequest getRequestedConfiguration() {
+        final ConfigurationRequest transportConfig = transport.getRequestedConfiguration();
+        final ConfigurationRequest codecConfig = codec.getRequestedConfiguration();
+        final ConfigurationRequest r = new ConfigurationRequest();
+        r.putAll(transportConfig.getFields());
+        r.putAll(codecConfig.getFields());
+
+        r.addField(new TextField(
+                CK_OVERRIDE_SOURCE,
+                "Override source",
+                null,
+                "The source is a hostname derived from the received packet by default. Set this if you want to override " +
+                        "it with a custom string.",
+                ConfigurationField.Optional.OPTIONAL
+        ));
+
+        // give the codec the opportunity to override default values for certain configuration fields,
+        // this is commonly being used to default to some well known port for protocols such as GELF or syslog
+        codec.overrideDefaultValues(r);
+
+        return r;
+    }
 
     public abstract boolean isExclusive();
 
@@ -175,7 +248,7 @@ public abstract class MessageInput {
             } else {
                 // safety measure, although this is bad.
                 LOG.warn("Unknown input configuration setting {}={} found. Not trying to mask its value," +
-                        " though this is likely a bug.", attribute, value);
+                                 " though this is likely a bug.", attribute, value);
             }
 
             result.put(attribute.getKey(), value);
@@ -236,7 +309,85 @@ public abstract class MessageInput {
         defaultRecvBufferSize = size;
     }
 
-    public long getRecvBufferSize() {
-        return firstNonNull(configuration.getInt(CK_RECV_BUFFER_SIZE), defaultRecvBufferSize);
+    public Codec getCodec() {
+        return codec;
+    }
+
+    public void processRawMessage(RawMessage rawMessage) {
+        incomingMessages.mark();
+
+        final Message message;
+
+        try (Timer.Context ignored = parseTime.time()){
+            message = codec.decode(rawMessage);
+        } catch (RuntimeException e) {
+            LOG.warn("Codec " + codec + " threw exception", e);
+            failures.mark();
+            return;
+        }
+
+        if (message == null) {
+            failures.mark();
+            LOG.warn("Could not decode message. Dropping message {}", rawMessage.getId());
+            return;
+        }
+        if (!message.isComplete()) {
+            incompleteMessages.mark();
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Dropping incomplete message. Parsed fields: [{}]", message.getFields());
+            }
+            return;
+        }
+
+        processedMessages.mark();
+        rawSize.mark(rawMessage.getPayload().length);
+        processBuffer.insertCached(message, this);
+    }
+
+    /**
+     * Basically a reordered version of {@link #processRawMessage(org.graylog2.plugin.journal.RawMessage)} that only records a message
+     * as processed when adding it to processbuffer has worked.
+     * @param rawMessage
+     * @return true if the message was malformed and discarded. do not try to re-insert the message in that case but discard it.
+     *          false if the message was successfully processed, exception is raised otherwise
+     */
+    public boolean processRawMessageFailFast(RawMessage rawMessage) throws BufferOutOfCapacityException, ProcessingDisabledException {
+        final Message message;
+
+        try (Timer.Context ignored = parseTime.time()){
+            message = codec.decode(rawMessage);
+        } catch (RuntimeException e) {
+            LOG.warn("Codec " + codec + " threw exception", e);
+            incomingMessages.mark();
+            failures.mark();
+            return false;
+        }
+
+        if (message == null) {
+            incomingMessages.mark();
+            failures.mark();
+            LOG.warn("Could not decode message. Dropping message {}", rawMessage.getId());
+            return false;
+        }
+        if (!message.isComplete()) {
+            incomingMessages.mark();
+            incompleteMessages.mark();
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Dropping incomplete message. Parsed fields: [{}]", message.getFields());
+            }
+            return false;
+        }
+
+        processBuffer.insertFailFast(message, this);
+        // the following statements are only executed if insertFailFail does not throw!
+        incomingMessages.mark();
+        processedMessages.mark();
+        rawSize.mark(rawMessage.getPayload().length);
+        return true;
+    }
+
+    public interface Factory<M> {
+        M create(Configuration configuration);
+        M create(Configuration configuration, Transport transport, Codec codec);
     }
 }

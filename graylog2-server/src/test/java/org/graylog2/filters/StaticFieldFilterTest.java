@@ -16,16 +16,19 @@
  */
 package org.graylog2.filters;
 
+import com.codahale.metrics.MetricRegistry;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.buffers.Buffer;
 import org.graylog2.plugin.configuration.Configuration;
-import org.graylog2.plugin.configuration.ConfigurationException;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.MisfireException;
+import org.graylog2.plugin.inputs.codecs.Codec;
+import org.graylog2.plugin.inputs.transports.Transport;
 import org.testng.annotations.Test;
 
+import static org.mockito.Mockito.mock;
 import static org.testng.Assert.assertEquals;
 
 /**
@@ -37,7 +40,9 @@ public class StaticFieldFilterTest {
     public void testFilter() throws Exception {
         Message msg = new Message("hello", "junit", Tools.iso8601());
 
-        FakeInput fakeInput = new FakeInput();
+        FakeInput fakeInput = new FakeInput(mock(MetricRegistry.class),mock(Transport.class),
+                                            mock(MetricRegistry.class),
+                                            mock(Codec.class));
         fakeInput.addStaticField("foo", "bar");
 
         msg.setSourceInput(fakeInput);
@@ -55,7 +60,9 @@ public class StaticFieldFilterTest {
         Message msg = new Message("hello", "junit", Tools.iso8601());
         msg.addField("foo", "IWILLSURVIVE");
 
-        FakeInput fakeInput = new FakeInput();
+        FakeInput fakeInput = new FakeInput(mock(MetricRegistry.class),mock(Transport.class),
+                                            mock(MetricRegistry.class),
+                                            mock(Codec.class));
         fakeInput.addStaticField("foo", "bar");
 
         msg.setSourceInput(fakeInput);
@@ -70,8 +77,14 @@ public class StaticFieldFilterTest {
 
     private class FakeInput extends MessageInput {
 
+        public FakeInput(MetricRegistry metricRegistry,
+                         Transport transport,
+                         MetricRegistry localRegistry, Codec codec) {
+            super(metricRegistry, transport, localRegistry, codec);
+        }
+
         @Override
-        public void checkConfiguration(Configuration configuration) throws ConfigurationException {
+        public void checkConfiguration(Configuration configuration) {
             //To change body of implemented methods use File | Settings | File Templates.
         }
 

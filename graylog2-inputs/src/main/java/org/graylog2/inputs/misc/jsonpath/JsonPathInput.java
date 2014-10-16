@@ -16,173 +16,35 @@
  */
 package org.graylog2.inputs.misc.jsonpath;
 
-import com.google.common.collect.Maps;
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import com.jayway.jsonpath.JsonPath;
-import org.graylog2.plugin.Message;
-import org.graylog2.plugin.Tools;
-import org.graylog2.plugin.buffers.Buffer;
+import com.codahale.metrics.MetricRegistry;
+import com.google.inject.assistedinject.Assisted;
+import com.google.inject.assistedinject.AssistedInject;
+import org.graylog2.inputs.codecs.JsonPathCodec;
+import org.graylog2.inputs.transports.HttpPollTransport;
+import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.configuration.Configuration;
-import org.graylog2.plugin.configuration.ConfigurationException;
-import org.graylog2.plugin.configuration.ConfigurationRequest;
-import org.graylog2.plugin.configuration.fields.ConfigurationField;
-import org.graylog2.plugin.configuration.fields.DropdownField;
-import org.graylog2.plugin.configuration.fields.NumberField;
-import org.graylog2.plugin.configuration.fields.TextField;
 import org.graylog2.plugin.inputs.MessageInput;
-import org.graylog2.plugin.inputs.MisfireException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.graylog2.plugin.inputs.codecs.Codec;
+import org.graylog2.plugin.inputs.transports.Transport;
 
-import java.util.Map;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
-
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public class JsonPathInput extends MessageInput {
 
-    private static final Logger LOG = LoggerFactory.getLogger(JsonPathInput.class);
-
-    public static final String NAME = "JSON path from HTTP API";
-
-    private static final String CK_URL = "target_url";
-    private static final String CK_PATH = "path";
-    private static final String CK_SOURCE = "source";
-    private static final String CK_HEADERS = "headers";
-    private static final String CK_TIMEUNIT = "timeunit";
-    private static final String CK_INTERVAL = "interval";
-
-    private JsonPath jsonPath;
-
-    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1, new ThreadFactoryBuilder()
-            .setNameFormat("input-" + getId() + "-jsonpath-%d").build());
-
-    private ScheduledFuture<?> scheduledFuture;
-
-    /*
-     * TODO:
-     *
-     *   - add custom fields
-     *
-     */
-
-    @Override
-    public void checkConfiguration(Configuration configuration) throws ConfigurationException {
-        if (!checkConfig(configuration)) {
-            throw new ConfigurationException(configuration.getSource().toString());
-        }
-
-        this.jsonPath = JsonPath.compile(configuration.getString(CK_PATH));
+    @AssistedInject
+    public JsonPathInput(@Assisted Configuration configuration,
+                         @Assisted Transport transport,
+                         @Assisted Codec codec,
+                         MetricRegistry metricRegistry,
+                         LocalMetricRegistry localRegistry) {
+        super(metricRegistry, transport, localRegistry, codec);
     }
 
-    @Override
-    public void launch(final Buffer processBuffer) throws MisfireException {
-        final MessageInput parentInput = this;
-
-        Runnable task = new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    // Fetch JSON.
-                    String json;
-                    try {
-                        Collector collector = new Collector(
-                                configuration.getString(CK_URL),
-                                parseHeaders(configuration.getString(CK_HEADERS)),
-                                getId()
-                        );
-
-                        json = collector.getJson();
-                    } catch(Exception e) {
-                        LOG.error("Could not fetch JSON for JsonPathInput <" + getId() + ">.", e);
-                        return;
-                    }
-
-                    // Extract desired data from it.
-                    Selector selector = new Selector(jsonPath);
-                    Map<String, Object> fields = selector.read(json);
-
-                    Message m = new Message(selector.buildShortMessage(fields),
-                                            configuration.getString(CK_SOURCE),
-                                            Tools.iso8601());
-                    m.addFields(fields);
-
-                    // Add to buffer.
-                    processBuffer.insertCached(m, parentInput);
-                } catch(Exception e) {
-                    LOG.error("Could not run collector for JsonPathInput <" + getId() + ">.", e);
-                }
-            }
-        };
-
-        scheduledFuture = scheduler.scheduleAtFixedRate(task, 0, configuration.getInt(CK_INTERVAL), TimeUnit.valueOf(configuration.getString(CK_TIMEUNIT)));
-    }
-
-    @Override
-    public void stop() {
-        if (scheduledFuture != null) {
-            scheduledFuture.cancel(true);
-        }
-    }
-
-    @Override
-    public ConfigurationRequest getRequestedConfiguration() {
-        ConfigurationRequest r = new ConfigurationRequest();
-
-        r.addField(new TextField(
-                CK_URL,
-                "URI of JSON resource",
-                "http://example.org/api",
-                "HTTP resource returning JSON on GET",
-                ConfigurationField.Optional.NOT_OPTIONAL
-        ));
-
-        r.addField(new TextField(
-                CK_PATH,
-                "JSON path of data to extract",
-                "$.store.book[1].number_of_orders",
-                "Path to the value you want to extract from the JSON response. Take a look at the documentation for a more detailled explanation.",
-                ConfigurationField.Optional.NOT_OPTIONAL
-        ));
-
-
-        r.addField(new TextField(
-                CK_SOURCE,
-                "Message source",
-                "yourapi",
-                "What to use as source field of the resulting message.",
-                ConfigurationField.Optional.NOT_OPTIONAL
-        ));
-
-        r.addField(new TextField(
-                CK_HEADERS,
-                "Additional HTTP headers",
-                "",
-                "Add a comma separated list of additional HTTP headers. For example: Accept: application/json, X-Requester: Graylog2",
-                ConfigurationField.Optional.OPTIONAL
-        ));
-
-        r.addField(new NumberField(
-                CK_INTERVAL,
-                "Interval",
-                1,
-                "Time between every collector run. Select a time unit in the corresponding dropdown. Example: Run every 5 minutes.",
-                ConfigurationField.Optional.NOT_OPTIONAL
-        ));
-
-        r.addField(new DropdownField(
-                CK_TIMEUNIT,
-                "Interval time unit",
-                TimeUnit.MINUTES.toString(),
-                DropdownField.ValueTemplates.timeUnits(),
-                ConfigurationField.Optional.NOT_OPTIONAL
-        ));
-
-        return r;
+    @AssistedInject
+    public JsonPathInput(@Assisted Configuration configuration,
+                         HttpPollTransport.Factory transport,
+                         JsonPathCodec.Factory codec,
+                         MetricRegistry metricRegistry,
+                         LocalMetricRegistry localRegistry) {
+        super(metricRegistry, transport.create(configuration), localRegistry, codec.create(configuration));
     }
 
     @Override
@@ -192,7 +54,7 @@ public class JsonPathInput extends MessageInput {
 
     @Override
     public String getName() {
-        return NAME;
+        return "JSON path from HTTP API";
     }
 
     @Override
@@ -200,35 +62,11 @@ public class JsonPathInput extends MessageInput {
         return "http://graylog2.org/resources/documentation/sending/jsonpath";
     }
 
-    protected boolean checkConfig(Configuration config) {
-        return config.stringIsSet(CK_URL)
-                && config.stringIsSet(CK_PATH)
-                && config.stringIsSet(CK_SOURCE)
-                && config.stringIsSet(CK_TIMEUNIT)
-                && config.intIsSet(CK_INTERVAL);
+    public interface Factory extends MessageInput.Factory<JsonPathInput> {
+        @Override
+        JsonPathInput create(Configuration configuration);
+
+        @Override
+        JsonPathInput create(Configuration configuration, Transport transport, Codec codec);
     }
-
-    public static Map<String, String> parseHeaders(String headerString) {
-        Map<String, String> headers = Maps.newHashMap();
-
-        if (headerString == null || headerString.isEmpty()) {
-            return headers;
-        }
-
-        headerString = headerString.trim();
-
-        for (String headerPart : headerString.split(",")) {
-            headerPart = headerPart.trim();
-
-            String[] parts = headerPart.split(":");
-            if (parts == null || parts.length != 2) {
-                continue;
-            }
-
-            headers.put(parts[0].trim(), parts[1].trim());
-        }
-
-        return headers;
-    }
-
 }

@@ -28,7 +28,6 @@ public class GenericInitializerBindings extends AbstractModule {
     @Override
     protected void configure() {
         Multibinder<Service> serviceBinder = Multibinder.newSetBinder(binder(), Service.class);
-        serviceBinder.addBinding().to(GelfChunkManagerService.class);
         serviceBinder.addBinding().to(InputSetupService.class);
         serviceBinder.addBinding().to(PeriodicalsService.class);
         serviceBinder.addBinding().to(RestApiService.class);

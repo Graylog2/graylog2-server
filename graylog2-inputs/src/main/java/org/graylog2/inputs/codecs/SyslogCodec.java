@@ -37,7 +37,6 @@ import com.google.common.base.Charsets;
 import com.google.common.collect.Maps;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
-import org.graylog2.inputs.syslog.StructuredSyslog;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.configuration.Configuration;
@@ -60,7 +59,9 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import static com.google.common.base.Throwables.propagate;
@@ -247,5 +248,39 @@ public class SyslogCodec implements Codec {
     public interface Factory extends Codec.Factory<SyslogCodec> {
         @Override
         SyslogCodec create(Configuration configuration);
+    }
+
+    /**
+     * Parses structured syslog data.
+     *
+     * @author Lennart Koopmann <lennart@socketfeed.com>
+     */
+    public static class StructuredSyslog {
+
+        private static final Logger LOG = LoggerFactory.getLogger(StructuredSyslog.class);
+
+        public static Map<String, Object> extractFields(StructuredSyslogServerEvent msg) {
+            Map<String, Object> fields = Maps.newHashMap();
+            try {
+                Map raw = msg.getStructuredMessage().getStructuredData();
+                if (raw != null) {
+                    Set ks = raw.keySet();
+                    if (ks.size() > 0) {
+                        Object[] fl = raw.keySet().toArray();
+
+                        if (fl != null && fl.length > 0) {
+                            String sdID = (String) fl[0];
+                            fields = (HashMap) raw.get(sdID);
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                LOG.debug("Could not extract structured syslog", e);
+                return Maps.newHashMap();
+            }
+
+            return fields;
+        }
+
     }
 }

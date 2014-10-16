@@ -28,7 +28,7 @@ import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.configuration.fields.ConfigurationField;
 import org.graylog2.plugin.configuration.fields.NumberField;
 import org.graylog2.plugin.configuration.fields.TextField;
-import org.graylog2.plugin.inputs.MessageInput2;
+import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.MisfireException;
 import org.graylog2.plugin.inputs.codecs.CodecAggregator;
 import org.graylog2.plugin.inputs.transports.ThrottleableTransport;
@@ -130,7 +130,7 @@ public class AmqpTransport extends ThrottleableTransport {
     }
 
     @Override
-    public void launch(MessageInput2 input) throws MisfireException {
+    public void launch(MessageInput input) throws MisfireException {
         consumer = new AmqpConsumer(
                 configuration.getString(CK_HOSTNAME),
                 (int) configuration.getInt(CK_PORT),

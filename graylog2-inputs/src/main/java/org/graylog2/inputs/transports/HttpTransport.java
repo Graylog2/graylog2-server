@@ -24,7 +24,7 @@ import org.graylog2.plugin.collections.Pair;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.configuration.fields.BooleanField;
-import org.graylog2.plugin.inputs.MessageInput2;
+import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.transports.AbstractTcpTransport;
 import org.graylog2.plugin.inputs.transports.TransportFactory;
 import org.graylog2.plugin.inputs.util.ConnectionCounter;
@@ -69,7 +69,7 @@ public class HttpTransport extends AbstractTcpTransport {
     }
 
     @Override
-    protected List<Pair<String, ? extends ChannelHandler>> getBaseChannelHandlers(MessageInput2 input) {
+    protected List<Pair<String, ? extends ChannelHandler>> getBaseChannelHandlers(MessageInput input) {
         final List<Pair<String, ? extends ChannelHandler>> baseChannelHandlers = super.getBaseChannelHandlers(input);
 
         baseChannelHandlers.add(Pair.of("decoder", new HttpRequestDecoder()));
@@ -80,7 +80,7 @@ public class HttpTransport extends AbstractTcpTransport {
     }
 
     @Override
-    protected List<Pair<String, ? extends ChannelHandler>> getFinalChannelHandlers(MessageInput2 input) {
+    protected List<Pair<String, ? extends ChannelHandler>> getFinalChannelHandlers(MessageInput input) {
         final List<Pair<String, ? extends ChannelHandler>> handlers = Lists.newArrayList();
 
         handlers.add(Pair.of("http-handler", new Handler(enableCors)));
@@ -104,7 +104,7 @@ public class HttpTransport extends AbstractTcpTransport {
         HttpTransport create(Configuration configuration);
     }
 
-    private class Handler extends SimpleChannelHandler {
+    public static class Handler extends SimpleChannelHandler {
 
         private final boolean enableCors;
 

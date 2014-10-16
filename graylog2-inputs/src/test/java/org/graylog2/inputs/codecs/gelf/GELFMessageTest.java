@@ -14,11 +14,11 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.inputs.gelf;
+package org.graylog2.inputs.codecs.gelf;
 
 import org.graylog2.inputs.TestHelper;
-import org.graylog2.inputs.gelf.gelf.GELFMessage;
-import org.graylog2.inputs.gelf.gelf.GELFMessageChunk;
+import org.graylog2.inputs.codecs.gelf.GELFMessage;
+import org.graylog2.inputs.codecs.gelf.GELFMessageChunk;
 import org.testng.annotations.Test;
 import static org.testng.AssertJUnit.*;
 

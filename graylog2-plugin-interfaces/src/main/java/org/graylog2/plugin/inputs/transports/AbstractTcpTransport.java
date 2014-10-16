@@ -25,7 +25,7 @@ package org.graylog2.plugin.inputs.transports;
 import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.collections.Pair;
 import org.graylog2.plugin.configuration.Configuration;
-import org.graylog2.plugin.inputs.MessageInput2;
+import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.util.ConnectionCounter;
 import org.graylog2.plugin.inputs.util.ThroughputCounter;
 import org.jboss.netty.bootstrap.Bootstrap;
@@ -71,7 +71,7 @@ public abstract class AbstractTcpTransport extends NettyTransport {
     }
 
     @Override
-    protected List<Pair<String, ? extends ChannelHandler>> getBaseChannelHandlers(MessageInput2 input) {
+    protected List<Pair<String, ? extends ChannelHandler>> getBaseChannelHandlers(MessageInput input) {
         final List<Pair<String, ? extends ChannelHandler>> baseChannelHandlers = super.getBaseChannelHandlers(input);
         baseChannelHandlers.add(Pair.of("connection-counter", connectionCounter));
         return baseChannelHandlers;

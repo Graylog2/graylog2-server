@@ -39,7 +39,6 @@
 package org.graylog2.plugin.inputs.util;
 
 import org.graylog2.plugin.inputs.MessageInput;
-import org.graylog2.plugin.inputs.MessageInput2;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.MessageEvent;
@@ -51,24 +50,15 @@ public class PacketInformationDumper extends SimpleChannelUpstreamHandler {
     private static final Logger LOG = LoggerFactory.getLogger(PacketInformationDumper.class);
     private final Logger sourceInputLog;
 
-    private String sourceInputName;
-    private String sourceInputId;
-    private String uniqueReadableId;
+    private final String sourceInputName;
+    private final String sourceInputId;
 
     public PacketInformationDumper(MessageInput sourceInput) {
         sourceInputName = sourceInput.getName();
         sourceInputId = sourceInput.getId();
-        uniqueReadableId = sourceInput.getUniqueReadableId();
         sourceInputLog = LoggerFactory.getLogger(PacketInformationDumper.class.getCanonicalName() + "." + sourceInputId);
-        LOG.debug("Set {} to TRACE for network packet metadata dumps of input {}", sourceInputLog.getName(), uniqueReadableId);
-    }
-
-    public PacketInformationDumper(MessageInput2 sourceInput) {
-        sourceInputName = sourceInput.getName();
-        sourceInputId = sourceInput.getId();
-        uniqueReadableId = sourceInput.getUniqueReadableId();
-        sourceInputLog = LoggerFactory.getLogger(PacketInformationDumper.class.getCanonicalName() + "." + sourceInputId);
-        LOG.debug("Set {} to TRACE for network packet metadata dumps of input {}", sourceInputLog.getName(), uniqueReadableId);
+        LOG.debug("Set {} to TRACE for network packet metadata dumps of input {}", sourceInputLog.getName(),
+                  sourceInput.getUniqueReadableId());
     }
 
     @Override

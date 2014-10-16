@@ -25,7 +25,7 @@ package org.graylog2.plugin.inputs.transports;
 import com.codahale.metrics.MetricSet;
 import com.google.common.util.concurrent.AbstractExecutionThreadService;
 import com.google.common.util.concurrent.Service;
-import org.graylog2.plugin.inputs.MessageInput2;
+import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.MisfireException;
 import org.graylog2.plugin.inputs.codecs.CodecAggregator;
 import org.graylog2.plugin.journal.RawMessage;
@@ -42,10 +42,10 @@ public abstract class GeneratorTransport implements Transport {
 
     }
 
-    protected abstract RawMessage produceRawMessage(MessageInput2 input);
+    protected abstract RawMessage produceRawMessage(MessageInput input);
 
     @Override
-    public void launch(final MessageInput2 input) throws MisfireException {
+    public void launch(final MessageInput input) throws MisfireException {
         generatorService = new AbstractExecutionThreadService() {
             @Override
             protected void run() throws Exception {

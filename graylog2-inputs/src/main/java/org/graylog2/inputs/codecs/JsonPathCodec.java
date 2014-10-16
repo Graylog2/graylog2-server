@@ -16,6 +16,7 @@
  */
 package org.graylog2.inputs.codecs;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Maps;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
@@ -60,6 +61,17 @@ public class JsonPathCodec implements Codec {
             return null;
         }
         final String json = new String(rawMessage.getPayload(), StandardCharsets.UTF_8);
+        final Map<String, Object> fields = read(json);
+
+        final Message message = new Message(buildShortMessage(fields),
+                                            configuration.getString(CK_SOURCE),
+                                            rawMessage.getTimestamp());
+        message.addFields(fields);
+        return message;
+    }
+
+    @VisibleForTesting
+    protected Map<String, Object> read(String json) {
         final Object result = jsonPath.read(json);
 
         final Map<String, Object> fields = Maps.newHashMap();
@@ -75,15 +87,11 @@ public class JsonPathCodec implements Codec {
             // Now it's most likely a string or something we do not map.
             fields.put("result", result.toString());
         }
-
-        final Message message = new Message(buildShortMessage(fields),
-                                            configuration.getString(CK_SOURCE),
-                                            rawMessage.getTimestamp());
-        message.addFields(fields);
-        return message;
+        return fields;
     }
 
-    private String buildShortMessage(Map<String, Object> fields) {
+    @VisibleForTesting
+    protected String buildShortMessage(Map<String, Object> fields) {
         final StringBuilder shortMessage = new StringBuilder();
         shortMessage.append("JSON API poll result: ");
         shortMessage.append(jsonPath.getPath()).append(" -> ");

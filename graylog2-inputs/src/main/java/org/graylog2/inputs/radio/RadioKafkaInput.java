@@ -17,98 +17,49 @@
 package org.graylog2.inputs.radio;
 
 import com.codahale.metrics.MetricRegistry;
-import com.google.common.eventbus.EventBus;
-import com.google.inject.Inject;
+import com.google.inject.assistedinject.Assisted;
+import com.google.inject.assistedinject.AssistedInject;
+import org.graylog2.inputs.codecs.RadioMessageCodec;
 import org.graylog2.inputs.kafka.KafkaInput;
-import org.graylog2.plugin.ServerStatus;
+import org.graylog2.inputs.transports.RadioKafkaTransport;
+import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.configuration.Configuration;
-import org.graylog2.plugin.configuration.ConfigurationException;
-import org.graylog2.plugin.configuration.ConfigurationRequest;
-import org.graylog2.plugin.configuration.fields.ConfigurationField;
-import org.graylog2.plugin.configuration.fields.NumberField;
-import org.graylog2.plugin.configuration.fields.TextField;
-import org.graylog2.plugin.system.NodeId;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.graylog2.plugin.inputs.MessageInput;
+import org.graylog2.plugin.inputs.codecs.Codec;
+import org.graylog2.plugin.inputs.transports.Transport;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public class RadioKafkaInput extends KafkaInput {
 
-    private static final Logger LOG = LoggerFactory.getLogger(RadioKafkaInput.class);
-
-    public static final String NAME = "Graylog2 Radio Input (Kafka)";
-
-    @Inject
-    public RadioKafkaInput(MetricRegistry metricRegistry, NodeId nodeId, EventBus eventBus, ServerStatus serverStatus) {
-        super(metricRegistry, nodeId, eventBus, serverStatus);
+    @AssistedInject
+    public RadioKafkaInput(@Assisted Configuration configuration,
+                           MetricRegistry metricRegistry,
+                           @Assisted Transport transport,
+                           @Assisted Codec codec, LocalMetricRegistry localRegistry) {
+        super(configuration, metricRegistry, transport, codec, localRegistry);
     }
 
-    @Override
-    public void checkConfiguration(Configuration configuration) throws ConfigurationException {
-        configuration.setString(CK_TOPIC_FILTER, "^graylog2-radio-messages$");
-
-        if (!checkConfig(configuration)) {
-            throw new ConfigurationException(configuration.getSource().toString());
-        }
+    @AssistedInject
+    public RadioKafkaInput(@Assisted Configuration configuration,
+                           MetricRegistry metricRegistry,
+                           RadioKafkaTransport.Factory transport,
+                           RadioMessageCodec.Factory codec, LocalMetricRegistry localRegistry) {
+        super(configuration,
+              metricRegistry,
+              transport.create(configuration),
+              codec.create(configuration),
+              localRegistry);
     }
 
     @Override
     public String getName() {
-        return NAME;
+        return "Graylog2 Radio Input (Kafka)";
     }
 
-    @Override
-    public String linkToDocs() {
-        return "http://graylog2.org/resources/documentation/setup/radio";
+    public interface Factory extends MessageInput.Factory<RadioKafkaInput> {
+        @Override
+        RadioKafkaInput create(Configuration configuration);
+
+        @Override
+        RadioKafkaInput create(Configuration configuration, Transport transport, Codec codec);
     }
-
-    @Override
-    public ConfigurationRequest getRequestedConfiguration() {
-        ConfigurationRequest cr = new ConfigurationRequest();
-
-        cr.addField(new TextField(
-                CK_ZOOKEEPER,
-                "ZooKeeper address",
-                "192.168.1.1:2181",
-                "Host and port of the ZooKeeper that is managing your Kafka cluster.",
-                ConfigurationField.Optional.NOT_OPTIONAL
-        ));
-
-        cr.addField(new NumberField(
-                CK_FETCH_MIN_BYTES,
-                "Fetch minimum bytes",
-                5,
-                "Wait for a message batch to reach at least this size or the configured maximum wait time before fetching.",
-                ConfigurationField.Optional.NOT_OPTIONAL)
-        );
-
-        cr.addField(new NumberField(
-                CK_FETCH_WAIT_MAX,
-                "Fetch maximum wait time (ms)",
-                100,
-                "Wait for this time or the configured minimum size of a message batch before fetching.",
-                ConfigurationField.Optional.NOT_OPTIONAL)
-        );
-
-        cr.addField(new NumberField(
-                CK_THREADS,
-                "Processor threads",
-                2,
-                "Number of processor threads to spawn. Use one thread per Kafka topic partition.",
-                ConfigurationField.Optional.NOT_OPTIONAL)
-        );
-
-        return cr;
-    }
-
-    @Override
-    protected boolean checkConfig(Configuration config) {
-        return config.intIsSet(CK_FETCH_MIN_BYTES)
-                && config.intIsSet(CK_FETCH_WAIT_MAX)
-                && config.stringIsSet(CK_ZOOKEEPER)
-                && config.intIsSet(CK_THREADS)  && config.getInt(CK_THREADS) > 0;
-    }
-
 }

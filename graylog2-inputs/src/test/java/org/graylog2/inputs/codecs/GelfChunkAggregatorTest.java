@@ -17,7 +17,7 @@
 package org.graylog2.inputs.codecs;
 
 import org.graylog2.plugin.InstantMillisProvider;
-import org.graylog2.plugin.inputs.MessageInput2;
+import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.codecs.CodecAggregator;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.buffer.ChannelBuffers;
@@ -38,14 +38,14 @@ import static org.testng.Assert.*;
 
 public class GelfChunkAggregatorTest {
     private static final byte[] CHUNK_MAGIC_BYTES = new byte[]{0x1e, 0x0f};
-    private MessageInput2 input;
+    private MessageInput input;
     private ScheduledThreadPoolExecutor poolExecutor;
     private GelfChunkAggregator aggregator;
     private InetSocketAddress remoteAddress;
 
     @BeforeTest
     public void before() {
-        input = mock(MessageInput2.class);
+        input = mock(MessageInput.class);
         when(input.getUniqueReadableId()).thenReturn("input-id");
         poolExecutor = new ScheduledThreadPoolExecutor(1);
         aggregator = new GelfChunkAggregator(poolExecutor);
@@ -55,6 +55,7 @@ public class GelfChunkAggregatorTest {
     @AfterTest
     public void after() {
         poolExecutor.shutdown();
+        DateTimeUtils.setCurrentMillisSystem();
     }
 
     @Test

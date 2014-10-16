@@ -31,7 +31,7 @@ import org.graylog2.plugin.configuration.fields.ConfigurationField;
 import org.graylog2.plugin.configuration.fields.DropdownField;
 import org.graylog2.plugin.configuration.fields.NumberField;
 import org.graylog2.plugin.configuration.fields.TextField;
-import org.graylog2.plugin.inputs.MessageInput2;
+import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.MisfireException;
 import org.graylog2.plugin.inputs.codecs.CodecAggregator;
 import org.graylog2.plugin.inputs.transports.ThrottleableTransport;
@@ -79,7 +79,7 @@ public class LocalMetricsTransport extends ThrottleableTransport {
     }
 
     @Override
-    public void launch(final MessageInput2 input) throws MisfireException {
+    public void launch(final MessageInput input) throws MisfireException {
         reporter = Graylog2Reporter.forRegistry(metricRegistry)
                 .useSource(configuration.getString(CK_SOURCE))
                 .convertDurationsTo(TimeUnit.valueOf(configuration.getString(CK_DURATION_UNIT)))
@@ -175,9 +175,9 @@ public class LocalMetricsTransport extends ThrottleableTransport {
     }
 
     private class RawGelfWriter implements GELFTarget {
-        private final MessageInput2 input;
+        private final MessageInput input;
 
-        public RawGelfWriter(MessageInput2 input) {
+        public RawGelfWriter(MessageInput input) {
             this.input = input;
         }
 

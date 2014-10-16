@@ -20,7 +20,7 @@ import com.google.common.util.concurrent.Uninterruptibles;
 import com.rabbitmq.client.*;
 import org.graylog2.plugin.buffers.BufferOutOfCapacityException;
 import org.graylog2.plugin.buffers.ProcessingDisabledException;
-import org.graylog2.plugin.inputs.MessageInput2;
+import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.journal.RawMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,7 +51,7 @@ public class AmqpConsumer {
     private Connection connection;
     private Channel channel;
 
-    private final MessageInput2 sourceInput;
+    private final MessageInput sourceInput;
 
     private AtomicLong totalBytesRead = new AtomicLong(0);
     private AtomicLong lastSecBytesRead = new AtomicLong(0);
@@ -59,7 +59,7 @@ public class AmqpConsumer {
 
     public AmqpConsumer(String hostname, int port, String virtualHost, String username, String password,
                         int prefetchCount, String queue, String exchange, String routingKey,
-                        MessageInput2 sourceInput, ScheduledExecutorService scheduler) {
+                        MessageInput sourceInput, ScheduledExecutorService scheduler) {
         this.hostname = hostname;
         this.port = port;
         this.virtualHost = virtualHost;

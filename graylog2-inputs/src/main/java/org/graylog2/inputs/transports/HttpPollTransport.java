@@ -16,6 +16,7 @@
  */
 package org.graylog2.inputs.transports;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Maps;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
@@ -30,7 +31,7 @@ import org.graylog2.plugin.configuration.fields.ConfigurationField;
 import org.graylog2.plugin.configuration.fields.DropdownField;
 import org.graylog2.plugin.configuration.fields.NumberField;
 import org.graylog2.plugin.configuration.fields.TextField;
-import org.graylog2.plugin.inputs.MessageInput2;
+import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.MisfireException;
 import org.graylog2.plugin.inputs.codecs.CodecAggregator;
 import org.graylog2.plugin.inputs.transports.ThrottleableTransport;
@@ -79,7 +80,8 @@ public class HttpPollTransport extends ThrottleableTransport {
         this.scheduler = scheduler;
     }
 
-    private static Map<String, String> parseHeaders(String headerString) {
+    @VisibleForTesting
+    static Map<String, String> parseHeaders(String headerString) {
         final Map<String, String> headers = Maps.newHashMap();
 
         if (headerString == null || headerString.isEmpty()) {
@@ -120,7 +122,7 @@ public class HttpPollTransport extends ThrottleableTransport {
     }
 
     @Override
-    public void launch(final MessageInput2 input) throws MisfireException {
+    public void launch(final MessageInput input) throws MisfireException {
         serverStatus.awaitRunning(new Runnable() {
             @Override
             public void run() {

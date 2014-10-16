@@ -26,7 +26,7 @@ import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.configuration.fields.ConfigurationField;
 import org.graylog2.plugin.configuration.fields.NumberField;
 import org.graylog2.plugin.configuration.fields.TextField;
-import org.graylog2.plugin.inputs.MessageInput2;
+import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.transports.GeneratorTransport;
 import org.graylog2.plugin.inputs.transports.TransportFactory;
 import org.graylog2.plugin.journal.RawMessage;
@@ -37,7 +37,7 @@ import java.util.Random;
 
 import static com.google.common.util.concurrent.Uninterruptibles.sleepUninterruptibly;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static org.graylog2.inputs.random.generators.FakeHttpMessageGenerator.deviation;
+import static org.graylog2.inputs.random.generators.FakeHttpRawMessageGenerator.rateDeviation;
 
 public class RandomMessageTransport extends GeneratorTransport {
     private static final Logger log = LoggerFactory.getLogger(RandomMessageTransport.class);
@@ -95,7 +95,7 @@ public class RandomMessageTransport extends GeneratorTransport {
     }
 
     @Override
-    protected RawMessage produceRawMessage(MessageInput2 input) {
+    protected RawMessage produceRawMessage(MessageInput input) {
         final byte[] payload;
         try {
             final FakeHttpRawMessageGenerator.GeneratorState state = generator.generateState();
@@ -103,7 +103,7 @@ public class RandomMessageTransport extends GeneratorTransport {
 
             final RawMessage raw = new RawMessage("randomhttp", input.getId(), null, payload);
 
-            sleepUninterruptibly(deviation(sleepMs, maxSleepDeviation, rand), MILLISECONDS);
+            sleepUninterruptibly(rateDeviation(sleepMs, maxSleepDeviation, rand), MILLISECONDS);
             return raw;
         } catch (JsonProcessingException e) {
             log.error("Unable to serialize generator state", e);

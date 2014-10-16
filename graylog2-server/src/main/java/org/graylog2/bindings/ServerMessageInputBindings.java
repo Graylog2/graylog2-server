@@ -17,12 +17,6 @@
 package org.graylog2.bindings;
 
 import com.google.inject.AbstractModule;
-import com.google.inject.TypeLiteral;
-import com.google.inject.multibindings.Multibinder;
-import org.graylog2.inputs.radio.RadioAMQPInput;
-import org.graylog2.inputs.radio.RadioInput;
-import org.graylog2.inputs.radio.RadioKafkaInput;
-import org.graylog2.plugin.inputs.MessageInput;
 
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
@@ -30,10 +24,10 @@ import org.graylog2.plugin.inputs.MessageInput;
 public class ServerMessageInputBindings extends AbstractModule {
     @Override
     protected void configure() {
-        TypeLiteral<Class<? extends MessageInput>> typeLiteral = new TypeLiteral<Class<? extends MessageInput>>(){};
-        Multibinder<Class<? extends MessageInput>> messageInputs = Multibinder.newSetBinder(binder(), typeLiteral);
-        messageInputs.addBinding().toInstance(RadioAMQPInput.class);
-        messageInputs.addBinding().toInstance(RadioKafkaInput.class);
-        messageInputs.addBinding().toInstance(RadioInput.class);
+//        TypeLiteral<Class<? extends MessageInput>> typeLiteral = new TypeLiteral<Class<? extends MessageInput>>(){};
+//        Multibinder<Class<? extends MessageInput>> messageInputs = Multibinder.newSetBinder(binder(), typeLiteral);
+//        messageInputs.addBinding().toInstance(RadioAMQPInput.class);
+//        messageInputs.addBinding().toInstance(RadioKafkaInput.class);
+//        messageInputs.addBinding().toInstance(RadioInput.class);
     }
 }

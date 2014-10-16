@@ -16,115 +16,37 @@
  */
 package org.graylog2.inputs.random;
 
-import org.graylog2.inputs.random.generators.FakeHttpMessageGenerator;
-import org.graylog2.plugin.buffers.Buffer;
+import com.codahale.metrics.MetricRegistry;
+import com.google.inject.assistedinject.Assisted;
+import com.google.inject.assistedinject.AssistedInject;
+import org.graylog2.inputs.codecs.RandomHttpMessageCodec;
+import org.graylog2.inputs.transports.RandomMessageTransport;
+import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.configuration.Configuration;
-import org.graylog2.plugin.configuration.ConfigurationException;
-import org.graylog2.plugin.configuration.ConfigurationRequest;
-import org.graylog2.plugin.configuration.fields.ConfigurationField;
-import org.graylog2.plugin.configuration.fields.NumberField;
-import org.graylog2.plugin.configuration.fields.TextField;
 import org.graylog2.plugin.inputs.MessageInput;
-import org.graylog2.plugin.inputs.MisfireException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.graylog2.plugin.inputs.codecs.Codec;
+import org.graylog2.plugin.inputs.transports.Transport;
 
-import javax.inject.Inject;
-import java.util.Random;
-
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public class FakeHttpMessageInput extends MessageInput {
 
-    private static final Logger LOG = LoggerFactory.getLogger(FakeHttpMessageInput.class);
-
-    public static final String NAME = "Random HTTP message generator";
-
-    public static final String CK_SOURCE = "source";
-    public static final String CK_SLEEP = "sleep";
-    public static final String CK_SLEEP_DEVIATION_PERCENT = "sleep_deviation";
-
-    private final Random rand = new Random();
-
-    private boolean stopRequested = false;
-
-    private String source;
-    private int sleepMs;
-    private int maxSleepDeviation;
-
-    @Inject
-    public FakeHttpMessageInput() {
+    @AssistedInject
+    public FakeHttpMessageInput(@Assisted Configuration configuration,
+                                @Assisted Transport transport,
+                                @Assisted Codec codec,
+                                MetricRegistry metricRegistry,
+                                LocalMetricRegistry localRegistry) {
+        super(metricRegistry, transport, localRegistry, codec);
     }
 
-    @Override
-    public void checkConfiguration(Configuration configuration) throws ConfigurationException {
-        if (!checkConfig(configuration)) {
-            throw new ConfigurationException(configuration.getSource().toString());
-        }
-
-        source = configuration.getString(CK_SOURCE);
-        sleepMs = (int) configuration.getInt(CK_SLEEP);
-        maxSleepDeviation = (int) configuration.getInt(CK_SLEEP_DEVIATION_PERCENT);
-    }
-
-    @Override
-    public void launch(final Buffer processBuffer) throws MisfireException {
-        final MessageInput thisInput = this;
-        final FakeHttpMessageGenerator generator = new FakeHttpMessageGenerator(source);
-        Thread t = new Thread(new Runnable() {
-            public void run() {
-                while(!stopRequested) {
-                    processBuffer.insertCached(generator.generate(), thisInput);
-
-                    try {
-                        Thread.sleep(FakeHttpMessageGenerator.deviation(sleepMs, maxSleepDeviation, rand));
-                    } catch (InterruptedException e) {
-                        break;
-                    }
-                }
-                stopRequested = false;
-            }
-        });
-        t.start();
-    }
-
-    @Override
-    public void stop() {
-        this.stopRequested = true;
-    }
-
-    @Override
-    public ConfigurationRequest getRequestedConfiguration() {
-        ConfigurationRequest c = new ConfigurationRequest();
-
-        c.addField(new NumberField(
-                CK_SLEEP,
-                "Sleep time",
-                25,
-                "How many milliseconds to sleep between generating messages.",
-                ConfigurationField.Optional.NOT_OPTIONAL,
-                NumberField.Attribute.ONLY_POSITIVE
-        ));
-
-        c.addField(new NumberField(
-                CK_SLEEP_DEVIATION_PERCENT,
-                "Maximum random sleep time deviation",
-                30,
-                "The deviation is used to generate a more realistic and non-steady message flow.",
-                ConfigurationField.Optional.NOT_OPTIONAL,
-                NumberField.Attribute.ONLY_POSITIVE
-        ));
-
-        c.addField(new TextField(
-                CK_SOURCE,
-                "Source name",
-                "example.org",
-                "What to use as source of the generate messages.",
-                ConfigurationField.Optional.NOT_OPTIONAL
-        ));
-
-        return c;
+    @AssistedInject
+    public FakeHttpMessageInput(@Assisted Configuration configuration,
+                                RandomMessageTransport.Factory transportFactory,
+                                RandomHttpMessageCodec.Factory codecFactory,
+                                MetricRegistry metricRegistry, LocalMetricRegistry localRegistry) {
+        super(metricRegistry,
+              transportFactory.create(configuration),
+              localRegistry, codecFactory.create(configuration)
+        );
     }
 
     @Override
@@ -134,7 +56,7 @@ public class FakeHttpMessageInput extends MessageInput {
 
     @Override
     public String getName() {
-        return NAME;
+        return "Random HTTP message generator";
     }
 
     @Override
@@ -142,10 +64,9 @@ public class FakeHttpMessageInput extends MessageInput {
         return "";
     }
 
-    private boolean checkConfig(Configuration config) {
-        return config.stringIsSet(CK_SOURCE)
-                && config.intIsSet(CK_SLEEP)
-                && config.intIsSet(CK_SLEEP_DEVIATION_PERCENT);
-    }
+    public interface Factory extends MessageInput.Factory<FakeHttpMessageInput> {
+        FakeHttpMessageInput create(Configuration configuration);
 
+        FakeHttpMessageInput create(Configuration configuration, Transport transport, Codec codec);
+    }
 }

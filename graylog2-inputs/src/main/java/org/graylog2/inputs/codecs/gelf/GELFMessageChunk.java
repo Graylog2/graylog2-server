@@ -14,10 +14,11 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.inputs.gelf.gelf;
+package org.graylog2.inputs.codecs.gelf;
 
 import org.graylog2.plugin.inputs.MessageInput;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 
 public final class GELFMessageChunk {
 
@@ -113,7 +114,7 @@ public final class GELFMessageChunk {
         extractSequenceCount();
         extractSequenceNumber();
         extractData();
-        this.arrival = DateTime.now().getMillis();
+        this.arrival = DateTime.now(DateTimeZone.UTC).getMillis();
     }
 
     private String extractId() {
