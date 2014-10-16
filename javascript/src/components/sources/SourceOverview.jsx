@@ -83,7 +83,30 @@ var SourceOverview = React.createClass({
             .xUnits(d3.time.minutes)
             .renderHorizontalGridLines(true)
             .elasticX(true)
-            .elasticY(true);
+            .elasticY(true)
+            .on("filtered", (chart, foo) => {
+                var filter = chart.filter();
+                if (filter) {
+                    var fromDateTime = moment(filter[0]);
+                    var toDateTime = moment(filter[1]);
+
+                    activateTimerangeChooser("absolute", $('.timerange-selector-container .dropdown-menu a[data-selector-name="absolute"]'));
+                    var fromInput = $('#universalsearch .absolute .absolute-from-human');
+                    var toInput = $('#universalsearch .absolute .absolute-to-human');
+
+                    fromInput.val(fromDateTime.format(momentHelper.DATE_FORMAT_TZ));
+                    toInput.val(toDateTime.format(momentHelper.DATE_FORMAT_TZ));
+
+                    $(".timerange-selector-container").effect("bounce", { complete: function() {
+                        // Submit search directly if alt key is pressed.
+                        if(e.altKey) {
+                            $("#universalsearch form").submit();
+                        }
+                    }});
+                } else {
+                    activateTimerangeChooser("relative", $('.timerange-selector-container .dropdown-menu a[data-selector-name="relative"]'));
+                }
+            });
     },
     renderDataTable() {
         var dataTableDomNode = $("#dc-sources-result")[0];
