@@ -33,9 +33,13 @@ var SourceOverview = React.createClass({
             renderResultTable: false
         };
     },
+    loadHistogramData() {
+        var filters = this.othersDimension.top(Infinity).map((source) => source.name);
+        HistogramDataStore.loadHistogramData(this.state.range, filters);
+    },
     loadData() {
         SourcesStore.loadSources(this.state.range);
-        HistogramDataStore.loadHistogramData(this.state.range);
+        this.loadHistogramData();
     },
     componentDidMount() {
         SourcesStore.addChangeListener(this._onSourcesChanged);
@@ -53,22 +57,22 @@ var SourceOverview = React.createClass({
     renderPieChart() {
         var pieChartDomNode = $("#dc-sources-pie-chart")[0];
         var pieChartWidth = $(pieChartDomNode).width();
-        var pieChart = dc.pieChart(pieChartDomNode);
-        pieChart.width(pieChartWidth)
+        this.pieChart = dc.pieChart(pieChartDomNode);
+        this.pieChart.width(pieChartWidth)
             .height(pieChartWidth)
             .innerRadius(pieChartWidth / 5)
             .dimension(this.othersDimension)
             .group(this.othersMessageGroup)
             .renderlet((chart) => {
                 chart.selectAll("#dc-sources-pie-chart .pie-slice").on("click", (d, index) => {
-                    var filters = this.othersDimension.top(Infinity).map((source) => source.name);
-                    HistogramDataStore.loadHistogramData(this.state.range, filters);
+                    this.loadHistogramData();
                 });
             });
     },
     renderLineChart() {
         var lineChartDomNode = $("#dc-sources-line-chart")[0];
-        dc.lineChart(lineChartDomNode)
+        this.lineChart = dc.lineChart(lineChartDomNode);
+        this.lineChart
             .width($(lineChartDomNode).width())
             .height(200)
             .margins({left: 50, right: 20, top: 20, bottom: 20})
@@ -83,7 +87,8 @@ var SourceOverview = React.createClass({
     },
     renderDataTable() {
         var dataTableDomNode = $("#dc-sources-result")[0];
-        dc.dataTable(dataTableDomNode)
+        this.dataTable = dc.dataTable(dataTableDomNode);
+        this.dataTable
             .dimension(this.othersDimension)
             .group((d) => d.percentage > othersThreshold ? "Top Sources" : "Others")
             .size(500)
@@ -106,23 +111,48 @@ var SourceOverview = React.createClass({
             .order(d3.descending)
             .renderlet((table) => table.selectAll(".dc-table-group").classed("info", true));
     },
-     _onSourcesChanged() {
-        // TODO: save filters once we have some
-        var sources = SourcesStore.getSources();
+    _resetSources(sources) {
+        /*
+         * http://stackoverflow.com/questions/23500546/replace-crossfilter-data-restore-dimensions-and-groups
+         * It looks like dc interacts with crossfilter to represent the graphs and apply some filters
+         * on the crossfilter dimension, but it also stores those filters internally. That means that
+         * we need to remove the dimension and graphs filters, but we only need to reapply filters to the
+         * graphs, dc will propagate that to the crossfilter dimension.
+         */
+        var pieChartFilters = this.pieChart.filters();
+        var dataTableFilters = this.dataTable.filters();
+        this.othersDimension.filterAll();
+        this.pieChart.filterAll();
+        this.dataTable.filterAll();
         this.sourcesData.remove();
         this.sourcesData.add(sources);
+
+        pieChartFilters.forEach((filter)  => this.pieChart.filter(filter));
+        dataTableFilters.forEach((filter) => this.dataTable.filter(filter));
+
         dc.redrawAll();
+    },
+    _resetHistogram(histogram) {
+        var lineChartFilters = this.lineChart.filters();
+        this.valueDimension.filterAll();
+        this.lineChart.filterAll();
+        this.histogramData.remove();
+        this.histogramData.add(histogram);
+
+        lineChartFilters.forEach((filter)  => this.lineChart.filter(filter));
+        dc.redrawAll();
+    },
+
+    _onSourcesChanged() {
+        var sources = SourcesStore.getSources();
+        this._resetSources(sources);
         this.setState({renderResultTable: this.sourcesData.size() !== 0});
     },
     _onHistogramDataChanged() {
-        // TODO: save filters once we have some
         var histogramData = HistogramDataStore.getHistogramData();
-        // TODO do something with the rest of the data
-        this.histogramData.remove();
-        this.histogramData.add(histogramData.values);
-        dc.redrawAll();
+        this._resetHistogram(histogramData.values);
     },
-    _onRangeChanged(event){
+    _onRangeChanged(event) {
         this.setState({range: event.target.value}, () => this.loadData());
     },
     render() {
