@@ -26,10 +26,11 @@ var HistogramDataStore = {
         }
         if (typeof range !== 'undefined') {
             var interval = 'minute';
-            if (range >= 365 * 24 * 60 * 60 || range === 0) {
+            var rangeAsNumber = Number(range);
+            if (rangeAsNumber >= 365 * 24 * 60 * 60 || rangeAsNumber === 0) {
                 // for years and all interval will be day
                 interval = 'day';
-            } else if (range >= 31 * 24 * 60 * 60) {
+            } else if (rangeAsNumber >= 31 * 24 * 60 * 60) {
                 // for months interval will be day
                 interval = 'hour';
             }

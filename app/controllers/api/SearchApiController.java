@@ -258,7 +258,7 @@ public class SearchApiController extends AuthenticatedController {
         DateTime from;
         if (allQuery) {
             String firstTimestamp = histogramResults.entrySet().iterator().next().getKey();
-            from = new DateTime(Long.parseLong(firstTimestamp) * 1000);
+            from = new DateTime(Long.parseLong(firstTimestamp) * 1000, DateTimeZone.UTC);
         } else {
             from = DateTime.parse(histogram.getHistogramBoundaries().getFrom());
         }
