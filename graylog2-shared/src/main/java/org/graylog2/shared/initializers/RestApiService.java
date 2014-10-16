@@ -148,7 +148,7 @@ public class RestApiService extends AbstractIdleService {
 
         final File tlsCertFile;
         final File tlsKeyFile;
-        if (configuration.getRestTlsCertFile() == null || configuration.getRestTlsKeyFile() == null) {
+        if (configuration.isRestEnableTls() && (configuration.getRestTlsCertFile() == null || configuration.getRestTlsKeyFile() == null)) {
             final SelfSignedCertificate ssc = new SelfSignedCertificate(configuration.getRestListenUri().getHost());
             tlsCertFile = ssc.certificate();
             tlsKeyFile = ssc.privateKey();
