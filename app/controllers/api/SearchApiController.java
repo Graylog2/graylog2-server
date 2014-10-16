@@ -219,7 +219,7 @@ public class SearchApiController extends AuthenticatedController {
         try {
             UniversalSearch search = searchFactory.queryWithRangeAndFilter(q, timerange, filter);
             DateHistogramResult histogram = search.dateHistogram(interval);
-            List<Map<String, Long>> results = formatHistogramResults(histogram, maxDataPoints);
+            List<Map<String, Long>> results = formatHistogramResults(histogram, maxDataPoints, relative == 0);
 
             Map<String, Object> result = Maps.newHashMap();
             AbsoluteRange boundaries = histogram.getHistogramBoundaries();
@@ -251,11 +251,17 @@ public class SearchApiController extends AuthenticatedController {
      * [{ x: -1893456000, y: 92228531 }, { x: -1577923200, y: 106021568 }]
      *
      */
-    protected List<Map<String, Long>> formatHistogramResults(DateHistogramResult histogram, int maxDataPoints) {
+    protected List<Map<String, Long>> formatHistogramResults(DateHistogramResult histogram, int maxDataPoints, boolean allQuery) {
         final List<Map<String, Long>> points = Lists.newArrayList();
         final Map<String, Long> histogramResults = histogram.getResults();
 
-        final DateTime from = DateTime.parse(histogram.getHistogramBoundaries().getFrom());
+        DateTime from;
+        if (allQuery) {
+            String firstTimestamp = histogramResults.entrySet().iterator().next().getKey();
+            from = new DateTime(Long.parseLong(firstTimestamp) * 1000);
+        } else {
+            from = DateTime.parse(histogram.getHistogramBoundaries().getFrom());
+        }
         final DateTime to = DateTime.parse(histogram.getHistogramBoundaries().getTo());
         final MutableDateTime currentTime = new MutableDateTime(from);
 
