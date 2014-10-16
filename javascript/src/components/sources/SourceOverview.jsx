@@ -140,6 +140,7 @@ var SourceOverview = React.createClass({
         this.histogramData.add(histogram);
 
         lineChartFilters.forEach((filter)  => this.lineChart.filter(filter));
+
         dc.redrawAll();
     },
 
@@ -153,6 +154,10 @@ var SourceOverview = React.createClass({
         this._resetHistogram(histogramData.values);
     },
     _onRangeChanged(event) {
+        // when range is changed the filter in line chart (corresponding to the brush) does not make any sense any more
+        this.valueDimension.filterAll();
+        this.lineChart.filterAll();
+
         this.setState({range: event.target.value}, () => this.loadData());
     },
     render() {
