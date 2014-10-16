@@ -67,6 +67,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
 
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
@@ -161,6 +162,8 @@ public class RestApiService extends AbstractIdleService {
         final int maxHeaderSize = configuration.getRestMaxHeaderSize();
         final int maxChunkSize = configuration.getRestMaxChunkSize();
 
+        final ThreadPoolExecutor executor = new OrderedMemoryAwareThreadPoolExecutor(16, 1048576, 1048576);
+
         bootstrap.setPipelineFactory(new ChannelPipelineFactory() {
             @Override
             public ChannelPipeline getPipeline() throws Exception {
@@ -168,8 +171,7 @@ public class RestApiService extends AbstractIdleService {
                 pipeline.addLast("decoder", new HttpRequestDecoder(maxInitialLineLength, maxHeaderSize, maxChunkSize));
                 pipeline.addLast("encoder", new HttpResponseEncoder());
                 pipeline.addLast("chunks", new ChunkedWriteHandler());
-                pipeline.addLast("executor", new ExecutionHandler(
-                        new OrderedMemoryAwareThreadPoolExecutor(16, 1048576, 1048576)));
+                pipeline.addLast("executor", new ExecutionHandler(executor));
                 pipeline.addLast("jerseyHandler", jerseyHandler);
                 return pipeline;
             }
