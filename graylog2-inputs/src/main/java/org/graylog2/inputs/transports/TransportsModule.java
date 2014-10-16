@@ -38,7 +38,9 @@ public class TransportsModule extends AbstractModule {
         install(new FactoryModuleBuilder().implement(Transport.class, HttpTransport.class).build(HttpTransport.Factory.class));
         install(new FactoryModuleBuilder().implement(Transport.class, RandomMessageTransport.class).build(RandomMessageTransport.Factory.class));
         install(new FactoryModuleBuilder().implement(Transport.class, KafkaTransport.class).build(KafkaTransport.Factory.class));
+        install(new FactoryModuleBuilder().implement(Transport.class, RadioKafkaTransport.class).build(RadioKafkaTransport.Factory.class));
         install(new FactoryModuleBuilder().implement(Transport.class, AmqpTransport.class).build(AmqpTransport.Factory.class));
+        install(new FactoryModuleBuilder().implement(Transport.class, RadioAmqpTransport.class).build(RadioAmqpTransport.Factory.class));
         install(new FactoryModuleBuilder().implement(Transport.class, HttpPollTransport.class).build(HttpPollTransport.Factory.class));
         install(new FactoryModuleBuilder().implement(Transport.class, LocalMetricsTransport.class).build(LocalMetricsTransport.Factory.class));
 
@@ -54,7 +56,9 @@ public class TransportsModule extends AbstractModule {
         mapBinder.addBinding("http").to(Key.get(HttpTransport.Factory.class));
         mapBinder.addBinding("randomhttp").to(Key.get(RandomMessageTransport.Factory.class));
         mapBinder.addBinding("kafka").to(Key.get(KafkaTransport.Factory.class));
+        mapBinder.addBinding("radiokafka").to(Key.get(RadioKafkaTransport.Factory.class));
         mapBinder.addBinding("amqp").to(Key.get(AmqpTransport.Factory.class));
+        mapBinder.addBinding("radioamqp").to(Key.get(RadioAmqpTransport.Factory.class));
         mapBinder.addBinding("httppoll").to(Key.get(HttpPollTransport.Factory.class));
         mapBinder.addBinding("localmetrics").to(Key.get(LocalMetricsTransport.Factory.class));
 

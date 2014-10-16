@@ -55,6 +55,9 @@ public class ConfigurationRequest {
         return fields.get(fieldName);
     }
 
+    public boolean removeField(String fieldName) {
+        return fields.remove(fieldName) != null;
+    }
     public Map<String, ConfigurationField> getFields() {
         return fields;
     }

@@ -37,6 +37,8 @@ import org.graylog2.inputs.misc.jsonpath.JsonPathInput;
 import org.graylog2.inputs.misc.jsonpath.JsonPathInput2;
 import org.graylog2.inputs.misc.metrics.LocalMetricsInput;
 import org.graylog2.inputs.misc.metrics.LocalMetricsInput2;
+import org.graylog2.inputs.radio.RadioAMQPInput2;
+import org.graylog2.inputs.radio.RadioKafkaInput2;
 import org.graylog2.inputs.random.FakeHttpMessageInput;
 import org.graylog2.inputs.random.FakeHttpMessageInput2;
 import org.graylog2.inputs.raw.tcp.RawTCPInput;
@@ -91,7 +93,9 @@ public class MessageInputBindings extends AbstractModule {
         installInput(inputMapBinder, GELFHttpInput2.class, GELFHttpInput2.Factory.class);
         installInput(inputMapBinder, GELFUDPInput2.class, GELFUDPInput2.Factory.class);
         installInput(inputMapBinder, KafkaInput2.class, KafkaInput2.Factory.class);
+        installInput(inputMapBinder, RadioKafkaInput2.class, RadioKafkaInput2.Factory.class);
         installInput(inputMapBinder, AMQPInput2.class, AMQPInput2.Factory.class);
+        installInput(inputMapBinder, RadioAMQPInput2.class, RadioAMQPInput2.Factory.class);
         installInput(inputMapBinder, JsonPathInput2.class, JsonPathInput2.Factory.class);
         installInput(inputMapBinder, LocalMetricsInput2.class, LocalMetricsInput2.Factory.class);
     }
