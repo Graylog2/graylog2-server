@@ -60,7 +60,6 @@ public abstract class NettyTransport implements Transport {
 
     private static final Logger log = LoggerFactory.getLogger(NettyTransport.class);
 
-    public static final int DEFAULT_RECV_BUFFER_SIZE = 1024 * 1024;
     protected final MetricRegistry localRegistry;
 
     private final InetSocketAddress socketAddress;
