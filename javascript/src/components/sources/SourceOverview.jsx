@@ -1,5 +1,7 @@
 /** @jsx React.DOM */
 
+/* global activateTimerangeChooser, momentHelper */
+
 'use strict';
 
 var React = require('react');
@@ -71,6 +73,16 @@ var SourceOverview = React.createClass({
     },
     renderLineChart() {
         var lineChartDomNode = $("#dc-sources-line-chart")[0];
+        $(lineChartDomNode).on('mouseup', (event) => {
+            $(".timerange-selector-container").effect("bounce", {
+                complete: function () {
+                    // Submit search directly if alt key is pressed.
+                    if(event.altKey) {
+                        $("#universalsearch form").submit();
+                    }
+                }
+            });
+        });
         this.lineChart = dc.lineChart(lineChartDomNode);
         this.lineChart
             .width($(lineChartDomNode).width())
@@ -84,28 +96,24 @@ var SourceOverview = React.createClass({
             .renderHorizontalGridLines(true)
             .elasticX(true)
             .elasticY(true)
-            .on("filtered", (chart, foo) => {
-                var filter = chart.filter();
-                if (filter) {
-                    var fromDateTime = moment(filter[0]);
-                    var toDateTime = moment(filter[1]);
+            .on("filtered", (chart) => {
+                dc.events.trigger(() => {
 
-                    activateTimerangeChooser("absolute", $('.timerange-selector-container .dropdown-menu a[data-selector-name="absolute"]'));
-                    var fromInput = $('#universalsearch .absolute .absolute-from-human');
-                    var toInput = $('#universalsearch .absolute .absolute-to-human');
+                    var filter = chart.filter();
+                    if (filter) {
+                        var fromDateTime = moment(filter[0]);
+                        var toDateTime = moment(filter[1]);
 
-                    fromInput.val(fromDateTime.format(momentHelper.DATE_FORMAT_TZ));
-                    toInput.val(toDateTime.format(momentHelper.DATE_FORMAT_TZ));
+                        activateTimerangeChooser("absolute", $('.timerange-selector-container .dropdown-menu a[data-selector-name="absolute"]'));
+                        var fromInput = $('#universalsearch .absolute .absolute-from-human');
+                        var toInput = $('#universalsearch .absolute .absolute-to-human');
 
-                    $(".timerange-selector-container").effect("bounce", { complete: function() {
-                        // Submit search directly if alt key is pressed.
-                        if(e.altKey) {
-                            $("#universalsearch form").submit();
-                        }
-                    }});
-                } else {
-                    activateTimerangeChooser("relative", $('.timerange-selector-container .dropdown-menu a[data-selector-name="relative"]'));
-                }
+                        fromInput.val(fromDateTime.format(momentHelper.DATE_FORMAT_TZ));
+                        toInput.val(toDateTime.format(momentHelper.DATE_FORMAT_TZ));
+                    } else {
+                        activateTimerangeChooser("relative", $('.timerange-selector-container .dropdown-menu a[data-selector-name="relative"]'));
+                    }
+                });
             });
     },
     renderDataTable() {
