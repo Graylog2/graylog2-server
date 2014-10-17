@@ -111,7 +111,7 @@ var SourceOverview = React.createClass({
                         fromInput.val(fromDateTime.format(momentHelper.DATE_FORMAT_TZ));
                         toInput.val(toDateTime.format(momentHelper.DATE_FORMAT_TZ));
                     } else {
-                        activateTimerangeChooser("relative", $('.timerange-selector-container .dropdown-menu a[data-selector-name="relative"]'));
+                        this._syncRangeWithQuery();
                     }
                 });
             });
@@ -184,11 +184,24 @@ var SourceOverview = React.createClass({
         var histogramData = HistogramDataStore.getHistogramData();
         this._resetHistogram(histogramData.values);
     },
-    _onRangeChanged(event) {
+    _syncRangeWithQuery: function () {
+
+        var rangeSelectBox = this.refs.rangeSelector.getDOMNode();
+        if (Number(rangeSelectBox.value) === 0) {
+            // TODO: Handle all using relative query
+            activateTimerangeChooser("relative", $('.timerange-selector-container .dropdown-menu a[data-selector-name="relative"]'));
+            $('#relative-timerange-selector').val(0);
+        } else {
+            var selectedOptions = rangeSelectBox.selectedOptions;
+            var text = selectedOptions && selectedOptions[0] && selectedOptions[0].text;
+            activateTimerangeChooser("keyword", $('.timerange-selector-container .dropdown-menu a[data-selector-name="keyword"]'));
+            $('#universalsearch .timerange-selector.keyword > input').val(text);
+        }
+    }, _onRangeChanged(event) {
         // when range is changed the filter in line chart (corresponding to the brush) does not make any sense any more
         this.valueDimension.filterAll();
         this.lineChart.filterAll();
-
+        this._syncRangeWithQuery();
         this.setState({range: event.target.value}, () => this.loadData());
     },
     render() {
@@ -211,7 +224,7 @@ var SourceOverview = React.createClass({
             <div>
                 <div className="row-fluid">
                     <div>
-                        <select className="sources-range pull-right" value={this.state.range} onChange={this._onRangeChanged}>
+                        <select ref="rangeSelector" className="sources-range pull-right" value={this.state.range} onChange={this._onRangeChanged}>
                             <option value={daysToSeconds(1)}>Last Day</option>
                             <option value={daysToSeconds(7)}>Last Week</option>
                             <option value={daysToSeconds(31)}>Last Month</option>
