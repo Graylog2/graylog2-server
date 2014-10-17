@@ -48,6 +48,7 @@ public class RawProcessor {
     private final Meter incompleteMessages;
     private final Meter processedMessages;
     private final Timer parseTime;
+    private final Timer resolveTime;
 
     public RawProcessor(MetricRegistry metricRegistry,
                         Buffer processBuffer,
@@ -64,6 +65,7 @@ public class RawProcessor {
         this.processedMessages = metricRegistry.meter(name(metricName, "processedMessages"));
         this.incompleteMessages = metricRegistry.meter(name(metricName, "incompleteMessages"));
         this.parseTime = metricRegistry.timer(name(metricName, "parseTime"));
+        this.resolveTime = metricRegistry.timer(name(metricName, "resolveTime"));
     }
 
     public void messageReceived(String msg, InetAddress remoteAddress) throws BufferOutOfCapacityException {
@@ -92,11 +94,17 @@ public class RawProcessor {
     }
 
     private String parseSource(String msg, InetAddress remoteAddress) {
+        final String result;
+
         if (config.stringIsSet(RawInputBase.CK_OVERRIDE_SOURCE)) {
-            return config.getString(RawInputBase.CK_OVERRIDE_SOURCE);
+            result = config.getString(RawInputBase.CK_OVERRIDE_SOURCE);
+        } else {
+            Timer.Context context = this.resolveTime.time();
+            result = remoteAddress.getCanonicalHostName();
+            context.stop();
         }
 
-        return remoteAddress.getCanonicalHostName();
+        return result;
     }
 
 }
