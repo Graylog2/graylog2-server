@@ -52,7 +52,6 @@ public abstract class MessageInput {
     private static final Logger LOG = LoggerFactory.getLogger(MessageInput.class);
 
     public static final String CK_OVERRIDE_SOURCE = "override_source";
-    public static final String CK_RECV_BUFFER_SIZE = "recv_buffer_size";
 
     public static final String FIELD_TYPE = "type";
     public static final String FIELD_INPUT_ID = "input_id";
@@ -69,6 +68,7 @@ public abstract class MessageInput {
     public static final String FIELD_STATIC_FIELDS = "static_fields";
     public static final String FIELD_GLOBAL = "global";
 
+    @SuppressWarnings("StaticNonFinalField")
     private static long defaultRecvBufferSize = 1024 * 1024;
 
     private final MetricRegistry metricRegistry;
@@ -91,7 +91,7 @@ public abstract class MessageInput {
     protected Configuration configuration;
     protected Buffer processBuffer;
 
-    private Map<String, String> staticFields = Maps.newConcurrentMap();
+    private final Map<String, String> staticFields = Maps.newConcurrentMap();
 
     public MessageInput(MetricRegistry metricRegistry,
                         Transport transport,
@@ -303,6 +303,10 @@ public abstract class MessageInput {
 
     public static void setDefaultRecvBufferSize(long size) {
         defaultRecvBufferSize = size;
+    }
+
+    public static long getDefaultRecvBufferSize() {
+        return defaultRecvBufferSize;
     }
 
     public Codec getCodec() {

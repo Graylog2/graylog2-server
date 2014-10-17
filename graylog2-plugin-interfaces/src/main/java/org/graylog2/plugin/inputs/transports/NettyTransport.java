@@ -88,7 +88,7 @@ public abstract class NettyTransport implements Transport {
         }
         this.recvBufferSize = configuration.intIsSet(CK_RECV_BUFFER_SIZE)
                 ? configuration.getInt(CK_RECV_BUFFER_SIZE)
-                : DEFAULT_RECV_BUFFER_SIZE;
+                : MessageInput.getDefaultRecvBufferSize();
 
         this.localRegistry = localRegistry;
         localRegistry.registerAll(MetricSets.of(throughputCounter.gauges()));
