@@ -8,7 +8,7 @@
 @import lib.security.RestPermissions._;
 @import views.helpers.Permissions._;
 
-@main("Outputs of stream &raquo;@stream.getTitle&laquo;", views.html.sidebars.standard(currentUser), "", currentUser, false) {
+@main("Outputs of stream \"" + stream.getTitle + "\"", views.html.sidebars.standard(currentUser), "", currentUser, false) {
 
     <div class="row-fluid">
         <h1>
