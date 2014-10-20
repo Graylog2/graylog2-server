@@ -71,7 +71,7 @@ var SourceOverview = React.createClass({
         } else {
             this.pieChart
                 .dimension(this.othersDimension)
-                .group(this.othersMessageGroup)
+                .group(this.othersMessageGroup);
         }
     },
     renderPieChart() {
