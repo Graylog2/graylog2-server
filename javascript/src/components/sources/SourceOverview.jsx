@@ -18,11 +18,15 @@ var HistogramDataStore = require('../../stores/sources/HistogramDataStore');
 var daysToSeconds = (days) => moment.duration(days, 'days').as('seconds');
 
 var othersThreshold = 5;
+var othersName = "Others";
 
 var SourceOverview = React.createClass({
     getInitialState() {
         this.sourcesData = crossfilter();
-        this.othersDimension = this.sourcesData.dimension((d) => d.percentage > othersThreshold ? d.name : 'Others');
+        this.filterDimension = this.sourcesData.dimension((d) => d.name);
+        this.nameDimension = this.sourcesData.dimension((d) => d.name);
+        this.nameMessageGroup = this.nameDimension.group().reduceSum((d) => d.messageCount);
+        this.othersDimension = this.sourcesData.dimension((d) => d.percentage > othersThreshold ? d.name : othersName);
         this.othersMessageGroup = this.othersDimension.group().reduceSum((d) => d.messageCount);
 
         this.histogramData = crossfilter();
@@ -32,7 +36,9 @@ var SourceOverview = React.createClass({
         return {
             range: daysToSeconds(1),
             filter: '',
-            renderResultTable: false
+            renderResultTable: false,
+            numberOfSources: 100,
+            composedQuery: ''
         };
     },
     loadHistogramData() {
@@ -56,6 +62,18 @@ var SourceOverview = React.createClass({
         SourcesStore.removeChangeListener(this._onSourcesChanged);
         HistogramDataStore.removeChangeListener(this._onHistogramDataChanged);
     },
+    updatePieChartDimension() {
+        var onlyMinorValues = this.filterDimension.top(Infinity).reduce((reducedValue, current) => reducedValue && current.percentage < othersThreshold, true);
+        if (onlyMinorValues) {
+            this.pieChart
+                .dimension(this.nameDimension)
+                .group(this.nameMessageGroup);
+        } else {
+            this.pieChart
+                .dimension(this.othersDimension)
+                .group(this.othersMessageGroup)
+        }
+    },
     renderPieChart() {
         var pieChartDomNode = $("#dc-sources-pie-chart")[0];
         var pieChartWidth = $(pieChartDomNode).width();
@@ -77,7 +95,7 @@ var SourceOverview = React.createClass({
             $(".timerange-selector-container").effect("bounce", {
                 complete: function () {
                     // Submit search directly if alt key is pressed.
-                    if(event.altKey) {
+                    if (event.altKey) {
                         $("#universalsearch form").submit();
                     }
                 }
@@ -121,8 +139,8 @@ var SourceOverview = React.createClass({
         this.dataTable = dc.dataTable(dataTableDomNode);
         this.dataTable
             .dimension(this.othersDimension)
-            .group((d) => d.percentage > othersThreshold ? "Top Sources" : "Others")
-            .size(500)
+            .group((d) => d.percentage > othersThreshold ? "Top Sources" : othersName)
+            .size(this.state.numberOfSources)
             .columns([
                 function (d) {
                     // TODO
@@ -153,6 +171,8 @@ var SourceOverview = React.createClass({
         var pieChartFilters = this.pieChart.filters();
         var dataTableFilters = this.dataTable.filters();
         this.othersDimension.filterAll();
+        this.nameDimension.filterAll();
+        this.filterDimension.filterAll();
         this.pieChart.filterAll();
         this.dataTable.filterAll();
         this.sourcesData.remove();
@@ -160,6 +180,7 @@ var SourceOverview = React.createClass({
 
         pieChartFilters.forEach((filter)  => this.pieChart.filter(filter));
         dataTableFilters.forEach((filter) => this.dataTable.filter(filter));
+        this._filterSources();
 
         dc.redrawAll();
     },
@@ -174,7 +195,6 @@ var SourceOverview = React.createClass({
 
         dc.redrawAll();
     },
-
     _onSourcesChanged() {
         var sources = SourcesStore.getSources();
         this._resetSources(sources);
@@ -188,7 +208,6 @@ var SourceOverview = React.createClass({
 
         var rangeSelectBox = this.refs.rangeSelector.getDOMNode();
         if (Number(rangeSelectBox.value) === 0) {
-            // TODO: Handle all using relative query
             activateTimerangeChooser("relative", $('.timerange-selector-container .dropdown-menu a[data-selector-name="relative"]'));
             $('#relative-timerange-selector').val(0);
         } else {
@@ -203,6 +222,29 @@ var SourceOverview = React.createClass({
         this.lineChart.filterAll();
         this._syncRangeWithQuery();
         this.setState({range: event.target.value}, () => this.loadData());
+    },
+    _onNumberOfSourcesChanged(event) {
+        this.setState({numberOfSources: event.target.value}, () => {
+            this.dataTable
+                .size(this.state.numberOfSources)
+                .redraw();
+        });
+    },
+    _filterSources() {
+        this.filterDimension.filter((name) => {
+            // TODO: search for starts with instead? glob style?
+            //return name.indexOf(this.state.filter) === 0;
+            return name.indexOf(this.state.filter) !== -1;
+        });
+        this.updatePieChartDimension();
+    },
+    _onFilterChanged(event) {
+        // TODO: should we really update the pie chart when filtering for sources or just the table?
+        this.setState({filter: event.target.value}, () => {
+            this._filterSources();
+            this.dataTable.redraw();
+            this.pieChart.redraw();
+        });
     },
     render() {
         var emptySources = <div className="alert alert-info">
@@ -253,6 +295,26 @@ var SourceOverview = React.createClass({
                     </div>
                 </div>
                 {this.state.renderResultTable ? null : emptySources}
+                <div className="row-fluid">
+                    <div className="span6">
+                        <span>
+                            <span style={{"font-size": "14px"}}>Sources: </span>
+                            <select onChange={this._onNumberOfSourcesChanged} value={this.state.numberOfSources}>
+                                <option value="1">1</option>
+                                <option value="10">10</option>
+                                <option value="50">50</option>
+                                <option value="100">100</option>
+                                <option value="500">500</option>
+                            </select>
+                        </span>
+                    </div>
+                    <div className="span6">
+                        <span style={{float: "right"}}>
+                            <span style={{"font-size": "14px"}}>Search: </span>
+                            <input type="search" onChange={this._onFilterChanged}/>
+                        </span>
+                    </div>
+                </div>
                 <div className="row-fluid">
                     <div className="span9">
                     {resultTable}
