@@ -19,6 +19,11 @@ package org.graylog2.inputs.raw;
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
+import com.google.common.util.concurrent.SimpleTimeLimiter;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import com.google.common.util.concurrent.TimeLimiter;
+import org.elasticsearch.common.inject.assistedinject.AssistedInject;
+import org.graylog2.plugin.BaseConfiguration;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.buffers.Buffer;
@@ -29,6 +34,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.InetAddress;
+import java.util.concurrent.Callable;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import static com.codahale.metrics.MetricRegistry.name;
 
@@ -36,7 +47,6 @@ import static com.codahale.metrics.MetricRegistry.name;
  * @author Lennart Koopmann <lennart@torch.sh>
  */
 public class RawProcessor {
-
     private static final Logger LOG = LoggerFactory.getLogger(RawProcessor.class);
     private final Buffer processBuffer;
     private final Configuration config;
@@ -49,6 +59,10 @@ public class RawProcessor {
     private final Meter processedMessages;
     private final Timer parseTime;
     private final Timer resolveTime;
+    private final Meter resolveTimeouts;
+
+    private final ExecutorService executor;
+    private final TimeLimiter timeLimiter;
 
     public RawProcessor(MetricRegistry metricRegistry,
                         Buffer processBuffer,
@@ -66,6 +80,15 @@ public class RawProcessor {
         this.incompleteMessages = metricRegistry.meter(name(metricName, "incompleteMessages"));
         this.parseTime = metricRegistry.timer(name(metricName, "parseTime"));
         this.resolveTime = metricRegistry.timer(name(metricName, "resolveTime"));
+        this.resolveTimeouts = metricRegistry.meter(name(metricName, "resolveTimeouts"));
+
+        this.executor = Executors.newCachedThreadPool(
+                new ThreadFactoryBuilder()
+                        .setNameFormat("raw-processor-%d")
+                        .setDaemon(true)
+                        .build()
+        );
+        this.timeLimiter = new SimpleTimeLimiter(executor);
     }
 
     public void messageReceived(String msg, InetAddress remoteAddress) throws BufferOutOfCapacityException {
@@ -93,15 +116,34 @@ public class RawProcessor {
         processBuffer.insertCached(lm, sourceInput);
     }
 
-    private String parseSource(String msg, InetAddress remoteAddress) {
+    private String parseSource(String msg, final InetAddress remoteAddress) {
         final String result;
+        final long timeout;
+
+        if (config.getSource().containsKey(RawInputBase.CK_DNS_TIMEOUT))
+            timeout = config.getInt(RawInputBase.CK_DNS_TIMEOUT);
+        else
+            timeout = RawInputBase.CK_DNS_TIMEOUT_DEFAULT;
 
         if (config.stringIsSet(RawInputBase.CK_OVERRIDE_SOURCE)) {
             result = config.getString(RawInputBase.CK_OVERRIDE_SOURCE);
         } else {
-            Timer.Context context = this.resolveTime.time();
-            result = remoteAddress.getCanonicalHostName();
-            context.stop();
+            Callable<String> task = new Callable<String>() {
+                @Override
+                public String call() throws Exception {
+                    return remoteAddress.getCanonicalHostName();
+                }
+            };
+            try (Timer.Context context = this.resolveTime.time()) {
+                result = timeLimiter.callWithTimeout(task, timeout, TimeUnit.MILLISECONDS, true);
+            } catch (TimeoutException e) {
+                LOG.error("DNS lookup timed out for record: {}, timeout {}ms", remoteAddress.getHostAddress(), timeout);
+                this.resolveTimeouts.mark();
+                return remoteAddress.getHostAddress();
+            } catch (Exception e) {
+                LOG.error("Error occured during name resolution:", e);
+                return remoteAddress.getHostAddress();
+            }
         }
 
         return result;

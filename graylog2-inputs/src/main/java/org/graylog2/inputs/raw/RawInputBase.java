@@ -21,6 +21,7 @@ import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationException;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.configuration.fields.ConfigurationField;
+import org.graylog2.plugin.configuration.fields.NumberField;
 import org.graylog2.plugin.configuration.fields.TextField;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.MisfireException;
@@ -41,6 +42,8 @@ public abstract class RawInputBase extends MessageInput {
     public static final String CK_BIND_ADDRESS = "bind_address";
     public static final String CK_PORT = "port";
     public static final String CK_OVERRIDE_SOURCE = "override_source";
+    public static final String CK_DNS_TIMEOUT = "dns_timeout";
+    public static final int CK_DNS_TIMEOUT_DEFAULT = 30000;
 
     protected Bootstrap bootstrap;
     protected Channel channel;
@@ -95,6 +98,14 @@ public abstract class RawInputBase extends MessageInput {
         ));
 
         r.addField(ConfigurationRequest.Templates.recvBufferSize(CK_RECV_BUFFER_SIZE, 1024 * 1024));
+
+        r.addField(new NumberField(
+                CK_DNS_TIMEOUT,
+                "DNS timeout",
+                CK_DNS_TIMEOUT_DEFAULT,
+                "Defines the timeout after which a dns resolution should be aborted. Is defined in Milliseconds.",
+                ConfigurationField.Optional.NOT_OPTIONAL
+        ));
 
         return r;
     }
