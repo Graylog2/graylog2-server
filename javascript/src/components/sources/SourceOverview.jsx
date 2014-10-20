@@ -1,6 +1,6 @@
 /** @jsx React.DOM */
 
-/* global activateTimerangeChooser, momentHelper */
+/* global activateTimerangeChooser, momentHelper, htmlEscape */
 
 'use strict';
 
@@ -33,12 +33,13 @@ var SourceOverview = React.createClass({
         this.valueDimension = this.histogramData.dimension((d) => new Date(d.x * 1000));
         this.valueGroup = this.valueDimension.group().reduceSum((d) => d.y);
 
+        this.querySources = [];
+
         return {
             range: daysToSeconds(1),
             filter: '',
             renderResultTable: false,
-            numberOfSources: 100,
-            composedQuery: ''
+            numberOfSources: 100
         };
     },
     loadHistogramData() {
@@ -63,7 +64,9 @@ var SourceOverview = React.createClass({
         HistogramDataStore.removeChangeListener(this._onHistogramDataChanged);
     },
     updatePieChartDimension() {
-        var onlyMinorValues = this.filterDimension.top(Infinity).reduce((reducedValue, current) => reducedValue && current.percentage < othersThreshold, true);
+        // TODO: Decide if the pie chart should ever display grouped others (makes things complicated to program and to use, so disabled for now)
+        //var onlyMinorValues = this.filterDimension.top(Infinity).reduce((reducedValue, current) => reducedValue && current.percentage < othersThreshold, true);
+        var onlyMinorValues = true;
         if (onlyMinorValues) {
             this.pieChart
                 .dimension(this.nameDimension)
@@ -112,6 +115,7 @@ var SourceOverview = React.createClass({
             .x(d3.time.scale())
             .xUnits(d3.time.minutes)
             .renderHorizontalGridLines(true)
+            // FIXME: causes those nasty exceptions when rendering data (one per x axis tick)
             .elasticX(true)
             .elasticY(true)
             .on("filtered", (chart) => {
@@ -142,22 +146,37 @@ var SourceOverview = React.createClass({
             .group((d) => d.percentage > othersThreshold ? "Top Sources" : othersName)
             .size(this.state.numberOfSources)
             .columns([
-                function (d) {
-                    // TODO
-                    /*
-                     <a href="#" class="search-link" data-field="source" data-search-link-operator="OR" data-value="@source.getName">
-                     @source.getName
-                     </a>
-
-                     */
-
-                    return d.name;
-                },
+                (d) => "<i class='icon icon-search' title='Search for this source'></i>",
+                (d) => "<i class='icon icon-filter' title='Filter this source'></i>",
+                (d) => d.name,
                 (d) => d.percentage.toFixed(2) + "%",
                 (d) => d.messageCount
             ])
             .sortBy((d) => d.messageCount)
             .order(d3.descending)
+            .renderlet((chart) => {
+                chart.selectAll("#dc-sources-result tbody td.dc-table-column._0").on("click", (d) => {
+                    // toggles source
+                    var index = this.querySources.indexOf(d.name);
+                    if (index === -1) {
+                        this.querySources.push(d.name);
+                    } else {
+                        this.querySources.splice(index, 1);
+                    }
+
+                    var queryString = this.querySources.map((source) => "source:"+htmlEscape(source)).join(" OR ");
+                    $("#universalsearch-query").val(queryString);
+
+                    // TODO: highlight query icon
+                });
+            })
+            .renderlet((chart) => {
+                chart.selectAll("#dc-sources-result tbody td.dc-table-column._1").on("click", (d) => {
+                    this.pieChart.filter(d.name);
+                    dc.redrawAll();
+                    this.loadHistogramData();
+                });
+            })
             .renderlet((table) => table.selectAll(".dc-table-group").classed("info", true));
     },
     _resetSources(sources) {
@@ -239,7 +258,6 @@ var SourceOverview = React.createClass({
         this.updatePieChartDimension();
     },
     _onFilterChanged(event) {
-        // TODO: should we really update the pie chart when filtering for sources or just the table?
         this.setState({filter: event.target.value}, () => {
             this._filterSources();
             this.dataTable.redraw();
@@ -255,6 +273,8 @@ var SourceOverview = React.createClass({
         var resultTable = (<table id="dc-sources-result" className="sources table table-striped table-hover table-condensed" style={resultTableStyle}>
             <thead>
                 <tr>
+                    <th style={{width: "10px"}}></th>
+                    <th style={{width: "10px"}}></th>
                     <th>Source name</th>
                     <th>Percentage</th>
                     <th>Message count</th>
@@ -329,5 +349,3 @@ var SourceOverview = React.createClass({
 });
 
 module.exports = SourceOverview;
-
-
