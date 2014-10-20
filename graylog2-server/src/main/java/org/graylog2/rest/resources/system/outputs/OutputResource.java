@@ -17,17 +17,21 @@
 package org.graylog2.rest.resources.system.outputs;
 
 import com.codahale.metrics.annotation.Timed;
-import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.graylog2.database.NotFoundException;
-import org.graylog2.database.ValidationException;
-import org.graylog2.outputs.MessageOutputFactory;
-import org.graylog2.plugin.streams.Output;
+import com.google.common.collect.Sets;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
 import com.wordnik.swagger.annotations.ApiResponse;
 import com.wordnik.swagger.annotations.ApiResponses;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.graylog2.database.NotFoundException;
+import org.graylog2.database.ValidationException;
+import org.graylog2.outputs.MessageOutputFactory;
+import org.graylog2.plugin.configuration.ConfigurationRequest;
+import org.graylog2.plugin.configuration.fields.TextField;
+import org.graylog2.plugin.outputs.MessageOutput;
+import org.graylog2.plugin.streams.Output;
 import org.graylog2.rest.resources.RestResource;
 import org.graylog2.rest.resources.streams.outputs.AvailableOutputSummary;
 import org.graylog2.security.RestPermissions;
@@ -82,7 +86,7 @@ public class OutputResource extends RestResource {
         return new HashMap<String, Object>() {
             {
                 put("total", outputs.size());
-                put("outputs", outputs);
+                put("outputs", filterPasswordFields(outputs));
             }
         };
     }
@@ -95,9 +99,9 @@ public class OutputResource extends RestResource {
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "No such output on this node.")
     })
-    public Output get(@ApiParam(name = "outputId", value = "The id of the output we want.", required = true) @PathParam("outputId") String outputId) throws NotFoundException {
+    public Map<String, Object> get(@ApiParam(name = "outputId", value = "The id of the output we want.", required = true) @PathParam("outputId") String outputId) throws NotFoundException {
         checkPermission(RestPermissions.OUTPUTS_READ, outputId);
-        return outputService.load(outputId);
+        return filterPasswordFields(outputService.load(outputId));
     }
 
     @POST
@@ -121,7 +125,7 @@ public class OutputResource extends RestResource {
 
         Output output = outputService.create(csor, getCurrentUser().getName());
 
-        return Response.status(Response.Status.CREATED).entity(output).build();
+        return Response.status(Response.Status.CREATED).entity(filterPasswordFields(output)).build();
     }
 
     @DELETE @Path("/{outputId}")
@@ -151,5 +155,40 @@ public class OutputResource extends RestResource {
                 put("types", messageOutputFactory.getAvailableOutputs());
             }
         };
+    }
+
+    private Set<Map<String, Object>> filterPasswordFields(final Set<Output> outputs) {
+        final Set<Map<String, Object>> data = Sets.newHashSet();
+
+        for (Output output : outputs) {
+            data.add(filterPasswordFields(output));
+        }
+
+        return data;
+    }
+
+    // This is so ugly!
+    // TODO: Remove this once we implemented proper types for input/ouput configuration.
+    private Map<String, Object> filterPasswordFields(final Output output) {
+        final Map<String, Object> data = output.asMap();
+        final MessageOutput messageOutput = messageOutputFactory.fromStreamOutput(output);
+
+        if (messageOutput == null) {
+            return data;
+        }
+
+        final ConfigurationRequest requestedConfiguration = messageOutput.getRequestedConfiguration();
+
+        if (data.containsKey("configuration")) {
+            final Map<String, Object> c = (Map<String, Object>) data.get("configuration");
+
+            for (Map.Entry<String, Object> entry : c.entrySet()) {
+                if (requestedConfiguration.getField(entry.getKey()).getAttributes().contains(TextField.Attribute.IS_PASSWORD.toString().toLowerCase())) {
+                    c.put(entry.getKey(), "********");
+                }
+            }
+        }
+
+        return data;
     }
 }
