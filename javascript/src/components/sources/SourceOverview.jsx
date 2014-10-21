@@ -247,7 +247,8 @@ var SourceOverview = React.createClass({
             activateTimerangeChooser("keyword", $('.timerange-selector-container .dropdown-menu a[data-selector-name="keyword"]'));
             $('#universalsearch .timerange-selector.keyword > input').val(text);
         }
-    }, _onRangeChanged(event) {
+    },
+    _onRangeChanged(event) {
         // when range is changed the filter in line chart (corresponding to the brush) does not make any sense any more
         this.valueDimension.filterAll();
         this.lineChart.filterAll();
@@ -305,9 +306,7 @@ var SourceOverview = React.createClass({
                             <option value={daysToSeconds(365)}>Last Year</option>
                             <option value="0">All</option>
                         </select>
-                        <h1>
-                            <i className="icon icon-download-alt"></i>
-                        Sources</h1>
+                        <h1><i className="icon icon-download-alt"></i> Sources</h1>
                     </div>
                     <div style={{"margin-top": "15px"}}>
                     This is a list of all sources that sent in messages to Graylog2. Use it to quickly search for all
@@ -329,27 +328,35 @@ var SourceOverview = React.createClass({
                 {this.state.renderResultTable ? null : emptySources}
                 <div className="row-fluid">
                     <div className="span6">
-                        <span>
-                            <span style={{"font-size": "14px"}}>Sources: </span>
-                            <select onChange={this._onNumberOfSourcesChanged} value={this.state.numberOfSources}>
-                                <option value="1">1</option>
-                                <option value="10">10</option>
-                                <option value="50">50</option>
-                                <option value="100">100</option>
-                                <option value="500">500</option>
-                            </select>
-                        </span>
+                        <div className="form-horizontal pull-left">
+                            <div className="control-group">
+                                <label className="control-label">Sources:</label>
+                                <div className="controls">
+                                    <select onChange={this._onNumberOfSourcesChanged} value={this.state.numberOfSources}>
+                                        <option value="1">1</option>
+                                        <option value="10">10</option>
+                                        <option value="50">50</option>
+                                        <option value="100">100</option>
+                                        <option value="500">500</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <div className="span6">
-                        <span style={{float: "right"}}>
-                            <span style={{"font-size": "14px"}}>Search: </span>
-                            <input type="search" onChange={this._onFilterChanged}/>
-                        </span>
+                        <div className="form-horizontal pull-right">
+                            <div className="control-group">
+                                <label className="control-label">Search:</label>
+                                <div className="controls">
+                                    <input type="search" onChange={this._onFilterChanged}/>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div className="row-fluid">
                     <div className="span9">
-                    {resultTable}
+                        {resultTable}
                     </div>
                     <div id="dc-sources-pie-chart" className="span3">
                     </div>
