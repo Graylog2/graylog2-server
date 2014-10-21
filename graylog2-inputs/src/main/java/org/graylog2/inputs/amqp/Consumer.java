@@ -118,20 +118,12 @@ public class Consumer {
 
                                 final RadioMessage msg = messagePack.read(body, RadioMessage.class);
 
-                                if (!msg.strings.containsKey("message") || !msg.strings.containsKey("source") || msg.timestamp <= 0) {
+                                if (!msg.isComplete()) {
                                     LOG.error("Incomplete AMQP message. Skipping.");
                                     channel.basicAck(deliveryTag, false);
                                 }
 
-                                final Message event = new Message(
-                                        msg.strings.get("message"),
-                                        msg.strings.get("source"),
-                                        new DateTime(msg.timestamp, DateTimeZone.UTC)
-                                );
-
-                                event.addStringFields(msg.strings);
-                                event.addLongFields(msg.longs);
-                                event.addDoubleFields(msg.doubles);
+                                Message event = msg.toMessage();
 
                                 processBuffer.insertFailFast(event, sourceInput);
                                 channel.basicAck(deliveryTag, false);

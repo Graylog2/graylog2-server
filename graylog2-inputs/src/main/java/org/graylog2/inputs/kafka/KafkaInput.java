@@ -244,21 +244,13 @@ public class KafkaInput extends MessageInput {
 
                         RadioMessage msg = msgpack.read(bytes, RadioMessage.class);
 
-                        if (!msg.strings.containsKey("message") || !msg.strings.containsKey("source") || msg.timestamp <= 0) {
+                        if (!msg.isComplete()) {
                             LOG.error("Incomplete radio message. Skipping.");
                             return null;
                         }
 
-                        Message event = new Message(
-                                msg.strings.get("message"),
-                                msg.strings.get("source"),
-                                new DateTime(msg.timestamp)
-                        );
+                        return msg.toMessage();
 
-                        event.addStringFields(msg.strings);
-                        event.addLongFields(msg.longs);
-                        event.addDoubleFields(msg.doubles);
-                        return event;
                     } catch (Exception e) {
                         LOG.error("Error while processing Kafka radio message", e);
                         return null;

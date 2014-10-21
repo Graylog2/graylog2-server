@@ -65,4 +65,21 @@ public class RadioMessage {
         return pack.write(radioMessage);
     }
 
+    public boolean isComplete() {
+        return this.strings.containsKey("message") && this.strings.containsKey("source") && this.timestamp <= 0;
+    }
+
+    public Message toMessage() {
+        Message event = new Message(
+                this.strings.get("message"),
+                this.strings.get("source"),
+                new DateTime(this.timestamp)
+        );
+
+        event.addStringFields(this.strings);
+        event.addLongFields(this.longs);
+        event.addDoubleFields(this.doubles);
+        return event;
+    }
+
 }
