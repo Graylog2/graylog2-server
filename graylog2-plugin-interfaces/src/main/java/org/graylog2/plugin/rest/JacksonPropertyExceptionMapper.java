@@ -24,28 +24,24 @@ package org.graylog2.plugin.rest;
 
 import com.fasterxml.jackson.databind.exc.PropertyBindingException;
 import com.google.common.base.Joiner;
-import org.glassfish.jersey.spi.ExtendedExceptionMapper;
 
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 import java.util.Collection;
+import java.util.Collections;
 
+import static com.google.common.base.Objects.firstNonNull;
 import static javax.ws.rs.core.Response.status;
 
 @Provider
-public class JacksonPropertyExceptionMapper implements ExtendedExceptionMapper<PropertyBindingException> {
-
+public class JacksonPropertyExceptionMapper implements ExceptionMapper<PropertyBindingException> {
     @Override
-    public boolean isMappable(PropertyBindingException exception) {
-        return exception != null;
-    }
-
-    @Override
-    public Response toResponse(PropertyBindingException exception) {
-        final Collection<Object> knownPropertyIds = exception.getKnownPropertyIds();
-        final String message =
-                "Unable to map property " + exception.getPropertyName() + ". \nKnown properties include: "
-                        + (knownPropertyIds == null ? "<>" : Joiner.on(", ").join(knownPropertyIds));
-        return status(Response.Status.BAD_REQUEST).entity(message).build();
+    public Response toResponse(PropertyBindingException e) {
+        final Collection<Object> knownPropertyIds = firstNonNull(e.getKnownPropertyIds(), Collections.emptyList());
+        final ApiError apiError = new ApiError("Unable to map property " + e.getPropertyName()
+                + ".\nKnown properties include: " + Joiner.on(", ").join(knownPropertyIds));
+        return status(Response.Status.BAD_REQUEST).type(MediaType.APPLICATION_JSON_TYPE).entity(apiError).build();
     }
 }

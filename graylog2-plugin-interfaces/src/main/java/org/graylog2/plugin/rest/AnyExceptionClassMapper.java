@@ -22,7 +22,6 @@
  */
 package org.graylog2.plugin.rest;
 
-import com.google.common.base.Throwables;
 import org.glassfish.jersey.spi.ExtendedExceptionMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,6 +30,8 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.Provider;
+
+import static com.google.common.base.Strings.nullToEmpty;
 
 @Provider
 public class AnyExceptionClassMapper implements ExtendedExceptionMapper<Exception> {
@@ -44,17 +45,11 @@ public class AnyExceptionClassMapper implements ExtendedExceptionMapper<Exceptio
 
     @Override
     public Response toResponse(Exception exception) {
-
         LOG.error("Unhandled exception in REST resource", exception);
 
-        final StringBuilder sb = new StringBuilder();
-        if (exception.getMessage() != null) {
-            sb.append(exception.getMessage()).append("\n");
-        }
-        sb.append(Throwables.getStackTraceAsString(exception));
         return Response.serverError()
-                .type(MediaType.TEXT_PLAIN_TYPE)
-                .entity(sb.toString())
+                .type(MediaType.APPLICATION_JSON_TYPE)
+                .entity(new ApiError(nullToEmpty(exception.getMessage())))
                 .build();
     }
 

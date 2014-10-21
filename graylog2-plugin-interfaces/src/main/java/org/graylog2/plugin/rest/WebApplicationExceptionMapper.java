@@ -26,22 +26,20 @@ import org.glassfish.jersey.spi.ExtendedExceptionMapper;
 
 import javax.ws.rs.NotAuthorizedException;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.ext.Provider;
 
-/**
- * @author Dennis Oelkers <dennis@torch.sh>
- */
 public class WebApplicationExceptionMapper implements ExtendedExceptionMapper<WebApplicationException> {
     @Override
     public boolean isMappable(WebApplicationException e) {
-        if (e instanceof NotAuthorizedException)
-            return false;
-        return true;
+        return !(e instanceof NotAuthorizedException) && e != null;
     }
 
     @Override
-    public Response toResponse(WebApplicationException exception) {
-        ApiError apiError = new ApiError(exception.getMessage());
-        return Response.fromResponse(exception.getResponse()).entity(apiError).build();
+    public Response toResponse(WebApplicationException e) {
+        final ApiError apiError = new ApiError(e.getMessage());
+
+        return Response.fromResponse(e.getResponse()).type(MediaType.APPLICATION_JSON_TYPE).entity(apiError).build();
     }
 }
