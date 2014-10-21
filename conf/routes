@@ -82,9 +82,9 @@ POST        /system/inputs/:input_id/terminate                                  
 POST        /system/inputs/:node_id/:input_id/staticfields                           @controllers.InputsController.addStaticField(node_id: String, input_id: String)
 POST        /system/inputs/:input_id/staticfields                                    @controllers.InputsController.addStaticFieldGlobal(input_id: String)
 GET         /system/inputs/:node_id/:input_id/staticfields/:key/delete               @controllers.InputsController.removeStaticField(node_id: String, input_id: String, key: String)
-GET         /system/bundles                                                          @controllers.BundlesController.index()
-GET         /system/bundles/export                                                   @controllers.BundlesController.exportForm()
-POST        /system/bundles/export                                                   @controllers.BundlesController.export()
+GET         /system/contentpacks                                                     @controllers.BundlesController.index()
+GET         /system/contentpacks/export                                              @controllers.BundlesController.exportForm()
+POST        /system/contentpacks/export                                              @controllers.BundlesController.export()
 
 # Outputs
 GET         /system/outputs                                                          @controllers.OutputsController.index()
@@ -241,9 +241,9 @@ GET         /a/system/indices/failures/dynatable                                
 POST        /a/system/inputs/:input_id/extractors/order                              @controllers.api.ExtractorsApiController.order(input_id: String)
 
 # API: Bundles
-GET         /a/system/bundles                                                        @controllers.api.BundlesApiController.index()
-POST        /a/system/bundles                                                        @controllers.api.BundlesApiController.create()
-POST        /a/system/bundles/:bundle_id/apply                                       @controllers.api.BundlesApiController.apply(bundle_id: String)
+GET         /a/system/contentpacks                                                   @controllers.api.BundlesApiController.index()
+POST        /a/system/contentpacks                                                   @controllers.api.BundlesApiController.create()
+POST        /a/system/contentpacks/:pack_id/apply                                    @controllers.api.BundlesApiController.apply(pack_id: String)
 
 # Map static resources from the /public folder to the /assets URL path
 GET         /assets/*file                                                            controllers.Assets.at(path="/public", file)

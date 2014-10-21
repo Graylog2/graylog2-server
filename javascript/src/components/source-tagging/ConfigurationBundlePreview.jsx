@@ -11,7 +11,7 @@ var ConfigurationBundlePreview = React.createClass({
 
         if (this.props.sourceTypeDescription) {
             preview = this.props.sourceTypeDescription;
-            action = <form action={"/a/system/bundles/" + this.props.sourceTypeId + "/apply"} method="POST">
+            action = <form action={"/a/system/contentpacks/" + this.props.sourceTypeId + "/apply"} method="POST">
                         <input type="submit" value="Apply" className="btn btn-success"/>
                      </form>;
         }

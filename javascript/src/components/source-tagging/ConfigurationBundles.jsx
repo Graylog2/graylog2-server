@@ -21,7 +21,7 @@ var ConfigurationBundles = React.createClass({
         this.setState({sourceTypeId: sourceTypeId, sourceTypeDescription: sourceTypeDescription});
     },
     componentDidMount: function() {
-        $.get('/a/system/bundles', function(result) {
+        $.get('/a/system/contentpacks', function(result) {
             if (this.isMounted()) {
                 this.setState({
                     bundles: result
@@ -75,8 +75,8 @@ var ConfigurationBundles = React.createClass({
                 <div className="span6">
                     <BootstrapAccordion>
                             {this._getCategoriesHtml()}
-                        <BootstrapAccordionGroup name="Custom">
-                            <form method="POST" action="/a/system/bundles" className="form-inline upload" encType="multipart/form-data">
+                        <BootstrapAccordionGroup name="Import">
+                            <form method="POST" action="/a/system/contentpacks" className="form-inline upload" encType="multipart/form-data">
                                 <input type="file" name="bundle" />
                                 <button type="submit" className="btn btn-success">Upload</button>
                             </form>

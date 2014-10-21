@@ -30,8 +30,8 @@
     @views.html.partials.breadcrumbs(breadcrumbs)
 
     <div class="row-fluid">
-        <h1><i class="icon icon-sitemap"></i> Export Bundle</h1>
-        Export your inputs, outputs, streams and dashboards as a configuration bundle.
+        <h1><i class="icon icon-sitemap"></i> Build your own Content Pack</h1>
+        Export your inputs, outputs, streams and dashboards as a content pack and share it with the community.
     </div>
 
     @helper.form(action = routes.BundlesController.export(), 'class -> "form-horizontal") {
@@ -39,7 +39,7 @@
             <label class="control-label" for="name">Name</label>
             <div class="controls">
                 <input type="text" id="name" name="name" value="@form("name").value()" required/>
-                <span class="help-block">Write a name for your configuration bundle.</span>
+                <span class="help-block">The name of your configuration bundle.</span>
 
             </div>
         </div>
@@ -48,7 +48,7 @@
             <label class="control-label" for="description">Description</label>
             <div class="controls">
                 <textarea rows="3" id="description" name="description" required>@form("description").value()</textarea>
-                <span class="help-block">Write a description of what your bundle does.</span>
+                <span class="help-block">A description of what your bundle does and instructions about possible inputs to start manually.</span>
             </div>
         </div>
 
@@ -56,7 +56,7 @@
             <label class="control-label" for="category">Category</label>
             <div class="controls">
                 <input type="text" id="category" name="category" value="@form("category").value()" required/>
-                <span class="help-block">Write a category for your bundle, e.g. Linux, Firewall, Switch.</span>
+                <span class="help-block">A category for your bundle, e.g. Operating System, Firewall or Switch.</span>
             </div>
         </div>
 
@@ -143,9 +143,9 @@
 
         <div class="control-group">
             <div class="controls">
-                <button type="submit" class="btn btn-primary">
-                    <i class="icon icon-rocket"></i>
-                    Export bundle
+                <button type="submit" class="btn btn-success">
+                    <i class="icon icon-cloud-download"></i>
+                    Download my content pack
                 </button>
             </div>
         </div>
