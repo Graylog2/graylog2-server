@@ -37,6 +37,7 @@ var SourceOverview = React.createClass({
 
         return {
             range: daysToSeconds(1),
+            resolution: 'minute',
             filter: '',
             renderResultTable: false,
             numberOfSources: 100
@@ -233,6 +234,7 @@ var SourceOverview = React.createClass({
     },
     _onHistogramDataChanged() {
         var histogramData = HistogramDataStore.getHistogramData();
+        this.setState({resolution: histogramData.interval});
         this._resetHistogram(histogramData.values);
     },
     _syncRangeWithQuery: function () {
@@ -323,6 +325,7 @@ var SourceOverview = React.createClass({
                 </div>
                 <div className="row-fluid">
                     <div id="dc-sources-line-chart" className="span12">
+                        <h2><i className="icon icon-calendar"></i> Messages per {this.state.resolution}</h2>
                     </div>
                 </div>
                 {this.state.renderResultTable ? null : emptySources}
