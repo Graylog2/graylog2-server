@@ -189,10 +189,15 @@ var SourceOverview = React.createClass({
             })
             .renderlet((table) => table.selectAll(".dc-table-group").classed("info", true));
     },
-    resetFilters() {
+    resetSourcesFilters() {
         this.pieChart.filterAll();
         this.othersDimension.filterAll();
         this.loadHistogramData();
+        dc.redrawAll();
+    },
+    resetHistogramFilters() {
+        this.valueDimension.filterAll();
+        this.lineChart.filterAll();
         dc.redrawAll();
     },
     _resetSources(sources) {
@@ -326,7 +331,7 @@ var SourceOverview = React.createClass({
                 </div>
                 <div className="row-fluid">
                     <div id="dc-sources-line-chart" className="span12">
-                        <h3><i className="icon icon-calendar"></i> Messages per {this.state.resolution}</h3>
+                        <h3><i className="icon icon-calendar"></i> Messages per {this.state.resolution} <small><a href="javascript:undefined" className="reset" onClick={this.resetHistogramFilters} style={{"display": "none"}}><i className="icon icon-repeat"></i></a></small></h3>
                     </div>
                 </div>
                 {this.state.renderResultTable ? null : emptySources}
@@ -365,7 +370,7 @@ var SourceOverview = React.createClass({
                     </div>
                     <div className="span3">
                         <div id="dc-sources-pie-chart">
-                            <h3><i className="icon icon-bar-chart"></i> Messages per source <small><a href="javascript:undefined" className="reset" onClick={this.resetFilters} style={{"display": "none"}}><i className="icon icon-repeat"></i></a></small></h3>
+                            <h3><i className="icon icon-bar-chart"></i> Messages per source <small><a href="javascript:undefined" className="reset" onClick={this.resetSourcesFilters} style={{"display": "none"}}><i className="icon icon-repeat"></i></a></small></h3>
                         </div>
                     </div>
                 </div>
