@@ -147,8 +147,8 @@ var SourceOverview = React.createClass({
             .group((d) => d.percentage > othersThreshold ? "Top Sources" : othersName)
             .size(this.state.numberOfSources)
             .columns([
-                (d) => "<a href='#' class='dc-search-link'><i class='icon icon-search' title='Search for this source'></i></button>",
-                (d) => "<a href='#' class='dc-filter-link' title='Filter this source'>" + d.name +"</a>",
+                (d) => "<a href='javascript:undefined' class='dc-search-link'><i class='icon icon-search' title='Search for this source'></i></button>",
+                (d) => "<a href='javascript:undefined' class='dc-filter-link' title='Filter this source'>" + d.name +"</a>",
                 (d) => d.percentage.toFixed(2) + "%",
                 (d) => d.messageCount
             ])
@@ -174,7 +174,6 @@ var SourceOverview = React.createClass({
                     query.val(queryString);
                     query.effect("bounce");
 
-                    d3.event.preventDefault();
                     // TODO: highlight query icon
                 });
             })
@@ -186,8 +185,6 @@ var SourceOverview = React.createClass({
                     this.pieChart.filter(datum.name);
                     dc.redrawAll();
                     this.loadHistogramData();
-
-                    d3.event.preventDefault();
                 });
             })
             .renderlet((table) => table.selectAll(".dc-table-group").classed("info", true));
@@ -238,7 +235,6 @@ var SourceOverview = React.createClass({
         this._resetHistogram(histogramData.values);
     },
     _syncRangeWithQuery: function () {
-
         var rangeSelectBox = this.refs.rangeSelector.getDOMNode();
         if (Number(rangeSelectBox.value) === 0) {
             activateTimerangeChooser("relative", $('.timerange-selector-container .dropdown-menu a[data-selector-name="relative"]'));
