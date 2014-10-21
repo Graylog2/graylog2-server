@@ -83,28 +83,25 @@ public class IndicesResource extends RestResource {
         checkPermission(RestPermissions.INDICES_READ, index);
 
         if (!deflector.isGraylog2Index(index)) {
-            LOG.info("Index [{}] doesn't look like an index managed by Graylog2.", index);
-            throw new NotFoundException();
+            final String msg = "Index [" + index + "] doesn't look like an index managed by Graylog2.";
+            LOG.info(msg);
+            throw new NotFoundException(msg);
         }
 
-        try {
-            final IndexStatistics stats = indices.getIndexStats(index);
-            if (stats == null) {
-                LOG.error("Index [{}] not found.", index);
-                throw new NotFoundException();
-            }
-
-            final ImmutableList.Builder<ShardRouting> routing = ImmutableList.builder();
-            for (org.elasticsearch.cluster.routing.ShardRouting shardRouting : stats.getShardRoutings()) {
-                routing.add(shardRouting(shardRouting));
-            }
-
-            return IndexInfo.create(indexStats(stats.getPrimaries()), indexStats(stats.getTotal()),
-                    routing.build(), indices.isReopened(index));
-        } catch (Exception e) {
-            LOG.error("Could not get indices information.", e);
-            throw new InternalServerErrorException(e);
+        final IndexStatistics stats = indices.getIndexStats(index);
+        if (stats == null) {
+            final String msg = "Index [" + index + "] not found.";
+            LOG.error(msg);
+            throw new NotFoundException(msg);
         }
+
+        final ImmutableList.Builder<ShardRouting> routing = ImmutableList.builder();
+        for (org.elasticsearch.cluster.routing.ShardRouting shardRouting : stats.getShardRoutings()) {
+            routing.add(shardRouting(shardRouting));
+        }
+
+        return IndexInfo.create(indexStats(stats.getPrimaries()), indexStats(stats.getTotal()),
+                routing.build(), indices.isReopened(index));
     }
 
     @GET
@@ -149,8 +146,9 @@ public class IndicesResource extends RestResource {
         try {
             systemJobManager.submit(rebuildJob);
         } catch (SystemJobConcurrencyException e) {
-            LOG.error("Concurrency level of this job reached: " + e.getMessage());
-            throw new ForbiddenException();
+            final String msg = "Concurrency level of this job reached: " + e.getMessage();
+            LOG.error(msg);
+            throw new ForbiddenException(msg);
         }
     }
 
@@ -182,8 +180,9 @@ public class IndicesResource extends RestResource {
         try {
             systemJobManager.submit(rebuildJob);
         } catch (SystemJobConcurrencyException e) {
-            LOG.error("Concurrency level of this job reached: " + e.getMessage());
-            throw new ForbiddenException();
+            final String msg = "Concurrency level of this job reached: " + e.getMessage();
+            LOG.error(msg);
+            throw new ForbiddenException(msg);
         }
     }
 
@@ -199,8 +198,9 @@ public class IndicesResource extends RestResource {
         checkPermission(RestPermissions.INDICES_DELETE, index);
 
         if (!deflector.isGraylog2Index(index)) {
-            LOG.info("Index [{}] doesn't look like an index managed by Graylog2.", index);
-            throw new NotFoundException();
+            final String msg = "Index [" + index + "] doesn't look like an index managed by Graylog2.";
+            LOG.info(msg);
+            throw new NotFoundException(msg);
         }
 
         if (deflector.getCurrentActualTargetIndex().equals(index)) {
@@ -215,10 +215,10 @@ public class IndicesResource extends RestResource {
         try {
             systemJobManager.submit(rebuildJob);
         } catch (SystemJobConcurrencyException e) {
-            LOG.error("Concurrency level of this job reached: " + e.getMessage());
-            throw new ForbiddenException();
+            final String msg = "Concurrency level of this job reached: " + e.getMessage();
+            LOG.error(msg);
+            throw new ForbiddenException(msg);
         }
-
     }
 
     private ShardRouting shardRouting(org.elasticsearch.cluster.routing.ShardRouting route) {
