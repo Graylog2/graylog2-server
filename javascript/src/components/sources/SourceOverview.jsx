@@ -158,7 +158,7 @@ var SourceOverview = React.createClass({
                 chart.selectAll("#dc-sources-result tbody td.dc-table-column._0 button.dc-search-button").on("click", (_) => {
                     // d3 doesn't pass any data to the onclick event as the buttons do not
                     // have any. Instead, we need to get it from the table element.
-                    var parentTdElement = $(event.target).parents("td.dc-table-column._0");
+                    var parentTdElement = $(d3.event.target).parents("td.dc-table-column._0");
                     var datum = d3.selectAll(parentTdElement).datum();
 
                     // toggles source
@@ -179,7 +179,7 @@ var SourceOverview = React.createClass({
             })
             .renderlet((chart) => {
                 chart.selectAll("#dc-sources-result tbody td.dc-table-column._1 button.dc-filter-button").on("click", (_) => {
-                    var parentTdElement = $(event.target).parents("td.dc-table-column._1");
+                    var parentTdElement = $(d3.event.target).parents("td.dc-table-column._1");
                     var datum = d3.selectAll(parentTdElement).datum();
 
                     this.pieChart.filter(datum.name);
