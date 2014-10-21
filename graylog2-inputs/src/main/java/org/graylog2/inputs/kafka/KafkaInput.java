@@ -108,6 +108,7 @@ public class KafkaInput extends MessageInput {
             case HALTING:
                 pausedLatch = new CountDownLatch(1);
                 paused = true;
+                break;
             default:
                 paused = false;
                 pausedLatch.countDown();
