@@ -119,13 +119,16 @@ public class KafkaTransport extends ThrottleableTransport {
     public void lifecycleStateChange(Lifecycle lifecycle) {
         LOG.debug("Lifecycle changed to {}", lifecycle);
         switch (lifecycle) {
-            case RUNNING:
+            case PAUSED:
+            case FAILED:
+            case HALTING:
+                pausedLatch = new CountDownLatch(1);
+                paused = true;
+                break;
+            default:
                 paused = false;
                 pausedLatch.countDown();
                 break;
-            default:
-                pausedLatch = new CountDownLatch(1);
-                paused = true;
         }
     }
 

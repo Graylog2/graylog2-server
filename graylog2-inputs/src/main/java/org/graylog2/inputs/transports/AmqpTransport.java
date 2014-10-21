@@ -98,7 +98,18 @@ public class AmqpTransport extends ThrottleableTransport {
         try {
             LOG.debug("Lifecycle changed to {}", lifecycle);
             switch (lifecycle) {
-                case RUNNING:
+                case PAUSED:
+                case FAILED:
+                case HALTING:
+                    try {
+                        if (consumer != null) {
+                            consumer.stop();
+                        }
+                    } catch (IOException e) {
+                        LOG.warn("Unable to stop consumer", e);
+                    }
+                    break;
+                default:
                     if (consumer.isConnected()) {
                         LOG.debug("Consumer is already connected, not running it a second time.");
                         break;
@@ -107,15 +118,6 @@ public class AmqpTransport extends ThrottleableTransport {
                         consumer.run();
                     } catch (IOException e) {
                         LOG.warn("Unable to resume consumer", e);
-                    }
-                    break;
-                default:
-                    try {
-                        if (consumer != null) {
-                            consumer.stop();
-                        }
-                    } catch (IOException e) {
-                        LOG.warn("Unable to stop consumer", e);
                     }
                     break;
             }
