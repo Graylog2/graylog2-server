@@ -3,6 +3,7 @@
 'use strict';
 
 var React = require('react');
+var Markdown = require('markdown').markdown;
 
 var ConfigurationBundlePreview = React.createClass({
     render: function () {
@@ -19,7 +20,7 @@ var ConfigurationBundlePreview = React.createClass({
         return (
             <div className="bundle-preview">
                 <h2>Preview:</h2>
-                <p>{preview}</p>
+                <p dangerouslySetInnerHTML={{__html: Markdown.toHTML(preview)}}></p>
                 {action}
             </div>
         );

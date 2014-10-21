@@ -20,7 +20,7 @@
     if(input.getAttributes.containsKey("bind_address")) {
         details += " on " + input.getAttributes.get("bind_address")
         if(input.getAttributes.containsKey("port")) {
-            details += ":" + input.getAttributes.get("port")
+            details += " port " + input.getAttributes.get("port")
         }
     }
     details
@@ -38,24 +38,26 @@
         <div class="control-group @if(form("name").hasErrors) {error}">
             <label class="control-label" for="name">Name</label>
             <div class="controls">
-                <input type="text" id="name" name="name" value="@form("name").value()" required/>
+                <input type="text" id="name" class="input-xlarge" name="name" value="@form("name").value()" required/>
                 <span class="help-block">The name of your configuration bundle.</span>
-
             </div>
         </div>
 
         <div class="control-group @if(form("description").hasErrors) {error}">
             <label class="control-label" for="description">Description</label>
             <div class="controls">
-                <textarea rows="3" id="description" name="description" required>@form("description").value()</textarea>
-                <span class="help-block">A description of what your bundle does and instructions about possible inputs to start manually.</span>
+                <textarea rows="6" id="description" name="description" class="input-xlarge" required>@form("description").value()</textarea>
+                <span class="help-block">
+                    A description of what your bundle does and instructions about possible inputs to start manually.
+                    You can use <a href="http://daringfireball.net/projects/markdown/syntax" target="_blank">Markdown</a> syntax.
+                </span>
             </div>
         </div>
 
         <div class="control-group @if(form("category").hasErrors) {error}">
             <label class="control-label" for="category">Category</label>
             <div class="controls">
-                <input type="text" id="category" name="category" value="@form("category").value()" required/>
+                <input type="text" id="category" name="category" class="input-xlarge" value="@form("category").value()" required/>
                 <span class="help-block">A category for your bundle, e.g. Operating System, Firewall or Switch.</span>
             </div>
         </div>
@@ -69,10 +71,7 @@
                     } else {
                         @for(i <- inputs.sortBy(_.getTitle)) {
                             <div class="checkbox-control">
-                                <label class="checkbox">
-                                    <input type="checkbox" name="inputs" id="input_@i.getId" value="@i.getId" @if(listValues.contains(Some(i.getId))) {checked=""}>
-                                    @i.getTitle
-                                </label>
+                                <label class="checkbox"><input type="checkbox" name="inputs" id="input_@i.getId" value="@i.getId" @if(listValues.contains(Some(i.getId))) {checked=""}>@i.getTitle</label>
                                 <span class="help-inline">(@inputDetails(i))</span>
                             </div>
                         }
@@ -90,10 +89,7 @@
                 } else {
                     @for(o <- outputs.sortBy(_.getTitle)) {
                         <div class="checkbox-control">
-                            <label class="checkbox">
-                                <input type="checkbox" name="outputs" id="output_@o.getId" value="@o.getId" @if(listValues.contains(Some(o.getId))) {checked=""}>
-                                @o.getTitle
-                            </label>
+                            <label class="checkbox"><input type="checkbox" name="outputs" id="output_@o.getId" value="@o.getId" @if(listValues.contains(Some(o.getId))) {checked=""}>@o.getTitle</label>
                         </div>
                     }
                 }
@@ -110,10 +106,7 @@
                 } else {
                     @for(s <- streams.sortBy(_.getTitle)) {
                         <div class="checkbox-control">
-                            <label class="checkbox">
-                                <input type="checkbox" name="streams" id="stream_@s.getId" value="@s.getId" @if(listValues.contains(Some(s.getId))) {checked=""}>
-                                @s.getTitle
-                            </label>
+                            <label class="checkbox"><input type="checkbox" name="streams" id="stream_@s.getId" value="@s.getId" @if(listValues.contains(Some(s.getId))) {checked=""}>@s.getTitle</label>
                         </div>
                     }
                 }
@@ -130,10 +123,7 @@
                 } else {
                     @for(d <- dashboards.sortBy(_.getTitle)) {
                         <div class="checkbox-control">
-                            <label class="checkbox">
-                                <input type="checkbox" name="dashboards" id="dashboard_@d.getId" value="@d.getId" @if(listValues.contains(Some(d.getId))) {checked=""}>
-                                @d.getTitle
-                            </label>
+                            <label class="checkbox"><input type="checkbox" name="dashboards" id="dashboard_@d.getId" value="@d.getId" @if(listValues.contains(Some(d.getId))) {checked=""}>@d.getTitle</label>
                         </div>
                     }
                 }

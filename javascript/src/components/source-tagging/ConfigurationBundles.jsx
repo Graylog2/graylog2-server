@@ -45,16 +45,16 @@ var ConfigurationBundles = React.createClass({
                     {bundles.map(function(bundle){
                         return (
                             <li key={bundle.id}>
-                    <SourceType id={bundle.id}
-                    name={bundle.name}
-                    description={bundle.description}
-                    onSelect={this.handleSourceTypeChange}/>
-                </li>
-            );
-            }, this)}
-            </ul>
-                </BootstrapAccordionGroup>
-            );
+                                <SourceType id={bundle.id}
+                                    name={bundle.name}
+                                    description={bundle.description}
+                                    onSelect={this.handleSourceTypeChange}/>
+                            </li>
+                        );
+                    }, this)}
+                </ul>
+            </BootstrapAccordionGroup>
+        );
     },
     _getSortedBundles: function(category) {
         var bundles = this.state.bundles[category];
@@ -77,6 +77,7 @@ var ConfigurationBundles = React.createClass({
                             {this._getCategoriesHtml()}
                         <BootstrapAccordionGroup name="Import">
                             <form method="POST" action="/a/system/contentpacks" className="form-inline upload" encType="multipart/form-data">
+                                <span className="help-block">Please apply the configuration bundle after uploading it to make the changes effective.</span>
                                 <input type="file" name="bundle" />
                                 <button type="submit" className="btn btn-success">Upload</button>
                             </form>
@@ -84,12 +85,10 @@ var ConfigurationBundles = React.createClass({
                     </BootstrapAccordion>
                 </div>
                 <div className="span6">
-                    <ConfigurationBundlePreview sourceTypeId={this.state.sourceTypeId} sourceTypeDescription={this.state.sourceTypeDescription}>
-                        <p>Select an item in the right list to preview it.</p>
-                    </ConfigurationBundlePreview>
+                    <ConfigurationBundlePreview sourceTypeId={this.state.sourceTypeId} sourceTypeDescription={this.state.sourceTypeDescription}/>
                 </div>
             </div>
-            );
+        );
     }
 });
 
