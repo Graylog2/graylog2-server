@@ -1,6 +1,8 @@
 /** @jsx React.DOM */
 
 /* global activateTimerangeChooser, momentHelper, htmlEscape */
+// TODO: is there a better way of doing this?
+/* jshint -W107 */
 
 'use strict';
 
