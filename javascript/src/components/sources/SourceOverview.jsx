@@ -147,16 +147,15 @@ var SourceOverview = React.createClass({
             .group((d) => d.percentage > othersThreshold ? "Top Sources" : othersName)
             .size(this.state.numberOfSources)
             .columns([
-                (d) => "<button class='btn btn-mini btn-success dc-search-button'><i class='icon icon-search' title='Search for this source'></i></button>",
-                (d) => "<button class='btn btn-mini btn-info dc-filter-button'><i class='icon icon-filter' title='Filter this source'></i></button>",
-                (d) => d.name,
+                (d) => "<a href='#' class='dc-search-link'><i class='icon icon-search' title='Search for this source'></i></button>",
+                (d) => "<a href='#' class='dc-filter-link' title='Filter this source'>" + d.name +"</a>",
                 (d) => d.percentage.toFixed(2) + "%",
                 (d) => d.messageCount
             ])
             .sortBy((d) => d.messageCount)
             .order(d3.descending)
             .renderlet((chart) => {
-                chart.selectAll("#dc-sources-result tbody td.dc-table-column._0 button.dc-search-button").on("click", (_) => {
+                chart.selectAll("#dc-sources-result tbody td.dc-table-column._0 a.dc-search-link").on("click", (_) => {
                     // d3 doesn't pass any data to the onclick event as the buttons do not
                     // have any. Instead, we need to get it from the table element.
                     var parentTdElement = $(d3.event.target).parents("td.dc-table-column._0");
@@ -175,11 +174,12 @@ var SourceOverview = React.createClass({
                     query.val(queryString);
                     query.effect("bounce");
 
+                    d3.event.preventDefault();
                     // TODO: highlight query icon
                 });
             })
             .renderlet((chart) => {
-                chart.selectAll("#dc-sources-result tbody td.dc-table-column._1 button.dc-filter-button").on("click", (_) => {
+                chart.selectAll("#dc-sources-result tbody td.dc-table-column._1 a.dc-filter-link").on("click", (_) => {
                     var parentTdElement = $(d3.event.target).parents("td.dc-table-column._1");
                     var datum = d3.selectAll(parentTdElement).datum();
 
@@ -187,7 +187,7 @@ var SourceOverview = React.createClass({
                     dc.redrawAll();
                     this.loadHistogramData();
 
-                    // TODO: highlight filter icon
+                    d3.event.preventDefault();
                 });
             })
             .renderlet((table) => table.selectAll(".dc-table-group").classed("info", true));
@@ -289,7 +289,6 @@ var SourceOverview = React.createClass({
             <thead>
                 <tr>
                     <th style={{width: "10px"}}></th>
-                    <th style={{width: "10px"}}></th>
                     <th>Source name</th>
                     <th>Percentage</th>
                     <th>Message count</th>
@@ -325,43 +324,47 @@ var SourceOverview = React.createClass({
                 </div>
                 <div className="row-fluid">
                     <div id="dc-sources-line-chart" className="span12">
-                        <h2><i className="icon icon-calendar"></i> Messages per {this.state.resolution}</h2>
+                        <h3><i className="icon icon-calendar"></i> Messages per {this.state.resolution}</h3>
                     </div>
                 </div>
                 {this.state.renderResultTable ? null : emptySources}
                 <div className="row-fluid">
-                    <div className="span6">
-                        <div className="form-horizontal pull-left">
-                            <div className="control-group">
-                                <label className="control-label">Sources:</label>
-                                <div className="controls">
-                                    <select onChange={this._onNumberOfSourcesChanged} value={this.state.numberOfSources}>
-                                        <option value="1">1</option>
-                                        <option value="10">10</option>
-                                        <option value="50">50</option>
-                                        <option value="100">100</option>
-                                        <option value="500">500</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="span6">
-                        <div className="form-horizontal pull-right">
-                            <div className="control-group">
-                                <label className="control-label">Search:</label>
-                                <div className="controls">
-                                    <input type="search" onChange={this._onFilterChanged}/>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div className="row-fluid">
                     <div className="span9">
+                        <h3><i className="icon icon-th-list"></i> All sources selected</h3>
+                        <div className="row-fluid sources-filtering">
+                            <div className="span6">
+                                <div className="form-horizontal pull-left">
+                                    <div className="control-group">
+                                        <label className="control-label">Search:</label>
+                                        <div className="controls">
+                                            <input type="search" className="input-medium" onChange={this._onFilterChanged}/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="span6">
+                                <div className="form-horizontal pull-right">
+                                    <div className="control-group">
+                                        <label className="control-label">Sources:</label>
+                                        <div className="controls">
+                                            <select className="input-small" onChange={this._onNumberOfSourcesChanged} value={this.state.numberOfSources}>
+                                                <option value="1">1</option>
+                                                <option value="10">10</option>
+                                                <option value="50">50</option>
+                                                <option value="100">100</option>
+                                                <option value="500">500</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                         {resultTable}
                     </div>
-                    <div id="dc-sources-pie-chart" className="span3">
+                    <div className="span3">
+                        <div id="dc-sources-pie-chart">
+                            <h3><i className="icon icon-bar-chart"></i> Messages per source</h3>
+                        </div>
                     </div>
                 </div>
             </div>
