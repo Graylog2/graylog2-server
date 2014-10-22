@@ -92,6 +92,7 @@ var SourceOverview = React.createClass({
             .renderlet((chart) => {
                 chart.selectAll("#dc-sources-pie-chart .pie-slice").on("click", (d, index) => {
                     this.loadHistogramData();
+                    this._toggleResetButtons();
                 });
             });
     },
@@ -185,6 +186,7 @@ var SourceOverview = React.createClass({
                     var datum = d3.selectAll(parentTdElement).datum();
 
                     this.pieChart.filter(datum.name);
+                    this._toggleResetButtons();
                     dc.redrawAll();
                     this.loadHistogramData();
                 });
@@ -195,6 +197,7 @@ var SourceOverview = React.createClass({
         this.pieChart.filterAll();
         this.othersDimension.filterAll();
         this.loadHistogramData();
+        this._toggleResetButtons();
         dc.redrawAll();
     },
     resetHistogramFilters() {
@@ -247,7 +250,7 @@ var SourceOverview = React.createClass({
         this.setState({resolution: histogramData.interval});
         this._resetHistogram(histogramData.values);
     },
-    _syncRangeWithQuery: function () {
+    _syncRangeWithQuery() {
         var rangeSelectBox = this.refs.rangeSelector.getDOMNode();
         if (Number(rangeSelectBox.value) === 0) {
             activateTimerangeChooser("relative", $('.timerange-selector-container .dropdown-menu a[data-selector-name="relative"]'));
@@ -257,6 +260,14 @@ var SourceOverview = React.createClass({
             var text = selectedOptions && selectedOptions[0] && selectedOptions[0].text;
             activateTimerangeChooser("keyword", $('.timerange-selector-container .dropdown-menu a[data-selector-name="keyword"]'));
             $('#universalsearch .timerange-selector.keyword > input').val(text);
+        }
+    },
+    _toggleResetButtons() {
+        // We only need to toggle the datatable reset button, dc will take care of the other reset buttons
+        if (this.pieChart.filter()) {
+            $('#dc-sources-result-reset').show();
+        } else {
+            $('#dc-sources-result-reset').hide();
         }
     },
     _onRangeChanged(event) {
@@ -333,13 +344,17 @@ var SourceOverview = React.createClass({
                 </div>
                 <div className="row-fluid">
                     <div id="dc-sources-line-chart" className="span12">
-                        <h3><i className="icon icon-calendar"></i> Messages per {this.state.resolution} <small><a href="javascript:undefined" className="reset" onClick={this.resetHistogramFilters} style={{"display": "none"}}><i className="icon icon-repeat"></i></a></small></h3>
+                        <h3><i className="icon icon-calendar"></i> Messages per {this.state.resolution}&nbsp;
+                            <small><a href="javascript:undefined" className="reset" onClick={this.resetHistogramFilters} title="Reset filter" style={{"display": "none"}}><i className="icon icon-repeat"></i></a></small>
+                        </h3>
                     </div>
                 </div>
                 {this.state.renderResultTable ? null : emptySources}
                 <div className="row-fluid">
                     <div className="span9">
-                        <h3><i className="icon icon-th-list"></i> All sources selected</h3>
+                        <h3><i className="icon icon-th-list"></i> All sources selected&nbsp;
+                            <small><a href="javascript:undefined" id="dc-sources-result-reset" className="reset" onClick={this.resetSourcesFilters} title="Reset filter" style={{"display": "none"}}><i className="icon icon-repeat"></i></a></small>
+                        </h3>
                         <div className="row-fluid sources-filtering">
                             <div className="span6">
                                 <div className="form-horizontal pull-left">
@@ -372,7 +387,9 @@ var SourceOverview = React.createClass({
                     </div>
                     <div className="span3">
                         <div id="dc-sources-pie-chart">
-                            <h3><i className="icon icon-bar-chart"></i> Messages per source <small><a href="javascript:undefined" className="reset" onClick={this.resetSourcesFilters} style={{"display": "none"}}><i className="icon icon-repeat"></i></a></small></h3>
+                            <h3><i className="icon icon-bar-chart"></i> Messages per source&nbsp;
+                                <small><a href="javascript:undefined" className="reset" onClick={this.resetSourcesFilters} title="Reset filter" style={{"display": "none"}}><i className="icon icon-repeat"></i></a></small>
+                            </h3>
                         </div>
                     </div>
                 </div>
