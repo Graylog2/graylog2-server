@@ -22,6 +22,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
 import org.graylog2.inputs.codecs.gelf.GELFMessage;
+import org.graylog2.plugin.ConfigClass;
+import org.graylog2.plugin.FactoryClass;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.configuration.Configuration;
@@ -44,11 +46,13 @@ public class GelfCodec implements Codec {
 
     private final GelfChunkAggregator aggregator;
     private final ObjectMapper objectMapper;
+    private final ConfigurationRequest requestedConfiguration;
 
     @Inject
-    public GelfCodec(@Assisted Configuration configuration, GelfChunkAggregator aggregator) {
+    public GelfCodec(@Assisted Configuration configuration, GelfChunkAggregator aggregator, Config config) {
         this.aggregator = aggregator;
         this.objectMapper = new ObjectMapper();
+        requestedConfiguration = config.getRequestedConfiguration();
         objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_CONTROL_CHARS, true);
     }
 
@@ -200,21 +204,27 @@ public class GelfCodec implements Codec {
         return "gelf";
     }
 
-    @Nonnull
-    @Override
-    public ConfigurationRequest getRequestedConfiguration() {
-        return new ConfigurationRequest();
-    }
-
-    @Override
-    public void overrideDefaultValues(@Nonnull ConfigurationRequest cr) {
-        if (cr.containsField(NettyTransport.CK_PORT)) {
-            cr.getField(NettyTransport.CK_PORT).setDefaultValue(12201);
-        }
-    }
-
+    @FactoryClass
     public interface Factory extends Codec.Factory<GelfCodec> {
         @Override
         GelfCodec create(Configuration configuration);
+
+        @Override
+        Config getConfig();
+    }
+
+    @ConfigClass
+    public static class Config implements Codec.Config {
+        @Override
+        public ConfigurationRequest getRequestedConfiguration() {
+            return new ConfigurationRequest();
+        }
+
+        @Override
+        public void overrideDefaultValues(@Nonnull ConfigurationRequest cr) {
+            if (cr.containsField(NettyTransport.CK_PORT)) {
+                cr.getField(NettyTransport.CK_PORT).setDefaultValue(12201);
+            }
+        }
     }
 }

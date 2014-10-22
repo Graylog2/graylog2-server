@@ -20,10 +20,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.graylog2.plugin.inputs.transports;
+package org.graylog2.plugin;
 
-import org.graylog2.plugin.configuration.Configuration;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-public interface TransportFactory<T extends Transport> {
-    T create(Configuration configuration);
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface ConfigClass {
 }

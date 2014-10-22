@@ -19,11 +19,13 @@ package org.graylog2.inputs.transports;
 import com.google.common.eventbus.EventBus;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
+import org.graylog2.plugin.ConfigClass;
+import org.graylog2.plugin.FactoryClass;
 import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
-import org.graylog2.plugin.inputs.transports.TransportFactory;
+import org.graylog2.plugin.inputs.transports.Transport;
 import org.graylog2.plugin.system.NodeId;
 
 import javax.inject.Named;
@@ -54,8 +56,23 @@ public class RadioKafkaTransport extends KafkaTransport {
         return r;
     }
 
-    public interface Factory extends TransportFactory<RadioKafkaTransport> {
+    @FactoryClass
+    public interface Factory extends Transport.Factory<RadioKafkaTransport> {
         @Override
         RadioKafkaTransport create(Configuration configuration);
+
+        @Override
+        Config getConfig();
+    }
+
+    @ConfigClass
+    public static class Config extends KafkaTransport.Config {
+        @Override
+        public ConfigurationRequest getRequestedConfiguration() {
+            final ConfigurationRequest r = super.getRequestedConfiguration();
+            // we provide a default value for that setting
+            r.removeField(CK_TOPIC_FILTER);
+            return r;
+        }
     }
 }

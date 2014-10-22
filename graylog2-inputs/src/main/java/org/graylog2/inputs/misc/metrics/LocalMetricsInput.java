@@ -24,40 +24,18 @@ import org.graylog2.inputs.transports.LocalMetricsTransport;
 import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.inputs.MessageInput;
-import org.graylog2.plugin.inputs.codecs.Codec;
-import org.graylog2.plugin.inputs.transports.Transport;
 
 public class LocalMetricsInput extends MessageInput {
+
+    private static final String NAME = "Internal metrics reporter";
 
     @AssistedInject
     public LocalMetricsInput(@Assisted Configuration configuration,
                              MetricRegistry metricRegistry,
                              LocalMetricsTransport.Factory transport,
-                             GelfCodec.Factory codec, LocalMetricRegistry localRegistry) {
-        super(metricRegistry, transport.create(configuration), localRegistry, codec.create(configuration));
-    }
-
-    @AssistedInject
-    public LocalMetricsInput(@Assisted Configuration configuration,
-                             MetricRegistry metricRegistry,
-                             @Assisted Transport transport,
-                             @Assisted Codec codec, LocalMetricRegistry localRegistry) {
-        super(metricRegistry, transport, localRegistry, codec);
-    }
-
-    @Override
-    public boolean isExclusive() {
-        return true;
-    }
-
-    @Override
-    public String getName() {
-        return "Internal metrics reporter";
-    }
-
-    @Override
-    public String linkToDocs() {
-        return "";
+                             GelfCodec.Factory codec, LocalMetricRegistry localRegistry, Config config, Descriptor descriptor) {
+        super(metricRegistry, transport.create(configuration), localRegistry, codec.create(configuration), config,
+              descriptor);
     }
 
     public interface Factory extends MessageInput.Factory<LocalMetricsInput> {
@@ -65,6 +43,23 @@ public class LocalMetricsInput extends MessageInput {
         LocalMetricsInput create(Configuration configuration);
 
         @Override
-        LocalMetricsInput create(Configuration configuration, Transport transport, Codec codec);
+        Config getConfig();
+
+        @Override
+        Descriptor getDescriptor();
+    }
+
+    public static class Descriptor extends MessageInput.Descriptor {
+        public Descriptor() {
+            super(NAME, true, "");
+        }
+    }
+
+    public static class Config extends MessageInput.Config {
+        public Config() { /* required by guice */ }
+        @AssistedInject
+        public Config(LocalMetricsTransport.Factory transport, GelfCodec.Factory codec) {
+            super(transport.getConfig(), codec.getConfig());
+        }
     }
 }

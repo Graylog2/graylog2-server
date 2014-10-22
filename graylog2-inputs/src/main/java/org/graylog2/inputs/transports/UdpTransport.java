@@ -35,10 +35,12 @@ package org.graylog2.inputs.transports;
 
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
+import org.graylog2.plugin.ConfigClass;
+import org.graylog2.plugin.FactoryClass;
 import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.inputs.transports.NettyTransport;
-import org.graylog2.plugin.inputs.transports.TransportFactory;
+import org.graylog2.plugin.inputs.transports.Transport;
 import org.graylog2.plugin.inputs.util.ThroughputCounter;
 import org.jboss.netty.bootstrap.Bootstrap;
 import org.jboss.netty.bootstrap.ConnectionlessBootstrap;
@@ -73,8 +75,17 @@ public class UdpTransport extends NettyTransport {
         return bootstrap;
     }
 
-
-    public interface Factory extends TransportFactory<UdpTransport> {
+    @FactoryClass
+    public interface Factory extends Transport.Factory<UdpTransport> {
+        @Override
         UdpTransport create(Configuration configuration);
+
+        @Override
+        Config getConfig();
+    }
+
+    // only here for consistency
+    @ConfigClass
+    public static class Config extends NettyTransport.Config {
     }
 }

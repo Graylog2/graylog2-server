@@ -24,40 +24,34 @@ import org.graylog2.inputs.transports.KafkaTransport;
 import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.inputs.MessageInput;
-import org.graylog2.plugin.inputs.codecs.Codec;
-import org.graylog2.plugin.inputs.transports.Transport;
 
 public class KafkaInput extends MessageInput {
 
-    @AssistedInject
-    public KafkaInput(@Assisted Configuration configuration,
-                      MetricRegistry metricRegistry,
-                      @Assisted Transport transport,
-                      @Assisted Codec codec, LocalMetricRegistry localRegistry) {
-        super(metricRegistry, transport, localRegistry, codec);
-    }
+    private static final String NAME = "Kafka Input";
 
     @AssistedInject
     public KafkaInput(@Assisted Configuration configuration,
                       MetricRegistry metricRegistry,
                       KafkaTransport.Factory transport,
-                      RadioMessageCodec.Factory codec, LocalMetricRegistry localRegistry) {
-        super(metricRegistry, transport.create(configuration), localRegistry, codec.create(configuration));
+                      RadioMessageCodec.Factory codec,
+                      LocalMetricRegistry localRegistry,
+                      Config config,
+                      Descriptor descriptor) {
+        this(metricRegistry,
+             transport.create(configuration),
+             codec.create(configuration),
+             localRegistry,
+             config,
+             descriptor);
     }
 
-    @Override
-    public boolean isExclusive() {
-        return false;
-    }
-
-    @Override
-    public String getName() {
-        return "Kafka Input";
-    }
-
-    @Override
-    public String linkToDocs() {
-        return "http://www.graylog2.org/resources/documentation/sending/kafka";
+    protected KafkaInput(MetricRegistry metricRegistry,
+                         KafkaTransport radioKafkaTransport,
+                         RadioMessageCodec radioMessageCodec,
+                         LocalMetricRegistry localRegistry,
+                         MessageInput.Config config,
+                         MessageInput.Descriptor descriptor) {
+        super(metricRegistry, radioKafkaTransport, localRegistry, radioMessageCodec, config, descriptor);
     }
 
     public interface Factory extends MessageInput.Factory<KafkaInput> {
@@ -65,6 +59,23 @@ public class KafkaInput extends MessageInput {
         KafkaInput create(Configuration configuration);
 
         @Override
-        KafkaInput create(Configuration configuration, Transport transport, Codec codec);
+        Config getConfig();
+
+        @Override
+        Descriptor getDescriptor();
+    }
+
+    public static class Descriptor extends MessageInput.Descriptor {
+        public Descriptor() {
+            super(NAME, false, "http://www.graylog2.org/resources/documentation/sending/kafka");
+        }
+    }
+
+    public static class Config extends MessageInput.Config {
+        public Config() { /* required by guice */ }
+        @AssistedInject
+        public Config(KafkaTransport.Factory transport, RadioMessageCodec.Factory codec) {
+            super(transport.getConfig(), codec.getConfig());
+        }
     }
 }

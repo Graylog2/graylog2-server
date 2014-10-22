@@ -25,32 +25,23 @@ import org.graylog2.inputs.transports.RadioAmqpTransport;
 import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.inputs.MessageInput;
-import org.graylog2.plugin.inputs.codecs.Codec;
-import org.graylog2.plugin.inputs.transports.Transport;
 
 public class RadioAMQPInput extends AMQPInput {
 
-    @AssistedInject
-    public RadioAMQPInput(@Assisted Configuration configuration,
-                          MetricRegistry metricRegistry,
-                          @Assisted Transport transport,
-                          @Assisted Codec codec,
-                          LocalMetricRegistry localRegistry) {
-        super(configuration, metricRegistry, transport, codec, localRegistry);
-    }
+    private static final String NAME = "Graylog2 Radio Input (AMQP)";
 
     @AssistedInject
     public RadioAMQPInput(@Assisted Configuration configuration,
                           MetricRegistry metricRegistry,
                           RadioAmqpTransport.Factory transport,
                           RadioMessageCodec.Factory codec,
-                          LocalMetricRegistry localRegistry) {
-        super(configuration, metricRegistry, transport.create(configuration), codec.create(configuration), localRegistry);
-    }
-
-    @Override
-    public String getName() {
-        return "Graylog2 Radio Input (AMQP)";
+                          LocalMetricRegistry localRegistry, Config config, Descriptor descriptor) {
+        super(metricRegistry,
+              transport.create(configuration),
+              codec.create(configuration),
+              localRegistry,
+              config,
+              descriptor);
     }
 
     public interface Factory extends MessageInput.Factory<RadioAMQPInput> {
@@ -58,6 +49,23 @@ public class RadioAMQPInput extends AMQPInput {
         RadioAMQPInput create(Configuration configuration);
 
         @Override
-        RadioAMQPInput create(Configuration configuration, Transport transport, Codec codec);
+        Config getConfig();
+
+        @Override
+        Descriptor getDescriptor();
+    }
+
+    public static class Descriptor extends MessageInput.Descriptor {
+        public Descriptor() {
+            super(NAME, false, "");
+        }
+    }
+
+    public static class Config extends MessageInput.Config {
+        public Config() { /* required by guice */ }
+        @AssistedInject
+        public Config(RadioAmqpTransport.Factory transport, RadioMessageCodec.Factory codec) {
+            super(transport.getConfig(), codec.getConfig());
+        }
     }
 }

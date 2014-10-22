@@ -19,6 +19,8 @@ package org.graylog2.inputs.transports;
 import com.google.common.collect.Lists;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
+import org.graylog2.plugin.ConfigClass;
+import org.graylog2.plugin.FactoryClass;
 import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.collections.Pair;
 import org.graylog2.plugin.configuration.Configuration;
@@ -28,7 +30,7 @@ import org.graylog2.plugin.configuration.fields.ConfigurationField;
 import org.graylog2.plugin.configuration.fields.NumberField;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.transports.AbstractTcpTransport;
-import org.graylog2.plugin.inputs.transports.TransportFactory;
+import org.graylog2.plugin.inputs.transports.Transport;
 import org.graylog2.plugin.inputs.util.ConnectionCounter;
 import org.graylog2.plugin.inputs.util.ThroughputCounter;
 import org.jboss.netty.buffer.ChannelBuffer;
@@ -65,7 +67,7 @@ public class TcpTransport extends AbstractTcpTransport {
         if (configuration.intIsSet(CK_MAX_MESSAGE_SIZE)) {
             maxFrameLength = (int) configuration.getInt(CK_MAX_MESSAGE_SIZE);
         } else {
-            maxFrameLength = 2 * 1024 * 1024;
+            maxFrameLength = Config.DEFAULT_MAX_FRAME_LENGTH;
         }
     }
 
@@ -105,7 +107,42 @@ public class TcpTransport extends AbstractTcpTransport {
         return x;
     }
 
-    public interface Factory extends TransportFactory<TcpTransport> {
+    @FactoryClass
+    public interface Factory extends Transport.Factory<TcpTransport> {
         TcpTransport create(Configuration configuration);
+
+        @Override
+        Config getConfig();
+    }
+
+    @ConfigClass
+    public static class Config extends AbstractTcpTransport.Config {
+        public static final int DEFAULT_MAX_FRAME_LENGTH = 2 * 1024 * 1024;
+
+        @Override
+        public ConfigurationRequest getRequestedConfiguration() {
+            final ConfigurationRequest x = super.getRequestedConfiguration();
+
+            x.addField(
+                    new BooleanField(
+                            CK_USE_NULL_DELIMITER,
+                            "Null frame delimiter?",
+                            false,
+                            "Use null byte as frame delimiter? Default is newline."
+                    )
+            );
+            x.addField(
+                    new NumberField(
+                            CK_MAX_MESSAGE_SIZE,
+                            "Maximum message size",
+                            2 * 1024 * 1024,
+                            "The maximum length of a message.",
+                            ConfigurationField.Optional.OPTIONAL,
+                            NumberField.Attribute.ONLY_POSITIVE
+                    )
+            );
+
+            return x;
+        }
     }
 }

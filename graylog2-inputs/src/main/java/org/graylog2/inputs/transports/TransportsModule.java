@@ -24,43 +24,33 @@ import com.google.inject.TypeLiteral;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.multibindings.MapBinder;
 import com.google.inject.name.Names;
+import org.graylog2.plugin.ConfigClass;
+import org.graylog2.plugin.FactoryClass;
 import org.graylog2.plugin.inputs.transports.Transport;
-import org.graylog2.plugin.inputs.transports.TransportFactory;
 
+import java.lang.annotation.Annotation;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
 public class TransportsModule extends AbstractModule {
     protected void configure() {
-
-        install(new FactoryModuleBuilder().implement(Transport.class, UdpTransport.class).build(UdpTransport.Factory.class));
-        install(new FactoryModuleBuilder().implement(Transport.class, TcpTransport.class).build(TcpTransport.Factory.class));
-        install(new FactoryModuleBuilder().implement(Transport.class, HttpTransport.class).build(HttpTransport.Factory.class));
-        install(new FactoryModuleBuilder().implement(Transport.class, RandomMessageTransport.class).build(RandomMessageTransport.Factory.class));
-        install(new FactoryModuleBuilder().implement(Transport.class, KafkaTransport.class).build(KafkaTransport.Factory.class));
-        install(new FactoryModuleBuilder().implement(Transport.class, RadioKafkaTransport.class).build(RadioKafkaTransport.Factory.class));
-        install(new FactoryModuleBuilder().implement(Transport.class, AmqpTransport.class).build(AmqpTransport.Factory.class));
-        install(new FactoryModuleBuilder().implement(Transport.class, RadioAmqpTransport.class).build(RadioAmqpTransport.Factory.class));
-        install(new FactoryModuleBuilder().implement(Transport.class, HttpPollTransport.class).build(HttpPollTransport.Factory.class));
-        install(new FactoryModuleBuilder().implement(Transport.class, LocalMetricsTransport.class).build(LocalMetricsTransport.Factory.class));
-
         // lol generics
-        final MapBinder<String, TransportFactory<? extends Transport>> mapBinder =
+        final MapBinder<String, Transport.Factory<? extends Transport>> mapBinder =
                 MapBinder.newMapBinder(binder(),
                                        TypeLiteral.get(String.class),
-                                       new TypeLiteral<TransportFactory<? extends Transport>>() {
+                                       new TypeLiteral<Transport.Factory<? extends Transport>>() {
                                        });
 
-        mapBinder.addBinding("udp").to(Key.get(UdpTransport.Factory.class));
-        mapBinder.addBinding("tcp").to(Key.get(TcpTransport.Factory.class));
-        mapBinder.addBinding("http").to(Key.get(HttpTransport.Factory.class));
-        mapBinder.addBinding("randomhttp").to(Key.get(RandomMessageTransport.Factory.class));
-        mapBinder.addBinding("kafka").to(Key.get(KafkaTransport.Factory.class));
-        mapBinder.addBinding("radiokafka").to(Key.get(RadioKafkaTransport.Factory.class));
-        mapBinder.addBinding("amqp").to(Key.get(AmqpTransport.Factory.class));
-        mapBinder.addBinding("radioamqp").to(Key.get(RadioAmqpTransport.Factory.class));
-        mapBinder.addBinding("httppoll").to(Key.get(HttpPollTransport.Factory.class));
-        mapBinder.addBinding("localmetrics").to(Key.get(LocalMetricsTransport.Factory.class));
+        installTransport(mapBinder, "udp", UdpTransport.class);
+        installTransport(mapBinder, "tcp", TcpTransport.class);
+        installTransport(mapBinder, "http", HttpTransport.class);
+        installTransport(mapBinder, "randomhttp", RandomMessageTransport.class);
+        installTransport(mapBinder, "kafka", KafkaTransport.class);
+        installTransport(mapBinder, "radiokafka", RadioKafkaTransport.class);
+        installTransport(mapBinder, "amqp", AmqpTransport.class);
+        installTransport(mapBinder, "radioamqp", RadioAmqpTransport.class);
+        installTransport(mapBinder, "httppoll", HttpPollTransport.class);
+        installTransport(mapBinder, "localmetrics", LocalMetricsTransport.class);
 
         bind(Executor.class)
                 .annotatedWith(Names.named("bossPool"))
@@ -78,4 +68,58 @@ public class TransportsModule extends AbstractModule {
                 });
     }
 
+    // TODO fix duplication with CodecsModule
+    private void installTransport(
+            MapBinder<String, Transport.Factory<? extends Transport>> mapBinder,
+            String name,
+            Class<? extends Transport> transportClass) {
+
+        final Class<? extends Transport.Config> configClass =
+                (Class<? extends Transport.Config>)
+                        findInnerClassAnnotatedWith(ConfigClass.class, transportClass, Transport.Config.class);
+
+        final Class<? extends Transport.Factory<? extends Transport>> factoryClass =
+                (Class<? extends Transport.Factory<? extends Transport>>)
+                        findInnerClassAnnotatedWith(FactoryClass.class, transportClass, Transport.Factory.class);
+
+        if (configClass == null || factoryClass == null) {
+            throw new IllegalStateException("Missing annotations on transport class " + transportClass);
+        }
+        installTransport(mapBinder, name, transportClass, configClass, factoryClass);
+    }
+
+    private void installTransport(
+            MapBinder<String, Transport.Factory<? extends Transport>> mapBinder,
+            String name,
+            Class<? extends Transport> transportClass,
+            Class<? extends Transport.Config> configClass,
+            Class<? extends Transport.Factory<? extends Transport>> factoryClass) {
+        final Key<? extends Transport.Factory<? extends Transport>> factoryKey = Key.get(factoryClass);
+        install(new FactoryModuleBuilder()
+                        .implement(Transport.class, transportClass)
+                        .implement(Transport.Config.class, configClass)
+                        .build(factoryClass));
+
+        mapBinder.addBinding(name).to(factoryKey);
+    }
+
+    private Class<?> findInnerClassAnnotatedWith(Class<? extends Annotation> annotationClass,
+                                                     Class<? extends Transport> transportClass,
+                                                     Class<?> targetClass) {
+        final Class<?>[] declaredClasses = transportClass.getDeclaredClasses();
+        Class<?> annotatedClass = null;
+        for (final Class<?> declaredClass : declaredClasses) {
+            if (!declaredClass.isAnnotationPresent(annotationClass)) {
+                continue;
+            }
+            // must be subclass of Transport.Config
+            if (targetClass.isAssignableFrom(declaredClass)) {
+                // TODO log error if configClass is already assigned
+                annotatedClass = declaredClass;
+            } else {
+                // TODO log error and skip transport
+            }
+        }
+        return annotatedClass;
+    }
 }

@@ -32,6 +32,7 @@ import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.rest.resources.RestResource;
 import org.graylog2.security.RestPermissions;
 import org.graylog2.plugin.ServerStatus;
+import org.graylog2.shared.inputs.InputDescription;
 import org.graylog2.shared.inputs.InputRegistry;
 import org.graylog2.shared.inputs.NoSuchInputTypeException;
 import org.graylog2.shared.rest.resources.system.inputs.requests.InputLaunchRequest;
@@ -198,8 +199,14 @@ public class InputsResource extends RestResource {
     @ApiOperation(value = "Get all available input types of this node")
     @Produces(MediaType.APPLICATION_JSON)
     public String types() {
-        Map<String, Object> result = Maps.newHashMap();
-        result.put("types", inputRegistry.getAvailableInputs());
+        final Map<String, Object> result = Maps.newHashMap();
+        final Map<String, InputDescription> availableInputs = inputRegistry.getAvailableInputs();
+        final Map<String, String> inputs = Maps.newHashMap();
+        for (final String key : availableInputs.keySet()) {
+            inputs.put(key, availableInputs.get(key).getName());
+        }
+
+        result.put("types", inputs);
 
         return json(result);
     }
@@ -331,24 +338,18 @@ public class InputsResource extends RestResource {
             @ApiResponse(code = 404, message = "No such input type registered.")
     })
     public String info(@ApiParam(name = "inputType", required = true) @PathParam("inputType") String inputType) {
-
-        MessageInput input;
-        try {
-            input = inputRegistry.create(inputType, new Configuration(Maps.<String, Object>newHashMap()));
-        } catch (NoSuchInputTypeException e) {
-            LOG.error("There is no such input type registered.", e);
-            throw new WebApplicationException(e, Response.Status.NOT_FOUND);
-        } catch (Exception e) {
-            LOG.error("Unable to instantiate input of type <" + inputType + ">", e);
-            throw new WebApplicationException(e, Response.Status.INTERNAL_SERVER_ERROR);
+        final Map<String, InputDescription> availableInputs = inputRegistry.getAvailableInputs();
+        if (!availableInputs.containsKey(inputType)) {
+            LOG.error("Unknown input type {} requested.", inputType);
+            throw new WebApplicationException(Response.Status.NOT_FOUND);
         }
-
-        Map<String, Object> result = Maps.newHashMap();
-        result.put("type", input.getClass().getCanonicalName());
-        result.put("name", input.getName());
-        result.put("is_exclusive", input.isExclusive());
-        result.put("requested_configuration", input.getRequestedConfiguration().asList());
-        result.put("link_to_docs", input.linkToDocs());
+        final InputDescription description = availableInputs.get(inputType);
+        final Map<String, Object> result = Maps.newHashMap();
+        result.put("type", inputType);
+        result.put("name", description.getName());
+        result.put("is_exclusive", description.isExclusive());
+        result.put("requested_configuration", description.getRequestedConfiguration());
+        result.put("link_to_docs", description.getLinkToDocs());
 
         return json(result);
     }

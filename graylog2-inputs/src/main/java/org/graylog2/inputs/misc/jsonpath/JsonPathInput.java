@@ -24,42 +24,19 @@ import org.graylog2.inputs.transports.HttpPollTransport;
 import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.inputs.MessageInput;
-import org.graylog2.plugin.inputs.codecs.Codec;
-import org.graylog2.plugin.inputs.transports.Transport;
 
 public class JsonPathInput extends MessageInput {
 
-    @AssistedInject
-    public JsonPathInput(@Assisted Configuration configuration,
-                         @Assisted Transport transport,
-                         @Assisted Codec codec,
-                         MetricRegistry metricRegistry,
-                         LocalMetricRegistry localRegistry) {
-        super(metricRegistry, transport, localRegistry, codec);
-    }
+    private static final String NAME = "JSON path from HTTP API";
 
     @AssistedInject
     public JsonPathInput(@Assisted Configuration configuration,
                          HttpPollTransport.Factory transport,
                          JsonPathCodec.Factory codec,
                          MetricRegistry metricRegistry,
-                         LocalMetricRegistry localRegistry) {
-        super(metricRegistry, transport.create(configuration), localRegistry, codec.create(configuration));
-    }
-
-    @Override
-    public boolean isExclusive() {
-        return false;
-    }
-
-    @Override
-    public String getName() {
-        return "JSON path from HTTP API";
-    }
-
-    @Override
-    public String linkToDocs() {
-        return "http://graylog2.org/resources/documentation/sending/jsonpath";
+                         LocalMetricRegistry localRegistry, Config config, Descriptor descriptor) {
+        super(metricRegistry, transport.create(configuration), localRegistry, codec.create(configuration), config,
+              descriptor);
     }
 
     public interface Factory extends MessageInput.Factory<JsonPathInput> {
@@ -67,6 +44,24 @@ public class JsonPathInput extends MessageInput {
         JsonPathInput create(Configuration configuration);
 
         @Override
-        JsonPathInput create(Configuration configuration, Transport transport, Codec codec);
+        Config getConfig();
+
+        @Override
+        Descriptor getDescriptor();
+    }
+
+    public static class Descriptor extends MessageInput.Descriptor {
+        public Descriptor() {
+            super(NAME, false, "http://graylog2.org/resources/documentation/sending/jsonpath");
+        }
+    }
+
+
+    public static class Config extends MessageInput.Config {
+        public Config() { /* required by guice */ }
+        @AssistedInject
+        public Config(HttpPollTransport.Factory transport, JsonPathCodec.Factory codec) {
+            super(transport.getConfig(), codec.getConfig());
+        }
     }
 }

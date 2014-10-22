@@ -24,40 +24,21 @@ import org.graylog2.inputs.transports.TcpTransport;
 import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.inputs.MessageInput;
-import org.graylog2.plugin.inputs.codecs.Codec;
-import org.graylog2.plugin.inputs.transports.Transport;
 
 public class GELFTCPInput extends MessageInput {
+
+    private static final String NAME = "GELF TCP";
 
     @AssistedInject
     public GELFTCPInput(MetricRegistry metricRegistry,
                         @Assisted Configuration configuration,
                         TcpTransport.Factory tcpFactory,
-                        GelfCodec.Factory gelfCodecFactory, LocalMetricRegistry localRegistry) {
-        super(metricRegistry, tcpFactory.create(configuration), localRegistry, gelfCodecFactory.create(configuration));
-    }
-
-    @AssistedInject
-    public GELFTCPInput(MetricRegistry metricRegistry,
-                        @Assisted Configuration configuration,
-                        @Assisted Transport transport,
-                        @Assisted Codec codec, LocalMetricRegistry localRegistry) {
-        super(metricRegistry, transport, localRegistry, codec);
-    }
-
-    @Override
-    public boolean isExclusive() {
-        return false;
-    }
-
-    @Override
-    public String getName() {
-        return "GELF TCP";
-    }
-
-    @Override
-    public String linkToDocs() {
-        return "";
+                        GelfCodec.Factory gelfCodecFactory,
+                        LocalMetricRegistry localRegistry,
+                        Config config,
+                        Descriptor descriptor) {
+        super(metricRegistry, tcpFactory.create(configuration), localRegistry, gelfCodecFactory.create(configuration),
+              config, descriptor);
     }
 
     public interface Factory extends MessageInput.Factory<GELFTCPInput> {
@@ -65,6 +46,23 @@ public class GELFTCPInput extends MessageInput {
         GELFTCPInput create(Configuration configuration);
 
         @Override
-        GELFTCPInput create(Configuration configuration, Transport transport, Codec codec);
+        Config getConfig();
+
+        @Override
+        Descriptor getDescriptor();
+    }
+
+    public static class Descriptor extends MessageInput.Descriptor {
+        public Descriptor() {
+            super(NAME, false, "");
+        }
+    }
+
+    public static class Config extends MessageInput.Config {
+        public Config() { /* required by guice */ }
+        @AssistedInject
+        public Config(TcpTransport.Factory transport, GelfCodec.Factory codec) {
+            super(transport.getConfig(), codec.getConfig());
+        }
     }
 }

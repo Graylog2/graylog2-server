@@ -19,10 +19,12 @@ package org.graylog2.inputs.transports;
 import com.google.common.eventbus.EventBus;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
+import org.graylog2.plugin.ConfigClass;
+import org.graylog2.plugin.FactoryClass;
 import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
-import org.graylog2.plugin.inputs.transports.TransportFactory;
+import org.graylog2.plugin.inputs.transports.Transport;
 
 import javax.inject.Named;
 import java.util.concurrent.ScheduledExecutorService;
@@ -54,7 +56,25 @@ public class RadioAmqpTransport extends AmqpTransport {
         return r;
     }
 
-    public interface Factory extends TransportFactory<RadioAmqpTransport> {
+    @FactoryClass
+    public interface Factory extends Transport.Factory<RadioAmqpTransport> {
         @Override
         RadioAmqpTransport create(Configuration configuration);
-    }}
+
+        @Override
+        Config getConfig();
+    }
+
+    @ConfigClass
+    public static class Config extends AmqpTransport.Config {
+        @Override
+        public ConfigurationRequest getRequestedConfiguration() {
+            final ConfigurationRequest r = super.getRequestedConfiguration();
+            // we have defaults for these
+            r.removeField(CK_EXCHANGE);
+            r.removeField(CK_QUEUE);
+            r.removeField(CK_ROUTING_KEY);
+            return r;
+        }
+    }
+}

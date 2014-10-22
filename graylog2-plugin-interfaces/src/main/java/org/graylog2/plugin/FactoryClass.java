@@ -20,33 +20,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.graylog2.plugin.inputs.codecs;
+package org.graylog2.plugin;
 
-import org.graylog2.plugin.Message;
-import org.graylog2.plugin.configuration.Configuration;
-import org.graylog2.plugin.configuration.ConfigurationRequest;
-import org.graylog2.plugin.journal.RawMessage;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
-public interface Codec {
-
-    @Nullable
-    Message decode(@Nonnull RawMessage rawMessage);
-
-    @Nullable
-    CodecAggregator getAggregator();
-
-    String getName();
-
-    public interface Factory<C> {
-        C create(Configuration configuration);
-        Config getConfig();
-    }
-
-    public interface Config {
-        ConfigurationRequest getRequestedConfiguration();
-        void overrideDefaultValues(@Nonnull ConfigurationRequest cr);
-    }
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface FactoryClass {
 }

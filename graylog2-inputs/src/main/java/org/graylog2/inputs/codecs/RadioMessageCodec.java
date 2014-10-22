@@ -18,6 +18,8 @@ package org.graylog2.inputs.codecs;
 
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
+import org.graylog2.plugin.ConfigClass;
+import org.graylog2.plugin.FactoryClass;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.RadioMessage;
 import org.graylog2.plugin.configuration.Configuration;
@@ -83,18 +85,26 @@ public class RadioMessageCodec implements Codec {
         return "Radio Message";
     }
 
-    @Nonnull
-    @Override
-    public ConfigurationRequest getRequestedConfiguration() {
-        return new ConfigurationRequest();
-    }
-
-    @Override
-    public void overrideDefaultValues(@Nonnull ConfigurationRequest cr) {
-    }
-
+    @FactoryClass
     public interface Factory extends Codec.Factory<RadioMessageCodec> {
         @Override
         public RadioMessageCodec create(Configuration configuration);
+
+        @Override
+        Config getConfig();
     }
+
+    @ConfigClass
+    public static class Config implements Codec.Config {
+        @Override
+        public ConfigurationRequest getRequestedConfiguration() {
+            return new ConfigurationRequest();
+        }
+
+        @Override
+        public void overrideDefaultValues(@Nonnull ConfigurationRequest cr) {
+
+        }
+    }
+
 }

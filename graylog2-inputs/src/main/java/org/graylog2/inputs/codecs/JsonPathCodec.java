@@ -21,6 +21,8 @@ import com.google.common.collect.Maps;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import com.jayway.jsonpath.JsonPath;
+import org.graylog2.plugin.ConfigClass;
+import org.graylog2.plugin.FactoryClass;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
@@ -115,36 +117,42 @@ public class JsonPathCodec implements Codec {
         return "JsonPath";
     }
 
-    @Nonnull
-    @Override
-    public ConfigurationRequest getRequestedConfiguration() {
-        final ConfigurationRequest r = new ConfigurationRequest();
-
-        r.addField(new TextField(
-                CK_PATH,
-                "JSON path of data to extract",
-                "$.store.book[1].number_of_orders",
-                "Path to the value you want to extract from the JSON response. Take a look at the documentation for a more detailled explanation.",
-                ConfigurationField.Optional.NOT_OPTIONAL
-        ));
-
-        r.addField(new TextField(
-                CK_SOURCE,
-                "Message source",
-                "yourapi",
-                "What to use as source field of the resulting message.",
-                ConfigurationField.Optional.NOT_OPTIONAL
-        ));
-
-        return r;
-    }
-
-    @Override
-    public void overrideDefaultValues(@Nonnull ConfigurationRequest cr) {
-    }
-
+    @FactoryClass
     public interface Factory extends Codec.Factory<JsonPathCodec> {
         @Override
         JsonPathCodec create(Configuration configuration);
+
+        @Override
+        Config getConfig();
+    }
+
+    @ConfigClass
+    public static class Config implements Codec.Config {
+        @Override
+        public ConfigurationRequest getRequestedConfiguration() {
+            final ConfigurationRequest r = new ConfigurationRequest();
+
+            r.addField(new TextField(
+                    CK_PATH,
+                    "JSON path of data to extract",
+                    "$.store.book[1].number_of_orders",
+                    "Path to the value you want to extract from the JSON response. Take a look at the documentation for a more detailled explanation.",
+                    ConfigurationField.Optional.NOT_OPTIONAL
+            ));
+
+            r.addField(new TextField(
+                    CK_SOURCE,
+                    "Message source",
+                    "yourapi",
+                    "What to use as source field of the resulting message.",
+                    ConfigurationField.Optional.NOT_OPTIONAL
+            ));
+
+            return r;        }
+
+        @Override
+        public void overrideDefaultValues(@Nonnull ConfigurationRequest cr) {
+
+        }
     }
 }

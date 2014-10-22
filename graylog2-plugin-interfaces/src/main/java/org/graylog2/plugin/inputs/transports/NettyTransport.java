@@ -295,4 +295,17 @@ public abstract class NettyTransport implements Transport {
             }
         }
     }
+
+    public static class Config implements Transport.Config {
+        @Override
+        public ConfigurationRequest getRequestedConfiguration() {
+            final ConfigurationRequest r = new ConfigurationRequest();
+
+            r.addField(ConfigurationRequest.Templates.bindAddress(CK_BIND_ADDRESS));
+            r.addField(ConfigurationRequest.Templates.portNumber(CK_PORT, 5555));
+            r.addField(ConfigurationRequest.Templates.recvBufferSize(CK_RECV_BUFFER_SIZE, 1024 * 1024));
+
+            return r;
+        }
+    }
 }

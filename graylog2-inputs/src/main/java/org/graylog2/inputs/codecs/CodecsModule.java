@@ -27,28 +27,82 @@ import com.google.inject.Key;
 import com.google.inject.TypeLiteral;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.multibindings.MapBinder;
+import org.graylog2.plugin.ConfigClass;
+import org.graylog2.plugin.FactoryClass;
 import org.graylog2.plugin.inputs.codecs.Codec;
+
+import java.lang.annotation.Annotation;
 
 public class CodecsModule extends AbstractModule {
     protected void configure() {
-        install(new FactoryModuleBuilder().implement(Codec.class, RawCodec.class).build(RawCodec.Factory.class));
-        install(new FactoryModuleBuilder().implement(Codec.class, SyslogCodec.class).build(SyslogCodec.Factory.class));
-        install(new FactoryModuleBuilder().implement(Codec.class, RandomHttpMessageCodec.class).build(RandomHttpMessageCodec.Factory.class));
-        install(new FactoryModuleBuilder().implement(Codec.class, GelfCodec.class).build(GelfCodec.Factory.class));
-        install(new FactoryModuleBuilder().implement(Codec.class, RadioMessageCodec.class).build(RadioMessageCodec.Factory.class));
-        install(new FactoryModuleBuilder().implement(Codec.class, JsonPathCodec.class).build(JsonPathCodec.Factory.class));
-
         final MapBinder<String, Codec.Factory<? extends Codec>> mapBinder =
                 MapBinder.newMapBinder(binder(),
                                        TypeLiteral.get(String.class),
                                        new TypeLiteral<Codec.Factory<? extends Codec>>() {
                                        });
 
-        mapBinder.addBinding("raw").to(Key.get(RawCodec.Factory.class));
-        mapBinder.addBinding("syslog").to(Key.get(SyslogCodec.Factory.class));
-        mapBinder.addBinding("randomhttp").to(Key.get(RandomHttpMessageCodec.Factory.class));
-        mapBinder.addBinding("gelf").to(Key.get(GelfCodec.Factory.class));
-        mapBinder.addBinding("radio-msgpack").to(Key.get(RadioMessageCodec.Factory.class));
-        mapBinder.addBinding("jsonpath").to(Key.get(JsonPathCodec.Factory.class));
+        installCodec(mapBinder, "raw", RawCodec.class);
+        installCodec(mapBinder, "syslog", SyslogCodec.class);
+        installCodec(mapBinder, "randomhttp", RandomHttpMessageCodec.class);
+        installCodec(mapBinder, "gelf", GelfCodec.class);
+        installCodec(mapBinder, "radio-msgpack", RadioMessageCodec.class);
+        installCodec(mapBinder, "jsonpath", JsonPathCodec.class);
+    }
+
+    // TODO fix duplication with TransportsModule
+    private void installCodec(
+            MapBinder<String, Codec.Factory<? extends Codec>> mapBinder,
+            String name,
+            Class<? extends Codec> codecClass) {
+
+        final Class<? extends Codec.Config> configClass =
+                (Class<? extends Codec.Config>)
+                        findInnerClassAnnotatedWith(ConfigClass.class, codecClass, Codec.Config.class);
+
+        final Class<? extends Codec.Factory<? extends Codec>> factoryClass =
+                (Class<? extends Codec.Factory<? extends Codec>>)
+                        findInnerClassAnnotatedWith(FactoryClass.class, codecClass, Codec.Factory.class);
+
+        if (configClass == null || factoryClass == null) {
+            throw new IllegalStateException("Missing annotations on transport class " + codecClass);
+        }
+        installCodec(mapBinder, name, codecClass, configClass, factoryClass);
+    }
+
+    private void installCodec(
+            MapBinder<String, Codec.Factory<? extends Codec>> mapBinder,
+            String name,
+            Class<? extends Codec> codecClass,
+            Class<? extends Codec.Config> configClass,
+            Class<? extends Codec.Factory<? extends Codec>> factoryClass) {
+
+        final Key<? extends Codec.Factory<? extends Codec>> factoryKey = Key.get(factoryClass);
+
+        install(new FactoryModuleBuilder()
+                        .implement(Codec.class, codecClass)
+                        .implement(Codec.Config.class, configClass)
+                        .build(factoryClass));
+
+        mapBinder.addBinding(name).to(factoryKey);
+    }
+
+    private Class<?> findInnerClassAnnotatedWith(Class<? extends Annotation> annotationClass,
+                                                 Class<? extends Codec> codecClass,
+                                                 Class<?> targetClass) {
+        final Class<?>[] declaredClasses = codecClass.getDeclaredClasses();
+        Class<?> annotatedClass = null;
+        for (final Class<?> declaredClass : declaredClasses) {
+            if (!declaredClass.isAnnotationPresent(annotationClass)) {
+                continue;
+            }
+            // must be subclass of Transport.Config
+            if (targetClass.isAssignableFrom(declaredClass)) {
+                // TODO log error if configClass is already assigned
+                annotatedClass = declaredClass;
+            } else {
+                // TODO log error and skip transport
+            }
+        }
+        return annotatedClass;
     }
 }

@@ -25,6 +25,8 @@ import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import org.graylog2.inputs.misc.metrics.agent.GELFTarget;
 import org.graylog2.inputs.misc.metrics.agent.Graylog2Reporter;
+import org.graylog2.plugin.ConfigClass;
+import org.graylog2.plugin.FactoryClass;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.configuration.fields.ConfigurationField;
@@ -35,7 +37,7 @@ import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.MisfireException;
 import org.graylog2.plugin.inputs.codecs.CodecAggregator;
 import org.graylog2.plugin.inputs.transports.ThrottleableTransport;
-import org.graylog2.plugin.inputs.transports.TransportFactory;
+import org.graylog2.plugin.inputs.transports.Transport;
 import org.graylog2.plugin.journal.RawMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -169,9 +171,75 @@ public class LocalMetricsTransport extends ThrottleableTransport {
         return null;
     }
 
-    public interface Factory extends TransportFactory<LocalMetricsTransport> {
+    @FactoryClass
+    public interface Factory extends Transport.Factory<LocalMetricsTransport> {
         @Override
         LocalMetricsTransport create(Configuration configuration);
+
+        @Override
+        Config getConfig();
+    }
+
+    @ConfigClass
+    public static class Config extends ThrottleableTransport.Config {
+        @Override
+        public ConfigurationRequest getRequestedConfiguration() {
+            final ConfigurationRequest r = super.getRequestedConfiguration();
+
+            r.addField(new TextField(
+                    CK_SOURCE,
+                    "Source",
+                    "metrics",
+                    "Define a name of the source. For example 'metrics'.",
+                    ConfigurationField.Optional.NOT_OPTIONAL
+            ));
+
+
+            r.addField(
+                    new NumberField(
+                            CK_REPORT_INTERVAL,
+                            "Report interval",
+                            10,
+                            "Time between each report. Select a time unit in the corresponding dropdown.",
+                            ConfigurationField.Optional.NOT_OPTIONAL,
+                            NumberField.Attribute.ONLY_POSITIVE
+                    )
+            );
+
+            r.addField(
+                    new DropdownField(
+                            CK_REPORT_UNIT,
+                            "Report interval unit",
+                            TimeUnit.SECONDS.toString(),
+                            DropdownField.ValueTemplates.timeUnits(),
+                            ConfigurationField.Optional.NOT_OPTIONAL
+                    )
+            );
+
+            r.addField(
+                    new DropdownField(
+                            CK_DURATION_UNIT,
+                            "Time unit of measured durations",
+                            TimeUnit.MILLISECONDS.toString(),
+                            DropdownField.ValueTemplates.timeUnits(),
+                            "The time unit that will be used in for example timer values. Think of: took 15ms",
+                            ConfigurationField.Optional.NOT_OPTIONAL
+                    )
+            );
+
+            r.addField(
+                    new DropdownField(
+                            CK_RATE_UNIT,
+                            "Time unit of measured rates",
+                            TimeUnit.SECONDS.toString(),
+                            DropdownField.ValueTemplates.timeUnits(),
+                            "The time unit that will be used in for example meter values. Think of: 7 per second",
+                            ConfigurationField.Optional.NOT_OPTIONAL
+                    )
+            );
+
+            return r;
+        }
     }
 
     private class RawGelfWriter implements GELFTarget {
