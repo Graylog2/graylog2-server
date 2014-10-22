@@ -35,6 +35,7 @@ import org.graylog2.inputs.random.FakeHttpMessageInput;
 import org.graylog2.inputs.raw.tcp.RawTCPInput;
 import org.graylog2.inputs.raw.udp.RawUDPInput;
 import org.graylog2.inputs.syslog.tcp.SyslogTCPInput;
+import org.graylog2.inputs.syslog.tcp.SyslogTCPOctetCountInput;
 import org.graylog2.inputs.syslog.udp.SyslogUDPInput;
 import org.graylog2.inputs.transports.TransportsModule;
 import org.graylog2.plugin.inputs.MessageInput;
@@ -58,6 +59,7 @@ public class MessageInputBindings extends AbstractModule {
         installInput(inputMapBinder, RawUDPInput.class, RawUDPInput.Factory.class);
         installInput(inputMapBinder, SyslogTCPInput.class, SyslogTCPInput.Factory.class);
         installInput(inputMapBinder, SyslogUDPInput.class, SyslogUDPInput.Factory.class);
+        installInput(inputMapBinder, SyslogTCPOctetCountInput.class, SyslogTCPOctetCountInput.Factory.class);
         installInput(inputMapBinder, FakeHttpMessageInput.class, FakeHttpMessageInput.Factory.class);
         installInput(inputMapBinder, GELFTCPInput.class, GELFTCPInput.Factory.class);
         installInput(inputMapBinder, GELFHttpInput.class, GELFHttpInput.Factory.class);

@@ -51,6 +51,7 @@ public class TransportsModule extends AbstractModule {
         installTransport(mapBinder, "radioamqp", RadioAmqpTransport.class);
         installTransport(mapBinder, "httppoll", HttpPollTransport.class);
         installTransport(mapBinder, "localmetrics", LocalMetricsTransport.class);
+        installTransport(mapBinder, "syslog-tcp", SyslogTcpInput.class);
 
         bind(Executor.class)
                 .annotatedWith(Names.named("bossPool"))
