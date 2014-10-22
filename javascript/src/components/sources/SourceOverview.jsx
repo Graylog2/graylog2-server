@@ -112,12 +112,10 @@ var SourceOverview = React.createClass({
         this.lineChart
             .width($(lineChartDomNode).width())
             .height(200)
-            .margins({left: 50, right: 20, top: 20, bottom: 20})
-            //.renderArea(true)
+            .margins({left: 35, right: 20, top: 20, bottom: 20})
             .dimension(this.valueDimension)
             .group(this.valueGroup)
             .x(d3.time.scale())
-            .xUnits(d3.time.minutes)
             .renderHorizontalGridLines(true)
             // FIXME: causes those nasty exceptions when rendering data (one per x axis tick)
             .elasticX(true)
@@ -141,6 +139,9 @@ var SourceOverview = React.createClass({
                     }
                 });
             });
+        this.lineChart.yAxis()
+            .ticks(6)
+            .tickFormat(d3.format("s"));
     },
     renderDataTable() {
         var dataTableDomNode = $("#dc-sources-result")[0];
