@@ -90,9 +90,22 @@ var SourceOverview = React.createClass({
             .dimension(this.othersDimension)
             .group(this.othersMessageGroup)
             .renderlet((chart) => {
-                chart.selectAll("#dc-sources-pie-chart .pie-slice").on("click", (d, index) => {
+                chart.selectAll(".pie-slice").on("click", () => {
                     this.loadHistogramData();
                     this._toggleResetButtons();
+                });
+            })
+            .renderlet((chart) => {
+                // FIXME: Pie chart labels don't react to mouse events as slices, submit bug to dc-js
+                chart.selectAll("text.pie-slice").on("click", (data) => {
+                    chart.filter(data.data.key);
+                    dc.redrawAll();
+                });
+                chart.selectAll("text.pie-slice").on("mouseover", (data, index) => {
+                    chart.selectAll("g.pie-slice._" + index).classed("highlighted", true);
+                });
+                chart.selectAll("text.pie-slice").on("mouseout", (data, index) => {
+                    chart.selectAll("g.pie-slice._" + index).classed("highlighted", false);
                 });
             });
     },
@@ -122,7 +135,6 @@ var SourceOverview = React.createClass({
             .elasticY(true)
             .on("filtered", (chart) => {
                 dc.events.trigger(() => {
-
                     var filter = chart.filter();
                     if (filter) {
                         var fromDateTime = moment(filter[0]);
