@@ -244,6 +244,7 @@ POST        /a/system/inputs/:input_id/extractors/order                         
 GET         /a/system/contentpacks                                                   @controllers.api.BundlesApiController.index()
 POST        /a/system/contentpacks                                                   @controllers.api.BundlesApiController.create()
 POST        /a/system/contentpacks/:pack_id/apply                                    @controllers.api.BundlesApiController.apply(pack_id: String)
+POST        /a/system/contentpacks/:pack_id/delete                                   @controllers.api.BundlesApiController.delete(pack_id: String)
 
 # Map static resources from the /public folder to the /assets URL path
 GET         /assets/*file                                                            controllers.Assets.at(path="/public", file)

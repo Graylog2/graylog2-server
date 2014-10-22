@@ -23,11 +23,10 @@ import com.google.gson.Gson;
 import com.google.inject.Inject;
 import controllers.AuthenticatedController;
 import org.glassfish.grizzly.utils.Charsets;
+import org.graylog2.restclient.models.api.requests.CreateBundleRequest;
 import org.graylog2.restclient.models.bundles.BundleService;
 import org.graylog2.restclient.models.bundles.ConfigurationBundle;
-import org.graylog2.restclient.models.api.requests.CreateBundleRequest;
 import play.Logger;
-import play.Play;
 import play.mvc.Http.MultipartFormData;
 import play.mvc.Http.MultipartFormData.FilePart;
 import play.mvc.Result;
@@ -36,7 +35,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Map;
 
 public class BundlesApiController extends AuthenticatedController {
     @Inject
@@ -81,6 +79,16 @@ public class BundlesApiController extends AuthenticatedController {
             flash("success", "Bundle applied successfully");
         } catch (Exception e) {
             flash("error", "Could not apply bundle: " + e);
+        }
+        return redirect(getRefererPath());
+    }
+
+    public Result delete(String bundleId) {
+        try {
+            bundleService.delete(bundleId);
+            flash("success", "Bundle successfully deleted");
+        } catch (Exception e) {
+            flash("error", "Could not delete bundle: " + e);
         }
         return redirect(getRefererPath());
     }
