@@ -69,6 +69,10 @@ public class BundleService {
         api.path(routes.BundleResource().applyBundle(bundleId)).expect(Http.Status.NO_CONTENT).execute();
     }
 
+    public void delete(String bundleId) throws APIException, IOException {
+        api.path(routes.BundleResource().deleteBundle(bundleId)).expect(Http.Status.NO_CONTENT).execute();
+    }
+
     public ConfigurationBundle export(ExportBundleRequest request) throws APIException, IOException {
         try {
             ConfigurationBundle response = api.path(routes.BundleResource().exportBundle(), ConfigurationBundle.class)
