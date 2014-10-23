@@ -116,7 +116,7 @@ public class BundlesController extends AuthenticatedController {
             ConfigurationBundle bundle = bundleService.export(exportBundleRequest);
 
             response().setContentType(MediaType.JSON_UTF_8.toString());
-            response().setHeader("Content-Disposition", "attachment; filename=configuration_bundle.json");
+            response().setHeader("Content-Disposition", "attachment; filename=content_pack.json");
             ObjectMapper m = new ObjectMapper();
             ObjectWriter ow = m.writer().withDefaultPrettyPrinter();
             return ok(ow.writeValueAsString(bundle));
