@@ -4,13 +4,19 @@
 @for((key, value) <- message.getFormattedFields()) {
     <dt>
         <div class="btn-group message-field-dropdown">
-            <a data-toggle="dropdown" href="#" class="key">
-            @key
+            <a href="#" class="search-link" data-field="@key" data-value="@Tools.removeTrailingNewline(value)">
+                <i class="icon icon-search icon-mini"></i>
             </a>
 
-            <ul class="dropdown-menu">
-                <li><a href="#" class="search-link" data-field="@key" data-value="@Tools.removeTrailingNewline(value)">Search for value</a></li>
+            <a data-toggle="dropdown" href="#">
+                <i class="icon icon-cog icon-mini"></i>
+            </a>
 
+            <span class="key">
+                @key
+            </span>
+
+            <ul class="dropdown-menu">
                 @if(sourceNode != null && sourceInput != null) {
                     <li class="dropdown-submenu">
                         <a href="#">Create extractor</a>
