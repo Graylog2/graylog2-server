@@ -36,9 +36,9 @@ public class SyslogTCPFramingRouterHandler extends SimpleChannelUpstreamHandler 
     public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
         if (! routed) {
             if (usesOctetCountFraming(e)) {
-                ctx.getPipeline().addAfter(ctx.getName(), "framer", new SyslogOctetCountFrameDecoder());
+                ctx.getPipeline().addAfter(ctx.getName(), "framer-octet", new SyslogOctetCountFrameDecoder());
             } else {
-                ctx.getPipeline().addAfter(ctx.getName(), "framer", new DelimiterBasedFrameDecoder(maxFrameLength, delimiter));
+                ctx.getPipeline().addAfter(ctx.getName(), "framer-delimiter", new DelimiterBasedFrameDecoder(maxFrameLength, delimiter));
             }
 
             routed = true;
