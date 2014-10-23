@@ -26,10 +26,10 @@ import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.MetricSet;
 import com.codahale.metrics.Timer;
-import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.util.concurrent.Callables;
 import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.MetricSets;
-import org.graylog2.plugin.collections.Pair;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.inputs.MessageInput;
@@ -49,7 +49,9 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import java.net.InetSocketAddress;
-import java.util.List;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.concurrent.Callable;
 
 import static org.jboss.netty.channel.Channels.fireMessageReceived;
 
@@ -93,13 +95,13 @@ public abstract class NettyTransport implements Transport {
         localRegistry.registerAll(MetricSets.of(throughputCounter.gauges()));
     }
 
-    private ChannelPipelineFactory getPipelineFactory(final List<Pair<String, ? extends ChannelHandler>> handlerList) {
+    private ChannelPipelineFactory getPipelineFactory(final LinkedHashMap<String, Callable<? extends ChannelHandler>> handlerList) {
         return new ChannelPipelineFactory() {
             @Override
             public ChannelPipeline getPipeline() throws Exception {
-                ChannelPipeline p = Channels.pipeline();
-                for (Pair<String, ? extends ChannelHandler> pair : handlerList) {
-                    p.addLast(pair.first(), pair.second());
+                final ChannelPipeline p = Channels.pipeline();
+                for (final Map.Entry<String, Callable<? extends ChannelHandler>> entry : handlerList.entrySet()) {
+                    p.addLast(entry.getKey(), entry.getValue().call());
                 }
                 return p;
             }
@@ -113,10 +115,10 @@ public abstract class NettyTransport implements Transport {
 
     @Override
     public void launch(final MessageInput input) throws MisfireException {
-        final List<Pair<String, ? extends ChannelHandler>> handlerList = getBaseChannelHandlers(input);
-        final List<Pair<String, ? extends ChannelHandler>> finalChannelHandlers = getFinalChannelHandlers(input);
+        final LinkedHashMap<String, Callable<? extends ChannelHandler>> handlerList = getBaseChannelHandlers(input);
+        final LinkedHashMap<String, Callable<? extends ChannelHandler>> finalHandlers = getFinalChannelHandlers(input);
 
-        handlerList.addAll(finalChannelHandlers);
+        handlerList.putAll(finalHandlers);
 
         try {
             bootstrap = getBootstrap();
@@ -176,11 +178,16 @@ public abstract class NettyTransport implements Transport {
      * @return the list of initial channelhandlers to add to the {@link org.jboss.netty.channel.ChannelPipelineFactory}
      * @param input
      */
-    protected List<Pair<String, ? extends ChannelHandler>> getBaseChannelHandlers(MessageInput input) {
-        List<Pair<String, ? extends ChannelHandler>> handlerList = Lists.newArrayList();
+    protected LinkedHashMap<String, Callable<? extends ChannelHandler>> getBaseChannelHandlers(final MessageInput input) {
+        LinkedHashMap<String, Callable<? extends ChannelHandler>> handlerList = Maps.newLinkedHashMap();
 
-        handlerList.add(Pair.of("packet-meta-dumper", new PacketInformationDumper(input)));
-        handlerList.add(Pair.of("traffic-counter", throughputCounter));
+        handlerList.put("packet-meta-dumper", new Callable<ChannelHandler>() {
+            @Override
+            public ChannelHandler call() throws Exception {
+                return new PacketInformationDumper(input);
+            }
+        });
+        handlerList.put("traffic-counter", Callables.returning(throughputCounter));
 
         return handlerList;
     }
@@ -198,15 +205,25 @@ public abstract class NettyTransport implements Transport {
      * @return the list of channel handlers at the end of the pipeline
      * @param input
      */
-    protected List<Pair<String, ? extends ChannelHandler>> getFinalChannelHandlers(MessageInput input) {
-        List<Pair<String, ? extends ChannelHandler>> handlerList = Lists.newArrayList();
+    protected LinkedHashMap<String, Callable<? extends ChannelHandler>> getFinalChannelHandlers(final MessageInput input) {
+        LinkedHashMap<String, Callable<? extends ChannelHandler>> handlerList = Maps.newLinkedHashMap();
 
         if (aggregator != null) {
             log.debug("Adding codec aggregator {} to channel pipeline", aggregator);
-            handlerList.add(Pair.of("codec-aggregator", new MessageAggregationHandler(input, aggregator)));
+            handlerList.put("codec-aggregator", new Callable<ChannelHandler>() {
+                @Override
+                public ChannelHandler call() throws Exception {
+                    return new MessageAggregationHandler(input, aggregator);
+                }
+            });
         }
 
-        handlerList.add(Pair.of("rawmessage-handler", new RawMessageHandler(input)));
+        handlerList.put("rawmessage-handler", new Callable<ChannelHandler>() {
+            @Override
+            public ChannelHandler call() throws Exception {
+                return new RawMessageHandler(input);
+            }
+        });
         return handlerList;
     }
 

@@ -22,8 +22,8 @@
  */
 package org.graylog2.plugin.inputs.transports;
 
+import com.google.common.util.concurrent.Callables;
 import org.graylog2.plugin.LocalMetricRegistry;
-import org.graylog2.plugin.collections.Pair;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.util.ConnectionCounter;
@@ -35,7 +35,8 @@ import org.jboss.netty.channel.FixedReceiveBufferSizePredictorFactory;
 import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory;
 
 import javax.inject.Provider;
-import java.util.List;
+import java.util.LinkedHashMap;
+import java.util.concurrent.Callable;
 import java.util.concurrent.Executor;
 
 public abstract class AbstractTcpTransport extends NettyTransport {
@@ -71,9 +72,11 @@ public abstract class AbstractTcpTransport extends NettyTransport {
     }
 
     @Override
-    protected List<Pair<String, ? extends ChannelHandler>> getBaseChannelHandlers(MessageInput input) {
-        final List<Pair<String, ? extends ChannelHandler>> baseChannelHandlers = super.getBaseChannelHandlers(input);
-        baseChannelHandlers.add(Pair.of("connection-counter", connectionCounter));
+    protected LinkedHashMap<String, Callable<? extends ChannelHandler>> getBaseChannelHandlers(
+            MessageInput input) {
+        final LinkedHashMap<String, Callable<? extends ChannelHandler>> baseChannelHandlers =
+                super.getBaseChannelHandlers(input);
+        baseChannelHandlers.put("connection-counter", Callables.returning(connectionCounter));
         return baseChannelHandlers;
     }
 

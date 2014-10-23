@@ -16,13 +16,12 @@
  */
 package org.graylog2.inputs.transports;
 
-import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import org.graylog2.plugin.ConfigClass;
 import org.graylog2.plugin.FactoryClass;
 import org.graylog2.plugin.LocalMetricRegistry;
-import org.graylog2.plugin.collections.Pair;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.configuration.fields.BooleanField;
@@ -39,7 +38,8 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Named;
 import javax.inject.Provider;
-import java.util.List;
+import java.util.LinkedHashMap;
+import java.util.concurrent.Callable;
 import java.util.concurrent.Executor;
 
 import static org.jboss.netty.channel.Channels.fireMessageReceived;
@@ -71,23 +71,44 @@ public class HttpTransport extends AbstractTcpTransport {
     }
 
     @Override
-    protected List<Pair<String, ? extends ChannelHandler>> getBaseChannelHandlers(MessageInput input) {
-        final List<Pair<String, ? extends ChannelHandler>> baseChannelHandlers = super.getBaseChannelHandlers(input);
+    protected LinkedHashMap<String, Callable<? extends ChannelHandler>> getBaseChannelHandlers(MessageInput input) {
+        final LinkedHashMap<String, Callable<? extends ChannelHandler>> baseChannelHandlers =
+                super.getBaseChannelHandlers(input);
 
-        baseChannelHandlers.add(Pair.of("decoder", new HttpRequestDecoder()));
-        baseChannelHandlers.add(Pair.of("encoder", new HttpResponseEncoder()));
-        baseChannelHandlers.add(Pair.of("decompressor", new HttpContentDecompressor()));
+        baseChannelHandlers.put("decoder", new Callable<ChannelHandler>() {
+            @Override
+            public ChannelHandler call() throws Exception {
+                return new HttpRequestDecoder();
+            }
+        });
+        baseChannelHandlers.put("encoder", new Callable<ChannelHandler>() {
+            @Override
+            public ChannelHandler call() throws Exception {
+                return new HttpResponseEncoder();
+            }
+        });
+        baseChannelHandlers.put("decompressor", new Callable<ChannelHandler>() {
+            @Override
+            public ChannelHandler call() throws Exception {
+                return new HttpContentDecompressor();
+            }
+        });
 
         return baseChannelHandlers;
     }
 
     @Override
-    protected List<Pair<String, ? extends ChannelHandler>> getFinalChannelHandlers(MessageInput input) {
-        final List<Pair<String, ? extends ChannelHandler>> handlers = Lists.newArrayList();
+    protected LinkedHashMap<String, Callable<? extends ChannelHandler>> getFinalChannelHandlers(MessageInput input) {
+        final LinkedHashMap<String, Callable<? extends ChannelHandler>> handlers = Maps.newLinkedHashMap();
 
-        handlers.add(Pair.of("http-handler", new Handler(enableCors)));
+        handlers.put("http-handler", new Callable<ChannelHandler>() {
+            @Override
+            public ChannelHandler call() throws Exception {
+                return new Handler(enableCors);
+            }
+        });
 
-        handlers.addAll(super.getFinalChannelHandlers(input));
+        handlers.putAll(super.getFinalChannelHandlers(input));
         return handlers;
     }
 
