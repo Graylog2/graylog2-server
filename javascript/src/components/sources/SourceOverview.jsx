@@ -1,7 +1,6 @@
 /** @jsx React.DOM */
 
 /* global activateTimerangeChooser, momentHelper, htmlEscape */
-// TODO: is there a better way of doing this?
 /* jshint -W107 */
 
 'use strict';
@@ -163,7 +162,7 @@ var SourceOverview = React.createClass({
             .group((d) => d.percentage > othersThreshold ? "Top Sources" : othersName)
             .size(this.state.numberOfSources)
             .columns([
-                (d) => "<a href='javascript:undefined' class='btn btn-mini dc-search-link' title='Search for this source'><i class='icon icon-search'></i></a>",
+                (d) => "<button class='btn btn-mini dc-search-button' title='Search for this source'><i class='icon icon-search'></i></button>",
                 (d) => "<a href='javascript:undefined' class='dc-filter-link' title='Filter this source'>" + d.name +"</a>",
                 (d) => d.percentage.toFixed(2) + "%",
                 (d) => d.messageCount
@@ -171,7 +170,7 @@ var SourceOverview = React.createClass({
             .sortBy((d) => d.messageCount)
             .order(d3.descending)
             .renderlet((table) => {
-                table.selectAll("td.dc-table-column._0 a.dc-search-link").on("click", () => {
+                table.selectAll("td.dc-table-column._0 button.dc-search-button").on("click", () => {
                     // d3 doesn't pass any data to the onclick event as the buttons do not
                     // have any. Instead, we need to get it from the table element.
                     var parentTdElement = $(d3.event.target).parents("td.dc-table-column._0");
@@ -208,7 +207,7 @@ var SourceOverview = React.createClass({
             .renderlet((table) => {
                 table.selectAll("td.dc-table-column._0")
                     .filter((datum, index) => this.querySources.indexOf(datum.name) !== -1)
-                    .selectAll("a.dc-search-link")
+                    .selectAll("button.dc-search-button")
                     .classed("active", true);
             });
     },
