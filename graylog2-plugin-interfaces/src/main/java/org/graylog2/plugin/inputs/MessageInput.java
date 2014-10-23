@@ -381,10 +381,8 @@ public abstract class MessageInput {
         private final Transport.Config transportConfig;
         private final Codec.Config codecConfig;
 
-        // Guice requires to be able to instantiate this class, it cannot be abstact nor can we flag the actual constructor
-        // as being the @AssistedInject constructor, because the parameters are actually passed directly via a subclass.
-        // yes, it sucks, but this really should never be instantiated anyway.
-        public Config() {
+        // required for guice, but isn't called.
+        Config() {
             throw new IllegalStateException("This class should not be instantiated directly, this is a bug.");
         }
 
@@ -422,10 +420,8 @@ public abstract class MessageInput {
         private final boolean exclusive;
         private final String linkToDocs;
 
-        // Guice requires to be able to instantiate this class, it cannot be abstact nor can we flag the actual constructor
-        // as being the @AssistedInject constructor, because the parameters are actually passed directly via a subclass.
-        // yes, it sucks, but this really should never be instantiated anyway.
-        public Descriptor() {
+        // required for guice, but isn't called.
+        Descriptor() {
             throw new IllegalStateException("This class should not be instantiated directly, this is a bug.");
         }
 
