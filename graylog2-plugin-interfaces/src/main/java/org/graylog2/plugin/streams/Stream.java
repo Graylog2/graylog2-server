@@ -28,21 +28,25 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-/**
- *
- * @author Lennart Koopmann <lennart@socketfeed.com>
- */
 public interface Stream extends Persisted {
 
     public String getId();
 
     public String getTitle();
+
     public String getDescription();
+
     public Boolean getDisabled();
 
+    public String getContentPack();
+
     public void setTitle(String title);
+
     public void setDescription(String description);
+
     public void setDisabled(Boolean disabled);
+
+    public void setContentPack(String contentPack);
 
     public Boolean isPaused();
 

@@ -49,6 +49,8 @@ import java.util.List;
 import java.util.Map;
 
 public abstract class MessageInput {
+    private static final Logger LOG = LoggerFactory.getLogger(MessageInput.class);
+
     public static final String CK_OVERRIDE_SOURCE = "override_source";
     public static final String FIELD_TYPE = "type";
     public static final String FIELD_INPUT_ID = "input_id";
@@ -64,7 +66,8 @@ public abstract class MessageInput {
     public static final String FIELD_ATTRIBUTES = "attributes";
     public static final String FIELD_STATIC_FIELDS = "static_fields";
     public static final String FIELD_GLOBAL = "global";
-    private static final Logger LOG = LoggerFactory.getLogger(MessageInput.class);
+    public static final String FIELD_CONTENT_PACK = "content_pack";
+
     @SuppressWarnings("StaticNonFinalField")
     private static long defaultRecvBufferSize = 1024 * 1024;
 
@@ -87,6 +90,8 @@ public abstract class MessageInput {
     protected String persistId;
     protected DateTime createdAt;
     protected Boolean global = false;
+    protected String contentPack;
+
     protected Configuration configuration;
     protected Buffer processBuffer;
 
@@ -151,7 +156,9 @@ public abstract class MessageInput {
 
     public Descriptor getDescriptor() {
         return descriptor;
-    };
+    }
+
+    ;
 
     public String getName() {
         return descriptor.getName();
@@ -213,6 +220,14 @@ public abstract class MessageInput {
         this.global = global;
     }
 
+    public String getContentPack() {
+        return contentPack;
+    }
+
+    public void setContentPack(String contentPack) {
+        this.contentPack = contentPack;
+    }
+
     @SuppressWarnings("unchecked")
     public Object getAttributesWithMaskedPasswords() {
         final ConfigurationRequest config = getRequestedConfiguration();
@@ -237,7 +252,7 @@ public abstract class MessageInput {
             } else {
                 // safety measure, although this is bad.
                 LOG.warn("Unknown input configuration setting {}={} found. Not trying to mask its value," +
-                                 " though this is likely a bug.", attribute, value);
+                        " though this is likely a bug.", attribute, value);
             }
 
             result.put(attribute.getKey(), value);
@@ -259,6 +274,7 @@ public abstract class MessageInput {
         inputMap.put(FIELD_ATTRIBUTES, this.getAttributesWithMaskedPasswords());
         inputMap.put(FIELD_STATIC_FIELDS, this.getStaticFields());
         inputMap.put(FIELD_GLOBAL, this.getGlobal());
+        inputMap.put(FIELD_CONTENT_PACK, this.getContentPack());
 
         return inputMap;
     }
@@ -303,7 +319,7 @@ public abstract class MessageInput {
 
         final Message message;
 
-        try (Timer.Context ignored = parseTime.time()){
+        try (Timer.Context ignored = parseTime.time()) {
             message = codec.decode(rawMessage);
         } catch (RuntimeException e) {
             LOG.warn("Codec " + codec + " threw exception", e);
@@ -332,14 +348,15 @@ public abstract class MessageInput {
     /**
      * Basically a reordered version of {@link #processRawMessage(org.graylog2.plugin.journal.RawMessage)} that only records a message
      * as processed when adding it to processbuffer has worked.
+     *
      * @param rawMessage
      * @return true if the message was malformed and discarded. do not try to re-insert the message in that case but discard it.
-     *          false if the message was successfully processed, exception is raised otherwise
+     * false if the message was successfully processed, exception is raised otherwise
      */
     public boolean processRawMessageFailFast(RawMessage rawMessage) throws BufferOutOfCapacityException, ProcessingDisabledException {
         final Message message;
 
-        try (Timer.Context ignored = parseTime.time()){
+        try (Timer.Context ignored = parseTime.time()) {
             message = codec.decode(rawMessage);
         } catch (RuntimeException e) {
             LOG.warn("Codec " + codec + " threw exception", e);
@@ -373,7 +390,9 @@ public abstract class MessageInput {
 
     public interface Factory<M> {
         M create(Configuration configuration);
+
         Config getConfig();
+
         Descriptor getDescriptor();
     }
 

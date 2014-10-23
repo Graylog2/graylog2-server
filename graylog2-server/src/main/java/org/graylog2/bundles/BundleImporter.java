@@ -48,6 +48,7 @@ import org.graylog2.shared.inputs.InputRegistry;
 import org.graylog2.shared.inputs.NoSuchInputTypeException;
 import org.graylog2.streams.OutputImpl;
 import org.graylog2.streams.OutputService;
+import org.graylog2.streams.StreamImpl;
 import org.graylog2.streams.StreamRuleImpl;
 import org.graylog2.streams.StreamRuleService;
 import org.graylog2.streams.StreamService;
@@ -112,11 +113,13 @@ public class BundleImporter {
     }
 
     public void runImport(final ConfigurationBundle bundle, final String userName) {
+        final String bundleName = bundle.getName();
+
         try {
-            createInputs(bundle.getInputs(), userName);
-            createOutputs(bundle.getOutputs(), userName);
-            createStreams(bundle.getStreams(), userName);
-            createDashboards(bundle.getDashboards(), userName);
+            createInputs(bundleName, bundle.getInputs(), userName);
+            createOutputs(bundleName, bundle.getOutputs(), userName);
+            createStreams(bundleName, bundle.getStreams(), userName);
+            createDashboards(bundleName, bundle.getDashboards(), userName);
         } catch (Exception e) {
             LOG.error("Error while creating dashboards. Starting rollback.", e);
             if (!rollback()) {
@@ -195,10 +198,10 @@ public class BundleImporter {
         }
     }
 
-    private void createInputs(final List<Input> inputs, final String userName)
+    private void createInputs(final String bundleName, final List<Input> inputs, final String userName)
             throws org.graylog2.plugin.inputs.Extractor.ReservedFieldException, org.graylog2.ConfigurationException, NoSuchInputTypeException, ValidationException, ExtractorFactory.NoSuchExtractorException, NotFoundException, ConfigurationException {
         for (final Input input : inputs) {
-            final MessageInput messageInput = createMessageInput(input, userName);
+            final MessageInput messageInput = createMessageInput(bundleName, input, userName);
             createdInputs.put(messageInput.getId(), messageInput);
 
             // Launch input. (this will run async and clean up itself in case of an error.)
@@ -206,7 +209,7 @@ public class BundleImporter {
         }
     }
 
-    private MessageInput createMessageInput(final Input inputDescription, final String userName)
+    private MessageInput createMessageInput(final String bundleName, final Input inputDescription, final String userName)
             throws NoSuchInputTypeException, ConfigurationException, ValidationException,
             NotFoundException, org.graylog2.ConfigurationException, ExtractorFactory.NoSuchExtractorException,
             org.graylog2.plugin.inputs.Extractor.ReservedFieldException {
@@ -218,6 +221,7 @@ public class BundleImporter {
         messageInput.setGlobal(inputDescription.isGlobal());
         messageInput.setCreatorUserId(userName);
         messageInput.setCreatedAt(createdAt);
+        messageInput.setContentPack(bundleName);
 
         messageInput.setConfiguration(inputConfig);
         messageInput.checkConfiguration();
@@ -229,7 +233,7 @@ public class BundleImporter {
         }
 
         org.graylog2.inputs.Input mongoInput = new InputImpl(
-                buildMongoDbInput(UUID.randomUUID(), inputDescription, userName, createdAt));
+                buildMongoDbInput(UUID.randomUUID(), inputDescription, userName, createdAt, bundleName));
 
         // Persist input.
         final String persistId = inputService.save(mongoInput);
@@ -335,7 +339,8 @@ public class BundleImporter {
             final UUID inputId,
             final Input input,
             final String userName,
-            final DateTime createdAt) {
+            final DateTime createdAt,
+            final String bundleName) {
         final ImmutableMap.Builder<String, Object> inputData = ImmutableMap.builder();
         inputData.put(MessageInput.FIELD_INPUT_ID, inputId.toString());
         inputData.put(MessageInput.FIELD_TITLE, input.getTitle());
@@ -343,6 +348,7 @@ public class BundleImporter {
         inputData.put(MessageInput.FIELD_CREATOR_USER_ID, userName);
         inputData.put(MessageInput.FIELD_CONFIGURATION, input.getConfiguration());
         inputData.put(MessageInput.FIELD_CREATED_AT, createdAt);
+        inputData.put(MessageInput.FIELD_CONTENT_PACK, bundleName);
 
         if (input.isGlobal()) {
             inputData.put(MessageInput.FIELD_GLOBAL, true);
@@ -353,15 +359,15 @@ public class BundleImporter {
         return inputData.build();
     }
 
-    private void createOutputs(final List<Output> outputs, final String userName)
+    private void createOutputs(final String bundleName, final List<Output> outputs, final String userName)
             throws ValidationException {
         for (final Output outputDescription : outputs) {
-            final OutputImpl output = createOutput(outputDescription, userName);
+            final OutputImpl output = createOutput(bundleName, outputDescription, userName);
             createdOutputs.put(output.getId(), output);
         }
     }
 
-    private OutputImpl createOutput(final Output outputDescription, final String userName)
+    private OutputImpl createOutput(final String bundleName, final Output outputDescription, final String userName)
             throws ValidationException {
         final String referenceId = outputDescription.getId();
         final OutputImpl output = (OutputImpl) outputService.create(new OutputImpl(
@@ -369,7 +375,8 @@ public class BundleImporter {
                 outputDescription.getType(),
                 outputDescription.getConfiguration(),
                 DateTime.now(DateTimeZone.UTC).toDate(),
-                userName));
+                userName,
+                bundleName));
 
         if (!isNullOrEmpty(referenceId)) {
             outputsByReferenceId.put(referenceId, output);
@@ -378,11 +385,11 @@ public class BundleImporter {
         return output;
     }
 
-    private void createStreams(final List<Stream> streams, final String userName)
+    private void createStreams(final String bundleName, final List<Stream> streams, final String userName)
             throws ValidationException {
         for (final Stream streamDescription : streams) {
             final String referenceId = streamDescription.getId();
-            final org.graylog2.plugin.streams.Stream stream = createStream(streamDescription, userName);
+            final org.graylog2.plugin.streams.Stream stream = createStream(bundleName, streamDescription, userName);
             createdStreams.put(stream.getId(), stream);
 
             if (!isNullOrEmpty(referenceId)) {
@@ -391,28 +398,30 @@ public class BundleImporter {
         }
     }
 
-    private org.graylog2.plugin.streams.Stream createStream(final Stream streamDescription, final String userName)
+    private org.graylog2.plugin.streams.Stream createStream(final String bundleName, final Stream streamDescription, final String userName)
             throws ValidationException {
-        final Map<String, Object> streamData = ImmutableMap.<String, Object>of(
-                "title", streamDescription.getTitle(),
-                "description", streamDescription.getDescription(),
-                "disabled", streamDescription.isDisabled(),
-                "creator_user_id", userName,
-                "created_at", DateTime.now(DateTimeZone.UTC));
+        final ImmutableMap.Builder<String, Object> streamData = ImmutableMap.builder();
+        streamData.put(StreamImpl.FIELD_TITLE, streamDescription.getTitle());
+        streamData.put(StreamImpl.FIELD_DESCRIPTION, streamDescription.getDescription());
+        streamData.put(StreamImpl.FIELD_DISABLED, streamDescription.isDisabled());
+        streamData.put(StreamImpl.FIELD_CREATOR_USER_ID, userName);
+        streamData.put(StreamImpl.FIELD_CREATED_AT, DateTime.now(DateTimeZone.UTC));
+        streamData.put(StreamImpl.FIELD_CONTENT_PACK, bundleName);
 
-        final org.graylog2.plugin.streams.Stream stream = streamService.create(streamData);
+        final org.graylog2.plugin.streams.Stream stream = streamService.create(streamData.build());
         final String streamId = streamService.save(stream);
 
         if (streamDescription.getStreamRules() != null) {
             for (StreamRule streamRule : streamDescription.getStreamRules()) {
-                final Map<String, Object> streamRuleData = ImmutableMap.<String, Object>of(
-                        "type", streamRule.getType().toInteger(),
-                        "value", streamRule.getValue(),
-                        "field", streamRule.getField(),
-                        "inverted", streamRule.isInverted(),
-                        "stream_id", new ObjectId(streamId));
+                final ImmutableMap.Builder<String, Object> streamRuleData = ImmutableMap.builder();
+                streamRuleData.put(StreamRuleImpl.FIELD_TYPE, streamRule.getType().toInteger());
+                streamRuleData.put(StreamRuleImpl.FIELD_VALUE, streamRule.getValue());
+                streamRuleData.put(StreamRuleImpl.FIELD_FIELD, streamRule.getField());
+                streamRuleData.put(StreamRuleImpl.FIELD_INVERTED, streamRule.isInverted());
+                streamRuleData.put(StreamRuleImpl.FIELD_STREAM_ID, new ObjectId(streamId));
+                streamRuleData.put(StreamRuleImpl.FIELD_CONTENT_PACK, bundleName);
 
-                streamRuleService.save(new StreamRuleImpl(streamRuleData));
+                streamRuleService.save(new StreamRuleImpl(streamRuleData.build()));
             }
         }
 
@@ -427,22 +436,23 @@ public class BundleImporter {
         return stream;
     }
 
-    private void createDashboards(final List<Dashboard> dashboards, final String userName)
+    private void createDashboards(final String bundleName, final List<Dashboard> dashboards, final String userName)
             throws org.graylog2.dashboards.widgets.DashboardWidget.NoSuchWidgetTypeException, InvalidWidgetConfigurationException, InvalidRangeParametersException, ValidationException {
         for (final Dashboard dashboard : dashboards) {
-            org.graylog2.dashboards.Dashboard createdDashboard = createDashboard(dashboard, userName);
+            org.graylog2.dashboards.Dashboard createdDashboard = createDashboard(bundleName, dashboard, userName);
             createdDashboards.put(createdDashboard.getId(), createdDashboard);
         }
     }
 
-    private org.graylog2.dashboards.Dashboard createDashboard(final Dashboard dashboardDescription, final String userName)
+    private org.graylog2.dashboards.Dashboard createDashboard(final String bundleName, final Dashboard dashboardDescription, final String userName)
             throws ValidationException, org.graylog2.dashboards.widgets.DashboardWidget.NoSuchWidgetTypeException, InvalidRangeParametersException, InvalidWidgetConfigurationException {
         // Create dashboard.
         final Map<String, Object> dashboardData = new HashMap<>();
-        dashboardData.put("title", dashboardDescription.getTitle());
-        dashboardData.put("description", dashboardDescription.getDescription());
-        dashboardData.put("creator_user_id", userName);
-        dashboardData.put("created_at", DateTime.now(DateTimeZone.UTC));
+        dashboardData.put(DashboardImpl.FIELD_TITLE, dashboardDescription.getTitle());
+        dashboardData.put(DashboardImpl.FIELD_DESCRIPTION, dashboardDescription.getDescription());
+        dashboardData.put(DashboardImpl.FIELD_CONTENT_PACK, bundleName);
+        dashboardData.put(DashboardImpl.FIELD_CREATOR_USER_ID, userName);
+        dashboardData.put(DashboardImpl.FIELD_CREATED_AT, DateTime.now(DateTimeZone.UTC));
 
         final org.graylog2.dashboards.Dashboard dashboard = new DashboardImpl(dashboardData);
         final String dashboardId = dashboardService.save(dashboard);

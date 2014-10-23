@@ -18,50 +18,65 @@ package org.graylog2.streams;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
+import com.google.common.collect.ImmutableMap;
 import org.bson.types.ObjectId;
 import org.graylog2.database.CollectionName;
 import org.graylog2.database.validators.FilledStringValidator;
+import org.graylog2.database.validators.OptionalStringValidator;
 import org.graylog2.plugin.database.validators.Validator;
 import org.graylog2.plugin.streams.Output;
 
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * @author Dennis Oelkers <dennis@torch.sh>
- */
 @CollectionName("outputs")
 public class OutputImpl implements Output {
+    private static final String FIELD_ID = "_id";
+    private static final String FIELD_TITLE = "title";
+    private static final String FIELD_TYPE = "type";
+    private static final String FIELD_CONFIGURATION = "configuration";
+    private static final String FIELD_CREATOR_USER_ID = "creator_user_id";
+    private static final String FIELD_CREATED_AT = "created_at";
+    private static final String FIELD_CONTENT_PACK = "content_pack";
+
     private ObjectId _id;
     private String title;
     private String type;
     private Map<String, Object> configuration;
-    @JsonProperty("created_at")
+    @JsonProperty(FIELD_CREATED_AT)
     private Date createdAt;
-    @JsonProperty("creator_user_id")
+    @JsonProperty(FIELD_CREATOR_USER_ID)
     private String creatorUserId;
+    private String contentPack = null;
 
     public OutputImpl() {
         this._id = new ObjectId();
     }
 
     public OutputImpl(String title, String type, Map<String, Object> configuration, Date createdAt, String creatorUserId) {
+        this(title, type, configuration, createdAt, creatorUserId, null);
+    }
+
+    public OutputImpl(String title, String type, Map<String, Object> configuration, Date createdAt, String creatorUserId, String contentPack) {
         this._id = new ObjectId();
         this.title = title;
         this.type = type;
         this.configuration = configuration;
         this.createdAt = createdAt;
         this.creatorUserId = creatorUserId;
+        this.contentPack = contentPack;
     }
 
     public OutputImpl(ObjectId id, Map<String, Object> fields) {
         this._id = id;
-        this.title = fields.get("title").toString();
-        this.type = fields.get("type").toString();
-        this.configuration = (Map<String, Object>)fields.get("configuration");
-        this.createdAt = (Date)fields.get("created_at");
-        this.creatorUserId = fields.get("creator_user_id").toString();
+        this.title = String.valueOf(fields.get(FIELD_TITLE));
+        this.type = String.valueOf(fields.get(FIELD_TYPE));
+        this.configuration = (Map<String, Object>) fields.get(FIELD_CONFIGURATION);
+        this.createdAt = (Date) fields.get(FIELD_CREATED_AT);
+        this.creatorUserId = String.valueOf(fields.get(FIELD_CREATOR_USER_ID));
+        this.contentPack = String.valueOf(fields.get(FIELD_CONTENT_PACK));
     }
 
     public String getTitle() {
@@ -77,15 +92,15 @@ public class OutputImpl implements Output {
     }
 
     public Map<String, Validator> getValidations() {
-        return new HashMap<String, Validator>() {{
-            put("title", new FilledStringValidator());
-            put("type", new FilledStringValidator());
-            put("creator_user_id", new FilledStringValidator());
-        }};
+        return ImmutableMap.<String, Validator>of(
+                FIELD_TITLE, new FilledStringValidator(),
+                FIELD_TYPE, new FilledStringValidator(),
+                FIELD_CREATOR_USER_ID, new FilledStringValidator(),
+                FIELD_CONTENT_PACK, new OptionalStringValidator());
     }
 
     public Map<String, Validator> getEmbeddedValidations(String key) {
-        return new HashMap<>();
+        return Collections.emptyMap();
     }
 
     @Override
@@ -105,23 +120,29 @@ public class OutputImpl implements Output {
         return creatorUserId;
     }
 
+    public String getContentPack() {
+        return contentPack;
+    }
+
     @Override
     public Map<String, Object> getFields() {
-        return new HashMap<String, Object>() {{
-            put("_id", new ObjectId(getId()));
-            put("title", getTitle());
-            put("type", getType());
-            put("configuration", getConfiguration());
-            put("creator_user_id", getCreatorUserId());
-            put("created_at", getCreatedAt());
-        }};
+        final HashMap<String, Object> fields = new HashMap<>();
+        fields.put(FIELD_ID, new ObjectId(getId()));
+        fields.put(FIELD_TITLE, getTitle());
+        fields.put(FIELD_TYPE, getType());
+        fields.put(FIELD_CONFIGURATION, getConfiguration());
+        fields.put(FIELD_CREATOR_USER_ID, getCreatorUserId());
+        fields.put(FIELD_CREATED_AT, getCreatedAt());
+        fields.put(FIELD_CONTENT_PACK, getContentPack());
+
+        return fields;
     }
 
     @Override
     @JsonValue
     public Map<String, Object> asMap() {
         final Map<String, Object> fields = getFields();
-        fields.put("id", ((ObjectId)fields.remove("_id")).toHexString());
+        fields.put("id", ((ObjectId) fields.remove(FIELD_ID)).toHexString());
         return fields;
     }
 }

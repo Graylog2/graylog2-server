@@ -111,7 +111,7 @@ public class DashboardServiceImpl extends PersistedServiceImpl implements Dashbo
             map.put(position.id, x);
         }
 
-        dashboard.getFields().put("positions", map);
+        dashboard.getFields().put(DashboardImpl.EMBEDDED_POSITIONS, map);
 
         save(dashboard);
     }

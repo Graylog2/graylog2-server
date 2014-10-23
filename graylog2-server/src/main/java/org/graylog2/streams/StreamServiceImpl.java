@@ -91,10 +91,11 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
     @Override
     public Stream create(CreateRequest cr, String userId) {
         Map<String, Object> streamData = Maps.newHashMap();
-        streamData.put("title", cr.title);
-        streamData.put("description", cr.description);
-        streamData.put("creator_user_id", userId);
-        streamData.put("created_at", new DateTime(DateTimeZone.UTC));
+        streamData.put(StreamImpl.FIELD_TITLE, cr.title);
+        streamData.put(StreamImpl.FIELD_DESCRIPTION, cr.description);
+        streamData.put(StreamImpl.FIELD_CREATOR_USER_ID, userId);
+        streamData.put(StreamImpl.FIELD_CREATED_AT, new DateTime(DateTimeZone.UTC));
+        streamData.put(StreamImpl.FIELD_CONTENT_PACK, cr.contentPack);
 
         return create(streamData);
     }
@@ -113,7 +114,7 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
 
     @SuppressWarnings("unchecked")
     public List<Stream> loadAllEnabled(Map<String, Object> additionalQueryOpts) {
-        additionalQueryOpts.put("disabled", false);
+        additionalQueryOpts.put(StreamImpl.FIELD_DISABLED, false);
 
         return loadAll(additionalQueryOpts);
     }
@@ -161,7 +162,7 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
     }
 
     protected Set<Output> loadOutputsForRawStream(DBObject stream) {
-        List<ObjectId> outputIds = (List<ObjectId>)stream.get("outputs");
+        List<ObjectId> outputIds = (List<ObjectId>)stream.get(StreamImpl.FIELD_OUTPUTS);
 
         Set<Output> result = new HashSet<>();
         if (outputIds != null)
@@ -169,7 +170,7 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
                 try {
                     result.add(outputService.load(outputId.toHexString()));
                 } catch (NotFoundException e) {
-                    LOG.warn("Nonexisting output <{}> referenced from stream <{}>!", outputId.toHexString(), stream.get("_id"));
+                    LOG.warn("Non-existing output <{}> referenced from stream <{}>!", outputId.toHexString(), stream.get("_id"));
                 }
 
         return result;
@@ -192,11 +193,11 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
 
     public void update(Stream stream, String title, String description) throws ValidationException {
         if (title != null) {
-            stream.getFields().put("title", title);
+            stream.getFields().put(StreamImpl.FIELD_TITLE, title);
         }
 
         if (description != null) {
-            stream.getFields().put("description", description);
+            stream.getFields().put(StreamImpl.FIELD_DESCRIPTION, description);
         }
 
         save(stream);
@@ -292,7 +293,7 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
     public void addOutput(Stream stream, Output output) {
         collection(stream).update(
                 new BasicDBObject("_id", new ObjectId(stream.getId())),
-                new BasicDBObject("$addToSet", new BasicDBObject("outputs", new ObjectId(output.getId())))
+                new BasicDBObject("$addToSet", new BasicDBObject(StreamImpl.FIELD_OUTPUTS, new ObjectId(output.getId())))
         );
     }
 
@@ -300,14 +301,14 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
     public void removeOutput(Stream stream, Output output) {
         collection(stream).update(
                 new BasicDBObject("_id", new ObjectId(stream.getId())),
-                new BasicDBObject("$pull", new BasicDBObject("outputs", new ObjectId(output.getId())))
+                new BasicDBObject("$pull", new BasicDBObject(StreamImpl.FIELD_OUTPUTS, new ObjectId(output.getId())))
         );
     }
 
     public void removeOutputFromAllStreams(Output output) {
         ObjectId outputId = new ObjectId(output.getId());
-        DBObject match = new BasicDBObject("outputs", outputId);
-        DBObject modify = new BasicDBObject("$pull", new BasicDBObject("outputs", outputId));
+        DBObject match = new BasicDBObject(StreamImpl.FIELD_OUTPUTS, outputId);
+        DBObject modify = new BasicDBObject("$pull", new BasicDBObject(StreamImpl.FIELD_OUTPUTS, outputId));
 
         collection(StreamImpl.class).update(
                 match,

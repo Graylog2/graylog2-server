@@ -21,9 +21,6 @@ import org.joda.time.DateTime;
 
 import java.util.Map;
 
-/**
- * @author Dennis Oelkers <dennis@torch.sh>
- */
 public interface Input extends Persisted {
     String getTitle();
 
@@ -40,4 +37,6 @@ public interface Input extends Persisted {
     String getInputId();
 
     Boolean isGlobal();
+
+    String getContentPack();
 }

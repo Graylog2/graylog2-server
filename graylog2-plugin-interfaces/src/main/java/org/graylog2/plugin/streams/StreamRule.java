@@ -27,24 +27,31 @@ import org.graylog2.plugin.database.Persisted;
 
 import java.util.Map;
 
-/**
- *
- * @author Lennart Koopmann <lennart@socketfeed.com>
- */
 @JsonAutoDetect
 public interface StreamRule extends Persisted {
     public String getId();
 
     public StreamRuleType getType();
+
     public String getField();
+
     public String getValue();
+
     public Boolean getInverted();
+
     public String getStreamId();
 
+    public String getContentPack();
+
     public void setType(StreamRuleType type);
+
     public void setField(String field);
+
     public void setValue(String value);
+
     public void setInverted(Boolean inverted);
+
+    public void setContentPack(String contentPack);
 
     public Map<String, Object> asMap();
 }
