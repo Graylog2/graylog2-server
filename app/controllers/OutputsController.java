@@ -65,11 +65,11 @@ public class OutputsController extends AuthenticatedController {
 
         final Output output = outputService.create(request);
 
-        flash("success", "Output " + output.getTitle() + " has been created!");
+        flash("success", "Output \"" + output.getTitle() + "\" has been created!");
         return redirect(routes.OutputsController.index());
     }
 
-    public Result terminate(String outputId) throws APIException, IOException {
+    public Result terminate(String outputId, String redirectToStream) throws APIException, IOException {
         if (!Permissions.isPermitted(RestPermissions.OUTPUTS_TERMINATE)) {
             return redirect(routes.StartpageController.redirect());
         }
@@ -79,8 +79,13 @@ public class OutputsController extends AuthenticatedController {
             flash("error", "No such output!");
         } else {
             outputService.delete(outputId);
-            flash("success", "Output " + output.getTitle() + " been deleted!");
+            flash("success", "Output \"" + output.getTitle() + "\" has been deleted!");
         }
-        return redirect(routes.OutputsController.index());
+
+        if (redirectToStream != null && !redirectToStream.isEmpty()) {
+            return redirect(routes.StreamOutputsController.index(redirectToStream));
+        } else {
+            return redirect(routes.OutputsController.index());
+        }
     }
 }

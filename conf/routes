@@ -89,7 +89,7 @@ POST        /system/contentpacks/export                                         
 # Outputs
 GET         /system/outputs                                                          @controllers.OutputsController.index()
 POST        /system/outputs                                                          @controllers.OutputsController.create()
-POST        /system/outputs/:output_id/terminate                                     @controllers.OutputsController.terminate(output_id: String)
+POST        /system/outputs/:output_id/terminate                                     @controllers.OutputsController.terminate(output_id: String, redirectToStream ?= "")
 
 POST        /system/inputs/:input_id/start                                           @controllers.InputsController.start(input_id: String)
 POST        /system/inputs/:input_id/stop                                            @controllers.InputsController.stop(input_id: String)
@@ -126,7 +126,6 @@ POST        /system/inputs/:node_id/:input_id/extractors/:extractor_id/delete   
 GET         /system/inputs/:node_id/:input_id/extractors/export                      @controllers.ExtractorsController.exportExtractors(node_id: String, input_id: String)
 GET         /system/inputs/:node_id/:input_id/extractors/import                      @controllers.ExtractorsController.importExtractorsPage(node_id: String, input_id: String)
 POST        /system/inputs/:node_id/:input_id/extractors/import                      @controllers.ExtractorsController.importExtractors(node_id: String, input_id: String)
-
 
 # Users
 GET         /system/users                                                            @controllers.UsersController.index()

@@ -20,7 +20,11 @@
             </form>
         }
         @if(isPermitted(OUTPUTS_TERMINATE)) {
-            <form action="@routes.OutputsController.terminate(output.getId)" method="POST">
+            @if(stream == null) {
+                <form action="@routes.OutputsController.terminate(output.getId)" method="POST">
+            } else {
+                <form action="@routes.OutputsController.terminate(output.getId, stream.getId)" method="POST">
+            }
                 <button class="btn btn-danger btn-mini"
                 type="submit"
                 data-confirm="Really terminate output?">
