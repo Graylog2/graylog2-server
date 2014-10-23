@@ -20,10 +20,9 @@
 
         A global view of all configured outputs is available <a href="@routes.OutputsController.index()">here</a>.
 
-        <br />
-        <i>Removing</i> an output removes it from this stream but is still in the list of available outputs
-        and <i>terminating</i> will stop it for all streams and remove it from all configurations and lists
-        completely.
+        <br /><br />
+        <i>Removing</i> an output removes it from this stream but it will still be in the list of available outputs.
+        You can terminate a stream in the <a href="@routes.OutputsController.index()">global output list</a>.
     </div>
 
     @if(isPermitted(OUTPUTS_CREATE)) {
@@ -54,7 +53,7 @@
                     }
                 </select>
 
-                <button type="submit" id="add-existing-output" class="btn btn-success">Add existing Output</button>
+                <button type="submit" id="add-existing-output" class="btn btn-success">Assign existing Output</button>
             }
         </div>
     }
@@ -67,7 +66,10 @@
                 @views.html.system.outputs.partials.output_summary.render(output, stream)
             }
         } else {
-            <div class="alert alert-info">There are no outputs for this stream. All messages will go to the default output only.</div>
+            <div class="alert alert-info">
+                There are no configured outputs for this stream but all messages are written to the Graylog2 search
+                indices by default.
+            </div>
         }
     </div>
 }
