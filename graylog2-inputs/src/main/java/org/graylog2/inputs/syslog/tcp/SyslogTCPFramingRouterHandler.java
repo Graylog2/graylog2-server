@@ -34,8 +34,14 @@ public class SyslogTCPFramingRouterHandler extends SimpleChannelUpstreamHandler 
 
     @Override
     public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
+        final ChannelBuffer message = (ChannelBuffer) e.getMessage();
+
+        if (! message.readable()) {
+            return;
+        }
+
         if (! routed) {
-            if (usesOctetCountFraming(e)) {
+            if (usesOctetCountFraming(message)) {
                 ctx.getPipeline().addAfter(ctx.getName(), "framer-octet", new SyslogOctetCountFrameDecoder());
             } else {
                 ctx.getPipeline().addAfter(ctx.getName(), "framer-delimiter", new DelimiterBasedFrameDecoder(maxFrameLength, delimiter));
@@ -47,9 +53,9 @@ public class SyslogTCPFramingRouterHandler extends SimpleChannelUpstreamHandler 
         ctx.sendUpstream(e);
     }
 
-    private boolean usesOctetCountFraming(MessageEvent e) {
-        final ChannelBuffer message = (ChannelBuffer) e.getMessage();
-
-        return Character.isDigit(message.getByte(0));
+    private boolean usesOctetCountFraming(ChannelBuffer message) {
+        // Octet counting framing needs to start with a non-zero digit.
+        // See: http://tools.ietf.org/html/rfc6587#section-3.4.1
+        return '0' < message.getByte(0) && message.getByte(0) <= '9';
     }
 }
