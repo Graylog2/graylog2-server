@@ -16,7 +16,7 @@
  */
 package org.graylog2.indexer;
 
-import com.google.common.collect.Maps;
+import com.google.common.collect.ImmutableMap;
 import org.bson.types.ObjectId;
 import org.graylog2.database.CollectionName;
 import org.graylog2.database.PersistedImpl;
@@ -24,12 +24,9 @@ import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.database.validators.Validator;
 import org.joda.time.DateTime;
 
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.Map;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 @CollectionName("dead_letters")
 public class PersistedDeadLetterImpl extends PersistedImpl implements PersistedDeadLetter {
 
@@ -43,21 +40,20 @@ public class PersistedDeadLetterImpl extends PersistedImpl implements PersistedD
 
     @Override
     public Map<String, Object> asMap() {
-        return new HashMap<String, Object>() {{
-            put("timestamp", Tools.getISO8601String((DateTime) fields.get("timestamp")));
-            put("letter_id", fields.get("letter_id"));
-            put("message", fields.get("message"));
-        }};
+        return ImmutableMap.of(
+                "timestamp", Tools.getISO8601String((DateTime) fields.get("timestamp")),
+                "letter_id", fields.get("letter_id"),
+                "message", fields.get("message"));
     }
 
     @Override
     public Map<String, Validator> getValidations() {
-        return Maps.newHashMap();
+        return Collections.emptyMap();
     }
 
     @Override
     public Map<String, Validator> getEmbeddedValidations(String key) {
-        return Maps.newHashMap();
+        return Collections.emptyMap();
     }
 
 }

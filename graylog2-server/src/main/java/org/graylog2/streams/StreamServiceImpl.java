@@ -41,7 +41,7 @@ import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -153,16 +153,15 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
     }
 
     public List<Stream> loadAllWithConfiguredAlertConditions() {
-        Map<String, Object> queryOpts = new HashMap<String, Object>() {{
-            // Explanation: alert_conditions.1 is the first Array element.
-            put(StreamImpl.EMBEDDED_ALERT_CONDITIONS, new BasicDBObject("$ne", new ArrayList<Object>()));
-        }};
+        // Explanation: alert_conditions.1 is the first Array element.
+        Map<String, Object> queryOpts = Collections.<String, Object>singletonMap(
+                StreamImpl.EMBEDDED_ALERT_CONDITIONS, new BasicDBObject("$ne", Collections.emptyList()));
 
         return loadAll(queryOpts);
     }
 
     protected Set<Output> loadOutputsForRawStream(DBObject stream) {
-        List<ObjectId> outputIds = (List<ObjectId>)stream.get(StreamImpl.FIELD_OUTPUTS);
+        List<ObjectId> outputIds = (List<ObjectId>) stream.get(StreamImpl.FIELD_OUTPUTS);
 
         Set<Output> result = new HashSet<>();
         if (outputIds != null)
@@ -183,7 +182,7 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
         }
         for (Notification notification : notificationService.all()) {
             Object rawValue = notification.getDetail("stream_id");
-            if ( rawValue != null && rawValue.toString().equals(stream.getId())) {
+            if (rawValue != null && rawValue.toString().equals(stream.getId())) {
                 LOG.debug("Removing notification that references stream: {}", notification);
                 notificationService.destroy(notification);
             }
@@ -262,7 +261,7 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
     }
 
     public void addAlertCondition(Stream stream, AlertCondition condition) throws ValidationException {
-        embed(stream, StreamImpl.EMBEDDED_ALERT_CONDITIONS, (EmbeddedPersistable)condition);
+        embed(stream, StreamImpl.EMBEDDED_ALERT_CONDITIONS, (EmbeddedPersistable) condition);
     }
 
     @Override

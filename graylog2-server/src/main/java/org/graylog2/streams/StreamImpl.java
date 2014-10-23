@@ -35,7 +35,6 @@ import org.graylog2.plugin.streams.StreamRule;
 import org.joda.time.DateTime;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -167,12 +166,12 @@ public class StreamImpl extends PersistedImpl implements Stream {
     }
 
     public Map<String, Validator> getValidations() {
-        return new HashMap<String, Validator>() {{
-            put(FIELD_TITLE, new FilledStringValidator());
-            put(FIELD_CREATOR_USER_ID, new FilledStringValidator());
-            put(FIELD_CREATED_AT, new DateValidator());
-            put(FIELD_CONTENT_PACK, new OptionalStringValidator());
-        }};
+        return ImmutableMap.<String, Validator>builder()
+                .put(FIELD_TITLE, new FilledStringValidator())
+                .put(FIELD_CREATOR_USER_ID, new FilledStringValidator())
+                .put(FIELD_CREATED_AT, new DateValidator())
+                .put(FIELD_CONTENT_PACK, new OptionalStringValidator())
+                .build();
     }
 
     @Override

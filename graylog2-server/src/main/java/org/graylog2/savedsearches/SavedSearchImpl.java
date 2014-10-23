@@ -16,7 +16,7 @@
  */
 package org.graylog2.savedsearches;
 
-import com.google.common.collect.Maps;
+import com.google.common.collect.ImmutableMap;
 import org.bson.types.ObjectId;
 import org.graylog2.database.CollectionName;
 import org.graylog2.database.PersistedImpl;
@@ -27,12 +27,9 @@ import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.database.validators.Validator;
 import org.joda.time.DateTime;
 
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.Map;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 @CollectionName("saved_searches")
 public class SavedSearchImpl extends PersistedImpl implements SavedSearch {
 
@@ -46,26 +43,26 @@ public class SavedSearchImpl extends PersistedImpl implements SavedSearch {
 
     @Override
     public Map<String, Validator> getValidations() {
-        return new HashMap<String, Validator>() {{
-            put("title", new FilledStringValidator());
-            put("query", new MapValidator());
-            put("creator_user_id", new FilledStringValidator());
-            put("created_at", new DateValidator());
-        }};
+        return ImmutableMap.<String, Validator>builder()
+                .put("title", new FilledStringValidator())
+                .put("query", new MapValidator())
+                .put("creator_user_id", new FilledStringValidator())
+                .put("created_at", new DateValidator())
+                .build();
     }
 
     @Override
     public Map<String, Validator> getEmbeddedValidations(String key) {
-        return Maps.newHashMap();
+        return Collections.emptyMap();
     }
 
     public Map<String, Object> asMap() {
-        return new HashMap<String, Object>() {{
-            put("id", ((ObjectId) fields.get("_id")).toHexString());
-            put("title", fields.get("title"));
-            put("query", fields.get("query"));
-            put("created_at", (Tools.getISO8601String((DateTime) fields.get("created_at"))));
-            put("creator_user_id", fields.get("creator_user_id"));
-        }};
+        return ImmutableMap.<String, Object>builder()
+                .put("id", ((ObjectId) fields.get("_id")).toHexString())
+                .put("title", fields.get("title"))
+                .put("query", fields.get("query"))
+                .put("created_at", (Tools.getISO8601String((DateTime) fields.get("created_at"))))
+                .put("creator_user_id", fields.get("creator_user_id"))
+                .build();
     }
 }

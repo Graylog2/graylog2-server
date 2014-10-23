@@ -30,7 +30,6 @@ import org.graylog2.plugin.database.validators.Validator;
 import org.joda.time.DateTime;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 
 @CollectionName("dashboards")
@@ -110,18 +109,18 @@ public class DashboardImpl extends PersistedImpl implements Dashboard {
 
     @Override
     public Map<String, Validator> getValidations() {
-        return new HashMap<String, Validator>() {{
-            put(FIELD_TITLE, new FilledStringValidator());
-            put(FIELD_DESCRIPTION, new FilledStringValidator());
-            put(FIELD_CONTENT_PACK, new OptionalStringValidator());
-            put(FIELD_CREATOR_USER_ID, new FilledStringValidator());
-            put(FIELD_CREATED_AT, new DateValidator());
-        }};
+        return ImmutableMap.<String, Validator>builder()
+                .put(FIELD_TITLE, new FilledStringValidator())
+                .put(FIELD_DESCRIPTION, new FilledStringValidator())
+                .put(FIELD_CONTENT_PACK, new OptionalStringValidator())
+                .put(FIELD_CREATOR_USER_ID, new FilledStringValidator())
+                .put(FIELD_CREATED_AT, new DateValidator())
+                .build();
     }
 
     @Override
     public Map<String, Validator> getEmbeddedValidations(String key) {
-        return Maps.newHashMap();
+        return Collections.emptyMap();
     }
 
     @Override

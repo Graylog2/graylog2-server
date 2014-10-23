@@ -17,14 +17,13 @@
 package org.graylog2.rest.resources.filters;
 
 import com.codahale.metrics.annotation.Timed;
-import com.google.common.collect.Sets;
-import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.graylog2.database.*;
-import org.graylog2.filters.FilterService;
-import org.graylog2.filters.blacklist.FilterDescription;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.graylog2.database.ValidationException;
+import org.graylog2.filters.FilterService;
+import org.graylog2.filters.blacklist.FilterDescription;
 import org.graylog2.rest.resources.RestResource;
 import org.graylog2.security.RestPermissions;
 import org.graylog2.users.User;
@@ -32,13 +31,26 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import javax.ws.rs.*;
+import javax.ws.rs.BadRequestException;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
 import javax.ws.rs.NotFoundException;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.Collections;
 import java.util.Set;
 
-import static javax.ws.rs.core.Response.*;
+import static javax.ws.rs.core.Response.Status;
+import static javax.ws.rs.core.Response.accepted;
+import static javax.ws.rs.core.Response.ok;
+import static javax.ws.rs.core.Response.serverError;
+import static javax.ws.rs.core.Response.status;
 
 @RequiresAuthentication
 @Api(value = "Filters", description = "Message blacklist filters")
@@ -84,7 +96,7 @@ public class BlacklistSourceResource extends RestResource {
         try {
             return filterService.loadAll();
         } catch (org.graylog2.database.NotFoundException e) {
-            return Sets.newHashSet();
+            return Collections.emptySet();
         }
     }
 

@@ -17,6 +17,7 @@
 package org.graylog2.dashboards.widgets;
 
 import com.codahale.metrics.MetricRegistry;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import org.graylog2.indexer.IndexHelper;
 import org.graylog2.indexer.results.TermsResult;
@@ -25,12 +26,8 @@ import org.graylog2.indexer.searches.timeranges.TimeRange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
 import java.util.Map;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public class QuickvaluesWidget extends DashboardWidget {
 
     private static final Logger LOG = LoggerFactory.getLogger(QuickvaluesWidget.class);
@@ -72,13 +69,12 @@ public class QuickvaluesWidget extends DashboardWidget {
 
     @Override
     public Map<String, Object> getPersistedConfig() {
-        return new HashMap<String, Object>() {{
-            put("query", query);
-            put("timerange", timeRange.getPersistedConfig());
-            put("stream_id", streamId);
-
-            put("field", field);
-        }};
+        return ImmutableMap.<String, Object>builder()
+                .put("query", query)
+                .put("timerange", timeRange.getPersistedConfig())
+                .put("stream_id", streamId)
+                .put("field", field)
+                .build();
     }
 
     @Override
@@ -108,5 +104,4 @@ public class QuickvaluesWidget extends DashboardWidget {
     private boolean checkConfig(Map<String, Object> config) {
         return config.containsKey("field");
     }
-
 }

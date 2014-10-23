@@ -17,17 +17,20 @@
 package org.graylog2.inputs.random.generators;
 
 import com.google.common.base.Function;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import static org.graylog2.inputs.random.generators.FakeHttpRawMessageGenerator.GeneratorState.Method.*;
+import static org.graylog2.inputs.random.generators.FakeHttpRawMessageGenerator.GeneratorState.Method.DELETE;
+import static org.graylog2.inputs.random.generators.FakeHttpRawMessageGenerator.GeneratorState.Method.GET;
+import static org.graylog2.inputs.random.generators.FakeHttpRawMessageGenerator.GeneratorState.Method.POST;
+import static org.graylog2.inputs.random.generators.FakeHttpRawMessageGenerator.GeneratorState.Method.PUT;
 
 public class FakeHttpRawMessageGenerator {
 
@@ -37,13 +40,12 @@ public class FakeHttpRawMessageGenerator {
 
     private final Random rand = new Random(System.currentTimeMillis());
 
-    private static final List<Resource> GET_RESOURCES = new ArrayList<Resource>() {{
-        add(new Resource("/login", "LoginController", "login", 10));
-        add(new Resource("/users", "UsersController", "index", 2));
-        add(new Resource("/posts", "PostsController", "index", 40));
-        add(new Resource("/posts/45326", "PostsController", "show", 12));
-        add(new Resource("/posts/45326/edit", "PostsController", "edit", 1));
-    }};
+    private static final List<Resource> GET_RESOURCES = ImmutableList.of(
+            new Resource("/login", "LoginController", "login", 10),
+            new Resource("/users", "UsersController", "index", 2),
+            new Resource("/posts", "PostsController", "index", 40),
+            new Resource("/posts/45326", "PostsController", "show", 12),
+            new Resource("/posts/45326/edit", "PostsController", "edit", 1));
 
     private static final ImmutableMap<String, Resource> RESOURCE_MAP = Maps.uniqueIndex(GET_RESOURCES, new Function<Resource, String>() {
         @Nullable
@@ -56,13 +58,12 @@ public class FakeHttpRawMessageGenerator {
         }
     });
 
-    private final List<UserId> USER_IDS = new ArrayList<UserId>() {{
-        add(new UserId(9001, 10));
-        add(new UserId(54351, 1));
-        add(new UserId(74422, 5));
-        add(new UserId(6476752, 12));
-        add(new UserId(6469981, 40));
-    }};
+    private final List<UserId> USER_IDS = ImmutableList.of(
+            new UserId(9001, 10),
+            new UserId(54351, 1),
+            new UserId(74422, 5),
+            new UserId(6476752, 12),
+            new UserId(6469981, 40));
 
     public FakeHttpRawMessageGenerator(String source) {
         this.source = source;
@@ -71,14 +72,14 @@ public class FakeHttpRawMessageGenerator {
     public static int rateDeviation(int val, int maxDeviation, Random rand) {
         int deviationPercent = rand.nextInt(maxDeviation);
 
-        double x = val/100.0*deviationPercent;
+        double x = val / 100.0 * deviationPercent;
 
         // Add or substract?
         double result = 0;
         if (rand.nextBoolean()) {
-            result = val-x;
+            result = val - x;
         } else {
-            result = val+x;
+            result = val + x;
         }
 
         if (result < 0) {
@@ -101,11 +102,11 @@ public class FakeHttpRawMessageGenerator {
             generatorState.method = GET;
             generatorState.isTimeout = rand.nextInt(5) == 1;
             generatorState.isSlowRequest = rand.nextInt(500) == 1;
-            generatorState.userId = ((UserId)getWeighted(USER_IDS)).getId();
-            generatorState.resource = ((Resource)getWeighted(GET_RESOURCES)).getResource();
-        } else if(methodProb > 95 && methodProb <= 98) {
+            generatorState.userId = ((UserId) getWeighted(USER_IDS)).getId();
+            generatorState.resource = ((Resource) getWeighted(GET_RESOURCES)).getResource();
+        } else if (methodProb > 95 && methodProb <= 98) {
             generatorState.method = POST;
-        } else if(methodProb == 99) {
+        } else if (methodProb == 99) {
             generatorState.method = DELETE;
         } else {
             generatorState.method = PUT;
@@ -282,7 +283,7 @@ public class FakeHttpRawMessageGenerator {
         public String resource;
 
         public enum Method {
-            GET, POST, DELETE, PUT;
+            GET, POST, DELETE, PUT
         }
     }
 }

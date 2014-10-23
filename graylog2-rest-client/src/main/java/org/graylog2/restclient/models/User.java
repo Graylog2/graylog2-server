@@ -16,17 +16,16 @@
  */
 package org.graylog2.restclient.models;
 
-import com.google.common.collect.Lists;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.subject.SimplePrincipalCollection;
+import org.apache.shiro.subject.Subject;
 import org.graylog2.restclient.lib.APIException;
 import org.graylog2.restclient.lib.ApiClient;
 import org.graylog2.restclient.models.api.requests.ChangePasswordRequest;
 import org.graylog2.restclient.models.api.requests.ChangeUserRequest;
 import org.graylog2.restclient.models.api.responses.system.UserResponse;
-import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.subject.SimplePrincipalCollection;
-import org.apache.shiro.subject.Subject;
 import org.graylog2.restroutes.generated.routes;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
@@ -136,7 +135,7 @@ public class User {
 
 	public List<String> getPermissions() {
         if (permissions == null) {
-            return Lists.newArrayList();
+            return Collections.emptyList();
         }
 		return permissions;
 	}

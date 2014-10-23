@@ -27,12 +27,10 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 @CollectionName("notifications")
 public class NotificationImpl extends PersistedImpl implements Notification {
 
@@ -49,7 +47,7 @@ public class NotificationImpl extends PersistedImpl implements Notification {
         this.type = Type.valueOf(((String) fields.get("type")).toUpperCase());
         this.severity = Severity.valueOf(((String) fields.get("severity")).toUpperCase());
         this.timestamp = new DateTime(fields.get("timestamp"));
-        this.node_id = (String)fields.get("node_id");
+        this.node_id = (String) fields.get("node_id");
     }
 
     protected NotificationImpl(Map<String, Object> fields) {
@@ -58,7 +56,7 @@ public class NotificationImpl extends PersistedImpl implements Notification {
         this.type = Type.valueOf(((String) fields.get("type")).toUpperCase());
         this.severity = Severity.valueOf(((String) fields.get("severity")).toUpperCase());
         this.timestamp = new DateTime(fields.get("timestamp"));
-        this.node_id = (String)fields.get("node_id");
+        this.node_id = (String) fields.get("node_id");
     }
 
     public NotificationImpl() {
@@ -118,14 +116,14 @@ public class NotificationImpl extends PersistedImpl implements Notification {
         if (fields.get("details") == null)
             fields.put("details", new HashMap<String, Object>());
 
-        details = (Map<String, Object>)fields.get("details");
+        details = (Map<String, Object>) fields.get("details");
         details.put(key, value);
         return this;
     }
 
     @Override
     public Object getDetail(String key) {
-        final Map<String, Object> details = (Map<String, Object>)fields.get("details");
+        final Map<String, Object> details = (Map<String, Object>) fields.get("details");
         if (details == null)
             return null;
 
@@ -148,12 +146,12 @@ public class NotificationImpl extends PersistedImpl implements Notification {
 
     @Override
     public Map<String, Validator> getValidations() {
-        return Maps.newHashMap();
+        return Collections.emptyMap();
     }
 
     @Override
     public Map<String, Validator> getEmbeddedValidations(String key) {
-        return Maps.newHashMap();
+        return Collections.emptyMap();
     }
 
 }

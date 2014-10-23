@@ -16,16 +16,12 @@
  */
 package org.graylog2.restclient.lib.metrics;
 
+import com.google.common.collect.ImmutableMap;
 import org.graylog2.restclient.models.api.responses.metrics.TimerMetricsResponse;
 
-import java.util.HashMap;
 import java.util.Map;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public class Timer extends Metric {
-
     public enum Unit {
         MICROSECONDS
     }
@@ -55,15 +51,15 @@ public class Timer extends Metric {
     }
 
     public Timer(final TimerMetricsResponse t, Unit durationUnit) {
-        this(new HashMap<String, Object>() {{
-            put("std_dev", t.stdDev);
-            put("min", t.min);
-            put("max", t.max);
-            put("mean", t.mean);
-            put("95th_percentile", t.percentile95th);
-            put("98th_percentile", t.percentile98th);
-            put("99th_percentile", t.percentile99th);
-        }}, durationUnit);
+        this(ImmutableMap.<String, Object>builder()
+                        .put("std_dev", t.stdDev)
+                        .put("min", t.min)
+                        .put("max", t.max)
+                        .put("mean", t.mean)
+                        .put("95th_percentile", t.percentile95th)
+                        .put("98th_percentile", t.percentile98th)
+                        .put("99th_percentile", t.percentile99th).build(),
+                durationUnit);
     }
 
     public double getStandardDeviation() {
@@ -93,5 +89,4 @@ public class Timer extends Metric {
     public double get99thPercentile() {
         return percentile99th;
     }
-
 }

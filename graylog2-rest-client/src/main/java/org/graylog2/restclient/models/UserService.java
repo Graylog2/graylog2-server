@@ -51,6 +51,7 @@ import org.slf4j.LoggerFactory;
 import play.mvc.Http;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -107,7 +108,7 @@ public class UserService {
         } catch (APIException e) {
             log.error("Could not retrieve list of users", e);
         }
-        return Lists.newArrayList();
+        return Collections.emptyList();
     }
 
     public boolean create(CreateUserRequest request) {

@@ -16,25 +16,18 @@
  */
 package org.graylog2.cluster;
 
-import com.google.common.collect.Maps;
 import org.bson.types.ObjectId;
 import org.graylog2.database.CollectionName;
 import org.graylog2.database.PersistedImpl;
 import org.graylog2.plugin.database.validators.Validator;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+import java.util.Collections;
 import java.util.Map;
 
-/**
- * @author Lennart Koopmann <lennart@socketfeed.com>
- */
 @CollectionName("nodes")
 public class NodeImpl extends PersistedImpl implements Node {
-
-    private static final Logger LOG = LoggerFactory.getLogger(NodeImpl.class);
 
     protected NodeImpl(Map<String, Object> fields) {
         super(fields);
@@ -61,7 +54,7 @@ public class NodeImpl extends PersistedImpl implements Node {
 
     @Override
     public DateTime getLastSeen() {
-        return new DateTime(((Integer) fields.get("last_seen"))*1000L, DateTimeZone.UTC);
+        return new DateTime(((Integer) fields.get("last_seen")) * 1000L, DateTimeZone.UTC);
     }
 
     @Override
@@ -80,12 +73,12 @@ public class NodeImpl extends PersistedImpl implements Node {
 
     @Override
     public Map<String, Validator> getValidations() {
-        return Maps.newHashMap();
+        return Collections.emptyMap();
     }
 
     @Override
     public Map<String, Validator> getEmbeddedValidations(String key) {
-        return Maps.newHashMap();
+        return Collections.emptyMap();
     }
 
 }

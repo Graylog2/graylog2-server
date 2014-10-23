@@ -16,6 +16,7 @@
  */
 package org.graylog2.alerts;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.mongodb.BasicDBObject;
@@ -36,7 +37,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -55,12 +55,11 @@ public class AlertServiceImpl extends PersistedServiceImpl implements AlertServi
 
     @Override
     public Alert factory(AlertCondition.CheckResult checkResult) {
-        Map<String, Object> fields = Maps.newHashMap();
-
         if (!checkResult.isTriggered()) {
             throw new RuntimeException("Tried to create alert from not triggered alert condition result.");
         }
 
+        Map<String, Object> fields = Maps.newHashMap();
         fields.put("triggered_at", checkResult.getTriggeredAt());
         fields.put("condition_id", checkResult.getTriggeredCondition().getId());
         fields.put("stream_id", checkResult.getTriggeredCondition().getStream().getId());
@@ -134,15 +133,15 @@ public class AlertServiceImpl extends PersistedServiceImpl implements AlertServi
         }
 
         return createAlertCondition(type,
-                                    stream,
-                                    (String) fields.get("id"),
-                                    DateTime.parse((String) fields.get("created_at")),
-                                    (String) fields.get("creator_user_id"),
-                                    (Map<String, Object>) fields.get("parameters"));
+                stream,
+                (String) fields.get("id"),
+                DateTime.parse((String) fields.get("created_at")),
+                (String) fields.get("creator_user_id"),
+                (Map<String, Object>) fields.get("parameters"));
     }
 
     private AbstractAlertCondition createAlertCondition(AbstractAlertCondition.Type type, Stream stream, String id, DateTime createdAt, String creatorId, Map<String, Object> parameters) throws AbstractAlertCondition.NoSuchAlertConditionTypeException {
-        switch(type) {
+        switch (type) {
             case MESSAGE_COUNT:
                 return messageCountAlertFactory.createAlertCondition(stream, id, createdAt, creatorId, parameters);
             case FIELD_VALUE:
@@ -168,7 +167,7 @@ public class AlertServiceImpl extends PersistedServiceImpl implements AlertServi
 
     @Override
     public AbstractAlertCondition updateFromRequest(AlertCondition alertCondition, CreateConditionRequest ccr) throws AbstractAlertCondition.NoSuchAlertConditionTypeException {
-        AbstractAlertCondition.Type type = ((AbstractAlertCondition)alertCondition).getType();
+        AbstractAlertCondition.Type type = ((AbstractAlertCondition) alertCondition).getType();
 
         Map<String, Object> parameters = ccr.parameters;
         for (Map.Entry<String, Object> stringObjectEntry : alertCondition.getParameters().entrySet()) {
@@ -194,36 +193,36 @@ public class AlertServiceImpl extends PersistedServiceImpl implements AlertServi
             return false;
         }
 
-        return lastAlertSecondsAgo < alertCondition.getGrace()*60;
+        return lastAlertSecondsAgo < alertCondition.getGrace() * 60;
     }
 
     @Override
     public AlertCondition.CheckResult triggeredNoGrace(AlertCondition alertCondition) {
         LOG.debug("Checking alert condition [{}] and not accounting grace time.", this);
-        return ((AbstractAlertCondition)alertCondition).runCheck();
+        return ((AbstractAlertCondition) alertCondition).runCheck();
     }
 
     @Override
     public AlertCondition.CheckResult triggered(AlertCondition alertCondition) {
         LOG.debug("Checking alert condition [{}]", this);
 
-        if(inGracePeriod(alertCondition)) {
+        if (inGracePeriod(alertCondition)) {
             LOG.debug("Alert condition [{}] is in grace period. Not triggered.", this);
             return new AbstractAlertCondition.CheckResult(false);
         }
 
-        return ((AbstractAlertCondition)alertCondition).runCheck();
+        return ((AbstractAlertCondition) alertCondition).runCheck();
     }
 
     @Override
     public Map<String, Object> asMap(final AlertCondition alertCondition) {
-        return new HashMap<String, Object>() {{
-            put("id", alertCondition.getId());
-            put("type", alertCondition.getTypeString().toLowerCase());
-            put("creator_user_id", alertCondition.getCreatorUserId());
-            put("created_at", Tools.getISO8601String(alertCondition.getCreatedAt()));
-            put("parameters", alertCondition.getParameters());
-            put("in_grace", inGracePeriod(alertCondition));
-        }};
+        return ImmutableMap.<String, Object>builder()
+                .put("id", alertCondition.getId())
+                .put("type", alertCondition.getTypeString().toLowerCase())
+                .put("creator_user_id", alertCondition.getCreatorUserId())
+                .put("created_at", Tools.getISO8601String(alertCondition.getCreatedAt()))
+                .put("parameters", alertCondition.getParameters())
+                .put("in_grace", inGracePeriod(alertCondition))
+                .build();
     }
 }

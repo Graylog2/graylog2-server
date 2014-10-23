@@ -68,6 +68,7 @@ import org.graylog2.plugin.indexer.retention.IndexManagement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -277,9 +278,7 @@ public class Indices implements IndexManagement {
     public void reopenIndex(String index) {
         // Mark this index as re-opened. It will never be touched by retention.
         UpdateSettingsRequest settings = new UpdateSettingsRequest(index);
-        settings.settings(new HashMap<String, Object>() {{
-            put("graylog2_reopened", true);
-        }});
+        settings.settings(Collections.<String, Object>singletonMap("graylog2_reopened", true));
         c.admin().indices().updateSettings(settings).actionGet();
 
         // Open index.

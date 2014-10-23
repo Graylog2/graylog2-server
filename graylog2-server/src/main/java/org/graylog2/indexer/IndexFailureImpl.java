@@ -16,7 +16,7 @@
  */
 package org.graylog2.indexer;
 
-import com.google.common.collect.Maps;
+import com.google.common.collect.ImmutableMap;
 import org.bson.types.ObjectId;
 import org.graylog2.database.CollectionName;
 import org.graylog2.database.PersistedImpl;
@@ -24,12 +24,9 @@ import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.database.validators.Validator;
 import org.joda.time.DateTime;
 
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.Map;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 @CollectionName("index_failures")
 public class IndexFailureImpl extends PersistedImpl implements IndexFailure {
 
@@ -43,24 +40,24 @@ public class IndexFailureImpl extends PersistedImpl implements IndexFailure {
 
     @Override
     public Map<String, Object> asMap() {
-        return new HashMap<String, Object>() {{
-            put("timestamp", Tools.getISO8601String((DateTime) fields.get("timestamp")));
-            put("letter_id", fields.get("letter_id"));
-            put("written", fields.get("written"));
-            put("message", fields.get("message"));
-            put("index", fields.get("index"));
-            put("type", fields.get("type"));
-        }};
+        return ImmutableMap.<String, Object>builder()
+                .put("timestamp", Tools.getISO8601String((DateTime) fields.get("timestamp")))
+                .put("letter_id", fields.get("letter_id"))
+                .put("written", fields.get("written"))
+                .put("message", fields.get("message"))
+                .put("index", fields.get("index"))
+                .put("type", fields.get("type"))
+                .build();
     }
 
     @Override
     public Map<String, Validator> getValidations() {
-        return Maps.newHashMap();
+        return Collections.emptyMap();
     }
 
     @Override
     public Map<String, Validator> getEmbeddedValidations(String key) {
-        return Maps.newHashMap();
+        return Collections.emptyMap();
     }
 
 }

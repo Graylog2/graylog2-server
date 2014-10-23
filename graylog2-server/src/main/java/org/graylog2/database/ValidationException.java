@@ -18,14 +18,11 @@ package org.graylog2.database;
 
 import org.graylog2.plugin.database.validators.ValidationResult;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public class ValidationException extends Exception {
     private final Map<String, List<ValidationResult>> errors;
 
@@ -39,9 +36,7 @@ public class ValidationException extends Exception {
 
     public ValidationException(final String field, final String message) {
         this.errors = new HashMap<>();
-        this.errors.put(field, new ArrayList<ValidationResult>() {{
-            add(new ValidationResult.ValidationFailed(message));
-        }});
+        this.errors.put(field, Collections.<ValidationResult>singletonList(new ValidationResult.ValidationFailed(message)));
     }
 
     public Map<String, List<ValidationResult>> getErrors() {

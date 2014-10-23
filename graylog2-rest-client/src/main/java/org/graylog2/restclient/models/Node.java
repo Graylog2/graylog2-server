@@ -52,6 +52,7 @@ import play.mvc.Http;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -405,7 +406,7 @@ public class Node extends ClusterEntity {
                 .expect(200)
                 .execute();
         if (response == null) {
-            return Maps.newHashMap();
+            return Collections.emptyMap();
         }
         return response.getMetrics();
     }
