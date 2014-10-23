@@ -150,6 +150,11 @@ public class SearchController extends AuthenticatedController {
         final int MONTH = HOUR * 24 * 30;
         final int YEAR = MONTH * 12;
 
+        // Return minute as default resolution if search from and to DateTimes are not available
+        if (searchResult.getFromDateTime() == null && searchResult.getToDateTime() == null) {
+            return "minute";
+        }
+
         int queryRangeInMinutes;
 
         // We don't want to use fromDateTime coming from the search query if the user asked for all messages

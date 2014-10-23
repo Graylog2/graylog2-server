@@ -5,6 +5,7 @@
         outputs: List[org.graylog2.restclient.models.Output],
         streams: List[org.graylog2.restclient.models.Stream],
         dashboards: List[org.graylog2.restclient.models.dashboards.Dashboard])
+@import org.graylog2.restclient.models.Input
 
 @values(field: Field) = @{
     if(field.indexes.size == 0) {
@@ -14,37 +15,50 @@
     }
 }
 
+@inputDetails(input: Input) = @{
+    var details = input.getName
+    if(input.getAttributes.containsKey("bind_address")) {
+        details += " on " + input.getAttributes.get("bind_address")
+        if(input.getAttributes.containsKey("port")) {
+            details += " port " + input.getAttributes.get("port")
+        }
+    }
+    details
+}
+
 @main("Export Bundle", views.html.system.sidebar(), "", currentUser) {
     @views.html.partials.breadcrumbs(breadcrumbs)
 
     <div class="row-fluid">
-        <h1><i class="icon icon-sitemap"></i> Export Bundle</h1>
-        Export your inputs, outputs, streams and dashboards as a configuration bundle.
+        <h1><i class="icon icon-sitemap"></i> Build your own Content Pack</h1>
+        Export your inputs, outputs, streams and dashboards as a content pack and share it with the community.
     </div>
 
     @helper.form(action = routes.BundlesController.export(), 'class -> "form-horizontal") {
         <div class="control-group @if(form("name").hasErrors) {error}">
             <label class="control-label" for="name">Name</label>
             <div class="controls">
-                <input type="text" id="name" name="name" value="@form("name").value()" required/>
-                <span class="help-block">Write a name for your configuration bundle.</span>
-
+                <input type="text" id="name" class="input-xlarge" name="name" value="@form("name").value()" required/>
+                <span class="help-block">The name of your configuration bundle.</span>
             </div>
         </div>
 
         <div class="control-group @if(form("description").hasErrors) {error}">
             <label class="control-label" for="description">Description</label>
             <div class="controls">
-                <textarea rows="3" id="description" name="description" required>@form("description").value()</textarea>
-                <span class="help-block">Write a description of what your bundle does.</span>
+                <textarea rows="6" id="description" name="description" class="input-xlarge" required>@form("description").value()</textarea>
+                <span class="help-block">
+                    A description of what your bundle does and instructions about possible inputs to start manually.
+                    You can use <a href="http://daringfireball.net/projects/markdown/syntax" target="_blank">Markdown</a> syntax.
+                </span>
             </div>
         </div>
 
         <div class="control-group @if(form("category").hasErrors) {error}">
             <label class="control-label" for="category">Category</label>
             <div class="controls">
-                <input type="text" id="category" name="category" value="@form("category").value()" required/>
-                <span class="help-block">Write a category for your bundle, e.g. Linux, Firewall, Switch.</span>
+                <input type="text" id="category" name="category" class="input-xlarge" value="@form("category").value()" required/>
+                <span class="help-block">A category for your bundle, e.g. Operating System, Firewall or Switch.</span>
             </div>
         </div>
 
@@ -55,11 +69,11 @@
                     @if(inputs.isEmpty) {
                         <span class="help-block help-standalone">There are no inputs to export.</span>
                     } else {
-                        @for(i <- inputs.sortBy(_.getName)) {
-                            <label class="checkbox">
-                                <input type="checkbox" name="inputs" id="input_@i.getId" value="@i.getId" @if(listValues.contains(Some(i.getId))) {checked=""}>
-                                @i.getName
-                            </label>
+                        @for(i <- inputs.sortBy(_.getTitle)) {
+                            <div class="checkbox-control">
+                                <label class="checkbox"><input type="checkbox" name="inputs" id="input_@i.getId" value="@i.getId" @if(listValues.contains(Some(i.getId))) {checked=""}>@i.getTitle</label>
+                                <span class="help-inline">(@inputDetails(i))</span>
+                            </div>
                         }
                     }
                 </div>
@@ -74,10 +88,9 @@
                     <span class="help-block help-standalone">There are no outputs to export.</span>
                 } else {
                     @for(o <- outputs.sortBy(_.getTitle)) {
-                        <label class="checkbox">
-                            <input type="checkbox" name="outputs" id="output_@o.getId" value="@o.getId" @if(listValues.contains(Some(o.getId))) {checked=""}>
-                            @o.getTitle
-                        </label>
+                        <div class="checkbox-control">
+                            <label class="checkbox"><input type="checkbox" name="outputs" id="output_@o.getId" value="@o.getId" @if(listValues.contains(Some(o.getId))) {checked=""}>@o.getTitle</label>
+                        </div>
                     }
                 }
                 </div>
@@ -92,10 +105,9 @@
                     <span class="help-block help-standalone">There are no streams to export.</span>
                 } else {
                     @for(s <- streams.sortBy(_.getTitle)) {
-                        <label class="checkbox">
-                            <input type="checkbox" name="streams" id="stream_@s.getId" value="@s.getId" @if(listValues.contains(Some(s.getId))) {checked=""}>
-                            @s.getTitle
-                        </label>
+                        <div class="checkbox-control">
+                            <label class="checkbox"><input type="checkbox" name="streams" id="stream_@s.getId" value="@s.getId" @if(listValues.contains(Some(s.getId))) {checked=""}>@s.getTitle</label>
+                        </div>
                     }
                 }
                 </div>
@@ -110,10 +122,9 @@
                     <span class="help-block help-standalone">There are no dashboards to export.</span>
                 } else {
                     @for(d <- dashboards.sortBy(_.getTitle)) {
-                        <label class="checkbox">
-                            <input type="checkbox" name="dashboards" id="dashboard_@d.getId" value="@d.getId" @if(listValues.contains(Some(d.getId))) {checked=""}>
-                            @d.getTitle
-                        </label>
+                        <div class="checkbox-control">
+                            <label class="checkbox"><input type="checkbox" name="dashboards" id="dashboard_@d.getId" value="@d.getId" @if(listValues.contains(Some(d.getId))) {checked=""}>@d.getTitle</label>
+                        </div>
                     }
                 }
                 </div>
@@ -122,9 +133,9 @@
 
         <div class="control-group">
             <div class="controls">
-                <button type="submit" class="btn btn-primary">
-                    <i class="icon icon-rocket"></i>
-                    Export bundle
+                <button type="submit" class="btn btn-success">
+                    <i class="icon icon-cloud-download"></i>
+                    Download my content pack
                 </button>
             </div>
         </div>

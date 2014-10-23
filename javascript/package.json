@@ -1,6 +1,6 @@
 {
   "name": "graylog2-web-interface",
-  "version": "0.92.0-snapshot",
+  "version": "0.92.0",
   "description": "Graylog2 Web Interface",
   "author": "torch",
   "license": "GPL",
@@ -27,7 +27,8 @@
     "crossfilter": "1.x",
     "d3": "3.x",
     "joi": "^4.6.2",
-    "react": "^0.11.2"
+    "react": "^0.11.2",
+    "markdown": "^0.5.0"
   },
   "devDependencies": {
     "browserify": "*",

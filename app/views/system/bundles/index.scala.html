@@ -1,12 +1,12 @@
 @(currentUser: org.graylog2.restclient.models.User,
     breadcrumbs: lib.BreadcrumbList)
 
-@main("Bundles", views.html.system.sidebar(), "", currentUser) {
+@main("Content packs", views.html.system.sidebar(), "", currentUser) {
 
     <div class="pull-right">
         <div class="btn-group">
             <a class="btn btn-info btn-small" href="@routes.BundlesController.export()">
-                Export bundle
+                Build your own content pack
             </a>
         </div>
     </div>
@@ -14,13 +14,15 @@
     @views.html.partials.breadcrumbs(breadcrumbs)
 
     <div class="row-fluid">
-        <h1><i class="icon icon-sitemap"></i> Bundles</h1>
-        Set up your Graylog2 easily with configuration bundles.
+        <h1><i class="icon icon-sitemap"></i> Content packs</h1>
+        Content packs are bundled sets of input/extractor combinations and fitting data representations like streams and
+        dashboards. Importing a content pack allows you to rapidly support a given source of log messages and automatically
+        get the most important streams and dashboards set up.
     </div>
 
     <div class="row-fluid">
-        <h2><i class="icon icon-cogs"></i> Apply a configuration bundle</h2>
-        Select a configuration bundle from the list to get you started.
+        <h2><i class="icon icon-cogs"></i> Manage content packs</h2>
+        Select a content pack from the list to get you started.
     </div>
     <div id="react-configuration-bundles"></div>
 }

@@ -8,7 +8,7 @@ var ConfigurationBundles = require('../source-tagging/ConfigurationBundles');
 
 var QuickStartCard = React.createClass({
     render: function () {
-        var quickStartDescription = <p>New to Graylog2? Select a configuration bundle to get you started:</p>;
+        var quickStartDescription = <p>New to Graylog2&#63; Select a configuration bundle to get you started:</p>;
 
         return (
             <Card title="Quick Start" icon="icon-plane">
