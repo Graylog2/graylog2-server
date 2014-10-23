@@ -47,8 +47,13 @@ h1.username {
 }
 
 /* Remove boostrap outline */
-a:focus, select:focus, input[type="file"]:focus, input[type="radio"]:focus, input[type="checkbox"]:focus {
+a:focus, select:focus, input[type="file"]:focus, input[type="radio"]:focus, input[type="checkbox"]:focus, .btn:focus {
   outline: none;
+  outline-offset: 0;
+}
+
+.btn:focus {
+  background-position: 0;
 }
 
 #top {
@@ -1744,6 +1749,14 @@ form.edit-dashboard-form {
     border-bottom: 1px dotted #4DBCE9;
 }
 
+.sources tbody tr button.dc-search-button {
+    color: #0088cc;
+}
+
+.sources tbody tr a.dc-filter-link {
+    border-bottom: 1px dotted;
+}
+
 .dynatable-per-page-label {
     font-size: 14px;
 }
@@ -2084,7 +2097,7 @@ textarea.textarea-xlarge {
 
 .scrollable-menu {
     max-height: 300px;
-    overflow: scroll;
+    overflow: auto;
 }
 
 .scrollable-table {
@@ -2238,6 +2251,15 @@ textarea.textarea-xlarge {
   padding: 20px;
 }
 
+.configuration-bundles .bundle-preview .preview-actions form {
+  display: inline-block;
+  margin-left: 20px;
+}
+
+.configuration-bundles .bundle-preview .preview-actions form:first-child {
+    margin-left: 0;
+}
+
 .configuration-bundles .bundle-preview pre {
   background-color: #cfcfcf;
 }
@@ -2264,6 +2286,32 @@ textarea.textarea-xlarge {
   vertical-align: middle;
   padding-top: 5px;
   line-height: 20px;
+}
+
+.form-horizontal.pull-left label.control-label {
+  width: auto;
+}
+
+.form-horizontal.pull-left div.controls {
+  display: inline-block;
+  float: right;
+  margin-left: 20px;
+}
+
+.sources-filtering {
+  margin-top: 20px;
+}
+
+.sources-filtering .control-group {
+  margin-bottom: 0px;
+}
+
+#dc-sources-pie-chart svg {
+  margin-top: 20px;
+}
+
+#dc-sources-pie-chart g.pie-slice.highlighted {
+  fill-opacity: 0.8;
 }
 
 .form-horizontal .control-group .controls .checkbox-control:first-child {

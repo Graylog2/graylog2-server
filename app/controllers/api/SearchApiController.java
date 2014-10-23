@@ -18,21 +18,27 @@
  */
 package controllers.api;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 import com.google.inject.Inject;
 import controllers.AuthenticatedController;
-import org.graylog2.restclient.lib.APIException;
 import lib.SearchTools;
-import org.graylog2.restclient.lib.timeranges.*;
+import org.graylog2.restclient.lib.APIException;
+import org.graylog2.restclient.lib.timeranges.AbsoluteRange;
+import org.graylog2.restclient.lib.timeranges.InvalidRangeParametersException;
+import org.graylog2.restclient.lib.timeranges.TimeRange;
 import org.graylog2.restclient.models.UniversalSearch;
 import org.graylog2.restclient.models.api.responses.FieldHistogramResponse;
 import org.graylog2.restclient.models.api.responses.FieldStatsResponse;
 import org.graylog2.restclient.models.api.responses.FieldTermsResponse;
-import play.Logger;
+import org.graylog2.restclient.models.api.results.DateHistogramResult;
+import org.joda.time.*;
 import play.mvc.Result;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -183,6 +189,194 @@ public class SearchApiController extends AuthenticatedController {
 
             return internalServerError("api exception " + e);
         }
+    }
+
+    public Result histogram(String q, String rangeType, int relative, String from, String to, String keyword, String interval, String streamId, int maxDataPoints) {
+        if (q == null || q.isEmpty()) {
+            q = "*";
+        }
+
+        // Interval.
+        if (interval == null || interval.isEmpty() || !SearchTools.isAllowedDateHistogramInterval(interval)) {
+            interval = "minute";
+        }
+
+        // Determine timerange type.
+        TimeRange timerange;
+        try {
+            timerange = TimeRange.factory(rangeType, relative, from, to, keyword);
+        } catch(InvalidRangeParametersException e2) {
+            return status(400, views.html.errors.error.render("Invalid range parameters provided.", e2, request()));
+        } catch(IllegalArgumentException e1) {
+            return status(400, views.html.errors.error.render("Invalid range type provided.", e1, request()));
+        }
+
+        String filter = null;
+        if (streamId != null && !streamId.isEmpty()) {
+            filter = "streams:" + streamId;
+        }
+
+        try {
+            UniversalSearch search = searchFactory.queryWithRangeAndFilter(q, timerange, filter);
+            DateHistogramResult histogram = search.dateHistogram(interval);
+            List<Map<String, Long>> results = formatHistogramResults(histogram, maxDataPoints, relative == 0);
+
+            Map<String, Object> result = Maps.newHashMap();
+            AbsoluteRange boundaries = histogram.getHistogramBoundaries();
+            result.put("time", histogram.getTookMs());
+            result.put("interval", histogram.getInterval());
+            result.put("values", results);
+            result.put("from", boundaries.getFrom());
+            result.put("to", boundaries.getTo());
+
+            ObjectMapper om = new ObjectMapper();
+            String json = om.writeValueAsString(result);
+
+            return ok(json).as("application/json");
+        } catch (IOException e) {
+            return internalServerError("io exception");
+        } catch (APIException e) {
+            if (e.getHttpCode() == 400) {
+                // This usually means the field does not have a numeric type. Pass through!
+                return badRequest();
+            }
+
+            return internalServerError("api exception " + e);
+        }
+    }
+
+    /**
+     * Create a list with histogram results that would be serialized to JSON like this
+     *
+     * [{ x: -1893456000, y: 92228531 }, { x: -1577923200, y: 106021568 }]
+     *
+     */
+    protected List<Map<String, Long>> formatHistogramResults(DateHistogramResult histogram, int maxDataPoints, boolean allQuery) {
+        final List<Map<String, Long>> points = Lists.newArrayList();
+        final Map<String, Long> histogramResults = histogram.getResults();
+
+        DateTime from;
+        if (allQuery) {
+            String firstTimestamp = histogramResults.entrySet().iterator().next().getKey();
+            from = new DateTime(Long.parseLong(firstTimestamp) * 1000, DateTimeZone.UTC);
+        } else {
+            from = DateTime.parse(histogram.getHistogramBoundaries().getFrom());
+        }
+        final DateTime to = DateTime.parse(histogram.getHistogramBoundaries().getTo());
+        final MutableDateTime currentTime = new MutableDateTime(from);
+
+        final Duration step = estimateIntervalStep(histogram.getInterval());
+        final int dataPoints = (int) ((to.getMillis() - from.getMillis()) / step.getMillis());
+
+        // using the absolute value guarantees, that there will always be enough values for the given resolution
+        final int factor = (maxDataPoints != -1 && dataPoints > maxDataPoints) ? dataPoints / maxDataPoints : 1;
+
+        int index = 0;
+        floorToBeginningOfInterval(histogram.getInterval(), currentTime);
+        while (currentTime.isBefore(to) || currentTime.isEqual(to)) {
+            if (index % factor == 0) {
+                String timestamp = Long.toString(currentTime.getMillis() / 1000);
+                Long result = histogramResults.get(timestamp);
+                Map<String, Long> point = Maps.newHashMap();
+                point.put("x", Long.parseLong(timestamp));
+                point.put("y", result != null ? result : 0);
+                points.add(point);
+            }
+            index++;
+            nextStep(histogram.getInterval(), currentTime);
+        }
+
+        return points;
+    }
+
+    private void nextStep(String interval, MutableDateTime currentTime) {
+        switch (interval) {
+            case "minute":
+                currentTime.addMinutes(1);
+                break;
+            case "hour":
+                currentTime.addHours(1);
+                break;
+            case "day":
+                currentTime.addDays(1);
+                break;
+            case "week":
+                currentTime.addWeeks(1);
+                break;
+            case "month":
+                currentTime.addMonths(1);
+                break;
+            case "quarter":
+                currentTime.addMonths(3);
+                break;
+            case "year":
+                currentTime.addYears(1);
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid duration specified: " + interval);
+        }
+    }
+
+    private void floorToBeginningOfInterval(String interval, MutableDateTime currentTime) {
+        switch (interval) {
+            case "minute":
+                currentTime.minuteOfDay().roundFloor();
+                break;
+            case "hour":
+                currentTime.hourOfDay().roundFloor();
+                break;
+            case "day":
+                currentTime.dayOfMonth().roundFloor();
+                break;
+            case "week":
+                currentTime.weekOfWeekyear().roundFloor();
+                break;
+            case "month":
+                currentTime.monthOfYear().roundFloor();
+                break;
+            case "quarter":
+                // set the month to the beginning of the quarter
+                int currentQuarter = ((currentTime.getMonthOfYear() - 1) / 3);
+                int startOfQuarter = (currentQuarter * 3) + 1;
+                currentTime.setMonthOfYear(startOfQuarter);
+                currentTime.monthOfYear().roundFloor();
+                break;
+            case "year":
+                currentTime.yearOfCentury().roundFloor();
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid duration specified: " + interval);
+        }
+    }
+
+    private Duration estimateIntervalStep(String interval) {
+        Duration step;
+        switch (interval) {
+            case "minute":
+                step = Minutes.ONE.toStandardDuration();
+                break;
+            case "hour":
+                step = Hours.ONE.toStandardDuration();
+                break;
+            case "day":
+                step = Days.ONE.toStandardDuration();
+                break;
+            case "week":
+                step = Weeks.ONE.toStandardDuration();
+                break;
+            case "month":
+                step = Days.days(31).toStandardDuration();
+                break;
+            case "quarter":
+                step = Days.days(31*3).toStandardDuration();
+                break;
+            case "year":
+                step = Days.days(365).toStandardDuration();
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid duration specified: " + interval);
+        }
+        return step;
     }
 
 }

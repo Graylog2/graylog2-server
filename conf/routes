@@ -170,6 +170,7 @@ POST        /dashboards/:id/delete                                              
 GET         /a/search/fieldstats                                                     @controllers.api.SearchApiController.fieldStats(q ?= "", field ?= "", rangetype ?= "", relative:Integer ?= -1, from ?= "", to ?= "", keyword ?= "", stream_id ?= "")
 GET         /a/search/fieldterms                                                     @controllers.api.SearchApiController.fieldTerms(q ?= "", field ?= "", rangetype ?= "", relative:Integer ?= -1, from ?= "", to ?= "", keyword ?= "", stream_id ?= "")
 GET         /a/search/fieldhistogram                                                 @controllers.api.SearchApiController.fieldHistogram(q ?= "", field ?= "", rangetype ?= "", relative:Integer ?= -1, from ?= "", to ?= "", keyword ?= "", interval ?= "", valueType ?= "", streamId ?= "")
+GET         /a/search/histogram                                                      @controllers.api.SearchApiController.histogram(q ?= "", rangetype ?= "", relative:Integer ?= -1, from ?= "", to ?= "", keyword ?= "", interval ?= "", streamId ?= "", maxDataPoints:Integer ?= -1)
 
 # API: Message counts and histograms
 GET         /a/messagecounts/total                                                   @controllers.MessageCountsController.total()
@@ -244,6 +245,10 @@ GET         /a/system/contentpacks                                              
 POST        /a/system/contentpacks                                                   @controllers.api.BundlesApiController.create()
 POST        /a/system/contentpacks/:pack_id/apply                                    @controllers.api.BundlesApiController.apply(pack_id: String)
 POST        /a/system/contentpacks/:pack_id/delete                                   @controllers.api.BundlesApiController.delete(pack_id: String)
+
+# API: Sources
+GET         /a/sources                                                               @controllers.api.SourcesApiController.list(range: Integer ?= 86400)
+
 
 # Map static resources from the /public folder to the /assets URL path
 GET         /assets/*file                                                            controllers.Assets.at(path="/public", file)

@@ -15,18 +15,15 @@ env:
       7SvCgLvni0ewVVs8P2F9dGeG7HZ0WRJ3tcdZCcJG9IBk6xNcWAQveZ2goBKJ
       0Y0YksLljdKHv8mn02KX2tZxLVYjgzq09Dvn0+bGOzQU+TLbkPY=
 before_script:
-  - wget http://downloads.typesafe.com/typesafe-activator/${ACTIVATOR_VERSION}/typesafe-activator-${ACTIVATOR_VERSION}-minimal.zip
-  - unzip -q typesafe-activator-${ACTIVATOR_VERSION}-minimal.zip
-  - activator-${ACTIVATOR_VERSION}-minimal/activator update
+  - wget -q http://downloads.typesafe.com/typesafe-activator/${ACTIVATOR_VERSION}/typesafe-activator-${ACTIVATOR_VERSION}.zip
+  - unzip -q typesafe-activator-${ACTIVATOR_VERSION}.zip
+  - activator-${ACTIVATOR_VERSION}/activator update
+  - pushd javascript && npm install && popd
 script:
-  - pushd javascript
-  - npm install
-  - npm test
-  - node_modules/.bin/gulp deploy-prod
-  - popd
-  - activator-${ACTIVATOR_VERSION}-minimal/activator test
+  - pushd javascript && npm test && node_modules/.bin/gulp deploy-prod && popd
+  - activator-${ACTIVATOR_VERSION}/activator test
 after_success:
-  - activator-${ACTIVATOR_VERSION}-minimal/activator universal:package-zip-tarball
+  - activator-${ACTIVATOR_VERSION}/activator universal:package-zip-tarball
 deploy:
   provider: s3
   access_key_id: AKIAIGYGO43W76PZMMVA

@@ -218,10 +218,11 @@ $(document).ready(function() {
 });
 
 function activateTimerangeChooser(selectorName, link) {
-    $(".timerange-selector").hide();
+    var timerange = $(".timerange-selector");
+    timerange.hide();
     $("#universalsearch .timerange-selector-container .keyword .preview").hide();
     $("#universalsearch-rangetype").val(selectorName);
-    $(".timerange-selector input,select").attr("disabled", "disabled");
+    $("input,select", timerange).attr("disabled", "disabled");
 
     var selected = $("." + selectorName, $(".universalsearch-form"));
     selected.show();
