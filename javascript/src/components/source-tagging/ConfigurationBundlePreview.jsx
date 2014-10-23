@@ -9,7 +9,7 @@ var ConfigurationBundlePreview = React.createClass({
     _confirmDeletion() {
        return window.confirm("You are about to delete this content pack, are you sure?");
     },
-    render: function () {
+    render() {
         var preview = "Select an element from the left list to see its preview.";
         var apply_action = "";
         var delete_action = "";
