@@ -189,16 +189,12 @@ var SourceOverview = React.createClass({
                     var index = this.querySources.indexOf(datum.name);
                     if (index === -1) {
                         this.querySources.push(datum.name);
-                    } else {
-                        this.querySources.splice(index, 1);
                     }
 
                     var queryString = this.querySources.map((source) => "source:"+escapeQuerySource(source)).join(" OR ");
                     var query = $("#universalsearch-query");
                     query.val(queryString);
                     query.effect("bounce");
-
-                    parentTdElement.children().toggleClass("active");
                 });
             })
             .renderlet((table) => {
@@ -212,13 +208,7 @@ var SourceOverview = React.createClass({
                     this.loadHistogramData();
                 });
             })
-            .renderlet((table) => table.selectAll(".dc-table-group").classed("info", true))
-            .renderlet((table) => {
-                table.selectAll("td.dc-table-column._0")
-                    .filter((datum, index) => this.querySources.indexOf(datum.name) !== -1)
-                    .selectAll("button.dc-search-button")
-                    .classed("active", true);
-            });
+            .renderlet((table) => table.selectAll(".dc-table-group").classed("info", true));
     },
     resetSourcesFilters() {
         this.pieChart.filterAll();
