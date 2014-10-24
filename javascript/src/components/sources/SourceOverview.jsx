@@ -1,6 +1,6 @@
 /** @jsx React.DOM */
 
-/* global activateTimerangeChooser, momentHelper, htmlEscape */
+/* global activateTimerangeChooser, momentHelper */
 /* jshint -W107 */
 
 'use strict';
@@ -20,6 +20,11 @@ var daysToSeconds = (days) => moment.duration(days, 'days').as('seconds');
 
 var othersThreshold = 5;
 var othersName = "Others";
+
+var escapeQuerySource = (source) => {
+    // Escape all lucene special characters from the source: && || : \ / + - ! ( ) { } [ ] ^ " ~ * ?
+    return source.replace(/(&&|\|\||[\:\\\/\+\-\!\(\)\{\}\[\]\^\"\~\*\?])/g, "\\$&");
+};
 
 var SourceOverview = React.createClass({
     getInitialState() {
@@ -45,7 +50,11 @@ var SourceOverview = React.createClass({
         };
     },
     loadHistogramData() {
-        var filters = this.othersDimension.top(Infinity).map((source) => source.name);
+        var filters;
+
+        if (this.pieChart.filters().length !== 0 || this.dataTable.filters().length !== 0) {
+            filters = this.nameDimension.top(Infinity).map((source) => escapeQuerySource(source.name));
+        }
         HistogramDataStore.loadHistogramData(this.state.range, filters);
     },
     loadData() {
@@ -184,7 +193,7 @@ var SourceOverview = React.createClass({
                         this.querySources.splice(index, 1);
                     }
 
-                    var queryString = this.querySources.map((source) => "source:"+htmlEscape(source)).join(" OR ");
+                    var queryString = this.querySources.map((source) => "source:"+escapeQuerySource(source)).join(" OR ");
                     var query = $("#universalsearch-query");
                     query.val(queryString);
                     query.effect("bounce");
