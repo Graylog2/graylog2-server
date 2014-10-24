@@ -17,29 +17,18 @@
 package org.graylog2.inputs.transports;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import com.google.inject.AbstractModule;
-import com.google.inject.Key;
 import com.google.inject.Provider;
-import com.google.inject.TypeLiteral;
-import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.multibindings.MapBinder;
 import com.google.inject.name.Names;
-import org.graylog2.plugin.ConfigClass;
-import org.graylog2.plugin.FactoryClass;
+import org.graylog2.plugin.inject.Graylog2Module;
 import org.graylog2.plugin.inputs.transports.Transport;
 
-import java.lang.annotation.Annotation;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
-public class TransportsModule extends AbstractModule {
+public class TransportsModule extends Graylog2Module {
     protected void configure() {
-        // lol generics
-        final MapBinder<String, Transport.Factory<? extends Transport>> mapBinder =
-                MapBinder.newMapBinder(binder(),
-                                       TypeLiteral.get(String.class),
-                                       new TypeLiteral<Transport.Factory<? extends Transport>>() {
-                                       });
+        final MapBinder<String, Transport.Factory<? extends Transport>> mapBinder = transportMapBinder();
 
         installTransport(mapBinder, "udp", UdpTransport.class);
         installTransport(mapBinder, "tcp", TcpTransport.class);
@@ -69,58 +58,4 @@ public class TransportsModule extends AbstractModule {
                 });
     }
 
-    // TODO fix duplication with CodecsModule
-    private void installTransport(
-            MapBinder<String, Transport.Factory<? extends Transport>> mapBinder,
-            String name,
-            Class<? extends Transport> transportClass) {
-
-        final Class<? extends Transport.Config> configClass =
-                (Class<? extends Transport.Config>)
-                        findInnerClassAnnotatedWith(ConfigClass.class, transportClass, Transport.Config.class);
-
-        final Class<? extends Transport.Factory<? extends Transport>> factoryClass =
-                (Class<? extends Transport.Factory<? extends Transport>>)
-                        findInnerClassAnnotatedWith(FactoryClass.class, transportClass, Transport.Factory.class);
-
-        if (configClass == null || factoryClass == null) {
-            throw new IllegalStateException("Missing annotations on transport class " + transportClass);
-        }
-        installTransport(mapBinder, name, transportClass, configClass, factoryClass);
-    }
-
-    private void installTransport(
-            MapBinder<String, Transport.Factory<? extends Transport>> mapBinder,
-            String name,
-            Class<? extends Transport> transportClass,
-            Class<? extends Transport.Config> configClass,
-            Class<? extends Transport.Factory<? extends Transport>> factoryClass) {
-        final Key<? extends Transport.Factory<? extends Transport>> factoryKey = Key.get(factoryClass);
-        install(new FactoryModuleBuilder()
-                        .implement(Transport.class, transportClass)
-                        .implement(Transport.Config.class, configClass)
-                        .build(factoryClass));
-
-        mapBinder.addBinding(name).to(factoryKey);
-    }
-
-    private Class<?> findInnerClassAnnotatedWith(Class<? extends Annotation> annotationClass,
-                                                     Class<? extends Transport> transportClass,
-                                                     Class<?> targetClass) {
-        final Class<?>[] declaredClasses = transportClass.getDeclaredClasses();
-        Class<?> annotatedClass = null;
-        for (final Class<?> declaredClass : declaredClasses) {
-            if (!declaredClass.isAnnotationPresent(annotationClass)) {
-                continue;
-            }
-            // must be subclass of Transport.Config
-            if (targetClass.isAssignableFrom(declaredClass)) {
-                // TODO log error if configClass is already assigned
-                annotatedClass = declaredClass;
-            } else {
-                // TODO log error and skip transport
-            }
-        }
-        return annotatedClass;
-    }
 }
