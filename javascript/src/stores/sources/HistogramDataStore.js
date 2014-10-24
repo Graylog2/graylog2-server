@@ -40,7 +40,6 @@ var HistogramDataStore = {
         var failCallback = (jqXHR, textStatus, errorThrown) => {
             console.error("Loading of histogram data failed with status: " + textStatus);
             console.error("Error", errorThrown);
-            alert("Could not retrieve histogram data from server - try reloading the page");
         };
         $.getJSON(url, successCallback).fail(failCallback);
     }

@@ -37,19 +37,8 @@ public class SourcesController extends AuthenticatedController {
     @Inject
     private SourcesService sourcesService;
 
-    public Result list(int range) {
-        if (range < 0) {
-            return status(400, views.html.errors.error.render("Invalid time range for sources list", new Exception(), request()));
-        }
-        try {
-            List<Source> sources = sourcesService.all(range);
-            return ok(views.html.sources.list.render(currentUser(), sources, range));
-        } catch (IOException e) {
-            return status(500, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
-        } catch (APIException e) {
-            String message = "Could not fetch sources information. We expected HTTP 200, but got a HTTP " + e.getHttpCode() + ".";
-            return status(500, views.html.errors.error.render(message, e, request()));
-        }
+    public Result list() {
+        return ok(views.html.sources.list.render(currentUser()));
     }
 
 }

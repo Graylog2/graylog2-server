@@ -36,7 +36,6 @@ var SourcesStore = {
         var failCallback = (jqXHR, textStatus, errorThrown) => {
             console.error("Loading of user sources failed with status: " + textStatus);
             console.error("Error", errorThrown);
-            alert("Could not retrieve sources from server - try reloading the page");
         };
         $.getJSON(url, successCallback).fail(failCallback);
     }

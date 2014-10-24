@@ -140,7 +140,7 @@ POST        /system/users/startpage/reset/:username                             
 POST        /system/users/resetpermissions/:username                                 @controllers.UsersController.resetPermissions(username: String)
 
 # Sources
-GET         /sources                                                                 @controllers.SourcesController.list(range: Integer ?= 86400)
+GET         /sources                                                                 @controllers.SourcesController.list()
 
 # Startpages
 GET         /startpage/set                                                           @controllers.StartpageController.set(pageType ?= "", id ?= "")

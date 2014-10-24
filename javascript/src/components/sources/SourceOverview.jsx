@@ -12,6 +12,7 @@ var $ = require('jquery');
 var crossfilter = require('crossfilter');
 var d3 = require('d3');
 var dc = require('dc');
+var Qs = require('qs');
 
 var SourcesStore = require('../../stores/sources/SourcesStore');
 var HistogramDataStore = require('../../stores/sources/HistogramDataStore');
@@ -20,6 +21,8 @@ var daysToSeconds = (days) => moment.duration(days, 'days').as('seconds');
 
 var othersThreshold = 5;
 var othersName = "Others";
+var DEFAULT_RANGE_IN_SECS = daysToSeconds(1);
+var SUPPORTED_RANGES_IN_SECS = [daysToSeconds(1), daysToSeconds(7), daysToSeconds(31), daysToSeconds(365), 0];
 
 var SourceOverview = React.createClass({
     getInitialState() {
@@ -37,7 +40,7 @@ var SourceOverview = React.createClass({
         this.querySources = [];
 
         return {
-            range: daysToSeconds(1),
+            range: DEFAULT_RANGE_IN_SECS,
             resolution: 'minute',
             filter: '',
             renderResultTable: false,
@@ -53,6 +56,7 @@ var SourceOverview = React.createClass({
         this.loadHistogramData();
     },
     componentDidMount() {
+        this.applyRangeParameter();
         SourcesStore.addChangeListener(this._onSourcesChanged);
         HistogramDataStore.addChangeListener(this._onHistogramDataChanged);
         this.renderDataTable();
@@ -64,6 +68,28 @@ var SourceOverview = React.createClass({
     componentWillUnmount() {
         SourcesStore.removeChangeListener(this._onSourcesChanged);
         HistogramDataStore.removeChangeListener(this._onHistogramDataChanged);
+    },
+    componentWillReceiveProps(newProps) {
+        var range = newProps.params.range;
+        this.changeRange(range);
+    },
+    applyRangeParameter() {
+        var range;
+        // redirect old range format (as query parameter) to new format (deep link)
+        var query = window.location.search;
+        if (query) {
+            if (query.indexOf("?") === 0 && query.length > 1) {
+                query = query.substr(1, query.length - 1);
+                range = Qs.parse(query)["range"];
+                if (range) {
+                    // if range is ill formatted, we take care of it in the deep link handling
+                    window.location.replace("sources#/" + range);
+                    return;
+                }
+            }
+        }
+        range = this.props.params.range;
+        this.changeRange(range);
     },
     updatePieChartDimension() {
         // TODO: Decide if the pie chart should ever display grouped others (makes things complicated to program and to use, so disabled for now)
@@ -288,12 +314,28 @@ var SourceOverview = React.createClass({
             $('#dc-sources-result-reset').hide();
         }
     },
-    _onRangeChanged(event) {
+    changeRange(range) {
+        if (typeof range === 'undefined' || SUPPORTED_RANGES_IN_SECS.indexOf(range) !== -1) {
+            range = DEFAULT_RANGE_IN_SECS;
+        }
+
+        if (this.state.range === range) {
+            return;
+        }
         // when range is changed the filter in line chart (corresponding to the brush) does not make any sense any more
         this.valueDimension.filterAll();
-        this.lineChart.filterAll();
+        if (this.lineChart) {
+            this.lineChart.filterAll();
+        }
         this._syncRangeWithQuery();
-        this.setState({range: event.target.value}, () => this.loadData());
+        // TODO: is this the best way of updating the URL???
+        //window.location.href = "sources#/" + range;
+        window.location.hash = "#/" + range;
+        this.setState({range: range}, () => this.loadData());
+    },
+    _onRangeChanged(event) {
+        var value = event.target.value;
+        this.changeRange(value);
     },
     _onNumberOfSourcesChanged(event) {
         this.setState({numberOfSources: event.target.value}, () => {
