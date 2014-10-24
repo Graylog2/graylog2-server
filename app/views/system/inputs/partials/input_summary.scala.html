@@ -24,8 +24,8 @@
             <form action="@routes.InputsController.terminate(inputState.getNode.getNodeId, input.getId)" method="POST">
                 <button class="btn btn-danger btn-mini"
                 type="submit"
-                data-confirm="Really terminate input?">
-                                            Terminate
+                data-confirm="Really delete input @input.getTitle?">
+                    <i class="icon icon-remove"></i> Delete
                 </button>
             </form>
             }
