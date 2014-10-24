@@ -38,18 +38,11 @@
                         </button>
                     }
                 }
+
+                @if(!currentUser.isReadonly) {
+                    <a href="@routes.StartpageController.set("dashboard", dashboard.getId)"
+                    class="btn btn-mini"><i class="icon-home"></i> Set as start page</a>
                 }
-                <div class="btn-group">
-                    <a class="btn btn-mini dropdown-toggle" data-toggle="dropdown" href="#">
-                    Action
-                        <span class="caret"></span>
-                    </a>
-                    <ul class="dropdown-menu">
-                        <li @if(currentUser.isReadonly) { class="disabled" }>
-                            <a href="@if(currentUser.isReadonly) { # } else { @routes.StartpageController.set("dashboard", dashboard.getId) }">Set as startpage</a>
-                        </li>
-                    </ul>
-                </div>
             </div>
 
             <h3>
