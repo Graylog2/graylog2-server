@@ -23,7 +23,6 @@ import org.graylog2.restclient.lib.APIException;
 import org.graylog2.restclient.lib.ApiClient;
 import org.graylog2.restclient.lib.ApiRequestBuilder;
 import org.graylog2.restclient.models.alerts.Alert;
-import org.graylog2.restclient.models.alerts.AlertCondition;
 import org.graylog2.restclient.models.alerts.AlertConditionService;
 import org.graylog2.restclient.models.api.requests.alerts.CreateAlertConditionRequest;
 import org.graylog2.restclient.models.api.responses.alerts.AlertSummaryResponse;
@@ -36,7 +35,6 @@ import org.graylog2.restroutes.generated.routes;
 import org.joda.time.DateTime;
 
 import java.io.IOException;
-import java.util.Collection;
 import java.util.List;
 
 public class Stream {
@@ -54,6 +52,7 @@ public class Stream {
     private final String description;
     private final String creatorUserId;
     private final String createdAt;
+    private final String contentPack;
     private final List<StreamRule> streamRules;
     private final Boolean disabled;
 
@@ -79,6 +78,7 @@ public class Stream {
         this.description = ssr.description;
         this.creatorUserId = ssr.creatorUserId;
         this.createdAt = ssr.createdAt;
+        this.contentPack = ssr.contentPack;
 
         this.streamRules = Lists.newArrayList();
 
@@ -187,6 +187,10 @@ public class Stream {
 
     public DateTime getCreatedAt() {
         return DateTime.parse(createdAt);
+    }
+
+    public String getContentPack() {
+        return contentPack;
     }
 
     public List<StreamRule> getStreamRules() {

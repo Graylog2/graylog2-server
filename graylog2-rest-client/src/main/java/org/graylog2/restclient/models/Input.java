@@ -59,6 +59,7 @@ public class Input {
     private final String title;
     private final DateTime createdAt;
     private final User creatorUser;
+    private final String contentPack;
     private final Boolean global;
     private final Map<String, Object> attributes;
     private final Map<String, String> staticFields;
@@ -84,6 +85,7 @@ public class Input {
         this.attributes = is.attributes;
         this.staticFields = is.staticFields;
         this.createdAt = DateTime.parse(is.createdAt);
+        this.contentPack = is.contentPack;
 
         // We might get a double parsed from JSON here. Make sure to round it to Integer. (would be .0 anyways)
         for (Map.Entry<String, Object> e : attributes.entrySet()) {
@@ -134,6 +136,10 @@ public class Input {
 
     public User getCreatorUser() {
         return creatorUser;
+    }
+
+    public String getContentPack() {
+        return contentPack;
     }
 
     public Map<String, String> getStaticFields() {

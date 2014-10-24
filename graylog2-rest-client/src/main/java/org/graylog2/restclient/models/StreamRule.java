@@ -71,6 +71,7 @@ public class StreamRule {
     private final Type type;
     private final Boolean inverted;
     private final String stream_id;
+    private final String contentPack;
 
     private final StreamService streamService;
 
@@ -83,6 +84,7 @@ public class StreamRule {
         this.type = Type.fromInt(srsr.type);
         this.stream_id = srsr.stream_id;
         this.streamService = streamService;
+        this.contentPack = srsr.contentPack;
     }
 
     public String getId() {
