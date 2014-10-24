@@ -1,5 +1,4 @@
-@(output: org.graylog2.restclient.models.Output,
-    stream: org.graylog2.restclient.models.Stream)
+@(output: org.graylog2.restclient.models.Output, stream: org.graylog2.restclient.models.Stream)
 
 @import lib.security.RestPermissions._;
 @import views.helpers.Permissions._;
@@ -12,10 +11,8 @@
         @if(stream != null && isPermitted(STREAM_OUTPUTS_DELETE)) {
             <form action="@routes.StreamOutputsController.remove(stream.getId, output.getId)" method="POST">
                 <button class="btn btn-warning btn-mini"
-                type="submit"
-                data-confirm="Really remove output from stream?"
-                >
-                    Remove from stream
+                type="submit" data-confirm="Really delete output @output.getTitle from stream @stream.getTitle?">
+                    <i class="icon icon-remove"></i> Delete from stream
                 </button>
             </form>
         }
@@ -25,17 +22,15 @@
             } else {
                 <form action="@routes.OutputsController.terminate(output.getId, stream.getId)" method="POST">
             }
-                <button class="btn btn-danger btn-mini"
-                type="submit"
-                data-confirm="Really terminate output globally? It will be removed from all streams in the system.">
-                    Terminate globally
+                <button class="btn btn-danger btn-mini" type="submit"
+                data-confirm="Really delete output @output.getTitle globally? It will be removed from all streams in the system.">
+                    <i class="icon icon-remove"></i> Delete globally
                 </button>
             </form>
         }
     </span>
     <h3>
-        <i class="icon icon-ellipsis-vertical"></i>
-        @output.getTitle (@output.getType)
+        <i class="icon icon-ellipsis-vertical"></i> @output.getTitle (@output.getType)
     </h3>
     <div class="well well-small">
         <ul>
