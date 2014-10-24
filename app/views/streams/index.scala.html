@@ -43,6 +43,9 @@
                 <i class="icon icon-ellipsis-vertical"></i>
                 <a class="added-width-search-link" href="@routes.StreamSearchController.index(stream.getId, "*", "relative", 300)">
                     @stream.getTitle
+                    @if(stream.getContentPack != null) {
+                        <span title="Created from content pack"><i class="icon-gift"></i></span>
+                    }
                 </a>
 
                 @if(stream.getDisabled) {

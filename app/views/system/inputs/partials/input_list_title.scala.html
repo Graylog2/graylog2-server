@@ -1,8 +1,10 @@
-@(input: org.graylog2.restclient.models.Input,
-        inputTypes: Map[String, org.graylog2.restclient.models.api.responses.system.InputTypeSummaryResponse])
+@(input: org.graylog2.restclient.models.Input, inputTypes: Map[String, org.graylog2.restclient.models.api.responses.system.InputTypeSummaryResponse])
 
 <i class="icon icon-ellipsis-vertical"></i>
 @input.getTitle (@input.getName)
+@if(input.getContentPack != null) {
+    <span title="Created from content pack"><i class="icon-gift"></i></span>
+}
 
 @if(inputTypes.get(input.getType).linkToDocs != null && !inputTypes.get(input.getType).linkToDocs.isEmpty) {
     <a href="@inputTypes.get(input.getType).linkToDocs" target="_blank">

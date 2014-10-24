@@ -31,6 +31,9 @@
     </span>
     <h3>
         <i class="icon icon-ellipsis-vertical"></i> @output.getTitle (@output.getType)
+        @if(output.getContentPack != null) {
+            <span title="Created from content pack"><i class="icon-gift"></i></span>
+        }
     </h3>
     <div class="well well-small">
         <ul>

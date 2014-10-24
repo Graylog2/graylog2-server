@@ -47,7 +47,12 @@
 
             <h3>
                 <i class="icon icon-ellipsis-vertical"></i>
-                <a href="@routes.DashboardsController.show(dashboard.getId)">@dashboard.getTitle</a>
+                <a href="@routes.DashboardsController.show(dashboard.getId)">
+                @dashboard.getTitle
+                @if(dashboard.getContentPack != null) {
+                    <span title="Created from content pack"><i class="icon-gift"></i></span>
+                }
+                </a>
             </h3>
 
             @dashboard.getWidgets.size() widgets.
