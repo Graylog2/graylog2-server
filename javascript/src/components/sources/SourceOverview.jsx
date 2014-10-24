@@ -55,7 +55,7 @@ var SourceOverview = React.createClass({
     loadHistogramData() {
         var filters;
 
-        if (this.pieChart.filters().length !== 0 || this.dataTable.filters().length !== 0) {
+        if (this.pieChart && (this.pieChart.filters().length !== 0 || this.dataTable.filters().length !== 0)) {
             filters = this.nameDimension.top(Infinity).map((source) => escapeQuerySource(source.name));
         }
         HistogramDataStore.loadHistogramData(this.state.range, filters);
