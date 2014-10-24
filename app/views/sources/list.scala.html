@@ -7,32 +7,4 @@
     <div id="react-sources">
 
     </div>
-
-    @if(sources.isEmpty) {
-        <div class="alert alert-info">
-            No message sources found. Looks like no messages were received in the selected timeframe.
-        </div>
-    } else {
-        <table class="sources table table-striped table-hover table-condensed">
-            <thead>
-                <tr>
-                    <th>Source name</th>
-                    <th>Message count</th>
-                </tr>
-            </thead>
-            <tbody>
-                @for(source <- sources.sortBy(-_.getMessageCount)) {
-                    <tr>
-                        <td>
-                            <a href="#" class="search-link" data-field="source" data-search-link-operator="OR" data-value="@source.getName">
-                                @source.getName
-                            </a>
-                        </td>
-                        <td>@source.getMessageCount</td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-    }
-
 }
