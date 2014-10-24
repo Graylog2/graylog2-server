@@ -1,6 +1,6 @@
 /** @jsx React.DOM */
 
-/* global activateTimerangeChooser, momentHelper, htmlEscape */
+/* global activateTimerangeChooser, momentHelper */
 /* jshint -W107 */
 
 'use strict';
@@ -23,6 +23,11 @@ var othersThreshold = 5;
 var othersName = "Others";
 var DEFAULT_RANGE_IN_SECS = daysToSeconds(1);
 var SUPPORTED_RANGES_IN_SECS = [daysToSeconds(1), daysToSeconds(7), daysToSeconds(31), daysToSeconds(365), 0];
+
+var escapeQuerySource = (source) => {
+    // Escape all lucene special characters from the source: && || : \ / + - ! ( ) { } [ ] ^ " ~ * ?
+    return source.replace(/(&&|\|\||[\:\\\/\+\-\!\(\)\{\}\[\]\^\"\~\*\?])/g, "\\$&");
+};
 
 var SourceOverview = React.createClass({
     getInitialState() {
@@ -48,7 +53,11 @@ var SourceOverview = React.createClass({
         };
     },
     loadHistogramData() {
-        var filters = this.othersDimension.top(Infinity).map((source) => source.name);
+        var filters;
+
+        if (this.pieChart.filters().length !== 0 || this.dataTable.filters().length !== 0) {
+            filters = this.nameDimension.top(Infinity).map((source) => escapeQuerySource(source.name));
+        }
         HistogramDataStore.loadHistogramData(this.state.range, filters);
     },
     loadData() {
@@ -188,7 +197,7 @@ var SourceOverview = React.createClass({
             .group((d) => d.percentage > othersThreshold ? "Top Sources" : othersName)
             .size(this.state.numberOfSources)
             .columns([
-                (d) => "<button class='btn btn-mini dc-search-button' title='Search for this source'><i class='icon icon-search'></i></button>",
+                (d) => "<button class='btn btn-mini btn-link dc-search-button' title='Search for this source'><i class='icon icon-search'></i></button>",
                 (d) => "<a href='javascript:undefined' class='dc-filter-link' title='Filter this source'>" + d.name +"</a>",
                 (d) => d.percentage.toFixed(2) + "%",
                 (d) => d.messageCount
@@ -206,16 +215,12 @@ var SourceOverview = React.createClass({
                     var index = this.querySources.indexOf(datum.name);
                     if (index === -1) {
                         this.querySources.push(datum.name);
-                    } else {
-                        this.querySources.splice(index, 1);
                     }
 
-                    var queryString = this.querySources.map((source) => "source:"+htmlEscape(source)).join(" OR ");
+                    var queryString = this.querySources.map((source) => "source:"+escapeQuerySource(source)).join(" OR ");
                     var query = $("#universalsearch-query");
                     query.val(queryString);
                     query.effect("bounce");
-
-                    parentTdElement.children().toggleClass("active");
                 });
             })
             .renderlet((table) => {
@@ -229,13 +234,7 @@ var SourceOverview = React.createClass({
                     this.loadHistogramData();
                 });
             })
-            .renderlet((table) => table.selectAll(".dc-table-group").classed("info", true))
-            .renderlet((table) => {
-                table.selectAll("td.dc-table-column._0")
-                    .filter((datum, index) => this.querySources.indexOf(datum.name) !== -1)
-                    .selectAll("button.dc-search-button")
-                    .classed("active", true);
-            });
+            .renderlet((table) => table.selectAll(".dc-table-group").classed("info", true));
     },
     resetSourcesFilters() {
         this.pieChart.filterAll();
@@ -405,34 +404,30 @@ var SourceOverview = React.createClass({
                 <div className="row-fluid">
                     <div id="dc-sources-line-chart" className="span12">
                         <h3><i className="icon icon-calendar"></i> Messages per {this.state.resolution}&nbsp;
-                            <small><a href="javascript:undefined" className="reset" onClick={this.resetHistogramFilters} title="Reset filter" style={{"display": "none"}}><i className="icon icon-repeat"></i></a></small>
+                            <small><a href="javascript:undefined" className="reset" onClick={this.resetHistogramFilters} title="Reset filter" style={{"display": "none"}}><i className="icon icon-retweet"></i></a></small>
                         </h3>
                     </div>
                 </div>
                 {this.state.renderResultTable ? null : emptySources}
                 <div className="row-fluid">
                     <div className="span9">
-                        <h3><i className="icon icon-th-list"></i> All sources selected&nbsp;
-                            <small><a href="javascript:undefined" id="dc-sources-result-reset" className="reset" onClick={this.resetSourcesFilters} title="Reset filter" style={{"display": "none"}}><i className="icon icon-repeat"></i></a></small>
+                        <h3><i className="icon icon-th-list"></i> Selected sources&nbsp;
+                            <small><a href="javascript:undefined" id="dc-sources-result-reset" className="reset" onClick={this.resetSourcesFilters} title="Reset filter" style={{"display": "none"}}><i className="icon icon-retweet"></i></a></small>
                         </h3>
                         <div className="row-fluid sources-filtering">
                             <div className="span6">
                                 <div className="form-horizontal pull-left">
                                     <div className="control-group">
-                                        <label className="control-label">Search:</label>
-                                        <div className="controls">
-                                            <input type="search" className="input-medium" onChange={this._onFilterChanged}/>
-                                        </div>
+                                        <input type="search" className="input-medium" onChange={this._onFilterChanged} placeholder="Search"/>
                                     </div>
                                 </div>
                             </div>
                             <div className="span6">
                                 <div className="form-horizontal pull-right">
                                     <div className="control-group">
-                                        <label className="control-label">Sources:</label>
+                                        <label className="control-label">Results:</label>
                                         <div className="controls">
                                             <select className="input-small" onChange={this._onNumberOfSourcesChanged} value={this.state.numberOfSources}>
-                                                <option value="1">1</option>
                                                 <option value="10">10</option>
                                                 <option value="50">50</option>
                                                 <option value="100">100</option>
@@ -448,7 +443,7 @@ var SourceOverview = React.createClass({
                     <div className="span3">
                         <div id="dc-sources-pie-chart">
                             <h3><i className="icon icon-bar-chart"></i> Messages per source&nbsp;
-                                <small><a href="javascript:undefined" className="reset" onClick={this.resetSourcesFilters} title="Reset filter" style={{"display": "none"}}><i className="icon icon-repeat"></i></a></small>
+                                <small><a href="javascript:undefined" className="reset" onClick={this.resetSourcesFilters} title="Reset filter" style={{"display": "none"}}><i className="icon icon-retweet"></i></a></small>
                             </h3>
                         </div>
                     </div>

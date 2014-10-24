@@ -1,7 +1,5 @@
 @(currentUser: org.graylog2.restclient.models.User)
 
-@import java.util.concurrent.TimeUnit.DAYS
-
 @main("Sources", views.html.sidebars.standard.render(currentUser), "", currentUser) {
 
     <div id="react-sources">
