@@ -16,8 +16,8 @@
         <li><a href="@routes.StreamRulesController.index(stream.getId)">Edit rules</a></li>
         <li><a href="@routes.StreamOutputsController.index(stream.getId)">Manage outputs</a></li>
 
-        <li @if(stream.getStreamRules.isEmpty()) { class="disabled" } >
-        @if(!stream.getStreamRules.isEmpty()) {
+        <li @if(stream.getStreamRules.isEmpty) { class="disabled" } >
+        @if(!stream.getStreamRules.isEmpty) {
             <a href="#" data-stream-id="@stream.getId" class="show-stream-rule">
             } else {
             <a href="#">
@@ -43,7 +43,7 @@
             </ul>
         </li>
         @if(isPermitted(STREAMS_CHANGESTATE, stream.getId)) {
-            @if(stream.getDisabled() == false) {
+            @if(stream.getDisabled == false) {
                 <li><a href="@routes.StreamsController.pause(stream.getId)" data-confirm="Really pause stream?">Pause this stream</a></li>
             } else {
                 <li><a href="@routes.StreamsController.resume(stream.getId)">Resume this stream</a></li>

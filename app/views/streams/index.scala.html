@@ -9,7 +9,7 @@
 @main("Streams", views.html.sidebars.standard(currentUser), "", currentUser, false) {
 
     @if(isPermitted(STREAMS_CREATE)) {
-    <a href="@routes.StreamsController.newStream()" class="btn btn-success pull-right">Create stream</a>
+        <a href="@routes.StreamsController.newStream()" class="btn btn-success pull-right">Create stream</a>
     }
 
     <div class="row-fluid">
@@ -21,17 +21,17 @@
         to be alerted whenever there are more logins than usual.
     </div>
 
-    @for(stream <- streams.sortBy(_.getTitle).filter(stream => isPermitted(STREAMS_READ, stream.getId))) {
+    @for(stream <- streams.filter(stream => isPermitted(STREAMS_READ, stream.getId)).sortBy(_.getTitle)) {
         <div class="row-fluid node-row stream-row" data-stream-id="@stream.getId">
             <span class="pull-right node-row-info">
                 Created by @views.html.partials.links.to_user.render(stream.getCreatorUser)
-                @DateHelper.readablePeriodFromNow(stream.getCreatedAt())
+                @DateHelper.readablePeriodFromNow(stream.getCreatedAt)
 
-                &nbsp;@if(isPermitted(STREAMS_EDIT, stream.getId)) {<button class="btn btn-danger btn-mini remove-stream"
-                    type="submit"
+                &nbsp;@if(isPermitted(STREAMS_EDIT, stream.getId)) {
+                    <button class="btn btn-danger btn-mini remove-stream" type="submit"
                     data-removeUrl="@routes.StreamsController.delete(stream.getId)">
-                        Delete
-                </button>
+                        <i class="icon icon-remove"></i> Delete
+                    </button>
                 }
 
                 <div class="btn-group">
