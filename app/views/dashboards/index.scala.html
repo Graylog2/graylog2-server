@@ -32,10 +32,11 @@
                 @DateHelper.readablePeriodFromNow(dashboard.getCreatedAt)
 
                 @if(isPermitted(DASHBOARDS_EDIT, dashboard.getId)) {
-                @helper.form(action = routes.DashboardsController.delete(dashboard.getId)) {
-                    <button type="submit" class="btn btn-danger btn-mini" data-confirm="Really delete dashboard?">
-                        Delete
-                    </button>
+                    @helper.form(action = routes.DashboardsController.delete(dashboard.getId)) {
+                        <button type="submit" class="btn btn-danger btn-mini" data-confirm="Really delete dashboard @dashboard.getTitle?">
+                            <i class="icon-remove"></i> Delete
+                        </button>
+                    }
                 }
                 }
                 <div class="btn-group">
