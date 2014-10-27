@@ -46,16 +46,6 @@ public class RadioAmqpTransport extends AmqpTransport {
         return configuration;
     }
 
-    @Override
-    public ConfigurationRequest getRequestedConfiguration() {
-        final ConfigurationRequest r = super.getRequestedConfiguration();
-        // we have defaults for these
-        r.removeField(CK_EXCHANGE);
-        r.removeField(CK_QUEUE);
-        r.removeField(CK_ROUTING_KEY);
-        return r;
-    }
-
     @FactoryClass
     public interface Factory extends Transport.Factory<RadioAmqpTransport> {
         @Override

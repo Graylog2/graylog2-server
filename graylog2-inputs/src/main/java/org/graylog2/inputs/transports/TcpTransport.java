@@ -86,31 +86,6 @@ public class TcpTransport extends AbstractTcpTransport {
         return finalChannelHandlers;
     }
 
-    @Override
-    public ConfigurationRequest getRequestedConfiguration() {
-        ConfigurationRequest x = super.getRequestedConfiguration();
-
-        x.addField(
-                new BooleanField(
-                        CK_USE_NULL_DELIMITER,
-                        "Null frame delimiter?",
-                        false,
-                        "Use null byte as frame delimiter? Default is newline."
-                )
-        );
-        x.addField(
-                new NumberField(
-                        CK_MAX_MESSAGE_SIZE,
-                        "Maximum message size",
-                        maxFrameLength,
-                        "The maximum length of a message.",
-                        ConfigurationField.Optional.OPTIONAL,
-                        NumberField.Attribute.ONLY_POSITIVE
-                )
-        );
-
-        return x;
-    }
 
     @FactoryClass
     public interface Factory extends Transport.Factory<TcpTransport> {

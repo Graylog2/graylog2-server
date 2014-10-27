@@ -16,10 +16,12 @@
  */
 package org.graylog2.shared;
 
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.inject.AbstractModule;
 import com.google.inject.Module;
 import org.graylog2.plugin.Tools;
+import org.graylog2.plugin.inject.Graylog2Module;
 import org.graylog2.shared.bindings.GenericBindings;
 import org.graylog2.shared.bindings.InstantiationService;
 import org.reflections.Reflections;
@@ -34,6 +36,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 public class NodeRunner {
     private static final Logger LOG = LoggerFactory.getLogger(NodeRunner.class);
@@ -42,7 +45,9 @@ public class NodeRunner {
         List<Module> result = Lists.newArrayList();
         result.add(new GenericBindings(instantiationService));
         Reflections reflections = new Reflections("org.graylog2.shared.bindings");
-        for (Class<? extends Module> type : reflections.getSubTypesOf(AbstractModule.class)) {
+        final Set<Class<? extends AbstractModule>> generic = reflections.getSubTypesOf(AbstractModule.class);
+        final Set<Class<? extends Graylog2Module>> gl2Modules = reflections.getSubTypesOf(Graylog2Module.class);
+        for (Class<? extends Module> type : Iterables.concat(generic, gl2Modules)) {
             // skip the GenericBindings module, because we have already instantiated it above, avoids a bogus log message
             if (type.equals(GenericBindings.class)) {
                 continue;

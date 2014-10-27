@@ -16,6 +16,8 @@
  */
 package org.graylog2.restclient.lib;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.io.Resources;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,11 +65,29 @@ public class Version {
 
     public static final Version VERSION = v0_92_0_SNAPSHOT;
 
-    public final int major;
-    public final int minor;
-    public final int patch;
-    public final String additional;
-    private final String commitSha1;
+    @JsonProperty
+    public int major;
+
+    @JsonProperty
+    public int minor;
+
+    @JsonProperty
+    public int patch;
+
+    @JsonProperty
+    public String additional;
+
+    @JsonProperty
+    private String commitSha1;
+
+    @JsonCreator
+    public Version() {
+        major = 0;
+        minor = 0;
+        patch = 0;
+        additional = null;
+        commitSha1 = null;
+    }
 
     public Version(int major, int minor, int patch) {
         this(major, minor, patch, null, null);

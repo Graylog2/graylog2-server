@@ -37,8 +37,6 @@ public interface Transport {
 
     void stop();
 
-    ConfigurationRequest getRequestedConfiguration();
-
     MetricSet getMetricSet();
 
     public interface Config {

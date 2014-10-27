@@ -199,45 +199,6 @@ public class HttpPollTransport extends ThrottleableTransport {
     }
 
     @Override
-    public ConfigurationRequest getRequestedConfiguration() {
-        final ConfigurationRequest r = new ConfigurationRequest();
-
-        r.addField(new TextField(
-                CK_URL,
-                "URI of JSON resource",
-                "http://example.org/api",
-                "HTTP resource returning JSON on GET",
-                ConfigurationField.Optional.NOT_OPTIONAL
-        ));
-
-        r.addField(new TextField(
-                CK_HEADERS,
-                "Additional HTTP headers",
-                "",
-                "Add a comma separated list of additional HTTP headers. For example: Accept: application/json, X-Requester: Graylog2",
-                ConfigurationField.Optional.OPTIONAL
-        ));
-
-        r.addField(new NumberField(
-                CK_INTERVAL,
-                "Interval",
-                1,
-                "Time between every collector run. Select a time unit in the corresponding dropdown. Example: Run every 5 minutes.",
-                ConfigurationField.Optional.NOT_OPTIONAL
-        ));
-
-        r.addField(new DropdownField(
-                CK_TIMEUNIT,
-                "Interval time unit",
-                TimeUnit.MINUTES.toString(),
-                DropdownField.ValueTemplates.timeUnits(),
-                ConfigurationField.Optional.NOT_OPTIONAL
-        ));
-
-        return r;
-    }
-
-    @Override
     public MetricSet getMetricSet() {
         // TODO do we need any metrics here?
         return null;

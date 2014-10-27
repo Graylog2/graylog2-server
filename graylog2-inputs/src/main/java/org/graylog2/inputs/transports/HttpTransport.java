@@ -112,16 +112,6 @@ public class HttpTransport extends AbstractTcpTransport {
         return handlers;
     }
 
-    @Override
-    public ConfigurationRequest getRequestedConfiguration() {
-        final ConfigurationRequest r = super.getRequestedConfiguration();
-        r.addField(new BooleanField(CK_ENABLE_CORS,
-                                    "Enable CORS",
-                                    true,
-                                    "Input sends CORS headers to satisfy browser security policies"));
-        return r;
-    }
-
     @FactoryClass
     public interface Factory extends Transport.Factory<HttpTransport> {
         @Override

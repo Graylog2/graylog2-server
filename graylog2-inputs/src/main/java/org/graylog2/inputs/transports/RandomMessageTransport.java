@@ -64,39 +64,6 @@ public class RandomMessageTransport extends GeneratorTransport {
     }
 
     @Override
-    public ConfigurationRequest getRequestedConfiguration() {
-        ConfigurationRequest c = new ConfigurationRequest();
-
-        c.addField(new NumberField(
-                CK_SLEEP,
-                "Sleep time",
-                25,
-                "How many milliseconds to sleep between generating messages.",
-                ConfigurationField.Optional.NOT_OPTIONAL,
-                NumberField.Attribute.ONLY_POSITIVE
-        ));
-
-        c.addField(new NumberField(
-                CK_SLEEP_DEVIATION_PERCENT,
-                "Maximum random sleep time deviation",
-                30,
-                "The deviation is used to generate a more realistic and non-steady message flow.",
-                ConfigurationField.Optional.NOT_OPTIONAL,
-                NumberField.Attribute.ONLY_POSITIVE
-        ));
-
-        c.addField(new TextField(
-                CK_SOURCE,
-                "Source name",
-                "example.org",
-                "What to use as source of the generate messages.",
-                ConfigurationField.Optional.NOT_OPTIONAL
-        ));
-
-        return c;
-    }
-
-    @Override
     protected RawMessage produceRawMessage(MessageInput input) {
         final byte[] payload;
         try {

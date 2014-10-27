@@ -16,10 +16,6 @@
  */
 package org.graylog2.shared.bindings;
 
-import com.google.inject.AbstractModule;
-import com.google.inject.Key;
-import com.google.inject.TypeLiteral;
-import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.multibindings.MapBinder;
 import org.graylog2.inputs.amqp.AMQPInput;
 import org.graylog2.inputs.codecs.CodecsModule;
@@ -37,22 +33,19 @@ import org.graylog2.inputs.raw.udp.RawUDPInput;
 import org.graylog2.inputs.syslog.tcp.SyslogTCPInput;
 import org.graylog2.inputs.syslog.udp.SyslogUDPInput;
 import org.graylog2.inputs.transports.TransportsModule;
+import org.graylog2.plugin.inject.Graylog2Module;
 import org.graylog2.plugin.inputs.MessageInput;
 
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
  */
-public class MessageInputBindings extends AbstractModule {
+public class MessageInputBindings extends Graylog2Module {
     @Override
     protected void configure() {
         install(new TransportsModule());
         install(new CodecsModule());
 
-        final MapBinder<String, MessageInput.Factory<? extends MessageInput>> inputMapBinder =
-                MapBinder.newMapBinder(binder(),
-                                       TypeLiteral.get(String.class),
-                                       new TypeLiteral<MessageInput.Factory<? extends MessageInput>>() {
-                                       });
+        final MapBinder<String, MessageInput.Factory<? extends MessageInput>> inputMapBinder = inputsMapBinder();
         // new style inputs, using transports and codecs
         installInput(inputMapBinder, RawTCPInput.class, RawTCPInput.Factory.class);
         installInput(inputMapBinder, RawUDPInput.class, RawUDPInput.Factory.class);
@@ -68,13 +61,6 @@ public class MessageInputBindings extends AbstractModule {
         installInput(inputMapBinder, RadioAMQPInput.class, RadioAMQPInput.Factory.class);
         installInput(inputMapBinder, JsonPathInput.class, JsonPathInput.Factory.class);
         installInput(inputMapBinder, LocalMetricsInput.class, LocalMetricsInput.Factory.class);
-    }
-
-    private <T extends MessageInput> void installInput(MapBinder<String, MessageInput.Factory<? extends MessageInput>> inputMapBinder,
-                                                        Class<T> target,
-                                                        Class<? extends MessageInput.Factory<T>> targetFactory) {
-        install(new FactoryModuleBuilder().implement(MessageInput.class, target).build(targetFactory));
-        inputMapBinder.addBinding(target.getCanonicalName()).to(Key.get(targetFactory));
     }
 
 

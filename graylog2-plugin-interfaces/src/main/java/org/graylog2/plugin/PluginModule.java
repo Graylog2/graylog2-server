@@ -23,12 +23,12 @@
 package org.graylog2.plugin;
 
 import com.google.common.util.concurrent.Service;
-import com.google.inject.AbstractModule;
 import com.google.inject.TypeLiteral;
 import com.google.inject.multibindings.MapBinder;
 import com.google.inject.multibindings.Multibinder;
 import org.graylog2.plugin.alarms.callbacks.AlarmCallback;
 import org.graylog2.plugin.filters.MessageFilter;
+import org.graylog2.plugin.inject.Graylog2Module;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.outputs.MessageOutput;
 import org.graylog2.plugin.periodical.Periodical;
@@ -37,11 +37,17 @@ import org.graylog2.plugin.rest.PluginRestResource;
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
  */
-public abstract class PluginModule extends AbstractModule {
+public abstract class PluginModule extends Graylog2Module {
     protected void registerPlugin(Class<? extends PluginMetaData> pluginMetaData) {
         Multibinder<PluginMetaData> pluginMetaDataMultibinder = Multibinder.newSetBinder(binder(), PluginMetaData.class);
         pluginMetaDataMultibinder.addBinding().to(pluginMetaData);
     }
+
+    /**
+     * @deprecated use {@link org.graylog2.plugin.inject.Graylog2Module#installInput(com.google.inject.multibindings.MapBinder, Class, Class)} instead
+     * @param messageInputClass
+     */
+    @Deprecated
     protected void addMessageInput(Class<? extends MessageInput> messageInputClass) {
         TypeLiteral<Class<? extends MessageInput>> typeLiteral = new TypeLiteral<Class<? extends MessageInput>>(){};
         Multibinder<Class<? extends MessageInput>> messageInputs = Multibinder.newSetBinder(binder(), typeLiteral);

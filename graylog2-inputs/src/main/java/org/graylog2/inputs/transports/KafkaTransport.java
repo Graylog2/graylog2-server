@@ -290,48 +290,6 @@ public class KafkaTransport extends ThrottleableTransport {
     }
 
     @Override
-    public ConfigurationRequest getRequestedConfiguration() {
-        final ConfigurationRequest cr = new ConfigurationRequest();
-
-        cr.addField(new TextField(
-                CK_ZOOKEEPER,
-                "ZooKeeper address",
-                "192.168.1.1:2181",
-                "Host and port of the ZooKeeper that is managing your Kafka cluster.",
-                ConfigurationField.Optional.NOT_OPTIONAL));
-
-        cr.addField(new TextField(
-                CK_TOPIC_FILTER,
-                "Topic filter regex",
-                "^your-topic$",
-                "Every topic that matches this regular expression will be consumed.",
-                ConfigurationField.Optional.NOT_OPTIONAL));
-
-        cr.addField(new NumberField(
-                CK_FETCH_MIN_BYTES,
-                "Fetch minimum bytes",
-                5,
-                "Wait for a message batch to reach at least this size or the configured maximum wait time before fetching.",
-                ConfigurationField.Optional.NOT_OPTIONAL));
-
-        cr.addField(new NumberField(
-                CK_FETCH_WAIT_MAX,
-                "Fetch maximum wait time (ms)",
-                100,
-                "Wait for this time or the configured minimum size of a message batch before fetching.",
-                ConfigurationField.Optional.NOT_OPTIONAL));
-
-        cr.addField(new NumberField(
-                CK_THREADS,
-                "Processor threads",
-                2,
-                "Number of processor threads to spawn. Use one thread per Kafka topic partition.",
-                ConfigurationField.Optional.NOT_OPTIONAL));
-
-        return cr;
-    }
-
-    @Override
     public MetricSet getMetricSet() {
         return localRegistry;
     }

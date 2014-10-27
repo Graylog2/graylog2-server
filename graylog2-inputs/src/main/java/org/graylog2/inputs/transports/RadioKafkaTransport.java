@@ -48,14 +48,6 @@ public class RadioKafkaTransport extends KafkaTransport {
         return configuration;
     }
 
-    @Override
-    public ConfigurationRequest getRequestedConfiguration() {
-        final ConfigurationRequest r = super.getRequestedConfiguration();
-        // we provide a default value for that setting
-        r.removeField(CK_TOPIC_FILTER);
-        return r;
-    }
-
     @FactoryClass
     public interface Factory extends Transport.Factory<RadioKafkaTransport> {
         @Override

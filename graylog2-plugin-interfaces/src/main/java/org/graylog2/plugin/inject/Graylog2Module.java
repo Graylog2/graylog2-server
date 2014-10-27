@@ -29,6 +29,7 @@ import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.multibindings.MapBinder;
 import org.graylog2.plugin.ConfigClass;
 import org.graylog2.plugin.FactoryClass;
+import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.codecs.Codec;
 import org.graylog2.plugin.inputs.transports.Transport;
 import org.slf4j.Logger;
@@ -161,5 +162,19 @@ public abstract class Graylog2Module extends AbstractModule {
                                       TypeLiteral.get(String.class),
                                       new TypeLiteral<Transport.Factory<? extends Transport>>() {
                                       });
+    }
+
+    protected MapBinder<String, MessageInput.Factory<? extends MessageInput>> inputsMapBinder() {
+        return MapBinder.newMapBinder(binder(),
+                               TypeLiteral.get(String.class),
+                               new TypeLiteral<MessageInput.Factory<? extends MessageInput>>() {
+                               });
+    }
+
+    protected <T extends MessageInput> void installInput(MapBinder<String, MessageInput.Factory<? extends MessageInput>> inputMapBinder,
+                                                         Class<T> target,
+                                                         Class<? extends MessageInput.Factory<T>> targetFactory) {
+        install(new FactoryModuleBuilder().implement(MessageInput.class, target).build(targetFactory));
+        inputMapBinder.addBinding(target.getCanonicalName()).to(Key.get(targetFactory));
     }
 }
