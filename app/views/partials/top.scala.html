@@ -1,3 +1,5 @@
+@import org.graylog2.restclient.models.UserService
+
 @import lib.security.RestPermissions._
 @import views.helpers.Permissions._
 @import org.graylog2.restclient.lib.Configuration
@@ -6,7 +8,7 @@
 <script type="text/javascript">
 // needs to be global!
 gl2AppPathPrefix = "@Configuration.getApplicationContext";
-gl2UserTimeZoneOffset = @DateTools.getUserTimeZoneOffset;
+gl2UserTimeZoneOffset = @DateTools.getUserTimeZoneOffset(UserService.current());
 </script>
 
 <div id="top" class="navbar navbar-fixed-top">
