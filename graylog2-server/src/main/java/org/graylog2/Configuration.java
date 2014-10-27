@@ -20,9 +20,11 @@ import com.github.joschi.jadconfig.Parameter;
 import com.github.joschi.jadconfig.ValidationException;
 import com.github.joschi.jadconfig.ValidatorMethod;
 import com.github.joschi.jadconfig.converters.StringListConverter;
+import com.github.joschi.jadconfig.util.Size;
 import com.github.joschi.jadconfig.validators.FileReadableValidator;
 import com.github.joschi.jadconfig.validators.InetPortValidator;
 import com.github.joschi.jadconfig.validators.PositiveIntegerValidator;
+import com.github.joschi.jadconfig.validators.PositiveLongValidator;
 import com.google.common.collect.Lists;
 import com.mongodb.ServerAddress;
 import org.graylog2.plugin.BaseConfiguration;
@@ -34,6 +36,7 @@ import java.net.InetAddress;
 import java.net.URI;
 import java.net.UnknownHostException;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static org.graylog2.plugin.Tools.getUriWithPort;
@@ -284,17 +287,26 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "stream_processing_max_faults", validator = PositiveIntegerValidator.class)
     private int streamProcessingMaxFaults = 3;
 
-    @Parameter(value = "output_module_timeout", validator = PositiveIntegerValidator.class)
+    @Parameter(value = "output_module_timeout", validator = PositiveLongValidator.class)
     private long outputModuleTimeout = 10000;
 
     @Parameter(value = "message_cache_spool_dir")
     private String messageCacheSpoolDir = "spool";
 
-    @Parameter(value = "message_cache_commit_interval", validator = PositiveIntegerValidator.class)
-    private long messageCacheCommitInterval = 1000;
+    @Parameter(value = "message_cache_commit_interval", validator = PositiveLongValidator.class)
+    private long messageCacheCommitInterval = TimeUnit.SECONDS.toMillis(1l);
+
+    @Parameter(value = "message_cache_compaction_interval")
+    private Long messageCacheCompactionInterval = null;
 
     @Parameter(value = "message_cache_off_heap")
     private boolean messageCacheOffHeap = true;
+
+    @Parameter(value = "message_cache_enable_compression")
+    private boolean messageCacheEnableCompression = false;
+
+    @Parameter(value = "message_cache_max_size")
+    private Size messageCacheMaxSize = null;
 
     @Parameter(value = "stale_master_timeout", validator = PositiveIntegerValidator.class)
     private int staleMasterTimeout = 2000;
@@ -663,8 +675,20 @@ public class Configuration extends BaseConfiguration {
         return messageCacheCommitInterval;
     }
 
+    public Long getMessageCacheCompactionInterval() {
+        return messageCacheCompactionInterval;
+    }
+
     public boolean isMessageCacheOffHeap() {
         return messageCacheOffHeap;
+    }
+
+    public boolean isMessageCacheEnableCompression() {
+        return messageCacheEnableCompression;
+    }
+
+    public Size getMessageCacheMaxSize() {
+        return messageCacheMaxSize;
     }
 
     public int getStaleMasterTimeout() {
