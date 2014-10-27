@@ -134,25 +134,14 @@ var SourceOverview = React.createClass({
         var pieChartWidth = $(pieChartDomNode).width();
         this.pieChart = dc.pieChart(pieChartDomNode);
         this.pieChart
+            .renderLabel(false)
+            .slicesCap(20) // max number of slices
             .dimension(this.othersDimension)
             .group(this.othersMessageGroup)
             .renderlet((chart) => {
                 chart.selectAll(".pie-slice").on("click", () => {
                     this.loadHistogramData();
                     this._toggleResetButtons();
-                });
-            })
-            .renderlet((chart) => {
-                // FIXME: Pie chart labels don't react to mouse events as slices, submit bug to dc-js
-                chart.selectAll("text.pie-slice").on("click", (data) => {
-                    chart.filter(data.data.key);
-                    dc.redrawAll();
-                });
-                chart.selectAll("text.pie-slice").on("mouseover", (data, index) => {
-                    chart.selectAll("g.pie-slice._" + index).classed("highlighted", true);
-                });
-                chart.selectAll("text.pie-slice").on("mouseout", (data, index) => {
-                    chart.selectAll("g.pie-slice._" + index).classed("highlighted", false);
                 });
             });
         this.configurePieChartWidth(pieChartWidth);
@@ -436,18 +425,16 @@ var SourceOverview = React.createClass({
                     </div>
                 </div>
                 <div className="row-fluid">
-                    <div className="span12">
-                        <div id="dc-sources-line-chart">
-                            <h3>
-                                <i className="icon icon-calendar"></i>
-                            Messages per {this.state.resolution}&nbsp;
-                                <small>
-                                    <a href="javascript:undefined" className="reset" onClick={this.resetHistogramFilters} title="Reset filter" style={{"display": "none"}}>
-                                        <i className="icon icon-retweet"></i>
-                                    </a>
-                                </small>
-                            </h3>
-                        </div>
+                    <div id="dc-sources-line-chart" className="span12">
+                        <h3>
+                            <i className="icon icon-calendar"></i>
+                        Messages per {this.state.resolution}&nbsp;
+                            <small>
+                                <a href="javascript:undefined" className="reset" onClick={this.resetHistogramFilters} title="Reset filter" style={{"display": "none"}}>
+                                    <i className="icon icon-retweet"></i>
+                                </a>
+                            </small>
+                        </h3>
                     </div>
                 </div>
                 {this.state.renderResultTable ? null : emptySources}
