@@ -1,4 +1,22 @@
-# http://www.playframework.com/documentation/2.2.0/ProductionDist
+#!/bin/bash
+ACTIVATOR_VERISON='1.2.10'
+ACTIVATOR_URL="http://downloads.typesafe.com/typesafe-activator/${ACTIVATOR_VERISON}/typesafe-activator-${ACTIVATOR_VERISON}-minimal.zip"
+
+ACTIVATOR_BIN=$(which activator &>/dev/null)
+
+if [[ -z "${ACTIVATOR_BIN}" ]]; then
+  ACTIVATOR_BIN="${ACTIVATOR_PATH}/activator"
+
+  if [[ ! -x "${ACTIVATOR_BIN}" ]]; then
+    echo "ERROR: Couldn't find Typesafe Activator in \$PATH or \$ACTIVATOR_PATH."
+    echo
+    echo "Please download and install Typesafe Activator before running this script:"
+    echo
+    echo "  wget ${ACTIVATOR_URL}"
+    echo
+    exit 1
+  fi
+fi
 
 read -p "Did you bump both app/lib/Version.java and project/Build.scala? (y/N) " -n 1 -r
 echo
@@ -10,15 +28,10 @@ else
   exit 1
 fi  
 
-# move configs around so we have our standard config packaged
-mv -f conf/graylog2-web-interface.conf /tmp/gl2build-tmp.conf || echo "No existing conf present."
-cp misc/graylog2-web-interface.conf.example conf/graylog2-web-interface.conf
-
-# .tar.gz
-play universal:package-zip-tarball
-
-# move local development config back
-mv -f /tmp/gl2build-tmp.conf conf/graylog2-web-interface.conf || echo "No tempfile to move back"
+# Build universal .tar.gz
+"${ACTIVATOR_BIN}" universal:package-zip-tarball
 
 date
-echo "Your package(s) are ready at target/universal"
+echo "Your package(s) are ready in 'target/universal':"
+echo
+ls -lt ./target/universal
