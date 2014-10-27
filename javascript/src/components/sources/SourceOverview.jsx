@@ -24,10 +24,13 @@ var othersName = "Others";
 var DEFAULT_RANGE_IN_SECS = daysToSeconds(1);
 var SUPPORTED_RANGES_IN_SECS = [daysToSeconds(1), daysToSeconds(7), daysToSeconds(31), daysToSeconds(365), 0];
 
+var SCREEN_RESOLUTION = $(window).width();
+
 var escapeQuerySource = (source) => {
     // Escape all lucene special characters from the source: && || : \ / + - ! ( ) { } [ ] ^ " ~ * ?
     return source.replace(/(&&|\|\||[\:\\\/\+\-\!\(\)\{\}\[\]\^\"\~\*\?])/g, "\\$&");
 };
+var resizeMutex;
 
 var SourceOverview = React.createClass({
     getInitialState() {
@@ -58,11 +61,16 @@ var SourceOverview = React.createClass({
         if (this.pieChart && (this.pieChart.filters().length !== 0 || this.dataTable.filters().length !== 0)) {
             filters = this.nameDimension.top(Infinity).map((source) => escapeQuerySource(source.name));
         }
-        HistogramDataStore.loadHistogramData(this.state.range, filters);
+        HistogramDataStore.loadHistogramData(this.state.range, filters, SCREEN_RESOLUTION);
     },
     loadData() {
         SourcesStore.loadSources(this.state.range);
         this.loadHistogramData();
+    },
+    _resizeCallback() {
+        // Call resizedWindow() only at end of resize event so we do not trigger all the time while resizing.
+        clearTimeout(resizeMutex);
+        resizeMutex = setTimeout(() => this._updateWidth(), 200);
     },
     componentDidMount() {
         this.applyRangeParameter();
@@ -73,10 +81,17 @@ var SourceOverview = React.createClass({
         this.renderLineChart();
         dc.renderAll();
         this.loadData();
+        $(window).on('resize', this._resizeCallback);
+        // register them live as we do not know if those buttons are currently in the DOM
+        $(document).on("click", ".sidebar-hide", () => this._updateWidth());
+        $(document).on("click", ".sidebar-show", () => this._updateWidth());
     },
     componentWillUnmount() {
         SourcesStore.removeChangeListener(this._onSourcesChanged);
         HistogramDataStore.removeChangeListener(this._onHistogramDataChanged);
+        $(window).off("resize", this._resizeCallback);
+        $(document).off("click", ".sidebar-hide", () => this._updateWidth());
+        $(document).off("click", ".sidebar-show", () => this._updateWidth());
     },
     componentWillReceiveProps(newProps) {
         var range = newProps.params.range;
@@ -118,9 +133,7 @@ var SourceOverview = React.createClass({
         var pieChartDomNode = $("#dc-sources-pie-chart")[0];
         var pieChartWidth = $(pieChartDomNode).width();
         this.pieChart = dc.pieChart(pieChartDomNode);
-        this.pieChart.width(pieChartWidth)
-            .height(pieChartWidth)
-            .innerRadius(pieChartWidth / 5)
+        this.pieChart
             .dimension(this.othersDimension)
             .group(this.othersMessageGroup)
             .renderlet((chart) => {
@@ -142,9 +155,11 @@ var SourceOverview = React.createClass({
                     chart.selectAll("g.pie-slice._" + index).classed("highlighted", false);
                 });
             });
+        this.configurePieChartWidth(pieChartWidth);
     },
     renderLineChart() {
         var lineChartDomNode = $("#dc-sources-line-chart")[0];
+        var width = $(lineChartDomNode).width();
         $(lineChartDomNode).on('mouseup', (event) => {
             $(".timerange-selector-container").effect("bounce", {
                 complete: function () {
@@ -157,7 +172,7 @@ var SourceOverview = React.createClass({
         });
         this.lineChart = dc.lineChart(lineChartDomNode);
         this.lineChart
-            .width($(lineChartDomNode).width())
+            .width(width)
             .height(200)
             .margins({left: 35, right: 20, top: 20, bottom: 20})
             .dimension(this.valueDimension)
@@ -247,6 +262,25 @@ var SourceOverview = React.createClass({
         this.valueDimension.filterAll();
         this.lineChart.filterAll();
         dc.redrawAll();
+    },
+    configurePieChartWidth: function (pieChartWidth) {
+        this.pieChart.width(pieChartWidth)
+            .height(pieChartWidth)
+            .radius(pieChartWidth / 2 - 10)
+            .innerRadius(pieChartWidth / 5);
+    },
+    _updateWidth() {
+        SCREEN_RESOLUTION = $(window).width();
+
+        var pieChartDomNode = $("#dc-sources-pie-chart").parent();
+        var pieChartWidth = pieChartDomNode.width();
+        this.configurePieChartWidth(pieChartWidth);
+        var lineChartDomNode = $("#dc-sources-line-chart");
+        var lineChartWidth = lineChartDomNode.width();
+        this.lineChart
+            .width(lineChartWidth);
+
+        dc.renderAll();
     },
     _resetSources(sources) {
         /*
@@ -402,10 +436,18 @@ var SourceOverview = React.createClass({
                     </div>
                 </div>
                 <div className="row-fluid">
-                    <div id="dc-sources-line-chart" className="span12">
-                        <h3><i className="icon icon-calendar"></i> Messages per {this.state.resolution}&nbsp;
-                            <small><a href="javascript:undefined" className="reset" onClick={this.resetHistogramFilters} title="Reset filter" style={{"display": "none"}}><i className="icon icon-retweet"></i></a></small>
-                        </h3>
+                    <div className="span12">
+                        <div id="dc-sources-line-chart">
+                            <h3>
+                                <i className="icon icon-calendar"></i>
+                            Messages per {this.state.resolution}&nbsp;
+                                <small>
+                                    <a href="javascript:undefined" className="reset" onClick={this.resetHistogramFilters} title="Reset filter" style={{"display": "none"}}>
+                                        <i className="icon icon-retweet"></i>
+                                    </a>
+                                </small>
+                            </h3>
+                        </div>
                     </div>
                 </div>
                 {this.state.renderResultTable ? null : emptySources}

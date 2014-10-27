@@ -6,8 +6,10 @@ var mergeInto = require('../../lib/util').mergeInto;
 var AbstractEventSendingStore = require('../AbstractEventSendingStore');
 var $ = require('jquery'); // excluded and shimed
 
+var DEFAULT_MAX_DATA_POINTS = 4000;
+var HISTOGRAM_URL = '/a/search/histogram';
+
 var HistogramDataStore = {
-    HISTOGRAM_URL: '/a/search/histogram',
 
     setHistogramData(histogramData) {
         this._histogramData = histogramData;
@@ -18,8 +20,12 @@ var HistogramDataStore = {
         return this._histogramData && JSON.parse(JSON.stringify(this._histogramData));
     },
 
-    loadHistogramData(range, sourceNames) {
-        var url = this.HISTOGRAM_URL;
+    loadHistogramData(range, sourceNames, maxDataPoints) {
+        var url = HISTOGRAM_URL;
+        if (typeof maxDataPoints === 'undefined') {
+            maxDataPoints = DEFAULT_MAX_DATA_POINTS;
+        }
+        url += `?maxDataPoints=${maxDataPoints}`;
         var q = "";
         if (typeof sourceNames !== 'undefined' && sourceNames instanceof Array) {
             q = encodeURIComponent(sourceNames.map((source) => "source:" + source).join(" OR "));
@@ -34,7 +40,7 @@ var HistogramDataStore = {
                 // for months interval will be day
                 interval = 'hour';
             }
-            url += `?q=${q}&rangetype=relative&relative=${ range }&interval=${interval}`;
+            url += `&q=${q}&rangetype=relative&relative=${ range }&interval=${interval}`;
         }
         var successCallback = (data) => this.setHistogramData(data);
         var failCallback = (jqXHR, textStatus, errorThrown) => {
