@@ -38,5 +38,5 @@ build_script/logs/*
 
 .vagrant/
 
-**/pom.xml.versionsBackup
-
+pom.xml.versionsBackup
+*/pom.xml.versionsBackup

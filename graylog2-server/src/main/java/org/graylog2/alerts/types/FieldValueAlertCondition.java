@@ -33,16 +33,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.text.DecimalFormat;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public class FieldValueAlertCondition extends AbstractAlertCondition {
-
     private static final Logger LOG = LoggerFactory.getLogger(FieldValueAlertCondition.class);
-    private List<Message> searchHits = null;
 
     public enum CheckType {
         MEAN, MIN, MAX, SUM, STDDEV
@@ -58,6 +54,7 @@ public class FieldValueAlertCondition extends AbstractAlertCondition {
     private final CheckType type;
     private final String field;
     private final DecimalFormat decimalFormat;
+    private List<Message> searchHits = Collections.emptyList();
 
     public FieldValueAlertCondition(Stream stream, String id, DateTime createdAt, String creatorUserId, Map<String, Object> parameters) {
         super(stream, id, Type.FIELD_VALUE, createdAt, creatorUserId, parameters);
@@ -73,19 +70,17 @@ public class FieldValueAlertCondition extends AbstractAlertCondition {
 
     @Override
     public String getDescription() {
-        return new StringBuilder()
-                .append("time: ").append(time)
-                .append(", field: ").append(field)
-                .append(", check type: ").append(type.toString().toLowerCase())
-                .append(", threshold_type: ").append(thresholdType.toString().toLowerCase())
-                .append(", threshold: ").append(decimalFormat.format(threshold))
-                .append(", grace: ").append(grace)
-                .toString();
+        return "time: " + time
+                + ", field: " + field
+                + ", check type: " + type.toString().toLowerCase()
+                + ", threshold_type: " + thresholdType.toString().toLowerCase()
+                + ", threshold: " + decimalFormat.format(threshold)
+                + ", grace: " + grace;
     }
 
     @Override
     protected CheckResult runCheck(Indexer indexer) {
-        this.searchHits = null;
+        this.searchHits = Collections.emptyList();
         try {
             String filter = "streams:"+stream.getId();
             FieldStatsResult fieldStatsResult = indexer.searches().fieldStats(field, "*", filter, new RelativeRange(time * 60));
@@ -125,7 +120,7 @@ public class FieldValueAlertCondition extends AbstractAlertCondition {
 
             LOG.debug("Alert check <{}> result: [{}]", id, result);
 
-            if(Double.isInfinite(result)) {
+            if (Double.isInfinite(result)) {
                 // This happens when there are no ES results/docs.
                 LOG.debug("Infinite value. Returning not triggered.");
                 return new CheckResult(false);
@@ -142,17 +137,11 @@ public class FieldValueAlertCondition extends AbstractAlertCondition {
             }
 
             if (triggered) {
-                StringBuilder resultDescription = new StringBuilder();
-
-                resultDescription.append("Field ").append(field).append(" had a ")
-                        .append(type.toString().toLowerCase()).append(" of ")
-                        .append(decimalFormat.format(result)).append(" in the last ")
-                        .append(time).append(" minutes with trigger condition ")
-                        .append(thresholdType.toString().toLowerCase()).append(" than ")
-                        .append(decimalFormat.format(threshold)).append(". ")
-                        .append("(Current grace time: ").append(grace).append(" minutes)");
-
-                return new CheckResult(true, this, resultDescription.toString(), Tools.iso8601());
+                final String resultDescription = "Field " + field + " had a " + type + " of "
+                        + decimalFormat.format(result) + " in the last " + time + " minutes with trigger condition "
+                        + thresholdType + " than " + decimalFormat.format(threshold) + ". "
+                        + "(Current grace time: " + grace + " minutes)";
+                return new CheckResult(true, this, resultDescription, Tools.iso8601());
             } else {
                 return new CheckResult(false);
             }
