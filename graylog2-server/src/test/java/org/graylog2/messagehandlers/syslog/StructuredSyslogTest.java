@@ -43,51 +43,56 @@ public class StructuredSyslogTest {
 
     @Test
     public void testExtractFields() {
-        Map expected = new HashMap();
+        Map<String, Object> expected = new HashMap<>();
         expected.put("eventSource", "Application");
         expected.put("eventID", "1011");
         expected.put("iut", "3");
 
-        Map result = SyslogCodec.StructuredSyslog.extractFields(newEvent(ValidStructuredMessage));
+        Map<String, Object> result = SyslogCodec.StructuredSyslog.extractFields(newEvent(ValidStructuredMessage), false);
         assertEquals(result, expected);
     }
 
     @Test
     public void testExtractMoreFields() {
-        Map expected = new HashMap();
+        Map<String, Object> expected = new HashMap<>();
         expected.put("eventSource", "Application");
         expected.put("eventID", "1011");
         expected.put("iut", "3");
         expected.put("sequenceId", "1");
 
-        Map result = SyslogCodec.StructuredSyslog.extractFields(newEvent(ValidStructuredMultiMessage));
+        Map<String, Object> result = SyslogCodec.StructuredSyslog.extractFields(newEvent(ValidStructuredMultiMessage), false);
         assertEquals(result, expected);
     }
 
     @Test
-    public void testExtractFieldsOverwriting() {
-        // TODO: The current implementation does not handle two different SD-ELEMENTS with the same SD-PARAM keys very well.
-        // TODO: Order is not guaranteed in the current syslog4j implementation!
-
-        Map result = SyslogCodec.StructuredSyslog.extractFields(newEvent(ValidStructuredMultiMessageSameKey));
+    public void testExtractFieldsWithoutExpansion() {
+        // Order is not guaranteed in the current syslog4j implementation!
+        Map<String, Object> result = SyslogCodec.StructuredSyslog.extractFields(newEvent(ValidStructuredMultiMessageSameKey), false);
         assertTrue(Pattern.compile("3|10").matcher((String) result.get("iut")).matches(), "iut value is not 3 or 10!");
     }
 
     @Test
+    public void testExtractFieldsWithExpansion() {
+        Map<String, Object> result = SyslogCodec.StructuredSyslog.extractFields(newEvent(ValidStructuredMultiMessageSameKey), true);
+        assertEquals(result.get("exampleSDID@32473_iut"), "3");
+        assertEquals(result.get("meta_iut"), "10");
+    }
+
+    @Test
     public void testExtractNoFields() {
-        Map result = SyslogCodec.StructuredSyslog.extractFields(newEvent(ValidStructuredNoStructValues));
+        Map<String, Object> result = SyslogCodec.StructuredSyslog.extractFields(newEvent(ValidStructuredNoStructValues), false);
         assertEquals(result, new HashMap());
     }
 
     @Test
     public void testExtractFieldsOfNonStructuredMessage() {
-        Map result = SyslogCodec.StructuredSyslog.extractFields(newEvent(ValidNonStructuredMessage));
+        Map<String, Object> result = SyslogCodec.StructuredSyslog.extractFields(newEvent(ValidNonStructuredMessage), false);
         assertEquals(result.size(), 0);
     }
 
     @Test
     public void testExtractFieldsOfAMessageThatOnlyLooksStructured() {
-        Map result = SyslogCodec.StructuredSyslog.extractFields(newEvent(MessageLookingLikeStructured));
+        Map<String, Object> result = SyslogCodec.StructuredSyslog.extractFields(newEvent(MessageLookingLikeStructured), false);
         assertEquals(result.size(), 0);
     }
 }
