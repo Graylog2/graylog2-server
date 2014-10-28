@@ -119,7 +119,6 @@ var SourceOverview = React.createClass({
         this.pieChart = dc.pieChart(pieChartDomNode);
         this.pieChart
             .renderLabel(false)
-            .slicesCap(20) // max number of slices
             .dimension(this.nameDimension)
             .group(this.nameMessageGroup)
             .renderlet((chart) => {
@@ -181,7 +180,7 @@ var SourceOverview = React.createClass({
         var dataTableDomNode = $("#dc-sources-result")[0];
         this.dataTable = dc.dataTable(dataTableDomNode);
         this.dataTable
-            .dimension(this.nameDimension)
+            .dimension(this.sourcesData.dimension((d) => d.messageCount))
             .group((d) => d.percentage > othersThreshold ? "Top Sources" : othersName)
             .size(this.state.numberOfSources)
             .columns([
