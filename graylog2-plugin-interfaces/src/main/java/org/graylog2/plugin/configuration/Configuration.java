@@ -28,11 +28,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public class Configuration {
-
     private static final Logger LOG = LoggerFactory.getLogger(Configuration.class);
 
     private final Map<String, Object> source;
@@ -79,7 +75,7 @@ public class Configuration {
         strings.put(key, value);
     }
 
-    public long getInt(String key) {
+    public int getInt(String key) {
         return ints.get(key);
     }
 
