@@ -65,7 +65,7 @@ public class TcpTransport extends AbstractTcpTransport {
         this.delimiter = nulDelimiter ? nulDelimiter() : lineDelimiter();
 
         if (configuration.intIsSet(CK_MAX_MESSAGE_SIZE)) {
-            maxFrameLength = (int) configuration.getInt(CK_MAX_MESSAGE_SIZE);
+            maxFrameLength = configuration.getInt(CK_MAX_MESSAGE_SIZE);
         } else {
             maxFrameLength = Config.DEFAULT_MAX_FRAME_LENGTH;
         }

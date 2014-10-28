@@ -59,8 +59,8 @@ public class RandomMessageTransport extends GeneratorTransport {
         this.objectMapper = objectMapper;
 
         generator = new FakeHttpRawMessageGenerator(configuration.getString(CK_SOURCE));
-        sleepMs = configuration.intIsSet(CK_SLEEP) ? (int) configuration.getInt(CK_SLEEP) : 0;
-        maxSleepDeviation =  configuration.intIsSet(CK_SLEEP_DEVIATION_PERCENT) ? (int) configuration.getInt(CK_SLEEP_DEVIATION_PERCENT) : 0;
+        sleepMs = configuration.intIsSet(CK_SLEEP) ? configuration.getInt(CK_SLEEP) : 0;
+        maxSleepDeviation =  configuration.intIsSet(CK_SLEEP_DEVIATION_PERCENT) ? configuration.getInt(CK_SLEEP_DEVIATION_PERCENT) : 0;
     }
 
     @Override

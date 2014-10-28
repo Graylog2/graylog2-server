@@ -163,7 +163,7 @@ public class KafkaTransport extends ThrottleableTransport {
         // if something breaks.
         props.put("auto.commit.interval.ms", "1000");
 
-        final int numThreads = (int) configuration.getInt(CK_THREADS);
+        final int numThreads = configuration.getInt(CK_THREADS);
         final ConsumerConfig consumerConfig = new ConsumerConfig(props);
         cc = Consumer.createJavaConsumerConnector(consumerConfig);
 
