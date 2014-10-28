@@ -380,9 +380,6 @@ var SourceOverview = React.createClass({
                                 </a>
                             </small>
                         </h3>
-                        <div className="reloading">
-                            <i className="icon icon-refresh"></i>
-                        </div>
                     </div>
                 </div>
                 <div className="row-fluid">
