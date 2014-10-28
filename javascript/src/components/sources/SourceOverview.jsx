@@ -384,7 +384,7 @@ var SourceOverview = React.createClass({
     },
     render() {
         var emptySources = <div className="alert alert-info">
-            No message sources found. Looks like you did not send in any messages yet.
+            No message sources found for this time range. Did you try using a different one?
         </div>;
 
         var resultTable = (<table id="dc-sources-result" className="sources table table-striped table-hover table-condensed">
@@ -468,18 +468,12 @@ var SourceOverview = React.createClass({
                         </select>
                         <h1><i className="icon icon-download-alt"></i> Sources</h1>
                     </div>
-                    <div style={{"margin-top": "15px"}}>
-                    This is a list of all sources that sent in messages to Graylog2. Use it to quickly search for all
-                    messages of a specific source or get an overview of what systems are sending in how many messages.
-                    &nbsp;
-                        <strong>
-                        Click on source name to prepare a query for it. Hold the Alt key while clicking to search right
-                        away.
-                        </strong>
-
-                    &nbsp;Note that the list is cached for a few seconds so you might have to wait a bit until a new source
-                    appears.
-                    </div>
+                    <p style={{"margin-top": "15px"}}>
+                        This is a list of all sources that sent in messages to Graylog2. Use the table and charts to interact
+                        with the different sources and get a better understanding of them.
+                        &nbsp;Note that the list is cached for a few seconds so you might have to wait a bit until a new source
+                        appears.
+                    </p>
                 </div>
 
                 {this.state.renderResultTable ? null : emptySources}
