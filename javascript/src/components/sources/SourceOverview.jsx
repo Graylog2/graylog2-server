@@ -38,8 +38,6 @@ var SourceOverview = React.createClass({
         this.filterDimension = this.sourcesData.dimension((d) => d.name);
         this.nameDimension = this.sourcesData.dimension((d) => d.name);
         this.nameMessageGroup = this.nameDimension.group().reduceSum((d) => d.messageCount);
-        this.othersDimension = this.sourcesData.dimension((d) => d.percentage > othersThreshold ? d.name : othersName);
-        this.othersMessageGroup = this.othersDimension.group().reduceSum((d) => d.messageCount);
 
         this.histogramData = crossfilter();
         this.valueDimension = this.histogramData.dimension((d) => new Date(d.x * 1000));
@@ -115,20 +113,6 @@ var SourceOverview = React.createClass({
         range = this.props.params.range;
         this.changeRange(range);
     },
-    updatePieChartDimension() {
-        // TODO: Decide if the pie chart should ever display grouped others (makes things complicated to program and to use, so disabled for now)
-        //var onlyMinorValues = this.filterDimension.top(Infinity).reduce((reducedValue, current) => reducedValue && current.percentage < othersThreshold, true);
-        var onlyMinorValues = true;
-        if (onlyMinorValues) {
-            this.pieChart
-                .dimension(this.nameDimension)
-                .group(this.nameMessageGroup);
-        } else {
-            this.pieChart
-                .dimension(this.othersDimension)
-                .group(this.othersMessageGroup);
-        }
-    },
     renderPieChart() {
         var pieChartDomNode = $("#dc-sources-pie-chart")[0];
         var pieChartWidth = $(pieChartDomNode).width();
@@ -136,8 +120,8 @@ var SourceOverview = React.createClass({
         this.pieChart
             .renderLabel(false)
             .slicesCap(20) // max number of slices
-            .dimension(this.othersDimension)
-            .group(this.othersMessageGroup)
+            .dimension(this.nameDimension)
+            .group(this.nameMessageGroup)
             .renderlet((chart) => {
                 chart.selectAll(".pie-slice").on("click", () => {
                     this.loadHistogramData();
@@ -197,7 +181,7 @@ var SourceOverview = React.createClass({
         var dataTableDomNode = $("#dc-sources-result")[0];
         this.dataTable = dc.dataTable(dataTableDomNode);
         this.dataTable
-            .dimension(this.othersDimension)
+            .dimension(this.nameDimension)
             .group((d) => d.percentage > othersThreshold ? "Top Sources" : othersName)
             .size(this.state.numberOfSources)
             .columns([
@@ -242,7 +226,7 @@ var SourceOverview = React.createClass({
     },
     resetSourcesFilters() {
         this.pieChart.filterAll();
-        this.othersDimension.filterAll();
+        this.nameDimension.filterAll();
         this.loadHistogramData();
         this._toggleResetButtons();
         dc.redrawAll();
@@ -281,7 +265,6 @@ var SourceOverview = React.createClass({
          */
         var pieChartFilters = this.pieChart.filters();
         var dataTableFilters = this.dataTable.filters();
-        this.othersDimension.filterAll();
         this.nameDimension.filterAll();
         this.filterDimension.filterAll();
         this.pieChart.filterAll();
@@ -373,7 +356,6 @@ var SourceOverview = React.createClass({
             //return name.indexOf(this.state.filter) === 0;
             return name.indexOf(this.state.filter) !== -1;
         });
-        this.updatePieChartDimension();
     },
     _onFilterChanged(event) {
         this.setState({filter: event.target.value}, () => {
