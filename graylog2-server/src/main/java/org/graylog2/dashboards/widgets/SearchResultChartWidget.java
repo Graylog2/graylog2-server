@@ -17,17 +17,16 @@
 package org.graylog2.dashboards.widgets;
 
 import com.codahale.metrics.MetricRegistry;
+import com.google.common.collect.ImmutableMap;
 import org.graylog2.indexer.IndexHelper;
 import org.graylog2.indexer.results.HistogramResult;
 import org.graylog2.indexer.searches.Searches;
 import org.graylog2.indexer.searches.timeranges.TimeRange;
 
-import java.util.HashMap;
 import java.util.Map;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
+import static com.google.common.base.Strings.isNullOrEmpty;
+
 public class SearchResultChartWidget extends DashboardWidget {
 
     private final String query;
@@ -58,7 +57,7 @@ public class SearchResultChartWidget extends DashboardWidget {
 
     // We need to ensure query is not empty, or the histogram calculation will fail
     private String getNonEmptyQuery(String query) {
-        if (query == null || query.isEmpty()) {
+        if (isNullOrEmpty(query)) {
             return "*";
         }
         return query;
@@ -74,18 +73,18 @@ public class SearchResultChartWidget extends DashboardWidget {
 
     @Override
     public Map<String, Object> getPersistedConfig() {
-        return new HashMap<String, Object>() {{
-            put("query", query);
-            put("stream_id", streamId);
-            put("interval", interval.toString().toLowerCase());
-            put("timerange", timeRange.getPersistedConfig());
-        }};
+        return ImmutableMap.<String, Object>builder()
+                .put("query", query)
+                .put("stream_id", streamId)
+                .put("interval", interval.toString().toLowerCase())
+                .put("timerange", timeRange.getPersistedConfig())
+                .build();
     }
 
     @Override
     protected ComputationResult compute() {
         String filter = null;
-        if (streamId != null && !streamId.isEmpty()) {
+        if (!isNullOrEmpty(streamId)) {
             filter = "streams:" + streamId;
         }
 
@@ -96,5 +95,4 @@ public class SearchResultChartWidget extends DashboardWidget {
             throw new RuntimeException("Invalid timerange format.", e);
         }
     }
-
 }

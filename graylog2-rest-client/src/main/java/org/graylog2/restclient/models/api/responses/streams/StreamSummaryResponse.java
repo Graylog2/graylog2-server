@@ -17,7 +17,6 @@
 package org.graylog2.restclient.models.api.responses.streams;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.graylog2.restclient.models.api.responses.TimestampResponse;
 
 import java.util.List;
 import java.util.Map;
@@ -41,5 +40,7 @@ public class StreamSummaryResponse {
 
     @JsonProperty("alert_receivers")
 	public Map<String, List<String>> alertReceivers;
-	
+
+	@JsonProperty("content_pack")
+	public String contentPack;
 }

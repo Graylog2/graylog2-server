@@ -22,15 +22,10 @@
  */
 package org.graylog2.plugin.configuration.fields;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-/**
- * @author Dennis Oelkers <dennis@torch.sh>
- */
 public abstract class AbstractConfigurationField implements ConfigurationField {
     protected final String field_type;
     protected final String name;
@@ -67,10 +62,10 @@ public abstract class AbstractConfigurationField implements ConfigurationField {
     }
 
     public List<String> getAttributes() {
-        return Lists.newArrayList();
+        return Collections.emptyList();
     }
 
     public Map<String, Map<String, String>> getAdditionalInformation() {
-        return Maps.newHashMap();
+        return Collections.emptyMap();
     }
 }

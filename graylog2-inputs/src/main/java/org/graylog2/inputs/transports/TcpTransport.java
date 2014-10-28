@@ -16,11 +16,12 @@
  */
 package org.graylog2.inputs.transports;
 
-import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
+import org.graylog2.plugin.ConfigClass;
+import org.graylog2.plugin.FactoryClass;
 import org.graylog2.plugin.LocalMetricRegistry;
-import org.graylog2.plugin.collections.Pair;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.configuration.fields.BooleanField;
@@ -28,7 +29,7 @@ import org.graylog2.plugin.configuration.fields.ConfigurationField;
 import org.graylog2.plugin.configuration.fields.NumberField;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.transports.AbstractTcpTransport;
-import org.graylog2.plugin.inputs.transports.TransportFactory;
+import org.graylog2.plugin.inputs.transports.Transport;
 import org.graylog2.plugin.inputs.util.ConnectionCounter;
 import org.graylog2.plugin.inputs.util.ThroughputCounter;
 import org.jboss.netty.buffer.ChannelBuffer;
@@ -37,7 +38,8 @@ import org.jboss.netty.handler.codec.frame.DelimiterBasedFrameDecoder;
 
 import javax.inject.Named;
 import javax.inject.Provider;
-import java.util.List;
+import java.util.LinkedHashMap;
+import java.util.concurrent.Callable;
 import java.util.concurrent.Executor;
 
 import static org.jboss.netty.handler.codec.frame.Delimiters.lineDelimiter;
@@ -63,49 +65,64 @@ public class TcpTransport extends AbstractTcpTransport {
         this.delimiter = nulDelimiter ? nulDelimiter() : lineDelimiter();
 
         if (configuration.intIsSet(CK_MAX_MESSAGE_SIZE)) {
-            maxFrameLength = (int) configuration.getInt(CK_MAX_MESSAGE_SIZE);
+            maxFrameLength = configuration.getInt(CK_MAX_MESSAGE_SIZE);
         } else {
-            maxFrameLength = 2 * 1024 * 1024;
+            maxFrameLength = Config.DEFAULT_MAX_FRAME_LENGTH;
         }
     }
 
     @Override
-    protected List<Pair<String, ? extends ChannelHandler>> getFinalChannelHandlers(MessageInput input) {
-        final List<Pair<String, ? extends ChannelHandler>> finalChannelHandlers = Lists.newArrayList();
+    protected LinkedHashMap<String, Callable<? extends ChannelHandler>> getFinalChannelHandlers(MessageInput input) {
+        final LinkedHashMap<String, Callable<? extends ChannelHandler>> finalChannelHandlers = Maps.newLinkedHashMap();
 
-        finalChannelHandlers.add(Pair.of("framer", new DelimiterBasedFrameDecoder(maxFrameLength, delimiter)));
-        finalChannelHandlers.addAll(super.getFinalChannelHandlers(input));
+        finalChannelHandlers.put("framer", new Callable<ChannelHandler>() {
+            @Override
+            public ChannelHandler call() throws Exception {
+                return new DelimiterBasedFrameDecoder(maxFrameLength, delimiter);
+            }
+        });
+        finalChannelHandlers.putAll(super.getFinalChannelHandlers(input));
 
         return finalChannelHandlers;
     }
 
-    @Override
-    public ConfigurationRequest getRequestedConfiguration() {
-        ConfigurationRequest x = super.getRequestedConfiguration();
 
-        x.addField(
-                new BooleanField(
-                        CK_USE_NULL_DELIMITER,
-                        "Null frame delimiter?",
-                        false,
-                        "Use null byte as frame delimiter? Default is newline."
-                )
-        );
-        x.addField(
-                new NumberField(
-                        CK_MAX_MESSAGE_SIZE,
-                        "Maximum message size",
-                        maxFrameLength,
-                        "The maximum length of a message.",
-                        ConfigurationField.Optional.OPTIONAL,
-                        NumberField.Attribute.ONLY_POSITIVE
-                )
-        );
+    @FactoryClass
+    public interface Factory extends Transport.Factory<TcpTransport> {
+        TcpTransport create(Configuration configuration);
 
-        return x;
+        @Override
+        Config getConfig();
     }
 
-    public interface Factory extends TransportFactory<TcpTransport> {
-        TcpTransport create(Configuration configuration);
+    @ConfigClass
+    public static class Config extends AbstractTcpTransport.Config {
+        public static final int DEFAULT_MAX_FRAME_LENGTH = 2 * 1024 * 1024;
+
+        @Override
+        public ConfigurationRequest getRequestedConfiguration() {
+            final ConfigurationRequest x = super.getRequestedConfiguration();
+
+            x.addField(
+                    new BooleanField(
+                            CK_USE_NULL_DELIMITER,
+                            "Null frame delimiter?",
+                            false,
+                            "Use null byte as frame delimiter? Default is newline."
+                    )
+            );
+            x.addField(
+                    new NumberField(
+                            CK_MAX_MESSAGE_SIZE,
+                            "Maximum message size",
+                            2 * 1024 * 1024,
+                            "The maximum length of a message.",
+                            ConfigurationField.Optional.OPTIONAL,
+                            NumberField.Attribute.ONLY_POSITIVE
+                    )
+            );
+
+            return x;
+        }
     }
 }

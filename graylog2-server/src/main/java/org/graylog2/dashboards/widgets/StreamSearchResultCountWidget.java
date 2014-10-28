@@ -17,17 +17,14 @@
 package org.graylog2.dashboards.widgets;
 
 import com.codahale.metrics.MetricRegistry;
+import com.google.common.collect.ImmutableMap;
 import org.graylog2.indexer.IndexHelper;
 import org.graylog2.indexer.results.CountResult;
 import org.graylog2.indexer.searches.Searches;
 import org.graylog2.indexer.searches.timeranges.TimeRange;
 
-import java.util.HashMap;
 import java.util.Map;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public class StreamSearchResultCountWidget extends DashboardWidget {
 
     private final String query;
@@ -54,11 +51,11 @@ public class StreamSearchResultCountWidget extends DashboardWidget {
 
     @Override
     public Map<String, Object> getPersistedConfig() {
-        return new HashMap<String, Object>() {{
-            put("query", query);
-            put("timerange", timeRange.getPersistedConfig());
-            put("stream_id", streamId);
-        }};
+        return ImmutableMap.<String, Object>builder()
+                .put("query", query)
+                .put("timerange", timeRange.getPersistedConfig())
+                .put("stream_id", streamId)
+                .build();
     }
 
     @Override

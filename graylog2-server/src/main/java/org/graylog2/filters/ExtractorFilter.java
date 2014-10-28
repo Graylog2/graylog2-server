@@ -96,7 +96,7 @@ public class ExtractorFilter implements MessageFilter {
             });
         } catch (ExecutionException e) {
             LOG.error("Could not load extractors into cache. Returning empty list.", e);
-            return Lists.newArrayList();
+            return Collections.emptyList();
         }
     }
 

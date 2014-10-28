@@ -23,6 +23,7 @@
 package org.graylog2.plugin.inputs.transports;
 
 import com.codahale.metrics.MetricSet;
+import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.MisfireException;
@@ -36,7 +37,14 @@ public interface Transport {
 
     void stop();
 
-    ConfigurationRequest getRequestedConfiguration();
-
     MetricSet getMetricSet();
+
+    public interface Config {
+        ConfigurationRequest getRequestedConfiguration();
+    }
+
+    interface Factory<T extends Transport> {
+        T create(Configuration configuration);
+        Config getConfig();
+    }
 }

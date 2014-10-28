@@ -21,11 +21,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 import java.util.Map;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public class DashboardSummaryResponse {
-
     public String id;
     public String title;
     public String description;
@@ -39,4 +35,6 @@ public class DashboardSummaryResponse {
     @JsonProperty("creator_user_id")
     public String creatorUserId;
 
+    @JsonProperty("content_pack")
+    public String contentPack;
 }

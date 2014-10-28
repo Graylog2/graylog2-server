@@ -16,16 +16,13 @@
  */
 package org.graylog2.indexer.searches.timeranges;
 
+import com.google.common.collect.ImmutableMap;
 import org.graylog2.plugin.Tools;
 import org.joda.time.DateTime;
 import org.joda.time.format.ISODateTimeFormat;
 
-import java.util.HashMap;
 import java.util.Map;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public class AbsoluteRange implements TimeRange {
 
     private final DateTime from;
@@ -59,11 +56,10 @@ public class AbsoluteRange implements TimeRange {
 
     @Override
     public Map<String, Object> getPersistedConfig() {
-        return new HashMap<String, Object>() {{
-            put("type", getType().toString().toLowerCase());
-            put("from", getFrom());
-            put("to", getTo());
-        }};
+        return ImmutableMap.<String, Object>of(
+                "type", getType().toString().toLowerCase(),
+                "from", getFrom(),
+                "to", getTo());
     }
 
     public DateTime getFrom() {
@@ -75,10 +71,8 @@ public class AbsoluteRange implements TimeRange {
     }
 
     public Map<String, DateTime> getLimits() {
-        return new HashMap<String, DateTime>() {{
-            put("from", getFrom());
-            put("to", getTo());
-        }};
+        return ImmutableMap.of(
+                "from", getFrom(),
+                "to", getTo());
     }
-
 }

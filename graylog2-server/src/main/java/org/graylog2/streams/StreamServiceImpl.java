@@ -41,7 +41,7 @@ import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -91,10 +91,11 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
     @Override
     public Stream create(CreateRequest cr, String userId) {
         Map<String, Object> streamData = Maps.newHashMap();
-        streamData.put("title", cr.title);
-        streamData.put("description", cr.description);
-        streamData.put("creator_user_id", userId);
-        streamData.put("created_at", new DateTime(DateTimeZone.UTC));
+        streamData.put(StreamImpl.FIELD_TITLE, cr.title);
+        streamData.put(StreamImpl.FIELD_DESCRIPTION, cr.description);
+        streamData.put(StreamImpl.FIELD_CREATOR_USER_ID, userId);
+        streamData.put(StreamImpl.FIELD_CREATED_AT, new DateTime(DateTimeZone.UTC));
+        streamData.put(StreamImpl.FIELD_CONTENT_PACK, cr.contentPack);
 
         return create(streamData);
     }
@@ -113,7 +114,7 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
 
     @SuppressWarnings("unchecked")
     public List<Stream> loadAllEnabled(Map<String, Object> additionalQueryOpts) {
-        additionalQueryOpts.put("disabled", false);
+        additionalQueryOpts.put(StreamImpl.FIELD_DISABLED, false);
 
         return loadAll(additionalQueryOpts);
     }
@@ -152,16 +153,15 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
     }
 
     public List<Stream> loadAllWithConfiguredAlertConditions() {
-        Map<String, Object> queryOpts = new HashMap<String, Object>() {{
-            // Explanation: alert_conditions.1 is the first Array element.
-            put(StreamImpl.EMBEDDED_ALERT_CONDITIONS, new BasicDBObject("$ne", new ArrayList<Object>()));
-        }};
+        // Explanation: alert_conditions.1 is the first Array element.
+        Map<String, Object> queryOpts = Collections.<String, Object>singletonMap(
+                StreamImpl.EMBEDDED_ALERT_CONDITIONS, new BasicDBObject("$ne", Collections.emptyList()));
 
         return loadAll(queryOpts);
     }
 
     protected Set<Output> loadOutputsForRawStream(DBObject stream) {
-        List<ObjectId> outputIds = (List<ObjectId>)stream.get("outputs");
+        List<ObjectId> outputIds = (List<ObjectId>) stream.get(StreamImpl.FIELD_OUTPUTS);
 
         Set<Output> result = new HashSet<>();
         if (outputIds != null)
@@ -169,7 +169,7 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
                 try {
                     result.add(outputService.load(outputId.toHexString()));
                 } catch (NotFoundException e) {
-                    LOG.warn("Nonexisting output <{}> referenced from stream <{}>!", outputId.toHexString(), stream.get("_id"));
+                    LOG.warn("Non-existing output <{}> referenced from stream <{}>!", outputId.toHexString(), stream.get("_id"));
                 }
 
         return result;
@@ -182,7 +182,7 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
         }
         for (Notification notification : notificationService.all()) {
             Object rawValue = notification.getDetail("stream_id");
-            if ( rawValue != null && rawValue.toString().equals(stream.getId())) {
+            if (rawValue != null && rawValue.toString().equals(stream.getId())) {
                 LOG.debug("Removing notification that references stream: {}", notification);
                 notificationService.destroy(notification);
             }
@@ -192,11 +192,11 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
 
     public void update(Stream stream, String title, String description) throws ValidationException {
         if (title != null) {
-            stream.getFields().put("title", title);
+            stream.getFields().put(StreamImpl.FIELD_TITLE, title);
         }
 
         if (description != null) {
-            stream.getFields().put("description", description);
+            stream.getFields().put(StreamImpl.FIELD_DESCRIPTION, description);
         }
 
         save(stream);
@@ -261,7 +261,7 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
     }
 
     public void addAlertCondition(Stream stream, AlertCondition condition) throws ValidationException {
-        embed(stream, StreamImpl.EMBEDDED_ALERT_CONDITIONS, (EmbeddedPersistable)condition);
+        embed(stream, StreamImpl.EMBEDDED_ALERT_CONDITIONS, (EmbeddedPersistable) condition);
     }
 
     @Override
@@ -292,7 +292,7 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
     public void addOutput(Stream stream, Output output) {
         collection(stream).update(
                 new BasicDBObject("_id", new ObjectId(stream.getId())),
-                new BasicDBObject("$addToSet", new BasicDBObject("outputs", new ObjectId(output.getId())))
+                new BasicDBObject("$addToSet", new BasicDBObject(StreamImpl.FIELD_OUTPUTS, new ObjectId(output.getId())))
         );
     }
 
@@ -300,14 +300,14 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
     public void removeOutput(Stream stream, Output output) {
         collection(stream).update(
                 new BasicDBObject("_id", new ObjectId(stream.getId())),
-                new BasicDBObject("$pull", new BasicDBObject("outputs", new ObjectId(output.getId())))
+                new BasicDBObject("$pull", new BasicDBObject(StreamImpl.FIELD_OUTPUTS, new ObjectId(output.getId())))
         );
     }
 
     public void removeOutputFromAllStreams(Output output) {
         ObjectId outputId = new ObjectId(output.getId());
-        DBObject match = new BasicDBObject("outputs", outputId);
-        DBObject modify = new BasicDBObject("$pull", new BasicDBObject("outputs", outputId));
+        DBObject match = new BasicDBObject(StreamImpl.FIELD_OUTPUTS, outputId);
+        DBObject modify = new BasicDBObject("$pull", new BasicDBObject(StreamImpl.FIELD_OUTPUTS, outputId));
 
         collection(StreamImpl.class).update(
                 match,

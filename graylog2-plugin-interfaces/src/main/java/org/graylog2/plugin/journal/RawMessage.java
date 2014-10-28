@@ -26,7 +26,6 @@ import com.eaio.uuid.UUID;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Objects;
-import com.google.common.collect.Maps;
 import org.joda.time.DateTime;
 
 import javax.annotation.Nonnull;
@@ -38,6 +37,7 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
+import java.util.Collections;
 import java.util.Map;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -233,12 +233,12 @@ public class RawMessage implements Serializable {
     @Nonnull
     public Map<String, Object> getParsedMetaData() {
         if (getMetaData() == null) {
-            return Maps.newHashMap();
+            return Collections.emptyMap();
         }
         try {
             return OBJECT_MAPPER.readValue(getMetaData(), new TypeReference<Map<String, Object>>() {});
         } catch (IOException e) {
-            return Maps.newHashMap();
+            return Collections.emptyMap();
         }
     }
 

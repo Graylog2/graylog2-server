@@ -22,6 +22,8 @@
  */
 package org.graylog2.plugin.inputs.transports;
 
+import org.graylog2.plugin.configuration.ConfigurationRequest;
+
 /**
  * Placeholder class for implementing logic to throttle certain transports which support backpressure.
  * The built in transports that support this by reading less are the Kafka and AMQP transports.
@@ -30,5 +32,11 @@ package org.graylog2.plugin.inputs.transports;
  * to supply back pressure in some other way.
  */
 public abstract class ThrottleableTransport implements Transport {
+    public static class Config implements Transport.Config {
+        @Override
+        public ConfigurationRequest getRequestedConfiguration() {
+            return new ConfigurationRequest();
+        }
+    }
 
 }

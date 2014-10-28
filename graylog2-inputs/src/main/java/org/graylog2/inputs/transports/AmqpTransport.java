@@ -22,6 +22,8 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
+import org.graylog2.plugin.ConfigClass;
+import org.graylog2.plugin.FactoryClass;
 import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
@@ -32,7 +34,7 @@ import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.MisfireException;
 import org.graylog2.plugin.inputs.codecs.CodecAggregator;
 import org.graylog2.plugin.inputs.transports.ThrottleableTransport;
-import org.graylog2.plugin.inputs.transports.TransportFactory;
+import org.graylog2.plugin.inputs.transports.Transport;
 import org.graylog2.plugin.lifecycles.Lifecycle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -135,11 +137,11 @@ public class AmqpTransport extends ThrottleableTransport {
     public void launch(MessageInput input) throws MisfireException {
         consumer = new AmqpConsumer(
                 configuration.getString(CK_HOSTNAME),
-                (int) configuration.getInt(CK_PORT),
+                configuration.getInt(CK_PORT),
                 configuration.getString(CK_VHOST),
                 configuration.getString(CK_USERNAME),
                 configuration.getString(CK_PASSWORD),
-                (int) configuration.getInt(CK_PREFETCH),
+                configuration.getInt(CK_PREFETCH),
                 configuration.getString(CK_QUEUE),
                 configuration.getString(CK_EXCHANGE),
                 configuration.getString(CK_ROUTING_KEY),
@@ -167,111 +169,117 @@ public class AmqpTransport extends ThrottleableTransport {
     }
 
     @Override
-    public ConfigurationRequest getRequestedConfiguration() {
-        final ConfigurationRequest cr = new ConfigurationRequest();
-
-        cr.addField(
-                new TextField(
-                        CK_HOSTNAME,
-                        "Broker hostname",
-                        "",
-                        "Hostname of the AMQP broker to use",
-                        ConfigurationField.Optional.NOT_OPTIONAL
-                )
-        );
-
-        cr.addField(
-                new NumberField(
-                        CK_PORT,
-                        "Broker port",
-                        5672,
-                        "Port of the AMQP broker to use",
-                        ConfigurationField.Optional.OPTIONAL,
-                        NumberField.Attribute.IS_PORT_NUMBER
-                )
-        );
-
-        cr.addField(
-                new TextField(
-                        CK_VHOST,
-                        "Broker virtual host",
-                        "/",
-                        "Virtual host of the AMQP broker to use",
-                        ConfigurationField.Optional.NOT_OPTIONAL
-                )
-        );
-
-        cr.addField(
-                new TextField(
-                        CK_USERNAME,
-                        "Username",
-                        "",
-                        "Username to connect to AMQP broker",
-                        ConfigurationField.Optional.OPTIONAL
-                )
-        );
-
-        cr.addField(
-                new TextField(
-                        CK_PASSWORD,
-                        "Password",
-                        "",
-                        "Password to connect to AMQP broker",
-                        ConfigurationField.Optional.OPTIONAL,
-                        TextField.Attribute.IS_PASSWORD
-                )
-        );
-
-        cr.addField(
-                new NumberField(
-                        CK_PREFETCH,
-                        "Prefetch count",
-                        100,
-                        "For advanced usage: AMQP prefetch count. Default is 100.",
-                        ConfigurationField.Optional.NOT_OPTIONAL
-                )
-        );
-
-        cr.addField(
-                new TextField(
-                        CK_QUEUE,
-                        "Queue",
-                        "log-messages",
-                        "Name of queue that is created.",
-                        ConfigurationField.Optional.NOT_OPTIONAL
-                )
-        );
-
-        cr.addField(
-                new TextField(
-                        CK_EXCHANGE,
-                        "Exchange",
-                        "log-messages",
-                        "Name of exchange to bind to.",
-                        ConfigurationField.Optional.NOT_OPTIONAL
-                )
-        );
-
-        cr.addField(
-                new TextField(
-                        CK_ROUTING_KEY,
-                        "Routing key",
-                        "#",
-                        "Routing key to listen for.",
-                        ConfigurationField.Optional.NOT_OPTIONAL
-                )
-        );
-
-        return cr;
-    }
-
-    @Override
     public com.codahale.metrics.MetricSet getMetricSet() {
         return localRegistry;
     }
 
-    public interface Factory extends TransportFactory<AmqpTransport> {
+    @FactoryClass
+    public interface Factory extends Transport.Factory<AmqpTransport> {
         @Override
         AmqpTransport create(Configuration configuration);
+
+        @Override
+        Config getConfig();
+    }
+
+    @ConfigClass
+    public static class Config extends ThrottleableTransport.Config {
+        @Override
+        public ConfigurationRequest getRequestedConfiguration() {
+            final ConfigurationRequest cr = super.getRequestedConfiguration();
+            cr.addField(
+                    new TextField(
+                            CK_HOSTNAME,
+                            "Broker hostname",
+                            "",
+                            "Hostname of the AMQP broker to use",
+                            ConfigurationField.Optional.NOT_OPTIONAL
+                    )
+            );
+
+            cr.addField(
+                    new NumberField(
+                            CK_PORT,
+                            "Broker port",
+                            5672,
+                            "Port of the AMQP broker to use",
+                            ConfigurationField.Optional.OPTIONAL,
+                            NumberField.Attribute.IS_PORT_NUMBER
+                    )
+            );
+
+            cr.addField(
+                    new TextField(
+                            CK_VHOST,
+                            "Broker virtual host",
+                            "/",
+                            "Virtual host of the AMQP broker to use",
+                            ConfigurationField.Optional.NOT_OPTIONAL
+                    )
+            );
+
+            cr.addField(
+                    new TextField(
+                            CK_USERNAME,
+                            "Username",
+                            "",
+                            "Username to connect to AMQP broker",
+                            ConfigurationField.Optional.OPTIONAL
+                    )
+            );
+
+            cr.addField(
+                    new TextField(
+                            CK_PASSWORD,
+                            "Password",
+                            "",
+                            "Password to connect to AMQP broker",
+                            ConfigurationField.Optional.OPTIONAL,
+                            TextField.Attribute.IS_PASSWORD
+                    )
+            );
+
+            cr.addField(
+                    new NumberField(
+                            CK_PREFETCH,
+                            "Prefetch count",
+                            100,
+                            "For advanced usage: AMQP prefetch count. Default is 100.",
+                            ConfigurationField.Optional.NOT_OPTIONAL
+                    )
+            );
+
+            cr.addField(
+                    new TextField(
+                            CK_QUEUE,
+                            "Queue",
+                            "log-messages",
+                            "Name of queue that is created.",
+                            ConfigurationField.Optional.NOT_OPTIONAL
+                    )
+            );
+
+            cr.addField(
+                    new TextField(
+                            CK_EXCHANGE,
+                            "Exchange",
+                            "log-messages",
+                            "Name of exchange to bind to.",
+                            ConfigurationField.Optional.NOT_OPTIONAL
+                    )
+            );
+
+            cr.addField(
+                    new TextField(
+                            CK_ROUTING_KEY,
+                            "Routing key",
+                            "#",
+                            "Routing key to listen for.",
+                            ConfigurationField.Optional.NOT_OPTIONAL
+                    )
+            );
+
+            return cr;
+        }
     }
 }

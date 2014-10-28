@@ -31,7 +31,6 @@ import org.graylog2.plugin.database.EmbeddedPersistable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
@@ -291,20 +290,20 @@ public abstract class Extractor implements EmbeddedPersistable {
     }
 
     public Map<String, Object> getPersistedFields() {
-        return new HashMap<String, Object>() {{
-            put(FIELD_ID, id);
-            put(FIELD_TITLE, title);
-            put(FIELD_ORDER, order);
-            put(FIELD_TYPE, superType.toString().toLowerCase());
-            put(FIELD_CURSOR_STRATEGY, cursorStrategy.toString().toLowerCase());
-            put(FIELD_TARGET_FIELD, targetField);
-            put(FIELD_SOURCE_FIELD, sourceField);
-            put(FIELD_CREATOR_USER_ID, creatorUserId);
-            put(FIELD_EXTRACTOR_CONFIG, extractorConfig);
-            put(FIELD_CONDITION_TYPE, conditionType.toString().toLowerCase());
-            put(FIELD_CONDITION_VALUE, conditionValue);
-            put(FIELD_CONVERTERS, converterConfigMap());
-        }};
+        return ImmutableMap.<String, Object>builder()
+                .put(FIELD_ID, id)
+                .put(FIELD_TITLE, title)
+                .put(FIELD_ORDER, order)
+                .put(FIELD_TYPE, superType.toString().toLowerCase())
+                .put(FIELD_CURSOR_STRATEGY, cursorStrategy.toString().toLowerCase())
+                .put(FIELD_TARGET_FIELD, targetField)
+                .put(FIELD_SOURCE_FIELD, sourceField)
+                .put(FIELD_CREATOR_USER_ID, creatorUserId)
+                .put(FIELD_EXTRACTOR_CONFIG, extractorConfig)
+                .put(FIELD_CONDITION_TYPE, conditionType.toString().toLowerCase())
+                .put(FIELD_CONDITION_VALUE, conditionValue)
+                .put(FIELD_CONVERTERS, converterConfigMap())
+                .build();
     }
 
     public List<Converter> getConverters() {

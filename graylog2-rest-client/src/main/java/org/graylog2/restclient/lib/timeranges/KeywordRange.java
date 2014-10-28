@@ -16,18 +16,18 @@
  */
 package org.graylog2.restclient.lib.timeranges;
 
-import java.util.HashMap;
+import com.google.common.collect.ImmutableMap;
+
 import java.util.Map;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
+import static com.google.common.base.Strings.isNullOrEmpty;
+
 public class KeywordRange extends TimeRange {
 
     private final String keyword;
 
     public KeywordRange(String keyword) throws InvalidRangeParametersException {
-        if (keyword == null || keyword.isEmpty()) {
+        if (isNullOrEmpty(keyword)) {
             throw new InvalidRangeParametersException();
         }
 
@@ -41,18 +41,14 @@ public class KeywordRange extends TimeRange {
 
     @Override
     public Map<String, String> getQueryParams() {
-        return new HashMap<String, String>() {{
-            put("range_type", getType().toString().toLowerCase());
-            put("keyword", String.valueOf(keyword));
-        }};
+        return ImmutableMap.of(
+                "range_type", getType().toString().toLowerCase(),
+                "keyword", String.valueOf(keyword));
     }
 
     @Override
     public String toString() {
-        StringBuilder sb =  new StringBuilder("Keyword time range [").append(this.getClass().getCanonicalName()).append("] - ");
-        sb.append("keyword: ").append(this.keyword);
-
-        return sb.toString();
+        return "Keyword time range [" + getClass().getCanonicalName() + "] - keyword: " + keyword;
     }
 
 }

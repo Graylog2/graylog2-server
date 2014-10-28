@@ -17,6 +17,7 @@
 package org.graylog2.inputs.random;
 
 import com.codahale.metrics.MetricRegistry;
+import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import org.graylog2.inputs.codecs.RandomHttpMessageCodec;
@@ -24,49 +25,44 @@ import org.graylog2.inputs.transports.RandomMessageTransport;
 import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.inputs.MessageInput;
-import org.graylog2.plugin.inputs.codecs.Codec;
-import org.graylog2.plugin.inputs.transports.Transport;
 
 public class FakeHttpMessageInput extends MessageInput {
 
-    @AssistedInject
-    public FakeHttpMessageInput(@Assisted Configuration configuration,
-                                @Assisted Transport transport,
-                                @Assisted Codec codec,
-                                MetricRegistry metricRegistry,
-                                LocalMetricRegistry localRegistry) {
-        super(metricRegistry, transport, localRegistry, codec);
-    }
+    private static final String NAME = "Random HTTP message generator";
 
     @AssistedInject
     public FakeHttpMessageInput(@Assisted Configuration configuration,
                                 RandomMessageTransport.Factory transportFactory,
                                 RandomHttpMessageCodec.Factory codecFactory,
-                                MetricRegistry metricRegistry, LocalMetricRegistry localRegistry) {
+                                MetricRegistry metricRegistry, LocalMetricRegistry localRegistry, Config config, Descriptor descriptor) {
         super(metricRegistry,
               transportFactory.create(configuration),
-              localRegistry, codecFactory.create(configuration)
-        );
-    }
-
-    @Override
-    public boolean isExclusive() {
-        return false;
-    }
-
-    @Override
-    public String getName() {
-        return "Random HTTP message generator";
-    }
-
-    @Override
-    public String linkToDocs() {
-        return "";
+              localRegistry, codecFactory.create(configuration),
+              config, descriptor);
     }
 
     public interface Factory extends MessageInput.Factory<FakeHttpMessageInput> {
+        @Override
         FakeHttpMessageInput create(Configuration configuration);
 
-        FakeHttpMessageInput create(Configuration configuration, Transport transport, Codec codec);
+        @Override
+        Config getConfig();
+
+        @Override
+        Descriptor getDescriptor();
+    }
+
+    public static class Descriptor extends MessageInput.Descriptor {
+        @Inject
+        public Descriptor() {
+            super(NAME, false, "");
+        }
+    }
+
+    public static class Config extends MessageInput.Config {
+        @Inject
+        public Config(RandomMessageTransport.Factory transport, RandomHttpMessageCodec.Factory codec) {
+            super(transport.getConfig(), codec.getConfig());
+        }
     }
 }

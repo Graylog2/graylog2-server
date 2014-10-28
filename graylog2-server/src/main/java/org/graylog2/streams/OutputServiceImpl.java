@@ -31,9 +31,6 @@ import org.joda.time.DateTime;
 import javax.inject.Inject;
 import java.util.*;
 
-/**
- * @author Dennis Oelkers <dennis@torch.sh>
- */
 public class OutputServiceImpl extends PersistedServiceImpl implements OutputService {
     private final StreamService streamService;
 
@@ -94,7 +91,7 @@ public class OutputServiceImpl extends PersistedServiceImpl implements OutputSer
 
     @Override
     public Output create(CreateOutputRequest request, String userId) throws ValidationException {
-        return create(new OutputImpl(request.title, request.type, request.configuration, DateTime.now().toDate(), userId));
+        return create(new OutputImpl(request.title, request.type, request.configuration, DateTime.now().toDate(), userId, request.contentPack));
     }
 
     @Override

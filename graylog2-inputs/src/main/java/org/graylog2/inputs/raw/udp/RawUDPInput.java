@@ -34,6 +34,7 @@
 package org.graylog2.inputs.raw.udp;
 
 import com.codahale.metrics.MetricRegistry;
+import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import org.graylog2.inputs.codecs.RawCodec;
@@ -41,46 +42,47 @@ import org.graylog2.inputs.transports.UdpTransport;
 import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.inputs.MessageInput;
-import org.graylog2.plugin.inputs.codecs.Codec;
-import org.graylog2.plugin.inputs.transports.Transport;
 
 public class RawUDPInput extends MessageInput {
 
-    @AssistedInject
-    public RawUDPInput(MetricRegistry metricRegistry,
-                       @Assisted final Configuration configuration,
-                       @Assisted final Transport transport,
-                       @Assisted final Codec codec, LocalMetricRegistry localRegistry) {
-        super(metricRegistry, transport, localRegistry, codec);
-    }
+    private static final String NAME = "Raw/Plaintext UDP";
 
     @AssistedInject
     public RawUDPInput(MetricRegistry metricRegistry,
                        @Assisted final Configuration configuration,
                        final UdpTransport.Factory udpTransportFactory,
-                       final RawCodec.Factory rawCodecFactory, LocalMetricRegistry localRegistry) {
+                       final RawCodec.Factory rawCodecFactory,
+                       LocalMetricRegistry localRegistry,
+                       Config config,
+                       Descriptor descriptor) {
         super(metricRegistry, udpTransportFactory.create(configuration),
               localRegistry,
-              rawCodecFactory.create(configuration));
+              rawCodecFactory.create(configuration), config, descriptor);
     }
 
-    @Override
-    public boolean isExclusive() {
-        return false;
-    }
-
-    @Override
-    public String getName() {
-        return "Raw/Plaintext UDP (transport based)";
-    }
-
-    @Override
-    public String linkToDocs() {
-        return "";
-    }
 
     public interface Factory extends MessageInput.Factory<RawUDPInput> {
+        @Override
         RawUDPInput create(Configuration configuration);
-        RawUDPInput create(Configuration configuration, Transport transport, Codec codec);
+
+        @Override
+        Config getConfig();
+
+        @Override
+        Descriptor getDescriptor();
+    }
+
+    public static class Descriptor extends MessageInput.Descriptor {
+        @Inject
+        public Descriptor() {
+            super(NAME, false, "");
+        }
+    }
+
+    public static class Config extends MessageInput.Config {
+        @Inject
+        public Config(UdpTransport.Factory transport, RawCodec.Factory codec) {
+            super(transport.getConfig(), codec.getConfig());
+        }
     }
 }

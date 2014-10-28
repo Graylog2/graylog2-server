@@ -17,6 +17,7 @@
 package org.graylog2.inputs.radio;
 
 import com.codahale.metrics.MetricRegistry;
+import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import org.graylog2.inputs.codecs.RadioMessageCodec;
@@ -25,34 +26,25 @@ import org.graylog2.inputs.transports.RadioKafkaTransport;
 import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.inputs.MessageInput;
-import org.graylog2.plugin.inputs.codecs.Codec;
-import org.graylog2.plugin.inputs.transports.Transport;
 
 public class RadioKafkaInput extends KafkaInput {
 
-    @AssistedInject
-    public RadioKafkaInput(@Assisted Configuration configuration,
-                           MetricRegistry metricRegistry,
-                           @Assisted Transport transport,
-                           @Assisted Codec codec, LocalMetricRegistry localRegistry) {
-        super(configuration, metricRegistry, transport, codec, localRegistry);
-    }
+    private static final String NAME = "Graylog2 Radio Input (Kafka)";
 
     @AssistedInject
     public RadioKafkaInput(@Assisted Configuration configuration,
                            MetricRegistry metricRegistry,
                            RadioKafkaTransport.Factory transport,
-                           RadioMessageCodec.Factory codec, LocalMetricRegistry localRegistry) {
-        super(configuration,
-              metricRegistry,
+                           RadioMessageCodec.Factory codec,
+                           LocalMetricRegistry localRegistry,
+                           Config config,
+                           Descriptor descriptor) {
+        super(metricRegistry,
               transport.create(configuration),
               codec.create(configuration),
-              localRegistry);
-    }
-
-    @Override
-    public String getName() {
-        return "Graylog2 Radio Input (Kafka)";
+              localRegistry,
+              config,
+              descriptor);
     }
 
     public interface Factory extends MessageInput.Factory<RadioKafkaInput> {
@@ -60,6 +52,23 @@ public class RadioKafkaInput extends KafkaInput {
         RadioKafkaInput create(Configuration configuration);
 
         @Override
-        RadioKafkaInput create(Configuration configuration, Transport transport, Codec codec);
+        Config getConfig();
+
+        @Override
+        Descriptor getDescriptor();
+    }
+
+    public static class Descriptor extends MessageInput.Descriptor {
+        @Inject
+        public Descriptor() {
+            super(NAME, false, "");
+        }
+    }
+
+    public static class Config extends MessageInput.Config {
+        @Inject
+        public Config(RadioKafkaTransport.Factory transport, RadioMessageCodec.Factory codec) {
+            super(transport.getConfig(), codec.getConfig());
+        }
     }
 }

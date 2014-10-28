@@ -16,7 +16,7 @@
  */
 package org.graylog2.users;
 
-import com.google.common.collect.Lists;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import org.apache.shiro.crypto.hash.SimpleHash;
 import org.bson.types.ObjectId;
@@ -33,7 +33,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -72,18 +71,18 @@ public class UserImpl extends PersistedImpl implements User {
     }
 
     public Map<String, Validator> getValidations() {
-        return new HashMap<String, Validator>() {{
-            put(USERNAME, new LimitedStringValidator(1, MAX_USERNAME_LENGTH));
-            put(PASSWORD, new FilledStringValidator());
-            put(EMAIL, new LimitedStringValidator(1, MAX_EMAIL_LENGTH));
-            put(FULL_NAME, new LimitedOptionalStringValidator(MAX_FULL_NAME_LENGTH));
-            put(PERMISSIONS, new ListValidator());
-        }};
+        return ImmutableMap.<String, Validator>builder()
+                .put(USERNAME, new LimitedStringValidator(1, MAX_USERNAME_LENGTH))
+                .put(PASSWORD, new FilledStringValidator())
+                .put(EMAIL, new LimitedStringValidator(1, MAX_EMAIL_LENGTH))
+                .put(FULL_NAME, new LimitedOptionalStringValidator(MAX_FULL_NAME_LENGTH))
+                .put(PERMISSIONS, new ListValidator())
+                .build();
     }
 
     @Override
     public Map<String, Validator> getEmbeddedValidations(final String key) {
-        return Maps.newHashMap();
+        return Collections.emptyMap();
     }
 
     @Override
@@ -247,7 +246,7 @@ public class UserImpl extends PersistedImpl implements User {
         private final Configuration configuration;
 
         public LocalAdminUser(Configuration configuration) {
-            super(null, Maps.<String, Object>newHashMap());
+            super(null, Collections.<String, Object>emptyMap());
             this.configuration = configuration;
         }
 
@@ -282,7 +281,7 @@ public class UserImpl extends PersistedImpl implements User {
 
         @Override
         public List<String> getPermissions() {
-            return Lists.newArrayList("*");
+            return Collections.singletonList("*");
         }
 
         @Override

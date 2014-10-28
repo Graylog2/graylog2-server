@@ -41,7 +41,8 @@ public class StaticFieldFilterTest {
 
         FakeInput fakeInput = new FakeInput(mock(MetricRegistry.class),mock(Transport.class),
                                             mock(MetricRegistry.class),
-                                            mock(Codec.class));
+                                            mock(Codec.class),
+                                            mock(MessageInput.Config.class), mock(MessageInput.Descriptor.class));
         fakeInput.addStaticField("foo", "bar");
 
         msg.setSourceInput(fakeInput);
@@ -61,7 +62,8 @@ public class StaticFieldFilterTest {
 
         FakeInput fakeInput = new FakeInput(mock(MetricRegistry.class),mock(Transport.class),
                                             mock(MetricRegistry.class),
-                                            mock(Codec.class));
+                                            mock(Codec.class),
+                                            mock(MessageInput.Config.class), mock(MessageInput.Descriptor.class));
         fakeInput.addStaticField("foo", "bar");
 
         msg.setSourceInput(fakeInput);
@@ -78,8 +80,8 @@ public class StaticFieldFilterTest {
 
         public FakeInput(MetricRegistry metricRegistry,
                          Transport transport,
-                         MetricRegistry localRegistry, Codec codec) {
-            super(metricRegistry, transport, localRegistry, codec);
+                         MetricRegistry localRegistry, Codec codec, Config config, Descriptor descriptor) {
+            super(metricRegistry, transport, localRegistry, codec, config, descriptor);
         }
 
 
@@ -95,21 +97,6 @@ public class StaticFieldFilterTest {
 
         @Override
         public ConfigurationRequest getRequestedConfiguration() {
-            return null;  //To change body of implemented methods use File | Settings | File Templates.
-        }
-
-        @Override
-        public boolean isExclusive() {
-            return false;  //To change body of implemented methods use File | Settings | File Templates.
-        }
-
-        @Override
-        public String getName() {
-            return null;  //To change body of implemented methods use File | Settings | File Templates.
-        }
-
-        @Override
-        public String linkToDocs() {
             return null;  //To change body of implemented methods use File | Settings | File Templates.
         }
     }

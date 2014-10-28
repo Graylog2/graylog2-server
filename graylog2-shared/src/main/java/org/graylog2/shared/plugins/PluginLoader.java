@@ -31,6 +31,7 @@ import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Properties;
 import java.util.Set;
+import java.util.jar.JarFile;
 
 public class PluginLoader {
     private static final Logger LOG = LoggerFactory.getLogger(PluginLoader.class);
@@ -85,6 +86,10 @@ public class PluginLoader {
         LOG.debug("Loading [{}] plugins", files.length);
         for (File jar : files) {
             try {
+                // just try to read the plugin.properties file, so we can be sure the URLClassLoader doesn't fall back to the system classloader
+                final JarFile jarFile = new JarFile(jar);
+                jarFile.getEntry(GRAYLOG2_PLUGIN_PROPERTIES);
+
                 LOG.debug("Loading <" + jar.getAbsolutePath() + ">");
                 final URLClassLoader pluginClassLoader = new URLClassLoader(new URL[]{ jar.toURI().toURL() }, classLoader);
 
@@ -98,6 +103,8 @@ public class PluginLoader {
                 }
             } catch (MalformedURLException e) {
                 LOG.error("Cannot open jar for discovering plugins", e);
+            } catch (IOException e) {
+                LOG.debug("Skipping file {}, not a plugin jar", jar.getAbsolutePath());
             }
         }
 

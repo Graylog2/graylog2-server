@@ -51,7 +51,7 @@ public abstract class PersistedImpl implements Persisted {
         // Transform all java.util.Date's to JodaTime because MongoDB gives back java.util.Date's. #lol
         for(Map.Entry<String, Object> field : fields.entrySet()) {
             if (field.getValue() instanceof Date) {
-                fields.put(field.getKey(), new DateTime((Date) field.getValue(), DateTimeZone.UTC));
+                fields.put(field.getKey(), new DateTime(field.getValue(), DateTimeZone.UTC));
             }
         }
     }

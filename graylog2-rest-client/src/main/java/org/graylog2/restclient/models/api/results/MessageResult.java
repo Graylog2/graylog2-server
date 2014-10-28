@@ -18,7 +18,6 @@ package org.graylog2.restclient.models.api.results;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.graylog2.restclient.models.FieldMapper;
 import org.graylog2.restclient.models.api.responses.HighlightRange;
@@ -27,6 +26,7 @@ import org.joda.time.DateTimeZone;
 
 import javax.annotation.Nullable;
 import java.text.DecimalFormat;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -93,7 +93,7 @@ public class MessageResult {
         this.index = index;
         this.streamIds = (List<String>) message.get("streams");
 
-        if(message.containsKey("gl2_source_radio")) {
+        if (message.containsKey("gl2_source_radio")) {
             sourceRadioId = (String) message.get("gl2_source_radio");
             sourceRadioInputId = (String) message.get("gl2_source_radio_input");
         } else {
@@ -142,7 +142,7 @@ public class MessageResult {
             public Object transformEntry(@Nullable String key, @Nullable Object value) {
                 // Get rid of .0 of doubles. 9001.0 becomes "9001", 9001.25 becomes "9001.25"
                 // Never format a double in scientific notation.
-                if(value instanceof Double) {
+                if (value instanceof Double) {
                     Double d = (Double) value;
                     if (d.longValue() == d) {
                         // preserve the "numberness" of the value, so the field mappers can take this into account
@@ -185,7 +185,7 @@ public class MessageResult {
         if (this.streamIds != null) {
             return this.streamIds;
         } else {
-            return Lists.newArrayList();
+            return Collections.emptyList();
         }
     }
 

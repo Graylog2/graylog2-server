@@ -180,7 +180,7 @@ public abstract class InputRegistry {
         return false;
     }
 
-    public Map<String, String> getAvailableInputs() {
+    public Map<String, InputDescription> getAvailableInputs() {
         return messageInputFactory.getAvailableInputs();
     }
 

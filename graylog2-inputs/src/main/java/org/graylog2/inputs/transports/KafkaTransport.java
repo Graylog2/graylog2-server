@@ -18,6 +18,7 @@ package org.graylog2.inputs.transports;
 
 import com.codahale.metrics.Gauge;
 import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.MetricSet;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.common.util.concurrent.Uninterruptibles;
@@ -26,6 +27,8 @@ import com.google.inject.assistedinject.AssistedInject;
 import kafka.consumer.*;
 import kafka.javaapi.consumer.ConsumerConnector;
 import kafka.message.MessageAndMetadata;
+import org.graylog2.plugin.ConfigClass;
+import org.graylog2.plugin.FactoryClass;
 import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.buffers.BufferOutOfCapacityException;
@@ -39,7 +42,7 @@ import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.MisfireException;
 import org.graylog2.plugin.inputs.codecs.CodecAggregator;
 import org.graylog2.plugin.inputs.transports.ThrottleableTransport;
-import org.graylog2.plugin.inputs.transports.TransportFactory;
+import org.graylog2.plugin.inputs.transports.Transport;
 import org.graylog2.plugin.journal.RawMessage;
 import org.graylog2.plugin.lifecycles.Lifecycle;
 import org.graylog2.plugin.system.NodeId;
@@ -160,7 +163,7 @@ public class KafkaTransport extends ThrottleableTransport {
         // if something breaks.
         props.put("auto.commit.interval.ms", "1000");
 
-        final int numThreads = (int) configuration.getInt(CK_THREADS);
+        final int numThreads = configuration.getInt(CK_THREADS);
         final ConsumerConfig consumerConfig = new ConsumerConfig(props);
         cc = Consumer.createJavaConsumerConnector(consumerConfig);
 
@@ -287,54 +290,61 @@ public class KafkaTransport extends ThrottleableTransport {
     }
 
     @Override
-    public ConfigurationRequest getRequestedConfiguration() {
-        final ConfigurationRequest cr = new ConfigurationRequest();
-
-        cr.addField(new TextField(
-                CK_ZOOKEEPER,
-                "ZooKeeper address",
-                "192.168.1.1:2181",
-                "Host and port of the ZooKeeper that is managing your Kafka cluster.",
-                ConfigurationField.Optional.NOT_OPTIONAL));
-
-        cr.addField(new TextField(
-                CK_TOPIC_FILTER,
-                "Topic filter regex",
-                "^your-topic$",
-                "Every topic that matches this regular expression will be consumed.",
-                ConfigurationField.Optional.NOT_OPTIONAL));
-
-        cr.addField(new NumberField(
-                CK_FETCH_MIN_BYTES,
-                "Fetch minimum bytes",
-                5,
-                "Wait for a message batch to reach at least this size or the configured maximum wait time before fetching.",
-                ConfigurationField.Optional.NOT_OPTIONAL));
-
-        cr.addField(new NumberField(
-                CK_FETCH_WAIT_MAX,
-                "Fetch maximum wait time (ms)",
-                100,
-                "Wait for this time or the configured minimum size of a message batch before fetching.",
-                ConfigurationField.Optional.NOT_OPTIONAL));
-
-        cr.addField(new NumberField(
-                CK_THREADS,
-                "Processor threads",
-                2,
-                "Number of processor threads to spawn. Use one thread per Kafka topic partition.",
-                ConfigurationField.Optional.NOT_OPTIONAL));
-
-        return cr;
-    }
-
-    @Override
-    public com.codahale.metrics.MetricSet getMetricSet() {
+    public MetricSet getMetricSet() {
         return localRegistry;
     }
 
-    public interface Factory extends TransportFactory<KafkaTransport> {
+    @FactoryClass
+    public interface Factory extends Transport.Factory<KafkaTransport> {
         @Override
         KafkaTransport create(Configuration configuration);
+
+        @Override
+        Config getConfig();
+    }
+
+    @ConfigClass
+    public static class Config extends ThrottleableTransport.Config {
+        @Override
+        public ConfigurationRequest getRequestedConfiguration() {
+            final ConfigurationRequest cr = super.getRequestedConfiguration();
+
+            cr.addField(new TextField(
+                    CK_ZOOKEEPER,
+                    "ZooKeeper address",
+                    "192.168.1.1:2181",
+                    "Host and port of the ZooKeeper that is managing your Kafka cluster.",
+                    ConfigurationField.Optional.NOT_OPTIONAL));
+
+            cr.addField(new TextField(
+                    CK_TOPIC_FILTER,
+                    "Topic filter regex",
+                    "^your-topic$",
+                    "Every topic that matches this regular expression will be consumed.",
+                    ConfigurationField.Optional.NOT_OPTIONAL));
+
+            cr.addField(new NumberField(
+                    CK_FETCH_MIN_BYTES,
+                    "Fetch minimum bytes",
+                    5,
+                    "Wait for a message batch to reach at least this size or the configured maximum wait time before fetching.",
+                    ConfigurationField.Optional.NOT_OPTIONAL));
+
+            cr.addField(new NumberField(
+                    CK_FETCH_WAIT_MAX,
+                    "Fetch maximum wait time (ms)",
+                    100,
+                    "Wait for this time or the configured minimum size of a message batch before fetching.",
+                    ConfigurationField.Optional.NOT_OPTIONAL));
+
+            cr.addField(new NumberField(
+                    CK_THREADS,
+                    "Processor threads",
+                    2,
+                    "Number of processor threads to spawn. Use one thread per Kafka topic partition.",
+                    ConfigurationField.Optional.NOT_OPTIONAL));
+
+            return cr;
+        }
     }
 }

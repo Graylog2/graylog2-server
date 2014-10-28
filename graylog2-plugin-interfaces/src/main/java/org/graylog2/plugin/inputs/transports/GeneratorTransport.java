@@ -25,6 +25,7 @@ package org.graylog2.plugin.inputs.transports;
 import com.codahale.metrics.MetricSet;
 import com.google.common.util.concurrent.AbstractExecutionThreadService;
 import com.google.common.util.concurrent.Service;
+import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.MisfireException;
 import org.graylog2.plugin.inputs.codecs.CodecAggregator;
@@ -76,5 +77,12 @@ public abstract class GeneratorTransport implements Transport {
     @Override
     public MetricSet getMetricSet() {
         return null;
+    }
+
+    public static class Config implements Transport.Config {
+        @Override
+        public ConfigurationRequest getRequestedConfiguration() {
+            return new ConfigurationRequest();
+        }
     }
 }

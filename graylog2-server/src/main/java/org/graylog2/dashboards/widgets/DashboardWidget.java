@@ -21,6 +21,7 @@ import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import com.google.common.collect.ImmutableMap;
 import com.mongodb.BasicDBObject;
 import org.graylog2.indexer.searches.Searches;
 import org.graylog2.indexer.searches.timeranges.AbsoluteRange;
@@ -33,7 +34,6 @@ import org.graylog2.plugin.database.EmbeddedPersistable;
 import org.graylog2.rest.resources.dashboards.requests.AddWidgetRequest;
 import org.joda.time.DateTime;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.Callable;
@@ -267,14 +267,14 @@ public abstract class DashboardWidget implements EmbeddedPersistable {
     }
 
     public Map<String, Object> getPersistedFields() {
-        return new HashMap<String, Object>() {{
-            put("id", id);
-            put("type", type.toString().toLowerCase());
-            put("description", description);
-            put("cache_time", cacheTime);
-            put("creator_user_id", creatorUserId);
-            put("config", getPersistedConfig());
-        }};
+        return ImmutableMap.<String, Object>builder()
+                .put("id", id)
+                .put("type", type.toString().toLowerCase())
+                .put("description", description)
+                .put("cache_time", cacheTime)
+                .put("creator_user_id", creatorUserId)
+                .put("config", getPersistedConfig())
+                .build();
     }
 
     public ComputationResult getComputationResult() throws ExecutionException {

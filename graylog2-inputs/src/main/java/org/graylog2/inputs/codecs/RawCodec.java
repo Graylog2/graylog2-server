@@ -38,6 +38,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Charsets;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
+import org.graylog2.plugin.ConfigClass;
+import org.graylog2.plugin.FactoryClass;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
@@ -97,21 +99,28 @@ public class RawCodec implements Codec {
         return "raw";
     }
 
-    @Nonnull
-    @Override
-    public ConfigurationRequest getRequestedConfiguration() {
-        return new ConfigurationRequest();
-    }
-
-    @Override
-    public void overrideDefaultValues(@Nonnull ConfigurationRequest cr) {
-        if (cr.containsField(NettyTransport.CK_PORT)) {
-            cr.getField(NettyTransport.CK_PORT).setDefaultValue(5555);
-        }
-    }
-
+    @FactoryClass
     public interface Factory extends Codec.Factory<RawCodec> {
         @Override
         RawCodec create(Configuration configuration);
+
+        @Override
+        Config getConfig();
     }
+
+    @ConfigClass
+    public static class Config implements Codec.Config {
+        @Override
+        public ConfigurationRequest getRequestedConfiguration() {
+            return new ConfigurationRequest();
+        }
+
+        @Override
+        public void overrideDefaultValues(@Nonnull ConfigurationRequest cr) {
+            if (cr.containsField(NettyTransport.CK_PORT)) {
+                cr.getField(NettyTransport.CK_PORT).setDefaultValue(5555);
+            }
+        }
+    }
+
 }

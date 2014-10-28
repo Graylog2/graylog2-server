@@ -20,6 +20,7 @@ import com.codahale.metrics.MetricRegistry;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Charsets;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.http.HttpEntity;
@@ -47,22 +48,16 @@ import javax.inject.Inject;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
 import static java.util.concurrent.TimeUnit.MINUTES;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public class TelemetryReporterThread extends Periodical {
-
     private static final Logger LOG = LoggerFactory.getLogger(TelemetryReporterThread.class);
-
-    private static final Set<String> METRICS_BLACKLIST = new HashSet<String>() {{
-        add("org.graylog2.rest.resources");
-    }};
+    private static final Set<String> METRICS_BLACKLIST = ImmutableSet.<String>builder()
+            .add("org.graylog2.rest.resources")
+            .build();
 
     @Inject
     private ObjectMapper objectMapper;
@@ -92,7 +87,7 @@ public class TelemetryReporterThread extends Periodical {
 
         HttpEntity postBody;
         try {
-            Map<String,Object> report = Maps.newHashMap();
+            Map<String, Object> report = Maps.newHashMap();
 
             report.put("token", configuration.getTelemetryServiceToken());
             report.put("anon_id", DigestUtils.sha256Hex(serverStatus.getNodeId().toString()));

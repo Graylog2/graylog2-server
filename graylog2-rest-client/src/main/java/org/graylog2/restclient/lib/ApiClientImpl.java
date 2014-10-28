@@ -471,7 +471,7 @@ class ApiClientImpl implements ApiClient {
 
                         return result;
                     } catch (Exception e) {
-                        LOG.error("Caught Exception while deserializing JSON request: " + e);
+                        LOG.error("Caught Exception while deserializing JSON request: ", e);
                         LOG.debug("Response from backend was: " + response.getResponseBody("UTF-8"));
 
                         throw new APIException(request, response, e);

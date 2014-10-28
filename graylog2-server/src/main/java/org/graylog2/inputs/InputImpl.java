@@ -16,6 +16,7 @@
  */
 package org.graylog2.inputs;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.mongodb.BasicDBList;
 import com.mongodb.DBObject;
@@ -25,6 +26,7 @@ import org.graylog2.database.PersistedImpl;
 import org.graylog2.database.validators.DateValidator;
 import org.graylog2.database.validators.FilledStringValidator;
 import org.graylog2.database.validators.MapValidator;
+import org.graylog2.database.validators.OptionalStringValidator;
 import org.graylog2.plugin.database.validators.Validator;
 import org.graylog2.plugin.inputs.Extractor;
 import org.graylog2.plugin.inputs.MessageInput;
@@ -33,7 +35,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 
 @CollectionName("inputs")
@@ -56,36 +57,36 @@ public class InputImpl extends PersistedImpl implements Input {
 
     @Override
     public Map<String, Validator> getValidations() {
-        return new HashMap<String, Validator>() {{
-            put(MessageInput.FIELD_INPUT_ID, new FilledStringValidator());
-            put(MessageInput.FIELD_TITLE, new FilledStringValidator());
-            put(MessageInput.FIELD_TYPE, new FilledStringValidator());
-            put(MessageInput.FIELD_CONFIGURATION, new MapValidator());
-            put(MessageInput.FIELD_CREATOR_USER_ID, new FilledStringValidator());
-            put(MessageInput.FIELD_CREATED_AT, new DateValidator());
-        }};
+        final ImmutableMap.Builder<String, Validator> validations = ImmutableMap.builder();
+        validations.put(MessageInput.FIELD_INPUT_ID, new FilledStringValidator());
+        validations.put(MessageInput.FIELD_TITLE, new FilledStringValidator());
+        validations.put(MessageInput.FIELD_TYPE, new FilledStringValidator());
+        validations.put(MessageInput.FIELD_CONFIGURATION, new MapValidator());
+        validations.put(MessageInput.FIELD_CREATOR_USER_ID, new FilledStringValidator());
+        validations.put(MessageInput.FIELD_CREATED_AT, new DateValidator());
+        validations.put(MessageInput.FIELD_CONTENT_PACK, new OptionalStringValidator());
+
+        return validations.build();
     }
 
     @Override
     public Map<String, Validator> getEmbeddedValidations(String key) {
         if (key.equals(EMBEDDED_EXTRACTORS)) {
-            return new HashMap<String, Validator>() {{
-                put(Extractor.FIELD_ID, new FilledStringValidator());
-                put(Extractor.FIELD_TITLE, new FilledStringValidator());
-                put(Extractor.FIELD_TYPE, new FilledStringValidator());
-                put(Extractor.FIELD_CURSOR_STRATEGY, new FilledStringValidator());
-                put(Extractor.FIELD_TARGET_FIELD, new FilledStringValidator());
-                put(Extractor.FIELD_SOURCE_FIELD, new FilledStringValidator());
-                put(Extractor.FIELD_CREATOR_USER_ID, new FilledStringValidator());
-                put(Extractor.FIELD_EXTRACTOR_CONFIG, new MapValidator());
-            }};
+            final ImmutableMap.Builder<String, Validator> validations = ImmutableMap.builder();
+            validations.put(Extractor.FIELD_ID, new FilledStringValidator());
+            validations.put(Extractor.FIELD_TITLE, new FilledStringValidator());
+            validations.put(Extractor.FIELD_TYPE, new FilledStringValidator());
+            validations.put(Extractor.FIELD_CURSOR_STRATEGY, new FilledStringValidator());
+            validations.put(Extractor.FIELD_TARGET_FIELD, new FilledStringValidator());
+            validations.put(Extractor.FIELD_SOURCE_FIELD, new FilledStringValidator());
+            validations.put(Extractor.FIELD_CREATOR_USER_ID, new FilledStringValidator());
+            validations.put(Extractor.FIELD_EXTRACTOR_CONFIG, new MapValidator());
         }
 
         if (key.equals(EMBEDDED_STATIC_FIELDS)) {
-            return new HashMap<String, Validator>() {{
-                put(FIELD_STATIC_FIELD_KEY, new FilledStringValidator());
-                put(FIELD_STATIC_FIELD_VALUE, new FilledStringValidator());
-            }};
+            return ImmutableMap.<String, Validator>of(
+                    FIELD_STATIC_FIELD_KEY, new FilledStringValidator(),
+                    FIELD_STATIC_FIELD_VALUE, new FilledStringValidator());
         }
 
         return Collections.emptyMap();
@@ -152,4 +153,8 @@ public class InputImpl extends PersistedImpl implements Input {
         }
     }
 
+    @Override
+    public String getContentPack() {
+        return (String) fields.get(MessageInput.FIELD_CONTENT_PACK);
+    }
 }

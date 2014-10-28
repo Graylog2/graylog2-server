@@ -17,6 +17,7 @@
 package org.graylog2.streams;
 
 import com.fasterxml.jackson.annotation.JsonValue;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.bson.types.ObjectId;
@@ -25,16 +26,15 @@ import org.graylog2.database.PersistedImpl;
 import org.graylog2.database.validators.DateValidator;
 import org.graylog2.database.validators.FilledStringValidator;
 import org.graylog2.database.validators.MapValidator;
+import org.graylog2.database.validators.OptionalStringValidator;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.database.validators.Validator;
 import org.graylog2.plugin.streams.Output;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.streams.StreamRule;
 import org.joda.time.DateTime;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -42,25 +42,31 @@ import java.util.Set;
 /**
  * Representing a single stream from the streams collection. Also provides method
  * to get all streams of this collection.
- *
- * @author Lennart Koopmann <lennart@torch.sh>
  */
 @CollectionName("streams")
 public class StreamImpl extends PersistedImpl implements Stream {
-
-    private static final Logger LOG = LoggerFactory.getLogger(StreamImpl.class);
+    public static final String FIELD_TITLE = "title";
+    public static final String FIELD_DESCRIPTION = "description";
+    public static final String FIELD_RULES = "rules";
+    public static final String FIELD_OUTPUTS = "outputs";
+    public static final String FIELD_CONTENT_PACK = "content_pack";
+    public static final String FIELD_ALERT_RECEIVERS = "alert_receivers";
+    public static final String FIELD_DISABLED = "disabled";
+    public static final String FIELD_CREATED_AT = "created_at";
+    public static final String FIELD_CREATOR_USER_ID = "creator_user_id";
     public static final String EMBEDDED_ALERT_CONDITIONS = "alert_conditions";
+
     private final List<StreamRule> streamRules;
     private final Set<Output> outputs;
 
     public StreamImpl(Map<String, Object> fields) {
-    	super(fields);
+        super(fields);
         this.streamRules = null;
         this.outputs = null;
     }
 
     protected StreamImpl(ObjectId id, Map<String, Object> fields) {
-    	super(id, fields);
+        super(id, fields);
         this.streamRules = null;
         this.outputs = null;
     }
@@ -88,41 +94,51 @@ public class StreamImpl extends PersistedImpl implements Stream {
     }
 
     @Override
-	public String getTitle() {
-		return (String) fields.get("title");
-	}
+    public String getTitle() {
+        return (String) fields.get(FIELD_TITLE);
+    }
 
     @Override
     public String getDescription() {
-        return (String) fields.get("description");
+        return (String) fields.get(FIELD_DESCRIPTION);
     }
 
     @Override
     public void setTitle(String title) {
-        fields.put("title", title);
+        fields.put(FIELD_TITLE, title);
     }
 
     @Override
     public void setDescription(String description) {
-        fields.put("description", description);
+        fields.put(FIELD_DESCRIPTION, description);
     }
 
     @Override
     public Boolean getDisabled() {
-        return (Boolean) fields.get("disabled");
+        return (Boolean) fields.get(FIELD_DISABLED);
     }
 
     @Override
     public void setDisabled(Boolean disabled) {
-        fields.put("disabled", disabled);
+        fields.put(FIELD_DISABLED, disabled);
+    }
+
+    @Override
+    public String getContentPack() {
+        return (String) fields.get(FIELD_CONTENT_PACK);
+    }
+
+    @Override
+    public void setContentPack(String contentPack) {
+        fields.put(FIELD_CONTENT_PACK, contentPack);
     }
 
     public Boolean isPaused() {
         Boolean disabled = getDisabled();
         return (disabled != null && disabled);
     }
-	
-	public Map<String, Object> asMap(List<StreamRule> streamRules) {
+
+    public Map<String, Object> asMap(List<StreamRule> streamRules) {
         Map<String, Object> result = asMap();
 
         List<Map<String, Object>> streamRulesMap = Lists.newArrayList();
@@ -131,10 +147,10 @@ public class StreamImpl extends PersistedImpl implements Stream {
             streamRulesMap.add(streamRule.asMap());
         }
 
-        result.put("rules", streamRulesMap);
+        result.put(FIELD_RULES, streamRulesMap);
 
-		return result;
-	}
+        return result;
+    }
 
     @JsonValue
     public Map<String, Object> asMap() {
@@ -142,39 +158,39 @@ public class StreamImpl extends PersistedImpl implements Stream {
         Map<String, Object> result = Maps.newHashMap(fields);
         result.remove("_id");
         result.put("id", ((ObjectId) fields.get("_id")).toHexString());
-        result.remove("created_at");
-        result.put("created_at", (Tools.getISO8601String((DateTime) fields.get("created_at"))));
-        result.put("rules", streamRules);
-        result.put("outputs", outputs);
+        result.remove(FIELD_CREATED_AT);
+        result.put(FIELD_CREATED_AT, (Tools.getISO8601String((DateTime) fields.get(FIELD_CREATED_AT))));
+        result.put(FIELD_RULES, streamRules);
+        result.put(FIELD_OUTPUTS, outputs);
         return result;
     }
 
     public Map<String, Validator> getValidations() {
-        return new HashMap<String, Validator>() {{
-            put("title", new FilledStringValidator());
-            put("creator_user_id", new FilledStringValidator());
-            put("created_at", new DateValidator());
-        }};
+        return ImmutableMap.<String, Validator>builder()
+                .put(FIELD_TITLE, new FilledStringValidator())
+                .put(FIELD_CREATOR_USER_ID, new FilledStringValidator())
+                .put(FIELD_CREATED_AT, new DateValidator())
+                .put(FIELD_CONTENT_PACK, new OptionalStringValidator())
+                .build();
     }
 
     @Override
     public Map<String, Validator> getEmbeddedValidations(String key) {
-       if(key.equals(EMBEDDED_ALERT_CONDITIONS)) {
-            return new HashMap<String, Validator>() {{
-                put("id", new FilledStringValidator());
-                put("parameters", new MapValidator());
-            }};
+        if (key.equals(EMBEDDED_ALERT_CONDITIONS)) {
+            return ImmutableMap.of(
+                    "id", new FilledStringValidator(),
+                    "parameters", new MapValidator());
         }
 
-        return Maps.newHashMap();
+        return Collections.emptyMap();
     }
 
     public Map<String, List<String>> getAlertReceivers() {
-        if (!fields.containsKey("alert_receivers")) {
-            return Maps.newHashMap();
+        if (!fields.containsKey(FIELD_ALERT_RECEIVERS)) {
+            return Collections.emptyMap();
         }
 
-        return (Map<String, List<String>>) fields.get("alert_receivers");
+        return (Map<String, List<String>>) fields.get(FIELD_ALERT_RECEIVERS);
     }
 
 }

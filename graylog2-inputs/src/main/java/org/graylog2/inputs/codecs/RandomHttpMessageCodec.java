@@ -20,6 +20,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
 import org.graylog2.inputs.random.generators.FakeHttpRawMessageGenerator;
+import org.graylog2.plugin.ConfigClass;
+import org.graylog2.plugin.FactoryClass;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
@@ -72,19 +74,26 @@ public class RandomHttpMessageCodec implements Codec {
         return "randomhttp";
     }
 
-    @Nonnull
-    @Override
-    public ConfigurationRequest getRequestedConfiguration() {
-        return new ConfigurationRequest();
-    }
-
-    @Override
-    public void overrideDefaultValues(@Nonnull ConfigurationRequest cr) {
-
-    }
-
+    @FactoryClass
     public interface Factory extends Codec.Factory<RandomHttpMessageCodec> {
         @Override
         RandomHttpMessageCodec create(Configuration configuration);
+
+        @Override
+        Config getConfig();
     }
+
+    @ConfigClass
+    public static class Config implements Codec.Config {
+        @Override
+        public ConfigurationRequest getRequestedConfiguration() {
+            return new ConfigurationRequest();
+        }
+
+        @Override
+        public void overrideDefaultValues(@Nonnull ConfigurationRequest cr) {
+
+        }
+    }
+
 }

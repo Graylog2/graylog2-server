@@ -17,13 +17,16 @@
 package org.graylog2.restclient.models;
 
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import org.graylog2.restclient.lib.APIException;
 import org.graylog2.restclient.lib.ApiClient;
 import org.graylog2.restclient.lib.Configuration;
-import org.graylog2.restclient.models.api.responses.*;
+import org.graylog2.restclient.models.api.responses.GetMessageResponse;
+import org.graylog2.restclient.models.api.responses.HighlightRange;
+import org.graylog2.restclient.models.api.responses.MessageAnalyzeResponse;
+import org.graylog2.restclient.models.api.responses.MessageCountResponse;
+import org.graylog2.restclient.models.api.responses.MessageFieldResponse;
 import org.graylog2.restclient.models.api.results.MessageAnalyzeResult;
 import org.graylog2.restclient.models.api.results.MessageResult;
 import org.graylog2.restroutes.generated.routes;
@@ -33,6 +36,7 @@ import play.cache.Cache;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
@@ -75,7 +79,7 @@ public class MessagesService {
             log.error("Unexpected error condition", e);
             throw new IllegalStateException(e);
         }
-        return Sets.newHashSet();
+        return Collections.emptySet();
     }
 
     public long total() {

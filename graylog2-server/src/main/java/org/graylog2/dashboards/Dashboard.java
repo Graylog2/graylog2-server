@@ -30,6 +30,10 @@ public interface Dashboard extends Persisted {
 
     void setDescription(String description);
 
+    String getContentPack();
+
+    void setContentPack(String contentPack);
+
     void addPersistedWidget(DashboardWidget widget);
 
     DashboardWidget getWidget(String widgetId);

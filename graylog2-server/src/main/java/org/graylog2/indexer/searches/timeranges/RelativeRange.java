@@ -16,16 +16,14 @@
  */
 package org.graylog2.indexer.searches.timeranges;
 
+import com.google.common.collect.ImmutableMap;
 import org.graylog2.plugin.Tools;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.joda.time.Seconds;
 
-import java.util.HashMap;
 import java.util.Map;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public class RelativeRange implements TimeRange {
 
     private final int range;
@@ -45,10 +43,9 @@ public class RelativeRange implements TimeRange {
 
     @Override
     public Map<String, Object> getPersistedConfig() {
-        return new HashMap<String, Object>() {{
-            put("type", getType().toString().toLowerCase());
-            put("range", getRange());
-        }};
+        return ImmutableMap.<String, Object>of(
+                "type", getType().toString().toLowerCase(),
+                "range", getRange());
     }
 
     public int getRange() {
@@ -60,11 +57,11 @@ public class RelativeRange implements TimeRange {
         if (getRange() > 0) {
             return Tools.iso8601().minus(Seconds.seconds(getRange()));
         }
-        return new DateTime(0);
+        return new DateTime(0, DateTimeZone.UTC);
     }
 
     @Override
     public DateTime getTo() {
-        return DateTime.now();
+        return DateTime.now(DateTimeZone.UTC);
     }
 }

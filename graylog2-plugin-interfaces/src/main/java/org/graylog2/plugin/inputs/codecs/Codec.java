@@ -40,12 +40,13 @@ public interface Codec {
 
     String getName();
 
-    @Nonnull
-    ConfigurationRequest getRequestedConfiguration();
-
-    void overrideDefaultValues(@Nonnull ConfigurationRequest cr);
-
     public interface Factory<C> {
         C create(Configuration configuration);
+        Config getConfig();
+    }
+
+    public interface Config {
+        ConfigurationRequest getRequestedConfiguration();
+        void overrideDefaultValues(@Nonnull ConfigurationRequest cr);
     }
 }

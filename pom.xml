@@ -276,7 +276,7 @@
             <dependency>
                 <groupId>org.graylog2</groupId>
                 <artifactId>syslog4j</artifactId>
-                <version>0.9.48</version>
+                <version>0.9.50</version>
             </dependency>
 
             <dependency>

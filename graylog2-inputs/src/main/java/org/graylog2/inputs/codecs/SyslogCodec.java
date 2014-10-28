@@ -37,6 +37,8 @@ import com.google.common.base.Charsets;
 import com.google.common.collect.Maps;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
+import org.graylog2.plugin.ConfigClass;
+import org.graylog2.plugin.FactoryClass;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.configuration.Configuration;
@@ -59,6 +61,7 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
+import java.util.Collections;
 import java.util.Map;
 import java.util.regex.Pattern;
 
@@ -201,51 +204,57 @@ public class SyslogCodec implements Codec {
         return "syslog";
     }
 
-    @Nonnull
-    @Override
-    public ConfigurationRequest getRequestedConfiguration() {
-        final ConfigurationRequest r = new ConfigurationRequest();
-
-        r.addField(
-                new BooleanField(
-                        CK_FORCE_RDNS,
-                        "Force rDNS?",
-                        false,
-                        "Force rDNS resolution of hostname? Use if hostname cannot be parsed."
-                )
-        );
-
-        r.addField(
-                new BooleanField(
-                        CK_ALLOW_OVERRIDE_DATE,
-                        "Allow overriding date?",
-                        true,
-                        "Allow to override with current date if date could not be parsed?"
-                )
-        );
-
-        r.addField(
-                new BooleanField(
-                        CK_STORE_FULL_MESSAGE,
-                        "Store full message?",
-                        false,
-                        "Store the full original syslog message as full_message?"
-                )
-        );
-
-        return r;
-    }
-
-    @Override
-    public void overrideDefaultValues(@Nonnull ConfigurationRequest cr) {
-        if (cr.containsField(NettyTransport.CK_PORT)) {
-            cr.getField(NettyTransport.CK_PORT).setDefaultValue(514);
-        }
-    }
-
+    @FactoryClass
     public interface Factory extends Codec.Factory<SyslogCodec> {
         @Override
         SyslogCodec create(Configuration configuration);
+
+        @Override
+        Config getConfig();
+    }
+
+    @ConfigClass
+    public static class Config implements Codec.Config {
+        @Override
+        public ConfigurationRequest getRequestedConfiguration() {
+            final ConfigurationRequest r = new ConfigurationRequest();
+
+            r.addField(
+                    new BooleanField(
+                            CK_FORCE_RDNS,
+                            "Force rDNS?",
+                            false,
+                            "Force rDNS resolution of hostname? Use if hostname cannot be parsed."
+                    )
+            );
+
+            r.addField(
+                    new BooleanField(
+                            CK_ALLOW_OVERRIDE_DATE,
+                            "Allow overriding date?",
+                            true,
+                            "Allow to override with current date if date could not be parsed?"
+                    )
+            );
+
+            r.addField(
+                    new BooleanField(
+                            CK_STORE_FULL_MESSAGE,
+                            "Store full message?",
+                            false,
+                            "Store the full original syslog message as full_message?"
+                    )
+            );
+
+            return r;
+        }
+
+        @Override
+        public void overrideDefaultValues(@Nonnull ConfigurationRequest cr) {
+            if (cr.containsField(NettyTransport.CK_PORT)) {
+                cr.getField(NettyTransport.CK_PORT).setDefaultValue(514);
+            }
+        }
     }
 
     /**
@@ -280,7 +289,7 @@ public class SyslogCodec implements Codec {
                 }
             } catch (Exception e) {
                 LOG.debug("Could not extract structured syslog", e);
-                return Maps.newHashMap();
+                return Collections.emptyMap();
             }
 
             return fields;

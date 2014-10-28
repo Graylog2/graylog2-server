@@ -16,19 +16,19 @@
  */
 package org.graylog2.restclient.lib.timeranges;
 
-import java.util.HashMap;
+import com.google.common.collect.ImmutableMap;
+
 import java.util.Map;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
+import static com.google.common.base.Strings.isNullOrEmpty;
+
 public class AbsoluteRange extends TimeRange {
 
     private final String from;
     private final String to;
 
     public AbsoluteRange(String from, String to) throws InvalidRangeParametersException {
-        if (from == null || to == null || from.isEmpty() || to.isEmpty()) {
+        if (isNullOrEmpty(from) || isNullOrEmpty(to)) {
             throw new InvalidRangeParametersException();
         }
 
@@ -51,19 +51,14 @@ public class AbsoluteRange extends TimeRange {
 
     @Override
     public Map<String, String> getQueryParams() {
-        return new HashMap<String, String>() {{
-            put("range_type", getType().toString().toLowerCase());
-            put("from", from);
-            put("to", to);
-        }};
+        return ImmutableMap.of(
+                "range_type", getType().toString().toLowerCase(),
+                "from", from,
+                "to", to);
     }
 
     @Override
     public String toString() {
-        StringBuilder sb =  new StringBuilder("Absolute time range [").append(this.getClass().getCanonicalName()).append("] - ");
-        sb.append("from: ").append(this.from).append(" to: ").append(this.to);
-
-        return sb.toString();
+        return "Absolute time range [" + getClass().getCanonicalName() + "] - from: " + from + " to: " + to;
     }
-
 }

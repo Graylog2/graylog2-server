@@ -274,6 +274,8 @@ public class InputServiceImpl extends PersistedServiceImpl implements InputServi
         input.setCreatorUserId(io.getCreatorUserId());
         input.setPersistId(io.getId());
         input.setCreatedAt(io.getCreatedAt());
+        input.setContentPack(io.getContentPack());
+
         if (io.isGlobal()) {
             input.setGlobal(true);
         }
