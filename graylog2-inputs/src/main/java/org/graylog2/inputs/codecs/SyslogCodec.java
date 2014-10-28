@@ -33,6 +33,7 @@
  */
 package org.graylog2.inputs.codecs;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import org.graylog2.plugin.ConfigClass;
@@ -150,7 +151,7 @@ public class SyslogCodec implements Codec {
         // Structured syslog has more data we can parse.
         if (msg instanceof StructuredSyslogServerEvent) {
             final StructuredSyslogServerEvent sMsg = (StructuredSyslogServerEvent) msg;
-            final Map<String, Object> structuredData = new HashMap<>(StructuredSyslog.extractFields(sMsg, expand));
+            final Map<String, Object> structuredData = new HashMap<>(extractFields(sMsg, expand));
 
             if (!isNullOrEmpty(sMsg.getApplicationName())) {
                 structuredData.put("application_name", sMsg.getApplicationName());
@@ -268,45 +269,39 @@ public class SyslogCodec implements Codec {
         }
     }
 
-    /**
-     * Parses structured syslog data.
-     */
-    public static class StructuredSyslog {
-        private static final Logger LOG = LoggerFactory.getLogger(StructuredSyslog.class);
+    @SuppressWarnings("unchecked")
+    @VisibleForTesting
+    Map<String, Object> extractFields(final StructuredSyslogServerEvent msg, final boolean expand) {
+        try {
+            final Map<String, Map<String, String>> raw = msg.getStructuredMessage().getStructuredData();
 
-        @SuppressWarnings("unchecked")
-        public static Map<String, Object> extractFields(final StructuredSyslogServerEvent msg, final boolean expand) {
-            try {
-                final Map<String, Map<String, String>> raw = msg.getStructuredMessage().getStructuredData();
-
-                if (raw != null && !raw.isEmpty()) {
-                    final Map<String, Object> fields = new HashMap<>(raw.size());
-                    for (Map.Entry<String, Map<String, String>> entry : raw.entrySet()) {
-                        if (expand) {
-                            fields.putAll(prefixElements(entry.getKey(), entry.getValue()));
-                        } else {
-                            fields.putAll(entry.getValue());
-                        }
+            if (raw != null && !raw.isEmpty()) {
+                final Map<String, Object> fields = new HashMap<>(raw.size());
+                for (Map.Entry<String, Map<String, String>> entry : raw.entrySet()) {
+                    if (expand) {
+                        fields.putAll(prefixElements(entry.getKey(), entry.getValue()));
+                    } else {
+                        fields.putAll(entry.getValue());
                     }
-                    return fields;
                 }
-            } catch (Exception e) {
-                LOG.debug("Could not extract structured syslog", e);
+                return fields;
             }
+        } catch (Exception e) {
+            LOG.debug("Could not extract structured syslog", e);
+        }
+        return Collections.emptyMap();
+    }
+
+    private Map<String, String> prefixElements(final String prefix, final Map<String, String> elements) {
+        if (elements == null || elements.isEmpty()) {
             return Collections.emptyMap();
         }
 
-        private static Map<String, String> prefixElements(final String prefix, final Map<String, String> elements) {
-            if (elements == null || elements.isEmpty()) {
-                return Collections.emptyMap();
-            }
-
-            final Map<String, String> prefixedMap = new HashMap<>(elements.size());
-            for (Map.Entry<String, String> entry : elements.entrySet()) {
-                prefixedMap.put(prefix.trim() + "_" + entry.getKey(), entry.getValue());
-            }
-
-            return prefixedMap;
+        final Map<String, String> prefixedMap = new HashMap<>(elements.size());
+        for (Map.Entry<String, String> entry : elements.entrySet()) {
+            prefixedMap.put(prefix.trim() + "_" + entry.getKey(), entry.getValue());
         }
+
+        return prefixedMap;
     }
 }
