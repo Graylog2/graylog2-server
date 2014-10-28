@@ -80,7 +80,7 @@ public class GelfOutput implements MessageOutput {
     protected GelfTransport buildTransport(final Configuration configuration) throws MessageOutputConfigurationException {
         final String protocol = configuration.getString(CK_PROTOCOL).toUpperCase();
         final String hostname = configuration.getString(CK_HOSTNAME);
-        final int port = Integer.parseInt(configuration.getString(CK_PORT));
+        final int port = configuration.getInt(CK_PORT);
 
         final GelfConfiguration gelfConfiguration = new GelfConfiguration(new InetSocketAddress(hostname, port))
                 .transport(GelfTransports.valueOf(protocol));
