@@ -17,6 +17,8 @@ var Qs = require('qs');
 var SourcesStore = require('../../stores/sources/SourcesStore');
 var HistogramDataStore = require('../../stores/sources/HistogramDataStore');
 
+var UniversalSearch = require('../search/UniversalSearch');
+
 var daysToSeconds = (days) => moment.duration(days, 'days').as('seconds');
 
 var othersThreshold = 5;
@@ -26,10 +28,6 @@ var SUPPORTED_RANGES_IN_SECS = [daysToSeconds(1), daysToSeconds(7), daysToSecond
 
 var SCREEN_RESOLUTION = $(window).width();
 
-var escapeQuerySource = (source) => {
-    // Escape all lucene special characters from the source: && || : \ / + - ! ( ) { } [ ] ^ " ~ * ?
-    return source.replace(/(&&|\|\||[\:\\\/\+\-\!\(\)\{\}\[\]\^\"\~\*\?])/g, "\\$&");
-};
 var resizeMutex;
 
 var SourceOverview = React.createClass({
@@ -43,8 +41,6 @@ var SourceOverview = React.createClass({
         this.valueDimension = this.histogramData.dimension((d) => new Date(d.x * 1000));
         this.valueGroup = this.valueDimension.group().reduceSum((d) => d.y);
 
-        this.querySources = [];
-
         return {
             range: DEFAULT_RANGE_IN_SECS,
             resolution: 'minute',
@@ -57,7 +53,7 @@ var SourceOverview = React.createClass({
         var filters;
 
         if (this.pieChart && (this.pieChart.filters().length !== 0 || this.dataTable.filters().length !== 0)) {
-            filters = this.nameDimension.top(Infinity).map((source) => escapeQuerySource(source.name));
+            filters = this.nameDimension.top(Infinity).map((source) => UniversalSearch.escape(source.name));
         }
         HistogramDataStore.loadHistogramData(this.state.range, filters, SCREEN_RESOLUTION);
     },
@@ -83,6 +79,7 @@ var SourceOverview = React.createClass({
         // register them live as we do not know if those buttons are currently in the DOM
         $(document).on("click", ".sidebar-hide", () => this._updateWidth());
         $(document).on("click", ".sidebar-show", () => this._updateWidth());
+        UniversalSearch.init();
     },
     componentWillUnmount() {
         SourcesStore.removeChangeListener(this._onSourcesChanged);
@@ -137,7 +134,7 @@ var SourceOverview = React.createClass({
                 complete: function () {
                     // Submit search directly if alt key is pressed.
                     if (event.altKey) {
-                        $("#universalsearch form").submit();
+                        UniversalSearch.submit();
                     }
                 }
             });
@@ -197,17 +194,8 @@ var SourceOverview = React.createClass({
                     // have any. Instead, we need to get it from the table element.
                     var parentTdElement = $(d3.event.target).parents("td.dc-table-column._0");
                     var datum = d3.selectAll(parentTdElement).datum();
-
-                    // toggles source
-                    var index = this.querySources.indexOf(datum.name);
-                    if (index === -1) {
-                        this.querySources.push(datum.name);
-                    }
-
-                    var queryString = this.querySources.map((source) => "source:"+escapeQuerySource(source)).join(" OR ");
-                    var query = $("#universalsearch-query");
-                    query.val(queryString);
-                    query.effect("bounce");
+                    var source = datum.name;
+                    UniversalSearch.addSegment(UniversalSearch.createSourceQuery(source), UniversalSearch.orOperator());
                 });
             })
             .renderlet((table) => {
@@ -392,6 +380,9 @@ var SourceOverview = React.createClass({
                                 </a>
                             </small>
                         </h3>
+                        <div className="reloading">
+                            <i className="icon icon-refresh"></i>
+                        </div>
                     </div>
                 </div>
                 <div className="row-fluid">
