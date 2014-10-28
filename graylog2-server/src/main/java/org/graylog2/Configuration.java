@@ -25,7 +25,7 @@ import com.github.joschi.jadconfig.validators.FileReadableValidator;
 import com.github.joschi.jadconfig.validators.InetPortValidator;
 import com.github.joschi.jadconfig.validators.PositiveIntegerValidator;
 import com.github.joschi.jadconfig.validators.PositiveLongValidator;
-import com.google.common.collect.Lists;
+import com.google.common.net.HostAndPort;
 import com.mongodb.ServerAddress;
 import org.graylog2.plugin.BaseConfiguration;
 import org.joda.time.Period;
@@ -35,6 +35,7 @@ import org.slf4j.LoggerFactory;
 import java.net.InetAddress;
 import java.net.URI;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -59,7 +60,7 @@ public class Configuration extends BaseConfiguration {
 
     @Parameter(value = "udp_recvbuffer_sizes", required = true, validator = PositiveIntegerValidator.class)
     private int udpRecvBufferSizes = 1048576;
-    
+
     @Parameter(value = "mongodb_useauth", required = true)
     private boolean mongoUseAuth = false;
 
@@ -83,10 +84,10 @@ public class Configuration extends BaseConfiguration {
 
     @Parameter(value = "outputbuffer_processors", required = true, validator = PositiveIntegerValidator.class)
     private int outputBufferProcessors = 3;
-    
+
     @Parameter(value = "outputbuffer_processor_threads_max_pool_size", required = true, validator = PositiveIntegerValidator.class)
     private int outputBufferProcessorThreadsMaxPoolSize = 30;
-    
+
     @Parameter(value = "outputbuffer_processor_threads_core_pool_size", required = true, validator = PositiveIntegerValidator.class)
     private int outputBufferProcessorThreadsCorePoolSize = 3;
 
@@ -104,7 +105,7 @@ public class Configuration extends BaseConfiguration {
 
     @Parameter(value = "elasticsearch_index_prefix", required = true)
     private String elasticsearchIndexPrefix = "graylog2";
-    
+
     @Parameter(value = "elasticsearch_max_docs_per_index", validator = PositiveIntegerValidator.class, required = true)
     private int elasticsearchMaxDocsPerIndex = 80000000;
 
@@ -112,17 +113,17 @@ public class Configuration extends BaseConfiguration {
     private long elasticSearchMaxSizePerIndex = 1L * 1024 * 1024 * 1024; // 1GB
 
     @Parameter(value = "elasticsearch_max_time_per_index", required = true)
-    private Period elasticSearchMaxTimePerIndex= Period.days(1);
+    private Period elasticSearchMaxTimePerIndex = Period.days(1);
 
     @Parameter(value = "elasticsearch_shards", validator = PositiveIntegerValidator.class, required = true)
     private int elasticsearchShards = 4;
-    
+
     @Parameter(value = "elasticsearch_replicas", validator = PositiveIntegerValidator.class, required = true)
     private int elasticsearchReplicas = 0;
-    
+
     @Parameter(value = "elasticsearch_analyzer", required = true)
     private String elasticsearchAnalyzer = "standard";
-    
+
     @Parameter(value = "mongodb_user")
     private String mongoUser;
 
@@ -323,7 +324,7 @@ public class Configuration extends BaseConfiguration {
     public boolean isMaster() {
         return isMaster;
     }
-    
+
     public void setIsMaster(boolean is) {
         isMaster = is;
     }
@@ -339,7 +340,7 @@ public class Configuration extends BaseConfiguration {
     public void setPerformRetention(boolean retention) {
         noRetention = !retention;
     }
-    
+
     public int getMaxNumberOfIndices() {
         return maxNumberOfIndices;
     }
@@ -355,11 +356,11 @@ public class Configuration extends BaseConfiguration {
     public int getOutputBufferProcessors() {
         return outputBufferProcessors;
     }
-    
+
     public int getOutputBufferProcessorThreadsCorePoolSize() {
         return outputBufferProcessorThreadsCorePoolSize;
     }
-    
+
     public int getOutputBufferProcessorThreadsMaxPoolSize() {
         return outputBufferProcessorThreadsMaxPoolSize;
     }
@@ -371,7 +372,7 @@ public class Configuration extends BaseConfiguration {
     public int getRingSize() {
         return ringSize;
     }
-    
+
     public String getElasticSearchConfigFile() {
         return elasticSearchConfigFile;
     }
@@ -379,7 +380,7 @@ public class Configuration extends BaseConfiguration {
     public String getElasticSearchIndexPrefix() {
         return this.elasticsearchIndexPrefix;
     }
-    
+
     public int getElasticSearchMaxDocsPerIndex() {
         return this.elasticsearchMaxDocsPerIndex;
     }
@@ -387,15 +388,15 @@ public class Configuration extends BaseConfiguration {
     public int getElasticSearchShards() {
         return this.elasticsearchShards;
     }
-    
+
     public int getElasticSearchReplicas() {
         return this.elasticsearchReplicas;
     }
-    
+
     public String getElasticSearchAnalyzer() {
         return elasticsearchAnalyzer;
     }
-   
+
     public boolean isMongoUseAuth() {
         return mongoUseAuth;
     }
@@ -433,33 +434,22 @@ public class Configuration extends BaseConfiguration {
     }
 
     public List<ServerAddress> getMongoReplicaSet() {
-        final List<ServerAddress> replicaServers = Lists.newArrayList();
-        final List<String> rawSet = mongoReplicaSet;
-
-        if (rawSet == null || rawSet.isEmpty()) {
+        if (mongoReplicaSet == null || mongoReplicaSet.isEmpty()) {
             return null;
         }
 
-        for (String host : rawSet) {
-            // Split host:port.
-            final String[] replicaTarget = host.split(":");
-
-            // Check if valid.
-            if (replicaTarget.length != 2) {
-                LOG.error("Malformed mongodb_replica_set configuration.");
-                return null;
-            }
-
-            // Get host and port.
+        final List<ServerAddress> replicaServers = new ArrayList<>(mongoReplicaSet.size());
+        for (String host : mongoReplicaSet) {
             try {
+                final HostAndPort hostAndPort = HostAndPort.fromString(host)
+                        .withDefaultPort(27017);
                 replicaServers.add(new ServerAddress(
-                        InetAddress.getByName(replicaTarget[0]),
-                        Integer.parseInt(replicaTarget[1])));
-            } catch (UnknownHostException e) {
-                LOG.error("Unknown host in mongodb_replica_set: " + e.getMessage(), e);
+                        InetAddress.getByName(hostAndPort.getHostText()), hostAndPort.getPort()));
+            } catch (IllegalArgumentException e) {
+                LOG.error("Malformed mongodb_replica_set configuration.", e);
                 return null;
-            } catch (NumberFormatException e) {
-                LOG.error("Invalid port in mongodb_replica_set: " + e.getMessage(), e);
+            } catch (UnknownHostException e) {
+                LOG.error("Unknown host in mongodb_replica_set", e);
                 return null;
             }
         }
@@ -543,6 +533,7 @@ public class Configuration extends BaseConfiguration {
     public boolean isAllowLeadingWildcardSearches() {
         return allowLeadingWildcardSearches;
     }
+
     public boolean isAllowHighlighting() {
         return allowHighlighting;
     }
@@ -711,7 +702,9 @@ public class Configuration extends BaseConfiguration {
         return elasticSearchMaxSizePerIndex;
     }
 
-    public Period getElasticSearchMaxTimePerIndex() { return elasticSearchMaxTimePerIndex; }
+    public Period getElasticSearchMaxTimePerIndex() {
+        return elasticSearchMaxTimePerIndex;
+    }
 
     public int getAlertCheckInterval() {
         return alertCheckInterval;
