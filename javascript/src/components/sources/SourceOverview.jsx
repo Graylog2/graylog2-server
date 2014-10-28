@@ -310,6 +310,7 @@ var SourceOverview = React.createClass({
         var sources = SourcesStore.getSources();
         this._resetSources(sources);
         this.setState({renderResultTable: this.sourcesData.size() !== 0});
+        this._updateWidth();
     },
     _onHistogramDataChanged() {
         var histogramData = HistogramDataStore.getHistogramData();
@@ -383,11 +384,10 @@ var SourceOverview = React.createClass({
     },
     render() {
         var emptySources = <div className="alert alert-info">
-        No message sources found. Looks like you did not send in any messages yet.
+            No message sources found. Looks like you did not send in any messages yet.
         </div>;
 
-        var resultTableStyle = this.state.renderResultTable ? null : {display: 'none'};
-        var resultTable = (<table id="dc-sources-result" className="sources table table-striped table-hover table-condensed" style={resultTableStyle}>
+        var resultTable = (<table id="dc-sources-result" className="sources table table-striped table-hover table-condensed">
             <thead>
                 <tr>
                     <th style={{width: "10px"}}></th>
@@ -398,37 +398,13 @@ var SourceOverview = React.createClass({
             </thead>
         </table>);
 
-        return (
-            <div>
-                <div className="row-fluid">
-                    <div>
-                        <select ref="rangeSelector" className="sources-range pull-right" value={this.state.range} onChange={this._onRangeChanged}>
-                            <option value={daysToSeconds(1)}>Last Day</option>
-                            <option value={daysToSeconds(7)}>Last Week</option>
-                            <option value={daysToSeconds(31)}>Last Month</option>
-                            <option value={daysToSeconds(365)}>Last Year</option>
-                            <option value="0">All</option>
-                        </select>
-                        <h1><i className="icon icon-download-alt"></i> Sources</h1>
-                    </div>
-                    <div style={{"margin-top": "15px"}}>
-                    This is a list of all sources that sent in messages to Graylog2. Use it to quickly search for all
-                    messages of a specific source or get an overview of what systems are sending in how many messages.
-                    &nbsp;
-                        <strong>
-                        Click on source name to prepare a query for it. Hold the Alt key while clicking to search right
-                        away.
-                        </strong>
-
-                    &nbsp;Note that the list is cached for a few seconds so you might have to wait a bit until a new source
-                    appears.
-                    </div>
-                </div>
+        var resultsStyle = this.state.renderResultTable ? null : {display: 'none'};
+        var results = (
+            <div style={resultsStyle}>
                 <div className="row-fluid">
                     <div id="dc-sources-line-chart" className="span12">
                         <h3>
-                            <i className="icon icon-calendar"></i>
-                        Messages per {this.state.resolution}&nbsp;
+                            <i className="icon icon-calendar"></i> Messages per {this.state.resolution}&nbsp;
                             <small>
                                 <a href="javascript:undefined" className="reset" onClick={this.resetHistogramFilters} title="Reset filter" style={{"display": "none"}}>
                                     <i className="icon icon-retweet"></i>
@@ -437,7 +413,6 @@ var SourceOverview = React.createClass({
                         </h3>
                     </div>
                 </div>
-                {this.state.renderResultTable ? null : emptySources}
                 <div className="row-fluid">
                     <div className="span9">
                         <h3><i className="icon icon-th-list"></i> Selected sources&nbsp;
@@ -477,6 +452,39 @@ var SourceOverview = React.createClass({
                         </div>
                     </div>
                 </div>
+            </div>
+        );
+
+        return (
+            <div>
+                <div className="row-fluid">
+                    <div>
+                        <select ref="rangeSelector" className="sources-range pull-right" value={this.state.range} onChange={this._onRangeChanged}>
+                            <option value={daysToSeconds(1)}>Last Day</option>
+                            <option value={daysToSeconds(7)}>Last Week</option>
+                            <option value={daysToSeconds(31)}>Last Month</option>
+                            <option value={daysToSeconds(365)}>Last Year</option>
+                            <option value="0">All</option>
+                        </select>
+                        <h1><i className="icon icon-download-alt"></i> Sources</h1>
+                    </div>
+                    <div style={{"margin-top": "15px"}}>
+                    This is a list of all sources that sent in messages to Graylog2. Use it to quickly search for all
+                    messages of a specific source or get an overview of what systems are sending in how many messages.
+                    &nbsp;
+                        <strong>
+                        Click on source name to prepare a query for it. Hold the Alt key while clicking to search right
+                        away.
+                        </strong>
+
+                    &nbsp;Note that the list is cached for a few seconds so you might have to wait a bit until a new source
+                    appears.
+                    </div>
+                </div>
+
+                {this.state.renderResultTable ? null : emptySources}
+                {results}
+
             </div>
         );
     }
