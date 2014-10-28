@@ -45,7 +45,7 @@ import org.graylog2.plugin.inputs.MessageInput;
 
 public class RawUDPInput extends MessageInput {
 
-    private static final String NAME = "Raw/Plaintext UDP (transport based)";
+    private static final String NAME = "Raw/Plaintext UDP";
 
     @AssistedInject
     public RawUDPInput(MetricRegistry metricRegistry,
