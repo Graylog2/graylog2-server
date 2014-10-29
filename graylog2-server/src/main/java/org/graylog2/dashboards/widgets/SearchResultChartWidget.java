@@ -23,6 +23,7 @@ import org.graylog2.indexer.results.HistogramResult;
 import org.graylog2.indexer.searches.Searches;
 import org.graylog2.indexer.searches.timeranges.TimeRange;
 
+import javax.annotation.Nullable;
 import java.util.Map;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
@@ -32,6 +33,7 @@ public class SearchResultChartWidget extends DashboardWidget {
     private final String query;
     private final TimeRange timeRange;
     private final Searches.DateHistogramInterval interval;
+    @Nullable
     private final String streamId;
     private final Searches searches;
 
@@ -42,11 +44,7 @@ public class SearchResultChartWidget extends DashboardWidget {
         this.query = getNonEmptyQuery(query);
         this.timeRange = timeRange;
 
-        if (config.containsKey("stream_id")) {
-            this.streamId = (String) config.get("stream_id");
-        } else {
-            this.streamId = null;
-        }
+        this.streamId = (String) config.get("stream_id");
 
         if (config.containsKey("interval")) {
             this.interval = Searches.DateHistogramInterval.valueOf(((String) config.get("interval")).toUpperCase());
@@ -73,12 +71,16 @@ public class SearchResultChartWidget extends DashboardWidget {
 
     @Override
     public Map<String, Object> getPersistedConfig() {
-        return ImmutableMap.<String, Object>builder()
+        final ImmutableMap.Builder<String, Object> persistedConfig = ImmutableMap.<String, Object>builder()
                 .put("query", query)
-                .put("stream_id", streamId)
                 .put("interval", interval.toString().toLowerCase())
-                .put("timerange", timeRange.getPersistedConfig())
-                .build();
+                .put("timerange", timeRange.getPersistedConfig());
+
+        if (!isNullOrEmpty(streamId)) {
+            persistedConfig.put("stream_id", streamId);
+        }
+
+        return persistedConfig.build();
     }
 
     @Override

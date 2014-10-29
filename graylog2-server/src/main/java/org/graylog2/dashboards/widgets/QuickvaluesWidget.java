@@ -26,7 +26,10 @@ import org.graylog2.indexer.searches.timeranges.TimeRange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import java.util.Map;
+
+import static com.google.common.base.Strings.isNullOrEmpty;
 
 public class QuickvaluesWidget extends DashboardWidget {
 
@@ -34,6 +37,7 @@ public class QuickvaluesWidget extends DashboardWidget {
 
     private final String query;
     private final TimeRange timeRange;
+    @Nullable
     private final String streamId;
 
     private final String field;
@@ -51,12 +55,7 @@ public class QuickvaluesWidget extends DashboardWidget {
         this.timeRange = timeRange;
 
         this.field = (String) config.get("field");
-
-        if (config.containsKey("stream_id")) {
-            this.streamId = (String) config.get("stream_id");
-        } else {
-            this.streamId = null;
-        }
+        this.streamId = (String) config.get("stream_id");
     }
 
     public String getQuery() {
@@ -69,23 +68,27 @@ public class QuickvaluesWidget extends DashboardWidget {
 
     @Override
     public Map<String, Object> getPersistedConfig() {
-        return ImmutableMap.<String, Object>builder()
+        final ImmutableMap.Builder<String, Object> persistedConfig = ImmutableMap.<String, Object>builder()
                 .put("query", query)
                 .put("timerange", timeRange.getPersistedConfig())
-                .put("stream_id", streamId)
-                .put("field", field)
-                .build();
+                .put("field", field);
+
+        if (!isNullOrEmpty(streamId)) {
+            persistedConfig.put("stream_id", streamId);
+        }
+
+        return persistedConfig.build();
     }
 
     @Override
     protected ComputationResult compute() {
         String filter = null;
-        if (streamId != null && !streamId.isEmpty()) {
+        if (!isNullOrEmpty(streamId)) {
             filter = "streams:" + streamId;
         }
 
         try {
-            TermsResult terms = searches.terms(field, 50, query, filter, timeRange);
+            final TermsResult terms = searches.terms(field, 50, query, filter, timeRange);
 
             Map<String, Object> result = Maps.newHashMap();
             result.put("terms", terms.getTerms());

@@ -25,7 +25,10 @@ import org.graylog2.indexer.searches.timeranges.TimeRange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import java.util.Map;
+
+import static com.google.common.base.Strings.isNullOrEmpty;
 
 public class FieldChartWidget extends DashboardWidget {
 
@@ -33,6 +36,7 @@ public class FieldChartWidget extends DashboardWidget {
 
     private final String query;
     private final TimeRange timeRange;
+    @Nullable
     private final String streamId;
     private final Map<String, Object> config;
     private final Searches searches;
@@ -53,37 +57,36 @@ public class FieldChartWidget extends DashboardWidget {
 
         this.timeRange = timeRange;
         this.config = config;
-
-        if (config.containsKey("stream_id")) {
-            this.streamId = (String) config.get("stream_id");
-        } else {
-            this.streamId = null;
-        }
+        this.streamId = (String) config.get("stream_id");
     }
 
     @Override
     public Map<String, Object> getPersistedConfig() {
-        return ImmutableMap.<String, Object>builder()
+        final ImmutableMap.Builder<String, Object> persistedConfig = ImmutableMap.<String, Object>builder()
                 .put("query", query)
                 .put("timerange", timeRange.getPersistedConfig())
-                .put("stream_id", streamId)
                 .put("field", config.get("field"))
                 .put("valuetype", config.get("valuetype"))
                 .put("renderer", config.get("renderer"))
                 .put("interpolation", config.get("interpolation"))
-                .put("interval", config.get("interval"))
-                .build();
+                .put("interval", config.get("interval"));
+
+        if (!isNullOrEmpty(streamId)) {
+            persistedConfig.put("stream_id", streamId);
+        }
+
+        return persistedConfig.build();
     }
 
     @Override
     protected ComputationResult compute() {
         String filter = null;
-        if (streamId != null && !streamId.isEmpty()) {
+        if (!isNullOrEmpty(streamId)) {
             filter = "streams:" + streamId;
         }
 
         try {
-            HistogramResult histogramResult = searches.fieldHistogram(
+            final HistogramResult histogramResult = searches.fieldHistogram(
                     query,
                     (String) config.get("field"),
                     Searches.DateHistogramInterval.valueOf(((String) config.get("interval")).toUpperCase()),

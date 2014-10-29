@@ -23,12 +23,16 @@ import org.graylog2.indexer.results.CountResult;
 import org.graylog2.indexer.searches.Searches;
 import org.graylog2.indexer.searches.timeranges.TimeRange;
 
+import javax.annotation.Nullable;
 import java.util.Map;
+
+import static com.google.common.base.Strings.isNullOrEmpty;
 
 public class StreamSearchResultCountWidget extends DashboardWidget {
 
     private final String query;
     private final TimeRange timeRange;
+    @Nullable
     private final String streamId;
     private final Searches searches;
 
@@ -51,21 +55,29 @@ public class StreamSearchResultCountWidget extends DashboardWidget {
 
     @Override
     public Map<String, Object> getPersistedConfig() {
-        return ImmutableMap.<String, Object>builder()
+        final ImmutableMap.Builder<String, Object> persistedConfig = ImmutableMap.<String, Object>builder()
                 .put("query", query)
-                .put("timerange", timeRange.getPersistedConfig())
-                .put("stream_id", streamId)
-                .build();
+                .put("timerange", timeRange.getPersistedConfig());
+
+        if (!isNullOrEmpty(streamId)) {
+            persistedConfig.put("stream_id", streamId);
+        }
+
+        return persistedConfig.build();
     }
 
     @Override
     protected ComputationResult compute() {
+        String filter = null;
+        if (!isNullOrEmpty(streamId)) {
+            filter = "streams:" + streamId;
+        }
+
         try {
-            CountResult cr = searches.count(query, timeRange, "streams:" + streamId);
+            CountResult cr = searches.count(query, timeRange, filter);
             return new ComputationResult(cr.getCount(), cr.getTookMs());
         } catch (IndexHelper.InvalidRangeFormatException e) {
             throw new RuntimeException("Invalid timerange format.", e);
         }
     }
-
 }
