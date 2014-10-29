@@ -26,6 +26,7 @@ import org.graylog2.database.validators.OptionalStringValidator;
 import org.graylog2.plugin.database.validators.Validator;
 import org.graylog2.plugin.streams.Output;
 
+import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -49,6 +50,7 @@ public class OutputImpl implements Output {
     private Date createdAt;
     @JsonProperty(FIELD_CREATOR_USER_ID)
     private String creatorUserId;
+    @Nullable
     private String contentPack = null;
 
     public OutputImpl() {
@@ -71,12 +73,12 @@ public class OutputImpl implements Output {
 
     public OutputImpl(ObjectId id, Map<String, Object> fields) {
         this._id = id;
-        this.title = String.valueOf(fields.get(FIELD_TITLE));
-        this.type = String.valueOf(fields.get(FIELD_TYPE));
+        this.title = (String) fields.get(FIELD_TITLE);
+        this.type = (String) fields.get(FIELD_TYPE);
         this.configuration = (Map<String, Object>) fields.get(FIELD_CONFIGURATION);
         this.createdAt = (Date) fields.get(FIELD_CREATED_AT);
-        this.creatorUserId = String.valueOf(fields.get(FIELD_CREATOR_USER_ID));
-        this.contentPack = String.valueOf(fields.get(FIELD_CONTENT_PACK));
+        this.creatorUserId = (String) fields.get(FIELD_CREATOR_USER_ID);
+        this.contentPack = (String) fields.get(FIELD_CONTENT_PACK);
     }
 
     public String getTitle() {
@@ -120,6 +122,7 @@ public class OutputImpl implements Output {
         return creatorUserId;
     }
 
+    @Nullable
     public String getContentPack() {
         return contentPack;
     }
