@@ -78,7 +78,6 @@ var SourceOverview = React.createClass({
         this.renderPieChart();
         this.renderLineChart();
         dc.renderAll();
-        this.loadData();
         $(window).on('resize', this._resizeCallback);
         // register them live as we do not know if those buttons are currently in the DOM
         $(document).on("click", ".sidebar-hide", () => this._updateWidth());
