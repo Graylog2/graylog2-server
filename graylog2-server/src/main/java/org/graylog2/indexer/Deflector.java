@@ -23,6 +23,7 @@ import org.elasticsearch.indices.InvalidAliasNameException;
 import org.graylog2.Configuration;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.indices.jobs.OptimizeIndexJob;
+import org.graylog2.indexer.ranges.CreateNewSingleIndexRangeJob;
 import org.graylog2.indexer.ranges.RebuildIndexRangesJob;
 import org.graylog2.system.activities.Activity;
 import org.graylog2.system.activities.ActivityWriter;
@@ -53,6 +54,7 @@ public class Deflector { // extends Ablenkblech
     private final ActivityWriter activityWriter;
     private final RebuildIndexRangesJob.Factory rebuildIndexRangesJobFactory;
     private final OptimizeIndexJob.Factory optimizeIndexJobFactory;
+    private final CreateNewSingleIndexRangeJob.Factory createNewSingleIndexRangeJobFactory;
     private final String indexPrefix;
     private final String deflectorName;
     private final Indices indices;
@@ -64,6 +66,7 @@ public class Deflector { // extends Ablenkblech
                      final ActivityWriter activityWriter,
                      final RebuildIndexRangesJob.Factory rebuildIndexRangesJobFactory,
                      final OptimizeIndexJob.Factory optimizeIndexJobFactory,
+                     final CreateNewSingleIndexRangeJob.Factory createNewSingleIndexRangeJobFactory) {
                      final Indices indices) {
         this.configuration = configuration;
         indexPrefix = configuration.getElasticSearchIndexPrefix();
@@ -72,9 +75,10 @@ public class Deflector { // extends Ablenkblech
         this.activityWriter = activityWriter;
         this.rebuildIndexRangesJobFactory = rebuildIndexRangesJobFactory;
         this.optimizeIndexJobFactory = optimizeIndexJobFactory;
+        this.createNewSingleIndexRangeJobFactory = createNewSingleIndexRangeJobFactory;
 
         this.deflectorName = buildName(configuration.getElasticSearchIndexPrefix());
-        this.indices = indices;
+            this.indices = indices;
     }
 
     public boolean isUp() {
@@ -134,8 +138,11 @@ public class Deflector { // extends Ablenkblech
             LOG.error("Could not properly create new target <{}>", newTarget);
         }
 
-        if (!configuration.)
-        updateIndexRanges();
+        if (configuration.isDisableIndexRangeCalculation() && oldTargetNumber != -1) {
+            addSingleIndexRanges(oldTarget);
+            addSingleIndexRanges(newTarget);
+        } else
+            updateIndexRanges();
 
         LOG.info("Done!");
 
@@ -261,6 +268,16 @@ public class Deflector { // extends Ablenkblech
             systemJobManager.submit(rebuildIndexRangesJobFactory.create(this));
         } catch (SystemJobConcurrencyException e) {
             final String msg = "Could not re-calculate index ranges after cycling deflector: Maximum concurrency of job is reached.";
+            activityWriter.write(new Activity(msg, Deflector.class));
+            LOG.error(msg, e);
+        }
+    }
+
+    private void addSingleIndexRanges(String indexName) {
+        try {
+            systemJobManager.submit(createNewSingleIndexRangeJobFactory.create(this, indexName));
+        } catch (SystemJobConcurrencyException e) {
+            final String msg = "Could not calculate index ranges for index " + indexName + " after cycling deflector: Maximum concurrency of job is reached.";
             activityWriter.write(new Activity(msg, Deflector.class));
             LOG.error(msg, e);
         }
