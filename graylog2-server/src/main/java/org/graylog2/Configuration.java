@@ -316,6 +316,15 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "gc_warning_threshold")
     private Duration gcWarningThreshold = Duration.seconds(1l);
 
+    @Parameter(value = "disable_index_optimization")
+    private boolean disableIndexOptimization = false;
+
+    @Parameter(value = "disable_index_range_calculation")
+    private boolean disableIndexRangeCalculation = false;
+
+    @Parameter(value = "index_optimization_max_num_segments", validator = PositiveIntegerValidator.class)
+    private int indexOptimizationMaxNumSegments = 1;
+
     public boolean isMaster() {
         return isMaster;
     }
@@ -699,6 +708,18 @@ public class Configuration extends BaseConfiguration {
 
     public Duration getGcWarningThreshold() {
         return gcWarningThreshold;
+    }
+
+    public boolean isDisableIndexOptimization() {
+        return disableIndexOptimization;
+    }
+
+    public boolean isDisableIndexRangeCalculation() {
+        return disableIndexRangeCalculation;
+    }
+
+    public int getIndexOptimizationMaxNumSegments() {
+        return indexOptimizationMaxNumSegments;
     }
 
     @ValidatorMethod

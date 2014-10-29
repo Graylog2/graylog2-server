@@ -56,6 +56,7 @@ public class Deflector { // extends Ablenkblech
     private final String indexPrefix;
     private final String deflectorName;
     private final Indices indices;
+    private final Configuration configuration;
 
     @Inject
     public Deflector(final SystemJobManager systemJobManager,
@@ -64,6 +65,7 @@ public class Deflector { // extends Ablenkblech
                      final RebuildIndexRangesJob.Factory rebuildIndexRangesJobFactory,
                      final OptimizeIndexJob.Factory optimizeIndexJobFactory,
                      final Indices indices) {
+        this.configuration = configuration;
         indexPrefix = configuration.getElasticSearchIndexPrefix();
 
         this.systemJobManager = systemJobManager;
@@ -131,6 +133,8 @@ public class Deflector { // extends Ablenkblech
         if (!indices.create(newTarget)) {
             LOG.error("Could not properly create new target <{}>", newTarget);
         }
+
+        if (!configuration.)
         updateIndexRanges();
 
         LOG.info("Done!");
@@ -153,11 +157,13 @@ public class Deflector { // extends Ablenkblech
             indices.setReadOnly(oldTarget);
             activity.setMessage("Cycled deflector from <" + oldTarget + "> to <" + newTarget + ">");
 
-            try {
-                systemJobManager.submit(optimizeIndexJobFactory.create(oldTarget));
-            } catch (SystemJobConcurrencyException e) {
-                // The concurrency limit is very high. This should never happen.
-                LOG.error("Cannot optimize index <" + oldTarget + ">.", e);
+            if (!configuration.isDisableIndexOptimization()) {
+                try {
+                    systemJobManager.submit(optimizeIndexJobFactory.create(this, oldTarget));
+                } catch (SystemJobConcurrencyException e) {
+                    // The concurrency limit is very high. This should never happen.
+                    LOG.error("Cannot optimize index <" + oldTarget + ">.", e);
+                }
             }
         }
 
