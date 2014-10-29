@@ -46,6 +46,7 @@ var SourceOverview = React.createClass({
             resolution: 'minute',
             filter: '',
             renderResultTable: false,
+            histogramDataAvailable: true,
             numberOfSources: 100,
             reloadingHistogram: false,
             lineChartWidth: "100%"
@@ -292,7 +293,7 @@ var SourceOverview = React.createClass({
     },
     _onHistogramDataChanged() {
         var histogramData = HistogramDataStore.getHistogramData();
-        this.setState({resolution: histogramData.interval, reloadingHistogram: false});
+        this.setState({resolution: histogramData.interval, reloadingHistogram: false, histogramDataAvailable: histogramData.values.length >= 2 });
         this._resetHistogram(histogramData.values);
     },
     _syncRangeWithQuery() {
@@ -332,7 +333,7 @@ var SourceOverview = React.createClass({
         // TODO: is this the best way of updating the URL???
         //window.location.href = "sources#/" + range;
         window.location.hash = "#/" + range;
-        this.setState({range: range}, () => this.loadData());
+        this.setState({range: range, histogramDataAvailable: true}, () => this.loadData());
     },
     _onRangeChanged(event) {
         var value = event.target.value;
@@ -377,9 +378,14 @@ var SourceOverview = React.createClass({
 
         var loadingSpinnerStyle = {display: this.state.reloadingHistogram ? 'block' : 'none', width: this.state.lineChartWidth};
         var loadingSpinner = (
-            <div className="sources reloading" style={loadingSpinnerStyle}>
-                <i className="icon-spin icon-refresh icon-3x spinner"></i>
+            <div className="sources overlay" style={loadingSpinnerStyle}>
+                <i className="icon-spin icon-refresh spinner"></i>
             </div>
+        );
+
+        var noDataOverlayStyle = {display: this.state.histogramDataAvailable ? 'none' : 'block', width: this.state.lineChartWidth};
+        var noDataOverlay = (
+            <div className="sources overlay" style={noDataOverlayStyle}>No data available</div>
         );
 
         var resultsStyle = this.state.renderResultTable ? null : {display: 'none'};
@@ -396,6 +402,7 @@ var SourceOverview = React.createClass({
                     </small>
                 </h3>
                 {loadingSpinner}
+                {noDataOverlay}
             </div>
                 </div>
                 <div className="row-fluid">
