@@ -46,7 +46,9 @@ var SourceOverview = React.createClass({
             resolution: 'minute',
             filter: '',
             renderResultTable: false,
-            numberOfSources: 100
+            numberOfSources: 100,
+            reloadingHistogram: false,
+            lineChartWidth: "100%"
         };
     },
     loadHistogramData() {
@@ -56,6 +58,7 @@ var SourceOverview = React.createClass({
             filters = this.nameDimension.top(Infinity).map((source) => UniversalSearch.escape(source.name));
         }
         HistogramDataStore.loadHistogramData(this.state.range, filters, SCREEN_RESOLUTION);
+        this.setState({reloadingHistogram: true});
     },
     loadData() {
         SourcesStore.loadSources(this.state.range);
@@ -141,7 +144,6 @@ var SourceOverview = React.createClass({
         });
         this.lineChart = dc.lineChart(lineChartDomNode);
         this.lineChart
-            .width(width)
             .height(200)
             .margins({left: 35, right: 20, top: 20, bottom: 20})
             .dimension(this.valueDimension)
@@ -169,6 +171,7 @@ var SourceOverview = React.createClass({
                     }
                 });
             });
+        this.configureLineChartWidth(width);
         this.lineChart.yAxis()
             .ticks(6)
             .tickFormat(d3.format("s"));
@@ -229,16 +232,21 @@ var SourceOverview = React.createClass({
             .radius(pieChartWidth / 2 - 10)
             .innerRadius(pieChartWidth / 5);
     },
+    configureLineChartWidth: function (lineChartWidth) {
+        this.lineChart
+            .width(lineChartWidth);
+        this.setState({lineChartWidth: String(lineChartWidth) + "px"});
+    },
     _updateWidth() {
         SCREEN_RESOLUTION = $(window).width();
 
         var pieChartDomNode = $("#dc-sources-pie-chart").parent();
         var pieChartWidth = pieChartDomNode.width();
         this.configurePieChartWidth(pieChartWidth);
+
         var lineChartDomNode = $("#dc-sources-line-chart");
         var lineChartWidth = lineChartDomNode.width();
-        this.lineChart
-            .width(lineChartWidth);
+        this.configureLineChartWidth(lineChartWidth);
 
         dc.renderAll();
     },
@@ -284,7 +292,7 @@ var SourceOverview = React.createClass({
     },
     _onHistogramDataChanged() {
         var histogramData = HistogramDataStore.getHistogramData();
-        this.setState({resolution: histogramData.interval});
+        this.setState({resolution: histogramData.interval, reloadingHistogram: false});
         this._resetHistogram(histogramData.values);
     },
     _syncRangeWithQuery() {
@@ -367,20 +375,28 @@ var SourceOverview = React.createClass({
             </thead>
         </table>);
 
+        var loadingSpinnerStyle = {display: this.state.reloadingHistogram ? 'block' : 'none', width: this.state.lineChartWidth};
+        var loadingSpinner = (
+            <div className="sources reloading" style={loadingSpinnerStyle}>
+                <i className="icon-spin icon-refresh icon-3x spinner"></i>
+            </div>
+        );
+
         var resultsStyle = this.state.renderResultTable ? null : {display: 'none'};
         var results = (
             <div style={resultsStyle}>
                 <div className="row-fluid">
-                    <div id="dc-sources-line-chart" className="span12">
-                        <h3>
-                            <i className="icon icon-calendar"></i> Messages per {this.state.resolution}&nbsp;
-                            <small>
-                                <a href="javascript:undefined" className="reset" onClick={this.resetHistogramFilters} title="Reset filter" style={{"display": "none"}}>
-                                    <i className="icon icon-retweet"></i>
-                                </a>
-                            </small>
-                        </h3>
-                    </div>
+            <div id="dc-sources-line-chart" className="span12">
+                <h3>
+                    <i className="icon icon-calendar"></i> Messages per {this.state.resolution}&nbsp;
+                    <small>
+                        <a href="javascript:undefined" className="reset" onClick={this.resetHistogramFilters} title="Reset filter" style={{"display": "none"}}>
+                            <i className="icon icon-retweet"></i>
+                        </a>
+                    </small>
+                </h3>
+                {loadingSpinner}
+            </div>
                 </div>
                 <div className="row-fluid">
                     <div className="span9">
