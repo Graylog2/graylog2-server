@@ -23,6 +23,7 @@ package org.graylog2.indexer;
 import org.elasticsearch.action.admin.indices.stats.IndexStats;
 import org.graylog2.Configuration;
 import org.graylog2.indexer.indices.jobs.OptimizeIndexJob;
+import org.graylog2.indexer.ranges.CreateNewSingleIndexRangeJob;
 import org.graylog2.indexer.ranges.RebuildIndexRangesJob;
 import org.graylog2.system.activities.ActivityWriter;
 import org.graylog2.system.jobs.SystemJobManager;
@@ -50,7 +51,8 @@ public class DeflectorTest {
                 new Configuration(),
                 mock(ActivityWriter.class),
                 mock(RebuildIndexRangesJob.Factory.class),
-                mock(OptimizeIndexJob.Factory.class));
+                mock(OptimizeIndexJob.Factory.class),
+                mock(CreateNewSingleIndexRangeJob.Factory.class));
     }
 
     @Test
