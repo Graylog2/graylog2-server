@@ -294,6 +294,15 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "alert_check_interval", validator = PositiveIntegerValidator.class)
     private int alertCheckInterval = 60;
 
+    @Parameter(value = "disable_index_optimization")
+    private boolean disableIndexOptimization = false;
+
+    @Parameter(value = "disable_index_range_calculation")
+    private boolean disableIndexRangeCalculation = false;
+
+    @Parameter(value = "index_optimization_max_num_segments", validator = PositiveIntegerValidator.class)
+    private int indexOptimizationMaxNumSegments = 1;
+
     public boolean isMaster() {
         return isMaster;
     }
@@ -670,5 +679,17 @@ public class Configuration extends BaseConfiguration {
 
     public int getAlertCheckInterval() {
         return alertCheckInterval;
+    }
+
+    public boolean isDisableIndexOptimization() {
+        return disableIndexOptimization;
+    }
+
+    public boolean isDisableIndexRangeCalculation() {
+        return disableIndexRangeCalculation;
+    }
+
+    public int getIndexOptimizationMaxNumSegments() {
+        return indexOptimizationMaxNumSegments;
     }
 }

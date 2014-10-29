@@ -130,6 +130,8 @@ public class Deflector { // extends Ablenkblech
         if (!indexer.indices().create(newTarget)) {
             LOG.error("Could not properly create new target <{}>", newTarget);
         }
+
+        if (!configuration.)
         updateIndexRanges();
 
         LOG.info("Done!");
@@ -152,11 +154,13 @@ public class Deflector { // extends Ablenkblech
             indexer.indices().setReadOnly(oldTarget);
             activity.setMessage("Cycled deflector from <" + oldTarget + "> to <" + newTarget + ">");
 
-            try {
-                systemJobManager.submit(optimizeIndexJobFactory.create(this, oldTarget));
-            } catch (SystemJobConcurrencyException e) {
-                // The concurrency limit is very high. This should never happen.
-                LOG.error("Cannot optimize index <" + oldTarget + ">.", e);
+            if (!configuration.isDisableIndexOptimization()) {
+                try {
+                    systemJobManager.submit(optimizeIndexJobFactory.create(this, oldTarget));
+                } catch (SystemJobConcurrencyException e) {
+                    // The concurrency limit is very high. This should never happen.
+                    LOG.error("Cannot optimize index <" + oldTarget + ">.", e);
+                }
             }
         }
 
