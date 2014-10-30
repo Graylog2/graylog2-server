@@ -56,11 +56,16 @@ public class Version {
     public static final Version v0_21_0_BETA1 = new Version(0, 21, 0, "beta1");
     public static final Version v0_21_0_BETA2 = new Version(0, 21, 0, "beta2");
     public static final Version v0_21_0_BETA3 = new Version(0, 21, 0, "beta3");
-    public static final Version v0_21_0_BETA4_SNAPSHOT = new Version(0, 21, 0, "beta4-snapshot");
     public static final Version v0_21_0_BETA4 = new Version(0, 21, 0, "beta4");
-    public static final Version v0_21_0_BETA5_SNAPSHOT = new Version(0, 21, 0, "beta5-snapshot");
     public static final Version v0_21_0_RC_1 = new Version(0, 21, 0, "rc.1");
-    public static final Version v0_23_0_SNAPSHOT = new Version(0, 23, 0, "snapshot");
+
+    public static final Version v0_90_0 = new Version(0, 90, 0);
+    public static final Version v0_90_1 = new Version(0, 90, 1);
+    public static final Version v0_90_2 = new Version(0, 90, 2);
+    public static final Version v0_91_0 = new Version(0, 91, 0);
+    public static final Version v0_91_1 = new Version(0, 91, 1);
+    public static final Version v0_91_2 = new Version(0, 91, 2);
+
     public static final Version v0_92_0_SNAPSHOT = new Version(0, 92, 0, "snapshot");
 
     public static final Version VERSION = v0_92_0_SNAPSHOT;
