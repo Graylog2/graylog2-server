@@ -276,7 +276,7 @@ public class SyslogCodec implements Codec {
             final Map<String, Map<String, String>> raw = msg.getStructuredMessage().getStructuredData();
 
             if (raw != null && !raw.isEmpty()) {
-                final Map<String, Object> fields = new HashMap<>(raw.size());
+                final Map<String, Object> fields = new HashMap<>();
                 for (Map.Entry<String, Map<String, String>> entry : raw.entrySet()) {
                     if (expand) {
                         fields.putAll(prefixElements(entry.getKey(), entry.getValue()));
