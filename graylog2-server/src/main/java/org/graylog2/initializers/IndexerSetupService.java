@@ -19,6 +19,7 @@ package org.graylog2.initializers;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Splitter;
+import com.google.common.net.HostAndPort;
 import com.google.common.util.concurrent.AbstractIdleService;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -96,14 +97,12 @@ public class IndexerSetupService extends AbstractIdleService {
                     // if no elasticsearch running
                     for (String host : hostList) {
                         // guess that Elasticsearch http is listening on port 9200
-                        final Iterable<String> hostAndPort = Splitter.on(':').limit(2).split(host);
-                        final Iterator<String> it = hostAndPort.iterator();
-                        final String ip = it.next();
-                        LOG.info("Checking Elasticsearch HTTP API at http://{}:9200/", ip);
+                        final HostAndPort hostAndPort = HostAndPort.fromString(host);
+                        LOG.info("Checking Elasticsearch HTTP API at http://{}:9200/", hostAndPort.getHostText());
 
                         try {
                             // Try the HTTP API endpoint
-                            final ListenableFuture<Response> future = httpClient.prepareGet("http://" + ip + ":9200/_nodes").execute();
+                            final ListenableFuture<Response> future = httpClient.prepareGet("http://" + hostAndPort.getHostText() + ":9200/_nodes").execute();
                             final Response response = future.get();
 
                             final JsonNode resultTree = new ObjectMapper().readTree(response.getResponseBody());
@@ -135,7 +134,7 @@ public class IndexerSetupService extends AbstractIdleService {
                         } catch (InterruptedException ignore) {
                         } catch (ExecutionException e1) {
                             // could not find any server on that address
-                            LOG.error("Could not connect to Elasticsearch at http://" + ip + ":9200/, is it running?",
+                            LOG.error("Could not connect to Elasticsearch at http://" + hostAndPort.getHostText() + ":9200/, is it running?",
                                     e1.getCause());
                         }
                     }
