@@ -47,6 +47,8 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 @Singleton
 public class IndexerSetupService extends AbstractIdleService {
     private static final Logger LOG = LoggerFactory.getLogger(IndexerSetupService.class);
+    private static final Version MINIMUM_ES_VERSION = Version.V_1_3_2;
+    private static final Version MAXIMUM_ES_VERSION = Version.V_1_3_4;
 
     private final Node node;
     private final Configuration configuration;
@@ -111,12 +113,13 @@ public class IndexerSetupService extends AbstractIdleService {
                             final Iterator<String> nodes = nodesList.fieldNames();
                             while (nodes.hasNext()) {
                                 final String id = nodes.next();
-                                final String version = nodesList.get(id).get("version").textValue();
-                                if (!Version.CURRENT.toString().equals(version)) {
-                                    LOG.error("Elasticsearch node is of the wrong version {}, it must be {}! " +
+                                final Version clusterVersion = Version.fromString(nodesList.get(id).get("version").textValue());
+
+                                if (!clusterVersion.onOrAfter(MINIMUM_ES_VERSION) && !clusterVersion.onOrBefore(MAXIMUM_ES_VERSION)) {
+                                    LOG.error("Elasticsearch node is of the wrong version {}, it must be at least {}! " +
                                                     "Please make sure you are running the correct version of Elasticsearch.",
-                                            version,
-                                            Version.CURRENT.toString());
+                                            clusterVersion,
+                                            MINIMUM_ES_VERSION);
                                 }
                                 if (!node.settings().get("cluster.name").equals(clusterName)) {
                                     LOG.error(
