@@ -179,7 +179,7 @@ var SourceOverview = React.createClass({
         this.configureLineChartWidth(width);
         this.lineChart.xAxis()
             .ticks(graphHelper.customTickInterval(gl2UserTimeZoneOffset))
-            .tickFormat(graphHelper.customDateTimeFormat);
+            .tickFormat(graphHelper.customDateTimeFormat(gl2UserTimeZoneOffset));
         this.lineChart.yAxis()
             .ticks(6)
             .tickFormat(d3.format("s"));

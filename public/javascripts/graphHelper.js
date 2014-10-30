@@ -21,22 +21,24 @@
     ];
 
     var exports = {
-        customDateTimeFormat: function(date) {
-            var momentDate = moment.utc(date);
-            var formattedDate;
+        customDateTimeFormat: function(tzOffset) {
+            return function(date) {
+                var momentDate = moment.utc(date);
+                var formattedDate;
 
-            if (gl2UserTimeZoneOffset !== null) {
-                momentDate.zone(gl2UserTimeZoneOffset);
-            }
-
-            dateTimeFormats.some(function(format) {
-                if (format.condition(momentDate) === true) {
-                    formattedDate = momentDate.format(format.formatString);
-                    return true;
+                if (tzOffset !== null) {
+                    momentDate.zone(tzOffset);
                 }
-            });
 
-            return formattedDate;
+                dateTimeFormats.some(function (format) {
+                    if (format.condition(momentDate) === true) {
+                        formattedDate = momentDate.format(format.formatString);
+                        return true;
+                    }
+                });
+
+                return formattedDate;
+            }
         },
 
         customTickInterval: function(tzOffset) {
