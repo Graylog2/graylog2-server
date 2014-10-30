@@ -76,7 +76,7 @@ import static org.graylog2.UI.wallString;
 // TODO figure out how to gracefully deal with failure to connect (or losing connection) to the elastic search cluster!
 public class Indexer {
     private static final Logger LOG = LoggerFactory.getLogger(Indexer.class);
-    private static final Version MINIMUM_ES_VERSION = Version.V_1_3_2;
+    private static final Version MINIMUM_ES_VERSION = Version.V_1_3_4;
     private static final Version MAXIMUM_ES_VERSION = Version.V_1_3_4;
 
     private final Configuration configuration;
