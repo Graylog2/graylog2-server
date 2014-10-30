@@ -75,6 +75,8 @@ import static org.graylog2.UI.wallString;
 // TODO figure out how to gracefully deal with failure to connect (or losing connection) to the elastic search cluster!
 public class Indexer {
     private static final Logger LOG = LoggerFactory.getLogger(Indexer.class);
+    private static final Version MINIMUM_ES_VERSION = Version.V_1_3_2;
+    private static final Version MAXIMUM_ES_VERSION = Version.V_1_3_4;
 
     private final Configuration configuration;
     private final Searches.Factory searchesFactory;
@@ -181,10 +183,12 @@ public class Indexer {
                         final Iterator<String> nodes = nodesList.fieldNames();
                         while (nodes.hasNext()) {
                             final String id = nodes.next();
-                            final String version = nodesList.get(id).get("version").textValue();
-                            if (!Version.CURRENT.toString().equals(version)) {
+                            final Version clusterVersion = Version.fromString(nodesList.get(id).get("version").textValue());
+
+                            if (!clusterVersion.onOrAfter(MINIMUM_ES_VERSION) && !clusterVersion.onOrBefore(MAXIMUM_ES_VERSION)) {
                                 final String message =
-                                        String.format("Elasticsearch node is of the wrong version %s, it must be %s!%n", version, Version.CURRENT)
+                                        String.format("Elasticsearch node is of the wrong version %s, it must be at least %s!%n",
+                                                clusterVersion, MINIMUM_ES_VERSION)
                                                 + "Please make sure you are running the correct version of Elasticsearch.";
                                 LOG.error(wallString(message));
                             }
