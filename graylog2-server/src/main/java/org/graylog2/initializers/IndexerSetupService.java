@@ -48,7 +48,7 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 @Singleton
 public class IndexerSetupService extends AbstractIdleService {
     private static final Logger LOG = LoggerFactory.getLogger(IndexerSetupService.class);
-    private static final Version MINIMUM_ES_VERSION = Version.V_1_3_2;
+    private static final Version MINIMUM_ES_VERSION = Version.V_1_3_4;
     private static final Version MAXIMUM_ES_VERSION = Version.V_1_3_4;
 
     private final Node node;
