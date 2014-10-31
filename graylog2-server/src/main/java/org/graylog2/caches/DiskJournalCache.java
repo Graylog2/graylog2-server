@@ -16,10 +16,8 @@
  */
 package org.graylog2.caches;
 
-import com.codahale.metrics.Counter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
-import com.github.joschi.jadconfig.util.Size;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.graylog2.Configuration;
 import org.graylog2.inputs.InputCache;
@@ -35,7 +33,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.io.File;
-import java.io.IOError;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.concurrent.BlockingQueue;
@@ -45,9 +42,11 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * Implements a {@link org.graylog2.inputs.Cache} based on MapDB.
+ *
+ * @author Bernd Ahlers <bernd@torch.sh>
  */
 public abstract class DiskJournalCache implements InputCache, OutputCache {
-    protected static final Logger LOG = LoggerFactory.getLogger(DiskJournalCache.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DiskJournalCache.class);
 
     private final DB db;
     private final BlockingQueue<byte[]> queue;
@@ -59,10 +58,6 @@ public abstract class DiskJournalCache implements InputCache, OutputCache {
     private final Timer addTimer;
     private final Timer popTimer;
     private final Timer commitTimer;
-    private final Timer compactTimer;
-    private final Counter lostMessagesCounter;
-    private final Counter commitErrorCounter;
-    private final Counter compactionErrorCounter;
 
     public static class Input extends DiskJournalCache {
         @Inject
@@ -95,25 +90,7 @@ public abstract class DiskJournalCache implements InputCache, OutputCache {
 
         this.metricRegistry = metricRegistry;
         try {
-            final DBMaker dbMaker = DBMaker.newFileDB(getDbFile(config))
-                    .mmapFileEnable()
-                    .checksumEnable()
-                    .closeOnJvmShutdown();
-
-            if (config.isMessageCacheEnableCompression()) {
-                LOG.debug("Enabling compression for disk-based cache \"{}\"", getDbFileName());
-                dbMaker.compressionEnable();
-            }
-
-            final Size maxSize = config.getMessageCacheMaxSize();
-            if (maxSize != null) {
-                LOG.debug("Enabling size limit of {} for disk-based cache \"{}\"", maxSize, getDbFileName());
-                // Y U NO TAKE BYTES?!
-                final double maxSizeGb = maxSize.toBytes() / (1024d * 1024d * 1024d);
-                dbMaker.sizeLimit(maxSizeGb);
-            }
-
-            this.db = dbMaker.make();
+            this.db = DBMaker.newFileDB(getDbFile(config)).mmapFileEnable().checksumEnable().closeOnJvmShutdown().make();
         } catch (ArrayIndexOutOfBoundsException e) {
             LOG.error("Caught exception during disk journal initialization: ", e);
             throw new DiskJournalCacheCorruptSpoolException();
@@ -125,19 +102,15 @@ public abstract class DiskJournalCache implements InputCache, OutputCache {
                 new ThreadFactoryBuilder().setNameFormat("disk-journal-" + getDbFileName() + "-%d").build()
         );
         this.serializer = serializer;
-
-        this.addTimer = this.metricRegistry.timer(MetricRegistry.name(getClass(), getDbFileName(), "add", "executionTime"));
-        this.popTimer = this.metricRegistry.timer(MetricRegistry.name(getClass(), getDbFileName(), "pop", "executionTime"));
-        this.commitTimer = this.metricRegistry.timer(MetricRegistry.name(getClass(), getDbFileName(), "commit", "executionTime"));
-        this.compactTimer = this.metricRegistry.timer(MetricRegistry.name(getClass(), getDbFileName(), "compact", "executionTime"));
-        this.lostMessagesCounter = this.metricRegistry.counter(MetricRegistry.name(getClass(), getDbFileName(), "lostMessages"));
-        this.commitErrorCounter = this.metricRegistry.counter(MetricRegistry.name(getClass(), getDbFileName(), "commitErrors"));
-        this.compactionErrorCounter = this.metricRegistry.counter(MetricRegistry.name(getClass(), getDbFileName(), "compactionErrors"));
+        this.addTimer = metricRegistry.timer(MetricRegistry.name(getClass(), getDbFileName(), "add", "executionTime"));
+        this.popTimer = metricRegistry.timer(MetricRegistry.name(getClass(), getDbFileName(), "pop", "executionTime"));
+        this.commitTimer = metricRegistry.timer(MetricRegistry.name(getClass(), getDbFileName(), "commit", "executionTime"));
 
         /* Commit and compact the database to flush existing data in the transaction log and to reduce the file
          * size of the database.
          */
         commit();
+        LOG.info("Compacting off-heap message cache database files ({})", getDbFileName());
         compact();
 
         /* I have seen the counter getting out of sync with the actual entries in the queue. */
@@ -145,7 +118,6 @@ public abstract class DiskJournalCache implements InputCache, OutputCache {
             LOG.warn("Setting counter from {} to 0 because the queue is empty!", counter.get());
             counter.set(0);
             commit();
-            compact();
         }
 
         this.commitService.scheduleWithFixedDelay(new Runnable() {
@@ -158,102 +130,52 @@ public abstract class DiskJournalCache implements InputCache, OutputCache {
                 }
             }
         }, 0, config.getMessageCacheCommitInterval(), TimeUnit.MILLISECONDS);
-
-
-        if (config.getMessageCacheCompactionInterval() != null) {
-            LOG.warn("MapDB does not have smart defragmentation algorithms. So compaction usually recreates entire store from scratch.\n"
-                    + "This may be slow and require additional disk space.\n"
-                    + "You might want to disable the message_cache_compact_interval setting in your Graylog2 configuration");
-            this.commitService.scheduleWithFixedDelay(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        compact();
-                    } catch (Exception e) {
-                        LOG.error("Compact thread error", e);
-                    }
-                }
-            }, 0, config.getMessageCacheCompactionInterval(), TimeUnit.MILLISECONDS);
-        }
     }
 
-    @SuppressWarnings("unused")
     @Override
     public void add(final Message message) {
         if (LOG.isTraceEnabled()) {
             LOG.trace("Adding message to cache: {}", message.toString());
         }
-
         if (db.isClosed()) {
-            LOG.debug(getDbFileName() + " is closed.");
-            lostMessagesCounter.inc();
             return;
         }
-
-        try (final Timer.Context time = addTimer.time()) {
+        final Timer.Context time = addTimer.time();
+        try {
             if (queue.offer(serializer.serializeToBytes(message))) {
-                long current = counter.incrementAndGet();
-            } else {
-                LOG.info("Couldn't add message to disk-based cache \"{}\" (free {}/{})", getDbFileName(), store.getFreeSize(), store.getSizeLimit());
-                lostMessagesCounter.inc();
+                counter.incrementAndGet();
             }
-        } catch (IOError e) {
-            // Really, MapDB. Really?!
-            if (e.getCause() instanceof IOException) {
-                LOG.warn("No free space left in disk-based cache \"{}\"", getDbFileName());
-            } else {
-                LOG.error("Unable to enqueue message", e);
-            }
-
-            lostMessagesCounter.inc();
-        } catch (Exception e) {
+        } catch (IOException e) {
             LOG.error("Unable to enqueue message", e);
-            lostMessagesCounter.inc();
+        } finally {
+            time.stop();
         }
     }
 
-    @SuppressWarnings("unused")
     @Override
     public Message pop() {
         if (LOG.isTraceEnabled()) {
             LOG.trace("Consuming message from cache");
         }
-
         if (db.isClosed()) {
-            LOG.debug(getDbFileName() + " is closed.");
-            lostMessagesCounter.inc();
             return null;
         }
 
-        try (final Timer.Context time = popTimer.time()) {
-            final byte[] bytes = queue.poll();
+        final Timer.Context time = popTimer.time();
+        final byte[] bytes = queue.poll();
 
-            if (bytes != null) {
-                counter.decrementAndGet();
-                try {
-                    return serializer.deserialize(bytes);
-                } catch (IOException e) {
-                    LOG.error("Error deserializing message", e);
-                    lostMessagesCounter.inc();
-                    return null;
-                }
-            } else {
+        if (bytes != null) {
+            counter.decrementAndGet();
+            try {
+                return serializer.deserialize(bytes);
+            } catch (IOException e) {
+                LOG.error("Error deserializing message", e);
                 return null;
+            } finally {
+                time.stop();
             }
-        } catch (IOError e) {
-            // Really, MapDB. Really?!
-            if (e.getCause() instanceof IOException) {
-                LOG.warn("No free space left in disk-based cache \"{}\"", getDbFileName());
-            } else {
-                LOG.error("Error retrieving message from disk-based cache", e);
-            }
-            lostMessagesCounter.inc();
-
-            return null;
-        } catch (Exception e) {
-            LOG.error("Error retrieving message from disk-based cache", e);
-            lostMessagesCounter.inc();
-
+        } else {
+            time.stop();
             return null;
         }
     }
@@ -269,62 +191,36 @@ public abstract class DiskJournalCache implements InputCache, OutputCache {
 
     @Override
     public boolean isEmpty() {
-        try {
-            return db.isClosed() || queue.isEmpty();
-        } catch (Exception e) {
-            LOG.error("Unexpected error while checking if cache \"" + getDbFileName() + "\"is empty", e);
-            return true;
-        }
+        return db.isClosed() || queue.isEmpty();
     }
 
-    @SuppressWarnings("unused")
     private void commit() {
         if (db.isClosed()) {
-            LOG.debug(getDbFileName() + " is closed. Not committing");
             return;
         }
-
-        try (final Timer.Context time = commitTimer.time()) {
+        final Timer.Context time = commitTimer.time();
+        if (LOG.isDebugEnabled()) {
             LOG.debug("Committing {} (entries {})", getDbFileName(), size());
-            db.commit();
-
-            if (LOG.isDebugEnabled()) {
-                printStats();
-            }
-        } catch (Exception e) {
-            LOG.error("Unexpected error while committing to " + getDbFileName(), e);
-            commitErrorCounter.inc();
         }
+        db.commit();
+        time.stop();
     }
 
-    @SuppressWarnings("unused")
     private void compact() {
         if (db.isClosed()) {
-            LOG.debug(getDbFileName() + " is closed. Not compacting.");
             return;
         }
+        final long currSize = store.getCurrSize();
 
-        try (final Timer.Context time = compactTimer.time()) {
-            final long currSize = store.getCurrSize();
-            db.compact();
+        db.compact();
 
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("Compacted db {} (freed up {} bytes)", getDbFileName(), (currSize - store.getCurrSize()));
-                printStats();
-            }
-        } catch (Exception e) {
-            LOG.error("Unexpected error while compacting " + getDbFileName(), e);
-            compactionErrorCounter.inc();
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Compacted db {} (freed up {} bytes)", getDbFileName(), (currSize - store.getCurrSize()));
         }
     }
 
     private File getDbFile(final Configuration config) {
         return new File(config.getMessageCacheSpoolDir(), getDbFileName()).getAbsoluteFile();
-    }
-
-    private void printStats() {
-        LOG.debug("STATS for \"{}\": counter {}, store size: {} bytes, store free size: {} bytes, store size limit: {} bytes",
-                getDbFileName(), counter, store.getCurrSize(), store.getFreeSize(), store.getSizeLimit());
     }
 
     protected abstract String getDbFileName();
