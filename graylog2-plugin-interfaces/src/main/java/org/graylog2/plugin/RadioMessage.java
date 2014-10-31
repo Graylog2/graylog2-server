@@ -66,7 +66,7 @@ public class RadioMessage {
     }
 
     public boolean isComplete() {
-        return this.strings.containsKey("message") && this.strings.containsKey("source") && this.timestamp <= 0;
+        return this.strings.containsKey("message") && this.strings.containsKey("source") && this.timestamp > 0;
     }
 
     public Message toMessage() {
