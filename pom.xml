@@ -47,7 +47,8 @@
         <module>graylog2-radio</module>
         <module>graylog2-rest-routes</module>
         <module>graylog2-rest-client</module>
-    </modules>
+        <module>benchmarks</module>
+  </modules>
 
     <organization>
         <name>TORCH GmbH</name>
