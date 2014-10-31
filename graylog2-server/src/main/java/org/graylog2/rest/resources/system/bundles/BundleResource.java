@@ -51,7 +51,7 @@ import javax.ws.rs.core.UriBuilder;
 import java.net.URI;
 
 @RequiresAuthentication
-@Api(value = "System/Bundles", description = "Configuration bundles")
+@Api(value = "System/Bundles", description = "Content packs")
 @Path("/system/bundles")
 @Produces(MediaType.APPLICATION_JSON)
 public class BundleResource extends RestResource {
@@ -67,13 +67,13 @@ public class BundleResource extends RestResource {
     @POST
     @Timed
     @Consumes(MediaType.APPLICATION_JSON)
-    @ApiOperation(value = "Upload a configuration bundle")
+    @ApiOperation(value = "Upload a content pack")
     @ApiResponses(value = {
-            @ApiResponse(code = 400, message = "Missing or invalid configuration bundle"),
-            @ApiResponse(code = 500, message = "Error while saving configuration bundle")
+            @ApiResponse(code = 400, message = "Missing or invalid content pack"),
+            @ApiResponse(code = 500, message = "Error while saving content pack")
     })
     public Response createBundle(
-            @ApiParam(name = "Request body", value = "Configuration bundle", required = true)
+            @ApiParam(name = "Request body", value = "Content pack", required = true)
             @NotNull @Valid
             final ConfigurationBundle configurationBundle) {
         checkPermission(RestPermissions.BUNDLE_CREATE);
@@ -87,9 +87,9 @@ public class BundleResource extends RestResource {
 
     @GET
     @Timed
-    @ApiOperation(value = "List available configuration bundles")
+    @ApiOperation(value = "List available content packs")
     @ApiResponses(value = {
-            @ApiResponse(code = 500, message = "Error loading configuration bundles")
+            @ApiResponse(code = 500, message = "Error loading content packs")
     })
     public Multimap<String, ConfigurationBundle> listBundles() {
         final ImmutableSetMultimap.Builder<String, ConfigurationBundle> categoryBundleMap = ImmutableSetMultimap.builder();
@@ -105,13 +105,13 @@ public class BundleResource extends RestResource {
     @GET
     @Timed
     @Path("{bundleId}")
-    @ApiOperation(value = "Show configuration bundle")
+    @ApiOperation(value = "Show content pack")
     @ApiResponses(value = {
-            @ApiResponse(code = 404, message = "Missing or invalid configuration bundle"),
-            @ApiResponse(code = 500, message = "Error while loading configuration bundle")
+            @ApiResponse(code = 404, message = "Missing or invalid content pack"),
+            @ApiResponse(code = 500, message = "Error while loading content pack")
     })
     public ConfigurationBundle showBundle(
-            @ApiParam(name = "bundleId", value = "Configuration bundle ID", required = true)
+            @ApiParam(name = "bundleId", value = "Content pack ID", required = true)
             @NotNull
             @PathParam("bundleId")
             final String bundleId) throws NotFoundException {
@@ -123,17 +123,17 @@ public class BundleResource extends RestResource {
     @Timed
     @Path("{bundleId}")
     @Consumes(MediaType.APPLICATION_JSON)
-    @ApiOperation(value = "Update configuration bundle")
+    @ApiOperation(value = "Update content pack")
     @ApiResponses(value = {
-            @ApiResponse(code = 400, message = "Missing or invalid configuration bundle"),
-            @ApiResponse(code = 500, message = "Error while updating configuration bundle")
+            @ApiResponse(code = 400, message = "Missing or invalid content pack"),
+            @ApiResponse(code = 500, message = "Error while updating content pack")
     })
     public void updateBundle(
-            @ApiParam(name = "bundleId", value = "Configuration bundle ID", required = true)
+            @ApiParam(name = "bundleId", value = "Content pack ID", required = true)
             @NotNull
             @PathParam("bundleId")
             final String bundleId,
-            @ApiParam(name = "Request body", value = "Configuration bundle", required = true)
+            @ApiParam(name = "Request body", value = "Content pack", required = true)
             @NotNull @Valid
             final ConfigurationBundle configurationBundle) {
         checkPermission(RestPermissions.BUNDLE_UPDATE, bundleId);
@@ -143,31 +143,31 @@ public class BundleResource extends RestResource {
     @DELETE
     @Path("{bundleId}")
     @Timed
-    @ApiOperation(value = "Delete configuration bundle")
+    @ApiOperation(value = "Delete content pack")
     @ApiResponses(value = {
-            @ApiResponse(code = 404, message = "Missing or invalid configuration bundle"),
-            @ApiResponse(code = 500, message = "Error while applying configuration bundle")
+            @ApiResponse(code = 404, message = "Missing or invalid content pack"),
+            @ApiResponse(code = 500, message = "Error while applying content pack")
     })
     public void deleteBundle(
-            @ApiParam(name = "bundleId", value = "Configuration bundle ID", required = true)
+            @ApiParam(name = "bundleId", value = "Content pack ID", required = true)
             @NotNull
             @PathParam("bundleId")
             final String bundleId) {
         checkPermission(RestPermissions.BUNDLE_DELETE, bundleId);
         final int deletedBundles = bundleService.delete(bundleId);
-        LOG.debug("Successfully removed {} configuration bundles", deletedBundles);
+        LOG.debug("Successfully removed {} content packs", deletedBundles);
     }
 
     @POST
     @Path("{bundleId}/apply")
     @Timed
-    @ApiOperation(value = "Set up entities described by configuration bundle")
+    @ApiOperation(value = "Set up entities described by content pack")
     @ApiResponses(value = {
-            @ApiResponse(code = 404, message = "Missing or invalid configuration bundle"),
-            @ApiResponse(code = 500, message = "Error while applying configuration bundle")
+            @ApiResponse(code = 404, message = "Missing or invalid content pack"),
+            @ApiResponse(code = 500, message = "Error while applying content pack")
     })
     public void applyBundle(
-            @ApiParam(name = "bundleId", value = "Configuration bundle ID", required = true)
+            @ApiParam(name = "bundleId", value = "Content pack ID", required = true)
             @NotNull
             @PathParam("bundleId")
             final String bundleId) throws NotFoundException {
@@ -178,12 +178,12 @@ public class BundleResource extends RestResource {
     @POST
     @Path("export")
     @Timed
-    @ApiOperation(value = "Export entities as a configuration bundle")
+    @ApiOperation(value = "Export entities as a content pack")
     @ApiResponses(value = {
-            @ApiResponse(code = 500, message = "Error while exporting configuration bundle")
+            @ApiResponse(code = 500, message = "Error while exporting content pack")
     })
     public ConfigurationBundle exportBundle(
-            @ApiParam(name = "exportBundle", value = "Export bundle", required = true)
+            @ApiParam(name = "exportBundle", value = "Export content pack", required = true)
             @NotNull
             final ExportBundle exportBundle) throws NotFoundException {
         checkPermission(RestPermissions.BUNDLE_EXPORT);
