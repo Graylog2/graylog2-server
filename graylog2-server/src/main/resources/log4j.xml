@@ -18,6 +18,10 @@
     <logger name="org.apache.directory.api.ldap.model.message.BindRequestImpl">
         <level value="error"/>
     </logger>
+    <!-- Prevent DEBUG message about Lucene Expressions not found. -->
+    <logger name="org.elasticsearch.script">
+        <level value="warn"/>
+    </logger>
     <!-- Root Logger -->
     <root>
         <priority value="warn"/>
