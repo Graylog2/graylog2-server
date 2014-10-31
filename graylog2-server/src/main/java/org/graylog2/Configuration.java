@@ -303,6 +303,9 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "index_optimization_max_num_segments", validator = PositiveIntegerValidator.class)
     private int indexOptimizationMaxNumSegments = 1;
 
+    @Parameter(value = "disable_output_cache")
+    private boolean disableOutputCache = false;
+
     public boolean isMaster() {
         return isMaster;
     }
@@ -691,5 +694,9 @@ public class Configuration extends BaseConfiguration {
 
     public int getIndexOptimizationMaxNumSegments() {
         return indexOptimizationMaxNumSegments;
+    }
+
+    public boolean isDisableOutputCache() {
+        return disableOutputCache;
     }
 }
