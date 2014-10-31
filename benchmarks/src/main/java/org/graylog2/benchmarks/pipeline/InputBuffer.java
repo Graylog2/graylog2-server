@@ -10,6 +10,7 @@ import com.lmax.disruptor.EventTranslator;
 import com.lmax.disruptor.RingBuffer;
 import com.lmax.disruptor.dsl.Disruptor;
 import com.lmax.disruptor.dsl.ProducerType;
+import org.graylog2.benchmarks.utils.TimeCalculator;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -21,6 +22,7 @@ public class InputBuffer {
     @AssistedInject
     public InputBuffer(MetricRegistry metricRegistry,
                        FilterHandler.Factory handlerFactory,
+                       @Assisted TimeCalculator filterTime,
                        @Assisted OutputBuffer outputBuffer,
                        @Assisted("bufferSize") int bufferSize,
                        @Assisted("numFilterHander") int numFilterHandler) {
@@ -40,7 +42,7 @@ public class InputBuffer {
 
         final FilterHandler[] handlers = new FilterHandler[numFilterHandler];
         for (int i = 0; i < numFilterHandler; i++) {
-            handlers[i] = handlerFactory.create(outputBuffer, i, numFilterHandler);
+            handlers[i] = handlerFactory.create(outputBuffer, filterTime, i, numFilterHandler);
         }
 
         disruptor.handleEventsWith(handlers);
@@ -65,6 +67,6 @@ public class InputBuffer {
     }
 
     public interface Factory {
-        InputBuffer create(@Assisted OutputBuffer outputBuffer, @Assisted("bufferSize") int bufferSize, @Assisted("numFilterHander") int numFilterHandler);
+        InputBuffer create(TimeCalculator filterTime, @Assisted OutputBuffer outputBuffer, @Assisted("bufferSize") int bufferSize, @Assisted("numFilterHander") int numFilterHandler);
     }
 }
