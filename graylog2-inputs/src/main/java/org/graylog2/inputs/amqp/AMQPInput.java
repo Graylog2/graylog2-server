@@ -112,6 +112,7 @@ public class AMQPInput extends MessageInput {
     @Override
     public void launch(Buffer processBuffer) throws MisfireException {
         consumer = new Consumer(
+                metricRegistry,
                 configuration.getString(CK_HOSTNAME),
                 (int) configuration.getInt(CK_PORT),
                 configuration.getString(CK_VHOST),

@@ -16,6 +16,9 @@
  */
 package org.graylog2.inputs.amqp;
 
+import com.codahale.metrics.Meter;
+import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.Timer;
 import com.google.common.util.concurrent.Uninterruptibles;
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
@@ -42,6 +45,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
+
+import static com.codahale.metrics.MetricRegistry.name;
 
 public class Consumer {
     private static final Logger LOG = LoggerFactory.getLogger(Consumer.class);
@@ -71,7 +76,12 @@ public class Consumer {
     private AtomicLong lastSecBytesRead = new AtomicLong(0);
     private AtomicLong lastSecBytesReadTmp = new AtomicLong(0);
 
-    public Consumer(String hostname, int port, String virtualHost, String username, String password,
+    private final Meter incomingMessages;
+    private final Timer processTime;
+    private final Meter bufferFull;
+    private final Meter exceptions;
+
+    public Consumer(MetricRegistry metricRegistry, String hostname, int port, String virtualHost, String username, String password,
                     int prefetchCount, String queue, String exchange, String routingKey, int parallelQueues,
                     Buffer processBuffer, MessageInput sourceInput, final MessagePack messagePack) {
         this.hostname = hostname;
@@ -97,6 +107,15 @@ public class Consumer {
                 lastSecBytesRead.set(lastSecBytesReadTmp.getAndSet(0));
             }
         }, 1, 1, TimeUnit.SECONDS);
+
+        this.incomingMessages = metricRegistry.meter(name(this.getUniqueReadableId() + ".incomingMessages"));
+        this.processTime = metricRegistry.timer(name(this.getUniqueReadableId() + ".processTime"));
+        this.bufferFull = metricRegistry.meter(name(this.getUniqueReadableId() + ".bufferFull"));
+        this.exceptions = metricRegistry.meter(name(this.getUniqueReadableId() + ".exceptions"));
+    }
+
+    private String getUniqueReadableId() {
+        return this.getClass().getName() + "." + this.hashCode();
     }
 
     public void run() throws IOException {
@@ -110,9 +129,10 @@ public class Consumer {
             channel.basicConsume(queueName, false, new DefaultConsumer(channel) {
                         @Override
                         public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) throws IOException {
+                            incomingMessages.mark();
                             long deliveryTag = envelope.getDeliveryTag();
 
-                            try {
+                            try (Timer.Context context = processTime.time()) {
                                 totalBytesRead.addAndGet(body.length);
                                 lastSecBytesReadTmp.addAndGet(body.length);
 
@@ -129,6 +149,7 @@ public class Consumer {
                                 channel.basicAck(deliveryTag, false);
                             } catch (BufferOutOfCapacityException e) {
                                 LOG.debug("Input buffer full, requeuing message. Delaying 10 ms until trying next message.");
+                                bufferFull.mark();
                                 if (channel.isOpen()) {
                                     channel.basicNack(deliveryTag, false, true);
                                     Uninterruptibles.sleepUninterruptibly(10, TimeUnit.MILLISECONDS); // TODO magic number
@@ -141,6 +162,7 @@ public class Consumer {
                                 }
                             } catch (Exception e) {
                                 LOG.error("Error while trying to process AMQP message, requeuing message", e);
+                                exceptions.mark();
                                 if (channel.isOpen()) {
                                     channel.basicNack(deliveryTag, false, true);
                                 }
