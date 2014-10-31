@@ -43,6 +43,7 @@ public class PipelineBenchmark {
     private int outputBufferHandler = Integer.valueOf(System.getProperty("outputBufferHandler", "2"));
     private int filterProcessTime = Integer.valueOf(System.getProperty("inputProcessTimeMicros", "250"));
     private int outputProcessTime = Integer.valueOf(System.getProperty("outputProcessTimeMicros", "250"));
+    private boolean waitForProcessedBatch = Boolean.parseBoolean(System.getProperty("waitForProcessedBatch", "false"));
 
     @Setup
     public void setup() {
@@ -70,7 +71,8 @@ public class PipelineBenchmark {
             processedMessage = classicPipeline.produce();
         }
         assert processedMessage != null;
-        Uninterruptibles.getUninterruptibly(processedMessage);
+        if (waitForProcessedBatch)
+            Uninterruptibles.getUninterruptibly(processedMessage);
         counter.inc();
         meter.mark(batchSize);
     }

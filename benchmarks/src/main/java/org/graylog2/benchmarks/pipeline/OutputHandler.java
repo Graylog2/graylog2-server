@@ -2,6 +2,7 @@ package org.graylog2.benchmarks.pipeline;
 
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.Timer;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import com.lmax.disruptor.EventHandler;
@@ -18,6 +19,7 @@ public class OutputHandler implements EventHandler<Event> {
     private final int ordinal;
     private final int numHandler;
     private final Meter processed;
+    private final Timer filterTime;
 
     @AssistedInject
     public OutputHandler(MetricRegistry metricRegistry,
@@ -31,6 +33,11 @@ public class OutputHandler implements EventHandler<Event> {
         this.ordinal = ordinal;
         this.numHandler = numHandler;
         processed = metricRegistry.meter("output-handler" + ordinal + ".processed");
+        filterTime = metricRegistry.timer(metricName("timer"));
+    }
+
+    private String metricName(String suffix) {
+        return "output-handler" + ordinal + "." + suffix;
     }
 
     @Override
@@ -38,10 +45,14 @@ public class OutputHandler implements EventHandler<Event> {
         if ((sequence % numHandler) != ordinal) {
             return;
         }
+        final Timer.Context context = filterTime.time();
+
         consumeCpuFor(timeCalculator.sleepTimeNsForThread(ordinal), NANOSECONDS);
 
         messageOutput.write(event.message);
         processed.mark();
+
+        context.stop();
     }
 
     public interface Factory {
