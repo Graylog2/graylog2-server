@@ -115,15 +115,7 @@ public class ServerProcessBufferProcessor extends ProcessBufferProcessor {
 
         if (configuration.isDisableOutputCache()) {
             LOG.debug("Finished processing message. Writing to output buffer.");
-            for (;;) {
-                try {
-                    outputBuffer.insertFailFast(msg, null);
-                    break;
-                } catch (BufferOutOfCapacityException e) {
-                    LOG.debug("Output buffer is full. Retrying.");
-                    Uninterruptibles.sleepUninterruptibly(10, TimeUnit.MILLISECONDS);
-                }
-            }
+            outputBuffer.insertBlocking(msg, null);
         } else {
             LOG.debug("Finished processing message. Writing to output cache.");
             outputBuffer.insertCached(msg, null);

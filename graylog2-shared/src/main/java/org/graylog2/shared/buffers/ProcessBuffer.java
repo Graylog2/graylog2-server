@@ -125,13 +125,6 @@ public class ProcessBuffer extends Buffer {
     public void insertCached(Message message, MessageInput sourceInput) {
         prepareMessage(message, sourceInput);
 
-        if (!serverStatus.isProcessing()) {
-            LOG.debug("Message processing is paused. Writing to cache.");
-            cachedMessages.mark();
-            inputCache.add(message);
-            return;
-        }
-
         if (!hasCapacity()) {
             if (configuration.getInputCacheMaxSize() == 0 || inputCache.size() < configuration.getInputCacheMaxSize()) {
                 if (LOG.isDebugEnabled())
@@ -146,7 +139,13 @@ public class ProcessBuffer extends Buffer {
             return;
         }
 
-        insert(message);
+        try {
+            insertBlocking(message, sourceInput);
+        } catch (ProcessingDisabledException e) {
+            LOG.debug("Message processing is paused. Writing to cache.");
+            cachedMessages.mark();
+            inputCache.add(message);
+        }
     }
 
     private void prepareMessage(Message message, MessageInput sourceInput) {
@@ -167,10 +166,7 @@ public class ProcessBuffer extends Buffer {
     public void insertFailFast(Message message, MessageInput sourceInput) throws BufferOutOfCapacityException, ProcessingDisabledException {
         prepareMessage(message, sourceInput);
 
-        if (!serverStatus.isProcessing()) {
-            LOG.debug("Rejecting message, because message processing is paused.");
-            throw new ProcessingDisabledException();
-        }
+        checkProcessing();
 
         if (!hasCapacity()) {
             LOG.debug("Rejecting message, because I am full and caching was disabled by input. Raise my size or add more processors.");
@@ -178,7 +174,7 @@ public class ProcessBuffer extends Buffer {
             throw new BufferOutOfCapacityException();
         }
 
-        insert(message);
+        insertBlocking(message, sourceInput);
     }
 
     @Override
@@ -189,10 +185,7 @@ public class ProcessBuffer extends Buffer {
             prepareMessage(message, sourceInput);
         }
 
-        if (!serverStatus.isProcessing()) {
-            LOG.debug("Rejecting message, because message processing is paused.");
-            throw new ProcessingDisabledException();
-        }
+        checkProcessing();
 
         if (!hasCapacity(length)) {
             LOG.debug("Rejecting message, because I am full and caching was disabled by input. Raise my size or add more processors.");
@@ -200,8 +193,7 @@ public class ProcessBuffer extends Buffer {
             throw new BufferOutOfCapacityException();
         }
 
-        insert(messages.toArray(new Message[length]));
-        afterInsert(length);
+        insertBlocking(messages);
     }
 
     @Override
@@ -209,13 +201,6 @@ public class ProcessBuffer extends Buffer {
         int length = messages.size();
         for (Message message : messages)
             prepareMessage(message, message.getSourceInput());
-
-        if (!serverStatus.isProcessing()) {
-            LOG.debug("Message processing is paused. Writing to cache.");
-            cachedMessages.mark();
-            inputCache.add(messages);
-            return;
-        }
 
         if (!hasCapacity(length)) {
             if (configuration.getInputCacheMaxSize() == 0 || inputCache.size() < configuration.getInputCacheMaxSize()) {
@@ -231,8 +216,37 @@ public class ProcessBuffer extends Buffer {
             return;
         }
 
+        try {
+            insertBlocking(messages);
+        } catch (ProcessingDisabledException e) {
+            LOG.debug("Message processing is paused. Writing to cache.");
+            cachedMessages.mark();
+            inputCache.add(messages);
+        }
+    }
+
+    @Override
+    public void insertBlocking(Message message, MessageInput sourceInput) throws ProcessingDisabledException {
+        checkProcessing();
+
+        insert(message);
+        afterInsert(1);
+    }
+
+    @Override
+    public void insertBlocking(List<Message> messages) throws ProcessingDisabledException {
+        checkProcessing();
+
+        int length = messages.size();
         insert(messages.toArray(new Message[length]));
         afterInsert(length);
+    }
+
+    protected void checkProcessing() throws ProcessingDisabledException {
+        if (!serverStatus.isProcessing()) {
+            LOG.debug("Rejecting message, because message processing is paused.");
+            throw new ProcessingDisabledException();
+        }
     }
 
     @Override

@@ -145,15 +145,8 @@ public class Consumer {
 
                                 Message event = msg.toMessage();
 
-                                processBuffer.insertFailFast(event, sourceInput);
+                                processBuffer.insertBlocking(event, sourceInput);
                                 channel.basicAck(deliveryTag, false);
-                            } catch (BufferOutOfCapacityException e) {
-                                LOG.debug("Input buffer full, requeuing message. Delaying 10 ms until trying next message.");
-                                bufferFull.mark();
-                                if (channel.isOpen()) {
-                                    channel.basicNack(deliveryTag, false, true);
-                                    Uninterruptibles.sleepUninterruptibly(10, TimeUnit.MILLISECONDS); // TODO magic number
-                                }
                             } catch (ProcessingDisabledException e) {
                                 LOG.debug("Message processing is disabled, requeuing message. Delaying 100 ms until trying next message.");
                                 if (channel.isOpen()) {

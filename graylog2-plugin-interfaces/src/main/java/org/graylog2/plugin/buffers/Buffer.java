@@ -38,8 +38,10 @@ public abstract class Buffer {
 
     public abstract void insertFailFast(Message message, MessageInput sourceInput) throws BufferOutOfCapacityException, ProcessingDisabledException;
     public abstract void insertCached(Message message, MessageInput sourceInput);
+    public abstract void insertBlocking(Message message, MessageInput sourceInput) throws ProcessingDisabledException;
     public abstract void insertFailFast(List<Message> messages) throws BufferOutOfCapacityException, ProcessingDisabledException;
     public abstract void insertCached(List<Message> messages);
+    public abstract void insertBlocking(List<Message> messages) throws ProcessingDisabledException;
 
     public boolean isEmpty() {
         return getUsage() == 0;

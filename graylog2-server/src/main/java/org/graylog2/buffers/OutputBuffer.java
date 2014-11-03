@@ -18,6 +18,8 @@ package org.graylog2.buffers;
 
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.Timer;
+import com.google.common.base.Stopwatch;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.lmax.disruptor.dsl.Disruptor;
 import com.lmax.disruptor.dsl.ProducerType;
@@ -29,16 +31,17 @@ import org.graylog2.plugin.Message;
 import org.graylog2.plugin.buffers.Buffer;
 import org.graylog2.plugin.buffers.BufferOutOfCapacityException;
 import org.graylog2.plugin.buffers.MessageEvent;
+import org.graylog2.plugin.buffers.ProcessingDisabledException;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import static com.codahale.metrics.MetricRegistry.name;
 
@@ -63,6 +66,7 @@ public class OutputBuffer extends Buffer {
     private final Meter incomingMessages;
     private final Meter rejectedMessages;
     private final Meter cachedMessages;
+    private final Timer processTime;
 
     private final OutputBufferProcessor.Factory outputBufferProcessorFactory;
 
@@ -80,6 +84,7 @@ public class OutputBuffer extends Buffer {
         incomingMessages = metricRegistry.meter(name(OutputBuffer.class, "incomingMessages"));
         rejectedMessages = metricRegistry.meter(name(OutputBuffer.class, "rejectedMessages"));
         cachedMessages = metricRegistry.meter(name(OutputBuffer.class, "cachedMessages"));
+        processTime = metricRegistry.timer(name(OutputBuffer.class, "processTime"));
     }
 
     public Cache getOverflowCache() {
@@ -133,8 +138,7 @@ public class OutputBuffer extends Buffer {
             throw new BufferOutOfCapacityException();
         }
         
-        insert(message);
-        afterInsert(1);
+        insertBlocking(message, sourceInput);
     }
 
     @Override
@@ -160,8 +164,27 @@ public class OutputBuffer extends Buffer {
             throw new BufferOutOfCapacityException();
         }
 
+        insertBlocking(messages);
+    }
+
+    @Override
+    public void insertBlocking(Message message, MessageInput messageInput) {
+        final Timer.Context timer = this.processTime.time();
+        insert(message);
+        afterInsert(1);
+        final long time = timer.stop();
+        LOG.debug("It took me {}ns to put the message on the ring.", time);
+    }
+
+    @Override
+    public void insertBlocking(List<Message> messages) {
+        final Timer.Context timer = this.processTime.time();
+        int length = messages.size();
+
         insert(messages.toArray(new Message[length]));
         afterInsert(length);
+        final long time = timer.stop();
+        LOG.debug("It took me {}ns to put {} messages on the ring.", time, length);
     }
 
     @Override
