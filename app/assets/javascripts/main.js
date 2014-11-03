@@ -877,12 +877,7 @@ $(document).ready(function() {
     })();
 
     function onResizedWindow(){
-        redrawResultGraph();
-
-        for (var field in fieldGraphs) {
-            fieldGraphs[field].configure({ width: $("#main-content").width()-12 });
-            fieldGraphs[field].render();
-        }
+        redrawGraphs();
     }
 
     // Set up numeral language.
@@ -1038,7 +1033,7 @@ function hideSidebar() {
     var mainContentElement = $("#main-content");
     mainContentElement.removeClass("span8");
     mainContentElement.addClass("span12");
-    redrawResultGraph();
+    redrawGraphs();
 }
 
 function showSidebar() {
@@ -1047,12 +1042,17 @@ function showSidebar() {
     var mainContentElement = $("#main-content");
     mainContentElement.removeClass("span12");
     mainContentElement.addClass("span8");
-    redrawResultGraph();
+    redrawGraphs();
 }
 
-function redrawResultGraph() {
-    if (typeof resultHistogram != "undefined") {
+function redrawGraphs() {
+    if (typeof resultHistogram !== "undefined") {
         resultHistogram.redrawResultGraph();
+    }
+
+    for (var field in fieldGraphs) {
+        fieldGraphs[field].configure({ width: $(".field-graph-components > div.field-graph.rickshaw_graph:first").width() });
+        fieldGraphs[field].render();
     }
 }
 
