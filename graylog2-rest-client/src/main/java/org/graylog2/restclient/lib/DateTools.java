@@ -95,4 +95,14 @@ public class DateTools {
 
         return ((offset  / 1000) / 60) * -1;
     }
+
+    public static String getUserTimeZone(User currentUser) {
+        DateTimeZone tz = globalTimezone;
+
+        if (currentUser != null && currentUser.getTimeZone() != null) {
+            tz = currentUser.getTimeZone();
+        }
+
+        return tz.toString();
+    }
 }
