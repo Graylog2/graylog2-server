@@ -8,9 +8,6 @@ import org.graylog2.restclient.models.StreamService;
 import javax.inject.Inject;
 import java.io.IOException;
 
-/**
- * @author Dennis Oelkers <dennis@torch.sh>
- */
 public class NotificationTypeFactory {
     private final StreamService streamService;
 
@@ -49,7 +46,7 @@ public class NotificationTypeFactory {
                 } catch (APIException | IOException e) {
                     streamTitle = "(Stream title unavailable)";
                 }
-                long faultCount = Math.round((double)notification.getDetail("fault_count"));
+                long faultCount = (long) notification.getDetail("fault_count");
                 return new StreamProcessingDisabledNotification(notification, streamTitle, faultCount);
         }
 
