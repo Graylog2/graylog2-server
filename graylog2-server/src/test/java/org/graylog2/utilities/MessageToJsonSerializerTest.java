@@ -60,6 +60,10 @@ public class MessageToJsonSerializerTest {
 
         message.setSourceInput(messageInput);
         message.setStreams(Lists.newArrayList(stream));
+        message.addField("test1", "hello");
+        message.addField("test2", 1);
+        message.addField("test3", 1.2);
+        message.addField("test4", false);
 
         final String s = serializer.serializeToString(message);
 
@@ -70,6 +74,10 @@ public class MessageToJsonSerializerTest {
         assertEquals(newMessage.getSource(), message.getSource());
         assertEquals(newMessage.getSourceInput(), messageInput);
         assertEquals(newMessage.getStreams(), Lists.newArrayList(stream));
+        assertEquals(newMessage.getField("test1"), "hello");
+        assertEquals(newMessage.getField("test2"), 1);
+        assertEquals(newMessage.getField("test3"), 1.2);
+        assertEquals(newMessage.getField("test4"), false);
 
         // Just assert that the message id is not null because we cannot set the _id field on deserialize because the
         // Message object does not allow the _id field to be set.
