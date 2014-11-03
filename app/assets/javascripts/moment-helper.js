@@ -12,13 +12,15 @@ momentHelper = {
     toUserTimeZone: function(momentDate) {
         var date;
 
-        if ((momentDate == null) || !moment.isMoment(momentDate)) {
-            date = moment();
+        if ((momentDate == null)) {
+            date = moment.utc();
         } else {
-            date = moment(momentDate);
+            date = moment.utc(momentDate);
         }
 
-        if (gl2UserTimeZoneOffset != null) {
+        if (gl2UserTimeZone !== null) {
+            date.tz(gl2UserTimeZone);
+        } else if (gl2UserTimeZoneOffset != null) {
             date.zone(gl2UserTimeZoneOffset);
         }
 

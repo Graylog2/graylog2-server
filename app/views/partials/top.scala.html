@@ -8,7 +8,8 @@
 <script type="text/javascript">
 // needs to be global!
 gl2AppPathPrefix = "@Configuration.getApplicationContext";
-gl2UserTimeZoneOffset = @DateTools.getUserTimeZoneOffset(UserService.current());
+gl2UserTimeZone = "@DateTools.getUserTimeZone(UserService.current())";
+gl2UserTimeZoneOffset = "@DateTools.getUserTimeZoneOffset(UserService.current())";
 </script>
 
 <div id="top" class="navbar navbar-fixed-top">
