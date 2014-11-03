@@ -1,11 +1,18 @@
 resultHistogram = {
     _histogram: [],
+    _histogramContainer: $("#result-graph"),
+    _yAxis: $("#y_axis"),
+    _graphTimeline: $("#result-graph-timeline"),
+    _resultHistogramGraph: undefined,
 
     _correctDataBoundaries: function(data) {
-        var resultGraphElement = $("#result-graph");
         var selectedResolution = $(".date-histogram-res-selector.selected-resolution").data("resolution");
 
-        return rickshawHelper.correctDataBoundaries(data, resultGraphElement.data("from"), resultGraphElement.data("to"), selectedResolution);
+        return rickshawHelper.correctDataBoundaries(data, this._histogramContainer.data("from"), this._histogramContainer.data("to"), selectedResolution);
+    },
+
+    _getHistogramContainerWidth: function() {
+        return this._histogramContainer.width();
     },
 
     setData: function(data) {
@@ -13,20 +20,23 @@ resultHistogram = {
     },
 
     drawResultGraph: function() {
-        var resultGraphElement = $("#result-graph");
-        if (resultGraphElement.length == 0) {
+        if (this._histogramContainer.length === 0) {
             return;
         }
 
-        resultGraphElement.html("");
-        $("#result-graph-timeline" ).html("");
+        if (typeof this._resultHistogramGraph !== 'undefined') {
+            return;
+        }
 
-        var graphWidth = resultGraphElement.width();
+        this._histogramContainer.html("");
+        this._yAxis.html("");
+        this._graphTimeline.html("");
+
         var selectedResolution = $(".date-histogram-res-selector.selected-resolution").data("resolution");
 
         var resultGraph = new Rickshaw.Graph( {
-            element: resultGraphElement.get(0),
-            width: graphWidth,
+            element: this._histogramContainer[0],
+            width: this._getHistogramContainerWidth(),
             height: 175,
             renderer: rickshawHelper.getRenderer("bar"),
             resolution: selectedResolution,
@@ -40,6 +50,8 @@ resultHistogram = {
         new Rickshaw.Graph.Axis.Y( {
             graph: resultGraph,
             tickFormat: Rickshaw.Fixtures.Number.formatKMBT,
+            orientation: 'left',
+            element: this._yAxis[0],
             pixelsPerTick: 30
         });
 
@@ -72,17 +84,22 @@ resultHistogram = {
 
         var annotator = new Rickshaw.Graph.Annotate({
             graph: resultGraph,
-            element: document.getElementById('result-graph-timeline')
+            element: this._graphTimeline[0]
         });
 
         fillAlertAnnotator(resultGraph, annotator);
 
         resultGraph.render();
+
+        this._resultHistogramGraph = resultGraph;
     },
 
     redrawResultGraph: function() {
         if(this._histogram.length > 0) {
-            this.drawResultGraph();
+            if (typeof this._resultHistogramGraph !== 'undefined') {
+                this._resultHistogramGraph.configure({width: this._getHistogramContainerWidth()});
+                this._resultHistogramGraph.render();
+            }
         }
     }
 };
