@@ -26,6 +26,7 @@ import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.inputs.util.ThroughputCounter;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.bindings.providers.EventBusProvider;
+import org.graylog2.shared.bindings.providers.MetricRegistryProvider;
 import org.graylog2.shared.bindings.providers.NodeIdProvider;
 import org.graylog2.shared.bindings.providers.ProcessBufferProvider;
 import org.graylog2.shared.bindings.providers.ServiceManagerProvider;
@@ -34,9 +35,6 @@ import org.graylog2.shared.buffers.ProcessBufferWatermark;
 import org.graylog2.shared.stats.ThroughputStats;
 import org.jboss.netty.util.HashedWheelTimer;
 
-/**
- * @author Dennis Oelkers <dennis@torch.sh>
- */
 public class GenericBindings extends AbstractModule {
     private final InstantiationService instantiationService;
 
@@ -47,7 +45,7 @@ public class GenericBindings extends AbstractModule {
     @Override
     protected void configure() {
         // This is holding all our metrics.
-        bind(MetricRegistry.class).in(Scopes.SINGLETON);
+        bind(MetricRegistry.class).toProvider(MetricRegistryProvider.class).asEagerSingleton();
         bind(LocalMetricRegistry.class).in(Scopes.NO_SCOPE); // must not be a singleton!
         bind(ThroughputStats.class).toInstance(new ThroughputStats());
         bind(ProcessBufferWatermark.class).toInstance(new ProcessBufferWatermark());
