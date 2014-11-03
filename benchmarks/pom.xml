@@ -56,6 +56,15 @@ questions.
             <artifactId>graylog2-server</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.novaquark</groupId>
+            <artifactId>metrics-influxdb</artifactId>
+            <version>0.3.0</version>
+        </dependency>
+        <dependency>
+            <groupId>io.dropwizard.metrics</groupId>
+            <artifactId>metrics-jvm</artifactId>
+        </dependency>
     </dependencies>
 
     <properties>

@@ -1,9 +1,14 @@
 package org.graylog2.benchmarks;
 
 import com.codahale.metrics.*;
+import com.codahale.metrics.jvm.GarbageCollectorMetricSet;
+import com.codahale.metrics.jvm.MemoryUsageGaugeSet;
+import com.google.common.base.Throwables;
 import com.google.common.util.concurrent.Uninterruptibles;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import metrics_influxdb.Influxdb;
+import metrics_influxdb.InfluxdbReporter;
 import org.graylog2.benchmarks.pipeline.ClassicModule;
 import org.graylog2.benchmarks.pipeline.ClassicPipeline;
 import org.graylog2.benchmarks.pipeline.ProcessedMessage;
@@ -14,8 +19,9 @@ import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 import org.openjdk.jmh.runner.options.TimeValue;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -27,6 +33,7 @@ import java.util.concurrent.TimeUnit;
 
 @State(Scope.Benchmark)
 public class PipelineBenchmark {
+    private static final Logger log = LoggerFactory.getLogger(PipelineBenchmark.class);
 
     ClassicPipeline classicPipeline;
     Counter counter;
@@ -55,15 +62,44 @@ public class PipelineBenchmark {
         final MetricRegistry metricRegistry = injector.getInstance(MetricRegistry.class);
         counter = metricRegistry.counter("benchmark-iterations");
         meter = metricRegistry.meter("benchmark-ops");
+        metricRegistry.registerAll(new GarbageCollectorMetricSet());
+        metricRegistry.registerAll(new MemoryUsageGaugeSet());
 
-        reporter = CsvReporter.forRegistry(metricRegistry).build(new File("/tmp"));
-//        consoleReporter = ConsoleReporter.forRegistry(metricRegistry).build();
-        reporter.start(1, TimeUnit.SECONDS);
+        if (System.getProperty("useInfluxdb") != null) {
+            final String host = System.getProperty("influxdbHost", "127.0.0.1");
+            final String port = System.getProperty("influxdbPort", "8086");
+            final String db = System.getProperty("influxdbDb", "metrics");
+            final String user = System.getProperty("influxdbUser", "root");
+            final String pass = System.getProperty("influxdbPassword", "root");
+            Influxdb influxdb = null;
+            try {
+                influxdb = new Influxdb(host, Integer.valueOf(port), db, user, pass, TimeUnit.MILLISECONDS);
+            } catch (Exception e) {
+                Throwables.propagate(e);
+            }
+            final InfluxdbReporter reporter = InfluxdbReporter
+                    .forRegistry(metricRegistry)
+                    .prefixedWith("benchmark")
+                    .convertRatesTo(TimeUnit.SECONDS)
+                    .convertDurationsTo(TimeUnit.MILLISECONDS)
+                    .filter(MetricFilter.ALL)
+                    .build(influxdb);
+            reporter.start(1, TimeUnit.SECONDS);
+            log.info("Starting influxdb reporter, writing to {}", influxdb.url);
+        } else {
+            reporter = ConsoleReporter.forRegistry(metricRegistry).build();
+            reporter.start(5, TimeUnit.SECONDS);
+            log.info("Starting console reporter");
+        }
     }
 
     @TearDown
     public void stop() {
-        reporter.stop();
+        log.info("Tearing down benchmark");
+        if (reporter != null) {
+            log.info("Stopping reporter");
+            reporter.stop();
+        }
         classicPipeline.stop();
     }
 
