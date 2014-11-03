@@ -1,9 +1,6 @@
 package org.graylog2.benchmarks;
 
-import com.codahale.metrics.ConsoleReporter;
-import com.codahale.metrics.Counter;
-import com.codahale.metrics.Meter;
-import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.*;
 import com.google.common.util.concurrent.Uninterruptibles;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
@@ -11,16 +8,14 @@ import org.graylog2.benchmarks.pipeline.ClassicModule;
 import org.graylog2.benchmarks.pipeline.ClassicPipeline;
 import org.graylog2.benchmarks.pipeline.ProcessedMessage;
 import org.graylog2.benchmarks.utils.FixedTimeCalculator;
-import org.openjdk.jmh.annotations.Benchmark;
-import org.openjdk.jmh.annotations.Scope;
-import org.openjdk.jmh.annotations.Setup;
-import org.openjdk.jmh.annotations.State;
+import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 import org.openjdk.jmh.runner.options.TimeValue;
 
+import java.io.File;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -36,14 +31,15 @@ public class PipelineBenchmark {
     ClassicPipeline classicPipeline;
     Counter counter;
     Meter meter;
-    private int batchSize = Integer.valueOf(System.getProperty("batchSize", "10"));
-    private int inputBufferSize = Integer.valueOf(System.getProperty("inputBufferSize", "2048"));
-    private int inputBufferHandler = Integer.valueOf(System.getProperty("inputBufferHandler", "4"));
-    private int outputBufferSize = Integer.valueOf(System.getProperty("outputBufferSize", "2048"));
-    private int outputBufferHandler = Integer.valueOf(System.getProperty("outputBufferHandler", "2"));
-    private int filterProcessTime = Integer.valueOf(System.getProperty("inputProcessTimeMicros", "250"));
-    private int outputProcessTime = Integer.valueOf(System.getProperty("outputProcessTimeMicros", "250"));
-    private boolean waitForProcessedBatch = Boolean.parseBoolean(System.getProperty("waitForProcessedBatch", "false"));
+    private final int batchSize = Integer.valueOf(System.getProperty("batchSize", "10"));
+    private final int inputBufferSize = Integer.valueOf(System.getProperty("inputBufferSize", "2048"));
+    private final int inputBufferHandler = Integer.valueOf(System.getProperty("inputBufferHandler", "4"));
+    private final int outputBufferSize = Integer.valueOf(System.getProperty("outputBufferSize", "2048"));
+    private final int outputBufferHandler = Integer.valueOf(System.getProperty("outputBufferHandler", "2"));
+    private final int filterProcessTime = Integer.valueOf(System.getProperty("inputProcessTimeMicros", "250"));
+    private final int outputProcessTime = Integer.valueOf(System.getProperty("outputProcessTimeMicros", "250"));
+    private final boolean waitForProcessedBatch = Boolean.parseBoolean(System.getProperty("waitForProcessedBatch", "false"));
+    private ScheduledReporter reporter;
 
     @Setup
     public void setup() {
@@ -60,7 +56,15 @@ public class PipelineBenchmark {
         counter = metricRegistry.counter("benchmark-iterations");
         meter = metricRegistry.meter("benchmark-ops");
 
-        ConsoleReporter.forRegistry(metricRegistry).build().start(10, TimeUnit.SECONDS);
+        reporter = CsvReporter.forRegistry(metricRegistry).build(new File("/tmp"));
+//        consoleReporter = ConsoleReporter.forRegistry(metricRegistry).build();
+        reporter.start(1, TimeUnit.SECONDS);
+    }
+
+    @TearDown
+    public void stop() {
+        reporter.stop();
+        classicPipeline.stop();
     }
 
 

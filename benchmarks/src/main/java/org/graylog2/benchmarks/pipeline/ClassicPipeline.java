@@ -8,6 +8,8 @@ import org.graylog2.benchmarks.utils.TimeCalculator;
 public class ClassicPipeline {
 
     private final MessageProducer producer;
+    private final OutputBuffer outputBuffer;
+    private final InputBuffer inputBuffer;
 
     @AssistedInject
     public ClassicPipeline(@Assisted("numFilterHandler") int numFilterHandler,
@@ -20,8 +22,8 @@ public class ClassicPipeline {
                            MessageProducer.Factory producerFactory,
                            InputBuffer.Factory inputBufferFactory,
                            OutputBuffer.Factory outputBufferFactory) {
-        final OutputBuffer outputBuffer = outputBufferFactory.create(outputTime, outputBufferSize, numOutputHandler);
-        final InputBuffer inputBuffer = inputBufferFactory.create(filterTime, outputBuffer, inputBufferSize, numFilterHandler);
+        outputBuffer = outputBufferFactory.create(outputTime, outputBufferSize, numOutputHandler);
+        inputBuffer = inputBufferFactory.create(filterTime, outputBuffer, inputBufferSize, numFilterHandler);
 
         producer = producerFactory.create(inputBuffer);
     }
@@ -31,7 +33,8 @@ public class ClassicPipeline {
     }
 
     public void stop() {
-
+        inputBuffer.stop();
+        outputBuffer.stop();
     }
 
     public interface Factory {

@@ -18,6 +18,8 @@ import java.util.concurrent.Executors;
 public class InputBuffer {
 
     private final RingBuffer<Event> ringBuffer;
+    private final ExecutorService executor;
+    private final Disruptor<Event> disruptor;
 
     @AssistedInject
     public InputBuffer(MetricRegistry metricRegistry,
@@ -26,13 +28,13 @@ public class InputBuffer {
                        @Assisted OutputBuffer outputBuffer,
                        @Assisted("bufferSize") int bufferSize,
                        @Assisted("numFilterHander") int numFilterHandler) {
-        final ExecutorService executor = Executors.newCachedThreadPool(
+        executor = Executors.newCachedThreadPool(
                 new ThreadFactoryBuilder()
                         .setNameFormat("inputbuffer-%d")
                         .build()
         );
 
-        final Disruptor<Event> disruptor = new Disruptor<>(
+        disruptor = new Disruptor<>(
                 Event.FACTORY,
                 bufferSize,
                 executor,
@@ -64,6 +66,11 @@ public class InputBuffer {
                 event.message = processedMessage;
             }
         });
+    }
+
+    public void stop() {
+        disruptor.shutdown();
+        executor.shutdown();
     }
 
     public interface Factory {
