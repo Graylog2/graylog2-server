@@ -25,12 +25,17 @@ package org.graylog2.shared.inputs;
 import com.google.common.collect.Maps;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.shared.bindings.InstantiationService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.util.Map;
 import java.util.Set;
 
 public class MessageInputFactory {
+
+    private static final Logger LOG = LoggerFactory.getLogger(MessageInputFactory.class);
+
     private final InstantiationService instantiationService;
     private final Set<Class<? extends MessageInput>> implClasses;
 
@@ -55,8 +60,14 @@ public class MessageInputFactory {
     public Map<String, String> getAvailableInputs() {
         Map<String, String> result = Maps.newHashMap();
         for (Class<? extends MessageInput> implClass : implClasses) {
-            MessageInput instance = instantiationService.getInstance(implClass);
-            result.put(implClass.getCanonicalName(), instance.getName());
+            try {
+                MessageInput instance = instantiationService.getInstance(implClass);
+                result.put(implClass.getCanonicalName(), instance.getName());
+            } catch(NoClassDefFoundError e) {
+                LOG.warn("Skipping input [{}] for list of available inputs because instantiation failed.",
+                        implClass.getCanonicalName(), e);
+                continue;
+            }
         }
         return result;
     }

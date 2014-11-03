@@ -23,6 +23,7 @@ import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.net.HostAndPort;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.ListenableFuture;
 import com.ning.http.client.Response;
@@ -77,6 +78,8 @@ import static org.graylog2.UI.wallString;
 // TODO figure out how to gracefully deal with failure to connect (or losing connection) to the elastic search cluster!
 public class Indexer {
     private static final Logger LOG = LoggerFactory.getLogger(Indexer.class);
+    private static final Version MINIMUM_ES_VERSION = Version.V_1_3_4;
+    private static final Version MAXIMUM_ES_VERSION = Version.V_1_3_4;
 
     private final Configuration configuration;
     private final Searches.Factory searchesFactory;
@@ -167,14 +170,12 @@ public class Indexer {
                 // if no Elasticsearch running
                 for (String host : hostList) {
                     // guess that Elasticsearch http is listening on port 9200
-                    final Iterable<String> hostAndPort = Splitter.on(':').limit(2).split(host);
-                    final Iterator<String> it = hostAndPort.iterator();
-                    final String ip = it.next();
-                    LOG.info("Checking Elasticsearch HTTP API at http://{}:9200/", ip);
+                    final HostAndPort hostAndPort = HostAndPort.fromString(host);
+                    LOG.info("Checking Elasticsearch HTTP API at http://{}:9200/", hostAndPort.getHostText());
 
                     try {
                         // Try the HTTP API endpoint
-                        final ListenableFuture<Response> future = httpClient.prepareGet("http://" + ip + ":9200/_nodes").execute();
+                        final ListenableFuture<Response> future = httpClient.prepareGet("http://" + hostAndPort.getHostText() + ":9200/_nodes").execute();
                         final Response response = future.get();
 
                         final JsonNode resultTree = new ObjectMapper().readTree(response.getResponseBody());
@@ -184,10 +185,12 @@ public class Indexer {
                         final Iterator<String> nodes = nodesList.fieldNames();
                         while (nodes.hasNext()) {
                             final String id = nodes.next();
-                            final String version = nodesList.get(id).get("version").textValue();
-                            if (!Version.CURRENT.toString().equals(version)) {
+                            final Version clusterVersion = Version.fromString(nodesList.get(id).get("version").textValue());
+
+                            if (!clusterVersion.onOrAfter(MINIMUM_ES_VERSION) && !clusterVersion.onOrBefore(MAXIMUM_ES_VERSION)) {
                                 final String message =
-                                        String.format("Elasticsearch node is of the wrong version %s, it must be %s!%n", version, Version.CURRENT)
+                                        String.format("Elasticsearch node is of the wrong version %s, it must be at least %s!%n",
+                                                clusterVersion, MINIMUM_ES_VERSION)
                                                 + "Please make sure you are running the correct version of Elasticsearch.";
                                 LOG.error(wallString(message));
                             }
@@ -202,7 +205,7 @@ public class Indexer {
                     } catch (InterruptedException ignore) {
                     } catch (ExecutionException e1) {
                         // could not find any server on that address
-                        LOG.error("Could not connect to Elasticsearch at http://" + ip + ":9200/, is it running?", e1.getCause());
+                        LOG.error("Could not connect to Elasticsearch at http://" + hostAndPort.getHostText() + ":9200/, is it running?", e1.getCause());
                     }
                 }
             }

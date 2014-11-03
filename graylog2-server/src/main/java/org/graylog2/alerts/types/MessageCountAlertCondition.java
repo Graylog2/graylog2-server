@@ -33,14 +33,11 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public class MessageCountAlertCondition extends AbstractAlertCondition {
-
     private static final Logger LOG = LoggerFactory.getLogger(MessageCountAlertCondition.class);
 
     public enum ThresholdType {
@@ -50,7 +47,7 @@ public class MessageCountAlertCondition extends AbstractAlertCondition {
     private final int time;
     private final ThresholdType thresholdType;
     private final int threshold;
-    private List<Message> searchHits = null;
+    private List<Message> searchHits = Collections.emptyList();
 
     public MessageCountAlertCondition(Stream stream, String id, DateTime createdAt, String creatorUserId, Map<String, Object> parameters) {
         super(stream, id, Type.MESSAGE_COUNT, createdAt, creatorUserId, parameters);
@@ -62,17 +59,15 @@ public class MessageCountAlertCondition extends AbstractAlertCondition {
 
     @Override
     public String getDescription() {
-        return new StringBuilder()
-                .append("time: ").append(time)
-                .append(", threshold_type: ").append(thresholdType.toString().toLowerCase())
-                .append(", threshold: ").append(threshold)
-                .append(", grace: ").append(grace)
-                .toString();
+        return "time: " + time
+                + ", threshold_type: " + thresholdType.toString().toLowerCase()
+                + ", threshold: " + threshold
+                + ", grace: " + grace;
     }
 
     @Override
     protected CheckResult runCheck(Indexer indexer) {
-        this.searchHits = null;
+        this.searchHits = Collections.emptyList();
         try {
             String filter = "streams:"+stream.getId();
             CountResult result = indexer.searches().count("*", new RelativeRange(time * 60), filter);
@@ -100,15 +95,10 @@ public class MessageCountAlertCondition extends AbstractAlertCondition {
                     }
                 }
 
-                StringBuilder resultDescription = new StringBuilder();
-
-                resultDescription.append("Stream had ").append(count).append(" messages in the last ")
-                        .append(time).append(" minutes with trigger condition ")
-                        .append(thresholdType.toString().toLowerCase()).append(" than ")
-                        .append(threshold).append(" messages. ")
-                        .append("(Current grace time: ").append(grace).append(" minutes)");
-
-                return new CheckResult(true, this, resultDescription.toString(), Tools.iso8601());
+                final String resultDescription = "Stream had " + count + " messages in the last " + time
+                        + " minutes with trigger condition " + thresholdType.toString().toLowerCase()
+                        + " than " + threshold + " messages. " + "(Current grace time: " + grace + " minutes)";
+                return new CheckResult(true, this, resultDescription, Tools.iso8601());
             } else {
                 return new CheckResult(false);
             }

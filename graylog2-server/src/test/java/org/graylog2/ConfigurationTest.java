@@ -186,7 +186,7 @@ public class ConfigurationTest {
 
     @Test
     public void testGetMongoDBReplicaSetServersMalformed() throws RepositoryException, ValidationException {
-        validProperties.put("mongodb_replica_set", "malformed");
+        validProperties.put("mongodb_replica_set", "malformed#!#");
         Configuration configuration = new Configuration();
         new JadConfig(new InMemoryRepository(validProperties), configuration).process();
 
@@ -212,6 +212,15 @@ public class ConfigurationTest {
     }
 
     @Test
+    public void testGetMongoDBReplicaSetServersDefaultPort() throws RepositoryException, ValidationException {
+        validProperties.put("mongodb_replica_set", "127.0.0.1");
+        Configuration configuration = new Configuration();
+        new JadConfig(new InMemoryRepository(validProperties), configuration).process();
+
+        Assert.assertEquals(configuration.getMongoReplicaSet().get(0).getPort(), 27017);
+    }
+
+    @Test
     public void testGetMongoDBReplicaSetServers() throws RepositoryException, ValidationException {
         validProperties.put("mongodb_replica_set", "127.0.0.1:27017,127.0.0.1:27018");
 
@@ -219,6 +228,16 @@ public class ConfigurationTest {
         new JadConfig(new InMemoryRepository(validProperties), configuration).process();
 
         Assert.assertEquals(2, configuration.getMongoReplicaSet().size());
+    }
+
+    @Test
+    public void testGetMongoDBReplicaSetServersIPv6() throws RepositoryException, ValidationException {
+        validProperties.put("mongodb_replica_set", "fe80::221:6aff:fe6f:6c88,[fe80::221:6aff:fe6f:6c89]:27018,127.0.0.1:27019");
+
+        Configuration configuration = new Configuration();
+        new JadConfig(new InMemoryRepository(validProperties), configuration).process();
+
+        Assert.assertEquals(3, configuration.getMongoReplicaSet().size());
     }
 
     @Test

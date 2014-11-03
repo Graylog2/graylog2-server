@@ -43,7 +43,6 @@
     </parent>
 
     <properties>
-        <metrics.version>3.0.0</metrics.version>
         <mainClass>org.graylog2.Main</mainClass>
     </properties>
 
