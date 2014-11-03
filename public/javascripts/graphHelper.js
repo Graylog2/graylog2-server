@@ -6,7 +6,8 @@
         { formatString: ":s",     condition: function(d) { return d.seconds() !== 0; }},
         { formatString: "HH:mm",  condition: function(d) { return d.minutes() !== 0; }},
         { formatString: "HH:mm",  condition: function(d) { return d.hours() !== 0; }},
-        { formatString: "ddd DD", condition: function(d) { return d.date() !== 1; }},
+        { formatString: "ddd DD", condition: function(d) { return d.isoWeekday() !== 1 && d.date() !== 1; }},
+        { formatString: "MMM DD", condition: function(d) { return d.date() !== 1; }},
         { formatString: "MMM",    condition: function(d) { return d.month() !== 0; }},
         { formatString: "YYYY",   condition: function() { return true; }}
     ];
@@ -15,6 +16,7 @@
         { interval: 'year',  unit: 'year',  step: 1,  condition: function(duration) { return duration.years() > 1 }},
         { interval: 'month', unit: 'month', step: 1,  condition: function(duration) { return duration.years() === 1 || duration.months() > 1 }},
         { interval: 'day',   unit: 'date',  step: 2,  condition: function(duration) { return duration.months() === 1 || duration.days() > 10 }},
+        { interval: 'day',   unit: 'date',  step: 1,  condition: function(duration) { return duration.days() > 3 }},
         { interval: 'hour',  unit: 'hour',  step: 12, condition: function(duration) { return duration.days() > 1 }},
         { interval: 'hour',  unit: 'hour',  step: 3,  condition: function(duration) { return duration.days() == 1 }},
         { interval: 'hour',  unit: 'hour',  step: 1,  condition: function() { return true }}

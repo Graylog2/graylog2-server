@@ -10,15 +10,15 @@ Rickshaw.Fixtures.Graylog2Time = function(tzOffset) {
 		{
 			name: 'decade',
 			seconds: 86400 * 365.25 * 10,
-			formatter: function(d) { return (parseInt(d.getFullYear() / 10, 10) * 10) }
+			formatter: function(d) { return self.formatDate(d) }
 		}, {
 			name: 'year',
 			seconds: 86400 * 365.25,
-			formatter: function(d) { return d.getFullYear() }
+			formatter: function(d) { return self.formatDate(d) }
 		}, {
 			name: 'month',
 			seconds: 86400 * 30.5,
-			formatter: function(d) { return self.months[d.getMonth()] }
+			formatter: function(d) { return self.formatDate(d) }
 		}, {
 			name: 'week',
 			seconds: 86400 * 7,
@@ -26,39 +26,39 @@ Rickshaw.Fixtures.Graylog2Time = function(tzOffset) {
 		}, {
 			name: 'day',
 			seconds: 86400,
-			formatter: function(d) { return d.getDate() }
+			formatter: function(d) { return self.formatDate(d) }
 		}, {
-			name: '6 hour',
-			seconds: 3600 * 6,
-			formatter: function(d) { return self.formatTime(d) }
+			name: '3 hours',
+			seconds: 3600 * 3,
+			formatter: function(d) { return self.formatDateTime(d) }
 		}, {
 			name: 'hour',
 			seconds: 3600,
-			formatter: function(d) { return self.formatTime(d) }
+			formatter: function(d) { return self.formatDateTime(d) }
 		}, {
-			name: '15 minute',
+			name: '15 minutes',
 			seconds: 60 * 15,
-			formatter: function(d) { return self.formatTime(d) }
+			formatter: function(d) { return self.formatDateTime(d) }
+		}, {
+			name: '5 minutes',
+			seconds: 60 * 5,
+			formatter: function(d) { return self.formatDateTime(d) }
 		}, {
 			name: 'minute',
 			seconds: 60,
-			formatter: function(d) { return d.getMinutes() }
+			formatter: function(d) { return self.formatDateTime(d) }
 		}, {
 			name: '15 second',
 			seconds: 15,
-			formatter: function(d) { return d.getSeconds() + 's' }
+			formatter: function(d) { return self.formatDateTime(d) }
 		}, {
 			name: 'second',
 			seconds: 1,
-			formatter: function(d) { return d.getSeconds() + 's' }
+			formatter: function(d) { return self.formatDateTime(d) }
 		}, {
-			name: 'decisecond',
-			seconds: 1/10,
-			formatter: function(d) { return d.getMilliseconds() + 'ms' }
-		}, {
-			name: 'centisecond',
-			seconds: 1/100,
-			formatter: function(d) { return d.getMilliseconds() + 'ms' }
+			name: 'millisecond',
+			seconds: 1/1000,
+			formatter: function(d) { return self.formatDateTime(d) }
 		}
 	];
 
@@ -66,29 +66,25 @@ Rickshaw.Fixtures.Graylog2Time = function(tzOffset) {
 		return this.units.filter( function(unit) { return unitName == unit.name } ).shift();
 	};
 
-	this.formatDate = function(d) {
-		var dateMoment = moment(d);
+	this.formatDateTime = graphHelper.customDateTimeFormat(tzOffset);
 
-		if (tzOffset != null) {
-			dateMoment = dateMoment.zone(tzOffset);
-		}
-
-		return dateMoment.format('MMM DD');
-	};
-
-	this.formatTime = function(d) {
-		var dateMoment = moment(d);
-
-		if (tzOffset != null) {
-			dateMoment = dateMoment.zone(tzOffset);
-		}
-
-		return dateMoment.format('HH:mm');
-	};
+	// Data in histograms is calculated using UTC. When the histogram resolution is day or lower,
+	// we can't extrapolate the data to the user's local time, so we use UTC instead.
+	this.formatDate = graphHelper.customDateTimeFormat(0);
 
 	this.ceil = function(time, unit) {
 
 		var date, floor, year;
+
+		if (unit.name == 'week') {
+			var momentDate = moment.utc(time * 1000);
+			momentDate.startOf('isoWeek');
+
+			if (momentDate.unix() == time) return time;
+
+			momentDate.add(1, 'week');
+			return momentDate.unix();
+		}
 
 		if (unit.name == 'month') {
 
