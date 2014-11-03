@@ -4,7 +4,7 @@ $(document).ready(function() {
     $(".analyze-field .line-chart").on("click", function(e) {
         e.preventDefault();
 
-        opts = {}
+        opts = {};
         opts.field = $(this).attr("data-field");
         var container = $(this).closest(".analyze-field");
         if (!!container.attr("data-stream-id")) {
@@ -65,7 +65,7 @@ $(document).ready(function() {
             "interval": opts.interval,
             "valueType": opts.valuetype,
             "streamId": opts.streamid
-        }
+        };
 
         switch(opts.rangetype) {
             case "relative":
@@ -140,13 +140,14 @@ $(document).ready(function() {
                 $("#field-graphs .spinner").before(template);
 
                 var graphContainer = $('.field-graph-container[data-chart-id="' + opts.chartid + '"]', $("#field-graphs"));
-                var graphElem = $('.field-graph', graphContainer);
+                var graphElement = $('.field-graph', graphContainer);
+                var graphYAxis = $('.field-graph-y-axis', graphContainer);
 
                 var resultGraphElement = $("#result-graph");
 
                 var graph = new Rickshaw.Graph( {
-                    element: graphElem.get()[0],
-                    width: $("#main-content").width()-12,
+                    element: graphElement[0],
+                    width: graphElement.width(),
                     height: 175,
                     interpolation: opts.interpolation,
                     renderer: rickshawHelper.getRenderer(opts.renderer),
@@ -164,6 +165,8 @@ $(document).ready(function() {
                 new Rickshaw.Graph.Axis.Y( {
                     graph: graph,
                     tickFormat: Rickshaw.Fixtures.Number.formatKMBT,
+                    orientation: 'left',
+                    element: graphYAxis[0],
                     pixelsPerTick: 30
                 });
 
