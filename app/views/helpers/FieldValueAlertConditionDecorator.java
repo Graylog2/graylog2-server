@@ -43,7 +43,7 @@ public class FieldValueAlertConditionDecorator extends AlertConditionDecorator {
     }
 
     public int getTime() {
-        return (int) ((Number) getParameter("time", 0.0)).longValue();
+        return (int) getParameter("time", 0);
     }
 
     public String getThreshold() {

@@ -16,11 +16,11 @@ public class MessageCountAlertConditionDecorator extends AlertConditionDecorator
     }
 
     public int getTime() {
-        return (int) ((Double) getParameter("time", 0.0)).longValue();
+        return (int) getParameter("time", 0);
     }
 
     public int getThreshold() {
-        return (int) ((Double) getParameter("threshold", 0.0)).longValue();
+        return (int) getParameter("threshold", 0);
     }
 
     public String getThresholdType() {
@@ -33,7 +33,7 @@ public class MessageCountAlertConditionDecorator extends AlertConditionDecorator
 
     @Override
     public Call getFormAction(String streamId) {
-        if(isEmptyCondition()) {
+        if (isEmptyCondition()) {
             return routes.AlertsController.addTypeMessageCount(streamId);
         } else {
             return routes.AlertsController.updateCondition(streamId, getId());
