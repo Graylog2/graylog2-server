@@ -18,27 +18,24 @@ package org.graylog2.bindings.providers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.google.inject.Inject;
 import org.graylog2.database.ObjectIdSerializer;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 
 import javax.inject.Provider;
 
-/**
- * @author Dennis Oelkers <dennis@torch.sh>
- */
 public class ServerObjectMapperProvider extends ObjectMapperProvider implements Provider<ObjectMapper> {
-    private final SimpleModule simpleModule;
+    private final ObjectMapper objectMapper;
 
-    public ServerObjectMapperProvider() {
-        this.simpleModule = new SimpleModule() {{
-            addSerializer(new ObjectIdSerializer());
-        }};
+    @Inject
+    public ServerObjectMapperProvider(final ObjectMapperProvider objectMapperProvider) {
+        this.objectMapper = objectMapperProvider.get()
+                .copy()
+                .registerModule(new SimpleModule().addSerializer(new ObjectIdSerializer()));
     }
 
     @Override
     public ObjectMapper get() {
-        final ObjectMapper objectMapper = super.get();
-        objectMapper.registerModule(simpleModule);
         return objectMapper;
     }
 }
