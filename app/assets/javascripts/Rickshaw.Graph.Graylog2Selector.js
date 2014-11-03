@@ -93,10 +93,8 @@ Rickshaw.Graph.Graylog2Selector = Rickshaw.Class.create({
                 return;
             }
 
-            var fromDate = moment.utc((position.xMin)*1000);
-            var toDate = moment.utc((position.xMax)*1000);
-            fromDate = momentHelper.toUserTimeZone(fromDate);
-            toDate = momentHelper.toUserTimeZone(toDate);
+            fromDate = momentHelper.toUserTimeZone((position.xMin)*1000);
+            toDate = momentHelper.toUserTimeZone((position.xMax)*1000);
 
             activateTimerangeChooser("absolute", $('.timerange-selector-container .dropdown-menu a[data-selector-name="absolute"]'));
             from.val(fromDate.format(momentHelper.DATE_FORMAT_TZ));

@@ -24,11 +24,17 @@
 
     var exports = {
         customDateTimeFormat: function(tzOffset) {
+            if (typeof tzOffset === 'undefined') {
+                tzOffset = null;
+            }
             return function(date) {
-                var momentDate = moment.utc(date);
+                var momentDate;
                 var formattedDate;
 
-                if (tzOffset !== null) {
+                if (tzOffset === null) {
+                    momentDate = momentHelper.toUserTimeZone(date);
+                } else {
+                    momentDate = moment(date);
                     momentDate.zone(tzOffset);
                 }
 
@@ -44,23 +50,31 @@
         },
 
         customTickInterval: function(tzOffset) {
+            if (typeof tzOffset === 'undefined') {
+                tzOffset = null;
+            }
             return function(initDateTime, endDateTime, step) {
                 var ticks = [];
-                var tempMoment = moment(initDateTime);
-                var endMoment = moment(endDateTime);
+                var runningMoment;
+                var endMoment;
 
-                if (!tempMoment.isValid() || !endMoment.isValid()) {
-                    return ticks;
+                if (tzOffset === null) {
+                    runningMoment = momentHelper.toUserTimeZone(initDateTime);
+                    endMoment = momentHelper.toUserTimeZone(endDateTime);
+                } else {
+                    runningMoment = moment(initDateTime);
+                    endMoment = moment(endDateTime);
+                    runningMoment.zone(tzOffset);
+                    endMoment.zone(tzOffset);
                 }
 
-                if (tzOffset !== null) {
-                    tempMoment.zone(tzOffset);
-                    endMoment.zone(tzOffset);
+                if (!runningMoment.isValid() || !endMoment.isValid()) {
+                    return ticks;
                 }
 
                 var interval;
                 var unit;
-                var duration = moment.duration(endMoment.valueOf() - tempMoment.valueOf());
+                var duration = moment.duration(endMoment.valueOf() - runningMoment.valueOf());
                 intervalResolutions.some(function(resolution) {
                     if (resolution.condition(duration)) {
                         interval = resolution.interval;
@@ -70,19 +84,19 @@
                     }
                 });
 
-                tempMoment.add(1, interval).startOf(interval);
+                runningMoment.add(1, interval).startOf(interval);
 
                 if (step > 1) {
-                    while (tempMoment.isBefore(endMoment)) {
-                        if ((tempMoment.get(unit) % step) === 0) {
-                            ticks.push(new Date(tempMoment.valueOf()));
+                    while (runningMoment.isBefore(endMoment)) {
+                        if ((runningMoment.get(unit) % step) === 0) {
+                            ticks.push(new Date(runningMoment.valueOf()));
                         }
-                        tempMoment.add(1, interval);
+                        runningMoment.add(1, interval);
                     }
                 } else {
-                    while (tempMoment.isBefore(endMoment)) {
-                        ticks.push(new Date(tempMoment.valueOf()));
-                        tempMoment.add(1, interval);
+                    while (runningMoment.isBefore(endMoment)) {
+                        ticks.push(new Date(runningMoment.valueOf()));
+                        runningMoment.add(1, interval);
                     }
                 }
 

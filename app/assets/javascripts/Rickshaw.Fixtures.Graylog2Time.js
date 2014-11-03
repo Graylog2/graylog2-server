@@ -66,7 +66,7 @@ Rickshaw.Fixtures.Graylog2Time = function(tzOffset) {
 		return this.units.filter( function(unit) { return unitName == unit.name } ).shift();
 	};
 
-	this.formatDateTime = graphHelper.customDateTimeFormat(tzOffset);
+	this.formatDateTime = graphHelper.customDateTimeFormat();
 
 	// Data in histograms is calculated using UTC. When the histogram resolution is day or lower,
 	// we can't extrapolate the data to the user's local time, so we use UTC instead.

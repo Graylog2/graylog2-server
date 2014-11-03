@@ -67,7 +67,7 @@ resultHistogram = {
         new Rickshaw.Graph.HoverDetail({
             graph: resultGraph,
             formatter: function(series, x, y) {
-                var dateMoment = moment(new Date(x * 1000 )).zone(gl2UserTimeZoneOffset);
+                var dateMoment = momentHelper.toUserTimeZone(new Date(x * 1000 ));
                 var date = '<span class="date">' + dateMoment.format('ddd MMM DD YYYY HH:mm:ss ZZ') + '</span>';
                 var swatch = '<span class="detail_swatch"></span>';
                 var content = parseInt(y) + ' messages<br>' + date;

@@ -1,6 +1,6 @@
 /** @jsx React.DOM */
 
-/* global activateTimerangeChooser, momentHelper, graphHelper, gl2UserTimeZoneOffset */
+/* global activateTimerangeChooser, momentHelper, graphHelper */
 /* jshint -W107 */
 
 'use strict';
@@ -157,13 +157,8 @@ var SourceOverview = React.createClass({
                 dc.events.trigger(() => {
                     var filter = chart.filter();
                     if (filter) {
-                        var fromDateTime = moment.utc(filter[0]);
-                        var toDateTime = moment.utc(filter[1]);
-
-                        if (gl2UserTimeZoneOffset !== null) {
-                            fromDateTime.zone(gl2UserTimeZoneOffset);
-                            toDateTime.zone(gl2UserTimeZoneOffset);
-                        }
+                        var fromDateTime = momentHelper.toUserTimeZone(filter[0]);
+                        var toDateTime = momentHelper.toUserTimeZone(filter[1]);
 
                         activateTimerangeChooser("absolute", $('.timerange-selector-container .dropdown-menu a[data-selector-name="absolute"]'));
                         var fromInput = $('#universalsearch .absolute .absolute-from-human');
@@ -178,8 +173,8 @@ var SourceOverview = React.createClass({
             });
         this.configureLineChartWidth(width);
         this.lineChart.xAxis()
-            .ticks(graphHelper.customTickInterval(gl2UserTimeZoneOffset))
-            .tickFormat(graphHelper.customDateTimeFormat(gl2UserTimeZoneOffset));
+            .ticks(graphHelper.customTickInterval())
+            .tickFormat(graphHelper.customDateTimeFormat());
         this.lineChart.yAxis()
             .ticks(6)
             .tickFormat(d3.format("s"));
