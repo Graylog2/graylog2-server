@@ -1,4 +1,4 @@
-package org.graylog2.benchmarks.pipeline;
+package org.graylog2.benchmarks.pipeline.classicpooled;
 
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
@@ -7,11 +7,11 @@ import com.google.inject.assistedinject.AssistedInject;
 
 public class MessageProducer {
 
-    private final InputBuffer inputBuffer;
+    private final WorkerPoolInputBuffer inputBuffer;
     private final Meter produced;
 
     @AssistedInject
-    public MessageProducer(MetricRegistry metricRegistry, @Assisted InputBuffer inputBuffer) {
+    public MessageProducer(MetricRegistry metricRegistry, @Assisted WorkerPoolInputBuffer inputBuffer) {
         this.inputBuffer = inputBuffer;
         produced = metricRegistry.meter("message-producer.produced");
 
@@ -25,6 +25,6 @@ public class MessageProducer {
     }
 
     public interface Factory {
-        MessageProducer create(InputBuffer inputBuffer);
+        MessageProducer create(WorkerPoolInputBuffer inputBuffer);
     }
 }

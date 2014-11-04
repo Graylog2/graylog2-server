@@ -1,4 +1,4 @@
-package org.graylog2.benchmarks.pipeline;
+package org.graylog2.benchmarks.pipeline.classicpooled;
 
 import com.codahale.metrics.Gauge;
 import com.codahale.metrics.MetricRegistry;
@@ -8,6 +8,7 @@ import com.google.inject.assistedinject.AssistedInject;
 import com.lmax.disruptor.BlockingWaitStrategy;
 import com.lmax.disruptor.EventTranslator;
 import com.lmax.disruptor.RingBuffer;
+import com.lmax.disruptor.WorkHandler;
 import com.lmax.disruptor.dsl.Disruptor;
 import com.lmax.disruptor.dsl.ProducerType;
 import org.graylog2.benchmarks.utils.TimeCalculator;
@@ -15,19 +16,19 @@ import org.graylog2.benchmarks.utils.TimeCalculator;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class InputBuffer {
+public class WorkerPoolInputBuffer {
 
-    private final RingBuffer<Event> ringBuffer;
-    private final ExecutorService executor;
-    private final Disruptor<Event> disruptor;
+    protected final RingBuffer<Event> ringBuffer;
+    protected final ExecutorService executor;
+    protected final Disruptor disruptor;
 
     @AssistedInject
-    public InputBuffer(MetricRegistry metricRegistry,
-                       FilterHandler.Factory handlerFactory,
-                       @Assisted TimeCalculator filterTime,
-                       @Assisted OutputBuffer outputBuffer,
-                       @Assisted("bufferSize") int bufferSize,
-                       @Assisted("numFilterHander") int numFilterHandler) {
+    public WorkerPoolInputBuffer(MetricRegistry metricRegistry,
+                                 FilterWorker.Factory handlerFactory,
+                                 @Assisted TimeCalculator filterTime,
+                                 @Assisted OutputBuffer outputBuffer,
+                                 @Assisted("bufferSize") int bufferSize,
+                                 @Assisted("numFilterHander") int numFilterHandler) {
         executor = Executors.newCachedThreadPool(
                 new ThreadFactoryBuilder()
                         .setNameFormat("inputbuffer-%d")
@@ -42,12 +43,7 @@ public class InputBuffer {
                 new BlockingWaitStrategy()
         );
 
-        final FilterHandler[] handlers = new FilterHandler[numFilterHandler];
-        for (int i = 0; i < numFilterHandler; i++) {
-            handlers[i] = handlerFactory.create(outputBuffer, filterTime, i, numFilterHandler);
-        }
-
-        disruptor.handleEventsWith(handlers);
+        setupHandlers(handlerFactory, filterTime, outputBuffer, numFilterHandler);
 
         ringBuffer = disruptor.start();
 
@@ -57,6 +53,15 @@ public class InputBuffer {
                 return ringBuffer.remainingCapacity();
             }
         });
+    }
+
+    protected void setupHandlers(FilterWorker.Factory handlerFactory, TimeCalculator filterTime, OutputBuffer outputBuffer, int numFilterHandler) {
+        final WorkHandler[] handlers = new WorkHandler[numFilterHandler];
+        for (int i = 0; i < numFilterHandler; i++) {
+            handlers[i] = handlerFactory.create(outputBuffer, filterTime, i, numFilterHandler);
+        }
+
+        disruptor.handleEventsWithWorkerPool(handlers);
     }
 
     public void publish(final ProcessedMessage processedMessage) {
@@ -74,6 +79,9 @@ public class InputBuffer {
     }
 
     public interface Factory {
-        InputBuffer create(TimeCalculator filterTime, @Assisted OutputBuffer outputBuffer, @Assisted("bufferSize") int bufferSize, @Assisted("numFilterHander") int numFilterHandler);
+        WorkerPoolInputBuffer create(TimeCalculator filterTime,
+                                     @Assisted OutputBuffer outputBuffer,
+                                     @Assisted("bufferSize") int bufferSize,
+                                     @Assisted("numFilterHander") int numFilterHandler);
     }
 }

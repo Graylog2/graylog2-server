@@ -1,4 +1,4 @@
-package org.graylog2.benchmarks.pipeline;
+package org.graylog2.benchmarks.pipeline.classicpooled;
 
 import com.codahale.metrics.Gauge;
 import com.codahale.metrics.MetricRegistry;

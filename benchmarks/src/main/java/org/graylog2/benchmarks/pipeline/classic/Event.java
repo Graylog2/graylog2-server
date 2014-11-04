@@ -1,4 +1,4 @@
-package org.graylog2.benchmarks.pipeline;
+package org.graylog2.benchmarks.pipeline.classic;
 
 import com.lmax.disruptor.EventFactory;
 

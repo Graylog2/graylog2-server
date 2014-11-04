@@ -9,9 +9,9 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import metrics_influxdb.Influxdb;
 import metrics_influxdb.InfluxdbReporter;
-import org.graylog2.benchmarks.pipeline.ClassicModule;
-import org.graylog2.benchmarks.pipeline.ClassicPipeline;
-import org.graylog2.benchmarks.pipeline.ProcessedMessage;
+import org.graylog2.benchmarks.pipeline.classicpooled.ProcessedMessage;
+import org.graylog2.benchmarks.pipeline.classicpooled.ClassicPooledModule;
+import org.graylog2.benchmarks.pipeline.classicpooled.ClassicPooledPipeline;
 import org.graylog2.benchmarks.utils.FixedTimeCalculator;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.runner.Runner;
@@ -28,14 +28,14 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 /*
-    run with  java -DbatchSize=32 -DinputBufferSize=8192 -DoutputBufferSize=8192 -Xmx512m -jar target/benchmarks.jar PipelineBenchmark -wf 0 -wi 0 -t 16 -f 1 -r 60s -si false
+    run with  java -DbatchSize=32 -DinputBufferSize=8192 -DoutputBufferSize=8192 -Xmx512m -jar target/benchmarks.jar PooledPipelineBenchmark -wf 0 -wi 0 -t 16 -f 1 -r 60s -si false
  */
 
 @State(Scope.Benchmark)
-public class PipelineBenchmark {
-    private static final Logger log = LoggerFactory.getLogger(PipelineBenchmark.class);
+public class PooledPipelineBenchmark {
+    private static final Logger log = LoggerFactory.getLogger(PooledPipelineBenchmark.class);
 
-    ClassicPipeline classicPipeline;
+    ClassicPooledPipeline pooledPipeline;
     Counter counter;
     Meter meter;
     private final int batchSize = Integer.valueOf(System.getProperty("batchSize", "10"));
@@ -50,9 +50,9 @@ public class PipelineBenchmark {
 
     @Setup
     public void setup() {
-        final Injector injector = Guice.createInjector(new ClassicModule());
-        final ClassicPipeline.Factory factory = injector.getInstance(ClassicPipeline.Factory.class);
-        classicPipeline = factory.create(
+        final Injector injector = Guice.createInjector(new ClassicPooledModule());
+        final ClassicPooledPipeline.Factory factory = injector.getInstance(ClassicPooledPipeline.Factory.class);
+        pooledPipeline = factory.create(
                 inputBufferHandler,
                 new FixedTimeCalculator(filterProcessTime, TimeUnit.MICROSECONDS),
                 outputBufferHandler,
@@ -61,14 +61,14 @@ public class PipelineBenchmark {
                 outputBufferSize);
         final MetricRegistry metricRegistry = injector.getInstance(MetricRegistry.class);
         counter = metricRegistry.counter("benchmark-iterations");
-        meter = metricRegistry.meter("benchmark-ops");
+        meter = metricRegistry.meter("benchmark-messages-inserted");
         metricRegistry.registerAll(new GarbageCollectorMetricSet());
         metricRegistry.registerAll(new MemoryUsageGaugeSet());
 
         if (System.getProperty("useInfluxdb") != null) {
-            final String host = System.getProperty("influxdbHost", "127.0.0.1");
+            final String host = System.getProperty("influxdbHost", "172.16.20.14");
             final String port = System.getProperty("influxdbPort", "8086");
-            final String db = System.getProperty("influxdbDb", "metrics");
+            final String db = System.getProperty("influxdbDb", "benchmarks");
             final String user = System.getProperty("influxdbUser", "root");
             final String pass = System.getProperty("influxdbPassword", "root");
             Influxdb influxdb = null;
@@ -79,7 +79,7 @@ public class PipelineBenchmark {
             }
             final InfluxdbReporter reporter = InfluxdbReporter
                     .forRegistry(metricRegistry)
-                    .prefixedWith("benchmark")
+                    .prefixedWith(PooledPipelineBenchmark.class.getSimpleName())
                     .convertRatesTo(TimeUnit.SECONDS)
                     .convertDurationsTo(TimeUnit.MILLISECONDS)
                     .filter(MetricFilter.ALL)
@@ -100,7 +100,7 @@ public class PipelineBenchmark {
             log.info("Stopping reporter");
             reporter.stop();
         }
-        classicPipeline.stop();
+        pooledPipeline.stop();
     }
 
 
@@ -108,7 +108,7 @@ public class PipelineBenchmark {
     public void classic() throws ExecutionException {
         ProcessedMessage processedMessage = null;
         for (int i = 0; i < batchSize; i++) {
-            processedMessage = classicPipeline.produce();
+            processedMessage = pooledPipeline.produce();
         }
         assert processedMessage != null;
         if (waitForProcessedBatch)
@@ -119,7 +119,7 @@ public class PipelineBenchmark {
 
     public static void main(String[] args) throws RunnerException {
         Options opt = new OptionsBuilder()
-                .include(PipelineBenchmark.class.getSimpleName())
+                .include(PooledPipelineBenchmark.class.getSimpleName())
                 .warmupIterations(0)
                 .measurementIterations(5)
                 .measurementTime(TimeValue.minutes(1))
@@ -130,7 +130,7 @@ public class PipelineBenchmark {
 
     public static class SimpleRun {
         public static void main(String[] args) {
-            final PipelineBenchmark p = new PipelineBenchmark();
+            final PooledPipelineBenchmark p = new PooledPipelineBenchmark();
             p.setup();
 
             final int nThreads = 32;

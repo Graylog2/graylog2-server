@@ -1,4 +1,4 @@
-package org.graylog2.benchmarks.pipeline;
+package org.graylog2.benchmarks.pipeline.classic;
 
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
@@ -11,10 +11,10 @@ import org.graylog2.benchmarks.utils.TimeCalculator;
 import static java.util.concurrent.TimeUnit.NANOSECONDS;
 import static org.graylog2.benchmarks.utils.BusySleeper.consumeCpuFor;
 
-public class FilterHandler implements EventHandler<Event> {
+public class OutputHandler implements EventHandler<Event> {
 
     private final MetricRegistry metricRegistry;
-    private final OutputBuffer outputBuffer;
+    private final MessageOutput messageOutput;
     private final TimeCalculator timeCalculator;
     private final int ordinal;
     private final int numHandler;
@@ -22,22 +22,22 @@ public class FilterHandler implements EventHandler<Event> {
     private final Timer filterTime;
 
     @AssistedInject
-    public FilterHandler(MetricRegistry metricRegistry,
-                         @Assisted OutputBuffer outputBuffer,
+    public OutputHandler(MetricRegistry metricRegistry,
+                         MessageOutput messageOutput,
                          @Assisted TimeCalculator timeCalculator,
                          @Assisted("ordinal") int ordinal,
                          @Assisted("numHandler") int numHandler) {
         this.metricRegistry = metricRegistry;
-        this.outputBuffer = outputBuffer;
+        this.messageOutput = messageOutput;
         this.timeCalculator = timeCalculator;
         this.ordinal = ordinal;
         this.numHandler = numHandler;
-        processed = metricRegistry.meter(metricName("processed"));
+        processed = metricRegistry.meter("output-handler" + ordinal + ".processed");
         filterTime = metricRegistry.timer(metricName("timer"));
     }
 
     private String metricName(String suffix) {
-        return "filter-handler" + ordinal + "." + suffix;
+        return "output-handler" + ordinal + "." + suffix;
     }
 
     @Override
@@ -49,13 +49,13 @@ public class FilterHandler implements EventHandler<Event> {
 
         consumeCpuFor(timeCalculator.sleepTimeNsForThread(ordinal), NANOSECONDS);
 
-        outputBuffer.publish(event.message);
+        messageOutput.write(event.message);
         processed.mark();
 
         context.stop();
     }
 
     public interface Factory {
-        FilterHandler create(OutputBuffer outputBuffer, TimeCalculator timeCalculator, @Assisted("ordinal") int ordinal, @Assisted("numHandler") int numHandler);
+        OutputHandler create(TimeCalculator timeCalculator, @Assisted("ordinal") int ordinal, @Assisted("numHandler") int numHandler);
     }
 }
