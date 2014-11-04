@@ -1,6 +1,4 @@
 /**
- * Copyright 2013 Lennart Koopmann <lennart@torch.sh>
- *
  * This file is part of Graylog2.
  *
  * Graylog2 is free software: you can redistribute it and/or modify
@@ -15,7 +13,6 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 package org.graylog2.restclient.lib;
 
@@ -73,8 +70,9 @@ public class Version {
     public static final Version v0_91_1 = new Version(0, 91, 1);
     public static final Version v0_91_2 = new Version(0, 91, 2);
     public static final Version v0_91_3 = new Version(0, 91, 3);
+    public static final Version v0_91_4 = new Version(0, 91, 4);
 
-    public static final Version VERSION = v0_91_3;
+    public static final Version VERSION = v0_91_4;
 
     public final int major;
     public final int minor;
