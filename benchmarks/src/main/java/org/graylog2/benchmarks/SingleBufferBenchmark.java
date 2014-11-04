@@ -9,9 +9,9 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import metrics_influxdb.Influxdb;
 import metrics_influxdb.InfluxdbReporter;
-import org.graylog2.benchmarks.pipeline.classicpooled.ProcessedMessage;
-import org.graylog2.benchmarks.pipeline.classicpooled.ClassicPooledModule;
-import org.graylog2.benchmarks.pipeline.classicpooled.ClassicPooledPipeline;
+import org.graylog2.benchmarks.pipeline.singlebuffer.ProcessedMessage;
+import org.graylog2.benchmarks.pipeline.singlebuffer.SingleBufferModule;
+import org.graylog2.benchmarks.pipeline.singlebuffer.SingleBufferPipeline;
 import org.graylog2.benchmarks.utils.FixedTimeCalculator;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.runner.Runner;
@@ -32,16 +32,15 @@ import java.util.concurrent.TimeUnit;
  */
 
 @State(Scope.Benchmark)
-public class PooledPipelineBenchmark {
-    private static final Logger log = LoggerFactory.getLogger(PooledPipelineBenchmark.class);
+public class SingleBufferBenchmark {
+    private static final Logger log = LoggerFactory.getLogger(SingleBufferBenchmark.class);
 
-    ClassicPooledPipeline pooledPipeline;
+    SingleBufferPipeline pooledPipeline;
     Counter counter;
     Meter meter;
     private final int batchSize = Integer.valueOf(System.getProperty("batchSize", "10"));
     private final int inputBufferSize = Integer.valueOf(System.getProperty("inputBufferSize", "2048"));
     private final int inputBufferHandler = Integer.valueOf(System.getProperty("inputBufferHandler", "4"));
-    private final int outputBufferSize = Integer.valueOf(System.getProperty("outputBufferSize", "2048"));
     private final int outputBufferHandler = Integer.valueOf(System.getProperty("outputBufferHandler", "2"));
     private final int filterProcessTime = Integer.valueOf(System.getProperty("inputProcessTimeMicros", "250"));
     private final int outputProcessTime = Integer.valueOf(System.getProperty("outputProcessTimeMicros", "250"));
@@ -50,15 +49,12 @@ public class PooledPipelineBenchmark {
 
     @Setup
     public void setup() {
-        final Injector injector = Guice.createInjector(new ClassicPooledModule());
-        final ClassicPooledPipeline.Factory factory = injector.getInstance(ClassicPooledPipeline.Factory.class);
+        final Injector injector = Guice.createInjector(new SingleBufferModule());
+        final SingleBufferPipeline.Factory factory = injector.getInstance(SingleBufferPipeline.Factory.class);
         pooledPipeline = factory.create(
-                inputBufferHandler,
-                new FixedTimeCalculator(filterProcessTime, TimeUnit.MICROSECONDS),
-                outputBufferHandler,
-                new FixedTimeCalculator(outputProcessTime, TimeUnit.MICROSECONDS),
-                inputBufferSize,
-                outputBufferSize);
+                new FixedTimeCalculator(filterProcessTime, TimeUnit.MICROSECONDS), inputBufferHandler,
+                new FixedTimeCalculator(outputProcessTime, TimeUnit.MICROSECONDS), outputBufferHandler,
+                inputBufferSize);
         final MetricRegistry metricRegistry = injector.getInstance(MetricRegistry.class);
         counter = metricRegistry.counter("benchmark-iterations");
         meter = metricRegistry.meter("benchmark-messages-inserted");
@@ -119,7 +115,7 @@ public class PooledPipelineBenchmark {
 
     public static void main(String[] args) throws RunnerException {
         Options opt = new OptionsBuilder()
-                .include(PooledPipelineBenchmark.class.getSimpleName())
+                .include(SingleBufferBenchmark.class.getSimpleName())
                 .warmupIterations(0)
                 .measurementIterations(5)
                 .measurementTime(TimeValue.minutes(1))
@@ -130,7 +126,7 @@ public class PooledPipelineBenchmark {
 
     public static class SimpleRun {
         public static void main(String[] args) {
-            final PooledPipelineBenchmark p = new PooledPipelineBenchmark();
+            final SingleBufferBenchmark p = new SingleBufferBenchmark();
             p.setup();
 
             final int nThreads = 32;

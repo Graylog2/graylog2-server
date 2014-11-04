@@ -79,7 +79,7 @@ public class ClassicPipelineBenchmark {
             }
             final InfluxdbReporter reporter = InfluxdbReporter
                     .forRegistry(metricRegistry)
-                    .prefixedWith(ClassicPipelineBenchmark.class.getSimpleName())
+                    .prefixedWith(this.getClass().getSimpleName())
                     .convertRatesTo(TimeUnit.SECONDS)
                     .convertDurationsTo(TimeUnit.MILLISECONDS)
                     .filter(MetricFilter.ALL)
