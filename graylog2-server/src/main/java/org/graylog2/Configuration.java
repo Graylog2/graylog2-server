@@ -20,6 +20,7 @@ import com.github.joschi.jadconfig.Parameter;
 import com.github.joschi.jadconfig.ValidationException;
 import com.github.joschi.jadconfig.ValidatorMethod;
 import com.github.joschi.jadconfig.converters.StringListConverter;
+import com.github.joschi.jadconfig.util.Duration;
 import com.github.joschi.jadconfig.validators.FileReadableValidator;
 import com.github.joschi.jadconfig.validators.InetPortValidator;
 import com.github.joschi.jadconfig.validators.PositiveIntegerValidator;
@@ -308,6 +309,12 @@ public class Configuration extends BaseConfiguration {
 
     @Parameter(value = "alert_check_interval", validator = PositiveIntegerValidator.class)
     private int alertCheckInterval = 60;
+
+    @Parameter(value = "gc_check_interval")
+    private Duration gcCheckInterval = Duration.minutes(1l);
+
+    @Parameter(value = "gc_warning_threshold")
+    private Duration gcWarningThreshold = Duration.seconds(1l);
 
     public boolean isMaster() {
         return isMaster;
@@ -684,6 +691,14 @@ public class Configuration extends BaseConfiguration {
 
     public int getAlertCheckInterval() {
         return alertCheckInterval;
+    }
+
+    public Duration getGcCheckInterval() {
+        return gcCheckInterval;
+    }
+
+    public Duration getGcWarningThreshold() {
+        return gcWarningThreshold;
     }
 
     @ValidatorMethod
