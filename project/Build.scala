@@ -57,6 +57,7 @@ object ApplicationBuild extends Build {
     version := appVersion,
     libraryDependencies ++= appDependencies,
     resolvers ++= repositories,
+    javacOptions ++= Seq("-source", "1.7", "-target", "1.7"),
     resourceGenerators in Compile <+= resourceManaged in Compile map { dir =>
       val propsFile = new File(dir, "git.properties")
       val currentGitSha = "git.sha1=%s\n".format("git rev-parse HEAD" !!)
