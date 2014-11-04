@@ -1,6 +1,6 @@
 Rickshaw.namespace('Rickshaw.Fixtures.Graylog2Time');
 
-Rickshaw.Fixtures.Graylog2Time = function(tzOffset) {
+Rickshaw.Fixtures.Graylog2Time = function() {
 
 	var self = this;
 
