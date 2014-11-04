@@ -33,7 +33,7 @@
             <outputDirectory>/</outputDirectory>
         </file>
         <file>
-            <source>${project.basedir}/../build_script/copy/bin/radioctl</source>
+            <source>${project.basedir}/../bin/radioctl</source>
             <outputDirectory>bin/</outputDirectory>
             <fileMode>0755</fileMode>
         </file>

@@ -28,9 +28,6 @@ dependency-reduced-pom.xml
 /plugin/
 *_gl2plugin.jar
 
-/build_script/builds/*
-/build_script/logs/*
-
 *.iml
 *.ipr
 *.iws
