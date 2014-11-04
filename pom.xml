@@ -922,7 +922,7 @@
                         <configuration>
                             <consoleOutput>true</consoleOutput>
                             <failOnViolation>false</failOnViolation>
-                            <configLocation>checkstyle.xml</configLocation>
+                            <configLocation>config/checkstyle.xml</configLocation>
                         </configuration>
                         <executions>
                             <execution>
@@ -983,7 +983,7 @@
                         <configuration>
                             <consoleOutput>true</consoleOutput>
                             <failOnViolation>false</failOnViolation>
-                            <configLocation>checkstyle.xml</configLocation>
+                            <configLocation>config/checkstyle.xml</configLocation>
                         </configuration>
                     </plugin>
                     <plugin>
