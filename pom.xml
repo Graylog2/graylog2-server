@@ -27,7 +27,7 @@
 
     <groupId>org.graylog2</groupId>
     <artifactId>graylog2-parent</artifactId>
-    <version>0.91.3-SNAPSHOT</version>
+    <version>0.91.3</version>
     <packaging>pom</packaging>
     <name>Graylog2</name>
     <url>http://graylog2.org/</url>
