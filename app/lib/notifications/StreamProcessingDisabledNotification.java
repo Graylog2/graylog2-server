@@ -37,7 +37,7 @@ public class StreamProcessingDisabledNotification implements NotificationType {
                 + "</em> has taken too long for " + faultCount + " times. "
                 + "To protect the stability of message processing, this stream has been disabled. "
                 + "Please correct the stream rules and reenable the stream."
-                + " Check " + NotificationHelper.linkToKnowledgeBase("stream-processing-runtime-limits", "this article")
+                + " Check " + NotificationHelper.linkToKnowledgeBase("general/streams", "this article")
                 + " for more details.";
 
     }
