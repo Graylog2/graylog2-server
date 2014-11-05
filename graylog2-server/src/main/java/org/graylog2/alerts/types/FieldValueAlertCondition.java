@@ -33,6 +33,7 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import java.text.DecimalFormat;
 import java.util.Collections;
 import java.util.List;
@@ -63,7 +64,7 @@ public class FieldValueAlertCondition extends AbstractAlertCondition {
     private List<Message> searchHits = Collections.emptyList();
 
     @AssistedInject
-    public FieldValueAlertCondition(Searches searches, @Assisted Stream stream, @Assisted String id, @Assisted DateTime createdAt, @Assisted("userid") String creatorUserId, @Assisted Map<String, Object> parameters) {
+    public FieldValueAlertCondition(Searches searches, @Assisted Stream stream, @Nullable @Assisted String id, @Assisted DateTime createdAt, @Assisted("userid") String creatorUserId, @Assisted Map<String, Object> parameters) {
         super(stream, id, Type.FIELD_VALUE, createdAt, creatorUserId, parameters);
         this.searches = searches;
 

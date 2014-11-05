@@ -35,6 +35,7 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -57,7 +58,7 @@ public class MessageCountAlertCondition extends AbstractAlertCondition {
     private final Searches searches;
 
     @AssistedInject
-    public MessageCountAlertCondition(Searches searches, @Assisted Stream stream, @Assisted String id, @Assisted DateTime createdAt, @Assisted("userid") String creatorUserId, @Assisted Map<String, Object> parameters) {
+    public MessageCountAlertCondition(Searches searches, @Assisted Stream stream, @Nullable @Assisted String id, @Assisted DateTime createdAt, @Assisted("userid") String creatorUserId, @Assisted Map<String, Object> parameters) {
         super(stream, id, Type.MESSAGE_COUNT, createdAt, creatorUserId, parameters);
 
         this.searches = searches;
