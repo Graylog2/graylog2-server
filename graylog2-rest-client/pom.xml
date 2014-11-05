@@ -10,7 +10,7 @@
     <parent>
         <groupId>org.graylog2</groupId>
         <artifactId>graylog2-parent</artifactId>
-        <version>0.91.1</version>
+        <version>0.91.3+perfFixes</version>
     </parent>
 
     <artifactId>graylog2-rest-client</artifactId>
