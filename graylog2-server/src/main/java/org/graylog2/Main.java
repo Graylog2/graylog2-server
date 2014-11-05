@@ -152,20 +152,12 @@ public final class Main extends NodeRunner {
 
         LOG.debug("Loaded modules: " + pluginModules);
 
-        GuiceInstantiationService instantiationService = new GuiceInstantiationService();
-        List<Module> bindingsModules = getBindingsModules(instantiationService,
-                new ServerBindings(configuration),
-                new PersistenceServicesBindings(),
-                new ServerMessageInputBindings(),
-                new MessageFilterBindings(),
-                new AlarmCallbackBindings(),
-                new InitializerBindings(),
-                new MessageOutputBindings(),
-                new RotationStrategyBindings());
-        LOG.debug("Adding plugin modules: " + pluginModules);
-        bindingsModules.addAll(pluginModules);
-        final Injector injector = GuiceInjectorHolder.createInjector(bindingsModules);
-        instantiationService.setInjector(injector);
+        final Injector injector = setupInjector(configuration, pluginModules);
+
+        if (injector == null) {
+            LOG.error("Injector could not be created, exiting! (Please include the previous stacktraces in bug reports.)");
+            System.exit(1);
+        }
 
         // This is holding all our metrics.
         final MetricRegistry metrics = injector.getInstance(MetricRegistry.class);
@@ -305,6 +297,30 @@ public final class Main extends NodeRunner {
             }
         } catch (InterruptedException e) {
             return;
+        }
+    }
+
+    private static Injector setupInjector(Configuration configuration, List<PluginModule> pluginModules) {
+        try {
+            GuiceInstantiationService instantiationService = new GuiceInstantiationService();
+            List<Module> bindingsModules = getBindingsModules(instantiationService,
+                    new ServerBindings(configuration),
+                    new PersistenceServicesBindings(),
+                    new ServerMessageInputBindings(),
+                    new MessageFilterBindings(),
+                    new AlarmCallbackBindings(),
+                    new InitializerBindings(),
+                    new MessageOutputBindings(),
+                    new RotationStrategyBindings());
+            LOG.debug("Adding plugin modules: " + pluginModules);
+            bindingsModules.addAll(pluginModules);
+            final Injector injector = GuiceInjectorHolder.createInjector(bindingsModules);
+            instantiationService.setInjector(injector);
+
+            return injector;
+        } catch (Exception e) {
+            LOG.error("Injector creation failed!", e);
+            return null;
         }
     }
 
