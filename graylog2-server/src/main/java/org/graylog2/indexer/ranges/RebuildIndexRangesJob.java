@@ -37,9 +37,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public class RebuildIndexRangesJob extends SystemJob {
     public interface Factory {
         public RebuildIndexRangesJob create(Deflector deflector);

@@ -131,7 +131,6 @@ public class Deflector { // extends Ablenkblech
         if (!indices.create(newTarget)) {
             LOG.error("Could not properly create new target <{}>", newTarget);
         }
-        updateIndexRanges();
 
         LOG.info("Done!");
 
@@ -160,6 +159,8 @@ public class Deflector { // extends Ablenkblech
                 LOG.error("Cannot optimize index <" + oldTarget + ">.", e);
             }
         }
+
+        updateIndexRanges();
 
         LOG.info("Done!");
 
