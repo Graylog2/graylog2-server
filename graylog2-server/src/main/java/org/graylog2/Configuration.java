@@ -210,6 +210,9 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "elasticsearch_cluster_discovery_timeout", validator = PositiveIntegerValidator.class)
     private long esClusterDiscoveryTimeout = 5000;
 
+    @Parameter(value = "elasticsearch_disable_version_check")
+    private boolean esDisableVersionCheck = false;
+
     @Parameter(value = "versionchecks")
     private boolean versionchecks = true;
 
@@ -519,6 +522,10 @@ public class Configuration extends BaseConfiguration {
 
     public String getEsNetworkPublishHost() {
         return esNetworkPublishHost;
+    }
+
+    public boolean isEsDisableVersionCheck() {
+        return esDisableVersionCheck;
     }
 
     public String getRetentionStrategy() {
