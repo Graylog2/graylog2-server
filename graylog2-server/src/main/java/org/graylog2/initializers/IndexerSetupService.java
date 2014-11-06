@@ -114,21 +114,12 @@ public class IndexerSetupService extends AbstractIdleService {
                                 final String id = nodes.next();
                                 final Version clusterVersion = Version.fromString(nodesList.get(id).get("version").textValue());
 
-                                if (!clusterVersion.onOrAfter(MINIMUM_ES_VERSION) && !clusterVersion.onOrBefore(MAXIMUM_ES_VERSION)) {
-                                    LOG.error("Elasticsearch node is of the wrong version {}, it must be at least {}! " +
-                                                    "Please make sure you are running the correct version of Elasticsearch.",
-                                            clusterVersion,
-                                            MINIMUM_ES_VERSION);
+                                if (!configuration.isEsDisableVersionCheck()) {
+                                    checkClusterVersion(clusterVersion);
                                 }
-                                if (!node.settings().get("cluster.name").equals(clusterName)) {
-                                    LOG.error(
-                                            "Elasticsearch cluster name is different, Graylog2 uses `{}`, Elasticsearch cluster uses `{}`. " +
-                                                    "Please check the `cluster.name` setting of both Graylog2 and Elasticsearch.",
-                                            node.settings().get("cluster.name"),
-                                            clusterName);
-                                }
-
                             }
+
+                            checkClusterName(clusterName);
                         } catch (IOException ioException) {
                             LOG.error("Could not connect to Elasticsearch.", ioException);
                         } catch (InterruptedException ignore) {
@@ -147,6 +138,23 @@ public class IndexerSetupService extends AbstractIdleService {
         } catch (Exception e) {
             bufferSynchronizerService.setIndexerUnavailable();
             throw e;
+        }
+    }
+
+    private void checkClusterVersion(Version clusterVersion) {
+        if (!clusterVersion.onOrAfter(MINIMUM_ES_VERSION) && !clusterVersion.onOrBefore(MAXIMUM_ES_VERSION)) {
+            LOG.error("Elasticsearch node is of the wrong version {}, it must be between {} and {}! "
+                            + "Please make sure you are running the correct version of Elasticsearch.",
+                    clusterVersion, MINIMUM_ES_VERSION, MAXIMUM_ES_VERSION);
+        }
+    }
+
+    private void checkClusterName(String clusterName) {
+        if (!node.settings().get("cluster.name").equals(clusterName)) {
+            LOG.error("Elasticsearch cluster name is different, Graylog2 uses `{}`, Elasticsearch cluster uses `{}`. "
+                            + "Please check the `cluster.name` setting of both Graylog2 and Elasticsearch.",
+                    node.settings().get("cluster.name"),
+                    clusterName);
         }
     }
 
