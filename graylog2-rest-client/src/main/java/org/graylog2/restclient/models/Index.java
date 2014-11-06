@@ -27,6 +27,7 @@ import org.graylog2.restclient.models.api.responses.system.indices.ShardMeterRes
 import org.graylog2.restclient.models.api.responses.system.indices.ShardRoutingResponse;
 import org.graylog2.restroutes.generated.routes;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -206,12 +207,12 @@ public class Index {
         private DateTime calculatedAt = null;
 
         public Range(IndexRangeSummary ir) {
-            this.starts = new DateTime(ir.starts);
+            this.starts = new DateTime(ir.starts, DateTimeZone.UTC);
 
             if (ir.calculatedAt != null && !ir.calculatedAt.isEmpty() && ir.calculationTookMs >= 0) {
                 this.providesCalculationInfo = true;
                 this.calculationTookMs = ir.calculationTookMs;
-                this.calculatedAt = new DateTime(ir.calculatedAt);
+                this.calculatedAt = new DateTime(ir.calculatedAt, DateTimeZone.UTC);
             } else {
                 this.providesCalculationInfo = false;
             }

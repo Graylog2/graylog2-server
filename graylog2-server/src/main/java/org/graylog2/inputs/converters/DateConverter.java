@@ -17,15 +17,13 @@
 package org.graylog2.inputs.converters;
 
 import org.graylog2.ConfigurationException;
+import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.inputs.Converter;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 
 import java.util.Map;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public class DateConverter extends Converter {
 
     private final String dateFormat;
@@ -46,14 +44,13 @@ public class DateConverter extends Converter {
             return null;
         }
 
-        DateTime localNow = new DateTime();
+        final DateTime localNow = Tools.iso8601();
 
-        return DateTime.parse(value,DateTimeFormat.forPattern(dateFormat).withDefaultYear(localNow.getYear()));
+        return DateTime.parse(value, DateTimeFormat.forPattern(dateFormat).withDefaultYear(localNow.getYear()));
     }
 
     @Override
     public boolean buildsMultipleFields() {
         return false;
     }
-
 }

@@ -24,6 +24,7 @@ import org.graylog2.database.validators.DateValidator;
 import org.graylog2.database.validators.FilledStringValidator;
 import org.graylog2.plugin.database.validators.Validator;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 
 import java.util.Collections;
 import java.util.Map;
@@ -41,7 +42,7 @@ public class SystemMessageImpl extends PersistedImpl implements SystemMessage {
 
         this.caller = fields.get("caller").toString();
         this.content = fields.get("content").toString();
-        this.timestamp = new DateTime(fields.get("timestamp").toString());
+        this.timestamp = new DateTime(fields.get("timestamp").toString(), DateTimeZone.UTC);
         this.nodeId = fields.get("node_id").toString();
     }
 
@@ -50,7 +51,7 @@ public class SystemMessageImpl extends PersistedImpl implements SystemMessage {
 
         this.caller = (String) fields.get("caller");
         this.content = (String) fields.get("content");
-        this.timestamp = new DateTime(fields.get("timestamp"));
+        this.timestamp = new DateTime(fields.get("timestamp"), DateTimeZone.UTC);
         this.nodeId = (String) fields.get("node_id");
     }
 

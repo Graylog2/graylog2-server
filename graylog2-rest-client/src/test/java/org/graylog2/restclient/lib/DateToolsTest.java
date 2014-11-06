@@ -43,7 +43,7 @@ public class DateToolsTest {
 
     @Test
     public void testGetUserTimeZoneOffsetStandardTime() throws Exception {
-        InstantMillisProvider instantMillisProvider = new InstantMillisProvider(new DateTime(2014, 10, 27, 0, 0));
+        InstantMillisProvider instantMillisProvider = new InstantMillisProvider(new DateTime(2014, 10, 27, 0, 0, DateTimeZone.UTC));
         DateTimeUtils.setCurrentMillisProvider(instantMillisProvider);
 
         int userTimeZoneOffset = DateTools.getUserTimeZoneOffset(user);
@@ -52,7 +52,7 @@ public class DateToolsTest {
 
     @Test
     public void testGetUserTimeZoneOffsetDSTTime() throws Exception {
-        InstantMillisProvider instantMillisProvider = new InstantMillisProvider(new DateTime(2014, 10, 25, 0, 0));
+        InstantMillisProvider instantMillisProvider = new InstantMillisProvider(new DateTime(2014, 10, 25, 0, 0, DateTimeZone.UTC));
         DateTimeUtils.setCurrentMillisProvider(instantMillisProvider);
 
         int userTimeZoneOffset = DateTools.getUserTimeZoneOffset(user);

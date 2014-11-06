@@ -36,6 +36,7 @@ import org.graylog2.dashboards.widgets.InvalidWidgetConfigurationException;
 import org.graylog2.database.ValidationException;
 import org.graylog2.indexer.searches.Searches;
 import org.graylog2.indexer.searches.timeranges.InvalidRangeParametersException;
+import org.graylog2.plugin.Tools;
 import org.graylog2.rest.resources.RestResource;
 import org.graylog2.rest.resources.dashboards.requests.AddWidgetRequest;
 import org.graylog2.rest.resources.dashboards.requests.CreateRequest;
@@ -45,8 +46,6 @@ import org.graylog2.rest.resources.dashboards.requests.UpdateWidgetRequest;
 import org.graylog2.security.RestPermissions;
 import org.graylog2.system.activities.Activity;
 import org.graylog2.system.activities.ActivityWriter;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -120,7 +119,7 @@ public class DashboardsResource extends RestResource {
         dashboardData.put("title", cr.title);
         dashboardData.put("description", cr.description);
         dashboardData.put("creator_user_id", getCurrentUser().getName());
-        dashboardData.put("created_at", new DateTime(DateTimeZone.UTC));
+        dashboardData.put("created_at", Tools.iso8601());
 
         Dashboard dashboard = new DashboardImpl(dashboardData);
         String id;

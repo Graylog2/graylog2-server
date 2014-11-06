@@ -30,14 +30,13 @@ import org.graylog2.database.PersistedServiceImpl;
 import org.graylog2.database.ValidationException;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
+import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.alarms.AlertCondition;
 import org.graylog2.plugin.database.EmbeddedPersistable;
 import org.graylog2.plugin.streams.Output;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.streams.StreamRule;
 import org.graylog2.rest.resources.streams.requests.CreateRequest;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -94,7 +93,7 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
         streamData.put(StreamImpl.FIELD_TITLE, cr.title);
         streamData.put(StreamImpl.FIELD_DESCRIPTION, cr.description);
         streamData.put(StreamImpl.FIELD_CREATOR_USER_ID, userId);
-        streamData.put(StreamImpl.FIELD_CREATED_AT, new DateTime(DateTimeZone.UTC));
+        streamData.put(StreamImpl.FIELD_CREATED_AT, Tools.iso8601());
         streamData.put(StreamImpl.FIELD_CONTENT_PACK, cr.contentPack);
 
         return create(streamData);

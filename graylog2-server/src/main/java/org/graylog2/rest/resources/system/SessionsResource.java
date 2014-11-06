@@ -34,6 +34,7 @@ import org.graylog2.security.ShiroSecurityContext;
 import org.graylog2.users.User;
 import org.graylog2.users.UserService;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -109,7 +110,7 @@ public class SessionsResource extends RestResource {
             id = session.getId();
             result.sessionId = id.toString();
             // TODO is this even used by anyone yet?
-            result.validUntil = new DateTime(session.getLastAccessTime()).plus(session.getTimeout()).toDate();
+            result.validUntil = new DateTime(session.getLastAccessTime(), DateTimeZone.UTC).plus(session.getTimeout()).toDate();
             return result;
         }
         throw new NotAuthorizedException("Invalid username or password", "Basic realm=\"Graylog2 Server session\"");

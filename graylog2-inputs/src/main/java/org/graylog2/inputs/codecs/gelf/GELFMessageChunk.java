@@ -16,9 +16,8 @@
  */
 package org.graylog2.inputs.codecs.gelf;
 
+import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.inputs.MessageInput;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 
 public final class GELFMessageChunk {
 
@@ -114,7 +113,7 @@ public final class GELFMessageChunk {
         extractSequenceCount();
         extractSequenceNumber();
         extractData();
-        this.arrival = DateTime.now(DateTimeZone.UTC).getMillis();
+        this.arrival = Tools.iso8601().getMillis();
     }
 
     private String extractId() {
