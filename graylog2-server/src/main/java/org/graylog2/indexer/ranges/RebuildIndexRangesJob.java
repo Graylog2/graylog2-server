@@ -114,17 +114,18 @@ public class RebuildIndexRangesJob extends SystemJob {
             try {
                 ranges.add(calculateRange(index));
             } catch (EmptyIndexException e) {
-                // if the empty index happens to be the current deflector target, do not skip the index range.
-                // newly created indices have a high likelihood of being empty).
+                LOG.info("Index [{}] is empty, inserting dummy index range.", index);
+                Map<String, Object> emptyIndexRange = Maps.newHashMap();
+                emptyIndexRange.put("index", index);
+
                 if (deflector.getCurrentActualTargetIndex().equals(index)) {
-                    LOG.info("Index [{}] is empty but it is the current deflector target. Inserting dummy index range.", index);
-                    Map<String, Object> deflectorIndexRange = Maps.newHashMap();
-                    deflectorIndexRange.put("index", index);
-                    deflectorIndexRange.put("start", Tools.getUTCTimestamp());
-                    ranges.add(deflectorIndexRange);
+                    emptyIndexRange.put("start", Tools.getUTCTimestamp());
                 } else {
-                    LOG.info("Index [{}] is empty. Not calculating ranges.", index);
+                    emptyIndexRange.put("start", 0);
+                    emptyIndexRange.put("calculated_at", Tools.getUTCTimestamp());
                 }
+
+                ranges.add(emptyIndexRange);
             } catch (Exception e) {
                 LOG.info("Could not calculate range of index [" + index + "]. Skipping.", e);
             } finally {
