@@ -681,11 +681,19 @@ $(document).ready(function() {
 
     $(".shard-routing .shards .shard").tooltip();
 
-    $(".index-description .open-index-details").on("click", function(e) {
+    $(".index-description .index-details").on("click", function(e) {
         e.preventDefault();
 
-        $(".index-info", $(this).closest(".index-description")).show();
-        $(this).hide();
+        $(".index-info", $(this).closest(".index-description")).toggle();
+        var icon = $(this).children().first();
+
+        if(icon.hasClass("icon-caret-right")) {
+            icon.removeClass("icon-caret-right");
+            icon.addClass("icon-caret-down");
+        } else {
+            icon.removeClass("icon-caret-down");
+            icon.addClass("icon-caret-right");
+        }
     });
 
     $(".nolink").on("live", function(e) {

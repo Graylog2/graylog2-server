@@ -1,6 +1,4 @@
 /**
- * Copyright 2013 Lennart Koopmann <lennart@torch.sh>
- *
  * This file is part of Graylog2.
  *
  * Graylog2 is free software: you can redistribute it and/or modify
@@ -15,14 +13,13 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 package controllers;
 
 import com.google.inject.Inject;
+import lib.BreadcrumbList;
 import org.graylog2.restclient.lib.APIException;
 import org.graylog2.restclient.lib.ApiClient;
-import lib.BreadcrumbList;
 import org.graylog2.restclient.models.ClusterService;
 import org.graylog2.restclient.models.ESClusterHealth;
 import org.graylog2.restclient.models.IndexService;
@@ -33,9 +30,6 @@ import play.mvc.Result;
 
 import java.io.IOException;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public class IndicesController extends AuthenticatedController {
 
     @Inject

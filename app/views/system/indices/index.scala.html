@@ -73,6 +73,23 @@
         @views.html.partials.es_cluster_health.render(clusterHealth)
     </div>
 
+    @* We may not have deflector index information if the deflector is cycled and the index ranges are being rebuilt. *@
+    @if(indices.find(_.getName == deflectorTarget) == None) {
+        <div class="row-fluid index-description">
+            <h3>
+                <i class="icon icon-ellipsis-vertical"></i>
+
+                <i class="icon icon-bolt" title="Write-active index"></i> @deflectorTarget
+            </h3>
+            <div class="index-info">
+                <div class="alert alert-info"><i class="icon icon-info-sign"></i> Deflector information is not available at the moment. Please try again once the index range calculation finishes.</div>
+            </div>
+
+            <hr style="margin-bottom: 5px; margin-top: 10px;">
+
+        </div>
+    }
+
     @for(index <- indices.sortWith(_.getNumber > _.getNumber)) {
         <div class="row-fluid index-description">
             <h3>
@@ -82,20 +99,28 @@
                     <i class="icon icon-bolt" title="Write-active index"></i>
                 }
 
+                @index.getName
+
                 @if(index.getInfo != null && index.getInfo.isReopened) {
                     <i class="icon icon-retweet" title="Reopened index"></i>
                 }
 
-                @index.getName
                 <span class="starts">
-                    Contains messages up to @DateHelper.readablePeriodFromNow(index.getRange.getStarts),
-                    @if(index.getInfo != null) {
-                        @Tools.byteToHuman(index.getInfo.getStoreSizeBytes) /
-                        <span class="number-format" data-format="0,0">@index.getInfo.getDocuments.count</span> messages
+                    @if(index.getRange.getStarts.isEqual(0)) {
+                        Contains no messages,
+                        @if(index.getInfo != null) {
+                            @Tools.byteToHuman(index.getInfo.getStoreSizeBytes)
+                        }
+                    } else {
+                        Contains messages up to @DateHelper.readablePeriodFromNow(index.getRange.getStarts),
+                        @if(index.getInfo != null) {
+                            @Tools.byteToHuman(index.getInfo.getStoreSizeBytes) /
+                            <span class="number-format" data-format="0,0">@index.getInfo.getDocuments.count</span> messages
+                        }
                     }
 
                     @if(!index.getName.equals(deflectorTarget)) {
-                        <a href="#" class="open-index-details"><i class="icon icon-caret-down"></i> Details / Actions</a>
+                        <a href="#" class="index-details"><i class="icon icon-caret-right"></i> Details / Actions</a>
                     }
                 </span>
             </h3>
@@ -110,7 +135,9 @@
                     in @(index.getRange.getCalculationTookMs)ms.
                 }
 
-                @if(index.getInfo != null) {
+                @if(index.getInfo == null) {
+                    <div class="alert alert-info"><i class="icon icon-info-sign"></i> Index information is not available at the moment, please try again later.</div>
+                } else {
                     @index.getInfo.getSegments segments,
                     @index.getInfo.getOpenSearchContexts open search contexts,
                     @index.getInfo.getDocuments.deleted deleted messages
