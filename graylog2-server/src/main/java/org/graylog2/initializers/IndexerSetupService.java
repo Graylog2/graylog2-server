@@ -34,8 +34,8 @@ import java.util.concurrent.Executors;
 @Singleton
 public class IndexerSetupService extends AbstractIdleService {
     private static final Logger LOG = LoggerFactory.getLogger(IndexerSetupService.class);
-    private static final Version MINIMUM_ES_VERSION = Version.V_1_3_2;
-    private static final Version MAXIMUM_ES_VERSION = Version.V_1_3_4;
+    private static final Version MINIMUM_ES_VERSION = Version.V_1_3_4;
+    private static final Version MAXIMUM_ES_VERSION = Version.fromString("1.4.99");
 
     private final Indexer indexer;
     private final Deflector deflector;
