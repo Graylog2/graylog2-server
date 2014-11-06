@@ -31,6 +31,7 @@ import org.graylog2.plugin.database.validators.Validator;
 import org.graylog2.plugin.inputs.Extractor;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -99,7 +100,7 @@ public class InputImpl extends PersistedImpl implements Input {
 
     @Override
     public DateTime getCreatedAt() {
-        return new DateTime(fields.get(MessageInput.FIELD_CREATED_AT));
+        return new DateTime(fields.get(MessageInput.FIELD_CREATED_AT), DateTimeZone.UTC);
     }
 
     @Override

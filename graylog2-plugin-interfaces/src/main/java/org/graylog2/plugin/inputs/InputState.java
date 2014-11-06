@@ -25,13 +25,11 @@ package org.graylog2.plugin.inputs;
 import com.google.common.collect.Maps;
 import org.graylog2.plugin.Tools;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 
 import java.util.Map;
 import java.util.UUID;
 
-/**
- * @author Dennis Oelkers <dennis@torch.sh>
- */
 public class InputState {
     public enum InputStateType {
         CREATED,
@@ -66,7 +64,7 @@ public class InputState {
         this.state = state;
         this.messageInput = input;
         this.id = id;
-        this.startedAt = DateTime.now();
+        this.startedAt = Tools.iso8601();
     }
 
 

@@ -214,7 +214,7 @@ public class BundleImporter {
             NotFoundException, org.graylog2.ConfigurationException, ExtractorFactory.NoSuchExtractorException,
             org.graylog2.plugin.inputs.Extractor.ReservedFieldException {
         final Configuration inputConfig = new Configuration(inputDescription.getConfiguration());
-        final DateTime createdAt = DateTime.now(DateTimeZone.UTC);
+        final DateTime createdAt = Tools.iso8601();
 
         final MessageInput messageInput = inputRegistry.create(inputDescription.getType(), inputConfig);
         messageInput.setTitle(inputDescription.getTitle());
@@ -374,7 +374,7 @@ public class BundleImporter {
                 outputDescription.getTitle(),
                 outputDescription.getType(),
                 outputDescription.getConfiguration(),
-                DateTime.now(DateTimeZone.UTC).toDate(),
+                Tools.iso8601().toDate(),
                 userName,
                 bundleId));
 
@@ -405,7 +405,7 @@ public class BundleImporter {
         streamData.put(StreamImpl.FIELD_DESCRIPTION, streamDescription.getDescription());
         streamData.put(StreamImpl.FIELD_DISABLED, streamDescription.isDisabled());
         streamData.put(StreamImpl.FIELD_CREATOR_USER_ID, userName);
-        streamData.put(StreamImpl.FIELD_CREATED_AT, DateTime.now(DateTimeZone.UTC));
+        streamData.put(StreamImpl.FIELD_CREATED_AT, Tools.iso8601());
         streamData.put(StreamImpl.FIELD_CONTENT_PACK, bundleId);
 
         final org.graylog2.plugin.streams.Stream stream = streamService.create(streamData.build());
@@ -452,7 +452,7 @@ public class BundleImporter {
         dashboardData.put(DashboardImpl.FIELD_DESCRIPTION, dashboardDescription.getDescription());
         dashboardData.put(DashboardImpl.FIELD_CONTENT_PACK, bundleId);
         dashboardData.put(DashboardImpl.FIELD_CREATOR_USER_ID, userName);
-        dashboardData.put(DashboardImpl.FIELD_CREATED_AT, DateTime.now(DateTimeZone.UTC));
+        dashboardData.put(DashboardImpl.FIELD_CREATED_AT, Tools.iso8601());
 
         final org.graylog2.dashboards.Dashboard dashboard = new DashboardImpl(dashboardData);
         final String dashboardId = dashboardService.save(dashboard);
@@ -517,8 +517,8 @@ public class BundleImporter {
                 timeRange = new KeywordRange((String) timerangeConfig.get("keyword"));
                 break;
             case "absolute":
-                final String from = new DateTime(timerangeConfig.get("from")).toString(Tools.ES_DATE_FORMAT);
-                final String to = new DateTime(timerangeConfig.get("to")).toString(Tools.ES_DATE_FORMAT);
+                final String from = new DateTime(timerangeConfig.get("from"), DateTimeZone.UTC).toString(Tools.ES_DATE_FORMAT);
+                final String to = new DateTime(timerangeConfig.get("to"), DateTimeZone.UTC).toString(Tools.ES_DATE_FORMAT);
 
                 timeRange = new AbsoluteRange(from, to);
                 break;

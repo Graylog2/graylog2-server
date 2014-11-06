@@ -23,13 +23,17 @@ import org.graylog2.database.MongoConnection;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.database.PersistedServiceImpl;
 import org.graylog2.database.ValidationException;
+import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.streams.Output;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.streams.outputs.CreateOutputRequest;
-import org.joda.time.DateTime;
 
 import javax.inject.Inject;
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class OutputServiceImpl extends PersistedServiceImpl implements OutputService {
     private final StreamService streamService;
@@ -49,7 +53,7 @@ public class OutputServiceImpl extends PersistedServiceImpl implements OutputSer
             throw new NotFoundException("Output <" + streamOutputId + "> not found!");
         }
 
-        return new OutputImpl((ObjectId)o.get("_id"), o.toMap());
+        return new OutputImpl((ObjectId) o.get("_id"), o.toMap());
     }
 
     @Override
@@ -91,7 +95,8 @@ public class OutputServiceImpl extends PersistedServiceImpl implements OutputSer
 
     @Override
     public Output create(CreateOutputRequest request, String userId) throws ValidationException {
-        return create(new OutputImpl(request.title, request.type, request.configuration, DateTime.now().toDate(), userId, request.contentPack));
+        return create(new OutputImpl(request.title, request.type, request.configuration,
+                Tools.iso8601().toDate(), userId, request.contentPack));
     }
 
     @Override

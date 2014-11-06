@@ -30,6 +30,7 @@ import org.graylog2.shared.inputs.InputRegistry;
 import org.graylog2.shared.inputs.MessageInputFactory;
 import org.graylog2.shared.inputs.NoSuchInputTypeException;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,7 +69,7 @@ public class RadioInputRegistry extends InputRegistry {
             input.setTitle(isr.title);
             input.setCreatorUserId(isr.creatorUserId);
             input.setPersistId(isr.id);
-            input.setCreatedAt(new DateTime(isr.createdAt));
+            input.setCreatedAt(new DateTime(isr.createdAt, DateTimeZone.UTC));
             input.setGlobal(isr.global);
             input.setConfiguration(inputConfig);
 

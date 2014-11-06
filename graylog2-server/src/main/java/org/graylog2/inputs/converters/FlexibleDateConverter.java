@@ -17,16 +17,15 @@
 package org.graylog2.inputs.converters;
 
 import com.joestelmach.natty.DateGroup;
-import org.graylog2.plugin.inputs.Converter;
 import com.joestelmach.natty.Parser;
+import org.graylog2.plugin.inputs.Converter;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public class FlexibleDateConverter extends Converter {
 
     public FlexibleDateConverter(Map<String, Object> config) {
@@ -40,14 +39,14 @@ public class FlexibleDateConverter extends Converter {
         }
 
         // Parser is using local timezone with no constructor parameter passed.
-        Parser parser = new Parser();
+        Parser parser = new Parser(TimeZone.getTimeZone("UTC"));
         List<DateGroup> r = parser.parse(value);
 
-        if(r.isEmpty() || r.get(0).getDates().isEmpty()) {
+        if (r.isEmpty() || r.get(0).getDates().isEmpty()) {
             return null;
         }
 
-        return new DateTime(r.get(0).getDates().get(0));
+        return new DateTime(r.get(0).getDates().get(0), DateTimeZone.UTC);
     }
 
     @Override

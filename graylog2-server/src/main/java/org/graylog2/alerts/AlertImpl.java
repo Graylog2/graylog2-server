@@ -23,15 +23,13 @@ import org.graylog2.database.PersistedImpl;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.database.validators.Validator;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Collections;
 import java.util.Map;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 @CollectionName("alerts")
 public class AlertImpl extends PersistedImpl implements Alert {
 
@@ -52,7 +50,7 @@ public class AlertImpl extends PersistedImpl implements Alert {
     public Map<String,Object> toMap() {
         Map<String, Object> map = Maps.newHashMap();
 
-        DateTime triggeredAt = new DateTime(fields.get("triggered_at"));
+        DateTime triggeredAt = new DateTime(fields.get("triggered_at"), DateTimeZone.UTC);
 
         map.put("id", fields.get("_id").toString());
         map.put("condition_id", fields.get("condition_id"));

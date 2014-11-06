@@ -17,7 +17,7 @@
 package org.graylog2.rules;
 
 import org.graylog2.plugin.Message;
-import org.joda.time.DateTime;
+import org.graylog2.plugin.Tools;
 import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.rule.FactHandle;
 import org.mockito.Mock;
@@ -25,14 +25,18 @@ import org.mockito.MockitoAnnotations;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
 public class DroolsRulesSessionTest {
-    @Mock private KieSession kieSession;
-    @Mock private FactHandle factHandle;
+    @Mock
+    private KieSession kieSession;
+    @Mock
+    private FactHandle factHandle;
 
     private Message message;
     private DroolsRulesSession session;
@@ -42,7 +46,7 @@ public class DroolsRulesSessionTest {
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
 
-        message = new Message("hello", "localhost", new DateTime());
+        message = new Message("hello", "localhost", Tools.iso8601());
 
         when(kieSession.insert(message)).thenReturn(factHandle);
         when(kieSession.fireAllRules()).thenReturn(rulesFired);

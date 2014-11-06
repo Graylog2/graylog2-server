@@ -19,12 +19,14 @@ package org.graylog2.rules;
 import com.google.common.collect.Sets;
 import org.graylog2.Graylog2BaseTest;
 import org.graylog2.plugin.Message;
-import org.joda.time.DateTime;
+import org.graylog2.plugin.Tools;
 import org.testng.annotations.Test;
 
 import java.net.URL;
 
-import static org.testng.Assert.*;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
 
 public class DroolsEngineTest extends Graylog2BaseTest {
 
@@ -32,7 +34,7 @@ public class DroolsEngineTest extends Graylog2BaseTest {
     public void runWithoutRules() {
         final DroolsEngine engine = new DroolsEngine(Sets.<URL>newHashSet());
 
-        final int rulesFired = engine.evaluateInSharedSession(new Message("test message", "test", DateTime.now()));
+        final int rulesFired = engine.evaluateInSharedSession(new Message("test message", "test", Tools.iso8601()));
 
         assertEquals(rulesFired, 0, "No rules should have fired");
 
@@ -73,7 +75,7 @@ public class DroolsEngineTest extends Graylog2BaseTest {
         final boolean valid2 = engine.addRule(rule2);
         assertTrue(valid2, "Rule should compile without errors");
 
-        final Message msg = new Message("test message", "test source", DateTime.now());
+        final Message msg = new Message("test message", "test source", Tools.iso8601());
         final int fired = engine.evaluateInSharedSession(msg);
 
         assertTrue(msg.getFilterOut(), "msg is filtered out");
@@ -104,7 +106,7 @@ public class DroolsEngineTest extends Graylog2BaseTest {
         deployed = engine.addRule(validRule);
         assertTrue(deployed, "Subsequent deployment of valid rule works");
 
-        engine.evaluateInSharedSession(new Message("foo", "source", DateTime.now()));
+        engine.evaluateInSharedSession(new Message("foo", "source", Tools.iso8601()));
 
         engine.stop();
     }

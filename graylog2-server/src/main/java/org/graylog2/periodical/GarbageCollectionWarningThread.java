@@ -20,10 +20,9 @@ import com.github.joschi.jadconfig.util.Duration;
 import org.graylog2.Configuration;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
+import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.periodical.Periodical;
 import org.graylog2.plugin.system.NodeId;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -116,7 +115,7 @@ public class GarbageCollectionWarningThread extends Periodical {
 
                 final Notification notification = notificationService.buildNow()
                         .addNode(nodeId.toString())
-                        .addTimestamp(DateTime.now(DateTimeZone.UTC))
+                        .addTimestamp(Tools.iso8601())
                         .addSeverity(Notification.Severity.URGENT)
                         .addType(Notification.Type.GC_TOO_LONG)
                         .addDetail("gc_name", gc.getName())

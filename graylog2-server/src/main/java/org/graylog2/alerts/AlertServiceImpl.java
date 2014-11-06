@@ -32,6 +32,7 @@ import org.graylog2.plugin.alarms.AlertCondition;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.rest.resources.streams.alerts.requests.CreateConditionRequest;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.joda.time.Seconds;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -107,9 +108,9 @@ public class AlertServiceImpl extends PersistedServiceImpl implements AlertServi
             return -1;
         }
 
-        DateTime triggeredAt = new DateTime(alert.get("triggered_at"));
+        DateTime triggeredAt = new DateTime(alert.get("triggered_at"), DateTimeZone.UTC);
 
-        return Seconds.secondsBetween(triggeredAt, DateTime.now()).getSeconds();
+        return Seconds.secondsBetween(triggeredAt, Tools.iso8601()).getSeconds();
     }
 
     @Override

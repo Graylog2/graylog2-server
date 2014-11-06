@@ -66,7 +66,7 @@ public class ServerStatus {
     public ServerStatus(BaseConfiguration configuration, Set<Capability> capabilities, EventBus eventBus) {
         this.eventBus = eventBus;
         this.nodeId = new NodeId(configuration.getNodeIdFile());
-        this.startedAt = new DateTime(DateTimeZone.UTC);
+        this.startedAt = Tools.iso8601();
         this.capabilitySet = Sets.newHashSet(capabilities); // copy, because we support adding more capabilities later
     }
 

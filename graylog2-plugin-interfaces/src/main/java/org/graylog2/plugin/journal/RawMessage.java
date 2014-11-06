@@ -26,7 +26,9 @@ import com.eaio.uuid.UUID;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Objects;
+import org.graylog2.plugin.Tools;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -87,7 +89,7 @@ public class RawMessage implements Serializable {
                       InetSocketAddress remoteAddress,
                       @Nullable String metaData,
                       byte[] payload) {
-        this(Long.MIN_VALUE, new UUID(), DateTime.now(), payloadType, sourceInputId, remoteAddress, metaData, payload);
+        this(Long.MIN_VALUE, new UUID(), Tools.iso8601(), payloadType, sourceInputId, remoteAddress, metaData, payload);
     }
 
     public RawMessage(long sequenceNumber,
@@ -192,7 +194,7 @@ public class RawMessage implements Serializable {
             return new RawMessage(
                     sequenceNumber,
                     new UUID(time, clockSeqAndNode),
-                    new DateTime(millis),
+                    new DateTime(millis, DateTimeZone.UTC),
                     new String(payloadType, UTF_8),
                     new String(sourceInput, UTF_8),
                     new InetSocketAddress(InetAddress.getByAddress(address), port),
