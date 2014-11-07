@@ -16,34 +16,37 @@
  */
 package controllers.api;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Multimap;
 import com.google.common.io.Files;
-import com.google.gson.Gson;
-import com.google.inject.Inject;
 import controllers.AuthenticatedController;
-import org.glassfish.grizzly.utils.Charsets;
 import org.graylog2.restclient.models.api.requests.CreateBundleRequest;
 import org.graylog2.restclient.models.bundles.BundleService;
 import org.graylog2.restclient.models.bundles.ConfigurationBundle;
 import play.Logger;
+import play.libs.Json;
 import play.mvc.Http.MultipartFormData;
 import play.mvc.Http.MultipartFormData.FilePart;
 import play.mvc.Result;
 
+import javax.inject.Inject;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 
 public class BundlesApiController extends AuthenticatedController {
+    private final BundleService bundleService;
+
     @Inject
-    private BundleService bundleService;
+    public BundlesApiController(BundleService bundleService) {
+        this.bundleService = bundleService;
+    }
 
     public Result index() {
         Multimap<String, ConfigurationBundle> bundles = bundleService.all();
 
-        return ok(new Gson().toJson(bundles.asMap())).as("application/json");
+        return ok(Json.toJson(bundles.asMap()));
     }
 
     public Result create() {
@@ -54,9 +57,8 @@ public class BundlesApiController extends AuthenticatedController {
             CreateBundleRequest cbr;
             try {
                 File file = bundle.getFile();
-                String bundleContents = Files.toString(file, Charsets.UTF8_CHARSET);
-                ObjectMapper om = new ObjectMapper();
-                cbr = om.readValue(bundleContents, CreateBundleRequest.class);
+                String bundleContents = Files.toString(file, StandardCharsets.UTF_8);
+                cbr = Json.fromJson(Json.parse(bundleContents), CreateBundleRequest.class);
             } catch (IOException e) {
                 Logger.error("Could not parse uploaded bundle: " + e);
                 flash("error", "The uploaded bundle could not be applied: does it have the right format?");

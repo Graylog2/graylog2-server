@@ -1,28 +1,31 @@
 package controllers;
 
-import com.google.inject.Inject;
+import lib.BreadcrumbList;
 import org.graylog2.restclient.lib.APIException;
 import org.graylog2.restclient.lib.ApiClient;
-import lib.BreadcrumbList;
-import org.graylog2.restclient.models.*;
+import org.graylog2.restclient.models.Stream;
+import org.graylog2.restclient.models.StreamRule;
+import org.graylog2.restclient.models.StreamRuleService;
+import org.graylog2.restclient.models.StreamService;
 import org.graylog2.restclient.models.api.requests.streams.CreateStreamRuleRequest;
 import org.graylog2.restclient.models.api.responses.streams.CreateStreamRuleResponse;
 import play.data.Form;
 import play.mvc.Result;
 
+import javax.inject.Inject;
 import java.io.IOException;
 
-/**
- * @author Dennis Oelkers <dennis@torch.sh>
- */
 public class StreamRulesController extends AuthenticatedController {
     private static final Form<CreateStreamRuleRequest> createStreamRuleForm = Form.form(CreateStreamRuleRequest.class);
 
-    @Inject
-    private StreamService streamService;
+    private final StreamService streamService;
+    private final StreamRuleService streamRuleService;
 
     @Inject
-    private StreamRuleService streamRuleService;
+    public StreamRulesController(StreamService streamService, StreamRuleService streamRuleService) {
+        this.streamService = streamService;
+        this.streamRuleService = streamRuleService;
+    }
 
     public Result index(String streamId) {
         Stream stream;
@@ -45,12 +48,8 @@ public class StreamRulesController extends AuthenticatedController {
         try {
             CreateStreamRuleRequest csrr = form.get();
             response = streamRuleService.create(streamId, csrr);
-            /*if (request().accepts("application/json"))
-                return created(new Gson().toJson(response)).as("application/json");
-            else {*/
-                StreamRule streamRule = streamRuleService.get(streamId, response.streamrule_id);
-                return created(views.html.partials.streamrules.list_item.render(streamRule));
-            //}
+            StreamRule streamRule = streamRuleService.get(streamId, response.streamrule_id);
+            return created(views.html.partials.streamrules.list_item.render(streamRule));
         } catch (APIException e) {
             String message = "Could not create stream rule. We expected HTTP 201, but got a HTTP " + e.getHttpCode() + ".";
             return status(504, message);
@@ -67,12 +66,8 @@ public class StreamRulesController extends AuthenticatedController {
         try {
             CreateStreamRuleRequest csrr = form.get();
             response = streamRuleService.update(streamId, streamRuleId, csrr);
-            /*if (request().accepts("application/json"))
-                return created(new Gson().toJson(response)).as("application/json");
-            else {*/
-                StreamRule streamRule = streamRuleService.get(streamId, response.streamrule_id);
-                return created(views.html.partials.streamrules.list_item.render(streamRule));
-            //}
+            StreamRule streamRule = streamRuleService.get(streamId, response.streamrule_id);
+            return created(views.html.partials.streamrules.list_item.render(streamRule));
         } catch (APIException e) {
             String message = "Could not create stream rule. We expected HTTP 200, but got a HTTP " + e.getHttpCode() + ".";
             return status(504, message);
@@ -81,7 +76,7 @@ public class StreamRulesController extends AuthenticatedController {
         }
     }
 
-    public Result delete(String streamId, String streamRuleId){
+    public Result delete(String streamId, String streamRuleId) {
         try {
             streamRuleService.delete(streamId, streamRuleId);
         } catch (APIException e) {

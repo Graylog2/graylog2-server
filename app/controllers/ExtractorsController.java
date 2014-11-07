@@ -18,8 +18,6 @@
  */
 package controllers;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.inject.Inject;
@@ -27,20 +25,23 @@ import lib.BreadcrumbList;
 import org.graylog2.restclient.lib.APIException;
 import org.graylog2.restclient.lib.ApiClient;
 import org.graylog2.restclient.lib.Version;
-import org.graylog2.restclient.models.*;
+import org.graylog2.restclient.models.Extractor;
+import org.graylog2.restclient.models.ExtractorService;
+import org.graylog2.restclient.models.Input;
+import org.graylog2.restclient.models.MessagesService;
+import org.graylog2.restclient.models.Node;
+import org.graylog2.restclient.models.NodeService;
 import org.graylog2.restclient.models.api.requests.ExtractorImportRequest;
 import org.graylog2.restclient.models.api.requests.ExtractorListImportRequest;
 import org.graylog2.restclient.models.api.results.MessageResult;
 import play.Logger;
+import play.libs.Json;
 import play.mvc.Result;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public class ExtractorsController extends AuthenticatedController {
 
     @Inject
@@ -58,11 +59,11 @@ public class ExtractorsController extends AuthenticatedController {
             Input input = node.getInput(inputId);
 
             return ok(views.html.system.inputs.extractors.manage.render(
-                    currentUser(),
-                    standardBreadcrumbs(node, input),
-                    node,
-                    input,
-                    extractorService.all(node, input))
+                            currentUser(),
+                            standardBreadcrumbs(node, input),
+                            node,
+                            input,
+                            extractorService.all(node, input))
             );
         } catch (IOException e) {
             return status(500, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
@@ -80,11 +81,11 @@ public class ExtractorsController extends AuthenticatedController {
             Input input = node.getInput(inputId);
 
             return ok(views.html.system.inputs.extractors.manage.render(
-                    currentUser(),
-                    standardBreadcrumbs(node, input),
-                    node,
-                    input,
-                    extractorService.all(node, input))
+                            currentUser(),
+                            standardBreadcrumbs(node, input),
+                            node,
+                            input,
+                            extractorService.all(node, input))
             );
         } catch (IOException e) {
             return status(500, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
@@ -102,13 +103,13 @@ public class ExtractorsController extends AuthenticatedController {
             String example = exampleMessage.getFields().get(field).toString();
 
             return ok(views.html.system.inputs.extractors.new_extractor.render(
-                    currentUser(),
-                    standardBreadcrumbs(node, input),
-                    node,
-                    input,
-                    Extractor.Type.valueOf(extractorType.toUpperCase()),
-                    field,
-                    example)
+                            currentUser(),
+                            standardBreadcrumbs(node, input),
+                            node,
+                            input,
+                            Extractor.Type.valueOf(extractorType.toUpperCase()),
+                            field,
+                            example)
             );
         } catch (IOException e) {
             return status(500, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
@@ -191,20 +192,14 @@ public class ExtractorsController extends AuthenticatedController {
             result.put("extractors", extractors);
             result.put("version", Version.VERSION.toString());
 
-            String extractorExport = "[]";
-            try {
-                ObjectMapper om = new ObjectMapper();
-                extractorExport = om.writeValueAsString(result);
-            } catch(JsonProcessingException e) {
-                Logger.error("Could not generate extractor export.", e);
-            }
+            String extractorExport = Json.stringify(Json.toJson(result));
 
             return ok(views.html.system.inputs.extractors.export.render(
-                    currentUser(),
-                    bc,
-                    node,
-                    input,
-                    extractorExport)
+                            currentUser(),
+                            bc,
+                            node,
+                            input,
+                            extractorExport)
             );
         } catch (IOException e) {
             return status(500, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
@@ -243,16 +238,15 @@ public class ExtractorsController extends AuthenticatedController {
     public Result importExtractors(String nodeId, String inputId) {
         Map<String, String> form = flattenFormUrlEncoded(request().body().asFormUrlEncoded());
 
-        if(!form.containsKey("extractors") || form.get("extractors").isEmpty()) {
+        if (!form.containsKey("extractors") || form.get("extractors").isEmpty()) {
             flash("error", "No JSON provided. Please fill out the import definition field.");
             return redirect(controllers.routes.ExtractorsController.importExtractorsPage(nodeId, inputId));
         }
 
         ExtractorListImportRequest elir;
         try {
-            ObjectMapper om = new ObjectMapper();
-            elir = om.readValue(form.get("extractors"), ExtractorListImportRequest.class);
-        } catch(Exception e) {
+            elir = Json.fromJson(Json.parse(form.get("extractors")), ExtractorListImportRequest.class);
+        } catch (Exception e) {
             Logger.error("Could not read JSON.", e);
             flash("error", "Could not read JSON.");
             return redirect(controllers.routes.ExtractorsController.importExtractorsPage(nodeId, inputId));

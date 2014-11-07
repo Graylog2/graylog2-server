@@ -18,21 +18,18 @@
  */
 package controllers.api;
 
-import com.google.gson.Gson;
 import com.google.inject.Inject;
 import controllers.AuthenticatedController;
-import org.graylog2.restclient.lib.APIException;
 import lib.NaturalDateTest;
 import lib.extractors.testers.RegexTest;
 import lib.extractors.testers.SplitAndIndexTest;
 import lib.extractors.testers.SubstringTest;
+import org.graylog2.restclient.lib.APIException;
+import play.libs.Json;
 import play.mvc.Result;
 
 import java.io.IOException;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public class ToolsApiController extends AuthenticatedController {
 
     private final RegexTest regexTest;
@@ -57,7 +54,7 @@ public class ToolsApiController extends AuthenticatedController {
                 return badRequest();
             }
 
-            return ok(new Gson().toJson(regexTest.test(regex, string))).as("application/json");
+            return ok(Json.toJson(regexTest.test(regex, string)));
         } catch (IOException e) {
             return internalServerError("io exception");
         } catch (APIException e) {
@@ -71,7 +68,7 @@ public class ToolsApiController extends AuthenticatedController {
                 return badRequest();
             }
 
-            return ok(new Gson().toJson(substringTest.test(start, end, string))).as("application/json");
+            return ok(Json.toJson(substringTest.test(start, end, string)));
         } catch (IOException e) {
             return internalServerError("io exception");
         } catch (APIException e) {
@@ -85,7 +82,7 @@ public class ToolsApiController extends AuthenticatedController {
                 return badRequest();
             }
 
-            return ok(new Gson().toJson(splitAndIndexTest.test(splitBy, index, string))).as("application/json");
+            return ok(Json.toJson(splitAndIndexTest.test(splitBy, index, string)));
         } catch (IOException e) {
             return internalServerError("io exception");
         } catch (APIException e) {
@@ -99,7 +96,7 @@ public class ToolsApiController extends AuthenticatedController {
         }
 
         try {
-            return ok(new Gson().toJson(naturalDateTest.test(string))).as("application/json");
+            return ok(Json.toJson(naturalDateTest.test(string)));
         } catch (IOException e) {
             return internalServerError("io exception");
         } catch (APIException e) {
@@ -109,5 +106,4 @@ public class ToolsApiController extends AuthenticatedController {
             return internalServerError("api exception " + e);
         }
     }
-
 }

@@ -17,7 +17,6 @@ object ApplicationBuild extends Build {
     cache,
     javaCore,
     javaEbean,
-    "com.google.code.gson" % "gson" % "2.2",
     "com.google.guava" % "guava" % "18.0",
     "com.ning" % "async-http-client" % "1.8.14",
     "org.apache.shiro" % "shiro-core" % "1.2.2",

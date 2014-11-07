@@ -19,15 +19,10 @@
  */
 package models;
 
-import com.google.gson.annotations.SerializedName;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.graylog2.restclient.models.api.responses.system.ClusterEntityJVMStatsResponse;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public class ServerJVMStatsResponse extends ClusterEntityJVMStatsResponse {
-
-    @SerializedName("is_processing")
+    @JsonProperty("is_processing")
     public boolean isProcessing;
-
 }

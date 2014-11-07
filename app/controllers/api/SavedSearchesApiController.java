@@ -19,31 +19,28 @@
  */
 package controllers.api;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.gson.Gson;
-import com.google.inject.Inject;
-import controllers.*;
-import controllers.routes;
+import controllers.AuthenticatedController;
 import org.graylog2.restclient.lib.APIException;
-import org.graylog2.restclient.lib.ServerNodes;
 import org.graylog2.restclient.models.SavedSearch;
 import org.graylog2.restclient.models.SavedSearchService;
 import org.graylog2.restclient.models.api.requests.searches.CreateSavedSearchRequest;
+import play.libs.Json;
 import play.mvc.Result;
 
+import javax.inject.Inject;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public class SavedSearchesApiController extends AuthenticatedController {
+    private final SavedSearchService savedSearchService;
 
     @Inject
-    private SavedSearchService savedSearchService;
+    public SavedSearchesApiController(SavedSearchService savedSearchService) {
+        this.savedSearchService = savedSearchService;
+    }
 
     public Result list() {
         try {
@@ -57,7 +54,7 @@ public class SavedSearchesApiController extends AuthenticatedController {
                 response.add(search);
             }
 
-            return ok(new Gson().toJson(response)).as("application/json");
+            return ok(Json.toJson(response));
         } catch (IOException e) {
             return internalServerError("io exception");
         } catch (APIException e) {
@@ -66,16 +63,9 @@ public class SavedSearchesApiController extends AuthenticatedController {
     }
 
     public Result create() {
-        Map<String,String> params = flattenFormUrlEncoded(request().body().asFormUrlEncoded());
-        String json = params.get("params");
+        Map<String, String> params = flattenFormUrlEncoded(request().body().asFormUrlEncoded());
 
-        ObjectMapper mapper = new ObjectMapper();
-        CreateSavedSearchRequest request;
-        try {
-            request = mapper.readValue(json, CreateSavedSearchRequest.class);
-        } catch (IOException e) {
-            return internalServerError("Could not parse JSON into request.");
-        }
+        CreateSavedSearchRequest request = Json.fromJson(Json.parse(params.get("params")), CreateSavedSearchRequest.class);
 
         try {
             savedSearchService.create(request);

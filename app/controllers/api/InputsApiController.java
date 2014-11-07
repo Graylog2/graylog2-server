@@ -20,8 +20,6 @@
 package controllers.api;
 
 import com.google.common.collect.Maps;
-import com.google.gson.Gson;
-import com.google.inject.Inject;
 import controllers.AuthenticatedController;
 import org.graylog2.restclient.lib.APIException;
 import org.graylog2.restclient.lib.ApiClient;
@@ -33,22 +31,24 @@ import org.graylog2.restclient.models.NodeService;
 import org.graylog2.restclient.models.api.results.MessageResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import play.libs.Json;
 import play.mvc.Result;
 
+import javax.inject.Inject;
 import java.io.IOException;
 import java.util.Map;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public class InputsApiController extends AuthenticatedController {
     private static final Logger log = LoggerFactory.getLogger(InputsApiController.class);
 
-    @Inject
-    private NodeService nodeService;
+    private final NodeService nodeService;
+    private final ClusterService clusterService;
 
     @Inject
-    private ClusterService clusterService;
+    public InputsApiController(NodeService nodeService, ClusterService clusterService) {
+        this.nodeService = nodeService;
+        this.clusterService = clusterService;
+    }
 
     public Result io(String nodeId, String inputId) {
         try {
@@ -63,7 +63,7 @@ public class InputsApiController extends AuthenticatedController {
             result.put("rx", Tools.byteToHuman(ioStats.readBytes));
             result.put("tx", Tools.byteToHuman(ioStats.writtenBytes));
 
-            return ok(new Gson().toJson(result)).as("application/json");
+            return ok(Json.toJson(result));
         } catch (IOException e) {
             return internalServerError("io exception");
         } catch (APIException e) {
@@ -97,7 +97,7 @@ public class InputsApiController extends AuthenticatedController {
         result.put("rx", Tools.byteToHuman(ioStats.readBytes));
         result.put("tx", Tools.byteToHuman(ioStats.writtenBytes));
 
-        return ok(new Gson().toJson(result)).as("application/json");
+        return ok(Json.toJson(result));
     }
 
     public Result connections(String nodeId, String inputId) {
@@ -110,7 +110,7 @@ public class InputsApiController extends AuthenticatedController {
             result.put("active", input.getConnections());
             result.put("total", input.getTotalConnections());
 
-            return ok(new Gson().toJson(result)).as("application/json");
+            return ok(Json.toJson(result));
         } catch (IOException e) {
             return internalServerError("io exception");
         } catch (APIException e) {
@@ -141,7 +141,7 @@ public class InputsApiController extends AuthenticatedController {
             else
                 result.put("fields", recentlyReceivedMessage.getFields());
 
-            return ok(new Gson().toJson(result)).as("application/json");
+            return ok(Json.toJson(result));
         } catch (IOException e) {
             return status(500);
         } catch (APIException e) {

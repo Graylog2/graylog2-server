@@ -19,16 +19,20 @@
 package controllers;
 
 import com.google.common.collect.Maps;
-import com.google.gson.Gson;
-import com.google.inject.Inject;
 import org.graylog2.restclient.models.MessagesService;
+import play.libs.Json;
 import play.mvc.Result;
 
+import javax.inject.Inject;
 import java.util.Map;
 
 public class MessageCountsController extends AuthenticatedController {
+    private final MessagesService messagesService;
+
     @Inject
-    private MessagesService messagesService;
+    public MessageCountsController(MessagesService messagesService) {
+        this.messagesService = messagesService;
+    }
 
     public Result total() {
         long countResult = messagesService.total();
@@ -36,6 +40,6 @@ public class MessageCountsController extends AuthenticatedController {
         Map<String, Long> result = Maps.newHashMap();
         result.put("events", countResult);
 
-        return ok(new Gson().toJson(result)).as("application/json");
+        return ok(Json.toJson(result));
     }
 }

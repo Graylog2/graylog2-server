@@ -19,20 +19,18 @@
  */
 package controllers.api;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Inject;
 import controllers.AuthenticatedController;
 import org.graylog2.restclient.lib.APIException;
-import org.graylog2.restclient.lib.ApiClient;
 import org.graylog2.restclient.models.Source;
 import org.graylog2.restclient.models.SourcesService;
+import play.libs.Json;
 import play.mvc.Result;
 
 import java.io.IOException;
 import java.util.List;
 
 public class SourcesApiController extends AuthenticatedController {
-
     @Inject
     private SourcesService sourcesService;
 
@@ -42,9 +40,7 @@ public class SourcesApiController extends AuthenticatedController {
         }
         try {
             List<Source> sources = sourcesService.all(range);
-            ObjectMapper om = new ObjectMapper();
-            String json = om.writeValueAsString(sources);
-            return ok(json).as("application/json");
+            return ok(Json.toJson(sources));
         } catch (IOException e) {
             return internalServerError("io exception");
         } catch (APIException e) {
@@ -56,5 +52,4 @@ public class SourcesApiController extends AuthenticatedController {
             return internalServerError("api exception " + e);
         }
     }
-
 }

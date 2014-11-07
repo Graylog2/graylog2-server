@@ -24,9 +24,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.net.MediaType;
-import com.google.gson.Gson;
-import com.google.inject.Inject;
-import lib.*;
+import lib.SearchTools;
 import lib.security.RestPermissions;
 import org.graylog2.restclient.lib.APIException;
 import org.graylog2.restclient.lib.ApiClient;
@@ -35,34 +33,37 @@ import org.graylog2.restclient.lib.ServerNodes;
 import org.graylog2.restclient.lib.timeranges.InvalidRangeParametersException;
 import org.graylog2.restclient.lib.timeranges.RelativeRange;
 import org.graylog2.restclient.lib.timeranges.TimeRange;
-import org.graylog2.restclient.models.*;
+import org.graylog2.restclient.models.MessagesService;
+import org.graylog2.restclient.models.SavedSearch;
+import org.graylog2.restclient.models.SavedSearchService;
+import org.graylog2.restclient.models.SearchSort;
+import org.graylog2.restclient.models.Stream;
+import org.graylog2.restclient.models.UniversalSearch;
 import org.graylog2.restclient.models.api.responses.system.indices.IndexRangeSummary;
 import org.graylog2.restclient.models.api.results.DateHistogramResult;
 import org.graylog2.restclient.models.api.results.SearchResult;
 import org.joda.time.DateTime;
 import org.joda.time.Minutes;
+import play.libs.Json;
 import play.mvc.Result;
 import views.helpers.Permissions;
 
+import javax.inject.Inject;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 public class SearchController extends AuthenticatedController {
-
     // guess high, so we never have a bad resolution
-    private static int DEFAULT_ASSUMED_GRAPH_RESOLUTION = 4000;
+    private static final int DEFAULT_ASSUMED_GRAPH_RESOLUTION = 4000;
 
     @Inject
     protected UniversalSearch.Factory searchFactory;
-
     @Inject
     protected MessagesService messagesService;
-
     @Inject
     protected SavedSearchService savedSearchService;
-
     @Inject
     private ServerNodes serverNodes;
 
@@ -97,9 +98,9 @@ public class SearchController extends AuthenticatedController {
         UniversalSearch search;
         try {
             search = getSearch(q, filter, rangeType, relative, from, to, keyword, page, sort);
-        } catch(InvalidRangeParametersException e2) {
+        } catch (InvalidRangeParametersException e2) {
             return status(400, views.html.errors.error.render("Invalid range parameters provided.", e2, request()));
-        } catch(IllegalArgumentException e1) {
+        } catch (IllegalArgumentException e1) {
             return status(400, views.html.errors.error.render("Invalid range type provided.", e1, request()));
         }
 
@@ -110,7 +111,7 @@ public class SearchController extends AuthenticatedController {
         String formattedHistogramResults;
 
         try {
-            if(savedSearchId != null && !savedSearchId.isEmpty()) {
+            if (savedSearchId != null && !savedSearchId.isEmpty()) {
                 savedSearch = savedSearchService.get(savedSearchId);
             } else {
                 savedSearch = null;
@@ -185,7 +186,7 @@ public class SearchController extends AuthenticatedController {
     }
 
     private boolean isEmptyRelativeRange(TimeRange timeRange) {
-        return (timeRange.getType() == TimeRange.Type.RELATIVE) && (((RelativeRange)timeRange).isEmptyRange());
+        return (timeRange.getType() == TimeRange.Type.RELATIVE) && (((RelativeRange) timeRange).isEmptyRange());
     }
 
     /**
@@ -213,7 +214,7 @@ public class SearchController extends AuthenticatedController {
             index++;
         }
 
-        return new Gson().toJson(points);
+        return Json.stringify(Json.toJson(points));
     }
 
     protected Set<String> getSelectedFields(String fields) {
@@ -230,9 +231,9 @@ public class SearchController extends AuthenticatedController {
         UniversalSearch search;
         try {
             search = getSearch(q, filter.isEmpty() ? null : filter, rangeType, relative, from, to, keyword, 0, UniversalSearch.DEFAULT_SORT);
-        } catch(InvalidRangeParametersException e2) {
+        } catch (InvalidRangeParametersException e2) {
             return status(400, views.html.errors.error.render("Invalid range parameters provided.", e2, request()));
-        } catch(IllegalArgumentException e1) {
+        } catch (IllegalArgumentException e1) {
             return status(400, views.html.errors.error.render("Invalid range type provided.", e1, request()));
         }
 
@@ -255,14 +256,14 @@ public class SearchController extends AuthenticatedController {
 
     protected List<Field> getAllFields() {
         List<Field> allFields = Lists.newArrayList();
-        for(String f : messagesService.getMessageFields()) {
+        for (String f : messagesService.getMessageFields()) {
             allFields.add(new Field(f));
         }
         return allFields;
     }
 
-    protected UniversalSearch getSearch(String q, String filter, String rangeType, int relative,String from, String to, String keyword, int page, SearchSort order)
-        throws InvalidRangeParametersException, IllegalArgumentException {
+    protected UniversalSearch getSearch(String q, String filter, String rangeType, int relative, String from, String to, String keyword, int page, SearchSort order)
+            throws InvalidRangeParametersException, IllegalArgumentException {
         if (q == null || q.trim().isEmpty()) {
             q = "*";
         }
@@ -287,7 +288,7 @@ public class SearchController extends AuthenticatedController {
 
         try {
             return new SearchSort(sortField, SearchSort.Direction.valueOf(sortOrder.toUpperCase()));
-        } catch(IllegalArgumentException e) {
+        } catch (IllegalArgumentException e) {
             return UniversalSearch.DEFAULT_SORT;
         }
     }

@@ -19,20 +19,23 @@
 package controllers;
 
 import com.google.common.collect.Maps;
-import com.google.gson.Gson;
-import com.google.inject.Inject;
 import org.graylog2.restclient.lib.ServerNodes;
 import org.graylog2.restclient.models.Node;
+import play.libs.Json;
 import play.mvc.Http;
 import play.mvc.Result;
 
+import javax.inject.Inject;
 import java.util.HashMap;
 import java.util.List;
 
 public class LonesomeInterfaceController extends BaseController {
+    private final ServerNodes serverNodes;
 
     @Inject
-    private ServerNodes serverNodes;
+    public LonesomeInterfaceController(ServerNodes serverNodes) {
+        this.serverNodes = serverNodes;
+    }
 
     public Result index() {
         if (serverNodes.isConnected()) {
@@ -45,10 +48,10 @@ public class LonesomeInterfaceController extends BaseController {
     }
 
     public Result checkServerAvailability() {
-        final HashMap<String,Object> map = Maps.newHashMap();
+        final HashMap<String, Object> map = Maps.newHashMap();
         map.put("connected", serverNodes.isConnected());
         map.put("connected_nodes_count", serverNodes.connectedNodesCount());
         map.put("total_nodes_count", serverNodes.totalNodesCount());
-        return ok(new Gson().toJson(map)).as("application/json");
+        return ok(Json.toJson(map));
     }
 }

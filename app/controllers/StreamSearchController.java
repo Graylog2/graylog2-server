@@ -3,20 +3,15 @@ package controllers;
 import com.google.inject.Inject;
 import org.graylog2.restclient.lib.APIException;
 import org.graylog2.restclient.lib.ApiClient;
-import lib.SearchTools;
 import org.graylog2.restclient.lib.ServerNodes;
-import org.graylog2.restclient.lib.timeranges.InvalidRangeParametersException;
-import org.graylog2.restclient.models.*;
-import org.graylog2.restclient.models.api.results.DateHistogramResult;
-import org.graylog2.restclient.models.api.results.SearchResult;
+import org.graylog2.restclient.models.SearchSort;
+import org.graylog2.restclient.models.Startpage;
+import org.graylog2.restclient.models.Stream;
+import org.graylog2.restclient.models.StreamService;
 import play.mvc.Result;
 
 import java.io.IOException;
-import java.util.Set;
 
-/**
- * @author Dennis Oelkers <dennis@torch.sh>
- */
 public class StreamSearchController extends SearchController {
     @Inject
     private StreamService streamService;
@@ -64,6 +59,6 @@ public class StreamSearchController extends SearchController {
 
     @Override
     public Result exportAsCsv(String q, String streamId, String rangeType, int relative, String from, String to, String keyword, String fields) {
-        return super.exportAsCsv(q, "streams:"+streamId, rangeType, relative, from, to, keyword, fields);
+        return super.exportAsCsv(q, "streams:" + streamId, rangeType, relative, from, to, keyword, fields);
     }
 }

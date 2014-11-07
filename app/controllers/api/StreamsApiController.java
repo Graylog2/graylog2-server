@@ -1,45 +1,31 @@
 package controllers.api;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.Maps;
-import com.google.gson.Gson;
-import com.google.inject.Inject;
 import controllers.AuthenticatedController;
 import org.graylog2.restclient.lib.APIException;
-import org.graylog2.restclient.lib.ApiClient;
-import org.graylog2.restclient.lib.Tools;
-import models.*;
 import org.graylog2.restclient.models.StreamService;
 import org.graylog2.restclient.models.api.requests.streams.TestMatchRequest;
 import org.graylog2.restclient.models.api.responses.streams.TestMatchResponse;
-import play.data.Form;
+import play.libs.Json;
 import play.mvc.BodyParser;
-import play.mvc.Controller;
-import play.mvc.Http;
 import play.mvc.Result;
 
+import javax.inject.Inject;
 import java.io.IOException;
-import java.util.Map;
 
-/**
- * @author Dennis Oelkers <dennis@torch.sh>
- *         Lennart Koopmann <lennart@torch.sh>
- */
 public class StreamsApiController extends AuthenticatedController {
+    private final StreamService streamService;
 
     @Inject
-    StreamService streamService;
+    public StreamsApiController(StreamService streamService) {
+        this.streamService = streamService;
+    }
 
     @BodyParser.Of(BodyParser.Json.class)
     public Result testMatch(String stream_id) {
-        JsonNode json = request().body().asJson();
 
-        ObjectMapper mapper = new ObjectMapper();
         TestMatchResponse response = null;
-
         try {
-            TestMatchRequest tmr = mapper.readValue(json.toString(), TestMatchRequest.class);
+            TestMatchRequest tmr = Json.fromJson(request().body().asJson(), TestMatchRequest.class);
             response = streamService.testMatch(stream_id, tmr);
         } catch (APIException e) {
             String message = "Could not test stream rule matching. We expected HTTP 201, but got a HTTP " + e.getHttpCode() + ".";
@@ -48,7 +34,6 @@ public class StreamsApiController extends AuthenticatedController {
             return status(504, e.toString());
         }
 
-        return ok(new Gson().toJson(response)).as("application/json");
+        return ok(Json.toJson(response));
     }
-
 }

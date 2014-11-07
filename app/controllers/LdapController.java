@@ -18,10 +18,8 @@
  */
 package controllers;
 
-import com.google.gson.Gson;
-import com.google.inject.Inject;
-import org.graylog2.restclient.lib.APIException;
 import lib.BreadcrumbList;
+import org.graylog2.restclient.lib.APIException;
 import org.graylog2.restclient.models.accounts.LdapSettings;
 import org.graylog2.restclient.models.accounts.LdapSettingsService;
 import org.graylog2.restclient.models.api.requests.accounts.LdapSettingsRequest;
@@ -31,21 +29,27 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import play.data.DynamicForm;
 import play.data.Form;
+import play.libs.Json;
 import play.mvc.Result;
 
+import javax.inject.Inject;
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
 import java.util.Map;
 
-import static com.google.common.base.Objects.firstNonNull;
+import static com.google.common.base.MoreObjects.firstNonNull;
 import static play.data.Form.form;
 
 public class LdapController extends AuthenticatedController {
     private static final Logger log = LoggerFactory.getLogger(LdapController.class);
     private final Form<LdapSettingsRequest> settingsForm = form(LdapSettingsRequest.class);
 
+    private final LdapSettingsService ldapSettingsService;
+
     @Inject
-    private LdapSettingsService ldapSettingsService;
+    public LdapController(final LdapSettingsService ldapSettingsService) {
+        this.ldapSettingsService = ldapSettingsService;
+    }
 
     public Result index() {
         final LdapSettings ldapSettings = ldapSettingsService.load();
@@ -79,7 +83,7 @@ public class LdapController extends AuthenticatedController {
             log.error("Unable to connect", e);
             return internalServerError();
         }
-        return ok(new Gson().toJson(result)).as(MediaType.APPLICATION_JSON);
+        return ok(Json.toJson(result));
     }
 
     public Result apiTestLdapLogin() {
@@ -106,7 +110,7 @@ public class LdapController extends AuthenticatedController {
             log.error("Unable to connect", e);
             return internalServerError();
         }
-        return ok(new Gson().toJson(result)).as(MediaType.APPLICATION_JSON);
+        return ok(Json.toJson(result));
     }
 
     private LdapTestConnectionRequest getLdapTestConnectionRequest(Map<String, String> formData) {

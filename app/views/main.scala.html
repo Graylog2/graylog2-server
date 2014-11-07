@@ -1,10 +1,9 @@
 @(title: String, sidebarContent: Html, searchQuery: String = "", currentUser: org.graylog2.restclient.models.User, hasSearch: Boolean = true)(content: Html)(implicit stream: org.graylog2.restclient.models.Stream = null)
-
+@import play.libs.Json
 @import views.helpers.Permissions._
 @import lib.security.RestPermissions._
 @import org.graylog2.restclient.lib.Configuration
 @import org.graylog2.restclient.lib.Version
-@import com.google.gson.Gson
 
 
     <!DOCTYPE html>
@@ -12,12 +11,11 @@
     <head>
         <title>Graylog2 - @title</title>
         <script type="text/javascript">
-            var userPreferences = @Html(new Gson().toJson(currentUser.getPreferences));
+            var userPreferences = @Html(Json.stringify(Json.toJson(currentUser.getPreferences)));
         </script>
       	@partials.head()
     </head>
     <body>
-
         @partials.top()
 
         <div id="scroll-to-search-hint" style="display: none;" class="alpha80">

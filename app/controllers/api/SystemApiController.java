@@ -20,31 +20,44 @@ package controllers.api;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.gson.Gson;
-import com.google.inject.Inject;
 import controllers.AuthenticatedController;
 import org.graylog2.restclient.lib.APIException;
 import org.graylog2.restclient.lib.metrics.Meter;
-import org.graylog2.restclient.models.*;
+import org.graylog2.restclient.models.BufferInfo;
+import org.graylog2.restclient.models.ClusterService;
+import org.graylog2.restclient.models.MessagesService;
+import org.graylog2.restclient.models.Node;
+import org.graylog2.restclient.models.NodeJVMStats;
+import org.graylog2.restclient.models.NodeService;
+import org.graylog2.restclient.models.Notification;
+import org.graylog2.restclient.models.Radio;
+import org.graylog2.restclient.models.Stream;
+import org.graylog2.restclient.models.StreamService;
+import org.graylog2.restclient.models.SystemJob;
 import play.libs.F;
+import play.libs.Json;
 import play.mvc.Http;
 import play.mvc.Result;
 
+import javax.inject.Inject;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 public class SystemApiController extends AuthenticatedController {
+    private final NodeService nodeService;
+    private final ClusterService clusterService;
+    private final MessagesService messagesService;
+    private final StreamService streamService;
 
     @Inject
-    private NodeService nodeService;
-    @Inject
-    private ClusterService clusterService;
-    @Inject
-    private MessagesService messagesService;
-    @Inject
-    private StreamService streamService;
+    public SystemApiController(NodeService nodeService, ClusterService clusterService, MessagesService messagesService, StreamService streamService) {
+        this.nodeService = nodeService;
+        this.clusterService = clusterService;
+        this.messagesService = messagesService;
+        this.streamService = streamService;
+    }
 
     public Result fields() {
         Set<String> fields = messagesService.getMessageFields();
@@ -52,7 +65,7 @@ public class SystemApiController extends AuthenticatedController {
         Map<String, Set<String>> result = Maps.newHashMap();
         result.put("fields", fields);
 
-        return ok(new Gson().toJson(result)).as("application/json");
+        return ok(Json.toJson(result));
     }
 
     public Result jobs() {
@@ -70,7 +83,7 @@ public class SystemApiController extends AuthenticatedController {
             Map<String, Object> result = Maps.newHashMap();
             result.put("jobs", jobs);
 
-            return ok(new Gson().toJson(result)).as("application/json");
+            return ok(Json.toJson(result));
         } catch (IOException e) {
             return internalServerError("io exception");
         } catch (APIException e) {
@@ -84,7 +97,7 @@ public class SystemApiController extends AuthenticatedController {
             result.put("count", clusterService.allNotifications().size());*/
             List<Notification> notifications = clusterService.allNotifications();
 
-            return ok(new Gson().toJson(notifications)).as("application/json");
+            return ok(Json.toJson(notifications));
         } catch (IOException e) {
             return internalServerError("io exception");
         } catch (APIException e) {
@@ -111,7 +124,7 @@ public class SystemApiController extends AuthenticatedController {
         result.put("throughput", throughputPerNodes._1);
         result.put("nodecount", throughputPerNodes._2);
 
-        return ok(new Gson().toJson(result)).as("application/json");
+        return ok(Json.toJson(result));
     }
 
     public Result nodeThroughput(String nodeId) {
@@ -120,7 +133,7 @@ public class SystemApiController extends AuthenticatedController {
             final Node node = nodeService.loadNode(nodeId);
             result.put("throughput", node.getThroughput());
 
-            return ok(new Gson().toJson(result)).as("application/json");
+            return ok(Json.toJson(result));
         } catch (NodeService.NodeNotFoundException e) {
             return status(404, "node not found");
         }
@@ -132,7 +145,7 @@ public class SystemApiController extends AuthenticatedController {
             final Radio radio = nodeService.loadRadio(radioId);
             result.put("throughput", radio.getThroughput());
 
-            return ok(new Gson().toJson(result)).as("application/json");
+            return ok(Json.toJson(result));
         } catch (NodeService.NodeNotFoundException e) {
             return status(404, "node not found");
         }
@@ -144,7 +157,7 @@ public class SystemApiController extends AuthenticatedController {
             final Stream stream = streamService.get(streamId);
             long throughput = stream.getThroughput();
             result.put("throughput", throughput);
-            return ok(new Gson().toJson(result)).as("application/json");
+            return ok(Json.toJson(result));
         } catch (APIException e) {
             return status(504, "Could not load stream " + streamId);
         } catch (IOException e) {
@@ -157,7 +170,7 @@ public class SystemApiController extends AuthenticatedController {
             Map<String, Object> result = Maps.newHashMap();
             Node node = nodeService.loadNode(nodeId);
 
-            return ok(new Gson().toJson(jvmMap(node.jvm(), node.getBufferInfo()))).as("application/json");
+            return ok(Json.toJson(jvmMap(node.jvm(), node.getBufferInfo())));
         } catch (NodeService.NodeNotFoundException e) {
             return status(404, "node not found");
         }
@@ -166,7 +179,7 @@ public class SystemApiController extends AuthenticatedController {
     public Result radioHeap(String radioId) {
         try {
             Radio radio = nodeService.loadRadio(radioId);
-            return ok(new Gson().toJson(jvmMap(radio.jvm(), radio.getBuffers()))).as("application/json");
+            return ok(Json.toJson(jvmMap(radio.jvm(), radio.getBuffers())));
         } catch (NodeService.NodeNotFoundException e) {
             return status(404, "radio not found");
         }
@@ -211,7 +224,7 @@ public class SystemApiController extends AuthenticatedController {
             Meter meter = (Meter) node.getSingleMetric("org.apache.log4j.Appender.all");
             result.put("total", meter.getTotal());
 
-            return ok(new Gson().toJson(result)).as("application/json");
+            return ok(Json.toJson(result));
         } catch (NodeService.NodeNotFoundException e) {
             return status(404, "node not found");
         } catch (IOException e) {
@@ -236,7 +249,7 @@ public class SystemApiController extends AuthenticatedController {
             };
 
             for (String level : levels) {
-                String shortName = level.substring(level.lastIndexOf(".")+1);
+                String shortName = level.substring(level.lastIndexOf(".") + 1);
                 Map<String, Object> meterMap = Maps.newHashMap();
 
                 Meter meter = (Meter) node.getSingleMetric(level);
@@ -248,7 +261,7 @@ public class SystemApiController extends AuthenticatedController {
                 result.put(shortName, meterMap);
             }
 
-            return ok(new Gson().toJson(result)).as("application/json");
+            return ok(Json.toJson(result));
         } catch (NodeService.NodeNotFoundException e) {
             return status(404, "node not found");
         } catch (IOException e) {
@@ -272,5 +285,4 @@ public class SystemApiController extends AuthenticatedController {
 
         return result;
     }
-
 }
