@@ -360,7 +360,7 @@ public class Indices implements IndexManagement {
         // http://www.elasticsearch.org/guide/reference/api/admin-indices-optimize/
         OptimizeRequest or = new OptimizeRequest(index);
 
-        or.maxNumSegments(1);
+        or.maxNumSegments(configuration.getIndexOptimizationMaxNumSegments());
         or.onlyExpungeDeletes(false);
         or.flush(true);
         or.waitForMerge(true); // This makes us block until the operation finished.

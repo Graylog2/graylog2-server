@@ -159,7 +159,7 @@ public class Deflector { // extends Ablenkblech
 
             if (!configuration.isDisableIndexOptimization()) {
                 try {
-                    systemJobManager.submit(optimizeIndexJobFactory.create(this, oldTarget));
+                    systemJobManager.submit(optimizeIndexJobFactory.create(oldTarget));
                 } catch (SystemJobConcurrencyException e) {
                     // The concurrency limit is very high. This should never happen.
                     LOG.error("Cannot optimize index <" + oldTarget + ">.", e);
