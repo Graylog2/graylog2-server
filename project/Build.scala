@@ -16,7 +16,6 @@ object ApplicationBuild extends Build {
   val appDependencies = Seq(
     cache,
     javaCore,
-    javaEbean,
     "com.google.guava" % "guava" % "18.0",
     "com.ning" % "async-http-client" % "1.8.14",
     "org.apache.shiro" % "shiro-core" % "1.2.2",
