@@ -37,11 +37,12 @@ import java.util.regex.Pattern;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.testng.AssertJUnit.*;
+import static org.testng.AssertJUnit.assertEquals;
+import static org.testng.AssertJUnit.assertFalse;
+import static org.testng.AssertJUnit.assertNotNull;
+import static org.testng.AssertJUnit.assertNull;
+import static org.testng.AssertJUnit.assertTrue;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public class MessageTest {
     private Message message;
 
@@ -285,32 +286,32 @@ public class MessageTest {
 
     @Test
     public void testIsComplete() throws Exception {
-        Message message = new Message("message", "source", new DateTime());
+        Message message = new Message("message", "source", Tools.iso8601());
         assertTrue(message.isComplete());
 
-        message = new Message("message", "", new DateTime());
+        message = new Message("message", "", Tools.iso8601());
         assertFalse(message.isComplete());
 
-        message = new Message("message", null, new DateTime());
+        message = new Message("message", null, Tools.iso8601());
         assertFalse(message.isComplete());
 
-        message = new Message("", "source", new DateTime());
+        message = new Message("", "source", Tools.iso8601());
         assertFalse(message.isComplete());
 
-        message = new Message(null, "source", new DateTime());
+        message = new Message(null, "source", Tools.iso8601());
         assertFalse(message.isComplete());
     }
 
     @Test
     public void testGetValidationErrorsWithEmptyMessage() throws Exception {
-        final Message message = new Message("", "source", new DateTime());
+        final Message message = new Message("", "source", Tools.iso8601());
 
         assertEquals("message is empty, ", message.getValidationErrors());
     }
 
     @Test
     public void testGetValidationErrorsWithNullMessage() throws Exception {
-        final Message message = new Message(null, "source", new DateTime());
+        final Message message = new Message(null, "source", Tools.iso8601());
 
         assertEquals("message is missing, ", message.getValidationErrors());
     }

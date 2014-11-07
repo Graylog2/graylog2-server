@@ -17,10 +17,10 @@
 package org.graylog2.restclient.models.api.results;
 
 import com.google.common.collect.ImmutableMap;
+import org.graylog2.restclient.lib.DateTools;
 import org.graylog2.restclient.models.FieldMapper;
 import org.graylog2.restclient.models.api.responses.HighlightRange;
 import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 import org.testng.annotations.Test;
 
 import java.util.Collections;
@@ -30,7 +30,7 @@ import static org.testng.Assert.assertEquals;
 
 public class MessageResultTest {
 
-    private static final DateTime NOW = DateTime.now(DateTimeZone.UTC);
+    private static final DateTime NOW = DateTools.nowInUTC();
 
     @Test
     public void testTimestampAsDouble() {

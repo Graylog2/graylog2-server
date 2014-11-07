@@ -76,6 +76,17 @@ public class GelfCodec implements Codec {
         return -1L;
     }
 
+    private static int intValue(final JsonNode json, final String fieldName) {
+        if (json != null) {
+            final JsonNode value = json.get(fieldName);
+
+            if (value != null) {
+                return value.asInt(-1);
+            }
+        }
+        return -1;
+    }
+
     private static double doubleValue(final JsonNode json, final String fieldName) {
         if (json != null) {
             final JsonNode value = json.get(fieldName);
@@ -132,7 +143,7 @@ public class GelfCodec implements Codec {
         }
 
         // Level is set by server if not specified by client.
-        final long level = longValue(node, "level");
+        final int level = intValue(node, "level");
         if (level > -1) {
             message.addField("level", level);
         }

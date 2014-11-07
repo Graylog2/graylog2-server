@@ -23,16 +23,13 @@ import com.mongodb.DBObject;
 import org.bson.types.ObjectId;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PersistedServiceImpl;
+import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.streams.Stream;
-import org.joda.time.DateTime;
 
 import javax.inject.Inject;
 import java.util.List;
 import java.util.Map;
 
-/**
- * @author Dennis Oelkers <dennis@torch.sh>
- */
 public class AlarmCallbackConfigurationServiceImpl extends PersistedServiceImpl implements AlarmCallbackConfigurationService {
     @Inject
     public AlarmCallbackConfigurationServiceImpl(MongoConnection mongoConnection) {
@@ -47,7 +44,7 @@ public class AlarmCallbackConfigurationServiceImpl extends PersistedServiceImpl 
         );
 
         for (DBObject configuration : respConfigurations) {
-            alarmCallbackConfigurations.add(new AlarmCallbackConfigurationImpl((ObjectId)configuration.get("_id"), configuration.toMap()));
+            alarmCallbackConfigurations.add(new AlarmCallbackConfigurationImpl((ObjectId) configuration.get("_id"), configuration.toMap()));
         }
 
         return alarmCallbackConfigurations;
@@ -61,7 +58,7 @@ public class AlarmCallbackConfigurationServiceImpl extends PersistedServiceImpl 
     @Override
     public AlarmCallbackConfiguration load(String alarmCallbackId) {
         DBObject rawModel = get(AlarmCallbackConfigurationImpl.class, alarmCallbackId);
-        return (rawModel == null ? null : new AlarmCallbackConfigurationImpl((ObjectId)(rawModel.get("_id")), rawModel.toMap()));
+        return (rawModel == null ? null : new AlarmCallbackConfigurationImpl((ObjectId) (rawModel.get("_id")), rawModel.toMap()));
     }
 
     @Override
@@ -70,7 +67,7 @@ public class AlarmCallbackConfigurationServiceImpl extends PersistedServiceImpl 
         fields.put("stream_id", new ObjectId(streamId));
         fields.put("type", request.type);
         fields.put("configuration", request.configuration);
-        fields.put("created_at", DateTime.now());
+        fields.put("created_at", Tools.iso8601());
         fields.put("creator_user_id", userId);
 
         return new AlarmCallbackConfigurationImpl(fields);

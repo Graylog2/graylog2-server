@@ -33,6 +33,7 @@ import org.graylog2.rest.resources.RestResource;
 import org.graylog2.security.RestPermissions;
 import org.graylog2.streams.StreamService;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -90,9 +91,9 @@ public class StreamAlertResource extends RestResource {
             throw new WebApplicationException(404);
         }
 
-        DateTime since;
+        final DateTime since;
         if (sinceTs > 0) {
-            since = new DateTime(sinceTs*1000L);
+            since = new DateTime(sinceTs*1000L, DateTimeZone.UTC);
         } else {
             since = null;
         }

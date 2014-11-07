@@ -19,33 +19,44 @@ package org.graylog2.rest.resources.system.inputs;
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.wordnik.swagger.annotations.Api;
+import com.wordnik.swagger.annotations.ApiOperation;
+import com.wordnik.swagger.annotations.ApiParam;
+import com.wordnik.swagger.annotations.ApiResponse;
+import com.wordnik.swagger.annotations.ApiResponses;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.graylog2.database.*;
+import org.graylog2.database.ValidationException;
 import org.graylog2.inputs.Input;
 import org.graylog2.inputs.InputImpl;
 import org.graylog2.inputs.InputService;
+import org.graylog2.plugin.ServerStatus;
+import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationException;
 import org.graylog2.plugin.inputs.InputState;
-import com.wordnik.swagger.annotations.*;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.rest.resources.RestResource;
 import org.graylog2.security.RestPermissions;
-import org.graylog2.plugin.ServerStatus;
 import org.graylog2.shared.inputs.InputDescription;
 import org.graylog2.shared.inputs.InputRegistry;
 import org.graylog2.shared.inputs.NoSuchInputTypeException;
 import org.graylog2.shared.rest.resources.system.inputs.requests.InputLaunchRequest;
 import org.graylog2.system.activities.Activity;
 import org.graylog2.system.activities.ActivityWriter;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import javax.ws.rs.*;
+import javax.ws.rs.BadRequestException;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
 import javax.ws.rs.NotFoundException;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
@@ -132,14 +143,13 @@ public class InputsResource extends RestResource {
         Configuration inputConfig = new Configuration(lr.configuration);
 
         // Build input.
-        DateTime createdAt = new DateTime(DateTimeZone.UTC);
         final MessageInput input;
         try {
             input = inputRegistry.create(lr.type, inputConfig);
             input.setTitle(lr.title);
             input.setGlobal(lr.global);
             input.setCreatorUserId(getCurrentUser().getName());
-            input.setCreatedAt(createdAt);
+            input.setCreatedAt(Tools.iso8601());
             input.setConfiguration(inputConfig);
 
             input.checkConfiguration();
@@ -167,7 +177,7 @@ public class InputsResource extends RestResource {
         inputData.put(MessageInput.FIELD_TYPE, lr.type);
         inputData.put(MessageInput.FIELD_CREATOR_USER_ID, getCurrentUser().getName());
         inputData.put(MessageInput.FIELD_CONFIGURATION, lr.configuration);
-        inputData.put(MessageInput.FIELD_CREATED_AT, createdAt);
+        inputData.put(MessageInput.FIELD_CREATED_AT, Tools.iso8601());
         if (lr.global) {
             inputData.put(MessageInput.FIELD_GLOBAL, true);
         } else {

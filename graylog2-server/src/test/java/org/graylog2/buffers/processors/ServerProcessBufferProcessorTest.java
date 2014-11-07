@@ -21,9 +21,9 @@ import com.google.common.collect.Sets;
 import org.graylog2.Configuration;
 import org.graylog2.buffers.OutputBuffer;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.filters.MessageFilter;
 import org.graylog2.plugin.inputs.MessageInput;
-import org.joda.time.DateTime;
 import org.mockito.Matchers;
 import org.testng.annotations.Test;
 
@@ -31,8 +31,14 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static org.mockito.Mockito.*;
-import static org.testng.Assert.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.same;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.fail;
 
 public class ServerProcessBufferProcessorTest {
 
@@ -69,7 +75,7 @@ public class ServerProcessBufferProcessorTest {
                                                  processBufferWatermark, 0, 1,
                                                  outputBuffer);
         try {
-            emptyFilters.handleMessage(new Message("test", "source", DateTime.now()));
+            emptyFilters.handleMessage(new Message("test", "source", Tools.iso8601()));
             fail("A processor with empty filter set should throw an exception");
         } catch (RuntimeException ignored) {}
     }
@@ -113,8 +119,8 @@ public class ServerProcessBufferProcessorTest {
                                                  processBufferWatermark, 0, 1,
                                                  outputBuffer);
         try {
-            Message filteredoutMessage = new Message("filtered out", "source", DateTime.now());
-            Message unfilteredMessage = new Message("filtered out", "source", DateTime.now());
+            Message filteredoutMessage = new Message("filtered out", "source", Tools.iso8601());
+            Message unfilteredMessage = new Message("filtered out", "source", Tools.iso8601());
 
             filterTest.handleMessage(filteredoutMessage);
             filterTest.handleMessage(unfilteredMessage);

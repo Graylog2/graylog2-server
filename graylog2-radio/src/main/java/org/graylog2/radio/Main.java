@@ -47,6 +47,7 @@ import org.graylog2.shared.bindings.GuiceInstantiationService;
 import org.graylog2.shared.initializers.ServiceManagerListener;
 import org.graylog2.shared.plugins.PluginLoader;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
@@ -201,7 +202,7 @@ public class Main extends NodeRunner {
     private static String dumpConfiguration(final Map<String, String> configMap) {
         final StringBuilder sb = new StringBuilder();
         sb.append("# Configuration of graylog2-radio ").append(RadioVersion.VERSION).append(System.lineSeparator());
-        sb.append("# Generated on ").append(DateTime.now()).append(System.lineSeparator());
+        sb.append("# Generated on ").append(Tools.iso8601()).append(System.lineSeparator());
 
         for (Map.Entry<String, String> entry : configMap.entrySet()) {
             sb.append(entry.getKey()).append('=').append(nullToEmpty(entry.getValue())).append(System.lineSeparator());

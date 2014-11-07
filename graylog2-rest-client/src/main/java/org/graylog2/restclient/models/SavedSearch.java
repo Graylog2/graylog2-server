@@ -20,6 +20,7 @@ import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import org.graylog2.restclient.models.api.responses.searches.SavedSearchSummaryResponse;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 
 import java.util.Map;
 
@@ -40,7 +41,7 @@ public class SavedSearch {
         this.id = ssr.id;
         this.title = ssr.title;
         this.query = ssr.query;
-        this.createdAt = new DateTime(ssr.createdAt);
+        this.createdAt = new DateTime(ssr.createdAt, DateTimeZone.UTC);
         this.creatorUserId = userService.load(ssr.creatorUserId);
     }
 

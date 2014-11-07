@@ -78,7 +78,7 @@ public class Deflector { // extends Ablenkblech
         this.createNewSingleIndexRangeJobFactory = createNewSingleIndexRangeJobFactory;
 
         this.deflectorName = buildName(configuration.getElasticSearchIndexPrefix());
-            this.indices = indices;
+        this.indices = indices;
     }
 
     public boolean isUp() {
@@ -138,12 +138,6 @@ public class Deflector { // extends Ablenkblech
             LOG.error("Could not properly create new target <{}>", newTarget);
         }
 
-        if (configuration.isDisableIndexRangeCalculation() && oldTargetNumber != -1) {
-            addSingleIndexRanges(oldTarget);
-            addSingleIndexRanges(newTarget);
-        } else
-            updateIndexRanges();
-
         LOG.info("Done!");
 
         // Point deflector to new index.
@@ -173,6 +167,12 @@ public class Deflector { // extends Ablenkblech
                 }
             }
         }
+
+        if (configuration.isDisableIndexRangeCalculation() && oldTargetNumber != -1) {
+            addSingleIndexRanges(oldTarget);
+            addSingleIndexRanges(newTarget);
+        } else
+            updateIndexRanges();
 
         LOG.info("Done!");
 

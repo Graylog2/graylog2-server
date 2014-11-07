@@ -33,6 +33,7 @@ import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.database.EmbeddedPersistable;
 import org.graylog2.rest.resources.dashboards.requests.AddWidgetRequest;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 
 import java.util.Map;
 import java.util.UUID;
@@ -147,8 +148,8 @@ public abstract class DashboardWidget implements EmbeddedPersistable {
             timeRange = new KeywordRange((String) timerangeConfig.get("keyword"));
         } else if (rangeType.equals("absolute")) {
 
-            String from = new DateTime(timerangeConfig.get("from")).toString(Tools.ES_DATE_FORMAT);
-            String to = new DateTime(timerangeConfig.get("to")).toString(Tools.ES_DATE_FORMAT);
+            String from = new DateTime(timerangeConfig.get("from"), DateTimeZone.UTC).toString(Tools.ES_DATE_FORMAT);
+            String to = new DateTime(timerangeConfig.get("to"), DateTimeZone.UTC).toString(Tools.ES_DATE_FORMAT);
 
             timeRange = new AbsoluteRange(from, to);
         } else {

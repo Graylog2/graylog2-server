@@ -21,11 +21,10 @@ import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 import org.graylog2.inputs.codecs.gelf.GELFMessage;
 import org.graylog2.inputs.codecs.gelf.GELFMessageChunk;
+import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.inputs.codecs.CodecAggregator;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.buffer.ChannelBuffers;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -144,7 +143,7 @@ public class GelfChunkAggregator implements CodecAggregator {
     }
 
     private boolean isOutdated(ChunkEntry entry) {
-        return (DateTime.now(DateTimeZone.UTC).getMillis() - entry.firstTimestamp) > VALIDITY_PERIOD;
+        return (Tools.iso8601().getMillis() - entry.firstTimestamp) > VALIDITY_PERIOD;
     }
 
     private ChunkEntry getAndCleanupEntry(String id) {

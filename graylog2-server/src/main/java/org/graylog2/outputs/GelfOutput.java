@@ -24,6 +24,7 @@ import org.graylog2.gelfclient.GelfMessageLevel;
 import org.graylog2.gelfclient.GelfTransports;
 import org.graylog2.gelfclient.transport.GelfTransport;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.configuration.fields.ConfigurationField;
@@ -41,18 +42,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-/**
- * @author Dennis Oelkers <dennis@torch.sh>
- */
 public class GelfOutput implements MessageOutput {
     private static final Logger LOG = LoggerFactory.getLogger(GelfOutput.class);
+
+    private static final String CK_PROTOCOL = "protocol";
+    private static final String CK_HOSTNAME = "hostname";
+    private static final String CK_PORT = "port";
+
     private final AtomicBoolean isRunning = new AtomicBoolean(false);
+
     private Configuration configuration;
     private GelfTransport transport;
-
-    private final String CK_PROTOCOL = "protocol";
-    private final String CK_HOSTNAME = "hostname";
-    private final String CK_PORT = "port";
 
     @Override
     public void initialize(final Configuration config) throws MessageOutputConfigurationException {
@@ -119,12 +119,11 @@ public class GelfOutput implements MessageOutput {
         if (message.getField("timestamp") != null || message.getField("timestamp") instanceof DateTime) {
             timestamp = (DateTime) message.getField("timestamp");
         } else {
-            timestamp = DateTime.now();
+            timestamp = Tools.iso8601();
         }
 
-        final String level = (String) message.getField("level");
-        final GelfMessageLevel messageLevel = level == null ?
-                GelfMessageLevel.ALERT : GelfMessageLevel.fromNumericLevel(Integer.parseInt(level));
+        final Integer level = (Integer) message.getField("level");
+        final GelfMessageLevel messageLevel = level == null ? GelfMessageLevel.ALERT : GelfMessageLevel.fromNumericLevel(level);
         final String fullMessage = (String) message.getField("message");
         final String facility = (String) message.getField("facility");
         final String forwarder = GelfOutput.class.getCanonicalName();

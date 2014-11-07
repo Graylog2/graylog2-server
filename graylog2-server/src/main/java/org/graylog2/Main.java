@@ -56,6 +56,7 @@ import org.graylog2.system.activities.Activity;
 import org.graylog2.system.activities.ActivityWriter;
 import org.graylog2.system.shutdown.GracefulShutdown;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
@@ -327,7 +328,7 @@ public final class Main extends NodeRunner {
     private static String dumpConfiguration(final Map<String, String> configMap) {
         final StringBuilder sb = new StringBuilder();
         sb.append("# Configuration of graylog2-server ").append(ServerVersion.VERSION).append(System.lineSeparator());
-        sb.append("# Generated on ").append(DateTime.now()).append(System.lineSeparator());
+        sb.append("# Generated on ").append(Tools.iso8601()).append(System.lineSeparator());
 
         for(Map.Entry<String, String> entry:  configMap.entrySet()) {
             sb.append(entry.getKey()).append('=').append(nullToEmpty(entry.getValue())).append(System.lineSeparator());

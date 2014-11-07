@@ -24,6 +24,7 @@ package org.graylog2.plugin;
 
 import com.google.common.collect.Maps;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.msgpack.MessagePack;
 import org.testng.annotations.Test;
 
@@ -40,7 +41,7 @@ public class RadioMessageTest {
         Map<String, Object> fields = Maps.newHashMap();
 
         //required field
-        fields.put("timestamp", DateTime.now());
+        fields.put("timestamp", Tools.iso8601());
 
         // all different types we support
         fields.put("long_val", Long.valueOf(1L));

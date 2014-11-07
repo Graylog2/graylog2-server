@@ -19,6 +19,7 @@ package org.graylog2.inputs.codecs;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.inputs.codecs.Codec;
 import org.graylog2.plugin.journal.RawMessage;
@@ -35,9 +36,11 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertNull;
 
 public class SyslogCodecTest {
+    private static final int YEAR = Tools.iso8601().getYear();
     public static String STRUCTURED = "<165>1 2012-12-25T22:14:15.003Z mymachine.example.com evntslog - ID47 [exampleSDID@32473 iut=\"3\" eventSource=\"Application\" eventID=\"1011\"] BOMAn application event log entry";
     private final String UNSTRUCTURED = "<45>Oct 21 12:09:37 c4dc57ba1ebb syslog-ng[7208]: syslog-ng starting up; version='3.5.3'";
 
@@ -61,8 +64,9 @@ public class SyslogCodecTest {
     public void testDecodeStructured() throws Exception {
         final Message message = codec.decode(buildRawMessage(STRUCTURED));
 
+        assertNotNull(message);
         assertEquals(message.getMessage(), "ID47 [exampleSDID@32473 iut=\"3\" eventSource=\"Application\" eventID=\"1011\"] BOMAn application event log entry");
-        assertEquals(((DateTime)message.getField("timestamp")).withZone(DateTimeZone.UTC), new DateTime("2012-12-25T22:14:15.003Z", DateTimeZone.UTC));
+        assertEquals(((DateTime) message.getField("timestamp")).withZone(DateTimeZone.UTC), new DateTime("2012-12-25T22:14:15.003Z", DateTimeZone.UTC));
         assertEquals(message.getField("source"), "mymachine.example.com");
         assertEquals(message.getField("level"), 5);
         assertEquals(message.getField("facility"), "local4");
@@ -70,8 +74,6 @@ public class SyslogCodecTest {
         assertEquals(message.getField("eventID"), "1011");
         assertEquals(message.getField("iut"), "3");
         assertEquals(message.getField("application_name"), "evntslog");
-        // Needs https://github.com/Graylog2/graylog2-server/pull/744 to pull out all SD-ELEMENTS.
-        //assertEquals(message.getField("sequenceId"), "1");
     }
 
     @Test
@@ -80,8 +82,9 @@ public class SyslogCodecTest {
 
         final Message message = codec.decode(buildRawMessage(STRUCTURED));
 
+        assertNotNull(message);
         assertEquals(message.getMessage(), "ID47 [exampleSDID@32473 iut=\"3\" eventSource=\"Application\" eventID=\"1011\"] BOMAn application event log entry");
-        assertEquals(((DateTime)message.getField("timestamp")).withZone(DateTimeZone.UTC), new DateTime("2012-12-25T22:14:15.003Z", DateTimeZone.UTC));
+        assertEquals(((DateTime) message.getField("timestamp")).withZone(DateTimeZone.UTC), new DateTime("2012-12-25T22:14:15.003Z", DateTimeZone.UTC));
         assertEquals(message.getField("source"), "mymachine.example.com");
         assertEquals(message.getField("level"), 5);
         assertEquals(message.getField("facility"), "local4");
@@ -90,16 +93,15 @@ public class SyslogCodecTest {
         assertEquals(message.getField("eventID"), "1011");
         assertEquals(message.getField("iut"), "3");
         assertEquals(message.getField("application_name"), "evntslog");
-        // Needs https://github.com/Graylog2/graylog2-server/pull/744 to pull out all SD-ELEMENTS.
-        //assertEquals(message.getField("sequenceId"), "1");
     }
 
     @Test
     public void testDecodeUnstructured() throws Exception {
         final Message message = codec.decode(buildRawMessage(UNSTRUCTURED));
 
+        assertNotNull(message);
         assertEquals(message.getMessage(), "c4dc57ba1ebb syslog-ng[7208]: syslog-ng starting up; version='3.5.3'");
-        assertEquals(message.getField("timestamp"), new DateTime(DateTime.now().getYear() + "-10-21T12:09:37"));
+        assertEquals(message.getField("timestamp"), new DateTime(YEAR + "-10-21T12:09:37"));
         assertEquals(message.getField("source"), "c4dc57ba1ebb");
         assertEquals(message.getField("level"), 5);
         assertEquals(message.getField("facility"), "syslogd");
@@ -112,8 +114,9 @@ public class SyslogCodecTest {
 
         final Message message = codec.decode(buildRawMessage(UNSTRUCTURED));
 
+        assertNotNull(message);
         assertEquals(message.getMessage(), "c4dc57ba1ebb syslog-ng[7208]: syslog-ng starting up; version='3.5.3'");
-        assertEquals(message.getField("timestamp"), new DateTime(DateTime.now().getYear() + "-10-21T12:09:37"));
+        assertEquals(message.getField("timestamp"), new DateTime(YEAR + "-10-21T12:09:37"));
         assertEquals(message.getField("source"), "c4dc57ba1ebb");
         assertEquals(message.getField("level"), 5);
         assertEquals(message.getField("facility"), "syslogd");

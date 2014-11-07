@@ -27,8 +27,6 @@ import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PersistedServiceImpl;
 import org.graylog2.database.ValidationException;
 import org.graylog2.plugin.Tools;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -110,7 +108,7 @@ public class AccessTokenServiceImpl extends PersistedServiceImpl implements Acce
 
     @Override
     public void touch(AccessToken accessToken) throws ValidationException {
-        accessToken.getFields().put(AccessTokenImpl.LAST_ACCESS, DateTime.now(DateTimeZone.UTC));
+        accessToken.getFields().put(AccessTokenImpl.LAST_ACCESS, Tools.iso8601());
         save(accessToken);
     }
 
