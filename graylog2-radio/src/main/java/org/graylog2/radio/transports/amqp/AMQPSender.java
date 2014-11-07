@@ -49,7 +49,12 @@ public class AMQPSender {
     private Connection connection;
     private Channel channel;
 
-    private final MessagePack pack;
+    private static final ThreadLocal<MessagePack> MSGPACK = new ThreadLocal<MessagePack>() {
+        @Override
+        protected MessagePack initialValue() {
+            return new MessagePack();
+        }
+    };
 
     public AMQPSender(String hostname,
                       int port,
@@ -64,7 +69,6 @@ public class AMQPSender {
         this.queueType = queueType;
         this.exchangeName = exchangeName;
         this.routingKey = routingKey;
-        pack = new MessagePack();
 
         this.hostname = hostname;
         this.port = port;
@@ -91,7 +95,7 @@ public class AMQPSender {
             connect();
         }
 
-        byte[] body = RadioMessage.serialize(pack, msg);
+        final byte[] body = RadioMessage.serialize(MSGPACK.get(), msg);
 
         boolean mandatory = true;
         channel.basicPublish(exchangeName, routingKey, mandatory, new AMQP.BasicProperties(), body);
