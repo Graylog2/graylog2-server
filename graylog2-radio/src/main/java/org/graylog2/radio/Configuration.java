@@ -97,9 +97,6 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "ring_size", required = true, validator = PositiveIntegerValidator.class)
     private int ringSize = 1024;
 
-    @Parameter(value = "ring_size", required = true, validator = PositiveIntegerValidator.class)
-    private int ringSize = 1024;
-
     public String getNodeIdFile() {
         return nodeIdFile;
     }

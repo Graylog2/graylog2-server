@@ -94,7 +94,7 @@ public class AMQPSender {
         byte[] body = RadioMessage.serialize(pack, msg);
 
         boolean mandatory = true;
-        channel.basicPublish(exchangeName, routingKey, mandatory, new AMQP.BasicProperties(), body)
+        channel.basicPublish(exchangeName, routingKey, mandatory, new AMQP.BasicProperties(), body);
     }
 
     public void connect() throws IOException {
