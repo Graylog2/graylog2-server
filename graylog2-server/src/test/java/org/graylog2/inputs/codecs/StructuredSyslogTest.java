@@ -16,9 +16,13 @@
  */
 package org.graylog2.inputs.codecs;
 
+import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.Timer;
 import com.google.common.collect.ImmutableMap;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.syslog4j.server.impl.event.structured.StructuredSyslogServerEvent;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
@@ -28,6 +32,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
@@ -47,10 +54,17 @@ public class StructuredSyslogTest {
             SyslogCodec.CK_STORE_FULL_MESSAGE, true
     ));
     private SyslogCodec syslogCodec;
+    @Mock private MetricRegistry metricRegistry;
+    @Mock private Timer mockedTimer;
 
     @BeforeTest
     public void setUp() {
-        syslogCodec = new SyslogCodec(configuration);
+        MockitoAnnotations.initMocks(this);
+
+        when(metricRegistry.timer(any(String.class))).thenReturn(mockedTimer);
+        when(mockedTimer.time()).thenReturn(mock(Timer.Context.class));
+
+        syslogCodec = new SyslogCodec(configuration, metricRegistry);
     }
 
     private StructuredSyslogServerEvent newEvent(String message) {

@@ -5,7 +5,7 @@ import com.google.inject.assistedinject.AssistedInject;
 import org.graylog2.database.ValidationException;
 import org.graylog2.indexer.Deflector;
 import org.graylog2.indexer.EmptyIndexException;
-import org.graylog2.indexer.Indexer;
+import org.graylog2.indexer.searches.Searches;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.system.activities.ActivityWriter;
 import org.slf4j.Logger;
@@ -27,11 +27,11 @@ public class CreateNewSingleIndexRangeJob extends RebuildIndexRangesJob {
     @AssistedInject
     public CreateNewSingleIndexRangeJob(@Assisted Deflector deflector,
                                         @Assisted String indexName,
+                                        Searches searches,
                                         ServerStatus serverStatus,
-                                        Indexer indexer,
                                         ActivityWriter activityWriter,
                                         IndexRangeService indexRangeService) {
-        super(deflector, serverStatus, indexer, activityWriter, indexRangeService);
+        super(deflector, serverStatus, searches, activityWriter, indexRangeService);
         this.indexName = indexName;
     }
 
@@ -45,7 +45,7 @@ public class CreateNewSingleIndexRangeJob extends RebuildIndexRangesJob {
         LOG.info("Calculating ranges for index {}.", indexName);
         try {
             final Map<String, Object> range;
-            if (deflector.getCurrentActualTargetIndex(indexer).equals(indexName))
+            if (deflector.getCurrentActualTargetIndex().equals(indexName))
                 range = calculateRange(indexName);
             else
                 range = getDeflectorIndexRange(indexName);

@@ -71,15 +71,15 @@ public class SyslogCodec implements Codec {
     @AssistedInject
     public SyslogCodec(@Assisted Configuration configuration, MetricRegistry metricRegistry) {
         this.configuration = configuration;
-        this.resolveTime = metricRegistry.timer(name(SyslogCodec.class, "resolveTime");
-        this.decodeTime = metricRegistry.timer(name(SyslogCodec.class, "decodeTime");
+        this.resolveTime = metricRegistry.timer(name(SyslogCodec.class, "resolveTime"));
+        this.decodeTime = metricRegistry.timer(name(SyslogCodec.class, "decodeTime"));
     }
 
     @Nullable
     @Override
     public Message decode(@Nonnull RawMessage rawMessage) {
         final String msg = new String(rawMessage.getPayload(), StandardCharsets.UTF_8);
-        try (Timer.Context context = this.decodeTime.time(){
+        try (Timer.Context context = this.decodeTime.time()) {
             final InetSocketAddress remoteAddress = rawMessage.getRemoteAddress();
             return parse(msg, remoteAddress.getAddress(), rawMessage.getTimestamp());
         } catch (ClassCastException e) {
@@ -159,7 +159,7 @@ public class SyslogCodec implements Codec {
 
     private String parseHost(SyslogServerEventIF msg, InetAddress remoteAddress) {
         if (remoteAddress != null && configuration.getBoolean(CK_FORCE_RDNS)) {
-            try (Timer.Context context = this.resolveTime.time(){
+            try (Timer.Context context = this.resolveTime.time()) {
                 return Tools.rdnsLookup(remoteAddress);
             } catch (UnknownHostException e) {
                 LOG.warn("Reverse DNS lookup failed. Falling back to parsed hostname.", e);

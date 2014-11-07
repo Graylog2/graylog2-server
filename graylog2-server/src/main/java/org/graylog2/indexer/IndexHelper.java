@@ -20,6 +20,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.elasticsearch.index.query.FilterBuilder;
 import org.elasticsearch.index.query.FilterBuilders;
+import org.graylog2.database.NotFoundException;
 import org.graylog2.indexer.ranges.IndexRange;
 import org.graylog2.indexer.ranges.IndexRangeService;
 import org.graylog2.indexer.searches.timeranges.RelativeRange;
@@ -115,8 +116,12 @@ public class IndexHelper {
 
         // Always include the most recent index in some cases.
         if (indices.isEmpty() || range instanceof RelativeRange) {
-            IndexRange deflectorIndexRange = indexRangeService.get(deflector.getCurrentActualTargetIndex());
-            indices.add(deflectorIndexRange);
+            try {
+                final IndexRange deflectorIndexRange = indexRangeService.get(deflector.getCurrentActualTargetIndex());
+                indices.add(deflectorIndexRange);
+            } catch (NotFoundException e) {
+                e.printStackTrace();
+            }
         }
 
         return indices;

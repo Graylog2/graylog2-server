@@ -66,7 +66,7 @@ public class Deflector { // extends Ablenkblech
                      final ActivityWriter activityWriter,
                      final RebuildIndexRangesJob.Factory rebuildIndexRangesJobFactory,
                      final OptimizeIndexJob.Factory optimizeIndexJobFactory,
-                     final CreateNewSingleIndexRangeJob.Factory createNewSingleIndexRangeJobFactory) {
+                     final CreateNewSingleIndexRangeJob.Factory createNewSingleIndexRangeJobFactory,
                      final Indices indices) {
         this.configuration = configuration;
         indexPrefix = configuration.getElasticSearchIndexPrefix();

@@ -49,7 +49,7 @@ public class DeflectorTest {
                 mock(ActivityWriter.class),
                 mock(RebuildIndexRangesJob.Factory.class),
                 mock(OptimizeIndexJob.Factory.class),
-                mock(CreateNewSingleIndexRangeJob.Factory.class));
+                mock(CreateNewSingleIndexRangeJob.Factory.class),
                 mock(Indices.class));
     }
 
@@ -80,7 +80,7 @@ public class DeflectorTest {
                 mock(ActivityWriter.class),
                 mock(RebuildIndexRangesJob.Factory.class),
                 mock(OptimizeIndexJob.Factory.class),
-                mock(CreateNewSingleIndexRangeJob.Factory.class));
+                mock(CreateNewSingleIndexRangeJob.Factory.class),
                 mock(Indices.class));
 
         assertEquals("graylog2_0", d.buildIndexName("graylog2", 0));
@@ -100,7 +100,7 @@ public class DeflectorTest {
                                     mock(ActivityWriter.class),
                                     mock(RebuildIndexRangesJob.Factory.class),
                                     mock(OptimizeIndexJob.Factory.class),
-                                    mock(CreateNewSingleIndexRangeJob.Factory.class));
+                                    mock(CreateNewSingleIndexRangeJob.Factory.class),
                                     mock(Indices.class));
         try {
             final Map<String, IndexStats> deflectorIndices = d.getAllDeflectorIndices();
@@ -118,7 +118,7 @@ public class DeflectorTest {
                                     mock(ActivityWriter.class),
                                     mock(RebuildIndexRangesJob.Factory.class),
                                     mock(OptimizeIndexJob.Factory.class),
-                                    mock(CreateNewSingleIndexRangeJob.Factory.class));
+                                    mock(CreateNewSingleIndexRangeJob.Factory.class),
                                     mock(Indices.class));
         try {
             final String[] deflectorIndices = d.getAllDeflectorIndexNames();
