@@ -40,21 +40,18 @@ import static com.codahale.metrics.MetricRegistry.name;
 
 public class KafkaProducer implements RadioTransport {
     private static final Logger LOG = LoggerFactory.getLogger(KafkaProducer.class);
-    private static final ThreadLocal<MessagePack> MSGPACK = new ThreadLocal<MessagePack>() {
-        @Override
-        protected MessagePack initialValue() {
-            return new MessagePack();
-        }
-    };
     public static final String KAFKA_TOPIC = "graylog2-radio-messages";
 
     private final Producer<byte[], byte[]> producer;
+    private final MessagePack pack;
     private final Meter incomingMessages;
     private final Meter rejectedMessages;
     private final Timer processTime;
 
     @Inject
     public KafkaProducer(ServerStatus serverStatus, Configuration configuration, MetricRegistry metricRegistry) {
+        pack = new MessagePack();
+
         Properties props = new Properties();
         props.put("metadata.broker.list", configuration.getKafkaBrokers());
         props.put("partitioner.class", "kafka.producer.DefaultPartitioner");
@@ -80,7 +77,7 @@ public class KafkaProducer implements RadioTransport {
         try(Timer.Context context = processTime.time()) {
             incomingMessages.mark();
             data = new KeyedMessage<>(
-                    KAFKA_TOPIC, msg.getId().getBytes(StandardCharsets.UTF_8), RadioMessage.serialize(MSGPACK.get(), msg));
+                    KAFKA_TOPIC, msg.getId().getBytes(StandardCharsets.UTF_8), RadioMessage.serialize(pack, msg));
 
             producer.send(data);
         } catch(IOException e) {

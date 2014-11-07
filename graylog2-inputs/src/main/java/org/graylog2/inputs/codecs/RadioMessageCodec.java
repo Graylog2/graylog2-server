@@ -35,24 +35,23 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import javax.inject.Provider;
 import java.io.IOException;
 
 public class RadioMessageCodec implements Codec {
     private static final Logger log = LoggerFactory.getLogger(RadioMessageCodec.class);
 
-    private final Provider<MessagePack> messagePackProvider;
+    private final MessagePack messagePack;
 
     @AssistedInject
-    public RadioMessageCodec(@Assisted Configuration configuration, Provider<MessagePack> messagePackProvider) {
-        this.messagePackProvider = messagePackProvider;
+    public RadioMessageCodec(@Assisted Configuration configuration, MessagePack messagePack) {
+        this.messagePack = messagePack;
     }
 
     @Nullable
     @Override
     public Message decode(@Nonnull RawMessage rawMessage) {
         try {
-            final RadioMessage msg = messagePackProvider.get().read(rawMessage.getPayload(), RadioMessage.class);
+            final RadioMessage msg = messagePack.read(rawMessage.getPayload(), RadioMessage.class);
 
             if (!msg.strings.containsKey("message") || !msg.strings.containsKey("source") || msg.timestamp <= 0) {
                 log.error("Incomplete AMQP message. Skipping.");
