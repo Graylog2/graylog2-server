@@ -19,10 +19,12 @@ package org.graylog2.radio.transports.amqp;
 import com.rabbitmq.client.*;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.RadioMessage;
+import org.graylog2.radio.Configuration;
 import org.msgpack.MessagePack;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
 import java.io.IOException;
 
 /**
@@ -39,13 +41,29 @@ public class AMQPSender {
     private final String vHost;
     private final String username;
     private final String password;
+    private final String queueName;
+    private final String queueType;
+    private final String exchangeName;
+    private final String routingKey;
 
     private Connection connection;
     private Channel channel;
 
     private final MessagePack pack;
 
-    public AMQPSender(String hostname, int port, String vHost, String username, String password) {
+    public AMQPSender(String hostname,
+                      int port,
+                      String vHost,
+                      String username,
+                      String password,
+                      String queueName,
+                      String queueType,
+                      String exchangeName,
+                      String routingKey) {
+        this.queueName = queueName;
+        this.queueType = queueType;
+        this.exchangeName = exchangeName;
+        this.routingKey = routingKey;
         pack = new MessagePack();
 
         this.hostname = hostname;
@@ -53,6 +71,19 @@ public class AMQPSender {
         this.vHost = vHost;
         this.username = username;
         this.password = password;
+    }
+
+    @Inject
+    public AMQPSender(Configuration configuration) {
+        this(configuration.getAmqpHostname(),
+                configuration.getAmqpPort(),
+                configuration.getAmqpVirtualHost(),
+                configuration.getAmqpUsername(),
+                configuration.getAmqpPassword(),
+                configuration.getAmqpQueueName(),
+                configuration.getAmqpQueueType(),
+                configuration.getAmqpExchangeName(),
+                configuration.getAmqpRoutingKey());
     }
 
     public void send(Message msg) throws IOException {
@@ -63,7 +94,7 @@ public class AMQPSender {
         byte[] body = RadioMessage.serialize(pack, msg);
 
         boolean mandatory = true;
-        channel.basicPublish(AMQPProducer.EXCHANGE, AMQPProducer.ROUTING_KEY, mandatory, new AMQP.BasicProperties(), body);
+        channel.basicPublish(exchangeName, routingKey, mandatory, new AMQP.BasicProperties(), body)
     }
 
     public void connect() throws IOException {
@@ -83,10 +114,10 @@ public class AMQPSender {
         channel = connection.createChannel();
 
         // It's ok if the queue or exchange already exist.
-        channel.queueDeclare(AMQPProducer.QUEUE, true, false, false, null);
-        channel.exchangeDeclare(AMQPProducer.EXCHANGE, "topic", true, false, null);
+        channel.queueDeclare(queueName, true, false, false, null);
+        channel.exchangeDeclare(exchangeName, queueType, false, false, null);
 
-        channel.queueBind(AMQPProducer.QUEUE, AMQPProducer.EXCHANGE, AMQPProducer.ROUTING_KEY);
+        channel.queueBind(queueName, exchangeName, routingKey);
     }
 
     public boolean isConnected() {
