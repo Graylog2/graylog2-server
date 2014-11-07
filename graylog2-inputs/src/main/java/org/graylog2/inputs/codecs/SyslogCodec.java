@@ -16,6 +16,8 @@
  */
 package org.graylog2.inputs.codecs;
 
+import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.Timer;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
@@ -48,6 +50,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import static com.codahale.metrics.MetricRegistry.name;
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static com.google.common.base.Throwables.propagate;
 
@@ -62,17 +65,21 @@ public class SyslogCodec implements Codec {
     public static final String CK_STORE_FULL_MESSAGE = "store_full_message";
 
     private final Configuration configuration;
+    private final Timer resolveTime;
+    private final Timer decodeTime;
 
     @AssistedInject
-    public SyslogCodec(@Assisted Configuration configuration) {
+    public SyslogCodec(@Assisted Configuration configuration, MetricRegistry metricRegistry) {
         this.configuration = configuration;
+        this.resolveTime = metricRegistry.timer(name(SyslogCodec.class, "resolveTime");
+        this.decodeTime = metricRegistry.timer(name(SyslogCodec.class, "decodeTime");
     }
 
     @Nullable
     @Override
     public Message decode(@Nonnull RawMessage rawMessage) {
         final String msg = new String(rawMessage.getPayload(), StandardCharsets.UTF_8);
-        try {
+        try (Timer.Context context = this.decodeTime.time(){
             final InetSocketAddress remoteAddress = rawMessage.getRemoteAddress();
             return parse(msg, remoteAddress.getAddress(), rawMessage.getTimestamp());
         } catch (ClassCastException e) {
@@ -152,7 +159,7 @@ public class SyslogCodec implements Codec {
 
     private String parseHost(SyslogServerEventIF msg, InetAddress remoteAddress) {
         if (remoteAddress != null && configuration.getBoolean(CK_FORCE_RDNS)) {
-            try {
+            try (Timer.Context context = this.resolveTime.time(){
                 return Tools.rdnsLookup(remoteAddress);
             } catch (UnknownHostException e) {
                 LOG.warn("Reverse DNS lookup failed. Falling back to parsed hostname.", e);
