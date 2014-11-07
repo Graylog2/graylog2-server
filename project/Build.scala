@@ -27,10 +27,10 @@ object ApplicationBuild extends Build {
     "org.graylog2" % "graylog2-rest-client" % appVersion,
 
     // TODO this is stupid, just to get that UriBuilder...
-    "javax.ws.rs" % "jsr311-api" % "0.11",
-    "com.sun.jersey" % "jersey-server" % "1.17.1",
-    "com.sun.jersey" % "jersey-grizzly2" % "1.17.1",
-    "com.sun.jersey" % "jersey-bundle" % "1.17.1",
+    "javax.ws.rs" % "jsr311-api" % "1.1.1",
+    "com.sun.jersey" % "jersey-server" % "1.18.1",
+    "com.sun.jersey" % "jersey-grizzly2" % "1.18.1",
+    "com.sun.jersey" % "jersey-bundle" % "1.18.1",
 
     "org.mockito" % "mockito-all" % "1.9.5" % "test"
   )
