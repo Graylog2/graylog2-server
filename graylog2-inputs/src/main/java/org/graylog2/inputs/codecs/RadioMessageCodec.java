@@ -28,6 +28,7 @@ import org.graylog2.plugin.inputs.codecs.Codec;
 import org.graylog2.plugin.inputs.codecs.CodecAggregator;
 import org.graylog2.plugin.journal.RawMessage;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.msgpack.MessagePack;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,7 +62,7 @@ public class RadioMessageCodec implements Codec {
             final Message event = new Message(
                     msg.strings.get("message"),
                     msg.strings.get("source"),
-                    new DateTime(msg.timestamp)
+                    new DateTime(msg.timestamp, DateTimeZone.UTC)
             );
 
             event.addStringFields(msg.strings);
