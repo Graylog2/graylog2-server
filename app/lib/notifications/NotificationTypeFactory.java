@@ -46,7 +46,7 @@ public class NotificationTypeFactory {
                 } catch (APIException | IOException e) {
                     streamTitle = "(Stream title unavailable)";
                 }
-                long faultCount = (long) notification.getDetail("fault_count");
+                int faultCount = (int) notification.getDetail("fault_count");
                 return new StreamProcessingDisabledNotification(notification, streamTitle, faultCount);
         }
 
