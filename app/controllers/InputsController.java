@@ -37,6 +37,7 @@ import org.graylog2.restclient.models.Radio;
 import org.graylog2.restclient.models.api.requests.inputs.LaunchInputRequest;
 import org.graylog2.restclient.models.api.responses.system.InputTypeSummaryResponse;
 import play.data.Form;
+import play.mvc.BodyParser;
 import play.mvc.Result;
 import views.helpers.Permissions;
 
@@ -453,6 +454,7 @@ public class InputsController extends AuthenticatedController {
         return redirect(routes.InputsController.index());
     }
 
+    @BodyParser.Of(BodyParser.FormUrlEncoded.class)
     public Result addStaticField(String nodeId, String inputId) {
         if (!Permissions.isPermitted(RestPermissions.INPUTS_EDIT, inputId)) {
             return redirect(routes.StartpageController.redirect());

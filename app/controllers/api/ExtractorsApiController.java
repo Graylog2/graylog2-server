@@ -21,22 +21,20 @@ package controllers.api;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Maps;
-import com.google.inject.Inject;
 import controllers.AuthenticatedController;
 import org.graylog2.restclient.lib.APIException;
 import org.graylog2.restclient.models.ExtractorService;
 import org.graylog2.restclient.models.InputService;
 import org.graylog2.restclient.models.NodeService;
 import play.Logger;
+import play.mvc.BodyParser;
 import play.mvc.Result;
 
+import javax.inject.Inject;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.SortedMap;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public class ExtractorsApiController extends AuthenticatedController {
 
     @Inject
@@ -54,15 +52,15 @@ public class ExtractorsApiController extends AuthenticatedController {
      * holding the extractor. This also makes it working with global inputs
      * out of the box. Hooray!
      */
+    @BodyParser.Of(BodyParser.Json.class)
     public Result order(String inputId) {
-        JsonNode json = request().body().asJson();
+        final JsonNode json = request().body().asJson();
 
-        SortedMap<Integer, String> positions = Maps.newTreeMap();
-
-        Iterator<JsonNode> order = json.get("order").elements();
+        final SortedMap<Integer, String> positions = Maps.newTreeMap();
+        final Iterator<JsonNode> order = json.get("order").elements();
         int i = 0;
-        while(order.hasNext()) {
-            String extractorId = order.next().asText();
+        while (order.hasNext()) {
+            final String extractorId = order.next().asText();
 
             positions.put(i, extractorId);
 
@@ -81,5 +79,4 @@ public class ExtractorsApiController extends AuthenticatedController {
 
         return ok();
     }
-
 }

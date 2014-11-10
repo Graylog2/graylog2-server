@@ -36,6 +36,7 @@ import org.graylog2.restclient.models.StreamService;
 import org.graylog2.restclient.models.SystemJob;
 import play.libs.F;
 import play.libs.Json;
+import play.mvc.BodyParser;
 import play.mvc.Http;
 import play.mvc.Result;
 
@@ -185,6 +186,7 @@ public class SystemApiController extends AuthenticatedController {
         }
     }
 
+    @BodyParser.Of(BodyParser.FormUrlEncoded.class)
     public Result pauseMessageProcessing() {
         try {
             Http.RequestBody body = request().body();
@@ -201,6 +203,7 @@ public class SystemApiController extends AuthenticatedController {
         }
     }
 
+    @BodyParser.Of(BodyParser.FormUrlEncoded.class)
     public Result resumeMessageProcessing() {
         try {
             Http.RequestBody body = request().body();

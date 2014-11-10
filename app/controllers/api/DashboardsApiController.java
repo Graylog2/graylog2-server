@@ -19,6 +19,7 @@
  */
 package controllers.api;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import controllers.AuthenticatedController;
@@ -40,6 +41,7 @@ import org.graylog2.restclient.models.dashboards.widgets.SearchResultCountWidget
 import org.graylog2.restclient.models.dashboards.widgets.StreamSearchResultCountWidget;
 import play.Logger;
 import play.libs.Json;
+import play.mvc.BodyParser;
 import play.mvc.Result;
 import views.helpers.Permissions;
 
@@ -114,6 +116,7 @@ public class DashboardsApiController extends AuthenticatedController {
         return writable;
     }
 
+    @BodyParser.Of(BodyParser.Json.class)
     public Result setWidgetPositions(String dashboardId) {
 
         try {
@@ -178,6 +181,7 @@ public class DashboardsApiController extends AuthenticatedController {
         return resultValue;
     }
 
+    @BodyParser.Of(BodyParser.FormUrlEncoded.class)
     public Result addWidget(String dashboardId) {
         try {
             final Map<String, String> params = flattenFormUrlEncoded(request().body().asFormUrlEncoded());
@@ -278,6 +282,7 @@ public class DashboardsApiController extends AuthenticatedController {
         }
     }
 
+    @BodyParser.Of(BodyParser.FormUrlEncoded.class)
     public Result updateWidgetDescription(String dashboardId, String widgetId) {
         String newDescription = flattenFormUrlEncoded(request().body().asFormUrlEncoded()).get("description");
 
@@ -300,6 +305,7 @@ public class DashboardsApiController extends AuthenticatedController {
         }
     }
 
+    @BodyParser.Of(BodyParser.FormUrlEncoded.class)
     public Result updateWidgetCacheTime(String dashboardId, String widgetId) {
         String newCacheTimeS = flattenFormUrlEncoded(request().body().asFormUrlEncoded()).get("cacheTime");
 

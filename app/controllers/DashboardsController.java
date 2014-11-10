@@ -33,6 +33,7 @@ import org.graylog2.restclient.models.dashboards.DashboardService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import play.data.Form;
+import play.mvc.BodyParser;
 import play.mvc.Result;
 
 import java.io.IOException;
@@ -123,6 +124,7 @@ public class DashboardsController extends AuthenticatedController {
         return redirect(routes.DashboardsController.index());
     }
 
+    @BodyParser.Of(BodyParser.FormUrlEncoded.class)
     public Result update(String id) {
         Map<String,String> params = flattenFormUrlEncoded(request().body().asFormUrlEncoded());
 

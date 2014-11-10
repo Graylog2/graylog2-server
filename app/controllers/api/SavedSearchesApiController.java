@@ -27,6 +27,7 @@ import org.graylog2.restclient.models.SavedSearch;
 import org.graylog2.restclient.models.SavedSearchService;
 import org.graylog2.restclient.models.api.requests.searches.CreateSavedSearchRequest;
 import play.libs.Json;
+import play.mvc.BodyParser;
 import play.mvc.Result;
 
 import javax.inject.Inject;
@@ -62,6 +63,7 @@ public class SavedSearchesApiController extends AuthenticatedController {
         }
     }
 
+    @BodyParser.Of(BodyParser.FormUrlEncoded.class)
     public Result create() {
         Map<String, String> params = flattenFormUrlEncoded(request().body().asFormUrlEncoded());
 

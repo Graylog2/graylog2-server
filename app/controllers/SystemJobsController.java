@@ -24,6 +24,7 @@ import org.graylog2.restclient.lib.ApiClient;
 import org.graylog2.restclient.models.ClusterService;
 import org.graylog2.restclient.models.SystemJob;
 import play.Logger;
+import play.mvc.BodyParser;
 import play.mvc.Http;
 import play.mvc.Result;
 
@@ -37,6 +38,7 @@ public class SystemJobsController extends AuthenticatedController {
     @Inject
     private ClusterService clusterService;
 
+    @BodyParser.Of(BodyParser.FormUrlEncoded.class)
     public Result trigger() {
         Http.RequestBody body = request().body();
 

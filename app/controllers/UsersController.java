@@ -44,6 +44,7 @@ import org.slf4j.LoggerFactory;
 import play.data.DynamicForm;
 import play.data.Form;
 import play.libs.Json;
+import play.mvc.BodyParser;
 import play.mvc.Result;
 import views.helpers.Permissions;
 import views.html.system.users.edit;
@@ -169,6 +170,7 @@ public class UsersController extends AuthenticatedController {
         }
     }
 
+    @BodyParser.Of(BodyParser.Json.class)
     public Result saveUserPreferences(String username) throws IOException {
         Map<String, Object> preferences = Json.fromJson(request().body().asJson(), Map.class);
         if (userService.savePreferences(username, normalizePreferences(preferences))) {

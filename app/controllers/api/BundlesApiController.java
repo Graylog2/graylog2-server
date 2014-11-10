@@ -24,6 +24,7 @@ import org.graylog2.restclient.models.bundles.BundleService;
 import org.graylog2.restclient.models.bundles.ConfigurationBundle;
 import play.Logger;
 import play.libs.Json;
+import play.mvc.BodyParser;
 import play.mvc.Http.MultipartFormData;
 import play.mvc.Http.MultipartFormData.FilePart;
 import play.mvc.Result;
@@ -49,6 +50,7 @@ public class BundlesApiController extends AuthenticatedController {
         return ok(Json.toJson(bundles.asMap()));
     }
 
+    @BodyParser.Of(BodyParser.MultipartFormData.class)
     public Result create() {
         String path = getRefererPath();
         MultipartFormData body = request().body().asMultipartFormData();

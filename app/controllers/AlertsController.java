@@ -28,6 +28,7 @@ import org.graylog2.restclient.models.alerts.AlertCondition;
 import org.graylog2.restclient.models.alerts.AlertConditionService;
 import org.graylog2.restclient.models.api.requests.alerts.CreateAlertConditionRequest;
 import org.graylog2.restclient.models.api.responses.alarmcallbacks.GetSingleAvailableAlarmCallbackResponse;
+import play.mvc.BodyParser;
 import play.mvc.Result;
 
 import java.io.IOException;
@@ -97,6 +98,7 @@ public class AlertsController extends AuthenticatedController {
         }
     }
 
+    @BodyParser.Of(BodyParser.FormUrlEncoded.class)
     public Result addTypeMessageCount(String streamId) {
         Map<String,String> form = flattenFormUrlEncoded(request().body().asFormUrlEncoded());
 
@@ -131,6 +133,7 @@ public class AlertsController extends AuthenticatedController {
         return redirect(routes.AlertsController.index(streamId));
     }
 
+    @BodyParser.Of(BodyParser.FormUrlEncoded.class)
     public Result addTypeFieldValue(String streamId) {
         Map<String,String> form = flattenFormUrlEncoded(request().body().asFormUrlEncoded());
 
@@ -169,6 +172,7 @@ public class AlertsController extends AuthenticatedController {
         return redirect(routes.AlertsController.index(streamId));
     }
 
+    @BodyParser.Of(BodyParser.FormUrlEncoded.class)
     public Result updateCondition(String streamId, String conditionId) {
         Map<String,String> form = flattenFormUrlEncoded(request().body().asFormUrlEncoded());
 
@@ -223,6 +227,7 @@ public class AlertsController extends AuthenticatedController {
         }
     }
 
+    @BodyParser.Of(BodyParser.FormUrlEncoded.class)
     public Result addReceiverUser(String streamId) {
         Map<String,String> form = flattenFormUrlEncoded(request().body().asFormUrlEncoded());
         String username = form.get("username");
@@ -280,6 +285,7 @@ public class AlertsController extends AuthenticatedController {
         }
     }
 
+    @BodyParser.Of(BodyParser.FormUrlEncoded.class)
     public Result addReceiverEmail(String streamId) {
         Map<String,String> form = flattenFormUrlEncoded(request().body().asFormUrlEncoded());
         String email = form.get("email");
