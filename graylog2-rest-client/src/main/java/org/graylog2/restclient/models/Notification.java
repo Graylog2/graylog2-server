@@ -22,9 +22,6 @@ import org.joda.time.DateTime;
 
 import java.util.Map;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public class Notification {
 
     @Inject
@@ -55,15 +52,20 @@ public class Notification {
     private final Type type;
     private final DateTime timestamp;
     private final Severity severity;
-    private final String node_id;
+    private final String nodeId;
     private final Map<String, Object> details;
 
     public Notification(NotificationSummaryResponse x) {
         this.type = Type.valueOf(x.type.toUpperCase());
         this.timestamp = DateTime.parse(x.timestamp);
         this.severity = Severity.valueOf(x.severity.toUpperCase());
-        this.node_id = x.node_id;
+        this.nodeId = x.node_id;
         this.details = x.details;
+    }
+
+    public Notification(NotificationSummaryResponse x, NodeService nodeService) {
+        this(x);
+        this.nodeService = nodeService;
     }
 
     public Type getType() {
@@ -75,12 +77,16 @@ public class Notification {
     }
 
     public String getNodeId() {
-        return this.node_id;
+        return this.nodeId;
     }
 
     public Node getNode() {
+        if (nodeService == null) {
+            return null;
+        }
+
         try {
-            return nodeService.loadNode(this.node_id);
+            return nodeService.loadNode(this.nodeId);
         } catch (NodeService.NodeNotFoundException e) {
             return null;
         }
@@ -91,9 +97,14 @@ public class Notification {
     }
 
     public Object getDetail(String id) {
-        if (details == null)
+        if (details == null) {
             return null;
+        }
 
         return details.get(id);
+    }
+
+    public Severity getSeverity() {
+        return severity;
     }
 }
