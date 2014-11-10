@@ -52,11 +52,13 @@ public class Periodicals {
         if (periodical.runsForever()) {
             LOG.info("Starting [{}] periodical, running forever.", periodical.getClass().getCanonicalName());
 
-            Thread t = new Thread(periodical);
-            t.setDaemon(periodical.isDaemon());
-            t.setName("periodical-" + periodical.getClass().getCanonicalName());
-            t.setUncaughtExceptionHandler(new Tools.LogUncaughtExceptionHandler(LOG));
-            t.start();
+            for (int i = 0; i < periodical.getParallelism(); i++) {
+                Thread t = new Thread(periodical);
+                t.setDaemon(periodical.isDaemon());
+                t.setName("periodical-" + periodical.getClass().getCanonicalName() + "-" + i);
+                t.setUncaughtExceptionHandler(new Tools.LogUncaughtExceptionHandler(LOG));
+                t.start();
+            }
         } else {
             LOG.info(
                     "Starting [{}] periodical in [{}s], polling every [{}s].",

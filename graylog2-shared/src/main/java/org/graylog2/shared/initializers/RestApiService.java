@@ -43,6 +43,8 @@ import org.jboss.netty.channel.Channels;
 import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory;
 import org.jboss.netty.handler.codec.http.HttpRequestDecoder;
 import org.jboss.netty.handler.codec.http.HttpResponseEncoder;
+import org.jboss.netty.handler.execution.ExecutionHandler;
+import org.jboss.netty.handler.execution.OrderedMemoryAwareThreadPoolExecutor;
 import org.jboss.netty.handler.ssl.SslContext;
 import org.jboss.netty.handler.ssl.SslHandler;
 import org.jboss.netty.handler.ssl.util.SelfSignedCertificate;
@@ -65,6 +67,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
 
 import static com.google.common.base.Strings.emptyToNull;
 
@@ -159,6 +162,8 @@ public class RestApiService extends AbstractIdleService {
             tlsKeyFile = configuration.getRestTlsKeyFile();
         }
 
+        final ThreadPoolExecutor executor = new OrderedMemoryAwareThreadPoolExecutor(configuration.getRestThreadPoolSize(), 1048576, 1048576);
+
         bootstrap.setPipelineFactory(new ChannelPipelineFactory() {
             @Override
             public ChannelPipeline getPipeline() throws Exception {
@@ -171,6 +176,7 @@ public class RestApiService extends AbstractIdleService {
                 pipeline.addLast("decoder", new HttpRequestDecoder(maxInitialLineLength, maxHeaderSize, maxChunkSize));
                 pipeline.addLast("encoder", new HttpResponseEncoder());
                 pipeline.addLast("chunks", new ChunkedWriteHandler());
+                pipeline.addLast("executor", new ExecutionHandler(executor));
                 pipeline.addLast("jerseyHandler", jerseyHandler);
 
                 return pipeline;

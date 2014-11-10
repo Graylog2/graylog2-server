@@ -16,6 +16,8 @@
  */
 package org.graylog2.inputs.codecs;
 
+import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.Timer;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.configuration.Configuration;
@@ -30,6 +32,8 @@ import org.testng.annotations.Test;
 
 import java.net.InetSocketAddress;
 
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
@@ -40,8 +44,9 @@ public class SyslogCodecTest {
     public static String STRUCTURED = "<165>1 2012-12-25T22:14:15.003Z mymachine.example.com evntslog - ID47 [exampleSDID@32473 iut=\"3\" eventSource=\"Application\" eventID=\"1011\"] BOMAn application event log entry";
     private final String UNSTRUCTURED = "<45>Oct 21 12:09:37 c4dc57ba1ebb syslog-ng[7208]: syslog-ng starting up; version='3.5.3'";
 
-    @Mock
-    private Configuration configuration;
+    @Mock private Configuration configuration;
+    @Mock private MetricRegistry metricRegistry;
+    @Mock private Timer mockedTimer;
 
     private Codec codec;
 
@@ -49,7 +54,10 @@ public class SyslogCodecTest {
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
 
-        codec = new SyslogCodec(configuration);
+        when(metricRegistry.timer(any(String.class))).thenReturn(mockedTimer);
+        when(mockedTimer.time()).thenReturn(mock(Timer.Context.class));
+
+        codec = new SyslogCodec(configuration, metricRegistry);
     }
 
     @Test

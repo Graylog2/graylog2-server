@@ -19,6 +19,7 @@ package org.graylog2.periodical;
 import com.codahale.metrics.MetricRegistry;
 import com.google.inject.Inject;
 import org.graylog2.inputs.InputCache;
+import org.graylog2.plugin.BaseConfiguration;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.shared.buffers.ProcessBuffer;
 import org.slf4j.Logger;
@@ -40,8 +41,9 @@ public class InputCacheWorkerThread extends AbstractCacheWorkerThread {
     public InputCacheWorkerThread(MetricRegistry metricRegistry,
                                   InputCache inputCache,
                                   ProcessBuffer processBuffer,
-                                  ServerStatus serverStatus) {
-        super(serverStatus);
+                                  ServerStatus serverStatus,
+                                  BaseConfiguration configuration) {
+        super(serverStatus, configuration);
         this.metricRegistry = metricRegistry;
         this.inputCache = inputCache;
         this.processBuffer = processBuffer;
@@ -58,5 +60,10 @@ public class InputCacheWorkerThread extends AbstractCacheWorkerThread {
                 work(inputCache, processBuffer);
             }
         }, "master-cache-worker-input").start();
+    }
+
+    @Override
+    public int getParallelism() {
+        return 1;
     }
 }

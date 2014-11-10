@@ -55,6 +55,7 @@ import org.graylog2.filters.FilterServiceImpl;
 import org.graylog2.indexer.healing.FixDeflectorByDeleteJob;
 import org.graylog2.indexer.healing.FixDeflectorByMoveJob;
 import org.graylog2.indexer.indices.jobs.OptimizeIndexJob;
+import org.graylog2.indexer.ranges.CreateNewSingleIndexRangeJob;
 import org.graylog2.indexer.ranges.RebuildIndexRangesJob;
 import org.graylog2.inputs.BasicCache;
 import org.graylog2.inputs.InputCache;
@@ -114,6 +115,7 @@ public class ServerBindings extends AbstractModule {
         install(new FactoryModuleBuilder().build(ServerProcessBufferProcessor.Factory.class));
         install(new FactoryModuleBuilder().build(RebuildIndexRangesJob.Factory.class));
         install(new FactoryModuleBuilder().build(OptimizeIndexJob.Factory.class));
+        install(new FactoryModuleBuilder().build(CreateNewSingleIndexRangeJob.Factory.class));
         install(new FactoryModuleBuilder().build(FixDeflectorByDeleteJob.Factory.class));
         install(new FactoryModuleBuilder().build(FixDeflectorByMoveJob.Factory.class));
         install(new FactoryModuleBuilder().build(LdapSettingsImpl.Factory.class));

@@ -50,6 +50,9 @@ public abstract class BaseConfiguration {
     @Parameter(value = "processor_wait_strategy", required = true)
     private String processorWaitStrategy = "blocking";
 
+    @Parameter(value = "ring_size", required = true, validator = PositiveIntegerValidator.class)
+    private int ringSize = 1024;
+
     @Parameter(value = "rest_enable_cors")
     private boolean restEnableCors = false;
 
@@ -68,6 +71,9 @@ public abstract class BaseConfiguration {
 
     @Parameter(value = "rest_enable_tls")
     private boolean restEnableTls = false;
+
+    @Parameter(value = "rest_thread_pool_size")
+    private int restThreadPoolSize = 16;
 
     @Parameter(value = "rest_tls_cert_file")
     private File restTlsCertFile;
@@ -152,6 +158,10 @@ public abstract class BaseConfiguration {
         }
     }
 
+    public int getRingSize() {
+        return ringSize;
+    }
+
     public boolean isRestEnableCors() {
         return restEnableCors;
     }
@@ -174,6 +184,10 @@ public abstract class BaseConfiguration {
 
     public boolean isRestEnableTls() {
         return restEnableTls;
+    }
+
+    public int getRestThreadPoolSize() {
+        return restThreadPoolSize;
     }
 
     public File getRestTlsCertFile() {

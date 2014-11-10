@@ -24,6 +24,7 @@ import org.elasticsearch.action.admin.indices.stats.IndexStats;
 import org.graylog2.Configuration;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.indices.jobs.OptimizeIndexJob;
+import org.graylog2.indexer.ranges.CreateNewSingleIndexRangeJob;
 import org.graylog2.indexer.ranges.RebuildIndexRangesJob;
 import org.graylog2.system.activities.ActivityWriter;
 import org.graylog2.system.jobs.SystemJobManager;
@@ -48,6 +49,7 @@ public class DeflectorTest {
                 mock(ActivityWriter.class),
                 mock(RebuildIndexRangesJob.Factory.class),
                 mock(OptimizeIndexJob.Factory.class),
+                mock(CreateNewSingleIndexRangeJob.Factory.class),
                 mock(Indices.class));
     }
 
@@ -78,6 +80,7 @@ public class DeflectorTest {
                 mock(ActivityWriter.class),
                 mock(RebuildIndexRangesJob.Factory.class),
                 mock(OptimizeIndexJob.Factory.class),
+                mock(CreateNewSingleIndexRangeJob.Factory.class),
                 mock(Indices.class));
 
         assertEquals("graylog2_0", d.buildIndexName("graylog2", 0));
@@ -97,6 +100,7 @@ public class DeflectorTest {
                                     mock(ActivityWriter.class),
                                     mock(RebuildIndexRangesJob.Factory.class),
                                     mock(OptimizeIndexJob.Factory.class),
+                                    mock(CreateNewSingleIndexRangeJob.Factory.class),
                                     mock(Indices.class));
         try {
             final Map<String, IndexStats> deflectorIndices = d.getAllDeflectorIndices();
@@ -114,6 +118,7 @@ public class DeflectorTest {
                                     mock(ActivityWriter.class),
                                     mock(RebuildIndexRangesJob.Factory.class),
                                     mock(OptimizeIndexJob.Factory.class),
+                                    mock(CreateNewSingleIndexRangeJob.Factory.class),
                                     mock(Indices.class));
         try {
             final String[] deflectorIndices = d.getAllDeflectorIndexNames();

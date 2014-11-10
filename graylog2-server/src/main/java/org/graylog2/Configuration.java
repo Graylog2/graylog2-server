@@ -92,9 +92,6 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "outputbuffer_processor_keep_alive_time", validator = PositiveIntegerValidator.class)
     private int outputBufferProcessorKeepAliveTime = 5000;
 
-    @Parameter(value = "ring_size", required = true, validator = PositiveIntegerValidator.class)
-    private int ringSize = 1024;
-
     @Parameter(value = "dead_letters_enabled")
     private boolean deadLettersEnabled = false;
 
@@ -319,6 +316,18 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "gc_warning_threshold")
     private Duration gcWarningThreshold = Duration.seconds(1l);
 
+    @Parameter(value = "disable_index_optimization")
+    private boolean disableIndexOptimization = false;
+
+    @Parameter(value = "disable_index_range_calculation")
+    private boolean disableIndexRangeCalculation = false;
+
+    @Parameter(value = "index_optimization_max_num_segments", validator = PositiveIntegerValidator.class)
+    private int indexOptimizationMaxNumSegments = 1;
+
+    @Parameter(value = "disable_output_cache")
+    private boolean disableOutputCache = false;
+
     public boolean isMaster() {
         return isMaster;
     }
@@ -365,10 +374,6 @@ public class Configuration extends BaseConfiguration {
 
     public int getOutputBufferProcessorKeepAliveTime() {
         return outputBufferProcessorKeepAliveTime;
-    }
-
-    public int getRingSize() {
-        return ringSize;
     }
 
     public String getElasticSearchConfigFile() {
@@ -706,6 +711,22 @@ public class Configuration extends BaseConfiguration {
 
     public Duration getGcWarningThreshold() {
         return gcWarningThreshold;
+    }
+
+    public boolean isDisableIndexOptimization() {
+        return disableIndexOptimization;
+    }
+
+    public boolean isDisableIndexRangeCalculation() {
+        return disableIndexRangeCalculation;
+    }
+
+    public int getIndexOptimizationMaxNumSegments() {
+        return indexOptimizationMaxNumSegments;
+    }
+
+    public boolean isDisableOutputCache() {
+        return disableOutputCache;
     }
 
     @ValidatorMethod

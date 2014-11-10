@@ -6,6 +6,9 @@
     <prerequisites>
         <maven>3.0.1</maven>
     </prerequisites>
+    <properties>
+        <play.version>2.3.6</play.version>
+    </properties>
 
     <parent>
         <groupId>org.graylog2</groupId>
@@ -77,7 +80,7 @@
         <dependency>
             <groupId>com.typesafe.play</groupId>
             <artifactId>play-java_2.10</artifactId>
-            <version>2.3.4</version>
+            <version>${play.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>ch.qos.logback</groupId>
@@ -92,7 +95,7 @@
         <dependency>
             <groupId>com.typesafe.play</groupId>
             <artifactId>play-cache_2.10</artifactId>
-            <version>2.3.4</version>
+            <version>${play.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.shiro</groupId>
@@ -101,12 +104,12 @@
         <dependency>
             <groupId>javax.ws.rs</groupId>
             <artifactId>jsr311-api</artifactId>
-            <version>0.11</version>
+            <version>1.1.1</version>
         </dependency>
         <dependency>
             <groupId>com.sun.jersey</groupId>
             <artifactId>jersey-bundle</artifactId>
-            <version>1.17.1</version>
+            <version>1.18.1</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>

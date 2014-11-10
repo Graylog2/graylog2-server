@@ -39,7 +39,7 @@
             <outputDirectory>/</outputDirectory>
         </file>
         <file>
-            <source>${project.basedir}/../build_script/copy/bin/graylog2ctl</source>
+            <source>${project.basedir}/../bin/graylog2ctl</source>
             <outputDirectory>bin/</outputDirectory>
             <fileMode>0755</fileMode>
         </file>
@@ -49,7 +49,7 @@
             <outputDirectory>/</outputDirectory>
         </file>
         <file>
-            <source>${project.basedir}/../build_script/copy/bin/graylog2-es-timestamp-fixup</source>
+            <source>${project.basedir}/../bin/graylog2-es-timestamp-fixup</source>
             <outputDirectory>bin/</outputDirectory>
             <fileMode>0755</fileMode>
         </file>
