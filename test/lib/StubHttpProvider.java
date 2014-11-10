@@ -31,6 +31,7 @@ import com.ning.http.client.Request;
 import com.ning.http.client.Response;
 import com.ning.http.client.cookie.Cookie;
 import com.ning.http.client.listenable.AbstractListenableFuture;
+import play.mvc.Http;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -234,7 +235,7 @@ public class StubHttpProvider implements AsyncHttpProvider {
 
             @Override
             public String getContentType() {
-                return "application/json";
+                return Http.MimeTypes.JSON;
             }
 
             @Override

@@ -42,6 +42,7 @@ import org.graylog2.restclient.models.dashboards.widgets.StreamSearchResultCount
 import play.Logger;
 import play.libs.Json;
 import play.mvc.BodyParser;
+import play.mvc.Http;
 import play.mvc.Result;
 import views.helpers.Permissions;
 
@@ -296,7 +297,7 @@ public class DashboardsApiController extends AuthenticatedController {
 
             widget.updateDescription(api(), newDescription.trim());
 
-            return ok().as("application/json");
+            return ok().as(Http.MimeTypes.JSON);
         } catch (APIException e) {
             String message = "Could not get widget. We expected HTTP 200, but got a HTTP " + e.getHttpCode() + ".";
             return status(504, views.html.errors.error.render(message, e, request()));
@@ -326,7 +327,7 @@ public class DashboardsApiController extends AuthenticatedController {
 
             widget.updateCacheTime(api(), newCacheTime);
 
-            return ok().as("application/json");
+            return ok().as(Http.MimeTypes.JSON);
         } catch (APIException e) {
             String message = "Could not get widget. We expected HTTP 200, but got a HTTP " + e.getHttpCode() + ".";
             return status(504, views.html.errors.error.render(message, e, request()));
