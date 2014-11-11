@@ -395,7 +395,7 @@ var SourceOverview = React.createClass({
 
         var noDataOverlayStyle = {display: this.state.histogramDataAvailable ? 'none' : 'block', width: this.state.lineChartWidth};
         var noDataOverlay = (
-            <div className="sources overlay" style={noDataOverlayStyle}>No data available</div>
+            <div className="sources overlay" style={noDataOverlayStyle}>Not enough data</div>
         );
 
         var resultsStyle = this.state.renderResultTable ? null : {display: 'none'};
