@@ -191,7 +191,7 @@ public class Global extends GlobalSettings {
     private ObjectMapper buildObjectMapper() {
         return new ObjectMapper()
                 .registerModules(new GuavaModule(), new JodaModule())
-                .setPropertyNamingStrategy(PropertyNamingStrategy.LOWER_CASE)
+                .setPropertyNamingStrategy(PropertyNamingStrategy.CAMEL_CASE_TO_LOWER_CASE_WITH_UNDERSCORES)
                 .enable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
                 .disable(DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES)
                 .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
