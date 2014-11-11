@@ -82,7 +82,7 @@ public class ClusterService {
         List<Notification> notifications = Lists.newArrayList();
         for (NotificationSummaryResponse notification : r.notifications) {
             try {
-                notifications.add(new Notification(notification, nodeService));
+                notifications.add(new Notification(notification));
             } catch (IllegalArgumentException e) {
                 LOG.warn("There is a notification type we can't handle: [{}]", notification.type);
             }

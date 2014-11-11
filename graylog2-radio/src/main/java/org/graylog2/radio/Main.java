@@ -29,7 +29,6 @@ import com.github.joschi.jadconfig.repositories.EnvironmentRepository;
 import com.github.joschi.jadconfig.repositories.PropertiesRepository;
 import com.github.joschi.jadconfig.repositories.SystemPropertiesRepository;
 import com.google.common.collect.Lists;
-import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.ServiceManager;
 import com.google.inject.Injector;
 import com.google.inject.Module;
@@ -46,8 +45,6 @@ import org.graylog2.shared.bindings.GuiceInjectorHolder;
 import org.graylog2.shared.bindings.GuiceInstantiationService;
 import org.graylog2.shared.initializers.ServiceManagerListener;
 import org.graylog2.shared.plugins.PluginLoader;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
@@ -160,7 +157,7 @@ public class Main extends NodeRunner {
 
         final ServiceManager serviceManager = injector.getInstance(ServiceManager.class);
         final ServiceManagerListener serviceManagerListener = injector.getInstance(ServiceManagerListener.class);
-        serviceManager.addListener(serviceManagerListener, MoreExecutors.sameThreadExecutor());
+        serviceManager.addListener(serviceManagerListener);
         serviceManager.startAsync().awaitHealthy();
 
         LOG.info("Graylog2 Radio up and running.");

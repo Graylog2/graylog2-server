@@ -16,16 +16,12 @@
  */
 package org.graylog2.restclient.models;
 
-import com.google.inject.Inject;
 import org.graylog2.restclient.models.api.responses.system.NotificationSummaryResponse;
 import org.joda.time.DateTime;
 
 import java.util.Map;
 
 public class Notification {
-
-    @Inject
-    private NodeService nodeService;
 
     public enum Type {
         DEFLECTOR_EXISTS_AS_INDEX,
@@ -63,11 +59,6 @@ public class Notification {
         this.details = x.details;
     }
 
-    public Notification(NotificationSummaryResponse x, NodeService nodeService) {
-        this(x);
-        this.nodeService = nodeService;
-    }
-
     public Type getType() {
         return type;
     }
@@ -78,18 +69,6 @@ public class Notification {
 
     public String getNodeId() {
         return this.nodeId;
-    }
-
-    public Node getNode() {
-        if (nodeService == null) {
-            return null;
-        }
-
-        try {
-            return nodeService.loadNode(this.nodeId);
-        } catch (NodeService.NodeNotFoundException e) {
-            return null;
-        }
     }
 
     public Map<String, Object> getDetails() {

@@ -17,6 +17,8 @@
 package org.graylog2.buffers.processors;
 
 import com.codahale.metrics.Histogram;
+import com.codahale.metrics.InstrumentedExecutorService;
+import com.codahale.metrics.InstrumentedThreadFactory;
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
@@ -30,21 +32,23 @@ import org.graylog2.outputs.CachedOutputRouter;
 import org.graylog2.outputs.OutputRegistry;
 import org.graylog2.outputs.OutputRouter;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.buffers.MessageEvent;
 import org.graylog2.plugin.outputs.MessageOutput;
-import org.graylog2.plugin.ServerStatus;
 import org.graylog2.shared.stats.ThroughputStats;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Set;
-import java.util.concurrent.*;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import static com.codahale.metrics.MetricRegistry.name;
 
-/**
- * @author Lennart Koopmann <lennart@socketfeed.com>
- */
 public class OutputBufferProcessor implements EventHandler<MessageEvent> {
     public interface Factory {
         public OutputBufferProcessor create(@Assisted("ordinal") final long ordinal,
@@ -90,18 +94,28 @@ public class OutputBufferProcessor implements EventHandler<MessageEvent> {
         this.ordinal = ordinal;
         this.numberOfConsumers = numberOfConsumers;
 
-        executor = new ThreadPoolExecutor(
-            configuration.getOutputBufferProcessorThreadsCorePoolSize(),
-            configuration.getOutputBufferProcessorThreadsMaxPoolSize(),
-            configuration.getOutputBufferProcessorKeepAliveTime(), TimeUnit.MILLISECONDS,
-            new LinkedBlockingQueue<Runnable>(),
-            new ThreadFactoryBuilder()
-            .setNameFormat("outputbuffer-processor-" + ordinal + "-executor-%d")
-            .build());
+        final String nameFormat = "outputbuffer-processor-" + ordinal + "-executor-%d";
+        final int corePoolSize = configuration.getOutputBufferProcessorThreadsCorePoolSize();
+        final int maxPoolSize = configuration.getOutputBufferProcessorThreadsMaxPoolSize();
+        final int keepAliveTime = configuration.getOutputBufferProcessorKeepAliveTime();
+        this.executor = executorService(metricRegistry, nameFormat, corePoolSize, maxPoolSize, keepAliveTime);
 
-        incomingMessages = metricRegistry.meter(name(OutputBufferProcessor.class, "incomingMessages"));
-        batchSize = metricRegistry.histogram(name(OutputBufferProcessor.class, "batchSize"));
-        processTime = metricRegistry.timer(name(OutputBufferProcessor.class, "processTime"));
+        this.incomingMessages = metricRegistry.meter(name(OutputBufferProcessor.class, "incomingMessages"));
+        this.batchSize = metricRegistry.histogram(name(OutputBufferProcessor.class, "batchSize"));
+        this.processTime = metricRegistry.timer(name(OutputBufferProcessor.class, "processTime"));
+    }
+
+    private ExecutorService executorService(final MetricRegistry metricRegistry, final String nameFormat,
+                                            final int corePoolSize, final int maxPoolSize, final int keepAliveTime) {
+        return new InstrumentedExecutorService(new ThreadPoolExecutor(
+                corePoolSize, maxPoolSize, keepAliveTime, TimeUnit.MILLISECONDS,
+                new LinkedBlockingQueue<Runnable>(), threadFactory(metricRegistry, nameFormat)), metricRegistry);
+    }
+
+    private ThreadFactory threadFactory(final MetricRegistry metricRegistry, final String nameFormat) {
+        return new InstrumentedThreadFactory(
+                new ThreadFactoryBuilder().setNameFormat(nameFormat).build(),
+                metricRegistry);
     }
 
     @Override
@@ -138,10 +152,10 @@ public class OutputBufferProcessor implements EventHandler<MessageEvent> {
                 executor.submit(new Runnable() {
                     @Override
                     public void run() {
-                        try(Timer.Context context = processTime.time()) {
+                        try (Timer.Context context = processTime.time()) {
                             output.write(msg);
                         } catch (Exception e) {
-                            LOG.error("Error in output [" + output.getName() +"].", e);
+                            LOG.error("Error in output [" + output.getName() + "].", e);
                         } finally {
                             doneSignal.countDown();
                         }
@@ -149,7 +163,7 @@ public class OutputBufferProcessor implements EventHandler<MessageEvent> {
                 });
 
             } catch (Exception e) {
-                LOG.error("Could not write message batch to output [" + output.getName() +"].", e);
+                LOG.error("Could not write message batch to output [" + output.getName() + "].", e);
                 doneSignal.countDown();
             }
         }

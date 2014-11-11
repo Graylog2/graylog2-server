@@ -16,6 +16,7 @@
  */
 package org.graylog2.radio.inputs;
 
+import com.codahale.metrics.MetricRegistry;
 import com.google.common.collect.Lists;
 import com.ning.http.client.AsyncHttpClient;
 import org.graylog2.plugin.configuration.Configuration;
@@ -38,9 +39,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.List;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public class RadioInputRegistry extends InputRegistry {
     private static final Logger LOG = LoggerFactory.getLogger(RadioInputRegistry.class);
 
@@ -52,8 +50,9 @@ public class RadioInputRegistry extends InputRegistry {
                               ProcessBuffer processBuffer,
                               AsyncHttpClient httpclient,
                               URI serverUrl,
-                              InputService inputService) {
-        super(messageInputFactory, processBuffer);
+                              InputService inputService,
+                              MetricRegistry metricRegistry) {
+        super(messageInputFactory, processBuffer, metricRegistry);
         this.httpclient = httpclient;
         this.serverUrl = serverUrl;
         this.inputService = inputService;

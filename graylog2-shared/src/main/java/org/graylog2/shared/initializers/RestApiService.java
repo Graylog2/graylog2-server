@@ -16,6 +16,9 @@
  */
 package org.graylog2.shared.initializers;
 
+import com.codahale.metrics.InstrumentedExecutorService;
+import com.codahale.metrics.InstrumentedThreadFactory;
+import com.codahale.metrics.MetricRegistry;
 import com.google.common.util.concurrent.AbstractIdleService;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.inject.internal.util.$Nullable;
@@ -67,7 +70,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.ThreadFactory;
 
 import static com.google.common.base.Strings.emptyToNull;
 
@@ -76,6 +79,7 @@ public class RestApiService extends AbstractIdleService {
     private static final Logger LOG = LoggerFactory.getLogger(RestApiService.class);
 
     private final BaseConfiguration configuration;
+    private final MetricRegistry metricRegistry;
     private final SecurityContextFactory securityContextFactory;
     private final Set<Class<? extends DynamicFeature>> dynamicFeatures;
     private final Set<Class<? extends ContainerResponseFilter>> containerResponseFilters;
@@ -86,42 +90,57 @@ public class RestApiService extends AbstractIdleService {
 
     @Inject
     public RestApiService(BaseConfiguration configuration,
+                          MetricRegistry metricRegistry,
                           @$Nullable SecurityContextFactory securityContextFactory,
                           Set<Class<? extends DynamicFeature>> dynamicFeatures,
                           Set<Class<? extends ContainerResponseFilter>> containerResponseFilters,
                           Set<Class<? extends ExceptionMapper>> exceptionMappers,
                           Map<String, Set<PluginRestResource>> pluginRestResources) {
-        this(configuration, securityContextFactory, dynamicFeatures, containerResponseFilters,
+        this(configuration, metricRegistry, securityContextFactory, dynamicFeatures, containerResponseFilters,
                 exceptionMappers, pluginRestResources,
-                Executors.newCachedThreadPool(new ThreadFactoryBuilder().setNameFormat("restapi-boss-%d").build()),
-                Executors.newCachedThreadPool(new ThreadFactoryBuilder().setNameFormat("restapi-worker-%d").build()));
+                instrumentedExecutor("restapi-boss-%d", metricRegistry),
+                instrumentedExecutor("restapi-worker-%d", metricRegistry));
     }
 
     private RestApiService(final BaseConfiguration configuration,
-                   final SecurityContextFactory securityContextFactory,
-                   final Set<Class<? extends DynamicFeature>> dynamicFeatures,
-                   final Set<Class<? extends ContainerResponseFilter>> containerResponseFilters,
-                   final Set<Class<? extends ExceptionMapper>> exceptionMappers,
-                   final Map<String, Set<PluginRestResource>> pluginRestResources,
-                   final ExecutorService bossExecutor,
-                   final ExecutorService workerExecutor) {
-        this(configuration, securityContextFactory, dynamicFeatures, containerResponseFilters, exceptionMappers, pluginRestResources, buildServerBootStrap(bossExecutor, workerExecutor));
+                           final MetricRegistry metricRegistry,
+                           final SecurityContextFactory securityContextFactory,
+                           final Set<Class<? extends DynamicFeature>> dynamicFeatures,
+                           final Set<Class<? extends ContainerResponseFilter>> containerResponseFilters,
+                           final Set<Class<? extends ExceptionMapper>> exceptionMappers,
+                           final Map<String, Set<PluginRestResource>> pluginRestResources,
+                           final ExecutorService bossExecutor,
+                           final ExecutorService workerExecutor) {
+        this(configuration, metricRegistry, securityContextFactory, dynamicFeatures, containerResponseFilters,
+                exceptionMappers, pluginRestResources, buildServerBootStrap(bossExecutor, workerExecutor));
     }
 
     private RestApiService(final BaseConfiguration configuration,
-                   final SecurityContextFactory securityContextFactory,
-                   final Set<Class<? extends DynamicFeature>> dynamicFeatures,
-                   final Set<Class<? extends ContainerResponseFilter>> containerResponseFilters,
-                   final Set<Class<? extends ExceptionMapper>> exceptionMappers,
-                   final Map<String, Set<PluginRestResource>> pluginRestResources,
-                   final ServerBootstrap bootstrap) {
+                           final MetricRegistry metricRegistry,
+                           final SecurityContextFactory securityContextFactory,
+                           final Set<Class<? extends DynamicFeature>> dynamicFeatures,
+                           final Set<Class<? extends ContainerResponseFilter>> containerResponseFilters,
+                           final Set<Class<? extends ExceptionMapper>> exceptionMappers,
+                           final Map<String, Set<PluginRestResource>> pluginRestResources,
+                           final ServerBootstrap bootstrap) {
         this.configuration = configuration;
+        this.metricRegistry = metricRegistry;
         this.securityContextFactory = securityContextFactory;
         this.dynamicFeatures = dynamicFeatures;
         this.containerResponseFilters = containerResponseFilters;
         this.exceptionMappers = exceptionMappers;
         this.pluginRestResources = pluginRestResources;
         this.bootstrap = bootstrap;
+    }
+
+    private static ExecutorService instrumentedExecutor(final String nameFormat, final MetricRegistry metricRegistry) {
+        return new InstrumentedExecutorService(
+                Executors.newCachedThreadPool(threadFactory(nameFormat, metricRegistry)), metricRegistry);
+    }
+
+    private static ThreadFactory threadFactory(final String nameFormat, final MetricRegistry metricRegistry) {
+        return new InstrumentedThreadFactory(
+                new ThreadFactoryBuilder().setNameFormat(nameFormat).build(), metricRegistry);
     }
 
     private static ServerBootstrap buildServerBootStrap(final ExecutorService bossExecutor, final ExecutorService workerExecutor) {
@@ -162,7 +181,8 @@ public class RestApiService extends AbstractIdleService {
             tlsKeyFile = configuration.getRestTlsKeyFile();
         }
 
-        final ThreadPoolExecutor executor = new OrderedMemoryAwareThreadPoolExecutor(configuration.getRestThreadPoolSize(), 1048576, 1048576);
+        // TODO Magic numbers
+        final ExecutorService executor = new InstrumentedExecutorService(new OrderedMemoryAwareThreadPoolExecutor(configuration.getRestThreadPoolSize(), 1048576, 1048576), metricRegistry);
 
         bootstrap.setPipelineFactory(new ChannelPipelineFactory() {
             @Override

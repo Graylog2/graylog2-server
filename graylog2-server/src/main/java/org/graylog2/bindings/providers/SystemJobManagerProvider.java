@@ -16,22 +16,20 @@
  */
 package org.graylog2.bindings.providers;
 
+import com.codahale.metrics.MetricRegistry;
 import org.graylog2.system.activities.ActivityWriter;
 import org.graylog2.system.jobs.SystemJobManager;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-/**
- * @author Dennis Oelkers <dennis@torch.sh>
- */
 public class SystemJobManagerProvider implements Provider<SystemJobManager> {
     private static SystemJobManager systemJobManager = null;
 
     @Inject
-    public SystemJobManagerProvider(ActivityWriter activityWriter) {
+    public SystemJobManagerProvider(ActivityWriter activityWriter, MetricRegistry metricRegistry) {
         if (systemJobManager == null)
-            systemJobManager = new SystemJobManager(activityWriter);
+            systemJobManager = new SystemJobManager(activityWriter, metricRegistry);
     }
 
     @Override

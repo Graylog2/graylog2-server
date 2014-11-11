@@ -16,6 +16,7 @@
  */
 package org.graylog2.system.jobs;
 
+import com.codahale.metrics.MetricRegistry;
 import org.graylog2.system.activities.ActivityWriter;
 import org.testng.annotations.Test;
 
@@ -23,14 +24,11 @@ import static org.mockito.Mockito.mock;
 import static org.testng.AssertJUnit.assertEquals;
 import static org.testng.AssertJUnit.assertTrue;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public class SystemJobManagerTest {
 
     @Test
     public void testGetRunningJobs() throws Exception {
-        SystemJobManager manager = new SystemJobManager(mock(ActivityWriter.class));
+        SystemJobManager manager = new SystemJobManager(mock(ActivityWriter.class), new MetricRegistry());
 
         LongRunningJob job1 = new LongRunningJob(1);
         LongRunningJob job2 = new LongRunningJob(1);
@@ -48,7 +46,7 @@ public class SystemJobManagerTest {
 
     @Test
     public void testConcurrentJobs() throws Exception {
-        SystemJobManager manager = new SystemJobManager(mock(ActivityWriter.class));
+        SystemJobManager manager = new SystemJobManager(mock(ActivityWriter.class), new MetricRegistry());
 
         SystemJob job1 = new LongRunningJob(3);
         SystemJob job2 = new LongRunningJob(3);
@@ -64,7 +62,7 @@ public class SystemJobManagerTest {
 
     @Test
     public void testSubmitThrowsExceptionIfMaxConcurrencyLevelReached() throws Exception {
-        SystemJobManager manager = new SystemJobManager(mock(ActivityWriter.class));
+        SystemJobManager manager = new SystemJobManager(mock(ActivityWriter.class), new MetricRegistry());
 
         LongRunningJob job1 = new LongRunningJob(3);
         LongRunningJob job2 = new LongRunningJob(3);
@@ -79,7 +77,7 @@ public class SystemJobManagerTest {
         boolean exceptionThrown = false;
         try {
             manager.submit(job2);
-        } catch(SystemJobConcurrencyException e) {
+        } catch (SystemJobConcurrencyException e) {
             exceptionThrown = true;
         }
 
@@ -103,7 +101,7 @@ public class SystemJobManagerTest {
         @Override
         public void execute() {
             try {
-                Thread.sleep(seconds*1000);
+                Thread.sleep(seconds * 1000);
             } catch (InterruptedException e) {
                 // That's fine.
                 return;
@@ -160,7 +158,7 @@ public class SystemJobManagerTest {
         @Override
         public void execute() {
             try {
-                Thread.sleep(seconds*1000);
+                Thread.sleep(seconds * 1000);
             } catch (InterruptedException e) {
                 // That's fine.
                 return;

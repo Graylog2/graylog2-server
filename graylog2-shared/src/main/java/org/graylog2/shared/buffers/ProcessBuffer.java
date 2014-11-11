@@ -16,6 +16,8 @@
  */
 package org.graylog2.shared.buffers;
 
+import com.codahale.metrics.InstrumentedExecutorService;
+import com.codahale.metrics.InstrumentedThreadFactory;
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
@@ -28,11 +30,11 @@ import org.graylog2.inputs.Cache;
 import org.graylog2.inputs.InputCache;
 import org.graylog2.plugin.BaseConfiguration;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.buffers.Buffer;
 import org.graylog2.plugin.buffers.BufferOutOfCapacityException;
 import org.graylog2.plugin.buffers.MessageEvent;
 import org.graylog2.plugin.buffers.ProcessingDisabledException;
-import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.shared.buffers.processors.ProcessBufferProcessor;
 import org.slf4j.Logger;
@@ -41,13 +43,11 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.codahale.metrics.MetricRegistry.name;
 
-/**
- * @author Lennart Koopmann <lennart@socketfeed.com>
- */
 public class ProcessBuffer extends Buffer {
     public interface Factory {
         public ProcessBuffer create(InputCache inputCache, AtomicInteger processBufferWatermark);
@@ -58,15 +58,10 @@ public class ProcessBuffer extends Buffer {
     public static String SOURCE_INPUT_ATTR_NAME;
     public static String SOURCE_NODE_ATTR_NAME;
 
-    protected ExecutorService executor = Executors.newCachedThreadPool(
-            new ThreadFactoryBuilder()
-                .setNameFormat("processbufferprocessor-%d")
-                .build()
-    );
-
     private final BaseConfiguration configuration;
     private final InputCache inputCache;
     private final AtomicInteger processBufferWatermark;
+    private final ExecutorService executor;
 
     private final Meter incomingMessages;
     private final Meter rejectedMessages;
@@ -85,9 +80,10 @@ public class ProcessBuffer extends Buffer {
         this.inputCache = inputCache;
         this.processBufferWatermark = processBufferWatermark;
 
-        incomingMessages = metricRegistry.meter(name(ProcessBuffer.class, "incomingMessages"));
-        rejectedMessages = metricRegistry.meter(name(ProcessBuffer.class, "rejectedMessages"));
-        cachedMessages = metricRegistry.meter(name(ProcessBuffer.class, "cachedMessages"));
+        this.executor = executorService(metricRegistry);
+        this.incomingMessages = metricRegistry.meter(name(ProcessBuffer.class, "incomingMessages"));
+        this.rejectedMessages = metricRegistry.meter(name(ProcessBuffer.class, "rejectedMessages"));
+        this.cachedMessages = metricRegistry.meter(name(ProcessBuffer.class, "cachedMessages"));
 
         if (serverStatus.hasCapability(ServerStatus.Capability.RADIO)) {
             SOURCE_INPUT_ATTR_NAME = "gl2_source_radio_input";
@@ -96,6 +92,16 @@ public class ProcessBuffer extends Buffer {
             SOURCE_INPUT_ATTR_NAME = "gl2_source_input";
             SOURCE_NODE_ATTR_NAME = "gl2_source_node";
         }
+    }
+
+    private ExecutorService executorService(MetricRegistry metricRegistry) {
+        return new InstrumentedExecutorService(
+                Executors.newCachedThreadPool(threadFactory(metricRegistry)), metricRegistry);
+    }
+
+    private ThreadFactory threadFactory(MetricRegistry metricRegistry) {
+        return new InstrumentedThreadFactory(
+                new ThreadFactoryBuilder().setNameFormat("processbufferprocessor-%d").build(), metricRegistry);
     }
 
     public Cache getInputCache() {
@@ -110,16 +116,16 @@ public class ProcessBuffer extends Buffer {
                 ProducerType.MULTI,
                 waitStrategy
         );
-        
+
         LOG.info("Initialized ProcessBuffer with ring size <{}> "
-                + "and wait strategy <{}>.", ringBufferSize,
+                        + "and wait strategy <{}>.", ringBufferSize,
                 waitStrategy.getClass().getSimpleName());
 
         disruptor.handleEventsWith(processors);
-        
+
         ringBuffer = disruptor.start();
     }
-    
+
     @Override
     public void insertCached(Message message, MessageInput sourceInput) {
         prepareMessage(message, sourceInput);
