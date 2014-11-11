@@ -47,7 +47,7 @@ public class GelfChunkAggregator implements CodecAggregator {
     private static final long CHECK_PERIOD = 1000;
 
     private final ConcurrentMap<String, ChunkEntry> chunks = Maps.newConcurrentMap();
-    private final ConcurrentSkipListSet<ChunkEntry> sortedEvictionSet = new ConcurrentSkipListSet();
+    private final ConcurrentSkipListSet<ChunkEntry> sortedEvictionSet = new ConcurrentSkipListSet<>();
 
     @Inject
     public GelfChunkAggregator(@Named("daemonScheduler") ScheduledExecutorService scheduler) {
