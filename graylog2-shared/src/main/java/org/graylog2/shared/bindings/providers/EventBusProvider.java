@@ -16,6 +16,9 @@
  */
 package org.graylog2.shared.bindings.providers;
 
+import com.codahale.metrics.InstrumentedExecutorService;
+import com.codahale.metrics.InstrumentedThreadFactory;
+import com.codahale.metrics.MetricRegistry;
 import com.google.common.eventbus.AsyncEventBus;
 import com.google.common.eventbus.EventBus;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
@@ -23,29 +26,31 @@ import org.graylog2.plugin.BaseConfiguration;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
 
-/**
- * @author Dennis Oelkers <dennis@torch.sh>
- */
 public class EventBusProvider implements Provider<EventBus> {
     private final BaseConfiguration configuration;
+    private final MetricRegistry metricRegistry;
 
     @Inject
-    public EventBusProvider(BaseConfiguration configuration) {
+    public EventBusProvider(final BaseConfiguration configuration, final MetricRegistry metricRegistry) {
         this.configuration = configuration;
+        this.metricRegistry = metricRegistry;
     }
 
     @Override
     public EventBus get() {
-        return new AsyncEventBus("graylog2-eventbus",
-                Executors.newFixedThreadPool(
-                        configuration.getAsyncEventbusProcessors(),
-                        new ThreadFactoryBuilder()
-                                .setDaemon(true)
-                                .setNameFormat(
-                                        "eventbus-handler-%d")
-                                .build()
-                ));
+        return new AsyncEventBus("graylog2-eventbus", executorService(configuration.getAsyncEventbusProcessors()));
+    }
+
+    private ExecutorService executorService(int nThreads) {
+        return new InstrumentedExecutorService(Executors.newFixedThreadPool(nThreads, threadFactory()), metricRegistry);
+    }
+
+    private ThreadFactory threadFactory() {
+        return new InstrumentedThreadFactory(
+                new ThreadFactoryBuilder().setDaemon(true).setNameFormat("eventbus-handler-%d").build(), metricRegistry);
     }
 }

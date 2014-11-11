@@ -16,6 +16,8 @@
  */
 package org.graylog2.caches;
 
+import com.codahale.metrics.InstrumentedScheduledExecutorService;
+import com.codahale.metrics.InstrumentedThreadFactory;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
@@ -41,12 +43,11 @@ import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 
 /**
  * Implements a {@link org.graylog2.inputs.Cache} based on MapDB.
- *
- * @author Bernd Ahlers <bernd@torch.sh>
  */
 public abstract class DiskJournalCache implements InputCache, OutputCache {
     private static final Logger LOG = LoggerFactory.getLogger(DiskJournalCache.class);
@@ -54,7 +55,6 @@ public abstract class DiskJournalCache implements InputCache, OutputCache {
     private final DB db;
     private final BlockingQueue<byte[]> queue;
     private final Atomic.Long counter;
-    private final ScheduledExecutorService commitService;
     private final MessageToJsonSerializer serializer;
     private final Store store;
     private final MetricRegistry metricRegistry;
@@ -101,9 +101,6 @@ public abstract class DiskJournalCache implements InputCache, OutputCache {
         this.store = Store.forDB(this.db);
         this.queue = db.getQueue("messages");
         this.counter = db.getAtomicLong("counter");
-        this.commitService = Executors.newSingleThreadScheduledExecutor(
-                new ThreadFactoryBuilder().setNameFormat("disk-journal-" + getDbFileName() + "-%d").build()
-        );
         this.serializer = serializer;
         this.addTimer = metricRegistry.timer(MetricRegistry.name(getClass(), getDbFileName(), "add", "executionTime"));
         this.popTimer = metricRegistry.timer(MetricRegistry.name(getClass(), getDbFileName(), "pop", "executionTime"));
@@ -123,7 +120,8 @@ public abstract class DiskJournalCache implements InputCache, OutputCache {
             commit();
         }
 
-        this.commitService.scheduleWithFixedDelay(new Runnable() {
+        final ScheduledExecutorService commitService = commitExecutorService();
+        commitService.scheduleWithFixedDelay(new Runnable() {
             @Override
             public void run() {
                 try {
@@ -133,6 +131,17 @@ public abstract class DiskJournalCache implements InputCache, OutputCache {
                 }
             }
         }, 0, config.getMessageCacheCommitInterval(), TimeUnit.MILLISECONDS);
+    }
+
+    private ScheduledExecutorService commitExecutorService() {
+        return new InstrumentedScheduledExecutorService(
+                Executors.newSingleThreadScheduledExecutor(threadFactory()), metricRegistry);
+    }
+
+    private ThreadFactory threadFactory() {
+        return new InstrumentedThreadFactory(
+                new ThreadFactoryBuilder().setNameFormat("disk-journal-" + getDbFileName() + "-%d").build(),
+                metricRegistry);
     }
 
     @Override

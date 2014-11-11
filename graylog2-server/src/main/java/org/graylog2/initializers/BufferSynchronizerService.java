@@ -16,6 +16,8 @@
  */
 package org.graylog2.initializers;
 
+import com.codahale.metrics.InstrumentedExecutorService;
+import com.codahale.metrics.MetricRegistry;
 import com.google.common.util.concurrent.AbstractIdleService;
 import org.graylog2.Configuration;
 import org.graylog2.buffers.Buffers;
@@ -38,6 +40,7 @@ public class BufferSynchronizerService extends AbstractIdleService {
     private final Caches cacheSynchronizer;
     private final Cluster cluster;
     private final Configuration configuration;
+    private final MetricRegistry metricRegistry;
 
     private volatile boolean indexerAvailable = true;
 
@@ -45,11 +48,13 @@ public class BufferSynchronizerService extends AbstractIdleService {
     public BufferSynchronizerService(final Buffers bufferSynchronizer,
                                      final Caches cacheSynchronizer,
                                      final Cluster cluster,
-                                     final Configuration configuration) {
+                                     final Configuration configuration,
+                                     final MetricRegistry metricRegistry) {
         this.bufferSynchronizer = bufferSynchronizer;
         this.cacheSynchronizer = cacheSynchronizer;
         this.cluster = cluster;
         this.configuration = configuration;
+        this.metricRegistry = metricRegistry;
     }
 
     @Override
@@ -60,7 +65,7 @@ public class BufferSynchronizerService extends AbstractIdleService {
     protected void shutDown() throws Exception {
         LOG.debug("Stopping BufferSynchronizerService");
         if (indexerAvailable && cluster.isConnectedAndHealthy()) {
-            final ExecutorService executorService = Executors.newFixedThreadPool(2);
+            final ExecutorService executorService = new InstrumentedExecutorService(Executors.newFixedThreadPool(2), metricRegistry);
 
             executorService.submit(new Runnable() {
                 @Override

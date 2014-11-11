@@ -17,6 +17,7 @@
 package org.graylog2.outputs;
 
 import com.codahale.metrics.Histogram;
+import com.codahale.metrics.InstrumentedExecutorService;
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
@@ -42,7 +43,7 @@ public class BatchedElasticSearchOutput extends ElasticSearchOutput {
 
     private final List<Message> buffer;
     private final int maxBufferSize;
-    private final ExecutorService flushThread = Executors.newSingleThreadExecutor();
+    private final ExecutorService flushThread;
     private final Timer processTime;
     private final Histogram batchSize;
     private final Meter bufferFlushes;
@@ -59,6 +60,7 @@ public class BatchedElasticSearchOutput extends ElasticSearchOutput {
         this.batchSize = metricRegistry.histogram(name(this.getClass(), "batchSize"));
         this.bufferFlushes = metricRegistry.meter(name(this.getClass(), "bufferFlushes"));
         this.bufferFlushesRequested = metricRegistry.meter(name(this.getClass(), "bufferFlushesRequested"));
+        this.flushThread = new InstrumentedExecutorService(Executors.newSingleThreadExecutor(), metricRegistry);
     }
 
     @Override

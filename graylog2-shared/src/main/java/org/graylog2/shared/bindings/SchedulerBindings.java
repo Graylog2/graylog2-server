@@ -34,6 +34,7 @@ public class SchedulerBindings extends AbstractModule {
 
     @Override
     protected void configure() {
+        // TODO Add instrumentation to ExecutorService and ThreadFactory
         final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(SCHEDULED_THREADS_POOL_SIZE,
                 new ThreadFactoryBuilder()
                         .setNameFormat("scheduled-%d")
@@ -44,6 +45,7 @@ public class SchedulerBindings extends AbstractModule {
 
         bind(ScheduledExecutorService.class).annotatedWith(Names.named("scheduler")).toInstance(scheduler);
 
+        // TODO Add instrumentation to ExecutorService and ThreadFactory
         final ScheduledExecutorService daemonScheduler = Executors.newScheduledThreadPool(SCHEDULED_THREADS_POOL_SIZE,
                 new ThreadFactoryBuilder()
                         .setNameFormat("scheduled-daemon-%d")

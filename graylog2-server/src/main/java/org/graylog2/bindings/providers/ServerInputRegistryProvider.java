@@ -16,6 +16,7 @@
  */
 package org.graylog2.bindings.providers;
 
+import com.codahale.metrics.MetricRegistry;
 import org.graylog2.inputs.InputService;
 import org.graylog2.inputs.ServerInputRegistry;
 import org.graylog2.notifications.NotificationService;
@@ -28,9 +29,6 @@ import org.graylog2.system.activities.ActivityWriter;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-/**
- * @author Dennis Oelkers <dennis@torch.sh>
- */
 public class ServerInputRegistryProvider implements Provider<InputRegistry> {
     private static ServerInputRegistry serverInputRegistry = null;
 
@@ -40,10 +38,12 @@ public class ServerInputRegistryProvider implements Provider<InputRegistry> {
                                        ServerStatus serverStatus,
                                        ActivityWriter activityWriter,
                                        InputService inputService,
-                                       NotificationService notificationService) {
-        if (serverInputRegistry == null)
+                                       NotificationService notificationService,
+                                       MetricRegistry metricRegistry) {
+        if (serverInputRegistry == null) {
             serverInputRegistry = new ServerInputRegistry(messageInputFactory, processBuffer,
-                    serverStatus, activityWriter, inputService, notificationService);
+                    serverStatus, activityWriter, inputService, notificationService, metricRegistry);
+        }
     }
 
     @Override

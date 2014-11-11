@@ -17,6 +17,7 @@
 package org.graylog2.inputs.transports;
 
 import com.codahale.metrics.Gauge;
+import com.codahale.metrics.InstrumentedExecutorService;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.MetricSet;
 import com.google.common.eventbus.EventBus;
@@ -24,7 +25,12 @@ import com.google.common.eventbus.Subscribe;
 import com.google.common.util.concurrent.Uninterruptibles;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
-import kafka.consumer.*;
+import kafka.consumer.Consumer;
+import kafka.consumer.ConsumerConfig;
+import kafka.consumer.ConsumerIterator;
+import kafka.consumer.KafkaStream;
+import kafka.consumer.TopicFilter;
+import kafka.consumer.Whitelist;
 import kafka.javaapi.consumer.ConsumerConnector;
 import kafka.message.MessageAndMetadata;
 import org.graylog2.plugin.ConfigClass;
@@ -52,7 +58,11 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Named;
 import java.util.List;
 import java.util.Properties;
-import java.util.concurrent.*;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class KafkaTransport extends ThrottleableTransport {
@@ -62,19 +72,24 @@ public class KafkaTransport extends ThrottleableTransport {
     public static final String CK_ZOOKEEPER = "zookeeper";
     public static final String CK_TOPIC_FILTER = "topic_filter";
     public static final String CK_THREADS = "threads";
+
     private static final Logger LOG = LoggerFactory.getLogger(KafkaTransport.class);
+
     private final Configuration configuration;
     private final MetricRegistry localRegistry;
     private final NodeId nodeId;
     private final EventBus serverEventBus;
     private final ServerStatus serverStatus;
     private final ScheduledExecutorService scheduler;
+    private final MetricRegistry metricRegistry;
     private final AtomicLong totalBytesRead = new AtomicLong(0);
     private final AtomicLong lastSecBytesRead = new AtomicLong(0);
     private final AtomicLong lastSecBytesReadTmp = new AtomicLong(0);
+
     private volatile boolean stopped = false;
     private volatile boolean paused = true;
     private volatile CountDownLatch pausedLatch = new CountDownLatch(1);
+
     private CountDownLatch stopLatch;
     private ConsumerConnector cc;
 
@@ -91,6 +106,7 @@ public class KafkaTransport extends ThrottleableTransport {
         this.serverEventBus = serverEventBus;
         this.serverStatus = serverStatus;
         this.scheduler = scheduler;
+        this.metricRegistry = localRegistry;
 
         localRegistry.register("read_bytes_1sec", new Gauge<Long>() {
             @Override
@@ -170,7 +186,7 @@ public class KafkaTransport extends ThrottleableTransport {
         final TopicFilter filter = new Whitelist(configuration.getString(CK_TOPIC_FILTER));
 
         final List<KafkaStream<byte[], byte[]>> streams = cc.createMessageStreamsByFilter(filter, numThreads);
-        final ExecutorService executor = Executors.newFixedThreadPool(numThreads);
+        final ExecutorService executor = new InstrumentedExecutorService(Executors.newFixedThreadPool(numThreads), metricRegistry);
 
         // this is being used during shutdown to first stop all submitted jobs before committing the offsets back to zookeeper
         // and then shutting down the connection.
@@ -205,9 +221,9 @@ public class KafkaTransport extends ThrottleableTransport {
                         lastSecBytesReadTmp.addAndGet(bytes.length);
 
                         final RawMessage rawMessage = new RawMessage("radio-msgpack",
-                                                                     input.getId(),
-                                                                     null,
-                                                                     bytes);
+                                input.getId(),
+                                null,
+                                bytes);
 
                         // the loop below is like this because we cannot "unsee" the message we've just gotten by calling .next()
                         // the high level consumer of Kafka marks the message as "processed" immediately after being returned from next.
@@ -219,9 +235,9 @@ public class KafkaTransport extends ThrottleableTransport {
                                 if (retry) {
                                     // don't try immediately if the buffer was full, try not spin too much
                                     LOG.debug("Waiting 10ms to retry inserting into buffer, retried {} times",
-                                              retryCount);
+                                            retryCount);
                                     Uninterruptibles.sleepUninterruptibly(10,
-                                                                          TimeUnit.MILLISECONDS); // TODO magic number
+                                            TimeUnit.MILLISECONDS); // TODO magic number
                                 }
                                 // try to process the message, if it succeeds, we immediately move on to the next message (retry will be false)
                                 // if parsing the message failed, this will return 'true' (sorry for the stupid return value handling, amqp needs to know

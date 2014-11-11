@@ -16,6 +16,8 @@
  */
 package org.graylog2.initializers;
 
+import com.codahale.metrics.InstrumentedExecutorService;
+import com.codahale.metrics.MetricRegistry;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Splitter;
@@ -60,7 +62,8 @@ public class IndexerSetupService extends AbstractIdleService {
     public IndexerSetupService(final Node node,
                                final Configuration configuration,
                                final BufferSynchronizerService bufferSynchronizerService,
-                               final AsyncHttpClient httpClient) {
+                               final AsyncHttpClient httpClient,
+                               final MetricRegistry metricRegistry) {
         this.node = node;
         this.configuration = configuration;
         this.bufferSynchronizerService = bufferSynchronizerService;
@@ -74,7 +77,7 @@ public class IndexerSetupService extends AbstractIdleService {
                 // Properly close ElasticSearch node.
                 IndexerSetupService.this.node.close();
             }
-        }, Executors.newSingleThreadExecutor());
+        }, new InstrumentedExecutorService(Executors.newSingleThreadExecutor(), metricRegistry));
     }
 
     @Override

@@ -16,6 +16,8 @@
  */
 package org.graylog2.streams;
 
+import com.codahale.metrics.InstrumentedExecutorService;
+import com.codahale.metrics.InstrumentedThreadFactory;
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
@@ -44,6 +46,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -82,13 +85,19 @@ public class StreamRouter {
         this.configuration = configuration;
         this.notificationService = notificationService;
         this.faultCounter = Maps.newConcurrentMap();
-        this.executor = Executors.newCachedThreadPool(
-                new ThreadFactoryBuilder()
-                        .setNameFormat("stream-router-%d")
-                        .setDaemon(true)
-                        .build()
-        );
+        this.executor = executorService();
         this.timeLimiter = new SimpleTimeLimiter(executor);
+    }
+
+    private ExecutorService executorService() {
+        return new InstrumentedExecutorService(Executors.newCachedThreadPool(threadFactory()), metricRegistry);
+    }
+
+    private ThreadFactory threadFactory() {
+        return new InstrumentedThreadFactory(new ThreadFactoryBuilder()
+                .setNameFormat("stream-router-%d")
+                .setDaemon(true)
+                .build(), metricRegistry);
     }
 
     private AtomicInteger getFaultCount(String streamId) {

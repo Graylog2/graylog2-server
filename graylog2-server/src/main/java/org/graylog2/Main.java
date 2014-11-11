@@ -29,7 +29,6 @@ import com.github.joschi.jadconfig.repositories.EnvironmentRepository;
 import com.github.joschi.jadconfig.repositories.PropertiesRepository;
 import com.github.joschi.jadconfig.repositories.SystemPropertiesRepository;
 import com.google.common.collect.Lists;
-import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.ServiceManager;
 import com.google.inject.Injector;
 import com.google.inject.Module;
@@ -37,7 +36,14 @@ import com.google.inject.ProvisionException;
 import com.google.inject.spi.Message;
 import com.mongodb.MongoException;
 import org.apache.log4j.Level;
-import org.graylog2.bindings.*;
+import org.graylog2.bindings.AlarmCallbackBindings;
+import org.graylog2.bindings.InitializerBindings;
+import org.graylog2.bindings.MessageFilterBindings;
+import org.graylog2.bindings.MessageOutputBindings;
+import org.graylog2.bindings.PersistenceServicesBindings;
+import org.graylog2.bindings.RotationStrategyBindings;
+import org.graylog2.bindings.ServerBindings;
+import org.graylog2.bindings.ServerMessageInputBindings;
 import org.graylog2.cluster.NodeService;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
@@ -55,8 +61,6 @@ import org.graylog2.shared.plugins.PluginLoader;
 import org.graylog2.system.activities.Activity;
 import org.graylog2.system.activities.ActivityWriter;
 import org.graylog2.system.shutdown.GracefulShutdown;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
@@ -274,7 +278,7 @@ public final class Main extends NodeRunner {
 
         // Start services.
         final ServiceManagerListener serviceManagerListener = injector.getInstance(ServiceManagerListener.class);
-        serviceManager.addListener(serviceManagerListener, MoreExecutors.sameThreadExecutor());
+        serviceManager.addListener(serviceManagerListener);
         try {
             serviceManager.startAsync().awaitHealthy();
         } catch (Exception e) {
