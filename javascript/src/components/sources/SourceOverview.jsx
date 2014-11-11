@@ -35,7 +35,7 @@ var SourceOverview = React.createClass({
         this.sourcesData = crossfilter();
         this.filterDimension = this.sourcesData.dimension((d) => d.name);
         this.nameDimension = this.sourcesData.dimension((d) => d.name);
-        this.nameMessageGroup = this.nameDimension.group().reduceSum((d) => d.messageCount);
+        this.nameMessageGroup = this.nameDimension.group().reduceSum((d) => d.message_count);
 
         this.histogramData = crossfilter();
         this.valueDimension = this.histogramData.dimension((d) => new Date(d.x * 1000));
@@ -183,16 +183,16 @@ var SourceOverview = React.createClass({
         var dataTableDomNode = $("#dc-sources-result")[0];
         this.dataTable = dc.dataTable(dataTableDomNode);
         this.dataTable
-            .dimension(this.sourcesData.dimension((d) => d.messageCount))
+            .dimension(this.sourcesData.dimension((d) => d.message_count))
             .group((d) => d.percentage > othersThreshold ? "Top Sources" : othersName)
             .size(this.state.numberOfSources)
             .columns([
                 (d) => "<button class='btn btn-mini btn-link dc-search-button' title='Search for this source'><i class='icon icon-search'></i></button>",
                 (d) => "<a href='javascript:undefined' class='dc-filter-link' title='Filter this source'>" + d.name +"</a>",
                 (d) => d.percentage.toFixed(2) + "%",
-                (d) => d.messageCount
+                (d) => d.message_count
             ])
-            .sortBy((d) => d.messageCount)
+            .sortBy((d) => d.message_count)
             .order(d3.descending)
             .renderlet((table) => {
                 table.selectAll("td.dc-table-column._0 button.dc-search-button").on("click", () => {

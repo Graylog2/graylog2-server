@@ -8,9 +8,9 @@ var $ = require('jquery'); // excluded and shimed
 
 var processSourcesData = (sources) => {
     var total = 0;
-    sources.forEach((d) => total += d.messageCount);
+    sources.forEach((d) => total += d.message_count);
     sources.forEach((d) => {
-        d.percentage = d.messageCount / total * 100;
+        d.percentage = d.message_count / total * 100;
     });
     return sources;
 };
