@@ -83,14 +83,30 @@ $(document).ready(function() {
         }
     }
 
-    $("ul.dashboard-selector li a[data-dashboard-id]").live("click", function() {
-        var description = prompt("Give the widget a title:");
-        if (description != null && description != "") {
+    function configuration(widgetType, callback) {
+        var funcName = "configureDialog_" + widgetType;
+        var func = window[funcName];
+        if (func) {
+            func(callback);
+        } else {
+            var description = prompt("Give the widget a title:");
+            if (description != null && description != "") {
+                callback(description);
+            }
+        }
+    }
+
+    $("ul.dashboard-selector li a[data-dashboard-id]").live("click", function () {
+        var elem = $(this).closest("ul.dashboard-selector");
+        var widgetType = elem.attr("data-widget-type");
+        var dashboardId = $(this).attr("data-dashboard-id");
+        configuration(widgetType, createDashboard);
+        function createDashboard(description) {
             delegateAddToDashboard(
-                $(this).closest("ul.dashboard-selector").attr("data-widget-type"),
-                $(this).attr("data-dashboard-id"),
+                widgetType,
+                dashboardId,
                 description,
-                $(this).closest("ul.dashboard-selector")
+                elem
             );
         }
     });
