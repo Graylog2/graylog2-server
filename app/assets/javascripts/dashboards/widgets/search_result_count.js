@@ -1,8 +1,5 @@
 function configureDialog_search_result_count(callback) {
-    var description = prompt("Give the widget a title:");
-    if (description != null && description != "") {
-        callback(description);
-    }
+    trendDialogConfiguration.openModal(callback);
 }
 
 function addWidget_search_result_count(dashboardId, description, eventElem) {
