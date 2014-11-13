@@ -59,6 +59,7 @@ public class ServerProcessBufferProcessor extends ProcessBufferProcessor {
     private static final Logger LOG = LoggerFactory.getLogger(ServerProcessBufferProcessor.class);
     private final OutputBuffer outputBuffer;
     private final Meter filteredOutMessages;
+    private final Timer insertWaitTime;
     private final List<MessageFilter> filterRegistry;
 
 
@@ -86,6 +87,7 @@ public class ServerProcessBufferProcessor extends ProcessBufferProcessor {
 
         this.outputBuffer = outputBuffer;
         this.filteredOutMessages = metricRegistry.meter(name(ProcessBufferProcessor.class, "filteredOutMessages"));
+        this.insertWaitTime = metricRegistry.timer(name(ProcessBufferProcessor.class, "insertWaitTime"));
     }
 
     @Override
@@ -115,7 +117,9 @@ public class ServerProcessBufferProcessor extends ProcessBufferProcessor {
 
         if (configuration.isDisableOutputCache()) {
             LOG.debug("Finished processing message. Writing to output buffer.");
+            Timer.Context context = this.insertWaitTime.time();
             outputBuffer.insertBlocking(msg, null);
+            context.stop();
         } else {
             LOG.debug("Finished processing message. Writing to output cache.");
             outputBuffer.insertCached(msg, null);

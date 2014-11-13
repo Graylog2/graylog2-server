@@ -74,6 +74,9 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "output_flush_interval", required = true, validator = PositiveIntegerValidator.class)
     private int outputFlushInterval = 1;
 
+    @Parameter(value = "output_max_flush_workers", required = true, validator = PositiveIntegerValidator.class)
+    private int outputMaxFlushWorkers = 4;
+
     @Parameter(value = "outputbuffer_processors", required = true, validator = PositiveIntegerValidator.class)
     private int outputBufferProcessors = 3;
 
@@ -337,6 +340,10 @@ public class Configuration extends BaseConfiguration {
 
     public int getOutputFlushInterval() {
         return outputFlushInterval;
+    }
+
+    public int getOutputMaxFlushWorkers() {
+        return outputMaxFlushWorkers;
     }
 
     public int getOutputBufferProcessors() {
