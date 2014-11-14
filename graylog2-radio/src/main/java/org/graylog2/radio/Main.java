@@ -38,6 +38,7 @@ import org.graylog2.plugin.Plugin;
 import org.graylog2.plugin.PluginModule;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.Tools;
+import org.graylog2.plugin.Version;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.radio.bindings.RadioBindings;
 import org.graylog2.radio.bindings.RadioInitializerBindings;
@@ -47,6 +48,8 @@ import org.graylog2.shared.bindings.GuiceInjectorHolder;
 import org.graylog2.shared.bindings.GuiceInstantiationService;
 import org.graylog2.shared.initializers.ServiceManagerListener;
 import org.graylog2.shared.plugins.PluginLoader;
+import org.graylog2.shared.system.activities.Activity;
+import org.graylog2.shared.system.activities.ActivityWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
@@ -69,6 +72,10 @@ public class Main extends NodeRunner {
     private static final String ENVIRONMENT_PREFIX = "GRAYLOG2_";
     private static final String PROPERTIES_PREFIX = "graylog2.";
 
+    private static final String profileName = "Radio";
+
+    private static final Version version = Version.CURRENT_CLASSPATH;
+
     /**
      * @param args the command line arguments
      */
@@ -78,7 +85,7 @@ public class Main extends NodeRunner {
 
         final CommandLineArguments commandLineArguments = new CommandLineArguments();
         final JCommander jCommander = new JCommander(commandLineArguments, args);
-        jCommander.setProgramName("graylog2-radio");
+        jCommander.setProgramName("graylog2-" + profileName.toLowerCase());
 
         if (commandLineArguments.isShowHelp()) {
             jCommander.usage();
@@ -86,7 +93,7 @@ public class Main extends NodeRunner {
         }
 
         if (commandLineArguments.isShowVersion()) {
-            System.out.println("Graylog2 Radio " + RadioVersion.VERSION);
+            System.out.println("Graylog2 " + profileName + " " + version);
             System.out.println("JRE: " + Tools.getSystemInformation());
             System.exit(0);
         }
@@ -145,7 +152,7 @@ public class Main extends NodeRunner {
         SLF4JBridgeHandler.removeHandlersForRootLogger();
         SLF4JBridgeHandler.install();
 
-        LOG.info("Graylog2 Radio {} starting up. (JRE: {})", RadioVersion.VERSION, Tools.getSystemInformation());
+        LOG.info("Graylog2 " + profileName + " {} starting up. (JRE: {})", version, Tools.getSystemInformation());
 
         // Do not use a PID file if the user requested not to
         if (!commandLineArguments.isNoPidFile()) {
@@ -159,8 +166,10 @@ public class Main extends NodeRunner {
         Ping.Pinger pinger = injector.getInstance(Ping.Pinger.class);
         pinger.ping();
 
+        final ActivityWriter activityWriter;
         final ServiceManager serviceManager;
         try {
+            activityWriter = injector.getInstance(ActivityWriter.class);
             serviceManager = injector.getInstance(ServiceManager.class);
         } catch (ProvisionException e) {
             LOG.error("Guice error", e);
@@ -171,6 +180,17 @@ public class Main extends NodeRunner {
             System.exit(-1);
             return;
         }
+
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+            @Override
+            public void run() {
+                String msg = "SIGNAL received. Shutting down.";
+                LOG.info(msg);
+                activityWriter.write(new Activity(msg, Main.class));
+
+                serviceManager.stopAsync().awaitStopped();
+            }
+        });
 
         // propagate default size to input plugins
         MessageInput.setDefaultRecvBufferSize(configuration.getUdpRecvBufferSizes());
@@ -191,7 +211,8 @@ public class Main extends NodeRunner {
         }
         LOG.info("Services started, startup times in ms: {}", serviceManager.startupTimes());
 
-        LOG.info("Graylog2 Radio up and running.");
+        activityWriter.write(new Activity("Started up.", Main.class));
+        LOG.info("Graylog2 " + profileName + " up and running.");
 
         // Block forever.
         try {
@@ -223,7 +244,7 @@ public class Main extends NodeRunner {
 
     private static String dumpConfiguration(final Map<String, String> configMap) {
         final StringBuilder sb = new StringBuilder();
-        sb.append("# Configuration of graylog2-radio ").append(RadioVersion.VERSION).append(System.lineSeparator());
+        sb.append("# Configuration of graylog2-").append(profileName).append(" ").append(version).append(System.lineSeparator());
         sb.append("# Generated on ").append(Tools.iso8601()).append(System.lineSeparator());
 
         for (Map.Entry<String, String> entry : configMap.entrySet()) {

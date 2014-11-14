@@ -23,7 +23,7 @@ import org.graylog2.indexer.indices.Indices;
 import org.graylog2.initializers.IndexerSetupService;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.indexer.rotation.RotationStrategy;
-import org.graylog2.system.activities.ActivityWriter;
+import org.graylog2.system.activities.SystemMessageActivityWriter;
 import org.testng.annotations.Test;
 
 import javax.annotation.Nullable;
@@ -52,7 +52,7 @@ public class IndexRotationThreadTest {
                 mock(NotificationService.class),
                 mock(Indices.class),
                 deflector,
-                mock(ActivityWriter.class),
+                mock(SystemMessageActivityWriter.class),
                 mock(IndexerSetupService.class),
                 provider
             );
@@ -92,7 +92,7 @@ public class IndexRotationThreadTest {
                 mock(NotificationService.class),
                 mock(Indices.class),
                 deflector,
-                mock(ActivityWriter.class),
+                mock(SystemMessageActivityWriter.class),
                 mock(IndexerSetupService.class),
                 provider
             );
@@ -135,7 +135,7 @@ public class IndexRotationThreadTest {
                 mock(NotificationService.class),
                 mock(Indices.class),
                 deflector,
-                mock(ActivityWriter.class),
+                mock(SystemMessageActivityWriter.class),
                 mock(IndexerSetupService.class),
                 provider
         );

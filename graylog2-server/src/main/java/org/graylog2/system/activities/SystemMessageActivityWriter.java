@@ -21,6 +21,8 @@ import com.google.inject.Inject;
 import org.graylog2.database.ValidationException;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.ServerStatus;
+import org.graylog2.shared.system.activities.Activity;
+import org.graylog2.shared.system.activities.ActivityWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,18 +31,19 @@ import java.util.Map;
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
-public class ActivityWriter {
+public class SystemMessageActivityWriter implements ActivityWriter {
 
-    private static final Logger LOG = LoggerFactory.getLogger(ActivityWriter.class);
+    private static final Logger LOG = LoggerFactory.getLogger(SystemMessageActivityWriter.class);
     private final SystemMessageService systemMessageService;
     private final ServerStatus serverStatus;
 
     @Inject
-    public ActivityWriter(SystemMessageService systemMessageService, ServerStatus serverStatus) {
+    public SystemMessageActivityWriter(SystemMessageService systemMessageService, ServerStatus serverStatus) {
         this.systemMessageService = systemMessageService;
         this.serverStatus = serverStatus;
     }
     
+    @Override
     public void write(Activity activity) {
         try {
             Map<String, Object> entry = Maps.newHashMap();
@@ -49,7 +52,7 @@ public class ActivityWriter {
             entry.put("caller", activity.getCaller().getCanonicalName());
             entry.put("node_id", serverStatus.getNodeId().toString());
 
-            SystemMessageImpl sm = new SystemMessageImpl(entry);
+            final SystemMessage sm = systemMessageService.create(entry);
             systemMessageService.save(sm);
         } catch (ValidationException e) {
             LOG.error("Could not write activity.", e);

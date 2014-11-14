@@ -17,7 +17,7 @@
 package org.graylog2.system.jobs;
 
 import com.codahale.metrics.MetricRegistry;
-import org.graylog2.system.activities.ActivityWriter;
+import org.graylog2.system.activities.SystemMessageActivityWriter;
 import org.testng.annotations.Test;
 
 import static org.mockito.Mockito.mock;
@@ -28,7 +28,7 @@ public class SystemJobManagerTest {
 
     @Test
     public void testGetRunningJobs() throws Exception {
-        SystemJobManager manager = new SystemJobManager(mock(ActivityWriter.class), new MetricRegistry());
+        SystemJobManager manager = new SystemJobManager(mock(SystemMessageActivityWriter.class), new MetricRegistry());
 
         LongRunningJob job1 = new LongRunningJob(1);
         LongRunningJob job2 = new LongRunningJob(1);
@@ -46,7 +46,7 @@ public class SystemJobManagerTest {
 
     @Test
     public void testConcurrentJobs() throws Exception {
-        SystemJobManager manager = new SystemJobManager(mock(ActivityWriter.class), new MetricRegistry());
+        SystemJobManager manager = new SystemJobManager(mock(SystemMessageActivityWriter.class), new MetricRegistry());
 
         SystemJob job1 = new LongRunningJob(3);
         SystemJob job2 = new LongRunningJob(3);
@@ -62,7 +62,7 @@ public class SystemJobManagerTest {
 
     @Test
     public void testSubmitThrowsExceptionIfMaxConcurrencyLevelReached() throws Exception {
-        SystemJobManager manager = new SystemJobManager(mock(ActivityWriter.class), new MetricRegistry());
+        SystemJobManager manager = new SystemJobManager(mock(SystemMessageActivityWriter.class), new MetricRegistry());
 
         LongRunningJob job1 = new LongRunningJob(3);
         LongRunningJob job2 = new LongRunningJob(3);
