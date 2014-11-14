@@ -32,11 +32,13 @@ import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.ServiceManager;
 import com.google.inject.Injector;
 import com.google.inject.Module;
+import com.google.inject.ProvisionException;
 import org.apache.log4j.Level;
 import org.graylog2.plugin.Plugin;
 import org.graylog2.plugin.PluginModule;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.Tools;
+import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.radio.bindings.RadioBindings;
 import org.graylog2.radio.bindings.RadioInitializerBindings;
 import org.graylog2.radio.cluster.Ping;
@@ -53,6 +55,8 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import static com.google.common.base.Strings.nullToEmpty;
 
@@ -69,6 +73,8 @@ public class Main extends NodeRunner {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
+
+        // So jung kommen wir nicht mehr zusammen.
 
         final CommandLineArguments commandLineArguments = new CommandLineArguments();
         final JCommander jCommander = new JCommander(commandLineArguments, args);
@@ -108,6 +114,8 @@ public class Main extends NodeRunner {
             LOG.info("Running in Debug mode");
             logLevel = Level.DEBUG;
         }
+        org.apache.log4j.Logger.getRootLogger().setLevel(logLevel);
+        org.apache.log4j.Logger.getLogger(Main.class.getPackage().getName()).setLevel(logLevel);
 
         PluginLoader pluginLoader = new PluginLoader(new File(configuration.getPluginDir()));
         List<PluginModule> pluginModules = Lists.newArrayList();
@@ -116,14 +124,12 @@ public class Main extends NodeRunner {
 
         LOG.debug("Loaded modules: " + pluginModules);
 
-        GuiceInstantiationService instantiationService = new GuiceInstantiationService();
-        List<Module> bindingsModules = getBindingsModules(instantiationService,
-                new RadioBindings(configuration),
-                new RadioInitializerBindings());
-        LOG.debug("Adding plugin modules: " + pluginModules);
-        bindingsModules.addAll(pluginModules);
-        final Injector injector = GuiceInjectorHolder.createInjector(bindingsModules);
-        instantiationService.setInjector(injector);
+        final Injector injector = setupInjector(configuration, pluginModules);
+
+        if (injector == null) {
+            LOG.error("Injector could not be created, exiting! (Please include the previous stacktraces in bug reports.)");
+            System.exit(1);
+        }
 
         // This is holding all our metrics.
         final MetricRegistry metrics = injector.getInstance(MetricRegistry.class);
@@ -134,8 +140,6 @@ public class Main extends NodeRunner {
 
         InstrumentedAppender logMetrics = new InstrumentedAppender(metrics);
         logMetrics.activateOptions();
-        org.apache.log4j.Logger.getRootLogger().setLevel(logLevel);
-        org.apache.log4j.Logger.getLogger(Main.class.getPackage().getName()).setLevel(logLevel);
         org.apache.log4j.Logger.getRootLogger().addAppender(logMetrics);
 
         SLF4JBridgeHandler.removeHandlersForRootLogger();
@@ -155,16 +159,78 @@ public class Main extends NodeRunner {
         Ping.Pinger pinger = injector.getInstance(Ping.Pinger.class);
         pinger.ping();
 
-        final ServiceManager serviceManager = injector.getInstance(ServiceManager.class);
+        final ServiceManager serviceManager;
+        try {
+            serviceManager = injector.getInstance(ServiceManager.class);
+        } catch (ProvisionException e) {
+            LOG.error("Guice error", e);
+            System.exit(-1);
+            return;
+        } catch (Exception e) {
+            LOG.error("Unexpected exception", e);
+            System.exit(-1);
+            return;
+        }
+
+        // propagate default size to input plugins
+        MessageInput.setDefaultRecvBufferSize(configuration.getUdpRecvBufferSizes());
+
+        // Start services.
         final ServiceManagerListener serviceManagerListener = injector.getInstance(ServiceManagerListener.class);
         serviceManager.addListener(serviceManagerListener);
+        try {
         serviceManager.startAsync().awaitHealthy();
+        } catch (Exception e) {
+            try {
+                serviceManager.stopAsync().awaitStopped(configuration.getShutdownTimeout(), TimeUnit.MILLISECONDS);
+            } catch (TimeoutException timeoutException) {
+                LOG.error("Unable to shutdown properly on time. {}", serviceManager.servicesByState());
+            }
+            LOG.error("Graylog2 startup failed. Exiting. Exception was:", e);
+            System.exit(-1);
+        }
+        LOG.info("Services started, startup times in ms: {}", serviceManager.startupTimes());
 
         LOG.info("Graylog2 Radio up and running.");
 
-        while (true) {
-            try { Thread.sleep(1000); } catch (InterruptedException e) { /* lol, i don't care */ }
+        // Block forever.
+        try {
+            while (true) {
+                Thread.sleep(1000);
+            }
+        } catch (InterruptedException e) {
+            return;
         }
+    }
+
+    private static Injector setupInjector(Configuration configuration, List<PluginModule> pluginModules) {
+        try {
+            GuiceInstantiationService instantiationService = new GuiceInstantiationService();
+            List<Module> bindingsModules = getBindingsModules(instantiationService,
+                    new RadioBindings(configuration),
+                    new RadioInitializerBindings());
+            LOG.debug("Adding plugin modules: " + pluginModules);
+            bindingsModules.addAll(pluginModules);
+            final Injector injector = GuiceInjectorHolder.createInjector(bindingsModules);
+            instantiationService.setInjector(injector);
+
+            return injector;
+        } catch (Exception e) {
+            LOG.error("Injector creation failed!", e);
+            return null;
+        }
+    }
+
+    private static String dumpConfiguration(final Map<String, String> configMap) {
+        final StringBuilder sb = new StringBuilder();
+        sb.append("# Configuration of graylog2-radio ").append(RadioVersion.VERSION).append(System.lineSeparator());
+        sb.append("# Generated on ").append(Tools.iso8601()).append(System.lineSeparator());
+
+        for (Map.Entry<String, String> entry : configMap.entrySet()) {
+            sb.append(entry.getKey()).append('=').append(nullToEmpty(entry.getValue())).append(System.lineSeparator());
+        }
+
+        return sb.toString();
     }
 
     private static Configuration readConfiguration(final JadConfig jadConfig, final String configFile) {
@@ -194,17 +260,5 @@ public class Main extends NodeRunner {
         }
 
         return configuration;
-    }
-
-    private static String dumpConfiguration(final Map<String, String> configMap) {
-        final StringBuilder sb = new StringBuilder();
-        sb.append("# Configuration of graylog2-radio ").append(RadioVersion.VERSION).append(System.lineSeparator());
-        sb.append("# Generated on ").append(Tools.iso8601()).append(System.lineSeparator());
-
-        for (Map.Entry<String, String> entry : configMap.entrySet()) {
-            sb.append(entry.getKey()).append('=').append(nullToEmpty(entry.getValue())).append(System.lineSeparator());
-        }
-
-        return sb.toString();
     }
 }
