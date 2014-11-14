@@ -77,7 +77,9 @@ import org.graylog2.security.realm.LdapUserAuthenticator;
 import org.graylog2.shared.bindings.providers.AsyncHttpClientProvider;
 import org.graylog2.shared.inputs.InputRegistry;
 import org.graylog2.shared.metrics.jersey2.MetricsDynamicBinding;
+import org.graylog2.shared.system.activities.ActivityWriter;
 import org.graylog2.streams.StreamRouter;
+import org.graylog2.system.activities.SystemMessageActivityWriter;
 import org.graylog2.system.jobs.SystemJobFactory;
 import org.graylog2.system.jobs.SystemJobManager;
 import org.graylog2.system.shutdown.GracefulShutdown;
@@ -165,6 +167,7 @@ public class ServerBindings extends AbstractModule {
         bind(AlertSender.class).to(FormattedEmailAlertSender.class);
         bind(StreamRouter.class);
         bind(FilterService.class).to(FilterServiceImpl.class).in(Scopes.SINGLETON);
+        bind(ActivityWriter.class).to(SystemMessageActivityWriter.class);
     }
 
     private void bindDynamicFeatures() {

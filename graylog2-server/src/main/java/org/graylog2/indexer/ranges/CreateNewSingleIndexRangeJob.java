@@ -23,7 +23,7 @@ import org.graylog2.indexer.Deflector;
 import org.graylog2.indexer.EmptyIndexException;
 import org.graylog2.indexer.searches.Searches;
 import org.graylog2.plugin.ServerStatus;
-import org.graylog2.system.activities.ActivityWriter;
+import org.graylog2.shared.system.activities.ActivityWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

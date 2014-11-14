@@ -25,6 +25,7 @@ import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PersistedServiceImpl;
 
 import java.util.List;
+import java.util.Map;
 
 public class SystemMessageServiceImpl extends PersistedServiceImpl implements SystemMessageService {
     private final int PER_PAGE = 30;
@@ -52,5 +53,10 @@ public class SystemMessageServiceImpl extends PersistedServiceImpl implements Sy
     @Override
     public long totalCount() {
         return super.totalCount(SystemMessageImpl.class);
+    }
+
+    @Override
+    public SystemMessage create(Map<String, Object> fields) {
+        return new SystemMessageImpl(fields);
     }
 }
