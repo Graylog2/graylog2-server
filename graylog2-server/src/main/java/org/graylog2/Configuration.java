@@ -56,9 +56,6 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "rest_listen_uri", required = true)
     private URI restListenUri = URI.create("http://127.0.0.1:" + GRAYLOG2_DEFAULT_PORT + "/");
 
-    @Parameter(value = "udp_recvbuffer_sizes", required = true, validator = PositiveIntegerValidator.class)
-    private int udpRecvBufferSizes = 1048576;
-
     @Parameter(value = "mongodb_useauth", required = true)
     private boolean mongoUseAuth = false;
 
@@ -301,9 +298,6 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "stale_master_timeout", validator = PositiveIntegerValidator.class)
     private int staleMasterTimeout = 2000;
 
-    @Parameter(value = "shutdown_timeout", validator = PositiveIntegerValidator.class)
-    private int shutdownTimeout = 30000;
-
     @Parameter(value = "ldap_connection_timeout", validator = PositiveIntegerValidator.class)
     private int ldapConnectionTimeout = 2000;
 
@@ -475,10 +469,6 @@ public class Configuration extends BaseConfiguration {
 
     public String getRootPasswordSha2() {
         return rootPasswordSha2;
-    }
-
-    public int getUdpRecvBufferSizes() {
-        return udpRecvBufferSizes;
     }
 
     public String getEsClusterName() {
@@ -679,10 +669,6 @@ public class Configuration extends BaseConfiguration {
 
     public int getStaleMasterTimeout() {
         return staleMasterTimeout;
-    }
-
-    public int getShutdownTimeout() {
-        return shutdownTimeout;
     }
 
     public int getLdapConnectionTimeout() {
