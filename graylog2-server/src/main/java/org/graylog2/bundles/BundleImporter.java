@@ -33,7 +33,6 @@ import org.graylog2.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.indexer.searches.timeranges.KeywordRange;
 import org.graylog2.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.indexer.searches.timeranges.TimeRange;
-import org.graylog2.inputs.InputImpl;
 import org.graylog2.inputs.InputService;
 import org.graylog2.inputs.converters.ConverterFactory;
 import org.graylog2.inputs.extractors.ExtractorFactory;
@@ -232,7 +231,7 @@ public class BundleImporter {
             LOG.error(error);
         }
 
-        org.graylog2.inputs.Input mongoInput = new InputImpl(
+        org.graylog2.inputs.Input mongoInput = inputService.create(
                 buildMongoDbInput(UUID.randomUUID(), inputDescription, userName, createdAt, bundleId));
 
         // Persist input.
