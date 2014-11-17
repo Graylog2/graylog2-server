@@ -24,11 +24,12 @@ package org.graylog2.plugin.journal;
 
 import com.eaio.uuid.UUID;
 import com.fasterxml.jackson.databind.util.ByteBufferBackedInputStream;
+import com.google.common.collect.Lists;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.UninitializedMessageException;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.configuration.Configuration;
-import org.graylog2.plugin.journal.JournalMessages.SourceNode;
+import org.graylog2.plugin.system.NodeId;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,6 +41,8 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -106,12 +109,6 @@ public class RawMessage implements Serializable {
         msgBuilder.setUuidClockseq(id.clockSeqAndNode);
 
         msgBuilder.setTimestamp(timestamp.getMillis());
-        msgBuilder.addSourceNodes(
-                msgBuilder.addSourceNodesBuilder()
-                        .setId(sourceInputId)
-                        .setType(SourceNode.Type.SERVER)
-                        .build()
-        );
         if (null != remoteAddress) {
             final JournalMessages.RemoteAddress.Builder remoteBuilder = msgBuilder.getRemoteBuilder()
                     .setAddress(ByteString.copyFrom(remoteAddress.getAddress().getAddress()))
@@ -131,6 +128,18 @@ public class RawMessage implements Serializable {
             codecBuilder.setConfig(metaData);
         }
         msgBuilder.setCodec(codecBuilder.build());
+    }
+
+    // XXX TODO After calling this once, getSourceNodes() returns two identical SourceNode objects and the
+    //          DecodingProcessor throws an exception!
+    public JournalMessage.Builder addSourceNode(String sourceInputId, NodeId nodeId, boolean isServer) {
+        return msgBuilder.addSourceNodes(
+                msgBuilder.addSourceNodesBuilder()
+                        .setInputId(sourceInputId)
+                        .setId(nodeId.toString())
+                        .setType(isServer ? JournalMessages.SourceNode.Type.SERVER : JournalMessages.SourceNode.Type.RADIO)
+                        .build()
+        );
     }
 
     public RawMessage(JournalMessage journalMessage, long sequenceNumber) {
@@ -230,5 +239,40 @@ public class RawMessage implements Serializable {
 
     public void setCodecConfig(Configuration codecConfig) {
         this.codecConfig = codecConfig;
+    }
+
+    public List<SourceNode> getSourceNodes() {
+        final ArrayList<SourceNode> list = Lists.newArrayList();
+
+        for (JournalMessages.SourceNode node : msgBuilder.getSourceNodesList()) {
+            list.add(new SourceNode(node));
+        }
+
+        return list;
+    }
+
+    public static class SourceNode {
+        public String nodeId;
+        public String inputId;
+        public Type type;
+
+        public enum Type {
+            SERVER,
+            RADIO;
+        }
+
+        public SourceNode(JournalMessages.SourceNode node) {
+            this.nodeId = node.getId();
+            this.inputId = node.getInputId();
+
+            switch (node.getType()) {
+                case SERVER:
+                    this.type = Type.SERVER;
+                    break;
+                case RADIO:
+                    this.type = Type.RADIO;
+                    break;
+            }
+        }
     }
 }

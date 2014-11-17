@@ -21,6 +21,7 @@ import com.codahale.metrics.Timer;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import com.lmax.disruptor.EventHandler;
+import org.graylog2.plugin.Message;
 import org.graylog2.plugin.buffers.MessageEvent;
 import org.graylog2.plugin.inputs.codecs.Codec;
 import org.graylog2.plugin.journal.RawMessage;
@@ -54,7 +55,6 @@ public class DecodingProcessor implements EventHandler<MessageEvent> {
         final Codec codec = codecFactory.get(raw.getPayloadType()).create(raw.getCodecConfig());
 
         /*
-        final Message message;
 
 
         if (message == null) {
@@ -73,10 +73,41 @@ public class DecodingProcessor implements EventHandler<MessageEvent> {
         processedMessages.mark();
         */
 
+        final Message message;
+
+        // TODO Create parse times per codec as well. (add some more metrics too)
         try (Timer.Context ignored = parseTime.time()) {
-            event.setMessage(codec.decode(raw));
+            message = codec.decode(raw);
         } catch (RuntimeException e) {
+            throw e;
             //failures.mark();
         }
+
+        if (message == null) {
+            return;
+        }
+
+        for (RawMessage.SourceNode node : raw.getSourceNodes()) {
+            switch (node.type) {
+                case SERVER:
+                    // Currently only one of each type supported at the moment.
+                    if (message.getField("gl2_source_input") != null) {
+                        throw new IllegalStateException("Multiple server nodes");
+                    }
+                    message.addField("gl2_source_input", node.inputId);
+                    message.addField("gl2_source_node", node.nodeId);
+                    break;
+                case RADIO:
+                    // Currently only one of each type supported at the moment.
+                    if (message.getField("gl2_source_radio_input") != null) {
+                        throw new IllegalStateException("Multiple radio nodes");
+                    }
+                    message.addField("gl2_source_radio_input", node.inputId);
+                    message.addField("gl2_source_radio", node.nodeId);
+                    break;
+            }
+        }
+
+        event.setMessage(message);
     }
 }
