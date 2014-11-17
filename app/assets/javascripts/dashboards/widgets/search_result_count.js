@@ -25,4 +25,17 @@ function updateWidget_search_result_count(widget, data) {
         nowCount = result;
     }
     $(".value", widget).text(numeral(nowCount).format());
+
+    if (previousCount !== null) {
+        if (nowCount > previousCount) {
+            $(".trend-higher", widget).show();
+            $(".trend-lower", widget).hide();
+        } else if (previousCount > nowCount) {
+            $(".trend-higher", widget).hide();
+            $(".trend-lower", widget).show();
+        } else {
+            $(".trend-higher", widget).show();
+            $(".trend-lower", widget).show();
+        }
+    }
 }
