@@ -16,5 +16,13 @@ function addWidget_search_result_count(dashboardId, config, eventElem) {
 }
 
 function updateWidget_search_result_count(widget, data) {
-    $(".value", widget).text(numeral(data.result).format());
+    var nowCount = null, previousCount = null;
+    var result = data.result;
+    if (typeof result === 'object') {
+        nowCount = result.now;
+        previousCount = result.previous;
+    } else {
+        nowCount = result;
+    }
+    $(".value", widget).text(numeral(nowCount).format());
 }
