@@ -24,6 +24,7 @@ import com.github.joschi.jadconfig.util.Duration;
 import com.github.joschi.jadconfig.validators.FileReadableValidator;
 import com.github.joschi.jadconfig.validators.InetPortValidator;
 import com.github.joschi.jadconfig.validators.PositiveIntegerValidator;
+import com.github.joschi.jadconfig.validators.PositiveLongValidator;
 import com.google.common.net.HostAndPort;
 import com.mongodb.ServerAddress;
 import org.graylog2.plugin.BaseConfiguration;
@@ -102,7 +103,7 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "elasticsearch_max_docs_per_index", validator = PositiveIntegerValidator.class, required = true)
     private int elasticsearchMaxDocsPerIndex = 80000000;
 
-    @Parameter(value = "elasticsearch_max_size_per_index", validator = PositiveIntegerValidator.class, required = true)
+    @Parameter(value = "elasticsearch_max_size_per_index", validator = PositiveLongValidator.class, required = true)
     private long elasticSearchMaxSizePerIndex = 1L * 1024 * 1024 * 1024; // 1GB
 
     @Parameter(value = "elasticsearch_max_time_per_index", required = true)
@@ -202,7 +203,7 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "elasticsearch_network_publish_host")
     private String esNetworkPublishHost;
 
-    @Parameter(value = "elasticsearch_cluster_discovery_timeout", validator = PositiveIntegerValidator.class)
+    @Parameter(value = "elasticsearch_cluster_discovery_timeout", validator = PositiveLongValidator.class)
     private long esClusterDiscoveryTimeout = 5000;
 
     @Parameter(value = "elasticsearch_disable_version_check")
@@ -278,19 +279,19 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "transport_email_web_interface_url")
     private URI emailTransportWebInterfaceUrl;
 
-    @Parameter(value = "stream_processing_timeout", validator = PositiveIntegerValidator.class)
+    @Parameter(value = "stream_processing_timeout", validator = PositiveLongValidator.class)
     private long streamProcessingTimeout = 2000;
 
     @Parameter(value = "stream_processing_max_faults", validator = PositiveIntegerValidator.class)
     private int streamProcessingMaxFaults = 3;
 
-    @Parameter(value = "output_module_timeout", validator = PositiveIntegerValidator.class)
+    @Parameter(value = "output_module_timeout", validator = PositiveLongValidator.class)
     private long outputModuleTimeout = 10000;
 
     @Parameter(value = "message_cache_spool_dir")
     private String messageCacheSpoolDir = "spool";
 
-    @Parameter(value = "message_cache_commit_interval", validator = PositiveIntegerValidator.class)
+    @Parameter(value = "message_cache_commit_interval", validator = PositiveLongValidator.class)
     private long messageCacheCommitInterval = 1000;
 
     @Parameter(value = "message_cache_off_heap")
