@@ -17,7 +17,9 @@
 
 package org.graylog2.shared.buffers.processors;
 
-import com.google.inject.Inject;
+import com.codahale.metrics.Timer;
+import com.google.inject.assistedinject.Assisted;
+import com.google.inject.assistedinject.AssistedInject;
 import com.lmax.disruptor.EventHandler;
 import org.graylog2.plugin.buffers.MessageEvent;
 import org.graylog2.plugin.inputs.codecs.Codec;
@@ -26,11 +28,24 @@ import org.graylog2.plugin.journal.RawMessage;
 import java.util.Map;
 
 public class DecodingProcessor implements EventHandler<MessageEvent> {
-    private final Map<String, Codec.Factory<? extends Codec>> codecFactory;
+    public interface Factory {
+        public DecodingProcessor create(@Assisted("parseTime") Timer parseTime);
+    }
 
-    @Inject
-    public DecodingProcessor(Map<String, Codec.Factory<? extends Codec>> codecFactory) {
+    private final Map<String, Codec.Factory<? extends Codec>> codecFactory;
+    private final Timer parseTime;
+
+    @AssistedInject
+    public DecodingProcessor(Map<String, Codec.Factory<? extends Codec>> codecFactory,
+                             @Assisted("parseTime") Timer parseTime) {
         this.codecFactory = codecFactory;
+
+        /*
+        failures = localRegistry.meter("failures");
+        incompleteMessages = localRegistry.meter("incompleteMessages");
+        rawSize = localRegistry.meter("rawSize");
+        */
+        this.parseTime = parseTime;
     }
 
     @Override
@@ -38,6 +53,30 @@ public class DecodingProcessor implements EventHandler<MessageEvent> {
         final RawMessage raw = event.getRaw();
         final Codec codec = codecFactory.get(raw.getPayloadType()).create(raw.getCodecConfig());
 
-        event.setMessage(codec.decode(raw));
+        /*
+        final Message message;
+
+
+        if (message == null) {
+            failures.mark();
+            LOG.warn("Could not decode message. Dropping message {}", rawMessage.getId());
+            return;
+        }
+        if (!message.isComplete()) {
+            incompleteMessages.mark();
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Dropping incomplete message. Parsed fields: [{}]", message.getFields());
+            }
+            return;
+        }
+
+        processedMessages.mark();
+        */
+
+        try (Timer.Context ignored = parseTime.time()) {
+            event.setMessage(codec.decode(raw));
+        } catch (RuntimeException e) {
+            //failures.mark();
+        }
     }
 }

@@ -34,6 +34,7 @@ import org.graylog2.shared.bindings.providers.ServiceManagerProvider;
 import org.graylog2.shared.buffers.InputBufferImpl;
 import org.graylog2.shared.buffers.ProcessBuffer;
 import org.graylog2.shared.buffers.ProcessBufferWatermark;
+import org.graylog2.shared.buffers.processors.DecodingProcessor;
 import org.graylog2.shared.stats.ThroughputStats;
 import org.jboss.netty.util.HashedWheelTimer;
 
@@ -55,6 +56,7 @@ public class GenericBindings extends AbstractModule {
         bind(InstantiationService.class).toInstance(instantiationService);
 
         install(new FactoryModuleBuilder().build(ProcessBuffer.Factory.class));
+        install(new FactoryModuleBuilder().build(DecodingProcessor.Factory.class));
 
         bind(ProcessBuffer.class).toProvider(ProcessBufferProvider.class);
         bind(InputBuffer.class).to(InputBufferImpl.class);
