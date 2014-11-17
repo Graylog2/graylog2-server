@@ -28,7 +28,7 @@ import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
-import org.graylog2.plugin.inputs.codecs.Codec;
+import org.graylog2.plugin.inputs.codecs.AbstractCodec;
 import org.graylog2.plugin.inputs.codecs.CodecAggregator;
 import org.graylog2.plugin.inputs.transports.NettyTransport;
 import org.graylog2.plugin.journal.RawMessage;
@@ -41,7 +41,7 @@ import javax.annotation.Nullable;
 import java.util.Iterator;
 import java.util.Map;
 
-public class GelfCodec implements Codec {
+public class GelfCodec extends AbstractCodec {
     private static final Logger log = LoggerFactory.getLogger(GelfCodec.class);
 
     private final GelfChunkAggregator aggregator;
@@ -49,6 +49,7 @@ public class GelfCodec implements Codec {
 
     @Inject
     public GelfCodec(@Assisted Configuration configuration, GelfChunkAggregator aggregator) {
+        super(configuration);
         this.aggregator = aggregator;
         this.objectMapper = new ObjectMapper();
         objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_CONTROL_CHARS, true);
@@ -214,7 +215,7 @@ public class GelfCodec implements Codec {
     }
 
     @FactoryClass
-    public interface Factory extends Codec.Factory<GelfCodec> {
+    public interface Factory extends AbstractCodec.Factory<GelfCodec> {
         @Override
         GelfCodec create(Configuration configuration);
 
@@ -223,7 +224,7 @@ public class GelfCodec implements Codec {
     }
 
     @ConfigClass
-    public static class Config implements Codec.Config {
+    public static class Config implements AbstractCodec.Config {
         @Override
         public ConfigurationRequest getRequestedConfiguration() {
             return new ConfigurationRequest();

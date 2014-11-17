@@ -36,6 +36,7 @@ import org.graylog2.plugin.buffers.BufferOutOfCapacityException;
 import org.graylog2.plugin.buffers.MessageEvent;
 import org.graylog2.plugin.buffers.ProcessingDisabledException;
 import org.graylog2.plugin.inputs.MessageInput;
+import org.graylog2.plugin.journal.RawMessage;
 import org.graylog2.shared.buffers.processors.ProcessBufferProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -238,6 +239,10 @@ public class ProcessBuffer extends Buffer {
 
         insert(messages.toArray(new Message[length]));
         afterInsert(length);
+    }
+
+    public void insertBlocking(RawMessage rawMessage) {
+        throw new IllegalStateException("not implemented " + rawMessage);
     }
 
     @Override

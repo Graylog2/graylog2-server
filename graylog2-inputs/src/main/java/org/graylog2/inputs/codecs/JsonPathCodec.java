@@ -28,7 +28,7 @@ import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.configuration.fields.ConfigurationField;
 import org.graylog2.plugin.configuration.fields.TextField;
-import org.graylog2.plugin.inputs.codecs.Codec;
+import org.graylog2.plugin.inputs.codecs.AbstractCodec;
 import org.graylog2.plugin.inputs.codecs.CodecAggregator;
 import org.graylog2.plugin.journal.RawMessage;
 
@@ -38,7 +38,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 
-public class JsonPathCodec implements Codec {
+public class JsonPathCodec extends AbstractCodec {
 
     public static final String CK_PATH = "path";
     public static final String CK_SOURCE = "source";
@@ -48,6 +48,7 @@ public class JsonPathCodec implements Codec {
 
     @AssistedInject
     public JsonPathCodec(@Assisted Configuration configuration) {
+        super(configuration);
         this.configuration = configuration;
         if (configuration.stringIsSet(CK_PATH)) {
             jsonPath = JsonPath.compile(configuration.getString(CK_PATH));
@@ -118,7 +119,7 @@ public class JsonPathCodec implements Codec {
     }
 
     @FactoryClass
-    public interface Factory extends Codec.Factory<JsonPathCodec> {
+    public interface Factory extends AbstractCodec.Factory<JsonPathCodec> {
         @Override
         JsonPathCodec create(Configuration configuration);
 
@@ -127,7 +128,7 @@ public class JsonPathCodec implements Codec {
     }
 
     @ConfigClass
-    public static class Config implements Codec.Config {
+    public static class Config implements AbstractCodec.Config {
         @Override
         public ConfigurationRequest getRequestedConfiguration() {
             final ConfigurationRequest r = new ConfigurationRequest();

@@ -84,6 +84,12 @@ public abstract class MessageInput {
     private final Meter rawSize;
     private final Map<String, String> staticFields = Maps.newConcurrentMap();
     private final ConfigurationRequest requestedConfiguration;
+    /**
+     * This is being used to decide which minimal set of configuration values need to be serialized when a message
+     * is written to the journal. The message input's config contains transport configuration as well, but we want to
+     * avoid serialising those parts of the configuration in order to save bytes on disk/network.
+     */
+    private final Configuration codecConfig;
 
     protected String title;
     protected String creatorUserId;
@@ -103,7 +109,8 @@ public abstract class MessageInput {
         this.localRegistry = localRegistry;
         this.codec = codec;
         this.descriptor = descriptor;
-        this.requestedConfiguration = config.getRequestedConfiguration();
+        this.requestedConfiguration = config.combinedRequestedConfiguration();
+        this.codecConfig = config.codecConfig.getRequestedConfiguration().filter(codec.getConfiguration());
         parseTime = localRegistry.timer("parseTime");
         processedMessages = localRegistry.meter("processedMessages");
         failures = localRegistry.meter("failures");
@@ -208,6 +215,7 @@ public abstract class MessageInput {
         return configuration;
     }
 
+    // TODO pass in via constructor
     public void setConfiguration(Configuration configuration) {
         this.configuration = configuration;
     }
@@ -397,8 +405,8 @@ public abstract class MessageInput {
     }
 
     public static class Config {
-        private final Transport.Config transportConfig;
-        private final Codec.Config codecConfig;
+        public final Transport.Config transportConfig;
+        public final Codec.Config codecConfig;
 
         // required for guice, but isn't called.
         Config() {
@@ -410,13 +418,14 @@ public abstract class MessageInput {
             this.codecConfig = codecConfig;
         }
 
-        public ConfigurationRequest getRequestedConfiguration() {
+        public ConfigurationRequest combinedRequestedConfiguration() {
             final ConfigurationRequest transport = transportConfig.getRequestedConfiguration();
             final ConfigurationRequest codec = codecConfig.getRequestedConfiguration();
             final ConfigurationRequest r = new ConfigurationRequest();
             r.putAll(transport.getFields());
             r.putAll(codec.getFields());
 
+            // TODO implement universal override (in raw message maybe?)
             r.addField(new TextField(
                     CK_OVERRIDE_SOURCE,
                     "Override source",

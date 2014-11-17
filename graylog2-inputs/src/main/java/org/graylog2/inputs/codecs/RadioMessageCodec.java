@@ -24,7 +24,7 @@ import org.graylog2.plugin.Message;
 import org.graylog2.plugin.RadioMessage;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
-import org.graylog2.plugin.inputs.codecs.Codec;
+import org.graylog2.plugin.inputs.codecs.AbstractCodec;
 import org.graylog2.plugin.inputs.codecs.CodecAggregator;
 import org.graylog2.plugin.journal.RawMessage;
 import org.joda.time.DateTime;
@@ -37,13 +37,14 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.IOException;
 
-public class RadioMessageCodec implements Codec {
+public class RadioMessageCodec extends AbstractCodec {
     private static final Logger log = LoggerFactory.getLogger(RadioMessageCodec.class);
 
     private final MessagePack messagePack;
 
     @AssistedInject
     public RadioMessageCodec(@Assisted Configuration configuration, MessagePack messagePack) {
+        super(configuration);
         this.messagePack = messagePack;
     }
 
@@ -87,7 +88,7 @@ public class RadioMessageCodec implements Codec {
     }
 
     @FactoryClass
-    public interface Factory extends Codec.Factory<RadioMessageCodec> {
+    public interface Factory extends AbstractCodec.Factory<RadioMessageCodec> {
         @Override
         public RadioMessageCodec create(Configuration configuration);
 
@@ -96,7 +97,7 @@ public class RadioMessageCodec implements Codec {
     }
 
     @ConfigClass
-    public static class Config implements Codec.Config {
+    public static class Config implements AbstractCodec.Config {
         @Override
         public ConfigurationRequest getRequestedConfiguration() {
             return new ConfigurationRequest();

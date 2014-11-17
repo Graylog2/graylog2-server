@@ -1,0 +1,55 @@
+package org.graylog2.plugin.journal;
+
+// to regenerate:
+// install protobuf compiler (this was generated with 2.5.0)
+// protoc --java_out=src/main/java resources/org/graylog2/plugin/journal/raw_message.proto
+
+option java_package = "org.graylog2.plugin.journal";
+option java_outer_classname = "JournalMessages";
+
+message JournalMessage {
+    // the version of the message format (used for simplifying code when deserializing messages)
+    optional uint32 version = 1;
+    // uuid, time is upper 64 bits, clockseq is lower 64 bits of the 128 bit uuid value
+    optional fixed64 uuid_time = 2;
+    optional fixed64 uuid_clockseq = 3;
+
+    // milliseconds since Java epoch (1970/01/01 00:00:00.000)
+    optional fixed64 timestamp = 4;
+    // which format the payload is supposed to have
+    optional CodecInfo codec = 5;
+
+    // the list of graylog2 nodes which have handled the message (radios, servers) in receive order
+    repeated SourceNode source_nodes = 6;
+
+    optional RemoteAddress remote = 7;
+
+    optional bytes payload = 8;
+}
+
+message RemoteAddress {
+    // the original remote (IP) address of the message sender, unresolved,
+    optional bytes address = 1;
+    // the port of the sender, if available/applicable
+    optional uint32 port = 2;
+    // a processing node can optionally resolve the address early
+    optional string resolved = 3;
+
+}
+
+message CodecInfo {
+    optional string name = 1;
+    // JSON description of configuration settings necessary to create the codec with
+    // for optimal performance make sure the serialization is stable, i.e. same config == same serialization bytes
+    optional string config = 2;
+}
+
+message SourceNode {
+    optional string id = 1;
+    enum Type {
+        SERVER = 0;
+        RADIO = 1;
+    }
+    optional Type type = 2 [default = SERVER];
+    optional string input_id = 3;
+}

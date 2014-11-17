@@ -23,29 +23,27 @@
 package org.graylog2.plugin.journal;
 
 import com.eaio.uuid.UUID;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.base.Objects;
+import com.fasterxml.jackson.databind.util.ByteBufferBackedInputStream;
+import com.google.protobuf.ByteString;
+import com.google.protobuf.UninitializedMessageException;
 import org.graylog2.plugin.Tools;
+import org.graylog2.plugin.journal.JournalMessages.SourceNode;
 import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.IOException;
 import java.io.Serializable;
-import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
-import java.util.Collections;
-import java.util.Map;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Strings.isNullOrEmpty;
-import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.graylog2.plugin.journal.JournalMessages.JournalMessage;
 
 /**
  * A raw message is the unparsed data Graylog2 was handed by an input.
@@ -61,21 +59,13 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  * </p>
  */
 public class RawMessage implements Serializable {
-
     public static final byte CURRENT_VERSION = 1;
 
-    public static final InetSocketAddress LOCALHOST_ANYPORT = new InetSocketAddress(0);
+    private static final Logger log = LoggerFactory.getLogger(RawMessage.class);
 
-    private final long sequenceNumber;
-    private final byte version;
+    private final JournalMessage.Builder msgBuilder;
     private final UUID id;
-    private final DateTime timestamp;
-    private final String sourceInputId;
-    private final InetSocketAddress remoteAddress;
-    private final String metaData;
-    private final String payloadType;
-    private final byte[] payload;
-    public static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+    private final long sequenceNumber;
 
     public RawMessage(String payloadType,
                       String sourceInputId,
@@ -100,156 +90,92 @@ public class RawMessage implements Serializable {
                       InetSocketAddress remoteAddress,
                       @Nullable String metaData,
                       byte[] payload) {
-        this.sequenceNumber = sequenceNumber;
         checkNotNull(payload, "The messsage payload must not be null!");
         checkArgument(payload.length > 0, "The message payload must not be empty!");
         checkArgument(!isNullOrEmpty(payloadType), "The payload type must not be null or empty!");
 
-        this.version = CURRENT_VERSION;
+        msgBuilder = JournalMessage.newBuilder();
+
+        this.sequenceNumber = sequenceNumber;
+        msgBuilder.setVersion(CURRENT_VERSION);
+
         this.id = id;
-        this.timestamp = timestamp;
-        this.sourceInputId = sourceInputId;
-        this.remoteAddress = Objects.firstNonNull(remoteAddress, LOCALHOST_ANYPORT);
-        this.metaData = metaData == null ? "" : metaData;
-        this.payloadType = payloadType;
-        this.payload = payload.clone();
+        msgBuilder.setUuidTime(id.time);
+        msgBuilder.setUuidClockseq(id.clockSeqAndNode);
+
+        msgBuilder.setTimestamp(timestamp.getMillis());
+        msgBuilder.addSourceNodes(
+                msgBuilder.addSourceNodesBuilder()
+                        .setId(sourceInputId)
+                        .setType(SourceNode.Type.SERVER)
+                        .build()
+        );
+        if (null != remoteAddress) {
+            final JournalMessages.RemoteAddress.Builder remoteBuilder = msgBuilder.getRemoteBuilder()
+                    .setAddress(ByteString.copyFrom(remoteAddress.getAddress().getAddress()))
+                    .setPort(remoteAddress.getPort());
+            // don't resolve the address just for serializing it. callers will decide whether to resolve addresses early or not.
+            if (!remoteAddress.isUnresolved()) {
+                remoteBuilder.setResolved(remoteAddress.getHostName());
+            }
+            msgBuilder.setRemote(remoteBuilder.build());
+        }
+
+        msgBuilder.setPayload(ByteString.copyFrom(payload));
+
+        final JournalMessages.CodecInfo.Builder codecBuilder = msgBuilder.getCodecBuilder();
+        codecBuilder.setName(payloadType);
+        if (metaData != null) {
+            codecBuilder.setConfig(metaData);
+        }
+        msgBuilder.setCodec(codecBuilder.build());
     }
 
-    public byte[] encode() {
-        final byte[] sourceInputIdBytes = sourceInputId.getBytes(UTF_8);
-        final byte[] metaDataBytes = metaData.getBytes(UTF_8);
-        final byte[] payloadTypeBytes = payloadType.getBytes(UTF_8);
-
-        final int bufferSize =
-                1 + /* version */
-                        16 + /* UUID is 2 longs */
-                        8 + /* timestamp is 1 long, in millis from 1970 */
-                        4 + /* source input id length */
-                        sourceInputIdBytes.length + /* source input id string. TODO could this be a proper UUID instead? would save many bytes*/
-                        1 + /* inet sock address length */
-                        remoteAddress.getAddress().getAddress().length + /* inet sock address byte representation */
-                        2 + /* source port */
-                        4 + /* payload type length */
-                        payloadTypeBytes.length + /* utf-8 encoded name of the payload type */
-                        4 + /* size of metadata, one int */
-                        metaDataBytes.length + /* number of bytes of UTF-8 encoded metadata, or 0 */
-                        4 + /* size of payload, one int */
-                        payload.length; /* raw length of payload data */
-
-        return ByteBuffer.allocate(bufferSize)
-                .put(version)
-                .putLong(id.getTime())
-                .putLong(id.getClockSeqAndNode())
-                .putLong(timestamp.getMillis())
-                .putInt(payloadTypeBytes.length)
-                .put(payloadTypeBytes)
-                .putInt(sourceInputIdBytes.length)
-                .put(sourceInputIdBytes)
-                .put((byte) (remoteAddress.getAddress() instanceof Inet4Address ? 4 : 16))
-                .put(remoteAddress.getAddress().getAddress())
-                .putInt(remoteAddress.getPort())
-                .putInt(metaDataBytes.length)
-                .put(metaDataBytes)
-                .putInt(payload.length)
-                .put(payload)
-                .array();
+    public RawMessage(JournalMessage journalMessage, long sequenceNumber) {
+        this.sequenceNumber = sequenceNumber;
+        id = new UUID(journalMessage.getUuidTime(), journalMessage.getUuidClockseq());
+        msgBuilder = JournalMessage.newBuilder(journalMessage);
     }
 
     public static RawMessage decode(final ByteBuffer buffer, final long sequenceNumber) {
-
         try {
-            final byte version = buffer.get();
-            if (version > CURRENT_VERSION) {
-                throw new IllegalArgumentException("Cannot decode raw message with version " + version +
-                                                           " this decoder only supports up to version " + CURRENT_VERSION);
-            }
+            final JournalMessage journalMessage = JournalMessage.parseFrom(new ByteBufferBackedInputStream(buffer));
 
-            final long time = buffer.getLong();
-            final long clockSeqAndNode = buffer.getLong();
+            // TODO validate message based on field contents and version number
 
-            final long millis = buffer.getLong();
-
-            final int payloadTypeLength = buffer.getInt();
-            final byte[] payloadType = new byte[payloadTypeLength];
-            buffer.get(payloadType);
-
-            final int sourceInputLength = buffer.getInt();
-            final byte[] sourceInput = new byte[sourceInputLength];
-            buffer.get(sourceInput);
-
-            final byte addressLength = buffer.get();
-            final byte[] address = new byte[addressLength];
-            buffer.get(address);
-
-            final int port = buffer.getInt();
-
-            final int metaDataLength = buffer.getInt();
-            final byte[] metaData = new byte[metaDataLength];
-            buffer.get(metaData);
-
-            final int payloadLength = buffer.getInt();
-            final byte[] payload = new byte[payloadLength];
-            buffer.get(payload);
-
-            return new RawMessage(
-                    sequenceNumber,
-                    new UUID(time, clockSeqAndNode),
-                    new DateTime(millis, DateTimeZone.UTC),
-                    new String(payloadType, UTF_8),
-                    new String(sourceInput, UTF_8),
-                    new InetSocketAddress(InetAddress.getByAddress(address), port),
-                    new String(metaData, UTF_8),
-                    payload);
-
-        } catch (IndexOutOfBoundsException e) {
-            throw new IllegalStateException("Cannot decode truncated raw message.", e);
-        } catch (UnknownHostException e) {
-            throw new IllegalStateException("Cannot decode raw message, malformed InetSockAddress", e);
+            return new RawMessage(journalMessage, sequenceNumber);
+        } catch (IOException e) {
+            log.error("Cannot read raw message from journal, ignoring this message.", e);
+            return null;
         }
     }
 
-    public long getSequenceNumber() {
-        return sequenceNumber;
+    public byte[] encode() {
+        try {
+            final JournalMessage journalMessage = msgBuilder.build();
+            return journalMessage.toByteArray();
+        } catch (UninitializedMessageException e) {
+            log.error(
+                    "Unable to write RawMessage to journal because required fields are missing, " +
+                            "this message will be discarded. This is a bug.", e);
+            return null;
+        }
     }
 
     public int getVersion() {
-        return version;
+        return msgBuilder.getVersion();
     }
 
     public DateTime getTimestamp() {
-        return timestamp;
-    }
-
-    public String getSourceInputId() {
-        return sourceInputId;
-    }
-
-    public InetSocketAddress getRemoteAddress() {
-        return remoteAddress;
-    }
-
-    public String getMetaData() {
-        return metaData;
-    }
-
-    @Nonnull
-    public Map<String, Object> getParsedMetaData() {
-        if (getMetaData() == null) {
-            return Collections.emptyMap();
-        }
-        try {
-            return OBJECT_MAPPER.readValue(getMetaData(), new TypeReference<Map<String, Object>>() {});
-        } catch (IOException e) {
-            return Collections.emptyMap();
-        }
+        return new DateTime(msgBuilder.getTimestamp()); // TODO PERFORMANCE object creation
     }
 
     public String getPayloadType() {
-        return payloadType;
+        return msgBuilder.getCodec().getName();
     }
 
     public byte[] getPayload() {
-        return payload;
+        return msgBuilder.getPayload().toByteArray(); // TODO PERFORMANCE array copy
     }
 
     public UUID getId() {
@@ -263,19 +189,27 @@ public class RawMessage implements Serializable {
         return ByteBuffer.allocate(16)
                 .putLong(time)
                 .putLong(clockSeqAndNode)
-                .array();
+                .array(); // TODO PERFORMANCE object creation
     }
 
-    @Override
-    public String toString() {
-        return "RawMessage{" +
-                "version=" + version +
-                ", id=" + id +
-                ", timestamp=" + timestamp +
-                ", sourceInputId='" + sourceInputId + '\'' +
-                ", metaData='" + metaData + '\'' +
-                ", payloadType='" + payloadType + '\'' +
-                ", payload.length=" + payload.length +
-                '}';
+    public InetAddress getRemoteAddress() {
+        if (msgBuilder.hasRemote()) {
+            final JournalMessages.RemoteAddress remoteAddress = msgBuilder.getRemote();
+            try {
+                return InetAddress.getByAddress(remoteAddress.getResolved(),
+                                         remoteAddress.getAddress().toByteArray());
+            } catch (UnknownHostException e) {
+                log.error("Cannot get remote address of raw message", e);
+            }
+        }
+        return null;
+    }
+
+    public RawMessage setRemoteAddress(InetAddress address) {
+        final JournalMessages.RemoteAddress.Builder remoteBuilder = msgBuilder.getRemoteBuilder();
+        remoteBuilder.setAddress(ByteString.copyFrom(address.getAddress()));
+
+        msgBuilder.setRemote(remoteBuilder.build());
+        return this;
     }
 }

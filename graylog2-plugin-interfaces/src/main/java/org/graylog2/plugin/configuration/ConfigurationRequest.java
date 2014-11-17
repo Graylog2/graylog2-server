@@ -28,6 +28,7 @@ import org.graylog2.plugin.configuration.fields.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nonnull;
 import java.util.Map;
 
 /**
@@ -110,6 +111,43 @@ public class ConfigurationRequest {
                 }
             }
         }
+    }
+
+    /**
+     * Creates a new {@link org.graylog2.plugin.configuration.Configuration configuration object} containing only the
+     * fields specified in this request object.
+     * @param config original Configuration
+     * @return filtered Configuration, not null but might be empty
+     */
+    @Nonnull
+    public Configuration filter(Configuration config) {
+        final Map<String, Object> values = Maps.newHashMap();
+
+        for (final ConfigurationField field : fields.values()) {
+            final String name = field.getName();
+            final String type = field.getFieldType();
+            switch (type) {
+                case BooleanField.FIELD_TYPE:
+                    if (config.booleanIsSet(name)) {
+                        values.put(name, config.getBoolean(name));
+                    }
+                    break;
+                case NumberField.FIELD_TYPE:
+                    if (!config.intIsSet(name)) {
+                        values.put(name, config.getInt(name));
+                    }
+                    break;
+                case TextField.FIELD_TYPE:
+                case DropdownField.FIELD_TYPE:
+                    if (!config.stringIsSet(name)) {
+                        values.put(name, config.getString(name));
+                    }
+                    break;
+                default:
+                    throw new IllegalStateException("Unknown field type " + type + ". This is a bug.");
+            }
+        }
+        return new Configuration(values);
     }
 
     public static class Templates {

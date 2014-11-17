@@ -25,7 +25,7 @@ import org.graylog2.plugin.FactoryClass;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
-import org.graylog2.plugin.inputs.codecs.Codec;
+import org.graylog2.plugin.inputs.codecs.AbstractCodec;
 import org.graylog2.plugin.inputs.codecs.CodecAggregator;
 import org.graylog2.plugin.journal.RawMessage;
 import org.slf4j.Logger;
@@ -37,12 +37,13 @@ import java.io.IOException;
 
 import static org.graylog2.inputs.random.generators.FakeHttpRawMessageGenerator.GeneratorState;
 
-public class RandomHttpMessageCodec implements Codec {
+public class RandomHttpMessageCodec extends AbstractCodec {
     private static final Logger log = LoggerFactory.getLogger(RandomHttpMessageCodec.class);
     private final ObjectMapper objectMapper;
 
     @Inject
     public RandomHttpMessageCodec(@Assisted Configuration configuration, ObjectMapper objectMapper) {
+        super(configuration);
         this.objectMapper = objectMapper;
     }
 
@@ -75,7 +76,7 @@ public class RandomHttpMessageCodec implements Codec {
     }
 
     @FactoryClass
-    public interface Factory extends Codec.Factory<RandomHttpMessageCodec> {
+    public interface Factory extends AbstractCodec.Factory<RandomHttpMessageCodec> {
         @Override
         RandomHttpMessageCodec create(Configuration configuration);
 
@@ -84,7 +85,7 @@ public class RandomHttpMessageCodec implements Codec {
     }
 
     @ConfigClass
-    public static class Config implements Codec.Config {
+    public static class Config implements AbstractCodec.Config {
         @Override
         public ConfigurationRequest getRequestedConfiguration() {
             return new ConfigurationRequest();

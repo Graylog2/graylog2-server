@@ -33,8 +33,6 @@
  */
 package org.graylog2.inputs.codecs;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Charsets;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
@@ -43,49 +41,29 @@ import org.graylog2.plugin.FactoryClass;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
-import org.graylog2.plugin.inputs.MessageInput;
-import org.graylog2.plugin.inputs.codecs.Codec;
+import org.graylog2.plugin.inputs.codecs.AbstractCodec;
 import org.graylog2.plugin.inputs.codecs.CodecAggregator;
 import org.graylog2.plugin.inputs.transports.NettyTransport;
 import org.graylog2.plugin.journal.RawMessage;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.io.IOException;
-import java.util.Map;
+import java.net.InetAddress;
 
-public class RawCodec implements Codec {
-    private final ObjectMapper objectMapper;
-    private final Configuration configuration;
+public class RawCodec extends AbstractCodec {
 
     @AssistedInject
-    public RawCodec(ObjectMapper objectMapper, @Assisted Configuration configuration) {
-        this.objectMapper = objectMapper;
-        this.configuration = configuration;
+    public RawCodec(@Assisted Configuration configuration) {
+        super(configuration);
     }
 
     @Nullable
     @Override
     public Message decode(@Nonnull RawMessage raw) {
-        // TODO fix remote address, use raw message
-        String source;
-        if (raw.getMetaData() != null) {
-            try {
-                final Map<String, Object> map = objectMapper.readValue(raw.getMetaData(),
-                                                        new TypeReference<Map<String, Object>>() {
-                                                        });
-                source = map.containsKey("remote_address") ? (String) map.get("remote_address") : "unknown";
-            } catch (IOException e) {
-                source = "unknown";
-            }
-        } else {
-            if (configuration.stringIsSet(MessageInput.CK_OVERRIDE_SOURCE)) {
-                source = configuration.getString(MessageInput.CK_OVERRIDE_SOURCE);
-            } else {
-                source = "unknown";
-            }
-        }
-        return new Message(new String(raw.getPayload(), Charsets.UTF_8), source, raw.getTimestamp());
+        final InetAddress remoteAddress = raw.getRemoteAddress();
+        return new Message(new String(raw.getPayload(), Charsets.UTF_8),
+                           remoteAddress == null ? "unknown" : remoteAddress.getHostName(),  // TODO lookups/override?
+                           raw.getTimestamp());
     }
 
     @Nullable
@@ -100,7 +78,7 @@ public class RawCodec implements Codec {
     }
 
     @FactoryClass
-    public interface Factory extends Codec.Factory<RawCodec> {
+    public interface Factory extends AbstractCodec.Factory<RawCodec> {
         @Override
         RawCodec create(Configuration configuration);
 
@@ -109,7 +87,7 @@ public class RawCodec implements Codec {
     }
 
     @ConfigClass
-    public static class Config implements Codec.Config {
+    public static class Config implements AbstractCodec.Config {
         @Override
         public ConfigurationRequest getRequestedConfiguration() {
             return new ConfigurationRequest();

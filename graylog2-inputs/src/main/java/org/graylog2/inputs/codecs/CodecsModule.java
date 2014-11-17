@@ -24,11 +24,12 @@ package org.graylog2.inputs.codecs;
 
 import com.google.inject.multibindings.MapBinder;
 import org.graylog2.plugin.inject.Graylog2Module;
+import org.graylog2.plugin.inputs.codecs.AbstractCodec;
 import org.graylog2.plugin.inputs.codecs.Codec;
 
 public class CodecsModule extends Graylog2Module {
     protected void configure() {
-        final MapBinder<String, Codec.Factory<? extends Codec>> mapBinder = codecMapBinder();
+        final MapBinder<String, AbstractCodec.Factory<? extends Codec>> mapBinder = codecMapBinder();
 
         installCodec(mapBinder, "raw", RawCodec.class);
         installCodec(mapBinder, "syslog", SyslogCodec.class);

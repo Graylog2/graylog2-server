@@ -42,6 +42,6 @@ public class InputDescription {
     }
 
     public Map<String, Map<String, Object>> getRequestedConfiguration() {
-        return config.getRequestedConfiguration().asList();
+        return config.combinedRequestedConfiguration().asList();
     }
 }

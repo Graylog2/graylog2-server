@@ -20,37 +20,24 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.graylog2.plugin.buffers;
+package org.graylog2.plugin.inputs.codecs;
 
-import com.lmax.disruptor.EventFactory;
-import org.graylog2.plugin.Message;
-import org.graylog2.plugin.journal.RawMessage;
+import org.graylog2.plugin.configuration.Configuration;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
-public class MessageEvent {
+import javax.annotation.Nonnull;
 
-    private RawMessage raw;
-    private Message msg;
-    
-    public Message getMessage()
-    {
-        return msg;
+public abstract class AbstractCodec implements Codec {
+
+    protected final Configuration configuration;
+
+    protected AbstractCodec(Configuration configuration) {
+        this.configuration = configuration;
     }
 
-    public void setMessage(final Message msg)
-    {
-        this.msg = msg;
+    @Override
+    @Nonnull
+    public Configuration getConfiguration() {
+        return configuration;
     }
-
-    public final static EventFactory<MessageEvent> EVENT_FACTORY = new EventFactory<MessageEvent>()
-    {
-        @Override
-        public MessageEvent newInstance()
-        {
-            return new MessageEvent();
-        }
-    };
 
 }
