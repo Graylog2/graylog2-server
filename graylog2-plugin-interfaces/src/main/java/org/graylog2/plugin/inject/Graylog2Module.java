@@ -119,8 +119,8 @@ public abstract class Graylog2Module extends AbstractModule {
         final Key<? extends AbstractCodec.Factory<? extends Codec>> factoryKey = Key.get(factoryClass);
 
         install(new FactoryModuleBuilder()
-                        .implement(AbstractCodec.class, codecClass)
-                        .implement(AbstractCodec.Config.class, configClass)
+                        .implement(Codec.class, codecClass)
+                        .implement(Codec.Config.class, configClass)
                         .build(factoryClass));
 
         mapBinder.addBinding(name).to(factoryKey);
