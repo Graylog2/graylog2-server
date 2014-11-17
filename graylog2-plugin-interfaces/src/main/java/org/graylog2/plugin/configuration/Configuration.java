@@ -22,23 +22,51 @@
  */
 package org.graylog2.plugin.configuration;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.google.common.collect.Maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.util.Map;
 
 public class Configuration {
     private static final Logger LOG = LoggerFactory.getLogger(Configuration.class);
+    private static final ObjectMapper objectMapper;
 
+    static {
+        objectMapper = new ObjectMapper();
+        objectMapper.enable(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS);
+    }
+
+    @JsonProperty
     private final Map<String, Object> source;
 
+    @JsonIgnore
     private final Map<String, String> strings;
+    @JsonIgnore
     private final Map<String, Integer> ints;
+    @JsonIgnore
     private final Map<String, Boolean> bools;
+    @JsonIgnore
+    private String serializedSource = null;
 
-    public Configuration(Map<String, Object> m) {
+    @JsonCreator
+    public Configuration(@JsonProperty("source") Map<String, Object> m) {
         this.source = m;
+
+        if (m != null && !m.isEmpty()) {
+            try {
+                this.serializedSource = objectMapper.writeValueAsString(this);
+            } catch (JsonProcessingException e) {
+                LOG.error("Serializing configuration failed.", e);
+            }
+        }
 
         strings = Maps.newHashMap();
         ints = Maps.newHashMap();
@@ -60,6 +88,7 @@ public class Configuration {
                     } else {
                         LOG.error("Cannot handle type [{}] of plugin configuration key <{}>.", e.getValue().getClass().getCanonicalName(), e.getKey());
                     }
+
                 } catch(Exception ex) {
                     LOG.warn("Could not read input configuration key <" + e.getKey() + ">. Skipping.", ex);
                 }
@@ -100,5 +129,18 @@ public class Configuration {
 
     public boolean intIsSet(String key) {
         return ints.get(key) != null;
+    }
+
+    public String serializeToJson() {
+        return serializedSource;
+    }
+
+    public static Configuration deserializeFromJson(String json) {
+        try {
+            return objectMapper.readValue(json, Configuration.class);
+        } catch (IOException e) {
+            LOG.error("Deserializing configuration failed.", e);
+            return null;
+        }
     }
 }
