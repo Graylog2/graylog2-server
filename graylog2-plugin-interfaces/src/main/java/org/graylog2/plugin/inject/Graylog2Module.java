@@ -30,7 +30,6 @@ import com.google.inject.multibindings.MapBinder;
 import org.graylog2.plugin.ConfigClass;
 import org.graylog2.plugin.FactoryClass;
 import org.graylog2.plugin.inputs.MessageInput;
-import org.graylog2.plugin.inputs.codecs.AbstractCodec;
 import org.graylog2.plugin.inputs.codecs.Codec;
 import org.graylog2.plugin.inputs.transports.Transport;
 import org.slf4j.Logger;
@@ -84,17 +83,17 @@ public abstract class Graylog2Module extends AbstractModule {
     }
 
     protected void installCodec(
-            MapBinder<String, AbstractCodec.Factory<? extends Codec>> mapBinder,
+            MapBinder<String, Codec.Factory<? extends Codec>> mapBinder,
             String name,
             Class<? extends Codec> codecClass) {
 
-        final Class<? extends AbstractCodec.Config> configClass =
-                (Class<? extends AbstractCodec.Config>)
-                        findInnerClassAnnotatedWith(ConfigClass.class, codecClass, AbstractCodec.Config.class);
+        final Class<? extends Codec.Config> configClass =
+                (Class<? extends Codec.Config>)
+                        findInnerClassAnnotatedWith(ConfigClass.class, codecClass, Codec.Config.class);
 
-        final Class<? extends AbstractCodec.Factory<? extends Codec>> factoryClass =
-                (Class<? extends AbstractCodec.Factory<? extends Codec>>)
-                        findInnerClassAnnotatedWith(FactoryClass.class, codecClass, AbstractCodec.Factory.class);
+        final Class<? extends Codec.Factory<? extends Codec>> factoryClass =
+                (Class<? extends Codec.Factory<? extends Codec>>)
+                        findInnerClassAnnotatedWith(FactoryClass.class, codecClass, Codec.Factory.class);
 
         if (configClass == null) {
             log.error("Unable to find an inner class annotated with @ConfigClass in codec {}. This codec will not be available!",
@@ -110,13 +109,13 @@ public abstract class Graylog2Module extends AbstractModule {
     }
 
     protected void installCodec(
-            MapBinder<String, AbstractCodec.Factory<? extends Codec>> mapBinder,
+            MapBinder<String, Codec.Factory<? extends Codec>> mapBinder,
             String name,
             Class<? extends Codec> codecClass,
-            Class<? extends AbstractCodec.Config> configClass,
-            Class<? extends AbstractCodec.Factory<? extends Codec>> factoryClass) {
+            Class<? extends Codec.Config> configClass,
+            Class<? extends Codec.Factory<? extends Codec>> factoryClass) {
 
-        final Key<? extends AbstractCodec.Factory<? extends Codec>> factoryKey = Key.get(factoryClass);
+        final Key<? extends Codec.Factory<? extends Codec>> factoryKey = Key.get(factoryClass);
 
         install(new FactoryModuleBuilder()
                         .implement(Codec.class, codecClass)
@@ -151,10 +150,10 @@ public abstract class Graylog2Module extends AbstractModule {
         return annotatedClass;
     }
 
-    protected MapBinder<String, AbstractCodec.Factory<? extends Codec>> codecMapBinder() {
+    protected MapBinder<String, Codec.Factory<? extends Codec>> codecMapBinder() {
         return MapBinder.newMapBinder(binder(),
                                       TypeLiteral.get(String.class),
-                                      new TypeLiteral<AbstractCodec.Factory<? extends Codec>>() {
+                                      new TypeLiteral<Codec.Factory<? extends Codec>>() {
                                       });
     }
 
