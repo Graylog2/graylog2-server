@@ -16,6 +16,7 @@
  */
 package org.graylog2.database;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.common.base.Objects;
 import org.bson.types.ObjectId;
 import org.graylog2.plugin.database.Persisted;
@@ -66,6 +67,7 @@ public abstract class PersistedImpl implements Persisted {
     }
 
     @Override
+    @JsonIgnore
     public Map<String, Object> getFields() {
         return fields;
     }
