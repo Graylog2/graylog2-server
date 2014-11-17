@@ -27,6 +27,7 @@ import com.fasterxml.jackson.databind.util.ByteBufferBackedInputStream;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.UninitializedMessageException;
 import org.graylog2.plugin.Tools;
+import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.journal.JournalMessages.SourceNode;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -66,6 +67,7 @@ public class RawMessage implements Serializable {
     private final JournalMessage.Builder msgBuilder;
     private final UUID id;
     private final long sequenceNumber;
+    private Configuration codecConfig;
 
     public RawMessage(String payloadType,
                       String sourceInputId,
@@ -90,7 +92,7 @@ public class RawMessage implements Serializable {
                       InetSocketAddress remoteAddress,
                       @Nullable String metaData,
                       byte[] payload) {
-        checkNotNull(payload, "The messsage payload must not be null!");
+        checkNotNull(payload, "The message payload must not be null!");
         checkArgument(payload.length > 0, "The message payload must not be empty!");
         checkArgument(!isNullOrEmpty(payloadType), "The payload type must not be null or empty!");
 
@@ -135,6 +137,7 @@ public class RawMessage implements Serializable {
         this.sequenceNumber = sequenceNumber;
         id = new UUID(journalMessage.getUuidTime(), journalMessage.getUuidClockseq());
         msgBuilder = JournalMessage.newBuilder(journalMessage);
+        codecConfig = Configuration.deserializeFromJson(journalMessage.getCodec().getConfig());
     }
 
     public static RawMessage decode(final ByteBuffer buffer, final long sequenceNumber) {
@@ -152,6 +155,12 @@ public class RawMessage implements Serializable {
 
     public byte[] encode() {
         try {
+            final JournalMessages.CodecInfo codec = msgBuilder.getCodec();
+            final JournalMessages.CodecInfo.Builder builder = JournalMessages.CodecInfo.newBuilder(codec);
+
+            builder.setConfig(codecConfig.serializeToJson());
+            msgBuilder.setCodec(builder.build());
+
             final JournalMessage journalMessage = msgBuilder.build();
             return journalMessage.toByteArray();
         } catch (UninitializedMessageException e) {
@@ -193,6 +202,7 @@ public class RawMessage implements Serializable {
     }
 
     public InetAddress getRemoteAddress() {
+        // TODO return InetSocketAddress here!
         if (msgBuilder.hasRemote()) {
             final JournalMessages.RemoteAddress remoteAddress = msgBuilder.getRemote();
             try {
@@ -206,10 +216,19 @@ public class RawMessage implements Serializable {
     }
 
     public RawMessage setRemoteAddress(InetAddress address) {
+        // TODO return InetSocketAddress here!
         final JournalMessages.RemoteAddress.Builder remoteBuilder = msgBuilder.getRemoteBuilder();
         remoteBuilder.setAddress(ByteString.copyFrom(address.getAddress()));
 
         msgBuilder.setRemote(remoteBuilder.build());
         return this;
+    }
+
+    public Configuration getCodecConfig() {
+        return codecConfig;
+    }
+
+    public void setCodecConfig(Configuration codecConfig) {
+        this.codecConfig = codecConfig;
     }
 }
