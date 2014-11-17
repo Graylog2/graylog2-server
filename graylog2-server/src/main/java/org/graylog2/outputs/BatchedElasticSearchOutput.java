@@ -70,6 +70,7 @@ public class BatchedElasticSearchOutput extends ElasticSearchOutput {
                 LOG.trace("Buffering message id to [{}]: <{}>", getName(), message.getId());
             }
             if (this.buffer.size() >= maxBufferSize) {
+                LOG.debug("[{}] Buffer reached maximum batch size, submitting flush request.", Thread.currentThread());
                 flush();
             }
         }
