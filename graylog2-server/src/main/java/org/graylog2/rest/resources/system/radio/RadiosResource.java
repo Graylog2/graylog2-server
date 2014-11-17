@@ -26,7 +26,6 @@ import com.wordnik.swagger.annotations.ApiResponse;
 import com.wordnik.swagger.annotations.ApiResponses;
 import org.bson.types.ObjectId;
 import org.graylog2.cluster.Node;
-import org.graylog2.cluster.NodeImpl;
 import org.graylog2.cluster.NodeNotFoundException;
 import org.graylog2.cluster.NodeService;
 import org.graylog2.database.ValidationException;
@@ -81,7 +80,7 @@ public class RadiosResource extends RestResource {
     @ApiOperation(value = "List all active radios in this cluster.")
     public String radios() {
         List<Map<String, Object>> radioList = Lists.newArrayList();
-        Map<String, Node> radios = nodeService.allActive(NodeImpl.Type.RADIO);
+        Map<String, Node> radios = nodeService.allActive(Node.Type.RADIO);
 
         for(Map.Entry<String, Node> radio : radios.entrySet()) {
             radioList.add(radioSummary(radio.getValue()));
