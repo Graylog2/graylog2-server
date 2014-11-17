@@ -333,7 +333,7 @@
             <dependency>
                 <groupId>com.github.joschi</groupId>
                 <artifactId>jadconfig</artifactId>
-                <version>0.8.0</version>
+                <version>0.9.1</version>
             </dependency>
 
             <!-- Jersey and Glassfish -->
