@@ -26,7 +26,7 @@
     details
 }
 
-@main("Export Bundle", views.html.system.sidebar(), "", currentUser) {
+@main("Build your own content pack", views.html.system.sidebar(), "", currentUser) {
     @views.html.partials.breadcrumbs(breadcrumbs)
 
     <div class="row-fluid">
@@ -34,7 +34,7 @@
         Export your inputs, outputs, streams and dashboards as a content pack and share it with the community.
     </div>
 
-    @helper.form(action = routes.BundlesController.export(), 'class -> "form-horizontal") {
+    @helper.form(action = routes.BundlesController.export(), 'class -> "form-horizontal build-content-pack") {
         <div class="control-group @if(form("name").hasErrors) {error}">
             <label class="control-label" for="name">Name</label>
             <div class="controls">
@@ -69,6 +69,7 @@
                     @if(inputs.isEmpty) {
                         <span class="help-block help-standalone">There are no inputs to export.</span>
                     } else {
+                        <button type="button" class="btn btn-small btn-link select-all" data-target="inputs">Select all</button>
                         @for(i <- inputs.sortBy(_.getTitle)) {
                             <div class="checkbox-control">
                                 <label class="checkbox"><input type="checkbox" name="inputs" id="input_@i.getId" value="@i.getId" @if(listValues.contains(Some(i.getId))) {checked=""}>@i.getTitle</label>
@@ -87,6 +88,7 @@
                 @if(outputs.isEmpty) {
                     <span class="help-block help-standalone">There are no outputs to export.</span>
                 } else {
+                    <button type="button" class="btn btn-small btn-link select-all" data-target="outputs">Select all</button>
                     @for(o <- outputs.sortBy(_.getTitle)) {
                         <div class="checkbox-control">
                             <label class="checkbox"><input type="checkbox" name="outputs" id="output_@o.getId" value="@o.getId" @if(listValues.contains(Some(o.getId))) {checked=""}>@o.getTitle</label>
@@ -104,6 +106,7 @@
                 @if(streams.isEmpty) {
                     <span class="help-block help-standalone">There are no streams to export.</span>
                 } else {
+                    <button type="button" class="btn btn-small btn-link select-all" data-target="streams">Select all</button>
                     @for(s <- streams.sortBy(_.getTitle)) {
                         <div class="checkbox-control">
                             <label class="checkbox"><input type="checkbox" name="streams" id="stream_@s.getId" value="@s.getId" @if(listValues.contains(Some(s.getId))) {checked=""}>@s.getTitle</label>
@@ -121,6 +124,7 @@
                 @if(dashboards.isEmpty) {
                     <span class="help-block help-standalone">There are no dashboards to export.</span>
                 } else {
+                    <button type="button" class="btn btn-small btn-link select-all" data-target="dashboards">Select all</button>
                     @for(d <- dashboards.sortBy(_.getTitle)) {
                         <div class="checkbox-control">
                             <label class="checkbox"><input type="checkbox" name="dashboards" id="dashboard_@d.getId" value="@d.getId" @if(listValues.contains(Some(d.getId))) {checked=""}>@d.getTitle</label>

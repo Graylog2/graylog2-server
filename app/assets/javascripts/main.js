@@ -959,7 +959,7 @@ $(document).ready(function() {
 
     $(".node-state").tooltip();
 
-    datetimeFields = $(".browser-datetime")
+    datetimeFields = $(".browser-datetime");
     if(datetimeFields.length > 0) {
         datetimeFields.each(function() {
             var currentDatetime = moment();
@@ -968,6 +968,14 @@ $(document).ready(function() {
             $(this).text(currentDatetime.format(momentHelper.DATE_FORMAT_TZ));
         });
     }
+
+    $("button.select-all").on("click", function(e){
+        var targetName = $(this).data('target');
+        var checkboxes = $("input[name=" + targetName + "]:checkbox");
+        checkboxes.each(function(index, element) {
+            $(element).prop("checked", true);
+        });
+    });
 });
 
 function showError(message) {
@@ -1012,7 +1020,7 @@ String.prototype.splice = function( idx, rem, s ) {
 
 String.prototype.capitalize = function() {
     return this.charAt(0).toUpperCase() + this.slice(1);
-}
+};
 
 function htmlEscape(x) {
     return $('<div/>').text(x).html();
