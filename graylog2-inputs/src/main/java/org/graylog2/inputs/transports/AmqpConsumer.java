@@ -17,9 +17,14 @@
 package org.graylog2.inputs.transports;
 
 import com.google.common.util.concurrent.Uninterruptibles;
-import com.rabbitmq.client.*;
-import org.graylog2.plugin.buffers.BufferOutOfCapacityException;
-import org.graylog2.plugin.buffers.ProcessingDisabledException;
+import com.rabbitmq.client.AMQP;
+import com.rabbitmq.client.Channel;
+import com.rabbitmq.client.Connection;
+import com.rabbitmq.client.ConnectionFactory;
+import com.rabbitmq.client.DefaultConsumer;
+import com.rabbitmq.client.Envelope;
+import com.rabbitmq.client.ShutdownListener;
+import com.rabbitmq.client.ShutdownSignalException;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.journal.RawMessage;
 import org.slf4j.Logger;
@@ -100,20 +105,9 @@ public class AmqpConsumer {
                         lastSecBytesReadTmp.addAndGet(body.length);
 
                         final RawMessage rawMessage = new RawMessage("radio-msgpack", sourceInput.getId(), null, body);
-                        sourceInput.processRawMessageFailFast(rawMessage);
+                        // TODO implement throttling
+                        sourceInput.processRawMessage(rawMessage);
                         channel.basicAck(deliveryTag, false);
-                    } catch (BufferOutOfCapacityException e) {
-                        LOG.debug("Input buffer full, requeuing message. Delaying 10 ms until trying next message.");
-                        if (channel.isOpen()) {
-                            channel.basicNack(deliveryTag, false, true);
-                            Uninterruptibles.sleepUninterruptibly(10, TimeUnit.MILLISECONDS); // TODO magic number
-                        }
-                    } catch (ProcessingDisabledException e) {
-                        LOG.debug("Message processing is disabled, requeuing message. Delaying 100 ms until trying next message.");
-                        if (channel.isOpen()) {
-                            channel.basicNack(deliveryTag, false, true);
-                            Uninterruptibles.sleepUninterruptibly(100, TimeUnit.MILLISECONDS); // TODO magic number
-                        }
                     } catch (Exception e) {
                         LOG.error("Error while trying to process AMQP message, requeuing message", e);
                         if (channel.isOpen()) {

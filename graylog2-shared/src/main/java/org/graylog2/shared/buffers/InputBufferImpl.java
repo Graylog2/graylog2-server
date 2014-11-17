@@ -24,12 +24,15 @@ import com.codahale.metrics.MetricRegistry;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
+import com.lmax.disruptor.ExceptionHandler;
 import com.lmax.disruptor.RingBuffer;
 import com.lmax.disruptor.dsl.Disruptor;
 import com.lmax.disruptor.dsl.ProducerType;
 import org.graylog2.plugin.BaseConfiguration;
 import org.graylog2.plugin.buffers.InputBuffer;
 import org.graylog2.plugin.journal.RawMessage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Singleton;
 import java.util.concurrent.ExecutorService;
@@ -39,22 +42,39 @@ import java.util.concurrent.ThreadFactory;
 
 @Singleton
 public class InputBufferImpl implements InputBuffer {
+    private static final Logger LOG = LoggerFactory.getLogger(InputBufferImpl.class);
 
     private final RingBuffer<RawMessageEvent> ringBuffer;
 
     @Inject
-    public InputBufferImpl(int bufferSize,
-                           MetricRegistry metricRegistry,
+    public InputBufferImpl(MetricRegistry metricRegistry,
                            BaseConfiguration configuration,
                            Provider<DirectMessageHandler> directMessageHandlerProvider) {
         final Disruptor<RawMessageEvent> disruptor = new Disruptor<>(
                 RawMessageEvent.FACTORY,
-                bufferSize,
+                configuration.getRingSize(),
                 executorService(metricRegistry),
                 ProducerType.MULTI,
                 configuration.getProcessorWaitStrategy());
 
+        disruptor.handleExceptionsWith(new ExceptionHandler() {
+            @Override
+            public void handleEventException(Throwable ex, long sequence, Object event) {
+                LOG.error("", ex);
+            }
+
+            @Override
+            public void handleOnStartException(Throwable ex) {
+                LOG.error("", ex);
+            }
+
+            @Override
+            public void handleOnShutdownException(Throwable ex) {
+                LOG.error("", ex);
+            }
+        });
         disruptor.handleEventsWithWorkerPool(directMessageHandlerProvider.get()); // TODO switch implementation + count based on config
+        disruptor.start();
 
         ringBuffer = disruptor.getRingBuffer();
     }

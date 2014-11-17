@@ -23,6 +23,7 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Scopes;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import org.graylog2.plugin.LocalMetricRegistry;
+import org.graylog2.plugin.buffers.InputBuffer;
 import org.graylog2.plugin.inputs.util.ThroughputCounter;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.bindings.providers.EventBusProvider;
@@ -30,6 +31,7 @@ import org.graylog2.shared.bindings.providers.MetricRegistryProvider;
 import org.graylog2.shared.bindings.providers.NodeIdProvider;
 import org.graylog2.shared.bindings.providers.ProcessBufferProvider;
 import org.graylog2.shared.bindings.providers.ServiceManagerProvider;
+import org.graylog2.shared.buffers.InputBufferImpl;
 import org.graylog2.shared.buffers.ProcessBuffer;
 import org.graylog2.shared.buffers.ProcessBufferWatermark;
 import org.graylog2.shared.stats.ThroughputStats;
@@ -55,6 +57,7 @@ public class GenericBindings extends AbstractModule {
         install(new FactoryModuleBuilder().build(ProcessBuffer.Factory.class));
 
         bind(ProcessBuffer.class).toProvider(ProcessBufferProvider.class);
+        bind(InputBuffer.class).to(InputBufferImpl.class);
         bind(NodeId.class).toProvider(NodeIdProvider.class);
 
         bind(ServiceManager.class).toProvider(ServiceManagerProvider.class).asEagerSingleton();

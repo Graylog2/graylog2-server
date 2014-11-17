@@ -37,8 +37,6 @@ import org.graylog2.plugin.ConfigClass;
 import org.graylog2.plugin.FactoryClass;
 import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.ServerStatus;
-import org.graylog2.plugin.buffers.BufferOutOfCapacityException;
-import org.graylog2.plugin.buffers.ProcessingDisabledException;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.configuration.fields.ConfigurationField;
@@ -225,40 +223,8 @@ public class KafkaTransport extends ThrottleableTransport {
                                 null,
                                 bytes);
 
-                        // the loop below is like this because we cannot "unsee" the message we've just gotten by calling .next()
-                        // the high level consumer of Kafka marks the message as "processed" immediately after being returned from next.
-                        // thus we need to retry processing it.
-                        boolean retry = false;
-                        int retryCount = 0;
-                        do {
-                            try {
-                                if (retry) {
-                                    // don't try immediately if the buffer was full, try not spin too much
-                                    LOG.debug("Waiting 10ms to retry inserting into buffer, retried {} times",
-                                            retryCount);
-                                    Uninterruptibles.sleepUninterruptibly(10,
-                                            TimeUnit.MILLISECONDS); // TODO magic number
-                                }
-                                // try to process the message, if it succeeds, we immediately move on to the next message (retry will be false)
-                                // if parsing the message failed, this will return 'true' (sorry for the stupid return value handling, amqp needs to know
-                                // whether to ack or nack the message)
-                                final boolean discardMalformedMessage = input.processRawMessageFailFast(rawMessage);
-                                if (discardMalformedMessage) {
-                                    LOG.debug("Message {} was malformed, skipping message.", rawMessage.getId());
-                                }
-                                retry = false;
-                            } catch (BufferOutOfCapacityException e) {
-                                LOG.debug("Input buffer full, retrying Kafka message processing");
-                                retry = true;
-                                retryCount++;
-                            } catch (ProcessingDisabledException e) {
-                                LOG.debug(
-                                        "Processing was disabled after we read the message but before we could insert it into " +
-                                                "the buffer. We cache this one message, and should block on the next iteration.");
-                                input.processRawMessage(rawMessage);
-                                retry = false;
-                            }
-                        } while (retry);
+                        // TODO implement throttling
+                        input.processRawMessage(rawMessage);
                     }
                     // explicitly commit our offsets when stopping.
                     // this might trigger a couple of times, but it won't hurt

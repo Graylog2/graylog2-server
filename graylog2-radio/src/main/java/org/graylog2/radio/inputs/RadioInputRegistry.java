@@ -19,6 +19,7 @@ package org.graylog2.radio.inputs;
 import com.codahale.metrics.MetricRegistry;
 import com.google.common.collect.Lists;
 import com.ning.http.client.AsyncHttpClient;
+import org.graylog2.plugin.buffers.InputBuffer;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationException;
 import org.graylog2.plugin.inputs.InputState;
@@ -26,7 +27,6 @@ import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.radio.cluster.InputService;
 import org.graylog2.radio.inputs.api.InputSummaryResponse;
 import org.graylog2.radio.inputs.api.RegisterInputResponse;
-import org.graylog2.shared.buffers.ProcessBuffer;
 import org.graylog2.shared.inputs.InputRegistry;
 import org.graylog2.shared.inputs.MessageInputFactory;
 import org.graylog2.shared.inputs.NoSuchInputTypeException;
@@ -47,12 +47,12 @@ public class RadioInputRegistry extends InputRegistry {
     private final InputService inputService;
 
     public RadioInputRegistry(MessageInputFactory messageInputFactory,
-                              ProcessBuffer processBuffer,
+                              InputBuffer inputBuffer,
                               AsyncHttpClient httpclient,
                               URI serverUrl,
                               InputService inputService,
                               MetricRegistry metricRegistry) {
-        super(messageInputFactory, processBuffer, metricRegistry);
+        super(messageInputFactory, inputBuffer, metricRegistry);
         this.httpclient = httpclient;
         this.serverUrl = serverUrl;
         this.inputService = inputService;

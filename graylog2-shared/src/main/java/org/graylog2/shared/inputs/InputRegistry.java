@@ -22,10 +22,10 @@ import com.codahale.metrics.InstrumentedThreadFactory;
 import com.codahale.metrics.MetricRegistry;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import org.graylog2.plugin.buffers.InputBuffer;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.inputs.InputState;
 import org.graylog2.plugin.inputs.MessageInput;
-import org.graylog2.shared.buffers.ProcessBuffer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,7 +39,7 @@ public abstract class InputRegistry {
     protected final Set<InputState> inputStates = new HashSet<>();
     protected final ExecutorService executor;
     private final MessageInputFactory messageInputFactory;
-    private final ProcessBuffer processBuffer;
+    private final InputBuffer inputBuffer;
 
     protected abstract void finishedLaunch(InputState state);
 
@@ -52,10 +52,10 @@ public abstract class InputRegistry {
     public abstract void cleanInput(MessageInput input);
 
     public InputRegistry(MessageInputFactory messageInputFactory,
-                         ProcessBuffer processBuffer,
+                         InputBuffer inputBuffer,
                          MetricRegistry metricRegistry) {
         this.messageInputFactory = messageInputFactory;
-        this.processBuffer = processBuffer;
+        this.inputBuffer = inputBuffer;
         this.executor = executorService(metricRegistry);
     }
 
@@ -102,7 +102,7 @@ public abstract class InputRegistry {
                 try {
                     input.checkConfiguration();
                     inputState.setState(InputState.InputStateType.STARTING);
-                    input.launch(processBuffer);
+                    input.launch(inputBuffer);
                     inputState.setState(InputState.InputStateType.RUNNING);
                     String msg = "Completed starting [" + input.getClass().getCanonicalName() + "] input with ID <" + input.getId() + ">";
                     LOG.info(msg);

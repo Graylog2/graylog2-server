@@ -53,4 +53,11 @@ public class MessageEvent {
         }
     };
 
+    public void setRaw(RawMessage raw) {
+        this.raw = raw;
+    }
+
+    public RawMessage getRaw() {
+        return raw;
+    }
 }

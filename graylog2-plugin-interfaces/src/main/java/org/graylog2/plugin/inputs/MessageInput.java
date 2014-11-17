@@ -27,11 +27,8 @@ import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.MetricSet;
 import com.codahale.metrics.Timer;
 import com.google.common.collect.Maps;
-import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
-import org.graylog2.plugin.buffers.Buffer;
-import org.graylog2.plugin.buffers.BufferOutOfCapacityException;
-import org.graylog2.plugin.buffers.ProcessingDisabledException;
+import org.graylog2.plugin.buffers.InputBuffer;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationException;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
@@ -99,7 +96,7 @@ public abstract class MessageInput {
     protected String contentPack;
 
     protected Configuration configuration;
-    protected Buffer processBuffer;
+    protected InputBuffer inputBuffer;
 
     public MessageInput(MetricRegistry metricRegistry,
                         Transport transport,
@@ -141,14 +138,14 @@ public abstract class MessageInput {
         cr.check(getConfiguration());
     }
 
-    public void launch(final Buffer buffer) throws MisfireException {
-        this.processBuffer = buffer;
+    public void launch(final InputBuffer buffer) throws MisfireException {
+        this.inputBuffer = buffer;
         try {
             transport.setMessageAggregator(codec.getAggregator());
 
             transport.launch(this);
         } catch (Exception e) {
-            processBuffer = null;
+            inputBuffer = null;
             throw new MisfireException(e);
         }
     }
@@ -323,77 +320,12 @@ public abstract class MessageInput {
     }
 
     public void processRawMessage(RawMessage rawMessage) {
+        rawMessage.setCodecConfig(codecConfig);
+
+        inputBuffer.insert(rawMessage);
+
         incomingMessages.mark();
-
-        final Message message;
-
-        try (Timer.Context ignored = parseTime.time()) {
-            message = codec.decode(rawMessage);
-        } catch (RuntimeException e) {
-            LOG.warn("Codec " + codec + " threw exception", e);
-            failures.mark();
-            return;
-        }
-
-        if (message == null) {
-            failures.mark();
-            LOG.warn("Could not decode message. Dropping message {}", rawMessage.getId());
-            return;
-        }
-        if (!message.isComplete()) {
-            incompleteMessages.mark();
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("Dropping incomplete message. Parsed fields: [{}]", message.getFields());
-            }
-            return;
-        }
-
-        processedMessages.mark();
         rawSize.mark(rawMessage.getPayload().length);
-        processBuffer.insertCached(message, this);
-    }
-
-    /**
-     * Basically a reordered version of {@link #processRawMessage(org.graylog2.plugin.journal.RawMessage)} that only records a message
-     * as processed when adding it to processbuffer has worked.
-     *
-     * @param rawMessage
-     * @return true if the message was malformed and discarded. do not try to re-insert the message in that case but discard it.
-     * false if the message was successfully processed, exception is raised otherwise
-     */
-    public boolean processRawMessageFailFast(RawMessage rawMessage) throws BufferOutOfCapacityException, ProcessingDisabledException {
-        final Message message;
-
-        try (Timer.Context ignored = parseTime.time()) {
-            message = codec.decode(rawMessage);
-        } catch (RuntimeException e) {
-            LOG.warn("Codec " + codec + " threw exception", e);
-            incomingMessages.mark();
-            failures.mark();
-            return false;
-        }
-
-        if (message == null) {
-            incomingMessages.mark();
-            failures.mark();
-            LOG.warn("Could not decode message. Dropping message {}", rawMessage.getId());
-            return false;
-        }
-        if (!message.isComplete()) {
-            incomingMessages.mark();
-            incompleteMessages.mark();
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("Dropping incomplete message. Parsed fields: [{}]", message.getFields());
-            }
-            return false;
-        }
-
-        processBuffer.insertFailFast(message, this);
-        // the following statements are only executed if insertFailFail does not throw!
-        incomingMessages.mark();
-        processedMessages.mark();
-        rawSize.mark(rawMessage.getPayload().length);
-        return true;
     }
 
     public interface Factory<M> {
