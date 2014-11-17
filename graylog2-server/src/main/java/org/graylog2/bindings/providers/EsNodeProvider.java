@@ -29,6 +29,7 @@ import org.graylog2.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -94,10 +95,10 @@ public class EsNodeProvider implements Provider<Node> {
         }
 
         // Overwrite from a custom ElasticSearch config file.
-        final String esConfigFilePath = conf.getElasticSearchConfigFile();
-        if (esConfigFilePath != null) {
+        final File esConfigFile = conf.getElasticSearchConfigFile();
+        if (esConfigFile != null) {
             try {
-                final byte[] esSettings = Files.readAllBytes(Paths.get(esConfigFilePath));
+                final byte[] esSettings = Files.readAllBytes(esConfigFile.toPath());
                 settings.putAll(new YamlSettingsLoader().load(esSettings));
             } catch (IOException e) {
                 LOG.warn("Cannot read Elasticsearch configuration.");
