@@ -18,6 +18,7 @@ package org.graylog2.initializers;
 
 import com.google.common.util.concurrent.AbstractIdleService;
 import com.google.inject.Singleton;
+import org.elasticsearch.Version;
 import org.graylog2.indexer.Deflector;
 import org.graylog2.indexer.Indexer;
 import org.graylog2.plugin.Tools;
