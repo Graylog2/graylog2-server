@@ -17,7 +17,7 @@
 package org.graylog2.indexer.rotation;
 
 import com.google.inject.Inject;
-import org.graylog2.Configuration;
+import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.indexer.rotation.RotationStrategy;
 import org.joda.time.*;
@@ -39,8 +39,8 @@ public class TimeBasedRotationStrategy implements RotationStrategy {
     private DateTime anchor;
 
     @Inject
-    public TimeBasedRotationStrategy(Configuration configuration) {
-        this(configuration.getElasticSearchMaxTimePerIndex());
+    public TimeBasedRotationStrategy(ElasticsearchConfiguration configuration) {
+        this(configuration.getMaxTimePerIndex());
     }
 
     public TimeBasedRotationStrategy(Period rotationPeriod) {

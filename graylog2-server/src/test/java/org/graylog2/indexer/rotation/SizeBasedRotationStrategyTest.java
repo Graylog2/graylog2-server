@@ -18,7 +18,7 @@ package org.graylog2.indexer.rotation;
 
 import org.elasticsearch.action.admin.indices.stats.CommonStats;
 import org.elasticsearch.index.store.StoreStats;
-import org.graylog2.Configuration;
+import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.indexer.IndexNotFoundException;
 import org.graylog2.indexer.indices.IndexStatistics;
 import org.graylog2.indexer.indices.Indices;
@@ -34,7 +34,7 @@ public class SizeBasedRotationStrategyTest {
 
     @Test
     public void testRotate() throws IndexNotFoundException {
-        final Configuration configuration = mock(Configuration.class);
+        final ElasticsearchConfiguration configuration = mock(ElasticsearchConfiguration.class);
         final Indices indices = mock(Indices.class);
 
         final IndexStatistics stats = new IndexStatistics();
@@ -43,13 +43,13 @@ public class SizeBasedRotationStrategyTest {
         stats.setPrimaries(commonStats);
 
         when(indices.getIndexStats("name")).thenReturn(stats);
-        when(configuration.getElasticSearchMaxSizePerIndex()).thenReturn(100L);
+        when(configuration.getMaxSizePerIndex()).thenReturn(100L);
 
         final SizeBasedRotationStrategy strategy = new SizeBasedRotationStrategy(configuration,
                                                                                        indices);
         final RotationStrategy.Result rotate = strategy.shouldRotate("name");
 
-        verify(configuration, atLeastOnce()).getElasticSearchMaxSizePerIndex();
+        verify(configuration, atLeastOnce()).getMaxSizePerIndex();
         assertNotNull(rotate);
         assertEquals(true, rotate.shouldRotate());
     }
@@ -57,7 +57,7 @@ public class SizeBasedRotationStrategyTest {
 
     @Test
     public void testDontRotate() throws IndexNotFoundException {
-        final Configuration configuration = mock(Configuration.class);
+        final ElasticsearchConfiguration configuration = mock(ElasticsearchConfiguration.class);
         final Indices indices = mock(Indices.class);
 
         final IndexStatistics stats = new IndexStatistics();
@@ -66,13 +66,13 @@ public class SizeBasedRotationStrategyTest {
         stats.setPrimaries(commonStats);
 
         when(indices.getIndexStats("name")).thenReturn(stats);
-        when(configuration.getElasticSearchMaxSizePerIndex()).thenReturn(100000L);
+        when(configuration.getMaxSizePerIndex()).thenReturn(100000L);
 
         final SizeBasedRotationStrategy strategy = new SizeBasedRotationStrategy(configuration,
                                                                                  indices);
         final RotationStrategy.Result rotate = strategy.shouldRotate("name");
 
-        verify(configuration, atLeastOnce()).getElasticSearchMaxSizePerIndex();
+        verify(configuration, atLeastOnce()).getMaxSizePerIndex();
         assertNotNull(rotate);
         assertEquals(false, rotate.shouldRotate());
     }
@@ -80,17 +80,17 @@ public class SizeBasedRotationStrategyTest {
 
     @Test
     public void testRotateFailed() throws IndexNotFoundException {
-        final Configuration configuration = mock(Configuration.class);
+        final ElasticsearchConfiguration configuration = mock(ElasticsearchConfiguration.class);
         final Indices indices = mock(Indices.class);
 
         when(indices.getIndexStats("name")).thenReturn(null);
-        when(configuration.getElasticSearchMaxSizePerIndex()).thenReturn(100L);
+        when(configuration.getMaxSizePerIndex()).thenReturn(100L);
 
         final SizeBasedRotationStrategy strategy = new SizeBasedRotationStrategy(configuration,
                                                                                  indices);
         final RotationStrategy.Result rotate = strategy.shouldRotate("name");
 
-        verify(configuration, atLeastOnce()).getElasticSearchMaxSizePerIndex();
+        verify(configuration, atLeastOnce()).getMaxSizePerIndex();
         assertNull(rotate);
     }
 
