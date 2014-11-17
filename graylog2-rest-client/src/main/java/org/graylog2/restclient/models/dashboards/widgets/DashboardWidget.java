@@ -143,9 +143,9 @@ public abstract class DashboardWidget {
                         w.cacheTime,
                         (String) w.config.get("query"),
                         TimeRange.factory((Map<String, Object>) w.config.get("timerange")),
-                        Boolean.parseBoolean(String.valueOf(w.config.get("trend"))),
-                        Integer.valueOf(String.valueOf(w.config.get("interval_amount"))),
-                        String.valueOf(w.config.get("interval_unit")),
+                        w.config.get("trend") == null ? false : Boolean.parseBoolean(String.valueOf(w.config.get("trend"))),
+                        w.config.get("interval_amount") == null ? 0 : Integer.valueOf(String.valueOf(w.config.get("interval_amount"))),
+                        w.config.get("interval_unit") == null ? "" : String.valueOf(w.config.get("interval_unit")),
                         w.creatorUserId
                 );
                 break;

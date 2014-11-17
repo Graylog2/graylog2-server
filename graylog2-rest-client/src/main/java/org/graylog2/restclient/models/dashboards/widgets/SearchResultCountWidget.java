@@ -30,8 +30,8 @@ public class SearchResultCountWidget extends DashboardWidget {
     private static final int WIDTH = 1;
     private static final int HEIGHT = 1;
 
-    private final boolean trend;
-    private final int intervalAmount;
+    private final Boolean trend;
+    private final Integer intervalAmount;
     private final String intervalUnit;
 
     public SearchResultCountWidget(Dashboard dashboard, String query, TimeRange timerange, String description, boolean trend, int intervalAmount, String intervalUnit) {

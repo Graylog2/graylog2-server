@@ -30,8 +30,8 @@ public class SearchResultCountWidget extends DashboardWidget {
     private final Searches searches;
     private final String query;
     private final TimeRange timeRange;
-    private final boolean trend;
-    private final int intervalAmount;
+    private final Boolean trend;
+    private final Integer intervalAmount;
     private final String intervalUnit;
 
     public SearchResultCountWidget(MetricRegistry metricRegistry, Searches searches, String id, String description, int cacheTime, Map<String, Object> config, String query, TimeRange timeRange, String creatorUserId) {
@@ -40,9 +40,9 @@ public class SearchResultCountWidget extends DashboardWidget {
 
         this.query = query;
         this.timeRange = timeRange;
-        this.trend = Boolean.parseBoolean(String.valueOf(config.get("trend")));
-        this.intervalAmount = Integer.parseInt(String.valueOf(config.get("interval_amount")));
-        this.intervalUnit = String.valueOf(config.get("interval_unit"));
+        this.trend = config.get("trend") == null ? false : Boolean.parseBoolean(String.valueOf(config.get("trend")));
+        this.intervalAmount = config.get("interval_amount") == null ? 0 : Integer.parseInt(String.valueOf(config.get("interval_amount")));
+        this.intervalUnit = config.get("interval_unit") == null ? "" : String.valueOf(config.get("interval_unit"));
     }
 
     public String getQuery() {
