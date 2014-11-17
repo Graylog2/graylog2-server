@@ -21,9 +21,9 @@ import com.codahale.metrics.InstrumentedThreadFactory;
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import com.google.inject.Provider;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
-import com.lmax.disruptor.EventHandler;
 import com.lmax.disruptor.WaitStrategy;
 import com.lmax.disruptor.dsl.Disruptor;
 import com.lmax.disruptor.dsl.ProducerType;
@@ -37,14 +37,13 @@ import org.graylog2.plugin.buffers.BufferOutOfCapacityException;
 import org.graylog2.plugin.buffers.MessageEvent;
 import org.graylog2.plugin.buffers.ProcessingDisabledException;
 import org.graylog2.plugin.inputs.MessageInput;
-import org.graylog2.plugin.inputs.codecs.Codec;
 import org.graylog2.plugin.journal.RawMessage;
+import org.graylog2.shared.buffers.processors.DecodingProcessor;
 import org.graylog2.shared.buffers.processors.ProcessBufferProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
@@ -63,7 +62,7 @@ public class ProcessBuffer extends Buffer {
     public static String SOURCE_NODE_ATTR_NAME;
 
     private final BaseConfiguration configuration;
-    private Map<String, Codec.Factory<? extends Codec>> codecFactory;
+    private final Provider<DecodingProcessor> decodingProcessorProvider;
     private final InputCache inputCache;
     private final AtomicInteger processBufferWatermark;
     private final ExecutorService executor;
@@ -78,12 +77,12 @@ public class ProcessBuffer extends Buffer {
     public ProcessBuffer(MetricRegistry metricRegistry,
                          ServerStatus serverStatus,
                          BaseConfiguration configuration,
-                         Map<String, Codec.Factory<? extends Codec>> codecFactory,
+                         Provider<DecodingProcessor> decodingProcessorProvider,
                          @Assisted InputCache inputCache,
                          @Assisted AtomicInteger processBufferWatermark) {
         this.serverStatus = serverStatus;
         this.configuration = configuration;
-        this.codecFactory = codecFactory;
+        this.decodingProcessorProvider = decodingProcessorProvider;
         this.inputCache = inputCache;
         this.processBufferWatermark = processBufferWatermark;
 
@@ -128,15 +127,7 @@ public class ProcessBuffer extends Buffer {
                         + "and wait strategy <{}>.", ringBufferSize,
                 waitStrategy.getClass().getSimpleName());
 
-        disruptor.handleEventsWith(new EventHandler<MessageEvent>() {
-            @Override
-            public void onEvent(MessageEvent event, long sequence, boolean endOfBatch) throws Exception {
-                final RawMessage raw = event.getRaw();
-                final Codec codec = codecFactory.get(raw.getPayloadType()).create(raw.getCodecConfig());
-
-                event.setMessage(codec.decode(raw));
-            }
-        }).then(processors);
+        disruptor.handleEventsWith(decodingProcessorProvider.get()).then(processors);
 
         ringBuffer = disruptor.start();
     }
@@ -268,4 +259,5 @@ public class ProcessBuffer extends Buffer {
         this.processBufferWatermark.addAndGet(n);
         incomingMessages.mark(n);
     }
+
 }
