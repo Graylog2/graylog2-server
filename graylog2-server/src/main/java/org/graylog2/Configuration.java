@@ -32,6 +32,7 @@ import org.joda.time.Period;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.net.InetAddress;
 import java.net.URI;
 import java.net.UnknownHostException;
@@ -95,7 +96,7 @@ public class Configuration extends BaseConfiguration {
     private boolean deadLettersEnabled = false;
 
     @Parameter(value = "elasticsearch_config_file", validator = FileReadableValidator.class)
-    private String elasticSearchConfigFile; // = "/etc/graylog2-elasticsearch.yml";
+    private File elasticSearchConfigFile; // = "/etc/graylog2-elasticsearch.yml";
 
     @Parameter(value = "elasticsearch_index_prefix", required = true)
     private String elasticsearchIndexPrefix = "graylog2";
@@ -372,7 +373,7 @@ public class Configuration extends BaseConfiguration {
         return outputBufferProcessorKeepAliveTime;
     }
 
-    public String getElasticSearchConfigFile() {
+    public File getElasticSearchConfigFile() {
         return elasticSearchConfigFile;
     }
 
