@@ -78,13 +78,8 @@ public class ClusterResource extends RestResource {
     @ApiOperation(value = "Information about this node.",
             notes = "This is returning information of this node in context to its state in the cluster. " +
                     "Use the system API of the node itself to get system information.")
-    public String node() {
-        try {
-            return json(nodeSummary(nodeService.byNodeId(nodeId)));
-        } catch (NodeNotFoundException e) {
-            // this exception should never happen, if it does we have made it worksn't.(tm)
-            throw new WebApplicationException(500);
-        }
+    public Node node() throws NodeNotFoundException {
+        return nodeService.byNodeId(nodeId);
     }
 
     @GET
@@ -96,21 +91,13 @@ public class ClusterResource extends RestResource {
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "Node not found.")
     })
-    public String node(@ApiParam(name = "nodeId", required = true) @PathParam("nodeId") String nodeId) {
+    public Node node(@ApiParam(name = "nodeId", required = true) @PathParam("nodeId") String nodeId) throws NodeNotFoundException {
         if (nodeId == null || nodeId.isEmpty()) {
             LOG.error("Missing nodeId. Returning HTTP 400.");
             throw new WebApplicationException(400);
         }
 
-        Node node = null;
-        try {
-            node = nodeService.byNodeId(nodeId);
-        } catch (NodeNotFoundException e) {
-            LOG.error("Node <{}> not found.", nodeId);
-            throw new WebApplicationException(404);
-        }
-
-        return json(nodeSummary(node));
+        return nodeService.byNodeId(nodeId);
     }
 
     private Map<String, Object> nodeSummary(Node node) {
@@ -127,5 +114,4 @@ public class ClusterResource extends RestResource {
 
         return m;
     }
-
 }
