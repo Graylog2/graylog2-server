@@ -46,7 +46,7 @@ public class NodeServiceImpl extends PersistedServiceImpl implements NodeService
         Map<String, Object> fields = Maps.newHashMap();
         fields.put("last_seen", Tools.getUTCTimestamp());
         fields.put("node_id", nodeId);
-        fields.put("type", NodeImpl.Type.SERVER.toString());
+        fields.put("type", Node.Type.SERVER.toString());
         fields.put("is_master", isMaster);
         fields.put("transport_address", restTransportUri.toString());
 
@@ -62,7 +62,7 @@ public class NodeServiceImpl extends PersistedServiceImpl implements NodeService
         Map<String, Object> fields = Maps.newHashMap();
         fields.put("last_seen", Tools.getUTCTimestamp());
         fields.put("node_id", nodeId);
-        fields.put("type", NodeImpl.Type.RADIO.toString());
+        fields.put("type", Node.Type.RADIO.toString());
         fields.put("transport_address", restTransportUri);
 
         try {
@@ -90,7 +90,7 @@ public class NodeServiceImpl extends PersistedServiceImpl implements NodeService
     }
 
     @Override
-    public Map<String, Node> allActive(NodeImpl.Type type) {
+    public Map<String, Node> allActive(Node.Type type) {
         Map<String, Node> nodes = Maps.newHashMap();
 
         BasicDBObject query = new BasicDBObject();
@@ -111,7 +111,7 @@ public class NodeServiceImpl extends PersistedServiceImpl implements NodeService
     public Map<String, Node> allActive() {
         Map<String, Node> nodes = Maps.newHashMap();
 
-        for (NodeImpl.Type type : NodeImpl.Type.values())
+        for (Node.Type type : Node.Type.values())
             nodes.putAll(allActive(type));
 
         return nodes;
@@ -151,7 +151,7 @@ public class NodeServiceImpl extends PersistedServiceImpl implements NodeService
     @Override
     public boolean isOnlyMaster(NodeId nodeId) {
         BasicDBObject query = new BasicDBObject();
-        query.put("type", NodeImpl.Type.SERVER.toString());
+        query.put("type", Node.Type.SERVER.toString());
         query.put("last_seen", new BasicDBObject("$gte", Tools.getUTCTimestamp() - pingTimeout));
         query.put("node_id", new BasicDBObject("$ne", nodeId.toString()));
         query.put("is_master", true);
@@ -162,7 +162,7 @@ public class NodeServiceImpl extends PersistedServiceImpl implements NodeService
     @Override
     public boolean isAnyMasterPresent() {
         BasicDBObject query = new BasicDBObject();
-        query.put("type", NodeImpl.Type.SERVER.toString());
+        query.put("type", Node.Type.SERVER.toString());
         query.put("last_seen", new BasicDBObject("$gte", Tools.getUTCTimestamp() - pingTimeout));
         query.put("is_master", true);
 
