@@ -27,6 +27,7 @@ import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.MetricSet;
 import com.codahale.metrics.Timer;
 import com.google.common.collect.Maps;
+import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.buffers.InputBuffer;
 import org.graylog2.plugin.configuration.Configuration;
@@ -73,6 +74,7 @@ public abstract class MessageInput {
     private final MetricRegistry localRegistry;
     private final Codec codec;
     private final Descriptor descriptor;
+    private final ServerStatus serverStatus;
     private final Meter failures;
     private final Meter incompleteMessages;
     private final Meter incomingMessages;
@@ -100,12 +102,13 @@ public abstract class MessageInput {
 
     public MessageInput(MetricRegistry metricRegistry,
                         Transport transport,
-                        MetricRegistry localRegistry, Codec codec, Config config, Descriptor descriptor) {
+                        MetricRegistry localRegistry, Codec codec, Config config, Descriptor descriptor, ServerStatus serverStatus) {
         this.metricRegistry = metricRegistry;
         this.transport = transport;
         this.localRegistry = localRegistry;
         this.codec = codec;
         this.descriptor = descriptor;
+        this.serverStatus = serverStatus;
         this.requestedConfiguration = config.combinedRequestedConfiguration();
         this.codecConfig = config.codecConfig.getRequestedConfiguration().filter(codec.getConfiguration());
         parseTime = localRegistry.timer("parseTime");

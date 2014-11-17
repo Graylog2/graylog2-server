@@ -23,6 +23,7 @@ import com.google.inject.assistedinject.AssistedInject;
 import org.graylog2.inputs.codecs.JsonPathCodec;
 import org.graylog2.inputs.transports.HttpPollTransport;
 import org.graylog2.plugin.LocalMetricRegistry;
+import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.inputs.MessageInput;
 
@@ -35,9 +36,9 @@ public class JsonPathInput extends MessageInput {
                          HttpPollTransport.Factory transport,
                          JsonPathCodec.Factory codec,
                          MetricRegistry metricRegistry,
-                         LocalMetricRegistry localRegistry, Config config, Descriptor descriptor) {
+                         LocalMetricRegistry localRegistry, Config config, Descriptor descriptor, ServerStatus serverStatus) {
         super(metricRegistry, transport.create(configuration), localRegistry, codec.create(configuration), config,
-              descriptor);
+              descriptor, serverStatus);
     }
 
     public interface Factory extends MessageInput.Factory<JsonPathInput> {

@@ -23,6 +23,7 @@ import com.google.inject.assistedinject.AssistedInject;
 import org.graylog2.inputs.codecs.GelfCodec;
 import org.graylog2.inputs.transports.UdpTransport;
 import org.graylog2.plugin.LocalMetricRegistry;
+import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.inputs.MessageInput;
 
@@ -34,9 +35,9 @@ public class GELFUDPInput extends MessageInput {
     public GELFUDPInput(MetricRegistry metricRegistry,
                         @Assisted Configuration configuration,
                         UdpTransport.Factory udpFactory,
-                        GelfCodec.Factory gelfCodecFactory, LocalMetricRegistry localRegistry, Config config, Descriptor descriptor) {
+                        GelfCodec.Factory gelfCodecFactory, LocalMetricRegistry localRegistry, Config config, Descriptor descriptor, ServerStatus serverStatus) {
         super(metricRegistry, udpFactory.create(configuration), localRegistry, gelfCodecFactory.create(configuration),
-              config, descriptor);
+              config, descriptor, serverStatus);
     }
 
     public interface Factory extends MessageInput.Factory<GELFUDPInput> {

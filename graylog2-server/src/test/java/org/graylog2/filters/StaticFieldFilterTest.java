@@ -18,6 +18,7 @@ package org.graylog2.filters;
 
 import com.codahale.metrics.MetricRegistry;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.buffers.InputBuffer;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
@@ -42,7 +43,7 @@ public class StaticFieldFilterTest {
         FakeInput fakeInput = new FakeInput(mock(MetricRegistry.class),mock(Transport.class),
                                             mock(MetricRegistry.class),
                                             mock(Codec.class),
-                                            mock(MessageInput.Config.class), mock(MessageInput.Descriptor.class));
+                                            mock(MessageInput.Config.class), mock(MessageInput.Descriptor.class), null);
         fakeInput.addStaticField("foo", "bar");
 
         msg.setSourceInput(fakeInput);
@@ -63,7 +64,7 @@ public class StaticFieldFilterTest {
         FakeInput fakeInput = new FakeInput(mock(MetricRegistry.class),mock(Transport.class),
                                             mock(MetricRegistry.class),
                                             mock(Codec.class),
-                                            mock(MessageInput.Config.class), mock(MessageInput.Descriptor.class));
+                                            mock(MessageInput.Config.class), mock(MessageInput.Descriptor.class), null);
         fakeInput.addStaticField("foo", "bar");
 
         msg.setSourceInput(fakeInput);
@@ -80,8 +81,8 @@ public class StaticFieldFilterTest {
 
         public FakeInput(MetricRegistry metricRegistry,
                          Transport transport,
-                         MetricRegistry localRegistry, Codec codec, Config config, Descriptor descriptor) {
-            super(metricRegistry, transport, localRegistry, codec, config, descriptor);
+                         MetricRegistry localRegistry, Codec codec, Config config, Descriptor descriptor, ServerStatus serverStatus) {
+            super(metricRegistry, transport, localRegistry, codec, config, descriptor, serverStatus);
         }
 
 

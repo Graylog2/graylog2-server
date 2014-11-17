@@ -40,6 +40,7 @@ import com.google.inject.assistedinject.AssistedInject;
 import org.graylog2.inputs.codecs.SyslogCodec;
 import org.graylog2.inputs.transports.SyslogTcpTransport;
 import org.graylog2.plugin.LocalMetricRegistry;
+import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.inputs.MessageInput;
 
@@ -55,11 +56,11 @@ public class SyslogTCPInput extends MessageInput {
                           final SyslogCodec.Factory syslogCodecFactory,
                           LocalMetricRegistry localRegistry,
                           Config config,
-                          Descriptor descriptor) {
+                          Descriptor descriptor, ServerStatus serverStatus) {
         super(metricRegistry,
               tcpTransportFactory.create(configuration),
               localRegistry, syslogCodecFactory.create(configuration),
-              config, descriptor);
+              config, descriptor, serverStatus);
     }
 
     public interface Factory extends MessageInput.Factory<SyslogTCPInput> {

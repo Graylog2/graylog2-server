@@ -40,6 +40,7 @@ import com.google.inject.assistedinject.AssistedInject;
 import org.graylog2.inputs.codecs.SyslogCodec;
 import org.graylog2.inputs.transports.UdpTransport;
 import org.graylog2.plugin.LocalMetricRegistry;
+import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.inputs.MessageInput;
 
@@ -52,11 +53,11 @@ public class SyslogUDPInput extends MessageInput {
                           @Assisted final Configuration configuration,
                           final UdpTransport.Factory udpTransportFactory,
                           final SyslogCodec.Factory syslogCodecFactory,
-                          LocalMetricRegistry localRegistry, Config config, Descriptor descriptor) {
+                          LocalMetricRegistry localRegistry, Config config, Descriptor descriptor, ServerStatus serverStatus) {
         super(metricRegistry,
               udpTransportFactory.create(configuration),
               localRegistry, syslogCodecFactory.create(configuration),
-              config, descriptor);
+              config, descriptor, serverStatus);
     }
 
     public interface Factory extends MessageInput.Factory<SyslogUDPInput> {
