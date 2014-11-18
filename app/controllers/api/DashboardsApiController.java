@@ -219,7 +219,14 @@ public class DashboardsApiController extends AuthenticatedController {
             try {
                 switch (DashboardWidget.Type.valueOf(params.get("widgetType"))) {
                     case SEARCH_RESULT_COUNT:
-                        widget = new SearchResultCountWidget(dashboard, query, timerange, description);
+                        Boolean trend = Boolean.parseBoolean(params.get("trend"));
+                        if (trend) {
+                            int amount = Integer.parseInt(params.get("amount"));
+                            String unit = params.get("unit");
+                            widget = new SearchResultCountWidget(dashboard, query, timerange, description, trend, amount, unit);
+                        } else {
+                            widget = new SearchResultCountWidget(dashboard, query, timerange, description);
+                        }
                         break;
                     case STREAM_SEARCH_RESULT_COUNT:
                         if (!canReadStream(streamId)) return unauthorized();

@@ -365,7 +365,7 @@ $(document).ready(function() {
 });
 
 function addWidget(dashboardId, description, params) {
-    if(description != undefined && description != "") {
+    if (description !== undefined && description !== "") {
         params.description = description;
     }
 

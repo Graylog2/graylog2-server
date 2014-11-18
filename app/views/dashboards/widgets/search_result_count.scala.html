@@ -4,9 +4,20 @@
 
 <div class="search_result_count">
 
-    <a href="@DashboardWidgetRouteHelper.replayRoute(widget)" class="replay-link">
-        <div class="value"><i class="icon icon-refresh"></i></div>
-    </a>
+    <div class="text-center">
+        <a href="@DashboardWidgetRouteHelper.replayRoute(widget)" class="replay-link">
+            <span class="value"><i class="icon icon-refresh"></i></span>
+        </a>
+        <div class="trend-icons">
+            <div class="trend-icon">
+                <span style="display : none" class="trend-higher"><i class="icon icon-caret-up"></i></span>
+            </div>
+            <div class="trend-icon">
+                <span style="display : none" class="trend-lower"><i class="icon icon-caret-down"></i></span>
+            </div>
+        </div>
+    </div>
+
 
     <div class="widget-subline">
         <div class="description">
