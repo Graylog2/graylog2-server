@@ -27,15 +27,24 @@ function updateWidget_search_result_count(widget, data) {
     $(".value", widget).text(numeral(nowCount).format());
 
     if (previousCount !== null) {
+        var green = "#2AAB2A";
+        var red = "#BD362F";
+        var blue = "#08C";
+        var arrowUp = $(".trend-higher", widget);
+        var arrowDown = $(".trend-lower", widget);
         if (nowCount > previousCount) {
-            $(".trend-higher", widget).show();
-            $(".trend-lower", widget).hide();
+            arrowUp.show();
+            arrowUp.children().css("color", green);
+            arrowDown.hide();
         } else if (previousCount > nowCount) {
-            $(".trend-higher", widget).hide();
-            $(".trend-lower", widget).show();
+            arrowUp.hide();
+            arrowDown.show();
+            arrowDown.children().css("color", red);
         } else {
-            $(".trend-higher", widget).show();
-            $(".trend-lower", widget).show();
+            arrowUp.show();
+            arrowUp.children().css("color", blue);
+            arrowDown.show();
+            arrowDown.children().css("color", blue);
         }
     }
 }
