@@ -11,8 +11,7 @@ function addWidget_search_result_count(dashboardId, config, eventElem) {
     // description: "", trend: false, amount: 1, unit: "days"
     params.description = config.description;
     params.trend = config.trend;
-    params.amount = config.amount;
-    params.unit = config.unit;
+    params.lowerIsBetter = config.lowerIsBetter;
 
     addWidget(dashboardId, undefined, params);
 }
@@ -32,21 +31,25 @@ function updateWidget_search_result_count(widget, data) {
         var green = "#2AAB2A";
         var red = "#BD362F";
         var blue = "#08C";
-        var arrowUp = $(".trend-higher", widget);
-        var arrowDown = $(".trend-lower", widget);
+        var lowerIsBetter = Boolean($(".trend-icons", widget).data("lower-is-better"));
+        var lowerColor = lowerIsBetter ? green : red;
+        var higherColor = lowerIsBetter ? red : green;
+        var higherIndicator = $(".trend-higher", widget);
+        var lowerIndicator = $(".trend-lower", widget);
+
         if (nowCount > previousCount) {
-            arrowUp.show();
-            arrowUp.children().css("color", green);
-            arrowDown.hide();
+            higherIndicator.show();
+            higherIndicator.children().css("color", higherColor);
+            lowerIndicator.hide();
         } else if (previousCount > nowCount) {
-            arrowUp.hide();
-            arrowDown.show();
-            arrowDown.children().css("color", red);
+            higherIndicator.hide();
+            lowerIndicator.show();
+            lowerIndicator.children().css("color", lowerColor);
         } else {
-            arrowUp.show();
-            arrowUp.children().css("color", blue);
-            arrowDown.show();
-            arrowDown.children().css("color", blue);
+            higherIndicator.show();
+            higherIndicator.children().css("color", blue);
+            lowerIndicator.show();
+            lowerIndicator.children().css("color", blue);
         }
     }
 }

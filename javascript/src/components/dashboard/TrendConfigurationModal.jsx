@@ -7,7 +7,7 @@ var BootstrapModal = require('../bootstrap/BootstrapModal');
 
 var TrendConfigurationModal = React.createClass({
     getInitialState() {
-        return {description: "", trend: false, amount: 1, unit: "days"};
+        return {description: "", trend: false, lowerIsBetter: false};
     },
     _onDescriptionChange(event) {
         this.setState({description: event.target.value});
@@ -15,25 +15,27 @@ var TrendConfigurationModal = React.createClass({
     _onTrendChange(event) {
         this.setState({trend: event.target.checked});
     },
-    _onAmountChange(event) {
-        this.setState({amount: event.target.value});
+    _onLowerIsBetterChange(event) {
+        this.setState({lowerIsBetter: event.target.checked});
     },
-    _onUnitChange(unit) {
-        this.setState({unit: unit});
-    },
-
     render() {
         var header = <h2>Configure Dashboard Widget</h2>;
-        var trendCheckbox = (
-            <label className="checkbox">
-                <input type="checkbox" onChange={this._onTrendChange} checked={this.state.trend}/> Display trend
-            </label>
+        var trendOptions = (
+            <div>
+                <label className="checkbox">
+                    <input type="checkbox" onChange={this._onTrendChange} checked={this.state.trend}/> Display trend
+                </label>
+                <label className="checkbox">
+                    <input type="checkbox" onChange={this._onLowerIsBetterChange} disabled={!this.state.trend} checked={this.state.lowerIsBetter}/> Lower value is better
+                    <span class="help-inline"> (use green colour when trend goes down)</span>
+                </label>
+            </div>
         );
         var body = (
             <fieldset>
                 <label>Description:</label>
                 <input type="text" onChange={this._onDescriptionChange} value={this.state.description}/>
-                {this.state.supportsTrending ? trendCheckbox : null}
+                {this.state.supportsTrending ? trendOptions : null}
             </fieldset>
         );
         return (

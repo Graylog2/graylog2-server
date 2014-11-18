@@ -219,9 +219,8 @@ public class DashboardsApiController extends AuthenticatedController {
                                 Logger.error("Cannot add search result count widget with trend on a non relative time range");
                                 return badRequest();
                             }
-                            int amount = Integer.parseInt(params.get("amount"));
-                            String unit = params.get("unit");
-                            widget = new SearchResultCountWidget(dashboard, query, timerange, description, trend, amount, unit);
+                            Boolean lowerIsBetter = Boolean.parseBoolean(params.get("lowerIsBetter"));
+                            widget = new SearchResultCountWidget(dashboard, query, timerange, description, trend, lowerIsBetter);
                         } else {
                             widget = new SearchResultCountWidget(dashboard, query, timerange, description);
                         }
