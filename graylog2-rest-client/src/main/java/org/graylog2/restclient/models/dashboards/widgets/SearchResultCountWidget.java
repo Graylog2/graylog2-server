@@ -31,23 +31,21 @@ public class SearchResultCountWidget extends DashboardWidget {
     private static final int HEIGHT = 1;
 
     private final Boolean trend;
-    private final Integer intervalAmount;
-    private final String intervalUnit;
+    private final Boolean lowerIsBetter;
 
-    public SearchResultCountWidget(Dashboard dashboard, String query, TimeRange timerange, String description, boolean trend, int intervalAmount, String intervalUnit) {
-        this(dashboard, null, description, 0, query, timerange, trend, intervalAmount, intervalUnit, null);
+    public SearchResultCountWidget(Dashboard dashboard, String query, TimeRange timerange, String description, boolean trend, boolean lowerIsBetter) {
+        this(dashboard, null, description, 0, query, timerange, trend, lowerIsBetter, null);
     }
 
     public SearchResultCountWidget(Dashboard dashboard, String query, TimeRange timerange, String description) {
-        this(dashboard, query, timerange, description, false, 0, "");
+        this(dashboard, query, timerange, description, false, false);
     }
 
-    public SearchResultCountWidget(Dashboard dashboard, String id, String description, int cacheTime, String query, TimeRange timerange, boolean trend, int intervalAmount, String intervalUnit, String creatorUserId) {
+    public SearchResultCountWidget(Dashboard dashboard, String id, String description, int cacheTime, String query, TimeRange timerange, boolean trend, boolean lowerIsBetter, String creatorUserId) {
         super(Type.SEARCH_RESULT_COUNT, id, description, cacheTime, dashboard, creatorUserId, query, timerange);
 
         this.trend = trend;
-        this.intervalAmount = intervalAmount;
-        this.intervalUnit = intervalUnit;
+        this.lowerIsBetter = lowerIsBetter;
     }
 
     @Override
@@ -56,8 +54,7 @@ public class SearchResultCountWidget extends DashboardWidget {
         config.putAll(getTimerange().getQueryParams());
         config.put("query", getQuery());
         config.put("trend", trend);
-        config.put("interval_amount", intervalAmount);
-        config.put("interval_unit", intervalUnit);
+        config.put("lower_is_better", lowerIsBetter);
 
         return config;
     }
@@ -81,4 +78,6 @@ public class SearchResultCountWidget extends DashboardWidget {
     public boolean hasFixedTimeAxis() {
         return false;
     }
+
+    public boolean getLowerIsBetter() { return lowerIsBetter; }
 }
