@@ -25,23 +25,16 @@ var TrendConfigurationModal = React.createClass({
     render() {
         var header = <h2>Configure Dashboard Widget</h2>;
         var body = (
-            <div>
+            <fieldset>
                 <label>Description:</label>
-                <input onChange={this._onDescriptionChange} className="form-control" value={this.state.description} placeholder="Description"/>
+                <input type="text" onChange={this._onDescriptionChange} value={this.state.description}/>
                 <label className="checkbox">
                     <input type="checkbox" onChange={this._onTrendChange} checked={this.state.trend}/> Display trend
                 </label>
-                <div className="btn-group" data-toggle="buttons-radio">
-                    <input type="number" onChange={this._onAmountChange} className="form-control" value={this.state.amount} placeholder="x" disabled={!this.state.trend}/>&nbsp;
-                    <button type="button" className="btn" onClick={this._onUnitChange.bind(this, "minutes")} disabled={!this.state.trend}>Minutes</button>
-                    <button type="button" className="btn" onClick={this._onUnitChange.bind(this, "hours")} disabled={!this.state.trend}>Hours</button>
-                    <button type="button" className="btn active" onClick={this._onUnitChange.bind(this, "days")} disabled={!this.state.trend}>Days</button>
-                    <button type="button" className="btn" onClick={this._onUnitChange.bind(this, "months")} disabled={!this.state.trend}>Months</button>
-                </div>
-            </div>
+            </fieldset>
         );
         return (
-            <form role="form">
+            <form>
                 <BootstrapModal ref="modal" onCancel={this.closeModal} onConfirm={this._save} cancel="Cancel" confirm="Save">
                    {header}
                    {body}
