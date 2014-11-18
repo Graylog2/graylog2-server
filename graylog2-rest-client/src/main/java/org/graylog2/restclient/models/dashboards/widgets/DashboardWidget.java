@@ -18,7 +18,6 @@ package org.graylog2.restclient.models.dashboards.widgets;
 
 import org.graylog2.restclient.lib.APIException;
 import org.graylog2.restclient.lib.ApiClient;
-import org.graylog2.restclient.lib.DateTools;
 import org.graylog2.restclient.lib.timeranges.InvalidRangeParametersException;
 import org.graylog2.restclient.lib.timeranges.TimeRange;
 import org.graylog2.restclient.models.api.requests.dashboards.WidgetUpdateRequest;
@@ -26,8 +25,6 @@ import org.graylog2.restclient.models.api.responses.dashboards.DashboardWidgetRe
 import org.graylog2.restclient.models.api.responses.dashboards.DashboardWidgetValueResponse;
 import org.graylog2.restclient.models.dashboards.Dashboard;
 import org.graylog2.restroutes.generated.routes;
-import org.joda.time.DateTime;
-import play.mvc.Call;
 
 import java.io.IOException;
 import java.util.Map;
@@ -146,6 +143,9 @@ public abstract class DashboardWidget {
                         w.cacheTime,
                         (String) w.config.get("query"),
                         TimeRange.factory((Map<String, Object>) w.config.get("timerange")),
+                        w.config.get("trend") == null ? false : Boolean.parseBoolean(String.valueOf(w.config.get("trend"))),
+                        w.config.get("interval_amount") == null ? 0 : Integer.valueOf(String.valueOf(w.config.get("interval_amount"))),
+                        w.config.get("interval_unit") == null ? "" : String.valueOf(w.config.get("interval_unit")),
                         w.creatorUserId
                 );
                 break;

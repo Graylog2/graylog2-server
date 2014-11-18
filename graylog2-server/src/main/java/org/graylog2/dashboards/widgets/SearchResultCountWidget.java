@@ -18,10 +18,15 @@ package org.graylog2.dashboards.widgets;
 
 import com.codahale.metrics.MetricRegistry;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
 import org.graylog2.indexer.IndexHelper;
 import org.graylog2.indexer.results.CountResult;
 import org.graylog2.indexer.searches.Searches;
+import org.graylog2.indexer.searches.timeranges.AbsoluteRange;
+import org.graylog2.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.indexer.searches.timeranges.TimeRange;
+import org.joda.time.DateTime;
+import org.joda.time.Seconds;
 
 import java.util.Map;
 
@@ -30,6 +35,9 @@ public class SearchResultCountWidget extends DashboardWidget {
     private final Searches searches;
     private final String query;
     private final TimeRange timeRange;
+    private final Boolean trend;
+    private final Integer intervalAmount;
+    private final String intervalUnit;
 
     public SearchResultCountWidget(MetricRegistry metricRegistry, Searches searches, String id, String description, int cacheTime, Map<String, Object> config, String query, TimeRange timeRange, String creatorUserId) {
         super(metricRegistry, Type.SEARCH_RESULT_COUNT, id, description, cacheTime, config, creatorUserId);
@@ -37,6 +45,9 @@ public class SearchResultCountWidget extends DashboardWidget {
 
         this.query = query;
         this.timeRange = timeRange;
+        this.trend = config.get("trend") == null ? false : Boolean.parseBoolean(String.valueOf(config.get("trend")));
+        this.intervalAmount = config.get("interval_amount") == null ? 0 : Integer.parseInt(String.valueOf(config.get("interval_amount")));
+        this.intervalUnit = config.get("interval_unit") == null ? "" : String.valueOf(config.get("interval_unit"));
     }
 
     public String getQuery() {
@@ -52,6 +63,9 @@ public class SearchResultCountWidget extends DashboardWidget {
         return ImmutableMap.<String, Object>builder()
                 .put("query", query)
                 .put("timerange", timeRange.getPersistedConfig())
+                .put("trend", trend)
+                .put("interval_amount", intervalAmount)
+                .put("interval_unit", intervalUnit)
                 .build();
     }
 
@@ -59,7 +73,19 @@ public class SearchResultCountWidget extends DashboardWidget {
     protected ComputationResult compute() {
         try {
             CountResult cr = searches.count(query, timeRange);
-            return new ComputationResult(cr.getCount(), cr.getTookMs());
+            if (timeRange instanceof RelativeRange) {
+                DateTime toPrevious = timeRange.getFrom();
+                DateTime fromPrevious = toPrevious.minus(Seconds.seconds(((RelativeRange)timeRange).getRange()));
+                TimeRange previousTimeRange = new AbsoluteRange(fromPrevious, toPrevious);
+                CountResult cr2 = searches.count(query, previousTimeRange);
+                Map<String, Object> results = Maps.newHashMap();
+                results.put("now", cr.getCount());
+                results.put("previous", cr2.getCount());
+                return new ComputationResult(results, cr.getTookMs());
+
+            } else {
+                return new ComputationResult(cr.getCount(), cr.getTookMs());
+            }
         } catch (IndexHelper.InvalidRangeFormatException e) {
             throw new RuntimeException("Invalid timerange format.", e);
         }

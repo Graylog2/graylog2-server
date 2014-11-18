@@ -19,7 +19,6 @@ package org.graylog2.restclient.models.dashboards.widgets;
 import com.google.common.collect.Maps;
 import org.graylog2.restclient.lib.timeranges.TimeRange;
 import org.graylog2.restclient.models.dashboards.Dashboard;
-import play.mvc.Call;
 
 import java.util.Map;
 
@@ -31,12 +30,24 @@ public class SearchResultCountWidget extends DashboardWidget {
     private static final int WIDTH = 1;
     private static final int HEIGHT = 1;
 
-    public SearchResultCountWidget(Dashboard dashboard, String query, TimeRange timerange, String description) {
-        this(dashboard, null, description, 0, query, timerange, null);
+    private final Boolean trend;
+    private final Integer intervalAmount;
+    private final String intervalUnit;
+
+    public SearchResultCountWidget(Dashboard dashboard, String query, TimeRange timerange, String description, boolean trend, int intervalAmount, String intervalUnit) {
+        this(dashboard, null, description, 0, query, timerange, trend, intervalAmount, intervalUnit, null);
     }
 
-    public SearchResultCountWidget(Dashboard dashboard, String id, String description, int cacheTime, String query, TimeRange timerange, String creatorUserId) {
+    public SearchResultCountWidget(Dashboard dashboard, String query, TimeRange timerange, String description) {
+        this(dashboard, query, timerange, description, false, 0, "");
+    }
+
+    public SearchResultCountWidget(Dashboard dashboard, String id, String description, int cacheTime, String query, TimeRange timerange, boolean trend, int intervalAmount, String intervalUnit, String creatorUserId) {
         super(Type.SEARCH_RESULT_COUNT, id, description, cacheTime, dashboard, creatorUserId, query, timerange);
+
+        this.trend = trend;
+        this.intervalAmount = intervalAmount;
+        this.intervalUnit = intervalUnit;
     }
 
     @Override
@@ -44,6 +55,9 @@ public class SearchResultCountWidget extends DashboardWidget {
         Map<String, Object> config = Maps.newHashMap();
         config.putAll(getTimerange().getQueryParams());
         config.put("query", getQuery());
+        config.put("trend", trend);
+        config.put("interval_amount", intervalAmount);
+        config.put("interval_unit", intervalUnit);
 
         return config;
     }
