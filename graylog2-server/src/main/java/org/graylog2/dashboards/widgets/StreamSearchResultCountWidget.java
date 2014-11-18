@@ -18,47 +18,26 @@ package org.graylog2.dashboards.widgets;
 
 import com.codahale.metrics.MetricRegistry;
 import com.google.common.collect.ImmutableMap;
-import org.graylog2.indexer.IndexHelper;
-import org.graylog2.indexer.results.CountResult;
 import org.graylog2.indexer.searches.Searches;
 import org.graylog2.indexer.searches.timeranges.TimeRange;
 
-import javax.annotation.Nullable;
 import java.util.Map;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 
-public class StreamSearchResultCountWidget extends DashboardWidget {
-
-    private final String query;
-    private final TimeRange timeRange;
-    @Nullable
+public class StreamSearchResultCountWidget extends SearchResultCountWidget {
     private final String streamId;
-    private final Searches searches;
 
     public StreamSearchResultCountWidget(MetricRegistry metricRegistry, Searches searches, String id, String description, int cacheTime, Map<String, Object> config, String query, TimeRange timeRange, String creatorUserId) {
-        super(metricRegistry, DashboardWidget.Type.STREAM_SEARCH_RESULT_COUNT, id, description, cacheTime, config, creatorUserId);
-        this.searches = searches;
-
-        this.query = query;
-        this.timeRange = timeRange;
+        super(metricRegistry, DashboardWidget.Type.STREAM_SEARCH_RESULT_COUNT, searches, id, description, cacheTime, config, query, timeRange, creatorUserId);
         this.streamId = (String) config.get("stream_id");
-    }
-
-    public String getQuery() {
-        return query;
-    }
-
-    public TimeRange getTimeRange() {
-        return timeRange;
     }
 
     @Override
     public Map<String, Object> getPersistedConfig() {
-        final ImmutableMap.Builder<String, Object> persistedConfig = ImmutableMap.<String, Object>builder()
-                .put("query", query)
-                .put("timerange", timeRange.getPersistedConfig());
-
+        final Map<String, Object> inheritedConfig = super.getPersistedConfig();
+        final ImmutableMap.Builder<String, Object> persistedConfig = ImmutableMap.builder();
+        persistedConfig.putAll(inheritedConfig);
         if (!isNullOrEmpty(streamId)) {
             persistedConfig.put("stream_id", streamId);
         }
@@ -72,12 +51,6 @@ public class StreamSearchResultCountWidget extends DashboardWidget {
         if (!isNullOrEmpty(streamId)) {
             filter = "streams:" + streamId;
         }
-
-        try {
-            CountResult cr = searches.count(query, timeRange, filter);
-            return new ComputationResult(cr.getCount(), cr.getTookMs());
-        } catch (IndexHelper.InvalidRangeFormatException e) {
-            throw new RuntimeException("Invalid timerange format.", e);
-        }
+        return computeInternal(filter);
     }
 }

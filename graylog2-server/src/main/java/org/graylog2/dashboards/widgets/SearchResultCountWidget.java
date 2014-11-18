@@ -39,7 +39,11 @@ public class SearchResultCountWidget extends DashboardWidget {
     private final Boolean lowerIsBetter;
 
     public SearchResultCountWidget(MetricRegistry metricRegistry, Searches searches, String id, String description, int cacheTime, Map<String, Object> config, String query, TimeRange timeRange, String creatorUserId) {
-        super(metricRegistry, Type.SEARCH_RESULT_COUNT, id, description, cacheTime, config, creatorUserId);
+        this(metricRegistry, Type.SEARCH_RESULT_COUNT, searches, id, description, cacheTime, config, query, timeRange, creatorUserId);
+    }
+
+    protected SearchResultCountWidget(MetricRegistry metricRegistry, Type type, Searches searches, String id, String description, int cacheTime, Map<String, Object> config, String query, TimeRange timeRange, String creatorUserId) {
+        super(metricRegistry, type, id, description, cacheTime, config, creatorUserId);
         this.searches = searches;
 
         this.query = query;
@@ -68,18 +72,21 @@ public class SearchResultCountWidget extends DashboardWidget {
 
     @Override
     protected ComputationResult compute() {
+        return computeInternal(null);
+    }
+
+    protected ComputationResult computeInternal(String filter) {
         try {
-            CountResult cr = searches.count(query, timeRange);
-            if (timeRange instanceof RelativeRange) {
+            CountResult cr = searches.count(query, timeRange, filter);
+            if (trend && timeRange instanceof RelativeRange) {
                 DateTime toPrevious = timeRange.getFrom();
-                DateTime fromPrevious = toPrevious.minus(Seconds.seconds(((RelativeRange)timeRange).getRange()));
+                DateTime fromPrevious = toPrevious.minus(Seconds.seconds(((RelativeRange) timeRange).getRange()));
                 TimeRange previousTimeRange = new AbsoluteRange(fromPrevious, toPrevious);
                 CountResult cr2 = searches.count(query, previousTimeRange);
                 Map<String, Object> results = Maps.newHashMap();
                 results.put("now", cr.getCount());
                 results.put("previous", cr2.getCount());
                 return new ComputationResult(results, cr.getTookMs());
-
             } else {
                 return new ComputationResult(cr.getCount(), cr.getTookMs());
             }

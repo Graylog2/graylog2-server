@@ -29,9 +29,6 @@ import org.graylog2.restroutes.generated.routes;
 import java.io.IOException;
 import java.util.Map;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public abstract class DashboardWidget {
 
     public enum Type {
@@ -156,6 +153,8 @@ public abstract class DashboardWidget {
                         w.cacheTime,
                         (String) w.config.get("query"),
                         TimeRange.factory((Map<String, Object>) w.config.get("timerange")),
+                        w.config.get("trend") != null && Boolean.parseBoolean(String.valueOf(w.config.get("trend"))),
+                        w.config.get("lower_is_better") != null && Boolean.parseBoolean(String.valueOf(w.config.get("lower_is_better"))),
                         (String) w.config.get("stream_id"),
                         w.creatorUserId
                 );
