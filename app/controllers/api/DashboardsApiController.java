@@ -209,26 +209,39 @@ public class DashboardsApiController extends AuthenticatedController {
                 streamId = params.get("streamid");
             }
 
-            DashboardWidget widget;
+            final DashboardWidget widget;
             try {
-                switch (DashboardWidget.Type.valueOf(params.get("widgetType"))) {
-                    case SEARCH_RESULT_COUNT:
-                        Boolean trend = Boolean.parseBoolean(params.get("trend"));
+                final DashboardWidget.Type widgetType = DashboardWidget.Type.valueOf(params.get("widgetType"));
+                switch (widgetType) {
+                    case SEARCH_RESULT_COUNT: {
+                        final Boolean trend = Boolean.parseBoolean(params.get("trend"));
                         if (trend) {
                             if (!rangeType.equals("relative")) {
                                 Logger.error("Cannot add search result count widget with trend on a non relative time range");
                                 return badRequest();
                             }
-                            Boolean lowerIsBetter = Boolean.parseBoolean(params.get("lowerIsBetter"));
+                            final Boolean lowerIsBetter = Boolean.parseBoolean(params.get("lowerIsBetter"));
                             widget = new SearchResultCountWidget(dashboard, query, timerange, description, trend, lowerIsBetter);
                         } else {
                             widget = new SearchResultCountWidget(dashboard, query, timerange, description);
                         }
                         break;
-                    case STREAM_SEARCH_RESULT_COUNT:
+                    }
+                    case STREAM_SEARCH_RESULT_COUNT: {
                         if (!canReadStream(streamId)) return unauthorized();
-                        widget = new StreamSearchResultCountWidget(dashboard, query, timerange, description, streamId);
+                        final Boolean trend = Boolean.parseBoolean(params.get("trend"));
+                        if (trend) {
+                            if (!rangeType.equals("relative")) {
+                                Logger.error("Cannot add search result count widget with trend on a non relative time range");
+                                return badRequest();
+                            }
+                            final Boolean lowerIsBetter = Boolean.parseBoolean(params.get("lowerIsBetter"));
+                            widget = new StreamSearchResultCountWidget(dashboard, query, timerange, description, trend, lowerIsBetter, streamId);
+                        } else {
+                            widget = new StreamSearchResultCountWidget(dashboard, query, timerange, description, streamId);
+                        }
                         break;
+                    }
                     case FIELD_CHART:
                         Map<String, Object> config = new HashMap<String, Object>() {{
                             put("field", params.get("field"));
