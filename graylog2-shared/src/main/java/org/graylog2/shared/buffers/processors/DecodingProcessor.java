@@ -52,7 +52,7 @@ public class DecodingProcessor implements EventHandler<MessageEvent> {
     @Override
     public void onEvent(MessageEvent event, long sequence, boolean endOfBatch) throws Exception {
         final RawMessage raw = event.getRaw();
-        final Codec codec = codecFactory.get(raw.getPayloadType()).create(raw.getCodecConfig());
+        final Codec codec = codecFactory.get(raw.getCodecName()).create(raw.getCodecConfig());
 
         /*
 

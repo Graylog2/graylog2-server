@@ -34,14 +34,15 @@
 package org.graylog2.inputs.codecs;
 
 import com.google.common.base.Charsets;
+import com.google.common.net.InetAddresses;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
-import org.graylog2.plugin.inputs.annotations.Codec;
-import org.graylog2.plugin.inputs.annotations.ConfigClass;
-import org.graylog2.plugin.inputs.annotations.FactoryClass;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
+import org.graylog2.plugin.inputs.annotations.Codec;
+import org.graylog2.plugin.inputs.annotations.ConfigClass;
+import org.graylog2.plugin.inputs.annotations.FactoryClass;
 import org.graylog2.plugin.inputs.codecs.AbstractCodec;
 import org.graylog2.plugin.inputs.codecs.CodecAggregator;
 import org.graylog2.plugin.inputs.transports.NettyTransport;
@@ -62,9 +63,9 @@ public class RawCodec extends AbstractCodec {
     @Nullable
     @Override
     public Message decode(@Nonnull RawMessage raw) {
-        final InetAddress remoteAddress = raw.getRemoteAddress();
+        final InetAddress remoteAddress = raw.getRemoteAddress().getAddress();
         return new Message(new String(raw.getPayload(), Charsets.UTF_8),
-                           remoteAddress == null ? "unknown" : remoteAddress.getHostName(),  // TODO lookups/override?
+                           remoteAddress == null ? "unknown" : InetAddresses.toAddrString(remoteAddress), // do not resolve early
                            raw.getTimestamp());
     }
 

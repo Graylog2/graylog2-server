@@ -43,6 +43,7 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
@@ -80,8 +81,8 @@ public class SyslogCodec extends AbstractCodec {
     public Message decode(@Nonnull RawMessage rawMessage) {
         final String msg = new String(rawMessage.getPayload(), StandardCharsets.UTF_8);
         try (Timer.Context ignored = this.decodeTime.time()) {
-            final InetAddress remoteAddress = rawMessage.getRemoteAddress();
-            return parse(msg, remoteAddress, rawMessage.getTimestamp());
+            final InetSocketAddress remoteAddress = rawMessage.getRemoteAddress().getInetSocketAddress();
+            return parse(msg, remoteAddress.getAddress(), rawMessage.getTimestamp());
         } catch (ClassCastException e) {
             propagate(e);
         }
