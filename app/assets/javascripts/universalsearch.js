@@ -8,7 +8,8 @@ $(document).ready(function() {
     });
 
     $("#universalsearch .timerange-selector-container .absolute .date-select").datepicker({
-        format: "yyyy-mm-dd"
+        format: "yyyy-mm-dd",
+        weekStart: 1
     }).on("changeDate", function(ev) {
         var dateString = $(this).val() + " 00:00:00";
         var date = momentHelper.parseUserLocalFromString(dateString);
