@@ -1,5 +1,7 @@
 function configureDialog_search_result_count(callback) {
-    trendDialogConfiguration.openModal(callback);
+    var params = originalUniversalSearchSettings();
+    var supportsTrending = params.rangeType === 'relative';
+    trendDialogConfiguration.openModal(callback, supportsTrending);
 }
 
 function addWidget_search_result_count(dashboardId, config, eventElem) {

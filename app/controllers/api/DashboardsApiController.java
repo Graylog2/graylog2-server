@@ -19,7 +19,6 @@
  */
 package controllers.api;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import controllers.AuthenticatedController;
@@ -33,12 +32,7 @@ import org.graylog2.restclient.models.api.requests.dashboards.UserSetWidgetPosit
 import org.graylog2.restclient.models.api.responses.dashboards.DashboardWidgetValueResponse;
 import org.graylog2.restclient.models.dashboards.Dashboard;
 import org.graylog2.restclient.models.dashboards.DashboardService;
-import org.graylog2.restclient.models.dashboards.widgets.DashboardWidget;
-import org.graylog2.restclient.models.dashboards.widgets.FieldChartWidget;
-import org.graylog2.restclient.models.dashboards.widgets.QuickvaluesWidget;
-import org.graylog2.restclient.models.dashboards.widgets.SearchResultChartWidget;
-import org.graylog2.restclient.models.dashboards.widgets.SearchResultCountWidget;
-import org.graylog2.restclient.models.dashboards.widgets.StreamSearchResultCountWidget;
+import org.graylog2.restclient.models.dashboards.widgets.*;
 import play.Logger;
 import play.libs.Json;
 import play.mvc.BodyParser;
@@ -221,6 +215,10 @@ public class DashboardsApiController extends AuthenticatedController {
                     case SEARCH_RESULT_COUNT:
                         Boolean trend = Boolean.parseBoolean(params.get("trend"));
                         if (trend) {
+                            if (!rangeType.equals("relative")) {
+                                Logger.error("Cannot add search result count widget with trend on a non relative time range");
+                                return badRequest();
+                            }
                             int amount = Integer.parseInt(params.get("amount"));
                             String unit = params.get("unit");
                             widget = new SearchResultCountWidget(dashboard, query, timerange, description, trend, amount, unit);

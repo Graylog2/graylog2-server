@@ -24,13 +24,16 @@ var TrendConfigurationModal = React.createClass({
 
     render() {
         var header = <h2>Configure Dashboard Widget</h2>;
+        var trendCheckbox = (
+            <label className="checkbox">
+                <input type="checkbox" onChange={this._onTrendChange} checked={this.state.trend}/> Display trend
+            </label>
+        );
         var body = (
             <fieldset>
                 <label>Description:</label>
                 <input type="text" onChange={this._onDescriptionChange} value={this.state.description}/>
-                <label className="checkbox">
-                    <input type="checkbox" onChange={this._onTrendChange} checked={this.state.trend}/> Display trend
-                </label>
+                {this.state.supportsTrending ? trendCheckbox : null}
             </fieldset>
         );
         return (
@@ -45,9 +48,11 @@ var TrendConfigurationModal = React.createClass({
     closeModal() {
         this.refs.modal.close();
     },
-    openModal(resultcallback) {
-        this.setState(this.getInitialState());
+    openModal(resultcallback, supportsTrending) {
+        var initialState = this.getInitialState();
         this.resultCallback = resultcallback;
+        initialState.supportsTrending = supportsTrending;
+        this.setState(initialState);
         this.refs.modal.open();
     },
     _save: function () {
