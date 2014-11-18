@@ -323,6 +323,8 @@ public abstract class MessageInput {
     }
 
     public void processRawMessage(RawMessage rawMessage) {
+        // add the common message metadata for this input/codec
+        rawMessage.setCodecName(codec.getName());
         rawMessage.setCodecConfig(codecConfig);
         rawMessage.addSourceNode(getId(), serverStatus.getNodeId(), serverStatus.hasCapability(ServerStatus.Capability.SERVER));
 

@@ -287,8 +287,7 @@ public abstract class NettyTransport implements Transport {
             final byte[] payload = new byte[buffer.readableBytes()];
             buffer.toByteBuffer().get(payload, buffer.readerIndex(), buffer.readableBytes());
 
-            final RawMessage raw = new RawMessage(input.getCodec().getName(), input.getId(),
-                                                  (InetSocketAddress) e.getRemoteAddress(), payload);
+            final RawMessage raw = new RawMessage(payload, (InetSocketAddress) e.getRemoteAddress());
             input.processRawMessage(raw);
         }
 

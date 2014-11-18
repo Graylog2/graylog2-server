@@ -72,32 +72,27 @@ public class RawMessage implements Serializable {
     private final long sequenceNumber;
     private Configuration codecConfig;
 
-    public RawMessage(String payloadType,
-                      String sourceInputId,
-                      InetSocketAddress remoteAddress,
-                      byte[] payload) {
-        this(payloadType, sourceInputId, remoteAddress, null, payload);
+    public RawMessage(byte[] payload) {
+        this(payload, null);
     }
 
-    public RawMessage(String payloadType,
-                      String sourceInputId,
-                      InetSocketAddress remoteAddress,
+    public RawMessage(byte[] payload, InetSocketAddress remoteAddress) {
+        this(remoteAddress, null, payload);
+    }
+
+    public RawMessage(InetSocketAddress remoteAddress,
                       @Nullable String metaData,
                       byte[] payload) {
-        this(Long.MIN_VALUE, new UUID(), Tools.iso8601(), payloadType, sourceInputId, remoteAddress, metaData, payload);
+        this(Long.MIN_VALUE, new UUID(), Tools.iso8601(), remoteAddress, payload);
     }
 
     public RawMessage(long sequenceNumber,
                       UUID id,
                       DateTime timestamp,
-                      String payloadType,
-                      String sourceInputId,
                       InetSocketAddress remoteAddress,
-                      @Nullable String metaData,
                       byte[] payload) {
         checkNotNull(payload, "The message payload must not be null!");
         checkArgument(payload.length > 0, "The message payload must not be empty!");
-        checkArgument(!isNullOrEmpty(payloadType), "The payload type must not be null or empty!");
 
         msgBuilder = JournalMessage.newBuilder();
 
@@ -121,13 +116,6 @@ public class RawMessage implements Serializable {
         }
 
         msgBuilder.setPayload(ByteString.copyFrom(payload));
-
-        final JournalMessages.CodecInfo.Builder codecBuilder = msgBuilder.getCodecBuilder();
-        codecBuilder.setName(payloadType);
-        if (metaData != null) {
-            codecBuilder.setConfig(metaData);
-        }
-        msgBuilder.setCodec(codecBuilder.build());
     }
 
     public void addSourceNode(String sourceInputId, NodeId nodeId, boolean isServer) {
@@ -229,6 +217,15 @@ public class RawMessage implements Serializable {
         return this;
     }
 
+    public String getCodecName() {
+        return msgBuilder.getCodecBuilder().getName();
+    }
+
+    public void setCodecName(String name) {
+        checkArgument(!isNullOrEmpty(name), "The payload type must not be null or empty!");
+        msgBuilder.getCodecBuilder().setName(name);
+    }
+
     public Configuration getCodecConfig() {
         return codecConfig;
     }
@@ -240,7 +237,7 @@ public class RawMessage implements Serializable {
     public List<SourceNode> getSourceNodes() {
         final ArrayList<SourceNode> list = Lists.newArrayList();
 
-        for (JournalMessages.SourceNode node : msgBuilder.getSourceNodesList()) {
+        for (final JournalMessages.SourceNode node : msgBuilder.getSourceNodesList()) {
             list.add(new SourceNode(node));
         }
 
@@ -254,7 +251,7 @@ public class RawMessage implements Serializable {
 
         public enum Type {
             SERVER,
-            RADIO;
+            RADIO
         }
 
         public SourceNode(JournalMessages.SourceNode node) {

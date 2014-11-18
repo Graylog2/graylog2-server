@@ -25,8 +25,8 @@ import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import org.graylog2.inputs.misc.metrics.agent.GELFTarget;
 import org.graylog2.inputs.misc.metrics.agent.Graylog2Reporter;
-import org.graylog2.plugin.ConfigClass;
-import org.graylog2.plugin.FactoryClass;
+import org.graylog2.plugin.inputs.annotations.ConfigClass;
+import org.graylog2.plugin.inputs.annotations.FactoryClass;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.configuration.fields.ConfigurationField;
@@ -198,7 +198,7 @@ public class LocalMetricsTransport extends ThrottleableTransport {
                 data.put("host", source);
                 data.putAll(fields);
                 final byte[] payload = mapper.writeValueAsBytes(data);
-                input.processRawMessage(new RawMessage("gelf", input.getId(), null, payload));
+                input.processRawMessage(new RawMessage(payload));
             } catch (JsonProcessingException e) {
                 log.error("Unable to serialized metrics", e);
             }

@@ -30,12 +30,12 @@ public class CodecsModule extends Graylog2Module {
     protected void configure() {
         final MapBinder<String, Codec.Factory<? extends Codec>> mapBinder = codecMapBinder();
 
-        installCodec(mapBinder, "raw", RawCodec.class);
-        installCodec(mapBinder, "syslog", SyslogCodec.class);
-        installCodec(mapBinder, "randomhttp", RandomHttpMessageCodec.class);
-        installCodec(mapBinder, "gelf", GelfCodec.class);
-        installCodec(mapBinder, "radio-msgpack", RadioMessageCodec.class);
-        installCodec(mapBinder, "jsonpath", JsonPathCodec.class);
+        installCodec(mapBinder, RawCodec.class);
+        installCodec(mapBinder, SyslogCodec.class);
+        installCodec(mapBinder, RandomHttpMessageCodec.class);
+        installCodec(mapBinder, GelfCodec.class);
+        installCodec(mapBinder, RadioMessageCodec.class);
+        installCodec(mapBinder, JsonPathCodec.class);
     }
 
 }

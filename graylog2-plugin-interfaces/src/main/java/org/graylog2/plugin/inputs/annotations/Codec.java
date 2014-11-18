@@ -20,14 +20,25 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.graylog2.plugin;
+package org.graylog2.plugin.inputs.annotations;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-@Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface FactoryClass {
+@Target(ElementType.TYPE)
+public @interface Codec {
+    /**
+     * Internal name used for identifying the codec.
+     * @return
+     */
+    String name();
+
+    /**
+     * Human readable name.
+     * @return
+     */
+    String displayName();
 }

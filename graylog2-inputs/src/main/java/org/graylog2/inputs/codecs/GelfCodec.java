@@ -22,8 +22,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
 import org.graylog2.inputs.codecs.gelf.GELFMessage;
-import org.graylog2.plugin.ConfigClass;
-import org.graylog2.plugin.FactoryClass;
+import org.graylog2.plugin.inputs.annotations.Codec;
+import org.graylog2.plugin.inputs.annotations.ConfigClass;
+import org.graylog2.plugin.inputs.annotations.FactoryClass;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.configuration.Configuration;
@@ -41,6 +42,7 @@ import javax.annotation.Nullable;
 import java.util.Iterator;
 import java.util.Map;
 
+@Codec(name = "gelf", displayName = "GELF")
 public class GelfCodec extends AbstractCodec {
     private static final Logger log = LoggerFactory.getLogger(GelfCodec.class);
 
@@ -207,11 +209,6 @@ public class GelfCodec extends AbstractCodec {
     @Override
     public CodecAggregator getAggregator() {
         return aggregator;
-    }
-
-    @Override
-    public String getName() {
-        return "gelf";
     }
 
     @FactoryClass

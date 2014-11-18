@@ -124,6 +124,6 @@ public class SyslogCodecTest {
     }
 
     private RawMessage buildRawMessage(String message) {
-        return new RawMessage("syslog", "input-id", new InetSocketAddress(5140), message.getBytes());
+        return new RawMessage(message.getBytes(), new InetSocketAddress(5140));
     }
 }

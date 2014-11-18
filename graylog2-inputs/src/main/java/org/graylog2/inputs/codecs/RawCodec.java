@@ -36,8 +36,9 @@ package org.graylog2.inputs.codecs;
 import com.google.common.base.Charsets;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
-import org.graylog2.plugin.ConfigClass;
-import org.graylog2.plugin.FactoryClass;
+import org.graylog2.plugin.inputs.annotations.Codec;
+import org.graylog2.plugin.inputs.annotations.ConfigClass;
+import org.graylog2.plugin.inputs.annotations.FactoryClass;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
@@ -50,6 +51,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.net.InetAddress;
 
+@Codec(name = "raw", displayName = "Raw String")
 public class RawCodec extends AbstractCodec {
 
     @AssistedInject
@@ -70,11 +72,6 @@ public class RawCodec extends AbstractCodec {
     @Override
     public CodecAggregator getAggregator() {
         return null;
-    }
-
-    @Override
-    public String getName() {
-        return "raw";
     }
 
     @FactoryClass

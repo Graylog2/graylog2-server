@@ -21,8 +21,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import org.graylog2.inputs.random.generators.FakeHttpRawMessageGenerator;
-import org.graylog2.plugin.ConfigClass;
-import org.graylog2.plugin.FactoryClass;
+import org.graylog2.plugin.inputs.annotations.ConfigClass;
+import org.graylog2.plugin.inputs.annotations.FactoryClass;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.configuration.fields.ConfigurationField;
@@ -70,7 +70,7 @@ public class RandomMessageTransport extends GeneratorTransport {
             final FakeHttpRawMessageGenerator.GeneratorState state = generator.generateState();
             payload = objectMapper.writeValueAsBytes(state);
 
-            final RawMessage raw = new RawMessage("randomhttp", input.getId(), null, payload);
+            final RawMessage raw = new RawMessage(payload);
 
             sleepUninterruptibly(rateDeviation(sleepMs, maxSleepDeviation, rand), MILLISECONDS);
             return raw;

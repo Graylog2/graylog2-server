@@ -104,7 +104,7 @@ public class AmqpConsumer {
                         totalBytesRead.addAndGet(body.length);
                         lastSecBytesReadTmp.addAndGet(body.length);
 
-                        final RawMessage rawMessage = new RawMessage("radio-msgpack", sourceInput.getId(), null, body);
+                        final RawMessage rawMessage = new RawMessage(body);
                         // TODO implement throttling
                         sourceInput.processRawMessage(rawMessage);
                         channel.basicAck(deliveryTag, false);

@@ -23,12 +23,17 @@
 package org.graylog2.plugin.inputs.codecs;
 
 import org.graylog2.plugin.configuration.Configuration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 
 public abstract class AbstractCodec implements Codec {
+    private static final Logger log = LoggerFactory.getLogger(AbstractCodec.class);
 
     protected final Configuration configuration;
+
+    private String name;
 
     protected AbstractCodec(Configuration configuration) {
         this.configuration = configuration;
@@ -40,4 +45,17 @@ public abstract class AbstractCodec implements Codec {
         return configuration;
     }
 
+    @Override
+    public String getName() {
+        // can be a race condition, but we don't care the outcome is always the same
+        if (name == null) {
+            if (this.getClass().isAnnotationPresent(org.graylog2.plugin.inputs.annotations.Codec.class)) {
+                name = this.getClass().getAnnotation(org.graylog2.plugin.inputs.annotations.Codec.class).name();
+            } else {
+                log.error("Annotation {} missing on codec {}. This is a bug and this codec will not be available.",
+                          org.graylog2.plugin.inputs.annotations.Codec.class, this.getClass());
+            }
+        }
+        return name;
+    }
 }

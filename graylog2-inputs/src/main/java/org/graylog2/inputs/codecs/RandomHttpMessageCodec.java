@@ -20,8 +20,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
 import org.graylog2.inputs.random.generators.FakeHttpRawMessageGenerator;
-import org.graylog2.plugin.ConfigClass;
-import org.graylog2.plugin.FactoryClass;
+import org.graylog2.plugin.inputs.annotations.Codec;
+import org.graylog2.plugin.inputs.annotations.ConfigClass;
+import org.graylog2.plugin.inputs.annotations.FactoryClass;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
@@ -37,6 +38,7 @@ import java.io.IOException;
 
 import static org.graylog2.inputs.random.generators.FakeHttpRawMessageGenerator.GeneratorState;
 
+@Codec(name = "random-http-msg", displayName = "Random HTTP Message")
 public class RandomHttpMessageCodec extends AbstractCodec {
     private static final Logger log = LoggerFactory.getLogger(RandomHttpMessageCodec.class);
     private final ObjectMapper objectMapper;
@@ -70,10 +72,6 @@ public class RandomHttpMessageCodec extends AbstractCodec {
         return null;
     }
 
-    @Override
-    public String getName() {
-        return "randomhttp";
-    }
 
     @FactoryClass
     public interface Factory extends AbstractCodec.Factory<RandomHttpMessageCodec> {

@@ -33,8 +33,8 @@ import kafka.consumer.TopicFilter;
 import kafka.consumer.Whitelist;
 import kafka.javaapi.consumer.ConsumerConnector;
 import kafka.message.MessageAndMetadata;
-import org.graylog2.plugin.ConfigClass;
-import org.graylog2.plugin.FactoryClass;
+import org.graylog2.plugin.inputs.annotations.ConfigClass;
+import org.graylog2.plugin.inputs.annotations.FactoryClass;
 import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.configuration.Configuration;
@@ -218,10 +218,7 @@ public class KafkaTransport extends ThrottleableTransport {
                         totalBytesRead.addAndGet(bytes.length);
                         lastSecBytesReadTmp.addAndGet(bytes.length);
 
-                        final RawMessage rawMessage = new RawMessage("radio-msgpack",
-                                input.getId(),
-                                null,
-                                bytes);
+                        final RawMessage rawMessage = new RawMessage(bytes);
 
                         // TODO implement throttling
                         input.processRawMessage(rawMessage);

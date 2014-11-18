@@ -25,8 +25,8 @@ import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.Response;
-import org.graylog2.plugin.ConfigClass;
-import org.graylog2.plugin.FactoryClass;
+import org.graylog2.plugin.inputs.annotations.ConfigClass;
+import org.graylog2.plugin.inputs.annotations.FactoryClass;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
@@ -175,10 +175,9 @@ public class HttpPollTransport extends ThrottleableTransport {
                         throw new RuntimeException("Expected HTTP status code 200, got " + r.getStatusCode());
                     }
 
-                    input.processRawMessage(new RawMessage(input.getCodec().getName(),
-                                                           input.getId(),
-                                                           remoteAddress,
-                                                           r.getResponseBody().getBytes(StandardCharsets.UTF_8)));
+                    input.processRawMessage(new RawMessage(r.getResponseBody().getBytes(StandardCharsets.UTF_8),
+                                                           remoteAddress
+                    ));
                 } catch (InterruptedException | ExecutionException | IOException e) {
                     LOG.error("Could not fetch HTTP resource at " + url, e);
                 }

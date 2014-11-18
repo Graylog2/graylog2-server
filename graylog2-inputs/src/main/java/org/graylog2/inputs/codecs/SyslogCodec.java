@@ -21,8 +21,9 @@ import com.codahale.metrics.Timer;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
-import org.graylog2.plugin.ConfigClass;
-import org.graylog2.plugin.FactoryClass;
+import org.graylog2.plugin.inputs.annotations.Codec;
+import org.graylog2.plugin.inputs.annotations.ConfigClass;
+import org.graylog2.plugin.inputs.annotations.FactoryClass;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.configuration.Configuration;
@@ -53,6 +54,7 @@ import static com.codahale.metrics.MetricRegistry.name;
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static com.google.common.base.Throwables.propagate;
 
+@Codec(name = "syslog", displayName = "Syslog")
 public class SyslogCodec extends AbstractCodec {
     private static final Logger LOG = LoggerFactory.getLogger(SyslogCodec.class);
 
@@ -188,11 +190,6 @@ public class SyslogCodec extends AbstractCodec {
     @Override
     public CodecAggregator getAggregator() {
         return null;
-    }
-
-    @Override
-    public String getName() {
-        return "syslog";
     }
 
     @FactoryClass

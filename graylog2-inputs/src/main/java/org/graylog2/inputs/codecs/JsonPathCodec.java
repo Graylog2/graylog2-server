@@ -21,8 +21,9 @@ import com.google.common.collect.Maps;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import com.jayway.jsonpath.JsonPath;
-import org.graylog2.plugin.ConfigClass;
-import org.graylog2.plugin.FactoryClass;
+import org.graylog2.plugin.inputs.annotations.Codec;
+import org.graylog2.plugin.inputs.annotations.ConfigClass;
+import org.graylog2.plugin.inputs.annotations.FactoryClass;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
@@ -38,6 +39,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 
+@Codec(name = "jsonpath", displayName = "JSON Path")
 public class JsonPathCodec extends AbstractCodec {
 
     public static final String CK_PATH = "path";
@@ -111,11 +113,6 @@ public class JsonPathCodec extends AbstractCodec {
     @Override
     public CodecAggregator getAggregator() {
         return null;
-    }
-
-    @Override
-    public String getName() {
-        return "JsonPath";
     }
 
     @FactoryClass

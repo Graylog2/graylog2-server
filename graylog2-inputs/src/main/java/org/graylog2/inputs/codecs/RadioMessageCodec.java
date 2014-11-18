@@ -18,8 +18,9 @@ package org.graylog2.inputs.codecs;
 
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
-import org.graylog2.plugin.ConfigClass;
-import org.graylog2.plugin.FactoryClass;
+import org.graylog2.plugin.inputs.annotations.Codec;
+import org.graylog2.plugin.inputs.annotations.ConfigClass;
+import org.graylog2.plugin.inputs.annotations.FactoryClass;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.RadioMessage;
 import org.graylog2.plugin.configuration.Configuration;
@@ -37,6 +38,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.IOException;
 
+@Codec(name = "radio-msg", displayName = "Radio Message")
 public class RadioMessageCodec extends AbstractCodec {
     private static final Logger log = LoggerFactory.getLogger(RadioMessageCodec.class);
 
@@ -80,11 +82,6 @@ public class RadioMessageCodec extends AbstractCodec {
     @Override
     public CodecAggregator getAggregator() {
         return null;
-    }
-
-    @Override
-    public String getName() {
-        return "Radio Message";
     }
 
     @FactoryClass

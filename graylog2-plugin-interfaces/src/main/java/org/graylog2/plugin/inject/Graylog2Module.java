@@ -27,9 +27,9 @@ import com.google.inject.Key;
 import com.google.inject.TypeLiteral;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.multibindings.MapBinder;
-import org.graylog2.plugin.ConfigClass;
-import org.graylog2.plugin.FactoryClass;
 import org.graylog2.plugin.inputs.MessageInput;
+import org.graylog2.plugin.inputs.annotations.ConfigClass;
+import org.graylog2.plugin.inputs.annotations.FactoryClass;
 import org.graylog2.plugin.inputs.codecs.Codec;
 import org.graylog2.plugin.inputs.transports.Transport;
 import org.slf4j.Logger;
@@ -80,6 +80,16 @@ public abstract class Graylog2Module extends AbstractModule {
                         .build(factoryClass));
 
         mapBinder.addBinding(name).to(factoryKey);
+    }
+
+    protected void installCodec(MapBinder<String, Codec.Factory<? extends Codec>> mapBinder, Class<? extends Codec> codecClass) {
+        if (codecClass.isAnnotationPresent(org.graylog2.plugin.inputs.annotations.Codec.class)) {
+            final org.graylog2.plugin.inputs.annotations.Codec a = codecClass.getAnnotation(org.graylog2.plugin.inputs.annotations.Codec.class);
+            installCodec(mapBinder, a.name(), codecClass);
+        } else {
+            log.error("Codec {} not annotated with {}. Cannot determine its id. This is a bug, please use that annotation, this codec will not be available",
+                      codecClass, org.graylog2.plugin.inputs.annotations.Codec.class);
+        }
     }
 
     protected void installCodec(
