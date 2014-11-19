@@ -32,7 +32,7 @@ public class EsOpenFilesNotification implements NotificationType {
             "open file limit (current limit: <em>%d</em> on <em>%s</em>; should be at least 64000) This will " +
             "be causing problems that can be hard to diagnose. " +
             "Read how to raise the maximum number of open files in " +
-            NotificationHelper.linkToKnowledgeBase("configuring-and-tuning-elasticsearch-for-graylog2-v0200", "the documentation.");
+            NotificationHelper.linkToKnowledgeBase("setup/elasticsearch", "the Elasticsearch setup documentation.");
 
     private final Notification notification;
 
