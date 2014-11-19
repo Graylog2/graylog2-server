@@ -110,6 +110,10 @@
                                 @views.html.dashboards.widgets.search_result_chart(widget.asInstanceOf[SearchResultChartWidget])
                             }
 
+                            @if(widget.getType.equals(DashboardWidget.Type.STATS_COUNT)) {
+                                @views.html.dashboards.widgets.stats_count(widget.asInstanceOf[StatisticalCountWidget])
+                            }
+
                         </div>
                     </li>
                 }

@@ -27,7 +27,7 @@ var TrendConfigurationModal = React.createClass({
                 </label>
                 <label className="checkbox">
                     <input type="checkbox" onChange={this._onLowerIsBetterChange} disabled={!this.state.trend} checked={this.state.lowerIsBetter}/> Lower value is better
-                    <span class="help-inline"> (use green colour when trend goes down)</span>
+                    <span className="help-inline"> (use green colour when trend goes down)</span>
                 </label>
             </div>
         );

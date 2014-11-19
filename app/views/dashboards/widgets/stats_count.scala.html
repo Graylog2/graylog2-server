@@ -1,0 +1,42 @@
+@(widget: org.graylog2.restclient.models.dashboards.widgets.StatisticalCountWidget)
+
+@import views.helpers.DashboardWidgetRouteHelper
+
+<div class="search_result_count">
+
+    <div class="text-center">
+        <a href="@DashboardWidgetRouteHelper.replayRoute(widget)" class="replay-link">
+            <span class="value"><i class="icon icon-refresh"></i></span>
+        </a>
+        @if(widget.getTrend()) {
+            <div class="trend-icons" data-lower-is-better="@widget.getLowerIsBetter">
+                <div class="trend-icon">
+                    <span class="trend-higher"><i class="icon icon-caret-up"></i></span>
+                </div>
+                <div class="trend-icon">
+                    <span class="trend-lower"><i class="icon icon-caret-down"></i></span>
+                </div>
+            </div>
+        }
+    </div>
+
+
+    <div class="widget-subline">
+        <div class="description">
+            <span class="widget-title">
+                @widget.getDescription
+            </span>
+
+            <a href="#" class="only-unlocked edit-description">
+                <i class="icon icon-edit"></i>
+            </a>
+        </div>
+
+        <div class="description-form">
+            <div class="input-append">
+                <input type="text" value="@widget.getDescription" class="description-value" />
+                <button class="btn btn-success update-description">Update</button>
+            </div>
+        </div>
+    </div>
+</div>

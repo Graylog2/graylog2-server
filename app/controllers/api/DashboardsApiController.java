@@ -262,6 +262,22 @@ public class DashboardsApiController extends AuthenticatedController {
                         if (!canReadStream(streamId)) return unauthorized();
                         widget = new SearchResultChartWidget(dashboard, query, timerange, description, streamId, params.get("interval"));
                         break;
+                    case STATS_COUNT: {
+                        final String field = params.get("field");
+                        final String statsFunction = params.get("statsFunction");
+                        final Boolean trend = Boolean.parseBoolean(params.get("trend"));
+                        if (trend) {
+                            if (!rangeType.equals("relative")) {
+                                Logger.error("Cannot add statistical count widget with trend on a non relative time range");
+                                return badRequest();
+                            }
+                            final Boolean lowerIsBetter = Boolean.parseBoolean(params.get("lowerIsBetter"));
+                            widget = new StatisticalCountWidget(dashboard, query, timerange, description, trend, lowerIsBetter, field, statsFunction);
+                        } else {
+                            widget = new StatisticalCountWidget(dashboard, query, timerange, description, field, statsFunction);
+                        }
+                        break;
+                    }
                     default:
                         throw new IllegalArgumentException();
                 }
