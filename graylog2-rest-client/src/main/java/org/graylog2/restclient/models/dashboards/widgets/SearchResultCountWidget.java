@@ -39,7 +39,11 @@ public class SearchResultCountWidget extends DashboardWidget {
     }
 
     public SearchResultCountWidget(Dashboard dashboard, String id, String description, int cacheTime, String query, TimeRange timerange, boolean trend, boolean lowerIsBetter, String creatorUserId) {
-        super(Type.SEARCH_RESULT_COUNT, id, description, cacheTime, dashboard, creatorUserId, query, timerange);
+        this(Type.SEARCH_RESULT_COUNT, dashboard, id, description, cacheTime, query, timerange, trend, lowerIsBetter, creatorUserId);
+    }
+
+    protected SearchResultCountWidget(Type type, Dashboard dashboard, String id, String description, int cacheTime, String query, TimeRange timerange, boolean trend, boolean lowerIsBetter, String creatorUserId) {
+        super(type, id, description, cacheTime, dashboard, creatorUserId, query, timerange);
 
         this.trend = trend;
         this.lowerIsBetter = lowerIsBetter;

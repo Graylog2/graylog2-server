@@ -22,14 +22,8 @@ import org.graylog2.restclient.models.dashboards.Dashboard;
 
 import java.util.Map;
 
-public class StreamSearchResultCountWidget extends DashboardWidget {
-
-    private static final int WIDTH = 1;
-    private static final int HEIGHT = 1;
-
+public class StreamSearchResultCountWidget extends SearchResultCountWidget {
     private final String streamId;
-    private final boolean lowerIsBetter;
-    private final boolean trend;
 
     public StreamSearchResultCountWidget(Dashboard dashboard, String query, TimeRange timerange, String description, boolean trend, boolean lowerIsBetter, String streamId) {
         this(dashboard, null, description, 0, query, timerange, trend, lowerIsBetter, streamId, null);
@@ -40,50 +34,26 @@ public class StreamSearchResultCountWidget extends DashboardWidget {
     }
 
     public StreamSearchResultCountWidget(Dashboard dashboard, String id, String description, int cacheTime, String query, TimeRange timerange, boolean trend, boolean lowerIsBetter, String streamId, String creatorUserId) {
-        super(DashboardWidget.Type.STREAM_SEARCH_RESULT_COUNT, id, description, cacheTime, dashboard, creatorUserId, query, timerange);
+        super(Type.STREAM_SEARCH_RESULT_COUNT, dashboard, id, description, cacheTime, query, timerange, trend, lowerIsBetter, creatorUserId);
 
         if (streamId == null || streamId.isEmpty()) {
             throw new RuntimeException("Missing streamId for widget [" + id + "] on dashboard [" + dashboard.getId() + "].");
         }
 
         this.streamId = streamId;
-        this.trend = trend;
-        this.lowerIsBetter = lowerIsBetter;
     }
 
     @Override
     public Map<String, Object> getConfig() {
         Map<String, Object> config = Maps.newHashMap();
-        config.putAll(getTimerange().getQueryParams());
-        config.put("query", getQuery());
+        config.putAll(super.getConfig());
         config.put("stream_id", streamId);
-        config.put("trend", trend);
-        config.put("lower_is_better", lowerIsBetter);
 
         return config;
-    }
-
-    @Override
-    public int getWidth() {
-        return WIDTH;
-    }
-
-    @Override
-    public int getHeight() {
-        return HEIGHT;
     }
 
     @Override
     public String getStreamId() {
         return streamId;
     }
-
-    @Override
-    public boolean hasFixedTimeAxis() {
-        return false;
-    }
-
-    public boolean getTrend() { return trend; }
-
-    public boolean getLowerIsBetter() { return lowerIsBetter; }
 }
