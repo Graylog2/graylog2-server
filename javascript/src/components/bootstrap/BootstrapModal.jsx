@@ -10,7 +10,7 @@ var BootstrapModal = React.createClass({
     componentDidMount: function () {
         // When the component is added, turn it into a modal
         $(this.getDOMNode())
-            .modal({backdrop: 'static', keyboard: false, show: false});
+            .modal({backdrop: 'static', keyboard: true, show: false});
     },
     componentWillUnmount: function () {
     },
@@ -18,7 +18,9 @@ var BootstrapModal = React.createClass({
         $(this.getDOMNode()).modal('hide');
     },
     open: function () {
-        $(this.getDOMNode()).modal('show');
+        var modal = $(this.getDOMNode());
+        modal.modal('show');
+        modal.on("shown", () => $("input", this.refs.body.getDOMNode()).first().focus());
     },
     _submit: function(event) {
         this.props.onConfirm();
@@ -45,12 +47,13 @@ var BootstrapModal = React.createClass({
                     <button
                     type="button"
                     className="close"
+                    data-dismiss="modal"
                     onClick={this.props.onCancel}
                     dangerouslySetInnerHTML={{__html: '&times'}}
                     />
                         {Array.isArray(this.props.children) ? this.props.children[0] : this.props.children}
                 </div>
-                <div className="modal-body">
+                <div ref="body" className="modal-body">
                         {this.props.children[1]}
                 </div>
                 <div className="modal-footer">
