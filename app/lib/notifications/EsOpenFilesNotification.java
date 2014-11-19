@@ -31,8 +31,8 @@ import java.util.Map;
  */
 public class EsOpenFilesNotification implements NotificationType {
 
-    private static final String TITLE = "ElasticSearch nodes with too low open file limit";
-    private static final String DESCRIPTION = "There are ElasticSearch nodes in the cluster that have a too low " +
+    private static final String TITLE = "Elasticsearch nodes with too low open file limit";
+    private static final String DESCRIPTION = "There are Elasticsearch nodes in the cluster that have a too low " +
                                               "open file limit. (below 64000) This will be causing problems that can be hard to diagnose. " +
                                               "Read how to raise the maximum number of open files in " +
                                               NotificationHelper.linkToKnowledgeBase("configuring-and-tuning-elasticsearch-for-graylog2-v0200", "the documentation.");
