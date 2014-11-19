@@ -21,7 +21,7 @@
     @if(dashboards.filter(d => isPermitted(DASHBOARDS_READ, d.getId)).isEmpty) {
         <div class="alert alert-warn">
             <i class="icon icon-info-sign"></i>
-            No dashboards configured.
+            No dashboards configured. <a href="@routes.DashboardsController.newDashboard()">Create one now</a>.
         </div>
     }
 

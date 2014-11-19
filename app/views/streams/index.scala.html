@@ -99,7 +99,8 @@
     }
 
     @if(streams.isEmpty && isPermitted(STREAMS_CREATE)) {
-        <div class="alert alert-error">
+        <div class="alert alert-warn">
+            <i class="icon icon-info-sign"></i>
             No streams configured. <a href="@routes.StreamsController.create()">Create one now</a>.
         </div>
     }
