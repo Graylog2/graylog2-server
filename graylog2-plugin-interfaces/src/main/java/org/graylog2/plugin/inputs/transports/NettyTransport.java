@@ -202,7 +202,7 @@ public abstract class NettyTransport implements Transport {
             handlerList.put("codec-aggregator", new Callable<ChannelHandler>() {
                 @Override
                 public ChannelHandler call() throws Exception {
-                    return new MessageAggregationHandler(input, aggregator);
+                    return new MessageAggregationHandler(aggregator);
                 }
             });
         }
@@ -226,13 +226,11 @@ public abstract class NettyTransport implements Transport {
     }
 
     private class MessageAggregationHandler extends SimpleChannelHandler {
-        private final MessageInput input;
         private final CodecAggregator aggregator;
         private final Timer aggregationTimer;
         private final Meter invalidChunksMeter;
 
-        public MessageAggregationHandler(MessageInput input, CodecAggregator aggregator) {
-            this.input = input;
+        public MessageAggregationHandler(CodecAggregator aggregator) {
             this.aggregator = aggregator;
             aggregationTimer = localRegistry.timer("aggregationTime");
             invalidChunksMeter = localRegistry.meter("invalidMessages");
