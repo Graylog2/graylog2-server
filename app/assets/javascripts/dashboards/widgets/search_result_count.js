@@ -50,26 +50,20 @@ function calculateValueFontSize(nowCount) {
 function displayTrendIndicator(widget, nowCount, previousCount) {
     var green = "#2AAB2A";
     var red = "#BD362F";
-    var blue = "#08C";
+    var grey = "#EBEBEB";
     var lowerIsBetter = Boolean($(".trend-icons", widget).data("lower-is-better"));
     var lowerColor = lowerIsBetter ? green : red;
     var higherColor = lowerIsBetter ? red : green;
     var higherIndicator = $(".trend-higher", widget);
     var lowerIndicator = $(".trend-lower", widget);
 
+    higherIndicator.children().css("color", grey);
+    lowerIndicator.children().css("color", grey);
+
     if (nowCount > previousCount) {
-        higherIndicator.show();
         higherIndicator.children().css("color", higherColor);
-        lowerIndicator.hide();
     } else if (previousCount > nowCount) {
-        higherIndicator.hide();
-        lowerIndicator.show();
         lowerIndicator.children().css("color", lowerColor);
-    } else {
-        higherIndicator.show();
-        higherIndicator.children().css("color", blue);
-        lowerIndicator.show();
-        lowerIndicator.children().css("color", blue);
     }
 }
 
