@@ -70,7 +70,7 @@ public class ProcessBufferTest {
         ProcessBufferProcessor[] processBufferProcessors = new ProcessBufferProcessor[1];
         processBufferProcessors[0] = processBufferProcessor;
 
-        processBuffer.initialize(processBufferProcessors, 1, new BlockingWaitStrategy(), 1);
+        processBuffer.initialize(processBufferProcessors, 1, new BlockingWaitStrategy());
 
         Message message = mock(Message.class);
         MessageInput messageInput = mock(MessageInput.class);

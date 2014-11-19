@@ -48,11 +48,11 @@ import static org.joda.time.DateTimeZone.UTC;
 public class Message {
     private static final Logger LOG = LoggerFactory.getLogger(Message.class);
 
-    private static final String FIELD_ID = "_id".intern();
-    private static final String FIELD_MESSAGE = "message".intern();
-    private static final String FIELD_SOURCE = "source".intern();
-    private static final String FIELD_TIMESTAMP = "timestamp".intern();
-    private static final String FIELD_STREAMS = "streams".intern();
+    private static final String FIELD_ID = "_id";
+    private static final String FIELD_MESSAGE = "message";
+    private static final String FIELD_SOURCE = "source";
+    private static final String FIELD_TIMESTAMP = "timestamp";
+    private static final String FIELD_STREAMS = "streams";
 
     private static final Pattern VALID_KEY_CHARS = Pattern.compile("^[\\w\\.\\-]*$");
 
@@ -73,7 +73,10 @@ public class Message {
             "gl2_source_node",
             "gl2_source_input",
             "gl2_source_radio",
-            "gl2_source_radio_input"
+            "gl2_source_radio_input",
+            "gl2_remote_ip",
+            "gl2_remote_port",
+            "gl2_remote_hostname"
     );
 
     public static final ImmutableSet<String> RESERVED_SETTABLE_FIELDS = ImmutableSet.of(
@@ -83,7 +86,10 @@ public class Message {
             "gl2_source_node",
             "gl2_source_input",
             "gl2_source_radio",
-            "gl2_source_radio_input"
+            "gl2_source_radio_input",
+            "gl2_remote_ip",
+            "gl2_remote_port",
+            "gl2_remote_hostname"
     );
 
     private static final ImmutableSet<String> REQUIRED_FIELDS = ImmutableSet.of(

@@ -119,7 +119,9 @@ public class ProcessBuffer extends Buffer {
         return inputCache;
     }
 
-    public void initialize(ProcessBufferProcessor[] processors, int ringBufferSize, WaitStrategy waitStrategy, int processBufferProcessors) {
+    public void initialize(ProcessBufferProcessor[] processors,
+                           int ringBufferSize,
+                           WaitStrategy waitStrategy) {
         Disruptor<MessageEvent> disruptor = new Disruptor<>(
                 MessageEvent.EVENT_FACTORY,
                 ringBufferSize,

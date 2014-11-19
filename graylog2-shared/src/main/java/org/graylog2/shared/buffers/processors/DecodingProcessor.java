@@ -18,10 +18,12 @@
 package org.graylog2.shared.buffers.processors;
 
 import com.codahale.metrics.Timer;
+import com.google.common.net.InetAddresses;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import com.lmax.disruptor.EventHandler;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.ResolvableInetSocketAddress;
 import org.graylog2.plugin.buffers.MessageEvent;
 import org.graylog2.plugin.inputs.codecs.Codec;
 import org.graylog2.plugin.journal.RawMessage;
@@ -87,7 +89,7 @@ public class DecodingProcessor implements EventHandler<MessageEvent> {
             return;
         }
 
-        for (RawMessage.SourceNode node : raw.getSourceNodes()) {
+        for (final RawMessage.SourceNode node : raw.getSourceNodes()) {
             switch (node.type) {
                 case SERVER:
                     // Currently only one of each type supported at the moment.
@@ -108,6 +110,16 @@ public class DecodingProcessor implements EventHandler<MessageEvent> {
             }
         }
 
+        final ResolvableInetSocketAddress remoteAddress = raw.getRemoteAddress();
+        if (remoteAddress != null) {
+            message.addField("gl2_remote_ip", InetAddresses.toAddrString(remoteAddress.getAddress()));
+            if (remoteAddress.getPort() > 0) {
+                message.addField("gl2_remote_port", remoteAddress.getPort());
+            }
+            if (remoteAddress.isReverseLookedUp()) { // avoid reverse lookup if the hostname is available
+                message.addField("gl2_remote_hostname", remoteAddress.getHostName());
+            }
+        }
         event.setMessage(message);
     }
 }

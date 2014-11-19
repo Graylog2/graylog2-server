@@ -72,9 +72,7 @@ public class InputBufferImpl implements InputBuffer {
             }
         });
         disruptor.handleEventsWithWorkerPool(directMessageHandlerProvider.get()); // TODO switch implementation + count based on config
-        disruptor.start();
-
-        ringBuffer = disruptor.getRingBuffer();
+        ringBuffer = disruptor.start();
     }
 
     public void insert(RawMessage message) {
