@@ -63,6 +63,7 @@ public class IndexerClusterCheckerThread extends Periodical {
                 final Notification notification = notificationService.buildNow()
                         .addType(Notification.Type.ES_OPEN_FILES)
                         .addSeverity(Notification.Severity.URGENT)
+                        .addDetail("hostname", node.getHostname())
                         .addDetail("max_file_descriptors", node.getProcess().getMaxFileDescriptors());
 
                 if (notificationService.publishIfFirst(notification)) {
