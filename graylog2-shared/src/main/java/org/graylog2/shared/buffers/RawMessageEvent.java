@@ -24,13 +24,14 @@ public class RawMessageEvent {
 
     public RawMessage rawMessage;
 
+    public byte[] encodedRawMessage;
+
     public static final EventFactory<RawMessageEvent> FACTORY = new EventFactory<RawMessageEvent>() {
         @Override
         public RawMessageEvent newInstance() {
             return new RawMessageEvent();
         }
     };
-
     public static final EventTranslatorOneArg<RawMessageEvent, RawMessage> TRANSLATOR = new EventTranslatorOneArg<RawMessageEvent, RawMessage>() {
         @Override
         public void translateTo(RawMessageEvent event, long sequence, RawMessage arg0) {

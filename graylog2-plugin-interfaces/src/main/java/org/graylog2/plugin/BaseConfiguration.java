@@ -99,6 +99,9 @@ public abstract class BaseConfiguration {
     @Parameter(value = "input_cache_max_size")
     private long inputCacheMaxSize = 0;
 
+    @Parameter("enable_message_journal")
+    private boolean messageJournalEnabled = false;
+
     public String getRestUriScheme() {
         return isRestEnableTls() ? "https" : "http";
     }
@@ -225,4 +228,8 @@ public abstract class BaseConfiguration {
     public abstract String getNodeIdFile();
 
     public abstract URI getRestListenUri();
+
+    public boolean isMessageJournalEnabled() {
+        return messageJournalEnabled;
+    }
 }
