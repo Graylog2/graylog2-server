@@ -48,6 +48,7 @@ import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.node.Node;
 import org.elasticsearch.search.SearchHit;
 import org.graylog2.bindings.providers.EsNodeProvider;
+import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.plugin.Tools;
 import org.graylog2.shared.bindings.GuiceInstantiationService;
 import org.joda.time.DateTime;
@@ -174,10 +175,10 @@ public class ESTimestampFixup {
     }
 
     private final Node node;
-    private final Configuration configuration;
+    private final ElasticsearchConfiguration configuration;
 
     @Inject
-    public ESTimestampFixup(final Node node, final Configuration configuration, final CommandLineOptions options) {
+    public ESTimestampFixup(final Node node, final ElasticsearchConfiguration configuration, final CommandLineOptions options) {
         this.node = node;
         this.configuration = configuration;
     }
@@ -267,10 +268,10 @@ public class ESTimestampFixup {
     }
 
     private void startEsNode() {
-        LOG.debug("Starting ES node (port={})", configuration.getEsTransportTcpPort());
+        LOG.debug("Starting ES node (port={})", configuration.getTransportTcpPort());
         node.start();
         node.client().admin().cluster().health(new ClusterHealthRequest().waitForYellowStatus())
-                .actionGet(configuration.getEsClusterDiscoveryTimeout(), TimeUnit.MILLISECONDS);
+                .actionGet(configuration.getClusterDiscoveryTimeout(), TimeUnit.MILLISECONDS);
     }
 
     private void stopEsNode() {

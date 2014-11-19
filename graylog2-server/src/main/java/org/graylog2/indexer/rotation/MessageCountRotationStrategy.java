@@ -17,7 +17,7 @@
 package org.graylog2.indexer.rotation;
 
 import com.google.inject.Inject;
-import org.graylog2.Configuration;
+import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.indexer.IndexNotFoundException;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.plugin.indexer.rotation.RotationStrategy;
@@ -33,9 +33,9 @@ public class MessageCountRotationStrategy implements RotationStrategy {
     private int maxDocsPerIndex;
 
     @Inject
-    public MessageCountRotationStrategy(Configuration configuration, Indices indices) {
+    public MessageCountRotationStrategy(ElasticsearchConfiguration configuration, Indices indices) {
         this.indices = indices;
-        maxDocsPerIndex = configuration.getElasticSearchMaxDocsPerIndex();
+        maxDocsPerIndex = configuration.getMaxDocsPerIndex();
     }
 
     @Override

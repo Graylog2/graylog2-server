@@ -24,10 +24,12 @@ import com.github.joschi.jadconfig.JadConfig;
 import com.github.joschi.jadconfig.ParameterException;
 import com.github.joschi.jadconfig.RepositoryException;
 import com.github.joschi.jadconfig.ValidationException;
+import com.github.joschi.jadconfig.guice.NamedConfigParametersModule;
 import com.github.joschi.jadconfig.jodatime.JodaTimeConverterFactory;
 import com.github.joschi.jadconfig.repositories.EnvironmentRepository;
 import com.github.joschi.jadconfig.repositories.PropertiesRepository;
 import com.github.joschi.jadconfig.repositories.SystemPropertiesRepository;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.ServiceManager;
 import com.google.inject.Injector;
@@ -36,22 +38,12 @@ import com.google.inject.ProvisionException;
 import com.google.inject.spi.Message;
 import com.mongodb.MongoException;
 import org.apache.log4j.Level;
-import org.graylog2.bindings.AlarmCallbackBindings;
-import org.graylog2.bindings.InitializerBindings;
-import org.graylog2.bindings.MessageFilterBindings;
-import org.graylog2.bindings.MessageOutputBindings;
-import org.graylog2.bindings.PersistenceServicesBindings;
-import org.graylog2.bindings.RotationStrategyBindings;
-import org.graylog2.bindings.ServerBindings;
-import org.graylog2.bindings.ServerMessageInputBindings;
+import org.graylog2.bindings.*;
 import org.graylog2.cluster.NodeService;
+import org.graylog2.configuration.*;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
-import org.graylog2.plugin.Plugin;
-import org.graylog2.plugin.PluginModule;
-import org.graylog2.plugin.ServerStatus;
-import org.graylog2.plugin.Tools;
-import org.graylog2.plugin.Version;
+import org.graylog2.plugin.*;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugins.PluginInstaller;
 import org.graylog2.shared.NodeRunner;
@@ -61,7 +53,6 @@ import org.graylog2.shared.initializers.ServiceManagerListener;
 import org.graylog2.shared.plugins.PluginLoader;
 import org.graylog2.shared.system.activities.Activity;
 import org.graylog2.shared.system.activities.ActivityWriter;
-import org.graylog2.system.activities.SystemMessageActivityWriter;
 import org.graylog2.system.shutdown.GracefulShutdown;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -82,7 +73,6 @@ import static com.google.common.base.Strings.nullToEmpty;
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public final class Main extends NodeRunner {
-
     private static final Logger LOG = LoggerFactory.getLogger(Main.class);
     private static final String ENVIRONMENT_PREFIX = "GRAYLOG2_";
     private static final String PROPERTIES_PREFIX = "graylog2.";
@@ -90,6 +80,12 @@ public final class Main extends NodeRunner {
     private static final String profileName = "Server";
 
     private static final Version version = Version.CURRENT_CLASSPATH;
+    private static final Configuration configuration = new Configuration();
+    private static final ElasticsearchConfiguration elasticsearchConfiguration = new ElasticsearchConfiguration();
+    private static final EmailConfiguration emailConfiguration = new EmailConfiguration();
+    private static final MongoDbConfiguration mongoDbConfiguration = new MongoDbConfiguration();
+    private static final TelemetryConfiguration telemetryConfiguration = new TelemetryConfiguration();
+    private static final VersionCheckConfiguration versionCheckConfiguration = new VersionCheckConfiguration();
 
     /**
      * @param args the command line arguments
@@ -113,7 +109,7 @@ public final class Main extends NodeRunner {
             System.exit(0);
         }
 
-        if(commandLineArguments.isDumpDefaultConfig()) {
+        if (commandLineArguments.isDumpDefaultConfig()) {
             final JadConfig jadConfig = new JadConfig();
             jadConfig.addConverterFactory(new JodaTimeConverterFactory());
             jadConfig.addConfigurationBean(new Configuration());
@@ -123,9 +119,9 @@ public final class Main extends NodeRunner {
 
         final JadConfig jadConfig = new JadConfig();
         jadConfig.addConverterFactory(new JodaTimeConverterFactory());
-        final Configuration configuration = readConfiguration(jadConfig, commandLineArguments.getConfigFile());
+        final NamedConfigParametersModule configModule = readConfiguration(jadConfig, commandLineArguments.getConfigFile());
 
-        if(commandLineArguments.isDumpConfig()) {
+        if (commandLineArguments.isDumpConfig()) {
             System.out.println(dumpConfiguration(jadConfig.dump()));
             System.exit(0);
         }
@@ -142,7 +138,7 @@ public final class Main extends NodeRunner {
                     commandLineArguments.getPluginVersion(),
                     commandLineArguments.isForcePlugin()
             );
-            
+
             installer.install();
             System.exit(0);
         }
@@ -163,7 +159,7 @@ public final class Main extends NodeRunner {
 
         LOG.debug("Loaded modules: " + pluginModules);
 
-        final Injector injector = setupInjector(configuration, pluginModules);
+        final Injector injector = setupInjector(configModule, pluginModules);
 
         if (injector == null) {
             LOG.error("Injector could not be created, exiting! (Please include the previous stacktraces in bug reports.)");
@@ -240,7 +236,7 @@ public final class Main extends NodeRunner {
             try {
                 Thread.sleep(configuration.getStaleMasterTimeout());
             } catch (InterruptedException e) { /* nope */ }
-            
+
             if (!nodeService.isOnlyMaster(serverStatus.getNodeId())) {
                 // All devils here.
                 String what = "Detected other master node in the cluster! Starting as non-master! "
@@ -260,7 +256,7 @@ public final class Main extends NodeRunner {
                 LOG.warn("Stale master has gone. Starting as master.");
             }
         }
-        
+
         // Enable local mode?
         if (commandLineArguments.isLocal() || commandLineArguments.isDebug()) {
             // In local mode, systemstats are sent to localhost for example.
@@ -276,7 +272,7 @@ public final class Main extends NodeRunner {
 
 
         if (!commandLineArguments.performRetention()) {
-            configuration.setPerformRetention(false);
+            elasticsearchConfiguration.setPerformRetention(false);
         }
 
         // propagate default size to input plugins
@@ -311,21 +307,26 @@ public final class Main extends NodeRunner {
         }
     }
 
-    private static Injector setupInjector(Configuration configuration, List<PluginModule> pluginModules) {
+    private static Injector setupInjector(NamedConfigParametersModule configModule, List<PluginModule> pluginModules) {
         try {
-            GuiceInstantiationService instantiationService = new GuiceInstantiationService();
-            List<Module> bindingsModules = getBindingsModules(instantiationService,
-                    new ServerBindings(configuration),
-                    new PersistenceServicesBindings(),
-                    new ServerMessageInputBindings(),
-                    new MessageFilterBindings(),
-                    new AlarmCallbackBindings(),
-                    new InitializerBindings(),
-                    new MessageOutputBindings(),
-                    new RotationStrategyBindings());
+            final GuiceInstantiationService instantiationService = new GuiceInstantiationService();
+
+            final ImmutableList.Builder<Module> modules = ImmutableList.builder();
+            modules.add(configModule);
+            modules.addAll(
+                    getBindingsModules(instantiationService,
+                            new ServerBindings(configuration),
+                            new PersistenceServicesBindings(),
+                            new ServerMessageInputBindings(),
+                            new MessageFilterBindings(),
+                            new AlarmCallbackBindings(),
+                            new InitializerBindings(),
+                            new MessageOutputBindings(),
+                            new RotationStrategyBindings()));
             LOG.debug("Adding plugin modules: " + pluginModules);
-            bindingsModules.addAll(pluginModules);
-            final Injector injector = GuiceInjectorHolder.createInjector(bindingsModules);
+            modules.addAll(pluginModules);
+
+            final Injector injector = GuiceInjectorHolder.createInjector(modules.build());
             instantiationService.setInjector(injector);
 
             return injector;
@@ -340,17 +341,20 @@ public final class Main extends NodeRunner {
         sb.append("# Configuration of graylog2-").append(profileName).append(" ").append(version).append(System.lineSeparator());
         sb.append("# Generated on ").append(Tools.iso8601()).append(System.lineSeparator());
 
-        for(Map.Entry<String, String> entry:  configMap.entrySet()) {
+        for (Map.Entry<String, String> entry : configMap.entrySet()) {
             sb.append(entry.getKey()).append('=').append(nullToEmpty(entry.getValue())).append(System.lineSeparator());
         }
 
         return sb.toString();
     }
 
-    private static Configuration readConfiguration(final JadConfig jadConfig, final String configFile) {
-        final Configuration configuration = new Configuration();
-
+    private static NamedConfigParametersModule readConfiguration(final JadConfig jadConfig, final String configFile) {
         jadConfig.addConfigurationBean(configuration);
+        jadConfig.addConfigurationBean(elasticsearchConfiguration);
+        jadConfig.addConfigurationBean(emailConfiguration);
+        jadConfig.addConfigurationBean(mongoDbConfiguration);
+        jadConfig.addConfigurationBean(telemetryConfiguration);
+        jadConfig.addConfigurationBean(versionCheckConfiguration);
         jadConfig.setRepositories(Arrays.asList(
                 new EnvironmentRepository(ENVIRONMENT_PREFIX),
                 new SystemPropertiesRepository(PROPERTIES_PREFIX),
@@ -373,6 +377,8 @@ public final class Main extends NodeRunner {
             LOG.debug("No rest_transport_uri set. Using default [{}].", configuration.getRestTransportUri());
         }
 
-        return configuration;
+        return new NamedConfigParametersModule(Arrays.asList(
+                configuration, elasticsearchConfiguration, emailConfiguration, mongoDbConfiguration, telemetryConfiguration,
+                versionCheckConfiguration));
     }
 }

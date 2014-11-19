@@ -26,7 +26,7 @@ import com.mongodb.MongoClientOptions;
 import com.mongodb.MongoClientOptions.Builder;
 import com.mongodb.ServerAddress;
 import com.mongodb.WriteConcern;
-import org.graylog2.Configuration;
+import org.graylog2.configuration.MongoDbConfiguration;
 
 import java.net.UnknownHostException;
 import java.util.List;
@@ -50,17 +50,17 @@ public class MongoConnection {
     private int port;
 
     @Inject
-    public MongoConnection(final Configuration configuration) {
+    public MongoConnection(final MongoDbConfiguration configuration) {
         this(
-                configuration.getMongoDatabase(),
-                configuration.getMongoHost(),
-                configuration.getMongoPort(),
-                configuration.getMongoReplicaSet(),
-                configuration.isMongoUseAuth(),
-                configuration.getMongoUser(),
-                configuration.getMongoPassword(),
-                configuration.getMongoMaxConnections(),
-                configuration.getMongoThreadsAllowedToBlockMultiplier());
+                configuration.getDatabase(),
+                configuration.getHost(),
+                configuration.getPort(),
+                configuration.getReplicaSet(),
+                configuration.isUseAuth(),
+                configuration.getUser(),
+                configuration.getPassword(),
+                configuration.getMaxConnections(),
+                configuration.getThreadsAllowedToBlockMultiplier());
     }
 
     public MongoConnection(final String database,

@@ -20,7 +20,7 @@ import org.apache.commons.mail.DefaultAuthenticator;
 import org.apache.commons.mail.Email;
 import org.apache.commons.mail.EmailException;
 import org.apache.commons.mail.SimpleEmail;
-import org.graylog2.Configuration;
+import org.graylog2.configuration.EmailConfiguration;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
@@ -38,20 +38,16 @@ import javax.inject.Inject;
 import java.net.URI;
 import java.util.List;
 
-
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public class StaticEmailAlertSender implements AlertSender {
 
     private static final Logger LOG = LoggerFactory.getLogger(StaticEmailAlertSender.class);
 
     private final StreamRuleService streamRuleService;
-    protected final Configuration configuration;
+    protected final EmailConfiguration configuration;
     private final UserService userService;
 
     @Inject
-    public StaticEmailAlertSender(Configuration configuration,
+    public StaticEmailAlertSender(EmailConfiguration configuration,
                                   StreamRuleService streamRuleService,
                                   UserService userService) {
         this.configuration = configuration;
@@ -70,42 +66,39 @@ public class StaticEmailAlertSender implements AlertSender {
 
     private void sendEmail(String emailAddress, Stream stream, AlertCondition.CheckResult checkResult, List<Message> backlog) throws TransportConfigurationException, EmailException {
         LOG.debug("Sending mail to " + emailAddress);
-        if(!configuration.isEmailTransportEnabled()) {
+        if(!configuration.isEnabled()) {
             throw new TransportConfigurationException("Email transport is not enabled!");
         }
 
         Email email = new SimpleEmail();
-        email.setHostName(configuration.getEmailTransportHostname());
-        email.setSmtpPort(configuration.getEmailTransportPort());
-        if (configuration.isEmailTransportUseSsl()) {
-            email.setSslSmtpPort(Integer.toString(configuration.getEmailTransportPort()));
+        email.setHostName(configuration.getHostname());
+        email.setSmtpPort(configuration.getPort());
+        if (configuration.isUseSsl()) {
+            email.setSslSmtpPort(Integer.toString(configuration.getPort()));
         }
 
-        if(configuration.isEmailTransportUseAuth()) {
+        if(configuration.isUseAuth()) {
             email.setAuthenticator(new DefaultAuthenticator(
-                    configuration.getEmailTransportUsername(),
-                    configuration.getEmailTransportPassword()
+                    configuration.getUsername(),
+                    configuration.getPassword()
             ));
         }
 
-        email.setSSLOnConnect(configuration.isEmailTransportUseSsl());
-        email.setStartTLSEnabled(configuration.isEmailTransportUseTls());
-        email.setFrom(configuration.getEmailTransportFromEmail());
+        email.setSSLOnConnect(configuration.isUseSsl());
+        email.setStartTLSEnabled(configuration.isUseTls());
+        email.setFrom(configuration.getFromEmail());
         email.setSubject(buildSubject(stream, checkResult, configuration, backlog));
-
-        StringBuilder body = new StringBuilder();
-        body.append(buildBody(stream, checkResult, backlog));
-        email.setMsg(body.toString());
+        email.setMsg(buildBody(stream, checkResult, backlog));
         email.addTo(emailAddress);
 
         email.send();
     }
 
-    protected String buildSubject(Stream stream, AlertCondition.CheckResult checkResult, Configuration config, List<Message> backlog) {
+    protected String buildSubject(Stream stream, AlertCondition.CheckResult checkResult, EmailConfiguration config, List<Message> backlog) {
         StringBuilder sb = new StringBuilder();
 
-        if (config.getEmailTransportSubjectPrefix() != null && !config.getEmailTransportSubjectPrefix().isEmpty()) {
-            sb.append(config.getEmailTransportSubjectPrefix()).append(" ");
+        if (config.getSubjectPrefix() != null && !config.getSubjectPrefix().isEmpty()) {
+            sb.append(config.getSubjectPrefix()).append(" ");
         }
 
         sb.append("Graylog2 alert for stream: ").append(stream.getTitle());
@@ -123,9 +116,9 @@ public class StaticEmailAlertSender implements AlertSender {
         sb.append("Date: ").append(Tools.iso8601().toString()).append("\n");
         sb.append("Stream ID: ").append(stream.getId()).append("\n");
         sb.append("Stream title: ").append(stream.getTitle()).append("\n");
-        if (configuration.getEmailTransportWebInterfaceUrl() != null)
+        if (configuration.getWebInterfaceUri() != null)
             sb.append("Stream URL: ").append(
-                    buildStreamDetailsURL(configuration.getEmailTransportWebInterfaceUrl(),
+                    buildStreamDetailsURL(configuration.getWebInterfaceUri(),
                             checkResult, stream));
         try {
             sb.append("Stream rules: ").append(streamRuleService.loadForStream(stream)).append("\n");
@@ -187,7 +180,7 @@ public class StaticEmailAlertSender implements AlertSender {
 
     @Override
     public void sendEmails(Stream stream, AlertCondition.CheckResult checkResult, List<Message> backlog) throws TransportConfigurationException, EmailException {
-        if(!configuration.isEmailTransportEnabled()) {
+        if(!configuration.isEnabled()) {
             throw new TransportConfigurationException("Email transport is not enabled!");
         }
 

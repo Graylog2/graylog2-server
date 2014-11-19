@@ -25,13 +25,13 @@ import com.google.inject.Singleton;
 import org.elasticsearch.common.settings.loader.YamlSettingsLoader;
 import org.elasticsearch.node.Node;
 import org.elasticsearch.node.NodeBuilder;
-import org.graylog2.Configuration;
+import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.Map;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
@@ -40,10 +40,10 @@ import static org.elasticsearch.node.NodeBuilder.nodeBuilder;
 public class EsNodeProvider implements Provider<Node> {
     private static final Logger LOG = LoggerFactory.getLogger(EsNodeProvider.class);
 
-    private final Configuration configuration;
+    private final ElasticsearchConfiguration configuration;
 
     @Inject
-    public EsNodeProvider(Configuration configuration) {
+    public EsNodeProvider(ElasticsearchConfiguration configuration) {
         this.configuration = configuration;
     }
 
@@ -57,47 +57,47 @@ public class EsNodeProvider implements Provider<Node> {
         return builder.build();
     }
 
-    public static Map<String, String> readNodeSettings(Configuration conf) {
+    public static Map<String, String> readNodeSettings(ElasticsearchConfiguration conf) {
         Map<String, String> settings = Maps.newHashMap();
 
         // Standard Configuration.
-        settings.put("cluster.name", conf.getEsClusterName());
+        settings.put("cluster.name", conf.getClusterName());
 
-        settings.put("node.name", conf.getEsNodeName());
-        settings.put("node.master", Boolean.toString(conf.isEsIsMasterEligible()));
-        settings.put("node.data", Boolean.toString(conf.isEsStoreData()));
+        settings.put("node.name", conf.getNodeName());
+        settings.put("node.master", Boolean.toString(conf.isMasterNode()));
+        settings.put("node.data", Boolean.toString(conf.isDataNode()));
 
         settings.put("action.auto_create_index", Boolean.toString(false));
 
-        settings.put("http.enabled", Boolean.toString(conf.isEsIsHttpEnabled()));
-        settings.put("transport.tcp.port", String.valueOf(conf.getEsTransportTcpPort()));
+        settings.put("http.enabled", Boolean.toString(conf.isHttpEnabled()));
+        settings.put("transport.tcp.port", String.valueOf(conf.getTransportTcpPort()));
 
-        settings.put("discovery.initial_state_timeout", conf.getEsInitialStateTimeout());
-        settings.put("discovery.zen.ping.multicast.enabled", Boolean.toString(conf.isEsMulticastDiscovery()));
+        settings.put("discovery.initial_state_timeout", conf.getInitialStateTimeout());
+        settings.put("discovery.zen.ping.multicast.enabled", Boolean.toString(conf.isMulticastDiscovery()));
 
-        if (conf.getEsUnicastHosts() != null && !conf.getEsUnicastHosts().isEmpty()) {
+        if (conf.getUnicastHosts() != null && !conf.getUnicastHosts().isEmpty()) {
             final ImmutableList.Builder<String> trimmedHosts = ImmutableList.builder();
-            for (String host : conf.getEsUnicastHosts()) {
+            for (String host : conf.getUnicastHosts()) {
                 trimmedHosts.add(host.trim());
             }
             settings.put("discovery.zen.ping.unicast.hosts", Joiner.on(",").join(trimmedHosts.build()));
         }
 
-        if (!isNullOrEmpty(conf.getEsNetworkHost())) {
-            settings.put("network.host", conf.getEsNetworkHost());
+        if (!isNullOrEmpty(conf.getNetworkHost())) {
+            settings.put("network.host", conf.getNetworkHost());
         }
-        if (!isNullOrEmpty(conf.getEsNetworkBindHost())) {
-            settings.put("network.bind_host", conf.getEsNetworkBindHost());
+        if (!isNullOrEmpty(conf.getNetworkBindHost())) {
+            settings.put("network.bind_host", conf.getNetworkBindHost());
         }
-        if (!isNullOrEmpty(conf.getEsNetworkPublishHost())) {
-            settings.put("network.publish_host", conf.getEsNetworkPublishHost());
+        if (!isNullOrEmpty(conf.getNetworkPublishHost())) {
+            settings.put("network.publish_host", conf.getNetworkPublishHost());
         }
 
         // Overwrite from a custom ElasticSearch config file.
-        final String esConfigFilePath = conf.getElasticSearchConfigFile();
-        if (esConfigFilePath != null) {
+        final File esConfigFile = conf.getConfigFile();
+        if (esConfigFile != null) {
             try {
-                final byte[] esSettings = Files.readAllBytes(Paths.get(esConfigFilePath));
+                final byte[] esSettings = Files.readAllBytes(esConfigFile.toPath());
                 settings.putAll(new YamlSettingsLoader().load(esSettings));
             } catch (IOException e) {
                 LOG.warn("Cannot read Elasticsearch configuration.");

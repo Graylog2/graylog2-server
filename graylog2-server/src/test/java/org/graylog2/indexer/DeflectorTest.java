@@ -21,7 +21,7 @@
 package org.graylog2.indexer;
 
 import org.elasticsearch.action.admin.indices.stats.IndexStats;
-import org.graylog2.Configuration;
+import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.indices.jobs.OptimizeIndexJob;
 import org.graylog2.indexer.ranges.CreateNewSingleIndexRangeJob;
@@ -45,7 +45,7 @@ public class DeflectorTest {
     public void setUp() {
         deflector = new Deflector(
                 mock(SystemJobManager.class),
-                new Configuration(),
+                new ElasticsearchConfiguration(),
                 mock(SystemMessageActivityWriter.class),
                 mock(RebuildIndexRangesJob.Factory.class),
                 mock(OptimizeIndexJob.Factory.class),
@@ -76,7 +76,7 @@ public class DeflectorTest {
     public void testBuildIndexName() {
 
         Deflector d = new Deflector(mock(SystemJobManager.class),
-                mock(Configuration.class),
+                mock(ElasticsearchConfiguration.class),
                 mock(SystemMessageActivityWriter.class),
                 mock(RebuildIndexRangesJob.Factory.class),
                 mock(OptimizeIndexJob.Factory.class),
@@ -96,7 +96,7 @@ public class DeflectorTest {
     @Test
     public void nullIndexerDoesNotThrow() {
         Deflector d = new Deflector(mock(SystemJobManager.class),
-                                    mock(Configuration.class),
+                                    mock(ElasticsearchConfiguration.class),
                                     mock(SystemMessageActivityWriter.class),
                                     mock(RebuildIndexRangesJob.Factory.class),
                                     mock(OptimizeIndexJob.Factory.class),
@@ -114,7 +114,7 @@ public class DeflectorTest {
     @Test
     public void nullIndexerDoesNotThrowOnIndexName() {
         Deflector d = new Deflector(mock(SystemJobManager.class),
-                                    mock(Configuration.class),
+                                    mock(ElasticsearchConfiguration.class),
                                     mock(SystemMessageActivityWriter.class),
                                     mock(RebuildIndexRangesJob.Factory.class),
                                     mock(OptimizeIndexJob.Factory.class),

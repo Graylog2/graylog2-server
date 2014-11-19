@@ -18,7 +18,7 @@ package org.graylog2.bindings.providers;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
-import org.graylog2.Configuration;
+import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.plugin.indexer.rotation.RotationStrategy;
 
 import java.util.Map;
@@ -29,7 +29,7 @@ public class RotationStrategyProvider implements Provider<RotationStrategy> {
     private final String rotationStrategy;
 
     @Inject
-    public RotationStrategyProvider(Map<String, RotationStrategy> strategies, Configuration configuration) {
+    public RotationStrategyProvider(Map<String, RotationStrategy> strategies, ElasticsearchConfiguration configuration) {
         this.strategies = strategies;
         rotationStrategy = configuration.getRotationStrategy();
     }

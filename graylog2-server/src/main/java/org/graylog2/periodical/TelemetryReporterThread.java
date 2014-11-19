@@ -35,6 +35,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.graylog2.Configuration;
 import org.graylog2.ServerVersion;
+import org.graylog2.configuration.TelemetryConfiguration;
 import org.graylog2.indexer.counts.Counts;
 import org.graylog2.metrics.MetricUtils;
 import org.graylog2.plugin.ServerStatus;
@@ -64,6 +65,7 @@ public class TelemetryReporterThread extends Periodical {
 
     private final MetricRegistry metricRegistry;
     private final ServerStatus serverStatus;
+    private final TelemetryConfiguration telemetryConfiguration;
     private final Configuration configuration;
     private final Counts counts;
     private ThroughputStats throughputStats;
@@ -73,11 +75,13 @@ public class TelemetryReporterThread extends Periodical {
                                    ServerStatus serverStatus,
                                    Counts counts,
                                    ThroughputStats throughputStats,
+                                   TelemetryConfiguration telemetryConfiguration,
                                    Configuration configuration) {
         this.metricRegistry = metricRegistry;
         this.serverStatus = serverStatus;
         this.counts = counts;
         this.throughputStats = throughputStats;
+        this.telemetryConfiguration = telemetryConfiguration;
         this.configuration = configuration;
     }
 
@@ -89,7 +93,7 @@ public class TelemetryReporterThread extends Periodical {
         try {
             Map<String, Object> report = Maps.newHashMap();
 
-            report.put("token", configuration.getTelemetryServiceToken());
+            report.put("token", telemetryConfiguration.getToken());
             report.put("anon_id", DigestUtils.sha256Hex(serverStatus.getNodeId().toString()));
             report.put("metrics", MetricUtils.mapAllFiltered(metricRegistry.getMetrics(), METRICS_BLACKLIST));
             report.put("statistics", buildStatistics());
@@ -104,16 +108,16 @@ public class TelemetryReporterThread extends Periodical {
 
         final HttpPost post;
         try {
-            post = new HttpPost(new URIBuilder(configuration.getTelemetryServiceUri()).build());
+            post = new HttpPost(new URIBuilder(telemetryConfiguration.getUri()).build());
             post.setHeader("User-Agent", "graylog2-server");
             post.setHeader("Content-Type", "application/json");
             post.setHeader("Content-Encoding", "gzip");
             post.setEntity(postBody);
 
             final RequestConfig.Builder configBuilder = RequestConfig.custom()
-                    .setConnectTimeout(configuration.getTelemetryServiceConnectTimeOut())
-                    .setSocketTimeout(configuration.getTelemetryServiceSocketTimeOut())
-                    .setConnectionRequestTimeout(configuration.getTelemetryServiceConnectionRequestTimeOut());
+                    .setConnectTimeout(telemetryConfiguration.getConnectTimeOut())
+                    .setSocketTimeout(telemetryConfiguration.getSocketTimeOut())
+                    .setConnectionRequestTimeout(telemetryConfiguration.getConnectionRequestTimeOut());
 
             if (configuration.getHttpProxyUri() != null) {
                 try {
@@ -189,9 +193,9 @@ public class TelemetryReporterThread extends Periodical {
 
     @Override
     public boolean startOnThisNode() {
-        return configuration.isTelemetryServiceEnabled()
-                && configuration.getTelemetryServiceToken() != null
-                && !configuration.getTelemetryServiceToken().isEmpty()
+        return telemetryConfiguration.isEnabled()
+                && telemetryConfiguration.getToken() != null
+                && !telemetryConfiguration.getToken().isEmpty()
                 && !serverStatus.hasCapability(ServerStatus.Capability.LOCALMODE);
     }
 

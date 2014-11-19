@@ -17,6 +17,7 @@
 package org.graylog2.bindings.providers;
 
 import org.graylog2.Configuration;
+import org.graylog2.configuration.MongoDbConfiguration;
 import org.graylog2.database.MongoConnection;
 
 import javax.inject.Inject;
@@ -26,7 +27,7 @@ public class MongoConnectionProvider implements Provider<MongoConnection> {
     private static MongoConnection mongoConnection = null;
 
     @Inject
-    public MongoConnectionProvider(Configuration configuration) {
+    public MongoConnectionProvider(MongoDbConfiguration configuration) {
         if (mongoConnection == null) {
             mongoConnection = new MongoConnection(configuration);
 

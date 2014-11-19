@@ -25,7 +25,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.io.Resources;
-import org.graylog2.Configuration;
+import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.testng.annotations.Test;
 
 import java.io.File;
@@ -34,18 +34,14 @@ import java.net.URISyntaxException;
 import java.util.Map;
 
 import static org.graylog2.AssertNotEquals.assertNotEquals;
-import static org.testng.AssertJUnit.assertEquals;
-import static org.testng.AssertJUnit.assertTrue;
-import static org.testng.AssertJUnit.fail;
+import static org.testng.AssertJUnit.*;
 
 public class EsNodeProviderTest {
-    private Configuration setupConfig(Map<String, String> settings) {
+    private ElasticsearchConfiguration setupConfig(Map<String, String> settings) {
         // required params we don't care about in this test, so we set them to dummy values for all test cases
-        settings.put("password_secret", "thisisatest");
         settings.put("retention_strategy", "delete");
-        settings.put("root_password_sha2", "thisisatest");
 
-        Configuration configuration = new Configuration();
+        ElasticsearchConfiguration configuration = new ElasticsearchConfiguration();
         try {
             new JadConfig(new InMemoryRepository(settings), configuration).process();
         } catch (ValidationException | RepositoryException e) {
@@ -58,21 +54,21 @@ public class EsNodeProviderTest {
     public void defaultConfigNoEsFile() {
         // check that all ES settings will be taken from the default values in Configuration.java if nothing is specified.
         Map<String, String> minimalSettings = Maps.newHashMap();
-        Configuration defaultConfig = setupConfig(minimalSettings);
+        ElasticsearchConfiguration defaultConfig = setupConfig(minimalSettings);
 
         Map<String, String> settings = Maps.newHashMap();
-        Configuration config = setupConfig(settings);
+        ElasticsearchConfiguration config = setupConfig(settings);
 
         Map<String, String> nodeSettings = EsNodeProvider.readNodeSettings(config);
 
-        assertEquals(defaultConfig.getEsClusterName(), nodeSettings.get("cluster.name"));
-        assertEquals(defaultConfig.getEsNodeName(), nodeSettings.get("node.name"));
-        assertEquals(Boolean.toString(defaultConfig.isEsIsMasterEligible()), nodeSettings.get("node.master"));
-        assertEquals(Boolean.toString(defaultConfig.isEsStoreData()), nodeSettings.get("node.data"));
-        assertEquals(Boolean.toString(defaultConfig.isEsIsHttpEnabled()), nodeSettings.get("http.enabled"));
-        assertEquals(String.valueOf(defaultConfig.getEsTransportTcpPort()), nodeSettings.get("transport.tcp.port"));
-        assertEquals(defaultConfig.getEsInitialStateTimeout(), nodeSettings.get("discovery.initial_state_timeout"));
-        assertEquals(Boolean.toString(defaultConfig.isEsMulticastDiscovery()),
+        assertEquals(defaultConfig.getClusterName(), nodeSettings.get("cluster.name"));
+        assertEquals(defaultConfig.getNodeName(), nodeSettings.get("node.name"));
+        assertEquals(Boolean.toString(defaultConfig.isMasterNode()), nodeSettings.get("node.master"));
+        assertEquals(Boolean.toString(defaultConfig.isDataNode()), nodeSettings.get("node.data"));
+        assertEquals(Boolean.toString(defaultConfig.isHttpEnabled()), nodeSettings.get("http.enabled"));
+        assertEquals(String.valueOf(defaultConfig.getTransportTcpPort()), nodeSettings.get("transport.tcp.port"));
+        assertEquals(defaultConfig.getInitialStateTimeout(), nodeSettings.get("discovery.initial_state_timeout"));
+        assertEquals(Boolean.toString(defaultConfig.isMulticastDiscovery()),
                 nodeSettings.get("discovery.zen.ping.multicast.enabled"));
         assertEquals(Boolean.toString(false), nodeSettings.get("action.auto_create_index"));
 
@@ -108,7 +104,7 @@ public class EsNodeProviderTest {
                 "5s");
         esPropNames.put("action.auto_create_index", "false");
 
-        Configuration config = setupConfig(settings);
+        ElasticsearchConfiguration config = setupConfig(settings);
 
         Map<String, String> nodeSettings = EsNodeProvider.readNodeSettings(config);
 
@@ -128,21 +124,21 @@ public class EsNodeProviderTest {
         final String esConfigFilePath = new File(Resources.getResource("org/graylog2/bindings/providers/elasticsearch.yml").toURI()).getAbsolutePath();
         settings.put("elasticsearch_config_file", esConfigFilePath);
 
-        Configuration config = setupConfig(settings);
+        ElasticsearchConfiguration config = setupConfig(settings);
 
         final Map<String, String> nodeSettings = EsNodeProvider.readNodeSettings(config);
 
-        assertNotEquals("cluster.name", config.getEsClusterName(), nodeSettings.get("cluster.name"));
-        assertNotEquals("node.name", config.getEsNodeName(), nodeSettings.get("node.name"));
-        assertNotEquals("node.master", Boolean.toString(config.isEsIsMasterEligible()), nodeSettings.get("node.master"));
-        assertNotEquals("node.data", Boolean.toString(config.isEsStoreData()), nodeSettings.get("node.data"));
-        assertNotEquals("http.enabled", Boolean.toString(config.isEsIsHttpEnabled()), nodeSettings.get("http.enabled"));
-        assertNotEquals("transport.tcp.port", String.valueOf(config.getEsTransportTcpPort()), nodeSettings.get("transport.tcp.port"));
-        assertNotEquals("discovery.initial_state_timeout", config.getEsInitialStateTimeout(), nodeSettings.get("discovery.initial_state_timeout"));
-        assertNotEquals("discovery.zen.ping.multicast.enabled", Boolean.toString(config.isEsMulticastDiscovery()),
+        assertNotEquals("cluster.name", config.getClusterName(), nodeSettings.get("cluster.name"));
+        assertNotEquals("node.name", config.getNodeName(), nodeSettings.get("node.name"));
+        assertNotEquals("node.master", Boolean.toString(config.isMasterNode()), nodeSettings.get("node.master"));
+        assertNotEquals("node.data", Boolean.toString(config.isDataNode()), nodeSettings.get("node.data"));
+        assertNotEquals("http.enabled", Boolean.toString(config.isHttpEnabled()), nodeSettings.get("http.enabled"));
+        assertNotEquals("transport.tcp.port", String.valueOf(config.getTransportTcpPort()), nodeSettings.get("transport.tcp.port"));
+        assertNotEquals("discovery.initial_state_timeout", config.getInitialStateTimeout(), nodeSettings.get("discovery.initial_state_timeout"));
+        assertNotEquals("discovery.zen.ping.multicast.enabled", Boolean.toString(config.isMulticastDiscovery()),
                 nodeSettings.get("discovery.zen.ping.multicast.enabled"));
         assertNotEquals("discovery.zen.ping.unicast.hosts",
-                config.getEsUnicastHosts(),
+                config.getUnicastHosts(),
                 Lists.newArrayList(Splitter.on(",").split(nodeSettings.get("discovery.zen.ping.unicast.hosts"))));
     }
 
@@ -154,7 +150,7 @@ public class EsNodeProviderTest {
                 "root_password_sha2", "thisisatest",
                 "elasticsearch_discovery_zen_ping_unicast_hosts", "example.com");
 
-        final Configuration config = new Configuration();
+        final ElasticsearchConfiguration config = new ElasticsearchConfiguration();
         new JadConfig(new InMemoryRepository(settings), config).process();
 
         final Map<String, String> nodeSettings = EsNodeProvider.readNodeSettings(config);
@@ -170,7 +166,7 @@ public class EsNodeProviderTest {
                 "root_password_sha2", "thisisatest",
                 "elasticsearch_discovery_zen_ping_unicast_hosts", " example.com,   example.net ");
 
-        final Configuration config = new Configuration();
+        final ElasticsearchConfiguration config = new ElasticsearchConfiguration();
         new JadConfig(new InMemoryRepository(settings), config).process();
 
         final Map<String, String> nodeSettings = EsNodeProvider.readNodeSettings(config);

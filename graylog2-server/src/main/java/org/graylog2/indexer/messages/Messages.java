@@ -35,7 +35,7 @@ import org.elasticsearch.client.Client;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.indices.IndexMissingException;
 import org.elasticsearch.node.Node;
-import org.graylog2.Configuration;
+import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.indexer.DeadLetter;
 import org.graylog2.indexer.Deflector;
 import org.graylog2.indexer.results.ResultMessage;
@@ -56,11 +56,11 @@ public class Messages {
     private static final Logger log = LoggerFactory.getLogger(Messages.class);
 
     private final Client c;
-    private final Configuration configuration;
+    private final ElasticsearchConfiguration configuration;
     private LinkedBlockingQueue<List<DeadLetter>> deadLetterQueue;
 
     @Inject
-	public Messages(Node node, Configuration configuration) {
+	public Messages(Node node, ElasticsearchConfiguration configuration) {
         this.configuration = configuration;
         this.c = node.client();
         this.deadLetterQueue = new LinkedBlockingQueue<>(1000);
@@ -102,7 +102,7 @@ public class Messages {
 
         final BulkRequestBuilder request = c.prepareBulk();
         for (Message msg : messages) {
-            request.add(buildIndexRequest(configuration.getElasticSearchIndexPrefix() + "_" + Deflector.DEFLECTOR_SUFFIX,
+            request.add(buildIndexRequest(configuration.getIndexPrefix() + "_" + Deflector.DEFLECTOR_SUFFIX,
                                           msg.toElasticSearchObject(),
                                           msg.getId())); // Main index.
         }

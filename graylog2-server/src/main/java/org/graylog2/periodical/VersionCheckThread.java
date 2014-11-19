@@ -31,6 +31,7 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.graylog2.Configuration;
 import org.graylog2.ServerVersion;
+import org.graylog2.configuration.VersionCheckConfiguration;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.Version;
@@ -56,14 +57,17 @@ public class VersionCheckThread extends Periodical {
     private static final Logger LOG = LoggerFactory.getLogger(VersionCheckThread.class);
     private final NotificationService notificationService;
     private final ServerStatus serverStatus;
+    private final VersionCheckConfiguration versionCheckConfiguration;
     private final Configuration configuration;
 
     @Inject
     public VersionCheckThread(NotificationService notificationService,
                               ServerStatus serverStatus,
+                              VersionCheckConfiguration versionCheckConfiguration,
                               Configuration configuration) {
         this.notificationService = notificationService;
         this.serverStatus = serverStatus;
+        this.versionCheckConfiguration = versionCheckConfiguration;
         this.configuration = configuration;
     }
 
@@ -72,7 +76,7 @@ public class VersionCheckThread extends Periodical {
         final URIBuilder uri;
         final HttpGet get;
         try {
-            uri = new URIBuilder(configuration.getVersionchecksUri());
+            uri = new URIBuilder(versionCheckConfiguration.getUri());
             uri.addParameter("anonid", DigestUtils.sha256Hex(serverStatus.getNodeId().toString()));
             uri.addParameter("version", ServerVersion.VERSION.toString());
 
@@ -84,9 +88,9 @@ public class VersionCheckThread extends Periodical {
                                   + System.getProperty("os.name") + ", "
                                   + System.getProperty("os.version") + ")");
             final RequestConfig.Builder configBuilder = RequestConfig.custom()
-                    .setConnectTimeout(configuration.getVersionchecksConnectTimeOut())
-                    .setSocketTimeout(configuration.getVersionchecksSocketTimeOut())
-                    .setConnectionRequestTimeout(configuration.getVersionchecksConnectionRequestTimeOut());
+                    .setConnectTimeout(versionCheckConfiguration.getConnectTimeOut())
+                    .setSocketTimeout(versionCheckConfiguration.getSocketTimeOut())
+                    .setConnectionRequestTimeout(versionCheckConfiguration.getConnectionRequestTimeOut());
             if (configuration.getHttpProxyUri() != null) {
                 try {
                     final URIBuilder uriBuilder = new URIBuilder(configuration.getHttpProxyUri());
@@ -179,7 +183,7 @@ public class VersionCheckThread extends Periodical {
 
     @Override
     public boolean startOnThisNode() {
-        return configuration.isVersionchecks() && !serverStatus.hasCapability(ServerStatus.Capability.LOCALMODE);
+        return versionCheckConfiguration.isEnabled() && !serverStatus.hasCapability(ServerStatus.Capability.LOCALMODE);
     }
 
     @Override
