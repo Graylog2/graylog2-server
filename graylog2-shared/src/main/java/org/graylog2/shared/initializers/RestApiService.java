@@ -61,9 +61,11 @@ import javax.net.ssl.SSLException;
 import javax.ws.rs.Path;
 import javax.ws.rs.container.ContainerResponseFilter;
 import javax.ws.rs.container.DynamicFeature;
+import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.ext.ExceptionMapper;
 import java.io.File;
 import java.net.InetSocketAddress;
+import java.net.URI;
 import java.security.cert.CertificateException;
 import java.util.HashSet;
 import java.util.Map;
@@ -73,6 +75,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 
 import static com.google.common.base.Strings.emptyToNull;
+import static com.google.common.base.Strings.isNullOrEmpty;
 
 @Singleton
 public class RestApiService extends AbstractIdleService {
@@ -224,8 +227,15 @@ public class RestApiService extends AbstractIdleService {
     private ResourceConfig buildResourceConfig(final boolean enableGzip,
                                                final boolean enableCors,
                                                final Set<Resource> additionalResources) {
+        final URI listenUri;
+        if (isNullOrEmpty(configuration.getRestListenUri().getPath())) {
+            listenUri = UriBuilder.fromUri(configuration.getRestListenUri()).path("/").build();
+        } else {
+            listenUri = configuration.getRestListenUri();
+        }
+
         ResourceConfig rc = new ResourceConfig()
-                .property(NettyContainer.PROPERTY_BASE_URI, configuration.getRestListenUri())
+                .property(NettyContainer.PROPERTY_BASE_URI, listenUri)
                 .registerClasses(
                         JacksonPropertyExceptionMapper.class,
                         AnyExceptionClassMapper.class,
