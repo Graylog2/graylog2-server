@@ -22,6 +22,7 @@ import com.google.inject.Scopes;
 import com.google.inject.TypeLiteral;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.multibindings.Multibinder;
+import com.google.inject.name.Names;
 import com.ning.http.client.AsyncHttpClient;
 import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.elasticsearch.node.Node;
@@ -30,21 +31,7 @@ import org.graylog2.alerts.AlertSender;
 import org.graylog2.alerts.FormattedEmailAlertSender;
 import org.graylog2.alerts.types.FieldValueAlertCondition;
 import org.graylog2.alerts.types.MessageCountAlertCondition;
-import org.graylog2.bindings.providers.BundleExporterProvider;
-import org.graylog2.bindings.providers.BundleImporterProvider;
-import org.graylog2.bindings.providers.DefaultSecurityManagerProvider;
-import org.graylog2.bindings.providers.EsNodeProvider;
-import org.graylog2.bindings.providers.InputCacheProvider;
-import org.graylog2.bindings.providers.LdapConnectorProvider;
-import org.graylog2.bindings.providers.LdapUserAuthenticatorProvider;
-import org.graylog2.bindings.providers.MongoConnectionProvider;
-import org.graylog2.bindings.providers.OutputCacheProvider;
-import org.graylog2.bindings.providers.RotationStrategyProvider;
-import org.graylog2.bindings.providers.RulesEngineProvider;
-import org.graylog2.bindings.providers.ServerInputRegistryProvider;
-import org.graylog2.bindings.providers.ServerObjectMapperProvider;
-import org.graylog2.bindings.providers.SystemJobFactoryProvider;
-import org.graylog2.bindings.providers.SystemJobManagerProvider;
+import org.graylog2.bindings.providers.*;
 import org.graylog2.buffers.OutputBufferWatermark;
 import org.graylog2.buffers.processors.OutputBufferProcessor;
 import org.graylog2.buffers.processors.ServerProcessBufferProcessor;
@@ -150,6 +137,8 @@ public class ServerBindings extends AbstractModule {
         bind(BundleService.class).in(Scopes.SINGLETON);
         bind(BundleImporterProvider.class).in(Scopes.SINGLETON);
         bind(BundleExporterProvider.class).in(Scopes.SINGLETON);
+
+        bind(String.class).annotatedWith(Names.named("spoolDirectory")).toInstance(configuration.getMessageCacheSpoolDir());
 
         if (configuration.isMessageCacheOffHeap()) {
             bind(InputCache.class).toProvider(InputCacheProvider.class).asEagerSingleton();

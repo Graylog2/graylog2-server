@@ -20,22 +20,29 @@ package org.graylog2.shared.buffers;
 
 import com.codahale.metrics.Counter;
 import com.codahale.metrics.MetricRegistry;
+import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 import com.lmax.disruptor.EventHandler;
+import org.graylog2.shared.journal.KafkaJournal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import java.util.List;
+
+import static com.google.common.collect.Lists.transform;
 
 public class SpoolingMessageHandler implements EventHandler<RawMessageEvent> {
     private static final Logger log = LoggerFactory.getLogger(SpoolingMessageHandler.class);
 
     private final List<RawMessageEvent> batch = Lists.newArrayList();
     private final Counter byteCounter;
+    private final KafkaJournal journal;
 
     @Inject
-    public SpoolingMessageHandler(MetricRegistry metrics) {
+    public SpoolingMessageHandler(MetricRegistry metrics, KafkaJournal journal) {
+        this.journal = journal;
         byteCounter = metrics.counter(MetricRegistry.name(SpoolingMessageHandler.class,
                                                           "written_bytes"));
     }
@@ -48,17 +55,34 @@ public class SpoolingMessageHandler implements EventHandler<RawMessageEvent> {
             log.info("End of batch, journalling {} messages", batch.size());
             // write batch to journal
 
-            long counter = 0;
-            for (RawMessageEvent evt : batch) {
-                log.info("Journalling message {}", evt.rawMessage.getId());
-                // TODO actually write to journal
-                final int size = evt.encodedRawMessage.length;
-                counter += size;
-                byteCounter.inc(size);
-            }
-            log.info("Processed batch, wrote {} bytes", counter);
+            final Converter converter = new Converter();
+            // copy to avoid re-running this all the time
+            final List<KafkaJournal.Entry> entries = Lists.newArrayList(transform(batch, converter));
+            final long lastOffset = journal.write(entries);
+            log.info("Processed batch, wrote {} bytes, last journal offset: {}", converter.getBytesWritten(), lastOffset);
 
             batch.clear();
+        }
+    }
+
+    private class Converter implements Function<RawMessageEvent, KafkaJournal.Entry> {
+        private long bytesWritten = 0;
+
+        public long getBytesWritten() {
+            return bytesWritten;
+        }
+
+        @Nullable
+        @Override
+        public KafkaJournal.Entry apply(RawMessageEvent input) {
+            log.info("Journalling message {}", input.rawMessage.getId());
+            // stats
+            final int size = input.encodedRawMessage.length;
+            bytesWritten += size;
+            byteCounter.inc(size);
+
+            // convert to journal entry
+            return journal.createEntry(input.rawMessage.getIdBytes(), input.encodedRawMessage);
         }
     }
 }
