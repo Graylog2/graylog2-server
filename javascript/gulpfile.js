@@ -31,6 +31,8 @@ var handlebarOpts = {
 
 var reactOpts = {
     harmony: true,
+    es6: true,
+    target: 'es5',
     stripTypes: true
 };
 
@@ -143,6 +145,10 @@ function browserifyIt(debug) {
 
 gulp.task('prod-js', function () {
     return browserifyIt(false);
+});
+
+gulp.task('debug-js', function () {
+    return browserifyIt(true);
 });
 
 gulp.task('compress', function () {
