@@ -72,6 +72,7 @@ import play.mvc.Result;
 
 import java.io.File;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
 
 import static play.mvc.Results.internalServerError;
@@ -122,7 +123,11 @@ public class Global extends GlobalSettings {
         final URI[] initialNodes = new URI[uris.length];
         int i = 0;
         for (String uri : uris) {
-            initialNodes[i++] = URI.create(uri);
+            try {
+                initialNodes[i++] = new URI(uri);
+            } catch (URISyntaxException e) {
+                log.error("Invalid URI in 'graylog2-server.uris': " + uri, e);
+            }
         }
         final String timezone = app.configuration().getString("timezone", "");
         if (!timezone.isEmpty()) {
