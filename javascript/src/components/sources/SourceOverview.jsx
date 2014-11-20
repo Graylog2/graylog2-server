@@ -1,5 +1,3 @@
-/** @jsx React.DOM */
-
 /* global activateTimerangeChooser, momentHelper, graphHelper */
 /* jshint -W107 */
 

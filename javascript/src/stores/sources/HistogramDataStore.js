@@ -1,5 +1,3 @@
-/** @jsx React.DOM */
-
 'use strict';
 
 var mergeInto = require('../../lib/util').mergeInto;

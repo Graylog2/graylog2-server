@@ -1,5 +1,3 @@
-/** @jsx React.DOM */
-
 'use strict';
 
 var $ = require('jquery'); // excluded and shimed

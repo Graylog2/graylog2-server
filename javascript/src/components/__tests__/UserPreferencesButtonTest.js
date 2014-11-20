@@ -1,5 +1,3 @@
-/** @jsx React.DOM */
-
 'use strict';
 
 jest.dontMock('../users/UserPreferencesButton');
