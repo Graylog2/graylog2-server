@@ -272,9 +272,9 @@ public class DashboardsApiController extends AuthenticatedController {
                                 return badRequest();
                             }
                             final Boolean lowerIsBetter = Boolean.parseBoolean(params.get("lowerIsBetter"));
-                            widget = new StatisticalCountWidget(dashboard, query, timerange, description, trend, lowerIsBetter, field, statsFunction);
+                            widget = new StatisticalCountWidget(dashboard, query, timerange, description, trend, lowerIsBetter, field, statsFunction, streamId);
                         } else {
-                            widget = new StatisticalCountWidget(dashboard, query, timerange, description, field, statsFunction);
+                            widget = new StatisticalCountWidget(dashboard, query, timerange, description, field, statsFunction, streamId);
                         }
                         break;
                     }

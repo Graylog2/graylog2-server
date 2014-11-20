@@ -1,4 +1,8 @@
 @(f: org.graylog2.restclient.lib.Field, streamId: String)
+@addToDashboardButton(statsFunction: String) = {
+    @views.html.partials.dashboards.add_to_dashboard.render("stats_count", Array("data-field='" + f.getName + "'", "data-statistical-function='"+ statsFunction + "'", if (streamId == null || streamId.isEmpty()) "" else "data-stream-id='" + streamId + "'"))
+}
+
 <div class="analyze-field" @if(streamId != null) { data-stream-id="@streamId" } style="display: none;">
     <a href="#" class="btn btn-info btn-mini generate-statistics" data-field="@f.getName">Statistics</a>
 
@@ -64,28 +68,28 @@
 
         <div class="analyzer-content" style="display: none;">
             <dl>
-                <dt>@views.html.partials.dashboards.add_to_dashboard.render("stats_count", Array("data-field='" + f.getName + "'", "data-statistical-function='count'")) Total messages:</dt>
+                <dt>@addToDashboardButton("count") Total messages:</dt>
                 <dd class="count"></dd>
 
-                <dt>@views.html.partials.dashboards.add_to_dashboard.render("stats_count", Array("data-field='" + f.getName + "'", "data-statistical-function='mean'")) Mean:</dt>
+                <dt>@addToDashboardButton("mean") Mean:</dt>
                 <dd class="mean"></dd>
 
-                <dt>@views.html.partials.dashboards.add_to_dashboard.render("stats_count", Array("data-field='" + f.getName + "'", "data-statistical-function='stddev'")) Std. deviation:</dt>
+                <dt>@addToDashboardButton("stddev") Std. deviation:</dt>
                 <dd class="stddev"></dd>
 
-                <dt>@views.html.partials.dashboards.add_to_dashboard.render("stats_count", Array("data-field='" + f.getName + "'", "data-statistical-function='min'")) Minimum:</dt>
+                <dt>@addToDashboardButton("min") Minimum:</dt>
                 <dd class="min"></dd>
 
-                <dt>@views.html.partials.dashboards.add_to_dashboard.render("stats_count", Array("data-field='" + f.getName + "'", "data-statistical-function='max'")) Maximum:</dt>
+                <dt>@addToDashboardButton("max") Maximum:</dt>
                 <dd class="max"></dd>
 
-                <dt>@views.html.partials.dashboards.add_to_dashboard.render("stats_count", Array("data-field='" + f.getName + "'", "data-statistical-function='sum'")) Sum:</dt>
+                <dt>@addToDashboardButton("sum") Sum:</dt>
                 <dd class="sum"></dd>
 
-                <dt>@views.html.partials.dashboards.add_to_dashboard.render("stats_count", Array("data-field='" + f.getName + "'", "data-statistical-function='variance'")) Variance:</dt>
+                <dt>@addToDashboardButton("variance") Variance:</dt>
                 <dd class="variance"></dd>
 
-                <dt>@views.html.partials.dashboards.add_to_dashboard.render("stats_count", Array("data-field='" + f.getName + "'", "data-statistical-function='squares'")) Sum of squares:</dt>
+                <dt>@addToDashboardButton("squares") Sum of squares:</dt>
                 <dd class="squares"></dd>
             </dl>
         </div>
