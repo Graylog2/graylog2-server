@@ -132,7 +132,7 @@ var SourceOverview = React.createClass({
         var width = $(lineChartDomNode).width();
         $(lineChartDomNode).on('mouseup', (event) => {
             $(".timerange-selector-container").effect("bounce", {
-                complete: function () {
+                complete: () => {
                     // Submit search directly if alt key is pressed.
                     if (event.altKey) {
                         UniversalSearch.submit();
@@ -230,13 +230,13 @@ var SourceOverview = React.createClass({
         this.lineChart.filterAll();
         dc.redrawAll();
     },
-    configurePieChartWidth: function (pieChartWidth) {
+    configurePieChartWidth(pieChartWidth) {
         this.pieChart.width(pieChartWidth)
             .height(pieChartWidth)
             .radius(pieChartWidth / 2 - 10)
             .innerRadius(pieChartWidth / 5);
     },
-    configureLineChartWidth: function (lineChartWidth) {
+    configureLineChartWidth(lineChartWidth) {
         this.lineChart
             .width(lineChartWidth);
         this.setState({lineChartWidth: String(lineChartWidth) + "px"});

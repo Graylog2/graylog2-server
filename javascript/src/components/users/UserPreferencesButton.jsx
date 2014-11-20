@@ -4,10 +4,10 @@ var React = require('react/addons');
 var PreferencesStore = require('../../stores/users/PreferencesStore');
 
 var UserPreferencesButton = React.createClass({
-    _onClick: function (event) {
+    _onClick(event) {
         PreferencesStore.loadUserPreferences(this.props.userName);
     },
-    render: function () {
+    render() {
         return (
             <button onClick={this._onClick} className="btn btn-primary btn-small">Edit user preferences</button>
         );

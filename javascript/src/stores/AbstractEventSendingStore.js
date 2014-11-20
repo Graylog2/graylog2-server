@@ -5,21 +5,21 @@ var mergeInto = require('../lib/util').mergeInto;
 
 var AbstractEventSendingStore = {
     CHANGE_EVENT: 'CHANGE_EVENT',
-    _emitChange: function () {
+    _emitChange() {
         this.emit(this.CHANGE_EVENT);
     },
 
     /**
      * @param {function} callback
      */
-    addChangeListener: function (callback) {
+    addChangeListener(callback) {
         this.on(this.CHANGE_EVENT, callback);
     },
 
     /**
      * @param {function} callback
      */
-    removeChangeListener: function (callback) {
+    removeChangeListener(callback) {
         this.removeListener(this.CHANGE_EVENT, callback);
     }
 };

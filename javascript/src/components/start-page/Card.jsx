@@ -3,7 +3,7 @@
 var React = require('react');
 
 var Card = React.createClass({
-    render: function () {
+    render() {
         var icon = null;
         var title = null;
         var classes = "card";

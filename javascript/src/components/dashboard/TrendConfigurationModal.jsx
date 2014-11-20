@@ -58,7 +58,7 @@ var TrendConfigurationModal = React.createClass({
         this.setState(initialState);
         this.refs.modal.open();
     },
-    _save: function () {
+    _save() {
         this.resultCallback(this.state);
         this.closeModal();
     }

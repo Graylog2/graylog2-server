@@ -11,7 +11,7 @@ describe('UserPreferencesButton', function () {
         var userName = "Full";
 
         var instance = ReactTestUtils.renderIntoDocument(
-                <UserPreferencesButton userName={userName} />
+            <UserPreferencesButton userName={userName} />
         );
         var input = ReactTestUtils.findRenderedDOMComponentWithTag(instance, "button");
 

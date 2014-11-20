@@ -2,7 +2,7 @@
 
 var $ = require('jquery'); // excluded and shimed
 
-$(document).ready(function () {
+$(document).ready(() => {
     require('./components/users/mount');
     require('./components/source-tagging/mount');
     require('./components/start-page/mount');

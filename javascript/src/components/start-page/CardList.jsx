@@ -5,7 +5,7 @@ var QuickStartCard = require('./QuickStartCard');
 var InformationCard = require('./InformationCard');
 
 var CardList = React.createClass({
-    render: function () {
+    render() {
         return (
             <div className="card-list">
                 <QuickStartCard />

@@ -3,7 +3,7 @@
 var React = require('react');
 
 var BootstrapAccordionGroup = React.createClass({
-    render: function () {
+    render() {
         var name = null;
         var id = null;
 

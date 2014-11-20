@@ -4,7 +4,7 @@ var React = require('react');
 var Card = require('./Card');
 
 var InformationCard = React.createClass({
-    render: function () {
+    render() {
         return (
             <Card type="info">
                 {this.props.children}

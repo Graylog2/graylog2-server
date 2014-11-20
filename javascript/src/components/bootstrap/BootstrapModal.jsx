@@ -5,26 +5,26 @@ var $ = require('jquery'); // excluded and shimed
 
 // adapted from react examples (https://github.com/facebook/react/tree/master/examples/jquery-bootstrap)
 var BootstrapModal = React.createClass({
-    componentDidMount: function () {
+    componentDidMount() {
         // When the component is added, turn it into a modal
         $(this.getDOMNode())
             .modal({backdrop: 'static', keyboard: true, show: false});
     },
-    componentWillUnmount: function () {
+    componentWillUnmount() {
     },
-    close: function () {
+    close() {
         $(this.getDOMNode()).modal('hide');
     },
-    open: function () {
+    open() {
         var modal = $(this.getDOMNode());
         modal.modal('show');
         modal.on("shown", () => $("input", this.refs.body.getDOMNode()).first().focus());
     },
-    _submit: function(event) {
+    _submit(event) {
         this.props.onConfirm();
         event.preventDefault();
     },
-    render: function () {
+    render() {
         var confirmButton = null;
         var cancelButton = null;
 

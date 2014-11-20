@@ -10,7 +10,7 @@ var UniversalSearch = {
         if (initialized) {
             return;
         }
-        $("#scroll-to-search-hint, #scroll-to-search-hint i").on("click", function() {
+        $("#scroll-to-search-hint, #scroll-to-search-hint i").on("click", () => {
             $("html, body").animate({ scrollTop: 0 }, "fast");
         });
         initialized = true;
@@ -19,7 +19,7 @@ var UniversalSearch = {
         // Escape all lucene special characters from the source: && || : \ / + - ! ( ) { } [ ] ^ " ~ * ?
         return source.replace(/(&&|\|\||[\:\\\/\+\-\!\(\)\{\}\[\]\^\"\~\*\?])/g, "\\$&");
     },
-    _query: function () {
+    _query() {
         var query = $("#universalsearch-query");
         return query;
     },
