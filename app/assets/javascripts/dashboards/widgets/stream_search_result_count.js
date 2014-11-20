@@ -1,5 +1,5 @@
-function configureDialog_stream_search_result_count(callback) {
-    configureDialog_search_result_count(callback);
+function configureDialog_stream_search_result_count(callback, element) {
+    configureDialog_search_result_count(callback, element);
 }
 
 function addWidget_stream_search_result_count(dashboardId, config, eventElem) {

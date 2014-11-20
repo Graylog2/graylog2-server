@@ -1,7 +1,7 @@
-function configureDialog_search_result_count(callback) {
+function configureDialog_search_result_count(callback, element, description) {
     var params = originalUniversalSearchSettings();
     var supportsTrending = params.rangeType === 'relative';
-    trendDialogConfiguration.openModal(callback, supportsTrending);
+    trendDialogConfiguration.openModal(callback, supportsTrending, description || "messages");
 }
 
 function copyInto(config, params) {

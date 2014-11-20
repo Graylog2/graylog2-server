@@ -83,11 +83,11 @@ $(document).ready(function() {
         }
     }
 
-    function configuration(widgetType, callback) {
+    function configuration(widgetType, element, callback) {
         var funcName = "configureDialog_" + widgetType;
         var func = window[funcName];
         if (func) {
-            func(callback);
+            func(callback, element);
         } else {
             var description = prompt("Give the widget a title:");
             if (description != null && description != "") {
@@ -100,7 +100,7 @@ $(document).ready(function() {
         var elem = $(this).closest("ul.dashboard-selector");
         var widgetType = elem.attr("data-widget-type");
         var dashboardId = $(this).attr("data-dashboard-id");
-        configuration(widgetType, createDashboard);
+        configuration(widgetType, elem, createDashboard);
         function createDashboard(description) {
             delegateAddToDashboard(
                 widgetType,

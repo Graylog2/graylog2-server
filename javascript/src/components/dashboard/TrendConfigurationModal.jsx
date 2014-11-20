@@ -50,10 +50,13 @@ var TrendConfigurationModal = React.createClass({
     closeModal() {
         this.refs.modal.close();
     },
-    openModal(resultcallback, supportsTrending) {
+    openModal(resultcallback, supportsTrending, description) {
         var initialState = this.getInitialState();
         this.resultCallback = resultcallback;
         initialState.supportsTrending = supportsTrending;
+        if (description) {
+            initialState.description = description;
+        }
         this.setState(initialState);
         this.refs.modal.open();
     },

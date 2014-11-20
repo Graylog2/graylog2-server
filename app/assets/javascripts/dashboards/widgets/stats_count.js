@@ -1,5 +1,8 @@
-function configureDialog_stats_count(callback) {
-    configureDialog_search_result_count(callback);
+function configureDialog_stats_count(callback, element) {
+    var field =  element.data("field");
+    var statsFunction =  element.data("statistical-function");
+    var description = statsFunction + " on " + field;
+    configureDialog_search_result_count(callback, element, description);
 }
 
 function addWidget_stats_count(dashboardId, config, eventElem) {
