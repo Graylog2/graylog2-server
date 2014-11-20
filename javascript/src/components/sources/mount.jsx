@@ -19,6 +19,6 @@ var routes = (
 
 var sourceOverviewDiv = document.getElementById('react-sources');
 if (sourceOverviewDiv) {
-    React.renderComponent(routes, sourceOverviewDiv);
+    React.render(routes, sourceOverviewDiv);
 }
 
