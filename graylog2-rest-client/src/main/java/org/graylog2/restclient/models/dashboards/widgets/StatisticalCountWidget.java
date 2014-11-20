@@ -22,19 +22,23 @@ import org.graylog2.restclient.models.dashboards.Dashboard;
 
 import java.util.Map;
 
+import static com.google.common.base.Strings.isNullOrEmpty;
+
 public class StatisticalCountWidget extends SearchResultCountWidget {
     private final String field;
     private final String statsFunction;
+    private final String streamId;
 
-    public StatisticalCountWidget(Dashboard dashboard, String query, TimeRange timerange, String description, boolean trend, boolean lowerIsBetter, String field, String statsFunction) {
-        this(dashboard, null, description, 0, query, timerange, trend, lowerIsBetter, field, statsFunction, null);
+
+    public StatisticalCountWidget(Dashboard dashboard, String query, TimeRange timerange, String description, boolean trend, boolean lowerIsBetter, String field, String statsFunction, String streamId) {
+        this(dashboard, null, description, 0, query, timerange, trend, lowerIsBetter, field, statsFunction, streamId, null);
     }
 
-    public StatisticalCountWidget(Dashboard dashboard, String query, TimeRange timerange, String description, String field, String statsFunction) {
-        this(dashboard, null, description, 0, query, timerange, false, false, field, statsFunction, null);
+    public StatisticalCountWidget(Dashboard dashboard, String query, TimeRange timerange, String description, String field, String statsFunction, String streamId) {
+        this(dashboard, null, description, 0, query, timerange, false, false, field, statsFunction, streamId, null);
     }
 
-    public StatisticalCountWidget(Dashboard dashboard, String id, String description, int cacheTime, String query, TimeRange timerange, boolean trend, boolean lowerIsBetter, String field, String statsFunction, String creatorUserId) {
+    public StatisticalCountWidget(Dashboard dashboard, String id, String description, int cacheTime, String query, TimeRange timerange, boolean trend, boolean lowerIsBetter, String field, String statsFunction, String streamId, String creatorUserId) {
         super(Type.STATS_COUNT, dashboard, id, description, cacheTime, query, timerange, trend, lowerIsBetter, creatorUserId);
 
         if (statsFunction == null || statsFunction.isEmpty()) {
@@ -47,6 +51,7 @@ public class StatisticalCountWidget extends SearchResultCountWidget {
 
         this.field = field;
         this.statsFunction = statsFunction;
+        this.streamId = streamId;
     }
 
     @Override
@@ -55,6 +60,9 @@ public class StatisticalCountWidget extends SearchResultCountWidget {
         config.putAll(super.getConfig());
         config.put("field", field);
         config.put("stats_function", statsFunction);
+        if (!isNullOrEmpty(streamId)) {
+            config.put("stream_id", streamId);
+        }
 
         return config;
     }

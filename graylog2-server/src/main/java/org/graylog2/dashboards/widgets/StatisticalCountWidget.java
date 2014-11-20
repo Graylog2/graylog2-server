@@ -30,14 +30,18 @@ import org.joda.time.Seconds;
 
 import java.util.Map;
 
+import static com.google.common.base.Strings.isNullOrEmpty;
+
 public class StatisticalCountWidget extends SearchResultCountWidget {
     private final String statsFunction;
     private final String field;
+    private final String streamId;
 
     public StatisticalCountWidget(MetricRegistry metricRegistry, Searches searches, String id, String description, int cacheTime, Map<String, Object> config, String query, TimeRange timeRange, String creatorUserId) {
         super(metricRegistry, Type.STATS_COUNT, searches, id, description, cacheTime, config, query, timeRange, creatorUserId);
         this.field = (String) config.get("field");
         this.statsFunction = (String) config.get("stats_function");
+        this.streamId = (String) config.get("stream_id");
     }
 
     @Override
@@ -47,6 +51,9 @@ public class StatisticalCountWidget extends SearchResultCountWidget {
         persistedConfig.putAll(inheritedConfig);
         persistedConfig.put("field", field);
         persistedConfig.put("stats_function", statsFunction);
+        if (!isNullOrEmpty(streamId)) {
+            persistedConfig.put("stream_id", streamId);
+        }
 
         return persistedConfig.build();
     }
@@ -80,8 +87,7 @@ public class StatisticalCountWidget extends SearchResultCountWidget {
                 statisticalValue = fieldStatsResult.getSumOfSquares();
                 break;
             default:
-                // TODO: Do something sensible here
-                statisticalValue = 0;
+                throw new IllegalArgumentException("Statistic function " + statsFunction + " is not supported");
         }
 
         return statisticalValue;
@@ -90,12 +96,18 @@ public class StatisticalCountWidget extends SearchResultCountWidget {
     @Override
     protected ComputationResult compute() {
         try {
-            FieldStatsResult fieldStatsResult = getSearches().fieldStats(field, query, timeRange);
+            final String filter;
+            if (!isNullOrEmpty(streamId)) {
+                filter = "streams:" + streamId;
+            } else {
+                filter = null;
+            }
+            FieldStatsResult fieldStatsResult = getSearches().fieldStats(field, query, filter, timeRange);
             if (trend && timeRange instanceof RelativeRange) {
                 DateTime toPrevious = timeRange.getFrom();
                 DateTime fromPrevious = toPrevious.minus(Seconds.seconds(((RelativeRange) timeRange).getRange()));
                 TimeRange previousTimeRange = new AbsoluteRange(fromPrevious, toPrevious);
-                FieldStatsResult previousFieldStatsResult = getSearches().fieldStats(field, query, previousTimeRange);
+                FieldStatsResult previousFieldStatsResult = getSearches().fieldStats(field, query, filter, previousTimeRange);
 
                 Map<String, Object> results = Maps.newHashMap();
                 results.put("now", getStatisticalValue(fieldStatsResult));
