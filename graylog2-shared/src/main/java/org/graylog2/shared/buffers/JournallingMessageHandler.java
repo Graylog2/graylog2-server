@@ -23,6 +23,7 @@ import com.codahale.metrics.MetricRegistry;
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import com.google.inject.Inject;
+import com.google.inject.name.Named;
 import com.lmax.disruptor.EventHandler;
 import org.graylog2.shared.journal.KafkaJournal;
 import org.slf4j.Logger;
@@ -30,21 +31,23 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import java.util.List;
+import java.util.concurrent.Semaphore;
 
 import static com.google.common.collect.Lists.transform;
 
-public class SpoolingMessageHandler implements EventHandler<RawMessageEvent> {
-    private static final Logger log = LoggerFactory.getLogger(SpoolingMessageHandler.class);
+public class JournallingMessageHandler implements EventHandler<RawMessageEvent> {
+    private static final Logger log = LoggerFactory.getLogger(JournallingMessageHandler.class);
 
     private final List<RawMessageEvent> batch = Lists.newArrayList();
     private final Counter byteCounter;
     private final KafkaJournal journal;
+    private final Semaphore journalFilled;
 
     @Inject
-    public SpoolingMessageHandler(MetricRegistry metrics, KafkaJournal journal) {
+    public JournallingMessageHandler(MetricRegistry metrics, KafkaJournal journal, @Named("JournalSignal") Semaphore journalFilled) {
         this.journal = journal;
-        byteCounter = metrics.counter(MetricRegistry.name(SpoolingMessageHandler.class,
-                                                          "written_bytes"));
+        this.journalFilled = journalFilled;
+        byteCounter = metrics.counter(MetricRegistry.name(JournallingMessageHandler.class, "written_bytes"));
     }
 
     @Override
@@ -59,7 +62,8 @@ public class SpoolingMessageHandler implements EventHandler<RawMessageEvent> {
             // copy to avoid re-running this all the time
             final List<KafkaJournal.Entry> entries = Lists.newArrayList(transform(batch, converter));
             final long lastOffset = journal.write(entries);
-            log.info("Processed batch, wrote {} bytes, last journal offset: {}", converter.getBytesWritten(), lastOffset);
+            log.info("Processed batch, wrote {} bytes, last journal offset: {}, signalling reader.", converter.getBytesWritten(), lastOffset);
+            journalFilled.release();
 
             batch.clear();
         }

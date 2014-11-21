@@ -24,6 +24,7 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Scopes;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.multibindings.Multibinder;
+import com.google.inject.name.Names;
 import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.buffers.InputBuffer;
 import org.graylog2.plugin.inputs.util.ThroughputCounter;
@@ -36,6 +37,8 @@ import org.graylog2.shared.buffers.processors.DecodingProcessor;
 import org.graylog2.shared.journal.JournalReader;
 import org.graylog2.shared.stats.ThroughputStats;
 import org.jboss.netty.util.HashedWheelTimer;
+
+import java.util.concurrent.Semaphore;
 
 public class GenericBindings extends AbstractModule {
     private final InstantiationService instantiationService;
@@ -68,6 +71,7 @@ public class GenericBindings extends AbstractModule {
 
         bind(EventBus.class).toProvider(EventBusProvider.class).in(Scopes.SINGLETON);
 
+        bind(Semaphore.class).annotatedWith(Names.named("JournalSignal")).toInstance(new Semaphore(0));
         Multibinder<Service> serviceBinder = Multibinder.newSetBinder(binder(), Service.class);
         serviceBinder.addBinding().to(JournalReader.class);
     }

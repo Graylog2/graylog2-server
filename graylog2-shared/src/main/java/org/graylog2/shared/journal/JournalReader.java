@@ -23,6 +23,7 @@ import com.google.common.eventbus.Subscribe;
 import com.google.common.util.concurrent.AbstractExecutionThreadService;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.google.inject.name.Named;
 import org.graylog2.plugin.journal.RawMessage;
 import org.graylog2.shared.buffers.ProcessBuffer;
 import org.slf4j.Logger;
@@ -30,6 +31,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Semaphore;
 
 @Singleton
 public class JournalReader extends AbstractExecutionThreadService {
@@ -37,13 +39,16 @@ public class JournalReader extends AbstractExecutionThreadService {
     private final KafkaJournal journal;
     private final EventBus eventBus;
     private final ProcessBuffer processBuffer;
+    private final Semaphore journalFilled;
     private final CountDownLatch startLatch = new CountDownLatch(1);
+    private Thread executionThread;
 
     @Inject
-    public JournalReader(KafkaJournal journal, EventBus eventBus, ProcessBuffer processBuffer) {
+    public JournalReader(KafkaJournal journal, EventBus eventBus, ProcessBuffer processBuffer, @Named("JournalSignal") Semaphore journalFilled) {
         this.journal = journal;
         this.eventBus = eventBus;
         this.processBuffer = processBuffer;
+        this.journalFilled = journalFilled;
 
         eventBus.register(this);
     }
@@ -53,6 +58,16 @@ public class JournalReader extends AbstractExecutionThreadService {
         if ("ProcessBufferInitialized".equals(notification)) {
             startLatch.countDown();
         }
+    }
+
+    @Override
+    protected void startUp() throws Exception {
+        executionThread = Thread.currentThread();
+    }
+
+    @Override
+    protected void triggerShutdown() {
+        executionThread.interrupt();
     }
 
     @Override
@@ -68,17 +83,31 @@ public class JournalReader extends AbstractExecutionThreadService {
 
         while (isRunning()) {
             final List<KafkaJournal.JournalReadEntry> encodedRawMessages = journal.read();
-            for (final KafkaJournal.JournalReadEntry encodedRawMessage : encodedRawMessages) {
-                final RawMessage rawMessage = RawMessage.decode(encodedRawMessage.getPayload(),
-                                                            encodedRawMessage.getOffset());
-                if (rawMessage == null) {
-                    // never insert null objects into the ringbuffer, as that is useless
+            if (encodedRawMessages.isEmpty()) {
+                log.info("No messages to read from Journal, waiting until the writer adds more messages.");
+                // block until something is written to the journal again
+                try {
+                    journalFilled.acquire();
+                } catch (InterruptedException ignored) {
+                    // this can happen when we are blocked but the system wants to shut down. We don't have to do anything in that case.
                     continue;
                 }
+                log.info("Messages have been written to Journal, continuing to read.");
+                // we don't care how many messages were inserted in the meantime, we'll read all of them eventually
+                journalFilled.drainPermits();
+            } else {
+                log.info("Processing {} messages from journal.", encodedRawMessages.size());
+                for (final KafkaJournal.JournalReadEntry encodedRawMessage : encodedRawMessages) {
+                    final RawMessage rawMessage = RawMessage.decode(encodedRawMessage.getPayload(),
+                                                                    encodedRawMessage.getOffset());
+                    if (rawMessage == null) {
+                        // never insert null objects into the ringbuffer, as that is useless
+                        continue;
+                    }
 
-                processBuffer.insertBlocking(rawMessage);
+                    processBuffer.insertBlocking(rawMessage);
+                }
             }
-
         }
         log.info("Stopping.");
     }

@@ -49,7 +49,7 @@ public class InputBufferImpl implements InputBuffer {
                            BaseConfiguration configuration,
                            Provider<DirectMessageHandler> directMessageHandlerProvider,
                            Provider<RawMessageEncoderHandler> rawMessageEncoderHandlerProvider,
-                           Provider<SpoolingMessageHandler> spoolingMessageHandlerProvider) {
+                           Provider<JournallingMessageHandler> spoolingMessageHandlerProvider) {
         final Disruptor<RawMessageEvent> disruptor = new Disruptor<>(
                 RawMessageEvent.FACTORY,
                 configuration.getRingSize(),
