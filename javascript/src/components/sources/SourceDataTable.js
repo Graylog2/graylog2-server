@@ -11,11 +11,11 @@ var othersThreshold = 5;
 var othersName = "Others";
 
 var SourceDataTable = {
-    renderDataTable(sourcesData, numberOfSources, onDataFiltered) {
+    renderDataTable(dimension, numberOfSources, onDataFiltered) {
         var dataTableDomNode = $("#dc-sources-result")[0];
         this.dataTable = dc.dataTable(dataTableDomNode);
         this.dataTable
-            .dimension(sourcesData.dimension((d) => d.message_count))
+            .dimension(dimension)
             .group((d) => d.percentage > othersThreshold ? "Top Sources" : othersName)
             .size(numberOfSources)
             .columns([

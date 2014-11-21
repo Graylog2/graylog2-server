@@ -35,6 +35,8 @@ var SourceOverview = React.createClass({
         this.nameDimension = this.sourcesData.dimension((d) => d.name);
         this.nameMessageGroup = this.nameDimension.group().reduceSum((d) => d.message_count);
 
+        this.messageCountDimension = this.sourcesData.dimension((d) => d.message_count);
+
         this.histogramData = crossfilter();
         this.valueDimension = this.histogramData.dimension((d) => new Date(d.x * 1000));
         this.valueGroup = this.valueDimension.group().reduceSum((d) => d.y);
@@ -72,7 +74,7 @@ var SourceOverview = React.createClass({
         this.applyRangeParameter();
         SourcesStore.addChangeListener(this._onSourcesChanged);
         HistogramDataStore.addChangeListener(this._onHistogramDataChanged);
-        SourceDataTable.renderDataTable(this.sourcesData, this.state.numberOfSources, (sourceName) => {
+        SourceDataTable.renderDataTable(this.messageCountDimension, this.state.numberOfSources, (sourceName) => {
             this.pieChart.filter(sourceName);
             this._toggleResetButtons();
             dc.redrawAll();
