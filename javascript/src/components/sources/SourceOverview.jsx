@@ -16,6 +16,7 @@ var SourcesStore = require('../../stores/sources/SourcesStore');
 var HistogramDataStore = require('../../stores/sources/HistogramDataStore');
 
 var SourceDataTable = require('./SourceDataTable');
+var SourcePieChart = require('./SourcePieChart');
 
 var UniversalSearch = require('../search/UniversalSearch');
 
@@ -55,7 +56,7 @@ var SourceOverview = React.createClass({
     loadHistogramData() {
         var filters;
 
-        if (this.pieChart && (this.pieChart.filters().length !== 0 || SourceDataTable.dataTable.filters().length !== 0)) {
+        if (SourcePieChart.pieChart && (SourcePieChart.pieChart.filters().length !== 0 || SourceDataTable.dataTable.filters().length !== 0)) {
             filters = this.nameDimension.top(Infinity).map((source) => UniversalSearch.escape(source.name));
         }
         HistogramDataStore.loadHistogramData(this.state.range, filters, SCREEN_RESOLUTION);
@@ -74,13 +75,17 @@ var SourceOverview = React.createClass({
         this.applyRangeParameter();
         SourcesStore.addChangeListener(this._onSourcesChanged);
         HistogramDataStore.addChangeListener(this._onHistogramDataChanged);
+
         SourceDataTable.renderDataTable(this.messageCountDimension, this.state.numberOfSources, (sourceName) => {
-            this.pieChart.filter(sourceName);
+            SourcePieChart.pieChart.filter(sourceName);
             this._toggleResetButtons();
             dc.redrawAll();
             this.loadHistogramData();
         });
-        this.renderPieChart();
+        SourcePieChart.renderPieChart(this.nameDimension, this.nameMessageGroup, () => {
+            this.loadHistogramData();
+            this._toggleResetButtons();
+        });
         this.renderLineChart();
         dc.renderAll();
         $(window).on('resize', this._resizeCallback);
@@ -117,22 +122,6 @@ var SourceOverview = React.createClass({
         }
         range = this.props.params.range;
         this.changeRange(range);
-    },
-    renderPieChart() {
-        var pieChartDomNode = $("#dc-sources-pie-chart")[0];
-        var pieChartWidth = $(pieChartDomNode).width();
-        this.pieChart = dc.pieChart(pieChartDomNode);
-        this.pieChart
-            .renderLabel(false)
-            .dimension(this.nameDimension)
-            .group(this.nameMessageGroup)
-            .renderlet((chart) => {
-                chart.selectAll(".pie-slice").on("click", () => {
-                    this.loadHistogramData();
-                    this._toggleResetButtons();
-                });
-            });
-        this.configurePieChartWidth(pieChartWidth);
     },
     renderLineChart() {
         var lineChartDomNode = $("#dc-sources-line-chart")[0];
@@ -185,7 +174,7 @@ var SourceOverview = React.createClass({
             .tickFormat(d3.format("s"));
     },
     resetSourcesFilters() {
-        this.pieChart.filterAll();
+        SourcePieChart.pieChart.filterAll();
         this.nameDimension.filterAll();
         this.loadHistogramData();
         this._toggleResetButtons();
@@ -195,12 +184,6 @@ var SourceOverview = React.createClass({
         this.valueDimension.filterAll();
         this.lineChart.filterAll();
         dc.redrawAll();
-    },
-    configurePieChartWidth(pieChartWidth) {
-        this.pieChart.width(pieChartWidth)
-            .height(pieChartWidth)
-            .radius(pieChartWidth / 2 - 10)
-            .innerRadius(pieChartWidth / 5);
     },
     configureLineChartWidth(lineChartWidth) {
         this.lineChart
@@ -212,7 +195,7 @@ var SourceOverview = React.createClass({
 
         var pieChartDomNode = $("#dc-sources-pie-chart").parent();
         var pieChartWidth = pieChartDomNode.width();
-        this.configurePieChartWidth(pieChartWidth);
+        SourcePieChart.configurePieChartWidth(pieChartWidth);
 
         var lineChartDomNode = $("#dc-sources-line-chart");
         var lineChartWidth = lineChartDomNode.width();
@@ -228,16 +211,16 @@ var SourceOverview = React.createClass({
          * we need to remove the dimension and graphs filters, but we only need to reapply filters to the
          * graphs, dc will propagate that to the crossfilter dimension.
          */
-        var pieChartFilters = this.pieChart.filters();
+        var pieChartFilters = SourcePieChart.pieChart.filters();
         var dataTableFilters = SourceDataTable.dataTable.filters();
         this.nameDimension.filterAll();
         this.filterDimension.filterAll();
-        this.pieChart.filterAll();
+        SourcePieChart.pieChart.filterAll();
         SourceDataTable.dataTable.filterAll();
         this.sourcesData.remove();
         this.sourcesData.add(sources);
 
-        pieChartFilters.forEach((filter)  => this.pieChart.filter(filter));
+        pieChartFilters.forEach((filter)  => SourcePieChart.pieChart.filter(filter));
         dataTableFilters.forEach((filter) => SourceDataTable.dataTable.filter(filter));
         this._filterSources();
 
@@ -279,7 +262,7 @@ var SourceOverview = React.createClass({
     },
     _toggleResetButtons() {
         // We only need to toggle the datatable reset button, dc will take care of the other reset buttons
-        if (this.pieChart.filter()) {
+        if (SourcePieChart.pieChart.filter()) {
             $('#dc-sources-result-reset').show();
         } else {
             $('#dc-sources-result-reset').hide();
@@ -329,7 +312,7 @@ var SourceOverview = React.createClass({
         this.setState({filter: event.target.value}, () => {
             this._filterSources();
             SourceDataTable.dataTable.redraw();
-            this.pieChart.redraw();
+            SourcePieChart.pieChart.redraw();
         });
     },
     render() {
