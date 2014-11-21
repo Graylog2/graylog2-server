@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
+import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
 
 public class RawMessageTest {
@@ -26,6 +27,8 @@ public class RawMessageTest {
         final RawMessage decodedMsg = RawMessage.decode(ByteBuffer.wrap(encoded), 1);
 
         assertNotNull(decodedMsg);
+        assertEquals(decodedMsg.getPayload(), "testmessage".getBytes(Charsets.UTF_8));
+        assertEquals(decodedMsg.getCodecName(), "raw");
 
     }
 

@@ -127,7 +127,6 @@ public class RawMessage implements Serializable {
 
     public static RawMessage decode(final ByteBuffer buffer, final long sequenceNumber) {
         try {
-            buffer.flip();
             final JournalMessage journalMessage = JournalMessage.parseFrom(new ByteBufferBackedInputStream(buffer));
 
             // TODO validate message based on field contents and version number
