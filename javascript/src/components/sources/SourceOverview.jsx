@@ -200,7 +200,7 @@ var SourceOverview = React.createClass({
                     var datum = d3.selectAll(parentTdElement).datum();
                     var source = datum.name;
                     UniversalSearch.addSegment(UniversalSearch.createSourceQuery(source), UniversalSearch.orOperator());
-                    if (window.event.altKey) {
+                    if (d3.event.altKey) {
                         UniversalSearch.submit();
                     }
                 });
