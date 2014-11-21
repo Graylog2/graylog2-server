@@ -15,12 +15,12 @@ var Qs = require('qs');
 var SourcesStore = require('../../stores/sources/SourcesStore');
 var HistogramDataStore = require('../../stores/sources/HistogramDataStore');
 
+var SourceDataTable = require('./SourceDataTable');
+
 var UniversalSearch = require('../search/UniversalSearch');
 
 var daysToSeconds = (days) => moment.duration(days, 'days').as('seconds');
 
-var othersThreshold = 5;
-var othersName = "Others";
 var DEFAULT_RANGE_IN_SECS = daysToSeconds(1);
 var SUPPORTED_RANGES_IN_SECS = [daysToSeconds(1), daysToSeconds(7), daysToSeconds(31), daysToSeconds(365), 0];
 
@@ -53,7 +53,7 @@ var SourceOverview = React.createClass({
     loadHistogramData() {
         var filters;
 
-        if (this.pieChart && (this.pieChart.filters().length !== 0 || this.dataTable.filters().length !== 0)) {
+        if (this.pieChart && (this.pieChart.filters().length !== 0 || SourceDataTable.dataTable.filters().length !== 0)) {
             filters = this.nameDimension.top(Infinity).map((source) => UniversalSearch.escape(source.name));
         }
         HistogramDataStore.loadHistogramData(this.state.range, filters, SCREEN_RESOLUTION);
@@ -72,7 +72,12 @@ var SourceOverview = React.createClass({
         this.applyRangeParameter();
         SourcesStore.addChangeListener(this._onSourcesChanged);
         HistogramDataStore.addChangeListener(this._onHistogramDataChanged);
-        this.renderDataTable();
+        SourceDataTable.renderDataTable(this.sourcesData, this.state.numberOfSources, (sourceName) => {
+            this.pieChart.filter(sourceName);
+            this._toggleResetButtons();
+            dc.redrawAll();
+            this.loadHistogramData();
+        });
         this.renderPieChart();
         this.renderLineChart();
         dc.renderAll();
@@ -177,47 +182,6 @@ var SourceOverview = React.createClass({
             .ticks(6)
             .tickFormat(d3.format("s"));
     },
-    renderDataTable() {
-        var dataTableDomNode = $("#dc-sources-result")[0];
-        this.dataTable = dc.dataTable(dataTableDomNode);
-        this.dataTable
-            .dimension(this.sourcesData.dimension((d) => d.message_count))
-            .group((d) => d.percentage > othersThreshold ? "Top Sources" : othersName)
-            .size(this.state.numberOfSources)
-            .columns([
-                (d) => "<button class='btn btn-mini btn-link dc-search-button' title='Search for this source'><i class='icon icon-search'></i></button>",
-                (d) => "<a href='javascript:undefined' class='dc-filter-link' title='Filter this source'>" + d.name +"</a>",
-                (d) => d.percentage.toFixed(2) + "%",
-                (d) => d.message_count
-            ])
-            .sortBy((d) => d.message_count)
-            .order(d3.descending)
-            .renderlet((table) => {
-                table.selectAll("td.dc-table-column._0 button.dc-search-button").on("click", () => {
-                    // d3 doesn't pass any data to the onclick event as the buttons do not
-                    // have any. Instead, we need to get it from the table element.
-                    var parentTdElement = $(d3.event.target).parents("td.dc-table-column._0");
-                    var datum = d3.selectAll(parentTdElement).datum();
-                    var source = datum.name;
-                    UniversalSearch.addSegment(UniversalSearch.createSourceQuery(source), UniversalSearch.orOperator());
-                    if (d3.event.altKey) {
-                        UniversalSearch.submit();
-                    }
-                });
-            })
-            .renderlet((table) => {
-                table.selectAll("td.dc-table-column._1 a.dc-filter-link").on("click", () => {
-                    var parentTdElement = $(d3.event.target).parents("td.dc-table-column._1");
-                    var datum = d3.selectAll(parentTdElement).datum();
-
-                    this.pieChart.filter(datum.name);
-                    this._toggleResetButtons();
-                    dc.redrawAll();
-                    this.loadHistogramData();
-                });
-            })
-            .renderlet((table) => table.selectAll(".dc-table-group").classed("info", true));
-    },
     resetSourcesFilters() {
         this.pieChart.filterAll();
         this.nameDimension.filterAll();
@@ -263,16 +227,16 @@ var SourceOverview = React.createClass({
          * graphs, dc will propagate that to the crossfilter dimension.
          */
         var pieChartFilters = this.pieChart.filters();
-        var dataTableFilters = this.dataTable.filters();
+        var dataTableFilters = SourceDataTable.dataTable.filters();
         this.nameDimension.filterAll();
         this.filterDimension.filterAll();
         this.pieChart.filterAll();
-        this.dataTable.filterAll();
+        SourceDataTable.dataTable.filterAll();
         this.sourcesData.remove();
         this.sourcesData.add(sources);
 
         pieChartFilters.forEach((filter)  => this.pieChart.filter(filter));
-        dataTableFilters.forEach((filter) => this.dataTable.filter(filter));
+        dataTableFilters.forEach((filter) => SourceDataTable.dataTable.filter(filter));
         this._filterSources();
 
         dc.redrawAll();
@@ -349,9 +313,7 @@ var SourceOverview = React.createClass({
     },
     _onNumberOfSourcesChanged(event) {
         this.setState({numberOfSources: event.target.value}, () => {
-            this.dataTable
-                .size(this.state.numberOfSources)
-                .redraw();
+            SourceDataTable.changeNumberOfSources(this.state.numberOfSources);
         });
     },
     _filterSources() {
@@ -364,7 +326,7 @@ var SourceOverview = React.createClass({
     _onFilterChanged(event) {
         this.setState({filter: event.target.value}, () => {
             this._filterSources();
-            this.dataTable.redraw();
+            SourceDataTable.dataTable.redraw();
             this.pieChart.redraw();
         });
     },
