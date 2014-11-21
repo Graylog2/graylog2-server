@@ -696,7 +696,7 @@
                 <configuration>
                     <autoVersionSubmodules>true</autoVersionSubmodules>
                     <mavenExecutorId>forked-path</mavenExecutorId>
-                    <tagNameFormat>v@{project.version}</tagNameFormat>
+                    <tagNameFormat>@{project.version}</tagNameFormat>
                     <preparationGoals>clean test</preparationGoals>
                 </configuration>
             </plugin>
