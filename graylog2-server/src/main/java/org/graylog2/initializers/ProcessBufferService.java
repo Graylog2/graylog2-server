@@ -16,6 +16,7 @@
  */
 package org.graylog2.initializers;
 
+import com.google.common.eventbus.EventBus;
 import com.google.common.util.concurrent.AbstractIdleService;
 import com.google.inject.Inject;
 import org.graylog2.Configuration;
@@ -37,18 +38,21 @@ public class ProcessBufferService extends AbstractIdleService {
     private final OutputBuffer outputBuffer;
     private final ProcessBufferWatermark processBufferWatermark;
     private final ProcessBuffer processBuffer;
+    private final EventBus eventBus;
 
     @Inject
     public ProcessBufferService(Configuration configuration,
                                 ServerProcessBufferProcessor.Factory processBufferProcessorFactory,
                                 OutputBuffer outputBuffer,
                                 ProcessBufferWatermark processBufferWatermark,
-                                ProcessBuffer processBuffer) {
+                                ProcessBuffer processBuffer,
+                                EventBus eventBus) {
         this.configuration = configuration;
         this.processBufferProcessorFactory = processBufferProcessorFactory;
         this.outputBuffer = outputBuffer;
         this.processBufferWatermark = processBufferWatermark;
         this.processBuffer = processBuffer;
+        this.eventBus = eventBus;
 
         outputBuffer.initialize();
     }
@@ -67,6 +71,7 @@ public class ProcessBufferService extends AbstractIdleService {
                 configuration.getProcessorWaitStrategy()
         );
 
+        eventBus.post("ProcessBufferInitialized");
     }
 
     @Override

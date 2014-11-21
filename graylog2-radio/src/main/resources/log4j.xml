@@ -11,9 +11,9 @@
 	</appender>
 	
 	<!-- Application Loggers -->
-	<logger name="org.graylog2">
+	<!-- logger name="org.graylog2">
 		<level value="warn" />
-	</logger>
+	</logger-->
 	<!-- Root Logger -->
 	<root>
 		<priority value="warn" />

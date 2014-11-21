@@ -19,9 +19,11 @@
 package org.graylog2.shared.journal;
 
 import com.google.common.base.Function;
+import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
+import kafka.common.OffsetOutOfRangeException;
 import kafka.common.TopicAndPartition;
 import kafka.log.CleanerConfig;
 import kafka.log.Log;
@@ -29,16 +31,20 @@ import kafka.log.LogConfig;
 import kafka.log.LogManager;
 import kafka.message.ByteBufferMessageSet;
 import kafka.message.Message;
+import kafka.message.MessageAndOffset;
+import kafka.message.MessageSet;
 import kafka.utils.KafkaScheduler;
 import kafka.utils.SystemTime$;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import scala.Option;
+import scala.collection.Iterator;
 import scala.collection.JavaConversions;
 import scala.collection.Map$;
 
 import javax.annotation.Nullable;
 import java.io.File;
+import java.nio.ByteBuffer;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -152,19 +158,25 @@ public class KafkaJournal {
         return write(Collections.singletonList(journalEntry));
     }
 
-/*    public List<byte[]> read() {
-        final MessageSet messageSet = kafkaLog.read(readOffset, 10 * 1024, Option.<Object>apply(readOffset + 1));
+    public List<JournalReadEntry> read() {
+        final long maxOffset = readOffset + 1;
+        final List<JournalReadEntry> messages = Lists.newArrayListWithCapacity((int) (maxOffset - readOffset));
+        try {
+            final MessageSet messageSet = kafkaLog.read(readOffset, 10 * 1024, Option.<Object>apply(maxOffset));
 
-        final Iterator<MessageAndOffset> iterator = messageSet.iterator();
-        while (iterator.hasNext()) {
-            final MessageAndOffset messageAndOffset = iterator.next();
-            final ByteBuffer payload = messageAndOffset.message().payload();
+            final Iterator<MessageAndOffset> iterator = messageSet.iterator();
+            while (iterator.hasNext()) {
+                final MessageAndOffset messageAndOffset = iterator.next();
+                final ByteBuffer payload = messageAndOffset.message().payload();
+                messages.add(new JournalReadEntry(payload, messageAndOffset.offset()));
+                readOffset = messageAndOffset.nextOffset();
+            }
 
+        } catch (OffsetOutOfRangeException e) {
+            log.warn("Offset out of range, no messages available starting at offset {}", readOffset);
         }
-
-        return null;
+        return messages;
     }
-*/
 
     public static class Entry {
         private final byte[] idBytes;
@@ -173,6 +185,25 @@ public class KafkaJournal {
         public Entry(byte[] idBytes, byte[] messageBytes) {
             this.idBytes = idBytes;
             this.messageBytes = messageBytes;
+        }
+    }
+
+    public static class JournalReadEntry {
+
+        private final ByteBuffer payload;
+        private final long offset;
+
+        public JournalReadEntry(ByteBuffer payload, long offset) {
+            this.payload = payload;
+            this.offset = offset;
+        }
+
+        public long getOffset() {
+            return offset;
+        }
+
+        public ByteBuffer getPayload() {
+            return payload;
         }
     }
 }
