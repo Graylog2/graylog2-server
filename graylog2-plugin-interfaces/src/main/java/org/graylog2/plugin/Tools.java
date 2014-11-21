@@ -459,6 +459,12 @@ public final class Tools {
         return null;
     }
 
+    public static String bytesToHex(byte[] a) {
+        StringBuilder sb = new StringBuilder(a.length * 2);
+        for(byte b: a)
+            sb.append(String.format("%02x", b & 0xff)).append(' ');
+        return sb.toString().trim();
+    }
     /**
      * The default uncaught exception handler will print to STDERR, which we don't always want for threads.
      * Using this utility method you can avoid writing to STDERR on a per-thread basis

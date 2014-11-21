@@ -35,6 +35,8 @@ import kafka.message.MessageAndOffset;
 import kafka.message.MessageSet;
 import kafka.utils.KafkaScheduler;
 import kafka.utils.SystemTime$;
+import kafka.utils.Utils;
+import org.graylog2.plugin.Tools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import scala.Option;
@@ -130,16 +132,22 @@ public class KafkaJournal {
      */
     public long write(List<Entry> entries) {
         final long[] payloadSize = {0L};
-        final ByteBufferMessageSet messageSet = new ByteBufferMessageSet(JavaConversions.asScalaBuffer(transform(
+        // make a copy
+        final List<Message> messages = Lists.newArrayList(transform(
                 entries,
                 new Function<Entry, Message>() {
                     @Nullable
                     @Override
                     public Message apply(Entry entry) {
                         payloadSize[0] += entry.messageBytes.length;
+                        if (log.isTraceEnabled()) {
+                            log.trace("Message {} contains bytes {}", Tools.bytesToHex(entry.idBytes),
+                                     Tools.bytesToHex(entry.messageBytes));
+                        }
                         return new Message(entry.messageBytes, entry.idBytes);
                     }
-                })));
+                }));
+        final ByteBufferMessageSet messageSet = new ByteBufferMessageSet(JavaConversions.asScalaBuffer(messages));
 
         final Log.LogAppendInfo appendInfo = kafkaLog.append(messageSet, true);
         log.info("Wrote {} messages to journal: {} bytes, log position {} to {}",
@@ -167,8 +175,14 @@ public class KafkaJournal {
             final Iterator<MessageAndOffset> iterator = messageSet.iterator();
             while (iterator.hasNext()) {
                 final MessageAndOffset messageAndOffset = iterator.next();
-                final ByteBuffer payload = messageAndOffset.message().payload();
-                messages.add(new JournalReadEntry(payload, messageAndOffset.offset()));
+
+                // TODO why are payload and key inverted? This seems odd.
+                final byte[] bytes = Utils.readBytes(messageAndOffset.message().payload());
+                final byte[] keyBytes = Utils.readBytes(messageAndOffset.message().key());
+                if (log.isTraceEnabled()) {
+                    log.trace("Read message {} contains {}", Tools.bytesToHex(bytes), Tools.bytesToHex(keyBytes));
+                }
+                messages.add(new JournalReadEntry(ByteBuffer.wrap(keyBytes), messageAndOffset.offset()));
                 readOffset = messageAndOffset.nextOffset();
             }
 
