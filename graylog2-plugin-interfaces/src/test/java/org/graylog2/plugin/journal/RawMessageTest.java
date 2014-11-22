@@ -29,7 +29,6 @@ import org.testng.annotations.Test;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.ByteBuffer;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
@@ -46,7 +45,7 @@ public class RawMessageTest {
         rawMessage.setCodecConfig(Configuration.EMPTY_CONFIGURATION);
 
         final byte[] encoded = rawMessage.encode();
-        final RawMessage decodedMsg = RawMessage.decode(ByteBuffer.wrap(encoded), 1);
+        final RawMessage decodedMsg = RawMessage.decode(encoded, 1);
 
         assertNotNull(decodedMsg);
         assertEquals(decodedMsg.getPayload(), "testmessage".getBytes(Charsets.UTF_8));

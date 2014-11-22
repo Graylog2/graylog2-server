@@ -22,6 +22,8 @@ import org.testng.ITestListener;
 import org.testng.ITestResult;
 import org.testng.annotations.Listeners;
 
+import java.io.File;
+
 @Listeners(Graylog2BaseTest.class)
 public class Graylog2BaseTest implements ITestListener {
 
@@ -62,5 +64,19 @@ public class Graylog2BaseTest implements ITestListener {
     @Override
     public void onFinish(ITestContext context) {
         MDC.clear();
+    }
+
+    public static void deleteDirectory(File folder) {
+        File[] files = folder.listFiles();
+        if(files!=null) { //some JVMs return null for empty dirs
+            for(File f: files) {
+                if(f.isDirectory()) {
+                    deleteDirectory(f);
+                } else {
+                    f.delete();
+                }
+            }
+        }
+        folder.delete();
     }
 }

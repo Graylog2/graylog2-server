@@ -23,7 +23,6 @@
 package org.graylog2.plugin.journal;
 
 import com.eaio.uuid.UUID;
-import com.fasterxml.jackson.databind.util.ByteBufferBackedInputStream;
 import com.google.common.collect.Lists;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.UninitializedMessageException;
@@ -125,9 +124,9 @@ public class RawMessage implements Serializable {
         codecConfig = Configuration.deserializeFromJson(journalMessage.getCodec().getConfig());
     }
 
-    public static RawMessage decode(final ByteBuffer buffer, final long sequenceNumber) {
+    public static RawMessage decode(final byte[] buffer, final long sequenceNumber) {
         try {
-            final JournalMessage journalMessage = JournalMessage.parseFrom(new ByteBufferBackedInputStream(buffer));
+            final JournalMessage journalMessage = JournalMessage.parseFrom(buffer);
 
             // TODO validate message based on field contents and version number
 

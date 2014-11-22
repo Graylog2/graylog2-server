@@ -439,6 +439,11 @@
             </dependency>
 
             <dependency>
+                <groupId>org.scala-lang</groupId>
+                <artifactId>scala-library</artifactId>
+                <version>2.9.2</version>
+            </dependency>
+            <dependency>
                 <groupId>org.apache.kafka</groupId>
                 <artifactId>kafka_2.9.2</artifactId>
                 <version>0.8.1.1</version>

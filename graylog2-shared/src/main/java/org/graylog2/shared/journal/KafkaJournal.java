@@ -44,7 +44,6 @@ import scala.collection.Map$;
 
 import javax.annotation.Nullable;
 import java.io.File;
-import java.nio.ByteBuffer;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -120,7 +119,7 @@ public class KafkaJournal {
      * @return a journal entry to be passed to {@link #write(java.util.List)}
      */
     public Entry createEntry(byte[] idBytes, byte[] messageBytes) {
-        return new Entry(messageBytes, idBytes);
+        return new Entry(idBytes, messageBytes);
     }
 
     /**
@@ -138,8 +137,8 @@ public class KafkaJournal {
                     @Override
                     public Message apply(Entry entry) {
                         payloadSize[0] += entry.messageBytes.length;
-                        if (log.isTraceEnabled()) {
-                            log.trace("Message {} contains bytes {}", Tools.bytesToHex(entry.idBytes),
+                        if (log.isInfoEnabled()) {
+                            log.info("Message {} contains bytes {}", Tools.bytesToHex(entry.idBytes),
                                      Tools.bytesToHex(entry.messageBytes));
                         }
                         return new Message(entry.messageBytes, entry.idBytes);
@@ -174,13 +173,12 @@ public class KafkaJournal {
             while (iterator.hasNext()) {
                 final MessageAndOffset messageAndOffset = iterator.next();
 
-                // TODO why are payload and key inverted? This seems odd.
-                final byte[] bytes = Utils.readBytes(messageAndOffset.message().payload());
-                final byte[] keyBytes = Utils.readBytes(messageAndOffset.message().key());
+                final byte[] payloadBytes = Utils.readBytes(messageAndOffset.message().payload());
                 if (log.isTraceEnabled()) {
-                    log.trace("Read message {} contains {}", Tools.bytesToHex(bytes), Tools.bytesToHex(keyBytes));
+                    final byte[] keyBytes = Utils.readBytes(messageAndOffset.message().key());
+                    log.trace("Read message {} contains {}", Tools.bytesToHex(keyBytes), Tools.bytesToHex(payloadBytes));
                 }
-                messages.add(new JournalReadEntry(ByteBuffer.wrap(keyBytes), messageAndOffset.offset()));
+                messages.add(new JournalReadEntry(payloadBytes, messageAndOffset.offset()));
                 readOffset = messageAndOffset.nextOffset();
             }
 
@@ -202,10 +200,10 @@ public class KafkaJournal {
 
     public static class JournalReadEntry {
 
-        private final ByteBuffer payload;
+        private final byte[] payload;
         private final long offset;
 
-        public JournalReadEntry(ByteBuffer payload, long offset) {
+        public JournalReadEntry(byte[] payload, long offset) {
             this.payload = payload;
             this.offset = offset;
         }
@@ -214,7 +212,7 @@ public class KafkaJournal {
             return offset;
         }
 
-        public ByteBuffer getPayload() {
+        public byte[] getPayload() {
             return payload;
         }
     }
