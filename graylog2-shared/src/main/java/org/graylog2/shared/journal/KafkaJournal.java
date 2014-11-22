@@ -99,7 +99,7 @@ public class KafkaJournal {
                 TimeUnit.SECONDS.toMillis(60),
                 TimeUnit.SECONDS.toMillis(60),
                 TimeUnit.SECONDS.toMillis(60),
-                new KafkaScheduler(2, "relay", false),
+                new KafkaScheduler(2, "kafka-journal-scheduler-", false),
                 SystemTime$.MODULE$);
 
         final TopicAndPartition topicAndPartition = new TopicAndPartition("messagejournal", 0);
