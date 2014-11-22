@@ -26,6 +26,7 @@ import org.graylog2.plugin.BaseConfiguration;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.inputs.MessageInput;
+import org.graylog2.shared.buffers.processors.DecodingProcessor;
 import org.graylog2.shared.buffers.processors.ProcessBufferProcessor;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -64,7 +65,7 @@ public class ProcessBufferTest {
     }
 
     public void testBasicInsert() throws Exception {
-        ProcessBuffer processBuffer = new ProcessBuffer(metricRegistry, serverStatus, mock(BaseConfiguration.class), null, mock(InputCache.class), new AtomicInteger());
+        ProcessBuffer processBuffer = new ProcessBuffer(metricRegistry, serverStatus, mock(BaseConfiguration.class), mock(DecodingProcessor.Factory.class), mock(InputCache.class), new AtomicInteger());
 
         ProcessBufferProcessor processBufferProcessor = mock(ProcessBufferProcessor.class);
         ProcessBufferProcessor[] processBufferProcessors = new ProcessBufferProcessor[1];

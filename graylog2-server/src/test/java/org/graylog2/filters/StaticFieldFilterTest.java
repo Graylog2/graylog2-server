@@ -26,15 +26,30 @@ import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.MisfireException;
 import org.graylog2.plugin.inputs.codecs.Codec;
 import org.graylog2.plugin.inputs.transports.Transport;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static org.testng.Assert.assertEquals;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
 public class StaticFieldFilterTest {
+
+    private FakeMessageCodecConfig fakeMessageCodecConfig;
+
+    @BeforeMethod
+    public void setUp() throws Exception {
+        final Transport.Config transportConfig = mock(Transport.Config.class);
+        final Codec.Config codecConfig = mock(Codec.Config.class);
+
+        when(transportConfig.getRequestedConfiguration()).thenReturn(new ConfigurationRequest());
+        when(codecConfig.getRequestedConfiguration()).thenReturn(new ConfigurationRequest());
+
+        fakeMessageCodecConfig = new FakeMessageCodecConfig(transportConfig, codecConfig);
+    }
 
     @Test
     public void testFilter() throws Exception {
@@ -43,7 +58,7 @@ public class StaticFieldFilterTest {
         FakeInput fakeInput = new FakeInput(mock(MetricRegistry.class),mock(Transport.class),
                                             mock(MetricRegistry.class),
                                             mock(Codec.class),
-                                            mock(MessageInput.Config.class), mock(MessageInput.Descriptor.class), null);
+                                            fakeMessageCodecConfig, mock(MessageInput.Descriptor.class), null);
         fakeInput.addStaticField("foo", "bar");
 
         msg.setSourceInput(fakeInput);
@@ -64,7 +79,7 @@ public class StaticFieldFilterTest {
         FakeInput fakeInput = new FakeInput(mock(MetricRegistry.class),mock(Transport.class),
                                             mock(MetricRegistry.class),
                                             mock(Codec.class),
-                                            mock(MessageInput.Config.class), mock(MessageInput.Descriptor.class), null);
+                                            fakeMessageCodecConfig, mock(MessageInput.Descriptor.class), null);
         fakeInput.addStaticField("foo", "bar");
 
         msg.setSourceInput(fakeInput);
@@ -102,4 +117,9 @@ public class StaticFieldFilterTest {
         }
     }
 
+    private class FakeMessageCodecConfig extends MessageInput.Config {
+        protected FakeMessageCodecConfig(Transport.Config transportConfig, Codec.Config codecConfig) {
+            super(transportConfig, codecConfig);
+        }
+    }
 }
