@@ -102,6 +102,9 @@ public abstract class BaseConfiguration {
     @Parameter("enable_message_journal")
     private boolean messageJournalEnabled = false;
 
+    @Parameter("message_journal_dir")
+    private String messageJournalDir = "journal";
+
     public String getRestUriScheme() {
         return isRestEnableTls() ? "https" : "http";
     }
@@ -231,5 +234,9 @@ public abstract class BaseConfiguration {
 
     public boolean isMessageJournalEnabled() {
         return messageJournalEnabled;
+    }
+
+    public String getMessageJournalDir() {
+        return messageJournalDir;
     }
 }

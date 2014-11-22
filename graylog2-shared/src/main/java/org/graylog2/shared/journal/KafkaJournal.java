@@ -61,7 +61,7 @@ public class KafkaJournal {
     private long readOffset = 0L; // TODO read from persisted store
 
     @Inject
-    public KafkaJournal(@Named("spoolDirectory") String spoolDir) {
+    public KafkaJournal(@Named("journalDirectory") String journalDir) {
 
         // TODO all of these configuration values need tweaking
         // these are the default values as per kafka 0.8.1.1
@@ -94,7 +94,7 @@ public class KafkaJournal {
                         false,
                         "MD5");
         logManager = new LogManager(
-                new File[]{new File(spoolDir)},
+                new File[]{new File(journalDir)},
                 Map$.MODULE$.<String, LogConfig>empty(),
                 defaultConfig,
                 cleanerConfig,
@@ -111,7 +111,7 @@ public class KafkaJournal {
         } else {
             kafkaLog = messageLog.get();
         }
-        log.info("Initialized Kafka based journal at {}", spoolDir);
+        log.info("Initialized Kafka based journal at {}", journalDir);
     }
 
     /**
