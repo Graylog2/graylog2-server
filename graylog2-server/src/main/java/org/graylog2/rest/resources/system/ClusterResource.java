@@ -103,7 +103,7 @@ public class ClusterResource extends RestResource {
     private Map<String, Object> nodeSummary(Node node) {
         Map<String, Object> m  = Maps.newHashMap();
 
-        m.put("id", node.getNodeId());
+        m.put("node_id", node.getNodeId());
         m.put("type", node.getType().toString().toLowerCase());
         m.put("is_master", node.isMaster());
         m.put("transport_address", node.getTransportAddress());
