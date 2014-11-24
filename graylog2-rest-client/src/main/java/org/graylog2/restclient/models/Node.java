@@ -105,7 +105,7 @@ public class Node extends ClusterEntity {
 
         transportAddress = normalizeUriPath(r.transportAddress);
         lastSeen = new DateTime(r.lastSeen, DateTimeZone.UTC);
-        nodeId = r.id;
+        nodeId = r.nodeId;
         shortNodeId = r.shortNodeId;
         isMaster = r.isMaster;
         fromConfiguration = false;

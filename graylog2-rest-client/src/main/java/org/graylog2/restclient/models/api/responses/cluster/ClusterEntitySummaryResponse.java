@@ -18,13 +18,9 @@ package org.graylog2.restclient.models.api.responses.cluster;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public class ClusterEntitySummaryResponse {
-
-    @JsonProperty("id")
-    public String id;
+    @JsonProperty("node_id")
+    public String nodeId;
 
     @JsonProperty("short_node_id")
     public String shortNodeId;
@@ -34,5 +30,4 @@ public class ClusterEntitySummaryResponse {
 
     @JsonProperty("transport_address")
     public String transportAddress;
-
 }
