@@ -9,12 +9,28 @@
             <span class="value"><i class="icon icon-refresh"></i></span>
         </a>
         @if(widget.getTrend()) {
-            <div class="trend-icons" data-lower-is-better="@widget.getLowerIsBetter">
-                <div class="trend-icon">
-                    <span class="trend-higher"><i class="icon icon-caret-up"></i></span>
+            <div class="trend-indicators" data-lower-is-better="@widget.getLowerIsBetter">
+                <div class="trend-icons-higher">
+                    <div class="trend-icon">
+                        <span class="trend-higher"><i class="icon icon-angle-up"></i></span>
+                    </div>
+                    <div class="trend-icon">
+                        <span class="trend-higher"><i class="icon icon-angle-up"></i></span>
+                    </div>
+                    <div class="trend-icon">
+                        <span class="trend-higher"><i class="icon icon-angle-up"></i></span>
+                    </div>
                 </div>
-                <div class="trend-icon">
-                    <span class="trend-lower"><i class="icon icon-caret-down"></i></span>
+                <div class="trend-icons-lower">
+                    <div class="trend-icon">
+                        <span class="trend-lower"><i class="icon icon-angle-down"></i></span>
+                    </div>
+                    <div class="trend-icon">
+                        <span class="trend-lower"><i class="icon icon-angle-down"></i></span>
+                    </div>
+                    <div class="trend-icon">
+                        <span class="trend-lower"><i class="icon icon-angle-down"></i></span>
+                    </div>
                 </div>
             </div>
         }

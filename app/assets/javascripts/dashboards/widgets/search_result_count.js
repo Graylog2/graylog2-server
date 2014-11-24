@@ -47,23 +47,40 @@ function calculateValueFontSize(nowCount) {
     return fontSize;
 }
 
-function displayTrendIndicator(widget, nowCount, previousCount) {
+function indicatorsFilter(index, percentage, reverse) {
+    var numberOfIndicators = 3;
+    var percentagePerIndicator = 30;
+
+    if (reverse) {
+        index = Math.abs(index - (numberOfIndicators - 1));
+    }
+    return Math.abs(percentage) >= percentagePerIndicator * index;
+}
+
+function displayTrendIndicators(widget, nowCount, previousCount) {
+    var percentage = previousCount === 0 ? 0 : ((nowCount - previousCount) / previousCount) * 100;
+
     var green = "#2AAB2A";
     var red = "#BD362F";
     var grey = "#EBEBEB";
-    var lowerIsBetter = Boolean($(".trend-icons", widget).data("lower-is-better"));
+    var lowerIsBetter = Boolean($(".trend-indicators", widget).data("lower-is-better"));
     var lowerColor = lowerIsBetter ? green : red;
     var higherColor = lowerIsBetter ? red : green;
-    var higherIndicator = $(".trend-higher", widget);
-    var lowerIndicator = $(".trend-lower", widget);
 
-    higherIndicator.children().css("color", grey);
-    lowerIndicator.children().css("color", grey);
+    var higherIndicators = $(".trend-higher", widget);
+    var lowerIndicators = $(".trend-lower", widget);
+
+    higherIndicators.children().css("color", grey);
+    lowerIndicators.children().css("color", grey);
 
     if (nowCount > previousCount) {
-        higherIndicator.children().css("color", higherColor);
-    } else if (previousCount > nowCount) {
-        lowerIndicator.children().css("color", lowerColor);
+        higherIndicators.filter(function (index) {
+            return indicatorsFilter(index, percentage, true)
+        }).children().css("color", higherColor);
+    } else if (nowCount < previousCount) {
+        lowerIndicators.filter(function (index) {
+            return indicatorsFilter(index, percentage, false)
+        }).children().css("color", lowerColor);
     }
 }
 
@@ -83,6 +100,6 @@ function updateWidget_search_result_count(widget, data) {
     valueElement.css("font-size", fontSize);
 
     if (previousCount !== null) {
-        displayTrendIndicator(widget, nowCount, previousCount);
+        displayTrendIndicators(widget, nowCount, previousCount);
     }
 }
