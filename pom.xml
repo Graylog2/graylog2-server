@@ -47,6 +47,7 @@
         <module>graylog2-radio</module>
         <module>graylog2-rest-routes</module>
         <module>graylog2-rest-client</module>
+        <module>graylog2-bootstrap</module>
     </modules>
 
     <organization>
@@ -577,6 +578,12 @@
                 <groupId>org.mapdb</groupId>
                 <artifactId>mapdb</artifactId>
                 <version>1.0.6</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.airlift</groupId>
+                <artifactId>airline</artifactId>
+                <version>0.6</version>
             </dependency>
 
             <dependency>
