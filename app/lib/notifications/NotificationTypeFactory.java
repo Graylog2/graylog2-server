@@ -48,6 +48,8 @@ public class NotificationTypeFactory {
                 }
                 int faultCount = (int) notification.getDetail("fault_count");
                 return new StreamProcessingDisabledNotification(notification, streamTitle, faultCount);
+            case GC_TOO_LONG:
+                return new GcTooLongNotification(notification);
         }
 
         throw new RuntimeException("No notification registered for " + notification.getType());
