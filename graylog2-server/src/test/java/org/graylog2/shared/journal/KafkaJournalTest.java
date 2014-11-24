@@ -18,30 +18,46 @@ package org.graylog2.shared.journal;
 
 import com.google.common.collect.Iterators;
 import org.graylog2.Graylog2BaseTest;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 import static com.google.common.base.Charsets.UTF_8;
 import static org.testng.Assert.assertEquals;
 
 public class KafkaJournalTest extends Graylog2BaseTest {
 
+    private ScheduledThreadPoolExecutor scheduler;
+
+    @BeforeClass
+    public void setup() {
+        scheduler = new ScheduledThreadPoolExecutor(1);
+        scheduler.prestartCoreThread();
+    }
+
+    @AfterClass
+    public void after() {
+        scheduler.shutdown();
+    }
+
     @Test
     public void writeAndRead() throws IOException {
         final Path journalDir = Files.createTempDirectory("journal");
-        final KafkaJournal journal = new KafkaJournal(journalDir.toFile().getAbsolutePath());
+        final Journal journal = new KafkaJournal(journalDir.toFile().getAbsolutePath(), scheduler);
 
         final byte[] idBytes = "id".getBytes(UTF_8);
         final byte[] messageBytes = "message".getBytes(UTF_8);
 
         final long position = journal.write(idBytes, messageBytes);
-        final List<KafkaJournal.JournalReadEntry> messages = journal.read();
+        final List<Journal.JournalReadEntry> messages = journal.read();
 
-        final KafkaJournal.JournalReadEntry firstMessage = Iterators.getOnlyElement(messages.iterator());
+        final Journal.JournalReadEntry firstMessage = Iterators.getOnlyElement(messages.iterator());
 
         assertEquals(new String(firstMessage.getPayload(), UTF_8), "message");
 

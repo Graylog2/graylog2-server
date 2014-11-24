@@ -20,7 +20,6 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.common.util.concurrent.AbstractExecutionThreadService;
 import com.google.inject.Inject;
-import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import org.graylog2.plugin.journal.RawMessage;
 import org.graylog2.shared.buffers.ProcessBuffer;
@@ -31,10 +30,9 @@ import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Semaphore;
 
-@Singleton
 public class JournalReader extends AbstractExecutionThreadService {
     private static final Logger log = LoggerFactory.getLogger(JournalReader.class);
-    private final KafkaJournal journal;
+    private final Journal journal;
     private final EventBus eventBus;
     private final ProcessBuffer processBuffer;
     private final Semaphore journalFilled;
@@ -42,7 +40,7 @@ public class JournalReader extends AbstractExecutionThreadService {
     private Thread executionThread;
 
     @Inject
-    public JournalReader(KafkaJournal journal, EventBus eventBus, ProcessBuffer processBuffer, @Named("JournalSignal") Semaphore journalFilled) {
+    public JournalReader(Journal journal, EventBus eventBus, ProcessBuffer processBuffer, @Named("JournalSignal") Semaphore journalFilled) {
         this.journal = journal;
         this.eventBus = eventBus;
         this.processBuffer = processBuffer;
@@ -80,7 +78,7 @@ public class JournalReader extends AbstractExecutionThreadService {
         startLatch.await();
 
         while (isRunning()) {
-            final List<KafkaJournal.JournalReadEntry> encodedRawMessages = journal.read();
+            final List<Journal.JournalReadEntry> encodedRawMessages = journal.read();
             if (encodedRawMessages.isEmpty()) {
                 log.info("No messages to read from Journal, waiting until the writer adds more messages.");
                 // block until something is written to the journal again
@@ -95,7 +93,7 @@ public class JournalReader extends AbstractExecutionThreadService {
                 journalFilled.drainPermits();
             } else {
                 log.info("Processing {} messages from journal.", encodedRawMessages.size());
-                for (final KafkaJournal.JournalReadEntry encodedRawMessage : encodedRawMessages) {
+                for (final Journal.JournalReadEntry encodedRawMessage : encodedRawMessages) {
                     final RawMessage rawMessage = RawMessage.decode(encodedRawMessage.getPayload(),
                                                                     encodedRawMessage.getOffset());
                     if (rawMessage == null) {

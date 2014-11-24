@@ -16,11 +16,7 @@
  */
 package org.graylog2.outputs;
 
-import com.codahale.metrics.Histogram;
-import com.codahale.metrics.InstrumentedExecutorService;
-import com.codahale.metrics.Meter;
-import com.codahale.metrics.MetricRegistry;
-import com.codahale.metrics.Timer;
+import com.codahale.metrics.*;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
@@ -28,6 +24,7 @@ import org.graylog2.Configuration;
 import org.graylog2.indexer.cluster.Cluster;
 import org.graylog2.indexer.messages.Messages;
 import org.graylog2.plugin.Message;
+import org.graylog2.shared.journal.Journal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,8 +48,12 @@ public class BatchedElasticSearchOutput extends ElasticSearchOutput {
     private final Cluster cluster;
 
     @Inject
-    public BatchedElasticSearchOutput(MetricRegistry metricRegistry, Messages messages, Cluster cluster, Configuration configuration) {
-        super(metricRegistry, messages);
+    public BatchedElasticSearchOutput(MetricRegistry metricRegistry,
+                                      Messages messages,
+                                      Cluster cluster,
+                                      Configuration configuration,
+                                      Journal journal) {
+        super(metricRegistry, messages, journal);
         this.cluster = cluster;
         this.maxBufferSize = configuration.getOutputBatchSize();
         this.buffer = Lists.newArrayListWithCapacity(maxBufferSize);

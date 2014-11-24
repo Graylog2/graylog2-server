@@ -24,10 +24,10 @@ import org.graylog2.indexer.cluster.Cluster;
 import org.graylog2.indexer.messages.Messages;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
+import org.graylog2.shared.journal.NoopJournal;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import javax.ws.rs.HEAD;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -64,7 +64,7 @@ public class BatchedElasticSearchOutputTest {
         MetricRegistry metricRegistry = new MetricRegistry();
 
         final BatchedElasticSearchOutput output = new BatchedElasticSearchOutput(metricRegistry, messages,
-                                                                                 cluster, config);
+                                                                                 cluster, config, new NoopJournal());
 
         try {
             for (Message message : messageList) {
@@ -90,7 +90,7 @@ public class BatchedElasticSearchOutputTest {
         when(cluster.isConnectedAndHealthy()).thenReturn(false);
 
         final List<Message> messageList = buildMessages(3);
-        BatchedElasticSearchOutput output = new BatchedElasticSearchOutput(metricRegistry, messages, cluster, config);
+        BatchedElasticSearchOutput output = new BatchedElasticSearchOutput(metricRegistry, messages, cluster, config, new NoopJournal());
 
         try {
             for (Message message : messageList) {
@@ -117,7 +117,7 @@ public class BatchedElasticSearchOutputTest {
         when(cluster.isConnectedAndHealthy()).thenReturn(true);
 
         final List<Message> messageList = buildMessages(batchSize + 1);
-        final BatchedElasticSearchOutput output = new BatchedElasticSearchOutput(metricRegistry, messages, cluster, config);
+        final BatchedElasticSearchOutput output = new BatchedElasticSearchOutput(metricRegistry, messages, cluster, config, new NoopJournal());
 
         try {
             for (Message message : messageList) {
@@ -143,7 +143,7 @@ public class BatchedElasticSearchOutputTest {
         };
         when(cluster.isConnectedAndHealthy()).thenReturn(true);
 
-        final BatchedElasticSearchOutput output = new BatchedElasticSearchOutput(metricRegistry, messages, cluster, config);
+        final BatchedElasticSearchOutput output = new BatchedElasticSearchOutput(metricRegistry, messages, cluster, config, new NoopJournal());
 
         output.flush(false);
 

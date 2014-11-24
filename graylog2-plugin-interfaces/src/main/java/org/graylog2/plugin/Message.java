@@ -105,6 +105,11 @@ public class Message {
     // Used for drools to filter out messages.
     private boolean filterOut = false;
     private InetAddress inetAddress;
+    /**
+     * The offset the message originally had in the journal it was read from. This will be MIN_VALUE if no journal
+     * was involved.
+     */
+    private long journalOffset = Long.MIN_VALUE;
 
     public Message(final String message, final String source, final DateTime timestamp) {
         // Adding the fields directly because they would not be accepted as a reserved fields.
@@ -325,6 +330,14 @@ public class Message {
 
     public InetAddress getInetAddress() {
         return inetAddress;
+    }
+
+    public void setJournalOffset(long journalOffset) {
+        this.journalOffset = journalOffset;
+    }
+
+    public long getJournalOffset() {
+        return journalOffset;
     }
 
     public static class MessageIdFunction implements Function<Message, String> {

@@ -29,6 +29,7 @@ import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.outputs.MessageOutput;
 import org.graylog2.plugin.outputs.MessageOutputConfigurationException;
+import org.graylog2.shared.journal.Journal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,12 +46,15 @@ public class ElasticSearchOutput implements MessageOutput {
     private final Meter writes;
     private final Timer processTime;
     private final Messages messages;
+    private final Journal journal;
     private final AtomicBoolean isRunning = new AtomicBoolean(false);
 
     @Inject
     public ElasticSearchOutput(MetricRegistry metricRegistry,
-                               Messages messages) {
+                               Messages messages,
+                               Journal journal) {
         this.messages = messages;
+        this.journal = journal;
         // Only constructing metrics here. write() get's another Core reference. (because this technically is a plugin)
         this.writes = metricRegistry.meter(name(ElasticSearchOutput.class, "writes"));
         this.processTime = metricRegistry.timer(name(ElasticSearchOutput.class, "processTime"));
@@ -74,11 +78,16 @@ public class ElasticSearchOutput implements MessageOutput {
                                                                                          Message.ID_FUNCTION));
             LOG.trace("Writing message ids to [{}]: <{}>", getName(), Joiner.on(", ").join(sortedIds));
         }
+        long maxOffset = Long.MIN_VALUE;
+        for (final Message message : messageList) {
+            maxOffset = Math.max(message.getJournalOffset(), maxOffset);
+        }
 
         writes.mark(messageList.size());
         try (final Timer.Context ignored = processTime.time()) {
             messages.bulkIndex(messageList);
         }
+        journal.markJournalOffsetCommitted(maxOffset);
     }
 
     @Override

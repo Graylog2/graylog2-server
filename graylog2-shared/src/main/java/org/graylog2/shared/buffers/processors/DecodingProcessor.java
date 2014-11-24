@@ -88,6 +88,7 @@ public class DecodingProcessor implements EventHandler<MessageEvent> {
         // TODO Create parse times per codec as well. (add some more metrics too)
         try (Timer.Context ignored = parseTime.time()) {
             message = codec.decode(raw);
+            message.setJournalOffset(raw.getJournalOffset());
         } catch (RuntimeException e) {
             throw e;
             //failures.mark();

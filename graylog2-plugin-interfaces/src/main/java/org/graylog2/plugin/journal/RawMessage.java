@@ -68,7 +68,7 @@ public class RawMessage implements Serializable {
 
     private final JournalMessage.Builder msgBuilder;
     private final UUID id;
-    private final long sequenceNumber;
+    private final long journalOffset;
     private Configuration codecConfig;
 
     public RawMessage(byte[] payload) {
@@ -83,7 +83,7 @@ public class RawMessage implements Serializable {
         this(Long.MIN_VALUE, new UUID(), Tools.iso8601(), remoteAddress, payload);
     }
 
-    public RawMessage(long sequenceNumber,
+    public RawMessage(long journalOffset,
                       UUID id,
                       DateTime timestamp,
                       ResolvableInetSocketAddress remoteAddress,
@@ -94,7 +94,7 @@ public class RawMessage implements Serializable {
 
         msgBuilder = JournalMessage.newBuilder();
 
-        this.sequenceNumber = sequenceNumber;
+        this.journalOffset = journalOffset;
         msgBuilder.setVersion(CURRENT_VERSION);
 
         this.id = id;
@@ -117,20 +117,20 @@ public class RawMessage implements Serializable {
                   .build();
     }
 
-    public RawMessage(JournalMessage journalMessage, long sequenceNumber) {
-        this.sequenceNumber = sequenceNumber;
+    public RawMessage(JournalMessage journalMessage, long journalOffset) {
+        this.journalOffset = journalOffset;
         id = new UUID(journalMessage.getUuidTime(), journalMessage.getUuidClockseq());
         msgBuilder = JournalMessage.newBuilder(journalMessage);
         codecConfig = Configuration.deserializeFromJson(journalMessage.getCodec().getConfig());
     }
 
-    public static RawMessage decode(final byte[] buffer, final long sequenceNumber) {
+    public static RawMessage decode(final byte[] buffer, final long journalOffset) {
         try {
             final JournalMessage journalMessage = JournalMessage.parseFrom(buffer);
 
             // TODO validate message based on field contents and version number
 
-            return new RawMessage(journalMessage, sequenceNumber);
+            return new RawMessage(journalMessage, journalOffset);
         } catch (IOException e) {
             log.error("Cannot read raw message from journal, ignoring this message.", e);
             return null;
@@ -239,6 +239,10 @@ public class RawMessage implements Serializable {
         }
 
         return list;
+    }
+
+    public long getJournalOffset() {
+        return journalOffset;
     }
 
     public static class SourceNode {

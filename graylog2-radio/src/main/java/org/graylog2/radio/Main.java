@@ -44,6 +44,8 @@ import org.graylog2.shared.NodeRunner;
 import org.graylog2.shared.bindings.GuiceInjectorHolder;
 import org.graylog2.shared.bindings.GuiceInstantiationService;
 import org.graylog2.shared.initializers.ServiceManagerListener;
+import org.graylog2.shared.journal.KafkaJournalModule;
+import org.graylog2.shared.journal.NoopJournalModule;
 import org.graylog2.shared.plugins.PluginLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -120,6 +122,11 @@ public class Main extends NodeRunner {
         List<Module> bindingsModules = getBindingsModules(instantiationService,
                 new RadioBindings(configuration),
                 new RadioInitializerBindings());
+        if (configuration.isMessageJournalEnabled()) {
+            bindingsModules.add(new KafkaJournalModule());
+        } else {
+            bindingsModules.add(new NoopJournalModule());
+        }
         LOG.debug("Adding plugin modules: " + pluginModules);
         bindingsModules.addAll(pluginModules);
         final Injector injector = GuiceInjectorHolder.createInjector(bindingsModules);
