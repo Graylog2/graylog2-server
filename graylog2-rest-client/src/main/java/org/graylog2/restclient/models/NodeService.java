@@ -89,7 +89,7 @@ public class NodeService {
 
         RadiosResponse r = api.path(routes.RadiosResource().radios(), RadiosResponse.class).execute();
         for (RadioSummaryResponse radio : r.radios) {
-            radios.put(radio.id, radioFactory.fromSummaryResponse(radio));
+            radios.put(radio.nodeId, radioFactory.fromSummaryResponse(radio));
         }
 
         return radios;
