@@ -100,13 +100,13 @@ public class ServerNodesTest extends BaseApiTest {
         final Node.Factory nodeFactory = injector.getInstance(Node.Factory.class);
         final NodeSummaryResponse r1 = new NodeSummaryResponse();
         r1.transportAddress = "http://localhost:65534";
-        r1.id = UUID.randomUUID().toString();
+        r1.nodeId = UUID.randomUUID().toString();
 
         final Node newNode = nodeFactory.fromSummaryResponse(r1);
         newNode.touch();
         final NodeSummaryResponse r2 = new NodeSummaryResponse();
         r2.transportAddress = firstNode.getTransportAddress();
-        r2.id = firstNode.getNodeId();
+        r2.nodeId = firstNode.getNodeId();
         final Node sameAsInitialNode = nodeFactory.fromSummaryResponse(r2);
         sameAsInitialNode.touch();
         serverNodes.put(ImmutableList.of(newNode, sameAsInitialNode));

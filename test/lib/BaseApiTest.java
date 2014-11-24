@@ -65,7 +65,7 @@ public class BaseApiTest {
         for (AddressNodeId n : nodeDesc) {
             NodeSummaryResponse r = new NodeSummaryResponse();
             r.transportAddress = n.address;
-            r.id = n.nodeId;
+            r.nodeId = n.nodeId;
             final Node node = factory.fromSummaryResponse(r);
             node.touch();
             nodes.add(node);
