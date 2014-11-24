@@ -45,6 +45,7 @@ import com.google.inject.Injector;
 import com.google.inject.Module;
 import com.google.inject.ProvisionException;
 import com.google.inject.name.Names;
+import io.airlift.command.Option;
 import org.apache.log4j.Level;
 import org.graylog2.plugin.BaseConfiguration;
 import org.graylog2.plugin.Plugin;
@@ -76,9 +77,12 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+
+import static com.google.common.base.Strings.nullToEmpty;
 
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
@@ -99,6 +103,12 @@ public abstract class Bootstrap implements Runnable {
         this.configuration = configuration;
     }
 
+    @Option(name = "--dump-config", description = "Show the effective Graylog2 configuration and exit")
+    protected boolean dumpConfig = false;
+
+    @Option(name = "--dump-default-config", description = "Show the default configuration and exit")
+    protected boolean dumpDefaultConfig = false;
+
     protected abstract void startNodeRegistration(Injector injector);
     protected abstract List<Module> getCommandBindings();
     protected abstract List<Object> getCommandConfigurationBeans();
@@ -110,11 +120,32 @@ public abstract class Bootstrap implements Runnable {
     protected abstract boolean isDebug();
     protected abstract boolean validateConfiguration();
 
+    public boolean isDumpConfig() {
+        return dumpConfig;
+    }
+
+    public boolean isDumpDefaultConfig() {
+        return dumpDefaultConfig;
+    }
+
     @Override
     public void run() {
         final JadConfig jadConfig = new JadConfig();
         jadConfig.addConverterFactory(new JodaTimeConverterFactory());
+
+        if (isDumpDefaultConfig()) {
+            for (Object bean : getCommandConfigurationBeans())
+                jadConfig.addConfigurationBean(bean);
+            System.out.println(dumpConfiguration(jadConfig.dump()));
+            System.exit(0);
+        }
+
         final NamedConfigParametersModule configModule = readConfiguration(jadConfig, getConfigFile());
+
+        if (isDumpConfig()) {
+            System.out.println(dumpConfiguration(jadConfig.dump()));
+            System.exit(0);
+        }
 
         if (!validateConfiguration()) {
             LOG.error("Validating configuration file failed - exiting.");
@@ -317,5 +348,17 @@ public abstract class Bootstrap implements Runnable {
         }
 
         return new NamedConfigParametersModule(beans);
+    }
+
+    private String dumpConfiguration(final Map<String, String> configMap) {
+        final StringBuilder sb = new StringBuilder();
+        sb.append("# Configuration of graylog2-").append(commandName).append(" ").append(version).append(System.lineSeparator());
+        sb.append("# Generated on ").append(Tools.iso8601()).append(System.lineSeparator());
+
+        for (Map.Entry<String, String> entry : configMap.entrySet()) {
+            sb.append(entry.getKey()).append('=').append(nullToEmpty(entry.getValue())).append(System.lineSeparator());
+        }
+
+        return sb.toString();
     }
 }

@@ -270,7 +270,6 @@ public final class Main extends NodeRunner {
             serverStatus.setStatsMode(true);
         }
 
-
         if (!commandLineArguments.performRetention()) {
             elasticsearchConfiguration.setPerformRetention(false);
         }

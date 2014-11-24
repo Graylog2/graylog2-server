@@ -41,6 +41,7 @@ public class Main {
                 .withCommands(Server.class, Radio.class, ShowVersion.class, Help.class);
 
         Cli<Runnable> gitParser = builder.build();
-        gitParser.parse(argv).run();
+        Runnable command = gitParser.parse(argv);
+        command.run();
     }
 }

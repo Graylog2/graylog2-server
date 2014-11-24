@@ -117,12 +117,6 @@ public class Server extends Bootstrap implements Runnable {
     @Option(name = {"-h", "--help"}, description = "Show usage information and exit")
     private boolean showHelp = false;
 
-    @Option(name = "--dump-config", description = "Show the effective Graylog2 configuration and exit")
-    private boolean dumpConfig = false;
-
-    @Option(name = "--dump-default-config", description = "Show the default configuration and exit")
-    private boolean dumpDefaultConfig = false;
-
     public String getConfigFile() {
         return configFile;
     }
@@ -149,10 +143,6 @@ public class Server extends Bootstrap implements Runnable {
 
     public boolean isConfigTest() {
         return configTest;
-    }
-
-    public void setConfigTest(boolean configTest) {
-        this.configTest = configTest;
     }
 
     public boolean isDebug() {
