@@ -119,7 +119,7 @@ public class GarbageCollectionWarningThread extends Periodical {
                         final Duration duration = Duration.milliseconds(gcInfo.getDuration());
 
                         if (duration.compareTo(gcWarningThreshold) > 0) {
-                            LOG.warn("Last GC run with {} took longer than {}ms (last duration={}ms)",
+                            LOG.warn("Last GC run with {} took longer than {} (last duration={})",
                                     gc.getName(), gcWarningThreshold, duration);
 
                             final Notification systemNotification = notificationService.buildNow()
