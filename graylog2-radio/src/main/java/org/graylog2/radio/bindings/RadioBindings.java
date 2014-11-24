@@ -87,6 +87,11 @@ public class RadioBindings extends AbstractModule {
         bind(URI.class).annotatedWith(Names.named("OurRadioUri")).toInstance(configuration.getRestTransportUri());
 
         bind(InputCache.class).to(BasicCache.class).in(Scopes.SINGLETON);
+
+        bind(String[].class).annotatedWith(Names.named("RestControllerPackages")).toInstance(new String[]{
+                "org.graylog2.radio.rest.resources",
+                "org.graylog2.shared.rest.resources"
+        });
     }
 
     private void bindProviders() {

@@ -56,6 +56,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.net.ssl.SSLException;
 import javax.ws.rs.Path;
@@ -90,6 +91,7 @@ public class RestApiService extends AbstractIdleService {
     private final Map<String, Set<PluginRestResource>> pluginRestResources;
 
     private final ServerBootstrap bootstrap;
+    private final String[] restControllerPackages;
 
     @Inject
     public RestApiService(BaseConfiguration configuration,
@@ -98,11 +100,13 @@ public class RestApiService extends AbstractIdleService {
                           Set<Class<? extends DynamicFeature>> dynamicFeatures,
                           Set<Class<? extends ContainerResponseFilter>> containerResponseFilters,
                           Set<Class<? extends ExceptionMapper>> exceptionMappers,
-                          Map<String, Set<PluginRestResource>> pluginRestResources) {
+                          Map<String, Set<PluginRestResource>> pluginRestResources,
+                          @Named("RestControllerPackages") String[] restControllerPackages) {
         this(configuration, metricRegistry, securityContextFactory, dynamicFeatures, containerResponseFilters,
                 exceptionMappers, pluginRestResources,
                 instrumentedExecutor("restapi-boss-%d", metricRegistry),
-                instrumentedExecutor("restapi-worker-%d", metricRegistry));
+                instrumentedExecutor("restapi-worker-%d", metricRegistry),
+                restControllerPackages);
     }
 
     private RestApiService(final BaseConfiguration configuration,
@@ -113,9 +117,10 @@ public class RestApiService extends AbstractIdleService {
                            final Set<Class<? extends ExceptionMapper>> exceptionMappers,
                            final Map<String, Set<PluginRestResource>> pluginRestResources,
                            final ExecutorService bossExecutor,
-                           final ExecutorService workerExecutor) {
+                           final ExecutorService workerExecutor,
+                           final String[] restControllerPackages) {
         this(configuration, metricRegistry, securityContextFactory, dynamicFeatures, containerResponseFilters,
-                exceptionMappers, pluginRestResources, buildServerBootStrap(bossExecutor, workerExecutor));
+                exceptionMappers, pluginRestResources, buildServerBootStrap(bossExecutor, workerExecutor), restControllerPackages);
     }
 
     private RestApiService(final BaseConfiguration configuration,
@@ -125,7 +130,8 @@ public class RestApiService extends AbstractIdleService {
                            final Set<Class<? extends ContainerResponseFilter>> containerResponseFilters,
                            final Set<Class<? extends ExceptionMapper>> exceptionMappers,
                            final Map<String, Set<PluginRestResource>> pluginRestResources,
-                           final ServerBootstrap bootstrap) {
+                           final ServerBootstrap bootstrap,
+                           final String[] restControllerPackages) {
         this.configuration = configuration;
         this.metricRegistry = metricRegistry;
         this.securityContextFactory = securityContextFactory;
@@ -134,6 +140,7 @@ public class RestApiService extends AbstractIdleService {
         this.exceptionMappers = exceptionMappers;
         this.pluginRestResources = pluginRestResources;
         this.bootstrap = bootstrap;
+        this.restControllerPackages = restControllerPackages;
     }
 
     private static ExecutorService instrumentedExecutor(final String nameFormat, final MetricRegistry metricRegistry) {
@@ -242,11 +249,7 @@ public class RestApiService extends AbstractIdleService {
                         WebApplicationExceptionMapper.class)
                 .register(ObjectMapperProvider.class)
                 .register(JacksonFeature.class)
-                .registerFinder(new PackageNamesScanner(new String[]{
-                        "org.graylog2.rest.resources",
-                        "org.graylog2.radio.rest.resources",
-                        "org.graylog2.shared.rest.resources"
-                }, true))
+                .registerFinder(new PackageNamesScanner(restControllerPackages, true))
                 .registerResources(additionalResources);
 
         for (Class<? extends ExceptionMapper> exceptionMapper : exceptionMappers) {

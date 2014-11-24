@@ -23,10 +23,13 @@
 
 package org.graylog2.bootstrap.commands;
 
+import io.airlift.command.Command;
+
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
  */
-public class DumpDefaultConfig implements Runnable {
+@Command(name = "config", description = "Dumps (default) config")
+public class DumpConfig implements Runnable {
     @Override
     public void run() {
 

@@ -21,26 +21,20 @@
  * THE SOFTWARE.
  */
 
-package org.graylog2.bootstrap;
+package org.graylog2.radio.bindings;
 
-import io.airlift.command.Cli;
-import io.airlift.command.Cli.CliBuilder;
-import io.airlift.command.Help;
-import org.graylog2.bootstrap.commands.Radio;
-import org.graylog2.bootstrap.commands.Server;
-import org.graylog2.bootstrap.commands.ShowVersion;
+import com.google.inject.AbstractModule;
+import com.google.inject.multibindings.Multibinder;
+import org.graylog2.periodical.MasterPingPeriodical;
+import org.graylog2.plugin.periodical.Periodical;
 
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
  */
-public class Main {
-    public static void main(String[] argv) {
-        CliBuilder<Runnable> builder = Cli.<Runnable>builder("graylog2")
-                .withDescription("Open source, centralized log management")
-                .withDefaultCommand(Help.class)
-                .withCommands(Server.class, Radio.class, ShowVersion.class, Help.class);
-
-        Cli<Runnable> gitParser = builder.build();
-        gitParser.parse(argv).run();
+public class PeriodicalBindings extends AbstractModule {
+    @Override
+    protected void configure() {
+        Multibinder<Periodical> periodicalBinder = Multibinder.newSetBinder(binder(), Periodical.class);
+        periodicalBinder.addBinding().to(MasterPingPeriodical.class);
     }
 }

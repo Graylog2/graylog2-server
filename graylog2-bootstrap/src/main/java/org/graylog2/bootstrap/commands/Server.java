@@ -23,15 +23,7 @@
 
 package org.graylog2.bootstrap.commands;
 
-import com.github.joschi.jadconfig.JadConfig;
-import com.github.joschi.jadconfig.ParameterException;
-import com.github.joschi.jadconfig.RepositoryException;
-import com.github.joschi.jadconfig.ValidationException;
-import com.github.joschi.jadconfig.guice.NamedConfigParametersModule;
-import com.github.joschi.jadconfig.repositories.EnvironmentRepository;
-import com.github.joschi.jadconfig.repositories.PropertiesRepository;
-import com.github.joschi.jadconfig.repositories.SystemPropertiesRepository;
-import com.google.common.collect.ImmutableList;
+import com.google.common.util.concurrent.ServiceManager;
 import com.google.inject.Injector;
 import com.google.inject.Module;
 import io.airlift.command.Command;
@@ -42,11 +34,13 @@ import org.graylog2.bindings.AlarmCallbackBindings;
 import org.graylog2.bindings.InitializerBindings;
 import org.graylog2.bindings.MessageFilterBindings;
 import org.graylog2.bindings.MessageOutputBindings;
+import org.graylog2.bindings.PeriodicalBindings;
 import org.graylog2.bindings.PersistenceServicesBindings;
 import org.graylog2.bindings.RotationStrategyBindings;
 import org.graylog2.bindings.ServerBindings;
 import org.graylog2.bindings.ServerMessageInputBindings;
 import org.graylog2.bootstrap.Bootstrap;
+import org.graylog2.bootstrap.Main;
 import org.graylog2.cluster.NodeService;
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.configuration.EmailConfiguration;
@@ -55,15 +49,14 @@ import org.graylog2.configuration.TelemetryConfiguration;
 import org.graylog2.configuration.VersionCheckConfiguration;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
-import org.graylog2.plugin.PluginModule;
 import org.graylog2.plugin.ServerStatus;
-import org.graylog2.shared.bindings.GuiceInjectorHolder;
-import org.graylog2.shared.bindings.GuiceInstantiationService;
 import org.graylog2.shared.system.activities.Activity;
 import org.graylog2.shared.system.activities.ActivityWriter;
+import org.graylog2.system.shutdown.GracefulShutdown;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
 import java.util.Arrays;
 import java.util.List;
 
@@ -82,7 +75,7 @@ public class Server extends Bootstrap implements Runnable {
     private final VersionCheckConfiguration versionCheckConfiguration = new VersionCheckConfiguration();
 
     public Server() {
-        super("server", configuration);
+        super("Server", configuration);
     }
 
     @Option(name = {"-f", "--configfile"}, description = "Configuration file for Graylog2")
@@ -230,69 +223,30 @@ public class Server extends Bootstrap implements Runnable {
         this.dumpConfig = dumpConfig;
     }
 
-    protected Injector setupInjector(NamedConfigParametersModule configModule, List<PluginModule> pluginModules) {
-        try {
-            final GuiceInstantiationService instantiationService = new GuiceInstantiationService();
-
-            final ImmutableList.Builder<Module> modules = ImmutableList.builder();
-            modules.add(configModule);
-            modules.addAll(
-                    getBindingsModules(instantiationService,
-                            new ServerBindings(configuration),
-                            new PersistenceServicesBindings(),
-                            new ServerMessageInputBindings(),
-                            new MessageFilterBindings(),
-                            new AlarmCallbackBindings(),
-                            new InitializerBindings(),
-                            new MessageOutputBindings(),
-                            new RotationStrategyBindings()));
-            LOG.debug("Adding plugin modules: " + pluginModules);
-            modules.addAll(pluginModules);
-
-            final Injector injector = GuiceInjectorHolder.createInjector(modules.build());
-            instantiationService.setInjector(injector);
-
-            return injector;
-        } catch (Exception e) {
-            LOG.error("Injector creation failed!", e);
-            return null;
-        }
+    @Override
+    protected List<Module> getCommandBindings() {
+        return Arrays.<Module>asList(new ServerBindings(configuration),
+                new PersistenceServicesBindings(),
+                new ServerMessageInputBindings(),
+                new MessageFilterBindings(),
+                new AlarmCallbackBindings(),
+                new InitializerBindings(),
+                new MessageOutputBindings(),
+                new RotationStrategyBindings(),
+                new PeriodicalBindings());
     }
 
-    protected NamedConfigParametersModule readConfiguration(final JadConfig jadConfig, final String configFile) {
-        jadConfig.addConfigurationBean(configuration);
-        jadConfig.addConfigurationBean(elasticsearchConfiguration);
-        jadConfig.addConfigurationBean(emailConfiguration);
-        jadConfig.addConfigurationBean(mongoDbConfiguration);
-        jadConfig.addConfigurationBean(telemetryConfiguration);
-        jadConfig.addConfigurationBean(versionCheckConfiguration);
-        jadConfig.setRepositories(Arrays.asList(
-                new EnvironmentRepository(ENVIRONMENT_PREFIX),
-                new SystemPropertiesRepository(PROPERTIES_PREFIX),
-                new PropertiesRepository(configFile)
-        ));
-
-        LOG.debug("Loading configuration from config file: {}", configFile);
-        try {
-            jadConfig.process();
-        } catch (RepositoryException e) {
-            LOG.error("Couldn't load configuration: {}", e.getMessage());
-            System.exit(1);
-        } catch (ParameterException | ValidationException e) {
-            LOG.error("Invalid configuration", e);
-            System.exit(1);
-        }
-
-        if (configuration.getRestTransportUri() == null) {
-            configuration.setRestTransportUri(configuration.getDefaultRestTransportUri());
-            LOG.debug("No rest_transport_uri set. Using default [{}].", configuration.getRestTransportUri());
-        }
-
-        return new NamedConfigParametersModule(Arrays.asList(
-                configuration, elasticsearchConfiguration, emailConfiguration, mongoDbConfiguration, telemetryConfiguration,
-                versionCheckConfiguration));
+    @Override
+    protected List<Object> getCommandConfigurationBeans() {
+        return Arrays.asList(configuration,
+                elasticsearchConfiguration,
+                emailConfiguration,
+                mongoDbConfiguration,
+                telemetryConfiguration,
+                versionCheckConfiguration);
     }
 
+    @Override
     protected void startNodeRegistration(Injector injector) {
         // Register this node.
         final NodeService nodeService = injector.getInstance(NodeService.class);
@@ -326,5 +280,43 @@ public class Server extends Bootstrap implements Runnable {
                 LOG.warn("Stale master has gone. Starting as master.");
             }
         }
+    }
+
+    @Override
+    protected boolean validateConfiguration() {
+        if (configuration.getPasswordSecret().isEmpty()) {
+            LOG.error("No password secret set. Please define password_secret in your graylog2.conf.");
+            return false;
+        }
+
+        return true;
+    }
+
+    private static class ShutdownHook implements Runnable {
+        private final ActivityWriter activityWriter;
+        private final ServiceManager serviceManager;
+        private final GracefulShutdown gracefulShutdown;
+
+        @Inject
+        public ShutdownHook(ActivityWriter activityWriter, ServiceManager serviceManager, GracefulShutdown gracefulShutdown) {
+            this.activityWriter = activityWriter;
+            this.serviceManager = serviceManager;
+            this.gracefulShutdown = gracefulShutdown;
+        }
+
+        @Override
+        public void run() {
+            String msg = "SIGNAL received. Shutting down.";
+            LOG.info(msg);
+            activityWriter.write(new Activity(msg, Main.class));
+
+            gracefulShutdown.runWithoutExit();
+            serviceManager.stopAsync().awaitStopped();
+        }
+    }
+
+    @Override
+    protected Class<? extends Runnable> shutdownHook() {
+        return ShutdownHook.class;
     }
 }

@@ -27,15 +27,24 @@ import com.codahale.metrics.JmxReporter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.log4j.InstrumentedAppender;
 import com.github.joschi.jadconfig.JadConfig;
+import com.github.joschi.jadconfig.ParameterException;
+import com.github.joschi.jadconfig.RepositoryException;
+import com.github.joschi.jadconfig.ValidationException;
 import com.github.joschi.jadconfig.guice.NamedConfigParametersModule;
 import com.github.joschi.jadconfig.jodatime.JodaTimeConverterFactory;
+import com.github.joschi.jadconfig.repositories.EnvironmentRepository;
+import com.github.joschi.jadconfig.repositories.PropertiesRepository;
+import com.github.joschi.jadconfig.repositories.SystemPropertiesRepository;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.ServiceManager;
 import com.google.inject.AbstractModule;
+import com.google.inject.Binder;
 import com.google.inject.Injector;
 import com.google.inject.Module;
 import com.google.inject.ProvisionException;
+import com.google.inject.name.Names;
 import org.apache.log4j.Level;
 import org.graylog2.plugin.BaseConfiguration;
 import org.graylog2.plugin.Plugin;
@@ -45,8 +54,9 @@ import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.Version;
 import org.graylog2.plugin.inject.Graylog2Module;
 import org.graylog2.plugin.inputs.MessageInput;
-import org.graylog2.radio.cluster.Ping;
 import org.graylog2.shared.bindings.GenericBindings;
+import org.graylog2.shared.bindings.GuiceInjectorHolder;
+import org.graylog2.shared.bindings.GuiceInstantiationService;
 import org.graylog2.shared.bindings.InstantiationService;
 import org.graylog2.shared.initializers.ServiceManagerListener;
 import org.graylog2.shared.plugins.PluginLoader;
@@ -89,20 +99,27 @@ public abstract class Bootstrap implements Runnable {
         this.configuration = configuration;
     }
 
-    protected abstract Injector setupInjector(NamedConfigParametersModule configModule, List<PluginModule> pluginModules);
-    protected abstract NamedConfigParametersModule readConfiguration(final JadConfig jadConfig, final String configFile);
     protected abstract void startNodeRegistration(Injector injector);
+    protected abstract List<Module> getCommandBindings();
+    protected abstract List<Object> getCommandConfigurationBeans();
+    protected abstract Class<? extends Runnable> shutdownHook();
 
     protected abstract String getConfigFile();
     protected abstract String getPidFile();
     protected abstract boolean isNoPidFile();
     protected abstract boolean isDebug();
+    protected abstract boolean validateConfiguration();
 
     @Override
     public void run() {
         final JadConfig jadConfig = new JadConfig();
         jadConfig.addConverterFactory(new JodaTimeConverterFactory());
         final NamedConfigParametersModule configModule = readConfiguration(jadConfig, getConfigFile());
+
+        if (!validateConfiguration()) {
+            LOG.error("Validating configuration file failed - exiting.");
+            System.exit(1);
+        }
 
         // Are we in debug mode?
         Level logLevel = Level.INFO;
@@ -113,12 +130,7 @@ public abstract class Bootstrap implements Runnable {
         org.apache.log4j.Logger.getRootLogger().setLevel(logLevel);
         org.apache.log4j.Logger.getLogger(Main.class.getPackage().getName()).setLevel(logLevel);
 
-        PluginLoader pluginLoader = new PluginLoader(new File(configuration.getPluginDir()));
-        List<PluginModule> pluginModules = Lists.newArrayList();
-        for (Plugin plugin : pluginLoader.loadPlugins())
-            pluginModules.addAll(plugin.modules());
-
-        LOG.debug("Loaded modules: " + pluginModules);
+        final List<PluginModule> pluginModules = loadPluginModules();
 
         final Injector injector = setupInjector(configModule, pluginModules);
 
@@ -168,16 +180,7 @@ public abstract class Bootstrap implements Runnable {
             return;
         }
 
-        Runtime.getRuntime().addShutdownHook(new Thread() {
-            @Override
-            public void run() {
-                String msg = "SIGNAL received. Shutting down.";
-                LOG.info(msg);
-                activityWriter.write(new Activity(msg, Main.class));
-
-                serviceManager.stopAsync().awaitStopped();
-            }
-        });
+        Runtime.getRuntime().addShutdownHook(new Thread(injector.getInstance(shutdownHook())));
 
         // propagate default size to input plugins
         MessageInput.setDefaultRecvBufferSize(configuration.getUdpRecvBufferSizes());
@@ -203,15 +206,23 @@ public abstract class Bootstrap implements Runnable {
 
         // Block forever.
         try {
-            while (true) {
-                Thread.sleep(1000);
-            }
+            Thread.currentThread().join();
         } catch (InterruptedException e) {
             return;
         }
     }
 
-    protected List<Module> getBindingsModules(InstantiationService instantiationService, Module... specificModules) {
+    protected List<PluginModule> loadPluginModules() {
+        PluginLoader pluginLoader = new PluginLoader(new File(configuration.getPluginDir()));
+        List<PluginModule> pluginModules = Lists.newArrayList();
+        for (Plugin plugin : pluginLoader.loadPlugins())
+            pluginModules.addAll(plugin.modules());
+
+        LOG.debug("Loaded modules: " + pluginModules);
+        return pluginModules;
+    }
+
+    protected List<Module> getSharedBindingsModules(InstantiationService instantiationService) {
         List<Module> result = Lists.newArrayList();
         result.add(new GenericBindings(instantiationService));
         Reflections reflections = new Reflections("org.graylog2.shared.bindings");
@@ -232,9 +243,34 @@ public abstract class Bootstrap implements Runnable {
                 LOG.info("No constructor found for guice module {}", type);
             }
         }
-
-        result.addAll(Arrays.asList(specificModules));
         return result;
+    }
+
+    protected Injector setupInjector(NamedConfigParametersModule configModule, List<PluginModule> pluginModules) {
+        try {
+            final GuiceInstantiationService instantiationService = new GuiceInstantiationService();
+
+            final ImmutableList.Builder<Module> modules = ImmutableList.builder();
+            modules.add(configModule);
+            modules.addAll(getSharedBindingsModules(instantiationService));
+            modules.addAll(getCommandBindings());
+            modules.add(new Module() {
+                @Override
+                public void configure(Binder binder) {
+                    binder.bind(String.class).annotatedWith(Names.named("BootstrapCommand")).toInstance(commandName);
+                }
+            });
+            LOG.debug("Adding plugin modules: " + pluginModules);
+            modules.addAll(pluginModules);
+
+            final Injector injector = GuiceInjectorHolder.createInjector(modules.build());
+            instantiationService.setInjector(injector);
+
+            return injector;
+        } catch (Exception e) {
+            LOG.error("Injector creation failed!", e);
+            return null;
+        }
     }
 
     protected void savePidFile(final String pidFile) {
@@ -252,5 +288,34 @@ public abstract class Bootstrap implements Runnable {
             LOG.error("Could not write PID file: " + e.getMessage(), e);
             System.exit(1);
         }
+    }
+
+    protected NamedConfigParametersModule readConfiguration(final JadConfig jadConfig, final String configFile) {
+        final List<Object> beans = getCommandConfigurationBeans();
+        for (Object bean : beans)
+            jadConfig.addConfigurationBean(bean);
+        jadConfig.setRepositories(Arrays.asList(
+                new EnvironmentRepository(ENVIRONMENT_PREFIX),
+                new SystemPropertiesRepository(PROPERTIES_PREFIX),
+                new PropertiesRepository(configFile)
+        ));
+
+        LOG.debug("Loading configuration from config file: {}", configFile);
+        try {
+            jadConfig.process();
+        } catch (RepositoryException e) {
+            LOG.error("Couldn't load configuration: {}", e.getMessage());
+            System.exit(1);
+        } catch (ParameterException | ValidationException e) {
+            LOG.error("Invalid configuration", e);
+            System.exit(1);
+        }
+
+        if (configuration.getRestTransportUri() == null) {
+            configuration.setRestTransportUri(configuration.getDefaultRestTransportUri());
+            LOG.debug("No rest_transport_uri set. Using default [{}].", configuration.getRestTransportUri());
+        }
+
+        return new NamedConfigParametersModule(beans);
     }
 }

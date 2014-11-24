@@ -22,6 +22,7 @@ import com.google.inject.Scopes;
 import com.google.inject.TypeLiteral;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.multibindings.Multibinder;
+import com.google.inject.name.Names;
 import com.ning.http.client.AsyncHttpClient;
 import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.elasticsearch.node.Node;
@@ -160,6 +161,11 @@ public class ServerBindings extends AbstractModule {
             bind(InputCache.class).to(BasicCache.class).in(Scopes.SINGLETON);
             bind(OutputCache.class).to(BasicCache.class).in(Scopes.SINGLETON);
         }
+
+        bind(String[].class).annotatedWith(Names.named("RestControllerPackages")).toInstance(new String[]{
+                "org.graylog2.rest.resources",
+                "org.graylog2.shared.rest.resources"
+        });
     }
 
     private void bindInterfaces() {

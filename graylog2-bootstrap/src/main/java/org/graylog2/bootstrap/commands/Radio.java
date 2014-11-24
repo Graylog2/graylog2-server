@@ -23,30 +23,24 @@
 
 package org.graylog2.bootstrap.commands;
 
-import com.github.joschi.jadconfig.JadConfig;
-import com.github.joschi.jadconfig.ParameterException;
-import com.github.joschi.jadconfig.RepositoryException;
-import com.github.joschi.jadconfig.ValidationException;
-import com.github.joschi.jadconfig.guice.NamedConfigParametersModule;
-import com.github.joschi.jadconfig.repositories.EnvironmentRepository;
-import com.github.joschi.jadconfig.repositories.PropertiesRepository;
-import com.github.joschi.jadconfig.repositories.SystemPropertiesRepository;
-import com.google.common.collect.ImmutableList;
+import com.google.common.util.concurrent.ServiceManager;
 import com.google.inject.Injector;
 import com.google.inject.Module;
 import io.airlift.command.Command;
 import io.airlift.command.Option;
 import org.graylog2.bootstrap.Bootstrap;
-import org.graylog2.plugin.PluginModule;
+import org.graylog2.bootstrap.Main;
 import org.graylog2.radio.Configuration;
+import org.graylog2.radio.bindings.PeriodicalBindings;
 import org.graylog2.radio.bindings.RadioBindings;
 import org.graylog2.radio.bindings.RadioInitializerBindings;
 import org.graylog2.radio.cluster.Ping;
-import org.graylog2.shared.bindings.GuiceInjectorHolder;
-import org.graylog2.shared.bindings.GuiceInstantiationService;
+import org.graylog2.shared.system.activities.Activity;
+import org.graylog2.shared.system.activities.ActivityWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
 import java.util.Arrays;
 import java.util.List;
 
@@ -60,7 +54,7 @@ public class Radio extends Bootstrap implements Runnable {
     private static final Configuration configuration = new Configuration();
 
     public Radio() {
-        super("radio", configuration);
+        super("Radio", configuration);
     }
 
     @Option(name = {"-f", "--configfile"}, description = "Configuration file for graylog2-radio")
@@ -143,59 +137,50 @@ public class Radio extends Bootstrap implements Runnable {
         this.dumpDefaultConfig = dumpDefaultConfig;
     }
 
-    protected Injector setupInjector(NamedConfigParametersModule configModule, List<PluginModule> pluginModules) {
-        try {
-            final GuiceInstantiationService instantiationService = new GuiceInstantiationService();
-
-            final ImmutableList.Builder<Module> modules = ImmutableList.builder();
-            modules.add(configModule);
-            modules.addAll(
-                    getBindingsModules(instantiationService,
-                            new RadioBindings(configuration),
-                            new RadioInitializerBindings()));
-            LOG.debug("Adding plugin modules: " + pluginModules);
-            modules.addAll(pluginModules);
-
-            final Injector injector = GuiceInjectorHolder.createInjector(modules.build());
-            instantiationService.setInjector(injector);
-
-            return injector;
-        } catch (Exception e) {
-            LOG.error("Injector creation failed!", e);
-            return null;
-        }
+    @Override
+    protected List<Module> getCommandBindings() {
+        return Arrays.<Module>asList(new RadioBindings(configuration), new RadioInitializerBindings(), new PeriodicalBindings());
     }
 
-    protected NamedConfigParametersModule readConfiguration(final JadConfig jadConfig, final String configFile) {
-        jadConfig.addConfigurationBean(configuration);
-        jadConfig.setRepositories(Arrays.asList(
-                new EnvironmentRepository(ENVIRONMENT_PREFIX),
-                new SystemPropertiesRepository(PROPERTIES_PREFIX),
-                new PropertiesRepository(configFile)
-        ));
-
-        LOG.debug("Loading configuration from config file: {}", configFile);
-        try {
-            jadConfig.process();
-        } catch (RepositoryException e) {
-            LOG.error("Couldn't load configuration: {}", e.getMessage());
-            System.exit(1);
-        } catch (ParameterException | ValidationException e) {
-            LOG.error("Invalid configuration", e);
-            System.exit(1);
-        }
-
-        if (configuration.getRestTransportUri() == null) {
-            configuration.setRestTransportUri(configuration.getDefaultRestTransportUri());
-            LOG.debug("No rest_transport_uri set. Using default [{}].", configuration.getRestTransportUri());
-        }
-
-        return new NamedConfigParametersModule(Arrays.asList(configuration));
+    @Override
+    protected List<Object> getCommandConfigurationBeans() {
+        return Arrays.<Object>asList(configuration);
     }
 
+    @Override
     protected void startNodeRegistration(Injector injector) {
         // register node by initiating first ping. if the node isn't registered, loading persisted inputs will fail silently, for example
         Ping.Pinger pinger = injector.getInstance(Ping.Pinger.class);
         pinger.ping();
+    }
+
+    @Override
+    protected boolean validateConfiguration() {
+        return true;
+    }
+
+    private static class ShutdownHook implements Runnable {
+        private final ActivityWriter activityWriter;
+        private final ServiceManager serviceManager;
+
+        @Inject
+        public ShutdownHook(ActivityWriter activityWriter, ServiceManager serviceManager) {
+            this.activityWriter = activityWriter;
+            this.serviceManager = serviceManager;
+        }
+
+        @Override
+        public void run() {
+            String msg = "SIGNAL received. Shutting down.";
+            LOG.info(msg);
+            activityWriter.write(new Activity(msg, Main.class));
+
+            serviceManager.stopAsync().awaitStopped();
+        }
+    }
+
+    @Override
+    protected Class<? extends Runnable> shutdownHook() {
+        return ShutdownHook.class;
     }
 }
