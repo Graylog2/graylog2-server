@@ -115,7 +115,8 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
                 // the file contains the last offset graylog2 has successfully processed.
                 // thus the nextReadOffset is one beyond that number
                 if (line != null) {
-                    nextReadOffset = Long.parseLong(line.trim()) + 1;
+                    committedOffset.set(Long.parseLong(line.trim()));
+                    nextReadOffset = committedOffset.get() + 1;
                 }
             }
         } catch (IOException e) {
