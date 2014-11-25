@@ -60,6 +60,7 @@ import javax.inject.Inject;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
@@ -197,7 +198,7 @@ public class BundleImporter {
         }
     }
 
-    private void createInputs(final String bundleId, final List<Input> inputs, final String userName)
+    private void createInputs(final String bundleId, final Set<Input> inputs, final String userName)
             throws org.graylog2.plugin.inputs.Extractor.ReservedFieldException, org.graylog2.ConfigurationException, NoSuchInputTypeException, ValidationException, ExtractorFactory.NoSuchExtractorException, NotFoundException, ConfigurationException {
         for (final Input input : inputs) {
             final MessageInput messageInput = createMessageInput(bundleId, input, userName);
@@ -358,7 +359,7 @@ public class BundleImporter {
         return inputData.build();
     }
 
-    private void createOutputs(final String bundleId, final List<Output> outputs, final String userName)
+    private void createOutputs(final String bundleId, final Set<Output> outputs, final String userName)
             throws ValidationException {
         for (final Output outputDescription : outputs) {
             final OutputImpl output = createOutput(bundleId, outputDescription, userName);
@@ -384,7 +385,7 @@ public class BundleImporter {
         return output;
     }
 
-    private void createStreams(final String bundleId, final List<Stream> streams, final String userName)
+    private void createStreams(final String bundleId, final Set<Stream> streams, final String userName)
             throws ValidationException {
         for (final Stream streamDescription : streams) {
             final String referenceId = streamDescription.getId();
@@ -435,7 +436,7 @@ public class BundleImporter {
         return stream;
     }
 
-    private void createDashboards(final String bundleId, final List<Dashboard> dashboards, final String userName)
+    private void createDashboards(final String bundleId, final Set<Dashboard> dashboards, final String userName)
             throws org.graylog2.dashboards.widgets.DashboardWidget.NoSuchWidgetTypeException, InvalidWidgetConfigurationException, InvalidRangeParametersException, ValidationException {
         for (final Dashboard dashboard : dashboards) {
             org.graylog2.dashboards.Dashboard createdDashboard = createDashboard(bundleId, dashboard, userName);
