@@ -26,6 +26,7 @@ package org.graylog2.bootstrap.commands;
 import com.google.common.util.concurrent.ServiceManager;
 import com.google.inject.Injector;
 import com.google.inject.Module;
+import com.google.inject.ProvisionException;
 import io.airlift.command.Command;
 import io.airlift.command.Option;
 import org.graylog2.bootstrap.Bootstrap;
@@ -102,5 +103,9 @@ public class Radio extends Bootstrap implements Runnable {
     @Override
     protected Class<? extends Runnable> shutdownHook() {
         return ShutdownHook.class;
+    }
+
+    @Override
+    protected void annotateProvisionException(ProvisionException e) {
     }
 }

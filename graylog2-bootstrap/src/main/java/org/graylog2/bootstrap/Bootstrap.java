@@ -125,6 +125,7 @@ public abstract class Bootstrap implements Runnable {
     protected abstract List<Module> getCommandBindings();
     protected abstract List<Object> getCommandConfigurationBeans();
     protected abstract Class<? extends Runnable> shutdownHook();
+    protected abstract void annotateProvisionException(ProvisionException e);
 
     protected abstract boolean validateConfiguration();
 
@@ -227,6 +228,7 @@ public abstract class Bootstrap implements Runnable {
             serviceManager = injector.getInstance(ServiceManager.class);
         } catch (ProvisionException e) {
             LOG.error("Guice error", e);
+            annotateProvisionException(e);
             System.exit(-1);
             return;
         } catch (Exception e) {

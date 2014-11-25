@@ -26,10 +26,14 @@ package org.graylog2.bootstrap.commands;
 import com.google.common.util.concurrent.ServiceManager;
 import com.google.inject.Injector;
 import com.google.inject.Module;
+import com.google.inject.ProvisionException;
+import com.google.inject.spi.Message;
+import com.mongodb.MongoException;
 import io.airlift.command.Command;
 import io.airlift.command.Option;
 import org.graylog2.Configuration;
 import org.graylog2.ServerVersion;
+import org.graylog2.UI;
 import org.graylog2.bindings.AlarmCallbackBindings;
 import org.graylog2.bindings.InitializerBindings;
 import org.graylog2.bindings.MessageFilterBindings;
@@ -226,5 +230,15 @@ public class Server extends Bootstrap implements Runnable {
     @Override
     protected Class<? extends Runnable> shutdownHook() {
         return ShutdownHook.class;
+    }
+
+    @Override
+    protected void annotateProvisionException(ProvisionException e) {
+        for (Message message : e.getErrorMessages()) {
+            if (message.getCause() instanceof MongoException) {
+                LOG.error(UI.wallString("Unable to connect to MongoDB. Is it running and the configuration correct?"));
+                System.exit(-1);
+            }
+        }
     }
 }
