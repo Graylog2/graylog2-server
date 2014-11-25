@@ -58,7 +58,7 @@ var SourceOverview = React.createClass({
     loadHistogramData() {
         var filters;
 
-        if (this.refs.sourcePieChart.pieChart && (this.refs.sourcePieChart.pieChart.filters().length !== 0 || SourceDataTable.dataTable.filters().length !== 0)) {
+        if (this.refs.sourcePieChart.getFilters().length !== 0 || SourceDataTable.dataTable.filters().length !== 0) {
             filters = this.nameDimension.top(Infinity).map((source) => UniversalSearch.escape(source.name));
         }
         HistogramDataStore.loadHistogramData(this.state.range, filters, SCREEN_RESOLUTION);
@@ -74,12 +74,11 @@ var SourceOverview = React.createClass({
         resizeMutex = setTimeout(() => this._updateWidth(), 200);
     },
     componentDidMount() {
-        this.applyRangeParameter();
         SourcesStore.addChangeListener(this._onSourcesChanged);
         HistogramDataStore.addChangeListener(this._onHistogramDataChanged);
 
         SourceDataTable.renderDataTable(this.messageCountDimension, this.state.numberOfSources, (sourceName) => {
-            this.refs.sourcePieChart.pieChart.filter(sourceName);
+            this.refs.sourcePieChart.setFilter(sourceName);
             this._toggleResetButtons();
             dc.redrawAll();
             this.loadHistogramData();
@@ -89,6 +88,7 @@ var SourceOverview = React.createClass({
             this._toggleResetButtons();
         });
         this.renderLineChart();
+        this.applyRangeParameter();
         dc.renderAll();
         $(window).on('resize', this._resizeCallback);
         // register them live as we do not know if those buttons are currently in the DOM
@@ -176,7 +176,7 @@ var SourceOverview = React.createClass({
             .tickFormat(d3.format("s"));
     },
     resetSourcesFilters() {
-        this.refs.sourcePieChart.pieChart.filterAll();
+        this.refs.sourcePieChart.clearFilters();
         this.nameDimension.filterAll();
         this.loadHistogramData();
         this._toggleResetButtons();
@@ -213,16 +213,16 @@ var SourceOverview = React.createClass({
          * we need to remove the dimension and graphs filters, but we only need to reapply filters to the
          * graphs, dc will propagate that to the crossfilter dimension.
          */
-        var pieChartFilters = this.refs.sourcePieChart.pieChart.filters();
+        var pieChartFilters = this.refs.sourcePieChart.getFilters();
         var dataTableFilters = SourceDataTable.dataTable.filters();
         this.nameDimension.filterAll();
         this.filterDimension.filterAll();
-        this.refs.sourcePieChart.pieChart.filterAll();
+        this.refs.sourcePieChart.clearFilters();
         SourceDataTable.dataTable.filterAll();
         this.sourcesData.remove();
         this.sourcesData.add(sources);
 
-        pieChartFilters.forEach((filter)  => this.refs.sourcePieChart.pieChart.filter(filter));
+        pieChartFilters.forEach((filter)  => this.refs.sourcePieChart.setFilter(filter));
         dataTableFilters.forEach((filter) => SourceDataTable.dataTable.filter(filter));
         this._filterSources();
 
@@ -264,7 +264,7 @@ var SourceOverview = React.createClass({
     },
     _toggleResetButtons() {
         // We only need to toggle the datatable reset button, dc will take care of the other reset buttons
-        if (this.refs.sourcePieChart.pieChart.filter()) {
+        if (this.refs.sourcePieChart.getFilters().length !== 0) {
             $('#dc-sources-result-reset').show();
         } else {
             $('#dc-sources-result-reset').hide();
@@ -314,7 +314,7 @@ var SourceOverview = React.createClass({
         this.setState({filter: event.target.value}, () => {
             this._filterSources();
             SourceDataTable.dataTable.redraw();
-            this.refs.sourcePieChart.pieChart.redraw();
+            this.refs.sourcePieChart.redraw();
         });
     },
     render() {

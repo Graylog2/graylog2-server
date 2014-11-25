@@ -11,8 +11,8 @@ var SourcePieChart = React.createClass({
     renderPieChart(dimension, group, onDataFiltered) {
         var pieChartDomNode = $("#dc-sources-pie-chart")[0];
         var pieChartWidth = $(pieChartDomNode).width();
-        this.pieChart = dc.pieChart(pieChartDomNode);
-        this.pieChart
+        this._pieChart = dc._pieChart(pieChartDomNode);
+        this._pieChart
             .renderLabel(false)
             .dimension(dimension)
             .group(group)
@@ -23,8 +23,20 @@ var SourcePieChart = React.createClass({
             });
         this.configurePieChartWidth(pieChartWidth);
     },
+    redraw() {
+        this._pieChart.redraw();
+    },
+    clearFilters() {
+        this._pieChart.filterAll();
+    },
+    getFilters() {
+        return this._pieChart ? this._pieChart.filters() : [];
+    },
+    setFilter(filter) {
+        this._pieChart.filter(filter);
+    },
     configurePieChartWidth(pieChartWidth) {
-        this.pieChart.width(pieChartWidth)
+        this._pieChart.width(pieChartWidth)
             .height(pieChartWidth)
             .radius(pieChartWidth / 2 - 10)
             .innerRadius(pieChartWidth / 5);
