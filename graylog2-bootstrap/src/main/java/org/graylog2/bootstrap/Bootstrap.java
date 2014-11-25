@@ -109,15 +109,23 @@ public abstract class Bootstrap implements Runnable {
     @Option(name = "--dump-default-config", description = "Show the default configuration and exit")
     protected boolean dumpDefaultConfig = false;
 
+    @Option(name = {"-d", "--debug"}, description = "Run Graylog2 in debug mode")
+    private boolean debug = false;
+
+    @Option(name = {"-f", "--configfile"}, description = "Configuration file for Graylog2")
+    private String configFile = "/etc/graylog2.conf";
+
+    @Option(name = {"-p", "--pidfile"}, description = "File containing the PID of Graylog2")
+    private String pidFile = TMPDIR + FILE_SEPARATOR + "graylog2.pid";
+
+    @Option(name = {"-np", "--no-pid-file"}, description = "Do not write a PID file (overrides -p/--pidfile)")
+    private boolean noPidFile = false;
+
     protected abstract void startNodeRegistration(Injector injector);
     protected abstract List<Module> getCommandBindings();
     protected abstract List<Object> getCommandConfigurationBeans();
     protected abstract Class<? extends Runnable> shutdownHook();
 
-    protected abstract String getConfigFile();
-    protected abstract String getPidFile();
-    protected abstract boolean isNoPidFile();
-    protected abstract boolean isDebug();
     protected abstract boolean validateConfiguration();
 
     public boolean isDumpConfig() {
@@ -126,6 +134,22 @@ public abstract class Bootstrap implements Runnable {
 
     public boolean isDumpDefaultConfig() {
         return dumpDefaultConfig;
+    }
+
+    public boolean isDebug() {
+        return debug;
+    }
+
+    public String getConfigFile() {
+        return configFile;
+    }
+
+    public String getPidFile() {
+        return pidFile;
+    }
+
+    public boolean isNoPidFile() {
+        return noPidFile;
     }
 
     @Override
