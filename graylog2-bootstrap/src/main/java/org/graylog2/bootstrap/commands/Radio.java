@@ -28,7 +28,6 @@ import com.google.inject.Injector;
 import com.google.inject.Module;
 import com.google.inject.ProvisionException;
 import io.airlift.command.Command;
-import io.airlift.command.Option;
 import org.graylog2.bootstrap.Bootstrap;
 import org.graylog2.bootstrap.Main;
 import org.graylog2.radio.Configuration;
