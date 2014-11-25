@@ -57,7 +57,7 @@ var SourceOverview = React.createClass({
     loadHistogramData() {
         var filters;
 
-        if (this.refs.sourcePieChart.getFilters().length !== 0 || this.refs.sourceDataTable.dataTable.filters().length !== 0) {
+        if (this.refs.sourcePieChart.getFilters().length !== 0 || this.refs.sourceDataTable.getFilters().length !== 0) {
             filters = this.nameDimension.top(Infinity).map((source) => UniversalSearch.escape(source.name));
         }
         HistogramDataStore.loadHistogramData(this.state.range, filters, SCREEN_RESOLUTION);
@@ -213,16 +213,16 @@ var SourceOverview = React.createClass({
          * graphs, dc will propagate that to the crossfilter dimension.
          */
         var pieChartFilters = this.refs.sourcePieChart.getFilters();
-        var dataTableFilters = this.refs.sourceDataTable.dataTable.filters();
+        var dataTableFilters = this.refs.sourceDataTable.getFilters();
         this.nameDimension.filterAll();
         this.filterDimension.filterAll();
         this.refs.sourcePieChart.clearFilters();
-        this.refs.sourceDataTable.dataTable.filterAll();
+        this.refs.sourceDataTable.clearFilters();
         this.sourcesData.remove();
         this.sourcesData.add(sources);
 
         pieChartFilters.forEach((filter)  => this.refs.sourcePieChart.setFilter(filter));
-        dataTableFilters.forEach((filter) => this.refs.sourceDataTable.dataTable.filter(filter));
+        dataTableFilters.forEach((filter) => this.refs.sourceDataTable.setFilter(filter));
         this._filterSources();
 
         dc.redrawAll();
@@ -307,7 +307,7 @@ var SourceOverview = React.createClass({
     setSearchFilter(filter) {
         this.setState({filter: filter}, () => {
             this._filterSources();
-            this.refs.sourceDataTable.dataTable.redraw();
+            this.refs.sourceDataTable.redraw();
             this.refs.sourcePieChart.redraw();
         });
     },

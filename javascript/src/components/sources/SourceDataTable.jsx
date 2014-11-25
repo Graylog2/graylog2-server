@@ -23,8 +23,8 @@ var SourceDataTable = React.createClass({
     },
     renderDataTable(dimension, onDataFiltered) {
         var dataTableDomNode = $("#dc-sources-result")[0];
-        this.dataTable = dc.dataTable(dataTableDomNode);
-        this.dataTable
+        this._dataTable = dc._dataTable(dataTableDomNode);
+        this._dataTable
             .dimension(dimension)
             .group((d) => d.percentage > othersThreshold ? "Top Sources" : othersName)
             .size(this.state.numberOfSources)
@@ -59,8 +59,21 @@ var SourceDataTable = React.createClass({
             })
             .renderlet((table) => table.selectAll(".dc-table-group").classed("info", true));
     },
+    redraw() {
+        this._dataTable.redraw();
+    },
+    clearFilters() {
+        this._dataTable.filterAll();
+    },
+    getFilters() {
+        return this._dataTable ? this._dataTable.filters() : [];
+    },
+    setFilter(filter) {
+        this._dataTable.filter(filter);
+    },
+
     changeNumberOfSources(numberOfSources) {
-        this.dataTable
+        this._dataTable
             .size(numberOfSources)
             .redraw();
     },
