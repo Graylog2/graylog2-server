@@ -11,6 +11,7 @@ var crossfilter = require('crossfilter');
 var d3 = require('d3');
 var dc = require('dc');
 var Qs = require('qs');
+var Router = require('react-router');
 
 var SourcesStore = require('../../stores/sources/SourcesStore');
 var HistogramDataStore = require('../../stores/sources/HistogramDataStore');
@@ -30,6 +31,7 @@ var SCREEN_RESOLUTION = $(window).width();
 var resizeMutex;
 
 var SourceOverview = React.createClass({
+    mixins: [ Router.State ],
     getInitialState() {
         this.sourcesData = crossfilter();
         this.filterDimension = this.sourcesData.dimension((d) => d.name);
@@ -120,7 +122,7 @@ var SourceOverview = React.createClass({
                 }
             }
         }
-        range = this.props.params.range;
+        range = this.getParams().range;
         this.changeRange(range);
     },
     renderLineChart() {
