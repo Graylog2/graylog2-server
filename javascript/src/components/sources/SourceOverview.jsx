@@ -104,7 +104,7 @@ var SourceOverview = React.createClass({
         $(document).off("click", ".sidebar-show", () => this._updateWidth());
     },
     componentWillReceiveProps(newProps) {
-        var range = newProps.getParams().range;
+        var range = newProps.params.range;
         this.changeRange(range);
     },
     applyRangeParameter() {
