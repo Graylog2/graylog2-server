@@ -117,9 +117,6 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "alert_check_interval", validator = PositiveIntegerValidator.class)
     private int alertCheckInterval = 60;
 
-    @Parameter(value = "gc_check_interval")
-    private Duration gcCheckInterval = Duration.minutes(1l);
-
     @Parameter(value = "gc_warning_threshold")
     private Duration gcWarningThreshold = Duration.seconds(1l);
 
@@ -241,10 +238,6 @@ public class Configuration extends BaseConfiguration {
 
     public int getAlertCheckInterval() {
         return alertCheckInterval;
-    }
-
-    public Duration getGcCheckInterval() {
-        return gcCheckInterval;
     }
 
     public Duration getGcWarningThreshold() {
