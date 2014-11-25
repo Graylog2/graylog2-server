@@ -1,4 +1,4 @@
-/* global activateTimerangeChooser, momentHelper, graphHelper */
+/* global activateTimerangeChooser */
 /* jshint -W107 */
 
 'use strict';
@@ -8,7 +8,6 @@ var React = require('react');
 var $ = require('jquery');
 
 var crossfilter = require('crossfilter');
-var d3 = require('d3');
 var dc = require('dc');
 var Qs = require('qs');
 var Router = require('react-router');
@@ -18,6 +17,7 @@ var HistogramDataStore = require('../../stores/sources/HistogramDataStore');
 
 var SourceDataTable = require('./SourceDataTable');
 var SourcePieChart = require('./SourcePieChart');
+var SourceLineChart = require('./SourceLineChart');
 
 var UniversalSearch = require('../search/UniversalSearch');
 
@@ -48,34 +48,12 @@ var SourceOverview = React.createClass({
             range: null,
             resolution: 'minute',
             filter: '',
-            renderResultTable: false,
-            histogramDataAvailable: true,
-            reloadingHistogram: false,
-            lineChartWidth: "100%"
+            renderResultTable: false
         };
-    },
-    loadHistogramData() {
-        var filters;
-
-        if (this.refs.sourcePieChart.getFilters().length !== 0 || this.refs.sourceDataTable.getFilters().length !== 0) {
-            filters = this.nameDimension.top(Infinity).map((source) => UniversalSearch.escape(source.name));
-        }
-        HistogramDataStore.loadHistogramData(this.state.range, filters, SCREEN_RESOLUTION);
-        this.setState({reloadingHistogram: true});
-    },
-    loadData() {
-        SourcesStore.loadSources(this.state.range);
-        this.loadHistogramData();
-    },
-    _resizeCallback() {
-        // Call resizedWindow() only at end of resize event so we do not trigger all the time while resizing.
-        clearTimeout(resizeMutex);
-        resizeMutex = setTimeout(() => this._updateWidth(), 200);
     },
     componentDidMount() {
         SourcesStore.addChangeListener(this._onSourcesChanged);
         HistogramDataStore.addChangeListener(this._onHistogramDataChanged);
-
         this.refs.sourceDataTable.renderDataTable(this.messageCountDimension, (sourceName) => {
             this.refs.sourcePieChart.setFilter(sourceName);
             this._toggleResetButtons();
@@ -86,7 +64,7 @@ var SourceOverview = React.createClass({
             this.loadHistogramData();
             this._toggleResetButtons();
         });
-        this.renderLineChart();
+        this.refs.sourceLineChart.renderLineChart(this.valueDimension, this.valueGroup, this.syncRangeWithQuery);
         this.applyRangeParameter();
         dc.renderAll();
         $(window).on('resize', this._resizeCallback);
@@ -106,6 +84,24 @@ var SourceOverview = React.createClass({
         var range = newProps.params.range;
         this.changeRange(range);
     },
+    loadHistogramData() {
+        var filters;
+
+        if (this.refs.sourcePieChart.getFilters().length !== 0 || this.refs.sourceDataTable.getFilters().length !== 0) {
+            filters = this.nameDimension.top(Infinity).map((source) => UniversalSearch.escape(source.name));
+        }
+        HistogramDataStore.loadHistogramData(this.state.range, filters, SCREEN_RESOLUTION);
+        this.setState({reloadingHistogram: true});
+    },
+    loadData() {
+        SourcesStore.loadSources(this.state.range);
+        this.loadHistogramData();
+    },
+    _resizeCallback() {
+        // Call resizedWindow() only at end of resize event so we do not trigger all the time while resizing.
+        clearTimeout(resizeMutex);
+        resizeMutex = setTimeout(() => this._updateWidth(), 200);
+    },
     applyRangeParameter() {
         var range;
         // redirect old range format (as query parameter) to new format (deep link)
@@ -124,56 +120,6 @@ var SourceOverview = React.createClass({
         range = this.getParams().range;
         this.changeRange(range);
     },
-    renderLineChart() {
-        var lineChartDomNode = $("#dc-sources-line-chart")[0];
-        var width = $(lineChartDomNode).width();
-        $(lineChartDomNode).on('mouseup', (event) => {
-            $(".timerange-selector-container").effect("bounce", {
-                complete: () => {
-                    // Submit search directly if alt key is pressed.
-                    if (event.altKey) {
-                        UniversalSearch.submit();
-                    }
-                }
-            });
-        });
-        this.lineChart = dc.lineChart(lineChartDomNode);
-        this.lineChart
-            .height(200)
-            .margins({left: 35, right: 20, top: 20, bottom: 20})
-            .dimension(this.valueDimension)
-            .group(this.valueGroup)
-            .x(d3.time.scale())
-            .renderHorizontalGridLines(true)
-            // FIXME: causes those nasty exceptions when rendering data (one per x axis tick)
-            .elasticX(true)
-            .elasticY(true)
-            .on("filtered", (chart) => {
-                dc.events.trigger(() => {
-                    var filter = chart.filter();
-                    if (filter) {
-                        var fromDateTime = momentHelper.toUserTimeZone(filter[0]);
-                        var toDateTime = momentHelper.toUserTimeZone(filter[1]);
-
-                        activateTimerangeChooser("absolute", $('.timerange-selector-container .dropdown-menu a[data-selector-name="absolute"]'));
-                        var fromInput = $('#universalsearch .absolute .absolute-from-human');
-                        var toInput = $('#universalsearch .absolute .absolute-to-human');
-
-                        fromInput.val(fromDateTime.format(momentHelper.DATE_FORMAT_TZ));
-                        toInput.val(toDateTime.format(momentHelper.DATE_FORMAT_TZ));
-                    } else {
-                        this._syncRangeWithQuery();
-                    }
-                });
-            });
-        this.configureLineChartWidth(width);
-        this.lineChart.xAxis()
-            .ticks(graphHelper.customTickInterval())
-            .tickFormat(graphHelper.customDateTimeFormat());
-        this.lineChart.yAxis()
-            .ticks(6)
-            .tickFormat(d3.format("s"));
-    },
     resetSourcesFilters() {
         this.refs.sourcePieChart.clearFilters();
         this.nameDimension.filterAll();
@@ -183,25 +129,13 @@ var SourceOverview = React.createClass({
     },
     resetHistogramFilters() {
         this.valueDimension.filterAll();
-        this.lineChart.filterAll();
+        this.refs.sourceLineChart.clearFilters();
         dc.redrawAll();
-    },
-    configureLineChartWidth(lineChartWidth) {
-        this.lineChart
-            .width(lineChartWidth);
-        this.setState({lineChartWidth: String(lineChartWidth) + "px"});
     },
     _updateWidth() {
         SCREEN_RESOLUTION = $(window).width();
-
-        var pieChartDomNode = $("#dc-sources-pie-chart").parent();
-        var pieChartWidth = pieChartDomNode.width();
-        this.refs.sourcePieChart.configurePieChartWidth(pieChartWidth);
-
-        var lineChartDomNode = $("#dc-sources-line-chart");
-        var lineChartWidth = lineChartDomNode.width();
-        this.configureLineChartWidth(lineChartWidth);
-
+        this.refs.sourcePieChart.updateWidth();
+        this.refs.sourceLineChart.updateWidth();
         dc.renderAll();
     },
     _resetSources(sources) {
@@ -228,13 +162,13 @@ var SourceOverview = React.createClass({
         dc.redrawAll();
     },
     _resetHistogram(histogram) {
-        var lineChartFilters = this.lineChart.filters();
+        var lineChartFilters = this.refs.sourceLineChart.getFilters();
         this.valueDimension.filterAll();
-        this.lineChart.filterAll();
+        this.refs.sourceLineChart.clearFilters();
         this.histogramData.remove();
         this.histogramData.add(histogram);
 
-        lineChartFilters.forEach((filter)  => this.lineChart.filter(filter));
+        lineChartFilters.forEach((filter)  => this.refs.sourceLineChart.setFilter(filter));
 
         dc.redrawAll();
     },
@@ -249,7 +183,7 @@ var SourceOverview = React.createClass({
         this.setState({resolution: histogramData.interval, reloadingHistogram: false, histogramDataAvailable: histogramData.values.length >= 2 });
         this._resetHistogram(histogramData.values);
     },
-    _syncRangeWithQuery() {
+    syncRangeWithQuery() {
         var rangeSelectBox = this.refs.rangeSelector.getDOMNode();
         if (Number(rangeSelectBox.value) === 0) {
             activateTimerangeChooser("relative", $('.timerange-selector-container .dropdown-menu a[data-selector-name="relative"]'));
@@ -284,12 +218,8 @@ var SourceOverview = React.createClass({
 
         // when range is changed the filter in line chart (corresponding to the brush) does not make any sense any more
         this.valueDimension.filterAll();
-        if (this.lineChart) {
-            this.lineChart.filterAll();
-        }
-        this._syncRangeWithQuery();
-        // TODO: is this the best way of updating the URL???
-        //window.location.href = "sources#/" + range;
+        this.refs.sourceLineChart.clearFilters();
+        this.syncRangeWithQuery();
         window.location.hash = "#/" + range;
         this.setState({range: range, histogramDataAvailable: true}, () => this.loadData());
     },
@@ -316,34 +246,11 @@ var SourceOverview = React.createClass({
             No message sources found for this time range. Did you try using a different one?
         </div>;
 
-        var loadingSpinnerStyle = {display: this.state.reloadingHistogram ? 'block' : 'none', width: this.state.lineChartWidth};
-        var loadingSpinner = (
-            <div className="sources overlay" style={loadingSpinnerStyle}>
-                <i className="icon-spin icon-refresh spinner"></i>
-            </div>
-        );
-
-        var noDataOverlayStyle = {display: this.state.histogramDataAvailable ? 'none' : 'block', width: this.state.lineChartWidth};
-        var noDataOverlay = (
-            <div className="sources overlay" style={noDataOverlayStyle}>Not enough data</div>
-        );
-
         var resultsStyle = this.state.renderResultTable ? null : {display: 'none'};
         var results = (
             <div style={resultsStyle}>
                 <div className="row-fluid">
-                    <div id="dc-sources-line-chart" className="span12">
-                        <h3>
-                            <i className="icon icon-calendar"></i> Messages per {this.state.resolution}&nbsp;
-                            <small>
-                                <a href="javascript:undefined" className="reset" onClick={this.resetHistogramFilters} title="Reset filter" style={{"display": "none"}}>
-                                    <i className="icon icon-retweet"></i>
-                                </a>
-                            </small>
-                        </h3>
-                        {loadingSpinner}
-                        {noDataOverlay}
-                    </div>
+                    <SourceLineChart ref="sourceLineChart" resolution={this.state.resolution} resetFilters={this.resetHistogramFilters}/>
                 </div>
                 <div className="row-fluid">
                     <div className="span9">

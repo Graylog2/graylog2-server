@@ -71,7 +71,6 @@ var SourceDataTable = React.createClass({
     setFilter(filter) {
         this._dataTable.filter(filter);
     },
-
     changeNumberOfSources(numberOfSources) {
         this._dataTable
             .size(numberOfSources)

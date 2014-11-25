@@ -21,7 +21,7 @@ var SourcePieChart = React.createClass({
                     onDataFiltered();
                 });
             });
-        this.configurePieChartWidth(pieChartWidth);
+        this._configureWidth(pieChartWidth);
     },
     redraw() {
         this._pieChart.redraw();
@@ -35,11 +35,16 @@ var SourcePieChart = React.createClass({
     setFilter(filter) {
         this._pieChart.filter(filter);
     },
-    configurePieChartWidth(pieChartWidth) {
+    _configureWidth(pieChartWidth) {
         this._pieChart.width(pieChartWidth)
             .height(pieChartWidth)
             .radius(pieChartWidth / 2 - 10)
             .innerRadius(pieChartWidth / 5);
+    },
+    updateWidth() {
+        var pieChartDomNode = $("#dc-sources-pie-chart").parent();
+        var pieChartWidth = pieChartDomNode.width();
+        this._configureWidth(pieChartWidth);
     },
     render() {
         return (
