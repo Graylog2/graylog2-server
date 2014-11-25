@@ -53,7 +53,6 @@ import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.Version;
 import org.graylog2.plugin.inputs.MessageInput;
-import org.graylog2.plugins.PluginInstaller;
 import org.graylog2.shared.NodeRunner;
 import org.graylog2.shared.bindings.GuiceInjectorHolder;
 import org.graylog2.shared.bindings.GuiceInstantiationService;
@@ -61,7 +60,6 @@ import org.graylog2.shared.initializers.ServiceManagerListener;
 import org.graylog2.shared.plugins.PluginLoader;
 import org.graylog2.shared.system.activities.Activity;
 import org.graylog2.shared.system.activities.ActivityWriter;
-import org.graylog2.system.activities.SystemMessageActivityWriter;
 import org.graylog2.system.shutdown.GracefulShutdown;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -133,18 +131,6 @@ public final class Main extends NodeRunner {
         if (configuration.getPasswordSecret().isEmpty()) {
             LOG.error("No password secret set. Please define password_secret in your graylog2.conf.");
             System.exit(1);
-        }
-
-        if (commandLineArguments.isInstallPlugin()) {
-            System.out.println("Plugin installation requested.");
-            PluginInstaller installer = new PluginInstaller(
-                    commandLineArguments.getPluginShortname(),
-                    commandLineArguments.getPluginVersion(),
-                    commandLineArguments.isForcePlugin()
-            );
-            
-            installer.install();
-            System.exit(0);
         }
 
         // Are we in debug mode?
