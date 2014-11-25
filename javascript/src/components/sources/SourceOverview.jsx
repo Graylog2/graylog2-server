@@ -50,7 +50,6 @@ var SourceOverview = React.createClass({
             filter: '',
             renderResultTable: false,
             histogramDataAvailable: true,
-            numberOfSources: 100,
             reloadingHistogram: false,
             lineChartWidth: "100%"
         };
@@ -58,7 +57,7 @@ var SourceOverview = React.createClass({
     loadHistogramData() {
         var filters;
 
-        if (this.refs.sourcePieChart.getFilters().length !== 0 || SourceDataTable.dataTable.filters().length !== 0) {
+        if (this.refs.sourcePieChart.getFilters().length !== 0 || this.refs.sourceDataTable.dataTable.filters().length !== 0) {
             filters = this.nameDimension.top(Infinity).map((source) => UniversalSearch.escape(source.name));
         }
         HistogramDataStore.loadHistogramData(this.state.range, filters, SCREEN_RESOLUTION);
@@ -77,7 +76,7 @@ var SourceOverview = React.createClass({
         SourcesStore.addChangeListener(this._onSourcesChanged);
         HistogramDataStore.addChangeListener(this._onHistogramDataChanged);
 
-        SourceDataTable.renderDataTable(this.messageCountDimension, this.state.numberOfSources, (sourceName) => {
+        this.refs.sourceDataTable.renderDataTable(this.messageCountDimension, (sourceName) => {
             this.refs.sourcePieChart.setFilter(sourceName);
             this._toggleResetButtons();
             dc.redrawAll();
@@ -214,16 +213,16 @@ var SourceOverview = React.createClass({
          * graphs, dc will propagate that to the crossfilter dimension.
          */
         var pieChartFilters = this.refs.sourcePieChart.getFilters();
-        var dataTableFilters = SourceDataTable.dataTable.filters();
+        var dataTableFilters = this.refs.sourceDataTable.dataTable.filters();
         this.nameDimension.filterAll();
         this.filterDimension.filterAll();
         this.refs.sourcePieChart.clearFilters();
-        SourceDataTable.dataTable.filterAll();
+        this.refs.sourceDataTable.dataTable.filterAll();
         this.sourcesData.remove();
         this.sourcesData.add(sources);
 
         pieChartFilters.forEach((filter)  => this.refs.sourcePieChart.setFilter(filter));
-        dataTableFilters.forEach((filter) => SourceDataTable.dataTable.filter(filter));
+        dataTableFilters.forEach((filter) => this.refs.sourceDataTable.dataTable.filter(filter));
         this._filterSources();
 
         dc.redrawAll();
@@ -298,11 +297,6 @@ var SourceOverview = React.createClass({
         var value = event.target.value;
         this.changeRange(value);
     },
-    _onNumberOfSourcesChanged(event) {
-        this.setState({numberOfSources: event.target.value}, () => {
-            SourceDataTable.changeNumberOfSources(this.state.numberOfSources);
-        });
-    },
     _filterSources() {
         this.filterDimension.filter((name) => {
             // TODO: search for starts with instead? glob style?
@@ -310,10 +304,10 @@ var SourceOverview = React.createClass({
             return name.indexOf(this.state.filter) !== -1;
         });
     },
-    _onFilterChanged(event) {
-        this.setState({filter: event.target.value}, () => {
+    setSearchFilter(filter) {
+        this.setState({filter: filter}, () => {
             this._filterSources();
-            SourceDataTable.dataTable.redraw();
+            this.refs.sourceDataTable.dataTable.redraw();
             this.refs.sourcePieChart.redraw();
         });
     },
@@ -321,17 +315,6 @@ var SourceOverview = React.createClass({
         var emptySources = <div className="alert alert-info">
             No message sources found for this time range. Did you try using a different one?
         </div>;
-
-        var resultTable = (<table id="dc-sources-result" className="sources table table-striped table-hover table-condensed">
-            <thead>
-                <tr>
-                    <th style={{width: "10px"}}></th>
-                    <th>Source name</th>
-                    <th>Percentage</th>
-                    <th>Message count</th>
-                </tr>
-            </thead>
-        </table>);
 
         var loadingSpinnerStyle = {display: this.state.reloadingHistogram ? 'block' : 'none', width: this.state.lineChartWidth};
         var loadingSpinner = (
@@ -349,49 +332,22 @@ var SourceOverview = React.createClass({
         var results = (
             <div style={resultsStyle}>
                 <div className="row-fluid">
-            <div id="dc-sources-line-chart" className="span12">
-                <h3>
-                    <i className="icon icon-calendar"></i> Messages per {this.state.resolution}&nbsp;
-                    <small>
-                        <a href="javascript:undefined" className="reset" onClick={this.resetHistogramFilters} title="Reset filter" style={{"display": "none"}}>
-                            <i className="icon icon-retweet"></i>
-                        </a>
-                    </small>
-                </h3>
-                {loadingSpinner}
-                {noDataOverlay}
-            </div>
+                    <div id="dc-sources-line-chart" className="span12">
+                        <h3>
+                            <i className="icon icon-calendar"></i> Messages per {this.state.resolution}&nbsp;
+                            <small>
+                                <a href="javascript:undefined" className="reset" onClick={this.resetHistogramFilters} title="Reset filter" style={{"display": "none"}}>
+                                    <i className="icon icon-retweet"></i>
+                                </a>
+                            </small>
+                        </h3>
+                        {loadingSpinner}
+                        {noDataOverlay}
+                    </div>
                 </div>
                 <div className="row-fluid">
                     <div className="span9">
-                        <h3><i className="icon icon-th-list"></i> Selected sources&nbsp;
-                            <small><a href="javascript:undefined" id="dc-sources-result-reset" className="reset" onClick={this.resetSourcesFilters} title="Reset filter" style={{"display": "none"}}><i className="icon icon-retweet"></i></a></small>
-                        </h3>
-                        <div className="row-fluid sources-filtering">
-                            <div className="span6">
-                                <div className="form-horizontal pull-left">
-                                    <div className="control-group">
-                                        <input type="search" className="input-medium" onChange={this._onFilterChanged} placeholder="Search"/>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="span6">
-                                <div className="form-horizontal pull-right">
-                                    <div className="control-group">
-                                        <label className="control-label">Results:</label>
-                                        <div className="controls">
-                                            <select className="input-small" onChange={this._onNumberOfSourcesChanged} value={this.state.numberOfSources}>
-                                                <option value="10">10</option>
-                                                <option value="50">50</option>
-                                                <option value="100">100</option>
-                                                <option value="500">500</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        {resultTable}
+                        <SourceDataTable ref="sourceDataTable" resetFilters={this.resetSourcesFilters} setSearchFilter={this.setSearchFilter}/>
                     </div>
                     <div className="span3">
                         <SourcePieChart ref="sourcePieChart" resetFilters={this.resetSourcesFilters}/>
