@@ -58,7 +58,7 @@ var SourceOverview = React.createClass({
     loadHistogramData() {
         var filters;
 
-        if (SourcePieChart.pieChart && (SourcePieChart.pieChart.filters().length !== 0 || SourceDataTable.dataTable.filters().length !== 0)) {
+        if (this.refs.sourcePieChart.pieChart && (this.refs.sourcePieChart.pieChart.filters().length !== 0 || SourceDataTable.dataTable.filters().length !== 0)) {
             filters = this.nameDimension.top(Infinity).map((source) => UniversalSearch.escape(source.name));
         }
         HistogramDataStore.loadHistogramData(this.state.range, filters, SCREEN_RESOLUTION);
@@ -79,12 +79,12 @@ var SourceOverview = React.createClass({
         HistogramDataStore.addChangeListener(this._onHistogramDataChanged);
 
         SourceDataTable.renderDataTable(this.messageCountDimension, this.state.numberOfSources, (sourceName) => {
-            SourcePieChart.pieChart.filter(sourceName);
+            this.refs.sourcePieChart.pieChart.filter(sourceName);
             this._toggleResetButtons();
             dc.redrawAll();
             this.loadHistogramData();
         });
-        SourcePieChart.renderPieChart(this.nameDimension, this.nameMessageGroup, () => {
+        this.refs.sourcePieChart.renderPieChart(this.nameDimension, this.nameMessageGroup, () => {
             this.loadHistogramData();
             this._toggleResetButtons();
         });
@@ -176,7 +176,7 @@ var SourceOverview = React.createClass({
             .tickFormat(d3.format("s"));
     },
     resetSourcesFilters() {
-        SourcePieChart.pieChart.filterAll();
+        this.refs.sourcePieChart.pieChart.filterAll();
         this.nameDimension.filterAll();
         this.loadHistogramData();
         this._toggleResetButtons();
@@ -197,7 +197,7 @@ var SourceOverview = React.createClass({
 
         var pieChartDomNode = $("#dc-sources-pie-chart").parent();
         var pieChartWidth = pieChartDomNode.width();
-        SourcePieChart.configurePieChartWidth(pieChartWidth);
+        this.refs.sourcePieChart.configurePieChartWidth(pieChartWidth);
 
         var lineChartDomNode = $("#dc-sources-line-chart");
         var lineChartWidth = lineChartDomNode.width();
@@ -213,16 +213,16 @@ var SourceOverview = React.createClass({
          * we need to remove the dimension and graphs filters, but we only need to reapply filters to the
          * graphs, dc will propagate that to the crossfilter dimension.
          */
-        var pieChartFilters = SourcePieChart.pieChart.filters();
+        var pieChartFilters = this.refs.sourcePieChart.pieChart.filters();
         var dataTableFilters = SourceDataTable.dataTable.filters();
         this.nameDimension.filterAll();
         this.filterDimension.filterAll();
-        SourcePieChart.pieChart.filterAll();
+        this.refs.sourcePieChart.pieChart.filterAll();
         SourceDataTable.dataTable.filterAll();
         this.sourcesData.remove();
         this.sourcesData.add(sources);
 
-        pieChartFilters.forEach((filter)  => SourcePieChart.pieChart.filter(filter));
+        pieChartFilters.forEach((filter)  => this.refs.sourcePieChart.pieChart.filter(filter));
         dataTableFilters.forEach((filter) => SourceDataTable.dataTable.filter(filter));
         this._filterSources();
 
@@ -264,7 +264,7 @@ var SourceOverview = React.createClass({
     },
     _toggleResetButtons() {
         // We only need to toggle the datatable reset button, dc will take care of the other reset buttons
-        if (SourcePieChart.pieChart.filter()) {
+        if (this.refs.sourcePieChart.pieChart.filter()) {
             $('#dc-sources-result-reset').show();
         } else {
             $('#dc-sources-result-reset').hide();
@@ -314,7 +314,7 @@ var SourceOverview = React.createClass({
         this.setState({filter: event.target.value}, () => {
             this._filterSources();
             SourceDataTable.dataTable.redraw();
-            SourcePieChart.pieChart.redraw();
+            this.refs.sourcePieChart.pieChart.redraw();
         });
     },
     render() {
@@ -394,11 +394,7 @@ var SourceOverview = React.createClass({
                         {resultTable}
                     </div>
                     <div className="span3">
-                        <div id="dc-sources-pie-chart">
-                            <h3><i className="icon icon-bar-chart"></i> Messages per source&nbsp;
-                                <small><a href="javascript:undefined" className="reset" onClick={this.resetSourcesFilters} title="Reset filter" style={{"display": "none"}}><i className="icon icon-retweet"></i></a></small>
-                            </h3>
-                        </div>
+                        <SourcePieChart ref="sourcePieChart" resetFilters={this.resetSourcesFilters}/>
                     </div>
                 </div>
             </div>
