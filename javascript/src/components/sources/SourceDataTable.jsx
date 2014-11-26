@@ -23,7 +23,7 @@ var SourceDataTable = React.createClass({
     },
     renderDataTable(dimension, onDataFiltered) {
         var dataTableDomNode = $("#dc-sources-result")[0];
-        this._dataTable = dc._dataTable(dataTableDomNode);
+        this._dataTable = dc.dataTable(dataTableDomNode);
         this._dataTable
             .dimension(dimension)
             .group((d) => d.percentage > othersThreshold ? "Top Sources" : othersName)

@@ -31,7 +31,7 @@ var SourceLineChart = React.createClass({
                 }
             });
         });
-        this._lineChart = dc._lineChart(lineChartDomNode);
+        this._lineChart = dc.lineChart(lineChartDomNode);
         this._lineChart
             .height(200)
             .margins({left: 35, right: 20, top: 20, bottom: 20})

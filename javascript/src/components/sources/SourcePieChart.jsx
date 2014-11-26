@@ -11,7 +11,7 @@ var SourcePieChart = React.createClass({
     renderPieChart(dimension, group, onDataFiltered) {
         var pieChartDomNode = $("#dc-sources-pie-chart")[0];
         var pieChartWidth = $(pieChartDomNode).width();
-        this._pieChart = dc._pieChart(pieChartDomNode);
+        this._pieChart = dc.pieChart(pieChartDomNode);
         this._pieChart
             .renderLabel(false)
             .dimension(dimension)

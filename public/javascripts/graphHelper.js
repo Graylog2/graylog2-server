@@ -19,7 +19,8 @@
         { interval: 'day',   unit: 'date',  step: 1,  condition: function(duration) { return duration.days() > 3 }},
         { interval: 'hour',  unit: 'hour',  step: 12, condition: function(duration) { return duration.days() > 1 }},
         { interval: 'hour',  unit: 'hour',  step: 3,  condition: function(duration) { return duration.days() == 1 }},
-        { interval: 'hour',  unit: 'hour',  step: 1,  condition: function() { return true }}
+        { interval: 'hour',  unit: 'hour',  step: 1,  condition: function(duration) { return duration.hours() > 1 }},
+        { interval: 'minute',  unit: 'minute',  step: 10,  condition: function() { return true }}
     ];
 
     var exports = {
