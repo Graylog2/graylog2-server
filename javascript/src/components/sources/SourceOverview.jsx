@@ -10,7 +10,6 @@ var $ = require('jquery');
 var crossfilter = require('crossfilter');
 var dc = require('dc');
 var Qs = require('qs');
-var Router = require('react-router');
 
 var SourcesStore = require('../../stores/sources/SourcesStore');
 var HistogramDataStore = require('../../stores/sources/HistogramDataStore');
@@ -32,7 +31,6 @@ var SCREEN_RESOLUTION = $(window).width();
 var resizeMutex;
 
 var SourceOverview = React.createClass({
-    mixins: [ Router.State ],
     getInitialState() {
         this.sourcesData = crossfilter();
         this.filterDimension = this.sourcesData.dimension((d) => d.name);
@@ -87,19 +85,17 @@ var SourceOverview = React.createClass({
         this.applyRangeParameter();
         dc.renderAll();
         $(window).on('resize', this._resizeCallback);
+        $(window).on('hashchange', this._applyRangeFromHash);
         // register them live as we do not know if those buttons are currently in the DOM
-        $(document).on("click", ".sidebar-hide", () => this._updateWidth());
-        $(document).on("click", ".sidebar-show", () => this._updateWidth());
+        $(document).on("click", ".sidebar-hide", this._updateWidth);
+        $(document).on("click", ".sidebar-show", this._updateWidth);
         UniversalSearch.init();
     },
     componentWillUnmount() {
         $(window).off("resize", this._resizeCallback);
-        $(document).off("click", ".sidebar-hide", () => this._updateWidth());
-        $(document).off("click", ".sidebar-show", () => this._updateWidth());
-    },
-    componentWillReceiveProps(newProps) {
-        var range = newProps.params.range;
-        this.changeRange(range);
+        $(window).off('hashchange', this._applyRangeFromHash);
+        $(document).off("click", ".sidebar-hide", this._updateWidth);
+        $(document).off("click", ".sidebar-show", this._updateWidth);
     },
     loadData() {
         this.loadSources();
@@ -184,13 +180,24 @@ var SourceOverview = React.createClass({
         }
         return null;
     },
+    _applyRangeFromHash() {
+        var range = this._getRangeFromHash();
+        this.changeRange(range);
+    },
     applyRangeParameter() {
         var range = this._getRangeFromOldQueryFormat();
         if (range) {
             this._redirectToRange(range);
         } else {
-            range = this.getParams().range;
-            this.changeRange(range);
+            this._applyRangeFromHash();
+        }
+    },
+    _getRangeFromHash() {
+        var hash = window.location.hash;
+        if (hash.indexOf("#/") !== 0) {
+            return DEFAULT_RANGE_IN_SECS;
+        } else {
+            return hash.substring(2);
         }
     },
     resetSourcesFilters() {
@@ -257,8 +264,6 @@ var SourceOverview = React.createClass({
     },
     _filterSources() {
         this.filterDimension.filter((name) => {
-            // TODO: search for starts with instead? glob style?
-            //return name.indexOf(this.state.filter) === 0;
             return name.indexOf(this.state.filter) !== -1;
         });
     },
