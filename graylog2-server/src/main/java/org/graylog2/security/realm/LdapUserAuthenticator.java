@@ -20,7 +20,11 @@ import org.apache.directory.api.ldap.model.cursor.CursorException;
 import org.apache.directory.api.ldap.model.exception.LdapException;
 import org.apache.directory.ldap.client.api.LdapConnectionConfig;
 import org.apache.directory.ldap.client.api.LdapNetworkConnection;
-import org.apache.shiro.authc.*;
+import org.apache.shiro.authc.AuthenticationException;
+import org.apache.shiro.authc.AuthenticationInfo;
+import org.apache.shiro.authc.AuthenticationToken;
+import org.apache.shiro.authc.SimpleAccount;
+import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.authc.credential.AllowAllCredentialsMatcher;
 import org.apache.shiro.realm.AuthenticatingRealm;
 import org.graylog2.security.TrustAllX509TrustManager;
@@ -30,6 +34,7 @@ import org.graylog2.security.ldap.LdapSettings;
 import org.graylog2.security.ldap.LdapSettingsService;
 import org.graylog2.users.User;
 import org.graylog2.users.UserService;
+import org.owasp.esapi.ESAPI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -73,12 +78,12 @@ public class LdapUserAuthenticator extends AuthenticatingRealm {
         config.setName(ldapSettings.getSystemUserName());
         config.setCredentials(ldapSettings.getSystemPassword());
 
-        final String principal = String.valueOf(token.getPrincipal());
+        final String principal = ESAPI.encoder().encodeForLDAP((String) token.getPrincipal());
         LdapNetworkConnection connection = null;
         try {
             connection = ldapConnector.connect(config);
 
-            if(null == connection) {
+            if (null == connection) {
                 LOG.error("Couldn't connect to LDAP directory");
                 return null;
             }
@@ -86,10 +91,10 @@ public class LdapUserAuthenticator extends AuthenticatingRealm {
             final String password = String.valueOf(token.getPassword());
 
             final LdapEntry userEntry = ldapConnector.search(connection,
-                                                             ldapSettings.getSearchBase(),
-                                                             ldapSettings.getSearchPattern(),
-                                                             principal,
-                                                             ldapSettings.isActiveDirectory());
+                    ldapSettings.getSearchBase(),
+                    ldapSettings.getSearchPattern(),
+                    principal,
+                    ldapSettings.isActiveDirectory());
             if (userEntry == null) {
                 LOG.debug("User {} not found in LDAP", principal);
                 return null;
@@ -97,8 +102,8 @@ public class LdapUserAuthenticator extends AuthenticatingRealm {
 
             // needs to use the DN of the entry, not the parameter for the lookup filter we used to find the entry!
             final boolean authenticated = ldapConnector.authenticate(connection,
-                                                                     userEntry.getDn(),
-                                                                     password);
+                    userEntry.getDn(),
+                    password);
             if (!authenticated) {
                 LOG.info("Invalid credentials for user {} (DN {})", principal, userEntry.getDn());
                 return null;
