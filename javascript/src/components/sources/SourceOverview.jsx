@@ -100,18 +100,9 @@ var SourceOverview = React.createClass({
         var range = newProps.params.range;
         this.changeRange(range);
     },
-    loadHistogramData() {
-        var filters;
-        var onLoaded = (histogramData) => {
-            this.setState({resolution: histogramData.interval, reloadingHistogram: false, histogramDataAvailable: histogramData.values.length >= 2 });
-            this._resetHistogram(histogramData.values);
-        };
-
-        if (this.refs.sourcePieChart.getFilters().length !== 0 || this.refs.sourceDataTable.getFilters().length !== 0) {
-            filters = this.nameDimension.top(Infinity).map((source) => UniversalSearch.escape(source.name));
-        }
-        HistogramDataStore.loadHistogramData(this.state.range, filters, SCREEN_RESOLUTION, onLoaded);
-        this.setState({reloadingHistogram: true});
+    loadData() {
+        this.loadSources();
+        this.loadHistogramData();
     },
     loadSources() {
         var onLoaded = (sources) => {
@@ -121,10 +112,6 @@ var SourceOverview = React.createClass({
         };
 
         SourcesStore.loadSources(this.state.range, onLoaded);
-    },
-    loadData() {
-        this.loadSources();
-        this.loadHistogramData();
     },
     _resetSources(sources) {
         /*
@@ -149,28 +136,61 @@ var SourceOverview = React.createClass({
 
         dc.redrawAll();
     },
+    loadHistogramData() {
+        var filters;
+        var onLoaded = (histogramData) => {
+            this.setState({resolution: histogramData.interval, reloadingHistogram: false, histogramDataAvailable: histogramData.values.length >= 2 });
+            this._resetHistogram(histogramData.values);
+        };
+
+        if (this.refs.sourcePieChart.getFilters().length !== 0 || this.refs.sourceDataTable.getFilters().length !== 0) {
+            filters = this.nameDimension.top(Infinity).map((source) => UniversalSearch.escape(source.name));
+        }
+        HistogramDataStore.loadHistogramData(this.state.range, filters, SCREEN_RESOLUTION, onLoaded);
+        this.setState({reloadingHistogram: true});
+    },
+    _resetHistogram(histogram) {
+        var lineChartFilters = this.refs.sourceLineChart.getFilters();
+        this.valueDimension.filterAll();
+        this.refs.sourceLineChart.clearFilters();
+        this.histogramData.remove();
+        this.histogramData.add(histogram);
+
+        lineChartFilters.forEach((filter)  => this.refs.sourceLineChart.setFilter(filter));
+
+        dc.redrawAll();
+    },
     _resizeCallback() {
         // Call resizedWindow() only at end of resize event so we do not trigger all the time while resizing.
         clearTimeout(resizeMutex);
         resizeMutex = setTimeout(() => this._updateWidth(), 200);
     },
-    applyRangeParameter() {
-        var range;
-        // redirect old range format (as query parameter) to new format (deep link)
+    // redirect old range format (as query parameter) to new format (deep link)
+    _redirectToRange(range) {
+        // if range is ill formatted, we take care of it in the deep link handling
+        window.location.replace("sources#/" + range);
+    },
+    _getRangeFromOldQueryFormat() {
         var query = window.location.search;
         if (query) {
             if (query.indexOf("?") === 0 && query.length > 1) {
                 query = query.substr(1, query.length - 1);
-                range = Qs.parse(query)["range"];
+                var range = Qs.parse(query)["range"];
                 if (range) {
-                    // if range is ill formatted, we take care of it in the deep link handling
-                    window.location.replace("sources#/" + range);
-                    return;
+                    return range;
                 }
             }
         }
-        range = this.getParams().range;
-        this.changeRange(range);
+        return null;
+    },
+    applyRangeParameter() {
+        var range = this._getRangeFromOldQueryFormat();
+        if (range) {
+            this._redirectToRange(range);
+        } else {
+            range = this.getParams().range;
+            this.changeRange(range);
+        }
     },
     resetSourcesFilters() {
         this.refs.sourcePieChart.clearFilters();
@@ -189,17 +209,6 @@ var SourceOverview = React.createClass({
         this.refs.sourcePieChart.updateWidth();
         this.refs.sourceLineChart.updateWidth();
         dc.renderAll();
-    },
-    _resetHistogram(histogram) {
-        var lineChartFilters = this.refs.sourceLineChart.getFilters();
-        this.valueDimension.filterAll();
-        this.refs.sourceLineChart.clearFilters();
-        this.histogramData.remove();
-        this.histogramData.add(histogram);
-
-        lineChartFilters.forEach((filter)  => this.refs.sourceLineChart.setFilter(filter));
-
-        dc.redrawAll();
     },
     syncRangeWithQuery() {
         var rangeSelectBox = this.refs.rangeSelector.getDOMNode();
