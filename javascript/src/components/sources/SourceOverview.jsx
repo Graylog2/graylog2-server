@@ -1,4 +1,4 @@
-/* global activateTimerangeChooser */
+/* global activateTimerangeChooser, momentHelper */
 /* jshint -W107 */
 
 'use strict';
@@ -54,7 +54,6 @@ var SourceOverview = React.createClass({
         };
     },
     componentDidMount() {
-        HistogramDataStore.addChangeListener(this._onHistogramDataChanged);
         var onDataTableFiltered = (sourceName) => {
             this.refs.sourcePieChart.setFilter(sourceName);
             this._toggleResetButtons();
@@ -93,7 +92,6 @@ var SourceOverview = React.createClass({
         UniversalSearch.init();
     },
     componentWillUnmount() {
-        HistogramDataStore.removeChangeListener(this._onHistogramDataChanged);
         $(window).off("resize", this._resizeCallback);
         $(document).off("click", ".sidebar-hide", () => this._updateWidth());
         $(document).off("click", ".sidebar-show", () => this._updateWidth());
@@ -104,21 +102,28 @@ var SourceOverview = React.createClass({
     },
     loadHistogramData() {
         var filters;
+        var onLoaded = (histogramData) => {
+            this.setState({resolution: histogramData.interval, reloadingHistogram: false, histogramDataAvailable: histogramData.values.length >= 2 });
+            this._resetHistogram(histogramData.values);
+        };
 
         if (this.refs.sourcePieChart.getFilters().length !== 0 || this.refs.sourceDataTable.getFilters().length !== 0) {
             filters = this.nameDimension.top(Infinity).map((source) => UniversalSearch.escape(source.name));
         }
-        HistogramDataStore.loadHistogramData(this.state.range, filters, SCREEN_RESOLUTION);
+        HistogramDataStore.loadHistogramData(this.state.range, filters, SCREEN_RESOLUTION, onLoaded);
         this.setState({reloadingHistogram: true});
     },
-    loadData() {
-        var onSourcesChanged = (sources) => {
+    loadSources() {
+        var onLoaded = (sources) => {
             this._resetSources(sources);
             this.setState({renderResultTable: this.sourcesData.size() !== 0});
             this._updateWidth();
         };
 
-        SourcesStore.loadSources(this.state.range, onSourcesChanged);
+        SourcesStore.loadSources(this.state.range, onLoaded);
+    },
+    loadData() {
+        this.loadSources();
         this.loadHistogramData();
     },
     _resetSources(sources) {
@@ -195,11 +200,6 @@ var SourceOverview = React.createClass({
         lineChartFilters.forEach((filter)  => this.refs.sourceLineChart.setFilter(filter));
 
         dc.redrawAll();
-    },
-    _onHistogramDataChanged() {
-        var histogramData = HistogramDataStore.getHistogramData();
-        this.setState({resolution: histogramData.interval, reloadingHistogram: false, histogramDataAvailable: histogramData.values.length >= 2 });
-        this._resetHistogram(histogramData.values);
     },
     syncRangeWithQuery() {
         var rangeSelectBox = this.refs.rangeSelector.getDOMNode();

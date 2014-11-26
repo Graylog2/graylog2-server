@@ -1,4 +1,4 @@
-/* global activateTimerangeChooser, momentHelper, graphHelper */
+/* global graphHelper */
 /* jshint -W107 */
 
 'use strict';

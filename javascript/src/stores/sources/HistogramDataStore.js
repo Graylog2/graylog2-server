@@ -1,24 +1,12 @@
 'use strict';
 
-var mergeInto = require('../../lib/util').mergeInto;
-var AbstractEventSendingStore = require('../AbstractEventSendingStore');
 var $ = require('jquery'); // excluded and shimed
 
 var DEFAULT_MAX_DATA_POINTS = 4000;
 var HISTOGRAM_URL = '/a/search/histogram';
 
 var HistogramDataStore = {
-
-    setHistogramData(histogramData) {
-        this._histogramData = histogramData;
-        this._emitChange();
-    },
-
-    getHistogramData() {
-        return this._histogramData && JSON.parse(JSON.stringify(this._histogramData));
-    },
-
-    loadHistogramData(range, sourceNames, maxDataPoints) {
+    loadHistogramData(range, sourceNames, maxDataPoints, callback) {
         var url = HISTOGRAM_URL;
         if (typeof maxDataPoints === 'undefined') {
             maxDataPoints = DEFAULT_MAX_DATA_POINTS;
@@ -40,14 +28,12 @@ var HistogramDataStore = {
             }
             url += `&q=${q}&rangetype=relative&relative=${ range }&interval=${interval}`;
         }
-        var successCallback = (data) => this.setHistogramData(data);
         var failCallback = (jqXHR, textStatus, errorThrown) => {
             console.error("Loading of histogram data failed with status: " + textStatus);
             console.error("Error", errorThrown);
         };
-        $.getJSON(url, successCallback).fail(failCallback);
+        $.getJSON(url, callback).fail(failCallback);
     }
 };
-mergeInto(HistogramDataStore, AbstractEventSendingStore);
 
 module.exports = HistogramDataStore;

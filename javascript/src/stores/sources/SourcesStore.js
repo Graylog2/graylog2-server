@@ -1,6 +1,5 @@
 'use strict';
 
-var mergeInto = require('../../lib/util').mergeInto;
 var $ = require('jquery'); // excluded and shimed
 
 var processSourcesData = (sources) => {
