@@ -48,7 +48,9 @@ var SourceOverview = React.createClass({
             range: null,
             resolution: 'minute',
             filter: '',
-            renderResultTable: false
+            renderResultTable: false,
+            histogramDataAvailable: true,
+            reloadingHistogram: false
         };
     },
     componentDidMount() {
@@ -250,7 +252,11 @@ var SourceOverview = React.createClass({
         var results = (
             <div style={resultsStyle}>
                 <div className="row-fluid">
-                    <SourceLineChart ref="sourceLineChart" resolution={this.state.resolution} resetFilters={this.resetHistogramFilters}/>
+                    <SourceLineChart ref="sourceLineChart"
+                        reloadingHistogram={this.state.reloadingHistogram}
+                        histogramDataAvailable={this.state.histogramDataAvailable}
+                        resolution={this.state.resolution}
+                        resetFilters={this.resetHistogramFilters}/>
                 </div>
                 <div className="row-fluid">
                     <div className="span9">

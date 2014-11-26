@@ -15,8 +15,6 @@ var UniversalSearch = require('../search/UniversalSearch');
 var SourceLineChart = React.createClass({
     getInitialState() {
         return {
-            histogramDataAvailable: true,
-            reloadingHistogram: false,
             lineChartWidth: "100%"
         };
     },
@@ -91,7 +89,7 @@ var SourceLineChart = React.createClass({
     },
     render() {
         var loadingSpinnerStyle = {
-            display: this.state.reloadingHistogram ? 'block' : 'none',
+            display: this.props.reloadingHistogram ? 'block' : 'none',
             width: this.state.lineChartWidth
         };
         var loadingSpinner = (
@@ -101,7 +99,7 @@ var SourceLineChart = React.createClass({
         );
 
         var noDataOverlayStyle = {
-            display: this.state.histogramDataAvailable ? 'none' : 'block',
+            display: this.props.histogramDataAvailable ? 'none' : 'block',
             width: this.state.lineChartWidth
         };
         var noDataOverlay = (
