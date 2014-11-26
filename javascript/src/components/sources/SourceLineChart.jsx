@@ -18,7 +18,7 @@ var SourceLineChart = React.createClass({
             lineChartWidth: "100%"
         };
     },
-    renderLineChart(dimension, group, syncRangeWithQuery) {
+    renderLineChart(dimension, group, onDataFiltered) {
         var lineChartDomNode = $("#dc-sources-line-chart")[0];
         var width = $(lineChartDomNode).width();
         $(lineChartDomNode).on('mouseup', (event) => {
@@ -45,19 +45,7 @@ var SourceLineChart = React.createClass({
             .on("filtered", (chart) => {
                 dc.events.trigger(() => {
                     var filter = chart.filter();
-                    if (filter) {
-                        var fromDateTime = momentHelper.toUserTimeZone(filter[0]);
-                        var toDateTime = momentHelper.toUserTimeZone(filter[1]);
-
-                        activateTimerangeChooser("absolute", $('.timerange-selector-container .dropdown-menu a[data-selector-name="absolute"]'));
-                        var fromInput = $('#universalsearch .absolute .absolute-from-human');
-                        var toInput = $('#universalsearch .absolute .absolute-to-human');
-
-                        fromInput.val(fromDateTime.format(momentHelper.DATE_FORMAT_TZ));
-                        toInput.val(toDateTime.format(momentHelper.DATE_FORMAT_TZ));
-                    } else {
-                        syncRangeWithQuery();
-                    }
+                    onDataFiltered(filter);
                 });
             });
         this._configureWidth(width);

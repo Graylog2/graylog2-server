@@ -54,19 +54,36 @@ var SourceOverview = React.createClass({
         };
     },
     componentDidMount() {
-        SourcesStore.addChangeListener(this._onSourcesChanged);
         HistogramDataStore.addChangeListener(this._onHistogramDataChanged);
-        this.refs.sourceDataTable.renderDataTable(this.messageCountDimension, (sourceName) => {
+        var onDataTableFiltered = (sourceName) => {
             this.refs.sourcePieChart.setFilter(sourceName);
             this._toggleResetButtons();
             dc.redrawAll();
             this.loadHistogramData();
-        });
-        this.refs.sourcePieChart.renderPieChart(this.nameDimension, this.nameMessageGroup, () => {
+        };
+        var onPieChartFiltered = () => {
             this.loadHistogramData();
             this._toggleResetButtons();
-        });
-        this.refs.sourceLineChart.renderLineChart(this.valueDimension, this.valueGroup, this.syncRangeWithQuery);
+        };
+        var onLineChartFiltered = (filter) => {
+            if (filter) {
+                var fromDateTime = momentHelper.toUserTimeZone(filter[0]);
+                var toDateTime = momentHelper.toUserTimeZone(filter[1]);
+
+                activateTimerangeChooser("absolute", $('.timerange-selector-container .dropdown-menu a[data-selector-name="absolute"]'));
+                var fromInput = $('#universalsearch .absolute .absolute-from-human');
+                var toInput = $('#universalsearch .absolute .absolute-to-human');
+
+                fromInput.val(fromDateTime.format(momentHelper.DATE_FORMAT_TZ));
+                toInput.val(toDateTime.format(momentHelper.DATE_FORMAT_TZ));
+            } else {
+                this.syncRangeWithQuery();
+            }
+        };
+
+        this.refs.sourceDataTable.renderDataTable(this.messageCountDimension, onDataTableFiltered);
+        this.refs.sourcePieChart.renderPieChart(this.nameDimension, this.nameMessageGroup, onPieChartFiltered);
+        this.refs.sourceLineChart.renderLineChart(this.valueDimension, this.valueGroup, onLineChartFiltered);
         this.applyRangeParameter();
         dc.renderAll();
         $(window).on('resize', this._resizeCallback);
@@ -76,7 +93,6 @@ var SourceOverview = React.createClass({
         UniversalSearch.init();
     },
     componentWillUnmount() {
-        SourcesStore.removeChangeListener(this._onSourcesChanged);
         HistogramDataStore.removeChangeListener(this._onHistogramDataChanged);
         $(window).off("resize", this._resizeCallback);
         $(document).off("click", ".sidebar-hide", () => this._updateWidth());
@@ -96,8 +112,37 @@ var SourceOverview = React.createClass({
         this.setState({reloadingHistogram: true});
     },
     loadData() {
-        SourcesStore.loadSources(this.state.range);
+        var onSourcesChanged = (sources) => {
+            this._resetSources(sources);
+            this.setState({renderResultTable: this.sourcesData.size() !== 0});
+            this._updateWidth();
+        };
+
+        SourcesStore.loadSources(this.state.range, onSourcesChanged);
         this.loadHistogramData();
+    },
+    _resetSources(sources) {
+        /*
+         * http://stackoverflow.com/questions/23500546/replace-crossfilter-data-restore-dimensions-and-groups
+         * It looks like dc interacts with crossfilter to represent the graphs and apply some filters
+         * on the crossfilter dimension, but it also stores those filters internally. That means that
+         * we need to remove the dimension and graphs filters, but we only need to reapply filters to the
+         * graphs, dc will propagate that to the crossfilter dimension.
+         */
+        var pieChartFilters = this.refs.sourcePieChart.getFilters();
+        var dataTableFilters = this.refs.sourceDataTable.getFilters();
+        this.nameDimension.filterAll();
+        this.filterDimension.filterAll();
+        this.refs.sourcePieChart.clearFilters();
+        this.refs.sourceDataTable.clearFilters();
+        this.sourcesData.remove();
+        this.sourcesData.add(sources);
+
+        pieChartFilters.forEach((filter)  => this.refs.sourcePieChart.setFilter(filter));
+        dataTableFilters.forEach((filter) => this.refs.sourceDataTable.setFilter(filter));
+        this._filterSources();
+
+        dc.redrawAll();
     },
     _resizeCallback() {
         // Call resizedWindow() only at end of resize event so we do not trigger all the time while resizing.
@@ -140,29 +185,6 @@ var SourceOverview = React.createClass({
         this.refs.sourceLineChart.updateWidth();
         dc.renderAll();
     },
-    _resetSources(sources) {
-        /*
-         * http://stackoverflow.com/questions/23500546/replace-crossfilter-data-restore-dimensions-and-groups
-         * It looks like dc interacts with crossfilter to represent the graphs and apply some filters
-         * on the crossfilter dimension, but it also stores those filters internally. That means that
-         * we need to remove the dimension and graphs filters, but we only need to reapply filters to the
-         * graphs, dc will propagate that to the crossfilter dimension.
-         */
-        var pieChartFilters = this.refs.sourcePieChart.getFilters();
-        var dataTableFilters = this.refs.sourceDataTable.getFilters();
-        this.nameDimension.filterAll();
-        this.filterDimension.filterAll();
-        this.refs.sourcePieChart.clearFilters();
-        this.refs.sourceDataTable.clearFilters();
-        this.sourcesData.remove();
-        this.sourcesData.add(sources);
-
-        pieChartFilters.forEach((filter)  => this.refs.sourcePieChart.setFilter(filter));
-        dataTableFilters.forEach((filter) => this.refs.sourceDataTable.setFilter(filter));
-        this._filterSources();
-
-        dc.redrawAll();
-    },
     _resetHistogram(histogram) {
         var lineChartFilters = this.refs.sourceLineChart.getFilters();
         this.valueDimension.filterAll();
@@ -173,12 +195,6 @@ var SourceOverview = React.createClass({
         lineChartFilters.forEach((filter)  => this.refs.sourceLineChart.setFilter(filter));
 
         dc.redrawAll();
-    },
-    _onSourcesChanged() {
-        var sources = SourcesStore.getSources();
-        this._resetSources(sources);
-        this.setState({renderResultTable: this.sourcesData.size() !== 0});
-        this._updateWidth();
     },
     _onHistogramDataChanged() {
         var histogramData = HistogramDataStore.getHistogramData();

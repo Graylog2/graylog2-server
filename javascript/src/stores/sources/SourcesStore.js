@@ -1,7 +1,6 @@
 'use strict';
 
 var mergeInto = require('../../lib/util').mergeInto;
-var AbstractEventSendingStore = require('../AbstractEventSendingStore');
 var $ = require('jquery'); // excluded and shimed
 
 var processSourcesData = (sources) => {
@@ -16,21 +15,15 @@ var processSourcesData = (sources) => {
 var SourcesStore = {
     SOURCES_URL: '/a/sources',
 
-    setSources(sources) {
-        this._sources = sources;
-        this._emitChange();
-    },
-
-    getSources() {
-        return this._sources && JSON.parse(JSON.stringify(this._sources));
-    },
-
-    loadSources(range) {
+    loadSources(range, callback) {
         var url = this.SOURCES_URL;
         if (typeof range !== 'undefined') {
             url += "?range="+range;
         }
-        var successCallback = (data) => this.setSources(processSourcesData(data));
+        var successCallback = (data) => {
+            var sources = processSourcesData(data);
+            callback(sources);
+        };
         var failCallback = (jqXHR, textStatus, errorThrown) => {
             console.error("Loading of user sources failed with status: " + textStatus);
             console.error("Error", errorThrown);
@@ -38,6 +31,4 @@ var SourcesStore = {
         $.getJSON(url, successCallback).fail(failCallback);
     }
 };
-mergeInto(SourcesStore, AbstractEventSendingStore);
-
 module.exports = SourcesStore;
