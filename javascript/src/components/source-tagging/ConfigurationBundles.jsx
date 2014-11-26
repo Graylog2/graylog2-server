@@ -18,6 +18,7 @@ var ConfigurationBundles = React.createClass({
     handleSourceTypeChange(sourceTypeId, sourceTypeDescription) {
         this.setState({sourceTypeId: sourceTypeId, sourceTypeDescription: sourceTypeDescription});
     },
+    // TODO: next time we touch this, we should create a store for this and preprocess the data
     componentDidMount() {
         $.get('/a/system/contentpacks', (result) => {
             if (this.isMounted()) {

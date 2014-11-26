@@ -1,28 +1,10 @@
 'use strict';
 
-var mergeInto = require('../../lib/util').mergeInto;
-var AbstractEventSendingStore = require('../AbstractEventSendingStore');
 var $ = require('jquery'); // excluded and shimed
 
 var PreferencesStore = {
     URL: '/a/system/user/',
-    DATA_SAVED_EVENT: 'DATA_SAVED_EVENT',
-    DATA_LOADED_EVENT: 'DATA_LOADED_EVENT',
-
-    setPreferences(preferences) {
-        this._preferences = preferences;
-        this._emitChange();
-    },
-
-    getPreferences() {
-        return this._preferences && this._preferences.slice();
-    },
-
-    getUserName() {
-        return this._userName;
-    },
-
-    saveUserPreferences(preferences) {
+    saveUserPreferences(preferences, callback) {
         if (!this._userName) {
             throw new Error("Need to load user preferences before you can save them");
         }
@@ -39,8 +21,7 @@ var PreferencesStore = {
             dataType: 'json',
             contentType: 'application/json'
         }).done(() => {
-            this.setPreferences(preferences);
-            this.emit(this.DATA_SAVED_EVENT);
+            callback(preferences);
         }).fail((jqXHR, textStatus, errorThrown) => {
             console.error("Saving of preferences for " + this._userName + " failed with status: " + textStatus);
             console.error("Error", errorThrown);
@@ -48,7 +29,7 @@ var PreferencesStore = {
         });
     },
 
-    loadUserPreferences(userName) {
+    loadUserPreferences(userName, callback) {
         this._userName = userName;
 
         var url = this.URL + userName;
@@ -65,8 +46,7 @@ var PreferencesStore = {
         };
         var successCallback = (data) => {
             var sortedArray = postProcessData(data.preferences || {});
-            this.setPreferences(sortedArray);
-            this.emit(this.DATA_LOADED_EVENT);
+            callback(sortedArray);
         };
         var failCallback = (jqXHR, textStatus, errorThrown) => {
             console.error("Loading of user preferences for " + userName + " failed with status: " + textStatus);
@@ -76,6 +56,5 @@ var PreferencesStore = {
         $.getJSON(url, successCallback).fail(failCallback);
     }
 };
-mergeInto(PreferencesStore, AbstractEventSendingStore);
 
 module.exports = PreferencesStore;

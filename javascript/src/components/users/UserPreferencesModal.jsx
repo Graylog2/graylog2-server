@@ -8,21 +8,6 @@ var UserPreferencesModal = React.createClass({
     getInitialState() {
         return {preferences: []};
     },
-    componentDidMount() {
-        PreferencesStore.addChangeListener(this._onInputChanged);
-        PreferencesStore.on(PreferencesStore.DATA_LOADED_EVENT, this._openModal);
-        PreferencesStore.on(PreferencesStore.DATA_SAVED_EVENT, this._closeModal);
-
-    },
-    componentWillUnmount() {
-        PreferencesStore.removeChangeListener(this._onInputChanged);
-        PreferencesStore.removeListener(this.DATA_LOADED_EVENT, this._openModal);
-        PreferencesStore.removeListener(PreferencesStore.DATA_SAVED_EVENT, this._closeModal);
-    },
-    _onInputChanged() {
-        var preferences = PreferencesStore.getPreferences();
-        this.setState({preferences: preferences});
-    },
     _onPreferenceChanged(name, event) {
         var preferenceToChange = this.state.preferences.filter((preference) => preference.name === name)[0];
         // TODO: we need the type of the preference to set it properly
@@ -32,7 +17,7 @@ var UserPreferencesModal = React.createClass({
         }
     },
     render() {
-        var header = <h2>Preferences for user {PreferencesStore.getUserName()}</h2>;
+        var header = <h2>Preferences for user {this.props.userName}</h2>;
         // TODO: Add additional row where you can add a new preference
         // TODO: Add delete button
         var body = (<table className="table table-hover">
@@ -58,11 +43,14 @@ var UserPreferencesModal = React.createClass({
     _closeModal() {
         this.refs.modal.close();
     },
-    _openModal() {
-        this.refs.modal.open();
+    openModal() {
+        PreferencesStore.loadUserPreferences(this.props.userName, (preferences) => {
+            this.setState({preferences: preferences});
+            this.refs.modal.open();
+        });
     },
     _save() {
-        PreferencesStore.saveUserPreferences(this.state.preferences);
+        PreferencesStore.saveUserPreferences(this.state.preferences, this._closeModal);
     }
 
 });
