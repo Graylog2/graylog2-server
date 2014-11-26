@@ -172,7 +172,7 @@ gulp.task('deploy-rev', function () {
 });
 
 gulp.task('deploy-prod', function (callback) {
-    runSequence('test', 'lint-strict', 'clean-target', 'clean', 'prod-js', 'compress', 'rev', 'replace-rev-prod', 'deploy-rev', callback);
+    runSequence('lint-strict', 'clean-target', 'clean', 'prod-js', 'compress', 'rev', 'replace-rev-prod', 'deploy-rev', callback);
 });
 
 gulp.task('prepare-dev', function (callback) {
