@@ -16,6 +16,7 @@
  */
 package org.graylog2.shared.journal;
 
+import com.codahale.metrics.MetricRegistry;
 import com.google.common.util.concurrent.Service;
 import com.google.inject.Provides;
 import com.google.inject.Scopes;
@@ -39,7 +40,8 @@ public class KafkaJournalModule extends Graylog2Module {
     @Singleton
     public KafkaJournal providesJournal(@Named("journalDirectory") String journalDirName,
                                         @Named("scheduler") ScheduledExecutorService scheduler,
-                                        @Named("journalSegmentSize") int segmentSize) {
-        return new KafkaJournal(journalDirName, scheduler, segmentSize);
+                                        @Named("journalSegmentSize") int segmentSize,
+                                        MetricRegistry metricRegistry) {
+        return new KafkaJournal(journalDirName, scheduler, segmentSize, metricRegistry);
     }
 }

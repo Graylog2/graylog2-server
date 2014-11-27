@@ -16,6 +16,8 @@
  */
 package org.graylog2.shared.journal;
 
+import com.codahale.metrics.Meter;
+import com.codahale.metrics.MetricRegistry;
 import com.google.common.base.Charsets;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
@@ -54,6 +56,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
+import static com.codahale.metrics.MetricRegistry.name;
 import static org.graylog2.plugin.Tools.bytesToHex;
 
 public class KafkaJournal extends AbstractIdleService implements Journal {
@@ -64,15 +67,24 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
     private final File committedReadOffsetFile;
     private final AtomicLong committedOffset = new AtomicLong(DEFAULT_COMMITTED_OFFSET);
     private final ScheduledExecutorService scheduler;
+    private final MetricRegistry metricRegistry;
     private final OffsetFileFlusher offsetFlusher;
     private long nextReadOffset = 0L;
     private final KafkaScheduler kafkaScheduler;
 
+    private final Meter messagesWritten;
+    private final Meter messagesRead;
+
     @Inject
     public KafkaJournal(@Named("journalDirectory") String journalDirName,
                         @Named("scheduler") ScheduledExecutorService scheduler,
-                        @Named("journalSegmentSize") int segmentSize) {
+                        @Named("journalSegmentSize") int segmentSize,
+                        MetricRegistry metricRegistry) {
         this.scheduler = scheduler;
+        this.metricRegistry = metricRegistry;
+
+        this.messagesWritten = metricRegistry.meter(name(this.getClass(), "messagesWritten"));
+        this.messagesRead = metricRegistry.meter(name(this.getClass(), "messagesRead"));
 
         // TODO all of these configuration values need tweaking
         // these are the default values as per kafka 0.8.1.1
@@ -195,6 +207,7 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
         final Log.LogAppendInfo appendInfo = kafkaLog.append(messageSet, true);
         log.debug("Wrote {} messages to journal: {} bytes, log position {} to {}",
                  entries.size(), payloadSize[0], appendInfo.firstOffset(), appendInfo.lastOffset());
+        messagesWritten.mark(entries.size());
         return appendInfo.lastOffset();
     }
 
@@ -252,6 +265,7 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
             // TODO how do we recover from this? the exception doesn't contain the next valid offset :(
             log.warn("Offset out of range, no messages available starting at offset {}", nextReadOffset);
         }
+        messagesRead.mark(messages.size());
         return messages;
     }
 
