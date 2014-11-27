@@ -19,7 +19,6 @@ package org.graylog2.radio.rest.resources.system;
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Maps;
 import org.graylog2.inputs.InputCache;
-import org.graylog2.plugin.buffers.BufferWatermark;
 import org.graylog2.radio.Configuration;
 import org.graylog2.radio.rest.resources.RestResource;
 import org.graylog2.shared.buffers.ProcessBuffer;
@@ -30,7 +29,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
@@ -73,13 +71,12 @@ public class BuffersResource extends RestResource {
         Map<String, Object> buffers = Maps.newHashMap();
         Map<String, Object> input = Maps.newHashMap();
 
-        BufferWatermark pWm = new BufferWatermark(
-                configuration.getRingSize(),
-                new AtomicLong(processBuffer.size())
-        );
+        final int ringSize = configuration.getRingSize();
+        final long inputSize = processBuffer.size();
+        final long inputUtil = inputSize/ringSize*100;
 
-        input.put("utilization_percent", pWm.getUtilizationPercentage());
-        input.put("utilization", pWm.getUtilization());
+        input.put("utilization_percent", inputUtil);
+        input.put("utilization", inputSize);
 
         buffers.put("input", input);
 
