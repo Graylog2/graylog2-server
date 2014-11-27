@@ -111,6 +111,9 @@ public abstract class BaseConfiguration {
     @Parameter("message_journal_dir")
     private String messageJournalDir = "journal";
 
+    @Parameter("message_journal_segment_size")
+    private int messageJournalSegmentSize = 1024 * 1024 * 100; // 100 MB
+
     @Parameter("inputbuffer_processors")
     private int inputbufferProcessors = 2;
 
@@ -263,5 +266,9 @@ public abstract class BaseConfiguration {
 
     public int getInputbufferProcessors() {
         return inputbufferProcessors;
+    }
+
+    public int getMessageJournalSegmentSize() {
+        return messageJournalSegmentSize;
     }
 }

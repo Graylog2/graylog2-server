@@ -68,14 +68,16 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
     private final KafkaScheduler kafkaScheduler;
 
     @Inject
-    public KafkaJournal(@Named("journalDirectory") String journalDirName, @Named("scheduler") ScheduledExecutorService scheduler) {
+    public KafkaJournal(@Named("journalDirectory") String journalDirName,
+                        @Named("scheduler") ScheduledExecutorService scheduler,
+                        @Named("journalSegmentSize") int segmentSize) {
         this.scheduler = scheduler;
 
         // TODO all of these configuration values need tweaking
         // these are the default values as per kafka 0.8.1.1
         final LogConfig defaultConfig =
                 new LogConfig(
-                        1024 * 1024,
+                        segmentSize,
                         Long.MAX_VALUE,
                         Long.MAX_VALUE,
                         Long.MAX_VALUE,

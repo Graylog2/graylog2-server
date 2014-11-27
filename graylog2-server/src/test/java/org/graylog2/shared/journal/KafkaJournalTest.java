@@ -49,7 +49,7 @@ public class KafkaJournalTest extends Graylog2BaseTest {
     @Test
     public void writeAndRead() throws IOException {
         final Path journalDir = Files.createTempDirectory("journal");
-        final Journal journal = new KafkaJournal(journalDir.toFile().getAbsolutePath(), scheduler);
+        final Journal journal = new KafkaJournal(journalDir.toFile().getAbsolutePath(), scheduler, 100 * 1024 * 1024);
 
         final byte[] idBytes = "id".getBytes(UTF_8);
         final byte[] messageBytes = "message".getBytes(UTF_8);

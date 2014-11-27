@@ -139,6 +139,7 @@ public class ServerBindings extends AbstractModule {
         bind(BundleExporterProvider.class).in(Scopes.SINGLETON);
 
         bind(String.class).annotatedWith(Names.named("journalDirectory")).toInstance(configuration.getMessageJournalDir());
+        bind(Integer.class).annotatedWith(Names.named("journalSegmentSize")).toInstance(configuration.getMessageJournalSegmentSize());
 
         if (configuration.isMessageCacheOffHeap()) {
             bind(InputCache.class).toProvider(InputCacheProvider.class).asEagerSingleton();

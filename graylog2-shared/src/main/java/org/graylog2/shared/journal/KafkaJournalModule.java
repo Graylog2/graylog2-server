@@ -37,7 +37,9 @@ public class KafkaJournalModule extends Graylog2Module {
 
     @Provides
     @Singleton
-    public KafkaJournal providesJournal(@Named("journalDirectory") String journalDirName, @Named("scheduler") ScheduledExecutorService scheduler) {
-        return new KafkaJournal(journalDirName, scheduler);
+    public KafkaJournal providesJournal(@Named("journalDirectory") String journalDirName,
+                                        @Named("scheduler") ScheduledExecutorService scheduler,
+                                        @Named("journalSegmentSize") int segmentSize) {
+        return new KafkaJournal(journalDirName, scheduler, segmentSize);
     }
 }
