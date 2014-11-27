@@ -111,6 +111,9 @@ public abstract class BaseConfiguration {
     @Parameter("message_journal_dir")
     private String messageJournalDir = "journal";
 
+    @Parameter("inputbuffer_processors")
+    private int inputbufferProcessors = 2;
+
     public String getRestUriScheme() {
         return isRestEnableTls() ? "https" : "http";
     }
@@ -256,5 +259,9 @@ public abstract class BaseConfiguration {
 
     public String getMessageJournalDir() {
         return messageJournalDir;
+    }
+
+    public int getInputbufferProcessors() {
+        return inputbufferProcessors;
     }
 }
