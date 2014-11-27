@@ -74,9 +74,9 @@ var ConfigurationBundles = React.createClass({
                 <div className="span6">
                     <BootstrapAccordion>
                             {this._getCategoriesHtml()}
-                        <BootstrapAccordionGroup name="Import">
+                        <BootstrapAccordionGroup name="Import content pack">
                             <form method="POST" action="/a/system/contentpacks" className="form-inline upload" encType="multipart/form-data">
-                                <span className="help-block">Please apply the configuration bundle after uploading it to make the changes effective.</span>
+                                <span className="help-block">Please apply the content pack after uploading it to make the changes effective.</span>
                                 <input type="file" name="bundle" />
                                 <button type="submit" className="btn btn-success">Upload</button>
                             </form>
