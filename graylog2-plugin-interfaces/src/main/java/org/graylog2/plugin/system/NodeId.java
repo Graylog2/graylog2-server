@@ -22,6 +22,7 @@
  */
 package org.graylog2.plugin.system;
 
+import com.google.common.hash.Hashing;
 import org.apache.commons.io.FileUtils;
 import org.graylog2.plugin.Tools;
 import org.slf4j.Logger;
@@ -37,13 +38,12 @@ import java.nio.file.Paths;
 import java.util.List;
 
 public class NodeId {
-
     private static final Logger LOG = LoggerFactory.getLogger(NodeId.class);
 
     private final String filename;
     private final String id;
 
-    public NodeId(String filename) {
+    public NodeId(final String filename) {
         this.filename = filename;
         this.id = readOrGenerate();
     }
@@ -58,7 +58,7 @@ public class NodeId {
 
             LOG.info("Node ID: {}", read);
             return read;
-        } catch(FileNotFoundException | NoSuchFileException e) {
+        } catch (FileNotFoundException | NoSuchFileException e) {
             return generate();
         } catch (Exception e2) {
             LOG.error("Could not read or generate node ID: ", e2);
@@ -90,8 +90,21 @@ public class NodeId {
         FileUtils.writeStringToFile(new File(filename), nodeId);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public String toString() {
         return id;
     }
 
+    /**
+     * Generate an "anonymized" node ID for use with external services. Currently it just hashes the actual node ID
+     * using SHA-256.
+     *
+     * @return The anonymized ID derived from hashing the node ID.
+     */
+    public String anonymize() {
+        return Hashing.sha256().hashString(id, StandardCharsets.UTF_8).toString();
+    }
 }

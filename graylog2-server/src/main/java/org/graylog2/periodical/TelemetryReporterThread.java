@@ -22,7 +22,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
-import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
 import org.apache.http.client.config.RequestConfig;
@@ -94,7 +93,7 @@ public class TelemetryReporterThread extends Periodical {
             Map<String, Object> report = Maps.newHashMap();
 
             report.put("token", telemetryConfiguration.getToken());
-            report.put("anon_id", DigestUtils.sha256Hex(serverStatus.getNodeId().toString()));
+            report.put("anon_id", serverStatus.getNodeId().anonymize());
             report.put("metrics", MetricUtils.mapAllFiltered(metricRegistry.getMetrics(), METRICS_BLACKLIST));
             report.put("statistics", buildStatistics());
 
