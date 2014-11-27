@@ -60,7 +60,7 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
     private static final Logger log = LoggerFactory.getLogger(KafkaJournal.class);
     private final LogManager logManager;
     private final Log kafkaLog;
-    private final File commmitedReadOffsetFile;
+    private final File committedReadOffsetFile;
     private final AtomicLong committedOffset = new AtomicLong(Long.MIN_VALUE);
     private final ScheduledExecutorService scheduler;
     private final OffsetFileFlusher offsetFlusher;
@@ -108,10 +108,10 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
             log.error("Cannot create journal directory at {}, please check the permissions", journalDirectory.getAbsolutePath());
         }
         // TODO add check for directory, etc
-        commmitedReadOffsetFile = new File(journalDirectory, "graylog2-committed-read-offset");
+        committedReadOffsetFile = new File(journalDirectory, "graylog2-committed-read-offset");
         try {
-            if (!commmitedReadOffsetFile.createNewFile()) {
-                final String line = Files.readFirstLine(commmitedReadOffsetFile, Charsets.UTF_8);
+            if (!committedReadOffsetFile.createNewFile()) {
+                final String line = Files.readFirstLine(committedReadOffsetFile, Charsets.UTF_8);
                 // the file contains the last offset graylog2 has successfully processed.
                 // thus the nextReadOffset is one beyond that number
                 if (line != null) {
@@ -272,17 +272,17 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
     private class OffsetFileFlusher implements Runnable {
         @Override
         public void run() {
-            try (final FileOutputStream fos = new FileOutputStream(commmitedReadOffsetFile)) {
+            try (final FileOutputStream fos = new FileOutputStream(committedReadOffsetFile)) {
                 fos.write(String.valueOf(committedOffset.get()).getBytes(Charsets.UTF_8));
                 // flush stream
                 fos.flush();
                 // actually sync to disk
                 fos.getFD().sync();
             } catch (SyncFailedException e) {
-                log.error("Cannot sync "+commmitedReadOffsetFile.getAbsolutePath()+" to disk. Continuing anyway," +
+                log.error("Cannot sync "+ committedReadOffsetFile.getAbsolutePath()+" to disk. Continuing anyway," +
                                   " but there is no guarantee that the file has been written.", e);
             } catch (IOException e) {
-                log.error("Cannot write "+commmitedReadOffsetFile.getAbsolutePath()+" to disk.", e);
+                log.error("Cannot write "+ committedReadOffsetFile.getAbsolutePath()+" to disk.", e);
             }
         }
     }
