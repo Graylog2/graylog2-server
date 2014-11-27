@@ -46,7 +46,7 @@ public class NoopJournal extends AbstractIdleService implements Journal {
     }
 
     @Override
-    public List<JournalReadEntry> read() {
+    public List<JournalReadEntry> read(long maximumCount) {
         return JOURNAL_READ_ENTRIES;
     }
 

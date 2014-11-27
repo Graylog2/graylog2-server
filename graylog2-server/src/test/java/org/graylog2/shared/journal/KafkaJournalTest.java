@@ -55,7 +55,7 @@ public class KafkaJournalTest extends Graylog2BaseTest {
         final byte[] messageBytes = "message".getBytes(UTF_8);
 
         final long position = journal.write(idBytes, messageBytes);
-        final List<Journal.JournalReadEntry> messages = journal.read();
+        final List<Journal.JournalReadEntry> messages = journal.read(1);
 
         final Journal.JournalReadEntry firstMessage = Iterators.getOnlyElement(messages.iterator());
 

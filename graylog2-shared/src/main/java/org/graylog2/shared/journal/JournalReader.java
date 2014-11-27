@@ -78,7 +78,9 @@ public class JournalReader extends AbstractExecutionThreadService {
         startLatch.await();
 
         while (isRunning()) {
-            final List<Journal.JournalReadEntry> encodedRawMessages = journal.read();
+            // approximate count to read from the journal to backfill the processing chain
+            final long remainingCapacity = processBuffer.getRemainingCapacity();
+            final List<Journal.JournalReadEntry> encodedRawMessages = journal.read(remainingCapacity);
             if (encodedRawMessages.isEmpty()) {
                 log.info("No messages to read from Journal, waiting until the writer adds more messages.");
                 // block until something is written to the journal again

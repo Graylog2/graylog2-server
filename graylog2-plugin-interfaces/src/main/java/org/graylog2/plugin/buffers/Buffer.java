@@ -53,6 +53,10 @@ public abstract class Buffer {
         return ringBuffer.hasAvailableCapacity(n);
     }
 
+    public long getRemainingCapacity() {
+        return ringBuffer.remainingCapacity();
+    }
+
     public long getUsage() {
         if (ringBuffer == null) {
             return 0;

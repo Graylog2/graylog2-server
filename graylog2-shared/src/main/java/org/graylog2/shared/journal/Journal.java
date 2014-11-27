@@ -25,7 +25,7 @@ public interface Journal {
 
     long write(byte[] idBytes, byte[] messageBytes);
 
-    List<JournalReadEntry> read();
+    List<JournalReadEntry> read(long maximumCount);
 
     void markJournalOffsetCommitted(long offset);
 
