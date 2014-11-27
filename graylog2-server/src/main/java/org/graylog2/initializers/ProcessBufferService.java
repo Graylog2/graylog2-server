@@ -22,7 +22,6 @@ import org.graylog2.Configuration;
 import org.graylog2.buffers.OutputBuffer;
 import org.graylog2.buffers.processors.ServerProcessBufferProcessor;
 import org.graylog2.shared.buffers.ProcessBuffer;
-import org.graylog2.shared.buffers.ProcessBufferWatermark;
 import org.graylog2.shared.buffers.processors.ProcessBufferProcessor;
 
 import javax.inject.Singleton;
@@ -35,19 +34,16 @@ public class ProcessBufferService extends AbstractIdleService {
     private final Configuration configuration;
     private final ServerProcessBufferProcessor.Factory processBufferProcessorFactory;
     private final OutputBuffer outputBuffer;
-    private final ProcessBufferWatermark processBufferWatermark;
     private final ProcessBuffer processBuffer;
 
     @Inject
     public ProcessBufferService(Configuration configuration,
                                 ServerProcessBufferProcessor.Factory processBufferProcessorFactory,
                                 OutputBuffer outputBuffer,
-                                ProcessBufferWatermark processBufferWatermark,
                                 ProcessBuffer processBuffer) {
         this.configuration = configuration;
         this.processBufferProcessorFactory = processBufferProcessorFactory;
         this.outputBuffer = outputBuffer;
-        this.processBufferWatermark = processBufferWatermark;
         this.processBuffer = processBuffer;
 
         outputBuffer.initialize();
@@ -60,7 +56,7 @@ public class ProcessBufferService extends AbstractIdleService {
         ProcessBufferProcessor[] processors = new ProcessBufferProcessor[processBufferProcessorCount];
 
         for (int i = 0; i < processBufferProcessorCount; i++) {
-            processors[i] = processBufferProcessorFactory.create(outputBuffer, processBufferWatermark, i, processBufferProcessorCount);
+            processors[i] = processBufferProcessorFactory.create(outputBuffer, i, processBufferProcessorCount);
         }
 
         processBuffer.initialize(processors, configuration.getRingSize(),

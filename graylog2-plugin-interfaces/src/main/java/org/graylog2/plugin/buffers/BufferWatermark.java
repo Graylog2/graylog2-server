@@ -23,6 +23,7 @@
 package org.graylog2.plugin.buffers;
 
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
@@ -30,14 +31,14 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class BufferWatermark {
     
     private final int bufferSize;
-    private final AtomicInteger watermark;
+    private final AtomicLong watermark;
     
-    public BufferWatermark(int bufferSize, AtomicInteger watermark) {
+    public BufferWatermark(int bufferSize, AtomicLong watermark) {
         this.bufferSize = bufferSize;
         this.watermark = watermark;
     }
     
-    public int getUtilization() {
+    public long getUtilization() {
         return watermark.get();
     }
     

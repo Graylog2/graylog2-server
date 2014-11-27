@@ -35,7 +35,6 @@ import static com.codahale.metrics.MetricRegistry.name;
 public abstract class ProcessBufferProcessor implements EventHandler<MessageEvent> {
     private static final Logger LOG = LoggerFactory.getLogger(ProcessBufferProcessor.class);
 
-    protected AtomicInteger processBufferWatermark;
     private final Meter incomingMessages;
     private final Timer processTime;
     private final Meter outgoingMessages;
@@ -46,13 +45,11 @@ public abstract class ProcessBufferProcessor implements EventHandler<MessageEven
     private final long numberOfConsumers;
 
     public ProcessBufferProcessor(MetricRegistry metricRegistry,
-                                  AtomicInteger processBufferWatermark,
                                   final long ordinal,
                                   final long numberOfConsumers) {
         this.metricRegistry = metricRegistry;
         this.ordinal = ordinal;
         this.numberOfConsumers = numberOfConsumers;
-        this.processBufferWatermark = processBufferWatermark;
 
         incomingMessages = metricRegistry.meter(name(ProcessBufferProcessor.class, "incomingMessages"));
         outgoingMessages = metricRegistry.meter(name(ProcessBufferProcessor.class, "outgoingMessages"));
@@ -66,8 +63,6 @@ public abstract class ProcessBufferProcessor implements EventHandler<MessageEven
             return;
         }
 
-        processBufferWatermark.decrementAndGet();
-        
         incomingMessages.mark();
         final Timer.Context tcx = processTime.time();
 
