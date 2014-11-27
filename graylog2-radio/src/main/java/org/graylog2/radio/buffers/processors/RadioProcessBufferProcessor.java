@@ -39,7 +39,6 @@ import static com.codahale.metrics.MetricRegistry.name;
 public class RadioProcessBufferProcessor extends ProcessBufferProcessor {
     public interface Factory {
         public RadioProcessBufferProcessor create(
-                AtomicInteger processBufferWatermark,
                 @Assisted("ordinal") final long ordinal,
                 @Assisted("numberOfConsumers") final long numberOfConsumers
         );
@@ -59,10 +58,9 @@ public class RadioProcessBufferProcessor extends ProcessBufferProcessor {
                                        RadioTransport radioTransport,
                                        ServerStatus serverStatus,
                                        Configuration configuration,
-                                       @Assisted AtomicInteger processBufferWatermark,
                                        @Assisted("ordinal") final long ordinal,
                                        @Assisted("numberOfConsumers") final long numberOfConsumers) {
-        super(metricRegistry, processBufferWatermark, ordinal, numberOfConsumers);
+        super(metricRegistry, ordinal, numberOfConsumers);
         this.throughputStats = throughputStats;
         this.radioTransport = radioTransport;
         this.serverStatus = serverStatus;

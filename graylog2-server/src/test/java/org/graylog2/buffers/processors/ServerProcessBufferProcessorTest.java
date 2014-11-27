@@ -53,7 +53,7 @@ public class ServerProcessBufferProcessorTest {
                 first,
                 second);
         final ServerProcessBufferProcessor processor = new ServerProcessBufferProcessor(mock(
-                MetricRegistry.class), filters, mock(Configuration.class), new AtomicInteger(), 0, 1, mock(OutputBuffer.class));
+                MetricRegistry.class), filters, mock(Configuration.class), 0, 1, mock(OutputBuffer.class));
         final List<MessageFilter> filterRegistry = processor.getFilterRegistry();
 
         assertEquals(filterRegistry.get(0), first);
@@ -73,7 +73,7 @@ public class ServerProcessBufferProcessorTest {
                 new ServerProcessBufferProcessor(metricRegistry,
                                                  Sets.<MessageFilter>newHashSet(),
                                                  configuration,
-                                                 processBufferWatermark, 0, 1,
+                                                 0, 1,
                                                  outputBuffer);
         try {
             emptyFilters.handleMessage(new Message("test", "source", Tools.iso8601()));
@@ -117,7 +117,7 @@ public class ServerProcessBufferProcessorTest {
                 new ServerProcessBufferProcessor(metricRegistry,
                                                  Sets.newHashSet(filterOnlyFirst),
                                                  configuration,
-                                                 processBufferWatermark, 0, 1,
+                                                 0, 1,
                                                  outputBuffer);
         try {
             Message filteredoutMessage = new Message("filtered out", "source", Tools.iso8601());

@@ -22,7 +22,7 @@ import org.graylog2.inputs.InputCache;
 import org.graylog2.plugin.buffers.BufferWatermark;
 import org.graylog2.radio.Configuration;
 import org.graylog2.radio.rest.resources.RestResource;
-import org.graylog2.shared.buffers.ProcessBufferWatermark;
+import org.graylog2.shared.buffers.ProcessBuffer;
 
 import javax.inject.Inject;
 import javax.ws.rs.GET;
@@ -30,18 +30,23 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
 @Path("/system/buffers")
 public class BuffersResource extends RestResource {
+    private final Configuration configuration;
+    private final InputCache inputCache;
+    private final ProcessBuffer processBuffer;
+
     @Inject
-    private Configuration configuration;
-    @Inject
-    private ProcessBufferWatermark processBufferWatermark;
-    @Inject
-    private InputCache inputCache;
+    public BuffersResource(Configuration configuration, InputCache inputCache, ProcessBuffer processBuffer) {
+        this.configuration = configuration;
+        this.inputCache = inputCache;
+        this.processBuffer = processBuffer;
+    }
 
     @GET @Timed
     @Produces(MediaType.APPLICATION_JSON)
@@ -70,7 +75,7 @@ public class BuffersResource extends RestResource {
 
         BufferWatermark pWm = new BufferWatermark(
                 configuration.getRingSize(),
-                processBufferWatermark
+                new AtomicLong(processBuffer.size())
         );
 
         input.put("utilization_percent", pWm.getUtilizationPercentage());
