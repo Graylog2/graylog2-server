@@ -25,7 +25,9 @@ public class RawMessageEncoderHandler implements WorkHandler<RawMessageEvent> {
     @Override
     public void onEvent(RawMessageEvent event) throws Exception {
         event.encodedRawMessage = event.rawMessage.encode();
-        log.info("Serialized message {} for journal, size {} bytes",
-                 event.rawMessage.getId(), event.encodedRawMessage.length);
+        if (log.isTraceEnabled()) {
+            log.trace("Serialized message {} for journal, size {} bytes",
+                      event.rawMessage.getId(), event.encodedRawMessage.length);
+        }
     }
 }

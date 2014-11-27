@@ -51,6 +51,7 @@ public class JournalReader extends AbstractExecutionThreadService {
 
     @Subscribe
     public void listener(String notification) {
+        // TODO use a proper class here.
         if ("ProcessBufferInitialized".equals(notification)) {
             startLatch.countDown();
         }
@@ -82,7 +83,7 @@ public class JournalReader extends AbstractExecutionThreadService {
             final long remainingCapacity = processBuffer.getRemainingCapacity();
             final List<Journal.JournalReadEntry> encodedRawMessages = journal.read(remainingCapacity);
             if (encodedRawMessages.isEmpty()) {
-                log.info("No messages to read from Journal, waiting until the writer adds more messages.");
+                log.debug("No messages to read from Journal, waiting until the writer adds more messages.");
                 // block until something is written to the journal again
                 try {
                     journalFilled.acquire();
@@ -90,11 +91,11 @@ public class JournalReader extends AbstractExecutionThreadService {
                     // this can happen when we are blocked but the system wants to shut down. We don't have to do anything in that case.
                     continue;
                 }
-                log.info("Messages have been written to Journal, continuing to read.");
+                log.debug("Messages have been written to Journal, continuing to read.");
                 // we don't care how many messages were inserted in the meantime, we'll read all of them eventually
                 journalFilled.drainPermits();
             } else {
-                log.info("Processing {} messages from journal.", encodedRawMessages.size());
+                log.debug("Processing {} messages from journal.", encodedRawMessages.size());
                 for (final Journal.JournalReadEntry encodedRawMessage : encodedRawMessages) {
                     final RawMessage rawMessage = RawMessage.decode(encodedRawMessage.getPayload(),
                                                                     encodedRawMessage.getOffset());

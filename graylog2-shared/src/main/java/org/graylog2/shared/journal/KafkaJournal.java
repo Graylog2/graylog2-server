@@ -184,15 +184,15 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
             payloadSize[0] += messageBytes.length;
             messages.add(new Message(messageBytes, idBytes));
 
-            if (log.isInfoEnabled()) {
-                log.info("Message {} contains bytes {}", bytesToHex(idBytes), bytesToHex(messageBytes));
+            if (log.isTraceEnabled()) {
+                log.trace("Message {} contains bytes {}", bytesToHex(idBytes), bytesToHex(messageBytes));
             }
         }
 
         final ByteBufferMessageSet messageSet = new ByteBufferMessageSet(JavaConversions.asScalaBuffer(messages));
 
         final Log.LogAppendInfo appendInfo = kafkaLog.append(messageSet, true);
-        log.info("Wrote {} messages to journal: {} bytes, log position {} to {}",
+        log.debug("Wrote {} messages to journal: {} bytes, log position {} to {}",
                  entries.size(), payloadSize[0], appendInfo.firstOffset(), appendInfo.lastOffset());
         return appendInfo.lastOffset();
     }

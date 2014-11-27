@@ -53,16 +53,16 @@ public class JournallingMessageHandler implements EventHandler<RawMessageEvent> 
         batch.add(event);
 
         if (endOfBatch) {
-            log.info("End of batch, journalling {} messages", batch.size());
+            log.debug("End of batch, journalling {} messages", batch.size());
             // write batch to journal
 
             final Converter converter = new Converter();
             // copy to avoid re-running this all the time
             final List<Journal.Entry> entries = Lists.newArrayList(transform(batch, converter));
             final long lastOffset = journal.write(entries);
-            log.info("Processed batch, wrote {} bytes, last journal offset: {}, signalling reader.",
-                     converter.getBytesWritten(),
-                     lastOffset);
+            log.debug("Processed batch, wrote {} bytes, last journal offset: {}, signalling reader.",
+                      converter.getBytesWritten(),
+                      lastOffset);
             journalFilled.release();
 
             batch.clear();
@@ -79,7 +79,9 @@ public class JournallingMessageHandler implements EventHandler<RawMessageEvent> 
         @Nullable
         @Override
         public Journal.Entry apply(RawMessageEvent input) {
-            log.info("Journalling message {}", input.rawMessage.getId());
+            if (log.isTraceEnabled()) {
+                log.trace("Journalling message {}", input.rawMessage.getId());
+            }
             // stats
             final int size = input.encodedRawMessage.length;
             bytesWritten += size;
