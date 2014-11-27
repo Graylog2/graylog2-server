@@ -42,6 +42,7 @@ import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.Version;
 import org.graylog2.plugin.inputs.MessageInput;
+import org.graylog2.radio.bindings.PeriodicalBindings;
 import org.graylog2.radio.bindings.RadioBindings;
 import org.graylog2.radio.bindings.RadioInitializerBindings;
 import org.graylog2.radio.cluster.Ping;
@@ -236,6 +237,7 @@ public class Main extends NodeRunner {
             modules.addAll(
                     getBindingsModules(instantiationService,
                             new RadioBindings(configuration),
+                            new PeriodicalBindings(),
                             new RadioInitializerBindings()));
             LOG.debug("Adding plugin modules: " + pluginModules);
             modules.addAll(pluginModules);

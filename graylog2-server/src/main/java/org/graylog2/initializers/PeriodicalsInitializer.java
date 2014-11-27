@@ -29,6 +29,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Collections;
 import java.util.Map;
+import java.util.Set;
 
 public class PeriodicalsInitializer implements Initializer {
 
@@ -36,27 +37,25 @@ public class PeriodicalsInitializer implements Initializer {
 
     public static final String NAME = "Periodicals initializer";
     private final InstantiationService instantiationService;
+    private final Set<Periodical> periodicalSet;
     private final Periodicals periodicals;
     private final ServerStatus serverStatus;
 
     @Inject
     public PeriodicalsInitializer(InstantiationService instantiationService,
                                   Periodicals periodicals,
+                                  Set<Periodical> periodicalSet,
                                   ServerStatus serverStatus) {
         this.instantiationService = instantiationService;
+        this.periodicalSet = periodicalSet;
         this.periodicals = periodicals;
         this.serverStatus = serverStatus;
     }
 
     @Override
     public void initialize(Map<String, String> config) throws InitializerConfigurationException {
-        String packageName = Periodical.class.getPackage().toString();
-        Reflections reflections = new Reflections("org.graylog2.shared.periodical");
-
-        for (Class<? extends Periodical> type : reflections.getSubTypesOf(Periodical.class)) {
+        for (Periodical periodical : periodicalSet) {
             try {
-                Periodical periodical = instantiationService.getInstance(type);
-
                 periodical.initialize();
 
                 if (periodical.masterOnly() && !serverStatus.hasCapability(ServerStatus.Capability.MASTER)) {

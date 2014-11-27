@@ -24,6 +24,7 @@ import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.inject.Graylog2Module;
 import org.graylog2.shared.bindings.GenericBindings;
 import org.graylog2.shared.bindings.InstantiationService;
+import org.graylog2.shared.bindings.SharedPeriodicalBindings;
 import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,6 +45,7 @@ public class NodeRunner {
     protected static List<Module> getBindingsModules(InstantiationService instantiationService, Module... specificModules) {
         List<Module> result = Lists.newArrayList();
         result.add(new GenericBindings(instantiationService));
+        result.add(new SharedPeriodicalBindings());
         Reflections reflections = new Reflections("org.graylog2.shared.bindings");
         final Set<Class<? extends AbstractModule>> generic = reflections.getSubTypesOf(AbstractModule.class);
         final Set<Class<? extends Graylog2Module>> gl2Modules = reflections.getSubTypesOf(Graylog2Module.class);

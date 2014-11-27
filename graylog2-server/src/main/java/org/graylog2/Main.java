@@ -316,6 +316,7 @@ public final class Main extends NodeRunner {
                     getBindingsModules(instantiationService,
                             new ServerBindings(configuration),
                             new PersistenceServicesBindings(),
+                            new PeriodicalBindings(),
                             new ServerMessageInputBindings(),
                             new MessageFilterBindings(),
                             new AlarmCallbackBindings(),
