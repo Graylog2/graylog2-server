@@ -18,7 +18,6 @@ package org.graylog2.periodical;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Inject;
-import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
@@ -49,9 +48,6 @@ import java.nio.charset.Charset;
 
 import static java.util.concurrent.TimeUnit.MINUTES;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public class VersionCheckThread extends Periodical {
 
     private static final Logger LOG = LoggerFactory.getLogger(VersionCheckThread.class);
@@ -77,7 +73,7 @@ public class VersionCheckThread extends Periodical {
         final HttpGet get;
         try {
             uri = new URIBuilder(versionCheckConfiguration.getUri());
-            uri.addParameter("anonid", DigestUtils.sha256Hex(serverStatus.getNodeId().toString()));
+            uri.addParameter("anonid", serverStatus.getNodeId().anonymize());
             uri.addParameter("version", ServerVersion.VERSION.toString());
 
             get = new HttpGet(uri.build());

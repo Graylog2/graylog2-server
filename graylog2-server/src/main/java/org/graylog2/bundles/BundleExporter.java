@@ -29,6 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -40,6 +41,8 @@ public class BundleExporter {
     private final StreamService streamService;
     private final OutputService outputService;
     private final DashboardService dashboardService;
+
+    private Set<String> streamSet = new HashSet<>();
 
     @Inject
     public BundleExporter(final InputService inputService,
@@ -55,10 +58,12 @@ public class BundleExporter {
     public ConfigurationBundle export(final ExportBundle exportBundle) {
         final ConfigurationBundle configurationBundle = new ConfigurationBundle();
 
-        final List<Input> inputs = exportInputs(exportBundle.getInputs());
-        final List<Stream> streams = exportStreams(exportBundle.getStreams());
-        final List<Output> outputs = exportOutputs(exportBundle.getOutputs());
-        final List<Dashboard> dashboards = exportDashboards(exportBundle.getDashboards());
+        streamSet = new HashSet<>(exportBundle.getStreams());
+
+        final Set<Dashboard> dashboards = exportDashboards(exportBundle.getDashboards());
+        final Set<Output> outputs = exportOutputs(exportBundle.getOutputs());
+        final Set<Stream> streams = exportStreams(streamSet);
+        final Set<Input> inputs = exportInputs(exportBundle.getInputs());
 
         configurationBundle.setName(exportBundle.getName());
         configurationBundle.setCategory(exportBundle.getCategory());
@@ -71,8 +76,8 @@ public class BundleExporter {
         return configurationBundle;
     }
 
-    private List<Input> exportInputs(final List<String> inputs) {
-        final ImmutableList.Builder<Input> inputBuilder = ImmutableList.builder();
+    private Set<Input> exportInputs(final Set<String> inputs) {
+        final ImmutableSet.Builder<Input> inputBuilder = ImmutableSet.builder();
 
         for (String inputId : inputs) {
             final Input input = exportInput(inputId);
@@ -150,8 +155,8 @@ public class BundleExporter {
         return converterBuilder.build();
     }
 
-    private List<Stream> exportStreams(final List<String> streams) {
-        final ImmutableList.Builder<Stream> streamBuilder = ImmutableList.builder();
+    private Set<Stream> exportStreams(final Set<String> streams) {
+        final ImmutableSet.Builder<Stream> streamBuilder = ImmutableSet.builder();
 
         for (String streamId : streams) {
             final Stream stream = exportStream(streamId);
@@ -210,8 +215,8 @@ public class BundleExporter {
         return outputBuilder.build();
     }
 
-    private List<Output> exportOutputs(final List<String> outputs) {
-        final ImmutableList.Builder<Output> outputBuilder = ImmutableList.builder();
+    private Set<Output> exportOutputs(final Set<String> outputs) {
+        final ImmutableSet.Builder<Output> outputBuilder = ImmutableSet.builder();
 
         for (String outputId : outputs) {
             final Output output = exportOutput(outputId);
@@ -243,8 +248,8 @@ public class BundleExporter {
         return outputDescription;
     }
 
-    private List<Dashboard> exportDashboards(final List<String> dashboards) {
-        final ImmutableList.Builder<Dashboard> dashboardBuilder = ImmutableList.builder();
+    private Set<Dashboard> exportDashboards(final Set<String> dashboards) {
+        final ImmutableSet.Builder<Dashboard> dashboardBuilder = ImmutableSet.builder();
 
         for (String dashboardId : dashboards) {
             final Dashboard dashboard = exportDashboard(dashboardId);
@@ -298,6 +303,14 @@ public class BundleExporter {
                 dashboardWidgetDescription.setType(widget.getType());
                 dashboardWidgetDescription.setConfiguration(widgetConfig);
                 dashboardWidgetDescription.setCacheTime(widget.getCacheTime());
+
+                // Mark referenced streams for export
+                final Object streamId = widgetConfig.get("stream_id");
+                if (streamId instanceof String) {
+                    if (streamSet.add((String) streamId)) {
+                        LOG.debug("Adding stream {} to export list", (String) streamId);
+                    }
+                }
 
                 @SuppressWarnings("unchecked")
                 final Map<String, Integer> widgetPosition = (Map<String, Integer>) positions.get(widget.getId());

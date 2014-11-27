@@ -290,7 +290,9 @@ public class RadiosResource extends RestResource {
     private Map<String, Object> radioSummary(Node node) {
         Map<String, Object> m  = Maps.newHashMap();
 
+        // TODO: Remove "id" in future versions
         m.put("id", node.getNodeId());
+        m.put("node_id", node.getNodeId());
         m.put("type", node.getType().toString().toLowerCase());
         m.put("transport_address", node.getTransportAddress());
         m.put("last_seen", Tools.getISO8601String(node.getLastSeen()));

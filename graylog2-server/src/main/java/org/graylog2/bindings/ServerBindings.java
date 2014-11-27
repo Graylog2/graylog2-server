@@ -46,7 +46,6 @@ import org.graylog2.bindings.providers.ServerInputRegistryProvider;
 import org.graylog2.bindings.providers.ServerObjectMapperProvider;
 import org.graylog2.bindings.providers.SystemJobFactoryProvider;
 import org.graylog2.bindings.providers.SystemJobManagerProvider;
-import org.graylog2.buffers.OutputBufferWatermark;
 import org.graylog2.buffers.processors.OutputBufferProcessor;
 import org.graylog2.buffers.processors.ServerProcessBufferProcessor;
 import org.graylog2.bundles.BundleService;
@@ -139,7 +138,6 @@ public class ServerBindings extends AbstractModule {
             capabilityBinder.addBinding().toInstance(ServerStatus.Capability.MASTER);
         bind(ServerStatus.class).in(Scopes.SINGLETON);
 
-        bind(OutputBufferWatermark.class).toInstance(new OutputBufferWatermark());
         bind(Node.class).toProvider(EsNodeProvider.class).in(Scopes.SINGLETON);
         bind(SystemJobManager.class).toProvider(SystemJobManagerProvider.class);
         bind(InputRegistry.class).toProvider(ServerInputRegistryProvider.class).asEagerSingleton();

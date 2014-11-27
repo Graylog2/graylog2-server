@@ -64,7 +64,7 @@ public class ProcessBufferTest {
     }
 
     public void testBasicInsert() throws Exception {
-        ProcessBuffer processBuffer = new ProcessBuffer(metricRegistry, serverStatus, mock(BaseConfiguration.class), mock(InputCache.class), new AtomicInteger());
+        ProcessBuffer processBuffer = new ProcessBuffer(metricRegistry, serverStatus, mock(BaseConfiguration.class), mock(InputCache.class));
 
         ProcessBufferProcessor processBufferProcessor = mock(ProcessBufferProcessor.class);
         ProcessBufferProcessor[] processBufferProcessors = new ProcessBufferProcessor[1];

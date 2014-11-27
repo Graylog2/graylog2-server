@@ -24,7 +24,7 @@ import org.mongojack.ObjectId;
 import javax.persistence.Id;
 import javax.validation.constraints.NotNull;
 import java.util.Collections;
-import java.util.List;
+import java.util.Set;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ConfigurationBundle {
@@ -42,16 +42,16 @@ public class ConfigurationBundle {
     private String category;
     @JsonProperty
     @NotNull
-    private List<Input> inputs = Collections.emptyList();
+    private Set<Input> inputs = Collections.emptySet();
     @JsonProperty
     @NotNull
-    private List<Stream> streams = Collections.emptyList();
+    private Set<Stream> streams = Collections.emptySet();
     @JsonProperty
     @NotNull
-    private List<Output> outputs = Collections.emptyList();
+    private Set<Output> outputs = Collections.emptySet();
     @JsonProperty
     @NotNull
-    private List<Dashboard> dashboards = Collections.emptyList();
+    private Set<Dashboard> dashboards = Collections.emptySet();
 
     public String getId() {
         return id;
@@ -85,35 +85,35 @@ public class ConfigurationBundle {
         this.category = category;
     }
 
-    public List<Input> getInputs() {
+    public Set<Input> getInputs() {
         return inputs;
     }
 
-    public void setInputs(List<Input> inputs) {
+    public void setInputs(Set<Input> inputs) {
         this.inputs = inputs;
     }
 
-    public List<Stream> getStreams() {
+    public Set<Stream> getStreams() {
         return streams;
     }
 
-    public void setStreams(List<Stream> streams) {
+    public void setStreams(Set<Stream> streams) {
         this.streams = streams;
     }
 
-    public List<Output> getOutputs() {
+    public Set<Output> getOutputs() {
         return outputs;
     }
 
-    public void setOutputs(List<Output> outputs) {
+    public void setOutputs(Set<Output> outputs) {
         this.outputs = outputs;
     }
 
-    public List<Dashboard> getDashboards() {
+    public Set<Dashboard> getDashboards() {
         return dashboards;
     }
 
-    public void setDashboards(List<Dashboard> dashboards) {
+    public void setDashboards(Set<Dashboard> dashboards) {
         this.dashboards = dashboards;
     }
 }
