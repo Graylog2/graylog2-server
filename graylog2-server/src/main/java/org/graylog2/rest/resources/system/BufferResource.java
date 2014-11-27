@@ -112,13 +112,15 @@ public class BufferResource extends RestResource {
 
         int ringSize = configuration.getRingSize();
 
-        BufferWatermark pWm = new BufferWatermark(ringSize, new AtomicLong(processBuffer.size()));
-        input.put("utilization_percent", pWm.getUtilizationPercentage());
-        input.put("utilization", pWm.getUtilization());
+        final long inputSize = processBuffer.size();
+        final float inputUtil = inputSize/ringSize*100;
+        input.put("utilization_percent", inputUtil);
+        input.put("utilization", inputSize);
 
-        BufferWatermark oWm = new BufferWatermark(ringSize, new AtomicLong(outputBuffer.size()));
-        output.put("utilization_percent", oWm.getUtilizationPercentage());
-        output.put("utilization", oWm.getUtilization());
+        final long outputSize = outputBuffer.size();
+        final float outputUtil = outputSize/ringSize*100;
+        output.put("utilization_percent", outputUtil);
+        output.put("utilization", outputSize);
 
         buffers.put("input", input);
         buffers.put("output", output);
