@@ -10,8 +10,6 @@
         </layout>
     </appender>
 
-    <loggerFactory class="org.owasp.esapi.reference.Log4JLoggerFactory"/>
-
     <!-- Application Loggers -->
     <logger name="org.graylog2">
         <level value="debug"/>
@@ -34,4 +32,5 @@
         <appender-ref ref="console"/>
     </root>
 
+    <loggerFactory class="org.owasp.esapi.reference.Log4JLoggerFactory"/>
 </log4j:configuration>
