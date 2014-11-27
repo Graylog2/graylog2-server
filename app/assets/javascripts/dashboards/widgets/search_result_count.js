@@ -58,7 +58,13 @@ function indicatorsFilter(index, percentage, reverse) {
 }
 
 function displayTrendIndicators(widget, nowCount, previousCount) {
-    var percentage = previousCount === 0 ? 0 : ((nowCount - previousCount) / previousCount) * 100;
+    var percentage;
+
+    if (previousCount === 0 || isNaN(previousCount)) {
+        percentage = 0;
+    } else {
+        percentage = ((nowCount - previousCount) / previousCount) * 100;
+    }
 
     var green = "#2AAB2A";
     var red = "#BD362F";
@@ -84,12 +90,25 @@ function displayTrendIndicators(widget, nowCount, previousCount) {
     }
 }
 
+function normalizeNumber(count) {
+    switch(count) {
+        case "NaN":
+            return NaN;
+        case "Infinity":
+            return Number.MAX_VALUE;
+        case "-Infinity":
+            return Number.MIN_VALUE;
+        default:
+            return count;
+    }
+}
+
 function updateWidget_search_result_count(widget, data) {
     var nowCount = null, previousCount = null;
     var result = data.result;
     if (typeof result === 'object') {
         nowCount = result.now;
-        previousCount = result.previous;
+        previousCount = normalizeNumber(result.previous);
     } else {
         nowCount = result;
     }
