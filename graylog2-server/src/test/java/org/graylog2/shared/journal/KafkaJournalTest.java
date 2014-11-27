@@ -64,4 +64,24 @@ public class KafkaJournalTest extends Graylog2BaseTest {
         deleteDirectory(journalDir.toFile());
     }
 
+    @Test
+    public void readAtLeastOne() throws Exception {
+        final Path journalDir = Files.createTempDirectory("journal");
+        final Journal journal = new KafkaJournal(journalDir.toFile().getAbsolutePath(), scheduler, 100 * 1024 * 1024);
+
+        final byte[] idBytes = "id".getBytes(UTF_8);
+        final byte[] messageBytes = "message1".getBytes(UTF_8);
+
+        final long position = journal.write(idBytes, messageBytes);
+
+        // Trying to read 0 should always read at least 1 entry.
+        final List<Journal.JournalReadEntry> messages = journal.read(0);
+
+        final Journal.JournalReadEntry firstMessage = Iterators.getOnlyElement(messages.iterator());
+
+        assertEquals(new String(firstMessage.getPayload(), UTF_8), "message1");
+
+        deleteDirectory(journalDir.toFile());
+    }
+
 }

@@ -210,7 +210,9 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
     }
 
     @Override
-    public List<JournalReadEntry> read(long maximumCount) {
+    public List<JournalReadEntry> read(long requestedMaximumCount) {
+        // Always read at least one!
+        final long maximumCount = Math.max(1, requestedMaximumCount);
         final long maxOffset = nextReadOffset + maximumCount;
         final List<JournalReadEntry> messages = Lists.newArrayListWithCapacity((int) (maximumCount));
         try {
