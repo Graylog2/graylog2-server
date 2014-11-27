@@ -276,7 +276,6 @@ public abstract class Bootstrap implements Runnable {
     protected List<Module> getSharedBindingsModules(InstantiationService instantiationService) {
         List<Module> result = Lists.newArrayList();
         result.add(new GenericBindings(instantiationService));
-        result.add(new SharedPeriodicalBindings());
         Reflections reflections = new Reflections("org.graylog2.shared.bindings");
         final Set<Class<? extends AbstractModule>> generic = reflections.getSubTypesOf(AbstractModule.class);
         final Set<Class<? extends Graylog2Module>> gl2Modules = reflections.getSubTypesOf(Graylog2Module.class);
