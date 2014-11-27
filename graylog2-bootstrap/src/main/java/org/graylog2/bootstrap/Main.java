@@ -16,6 +16,7 @@
  */
 package org.graylog2.bootstrap;
 
+import com.google.common.collect.ImmutableSet;
 import io.airlift.command.Cli;
 import io.airlift.command.Cli.CliBuilder;
 import io.airlift.command.Help;
@@ -23,18 +24,23 @@ import org.graylog2.bootstrap.commands.Radio;
 import org.graylog2.bootstrap.commands.Server;
 import org.graylog2.bootstrap.commands.ShowVersion;
 
-/**
- * @author Dennis Oelkers <dennis@torch.sh>
- */
+import java.util.Set;
+
 public class Main {
-    public static void main(String[] argv) {
-        CliBuilder<Runnable> builder = Cli.<Runnable>builder("graylog2")
+    public static void main(String[] args) {
+        final Set<Class<? extends Runnable>> commands = ImmutableSet.of(
+                Server.class,
+                Radio.class,
+                ShowVersion.class,
+                Help.class);
+
+        final CliBuilder<Runnable> builder = Cli.<Runnable>builder("graylog2")
                 .withDescription("Open source, centralized log management")
                 .withDefaultCommand(Help.class)
-                .withCommands(Server.class, Radio.class, ShowVersion.class, Help.class);
+                .withCommands(commands);
 
-        Cli<Runnable> gitParser = builder.build();
-        Runnable command = gitParser.parse(argv);
+        final Cli<Runnable> cli = builder.build();
+        final Runnable command = cli.parse(args);
         command.run();
     }
 }
