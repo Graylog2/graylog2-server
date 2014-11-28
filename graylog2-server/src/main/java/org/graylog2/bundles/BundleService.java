@@ -39,7 +39,7 @@ import java.util.Set;
 @Singleton
 public class BundleService {
     private static final Logger LOG = LoggerFactory.getLogger(BundleService.class);
-    private static final String COLLECTION_NAME = "config_bundles";
+    private static final String COLLECTION_NAME = "content_packs";
 
     private final JacksonDBCollection<ConfigurationBundle, ObjectId> dbCollection;
     private final BundleImporterProvider bundleImporterProvider;
