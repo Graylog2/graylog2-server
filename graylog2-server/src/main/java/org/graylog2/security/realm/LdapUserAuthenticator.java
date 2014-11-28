@@ -34,7 +34,6 @@ import org.graylog2.security.ldap.LdapSettings;
 import org.graylog2.security.ldap.LdapSettingsService;
 import org.graylog2.users.User;
 import org.graylog2.users.UserService;
-import org.owasp.esapi.ESAPI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
