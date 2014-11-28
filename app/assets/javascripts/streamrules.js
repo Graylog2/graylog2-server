@@ -40,7 +40,9 @@ $(document).ready(function() {
         $($(this).attr("data-reflect"), modalBody).text(value);
     });
 
-    $(".streamrules-list").on("click", "li a.remove-streamrule", function(event) {
+    var streamRulesList = $(".streamrules-list");
+
+    streamRulesList.on("click", "li a.remove-streamrule", function(event) {
         var result = confirm("Really delete stream rule?");
         var streamId = $(this).attr('data-stream-id');
         if (result) {
@@ -65,6 +67,16 @@ $(document).ready(function() {
         return false;
     });
 
+    streamRulesList.on("click", "li a.edit-streamrule", function(e) {
+        var streamRuleId = $(this).attr("data-streamrule-id");
+        var form = $('form#streamrule-form[data-streamrule-id="' + streamRuleId + '"]');
+        form.find(".sr-input").change();
+        form.find("div.modal").modal();
+        e.preventDefault();
+    });
+
+    $("div#streamrule-form-modal.modal").on("shown", focusFirstFormInput);
+
     // Stream rules inverter.
     $("form#streamrule-form").on("click", "#sr-inverted", function() {
         var modalBody = $(this).closest("form#streamrule-form").find(".modal-body");
@@ -82,7 +94,7 @@ $(document).ready(function() {
             }
         }
         $("#sr-result-category", modalBody).text(new_val);
-    })
+    });
 
     $(document.body).on("click", "button.streamrule-form-submit", function(e) {
         var form = $(this).closest("form#streamrule-form");
@@ -146,14 +158,6 @@ $(document).ready(function() {
         var streamId = $(this).attr("data-stream-id");
         var form = $('form#streamrule-form[data-stream-id="' + streamId + '"]');
         $("input[type=text]", form).val("");
-        form.find("div.modal").modal();
-        e.preventDefault();
-    });
-
-    $(".streamrules-list").on("click", "li a.edit-streamrule", function(e) {
-        var streamRuleId = $(this).attr("data-streamrule-id");
-        var form = $('form#streamrule-form[data-streamrule-id="' + streamRuleId + '"]');
-        form.find(".sr-input").change();
         form.find("div.modal").modal();
         e.preventDefault();
     });

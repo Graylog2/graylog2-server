@@ -402,11 +402,6 @@ $(document).ready(function() {
         $("form", modal).attr("action", appPrefixed("/system/inputs/" + $(this).attr("data-input-id") + "/staticfields"));
     });
 
-
-    var focusFirstFormInput = function() {
-        $("input[type!=hidden]", this).first().focus();
-    };
-
     // Set the focus on the first element of modals
     $(".input-configuration.modal").on("shown", focusFirstFormInput);
     $(".input-add-static-field.modal").on("shown", focusFirstFormInput);
@@ -1122,6 +1117,10 @@ function generateId() {
     }
 
     return r;
+}
+
+function focusFirstFormInput() {
+    $("input[type!=hidden]", this).first().focus();
 }
 
 // Animated change of numbers.
