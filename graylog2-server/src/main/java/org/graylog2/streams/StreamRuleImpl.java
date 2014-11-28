@@ -33,7 +33,7 @@ import org.graylog2.plugin.streams.StreamRuleType;
 import java.util.Collections;
 import java.util.Map;
 
-import static com.google.common.base.Objects.firstNonNull;
+import static com.google.common.base.MoreObjects.firstNonNull;
 
 /**
  * Representing the rules of a single stream.
