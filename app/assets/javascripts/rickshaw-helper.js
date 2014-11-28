@@ -33,6 +33,58 @@ rickshawHelper = {
         return renderer;
     },
 
+    processHistogramData: function (data, from, to, resolution) {
+        this.normalizeHistogramNumbers(data);
+        this._correctDataBoundaries(data, from, to, resolution);
+    },
+
+    // Statistical functions may return NaN, Infinity and -Infinity as values
+    // We need to normalize those numbers into something that makes sense and Rickshaw can represent
+    normalizeHistogramNumbers: function (data) {
+        console.log("before: " + data.map(function(i) { return i.y}).filter(function(i) { return isNaN(i) || i === "Infinity" || i === "-Infinity"}).length + " of " + data.length);
+        data.filter(function(point) {
+            return isNaN(point.y) || point.y === "Infinity" || point.y === "-Infinity";
+        }).forEach(function(point) {
+            point.y = this._normalizeHistogramNumber(point.y);
+        }.bind(this));
+        console.log("after: " + data.map(function(i) { return i.y}).filter(function(i) { return isNaN(i) || i === "Infinity" || i === "-Infinity"}).length + " of " + data.length);
+    },
+
+    _normalizeHistogramNumber: function (number) {
+        switch (number) {
+            case "NaN":
+                return NaN;
+            case "Infinity":
+                return 0;
+            case "-Infinity":
+                return 0;
+            default:
+                return number;
+        }
+    },
+
+    // Show the whole search time range on charts, even if no data is available.
+    _correctDataBoundaries: function (data, from, to, resolution) {
+        var fromMoment;
+        if (from == undefined || from == null) {
+            fromMoment = moment.utc();
+        } else {
+            fromMoment = moment.utc(from);
+        }
+        var toMoment = moment.utc(to);
+
+        var formattedResolution = momentHelper.getFormattedResolution(resolution);
+        var fromFormatted = fromMoment.startOf(formattedResolution).unix();
+        var toFormatted = toMoment.startOf(formattedResolution).unix();
+
+        // Correct left boundary
+        this._correctDataLeftBoundary(data, fromFormatted, resolution);
+
+        if (toFormatted != fromFormatted) {
+            this._correctDataRightBoundary(data, toFormatted, resolution);
+        }
+    },
+
     // Add two points before the actual data if needed to ensure charts look
     // good while we show the whole time range.
     _correctDataLeftBoundary: function (data, boundary, resolution) {
@@ -58,29 +110,5 @@ rickshawHelper = {
             }
             data.push({"x": boundary, "y": 0});
         }
-    },
-
-    // Show the whole search time range on charts, even if no data is available.
-    correctDataBoundaries: function (data, from, to, resolution) {
-        var fromMoment;
-        if (from == undefined || from == null) {
-            fromMoment = moment.utc();
-        } else {
-            fromMoment = moment.utc(from);
-        }
-        var toMoment = moment.utc(to);
-
-        var formattedResolution = momentHelper.getFormattedResolution(resolution);
-        var fromFormatted = fromMoment.startOf(formattedResolution).unix();
-        var toFormatted = toMoment.startOf(formattedResolution).unix();
-
-        // Correct left boundary
-        this._correctDataLeftBoundary(data, fromFormatted, resolution);
-
-        if (toFormatted != fromFormatted) {
-            this._correctDataRightBoundary(data, toFormatted, resolution);
-        }
-
-        return data;
     }
 };

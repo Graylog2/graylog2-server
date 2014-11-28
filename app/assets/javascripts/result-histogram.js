@@ -8,7 +8,8 @@ resultHistogram = {
     _correctDataBoundaries: function(data) {
         var selectedResolution = $(".date-histogram-res-selector.selected-resolution").data("resolution");
 
-        return rickshawHelper.correctDataBoundaries(data, this._histogramContainer.data("from"), this._histogramContainer.data("to"), selectedResolution);
+        rickshawHelper.processHistogramData(data, this._histogramContainer.data("from"), this._histogramContainer.data("to"), selectedResolution);
+        return data;
     },
 
     _getHistogramContainerWidth: function() {

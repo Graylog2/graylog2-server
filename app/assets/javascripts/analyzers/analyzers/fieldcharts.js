@@ -145,6 +145,8 @@ $(document).ready(function() {
 
                 var resultGraphElement = $("#result-graph");
 
+                rickshawHelper.processHistogramData(data.values, resultGraphElement.data("from"), resultGraphElement.data("to"), data.interval);
+
                 var graph = new Rickshaw.Graph( {
                     element: graphElement[0],
                     width: graphElement.width(),
@@ -154,7 +156,7 @@ $(document).ready(function() {
                     resolution: data.interval,
                     series: [ {
                         name: "value",
-                        data: rickshawHelper.correctDataBoundaries(data.values, resultGraphElement.data("from"), resultGraphElement.data("to"), data.interval),
+                        data: data.values,
                         color: '#26ADE4',
                         gl2_query: opts.query,
                         valuetype: opts.valuetype,

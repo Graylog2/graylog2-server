@@ -43,7 +43,9 @@ function updateWidget_search_result_chart(widget, data) {
         if (fixedTimeAxis) {
             from = data.time_range.from;
         }
-        rickshawHelper.correctDataBoundaries(series, from, data.time_range.to, resolution);
+        rickshawHelper.processHistogramData(series, from, data.time_range.to, resolution);
+    } else {
+        rickshawHelper.normalizeHistogramNumbers(series);
     }
 
     // we need to replace the entire element that rickshaw touches, otherwise

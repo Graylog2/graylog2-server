@@ -90,8 +90,8 @@ function displayTrendIndicators(widget, nowCount, previousCount) {
     }
 }
 
-function normalizeNumber(count) {
-    switch(count) {
+function normalizeNumber(number) {
+    switch(number) {
         case "NaN":
             return NaN;
         case "Infinity":
@@ -99,7 +99,7 @@ function normalizeNumber(count) {
         case "-Infinity":
             return Number.MIN_VALUE;
         default:
-            return count;
+            return number;
     }
 }
 
