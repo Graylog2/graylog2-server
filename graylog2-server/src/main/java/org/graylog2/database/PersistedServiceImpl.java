@@ -287,6 +287,7 @@ public class PersistedServiceImpl implements PersistedService {
 
             // Work on embedded Maps, too.
             if (x.getValue() instanceof Map) {
+                x.setValue(Maps.newHashMap((Map<String, Object>) x.getValue()));
                 fieldTransformations((Map<String, Object>) x.getValue());
                 continue;
             }
