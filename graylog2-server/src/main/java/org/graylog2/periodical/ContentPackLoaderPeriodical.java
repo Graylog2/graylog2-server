@@ -114,9 +114,9 @@ public class ContentPackLoaderPeriodical extends Periodical {
             } else {
                 try {
                     final ConfigurationBundle insertedContentPack = bundleService.insert(contentPack);
-                    LOG.debug("Successfully inserted content pack {} into database with ID " + insertedContentPack.getId());
+                    LOG.debug("Successfully inserted content pack {} into database with ID {}", resource, insertedContentPack.getId());
                 } catch (MongoException e) {
-                    LOG.error("Error while inserting content pack " + resource + "into database. Skipping.", e);
+                    LOG.error("Error while inserting content pack " + resource + " into database. Skipping.", e);
                     continue;
                 }
             }
