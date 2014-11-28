@@ -21,6 +21,7 @@ import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.log4j.InstrumentedAppender;
 import com.github.joschi.jadconfig.JadConfig;
 import com.github.joschi.jadconfig.ParameterException;
+import com.github.joschi.jadconfig.Repository;
 import com.github.joschi.jadconfig.RepositoryException;
 import com.github.joschi.jadconfig.ValidationException;
 import com.github.joschi.jadconfig.guice.NamedConfigParametersModule;
@@ -37,11 +38,14 @@ import com.google.inject.Binder;
 import com.google.inject.Injector;
 import com.google.inject.Module;
 import com.google.inject.ProvisionException;
+import com.google.inject.TypeLiteral;
 import com.google.inject.name.Names;
 import io.airlift.command.Option;
 import org.apache.log4j.Level;
 import org.graylog2.plugin.BaseConfiguration;
 import org.graylog2.plugin.Plugin;
+import org.graylog2.plugin.PluginConfigBean;
+import org.graylog2.plugin.PluginLoaderConfig;
 import org.graylog2.plugin.PluginModule;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.Tools;
@@ -70,6 +74,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -149,8 +154,16 @@ public abstract class Bootstrap implements Runnable {
 
     @Override
     public void run() {
+        String pluginPath = getPluginPath(getConfigFile());
+
         final JadConfig jadConfig = new JadConfig();
         jadConfig.addConverterFactory(new JodaTimeConverterFactory());
+
+        final List<PluginModule> pluginModules = loadPluginModules(pluginPath);
+
+        for (PluginModule pluginModule : pluginModules)
+            for (PluginConfigBean configBean : pluginModule.getConfigBeans())
+                jadConfig.addConfigurationBean(configBean);
 
         if (isDumpDefaultConfig()) {
             for (Object bean : getCommandConfigurationBeans())
@@ -179,8 +192,6 @@ public abstract class Bootstrap implements Runnable {
         }
         org.apache.log4j.Logger.getRootLogger().setLevel(logLevel);
         org.apache.log4j.Logger.getLogger(Main.class.getPackage().getName()).setLevel(logLevel);
-
-        final List<PluginModule> pluginModules = loadPluginModules();
 
         final Injector injector = setupInjector(configModule, pluginModules);
 
@@ -263,8 +274,27 @@ public abstract class Bootstrap implements Runnable {
         }
     }
 
-    protected List<PluginModule> loadPluginModules() {
-        PluginLoader pluginLoader = new PluginLoader(new File(configuration.getPluginDir()));
+    private String getPluginPath(String configFile) {
+        PluginLoaderConfig pluginLoaderConfig = new PluginLoaderConfig();
+        JadConfig jadConfig = new JadConfig();
+        jadConfig.addConfigurationBean(pluginLoaderConfig);
+        jadConfig.setRepositories(getConfigRepositories(configFile));
+
+        try {
+            jadConfig.process();
+        } catch (RepositoryException e) {
+            LOG.error("Couldn't load configuration: {}", e.getMessage());
+            System.exit(1);
+        } catch (ParameterException | ValidationException e) {
+            LOG.error("Invalid configuration", e);
+            System.exit(1);
+        }
+
+        return pluginLoaderConfig.getPluginDir();
+    }
+
+    protected List<PluginModule> loadPluginModules(String pluginPath) {
+        PluginLoader pluginLoader = new PluginLoader(new File(pluginPath));
         List<PluginModule> pluginModules = Lists.newArrayList();
         for (Plugin plugin : pluginLoader.loadPlugins())
             pluginModules.addAll(plugin.modules());
@@ -341,15 +371,19 @@ public abstract class Bootstrap implements Runnable {
         }
     }
 
+    protected Collection<Repository> getConfigRepositories(String configFile) {
+        return Arrays.asList(
+                new EnvironmentRepository(ENVIRONMENT_PREFIX),
+                new SystemPropertiesRepository(PROPERTIES_PREFIX),
+                new PropertiesRepository(configFile)
+        );
+    }
+
     protected NamedConfigParametersModule readConfiguration(final JadConfig jadConfig, final String configFile) {
         final List<Object> beans = getCommandConfigurationBeans();
         for (Object bean : beans)
             jadConfig.addConfigurationBean(bean);
-        jadConfig.setRepositories(Arrays.asList(
-                new EnvironmentRepository(ENVIRONMENT_PREFIX),
-                new SystemPropertiesRepository(PROPERTIES_PREFIX),
-                new PropertiesRepository(configFile)
-        ));
+        jadConfig.setRepositories(getConfigRepositories(configFile));
 
         LOG.debug("Loading configuration from config file: {}", configFile);
         try {

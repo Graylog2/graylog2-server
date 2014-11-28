@@ -22,6 +22,7 @@
  */
 package org.graylog2.plugin;
 
+import com.google.common.collect.ImmutableSet;
 import com.google.common.util.concurrent.Service;
 import com.google.inject.TypeLiteral;
 import com.google.inject.multibindings.MapBinder;
@@ -34,6 +35,8 @@ import org.graylog2.plugin.outputs.MessageOutput;
 import org.graylog2.plugin.periodical.Periodical;
 import org.graylog2.plugin.rest.PluginRestResource;
 
+import java.util.Set;
+
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
  */
@@ -41,6 +44,10 @@ public abstract class PluginModule extends Graylog2Module {
     protected void registerPlugin(Class<? extends PluginMetaData> pluginMetaData) {
         Multibinder<PluginMetaData> pluginMetaDataMultibinder = Multibinder.newSetBinder(binder(), PluginMetaData.class);
         pluginMetaDataMultibinder.addBinding().to(pluginMetaData);
+    }
+
+    public Set<PluginConfigBean> getConfigBeans() {
+        return ImmutableSet.<PluginConfigBean>builder().build();
     }
 
     /**
@@ -87,5 +94,10 @@ public abstract class PluginModule extends Graylog2Module {
     protected void addRestResource(Class<? extends PluginRestResource> restResourceClass) {
         MapBinder<String, PluginRestResource> pluginRestResourceMapBinder = MapBinder.newMapBinder(binder(), String.class, PluginRestResource.class).permitDuplicates();
         pluginRestResourceMapBinder.addBinding(this.getClass().getPackage().getName()).to(restResourceClass);
+    }
+
+    protected void addConfigBean(PluginConfigBean pluginConfigBean) {
+        Multibinder<PluginConfigBean> pluginConfigBeans = Multibinder.newSetBinder(binder(), PluginConfigBean.class);
+        pluginConfigBeans.addBinding().toInstance(pluginConfigBean);
     }
 }
