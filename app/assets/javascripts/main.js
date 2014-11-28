@@ -403,6 +403,15 @@ $(document).ready(function() {
     });
 
 
+    var focusFirstFormInput = function() {
+        $("input[type!=hidden]", this).first().focus();
+    };
+
+    // Set the focus on the first element of modals
+    $(".input-configuration.modal").on("shown", focusFirstFormInput);
+    $(".input-add-static-field.modal").on("shown", focusFirstFormInput);
+
+
     // Remove static field.
     $(".input-list .static-fields ul li").on("mouseenter", function() {
         $(".remove-static-field", $(this)).show();
