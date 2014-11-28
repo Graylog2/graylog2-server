@@ -16,6 +16,8 @@
  */
 package org.graylog2.utilities.date;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.annotations.Test;
 
 import static org.testng.AssertJUnit.*;
@@ -24,6 +26,7 @@ import static org.testng.AssertJUnit.*;
  * @author Lennart Koopmann <lennart@torch.sh>
  */
 public class NaturalDateParserTest {
+    private static final Logger LOG = LoggerFactory.getLogger(NaturalDateParserTest.class);
 
     @Test
     public void testParse() throws Exception, NaturalDateParser.DateNotParsableException {
@@ -53,6 +56,7 @@ public class NaturalDateParserTest {
         NaturalDateParser p = new NaturalDateParser();
 
         NaturalDateParser.Result result1 = p.parse("last hour");
+        LOG.info("From={}, To={}", result1.getFrom(), result1.getTo());
         assertTrue(result1.getFrom().compareTo(result1.getTo()) < 0);
 
         NaturalDateParser.Result result2 = p.parse("last one hour");
