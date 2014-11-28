@@ -24,6 +24,7 @@ import org.graylog2.plugin.ServerStatus;
 import org.graylog2.shared.initializers.InputSetupService;
 import org.graylog2.shared.initializers.PeriodicalsService;
 import org.graylog2.shared.initializers.RestApiService;
+import org.graylog2.shared.journal.JournalReader;
 import org.graylog2.system.activities.Activity;
 import org.graylog2.system.activities.ActivityWriter;
 import org.slf4j.Logger;
@@ -44,6 +45,7 @@ public class GracefulShutdown implements Runnable {
     private final ServerStatus serverStatus;
     private final ActivityWriter activityWriter;
     private final RestApiService restApiService;
+    private final JournalReader journalReader;
 
     @Inject
     public GracefulShutdown(ServerStatus serverStatus,
@@ -52,7 +54,8 @@ public class GracefulShutdown implements Runnable {
                             BufferSynchronizerService bufferSynchronizerService,
                             PeriodicalsService periodicalsService,
                             InputSetupService inputSetupService,
-                            RestApiService restApiService) {
+                            RestApiService restApiService,
+                            JournalReader journalReader) {
         this.serverStatus = serverStatus;
         this.activityWriter = activityWriter;
         this.configuration = configuration;
@@ -60,6 +63,7 @@ public class GracefulShutdown implements Runnable {
         this.periodicalsService = periodicalsService;
         this.inputSetupService = inputSetupService;
         this.restApiService = restApiService;
+        this.journalReader = journalReader;
     }
 
     @Override
@@ -97,6 +101,8 @@ public class GracefulShutdown implements Runnable {
 
         restApiService.awaitTerminated();
         inputSetupService.awaitTerminated();
+
+        journalReader.stopAsync().awaitTerminated();
 
         // Try to flush all remaining messages from the system
         bufferSynchronizerService.stopAsync().awaitTerminated();
