@@ -24,9 +24,6 @@ package org.graylog2.plugin.periodical;
 
 import org.slf4j.Logger;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public abstract class Periodical implements Runnable {
 
     /**
@@ -53,7 +50,7 @@ public abstract class Periodical implements Runnable {
     public abstract boolean masterOnly();
 
     /**
-     * Start on thise node? Useful to decide if to start the periodical based on local configuration.
+     * Start on this node? Useful to decide if to start the periodical based on local configuration.
      * @return
      */
     public abstract boolean startOnThisNode();
