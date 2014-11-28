@@ -1,8 +1,10 @@
 (function (exports, userPreferences) {
     'use strict';
 
+    var recheckInterval = 1000;
     var focussed = true;
     var updateUnfocussed = userPreferences.updateUnfocussed;
+    var expensiveUpdatesEnabled = !userPreferences.disableExpensiveUpdates;
 
     $(window).blur(function () {
         setFocus(false);
@@ -22,7 +24,6 @@
     }
 
     function assertUpdateEnabled(callback) {
-        var recheckInterval = 1000;
 
         if (!focussed) {
             setTimeout(callback, recheckInterval);
@@ -39,7 +40,17 @@
         return updateUnfocussed;
     }
 
+    function assertExpensiveUpdateEnabled(callback) {
+        var enabled = focussed && expensiveUpdatesEnabled;
+
+        if (!enabled) {
+            setTimeout(callback, recheckInterval);
+        }
+        return enabled;
+    }
+
     exports.assertUpdateEnabled = assertUpdateEnabled;
     exports.setUpdateUnfocussedMode = setUpdateUnfocussedMode;
     exports.getUpdateUnfocussedMode = getUpdateUnfocussedMode;
+    exports.assertExpensiveUpdateEnabled = assertExpensiveUpdateEnabled;
 })(window, userPreferences || {});

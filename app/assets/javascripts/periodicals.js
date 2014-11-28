@@ -3,6 +3,10 @@ $(document).ready(function() {
     (function updateTotalEvents() {
         if ($(".total-events").length > 0) {
             var interval = 2500;
+            if (!assertExpensiveUpdateEnabled(updateTotalEvents)) {
+                $(".expensive-update").hide();
+                return;
+            }
             if (!assertUpdateEnabled(updateTotalEvents)) return;
 
             $.ajax({

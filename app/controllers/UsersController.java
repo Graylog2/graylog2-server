@@ -173,7 +173,8 @@ public class UsersController extends AuthenticatedController {
     @BodyParser.Of(BodyParser.Json.class)
     public Result saveUserPreferences(String username) throws IOException {
         Map<String, Object> preferences = Json.fromJson(request().body().asJson(), Map.class);
-        if (userService.savePreferences(username, normalizePreferences(preferences))) {
+        Map<String, Object> normalizedPreferences = normalizePreferences(preferences);
+        if (userService.savePreferences(username, normalizedPreferences)) {
             return ok();
         } else {
             // TODO: Really?
@@ -183,8 +184,9 @@ public class UsersController extends AuthenticatedController {
 
     private Map<String, Object> initDefaultPreferences(Map<String, Object> preferences) {
         Map<String, Object> effectivePreferences = Maps.newHashMap();
-        // TODO: Move defaults into a static map once we at least have a second preference
+        // TODO: Move defaults into a static map once we have more preferences
         effectivePreferences.put("updateUnfocussed", false);
+        effectivePreferences.put("disableExpensiveUpdates", false);
         if (preferences != null) {
             effectivePreferences.putAll(preferences);
         }
@@ -193,20 +195,25 @@ public class UsersController extends AuthenticatedController {
 
     private Map<String, Object> normalizePreferences(Map<String, Object> preferences) {
         Map<String, Object> normalizedPreferences = Maps.newHashMap();
-        // TODO: Move types into a static map once we at least have a second preference
+        // TODO: Move types into a static map once we have more preferences
         for (Map.Entry<String, Object> preference : preferences.entrySet()) {
             if (preference.getKey().equals("updateUnfocussed")) {
-                final Object value = preference.getValue();
-                final Object normalizedValue;
-                if (value instanceof Boolean) {
-                    normalizedValue = value;
-                } else {
-                    normalizedValue = Boolean.valueOf(value.toString());
-                }
-                normalizedPreferences.put(preference.getKey(), normalizedValue);
+                normalizedPreferences.put(preference.getKey(), asBoolean(preference.getValue()));
+            } else if (preference.getKey().equals("disableExpensiveUpdates")) {
+                normalizedPreferences.put(preference.getKey(), asBoolean(preference.getValue()));
             }
         }
         return normalizedPreferences;
+    }
+
+    private static Boolean asBoolean(Object value) {
+        final Boolean normalizedValue;
+        if (value instanceof Boolean) {
+            normalizedValue = (Boolean) value;
+        } else {
+            normalizedValue = Boolean.valueOf(value.toString());
+        }
+        return normalizedValue;
     }
 
     public Result create() {
