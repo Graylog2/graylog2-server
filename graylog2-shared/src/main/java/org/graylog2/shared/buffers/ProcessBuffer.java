@@ -100,7 +100,7 @@ public class ProcessBuffer extends Buffer {
     }
 
     public void initialize(ProcessBufferProcessor[] processors, int ringBufferSize, WaitStrategy waitStrategy, int processBufferProcessors) {
-        Disruptor disruptor = new Disruptor<MessageEvent>(
+        Disruptor<MessageEvent> disruptor = new Disruptor<>(
                 MessageEvent.EVENT_FACTORY,
                 ringBufferSize,
                 executor,

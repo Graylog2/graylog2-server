@@ -90,7 +90,7 @@ public class OutputBuffer extends Buffer {
     }
 
     public void initialize() {
-        Disruptor disruptor = new Disruptor<MessageEvent>(
+        Disruptor<MessageEvent> disruptor = new Disruptor<>(
                 MessageEvent.EVENT_FACTORY,
                 configuration.getRingSize(),
                 executor,

@@ -34,7 +34,6 @@ import org.graylog2.security.ldap.LdapSettings;
 import org.graylog2.security.ldap.LdapSettingsService;
 import org.graylog2.users.User;
 import org.graylog2.users.UserService;
-import org.owasp.esapi.ESAPI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -78,7 +77,7 @@ public class LdapUserAuthenticator extends AuthenticatingRealm {
         config.setName(ldapSettings.getSystemUserName());
         config.setCredentials(ldapSettings.getSystemPassword());
 
-        final String principal = ESAPI.encoder().encodeForLDAP((String) token.getPrincipal());
+        final String principal = (String) token.getPrincipal();
         LdapNetworkConnection connection = null;
         try {
             connection = ldapConnector.connect(config);
