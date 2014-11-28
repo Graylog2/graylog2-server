@@ -25,7 +25,6 @@ package org.graylog2.plugin.journal;
 import com.eaio.uuid.UUID;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.base.Objects;
 import org.graylog2.plugin.Tools;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -42,6 +41,7 @@ import java.nio.ByteBuffer;
 import java.util.Collections;
 import java.util.Map;
 
+import static com.google.common.base.MoreObjects.firstNonNull;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Strings.isNullOrEmpty;
@@ -109,7 +109,7 @@ public class RawMessage implements Serializable {
         this.id = id;
         this.timestamp = timestamp;
         this.sourceInputId = sourceInputId;
-        this.remoteAddress = Objects.firstNonNull(remoteAddress, LOCALHOST_ANYPORT);
+        this.remoteAddress = firstNonNull(remoteAddress, LOCALHOST_ANYPORT);
         this.metaData = metaData == null ? "" : metaData;
         this.payloadType = payloadType;
         this.payload = payload.clone();
