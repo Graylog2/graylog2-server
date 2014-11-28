@@ -48,7 +48,7 @@ public class NaturalDateParserTest {
         new NaturalDateParser().parse("");
     }
 
-    @Test
+    @Test(enabled = false)
     public void testTemporalOrder() throws Exception, NaturalDateParser.DateNotParsableException {
         NaturalDateParser p = new NaturalDateParser();
 
