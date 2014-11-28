@@ -16,6 +16,9 @@
  */
 package org.graylog2.shared.journal;
 
+import com.codahale.metrics.Counter;
+import com.codahale.metrics.Histogram;
+import com.codahale.metrics.MetricRegistry;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.common.util.concurrent.AbstractExecutionThreadService;
@@ -30,6 +33,8 @@ import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Semaphore;
 
+import static com.codahale.metrics.MetricRegistry.name;
+
 public class JournalReader extends AbstractExecutionThreadService {
     private static final Logger log = LoggerFactory.getLogger(JournalReader.class);
     private final Journal journal;
@@ -37,15 +42,21 @@ public class JournalReader extends AbstractExecutionThreadService {
     private final ProcessBuffer processBuffer;
     private final Semaphore journalFilled;
     private final CountDownLatch startLatch = new CountDownLatch(1);
+    private final Histogram requestedReadCount;
+    private final Counter readBlocked;
     private Thread executionThread;
 
     @Inject
-    public JournalReader(Journal journal, EventBus eventBus, ProcessBuffer processBuffer, @Named("JournalSignal") Semaphore journalFilled) {
+    public JournalReader(Journal journal, EventBus eventBus,
+                         ProcessBuffer processBuffer,
+                         @Named("JournalSignal") Semaphore journalFilled,
+                         MetricRegistry metricRegistry) {
         this.journal = journal;
         this.eventBus = eventBus;
         this.processBuffer = processBuffer;
         this.journalFilled = journalFilled;
-
+        requestedReadCount = metricRegistry.histogram(name(this.getClass(), "requestedReadCount"));
+        readBlocked = metricRegistry.counter(name(this.getClass(), "readBlocked"));
         eventBus.register(this);
     }
 
@@ -81,11 +92,13 @@ public class JournalReader extends AbstractExecutionThreadService {
         while (isRunning()) {
             // approximate count to read from the journal to backfill the processing chain
             final long remainingCapacity = processBuffer.getRemainingCapacity();
+            requestedReadCount.update(remainingCapacity);
             final List<Journal.JournalReadEntry> encodedRawMessages = journal.read(remainingCapacity);
             if (encodedRawMessages.isEmpty()) {
                 log.debug("No messages to read from Journal, waiting until the writer adds more messages.");
                 // block until something is written to the journal again
                 try {
+                    readBlocked.inc();
                     journalFilled.acquire();
                 } catch (InterruptedException ignored) {
                     // this can happen when we are blocked but the system wants to shut down. We don't have to do anything in that case.

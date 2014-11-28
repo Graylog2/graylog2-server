@@ -18,6 +18,7 @@ package org.graylog2.shared.journal;
 
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.Timer;
 import com.google.common.base.Charsets;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
@@ -69,6 +70,8 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
     private final ScheduledExecutorService scheduler;
     private final MetricRegistry metricRegistry;
     private final OffsetFileFlusher offsetFlusher;
+    private final Timer writeTime;
+    private final Timer readTime;
     private long nextReadOffset = 0L;
     private final KafkaScheduler kafkaScheduler;
 
@@ -85,6 +88,8 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
 
         this.messagesWritten = metricRegistry.meter(name(this.getClass(), "messagesWritten"));
         this.messagesRead = metricRegistry.meter(name(this.getClass(), "messagesRead"));
+        writeTime = metricRegistry.timer(name(this.getClass(), "writeTime"));
+        readTime = metricRegistry.timer(name(this.getClass(), "readTime"));
 
         // TODO all of these configuration values need tweaking
         // these are the default values as per kafka 0.8.1.1
@@ -187,28 +192,30 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
      */
     @Override
     public long write(List<Entry> entries) {
-        final long[] payloadSize = {0L};
+        try (Timer.Context ignored = writeTime.time()) {
+            final long[] payloadSize = {0L};
 
-        final List<Message> messages = Lists.newArrayList();
-        for (final Entry entry : entries) {
-            final byte[] messageBytes = entry.getMessageBytes();
-            final byte[] idBytes = entry.getIdBytes();
+            final List<Message> messages = Lists.newArrayList();
+            for (final Entry entry : entries) {
+                final byte[] messageBytes = entry.getMessageBytes();
+                final byte[] idBytes = entry.getIdBytes();
 
-            payloadSize[0] += messageBytes.length;
-            messages.add(new Message(messageBytes, idBytes));
+                payloadSize[0] += messageBytes.length;
+                messages.add(new Message(messageBytes, idBytes));
 
-            if (log.isTraceEnabled()) {
-                log.trace("Message {} contains bytes {}", bytesToHex(idBytes), bytesToHex(messageBytes));
+                if (log.isTraceEnabled()) {
+                    log.trace("Message {} contains bytes {}", bytesToHex(idBytes), bytesToHex(messageBytes));
+                }
             }
+
+            final ByteBufferMessageSet messageSet = new ByteBufferMessageSet(JavaConversions.asScalaBuffer(messages));
+
+            final Log.LogAppendInfo appendInfo = kafkaLog.append(messageSet, true);
+            log.debug("Wrote {} messages to journal: {} bytes, log position {} to {}",
+                      entries.size(), payloadSize[0], appendInfo.firstOffset(), appendInfo.lastOffset());
+            messagesWritten.mark(entries.size());
+            return appendInfo.lastOffset();
         }
-
-        final ByteBufferMessageSet messageSet = new ByteBufferMessageSet(JavaConversions.asScalaBuffer(messages));
-
-        final Log.LogAppendInfo appendInfo = kafkaLog.append(messageSet, true);
-        log.debug("Wrote {} messages to journal: {} bytes, log position {} to {}",
-                 entries.size(), payloadSize[0], appendInfo.firstOffset(), appendInfo.lastOffset());
-        messagesWritten.mark(entries.size());
-        return appendInfo.lastOffset();
     }
 
     /**
@@ -229,7 +236,7 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
         final long maximumCount = Math.max(1, requestedMaximumCount);
         final long maxOffset = nextReadOffset + maximumCount;
         final List<JournalReadEntry> messages = Lists.newArrayListWithCapacity((int) (maximumCount));
-        try {
+        try (Timer.Context ignored = readTime.time()) {
             log.debug("Requesting to read a maximum of {} messages (or 100kb) from the journal, offset interval [{}, {})",
                       maximumCount, nextReadOffset, maxOffset);
             final MessageSet messageSet = kafkaLog.read(nextReadOffset, 100 * 1024, Option.<Object>apply(maxOffset));
