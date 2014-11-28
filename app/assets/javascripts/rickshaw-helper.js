@@ -41,13 +41,11 @@ rickshawHelper = {
     // Statistical functions may return NaN, Infinity and -Infinity as values
     // We need to normalize those numbers into something that makes sense and Rickshaw can represent
     normalizeHistogramNumbers: function (data) {
-        console.log("before: " + data.map(function(i) { return i.y}).filter(function(i) { return isNaN(i) || i === "Infinity" || i === "-Infinity"}).length + " of " + data.length);
         data.filter(function(point) {
             return isNaN(point.y) || point.y === "Infinity" || point.y === "-Infinity";
         }).forEach(function(point) {
             point.y = this._normalizeHistogramNumber(point.y);
         }.bind(this));
-        console.log("after: " + data.map(function(i) { return i.y}).filter(function(i) { return isNaN(i) || i === "Infinity" || i === "-Infinity"}).length + " of " + data.length);
     },
 
     _normalizeHistogramNumber: function (number) {
