@@ -78,7 +78,7 @@ public class LdapUserAuthenticator extends AuthenticatingRealm {
         config.setName(ldapSettings.getSystemUserName());
         config.setCredentials(ldapSettings.getSystemPassword());
 
-        final String principal = ESAPI.encoder().encodeForLDAP((String) token.getPrincipal());
+        final String principal = (String) token.getPrincipal();
         LdapNetworkConnection connection = null;
         try {
             connection = ldapConnector.connect(config);

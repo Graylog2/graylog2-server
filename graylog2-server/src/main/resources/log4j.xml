@@ -31,6 +31,4 @@
         <priority value="warn"/>
         <appender-ref ref="console"/>
     </root>
-
-    <loggerFactory class="org.owasp.esapi.reference.Log4JLoggerFactory"/>
 </log4j:configuration>
