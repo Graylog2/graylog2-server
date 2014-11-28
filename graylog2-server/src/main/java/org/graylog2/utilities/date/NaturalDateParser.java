@@ -41,7 +41,6 @@ public class NaturalDateParser {
         final List<DateGroup> groups = parser.parse(string);
         if (!groups.isEmpty()) {
             final List<Date> dates = groups.get(0).getDates();
-            Collections.sort(dates);
 
             if (dates.size() >= 1) {
                 from = dates.get(0);
@@ -49,6 +48,12 @@ public class NaturalDateParser {
 
             if (dates.size() >= 2) {
                 to = dates.get(1);
+            }
+
+            if(from != null && to != null && from.compareTo(to) > 0) {
+                final Date swap = from;
+                from = to;
+                to = swap;
             }
         } else {
             throw new DateNotParsableException();
