@@ -237,9 +237,9 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
         final long maxOffset = nextReadOffset + maximumCount;
         final List<JournalReadEntry> messages = Lists.newArrayListWithCapacity((int) (maximumCount));
         try (Timer.Context ignored = readTime.time()) {
-            log.debug("Requesting to read a maximum of {} messages (or 100kb) from the journal, offset interval [{}, {})",
+            log.debug("Requesting to read a maximum of {} messages (or 5MB) from the journal, offset interval [{}, {})",
                       maximumCount, nextReadOffset, maxOffset);
-            final MessageSet messageSet = kafkaLog.read(nextReadOffset, 100 * 1024, Option.<Object>apply(maxOffset));
+            final MessageSet messageSet = kafkaLog.read(nextReadOffset, 5 * 1025 * 1024, Option.<Object>apply(maxOffset));
 
             final Iterator<MessageAndOffset> iterator = messageSet.iterator();
             long firstOffset = Long.MIN_VALUE;
