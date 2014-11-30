@@ -129,7 +129,6 @@ public class OutputBuffer extends Buffer {
         }
 
         insert(message);
-        afterInsert(1);
     }
 
     @Override
@@ -141,7 +140,6 @@ public class OutputBuffer extends Buffer {
         }
 
         insert(message);
-        afterInsert(1);
     }
 
     @Override
@@ -155,7 +153,6 @@ public class OutputBuffer extends Buffer {
         }
 
         insert(messages.toArray(new Message[length]));
-        afterInsert(length);
     }
 
     @Override
@@ -168,7 +165,10 @@ public class OutputBuffer extends Buffer {
         }
 
         insert(messages.toArray(new Message[length]));
-        afterInsert(length);
+    }
+
+    public void insertBlocking(Message message) {
+        insert(message);
     }
 
     @Override
