@@ -6,7 +6,7 @@
     <div class="pull-right">
         <div class="btn-group">
             <a class="btn btn-success btn-small" href="@routes.BundlesController.export()">
-                Build your own content pack
+                Create a content pack
             </a>
         </div>
     </div>
@@ -15,14 +15,19 @@
 
     <div class="row-fluid">
         <h1><i class="icon icon-sitemap"></i> Content packs</h1>
-        Content packs are bundled sets of input/extractor combinations and fitting data representations like streams and
-        dashboards. Importing a content pack allows you to rapidly support a given source of log messages and automatically
-        get the most important streams and dashboards set up.
+
+        <p>
+            Content packs accelerate the set up process for a specific data source. A content pack can include inputs/extractors, streams, and dashboards.
+        </p>
+
+        <p>
+            <i class="icon icon-lightbulb"></i>&nbsp;
+            <a href="http://www.graylog2.org/supported-sources" target="_blank">Find more content packs on graylog2.org</a>.
+        </p>
     </div>
 
     <div class="row-fluid">
-        <h2><i class="icon icon-cogs"></i> Manage content packs</h2>
-        Select a content pack from the list to get you started.
+        <h2>Select content packs</h2>
     </div>
     <div id="react-configuration-bundles"></div>
 }

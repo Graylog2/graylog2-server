@@ -26,12 +26,12 @@
     details
 }
 
-@main("Build your own content pack", views.html.system.sidebar(), "", currentUser) {
+@main("Create a content pack", views.html.system.sidebar(), "", currentUser) {
     @views.html.partials.breadcrumbs(breadcrumbs)
 
     <div class="row-fluid">
-        <h1><i class="icon icon-sitemap"></i> Build your own Content Pack</h1>
-        Export your inputs, outputs, streams and dashboards as a content pack and share it with the community.
+        <h1><i class="icon icon-sitemap"></i> Create a content pack</h1>
+        Export your inputs, outputs, streams and dashboards as a content pack and share it with the community or other setups.
     </div>
 
     @helper.form(action = routes.BundlesController.export(), 'class -> "form-horizontal build-content-pack") {
@@ -48,7 +48,7 @@
             <div class="controls">
                 <textarea rows="6" id="description" name="description" class="input-xlarge" required>@form("description").value()</textarea>
                 <span class="help-block">
-                    A description of what your bundle does and instructions about possible inputs to start manually.
+                    A description of what your bundle does and possible special instructions for the user.
                     You can use <a href="http://daringfireball.net/projects/markdown/syntax" target="_blank">Markdown</a> syntax.
                 </span>
             </div>
@@ -141,7 +141,16 @@
                     <i class="icon icon-cloud-download"></i>
                     Download my content pack
                 </button>
+
+                <br /><br />
+                <p>
+                    <i class="icon icon-lightbulb"></i>&nbsp;
+                    Share your content pack with the community on <a href="http://www.graylog2.org/supported-sources" target="_blank">graylog2.org</a>
+                    after you have downloaded it.
+                </p>
             </div>
         </div>
+
+
     }
 }
