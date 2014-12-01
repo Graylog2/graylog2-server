@@ -1,4 +1,20 @@
 $(document).ready(function() {
+
+    var position = initBottomPosition();
+    function initBottomPosition() {
+        position = 0;
+        var charts = getPinnedCharts();
+        Object.keys(charts).forEach(function(chartId) {
+            var chart = charts[chartId];
+            position = Math.max(chart.position, position);
+        });
+        return position;
+    }
+
+    function getBottomPosition() {
+        return ++position;
+    }
+
     var palette = new Rickshaw.Color.Palette({ scheme: 'colorwheel' });
 
     $(".analyze-field .line-chart").on("click", function(e) {
@@ -58,6 +74,10 @@ $(document).ready(function() {
             opts.range = {};
         }
 
+        if (opts.position === undefined) {
+            opts.position = getBottomPosition();
+        }
+
         var params = {
             "rangetype": opts.rangetype,
             "q": opts.query,
@@ -113,7 +133,8 @@ $(document).ready(function() {
             success: function(data) {
                 var template = $("#field-graph-template").clone();
                 template.removeAttr("id");
-                template.attr("data-chart-id", opts.chartid)
+                template.attr("data-chart-position", opts.position);
+                template.attr("data-chart-id", opts.chartid);
                 template.attr("data-field", field);
                 template.css("display", "block");
                 $("h3 .title span", template).text(field);
