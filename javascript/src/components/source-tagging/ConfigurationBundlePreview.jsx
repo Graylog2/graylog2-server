@@ -23,7 +23,6 @@ var ConfigurationBundlePreview = React.createClass({
         }
 
         var markdownPreview = Markdown.toHTML(preview);
-        console.log(this.props);
         return (
             <div className="bundle-preview">
                 {delete_action}
