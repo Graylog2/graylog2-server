@@ -112,7 +112,10 @@ $(document).ready(function() {
         e.preventDefault();
 
         $(this).hide();
-        $(".save-search-form").show();
+
+        var saveSearchForm = $(".save-search-form");
+        saveSearchForm.show();
+        $("input", saveSearchForm).first().focus();
     });
 
     // Save a search: Ask for title and actually trigger saving.
