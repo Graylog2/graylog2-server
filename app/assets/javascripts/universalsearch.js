@@ -115,7 +115,7 @@ $(document).ready(function() {
 
         var saveSearchForm = $(".save-search-form");
         saveSearchForm.show();
-        $("input", saveSearchForm).first().focus();
+        focusFirstFormInput(saveSearchForm);
     });
 
     // Save a search: Ask for title and actually trigger saving.

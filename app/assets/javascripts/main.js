@@ -1119,8 +1119,12 @@ function generateId() {
     return r;
 }
 
-function focusFirstFormInput() {
-    $("input[type!=hidden]", this).first().focus();
+function focusFirstFormInput(form) {
+    var parentElement = form;
+    if (!(parentElement instanceof jQuery)) {
+        parentElement = this;
+    }
+    $("input[type!=hidden]", parentElement).first().focus();
 }
 
 // Animated change of numbers.
