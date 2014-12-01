@@ -70,15 +70,8 @@ public class ThroughputStats {
 
     public void incrementStreamThroughput(String streamId) {
         final ConcurrentHashMap<String, Counter> counterMap = streamThroughput.get();
-        Counter counter;
-        synchronized (counterMap) {
-            counter = counterMap.get(streamId);
-            if (counter == null) {
-                counter = new Counter();
-                counterMap.put(streamId, counter);
-            }
-        }
-        counter.increment();
+        counterMap.putIfAbsent(streamId, new Counter());
+        counterMap.get(streamId).increment();
     }
 
     public void setCurrentStreamThroughput(HashMap<String, Counter> throughput) {
