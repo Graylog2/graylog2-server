@@ -1,0 +1,20 @@
+@(widget: org.graylog2.restclient.models.dashboards.widgets.DashboardWidget)
+
+<div class="widget-subline">
+    <div class="description">
+        <span class="widget-title">
+        @widget.getDescription
+        </span>
+
+        <a href="#" class="only-unlocked edit-description">
+            <i class="icon icon-edit"></i>
+        </a>
+    </div>
+
+    <form class="description-form">
+        <div class="input-append">
+            <input type="text" value="@widget.getDescription" class="description-value" />
+            <button type="submit" class="btn btn-success update-description">Update</button>
+        </div>
+    </form>
+</div>

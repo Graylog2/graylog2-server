@@ -1119,8 +1119,8 @@ function generateId() {
     return r;
 }
 
-function focusFirstFormInput(form) {
-    var parentElement = form;
+function focusFirstFormInput(container) {
+    var parentElement = container;
     if (!(parentElement instanceof jQuery)) {
         parentElement = this;
     }

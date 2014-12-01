@@ -38,7 +38,7 @@
         <input type="text" name="description" class="input-xxlarge" id="description" value="@dashboard.getDescription" />
 
         <br />
-        <button class="btn btn-success">Update dashboard</button>
+        <button type="submit" class="btn btn-success">Update dashboard</button>
     </form>
 
     <p class="dashboard-description">
@@ -124,60 +124,39 @@
         </div>
     }
 
-
-    @**************** change dashboard config modal ****************@
-    <div id="update-dashboard-config" class="modal hide fade" tabindex="-1" role="dialog">
-        <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal">x</button>
-            <h2>Change widget cache time</h2>
-            Every widget has a configured cache time. Increasing this cache time leads to less
-            search load in the cluster. (minimum is 1 second)
-        </div>
-
-        <div class="modal-body">
-            <div class="input-prepend input-append">
-                <span class="add-on">Seconds:</span>
-                <input type="text" class="input-mini cachetime-value" />
-                <button class="btn btn-success update-cachetime">Update</button>
-            </div>
-        </div>
-
-        <div class="modal-footer">
-            <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
-        </div>
-    </div>
-
-
-
     @**************** change cache time modal ****************@
+    <form>
+        <div id="dashboardwidget-cache-time" class="modal hide fade" tabindex="-1" role="dialog">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                <h2>Change widget cache time</h2>
+                Every widget has a configured cache time. Increasing this cache time leads to less
+                search load in the cluster. (minimum is 1 second)
+            </div>
 
-    <div id="dashboardwidget-cache-time" class="modal hide fade" tabindex="-1" role="dialog">
-        <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal">x</button>
-            <h2>Change widget cache time</h2>
-            Every widget has a configured cache time. Increasing this cache time leads to less
-            search load in the cluster. (minimum is 1 second)
-        </div>
+            <div class="modal-body">
+                <div class="control-group">
+                    <label class="control-label" for="cachetime">Seconds</label>
+                    <div class="controls">
+                        <span class="help-block">Number of seconds the widget value will be cached</span>
+                        <input type="text" name="cachetime" class="input-mini cachetime-value" />
+                    </div>
+                </div>
+            </div>
 
-        <div class="modal-body">
-            <div class="input-prepend input-append">
-                <span class="add-on">Seconds:</span>
-                <input type="text" class="input-mini cachetime-value" />
-                <button class="btn btn-success update-cachetime">Update</button>
+            <div class="modal-footer">
+                <button type="button" class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+                <button type="submit" class="btn btn-success update-cachetime">Update</button>
             </div>
         </div>
-
-        <div class="modal-footer">
-            <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
-        </div>
-    </div>
+    </form>
 
     @**************** widget config modals ****************@
 
     @for(widget <- dashboard.getWidgets.values()) {
         <div class="modal hide fade widget-config" data-widget-id="@widget.getId" tabindex="-1" role="dialog">
             <div class="modal-header" style="padding-bottom: 3px;">
-                <button type="button" class="close" data-dismiss="modal">x</button>
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
                 <h2>Widget config</h2>
                 Type: @widget.getType.toString.toLowerCase, cached for @widget.getCacheTime seconds.
 

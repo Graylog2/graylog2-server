@@ -200,7 +200,9 @@ $(document).ready(function() {
         e.preventDefault();
         $(this).closest("h1").hide();
         $(".dashboard-description").hide();
-        $("form.edit-dashboard-form").show();
+        var editDashboardForm = $("form.edit-dashboard-form");
+        editDashboardForm.show();
+        focusFirstFormInput(editDashboardForm);
     });
 
     function displayUpdateUnfocussed(updateUnfocussed) {
@@ -262,7 +264,10 @@ $(document).ready(function() {
         var widget = $(this).closest(".widget");
 
         $(".description", widget).hide();
-        $(".description-form", widget).show();
+
+        var descriptionForm = $(".description-form", widget);
+        descriptionForm.show();
+        focusFirstFormInput(descriptionForm);
     });
 
     $(".dashboard .widget .description-form input").on("keyup", function() {
@@ -292,6 +297,8 @@ $(document).ready(function() {
         modalWindow.modal();
     });
 
+    $("#dashboardwidget-cache-time").on("shown", focusFirstFormInput);
+
     $("#dashboardwidget-cache-time input.cachetime-value").on("keyup", function() {
         if ($(this).val().length > 0 && isNumber($(this).val()) && parseInt($(this).val()) >= 1) {
             $("#dashboardwidget-cache-time button.update-cachetime").prop("disabled", false);
@@ -300,7 +307,8 @@ $(document).ready(function() {
         }
     });
 
-    $("#dashboardwidget-cache-time button.update-cachetime").on("click", function() {
+    $("#dashboardwidget-cache-time button.update-cachetime").on("click", function(e) {
+        e.preventDefault();
         var widget = $('.dashboard .widget[data-widget-id="' + $(this).attr("data-widget-id") + '"]')
         var newVal = $("#dashboardwidget-cache-time input.cachetime-value").val();
 
@@ -327,7 +335,8 @@ $(document).ready(function() {
         });
     });
 
-    $("button.update-description").on("click", function() {
+    $("button.update-description").on("click", function(e) {
+        e.preventDefault();
         var widget = $(this).closest(".widget");
         var dashboardId = widget.attr("data-dashboard-id");
         var widgetId = widget.attr("data-widget-id");

@@ -25,22 +25,5 @@
         </div>
     </div>
 
-    <div class="widget-subline">
-        <div class="description">
-            <span class="widget-title">
-                @widget.getDescription
-            </span>
-
-            <a href="#" class="only-unlocked edit-description">
-                <i class="icon icon-edit"></i>
-            </a>
-        </div>
-
-        <div class="description-form">
-            <div class="input-append">
-                <input type="text" value="@widget.getDescription" class="description-value" />
-                <button class="btn btn-success update-description">Update</button>
-            </div>
-        </div>
-    </div>
+    @views.html.dashboards.widgets.description_form(widget)
 </div>
