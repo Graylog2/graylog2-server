@@ -32,6 +32,13 @@
                 @DateHelper.readablePeriodFromNow(dashboard.getCreatedAt)
 
                 @if(isPermitted(DASHBOARDS_EDIT, dashboard.getId)) {
+                    <span
+                        class="react-edit-dashboard"
+                        data-dashboard-id="@dashboard.getId"
+                        data-dashboard-title="@dashboard.getTitle"
+                        data-dashboard-description="@dashboard.getDescription">
+                        <span class="btn btn-mini"><i class="icon-edit"></i> Edit</span></span>
+
                     @helper.form(action = routes.DashboardsController.delete(dashboard.getId)) {
                         <button type="submit" class="btn btn-danger btn-mini" data-confirm="Really delete dashboard @dashboard.getTitle?">
                             <i class="icon-remove"></i> Delete
@@ -48,7 +55,7 @@
             <h3>
                 <i class="icon icon-ellipsis-vertical"></i>
                 <a href="@routes.DashboardsController.show(dashboard.getId)">
-                @dashboard.getTitle
+                <span data-dashboard-id="@dashboard.getId" class="dashboard-title">@dashboard.getTitle</span>
                 @if(dashboard.getContentPack != null) {
                     <span title="Created from content pack"><i class="icon-gift"></i></span>
                 }
@@ -56,7 +63,7 @@
             </h3>
 
             @dashboard.getWidgets.size() widgets.
-            @dashboard.getDescription
+            <span data-dashboard-id="@dashboard.getId" class="dashboard-description">@dashboard.getDescription</span>
         </div>
     }
 
