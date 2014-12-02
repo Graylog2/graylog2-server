@@ -16,6 +16,10 @@
  */
 package org.graylog2.outputs;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import org.graylog2.database.NotFoundException;
@@ -23,6 +27,7 @@ import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.outputs.MessageOutput;
 import org.graylog2.plugin.outputs.MessageOutputConfigurationException;
 import org.graylog2.plugin.streams.Output;
+import org.graylog2.plugin.streams.Stream;
 import org.graylog2.streams.OutputService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,6 +38,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutionException;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
@@ -41,54 +49,57 @@ import java.util.Set;
 public class OutputRegistry {
     private static final Logger LOG = LoggerFactory.getLogger(OutputRegistry.class);
 
-    private final Map<String, MessageOutput> runningMessageOutputs;
+    private final Cache<String, MessageOutput> runningMessageOutputs;
     private final MessageOutput defaultMessageOutput;
     private final OutputService outputService;
     private final MessageOutputFactory messageOutputFactory;
 
     @Inject
     public OutputRegistry(@DefaultMessageOutput MessageOutput defaultMessageOutput,
-                          OutputService outputService,
+                          final OutputService outputService,
                           MessageOutputFactory messageOutputFactory) {
         this.defaultMessageOutput = defaultMessageOutput;
         this.outputService = outputService;
         this.messageOutputFactory = messageOutputFactory;
-        this.runningMessageOutputs = new HashMap<>();
+        this.runningMessageOutputs = CacheBuilder.newBuilder().build();
     }
 
-    public MessageOutput getOutputForId(String id) {
-        if (!getRunningMessageOutputs().containsKey(id))
-            try {
+    public MessageOutput getOutputForIdAndStream(String id, Stream stream) {
+        try {
+            return this.runningMessageOutputs.get(id, loadForIdAndStream(id, stream));
+        } catch (ExecutionException e) {
+            LOG.error("Unable to fetch output: ", e);
+            return null;
+        }
+    }
+
+    public Callable<MessageOutput> loadForIdAndStream(final String id, final Stream stream) {
+        return new Callable<MessageOutput>() {
+            @Override
+            public MessageOutput call() throws Exception {
                 final Output output = outputService.load(id);
-                register(id, launchOutput(output));
-            } catch (NotFoundException | MessageOutputConfigurationException e) {
-                LOG.error("Unable to launch output <{}>: {}", id, e);
-                return null;
+                return launchOutput(output, stream);
             }
-        return getRunningMessageOutputs().get(id);
+        };
     }
 
-    protected void register(String id, MessageOutput output) {
-        this.runningMessageOutputs.put(id, output);
-    }
-
-    protected MessageOutput launchOutput(Output output) throws MessageOutputConfigurationException {
-        final MessageOutput messageOutput = messageOutputFactory.fromStreamOutput(output);
+    protected MessageOutput launchOutput(Output output, Stream stream) throws MessageOutputConfigurationException {
+        final MessageOutput messageOutput = messageOutputFactory.fromStreamOutput(output, stream, new Configuration(output.getConfiguration()));
         if (messageOutput == null)
             throw new IllegalArgumentException("Failed to instantiate MessageOutput from Output: " + output);
-
-        messageOutput.initialize(new Configuration(output.getConfiguration()));
 
         return messageOutput;
     }
 
     protected Map<String, MessageOutput> getRunningMessageOutputs() {
-        return ImmutableMap.copyOf(runningMessageOutputs);
+        return ImmutableMap.copyOf(runningMessageOutputs.asMap());
     }
 
     public Set<MessageOutput> getMessageOutputs() {
-        Set<MessageOutput> runningOutputs = new HashSet<>(this.runningMessageOutputs.values());
-        runningOutputs.add(defaultMessageOutput);
-        return ImmutableSet.copyOf(runningOutputs);
+        final ImmutableSet.Builder<MessageOutput> builder = ImmutableSet.builder();
+
+        builder.addAll(this.runningMessageOutputs.asMap().values());
+        builder.add(defaultMessageOutput);
+        return ImmutableSet.copyOf(builder.build());
     }
 }

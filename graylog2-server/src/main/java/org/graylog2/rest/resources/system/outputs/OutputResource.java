@@ -28,9 +28,11 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.database.ValidationException;
 import org.graylog2.outputs.MessageOutputFactory;
+import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.configuration.fields.TextField;
 import org.graylog2.plugin.outputs.MessageOutput;
+import org.graylog2.plugin.outputs.MessageOutputConfigurationException;
 import org.graylog2.plugin.streams.Output;
 import org.graylog2.rest.resources.RestResource;
 import org.graylog2.rest.resources.streams.outputs.AvailableOutputSummary;
@@ -101,7 +103,12 @@ public class OutputResource extends RestResource {
     })
     public Map<String, Object> get(@ApiParam(name = "outputId", value = "The id of the output we want.", required = true) @PathParam("outputId") String outputId) throws NotFoundException {
         checkPermission(RestPermissions.OUTPUTS_READ, outputId);
-        return filterPasswordFields(outputService.load(outputId));
+        try {
+            return filterPasswordFields(outputService.load(outputId));
+        } catch (MessageOutputConfigurationException e) {
+            LOG.error("Unable to filter configuration fields of output {}: ", outputId, e);
+            return null;
+        }
     }
 
     @POST
@@ -125,7 +132,12 @@ public class OutputResource extends RestResource {
 
         Output output = outputService.create(csor, getCurrentUser().getName());
 
-        return Response.status(Response.Status.CREATED).entity(filterPasswordFields(output)).build();
+        try {
+            return Response.status(Response.Status.CREATED).entity(filterPasswordFields(output)).build();
+        } catch (MessageOutputConfigurationException e) {
+            LOG.error("Unable to filter configuration fields for output {}: ", output.getId(), e);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     @DELETE @Path("/{outputId}")
@@ -161,7 +173,11 @@ public class OutputResource extends RestResource {
         final Set<Map<String, Object>> data = Sets.newHashSet();
 
         for (Output output : outputs) {
-            data.add(filterPasswordFields(output));
+            try {
+                data.add(filterPasswordFields(output));
+            } catch (MessageOutputConfigurationException e) {
+                LOG.error("Unable to filter configuration fields for output {}: ", output.getId(), e);
+            }
         }
 
         return data;
@@ -169,15 +185,10 @@ public class OutputResource extends RestResource {
 
     // This is so ugly!
     // TODO: Remove this once we implemented proper types for input/ouput configuration.
-    private Map<String, Object> filterPasswordFields(final Output output) {
+    private Map<String, Object> filterPasswordFields(final Output output) throws MessageOutputConfigurationException {
         final Map<String, Object> data = output.asMap();
-        final MessageOutput messageOutput = messageOutputFactory.fromStreamOutput(output);
-
-        if (messageOutput == null) {
-            return data;
-        }
-
-        final ConfigurationRequest requestedConfiguration = messageOutput.getRequestedConfiguration();
+        final MessageOutput.Factory factory = messageOutputFactory.get(output.getType());
+        final ConfigurationRequest requestedConfiguration = factory.getConfig().getRequestedConfiguration();
 
         if (data.containsKey("configuration")) {
             final Map<String, Object> c = (Map<String, Object>) data.get("configuration");

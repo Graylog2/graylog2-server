@@ -72,7 +72,7 @@ public class OutputRouterTest {
         final Set<Output> outputSet = new HashSet<Output>() {{ add(output); }};
         when(stream.getOutputs()).thenReturn(outputSet);
         when(output.getId()).thenReturn(outputId);
-        when(outputRegistry.getOutputForId(eq(outputId))).thenReturn(messageOutput);
+        when(outputRegistry.getOutputForIdAndStream(eq(outputId), eq(stream))).thenReturn(messageOutput);
         final OutputRouter outputRouter = new OutputRouter(defaultMessageOutput, outputRegistry);
 
         final Collection<MessageOutput> messageOutputs = outputRouter.getMessageOutputsForStream(stream);
@@ -93,8 +93,8 @@ public class OutputRouterTest {
         when(stream.getOutputs()).thenReturn(outputSet);
         when(output1.getId()).thenReturn(output1Id);
         when(output2.getId()).thenReturn(output2Id);
-        when(outputRegistry.getOutputForId(eq(output1Id))).thenReturn(messageOutput1);
-        when(outputRegistry.getOutputForId(eq(output2Id))).thenReturn(messageOutput2);
+        when(outputRegistry.getOutputForIdAndStream(eq(output1Id), eq(stream))).thenReturn(messageOutput1);
+        when(outputRegistry.getOutputForIdAndStream(eq(output2Id), eq(stream))).thenReturn(messageOutput2);
         final OutputRouter outputRouter = new OutputRouter(defaultMessageOutput, outputRegistry);
 
         final Collection<MessageOutput> messageOutputs = outputRouter.getMessageOutputsForStream(stream);

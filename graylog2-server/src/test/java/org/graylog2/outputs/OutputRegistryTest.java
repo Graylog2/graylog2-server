@@ -22,6 +22,7 @@ import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.outputs.MessageOutput;
 import org.graylog2.plugin.outputs.MessageOutputConfigurationException;
 import org.graylog2.plugin.streams.Output;
+import org.graylog2.plugin.streams.Stream;
 import org.graylog2.streams.OutputService;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -29,6 +30,7 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
 
 import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
@@ -59,37 +61,38 @@ public class OutputRegistryTest {
 
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void testThrowExceptionForUnknownOutputType() throws MessageOutputConfigurationException {
-        when(messageOutputFactory.fromStreamOutput(eq(output))).thenReturn(null);
+        when(messageOutputFactory.fromStreamOutput(eq(output), any(Stream.class), any(Configuration.class))).thenReturn(null);
         OutputRegistry registry = new OutputRegistry(null, null, messageOutputFactory);
 
-        registry.launchOutput(output);
+        registry.launchOutput(output, null);
 
         assertEquals(registry.getRunningMessageOutputs().size(), 0);
     }
 
     public void testLaunchNewOutput() throws Exception {
         final String outputId = "foobar";
-        when(messageOutputFactory.fromStreamOutput(eq(output))).thenReturn(messageOutput);
+        final Stream stream = mock(Stream.class);
+        when(messageOutputFactory.fromStreamOutput(eq(output), eq(stream), any(Configuration.class))).thenReturn(messageOutput);
         when(outputService.load(eq(outputId))).thenReturn(output);
 
         final OutputRegistry outputRegistry = new OutputRegistry(null, outputService, messageOutputFactory);
         assertEquals(outputRegistry.getRunningMessageOutputs().size(), 0);
 
-        MessageOutput result = outputRegistry.getOutputForId(outputId);
+        MessageOutput result = outputRegistry.getOutputForIdAndStream(outputId, stream);
 
         assertSame(result, messageOutput);
         assertNotNull(outputRegistry.getRunningMessageOutputs());
         assertEquals(outputRegistry.getRunningMessageOutputs().size(), 1);
-        verify(result).initialize(any(Configuration.class));
     }
 
     public void testNonExistingInput() throws Exception {
         final String outputId = "foobar";
+        final Stream stream = mock(Stream.class);
         when(outputService.load(eq(outputId))).thenThrow(NotFoundException.class);
 
         final OutputRegistry outputRegistry = new OutputRegistry(null, outputService, null);
 
-        MessageOutput messageOutput = outputRegistry.getOutputForId(outputId);
+        MessageOutput messageOutput = outputRegistry.getOutputForIdAndStream(outputId, stream);
 
         assertNull(messageOutput);
         assertEquals(outputRegistry.getRunningMessageOutputs().size(), 0);
@@ -97,14 +100,14 @@ public class OutputRegistryTest {
 
     public void testInvalidOutputConfiguration() throws Exception {
         final String outputId = "foobar";
-        doThrow(new MessageOutputConfigurationException()).when(messageOutput).initialize(any(Configuration.class));
-        when(messageOutputFactory.fromStreamOutput(eq(output))).thenReturn(messageOutput);
+        final Stream stream = mock(Stream.class);
+        when(messageOutputFactory.fromStreamOutput(eq(output), any(Stream.class), any(Configuration.class))).thenThrow(new MessageOutputConfigurationException());
         when(outputService.load(eq(outputId))).thenReturn(output);
 
         final OutputRegistry outputRegistry = new OutputRegistry(null, outputService, messageOutputFactory);
         assertEquals(outputRegistry.getRunningMessageOutputs().size(), 0);
 
-        MessageOutput result = outputRegistry.getOutputForId(outputId);
+        MessageOutput result = outputRegistry.getOutputForIdAndStream(outputId, stream);
 
         assertNull(result);
         assertEquals(outputRegistry.getRunningMessageOutputs().size(), 0);

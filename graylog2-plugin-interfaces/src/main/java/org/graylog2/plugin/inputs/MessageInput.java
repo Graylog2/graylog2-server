@@ -27,6 +27,7 @@ import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.MetricSet;
 import com.codahale.metrics.Timer;
 import com.google.common.collect.Maps;
+import org.graylog2.plugin.AbstractDescriptor;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.buffers.Buffer;
@@ -434,32 +435,13 @@ public abstract class MessageInput {
         }
     }
 
-    public static class Descriptor {
-        private final String name;
-        private final boolean exclusive;
-        private final String linkToDocs;
-
-        // required for guice, but isn't called.
-        Descriptor() {
-            throw new IllegalStateException("This class should not be instantiated directly, this is a bug.");
+    public static class Descriptor extends AbstractDescriptor {
+        public Descriptor() {
+            super();
         }
 
         protected Descriptor(String name, boolean exclusive, String linkToDocs) {
-            this.name = name;
-            this.exclusive = exclusive;
-            this.linkToDocs = linkToDocs;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public boolean isExclusive() {
-            return exclusive;
-        }
-
-        public String getLinkToDocs() {
-            return linkToDocs;
+            super(name, exclusive, linkToDocs);
         }
     }
 }

@@ -140,9 +140,9 @@ public class OutputBufferProcessor implements EventHandler<MessageEvent> {
                 continue;
             }
             try {
-                LOG.debug("Writing message to [{}].", output.getName());
+                LOG.debug("Writing message to [{}].", output.getClass());
                 if (LOG.isTraceEnabled()) {
-                    LOG.trace("Message id for [{}]: <{}>", output.getName(), msg.getId());
+                    LOG.trace("Message id for [{}]: <{}>", output.getClass(), msg.getId());
                 }
                 executor.submit(new Runnable() {
                     @Override
@@ -150,7 +150,7 @@ public class OutputBufferProcessor implements EventHandler<MessageEvent> {
                         try (Timer.Context context = processTime.time()) {
                             output.write(msg);
                         } catch (Exception e) {
-                            LOG.error("Error in output [" + output.getName() + "].", e);
+                            LOG.error("Error in output [" + output.getClass() + "].", e);
                         } finally {
                             doneSignal.countDown();
                         }
@@ -158,7 +158,7 @@ public class OutputBufferProcessor implements EventHandler<MessageEvent> {
                 });
 
             } catch (Exception e) {
-                LOG.error("Could not write message batch to output [" + output.getName() + "].", e);
+                LOG.error("Could not write message batch to output [" + output.getClass() + "].", e);
                 doneSignal.countDown();
             }
         }
