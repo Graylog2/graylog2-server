@@ -44,6 +44,7 @@ public class MessageOutputBindings extends Graylog2Module {
     @Override
     protected void configure() {
         final Class<? extends MessageOutput> defaultMessageOutputClass = getDefaultMessageOutputClass(BatchedElasticSearchOutput.class);
+        LOG.debug("Using default message output class: {}", defaultMessageOutputClass.getCanonicalName());
         bind(MessageOutput.class).annotatedWith(DefaultMessageOutput.class).to(defaultMessageOutputClass).in(Scopes.SINGLETON);
 
         final MapBinder<String, MessageOutput.Factory<? extends MessageOutput>> outputMapBinder = outputsMapBinder();
