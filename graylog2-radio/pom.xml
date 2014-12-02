@@ -46,7 +46,6 @@
     </licenses>
 
     <properties>
-        <mainClass>org.graylog2.radio.Main</mainClass>
     </properties>
 
     <dependencies>

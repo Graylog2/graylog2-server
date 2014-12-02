@@ -43,7 +43,6 @@
     </parent>
 
     <properties>
-        <mainClass>org.graylog2.Main</mainClass>
     </properties>
 
     <dependencies>
