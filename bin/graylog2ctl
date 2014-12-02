@@ -36,7 +36,7 @@ done
 
 # take variables from environment if set
 GRAYLOG2CTL_DIR=${GRAYLOG2CTL_DIR:=$(dirname "$GRAYLOG2CTL")}
-GRAYLOG2_SERVER_JAR=${GRAYLOG2_SERVER_JAR:=graylog2-server.jar}
+GRAYLOG2_SERVER_JAR=${GRAYLOG2_SERVER_JAR:=graylog2.jar}
 GRAYLOG2_CONF=${GRAYLOG2_CONF:=/etc/graylog2.conf}
 GRAYLOG2_PID=${GRAYLOG2_PID:=/tmp/graylog2.pid}
 LOG_FILE=${LOG_FILE:=log/graylog2-server.log}
@@ -45,13 +45,13 @@ LOG4J=${LOG4J:=}
 start() {
     echo "Starting graylog2-server ..."
     cd "$GRAYLOG2CTL_DIR/.."
-    $NOHUP $JAVA_CMD ${LOG4J} -jar ${GRAYLOG2_SERVER_JAR} -f ${GRAYLOG2_CONF} -p ${GRAYLOG2_PID}>> ${LOG_FILE} &
+    $NOHUP $JAVA_CMD ${LOG4J} -jar ${GRAYLOG2_SERVER_JAR} server -f ${GRAYLOG2_CONF} -p ${GRAYLOG2_PID}>> ${LOG_FILE} &
 }
 
 run() {
     echo "Running graylog2-server ..."
     cd "$GRAYLOG2CTL_DIR/.."
-    exec java ${LOG4J} -jar ${GRAYLOG2_SERVER_JAR} -f ${GRAYLOG2_CONF} -p ${GRAYLOG2_PID}
+    exec java ${LOG4J} -jar ${GRAYLOG2_SERVER_JAR} server -f ${GRAYLOG2_CONF} -p ${GRAYLOG2_PID}
 }
 
 stop() {
