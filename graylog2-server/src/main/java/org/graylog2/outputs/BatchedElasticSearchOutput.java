@@ -20,11 +20,14 @@ import com.codahale.metrics.*;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
-import org.graylog2.Configuration;
+import com.google.inject.assistedinject.Assisted;
+import com.google.inject.assistedinject.AssistedInject;
 import org.graylog2.indexer.cluster.Cluster;
 import org.graylog2.indexer.messages.Messages;
 import org.graylog2.plugin.Message;
 import org.graylog2.shared.journal.Journal;
+import org.graylog2.plugin.configuration.Configuration;
+import org.graylog2.plugin.streams.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,15 +50,26 @@ public class BatchedElasticSearchOutput extends ElasticSearchOutput {
     private final Meter bufferFlushesRequested;
     private final Cluster cluster;
 
+    @AssistedInject
+    public BatchedElasticSearchOutput(MetricRegistry metricRegistry,
+                                      Messages messages,
+                                      Cluster cluster,
+                                      org.graylog2.Configuration serverConfiguration,
+                                      Journal journal,
+                                      @Assisted Stream stream,
+                                      @Assisted Configuration configuration) {
+        this(metricRegistry, messages, cluster, serverConfiguration, journal);
+    }
+
     @Inject
     public BatchedElasticSearchOutput(MetricRegistry metricRegistry,
                                       Messages messages,
                                       Cluster cluster,
-                                      Configuration configuration,
+                                      org.graylog2.Configuration serverConfiguration,
                                       Journal journal) {
         super(metricRegistry, messages, journal);
         this.cluster = cluster;
-        this.maxBufferSize = configuration.getOutputBatchSize();
+        this.maxBufferSize = serverConfiguration.getOutputBatchSize();
         this.buffer = Lists.newArrayListWithCapacity(maxBufferSize);
         this.processTime = metricRegistry.timer(name(this.getClass(), "processTime"));
         this.batchSize = metricRegistry.histogram(name(this.getClass(), "batchSize"));
@@ -69,17 +83,12 @@ public class BatchedElasticSearchOutput extends ElasticSearchOutput {
         synchronized (this.buffer) {
             this.buffer.add(message);
             if (LOG.isTraceEnabled()) {
-                LOG.trace("Buffering message id to [{}]: <{}>", getName(), message.getId());
+                LOG.trace("Buffering message id to [{}]: <{}>", getClass(), message.getId());
             }
             if (this.buffer.size() >= maxBufferSize) {
                 flush();
             }
         }
-    }
-
-    @Override
-    public String getHumanName() {
-        return "Elasticsearch Output with Batching";
     }
 
     private void synchronousFlush(List<Message> messageBuffer) {
@@ -132,6 +141,24 @@ public class BatchedElasticSearchOutput extends ElasticSearchOutput {
             }
         } else {
             LOG.debug("Not flushing empty buffer");
+        }
+    }
+
+    public interface Factory extends ElasticSearchOutput.Factory {
+        @Override
+        BatchedElasticSearchOutput create(Stream stream, Configuration configuration);
+
+        @Override
+        Config getConfig();
+
+        @Override
+        Descriptor getDescriptor();
+    }
+    public static class Config extends ElasticSearchOutput.Config {}
+
+    public static class Descriptor extends ElasticSearchOutput.Descriptor {
+        public Descriptor() {
+            super("Batched Elasticsearch Output", false, "", "Elasticsearch Output with Batching");
         }
     }
 }

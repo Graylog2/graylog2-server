@@ -16,6 +16,7 @@
  */
 package org.graylog2.outputs;
 
+import com.google.inject.assistedinject.Assisted;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
@@ -23,9 +24,11 @@ import org.graylog2.plugin.configuration.fields.ConfigurationField;
 import org.graylog2.plugin.configuration.fields.TextField;
 import org.graylog2.plugin.outputs.MessageOutput;
 import org.graylog2.plugin.outputs.MessageOutputConfigurationException;
+import org.graylog2.plugin.streams.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -35,10 +38,10 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class LoggingOutput implements MessageOutput {
     private static final Logger LOG = LoggerFactory.getLogger(LoggingOutput.class);
     private final AtomicBoolean isRunning = new AtomicBoolean(false);
-    private Configuration configuration;
+    private final Configuration configuration;
 
-    @Override
-    public void initialize(Configuration config) throws MessageOutputConfigurationException {
+    @Inject
+    public LoggingOutput(@Assisted Stream stream, @Assisted Configuration config) throws MessageOutputConfigurationException {
         LOG.info("Initializing");
         configuration = config;
         isRunning.set(true);
@@ -68,25 +71,30 @@ public class LoggingOutput implements MessageOutput {
 
     }
 
-    @Override
-    public ConfigurationRequest getRequestedConfiguration() {
-        ConfigurationRequest configurationRequest = new ConfigurationRequest();
-        configurationRequest.addField(new TextField("prefix", "Prefix", "Writing message: ", "How to prefix the message before logging it", ConfigurationField.Optional.OPTIONAL));
-        return configurationRequest;
+    public interface Factory extends MessageOutput.Factory<LoggingOutput> {
+        @Override
+        LoggingOutput create(Stream stream, Configuration configuration);
+
+        @Override
+        Config getConfig();
+
+        @Override
+        Descriptor getDescriptor();
     }
 
-    @Override
-    public String getName() {
-        return "STDOUT Output";
+    public static class Descriptor extends MessageOutput.Descriptor {
+        public Descriptor() {
+            super("STDOUT Output", false, "", "An output writing every message to STDOUT.");
+        }
     }
 
-    @Override
-    public String getHumanName() {
-        return "An output writing every message to STDOUT.";
-    }
 
-    @Override
-    public String getLinkToDocs() {
-        return null;
+    public static class Config extends MessageOutput.Config {
+        @Override
+        public ConfigurationRequest getRequestedConfiguration() {
+            ConfigurationRequest configurationRequest = new ConfigurationRequest();
+            configurationRequest.addField(new TextField("prefix", "Prefix", "Writing message: ", "How to prefix the message before logging it", ConfigurationField.Optional.OPTIONAL));
+            return configurationRequest;
+        }
     }
 }

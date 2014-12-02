@@ -24,6 +24,8 @@ import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.mockito.Mockito;
 import org.testng.annotations.Test;
 
+import java.util.HashMap;
+
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doReturn;
@@ -38,7 +40,13 @@ public class GelfOutputTest {
         final Message message = mock(Message.class);
         final GelfMessage gelfMessage = new GelfMessage("Test");
 
-        final GelfOutput gelfOutput = Mockito.spy(new GelfOutput());
+        Configuration configuration = new Configuration(new HashMap<String, Object>() {{
+            put("hostname", "localhost");
+            put("protocol", "tcp");
+            put("port", 12201);
+        }});
+
+        final GelfOutput gelfOutput = Mockito.spy(new GelfOutput(configuration, transport));
         doReturn(transport).when(gelfOutput).buildTransport(any(Configuration.class));
         doReturn(gelfMessage).when(gelfOutput).toGELFMessage(message);
 
@@ -48,9 +56,9 @@ public class GelfOutputTest {
     }
 
     public void testGetRequestedConfiguration() throws Exception {
-        final GelfOutput gelfOutput = new GelfOutput();
+        final GelfOutput.Config gelfOutputConfig = new GelfOutput.Config();
 
-        final ConfigurationRequest request = gelfOutput.getRequestedConfiguration();
+        final ConfigurationRequest request = gelfOutputConfig.getRequestedConfiguration();
 
         assertNotNull(request);
         assertNotNull(request.asList());

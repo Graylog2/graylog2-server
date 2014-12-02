@@ -40,17 +40,14 @@ public class PeriodicalsService extends AbstractIdleService {
     private static final Logger LOG = LoggerFactory.getLogger(PeriodicalsService.class);
 
     public static final String NAME = "Periodicals initializer";
-    private final InstantiationService instantiationService;
     private final Periodicals periodicals;
     private final ServerStatus serverStatus;
     private final Set<Periodical> periodicalSet;
 
     @Inject
-    public PeriodicalsService(InstantiationService instantiationService,
-                                  Periodicals periodicals,
-                                  ServerStatus serverStatus,
-                                  Set<Periodical> periodicalSet) {
-        this.instantiationService = instantiationService;
+    public PeriodicalsService(Periodicals periodicals,
+                              ServerStatus serverStatus,
+                              Set<Periodical> periodicalSet) {
         this.periodicals = periodicals;
         this.serverStatus = serverStatus;
         this.periodicalSet = periodicalSet;

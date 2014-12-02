@@ -20,11 +20,14 @@
  */
 package org.graylog2.buffers.processors.fakeoutputs;
 
+import com.google.inject.assistedinject.Assisted;
+import com.google.inject.assistedinject.AssistedInject;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.outputs.MessageOutput;
 import org.graylog2.plugin.outputs.MessageOutputConfigurationException;
+import org.graylog2.plugin.streams.Stream;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -37,9 +40,9 @@ public class FakeOutput implements MessageOutput {
     private final AtomicBoolean isRunning = new AtomicBoolean(false);
     private int callCount = 0;
     private int writeCount = 0;
-    
-    @Override
-    public void initialize(Configuration config) throws MessageOutputConfigurationException {
+
+    @AssistedInject
+    public FakeOutput(@Assisted Stream stream, @Assisted Configuration config) {
         isRunning.set(true);
     }
 
@@ -67,24 +70,28 @@ public class FakeOutput implements MessageOutput {
 
     }
 
-    @Override
-    public ConfigurationRequest getRequestedConfiguration() {
-        return new ConfigurationRequest();
+    public interface Factory extends MessageOutput.Factory<FakeOutput> {
+        @Override
+        FakeOutput create(Stream stream, Configuration configuration);
+
+        @Override
+        Config getConfig();
+
+        @Override
+        Descriptor getDescriptor();
     }
 
-    @Override
-    public String getName() {
-        return "FAKE OUTPUT";
+    public static class Config extends MessageOutput.Config {
+        @Override
+        public ConfigurationRequest getRequestedConfiguration() {
+            return new ConfigurationRequest();
+        }
     }
 
-    @Override
-    public String getHumanName() {
-        return "A fake only output";
-    }
-
-    @Override
-    public String getLinkToDocs() {
-        return null;
+    public static class Descriptor extends MessageOutput.Descriptor {
+        public Descriptor() {
+            super("FAKE OUTPUT", false, "", "A fake only output");
+        }
     }
 
     public int getCallCount() {

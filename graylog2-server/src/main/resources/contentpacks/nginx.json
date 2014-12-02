@@ -1,0 +1,633 @@
+{
+  "name": "nginx",
+  "description": "This content pack will create two inputs for the nginx `error_log` and the `access_log`. Extractors are applied to effectively read the most important data into message fields. You will be able to do searches for all requests of a given remote IP, all requests that were answered with a HTTP 400 or just all requests that were slow.\n\nFind nginx setup instructions and more details [here](http://www.graylog2.org/content-packs/547b5021e4b0a06d87eea01e)",
+  "category": "Web Servers",
+  "inputs": [
+    {
+      "title": "nginx error_log",
+      "configuration": {
+        "allow_override_date": true,
+        "recv_buffer_size": 1048576,
+        "port": 12302,
+        "override_source": "",
+        "bind_address": "0.0.0.0"
+      },
+      "type": "org.graylog2.inputs.syslog.udp.SyslogUDPInput",
+      "global": false,
+      "extractors": [
+        {
+          "title": "Timestamp",
+          "type": "REGEX",
+          "configuration": {
+            "regex_value": "^.*:\\s(\\d\\d\\d\\d/\\d\\d/\\d\\d\\s\\d\\d:\\d\\d:\\d\\d)\\s.*$"
+          },
+          "converters": [
+            {
+              "type": "DATE",
+              "configuration": {
+                "date_format": "yyyy/MM/dd HH:mm:ss "
+              }
+            }
+          ],
+          "order": 0,
+          "cursor_strategy": "COPY",
+          "target_field": "timestamp",
+          "source_field": "message",
+          "condition_type": "NONE",
+          "condition_value": ""
+        },
+        {
+          "title": "server",
+          "type": "REGEX",
+          "configuration": {
+            "regex_value": "server:\\s(.+?)(,|$)"
+          },
+          "converters": [],
+          "order": 0,
+          "cursor_strategy": "COPY",
+          "target_field": "server",
+          "source_field": "message",
+          "condition_type": "STRING",
+          "condition_value": "server"
+        },
+        {
+          "title": "remote_addr/client",
+          "type": "REGEX",
+          "configuration": {
+            "regex_value": "client:\\s(.+?)(,|$)"
+          },
+          "converters": [],
+          "order": 0,
+          "cursor_strategy": "COPY",
+          "target_field": "remote_addr",
+          "source_field": "message",
+          "condition_type": "STRING",
+          "condition_value": "client"
+        },
+        {
+          "title": "host",
+          "type": "REGEX",
+          "configuration": {
+            "regex_value": "host:\\s\"(.+?)\"(,|$)"
+          },
+          "converters": [],
+          "order": 0,
+          "cursor_strategy": "COPY",
+          "target_field": "host",
+          "source_field": "message",
+          "condition_type": "STRING",
+          "condition_value": "host"
+        },
+        {
+          "title": "request_path/request",
+          "type": "REGEX",
+          "configuration": {
+            "regex_value": "request:\\s\"(.+?)\"(,|$)"
+          },
+          "converters": [],
+          "order": 0,
+          "cursor_strategy": "COPY",
+          "target_field": "request_path",
+          "source_field": "message",
+          "condition_type": "STRING",
+          "condition_value": "request"
+        },
+        {
+          "title": "request_verb",
+          "type": "REGEX",
+          "configuration": {
+            "regex_value": "request:\\s\"(GET|HEAD|POST|PUT|DELETE|TRACE|OPTIONS|CONNECT|PATCH).+\"(,|$)"
+          },
+          "converters": [],
+          "order": 0,
+          "cursor_strategy": "COPY",
+          "target_field": "request_verb",
+          "source_field": "message",
+          "condition_type": "STRING",
+          "condition_value": "request"
+        }
+      ],
+      "static_fields": {
+        "nginx_error": "true",
+        "from_nginx": "true"
+      }
+    },
+    {
+      "title": "nginx access_log",
+      "configuration": {
+        "allow_override_date": true,
+        "recv_buffer_size": 1048576,
+        "port": 12301,
+        "override_source": "",
+        "bind_address": "0.0.0.0"
+      },
+      "type": "org.graylog2.inputs.syslog.udp.SyslogUDPInput",
+      "global": false,
+      "extractors": [
+        {
+          "title": "Remote Address",
+          "type": "REGEX",
+          "configuration": {
+            "regex_value": "nginx:\\s+(\\S+)"
+          },
+          "converters": [],
+          "order": 0,
+          "cursor_strategy": "COPY",
+          "target_field": "remote_addr",
+          "source_field": "message",
+          "condition_type": "REGEX",
+          "condition_value": "^\\S+\\s+nginx:"
+        },
+        {
+          "title": "Remote User",
+          "type": "REGEX",
+          "configuration": {
+            "regex_value": "nginx: \\S+ - (\\S+)"
+          },
+          "converters": [],
+          "order": 1,
+          "cursor_strategy": "COPY",
+          "target_field": "remote_user",
+          "source_field": "message",
+          "condition_type": "REGEX",
+          "condition_value": "^\\S+\\s+nginx:"
+        },
+        {
+          "title": "Request Timestamp",
+          "type": "REGEX",
+          "configuration": {
+            "regex_value": "nginx:.+?\\[(.+?)\\]"
+          },
+          "converters": [
+            {
+              "type": "DATE",
+              "configuration": {
+                "date_format": "dd/MMM/YYYY:HH:mm:ss Z"
+              }
+            }
+          ],
+          "order": 2,
+          "cursor_strategy": "COPY",
+          "target_field": "timestamp",
+          "source_field": "message",
+          "condition_type": "REGEX",
+          "condition_value": "^\\S+\\s+nginx:"
+        },
+        {
+          "title": "Request Verb",
+          "type": "REGEX",
+          "configuration": {
+            "regex_value": "nginx:.+\\[.+\\] \"(\\S+)"
+          },
+          "converters": [],
+          "order": 3,
+          "cursor_strategy": "COPY",
+          "target_field": "request_verb",
+          "source_field": "message",
+          "condition_type": "REGEX",
+          "condition_value": "^\\S+\\s+nginx:"
+        },
+        {
+          "title": "Request Path",
+          "type": "REGEX",
+          "configuration": {
+            "regex_value": "nginx:.+?\"\\S+ (\\S+).+\""
+          },
+          "converters": [
+            {
+              "type": "NUMERIC",
+              "configuration": {}
+            }
+          ],
+          "order": 4,
+          "cursor_strategy": "COPY",
+          "target_field": "request_path",
+          "source_field": "message",
+          "condition_type": "REGEX",
+          "condition_value": "^\\S+\\s+nginx:"
+        },
+        {
+          "title": "HTTP Version",
+          "type": "REGEX",
+          "configuration": {
+            "regex_value": "nginx:.+HTTP/(\\S+)\""
+          },
+          "converters": [],
+          "order": 5,
+          "cursor_strategy": "COPY",
+          "target_field": "http_version",
+          "source_field": "message",
+          "condition_type": "REGEX",
+          "condition_value": "^\\S+\\s+nginx:"
+        },
+        {
+          "title": "Response Status",
+          "type": "REGEX",
+          "configuration": {
+            "regex_value": "nginx:.+?HTTP/\\S+\" (\\d+)"
+          },
+          "converters": [
+            {
+              "type": "NUMERIC",
+              "configuration": {}
+            }
+          ],
+          "order": 6,
+          "cursor_strategy": "COPY",
+          "target_field": "response_status",
+          "source_field": "message",
+          "condition_type": "REGEX",
+          "condition_value": "^\\S+\\s+nginx:"
+        },
+        {
+          "title": "Response Bytes",
+          "type": "REGEX",
+          "configuration": {
+            "regex_value": "nginx:.+?HTTP/\\S+\" \\d+ (\\d+)"
+          },
+          "converters": [
+            {
+              "type": "NUMERIC",
+              "configuration": {}
+            }
+          ],
+          "order": 7,
+          "cursor_strategy": "COPY",
+          "target_field": "response_bytes",
+          "source_field": "message",
+          "condition_type": "REGEX",
+          "condition_value": "^\\S+\\s+nginx:"
+        },
+        {
+          "title": "HTTP Referer",
+          "type": "REGEX",
+          "configuration": {
+            "regex_value": "nginx:.+?HTTP/\\S+\" \\d+ \\d+ \"(.+?)\""
+          },
+          "converters": [],
+          "order": 9,
+          "cursor_strategy": "COPY",
+          "target_field": "http_referer",
+          "source_field": "message",
+          "condition_type": "REGEX",
+          "condition_value": "^\\S+\\s+nginx:"
+        },
+        {
+          "title": "HTTP User Agent",
+          "type": "REGEX",
+          "configuration": {
+            "regex_value": "nginx:.+?HTTP/\\S+\" \\d+ \\d+ \".+?\" \"(.+?)\""
+          },
+          "converters": [],
+          "order": 8,
+          "cursor_strategy": "COPY",
+          "target_field": "http_user_agent",
+          "source_field": "message",
+          "condition_type": "REGEX",
+          "condition_value": "^\\S+\\s+nginx:"
+        },
+        {
+          "title": "Connection ID",
+          "type": "REGEX",
+          "configuration": {
+            "regex_value": "connection=(.+?)\\|"
+          },
+          "converters": [
+            {
+              "type": "NUMERIC",
+              "configuration": {}
+            }
+          ],
+          "order": 10,
+          "cursor_strategy": "COPY",
+          "target_field": "connection_id",
+          "source_field": "message",
+          "condition_type": "REGEX",
+          "condition_value": ".+connection=.+"
+        },
+        {
+          "title": "Connection requests",
+          "type": "REGEX",
+          "configuration": {
+            "regex_value": "connection_requests=(.+?)\\|"
+          },
+          "converters": [
+            {
+              "type": "NUMERIC",
+              "configuration": {}
+            }
+          ],
+          "order": 11,
+          "cursor_strategy": "COPY",
+          "target_field": "connection_requests",
+          "source_field": "message",
+          "condition_type": "REGEX",
+          "condition_value": ".+connection_requests=.+"
+        },
+        {
+          "title": "Response time",
+          "type": "REGEX",
+          "configuration": {
+            "regex_value": "millis=(.+?)>"
+          },
+          "converters": [
+            {
+              "type": "NUMERIC",
+              "configuration": {}
+            }
+          ],
+          "order": 12,
+          "cursor_strategy": "COPY",
+          "target_field": "millis",
+          "source_field": "message",
+          "condition_type": "REGEX",
+          "condition_value": ".+millis=.+"
+        },
+        {
+          "title": "Message",
+          "type": "REGEX",
+          "configuration": {
+            "regex_value": "nginx:.+?\\\"(\\S+.+HTTP\\/\\S+)\\\" \\d+"
+          },
+          "converters": [],
+          "order": 13,
+          "cursor_strategy": "COPY",
+          "target_field": "message",
+          "source_field": "message",
+          "condition_type": "REGEX",
+          "condition_value": "^\\S+\\s+nginx:"
+        }
+      ],
+      "static_fields": {
+        "from_nginx": "true",
+        "nginx_access": "true"
+      }
+    }
+  ],
+  "streams": [
+    {
+      "id": "5445736fd4c6d7d480b5f4c2",
+      "title": "nginx requests",
+      "description": "All requests that were logged into the nginx access_log",
+      "disabled": false,
+      "outputs": [],
+      "stream_rules": [
+        {
+          "type": "EXACT",
+          "field": "nginx_access",
+          "value": "true",
+          "inverted": false
+        }
+      ]
+    },
+    {
+      "id": "5445733cd4c6d7d480b5f48b",
+      "title": "nginx errors",
+      "description": "All requests that were logged into the nginx error_log",
+      "disabled": false,
+      "outputs": [],
+      "stream_rules": [
+        {
+          "type": "EXACT",
+          "field": "nginx_error",
+          "value": "true",
+          "inverted": false
+        }
+      ]
+    },
+    {
+      "id": "547b29b6d4c6c10b4f1b934d",
+      "title": "nginx",
+      "description": "All requests that were logged into the nginx access_log or nginx_error_log",
+      "disabled": false,
+      "outputs": [],
+      "stream_rules": [
+        {
+          "type": "EXACT",
+          "field": "from_nginx",
+          "value": "true",
+          "inverted": false
+        }
+      ]
+    },
+    {
+      "id": "547b2ad4d4c6c10b4f1b9485",
+      "title": "nginx HTTP 4XXs",
+      "description": "All requests that were answered with a HTTP code in the 400 range by nginx",
+      "disabled": false,
+      "outputs": [],
+      "stream_rules": [
+        {
+          "type": "EXACT",
+          "field": "from_nginx",
+          "value": "true",
+          "inverted": false
+        },
+        {
+          "type": "GREATER",
+          "field": "response_status",
+          "value": "399",
+          "inverted": false
+        },
+        {
+          "type": "SMALLER",
+          "field": "response_status",
+          "value": "500",
+          "inverted": false
+        }
+      ]
+    },
+    {
+      "id": "547b2a77d4c6c10b4f1b941f",
+      "title": "nginx HTTP 5XXs",
+      "description": "All requests that were answered with a HTTP code in the 500 range by nginx",
+      "disabled": false,
+      "outputs": [],
+      "stream_rules": [
+        {
+          "type": "EXACT",
+          "field": "from_nginx",
+          "value": "true",
+          "inverted": false
+        },
+        {
+          "type": "GREATER",
+          "field": "response_status",
+          "value": "499",
+          "inverted": false
+        }
+      ]
+    },
+    {
+      "id": "547b2a2dd4c6c10b4f1b93ce",
+      "title": "nginx HTTP 404s",
+      "description": "All requests that were answered with a HTTP 404 by nginx",
+      "disabled": false,
+      "outputs": [],
+      "stream_rules": [
+        {
+          "type": "EXACT",
+          "field": "from_nginx",
+          "value": "true",
+          "inverted": false
+        },
+        {
+          "type": "EXACT",
+          "field": "response_status",
+          "value": "404",
+          "inverted": false
+        }
+      ]
+    }
+  ],
+  "outputs": [],
+  "dashboards": [
+    {
+      "title": "nginx overview",
+      "description": "Overview of requests handled by nginx",
+      "dashboard_widgets": [
+        {
+          "description": "Response codes last hour",
+          "type": "QUICKVALUES",
+          "configuration": {
+            "query": "*",
+            "timerange": {
+              "type": "relative",
+              "range": 3600
+            },
+            "field": "response_status",
+            "stream_id": "5445736fd4c6d7d480b5f4c2"
+          },
+          "col": 3,
+          "row": 4,
+          "cache_time": 10
+        },
+        {
+          "description": "Response codes last 24h",
+          "type": "QUICKVALUES",
+          "configuration": {
+            "query": "*",
+            "timerange": {
+              "type": "relative",
+              "range": 86400
+            },
+            "field": "response_status",
+            "stream_id": "5445736fd4c6d7d480b5f4c2"
+          },
+          "col": 2,
+          "row": 4,
+          "cache_time": 10
+        },
+        {
+          "description": "Requests last 24h",
+          "type": "SEARCH_RESULT_CHART",
+          "configuration": {
+            "query": "*",
+            "interval": "minute",
+            "timerange": {
+              "type": "relative",
+              "range": 86400
+            },
+            "stream_id": "5445736fd4c6d7d480b5f4c2"
+          },
+          "col": 2,
+          "row": 1,
+          "cache_time": 10
+        },
+        {
+          "description": "Requests last 24h",
+          "type": "STREAM_SEARCH_RESULT_COUNT",
+          "configuration": {
+            "query": "*",
+            "timerange": {
+              "type": "relative",
+              "range": 86400
+            },
+            "stream_id": "5445736fd4c6d7d480b5f4c2"
+          },
+          "col": 1,
+          "row": 1,
+          "cache_time": 10
+        },
+        {
+          "description": "HTTP versions last 24h",
+          "type": "QUICKVALUES",
+          "configuration": {
+            "query": "*",
+            "timerange": {
+              "type": "relative",
+              "range": 86400
+            },
+            "field": "http_version",
+            "stream_id": "5445736fd4c6d7d480b5f4c2"
+          },
+          "col": 1,
+          "row": 4,
+          "cache_time": 300
+        },
+        {
+          "description": "HTTP 5XXs last 24h",
+          "type": "STREAM_SEARCH_RESULT_COUNT",
+          "configuration": {
+            "query": "*",
+            "timerange": {
+              "type": "relative",
+              "range": 86400
+            },
+            "stream_id": "547b2a77d4c6c10b4f1b941f"
+          },
+          "col": 1,
+          "row": 3,
+          "cache_time": 10
+        },
+        {
+          "description": "HTTP 4XXs last 24h",
+          "type": "STREAM_SEARCH_RESULT_COUNT",
+          "configuration": {
+            "query": "*",
+            "timerange": {
+              "type": "relative",
+              "range": 86400
+            },
+            "stream_id": "547b2ad4d4c6c10b4f1b9485"
+          },
+          "col": 1,
+          "row": 2,
+          "cache_time": 10
+        },
+        {
+          "description": "HTTP 4XXs last 24h",
+          "type": "SEARCH_RESULT_CHART",
+          "configuration": {
+            "query": "*",
+            "interval": "minute",
+            "timerange": {
+              "type": "relative",
+              "range": 86400
+            },
+            "stream_id": "547b2ad4d4c6c10b4f1b9485"
+          },
+          "col": 2,
+          "row": 2,
+          "cache_time": 10
+        },
+        {
+          "description": "HTTP 5XXs last 24h",
+          "type": "SEARCH_RESULT_CHART",
+          "configuration": {
+            "query": "*",
+            "interval": "minute",
+            "timerange": {
+              "type": "relative",
+              "range": 86400
+            },
+            "stream_id": "547b2a77d4c6c10b4f1b941f"
+          },
+          "col": 2,
+          "row": 3,
+          "cache_time": 10
+        }
+      ]
+    }
+  ]
+}

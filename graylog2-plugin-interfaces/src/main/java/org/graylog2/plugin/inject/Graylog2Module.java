@@ -32,6 +32,7 @@ import org.graylog2.plugin.inputs.annotations.ConfigClass;
 import org.graylog2.plugin.inputs.annotations.FactoryClass;
 import org.graylog2.plugin.inputs.codecs.Codec;
 import org.graylog2.plugin.inputs.transports.Transport;
+import org.graylog2.plugin.outputs.MessageOutput;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -186,5 +187,19 @@ public abstract class Graylog2Module extends AbstractModule {
                                                          Class<? extends MessageInput.Factory<T>> targetFactory) {
         install(new FactoryModuleBuilder().implement(MessageInput.class, target).build(targetFactory));
         inputMapBinder.addBinding(target.getCanonicalName()).to(Key.get(targetFactory));
+    }
+
+    protected MapBinder<String, MessageOutput.Factory<? extends MessageOutput>> outputsMapBinder() {
+        return MapBinder.newMapBinder(binder(),
+                TypeLiteral.get(String.class),
+                new TypeLiteral<MessageOutput.Factory<? extends MessageOutput>>() {
+                });
+    }
+
+    protected <T extends MessageOutput> void installOutput(MapBinder<String, MessageOutput.Factory<? extends MessageOutput>> outputMapBinder,
+                                                           Class<T> target,
+                                                           Class<? extends MessageOutput.Factory<T>> targetFactory) {
+        install(new FactoryModuleBuilder().implement(MessageOutput.class, target).build(targetFactory));
+        outputMapBinder.addBinding(target.getCanonicalName()).to(Key.get(targetFactory));
     }
 }
