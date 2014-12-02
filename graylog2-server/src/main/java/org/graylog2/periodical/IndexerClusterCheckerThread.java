@@ -26,7 +26,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class IndexerClusterCheckerThread extends Periodical {
-
     private static final Logger LOG = LoggerFactory.getLogger(IndexerClusterCheckerThread.class);
     private static final int MINIMUM_OPEN_FILES_LIMIT = 64000;
 
@@ -63,7 +62,9 @@ public class IndexerClusterCheckerThread extends Periodical {
                 // Write notification.
                 final Notification notification = notificationService.buildNow()
                         .addType(Notification.Type.ES_OPEN_FILES)
-                        .addSeverity(Notification.Severity.URGENT);
+                        .addSeverity(Notification.Severity.URGENT)
+                        .addDetail("hostname", node.getHostname())
+                        .addDetail("max_file_descriptors", node.getProcess().getMaxFileDescriptors());
 
                 if (notificationService.publishIfFirst(notification)) {
                     LOG.warn("Indexer node <{}> open file limit is too low: [{}]. Set it to at least {}.",

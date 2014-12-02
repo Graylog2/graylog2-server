@@ -28,6 +28,11 @@ public class AbsoluteRange implements TimeRange {
     private final DateTime from;
     private final DateTime to;
 
+    public AbsoluteRange(DateTime from, DateTime to) {
+        this.from = from;
+        this.to = to;
+    }
+
     public AbsoluteRange(String from, String to) throws InvalidRangeParametersException {
         if (from == null || from.isEmpty() || to == null || to.isEmpty()) {
             throw new InvalidRangeParametersException();

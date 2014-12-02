@@ -25,6 +25,7 @@ import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.shared.inputs.NoSuchInputTypeException;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
@@ -33,6 +34,8 @@ public interface InputService extends PersistedService {
     List<Input> allOfThisNode(String nodeId);
 
     List<Input> allOfRadio(Node radio);
+
+    Input create(Map<String, Object> fields);
 
     Input find(String id) throws NotFoundException;
 

@@ -20,14 +20,14 @@ import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Maps;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.graylog2.Configuration;
+import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.indexer.Deflector;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import org.graylog2.rest.resources.RestResource;
 import org.graylog2.security.RestPermissions;
-import org.graylog2.system.activities.Activity;
-import org.graylog2.system.activities.ActivityWriter;
+import org.graylog2.shared.system.activities.Activity;
+import org.graylog2.shared.system.activities.ActivityWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,12 +52,12 @@ public class DeflectorResource extends RestResource {
     
     private final Deflector deflector;
     private final ActivityWriter activityWriter;
-    private final Configuration configuration;
+    private final ElasticsearchConfiguration configuration;
 
     @Inject
     public DeflectorResource(Deflector deflector,
                              ActivityWriter activityWriter,
-                             Configuration configuration) {
+                             ElasticsearchConfiguration configuration) {
         this.deflector = deflector;
         this.activityWriter = activityWriter;
         this.configuration = configuration;
@@ -86,7 +86,7 @@ public class DeflectorResource extends RestResource {
 
         Map<String, Object> result = Maps.newHashMap();
 
-        result.put("max_docs_per_index", configuration.getElasticSearchMaxDocsPerIndex());
+        result.put("max_docs_per_index", configuration.getMaxDocsPerIndex());
         result.put("max_number_of_indices", configuration.getMaxNumberOfIndices());
 
         return Response.ok().entity(json(result)).build();

@@ -25,6 +25,7 @@ import org.graylog2.database.MongoConnection;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.users.User;
 import org.mongojack.DBCursor;
+import org.mongojack.DBQuery;
 import org.mongojack.JacksonDBCollection;
 import org.mongojack.WriteResult;
 import org.slf4j.Logger;
@@ -38,7 +39,7 @@ import java.util.Set;
 @Singleton
 public class BundleService {
     private static final Logger LOG = LoggerFactory.getLogger(BundleService.class);
-    private static final String COLLECTION_NAME = "config_bundles";
+    private static final String COLLECTION_NAME = "content_packs";
 
     private final JacksonDBCollection<ConfigurationBundle, ObjectId> dbCollection;
     private final BundleImporterProvider bundleImporterProvider;
@@ -69,6 +70,13 @@ public class BundleService {
         if (bundle == null) {
             throw new NotFoundException();
         }
+
+        return bundle;
+    }
+
+    public ConfigurationBundle findByNameAndCategory(final String name, final String category) {
+        final DBQuery.Query query = DBQuery.is("name", name).is("category", category);
+        final ConfigurationBundle bundle = dbCollection.findOne(query);
 
         return bundle;
     }

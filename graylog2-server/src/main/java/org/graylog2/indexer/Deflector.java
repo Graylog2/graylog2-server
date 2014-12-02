@@ -20,13 +20,13 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import org.elasticsearch.action.admin.indices.stats.IndexStats;
 import org.elasticsearch.indices.InvalidAliasNameException;
-import org.graylog2.Configuration;
+import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.indices.jobs.OptimizeIndexJob;
 import org.graylog2.indexer.ranges.CreateNewSingleIndexRangeJob;
 import org.graylog2.indexer.ranges.RebuildIndexRangesJob;
-import org.graylog2.system.activities.Activity;
-import org.graylog2.system.activities.ActivityWriter;
+import org.graylog2.shared.system.activities.Activity;
+import org.graylog2.shared.system.activities.ActivityWriter;
 import org.graylog2.system.jobs.SystemJobConcurrencyException;
 import org.graylog2.system.jobs.SystemJobManager;
 import org.slf4j.Logger;
@@ -58,18 +58,18 @@ public class Deflector { // extends Ablenkblech
     private final String indexPrefix;
     private final String deflectorName;
     private final Indices indices;
-    private final Configuration configuration;
+    private final ElasticsearchConfiguration configuration;
 
     @Inject
     public Deflector(final SystemJobManager systemJobManager,
-                     final Configuration configuration,
+                     final ElasticsearchConfiguration configuration,
                      final ActivityWriter activityWriter,
                      final RebuildIndexRangesJob.Factory rebuildIndexRangesJobFactory,
                      final OptimizeIndexJob.Factory optimizeIndexJobFactory,
                      final CreateNewSingleIndexRangeJob.Factory createNewSingleIndexRangeJobFactory,
                      final Indices indices) {
         this.configuration = configuration;
-        indexPrefix = configuration.getElasticSearchIndexPrefix();
+        this.indexPrefix = configuration.getIndexPrefix();
 
         this.systemJobManager = systemJobManager;
         this.activityWriter = activityWriter;
@@ -77,7 +77,7 @@ public class Deflector { // extends Ablenkblech
         this.optimizeIndexJobFactory = optimizeIndexJobFactory;
         this.createNewSingleIndexRangeJobFactory = createNewSingleIndexRangeJobFactory;
 
-        this.deflectorName = buildName(configuration.getElasticSearchIndexPrefix());
+        this.deflectorName = buildName(configuration.getIndexPrefix());
         this.indices = indices;
     }
 

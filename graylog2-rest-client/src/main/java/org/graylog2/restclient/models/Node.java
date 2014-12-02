@@ -59,6 +59,8 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static com.google.common.base.MoreObjects.firstNonNull;
+
 public class Node extends ClusterEntity {
 
     public interface Factory {
@@ -103,7 +105,7 @@ public class Node extends ClusterEntity {
 
         transportAddress = normalizeUriPath(r.transportAddress);
         lastSeen = new DateTime(r.lastSeen, DateTimeZone.UTC);
-        nodeId = r.id;
+        nodeId = r.nodeId;
         shortNodeId = r.shortNodeId;
         isMaster = r.isMaster;
         fromConfiguration = false;
@@ -302,25 +304,26 @@ public class Node extends ClusterEntity {
     }
 
     // TODO nodes should not have state beyond their activity status
-    public synchronized void loadSystemInformation() {
+    public synchronized SystemOverviewResponse loadSystemInformation() {
         try {
-            this.systemInfo = api.path(routes.SystemResource().system(), SystemOverviewResponse.class)
+            return api.path(routes.SystemResource().system(), SystemOverviewResponse.class)
                     .node(this)
                     .execute();
         } catch (Exception e) {
             LOG.error("Unable to load system information for node " + this, e);
+            return null;
         }
     }
 
-    public synchronized void loadJVMInformation() {
+    public synchronized NodeJVMStats loadJVMInformation() {
         try {
-            jvmInfo = new NodeJVMStats(
-                    api.path(routes.SystemResource().jvm(), ClusterEntityJVMStatsResponse.class)
-                            .node(this)
-                            .execute()
+            return new NodeJVMStats(api.path(routes.SystemResource().jvm(), ClusterEntityJVMStatsResponse.class)
+                    .node(this)
+                    .execute()
             );
         } catch (Exception e) {
             LOG.error("Unable to load JVM information for node " + this, e);
+            return null;
         }
     }
 
@@ -561,11 +564,11 @@ public class Node extends ClusterEntity {
     }
 
     public void requireSystemInfo() {
-        loadSystemInformation();
+        this.systemInfo = firstNonNull(loadSystemInformation(), SystemOverviewResponse.buildEmpty());
     }
 
     public void requireJVMInfo() {
-        loadJVMInformation();
+        this.jvmInfo = firstNonNull(loadJVMInformation(), NodeJVMStats.buildEmpty());
     }
 
     @Override

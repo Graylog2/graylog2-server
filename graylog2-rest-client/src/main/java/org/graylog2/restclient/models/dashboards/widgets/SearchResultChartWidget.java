@@ -20,13 +20,9 @@ import com.google.common.collect.Maps;
 import org.graylog2.restclient.lib.timeranges.RelativeRange;
 import org.graylog2.restclient.lib.timeranges.TimeRange;
 import org.graylog2.restclient.models.dashboards.Dashboard;
-import play.mvc.Call;
 
 import java.util.Map;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public class SearchResultChartWidget extends DashboardWidget {
 
     private static final int WIDTH = 2;

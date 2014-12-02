@@ -18,6 +18,8 @@ package org.graylog2.shared.bindings;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.multibindings.Multibinder;
+import org.graylog2.periodical.InputCacheWorkerThread;
+import org.graylog2.periodical.ThroughputCounterManagerThread;
 import org.graylog2.plugin.periodical.Periodical;
 import org.reflections.Reflections;
 
@@ -26,13 +28,11 @@ import java.lang.reflect.Modifier;
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
  */
-public class PeriodicalBindings extends AbstractModule {
+public class SharedPeriodicalBindings extends AbstractModule {
     @Override
     protected void configure() {
         Multibinder<Periodical> periodicalBinder = Multibinder.newSetBinder(binder(), Periodical.class);
-        Reflections reflections = new Reflections("org.graylog2.periodical");
-        for (Class<? extends Periodical> periodicalClass : reflections.getSubTypesOf(Periodical.class))
-            if (!Modifier.isAbstract(periodicalClass.getModifiers()))
-                periodicalBinder.addBinding().to(periodicalClass);
+        periodicalBinder.addBinding().to(InputCacheWorkerThread.class);
+        periodicalBinder.addBinding().to(ThroughputCounterManagerThread.class);
     }
 }

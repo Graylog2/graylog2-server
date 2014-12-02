@@ -24,19 +24,25 @@ import com.github.joschi.jadconfig.JadConfig;
 import com.github.joschi.jadconfig.ParameterException;
 import com.github.joschi.jadconfig.RepositoryException;
 import com.github.joschi.jadconfig.ValidationException;
+import com.github.joschi.jadconfig.guice.NamedConfigParametersModule;
 import com.github.joschi.jadconfig.jodatime.JodaTimeConverterFactory;
 import com.github.joschi.jadconfig.repositories.EnvironmentRepository;
 import com.github.joschi.jadconfig.repositories.PropertiesRepository;
 import com.github.joschi.jadconfig.repositories.SystemPropertiesRepository;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.ServiceManager;
 import com.google.inject.Injector;
 import com.google.inject.Module;
+import com.google.inject.ProvisionException;
 import org.apache.log4j.Level;
 import org.graylog2.plugin.Plugin;
 import org.graylog2.plugin.PluginModule;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.Tools;
+import org.graylog2.plugin.Version;
+import org.graylog2.plugin.inputs.MessageInput;
+import org.graylog2.radio.bindings.PeriodicalBindings;
 import org.graylog2.radio.bindings.RadioBindings;
 import org.graylog2.radio.bindings.RadioInitializerBindings;
 import org.graylog2.radio.cluster.Ping;
@@ -47,6 +53,8 @@ import org.graylog2.shared.initializers.ServiceManagerListener;
 import org.graylog2.shared.journal.KafkaJournalModule;
 import org.graylog2.shared.journal.NoopJournalModule;
 import org.graylog2.shared.plugins.PluginLoader;
+import org.graylog2.shared.system.activities.Activity;
+import org.graylog2.shared.system.activities.ActivityWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
@@ -55,6 +63,8 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import static com.google.common.base.Strings.nullToEmpty;
 
@@ -67,14 +77,21 @@ public class Main extends NodeRunner {
     private static final String ENVIRONMENT_PREFIX = "GRAYLOG2_";
     private static final String PROPERTIES_PREFIX = "graylog2.";
 
+    private static final String profileName = "Radio";
+
+    private static final Version version = Version.CURRENT_CLASSPATH;
+    private static final Configuration configuration = new Configuration();
+
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args) {
 
+        // So jung kommen wir nicht mehr zusammen.
+
         final CommandLineArguments commandLineArguments = new CommandLineArguments();
         final JCommander jCommander = new JCommander(commandLineArguments, args);
-        jCommander.setProgramName("graylog2-radio");
+        jCommander.setProgramName("graylog2-" + profileName.toLowerCase());
 
         if (commandLineArguments.isShowHelp()) {
             jCommander.usage();
@@ -82,7 +99,7 @@ public class Main extends NodeRunner {
         }
 
         if (commandLineArguments.isShowVersion()) {
-            System.out.println("Graylog2 Radio " + RadioVersion.VERSION);
+            System.out.println("Graylog2 " + profileName + " " + version);
             System.out.println("JRE: " + Tools.getSystemInformation());
             System.exit(0);
         }
@@ -97,7 +114,7 @@ public class Main extends NodeRunner {
 
         final JadConfig jadConfig = new JadConfig();
         jadConfig.addConverterFactory(new JodaTimeConverterFactory());
-        final Configuration configuration = readConfiguration(jadConfig, commandLineArguments.getConfigFile());
+        final NamedConfigParametersModule configModule = readConfiguration(jadConfig, commandLineArguments.getConfigFile());
 
         if (commandLineArguments.isDumpConfig()) {
             System.out.println(dumpConfiguration(jadConfig.dump()));
@@ -110,6 +127,8 @@ public class Main extends NodeRunner {
             LOG.info("Running in Debug mode");
             logLevel = Level.DEBUG;
         }
+        org.apache.log4j.Logger.getRootLogger().setLevel(logLevel);
+        org.apache.log4j.Logger.getLogger(Main.class.getPackage().getName()).setLevel(logLevel);
 
         PluginLoader pluginLoader = new PluginLoader(new File(configuration.getPluginDir()));
         List<PluginModule> pluginModules = Lists.newArrayList();
@@ -118,19 +137,12 @@ public class Main extends NodeRunner {
 
         LOG.debug("Loaded modules: " + pluginModules);
 
-        GuiceInstantiationService instantiationService = new GuiceInstantiationService();
-        List<Module> bindingsModules = getBindingsModules(instantiationService,
-                new RadioBindings(configuration),
-                new RadioInitializerBindings());
-        if (configuration.isMessageJournalEnabled()) {
-            bindingsModules.add(new KafkaJournalModule());
-        } else {
-            bindingsModules.add(new NoopJournalModule());
+        final Injector injector = setupInjector(configModule, pluginModules);
+
+        if (injector == null) {
+            LOG.error("Injector could not be created, exiting! (Please include the previous stacktraces in bug reports.)");
+            System.exit(1);
         }
-        LOG.debug("Adding plugin modules: " + pluginModules);
-        bindingsModules.addAll(pluginModules);
-        final Injector injector = GuiceInjectorHolder.createInjector(bindingsModules);
-        instantiationService.setInjector(injector);
 
         // This is holding all our metrics.
         final MetricRegistry metrics = injector.getInstance(MetricRegistry.class);
@@ -141,14 +153,12 @@ public class Main extends NodeRunner {
 
         InstrumentedAppender logMetrics = new InstrumentedAppender(metrics);
         logMetrics.activateOptions();
-        org.apache.log4j.Logger.getRootLogger().setLevel(logLevel);
-        org.apache.log4j.Logger.getLogger(Main.class.getPackage().getName()).setLevel(logLevel);
         org.apache.log4j.Logger.getRootLogger().addAppender(logMetrics);
 
         SLF4JBridgeHandler.removeHandlersForRootLogger();
         SLF4JBridgeHandler.install();
 
-        LOG.info("Graylog2 Radio {} starting up. (JRE: {})", RadioVersion.VERSION, Tools.getSystemInformation());
+        LOG.info("Graylog2 " + profileName + " {} starting up. (JRE: {})", version, Tools.getSystemInformation());
 
         // Do not use a PID file if the user requested not to
         if (!commandLineArguments.isNoPidFile()) {
@@ -162,21 +172,106 @@ public class Main extends NodeRunner {
         Ping.Pinger pinger = injector.getInstance(Ping.Pinger.class);
         pinger.ping();
 
-        final ServiceManager serviceManager = injector.getInstance(ServiceManager.class);
+        final ActivityWriter activityWriter;
+        final ServiceManager serviceManager;
+        try {
+            activityWriter = injector.getInstance(ActivityWriter.class);
+            serviceManager = injector.getInstance(ServiceManager.class);
+        } catch (ProvisionException e) {
+            LOG.error("Guice error", e);
+            System.exit(-1);
+            return;
+        } catch (Exception e) {
+            LOG.error("Unexpected exception", e);
+            System.exit(-1);
+            return;
+        }
+
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+            @Override
+            public void run() {
+                String msg = "SIGNAL received. Shutting down.";
+                LOG.info(msg);
+                activityWriter.write(new Activity(msg, Main.class));
+
+                serviceManager.stopAsync().awaitStopped();
+            }
+        });
+
+        // propagate default size to input plugins
+        MessageInput.setDefaultRecvBufferSize(configuration.getUdpRecvBufferSizes());
+
+        // Start services.
         final ServiceManagerListener serviceManagerListener = injector.getInstance(ServiceManagerListener.class);
         serviceManager.addListener(serviceManagerListener);
+        try {
         serviceManager.startAsync().awaitHealthy();
+        } catch (Exception e) {
+            try {
+                serviceManager.stopAsync().awaitStopped(configuration.getShutdownTimeout(), TimeUnit.MILLISECONDS);
+            } catch (TimeoutException timeoutException) {
+                LOG.error("Unable to shutdown properly on time. {}", serviceManager.servicesByState());
+            }
+            LOG.error("Graylog2 startup failed. Exiting. Exception was:", e);
+            System.exit(-1);
+        }
+        LOG.info("Services started, startup times in ms: {}", serviceManager.startupTimes());
 
-        LOG.info("Graylog2 Radio up and running.");
+        activityWriter.write(new Activity("Started up.", Main.class));
+        LOG.info("Graylog2 " + profileName + " up and running.");
 
-        while (true) {
-            try { Thread.sleep(1000); } catch (InterruptedException e) { /* lol, i don't care */ }
+        // Block forever.
+        try {
+            while (true) {
+                Thread.sleep(1000);
+            }
+        } catch (InterruptedException e) {
+            return;
         }
     }
 
-    private static Configuration readConfiguration(final JadConfig jadConfig, final String configFile) {
-        final Configuration configuration = new Configuration();
+    private static Injector setupInjector(NamedConfigParametersModule configModule, List<PluginModule> pluginModules) {
+        try {
+            final GuiceInstantiationService instantiationService = new GuiceInstantiationService();
 
+            final ImmutableList.Builder<Module> modules = ImmutableList.builder();
+            modules.add(configModule);
+            modules.addAll(
+                    getBindingsModules(instantiationService,
+                            new RadioBindings(configuration),
+                            new PeriodicalBindings(),
+                            new RadioInitializerBindings()));
+            if (configuration.isMessageJournalEnabled()) {
+                modules.add(new KafkaJournalModule());
+            } else {
+                modules.add(new NoopJournalModule());
+            }
+            LOG.debug("Adding plugin modules: " + pluginModules);
+            modules.addAll(pluginModules);
+
+            final Injector injector = GuiceInjectorHolder.createInjector(modules.build());
+            instantiationService.setInjector(injector);
+
+            return injector;
+        } catch (Exception e) {
+            LOG.error("Injector creation failed!", e);
+            return null;
+        }
+    }
+
+    private static String dumpConfiguration(final Map<String, String> configMap) {
+        final StringBuilder sb = new StringBuilder();
+        sb.append("# Configuration of graylog2-").append(profileName).append(" ").append(version).append(System.lineSeparator());
+        sb.append("# Generated on ").append(Tools.iso8601()).append(System.lineSeparator());
+
+        for (Map.Entry<String, String> entry : configMap.entrySet()) {
+            sb.append(entry.getKey()).append('=').append(nullToEmpty(entry.getValue())).append(System.lineSeparator());
+        }
+
+        return sb.toString();
+    }
+
+    private static NamedConfigParametersModule readConfiguration(final JadConfig jadConfig, final String configFile) {
         jadConfig.addConfigurationBean(configuration);
         jadConfig.setRepositories(Arrays.asList(
                 new EnvironmentRepository(ENVIRONMENT_PREFIX),
@@ -200,18 +295,6 @@ public class Main extends NodeRunner {
             LOG.debug("No rest_transport_uri set. Using default [{}].", configuration.getRestTransportUri());
         }
 
-        return configuration;
-    }
-
-    private static String dumpConfiguration(final Map<String, String> configMap) {
-        final StringBuilder sb = new StringBuilder();
-        sb.append("# Configuration of graylog2-radio ").append(RadioVersion.VERSION).append(System.lineSeparator());
-        sb.append("# Generated on ").append(Tools.iso8601()).append(System.lineSeparator());
-
-        for (Map.Entry<String, String> entry : configMap.entrySet()) {
-            sb.append(entry.getKey()).append('=').append(nullToEmpty(entry.getValue())).append(System.lineSeparator());
-        }
-
-        return sb.toString();
+        return new NamedConfigParametersModule(Arrays.asList(configuration));
     }
 }

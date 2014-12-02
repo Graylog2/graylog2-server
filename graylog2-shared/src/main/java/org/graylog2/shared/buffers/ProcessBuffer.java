@@ -22,8 +22,6 @@ import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import com.google.inject.assistedinject.Assisted;
-import com.google.inject.assistedinject.AssistedInject;
 import com.lmax.disruptor.WaitStrategy;
 import com.lmax.disruptor.dsl.Disruptor;
 import com.lmax.disruptor.dsl.ProducerType;
@@ -43,21 +41,16 @@ import org.graylog2.shared.buffers.processors.ProcessBufferProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.codahale.metrics.MetricRegistry.name;
 
 public class ProcessBuffer extends Buffer {
-
     private final Timer parseTime;
-
-    public interface Factory {
-        public ProcessBuffer create(InputCache inputCache, AtomicInteger processBufferWatermark);
-    }
 
     private static final Logger LOG = LoggerFactory.getLogger(ProcessBuffer.class);
 
@@ -67,7 +60,6 @@ public class ProcessBuffer extends Buffer {
     private final BaseConfiguration configuration;
     private final DecodingProcessor.Factory decodingProcessorFactory;
     private final InputCache inputCache;
-    private final AtomicInteger processBufferWatermark;
     private final ExecutorService executor;
 
     private final Meter incomingMessages;
@@ -76,18 +68,16 @@ public class ProcessBuffer extends Buffer {
 
     private final ServerStatus serverStatus;
 
-    @AssistedInject
+    @Inject
     public ProcessBuffer(MetricRegistry metricRegistry,
                          ServerStatus serverStatus,
                          BaseConfiguration configuration,
                          DecodingProcessor.Factory decodingProcessorFactory,
-                         @Assisted InputCache inputCache,
-                         @Assisted AtomicInteger processBufferWatermark) {
+                         InputCache inputCache) {
         this.serverStatus = serverStatus;
         this.configuration = configuration;
         this.decodingProcessorFactory = decodingProcessorFactory;
         this.inputCache = inputCache;
-        this.processBufferWatermark = processBufferWatermark;
 
         this.executor = executorService(metricRegistry);
         this.incomingMessages = metricRegistry.meter(name(ProcessBuffer.class, "incomingMessages"));
@@ -263,7 +253,6 @@ public class ProcessBuffer extends Buffer {
 
     @Override
     protected void afterInsert(int n) {
-        this.processBufferWatermark.addAndGet(n);
         incomingMessages.mark(n);
     }
 

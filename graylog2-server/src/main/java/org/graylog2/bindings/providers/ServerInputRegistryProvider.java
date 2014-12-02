@@ -24,7 +24,7 @@ import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.buffers.InputBuffer;
 import org.graylog2.shared.inputs.InputRegistry;
 import org.graylog2.shared.inputs.MessageInputFactory;
-import org.graylog2.system.activities.ActivityWriter;
+import org.graylog2.shared.system.activities.ActivityWriter;
 
 import javax.inject.Inject;
 import javax.inject.Provider;

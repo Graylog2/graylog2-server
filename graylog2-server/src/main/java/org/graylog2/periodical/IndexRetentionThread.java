@@ -19,6 +19,7 @@ package org.graylog2.periodical;
 import com.google.inject.Inject;
 import org.elasticsearch.action.admin.indices.stats.IndexStats;
 import org.graylog2.Configuration;
+import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.indexer.Deflector;
 import org.graylog2.indexer.IndexHelper;
 import org.graylog2.indexer.NoTargetIndexException;
@@ -28,8 +29,8 @@ import org.graylog2.indexer.ranges.RebuildIndexRangesJob;
 import org.graylog2.indexer.retention.RetentionStrategyFactory;
 import org.graylog2.plugin.indexer.retention.RetentionStrategy;
 import org.graylog2.plugin.periodical.Periodical;
-import org.graylog2.system.activities.Activity;
-import org.graylog2.system.activities.ActivityWriter;
+import org.graylog2.shared.system.activities.Activity;
+import org.graylog2.shared.system.activities.ActivityWriter;
 import org.graylog2.system.jobs.SystemJobConcurrencyException;
 import org.graylog2.system.jobs.SystemJobManager;
 import org.slf4j.Logger;
@@ -46,7 +47,7 @@ public class IndexRetentionThread extends Periodical {
 
     private static final Logger LOG = LoggerFactory.getLogger(IndexRetentionThread.class);
 
-    private final Configuration configuration;
+    private final ElasticsearchConfiguration configuration;
     private final RebuildIndexRangesJob.Factory rebuildIndexRangesJobFactory;
     private final Deflector deflector;
     private final Cluster cluster;
@@ -55,7 +56,7 @@ public class IndexRetentionThread extends Periodical {
     private final Indices indices;
 
     @Inject
-    public IndexRetentionThread(Configuration configuration,
+    public IndexRetentionThread(ElasticsearchConfiguration configuration,
                                 RebuildIndexRangesJob.Factory rebuildIndexRangesJobFactory,
                                 Deflector deflector,
                                 Indices indices,

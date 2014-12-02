@@ -18,16 +18,18 @@ package org.graylog2.rest.resources.users;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.type.TypeFactory;
-import com.google.common.base.Objects;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.wordnik.swagger.annotations.Api;
+import com.wordnik.swagger.annotations.ApiOperation;
+import com.wordnik.swagger.annotations.ApiParam;
+import com.wordnik.swagger.annotations.ApiResponse;
+import com.wordnik.swagger.annotations.ApiResponses;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.Configuration;
 import org.graylog2.database.ValidationException;
-import com.wordnik.swagger.annotations.*;
 import org.graylog2.rest.resources.RestResource;
 import org.graylog2.rest.resources.users.requests.ChangePasswordRequest;
 import org.graylog2.rest.resources.users.requests.CreateRequest;
@@ -42,7 +44,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import javax.ws.rs.*;
+import javax.ws.rs.BadRequestException;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.ForbiddenException;
+import javax.ws.rs.GET;
+import javax.ws.rs.InternalServerErrorException;
+import javax.ws.rs.NotFoundException;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
@@ -51,8 +65,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static javax.ws.rs.core.Response.Status.*;
-import static javax.ws.rs.core.Response.*;
+import static com.google.common.base.MoreObjects.firstNonNull;
+import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
+import static javax.ws.rs.core.Response.Status.CREATED;
+import static javax.ws.rs.core.Response.Status.FORBIDDEN;
+import static javax.ws.rs.core.Response.Status.NOT_FOUND;
+import static javax.ws.rs.core.Response.Status.NO_CONTENT;
+import static javax.ws.rs.core.Response.noContent;
+import static javax.ws.rs.core.Response.ok;
+import static javax.ws.rs.core.Response.status;
 import static org.graylog2.security.RestPermissions.USERS_EDIT;
 import static org.graylog2.security.RestPermissions.USERS_PERMISSIONSEDIT;
 
@@ -464,7 +485,7 @@ public class UsersResource extends RestResource {
 
     private HashMap<String, Object> toMap(User user, boolean includePermissions) {
         final HashMap<String,Object> map = Maps.newHashMap();
-        map.put("id", Objects.firstNonNull(user.getId(), ""));
+        map.put("id", firstNonNull(user.getId(), ""));
         map.put("username", user.getName());
         map.put("email", user.getEmail());
         map.put("full_name", user.getFullName());

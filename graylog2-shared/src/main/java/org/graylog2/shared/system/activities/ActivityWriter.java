@@ -14,12 +14,11 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.shared.buffers;
-
-import java.util.concurrent.atomic.AtomicInteger;
+package org.graylog2.shared.system.activities;
 
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
  */
-public class ProcessBufferWatermark extends AtomicInteger {
+public interface ActivityWriter {
+    void write(Activity activity);
 }

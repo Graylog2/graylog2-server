@@ -24,6 +24,7 @@ import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.inject.Graylog2Module;
 import org.graylog2.shared.bindings.GenericBindings;
 import org.graylog2.shared.bindings.InstantiationService;
+import org.graylog2.shared.bindings.SharedPeriodicalBindings;
 import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

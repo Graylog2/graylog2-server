@@ -33,6 +33,7 @@ import org.graylog2.radio.bindings.providers.AsyncHttpClientProvider;
 import org.graylog2.radio.bindings.providers.RadioInputRegistryProvider;
 import org.graylog2.radio.bindings.providers.RadioTransportProvider;
 import org.graylog2.radio.buffers.processors.RadioProcessBufferProcessor;
+import org.graylog2.radio.system.activities.NullActivityWriter;
 import org.graylog2.radio.transports.RadioTransport;
 import org.graylog2.radio.transports.amqp.AMQPProducer;
 import org.graylog2.radio.transports.kafka.KafkaProducer;
@@ -40,6 +41,7 @@ import org.graylog2.plugin.BaseConfiguration;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.shared.inputs.InputRegistry;
+import org.graylog2.shared.system.activities.ActivityWriter;
 
 import javax.ws.rs.container.ContainerResponseFilter;
 import javax.ws.rs.container.DynamicFeature;
@@ -67,6 +69,7 @@ public class RadioBindings extends AbstractModule {
         bindDynamicFeatures();
         bindContainerResponseFilters();
         bindExceptionMappers();
+        bind(ActivityWriter.class).to(NullActivityWriter.class);
     }
 
     private void bindSingletons() {
@@ -84,6 +87,11 @@ public class RadioBindings extends AbstractModule {
         bind(URI.class).annotatedWith(Names.named("OurRadioUri")).toInstance(configuration.getRestTransportUri());
 
         bind(InputCache.class).to(BasicCache.class).in(Scopes.SINGLETON);
+
+        bind(String[].class).annotatedWith(Names.named("RestControllerPackages")).toInstance(new String[]{
+                "org.graylog2.radio.rest.resources",
+                "org.graylog2.shared.rest.resources"
+        });
     }
 
     private void bindProviders() {

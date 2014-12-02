@@ -73,7 +73,7 @@ public class Radio extends ClusterEntity {
         this.inputFactory = inputFactory;
 
         transportAddress = normalizeUriPath(r.transportAddress);
-        id = r.id;
+        id = r.nodeId;
         shortNodeId = r.shortNodeId;
     }
 

@@ -33,8 +33,8 @@ import org.elasticsearch.Version;
 import org.elasticsearch.action.admin.cluster.health.ClusterHealthRequest;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.node.Node;
-import org.graylog2.Configuration;
 import org.graylog2.UI;
+import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.plugin.Tools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,13 +54,13 @@ public class IndexerSetupService extends AbstractIdleService {
     private static final Version MAXIMUM_ES_VERSION = Version.fromString("1.4.99");
 
     private final Node node;
-    private final Configuration configuration;
+    private final ElasticsearchConfiguration configuration;
     private final BufferSynchronizerService bufferSynchronizerService;
     private final AsyncHttpClient httpClient;
 
     @Inject
     public IndexerSetupService(final Node node,
-                               final Configuration configuration,
+                               final ElasticsearchConfiguration configuration,
                                final BufferSynchronizerService bufferSynchronizerService,
                                final AsyncHttpClient httpClient,
                                final MetricRegistry metricRegistry) {
@@ -90,7 +90,7 @@ public class IndexerSetupService extends AbstractIdleService {
 
             final Client client = node.client();
             try {
-                client.admin().cluster().health(new ClusterHealthRequest().waitForYellowStatus()).actionGet(configuration.getEsClusterDiscoveryTimeout(), MILLISECONDS);
+                client.admin().cluster().health(new ClusterHealthRequest().waitForYellowStatus()).actionGet(configuration.getClusterDiscoveryTimeout(), MILLISECONDS);
             } catch (ElasticsearchTimeoutException e) {
                 final String hosts = node.settings().get("discovery.zen.ping.unicast.hosts");
 
@@ -117,7 +117,7 @@ public class IndexerSetupService extends AbstractIdleService {
                                 final String id = nodes.next();
                                 final Version clusterVersion = Version.fromString(nodesList.get(id).get("version").textValue());
 
-                                if (!configuration.isEsDisableVersionCheck()) {
+                                if (!configuration.isDisableVersionCheck()) {
                                     checkClusterVersion(clusterVersion);
                                 }
                             }

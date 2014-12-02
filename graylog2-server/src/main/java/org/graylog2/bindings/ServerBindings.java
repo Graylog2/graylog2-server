@@ -31,8 +31,21 @@ import org.graylog2.alerts.AlertSender;
 import org.graylog2.alerts.FormattedEmailAlertSender;
 import org.graylog2.alerts.types.FieldValueAlertCondition;
 import org.graylog2.alerts.types.MessageCountAlertCondition;
-import org.graylog2.bindings.providers.*;
-import org.graylog2.buffers.OutputBufferWatermark;
+import org.graylog2.bindings.providers.BundleExporterProvider;
+import org.graylog2.bindings.providers.BundleImporterProvider;
+import org.graylog2.bindings.providers.DefaultSecurityManagerProvider;
+import org.graylog2.bindings.providers.EsNodeProvider;
+import org.graylog2.bindings.providers.InputCacheProvider;
+import org.graylog2.bindings.providers.LdapConnectorProvider;
+import org.graylog2.bindings.providers.LdapUserAuthenticatorProvider;
+import org.graylog2.bindings.providers.MongoConnectionProvider;
+import org.graylog2.bindings.providers.OutputCacheProvider;
+import org.graylog2.bindings.providers.RotationStrategyProvider;
+import org.graylog2.bindings.providers.RulesEngineProvider;
+import org.graylog2.bindings.providers.ServerInputRegistryProvider;
+import org.graylog2.bindings.providers.ServerObjectMapperProvider;
+import org.graylog2.bindings.providers.SystemJobFactoryProvider;
+import org.graylog2.bindings.providers.SystemJobManagerProvider;
 import org.graylog2.buffers.processors.OutputBufferProcessor;
 import org.graylog2.buffers.processors.ServerProcessBufferProcessor;
 import org.graylog2.bundles.BundleService;
@@ -64,7 +77,9 @@ import org.graylog2.security.realm.LdapUserAuthenticator;
 import org.graylog2.shared.bindings.providers.AsyncHttpClientProvider;
 import org.graylog2.shared.inputs.InputRegistry;
 import org.graylog2.shared.metrics.jersey2.MetricsDynamicBinding;
+import org.graylog2.shared.system.activities.ActivityWriter;
 import org.graylog2.streams.StreamRouter;
+import org.graylog2.system.activities.SystemMessageActivityWriter;
 import org.graylog2.system.jobs.SystemJobFactory;
 import org.graylog2.system.jobs.SystemJobManager;
 import org.graylog2.system.shutdown.GracefulShutdown;
@@ -123,7 +138,6 @@ public class ServerBindings extends AbstractModule {
             capabilityBinder.addBinding().toInstance(ServerStatus.Capability.MASTER);
         bind(ServerStatus.class).in(Scopes.SINGLETON);
 
-        bind(OutputBufferWatermark.class).toInstance(new OutputBufferWatermark());
         bind(Node.class).toProvider(EsNodeProvider.class).in(Scopes.SINGLETON);
         bind(SystemJobManager.class).toProvider(SystemJobManagerProvider.class);
         bind(InputRegistry.class).toProvider(ServerInputRegistryProvider.class).asEagerSingleton();
@@ -148,6 +162,11 @@ public class ServerBindings extends AbstractModule {
             bind(InputCache.class).to(BasicCache.class).in(Scopes.SINGLETON);
             bind(OutputCache.class).to(BasicCache.class).in(Scopes.SINGLETON);
         }
+
+        bind(String[].class).annotatedWith(Names.named("RestControllerPackages")).toInstance(new String[]{
+                "org.graylog2.rest.resources",
+                "org.graylog2.shared.rest.resources"
+        });
     }
 
     private void bindInterfaces() {
@@ -155,6 +174,7 @@ public class ServerBindings extends AbstractModule {
         bind(AlertSender.class).to(FormattedEmailAlertSender.class);
         bind(StreamRouter.class);
         bind(FilterService.class).to(FilterServiceImpl.class).in(Scopes.SINGLETON);
+        bind(ActivityWriter.class).to(SystemMessageActivityWriter.class);
     }
 
     private void bindDynamicFeatures() {

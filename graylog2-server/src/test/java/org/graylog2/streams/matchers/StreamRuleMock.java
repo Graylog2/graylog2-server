@@ -23,7 +23,7 @@ import org.graylog2.streams.StreamRuleImpl;
 
 import java.util.Map;
 
-import static com.google.common.base.Objects.firstNonNull;
+import static com.google.common.base.MoreObjects.firstNonNull;
 
 public class StreamRuleMock implements StreamRule {
     private String id;

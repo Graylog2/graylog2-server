@@ -17,7 +17,7 @@
 package org.graylog2.bindings.providers;
 
 import com.codahale.metrics.MetricRegistry;
-import org.graylog2.system.activities.ActivityWriter;
+import org.graylog2.shared.system.activities.ActivityWriter;
 import org.graylog2.system.jobs.SystemJobManager;
 
 import javax.inject.Inject;

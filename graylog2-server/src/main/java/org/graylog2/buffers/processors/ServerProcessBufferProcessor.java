@@ -47,7 +47,6 @@ public class ServerProcessBufferProcessor extends ProcessBufferProcessor {
     public interface Factory {
         public ServerProcessBufferProcessor create(
                 OutputBuffer outputBuffer,
-                AtomicInteger processBufferWatermark,
                 @Assisted("ordinal") final long ordinal,
                 @Assisted("numberOfConsumers") final long numberOfConsumers
         );
@@ -63,11 +62,10 @@ public class ServerProcessBufferProcessor extends ProcessBufferProcessor {
     public ServerProcessBufferProcessor(MetricRegistry metricRegistry,
                                   Set<MessageFilter> filterRegistry,
                                   Configuration configuration,
-                                  @Assisted AtomicInteger processBufferWatermark,
                                   @Assisted("ordinal") final long ordinal,
                                   @Assisted("numberOfConsumers") final long numberOfConsumers,
                                   @Assisted OutputBuffer outputBuffer) {
-        super(metricRegistry, processBufferWatermark, ordinal, numberOfConsumers);
+        super(metricRegistry, ordinal, numberOfConsumers);
         this.configuration = configuration;
 
         // we need to keep this sorted properly, so that the filters run in the correct order

@@ -34,7 +34,8 @@ public class Notification {
         OUTDATED_VERSION,
         EMAIL_TRANSPORT_CONFIGURATION_INVALID,
         EMAIL_TRANSPORT_FAILED,
-        STREAM_PROCESSING_DISABLED;
+        STREAM_PROCESSING_DISABLED,
+        GC_TOO_LONG;
 
         public static Type fromString(String name) {
             return valueOf(name.toUpperCase());

@@ -25,8 +25,8 @@ import org.graylog2.shared.initializers.InputSetupService;
 import org.graylog2.shared.initializers.PeriodicalsService;
 import org.graylog2.shared.initializers.RestApiService;
 import org.graylog2.shared.journal.JournalReader;
-import org.graylog2.system.activities.Activity;
-import org.graylog2.system.activities.ActivityWriter;
+import org.graylog2.shared.system.activities.Activity;
+import org.graylog2.shared.system.activities.ActivityWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

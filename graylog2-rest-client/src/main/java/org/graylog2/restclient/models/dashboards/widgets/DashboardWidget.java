@@ -18,7 +18,6 @@ package org.graylog2.restclient.models.dashboards.widgets;
 
 import org.graylog2.restclient.lib.APIException;
 import org.graylog2.restclient.lib.ApiClient;
-import org.graylog2.restclient.lib.DateTools;
 import org.graylog2.restclient.lib.timeranges.InvalidRangeParametersException;
 import org.graylog2.restclient.lib.timeranges.TimeRange;
 import org.graylog2.restclient.models.api.requests.dashboards.WidgetUpdateRequest;
@@ -26,15 +25,10 @@ import org.graylog2.restclient.models.api.responses.dashboards.DashboardWidgetRe
 import org.graylog2.restclient.models.api.responses.dashboards.DashboardWidgetValueResponse;
 import org.graylog2.restclient.models.dashboards.Dashboard;
 import org.graylog2.restroutes.generated.routes;
-import org.joda.time.DateTime;
-import play.mvc.Call;
 
 import java.io.IOException;
 import java.util.Map;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public abstract class DashboardWidget {
 
     public enum Type {
@@ -42,7 +36,8 @@ public abstract class DashboardWidget {
         STREAM_SEARCH_RESULT_COUNT,
         FIELD_CHART,
         QUICKVALUES,
-        SEARCH_RESULT_CHART
+        SEARCH_RESULT_CHART,
+        STATS_COUNT
     }
 
     private final Type type;
@@ -146,6 +141,8 @@ public abstract class DashboardWidget {
                         w.cacheTime,
                         (String) w.config.get("query"),
                         TimeRange.factory((Map<String, Object>) w.config.get("timerange")),
+                        w.config.get("trend") != null && Boolean.parseBoolean(String.valueOf(w.config.get("trend"))),
+                        w.config.get("lower_is_better") != null && Boolean.parseBoolean(String.valueOf(w.config.get("lower_is_better"))),
                         w.creatorUserId
                 );
                 break;
@@ -157,6 +154,8 @@ public abstract class DashboardWidget {
                         w.cacheTime,
                         (String) w.config.get("query"),
                         TimeRange.factory((Map<String, Object>) w.config.get("timerange")),
+                        w.config.get("trend") != null && Boolean.parseBoolean(String.valueOf(w.config.get("trend"))),
+                        w.config.get("lower_is_better") != null && Boolean.parseBoolean(String.valueOf(w.config.get("lower_is_better"))),
                         (String) w.config.get("stream_id"),
                         w.creatorUserId
                 );
@@ -198,6 +197,22 @@ public abstract class DashboardWidget {
                         TimeRange.factory((Map<String, Object>) w.config.get("timerange")),
                         w.creatorUserId,
                         (String) w.config.get("interval")
+                );
+                break;
+            case STATS_COUNT:
+                widget = new StatisticalCountWidget(
+                        dashboard,
+                        w.id,
+                        w.description,
+                        w.cacheTime,
+                        (String) w.config.get("query"),
+                        TimeRange.factory((Map<String, Object>) w.config.get("timerange")),
+                        w.config.get("trend") != null && Boolean.parseBoolean(String.valueOf(w.config.get("trend"))),
+                        w.config.get("lower_is_better") != null && Boolean.parseBoolean(String.valueOf(w.config.get("lower_is_better"))),
+                        (String) w.config.get("field"),
+                        (String) w.config.get("stats_function"),
+                        (w.config.containsKey("stream_id") ? (String) w.config.get("stream_id") : null),
+                        w.creatorUserId
                 );
                 break;
             default:

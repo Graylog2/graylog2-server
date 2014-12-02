@@ -47,6 +47,7 @@
         <module>graylog2-radio</module>
         <module>graylog2-rest-routes</module>
         <module>graylog2-rest-client</module>
+        <module>graylog2-bootstrap</module>
     </modules>
 
     <organization>
@@ -334,7 +335,7 @@
             <dependency>
                 <groupId>com.github.joschi</groupId>
                 <artifactId>jadconfig</artifactId>
-                <version>0.8.0</version>
+                <version>0.9.1</version>
             </dependency>
 
             <!-- Jersey and Glassfish -->
@@ -590,6 +591,12 @@
             </dependency>
 
             <dependency>
+                <groupId>io.airlift</groupId>
+                <artifactId>airline</artifactId>
+                <version>0.6</version>
+            </dependency>
+
+            <dependency>
                 <groupId>org.testng</groupId>
                 <artifactId>testng</artifactId>
                 <version>6.8.8</version>
@@ -706,7 +713,7 @@
                 <configuration>
                     <autoVersionSubmodules>true</autoVersionSubmodules>
                     <mavenExecutorId>forked-path</mavenExecutorId>
-                    <tagNameFormat>v@{project.version}</tagNameFormat>
+                    <tagNameFormat>@{project.version}</tagNameFormat>
                     <preparationGoals>clean test</preparationGoals>
                 </configuration>
             </plugin>

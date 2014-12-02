@@ -19,6 +19,7 @@ package org.graylog2.system.activities;
 import org.graylog2.database.PersistedService;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
@@ -26,4 +27,5 @@ import java.util.List;
 public interface SystemMessageService extends PersistedService {
     List<SystemMessage> all(int page);
     long totalCount();
+    SystemMessage create(Map<String, Object> fields);
 }

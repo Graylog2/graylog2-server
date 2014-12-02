@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.system.activities;
+package org.graylog2.shared.system.activities;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>

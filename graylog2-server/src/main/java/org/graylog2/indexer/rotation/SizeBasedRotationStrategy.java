@@ -17,7 +17,7 @@
 package org.graylog2.indexer.rotation;
 
 import com.google.inject.Inject;
-import org.graylog2.Configuration;
+import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.indexer.indices.IndexStatistics;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.plugin.indexer.rotation.RotationStrategy;
@@ -33,9 +33,9 @@ public class SizeBasedRotationStrategy implements RotationStrategy {
     private final long maxSize;
 
     @Inject
-    public SizeBasedRotationStrategy(Configuration configuration, Indices indices) {
+    public SizeBasedRotationStrategy(ElasticsearchConfiguration configuration, Indices indices) {
         this.indices = indices;
-        maxSize = configuration.getElasticSearchMaxSizePerIndex();
+        maxSize = configuration.getMaxSizePerIndex();
     }
 
     @Nullable

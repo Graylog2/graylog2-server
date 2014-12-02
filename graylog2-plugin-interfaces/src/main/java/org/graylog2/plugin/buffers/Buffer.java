@@ -87,4 +87,8 @@ public abstract class Buffer {
         ringBuffer.publish(lo, hi);
         afterInsert(length);
     }
+
+    public long size() {
+        return ringBuffer.getBufferSize() - ringBuffer.remainingCapacity();
+    }
 }

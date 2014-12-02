@@ -33,7 +33,7 @@ public class DateTools {
 
     public static final DateTimeFormatter DEFAULT_DATE_FORMAT = DateTimeFormat.forPattern("E MMM dd YYYY HH:mm:ss.SSS ZZ");
     public static final DateTimeFormatter SHORT_DATE_FORMAT_TZ = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSS ZZ");
-    public static final DateTimeFormatter SHORT_DATE_FORMAT = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSS").withZoneUTC();
+    public static final DateTimeFormatter SHORT_DATE_FORMAT = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSS");
     private static DateTimeZone globalTimezone = DateTimeZone.UTC;
 
     private static final TreeMultimap<String, String> groupedZones;

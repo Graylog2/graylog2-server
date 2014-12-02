@@ -19,24 +19,34 @@ package org.graylog2.restclient.models.dashboards.widgets;
 import com.google.common.collect.Maps;
 import org.graylog2.restclient.lib.timeranges.TimeRange;
 import org.graylog2.restclient.models.dashboards.Dashboard;
-import play.mvc.Call;
 
 import java.util.Map;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public class SearchResultCountWidget extends DashboardWidget {
 
     private static final int WIDTH = 1;
     private static final int HEIGHT = 1;
 
-    public SearchResultCountWidget(Dashboard dashboard, String query, TimeRange timerange, String description) {
-        this(dashboard, null, description, 0, query, timerange, null);
+    private final Boolean trend;
+    private final Boolean lowerIsBetter;
+
+    public SearchResultCountWidget(Dashboard dashboard, String query, TimeRange timerange, String description, boolean trend, boolean lowerIsBetter) {
+        this(dashboard, null, description, 0, query, timerange, trend, lowerIsBetter, null);
     }
 
-    public SearchResultCountWidget(Dashboard dashboard, String id, String description, int cacheTime, String query, TimeRange timerange, String creatorUserId) {
-        super(Type.SEARCH_RESULT_COUNT, id, description, cacheTime, dashboard, creatorUserId, query, timerange);
+    public SearchResultCountWidget(Dashboard dashboard, String query, TimeRange timerange, String description) {
+        this(dashboard, query, timerange, description, false, false);
+    }
+
+    public SearchResultCountWidget(Dashboard dashboard, String id, String description, int cacheTime, String query, TimeRange timerange, boolean trend, boolean lowerIsBetter, String creatorUserId) {
+        this(Type.SEARCH_RESULT_COUNT, dashboard, id, description, cacheTime, query, timerange, trend, lowerIsBetter, creatorUserId);
+    }
+
+    protected SearchResultCountWidget(Type type, Dashboard dashboard, String id, String description, int cacheTime, String query, TimeRange timerange, boolean trend, boolean lowerIsBetter, String creatorUserId) {
+        super(type, id, description, cacheTime, dashboard, creatorUserId, query, timerange);
+
+        this.trend = trend;
+        this.lowerIsBetter = lowerIsBetter;
     }
 
     @Override
@@ -44,6 +54,8 @@ public class SearchResultCountWidget extends DashboardWidget {
         Map<String, Object> config = Maps.newHashMap();
         config.putAll(getTimerange().getQueryParams());
         config.put("query", getQuery());
+        config.put("trend", trend);
+        config.put("lower_is_better", lowerIsBetter);
 
         return config;
     }
@@ -67,4 +79,8 @@ public class SearchResultCountWidget extends DashboardWidget {
     public boolean hasFixedTimeAxis() {
         return false;
     }
+
+    public boolean getTrend() { return trend; }
+
+    public boolean getLowerIsBetter() { return lowerIsBetter; }
 }

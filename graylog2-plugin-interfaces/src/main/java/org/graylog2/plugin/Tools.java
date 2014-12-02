@@ -56,6 +56,8 @@ import java.util.UUID;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.InflaterInputStream;
 
+import static com.google.common.base.Strings.isNullOrEmpty;
+
 /**
  * Utility class for various tool/helper functions.
  */
@@ -66,7 +68,8 @@ public final class Tools {
 
     public static final DateTimeFormatter ES_DATE_FORMAT_FORMATTER = DateTimeFormat.forPattern(Tools.ES_DATE_FORMAT).withZoneUTC();
 
-    private Tools() { }
+    private Tools() {
+    }
 
     /**
      * Get the own PID of this process.
@@ -90,7 +93,7 @@ public final class Tools {
             case 1:
                 return "Alert";
             case 2:
-                return"Critical";
+                return "Critical";
             case 3:
                 return "Error";
             case 4:
@@ -114,30 +117,54 @@ public final class Tools {
      */
     public static String syslogFacilityToReadable(int facility) {
         switch (facility) {
-            case 0:  return "kernel";
-            case 1:  return "user-level";
-            case 2:  return "mail";
-            case 3:  return "system daemon";
-            case 4: case 10: return "security/authorization";
-            case 5:  return "syslogd";
-            case 6:  return "line printer";
-            case 7:  return "network news";
-            case 8:  return "UUCP";
-            case 9: case 15: return "clock";
-            case 11: return "FTP";
-            case 12: return "NTP";
-            case 13: return "log audit";
-            case 14: return "log alert";
+            case 0:
+                return "kernel";
+            case 1:
+                return "user-level";
+            case 2:
+                return "mail";
+            case 3:
+                return "system daemon";
+            case 4:
+            case 10:
+                return "security/authorization";
+            case 5:
+                return "syslogd";
+            case 6:
+                return "line printer";
+            case 7:
+                return "network news";
+            case 8:
+                return "UUCP";
+            case 9:
+            case 15:
+                return "clock";
+            case 11:
+                return "FTP";
+            case 12:
+                return "NTP";
+            case 13:
+                return "log audit";
+            case 14:
+                return "log alert";
 
             // TODO: Make user definable?
-            case 16: return "local0";
-            case 17: return "local1";
-            case 18: return "local2";
-            case 19: return "local3";
-            case 20: return "local4";
-            case 21: return "local5";
-            case 22: return "local6";
-            case 23: return "local7";
+            case 16:
+                return "local0";
+            case 17:
+                return "local1";
+            case 18:
+                return "local2";
+            case 19:
+                return "local3";
+            case 20:
+                return "local4";
+            case 21:
+                return "local5";
+            case 22:
+                return "local6";
+            case 23:
+                return "local7";
         }
 
         return "Unknown";
@@ -145,6 +172,7 @@ public final class Tools {
 
     /**
      * Get a String containing version information of JRE, OS, ...
+     *
      * @return Descriptive string of JRE and OS
      */
     public static String getSystemInformation() {
@@ -173,7 +201,7 @@ public final class Tools {
 
     /**
      * Decompress GZIP (RFC 1952) compressed data
-     * 
+     *
      * @return A string containing the decompressed data
      */
     public static String decompressGzip(byte[] compressedData) throws IOException {
@@ -187,11 +215,10 @@ public final class Tools {
     }
 
     /**
-     *
      * @return The current UTC UNIX timestamp.
      */
     public static int getUTCTimestamp() {
-       return (int) (System.currentTimeMillis()/1000);
+        return (int) (System.currentTimeMillis() / 1000);
     }
 
     /**
@@ -223,7 +250,7 @@ public final class Tools {
 
         return addr.getHostName();
     }
-    
+
     public static String getLocalCanonicalHostname() {
         InetAddress addr = null;
         try {
@@ -236,7 +263,7 @@ public final class Tools {
     }
 
     public static int getTimestampDaysAgo(int ts, int days) {
-        return (ts - (days*86400));
+        return (ts - (days * 86400));
     }
 
     public static String encodeBase64(final String what) {
@@ -250,11 +277,11 @@ public final class Tools {
     public static String rdnsLookup(InetAddress socketAddress) throws UnknownHostException {
         return socketAddress.getCanonicalHostName();
     }
-    
+
     public static String generateServerId() {
         return UUID.randomUUID().toString();
     }
-    
+
     public static <T extends Comparable<? super T>> List<T> asSortedList(Collection<T> c) {
         List<T> list = new ArrayList<T>(c);
         java.util.Collections.sort(list);
@@ -267,24 +294,24 @@ public final class Tools {
 
     /**
      * The double representation of a UNIX timestamp with milliseconds is a strange, human readable format.
-     *
+     * <p/>
      * This sucks and no format should use the double representation. Change GELF to use long. (zomg)
      */
     public static DateTime dateTimeFromDouble(double x) {
-        return new DateTime(Math.round(x*1000), DateTimeZone.UTC);
+        return new DateTime(Math.round(x * 1000), DateTimeZone.UTC);
     }
 
     /**
      * Accepts our ElasticSearch time formats without milliseconds.
      *
      * @return A DateTimeFormatter suitable to parse an ES_DATE_FORMAT formatted string to a
-     *         DateTime Object even if it contains no milliseconds.
+     * DateTime Object even if it contains no milliseconds.
      */
     public static DateTimeFormatter timeFormatterWithOptionalMilliseconds() {
         // This is the .SSS part
         DateTimeParser ms = new DateTimeFormatterBuilder()
                 .appendLiteral(".")
-                .appendFractionOfSecond(1,3)
+                .appendFractionOfSecond(1, 3)
                 .toParser();
 
         return new DateTimeFormatterBuilder()
@@ -302,7 +329,7 @@ public final class Tools {
         DateTimeFormatter formatter = DateTimeFormat.forPattern(ES_DATE_FORMAT).withZoneUTC();
         DateTime dt = formatter.parseDateTime(field.toString());
 
-        return (int) (dt.getMillis()/1000);
+        return (int) (dt.getMillis() / 1000);
     }
 
     public static DateTime iso8601() {
@@ -321,16 +348,15 @@ public final class Tools {
         try {
             DateTime dt = DateTime.parse(time, ES_DATE_FORMAT_FORMATTER);
             return getISO8601String(dt);
-        } catch(IllegalArgumentException e) {
+        } catch (IllegalArgumentException e) {
             return time;
         }
     }
 
     /**
-     *
      * @param target String to cut.
      * @param start  Character position to start cutting at. Inclusive.
-     * @param end Character position to stop cutting at. Exclusive!
+     * @param end    Character position to stop cutting at. Exclusive!
      * @return Extracted/cut part of the string or null when invalid positions where provided.
      */
     public static String safeSubstring(String target, int start, int end) {
@@ -409,7 +435,7 @@ public final class Tools {
     }
 
     public static URI getUriWithPort(final URI uri, final int port) {
-        if(uri == null) {
+        if (uri == null) {
             return null;
         }
 
@@ -432,23 +458,42 @@ public final class Tools {
     }
 
     public static URI getUriWithScheme(final URI uri, final String scheme) {
-            if(uri == null) {
-                return null;
-            }
-
-            try {
-                return new URI(
-                        scheme,
-                        uri.getUserInfo(),
-                        uri.getHost(),
-                        uri.getPort(),
-                        uri.getPath(),
-                        uri.getQuery(),
-                        uri.getFragment());
-            } catch (URISyntaxException e) {
-                throw new RuntimeException("Could not parse URI.", e);
-            }
+        if (uri == null) {
+            return null;
         }
+
+        try {
+            return new URI(
+                    scheme,
+                    uri.getUserInfo(),
+                    uri.getHost(),
+                    uri.getPort(),
+                    uri.getPath(),
+                    uri.getQuery(),
+                    uri.getFragment());
+        } catch (URISyntaxException e) {
+            throw new RuntimeException("Could not parse URI.", e);
+        }
+    }
+
+    public static URI getUriWithDefaultPath(final URI uri, final String path) {
+        if (uri == null) {
+            return null;
+        }
+
+        try {
+            return new URI(
+                    uri.getScheme(),
+                    uri.getUserInfo(),
+                    uri.getHost(),
+                    uri.getPort(),
+                    isNullOrEmpty(uri.getPath()) ? path : uri.getPath(),
+                    uri.getQuery(),
+                    uri.getFragment());
+        } catch (URISyntaxException e) {
+            throw new RuntimeException("Could not parse URI.", e);
+        }
+    }
 
     public static <T, E> T getKeyByValue(Map<T, E> map, E value) {
         for (Map.Entry<T, E> entry : map.entrySet()) {

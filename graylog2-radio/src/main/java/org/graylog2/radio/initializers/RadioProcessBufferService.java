@@ -17,11 +17,9 @@
 package org.graylog2.radio.initializers;
 
 import com.google.common.util.concurrent.AbstractIdleService;
-import org.graylog2.inputs.InputCache;
 import org.graylog2.radio.Configuration;
 import org.graylog2.radio.buffers.processors.RadioProcessBufferProcessor;
 import org.graylog2.shared.buffers.ProcessBuffer;
-import org.graylog2.shared.buffers.ProcessBufferWatermark;
 import org.graylog2.shared.buffers.processors.ProcessBufferProcessor;
 
 import javax.inject.Inject;
@@ -32,23 +30,17 @@ import javax.inject.Singleton;
  */
 @Singleton
 public class RadioProcessBufferService extends AbstractIdleService {
-    private final InputCache inputCache;
     private final RadioProcessBufferProcessor.Factory processBufferProcessorFactory;
     private final Configuration configuration;
     private final ProcessBuffer processBuffer;
-    private final ProcessBufferWatermark processBufferWatermark;
 
     @Inject
-    public RadioProcessBufferService(InputCache inputCache,
-                                     RadioProcessBufferProcessor.Factory processBufferProcessorFactory,
+    public RadioProcessBufferService(RadioProcessBufferProcessor.Factory processBufferProcessorFactory,
                                      Configuration configuration,
-                                     ProcessBuffer processBuffer,
-                                     ProcessBufferWatermark processBufferWatermark) {
-        this.inputCache = inputCache;
+                                     ProcessBuffer processBuffer) {
         this.processBufferProcessorFactory = processBufferProcessorFactory;
         this.configuration = configuration;
         this.processBuffer = processBuffer;
-        this.processBufferWatermark = processBufferWatermark;
     }
 
     @Override
@@ -58,9 +50,7 @@ public class RadioProcessBufferService extends AbstractIdleService {
         ProcessBufferProcessor[] processors = new ProcessBufferProcessor[processBufferProcessorCount];
 
         for (int i = 0; i < processBufferProcessorCount; i++) {
-            processors[i] = processBufferProcessorFactory.create(this.processBufferWatermark,
-                    i,
-                    processBufferProcessorCount);
+            processors[i] = processBufferProcessorFactory.create(i, processBufferProcessorCount);
         }
 
         processBuffer.initialize(processors, configuration.getRingSize(),

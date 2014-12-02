@@ -14,30 +14,16 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.shared.bindings.providers;
+package org.graylog2.radio.system.activities;
 
-import org.graylog2.inputs.InputCache;
-import org.graylog2.shared.buffers.ProcessBuffer;
-import org.graylog2.shared.buffers.ProcessBufferWatermark;
-
-import javax.inject.Inject;
-import javax.inject.Provider;
+import org.graylog2.shared.system.activities.Activity;
+import org.graylog2.shared.system.activities.ActivityWriter;
 
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
  */
-public class ProcessBufferProvider implements Provider<ProcessBuffer> {
-    private static ProcessBuffer processBuffer = null;
-
-    @Inject
-    public ProcessBufferProvider(InputCache inputCache, ProcessBuffer.Factory processBufferFactory, ProcessBufferWatermark processBufferWatermark) {
-        if (processBuffer == null) {
-            processBuffer = processBufferFactory.create(inputCache, processBufferWatermark);
-        }
-    }
-
+public class NullActivityWriter implements ActivityWriter {
     @Override
-    public ProcessBuffer get() {
-        return processBuffer;
+    public void write(Activity activity) {
     }
 }

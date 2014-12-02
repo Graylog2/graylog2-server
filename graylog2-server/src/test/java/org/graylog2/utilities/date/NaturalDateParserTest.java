@@ -48,4 +48,16 @@ public class NaturalDateParserTest {
         new NaturalDateParser().parse("");
     }
 
+    @Test(enabled = false)
+    public void testTemporalOrder() throws Exception, NaturalDateParser.DateNotParsableException {
+        NaturalDateParser p = new NaturalDateParser();
+
+        NaturalDateParser.Result result1 = p.parse("last hour");
+        assertTrue(result1.getFrom().compareTo(result1.getTo()) < 0);
+
+        NaturalDateParser.Result result2 = p.parse("last one hour");
+        assertTrue(result2.getFrom().compareTo(result2.getTo()) < 0);
+
+
+    }
 }

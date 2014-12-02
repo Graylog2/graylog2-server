@@ -21,10 +21,14 @@ import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.inputs.Converter;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 
 public class DateConverter extends Converter {
+
+    private static final Logger LOG = LoggerFactory.getLogger(DateConverter.class);
 
     private final String dateFormat;
 
@@ -35,7 +39,7 @@ public class DateConverter extends Converter {
             throw new ConfigurationException("Missing config [date_format].");
         }
 
-        dateFormat = (String) config.get("date_format");
+        dateFormat = ((String) config.get("date_format")).trim();
     }
 
     @Override
@@ -45,6 +49,8 @@ public class DateConverter extends Converter {
         }
 
         final DateTime localNow = Tools.iso8601();
+
+        LOG.debug("Trying to parse date <{}> with pattern <{}>.", value, dateFormat);
 
         return DateTime.parse(value, DateTimeFormat.forPattern(dateFormat).withDefaultYear(localNow.getYear()));
     }

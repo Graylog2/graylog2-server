@@ -14,12 +14,22 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.buffers;
+package org.graylog2.bootstrap.commands;
 
-import java.util.concurrent.atomic.AtomicInteger;
+import io.airlift.command.Command;
+import org.graylog2.plugin.Tools;
+import org.graylog2.plugin.Version;
 
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
  */
-public class OutputBufferWatermark extends AtomicInteger {
+@Command(name = "version", description = "Show the Graylog2 and JVM versions")
+public class ShowVersion implements Runnable {
+    private final Version version = Version.CURRENT_CLASSPATH;
+
+    @Override
+    public void run() {
+        System.out.println("Graylog2 " + version);
+        System.out.println("JRE: " + Tools.getSystemInformation());
+    }
 }
