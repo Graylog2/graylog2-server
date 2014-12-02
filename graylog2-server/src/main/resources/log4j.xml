@@ -26,9 +26,6 @@
     <logger name="org.elasticsearch.script">
         <level value="warn"/>
     </logger>
-    <logger name="org.graylog2.plugin.inputs.util.PacketInformationDumper">
-        <level value="trace"/>
-    </logger>
     <!-- Root Logger -->
     <root>
         <priority value="warn"/>

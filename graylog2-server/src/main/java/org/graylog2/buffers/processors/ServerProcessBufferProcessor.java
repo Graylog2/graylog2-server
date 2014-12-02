@@ -34,7 +34,6 @@ import org.slf4j.LoggerFactory;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.codahale.metrics.MetricRegistry.name;
 
@@ -110,7 +109,7 @@ public class ServerProcessBufferProcessor extends ProcessBufferProcessor {
 
         if (configuration.isDisableOutputCache()) {
             LOG.debug("Finished processing message. Writing to output buffer.");
-                outputBuffer.insertBlocking(msg);
+            outputBuffer.insertBlocking(msg);
         } else {
             LOG.debug("Finished processing message. Writing to output cache.");
             outputBuffer.insertCached(msg, null);
