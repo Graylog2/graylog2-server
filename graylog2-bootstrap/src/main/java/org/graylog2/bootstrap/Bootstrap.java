@@ -38,7 +38,6 @@ import com.google.inject.Binder;
 import com.google.inject.Injector;
 import com.google.inject.Module;
 import com.google.inject.ProvisionException;
-import com.google.inject.TypeLiteral;
 import com.google.inject.name.Names;
 import io.airlift.command.Option;
 import org.apache.log4j.Level;
@@ -56,8 +55,9 @@ import org.graylog2.shared.bindings.GenericBindings;
 import org.graylog2.shared.bindings.GuiceInjectorHolder;
 import org.graylog2.shared.bindings.GuiceInstantiationService;
 import org.graylog2.shared.bindings.InstantiationService;
-import org.graylog2.shared.bindings.SharedPeriodicalBindings;
 import org.graylog2.shared.initializers.ServiceManagerListener;
+import org.graylog2.shared.journal.KafkaJournalModule;
+import org.graylog2.shared.journal.NoopJournalModule;
 import org.graylog2.shared.plugins.PluginLoader;
 import org.graylog2.shared.system.activities.Activity;
 import org.graylog2.shared.system.activities.ActivityWriter;
@@ -335,6 +335,11 @@ public abstract class Bootstrap implements Runnable {
             modules.add(configModule);
             modules.addAll(getSharedBindingsModules(instantiationService));
             modules.addAll(getCommandBindings());
+            if (configuration.isMessageJournalEnabled()) {
+                modules.add(new KafkaJournalModule());
+            } else {
+                modules.add(new NoopJournalModule());
+            }
             modules.add(new Module() {
                 @Override
                 public void configure(Binder binder) {
