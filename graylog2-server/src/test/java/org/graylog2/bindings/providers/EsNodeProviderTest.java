@@ -85,6 +85,7 @@ public class EsNodeProviderTest {
         addEsConfig(esPropNames, settings, "node.name", "elasticsearch_node_name", "garylord");
         addEsConfig(esPropNames, settings, "node.master", "elasticsearch_node_master", "true");
         addEsConfig(esPropNames, settings, "node.data", "elasticsearch_node_data", "true");
+        addEsConfig(esPropNames, settings, "path.data", "elasticsearch_path_data", "elasticsearch-data");
         addEsConfig(esPropNames, settings, "transport.tcp.port", "elasticsearch_transport_tcp_port", "9999");
         addEsConfig(esPropNames, settings, "http.enabled", "elasticsearch_http_enabled", "true");
         addEsConfig(esPropNames,

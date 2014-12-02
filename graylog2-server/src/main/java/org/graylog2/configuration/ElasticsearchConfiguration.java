@@ -40,6 +40,9 @@ public class ElasticsearchConfiguration {
     @Parameter(value = "elasticsearch_node_data")
     private boolean dataNode = false;
 
+    @Parameter(value = "elasticsearch_path_data")
+    private String pathData = "elasticsearch-data";
+
     @Parameter(value = "elasticsearch_transport_tcp_port", validator = InetPortValidator.class)
     private int transportTcpPort = 9350;
 
@@ -129,6 +132,10 @@ public class ElasticsearchConfiguration {
 
     public boolean isDataNode() {
         return dataNode;
+    }
+
+    public boolean isClientNode() {
+        return !isDataNode();
     }
 
     public int getTransportTcpPort() {
@@ -233,5 +240,9 @@ public class ElasticsearchConfiguration {
 
     public boolean isDisableIndexRangeCalculation() {
         return disableIndexRangeCalculation;
+    }
+
+    public String getPathData() {
+        return pathData;
     }
 }

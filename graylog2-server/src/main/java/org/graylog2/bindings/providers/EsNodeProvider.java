@@ -50,7 +50,7 @@ public class EsNodeProvider implements Provider<Node> {
     @Override
     @Singleton
     public Node get() {
-        final NodeBuilder builder = nodeBuilder().client(true);
+        final NodeBuilder builder = nodeBuilder().client(configuration.isClientNode());
         Map<String, String> settings = readNodeSettings(configuration);
 
         builder.settings().put(settings);
@@ -66,6 +66,10 @@ public class EsNodeProvider implements Provider<Node> {
         settings.put("node.name", conf.getNodeName());
         settings.put("node.master", Boolean.toString(conf.isMasterNode()));
         settings.put("node.data", Boolean.toString(conf.isDataNode()));
+
+        if (!isNullOrEmpty(conf.getPathData())) {
+            settings.put("path.data", conf.getPathData());
+        }
 
         settings.put("action.auto_create_index", Boolean.toString(false));
 
