@@ -28,7 +28,7 @@ public class UI {
     private static final String HELP_COMMUNITY = "http://graylog2.org/resources/community-support";
     private static final String HELP_COMMERCIAL = "http://graylog2.org/products";
 
-    private static final Logger LOG = LoggerFactory.getLogger(Main.class);
+    private static final Logger LOG = LoggerFactory.getLogger(UI.class);
 
     public static void exitHardWithWall(String msg) {
         exitHardWithWall(msg, new String[]{});
