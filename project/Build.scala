@@ -22,7 +22,7 @@ object ApplicationBuild extends Build {
     "com.google.inject" % "guice" % "3.0",
     "com.google.inject.extensions" % "guice-assistedinject" % "3.0",
     "javax.inject" % "javax.inject" % "1",
-    "org.graylog2" % "play2-graylog2_2.10" % "1.0",
+    "org.graylog2" % "play2-graylog2_2.10" % "1.2",
     "org.graylog2" % "graylog2-rest-client" % appVersion,
 
     // TODO this is stupid, just to get that UriBuilder...
