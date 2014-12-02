@@ -24,7 +24,6 @@ import org.graylog2.plugin.BaseConfiguration;
 
 import java.net.URI;
 
-import static com.google.common.base.Strings.isNullOrEmpty;
 import static org.graylog2.plugin.Tools.getUriWithDefaultPath;
 import static org.graylog2.plugin.Tools.getUriWithPort;
 import static org.graylog2.plugin.Tools.getUriWithScheme;
@@ -122,6 +121,9 @@ public class Configuration extends BaseConfiguration {
 
     @Parameter(value = "disable_output_cache")
     private boolean disableOutputCache = true;
+
+    @Parameter(value = "default_message_output_class")
+    private String defaultMessageOutputClass = "";
 
     public boolean isMaster() {
         return isMaster;
@@ -246,5 +248,9 @@ public class Configuration extends BaseConfiguration {
 
     public boolean isDisableOutputCache() {
         return disableOutputCache;
+    }
+
+    public String getDefaultMessageOutputClass() {
+        return defaultMessageOutputClass;
     }
 }

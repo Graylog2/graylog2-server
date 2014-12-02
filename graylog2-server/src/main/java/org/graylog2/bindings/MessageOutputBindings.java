@@ -16,25 +16,36 @@
  */
 package org.graylog2.bindings;
 
-import com.google.inject.AbstractModule;
+import com.google.common.base.Strings;
 import com.google.inject.Scopes;
 import com.google.inject.TypeLiteral;
 import com.google.inject.multibindings.MapBinder;
-import com.google.inject.multibindings.Multibinder;
+import org.graylog2.Configuration;
 import org.graylog2.outputs.BatchedElasticSearchOutput;
 import org.graylog2.outputs.DefaultMessageOutput;
 import org.graylog2.outputs.GelfOutput;
 import org.graylog2.outputs.LoggingOutput;
 import org.graylog2.plugin.inject.Graylog2Module;
 import org.graylog2.plugin.outputs.MessageOutput;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
  */
 public class MessageOutputBindings extends Graylog2Module {
+    private static final Logger LOG = LoggerFactory.getLogger(MessageOutputBindings.class);
+
+    private final Configuration configuration;
+
+    public MessageOutputBindings(final Configuration configuration) {
+        this.configuration = configuration;
+    }
+
     @Override
     protected void configure() {
-        bind(MessageOutput.class).annotatedWith(DefaultMessageOutput.class).to(BatchedElasticSearchOutput.class).in(Scopes.SINGLETON);
+        final Class<? extends MessageOutput> defaultMessageOutputClass = getDefaultMessageOutputClass(BatchedElasticSearchOutput.class);
+        bind(MessageOutput.class).annotatedWith(DefaultMessageOutput.class).to(defaultMessageOutputClass).in(Scopes.SINGLETON);
 
         TypeLiteral<Class<? extends MessageOutput>> typeLiteral = new TypeLiteral<Class<? extends MessageOutput>>(){};
         //Multibinder<Class<? extends MessageOutput>> messageOutputs = Multibinder.newSetBinder(binder(), typeLiteral);
@@ -44,5 +55,33 @@ public class MessageOutputBindings extends Graylog2Module {
         final MapBinder<String, MessageOutput.Factory<? extends MessageOutput>> outputMapBinder = outputsMapBinder();
         installOutput(outputMapBinder, GelfOutput.class, GelfOutput.Factory.class);
         installOutput(outputMapBinder, LoggingOutput.class, LoggingOutput.Factory.class);
+    }
+
+    private Class<? extends MessageOutput> getDefaultMessageOutputClass(Class<? extends MessageOutput> fallbackClass) {
+        // Just use the default fallback if nothing is configured. This is the default case.
+        if (Strings.isNullOrEmpty(configuration.getDefaultMessageOutputClass())) {
+            return fallbackClass;
+        }
+
+        try {
+            @SuppressWarnings("unchecked")
+            final Class<? extends MessageOutput> defaultMessageOutputClass = (Class<? extends MessageOutput>) Class.forName(configuration.getDefaultMessageOutputClass());
+
+            if (MessageOutput.class.isAssignableFrom(defaultMessageOutputClass)) {
+                LOG.info("Using {} as default message output", defaultMessageOutputClass.getCanonicalName());
+                return defaultMessageOutputClass;
+            } else {
+                LOG.warn("Class \"{}\" is not a subclass of \"{}\". Using \"{}\" as default message output",
+                        configuration.getDefaultMessageOutputClass(),
+                        MessageOutput.class.getCanonicalName(),
+                        fallbackClass.getCanonicalName());
+                return fallbackClass;
+            }
+        } catch (ClassNotFoundException e) {
+            LOG.warn("Unable to find default message output class \"{}\", using \"{}\"",
+                    configuration.getDefaultMessageOutputClass(),
+                    fallbackClass.getCanonicalName());
+            return fallbackClass;
+        }
     }
 }
