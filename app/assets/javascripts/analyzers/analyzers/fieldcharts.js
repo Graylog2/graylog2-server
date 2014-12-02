@@ -15,6 +15,40 @@ $(document).ready(function() {
         return ++position;
     }
 
+    function findPreviousGraph(position, positionAttributeName) {
+        for (var beforePos = position - 1; beforePos > 0; beforePos--) {
+            var beforeGraph = $('[' + positionAttributeName + '="' + beforePos + '"]');
+            if (beforeGraph.length > 0) {
+                return beforeGraph;
+            }
+        }
+        return null;
+    }
+
+    function findElementBeforePosition(position, positionAttributeName) {
+        var previousGraph = findPreviousGraph(position, positionAttributeName);
+        var defaultElement = $("#field-graph-template");
+        return previousGraph !== null ? previousGraph : defaultElement;
+    }
+
+    function insertSpinner(position) {
+        var defaultElement = $("#field-graph-template");
+        var spinnerElement = $('<div class="spinner" style="height: 200px;"><i class="icon-spin icon-refresh icon-3x spinner"></i></div>');
+        spinnerElement.attr("data-position", position);
+        var previousElement = findPreviousGraph(position, "data-position");
+        if (previousElement === null) {
+            previousElement = findPreviousGraph(position, "data-chart-position");
+            if (previousElement === null) {
+                previousElement = defaultElement;
+            }
+        }
+        previousElement.after(spinnerElement);
+    }
+
+    function deleteSpinner(position) {
+        $("[data-position=" + position + "].spinner").remove();
+    }
+
     var palette = new Rickshaw.Color.Palette({ scheme: 'colorwheel' });
 
     $(".analyze-field .line-chart").on("click", function(e) {
@@ -116,13 +150,7 @@ $(document).ready(function() {
                 break;
         }
 
-        $("#field-graphs .spinner").show();
-
-        /*
-         * TODO:
-         *   - export to image, ...
-         *   - overflowing select box
-         */
+        insertSpinner(opts.position);
 
         // Delete a possibly already existing graph with this id. (for updates)
         $('.field-graph-container[data-chart-id="' + opts.chartid + '"]', $("#field-graphs")).remove();
@@ -157,8 +185,9 @@ $(document).ready(function() {
                     $(".unpin", template).show();
                 }
 
-                // Place the chart after all others but before the spinner.
-                $("#field-graphs .spinner").before(template);
+
+                var previousElement = findElementBeforePosition(opts.position, "data-chart-position");
+                previousElement.after(template);
 
                 var graphContainer = $('.field-graph-container[data-chart-id="' + opts.chartid + '"]', $("#field-graphs"));
                 var graphElement = $('.field-graph', graphContainer);
@@ -300,7 +329,7 @@ $(document).ready(function() {
                 showError("Line charts are only available for numeric field types.");
             }},
             complete: function() {
-                $("#field-graphs .spinner").hide();
+                deleteSpinner(opts.position);
             }
         });
     }
