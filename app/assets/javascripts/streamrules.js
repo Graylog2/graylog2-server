@@ -75,7 +75,7 @@ $(document).ready(function() {
         e.preventDefault();
     });
 
-    $("div#streamrule-form-modal.modal").on("shown", focusFirstFormInput);
+    $(document.body).on("shown", "div#streamrule-form-modal.modal", focusFirstFormInput);
 
     // Stream rules inverter.
     $("form#streamrule-form").on("click", "#sr-inverted", function() {
@@ -108,7 +108,7 @@ $(document).ready(function() {
             type: parseInt($("#sr-type", modalBody).val()),
             value: $("#sr-value", modalBody).val(),
             inverted: $("#sr-inverted", modalBody).is(":checked")
-        }
+        };
 
         var url, callback;
         var container = $(this).closest("div.streamrules-list-container");
