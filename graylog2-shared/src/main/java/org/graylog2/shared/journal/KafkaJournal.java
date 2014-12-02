@@ -16,6 +16,7 @@
  */
 package org.graylog2.shared.journal;
 
+import com.codahale.metrics.Gauge;
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
@@ -165,6 +166,7 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
                 kafkaLog = messageLog.get();
             }
             log.info("Initialized Kafka based journal at {}", journalDirName);
+            setupKafkaLogMetrics(metricRegistry);
             offsetFlusher = new OffsetFileFlusher();
         } catch (KafkaException e) {
             // most likely failed to grab lock
@@ -172,6 +174,46 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
             throw new RuntimeException(e);
         }
     }
+
+    private void setupKafkaLogMetrics(final MetricRegistry metricRegistry) {
+        metricRegistry.register(name(KafkaJournal.class, "size"), new Gauge<Long>() {
+            @Override
+            public Long getValue() {
+                return kafkaLog.size();
+            }
+        });
+        metricRegistry.register(name(KafkaJournal.class, "logEndOffset"), new Gauge<Long>() {
+            @Override
+            public Long getValue() {
+                return kafkaLog.logEndOffset();
+            }
+        });
+        metricRegistry.register(name(KafkaJournal.class, "numberOfSegments"), new Gauge<Integer>() {
+            @Override
+            public Integer getValue() {
+                return kafkaLog.numberOfSegments();
+            }
+        });
+        metricRegistry.register(name(KafkaJournal.class, "unflushedMessages"), new Gauge<Long>() {
+            @Override
+            public Long getValue() {
+                return kafkaLog.unflushedMessages();
+            }
+        });
+        metricRegistry.register(name(KafkaJournal.class, "recoveryPoint"), new Gauge<Long>() {
+            @Override
+            public Long getValue() {
+                return kafkaLog.recoveryPoint();
+            }
+        });
+        metricRegistry.register(name(KafkaJournal.class, "lastFlushTime"), new Gauge<Long>() {
+            @Override
+            public Long getValue() {
+                return kafkaLog.lastFlushTime();
+            }
+        });
+    }
+
 
     /**
      * Creates an opaque object which can be passed to {@link #write(java.util.List)} for a bulk journal write.
