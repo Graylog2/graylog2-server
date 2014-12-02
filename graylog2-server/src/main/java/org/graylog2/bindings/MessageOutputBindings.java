@@ -18,7 +18,6 @@ package org.graylog2.bindings;
 
 import com.google.common.base.Strings;
 import com.google.inject.Scopes;
-import com.google.inject.TypeLiteral;
 import com.google.inject.multibindings.MapBinder;
 import org.graylog2.Configuration;
 import org.graylog2.outputs.BatchedElasticSearchOutput;
@@ -47,11 +46,6 @@ public class MessageOutputBindings extends Graylog2Module {
         final Class<? extends MessageOutput> defaultMessageOutputClass = getDefaultMessageOutputClass(BatchedElasticSearchOutput.class);
         bind(MessageOutput.class).annotatedWith(DefaultMessageOutput.class).to(defaultMessageOutputClass).in(Scopes.SINGLETON);
 
-        TypeLiteral<Class<? extends MessageOutput>> typeLiteral = new TypeLiteral<Class<? extends MessageOutput>>(){};
-        //Multibinder<Class<? extends MessageOutput>> messageOutputs = Multibinder.newSetBinder(binder(), typeLiteral);
-
-        //messageOutputs.addBinding().toInstance(LoggingOutput.class);
-        //messageOutputs.addBinding().toInstance(GelfOutput.class);
         final MapBinder<String, MessageOutput.Factory<? extends MessageOutput>> outputMapBinder = outputsMapBinder();
         installOutput(outputMapBinder, GelfOutput.class, GelfOutput.Factory.class);
         installOutput(outputMapBinder, LoggingOutput.class, LoggingOutput.Factory.class);
