@@ -45,7 +45,7 @@ LOG4J=${LOG4J:=}
 start() {
     echo "Starting graylog2-server ..."
     cd "$GRAYLOG2CTL_DIR/.."
-    $NOHUP $JAVA_CMD ${LOG4J} -jar ${GRAYLOG2_SERVER_JAR} server -f ${GRAYLOG2_CONF} -p ${GRAYLOG2_PID}>> ${LOG_FILE} &
+    $NOHUP $JAVA_CMD ${LOG4J} -jar ${GRAYLOG2_SERVER_JAR} server -f ${GRAYLOG2_CONF} -p ${GRAYLOG2_PID}&> ${LOG_FILE} &
 }
 
 run() {
