@@ -33,7 +33,7 @@ import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationException;
-import org.graylog2.plugin.inputs.InputState;
+import org.graylog2.plugin.IOState;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.rest.resources.RestResource;
 import org.graylog2.security.RestPermissions;
@@ -107,11 +107,11 @@ public class InputsResource extends RestResource {
     @ApiOperation(value = "Get all inputs of this node")
     @Produces(MediaType.APPLICATION_JSON)
     public String list() {
-        List<Map<String, Object>> inputStates = Lists.newArrayList();
+        List<IOState<MessageInput>> inputStates = Lists.newArrayList();
         Map<String, Object> result = Maps.newHashMap();
-        for (InputState inputState : inputRegistry.getInputStates()) {
-			checkPermission(RestPermissions.INPUTS_READ, inputState.getMessageInput().getId());
-            inputStates.add(inputState.asMap());
+        for (IOState<MessageInput> inputState : inputRegistry.getInputStates()) {
+			checkPermission(RestPermissions.INPUTS_READ, inputState.getStoppable().getId());
+            inputStates.add(inputState);
 		}
         result.put("inputs", inputStates);
         result.put("total", inputStates.size());
@@ -264,7 +264,7 @@ public class InputsResource extends RestResource {
             @ApiResponse(code = 404, message = "No such input on this node.")
     })
     public Response launchExisting(@ApiParam(name = "inputId", required = true) @PathParam("inputId") String inputId) {
-        InputState inputState = inputRegistry.getInputState(inputId);
+        IOState<MessageInput> inputState = inputRegistry.getInputState(inputId);
         final MessageInput messageInput;
 
         if (inputState == null) {
@@ -278,7 +278,7 @@ public class InputsResource extends RestResource {
                 throw new NotFoundException(error);
             }
         } else
-            messageInput = inputState.getMessageInput();
+            messageInput = inputState.getStoppable();
 
         if (messageInput == null) {
             final String error = "Cannot launch input <" + inputId + ">. Input not found.";

@@ -24,7 +24,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.graylog2.plugin.buffers.InputBuffer;
 import org.graylog2.plugin.configuration.Configuration;
-import org.graylog2.plugin.inputs.InputState;
+import org.graylog2.plugin.IOState;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,16 +36,16 @@ import java.util.concurrent.ThreadFactory;
 
 public abstract class InputRegistry {
     private static final Logger LOG = LoggerFactory.getLogger(InputRegistry.class);
-    protected final Set<InputState> inputStates = new HashSet<>();
+    protected final Set<IOState<MessageInput>> inputStates = new HashSet<>();
     protected final ExecutorService executor;
     private final MessageInputFactory messageInputFactory;
     private final InputBuffer inputBuffer;
 
-    protected abstract void finishedLaunch(InputState state);
+    protected abstract void finishedLaunch(IOState<MessageInput> state);
 
-    protected abstract void finishedTermination(InputState state);
+    protected abstract void finishedTermination(IOState<MessageInput> state);
 
-    protected abstract void finishedStop(InputState inputState);
+    protected abstract void finishedStop(IOState<MessageInput> inputState);
 
     protected abstract List<MessageInput> getAllPersisted();
 
@@ -74,26 +74,26 @@ public abstract class InputRegistry {
         return messageInputFactory.create(inputClass, configuration);
     }
 
-    public InputState launch(final MessageInput input, String id) {
+    public IOState<MessageInput> launch(final MessageInput input, String id) {
         return launch(input, id, false);
     }
 
-    public InputState launch(final MessageInput input, String id, boolean register) {
-        final InputState inputState = new InputState(input, id);
+    public IOState<MessageInput> launch(final MessageInput input, String id, boolean register) {
+        final IOState<MessageInput> inputState = new IOState<MessageInput>(input, id);
         inputStates.add(inputState);
 
         return launch(input, inputState, register);
     }
 
-    protected InputState launch(final MessageInput input, final InputState inputState, final boolean register) {
+    protected IOState<MessageInput> launch(final MessageInput input, final IOState<MessageInput> inputState, final boolean register) {
         if (input == null)
             throw new IllegalArgumentException("InputState has no MessageInput!");
 
-        if (!inputState.getMessageInput().equals(input))
+        if (!inputState.getStoppable().equals(input))
             throw new IllegalArgumentException("Supplied InputState already has Input which is not the one supplied.");
 
-        if (inputState.getMessageInput() == null)
-            inputState.setMessageInput(input);
+        if (inputState.getStoppable() == null)
+            inputState.setStoppable(input);
 
         executor.submit(new Runnable() {
             @Override
@@ -101,9 +101,9 @@ public abstract class InputRegistry {
                 LOG.info("Starting [{}] input with ID <{}>", input.getClass().getCanonicalName(), input.getId());
                 try {
                     input.checkConfiguration();
-                    inputState.setState(InputState.InputStateType.STARTING);
+                    inputState.setState(IOState.Type.STARTING);
                     input.launch(inputBuffer);
-                    inputState.setState(InputState.InputStateType.RUNNING);
+                    inputState.setState(IOState.Type.RUNNING);
                     String msg = "Completed starting [" + input.getClass().getCanonicalName() + "] input with ID <" + input.getId() + ">";
                     LOG.info(msg);
                 } catch (Exception e) {
@@ -117,7 +117,7 @@ public abstract class InputRegistry {
         return inputState;
     }
 
-    protected void handleLaunchException(Throwable e, MessageInput input, InputState inputState) {
+    protected void handleLaunchException(Throwable e, MessageInput input, IOState<MessageInput> inputState) {
         StringBuilder msg = new StringBuilder("The [" + input.getClass().getCanonicalName() + "] input with ID <" + input.getId() + "> misfired. Reason: ");
 
         String causeMsg = extractMessageCause(e);
@@ -129,7 +129,7 @@ public abstract class InputRegistry {
         // Clean up.
         //cleanInput(input);
 
-        inputState.setState(InputState.InputStateType.FAILED);
+        inputState.setState(IOState.Type.FAILED);
         inputState.setDetailedMessage(causeMsg);
     }
 
@@ -150,41 +150,41 @@ public abstract class InputRegistry {
         return causeMsg.toString();
     }
 
-    public InputState launch(final MessageInput input) {
+    public IOState<MessageInput> launch(final MessageInput input) {
         return launch(input, UUID.randomUUID().toString());
     }
 
-    public InputState launch(final InputState inputState) {
-        final MessageInput input = inputState.getMessageInput();
+    public IOState<MessageInput> launch(final IOState<MessageInput> inputState) {
+        final MessageInput input = inputState.getStoppable();
 
         return launch(input, inputState, false);
     }
 
-    public Set<InputState> getInputStates() {
+    public Set<IOState<MessageInput>> getInputStates() {
         return ImmutableSet.copyOf(inputStates);
     }
 
-    public InputState getInputState(String inputId) {
-        for (InputState inputState : inputStates) {
-            if (inputState.getMessageInput().getPersistId().equals(inputId))
+    public IOState<MessageInput> getInputState(String inputId) {
+        for (IOState<MessageInput> inputState : inputStates) {
+            if (inputState.getStoppable().getPersistId().equals(inputId))
                 return inputState;
         }
 
         return null;
     }
 
-    public Set<InputState> getRunningInputs() {
-        Set<InputState> runningInputs = new HashSet<>();
-        for (InputState inputState : inputStates) {
-            if (inputState.getState() == InputState.InputStateType.RUNNING)
+    public Set<IOState<MessageInput>> getRunningInputs() {
+        Set<IOState<MessageInput>> runningInputs = new HashSet<>();
+        for (IOState<MessageInput> inputState : inputStates) {
+            if (inputState.getState() == IOState.Type.RUNNING)
                 runningInputs.add(inputState);
         }
         return ImmutableSet.copyOf(runningInputs);
     }
 
     public boolean hasTypeRunning(Class klazz) {
-        for (InputState inputState : inputStates) {
-            if (inputState.getMessageInput().getClass().equals(klazz)) {
+        for (IOState<MessageInput> inputState : inputStates) {
+            if (inputState.getStoppable().getClass().equals(klazz)) {
                 return true;
             }
         }
@@ -200,11 +200,11 @@ public abstract class InputRegistry {
         return getRunningInputs().size();
     }
 
-    public void removeFromRunning(InputState inputState) {
+    public void removeFromRunning(IOState<MessageInput> inputState) {
         inputStates.remove(inputState);
     }
 
-    public InputState launchPersisted(MessageInput input) {
+    public IOState<MessageInput> launchPersisted(MessageInput input) {
         return launch(input);
     }
 
@@ -215,19 +215,19 @@ public abstract class InputRegistry {
         }
     }
 
-    public InputState terminate(MessageInput input) {
-        InputState inputState = stop(input);
+    public IOState<MessageInput> terminate(MessageInput input) {
+        IOState<MessageInput> inputState = stop(input);
 
         if (inputState != null) {
-            inputState.setState(InputState.InputStateType.TERMINATED);
+            inputState.setState(IOState.Type.TERMINATED);
             finishedTermination(inputState);
         }
 
         return inputState;
     }
 
-    public InputState stop(MessageInput input) {
-        InputState inputState = getRunningInputState(input.getId());
+    public IOState<MessageInput> stop(MessageInput input) {
+        IOState<MessageInput> inputState = getRunningInputState(input.getId());
 
         if (inputState != null) {
             try {
@@ -235,7 +235,7 @@ public abstract class InputRegistry {
             } catch (Exception e) {
                 LOG.warn("Stopping input <{}> failed, removing anyway: {}", input.getId(), e);
             }
-            inputState.setState(InputState.InputStateType.STOPPED);
+            inputState.setState(IOState.Type.STOPPED);
             finishedStop(inputState);
         }
 
@@ -243,17 +243,17 @@ public abstract class InputRegistry {
     }
 
     public MessageInput getRunningInput(String inputId) {
-        for (InputState inputState : inputStates) {
-            if (inputState.getMessageInput().getId().equals(inputId))
-                return inputState.getMessageInput();
+        for (IOState<MessageInput> inputState : inputStates) {
+            if (inputState.getStoppable().getId().equals(inputId))
+                return inputState.getStoppable();
         }
 
         return null;
     }
 
-    public InputState getRunningInputState(String inputStateId) {
-        for (InputState inputState : inputStates) {
-            if (inputState.getMessageInput().getId().equals(inputStateId))
+    public IOState<MessageInput> getRunningInputState(String inputStateId) {
+        for (IOState<MessageInput> inputState : inputStates) {
+            if (inputState.getStoppable().getId().equals(inputStateId))
                 return inputState;
         }
 

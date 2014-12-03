@@ -23,7 +23,7 @@ import com.google.common.collect.Maps;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationException;
-import org.graylog2.plugin.inputs.InputState;
+import org.graylog2.plugin.IOState;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.radio.cluster.InputService;
 import org.graylog2.radio.rest.resources.RestResource;
@@ -71,10 +71,10 @@ public class InputsResource extends RestResource {
     @GET
     @Timed
     public String list() {
-        final List<Map<String, Object>> inputStates = Lists.newArrayList();
+        final List<IOState<MessageInput>> inputStates = Lists.newArrayList();
 
-        for (InputState inputState : inputRegistry.getInputStates()) {
-            inputStates.add(inputState.asMap());
+        for (IOState<MessageInput> inputState : inputRegistry.getInputStates()) {
+            inputStates.add(inputState);
         }
 
         final Map<String, Object> result = ImmutableMap.of(
@@ -214,13 +214,13 @@ public class InputsResource extends RestResource {
     @Timed
     @Path("/{inputId}/launch")
     public Response launchExisting(@PathParam("inputId") String inputId) {
-        final InputState inputState = inputRegistry.getInputState(inputId);
+        final IOState<MessageInput> inputState = inputRegistry.getInputState(inputId);
 
         final MessageInput input;
         if (inputState == null) {
             input = inputRegistry.getPersisted(inputId);
         } else {
-            input = inputState.getMessageInput();
+            input = inputState.getStoppable();
         }
 
         if (input == null) {

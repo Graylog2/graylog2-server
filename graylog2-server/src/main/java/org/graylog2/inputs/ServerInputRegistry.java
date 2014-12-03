@@ -21,9 +21,9 @@ import com.google.common.collect.Lists;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
+import org.graylog2.plugin.IOState;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.buffers.InputBuffer;
-import org.graylog2.plugin.inputs.InputState;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.shared.inputs.InputRegistry;
 import org.graylog2.shared.inputs.MessageInputFactory;
@@ -82,11 +82,11 @@ public class ServerInputRegistry extends InputRegistry {
     }
 
     @Override
-    protected void finishedLaunch(InputState state) {
+    protected void finishedLaunch(IOState<MessageInput> state) {
         switch (state.getState()) {
             case RUNNING:
                 notificationService.fixed(Notification.Type.NO_INPUT_RUNNING);
-                String msg = "Completed starting [" + state.getMessageInput().getClass().getCanonicalName() + "] input with ID <" + state.getMessageInput().getId() + ">";
+                String msg = "Completed starting [" + state.getStoppable().getClass().getCanonicalName() + "] input with ID <" + state.getStoppable().getId() + ">";
                 activityWriter.write(new Activity(msg, InputRegistry.class));
                 break;
             case FAILED:
@@ -94,7 +94,7 @@ public class ServerInputRegistry extends InputRegistry {
                 Notification notification = notificationService.buildNow();
                 notification.addType(Notification.Type.INPUT_FAILED_TO_START).addSeverity(Notification.Severity.NORMAL);
                 notification.addNode(serverStatus.getNodeId().toString());
-                notification.addDetail("input_id", state.getMessageInput().getId());
+                notification.addDetail("input_id", state.getStoppable().getId());
                 notification.addDetail("reason", state.getDetailedMessage());
                 notificationService.publishIfFirst(notification);
                 break;
@@ -102,11 +102,11 @@ public class ServerInputRegistry extends InputRegistry {
     }
 
     @Override
-    protected void finishedTermination(InputState state) {
+    protected void finishedTermination(IOState<MessageInput> state) {
         removeFromRunning(state);
     }
 
     @Override
-    protected void finishedStop(InputState inputState) {
+    protected void finishedStop(IOState<MessageInput> inputState) {
     }
 }

@@ -22,7 +22,7 @@ import com.ning.http.client.AsyncHttpClient;
 import org.graylog2.plugin.buffers.InputBuffer;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationException;
-import org.graylog2.plugin.inputs.InputState;
+import org.graylog2.plugin.IOState;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.radio.cluster.InputService;
 import org.graylog2.radio.inputs.api.InputSummaryResponse;
@@ -108,7 +108,7 @@ public class RadioInputRegistry extends InputRegistry {
     }
 
     @Override
-    protected void finishedLaunch(InputState state) {
+    protected void finishedLaunch(IOState<MessageInput> state) {
     }
 
     @Override
@@ -116,10 +116,10 @@ public class RadioInputRegistry extends InputRegistry {
     }
 
     @Override
-    protected void finishedTermination(InputState state) {
-        MessageInput input = state.getMessageInput();
+    protected void finishedTermination(IOState<MessageInput> state) {
+        MessageInput input = state.getStoppable();
         try {
-            if (!state.getMessageInput().getGlobal())
+            if (!input.getGlobal())
                 inputService.unregisterInCluster(input);
         } catch (Exception e) {
             LOG.error("Could not unregister input [{}], id <{}> on server cluster: {}", input.getName(), input.getId(), e);
@@ -132,7 +132,7 @@ public class RadioInputRegistry extends InputRegistry {
     }
 
     @Override
-    public InputState launch(MessageInput input, String id, boolean register) {
+    public IOState<MessageInput> launch(MessageInput input, String id, boolean register) {
         if (register) {
             try {
                 final RegisterInputResponse response = inputService.registerInCluster(input);
@@ -147,6 +147,6 @@ public class RadioInputRegistry extends InputRegistry {
     }
 
     @Override
-    protected void finishedStop(InputState inputState) {
+    protected void finishedStop(IOState<MessageInput> inputState) {
     }
 }

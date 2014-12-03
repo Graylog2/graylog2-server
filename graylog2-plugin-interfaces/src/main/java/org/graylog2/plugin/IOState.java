@@ -20,18 +20,16 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.graylog2.plugin.inputs;
+package org.graylog2.plugin;
 
-import com.google.common.collect.Maps;
-import org.graylog2.plugin.Tools;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 
-import java.util.Map;
 import java.util.UUID;
 
-public class InputState {
-    public enum InputStateType {
+@JsonAutoDetect
+public class IOState<T extends Stoppable> {
+    public enum Type {
         CREATED,
         INITIALIZED,
         INVALID_CONFIGURATION,
@@ -42,49 +40,49 @@ public class InputState {
         TERMINATED
     }
 
-    protected MessageInput messageInput;
+    protected T stoppable;
     protected final String id;
-    protected InputStateType state;
+    protected Type state;
     protected DateTime startedAt;
     protected String detailedMessage;
 
-    public InputState(MessageInput input) {
-        this(input, InputStateType.CREATED);
+    public IOState(T stoppable) {
+        this(stoppable, Type.CREATED);
     }
 
-    public InputState(MessageInput input, InputStateType state) {
-        this(input, state, UUID.randomUUID().toString());
+    public IOState(T stoppable, Type state) {
+        this(stoppable, state, UUID.randomUUID().toString());
     }
 
-    public InputState(MessageInput input, String id) {
-        this(input, InputStateType.CREATED, id);
+    public IOState(T stoppable, String id) {
+        this(stoppable, Type.CREATED, id);
     }
 
-    public InputState(MessageInput input, InputStateType state, String id) {
+    public IOState(T stoppable, Type state, String id) {
         this.state = state;
-        this.messageInput = input;
+        this.stoppable = stoppable;
         this.id = id;
         this.startedAt = Tools.iso8601();
     }
 
 
-    public MessageInput getMessageInput() {
-        return messageInput;
+    public T getStoppable() {
+        return stoppable;
     }
 
-    public void setMessageInput(MessageInput messageInput) {
-        this.messageInput = messageInput;
+    public void setStoppable(T stoppable) {
+        this.stoppable = stoppable;
     }
 
     public String getId() {
         return id;
     }
 
-    public InputStateType getState() {
+    public Type getState() {
         return state;
     }
 
-    public void setState(InputStateType state) {
+    public void setState(Type state) {
         this.state = state;
         this.setDetailedMessage(null);
     }
@@ -105,21 +103,10 @@ public class InputState {
         this.detailedMessage = detailedMessage;
     }
 
-    public Map<String, Object> asMap() {
-        Map<String, Object> inputStateMap = Maps.newHashMap();
-        inputStateMap.put("id", id);
-        inputStateMap.put("state", state.toString().toLowerCase());
-        inputStateMap.put("started_at", Tools.getISO8601String(startedAt));
-        inputStateMap.put("message_input", messageInput.asMap());
-        inputStateMap.put("detailed_message", detailedMessage);
-
-        return inputStateMap;
-    }
-
     @Override
     public String toString() {
         return "InputState{" +
-                "messageInput=" + messageInput +
+                "stoppable=" + stoppable +
                 ", id='" + id + '\'' +
                 ", state=" + state +
                 ", startedAt=" + startedAt +
@@ -132,17 +119,17 @@ public class InputState {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        InputState that = (InputState) o;
+        IOState that = (IOState) o;
 
         if (!id.equals(that.id)) return false;
-        if (!messageInput.equals(that.messageInput)) return false;
+        if (!stoppable.equals(that.stoppable)) return false;
 
         return true;
     }
 
     @Override
     public int hashCode() {
-        int result = messageInput.hashCode();
+        int result = stoppable.hashCode();
         result = 31 * result + id.hashCode();
         return result;
     }

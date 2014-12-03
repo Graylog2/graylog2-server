@@ -29,6 +29,8 @@ import com.codahale.metrics.Timer;
 import com.google.common.collect.Maps;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.AbstractDescriptor;
+import org.graylog2.plugin.Message;
+import org.graylog2.plugin.Stoppable;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.buffers.InputBuffer;
 import org.graylog2.plugin.configuration.Configuration;
@@ -47,7 +49,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-public abstract class MessageInput {
+public abstract class MessageInput implements Stoppable {
     private static final Logger LOG = LoggerFactory.getLogger(MessageInput.class);
 
     public static final String CK_OVERRIDE_SOURCE = "override_source";

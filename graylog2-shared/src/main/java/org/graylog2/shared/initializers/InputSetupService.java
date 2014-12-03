@@ -21,7 +21,7 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.common.util.concurrent.AbstractExecutionThreadService;
 import com.google.common.util.concurrent.Uninterruptibles;
-import org.graylog2.plugin.inputs.InputState;
+import org.graylog2.plugin.IOState;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.lifecycles.Lifecycle;
 import org.graylog2.shared.inputs.InputRegistry;
@@ -105,8 +105,8 @@ public class InputSetupService extends AbstractExecutionThreadService {
         LOG.debug("Stopping InputSetupService");
         eventBus.unregister(this);
 
-        for (InputState state : inputRegistry.getRunningInputs()) {
-            MessageInput input = state.getMessageInput();
+        for (IOState<MessageInput> state : inputRegistry.getRunningInputs()) {
+            MessageInput input = state.getStoppable();
 
             LOG.info("Attempting to close input <{}> [{}].", input.getUniqueReadableId(), input.getName());
 
