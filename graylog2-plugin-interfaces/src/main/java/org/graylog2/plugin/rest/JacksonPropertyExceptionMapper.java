@@ -32,7 +32,7 @@ import javax.ws.rs.ext.Provider;
 import java.util.Collection;
 import java.util.Collections;
 
-import static com.google.common.base.Objects.firstNonNull;
+import static com.google.common.base.MoreObjects.firstNonNull;
 import static javax.ws.rs.core.Response.status;
 
 @Provider
