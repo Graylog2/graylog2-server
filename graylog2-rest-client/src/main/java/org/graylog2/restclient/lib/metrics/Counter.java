@@ -14,29 +14,18 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package org.graylog2.restclient.lib.metrics;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
-public class Metric {
+public class Counter extends Metric {
+    private final long count;
 
-    public enum MetricType {
-        TIMER,
-        METER,
-        GAUGE,
-        HISTOGRAM,
-        COUNTER
+    public Counter(long count) {
+        super(MetricType.COUNTER);
+        this.count = count;
     }
 
-    private MetricType type;
-
-    public Metric(MetricType type) {
-        this.type = type;
+    public long getCount() {
+        return count;
     }
-
-    public MetricType getType() {
-        return type;
-    }
-
 }
