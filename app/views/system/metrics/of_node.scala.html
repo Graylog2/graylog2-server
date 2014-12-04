@@ -40,6 +40,10 @@
                         <i class="icon icon-dashboard"></i>
                     }
 
+                    @if(metric.getType.equals(Metric.MetricType.COUNTER)) {
+                        <i class="icon icon-circle"></i>
+                    }
+
                     <a href="#" class="open" data-metricname="@name">
                         <span class="prefix">@name.substring(0,"org.graylog2.".length)</span>@name.substring("org.graylog2.".length)
                     </a>
