@@ -88,6 +88,11 @@ public class StreamOutputsController extends AuthenticatedController {
         final AddOutputToStreamForm request = form.get();
         String outputId = request.outputId;
 
+        if (outputId == null) {
+            flash("error", "No output selected!");
+            return redirect(routes.StreamOutputsController.index(streamId));
+        }
+
         final Stream stream = streamService.get(streamId);
 
         if (stream == null) {
