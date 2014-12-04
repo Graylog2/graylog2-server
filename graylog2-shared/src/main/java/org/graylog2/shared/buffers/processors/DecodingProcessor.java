@@ -18,34 +18,49 @@
 package org.graylog2.shared.buffers.processors;
 
 import com.codahale.metrics.Timer;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import com.google.common.net.InetAddresses;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import com.lmax.disruptor.EventHandler;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.ResolvableInetSocketAddress;
+import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.buffers.MessageEvent;
+import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.codecs.Codec;
 import org.graylog2.plugin.journal.RawMessage;
+import org.graylog2.shared.inputs.InputRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 public class DecodingProcessor implements EventHandler<MessageEvent> {
     private static final Logger log = LoggerFactory.getLogger(DecodingProcessor.class);
+
+    private final LoadingCache<String, MessageInput> inputCache;
 
     public interface Factory {
         public DecodingProcessor create(@Assisted("parseTime") Timer parseTime);
     }
 
     private final Map<String, Codec.Factory<? extends Codec>> codecFactory;
+    private final InputRegistry inputRegistry;
+    private final ServerStatus serverStatus;
     private final Timer parseTime;
 
     @AssistedInject
     public DecodingProcessor(Map<String, Codec.Factory<? extends Codec>> codecFactory,
+                             final InputRegistry inputRegistry,
+                             final ServerStatus serverStatus,
                              @Assisted("parseTime") Timer parseTime) {
         this.codecFactory = codecFactory;
+        this.inputRegistry = inputRegistry;
+        this.serverStatus = serverStatus;
 
         /*
         failures = localRegistry.meter("failures");
@@ -53,6 +68,17 @@ public class DecodingProcessor implements EventHandler<MessageEvent> {
         rawSize = localRegistry.meter("rawSize");
         */
         this.parseTime = parseTime;
+
+        // Use cache here to avoid looking up the inputs in the InputRegistry for every message.
+        // TODO Check if there is a better way to do this!
+        this.inputCache = CacheBuilder.newBuilder()
+                .expireAfterAccess(1, TimeUnit.SECONDS)
+                .build(new CacheLoader<String, MessageInput>() {
+                    @Override
+                    public MessageInput load(String inputId) throws Exception {
+                        return inputRegistry.getRunningInput(inputId);
+                    }
+                });
     }
 
     @Override
@@ -116,6 +142,13 @@ public class DecodingProcessor implements EventHandler<MessageEvent> {
                     message.addField("gl2_source_radio_input", node.inputId);
                     message.addField("gl2_source_radio", node.nodeId);
                     break;
+            }
+        }
+
+        for (RawMessage.SourceNode node : raw.getSourceNodes()) {
+            if (serverStatus.getNodeId().toString().equals(node.nodeId) && node.inputId != null) {
+                message.setSourceInput(inputCache.get(node.inputId));
+                break;
             }
         }
 
