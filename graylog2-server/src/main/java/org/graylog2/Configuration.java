@@ -320,7 +320,7 @@ public class Configuration extends BaseConfiguration {
     private int indexOptimizationMaxNumSegments = 1;
 
     @Parameter(value = "disable_output_cache")
-    private boolean disableOutputCache = false;
+    private boolean disableOutputCache = true;
 
     public boolean isMaster() {
         return isMaster;
