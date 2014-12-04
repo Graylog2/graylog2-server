@@ -58,6 +58,7 @@ import org.graylog2.shared.bindings.InstantiationService;
 import org.graylog2.shared.initializers.ServiceManagerListener;
 import org.graylog2.shared.journal.KafkaJournalModule;
 import org.graylog2.shared.journal.NoopJournalModule;
+import org.graylog2.shared.plugins.LegacyPluginLoader;
 import org.graylog2.shared.plugins.PluginLoader;
 import org.graylog2.shared.system.activities.Activity;
 import org.graylog2.shared.system.activities.ActivityWriter;
@@ -75,6 +76,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -83,11 +85,9 @@ import java.util.concurrent.TimeoutException;
 
 import static com.google.common.base.Strings.nullToEmpty;
 
-/**
- * @author Dennis Oelkers <dennis@torch.sh>
- */
 public abstract class Bootstrap implements Runnable {
     private static final Logger LOG = LoggerFactory.getLogger(Bootstrap.class);
+
     protected static final String ENVIRONMENT_PREFIX = "GRAYLOG2_";
     protected static final String PROPERTIES_PREFIX = "graylog2.";
     protected static final Version version = Version.CURRENT_CLASSPATH;
@@ -159,7 +159,7 @@ public abstract class Bootstrap implements Runnable {
         final JadConfig jadConfig = new JadConfig();
         jadConfig.addConverterFactory(new JodaTimeConverterFactory());
 
-        final List<PluginModule> pluginModules = loadPluginModules(pluginPath);
+        final Set<PluginModule> pluginModules = loadPluginModules(pluginPath);
 
         for (PluginModule pluginModule : pluginModules)
             for (PluginConfigBean configBean : pluginModule.getConfigBeans())
@@ -293,11 +293,19 @@ public abstract class Bootstrap implements Runnable {
         return pluginLoaderConfig.getPluginDir();
     }
 
-    protected List<PluginModule> loadPluginModules(String pluginPath) {
-        PluginLoader pluginLoader = new PluginLoader(new File(pluginPath));
-        List<PluginModule> pluginModules = Lists.newArrayList();
-        for (Plugin plugin : pluginLoader.loadPlugins())
+    protected Set<PluginModule> loadPluginModules(String pluginPath) {
+        final File pluginDir = new File(pluginPath);
+        final Set<PluginModule> pluginModules = new HashSet<>();
+
+        final LegacyPluginLoader legacyPluginLoader = new LegacyPluginLoader(pluginDir);
+        for (Plugin plugin : legacyPluginLoader.loadPlugins()) {
             pluginModules.addAll(plugin.modules());
+        }
+
+        final PluginLoader pluginLoader = new PluginLoader(pluginDir);
+        for (Plugin plugin : pluginLoader.loadPlugins()) {
+            pluginModules.addAll(plugin.modules());
+        }
 
         LOG.debug("Loaded modules: " + pluginModules);
         return pluginModules;
@@ -327,7 +335,7 @@ public abstract class Bootstrap implements Runnable {
         return result;
     }
 
-    protected Injector setupInjector(NamedConfigParametersModule configModule, List<PluginModule> pluginModules) {
+    protected Injector setupInjector(NamedConfigParametersModule configModule, Set<PluginModule> pluginModules) {
         try {
             final GuiceInstantiationService instantiationService = new GuiceInstantiationService();
 
