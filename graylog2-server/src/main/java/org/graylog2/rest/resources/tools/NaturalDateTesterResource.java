@@ -20,41 +20,32 @@ import com.codahale.metrics.annotation.Timed;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.rest.resources.RestResource;
 import org.graylog2.utilities.date.NaturalDateParser;
+import org.hibernate.validator.constraints.NotEmpty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.ws.rs.*;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 import java.util.Map;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 @RequiresAuthentication
 @Path("/tools/natural_date_tester")
 public class NaturalDateTesterResource extends RestResource {
-
     private static final Logger LOG = LoggerFactory.getLogger(RegexTesterResource.class);
 
     @GET
     @Timed
     @Produces(MediaType.APPLICATION_JSON)
-    public String naturalDateTester(@QueryParam("string") String string) {
-        if (string == null || string.isEmpty()) {
-            LOG.info("Missing parameters for natural language date test.");
-            throw new WebApplicationException(Response.Status.BAD_REQUEST);
-        }
-
-        Map<String, String> result = null;
+    public Map<String, String> naturalDateTester(@QueryParam("string") @NotEmpty String string) {
         try {
-            result = new NaturalDateParser().parse(string).asMap();
+            return new NaturalDateParser().parse(string).asMap();
         } catch (NaturalDateParser.DateNotParsableException e) {
-            LOG.debug("Could not parse from natural date: " + string);
-            throw new WebApplicationException(422);
+            LOG.debug("Could not parse from natural date: " + string, e);
+            throw new WebApplicationException(e, 422);
         }
-
-        return json(result);
     }
-
 }

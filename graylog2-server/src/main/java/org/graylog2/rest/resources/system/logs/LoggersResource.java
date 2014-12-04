@@ -32,12 +32,12 @@ import org.graylog2.security.RestPermissions;
 import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.GET;
+import javax.ws.rs.NotFoundException;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 import java.util.Enumeration;
 import java.util.Map;
 
@@ -58,27 +58,26 @@ public class LoggersResource extends RestResource {
     @Timed
     @ApiOperation(value = "List all loggers and their current levels")
     @Produces(MediaType.APPLICATION_JSON)
-    public String loggers() {
-        Map<String, Object> loggerList = Maps.newHashMap();
+    public Map<String, Object> loggers() {
+        final Map<String, Object> loggerList = Maps.newHashMap();
 
-        Enumeration loggers = Logger.getRootLogger().getLoggerRepository().getCurrentLoggers();
+        final Enumeration loggers = Logger.getRootLogger().getLoggerRepository().getCurrentLoggers();
         while (loggers.hasMoreElements()) {
             Logger logger = (Logger) loggers.nextElement();
             if (!isPermitted(RestPermissions.LOGGERS_READ, logger.getName())) {
                 continue;
             }
-            Map<String, Object> loggerInfo = Maps.newHashMap();
+
+            final Map<String, Object> loggerInfo = Maps.newHashMap();
             loggerInfo.put("level", logger.getEffectiveLevel().toString().toLowerCase());
             loggerInfo.put("level_syslog", logger.getEffectiveLevel().getSyslogEquivalent());
 
             loggerList.put(logger.getName(), loggerInfo);
         }
 
-        Map<String, Object> result = Maps.newHashMap();
-        result.put("loggers", loggerList);
-        result.put("total", loggerList.size());
-
-        return json(result);
+        return ImmutableMap.of(
+                "loggers", loggerList,
+                "total", loggerList.size());
     }
 
     @GET
@@ -86,14 +85,13 @@ public class LoggersResource extends RestResource {
     @Path("/subsystems")
     @ApiOperation(value = "List all logger subsystems and their current levels")
     @Produces(MediaType.APPLICATION_JSON)
-    public String subsytems() {
-        Map<String, Object> result = Maps.newHashMap();
-        Map<String, Object> subsystems = Maps.newHashMap();
-
+    public Map<String, Map<String, Object>> subsytems() {
+        final Map<String, Object> subsystems = Maps.newHashMap();
         for (Map.Entry<String, Subsystem> subsystem : SUBSYSTEMS.entrySet()) {
             if (!isPermitted(RestPermissions.LOGGERS_READSUBSYSTEM, subsystem.getKey())) {
                 continue;
             }
+
             try {
                 Map<String, Object> info = Maps.newHashMap();
                 info.put("title", subsystem.getValue().getTitle());
@@ -107,14 +105,11 @@ public class LoggersResource extends RestResource {
 
                 subsystems.put(subsystem.getKey(), info);
             } catch (Exception e) {
-                LOG.error("Error while listing logger subsystem.", e);
-                continue;
+                LOG.warn("Error while listing logger subsystem.", e);
             }
         }
 
-        result.put("subsystems", subsystems);
-
-        return json(result);
+        return ImmutableMap.of("subsystems", subsystems);
     }
 
     @PUT
@@ -125,12 +120,12 @@ public class LoggersResource extends RestResource {
             @ApiResponse(code = 404, message = "No such subsystem.")
     })
     @Path("/subsystems/{subsystem}/level/{level}")
-    public Response setSubsystemLoggerLevel(
+    public void setSubsystemLoggerLevel(
             @ApiParam(name = "subsystem", required = true) @PathParam("subsystem") String subsystemTitle,
             @ApiParam(name = "level", required = true) @PathParam("level") String level) {
         if (!SUBSYSTEMS.containsKey(subsystemTitle)) {
             LOG.warn("No such subsystem: [{}]. Returning 404.", subsystemTitle);
-            return Response.status(404).build();
+            throw new NotFoundException();
         }
         checkPermission(RestPermissions.LOGGERS_EDITSUBSYSTEM, subsystemTitle);
         Subsystem subsystem = SUBSYSTEMS.get(subsystemTitle);
@@ -141,8 +136,6 @@ public class LoggersResource extends RestResource {
         // Setting the level falls back to DEBUG if provided level is invalid.
         Level newLevel = Level.toLevel(level.toUpperCase());
         logger.setLevel(newLevel);
-
-        return Response.ok().build();
     }
 
     @PUT
@@ -150,7 +143,7 @@ public class LoggersResource extends RestResource {
     @ApiOperation(value = "Set the loglevel of a single logger",
             notes = "Provided level is falling back to DEBUG if it does not exist")
     @Path("/{loggerName}/level/{level}")
-    public Response setSingleLoggerLevel(
+    public void setSingleLoggerLevel(
             @ApiParam(name = "loggerName", required = true) @PathParam("loggerName") String loggerName,
             @ApiParam(name = "level", required = true) @PathParam("level") String level) {
         checkPermission(RestPermissions.LOGGERS_EDIT, loggerName);
@@ -160,8 +153,6 @@ public class LoggersResource extends RestResource {
         // Setting the level falls back to DEBUG if provided level is invalid.
         Level newLevel = Level.toLevel(level.toUpperCase());
         logger.setLevel(newLevel);
-
-        return Response.ok().build();
     }
 
     private static class Subsystem {

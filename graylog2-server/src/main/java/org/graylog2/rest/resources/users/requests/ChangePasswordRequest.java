@@ -16,7 +16,24 @@
  */
 package org.graylog2.rest.resources.users.requests;
 
-public class ChangePasswordRequest {
-    public String old_password;
-    public String password;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.auto.value.AutoValue;
+import org.hibernate.validator.constraints.NotEmpty;
+
+@JsonAutoDetect
+@AutoValue
+public abstract class ChangePasswordRequest {
+    @JsonProperty
+    public abstract String oldPassword();
+
+    @JsonProperty
+    public abstract String password();
+
+    @JsonCreator
+    public static ChangePasswordRequest create(@JsonProperty("old_password") @NotEmpty String oldPassword,
+                                               @JsonProperty("password") @NotEmpty String password) {
+        return new AutoValue_ChangePasswordRequest(oldPassword, password);
+    }
 }

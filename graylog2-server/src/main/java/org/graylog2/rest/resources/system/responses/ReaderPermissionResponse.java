@@ -17,10 +17,18 @@
 package org.graylog2.rest.resources.system.responses;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.auto.value.AutoValue;
 
 import java.util.List;
 
 @JsonAutoDetect
-public class ReaderPermissionResponse {
-    public List<String> permissions;
+@AutoValue
+public abstract class ReaderPermissionResponse {
+    @JsonProperty
+    public abstract List<String> permissions();
+
+    public static ReaderPermissionResponse create(List<String> permissions) {
+        return new AutoValue_ReaderPermissionResponse(permissions);
+    }
 }

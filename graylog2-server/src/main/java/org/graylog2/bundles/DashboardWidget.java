@@ -16,6 +16,7 @@
  */
 package org.graylog2.bundles;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.validation.constraints.Min;
@@ -23,6 +24,7 @@ import javax.validation.constraints.NotNull;
 import java.util.Collections;
 import java.util.Map;
 
+@JsonAutoDetect
 public class DashboardWidget {
     @JsonProperty
     @NotNull

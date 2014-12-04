@@ -14,13 +14,20 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.streams.outputs;
+package org.graylog2.rest.resources.system.indexer.responses;
 
-import java.util.Set;
 
-/**
- * @author Dennis Oelkers <dennis@torch.sh>
- */
-public class AddOutputRequest {
-    public Set<String> outputs;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.auto.value.AutoValue;
+
+@JsonAutoDetect
+@AutoValue
+public abstract class FailureCount {
+    @JsonProperty
+    public abstract long count();
+
+    public static FailureCount create(long count) {
+        return new AutoValue_FailureCount(count);
+    }
 }

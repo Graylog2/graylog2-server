@@ -14,14 +14,26 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.rest.resources.users.requests;
+package org.graylog2.rest.resources.users.responses;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
-public class StartpageSummary {
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.auto.value.AutoValue;
+import org.joda.time.DateTime;
 
-    public String type;
-    public String id;
+@JsonAutoDetect
+@AutoValue
+public abstract class Token {
+    @JsonProperty
+    public abstract String name();
 
+    @JsonProperty
+    public abstract String token();
+
+    @JsonProperty
+    public abstract DateTime lastAccess();
+
+    public static Token create(String name, String token, DateTime lastAccess) {
+        return new AutoValue_Token(name, token, lastAccess);
+    }
 }

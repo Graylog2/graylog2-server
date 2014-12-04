@@ -16,14 +16,20 @@
  */
 package org.graylog2.rest.resources.system.radio.requests;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.auto.value.AutoValue;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
-public class PingRequest {
+@JsonAutoDetect
+@AutoValue
+public abstract class PingRequest {
+    @JsonProperty
+    public abstract String restTransportAddress();
 
-    @JsonProperty("rest_transport_address")
-    public String restTransportAddress;
+    @JsonCreator
+    public static PingRequest create(@JsonProperty("rest_transport_address") String restTransportAddress) {
+        return new AutoValue_PingRequest(restTransportAddress);
+    }
 
 }

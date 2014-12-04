@@ -16,9 +16,6 @@
  */
 package org.graylog2.outputs;
 
-import com.google.inject.Binder;
-import com.google.inject.Module;
-import com.google.inject.util.Providers;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.outputs.MessageOutput;
 import org.graylog2.plugin.outputs.MessageOutputConfigurationException;
@@ -30,11 +27,7 @@ import org.graylog2.shared.bindings.InstantiationService;
 import javax.inject.Inject;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
-/**
- * @author Dennis Oelkers <dennis@torch.sh>
- */
 public class MessageOutputFactory {
     private final InstantiationService instantiationService;
     private final Map<String, MessageOutput.Factory<? extends MessageOutput>> availableOutputs;
@@ -46,22 +39,25 @@ public class MessageOutputFactory {
         this.availableOutputs = availableOutputs;
     }
 
-    public MessageOutput fromStreamOutput(Output output, final Stream stream, Configuration configuration) throws MessageOutputConfigurationException{
+    public MessageOutput fromStreamOutput(Output output, final Stream stream, Configuration configuration) throws MessageOutputConfigurationException {
         return this.availableOutputs.get(output.getType()).create(stream, configuration);
     }
 
-    public Map<String, AvailableOutputSummary> getAvailableOutputs() {
-        Map<String, AvailableOutputSummary> result = new HashMap<>();
 
+    public Map<String, AvailableOutputSummary> getAvailableOutputs() {
+        final Map<String, AvailableOutputSummary> result = new HashMap<>(availableOutputs.size());
         for (Map.Entry<String, MessageOutput.Factory<? extends MessageOutput>> messageOutputEntry : this.availableOutputs.entrySet()) {
             final MessageOutput.Factory messageOutputFactoryClass = messageOutputEntry.getValue();
-            AvailableOutputSummary availableOutputSummary = new AvailableOutputSummary();
-            availableOutputSummary.requestedConfiguration = messageOutputFactoryClass.getConfig().getRequestedConfiguration();
             final MessageOutput.Descriptor descriptor = messageOutputFactoryClass.getDescriptor();
-            availableOutputSummary.name = descriptor.getName();
-            availableOutputSummary.type = messageOutputEntry.getKey();
-            availableOutputSummary.humanName = descriptor.getHumanName();
-            availableOutputSummary.linkToDocs = descriptor.getLinkToDocs();
+
+            final AvailableOutputSummary availableOutputSummary = AvailableOutputSummary.create(
+                    descriptor.getName(),
+                    messageOutputEntry.getKey(),
+                    descriptor.getHumanName(),
+                    descriptor.getLinkToDocs(),
+                    messageOutputFactoryClass.getConfig().getRequestedConfiguration()
+            );
+
             result.put(messageOutputEntry.getKey(), availableOutputSummary);
         }
 

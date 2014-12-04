@@ -16,6 +16,7 @@
  */
 package org.graylog2.bundles;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.hibernate.validator.constraints.NotBlank;
 
@@ -23,6 +24,7 @@ import javax.validation.constraints.NotNull;
 import java.util.Collections;
 import java.util.Map;
 
+@JsonAutoDetect
 public class Output {
     @JsonProperty
     private String id;

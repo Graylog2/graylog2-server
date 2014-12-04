@@ -17,7 +17,10 @@
 package org.graylog2.rest.resources.system;
 
 import com.codahale.metrics.annotation.Timed;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
+import com.wordnik.swagger.annotations.Api;
+import com.wordnik.swagger.annotations.ApiOperation;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.Configuration;
@@ -25,8 +28,6 @@ import org.graylog2.buffers.OutputBuffer;
 import org.graylog2.inputs.InputCache;
 import org.graylog2.inputs.OutputCache;
 import org.graylog2.plugin.buffers.BufferWatermark;
-import com.wordnik.swagger.annotations.Api;
-import com.wordnik.swagger.annotations.ApiOperation;
 import org.graylog2.rest.resources.RestResource;
 import org.graylog2.security.RestPermissions;
 import org.graylog2.shared.buffers.ProcessBuffer;
@@ -39,9 +40,6 @@ import javax.ws.rs.core.MediaType;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 @RequiresAuthentication
 @Api(value = "System/Buffers", description = "Buffer information of this node.")
 @Path("/system/buffers")
@@ -66,29 +64,27 @@ public class BufferResource extends RestResource {
         this.outputBuffer = outputBuffer;
     }
 
-    @GET @Timed
+    @GET
+    @Timed
     @ApiOperation(value = "Get current utilization of buffers and caches of this node.")
     @RequiresPermissions(RestPermissions.BUFFERS_READ)
     @Produces(MediaType.APPLICATION_JSON)
-    public String utilization() {
-        Map<String, Object> result = Maps.newHashMap();
-        result.put("buffers", buffers());
-        result.put("master_caches", masterCaches());
-
-        return json(result);
+    public Map<String, Map<String, Object>> utilization() {
+        return ImmutableMap.of(
+                "buffers", buffers(),
+                "master_caches", masterCaches());
     }
 
-    @GET @Timed
+    @GET
+    @Timed
     @Path("/classes")
     @ApiOperation(value = "Get classnames of current buffer implementations.")
     @RequiresPermissions(RestPermissions.BUFFERS_READ)
     @Produces(MediaType.APPLICATION_JSON)
-    public String getBufferClasses() {
-        Map<String, String> result = Maps.newHashMap();
-        result.put("process_buffer", processBuffer.getClass().getCanonicalName());
-        result.put("output_buffer", outputBuffer.getClass().getCanonicalName());
-
-        return json(result);
+    public Map<String, String> getBufferClasses() {
+        return ImmutableMap.of(
+                "process_buffer", processBuffer.getClass().getCanonicalName(),
+                "output_buffer", outputBuffer.getClass().getCanonicalName());
     }
 
     private Map<String, Object> masterCaches() {

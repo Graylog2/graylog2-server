@@ -14,25 +14,25 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.rest.resources.users.requests;
+package org.graylog2.rest.resources.streams.requests;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.auto.value.AutoValue;
 
-import java.util.List;
+@JsonAutoDetect
+@AutoValue
+public abstract class UpdateStreamRequest {
+    @JsonProperty
+    public abstract String title();
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
-public class CreateRequest {
+    @JsonProperty
+    public abstract String description();
 
-    public String username;
-    public String password;
-    public String email;
-    @JsonProperty("full_name")
-    public String fullname;
-    public List<String> permissions;
-    public String timezone;
-    public StartpageSummary startpage;
-    public Long session_timeout_ms;
-
+    @JsonCreator
+    public static UpdateStreamRequest create(@JsonProperty("title") String title,
+                                             @JsonProperty("description") String description) {
+        return new AutoValue_UpdateStreamRequest(title, description);
+    }
 }

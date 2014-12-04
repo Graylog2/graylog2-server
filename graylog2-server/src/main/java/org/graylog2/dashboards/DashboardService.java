@@ -20,19 +20,16 @@ import org.graylog2.dashboards.widgets.DashboardWidget;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.database.PersistedService;
 import org.graylog2.database.ValidationException;
-import org.graylog2.rest.resources.dashboards.requests.WidgetPositionRequest;
+import org.graylog2.rest.resources.dashboards.requests.WidgetPositions;
 
 import java.util.List;
 
-/**
- * @author Dennis Oelkers <dennis@torch.sh>
- */
 public interface DashboardService extends PersistedService {
     Dashboard load(String id) throws NotFoundException;
 
     List<Dashboard> all();
 
-    void updateWidgetPositions(Dashboard dashboard, List<WidgetPositionRequest> positions) throws ValidationException;
+    void updateWidgetPositions(Dashboard dashboard, WidgetPositions positions) throws ValidationException;
 
     void addWidget(Dashboard dashboard, DashboardWidget widget) throws ValidationException;
 

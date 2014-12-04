@@ -17,27 +17,27 @@
 package org.graylog2.rest.resources.system;
 
 import com.codahale.metrics.annotation.Timed;
-import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.graylog2.plugin.lifecycles.LoadBalancerStatus;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.graylog2.plugin.lifecycles.LoadBalancerStatus;
 import org.graylog2.rest.resources.RestResource;
 import org.graylog2.security.RestPermissions;
 
+import javax.ws.rs.BadRequestException;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 @Api(value = "System/LoadBalancers", description = "Status propagation for load balancers")
 @Path("/system/lbstatus")
-public class LoadBalancerStatusResource extends RestResource{
+public class LoadBalancerStatusResource extends RestResource {
 
     /*
      *  IMPORTANT: this resource is unauthenticated to allow easy
@@ -45,7 +45,8 @@ public class LoadBalancerStatusResource extends RestResource{
      *             when adding more stuff.
      */
 
-    @GET @Timed
+    @GET
+    @Timed
     @Produces(MediaType.TEXT_PLAIN)
     @ApiOperation(value = "Get status of this graylog2-server node for load balancers. " +
             "Returns either ALIVE with HTTP 200 or DEAD with HTTP 503.")
@@ -60,19 +61,20 @@ public class LoadBalancerStatusResource extends RestResource{
                 .build();
     }
 
-    @PUT @Timed
+    @PUT
+    @Timed
     @RequiresAuthentication
     @RequiresPermissions(RestPermissions.LBSTATUS_CHANGE)
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Override load balancer status of this graylog2-server node. Next lifecycle " +
             "change will override it again to its default. Set to ALIVE or DEAD.")
     @Path("/override/{status}")
-    public Response override(@ApiParam(name = "status") @PathParam("status") String status) {
+    public void override(@ApiParam(name = "status") @PathParam("status") String status) {
         final LoadBalancerStatus lbStatus;
         try {
             lbStatus = LoadBalancerStatus.valueOf(status.toUpperCase());
-        } catch(IllegalArgumentException e) {
-            throw new WebApplicationException(e, Response.Status.BAD_REQUEST);
+        } catch (IllegalArgumentException e) {
+            throw new BadRequestException(e);
         }
 
         switch (lbStatus) {
@@ -83,7 +85,5 @@ public class LoadBalancerStatusResource extends RestResource{
                 serverStatus.overrideLoadBalancerAlive();
                 break;
         }
-
-        return Response.ok().build();
     }
 }

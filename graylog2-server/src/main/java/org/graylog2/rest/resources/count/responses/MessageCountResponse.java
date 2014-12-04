@@ -14,15 +14,19 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.rest.resources.dashboards.requests;
+package org.graylog2.rest.resources.count.responses;
 
-import java.util.List;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.auto.value.AutoValue;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
-public class UpdateWidgetPositionsRequest {
+@JsonAutoDetect
+@AutoValue
+public abstract class MessageCountResponse {
+    @JsonProperty
+    public abstract long events();
 
-    public List<WidgetPositionRequest> positions;
-
+    public static MessageCountResponse create(long events) {
+        return new AutoValue_MessageCountResponse(events);
+    }
 }

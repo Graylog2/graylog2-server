@@ -17,6 +17,7 @@
 package org.graylog2.rest.resources.system;
 
 import com.codahale.metrics.annotation.Timed;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
@@ -41,13 +42,10 @@ import javax.ws.rs.core.MediaType;
 import java.util.List;
 import java.util.Map;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 @RequiresAuthentication
 @Api(value = "System/Messages", description = "Internal Graylog2 messages")
 @Path("/system/messages")
-public class    MessagesResource extends RestResource {
+public class MessagesResource extends RestResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(MessagesResource.class);
 
@@ -58,15 +56,15 @@ public class    MessagesResource extends RestResource {
         this.systemMessageService = systemMessageService;
     }
 
-    @GET @Timed
+    @GET
+    @Timed
     @ApiOperation(value = "Get internal Graylog2 system messages")
     @RequiresPermissions(RestPermissions.SYSTEMMESSAGES_READ)
     @Produces(MediaType.APPLICATION_JSON)
-    public String all(@ApiParam(name = "page", value = "Page", required = false) @QueryParam("page") int page) {
-        List<Map<String, Object>> messages = Lists.newArrayList();
-
+    public Map<String, Object> all(@ApiParam(name = "page", value = "Page", required = false) @QueryParam("page") int page) {
+        final List<Map<String, Object>> messages = Lists.newArrayList();
         for (SystemMessage sm : systemMessageService.all(page(page))) {
-            Map<String, Object> message = Maps.newHashMap();
+            Map<String, Object> message = Maps.newHashMapWithExpectedSize(4);
             message.put("caller", sm.getCaller());
             message.put("content", sm.getContent());
             message.put("timestamp", Tools.getISO8601String(sm.getTimestamp()));
@@ -75,11 +73,8 @@ public class    MessagesResource extends RestResource {
             messages.add(message);
         }
 
-        Map<String, Object> result = Maps.newHashMap();
-        result.put("messages", messages);
-        result.put("total", systemMessageService.totalCount());
-
-        return json(result);
+        return ImmutableMap.of(
+                "messages", messages,
+                "total", systemMessageService.totalCount());
     }
-
 }

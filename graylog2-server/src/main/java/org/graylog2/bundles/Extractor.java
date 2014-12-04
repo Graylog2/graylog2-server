@@ -16,12 +16,14 @@
  */
 package org.graylog2.bundles;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+@JsonAutoDetect
 public class Extractor {
     @JsonProperty
     private String title;

@@ -16,23 +16,37 @@
  */
 package org.graylog2.shared.rest.resources.system.inputs.requests;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.auto.value.AutoValue;
 
 import java.util.Map;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
-public class InputLaunchRequest {
+@JsonAutoDetect
+@AutoValue
+public abstract class InputLaunchRequest {
+    @JsonProperty
+    public abstract String title();
 
-    public String title;
-    public String type;
+    @JsonProperty
+    public abstract String type();
 
     @JsonProperty("creator_user_id")
-    public String creatorUserId;
+    public abstract String creatorUserId();
 
-    public Boolean global;
+    @JsonProperty
+    public abstract boolean global();
 
-    public Map<String, Object> configuration;
+    @JsonProperty
+    public abstract Map<String, Object> configuration();
 
+    @JsonCreator
+    public static InputLaunchRequest create(@JsonProperty("title") String title,
+                                            @JsonProperty("type") String type,
+                                            @JsonProperty("creator_user_id") String creatorUserId,
+                                            @JsonProperty("global") boolean global,
+                                            @JsonProperty("configuration") Map<String, Object> configuration) {
+        return new AutoValue_InputLaunchRequest(title, type, creatorUserId, global, configuration);
+    }
 }

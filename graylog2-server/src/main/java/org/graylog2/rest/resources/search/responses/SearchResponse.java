@@ -17,6 +17,8 @@
 package org.graylog2.rest.resources.search.responses;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.auto.value.AutoValue;
 import org.graylog2.indexer.ranges.IndexRange;
 import org.graylog2.indexer.results.ResultMessage;
 import org.joda.time.DateTime;
@@ -25,17 +27,45 @@ import java.util.List;
 import java.util.Set;
 
 @JsonAutoDetect
-public class SearchResponse {
-    public String query;
-    public String builtQuery;
-    public Set<IndexRange> usedIndices;
-    public List<ResultMessage> messages;
-    public Set<String> fields;
-    public long time;
-    public long totalResults;
-    public DateTime from;
-    public DateTime to;
+@AutoValue
+public abstract class SearchResponse {
+    @JsonProperty
+    public abstract String query();
 
-    public QueryParseError error;
-    public GenericError genericError;
+    @JsonProperty
+    public abstract String builtQuery();
+
+    @JsonProperty
+    public abstract Set<IndexRange> usedIndices();
+
+    @JsonProperty
+    public abstract List<ResultMessage> messages();
+
+    @JsonProperty
+    public abstract Set<String> fields();
+
+    @JsonProperty
+    public abstract long time();
+
+    @JsonProperty
+    public abstract long totalResults();
+
+    @JsonProperty
+    public abstract DateTime from();
+
+    @JsonProperty
+    public abstract DateTime to();
+
+    public static SearchResponse create(String query,
+                                        String builtQuery,
+                                        Set<IndexRange> usedIndices,
+                                        List<ResultMessage> messages,
+                                        Set<String> fields,
+                                        long time,
+                                        long totalResults,
+                                        DateTime from,
+                                        DateTime to) {
+        return new AutoValue_SearchResponse(query, builtQuery, usedIndices, messages,
+                fields, time, totalResults, from, to);
+    }
 }

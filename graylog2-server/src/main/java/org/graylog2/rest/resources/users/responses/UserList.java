@@ -14,14 +14,22 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.rest.resources.dashboards.requests;
+package org.graylog2.rest.resources.users.responses;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
-public class UpdateRequest {
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.auto.value.AutoValue;
 
-    public String title;
-    public String description;
+import java.util.List;
 
+@JsonAutoDetect
+
+@AutoValue
+public abstract class UserList {
+    @JsonProperty
+    public abstract List<User> users();
+
+    public static UserList create(List<User> users) {
+        return new AutoValue_UserList(users);
+    }
 }

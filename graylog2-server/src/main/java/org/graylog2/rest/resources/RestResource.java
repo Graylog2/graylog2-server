@@ -16,45 +16,36 @@
  */
 package org.graylog2.rest.resources;
 
-import com.codahale.metrics.Histogram;
-import com.codahale.metrics.Meter;
-import com.codahale.metrics.Timer;
 import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.jaxrs.cfg.EndpointConfigBase;
 import com.fasterxml.jackson.jaxrs.cfg.ObjectWriterInjector;
 import com.fasterxml.jackson.jaxrs.cfg.ObjectWriterModifier;
-import com.google.common.collect.Maps;
+import com.github.joschi.jadconfig.util.Size;
+import com.google.common.collect.ImmutableMap;
 import org.apache.shiro.subject.Subject;
 import org.bson.types.ObjectId;
-import org.graylog2.security.ShiroSecurityContext;
 import org.graylog2.plugin.ServerStatus;
+import org.graylog2.security.ShiroSecurityContext;
 import org.graylog2.users.User;
 import org.graylog2.users.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import javax.ws.rs.BadRequestException;
 import javax.ws.rs.ForbiddenException;
-import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.SecurityContext;
 import java.security.Principal;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public abstract class RestResource {
-	
-	private static final Logger LOG = LoggerFactory.getLogger(RestResource.class);
+    private static final Logger LOG = LoggerFactory.getLogger(RestResource.class);
 
     @Inject
     protected ObjectMapper objectMapper;
@@ -65,23 +56,8 @@ public abstract class RestResource {
     @Inject
     protected ServerStatus serverStatus;
 
-    private boolean prettyPrint;
-
     @Context
     SecurityContext securityContext;
-
-    protected RestResource() {
-        /*
-          * Jackson is serializing java.util.Date (coming out of MongoDB for example) as UNIX epoch by default.
-          * Make it write ISO8601 instead.
-          * TODO THIS IS EXTREMELY WRONG AND WILL LEAD TO BUGS. NEED TO HAVE IT INJECTED ONCE, AND THEN REUSED (see ObjectMapperProvider)
-          * but everyone and their grandmother are using this directly in resource objects instead of relying on Jackson :(
-          */
-        /*objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-        objectMapper.setPropertyNamingStrategy(PropertyNamingStrategy.CAMEL_CASE_TO_LOWER_CASE_WITH_UNDERSCORES);
-        objectMapper.registerModule(new JodaModule());
-        objectMapper.registerModule(new GuavaModule());*/
-    }
 
     @QueryParam("pretty")
     public void setPrettyPrint(boolean prettyPrint) {
@@ -94,15 +70,10 @@ public abstract class RestResource {
                 }
             });
         }
-        this.prettyPrint = prettyPrint;
     }
 
     protected int page(int page) {
-        if (page <= 0) {
-            return 0;
-        }
-
-        return page-1;
+        return Math.max(0, page - 1);
     }
 
     protected Subject getSubject() {
@@ -110,12 +81,14 @@ public abstract class RestResource {
             LOG.error("Cannot retrieve current subject, SecurityContext isn't set.");
             return null;
         }
+
         final Principal p = securityContext.getUserPrincipal();
         if (!(p instanceof ShiroSecurityContext.ShiroPrincipal)) {
             LOG.error("Unknown SecurityContext class {}, cannot continue.", securityContext);
             throw new IllegalStateException();
         }
-        ShiroSecurityContext.ShiroPrincipal principal = (ShiroSecurityContext.ShiroPrincipal) p;
+
+        final ShiroSecurityContext.ShiroPrincipal principal = (ShiroSecurityContext.ShiroPrincipal) p;
         return principal.getSubject();
     }
 
@@ -139,43 +112,26 @@ public abstract class RestResource {
         }
     }
 
-	protected ObjectId loadObjectId(String id) {
-		try {
-			return new ObjectId(id);
-		} catch (IllegalArgumentException e) {
-        	LOG.error("Invalid ObjectID \"" + id + "\". Returning HTTP 400.");
-        	throw new WebApplicationException(400);
-		}
-	}
-
-    protected String json(Object x) {
+    protected ObjectId loadObjectId(String id) {
         try {
-            if (this.prettyPrint) {
-                return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(x);
-            } else {
-                return objectMapper.writeValueAsString(x);
-            }
-        } catch (JsonProcessingException e) {
-            LOG.error("Error while generating JSON", e);
-            throw new InternalServerErrorException(e);
+            return new ObjectId(id);
+        } catch (IllegalArgumentException e) {
+            final String msg = "Invalid ObjectID \"" + id + "\".";
+            LOG.error(msg);
+            throw new BadRequestException(msg, e);
         }
     }
 
     protected Map<String, Long> bytesToValueMap(long bytes) {
-        Map<String, Long> r = Maps.newHashMap();
-
-        int kb = 1024;
-        int mb = kb*1024;
-
-        r.put("bytes", bytes);
-        r.put("kilobytes", bytes/kb);
-        r.put("megabytes", bytes/mb);
-
-        return r;
+        final Size size = Size.bytes(bytes);
+        return ImmutableMap.of(
+                "bytes", size.toBytes(),
+                "kilobytes", size.toKilobytes(),
+                "megabytes", size.toMegabytes());
     }
 
-    protected String guessContentType(String filename) {
-        // A really dump but for us good enough apporach. We only need this for a very few static files we control.
+    protected String guessContentType(final String filename) {
+        // A really dumb but for us good enough approach. We only need this for a very few static files we control.
 
         if (filename.endsWith(".png")) {
             return "image/png";
@@ -194,26 +150,27 @@ public abstract class RestResource {
         }
 
         if (filename.endsWith(".html")) {
-            return "text/html";
+            return MediaType.TEXT_HTML;
         }
 
         return MediaType.TEXT_PLAIN;
     }
 
     protected void restrictToMaster() {
-        if(!serverStatus.hasCapability(ServerStatus.Capability.MASTER)) {
+        if (!serverStatus.hasCapability(ServerStatus.Capability.MASTER)) {
             LOG.warn("Rejected request that is only allowed against master nodes. Returning HTTP 403.");
-            throw new WebApplicationException(403);
+            throw new ForbiddenException("Request is only allowed against master nodes.");
         }
     }
 
     protected User getCurrentUser() {
         final Object principal = getSubject().getPrincipal();
         final User user = userService.load(principal.toString());
+
         if (user == null) {
             LOG.error("Loading the current user failed, this should not happen. Did you call this method in an unauthenticated REST resource?");
-            return null;
         }
+
         return user;
     }
 }

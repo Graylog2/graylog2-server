@@ -31,9 +31,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import java.util.Map;
 
-/**
- * @author Dennis Oelkers <dennis@torch.sh>
- */
 @RequiresAuthentication
 @Api(value = "System/ServiceManager", description = "ServiceManager Status")
 @Path("/system/serviceManager")
@@ -49,8 +46,7 @@ public class ServiceManagerResource extends RestResource {
     @Timed
     @ApiOperation(value = "List current status of ServiceManager")
     @Produces(MediaType.APPLICATION_JSON)
-    public String list() {
-        Map<Service, Long> result = serviceManager.startupTimes();
-        return json(result);
+    public Map<Service, Long> list() {
+        return serviceManager.startupTimes();
     }
 }

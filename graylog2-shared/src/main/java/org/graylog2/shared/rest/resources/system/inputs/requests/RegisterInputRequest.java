@@ -16,40 +16,51 @@
  */
 package org.graylog2.shared.rest.resources.system.inputs.requests;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.auto.value.AutoValue;
 import org.graylog2.plugin.inputs.MessageInput;
 
+import javax.annotation.Nullable;
 import java.util.Map;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
-public class RegisterInputRequest {
+@JsonAutoDetect
+@AutoValue
+public abstract class RegisterInputRequest {
 
     @JsonProperty("input_id")
-    public String inputId;
+    @Nullable
+    public abstract String inputId();
 
-    public String title;
-    public String type;
+    @JsonProperty
+    public abstract String title();
 
-    public Map<String, Object> configuration;
+    @JsonProperty
+    public abstract String type();
+
+    @JsonProperty
+    public abstract Map<String, Object> configuration();
 
     @JsonProperty("radio_id")
-    public String radioId;
+    public abstract String radioId();
 
     @JsonProperty("creator_user_id")
-    public String creatorUserId;
+    public abstract String creatorUserId();
 
-    public RegisterInputRequest() {
+    @JsonCreator
+    public static RegisterInputRequest create(@JsonProperty("input_id") @Nullable String inputId,
+                                              @JsonProperty String title,
+                                              @JsonProperty String type,
+                                              @JsonProperty Map<String, Object> configuration,
+                                              @JsonProperty("radio_id") String radioId,
+                                              @JsonProperty("creator_user_id") String creatorUserId) {
+        return new AutoValue_RegisterInputRequest(inputId, title, type, configuration, radioId, creatorUserId);
     }
 
-    public RegisterInputRequest(MessageInput input, String radioId) {
-        this.inputId = input.getId();
-        this.title = input.getTitle();
-        this.type = input.getClass().getCanonicalName();
-        this.configuration = input.getConfiguration().getSource();
-        this.radioId = radioId;
-        this.creatorUserId = input.getCreatorUserId();
+    public static RegisterInputRequest create(MessageInput input, String radioId) {
+        return create(input.getId(), input.getTitle(), input.getClass().getCanonicalName(),
+                input.getConfiguration().getSource(), radioId, input.getCreatorUserId());
     }
 
 }
