@@ -33,14 +33,14 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.jar.JarFile;
 
-public class PluginLoader {
-    private static final Logger LOG = LoggerFactory.getLogger(PluginLoader.class);
+public class LegacyPluginLoader {
+    private static final Logger LOG = LoggerFactory.getLogger(LegacyPluginLoader.class);
 
     public static final String GRAYLOG2_PLUGIN_PROPERTIES = "graylog2-plugin.properties";
 
     private final File pluginDir;
 
-    public PluginLoader(File pluginDir) {
+    public LegacyPluginLoader(File pluginDir) {
         this.pluginDir = pluginDir;
     }
 
