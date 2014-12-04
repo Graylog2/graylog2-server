@@ -17,6 +17,7 @@
 package org.graylog2.restclient.models.api.responses.metrics;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.graylog2.restclient.lib.metrics.Counter;
 import org.graylog2.restclient.lib.metrics.Gauge;
 import org.graylog2.restclient.lib.metrics.Histogram;
 import org.graylog2.restclient.lib.metrics.Meter;
@@ -57,6 +58,8 @@ public class MetricsListItem {
                     Map<String, Object> histoTiming = (Map<String, Object>) metric.get("time");
                     double count = ((Number) metric.get("count")).doubleValue();
                     return new Histogram(histoTiming, count);
+                case COUNTER:
+                    return new Counter(((Number) metric.get("count")).longValue());
             }
         } catch(Exception e) {
             LOG.error("Could not parse metric: " + metric.toString(), e);

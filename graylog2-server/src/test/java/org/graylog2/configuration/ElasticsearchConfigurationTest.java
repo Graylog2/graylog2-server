@@ -16,19 +16,18 @@
  */
 package org.graylog2.configuration;
 
-import com.beust.jcommander.internal.Maps;
 import com.github.joschi.jadconfig.JadConfig;
 import com.github.joschi.jadconfig.RepositoryException;
 import com.github.joschi.jadconfig.ValidationException;
 import com.github.joschi.jadconfig.repositories.InMemoryRepository;
 import org.testng.annotations.Test;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
-
 
 public class ElasticsearchConfigurationTest {
     @Test
@@ -49,7 +48,7 @@ public class ElasticsearchConfigurationTest {
 
     @Test
     public void testIsClientNode() throws ValidationException, RepositoryException {
-        final Map<String, String> props = Maps.newHashMap();
+        final Map<String, String> props = new HashMap<>();
         final ElasticsearchConfiguration configuration1 = new ElasticsearchConfiguration();
 
         new JadConfig(new InMemoryRepository(), configuration1).process();
