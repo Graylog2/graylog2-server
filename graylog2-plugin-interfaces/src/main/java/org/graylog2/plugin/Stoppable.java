@@ -1,4 +1,4 @@
-/*
+/**
  * The MIT License
  * Copyright (c) 2012 TORCH GmbH
  *
@@ -20,7 +20,6 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 package org.graylog2.plugin;
 
 /**
