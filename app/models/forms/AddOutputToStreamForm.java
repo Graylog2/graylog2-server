@@ -5,4 +5,12 @@ package models.forms;
  */
 public class AddOutputToStreamForm {
     public String outputId;
+
+    public String getOutputId() {
+        return outputId;
+    }
+
+    public void setOutputId(String outputId) {
+        this.outputId = outputId;
+    }
 }
