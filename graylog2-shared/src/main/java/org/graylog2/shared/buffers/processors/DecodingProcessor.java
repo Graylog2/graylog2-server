@@ -76,7 +76,7 @@ public class DecodingProcessor implements EventHandler<MessageEvent> {
                 .build(new CacheLoader<String, MessageInput>() {
                     @Override
                     public MessageInput load(String inputId) throws Exception {
-                        return inputRegistry.getRunningInput(inputId);
+                        return inputRegistry.getPersisted(inputId);
                     }
                 });
     }
@@ -147,7 +147,11 @@ public class DecodingProcessor implements EventHandler<MessageEvent> {
 
         for (RawMessage.SourceNode node : raw.getSourceNodes()) {
             if (serverStatus.getNodeId().toString().equals(node.nodeId) && node.inputId != null) {
-                message.setSourceInput(inputCache.get(node.inputId));
+                try {
+                    message.setSourceInput(inputCache.get(node.inputId));
+                } catch (RuntimeException e) {
+                    log.warn("Unable to find input with id " + node.inputId + ", not setting input id in this message.", e);
+                }
                 break;
             }
         }
