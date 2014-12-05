@@ -25,6 +25,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import com.google.common.net.HttpHeaders;
 import com.google.common.net.MediaType;
 import com.google.inject.name.Named;
 import com.ning.http.client.AsyncCompletionHandler;
@@ -46,7 +47,6 @@ import org.graylog2.restroutes.PathMethod;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import play.libs.F;
-import play.mvc.Http;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -412,7 +412,7 @@ class ApiClientImpl implements ApiClient {
             ensureAuthentication();
             final URL url = prepareUrl(target);
             final AsyncHttpClient.BoundRequestBuilder requestBuilder = requestBuilderForUrl(url);
-            requestBuilder.addHeader(Http.HeaderNames.ACCEPT, mediaType.toString());
+            requestBuilder.addHeader(HttpHeaders.ACCEPT, mediaType.toString());
 
             final Request request = requestBuilder.build();
             if (LOG.isDebugEnabled()) {
@@ -421,7 +421,7 @@ class ApiClientImpl implements ApiClient {
 
             // Set 200 OK as standard if not defined.
             if (expectedResponseCodes.isEmpty()) {
-                expectedResponseCodes.add(Http.Status.OK);
+                expectedResponseCodes.add(200);
             }
 
             try {
@@ -531,7 +531,7 @@ class ApiClientImpl implements ApiClient {
                 final URL url = prepareUrl(currentNode);
                 try {
                     final AsyncHttpClient.BoundRequestBuilder requestBuilder = requestBuilderForUrl(url);
-                    requestBuilder.addHeader(Http.HeaderNames.ACCEPT, mediaType.toString());
+                    requestBuilder.addHeader(HttpHeaders.ACCEPT, mediaType.toString());
                     if (LOG.isDebugEnabled()) {
                         LOG.debug("API Request: {}", requestBuilder.build().toString());
                     }
