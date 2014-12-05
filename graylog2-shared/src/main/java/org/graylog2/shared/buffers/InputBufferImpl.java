@@ -59,6 +59,7 @@ public class InputBufferImpl implements InputBuffer {
                 ProducerType.MULTI,
                 configuration.getInputBufferWaitStrategy());
 
+        // TODO proper error reporting
         disruptor.handleExceptionsWith(new ExceptionHandler() {
             @Override
             public void handleEventException(Throwable ex, long sequence, Object event) {
