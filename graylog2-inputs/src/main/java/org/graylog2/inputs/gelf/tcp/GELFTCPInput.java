@@ -38,8 +38,16 @@ public class GELFTCPInput extends MessageInput {
                         LocalMetricRegistry localRegistry,
                         Config config,
                         Descriptor descriptor) {
-        super(metricRegistry, tcpFactory.create(configuration), localRegistry, gelfCodecFactory.create(configuration),
+        super(metricRegistry, tcpFactory.create(overrideDelimiter(configuration)), localRegistry, gelfCodecFactory.create(configuration),
               config, descriptor);
+    }
+
+    // Make sure that delimiter is null-byte for GELF. This is needed to support setups where the GELF TCP input
+    // has been created with the wrong value.
+    private static Configuration overrideDelimiter(Configuration configuration) {
+        configuration.setBoolean(TcpTransport.CK_USE_NULL_DELIMITER, true);
+
+        return configuration;
     }
 
     public interface Factory extends MessageInput.Factory<GELFTCPInput> {
