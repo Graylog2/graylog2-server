@@ -22,6 +22,8 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.datatype.guava.GuavaModule;
 import com.fasterxml.jackson.datatype.joda.JodaModule;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -46,17 +48,18 @@ import org.graylog2.restclient.models.api.responses.EmptyResponse;
 import org.graylog2.restroutes.PathMethod;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import play.libs.F;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.ws.rs.core.UriBuilder;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.ConnectException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -220,7 +223,7 @@ class ApiClientImpl implements ApiClient {
         private ApiRequest body;
         private final Class<T> responseClass;
         private final ArrayList<Object> pathParams = Lists.newArrayList();
-        private final ArrayList<F.Tuple<String, String>> queryParams = Lists.newArrayList();
+        private final ListMultimap<String, String> queryParams = ArrayListMultimap.create();
         private Set<Integer> expectedResponseCodes = Sets.newHashSet();
         private TimeUnit timeoutUnit = TimeUnit.MILLISECONDS;
         private long timeoutValue = defaultTimeout;
@@ -317,7 +320,7 @@ class ApiClientImpl implements ApiClient {
 
         @Override
         public ApiRequestBuilder<T> queryParam(String name, String value) {
-            queryParams.add(F.Tuple(name, value));
+            queryParams.put(name, value);
             return this;
         }
 
@@ -523,7 +526,7 @@ class ApiClientImpl implements ApiClient {
                 nodes = serverNodes.all();
             }
 
-            Collection<F.Tuple<ListenableFuture<Response>, Node>> requests = Lists.newArrayList();
+            final Map<Node, ListenableFuture<Response>> requests = Maps.newHashMap();
             final Collection<Response> responses = Lists.newArrayList();
 
             ensureAuthentication();
@@ -542,15 +545,15 @@ class ApiClientImpl implements ApiClient {
                             return response;
                         }
                     });
-                    requests.add(new F.Tuple<>(future, currentNode));
+                    requests.put(currentNode, future);
                 } catch (IOException e) {
                     LOG.error("Cannot execute request", e);
                     currentNode.markFailure();
                 }
             }
-            for (F.Tuple<ListenableFuture<Response>, Node> requestAndNode : requests) {
-                final ListenableFuture<Response> request = requestAndNode._1;
-                final Node node = requestAndNode._2;
+            for (Map.Entry<Node, ListenableFuture<Response>> requestAndNode : requests.entrySet()) {
+                final Node node = requestAndNode.getKey();
+                final ListenableFuture<Response> request = requestAndNode.getValue();
                 try {
                     final Response response = request.get(timeoutValue, timeoutUnit);
                     node.touch();
@@ -608,7 +611,7 @@ class ApiClientImpl implements ApiClient {
                 if (method != Method.PUT && method != Method.POST) {
                     throw new IllegalArgumentException("Cannot set request body on non-PUT or POST requests.");
                 }
-                requestBuilder.addHeader("Content-Type", "application/json; charset=utf-8");
+                requestBuilder.addHeader(HttpHeaders.CONTENT_TYPE, "application/json; charset=utf-8");
                 requestBuilder.setBodyEncoding("UTF-8");
                 requestBuilder.setBody(body.toJson());
             } else if (method == Method.POST) {
@@ -641,8 +644,14 @@ class ApiClientImpl implements ApiClient {
                 String path = MessageFormat.format(pathTemplate, pathParams.toArray());
                 final UriBuilder uriBuilder = UriBuilder.fromUri(target.getTransportAddress());
                 uriBuilder.path(path);
-                for (F.Tuple<String, String> queryParam : queryParams) {
-                    uriBuilder.queryParam(queryParam._1, queryParam._2);
+                for (String key : queryParams.keySet()) {
+                    for (String value : queryParams.get(key)) {
+                        try {
+                            uriBuilder.queryParam(key, URLEncoder.encode(value, StandardCharsets.UTF_8.name()));
+                        } catch (UnsupportedEncodingException e) {
+                            LOG.error("Couldn't URL encode query parameter {} with value {}", key, value);
+                        }
+                    }
                 }
 
                 if (unauthenticated && sessionId != null) {
