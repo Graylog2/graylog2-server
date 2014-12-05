@@ -17,11 +17,7 @@
 
 package org.graylog2.outputs;
 
-import com.codahale.metrics.CsvReporter;
-import com.codahale.metrics.Meter;
-import com.codahale.metrics.Metric;
-import com.codahale.metrics.MetricFilter;
-import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.*;
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
@@ -62,12 +58,16 @@ public class BenchmarkOutput implements MessageOutput {
         this.journal = journal;
         this.messagesWritten = metricRegistry.meter(name(this.getClass(), "messagesWritten"));
 
+        final File directory = new File("benchmark-csv");
+        //noinspection ResultOfMethodCallIgnored
+        directory.mkdirs();
+
         csvReporter = CsvReporter.forRegistry(metricRegistry)
                 .formatFor(Locale.US)
                 .convertRatesTo(TimeUnit.SECONDS)
                 .convertDurationsTo(TimeUnit.MILLISECONDS)
                 .filter(new CsvMetricFilter(SKIPPED_METRIC_PREFIXES))
-                .build(new File("benchmark-csv"));
+                .build(directory);
 
         csvReporter.start(1, TimeUnit.SECONDS);
 
