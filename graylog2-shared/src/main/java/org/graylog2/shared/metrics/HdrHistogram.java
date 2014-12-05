@@ -32,7 +32,6 @@ public class HdrHistogram extends com.codahale.metrics.Histogram {
     public HdrHistogram(AtomicHistogram hdrHistogram) {
         super(new ExponentiallyDecayingReservoir());
         this.hdrHistogram = hdrHistogram;
-        log.info("Histogram approx size {} bytes", hdrHistogram.getEstimatedFootprintInBytes());
     }
 
     public HdrHistogram(final long highestTrackableValue, final int numberOfSignificantValueDigits) {
