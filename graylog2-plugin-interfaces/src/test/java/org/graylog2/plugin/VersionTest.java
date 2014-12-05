@@ -90,4 +90,47 @@ public class VersionTest {
         assertTrue(v.greaterMinor(new Version(0, 19, 0, "rc.1")));
     }
 
+    @Test
+    public void testSameOrHigher() throws Exception {
+        Version v = new Version(0, 20, 2);
+
+        assertTrue(v.sameOrHigher(new Version(0, 19, 0)));
+        assertTrue(v.sameOrHigher(new Version(0, 18, 2)));
+        assertTrue(v.sameOrHigher(new Version(0, 19, 9001)));
+
+        assertTrue(v.sameOrHigher(new Version(0, 20, 0)));
+        assertFalse(v.sameOrHigher(new Version(1, 0, 0)));
+        assertFalse(v.sameOrHigher(new Version(1, 0, 9001)));
+        assertFalse(v.sameOrHigher(new Version(1, 20, 0)));
+        assertFalse(v.sameOrHigher(new Version(1, 1, 0)));
+        assertFalse(v.sameOrHigher(new Version(3, 2, 1)));
+
+        assertTrue(v.sameOrHigher(new Version(0, 19, 0, "rc.1")));
+        assertFalse(v.sameOrHigher(new Version(1, 19, 0, "rc.1")));
+        assertFalse(v.sameOrHigher(new Version(0, 21, 0, "rc.1")));
+        assertTrue(v.sameOrHigher(new Version(0, 20, 1, "rc.1")));
+        assertTrue(v.sameOrHigher(new Version(0, 20, 0, "rc.1")));
+        assertTrue(v.sameOrHigher(new Version(0, 20, 2, "rc.1")));
+        assertFalse(v.sameOrHigher(new Version(0, 20, 3, "rc.1")));
+
+        v = new Version(1, 5, 0);
+
+        assertTrue(v.sameOrHigher(new Version(0, 19, 0)));
+        assertTrue(v.sameOrHigher(new Version(1, 0, 0)));
+        assertTrue(v.sameOrHigher(new Version(0, 19, 9001)));
+        assertTrue(v.sameOrHigher(new Version(1, 5, 0)));
+        assertTrue(v.sameOrHigher(new Version(1, 4, 9)));
+
+        assertFalse(v.sameOrHigher(new Version(1, 6, 0)));
+        assertFalse(v.sameOrHigher(new Version(3, 0, 0)));
+        assertFalse(v.sameOrHigher(new Version(1, 5, 9001)));
+        assertFalse(v.sameOrHigher(new Version(1, 20, 0)));
+        assertFalse(v.sameOrHigher(new Version(1, 20, 5)));
+        assertFalse(v.sameOrHigher(new Version(3, 2, 1)));
+
+        assertTrue(v.sameOrHigher(new Version(0, 19, 0, "rc.1")));
+        assertFalse(v.sameOrHigher(new Version(2, 19, 0, "rc.1")));
+        assertTrue(v.sameOrHigher(new Version(0, 0, 0)));
+        assertFalse(v.sameOrHigher(new Version(Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE)));
+    }
 }

@@ -41,11 +41,6 @@ import java.util.Set;
  * @author Dennis Oelkers <dennis@torch.sh>
  */
 public abstract class PluginModule extends Graylog2Module {
-    protected void registerPlugin(Class<? extends PluginMetaData> pluginMetaData) {
-        Multibinder<PluginMetaData> pluginMetaDataMultibinder = Multibinder.newSetBinder(binder(), PluginMetaData.class);
-        pluginMetaDataMultibinder.addBinding().to(pluginMetaData);
-    }
-
     public Set<PluginConfigBean> getConfigBeans() {
         return ImmutableSet.<PluginConfigBean>builder().build();
     }

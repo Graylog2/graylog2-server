@@ -299,12 +299,18 @@ public abstract class Bootstrap implements Runnable {
 
         final LegacyPluginLoader legacyPluginLoader = new LegacyPluginLoader(pluginDir);
         for (Plugin plugin : legacyPluginLoader.loadPlugins()) {
-            pluginModules.addAll(plugin.modules());
+            if (version.sameOrHigher(plugin.metadata().getRequiredVersion()))
+                pluginModules.addAll(plugin.modules());
+            else
+                LOG.error("Plugin \"" + plugin.metadata().getName() + "\" requires version " + plugin.metadata().getRequiredVersion() + " - not loading!");
         }
 
         final PluginLoader pluginLoader = new PluginLoader(pluginDir);
         for (Plugin plugin : pluginLoader.loadPlugins()) {
-            pluginModules.addAll(plugin.modules());
+            if (version.sameOrHigher(plugin.metadata().getRequiredVersion()))
+                pluginModules.addAll(plugin.modules());
+            else
+                LOG.error("Plugin \"" + plugin.metadata().getName() + "\" requires version " + plugin.metadata().getRequiredVersion() + " - not loading!");
         }
 
         LOG.debug("Loaded modules: " + pluginModules);

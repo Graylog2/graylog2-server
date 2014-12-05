@@ -127,6 +127,11 @@ public class Version {
         return (other.major < this.major) || (other.major == this.major && other.minor < this.minor);
     }
 
+    public boolean sameOrHigher(Version other) {
+        return (this.major > other.major) ||
+                (this.major == other.major && (this.minor > other.minor || (this.minor == other.minor && this.patch >= other.patch)));
+    }
+
 
     @Override
     public boolean equals(final Object o) {
