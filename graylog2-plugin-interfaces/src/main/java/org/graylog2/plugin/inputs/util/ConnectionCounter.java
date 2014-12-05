@@ -43,14 +43,18 @@ public class ConnectionCounter extends SimpleChannelHandler {
     }
 
     @Override
-    public void channelConnected(ChannelHandlerContext ctx, ChannelStateEvent e) {
+    public void channelConnected(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
         connections.incrementAndGet();
         totalConnections++;
+
+        super.channelConnected(ctx, e);
     }
 
     @Override
-    public void channelDisconnected(ChannelHandlerContext ctx, ChannelStateEvent e) {
+    public void channelDisconnected(ChannelHandlerContext ctx, ChannelStateEvent e) throws Exception {
         connections.decrementAndGet();
+
+        super.channelDisconnected(ctx, e);
     }
 
     public int getConnectionCount() {
