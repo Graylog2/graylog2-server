@@ -26,6 +26,7 @@ import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import org.graylog2.plugin.journal.RawMessage;
 import org.graylog2.shared.buffers.ProcessBuffer;
+import org.graylog2.shared.metrics.HdrHistogram;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,8 +42,9 @@ public class JournalReader extends AbstractExecutionThreadService {
     private final EventBus eventBus;
     private final ProcessBuffer processBuffer;
     private final Semaphore journalFilled;
+    private final MetricRegistry metricRegistry;
     private final CountDownLatch startLatch = new CountDownLatch(1);
-    private final Histogram requestedReadCount;
+    private Histogram requestedReadCount;
     private final Counter readBlocked;
     private Thread executionThread;
 
@@ -55,7 +57,7 @@ public class JournalReader extends AbstractExecutionThreadService {
         this.eventBus = eventBus;
         this.processBuffer = processBuffer;
         this.journalFilled = journalFilled;
-        requestedReadCount = metricRegistry.histogram(name(this.getClass(), "requestedReadCount"));
+        this.metricRegistry = metricRegistry;
         readBlocked = metricRegistry.counter(name(this.getClass(), "readBlocked"));
         eventBus.register(this);
     }
@@ -88,6 +90,13 @@ public class JournalReader extends AbstractExecutionThreadService {
 
         // we need to wait for the ProcessBuffer to start its disruptor
         startLatch.await();
+
+        try {
+            requestedReadCount = metricRegistry.register(name(this.getClass(), "requestedReadCount"), new HdrHistogram(processBuffer.getRingBufferSize(), 3));
+        } catch (IllegalArgumentException e) {
+            log.warn("Metric already exists", e);
+            throw e;
+        }
 
         while (isRunning()) {
             // approximate count to read from the journal to backfill the processing chain

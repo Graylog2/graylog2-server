@@ -41,6 +41,7 @@ import kafka.message.MessageSet;
 import kafka.utils.KafkaScheduler;
 import kafka.utils.SystemTime$;
 import kafka.utils.Utils;
+import org.graylog2.shared.metrics.HdrTimer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import scala.Option;
@@ -71,8 +72,10 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
     private final ScheduledExecutorService scheduler;
     private final MetricRegistry metricRegistry;
     private final OffsetFileFlusher offsetFlusher;
+
     private final Timer writeTime;
     private final Timer readTime;
+
     private long nextReadOffset = 0L;
     private final KafkaScheduler kafkaScheduler;
 
@@ -89,8 +92,9 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
 
         this.messagesWritten = metricRegistry.meter(name(this.getClass(), "messagesWritten"));
         this.messagesRead = metricRegistry.meter(name(this.getClass(), "messagesRead"));
-        writeTime = metricRegistry.timer(name(this.getClass(), "writeTime"));
-        readTime = metricRegistry.timer(name(this.getClass(), "readTime"));
+
+        writeTime = metricRegistry.register(name(this.getClass(), "writeTime"), new HdrTimer(1, TimeUnit.SECONDS, 3));
+        readTime = metricRegistry.register(name(this.getClass(), "readTime"), new HdrTimer(1, TimeUnit.SECONDS, 3));
 
         // TODO all of these configuration values need tweaking
         // these are the default values as per kafka 0.8.1.1

@@ -35,6 +35,7 @@ import java.util.List;
 public abstract class Buffer {
 
     protected RingBuffer<MessageEvent> ringBuffer;
+    protected int ringBufferSize;
 
     public abstract void insertFailFast(Message message, MessageInput sourceInput) throws BufferOutOfCapacityException, ProcessingDisabledException;
     public abstract void insertCached(Message message, MessageInput sourceInput);
@@ -55,6 +56,10 @@ public abstract class Buffer {
 
     public long getRemainingCapacity() {
         return ringBuffer.remainingCapacity();
+    }
+
+    public int getRingBufferSize() {
+        return ringBufferSize;
     }
 
     public long getUsage() {

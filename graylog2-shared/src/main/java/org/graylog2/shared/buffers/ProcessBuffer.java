@@ -112,6 +112,7 @@ public class ProcessBuffer extends Buffer {
     public void initialize(ProcessBufferProcessor[] processors,
                            int ringBufferSize,
                            WaitStrategy waitStrategy) {
+        this.ringBufferSize = ringBufferSize;
         Disruptor<MessageEvent> disruptor = new Disruptor<>(
                 MessageEvent.EVENT_FACTORY,
                 ringBufferSize,
