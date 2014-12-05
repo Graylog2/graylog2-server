@@ -33,8 +33,8 @@ var EditDashboardModal = React.createClass({
         return (
             <span>
                 <button onClick={this.openModal} className="btn btn-mini">
-                    <i className="icon-edit"></i>
-                    Edit</button>
+                    <i className="icon-edit"></i> Edit
+                </button>
                 <form>
                     <BootstrapModal ref="modal" onCancel={this._closeModal} onConfirm={this._save} cancel="Cancel" confirm="Save">
                    {header}
