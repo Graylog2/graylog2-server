@@ -51,6 +51,7 @@ import static com.codahale.metrics.MetricRegistry.name;
 
 public class ProcessBuffer extends Buffer {
     private final Timer parseTime;
+    private final Timer decodeTime;
 
     private static final Logger LOG = LoggerFactory.getLogger(ProcessBuffer.class);
 
@@ -85,6 +86,7 @@ public class ProcessBuffer extends Buffer {
         this.cachedMessages = metricRegistry.meter(name(ProcessBuffer.class, "cachedMessages"));
 
         this.parseTime = metricRegistry.timer(name(ProcessBuffer.class, "parseTime"));
+        this.decodeTime = metricRegistry.timer(name(ProcessBuffer.class, "decodeTime"));
 
         if (serverStatus.hasCapability(ServerStatus.Capability.RADIO)) {
             SOURCE_INPUT_ATTR_NAME = "gl2_source_radio_input";
@@ -125,7 +127,7 @@ public class ProcessBuffer extends Buffer {
                         + "and wait strategy <{}>.", ringBufferSize,
                 waitStrategy.getClass().getSimpleName());
 
-        disruptor.handleEventsWith(decodingProcessorFactory.create(parseTime)).then(processors);
+        disruptor.handleEventsWith(decodingProcessorFactory.create(decodeTime, parseTime)).then(processors);
 
         ringBuffer = disruptor.start();
     }

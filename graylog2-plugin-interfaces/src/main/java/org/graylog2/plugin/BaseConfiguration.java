@@ -122,6 +122,9 @@ public abstract class BaseConfiguration {
     @Parameter("inputbuffer_processors")
     private int inputbufferProcessors = 2;
 
+    @Parameter("message_recordings_enable")
+    private boolean messageRecordingsEnable = false;
+
     public String getRestUriScheme() {
         return isRestEnableTls() ? "https" : "http";
     }
@@ -284,4 +287,9 @@ public abstract class BaseConfiguration {
     public int getUdpRecvBufferSizes() {
         return udpRecvBufferSizes;
     }
+
+    public boolean isMessageRecordingsEnabled() {
+        return messageRecordingsEnable;
+    }
+
 }

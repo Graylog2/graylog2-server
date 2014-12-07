@@ -21,6 +21,7 @@ import com.google.common.collect.Sets;
 import org.graylog2.Configuration;
 import org.graylog2.buffers.OutputBuffer;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.filters.MessageFilter;
 import org.graylog2.plugin.inputs.MessageInput;
@@ -53,7 +54,7 @@ public class ServerProcessBufferProcessorTest {
                 first,
                 second);
         final ServerProcessBufferProcessor processor = new ServerProcessBufferProcessor(mock(
-                MetricRegistry.class), filters, mock(Configuration.class), 0, 1, mock(OutputBuffer.class));
+                MetricRegistry.class), filters, mock(Configuration.class), mock(ServerStatus.class), 0, 1, mock(OutputBuffer.class));
         final List<MessageFilter> filterRegistry = processor.getFilterRegistry();
 
         assertEquals(filterRegistry.get(0), first);
@@ -73,6 +74,7 @@ public class ServerProcessBufferProcessorTest {
                 new ServerProcessBufferProcessor(metricRegistry,
                                                  Sets.<MessageFilter>newHashSet(),
                                                  configuration,
+                                                 mock(ServerStatus.class),
                                                  0, 1,
                                                  outputBuffer);
         try {
@@ -117,6 +119,7 @@ public class ServerProcessBufferProcessorTest {
                 new ServerProcessBufferProcessor(metricRegistry,
                                                  Sets.newHashSet(filterOnlyFirst),
                                                  configuration,
+                                                 mock(ServerStatus.class),
                                                  0, 1,
                                                  outputBuffer);
         try {

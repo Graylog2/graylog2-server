@@ -36,9 +36,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.InetAddress;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
 import static org.graylog2.plugin.Tools.buildElasticSearchTimeFormat;
@@ -110,6 +112,8 @@ public class Message {
      * was involved.
      */
     private long journalOffset = Long.MIN_VALUE;
+
+    private ArrayList<Recording> recordings;
 
     public Message(final String message, final String source, final DateTime timestamp) {
         // Adding the fields directly because they would not be accepted as a reserved fields.
@@ -338,6 +342,81 @@ public class Message {
 
     public long getJournalOffset() {
         return journalOffset;
+    }
+
+    // helper methods to optionally record timing information per message, useful for debugging or benchmarking
+    // not thread safe!
+    public void recordTiming(ServerStatus serverStatus, String name, long elapsedNanos) {
+        if (shouldNotRecord(serverStatus)) return;
+        lazyInitRecordings();
+        recordings.add(Recording.timing(name, elapsedNanos));
+    }
+
+    public void recordCounter(ServerStatus serverStatus, String name, int counter) {
+        if (shouldNotRecord(serverStatus)) return;
+        lazyInitRecordings();
+        recordings.add(Recording.counter(name, counter));
+    }
+
+    public String recordingsAsString() {
+        if (hasRecordings()) {
+            return Joiner.on(", ").join(recordings);
+        }
+        return "";
+    }
+
+    public boolean hasRecordings() {
+        return recordings != null && recordings.size() > 0;
+    }
+
+    private void lazyInitRecordings() {
+        if (recordings == null) {
+            recordings = new ArrayList<>();
+        }
+    }
+
+    private boolean shouldNotRecord(ServerStatus serverStatus) {
+        return !serverStatus.getDetailedMessageRecordingStrategy().shouldRecord(this);
+    }
+
+    public static abstract class Recording {
+        public static Timing timing(String name, long elapsedNanos) {
+            return new Timing(name, elapsedNanos);
+        }
+        public static Counter counter(String name, int counter) {
+            return new Counter(name, counter);
+        }
+
+    }
+
+    private static class Timing extends Recording {
+        private final String name;
+        private final long elapsedNanos;
+
+        public Timing(String name, long elapsedNanos) {
+            this.name = name;
+            this.elapsedNanos = elapsedNanos;
+        }
+
+        @Override
+        public String toString() {
+            return name + ": " + TimeUnit.NANOSECONDS.toMillis(elapsedNanos) + "ms";
+        }
+    }
+
+    private static class Counter extends Recording {
+        private final String name;
+        private final int counter;
+
+        public Counter(String name, int counter) {
+            this.name = name;
+            this.counter = counter;
+        }
+
+        @Override
+        public String toString() {
+            return name + ": " + counter;
+        }
     }
 
     public static class MessageIdFunction implements Function<Message, String> {
