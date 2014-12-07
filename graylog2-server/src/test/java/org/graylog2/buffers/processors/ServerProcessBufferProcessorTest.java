@@ -26,23 +26,25 @@ import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.filters.MessageFilter;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.mockito.Matchers;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.same;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
-import static org.testng.Assert.fail;
+import static org.mockito.Mockito.*;
+import static org.testng.Assert.*;
 
 public class ServerProcessBufferProcessorTest {
+
+    private ServerStatus serverStatus;
+
+    @BeforeClass
+    public void setUp() throws Exception {
+        serverStatus = mock(ServerStatus.class);
+        when(serverStatus.getDetailedMessageRecordingStrategy()).thenReturn(ServerStatus.MessageDetailRecordingStrategy.NEVER);
+    }
 
     @Test
     public void testFiltersAreOrdered() {
@@ -54,7 +56,7 @@ public class ServerProcessBufferProcessorTest {
                 first,
                 second);
         final ServerProcessBufferProcessor processor = new ServerProcessBufferProcessor(mock(
-                MetricRegistry.class), filters, mock(Configuration.class), mock(ServerStatus.class), 0, 1, mock(OutputBuffer.class));
+                MetricRegistry.class), filters, mock(Configuration.class), serverStatus, 0, 1, mock(OutputBuffer.class));
         final List<MessageFilter> filterRegistry = processor.getFilterRegistry();
 
         assertEquals(filterRegistry.get(0), first);
@@ -119,7 +121,7 @@ public class ServerProcessBufferProcessorTest {
                 new ServerProcessBufferProcessor(metricRegistry,
                                                  Sets.newHashSet(filterOnlyFirst),
                                                  configuration,
-                                                 mock(ServerStatus.class),
+                                                 serverStatus,
                                                  0, 1,
                                                  outputBuffer);
         try {
