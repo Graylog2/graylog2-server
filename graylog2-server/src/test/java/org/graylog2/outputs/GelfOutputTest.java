@@ -16,21 +16,23 @@
  */
 package org.graylog2.outputs;
 
+import com.google.common.collect.ImmutableMap;
 import org.graylog2.gelfclient.GelfMessage;
 import org.graylog2.gelfclient.transport.GelfTransport;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.mockito.Mockito;
 import org.testng.annotations.Test;
-
-import java.util.HashMap;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
 
 @Test
@@ -39,12 +41,10 @@ public class GelfOutputTest {
         final GelfTransport transport = mock(GelfTransport.class);
         final Message message = mock(Message.class);
         final GelfMessage gelfMessage = new GelfMessage("Test");
-
-        Configuration configuration = new Configuration(new HashMap<String, Object>() {{
-            put("hostname", "localhost");
-            put("protocol", "tcp");
-            put("port", 12201);
-        }});
+        final Configuration configuration = new Configuration(ImmutableMap.<String, Object>of(
+                "hostname", "localhost",
+                "protocol", "tcp",
+                "port", 12201));
 
         final GelfOutput gelfOutput = Mockito.spy(new GelfOutput(configuration, transport));
         doReturn(transport).when(gelfOutput).buildTransport(any(Configuration.class));
@@ -62,5 +62,21 @@ public class GelfOutputTest {
 
         assertNotNull(request);
         assertNotNull(request.asList());
+    }
+
+    @Test
+    public void testToGELFMessageTimestamp() throws Exception {
+        final GelfTransport transport = mock(GelfTransport.class);
+        final Configuration configuration = new Configuration(ImmutableMap.<String, Object>of(
+                "hostname", "localhost",
+                "protocol", "tcp",
+                "port", 12201));
+        final GelfOutput gelfOutput = new GelfOutput(configuration, transport);
+        final DateTime now = DateTime.now(DateTimeZone.UTC);
+        final Message message = new Message("Test", "Source", now);
+
+        final GelfMessage gelfMessage = gelfOutput.toGELFMessage(message);
+
+        assertEquals(gelfMessage.getTimestamp(), now.getMillis() / 1000.0d);
     }
 }
