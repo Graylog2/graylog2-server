@@ -169,9 +169,10 @@ public class StreamRouter {
         final Map<StreamRule, Boolean> result = Maps.newHashMap();
 
         final List<StreamRule> streamRules = getStreamRules(stream);
-        msg.recordCounter(serverStatus, "streamrules-evaluated-" + stream.getId(), streamRules.size());
 
+        int evaluatedRulesCount = 0;
         for (final StreamRule rule : streamRules) {
+            evaluatedRulesCount++;
             try {
                 final StreamRuleMatcher matcher = StreamRuleMatcherFactory.build(rule.getType());
                 result.put(rule, matchStreamRule(msg, matcher, rule));
@@ -179,6 +180,7 @@ public class StreamRouter {
                 LOG.warn("Invalid stream rule type. Skipping matching for this rule. " + e.getMessage(), e);
             }
         }
+        msg.recordCounter(serverStatus, "streamrules-evaluated-" + stream.getId(), evaluatedRulesCount);
 
         return result;
     }
