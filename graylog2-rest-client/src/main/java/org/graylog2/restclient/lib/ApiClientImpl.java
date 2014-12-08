@@ -53,13 +53,11 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.ws.rs.core.UriBuilder;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.ConnectException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -641,11 +639,12 @@ class ApiClientImpl implements ApiClient {
                 uriBuilder.path(path);
                 for (String key : queryParams.keySet()) {
                     for (String value : queryParams.get(key)) {
-                        try {
-                            uriBuilder.queryParam(key, URLEncoder.encode(value, StandardCharsets.UTF_8.name()));
-                        } catch (UnsupportedEncodingException e) {
-                            LOG.error("Couldn't URL encode query parameter {} with value {}", key, value);
-                        }
+                        // Jersey's UriBuilderImpl doesn't encode double quotes, which is correct per RFC 3986
+                        // (http://tools.ietf.org/html/rfc3986#section-3.4), but causes problems down the stack,
+                        // see https://github.com/Graylog2/graylog2-server/issues/793
+                        // So we fall back manually encoding double quotes right now because URLEncoder.encode does
+                        // too much and we'd end up with partially double encoded URIs. F... my life.
+                        uriBuilder.queryParam(key, value.replace("\"", "%22"));
                     }
                 }
 
