@@ -50,6 +50,7 @@
     "run-sequence": "*",
     "vinyl-source-stream": "*",
     "watchify": "*",
+    "tsify": "*",
 
     "gulp-react": "^2.0.0",
     "gulp-jest": "^0.2.2",

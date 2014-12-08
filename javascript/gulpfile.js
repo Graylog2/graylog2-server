@@ -124,6 +124,11 @@ function browserifyCall(debug) {
         ],
         debug: debug
     });
+    b.plugin('tsify', {noImplicitAny: false}).on('error', function (err) {
+        gutil.log(err);
+        this.emit('end');
+    });
+
     config.browserifyExcludes && config.browserifyExcludes.forEach(function(exclude) {
         b.exclude(exclude);
         //b.ignore('jquery');
