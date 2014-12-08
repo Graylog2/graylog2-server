@@ -433,11 +433,6 @@ class ApiClientImpl implements ApiClient {
 
                 target.touch();
 
-                // TODO this is wrong, shouldn't it accept some callback instead of throwing an exception?
-                if (!expectedResponseCodes.contains(response.getStatusCode())) {
-                    throw new APIException(request, response);
-                }
-
                 // TODO: once we switch to jackson we can take the media type into account automatically
                 final MediaType responseContentType;
                 if (response.getContentType() == null) {
@@ -453,8 +448,9 @@ class ApiClientImpl implements ApiClient {
                     return responseClass.cast(response.getResponseBody("UTF-8"));
                 }
 
-                if (expectedResponseCodes.contains(response.getStatusCode())
-                        || (response.getStatusCode() >= 200 && response.getStatusCode() < 300)) {
+                final boolean responseCodeIsExpected = expectedResponseCodes.contains(response.getStatusCode());
+                final boolean responseCodeIsSuccessful = response.getStatusCode() >= 200 && response.getStatusCode() < 300;
+                if (responseCodeIsExpected || responseCodeIsSuccessful) {
                     T result;
                     try {
                         if (response.getResponseBody().isEmpty()) {
@@ -480,6 +476,9 @@ class ApiClientImpl implements ApiClient {
                         throw new APIException(request, response, e);
                     }
                 } else {
+                    if (!responseCodeIsExpected) {
+                        throw new APIException(request, response);
+                    }
                     return null;
                 }
             } catch (InterruptedException e) {
