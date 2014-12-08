@@ -1,5 +1,3 @@
-'use strict';
-
 declare var $: any;
 
 import UserNotification = require("../../UserNotification");
@@ -37,7 +35,7 @@ var PreferencesStore = {
         });
         return preferencesAsMap;
     },
-    saveUserPreferences(preferences: Array<Preference>, callback): void {
+    saveUserPreferences(preferences: Array<Preference>, callback: (preferences: Array<any>) => void): void {
         if (!this._userName) {
             throw new Error("Need to load user preferences before you can save them");
         }
@@ -53,7 +51,8 @@ var PreferencesStore = {
             UserNotification.success("User preferences successfully saved");
             callback(preferences);
         }).fail((jqXHR, textStatus, errorThrown) => {
-            UserNotification.error("Could not save user preferences", "Saving of preferences for " + this._userName + " failed with status: " + errorThrown);
+            UserNotification.error("Could not save user preferences",
+                "Saving of preferences for " + this._userName + " failed with status: " + errorThrown);
         });
     },
     loadUserPreferences(userName: string, callback: (preferences: Array<any>) => void): void {
@@ -65,7 +64,8 @@ var PreferencesStore = {
             callback(sortedArray);
         };
         var failCallback = (jqXHR, textStatus, errorThrown) => {
-            UserNotification.error("Could not retrieve user preferences from server - try reloading the page", "Loading of user preferences for " + userName + " failed with status: " + errorThrown);
+            UserNotification.error("Could not retrieve user preferences from server - try reloading the page",
+                "Loading of user preferences for " + userName + " failed with status: " + errorThrown);
         };
         $.getJSON(url, successCallback).fail(failCallback);
     }

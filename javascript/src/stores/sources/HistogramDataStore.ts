@@ -1,6 +1,4 @@
-'use strict';
-
-var $ = require('jquery'); // excluded and shimed
+declare var $: any;
 
 var DEFAULT_MAX_DATA_POINTS = 4000;
 var HISTOGRAM_URL = '/a/search/histogram';
@@ -11,7 +9,7 @@ var HistogramDataStore = {
         if (typeof maxDataPoints === 'undefined') {
             maxDataPoints = DEFAULT_MAX_DATA_POINTS;
         }
-        url += `?maxDataPoints=${maxDataPoints}`;
+        url += "?maxDataPoints=" + maxDataPoints;
         var q = "";
         if (typeof sourceNames !== 'undefined' && sourceNames instanceof Array) {
             q = encodeURIComponent(sourceNames.map((source) => "source:" + source).join(" OR "));
@@ -26,7 +24,7 @@ var HistogramDataStore = {
                 // for months interval will be day
                 interval = 'hour';
             }
-            url += `&q=${q}&rangetype=relative&relative=${ range }&interval=${interval}`;
+            url += "&q=" + q + "&rangetype=relative&relative=" +  range + "&interval=" + interval;
         }
         var failCallback = (jqXHR, textStatus, errorThrown) => {
             console.error("Loading of histogram data failed with status: " + textStatus);
@@ -36,4 +34,4 @@ var HistogramDataStore = {
     }
 };
 
-module.exports = HistogramDataStore;
+export = HistogramDataStore;
