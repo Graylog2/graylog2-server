@@ -21,6 +21,8 @@ import org.graylog2.gelfclient.transport.GelfTransport;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.mockito.Mockito;
 import org.testng.annotations.Test;
 
@@ -29,6 +31,7 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
 
 @Test
@@ -54,5 +57,16 @@ public class GelfOutputTest {
 
         assertNotNull(request);
         assertNotNull(request.asList());
+    }
+
+    @Test
+    public void testToGELFMessageTimestamp() throws Exception {
+        final GelfOutput gelfOutput = new GelfOutput();
+        final DateTime now = DateTime.now(DateTimeZone.UTC);
+        final Message message = new Message("Test", "Source", now);
+
+        final GelfMessage gelfMessage = gelfOutput.toGELFMessage(message);
+
+        assertEquals(gelfMessage.getTimestamp(), now.getMillis() / 1000.0d);
     }
 }
