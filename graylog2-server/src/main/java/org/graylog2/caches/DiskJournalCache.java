@@ -161,6 +161,8 @@ public abstract class DiskJournalCache implements InputCache, OutputCache {
             }
         } catch (IOException e) {
             LOG.error("Unable to enqueue message", e);
+        } catch (IllegalAccessError e) {
+            throw new IllegalStateException("Error while accessing database", e);
         }
     }
 
@@ -192,7 +194,10 @@ public abstract class DiskJournalCache implements InputCache, OutputCache {
             LOG.error("Interrupted while dequeueing message: ", e);
         } catch (IOException e) {
             LOG.error("Error deserializing message", e);
+        } catch (IllegalAccessError e) {
+            throw new IllegalStateException("Error while accessing database", e);
         }
+
         return null;
     }
 
