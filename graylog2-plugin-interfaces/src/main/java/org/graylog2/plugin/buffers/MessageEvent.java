@@ -26,26 +26,15 @@ import com.lmax.disruptor.EventFactory;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.journal.RawMessage;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
 public class MessageEvent {
 
-    private RawMessage raw;
-    private Message msg;
-    
-    public Message getMessage()
-    {
-        return msg;
-    }
-
-    public void setMessage(final Message msg)
-    {
-        this.msg = msg;
-    }
-
-    public final static EventFactory<MessageEvent> EVENT_FACTORY = new EventFactory<MessageEvent>()
-    {
+    public final static EventFactory<MessageEvent> EVENT_FACTORY = new EventFactory<MessageEvent>() {
         @Override
         public MessageEvent newInstance()
         {
@@ -53,10 +42,32 @@ public class MessageEvent {
         }
     };
 
-    public void setRaw(RawMessage raw) {
-        this.raw = raw;
+    private RawMessage raw;
+    private Message msg;
+
+    @Nullable
+    public Message getMessage()
+    {
+        return msg;
     }
 
+    public void setMessage(@Nullable final Message msg)
+    {
+        this.msg = msg;
+    }
+
+    /**
+     * Sets the raw message but also clears out the {@link #getMessage() message} reference to avoid handling stale messages
+     * and to let older messages be garbage collected earlier.
+     *
+     * @param raw
+     */
+    public void setRaw(@Nonnull RawMessage raw) {
+        this.raw = raw;
+        setMessage(null);
+    }
+
+    @Nonnull
     public RawMessage getRaw() {
         return raw;
     }

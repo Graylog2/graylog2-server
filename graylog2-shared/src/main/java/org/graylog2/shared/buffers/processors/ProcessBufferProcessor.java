@@ -25,8 +25,6 @@ import org.graylog2.plugin.buffers.MessageEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.concurrent.atomic.AtomicInteger;
-
 import static com.codahale.metrics.MetricRegistry.name;
 
 /**
@@ -62,11 +60,14 @@ public abstract class ProcessBufferProcessor implements EventHandler<MessageEven
         if ((sequence % numberOfConsumers) != ordinal) {
             return;
         }
-
+        final Message msg = event.getMessage();
+        if (msg == null) {
+            // skip message events which could not be decoded properly
+            return;
+        }
         incomingMessages.mark();
         final Timer.Context tcx = processTime.time();
 
-        Message msg = event.getMessage();
 
         LOG.debug("Starting to process message <{}>.", msg.getId());
 

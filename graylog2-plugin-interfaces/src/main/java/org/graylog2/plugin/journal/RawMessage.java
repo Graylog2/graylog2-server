@@ -27,8 +27,6 @@ import com.google.common.collect.Lists;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.UninitializedMessageException;
 import org.graylog2.plugin.ResolvableInetSocketAddress;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.system.NodeId;
@@ -36,6 +34,7 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.io.Serializable;
 import java.net.InetAddress;
@@ -45,7 +44,6 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.google.common.base.MoreObjects.firstNonNull;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Strings.isNullOrEmpty;
@@ -127,6 +125,7 @@ public class RawMessage implements Serializable {
         codecConfig = Configuration.deserializeFromJson(journalMessage.getCodec().getConfig());
     }
 
+    @Nullable
     public static RawMessage decode(final byte[] buffer, final long journalOffset) {
         try {
             final JournalMessage journalMessage = JournalMessage.parseFrom(buffer);

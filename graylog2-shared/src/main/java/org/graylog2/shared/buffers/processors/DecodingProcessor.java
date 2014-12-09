@@ -17,10 +17,12 @@
 
 package org.graylog2.shared.buffers.processors;
 
+import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import com.google.common.collect.Iterables;
 import com.google.common.net.InetAddresses;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
@@ -37,7 +39,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+
+import static com.codahale.metrics.MetricRegistry.name;
 
 public class DecodingProcessor implements EventHandler<MessageEvent> {
     private static final Logger log = LoggerFactory.getLogger(DecodingProcessor.class);
@@ -51,22 +57,21 @@ public class DecodingProcessor implements EventHandler<MessageEvent> {
 
     private final Map<String, Codec.Factory<? extends Codec>> codecFactory;
     private final ServerStatus serverStatus;
+    private final MetricRegistry metricRegistry;
     private final Timer parseTime;
 
     @AssistedInject
     public DecodingProcessor(Map<String, Codec.Factory<? extends Codec>> codecFactory,
                              final InputRegistry inputRegistry,
                              final ServerStatus serverStatus,
+                             final MetricRegistry metricRegistry,
                              @Assisted("decodeTime") Timer decodeTime,
                              @Assisted("parseTime") Timer parseTime) {
         this.codecFactory = codecFactory;
         this.serverStatus = serverStatus;
+        this.metricRegistry = metricRegistry;
 
-        /*
-        failures = localRegistry.meter("failures");
-        incompleteMessages = localRegistry.meter("incompleteMessages");
-        rawSize = localRegistry.meter("rawSize");
-        */
+        // these metrics are global to all processors, thus they are passed in directly to avoid relying on the class name
         this.parseTime = parseTime;
         this.decodeTime = decodeTime;
 
@@ -86,6 +91,8 @@ public class DecodingProcessor implements EventHandler<MessageEvent> {
     public void onEvent(MessageEvent event, long sequence, boolean endOfBatch) throws Exception {
         final Timer.Context context = decodeTime.time();
         try {
+            // always set the result of processMessage, even if it is null, to avoid later stages to process old messages.
+            // basically this will make sure old messages are cleared out early.
             event.setMessage(processMessage(event.getRaw()));
         } finally {
             if (event.getMessage() != null) {
@@ -94,7 +101,7 @@ public class DecodingProcessor implements EventHandler<MessageEvent> {
         }
     }
 
-    private Message processMessage(RawMessage raw) throws java.util.concurrent.ExecutionException {
+    private Message processMessage(RawMessage raw) throws ExecutionException {
         if (raw == null) {
             log.warn("Ignoring null message");
             return null;
@@ -102,24 +109,17 @@ public class DecodingProcessor implements EventHandler<MessageEvent> {
 
         final Codec codec = codecFactory.get(raw.getCodecName()).create(raw.getCodecConfig());
 
-        /*
-
-
-        if (message == null) {
-            failures.mark();
-            LOG.warn("Could not decode message. Dropping message {}", rawMessage.getId());
-            return;
+        // for backwards compatibility: the last source node should contain the input we use.
+        // this means that extractors etc defined on the prior inputs are silently ignored.
+        // TODO fix the above
+        String inputIdOnCurrentNode;
+        try {
+            // .inputId checked during raw message decode!
+            inputIdOnCurrentNode = Iterables.getLast(raw.getSourceNodes()).inputId;
+        } catch (NoSuchElementException e) {
+            inputIdOnCurrentNode = null;
         }
-        if (!message.isComplete()) {
-            incompleteMessages.mark();
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("Dropping incomplete message. Parsed fields: [{}]", message.getFields());
-            }
-            return;
-        }
-
-        processedMessages.mark();
-        */
+        final String baseMetricName = name(codec.getClass(), inputIdOnCurrentNode);
 
         final Message message;
 
@@ -132,15 +132,24 @@ public class DecodingProcessor implements EventHandler<MessageEvent> {
                 message.setJournalOffset(raw.getJournalOffset());
             }
         } catch (RuntimeException e) {
-            //failures.mark();
+            metricRegistry.meter(name(baseMetricName, "failures")).mark();
             throw e;
         } finally {
             decodeTime = decodeTimeCtx.stop();
         }
 
         if (message == null) {
+            metricRegistry.meter(name(baseMetricName, "failures")).mark();
             return null;
         }
+        if (!message.isComplete()) {
+            metricRegistry.meter(name(baseMetricName, "incomplete")).mark();
+            if (log.isDebugEnabled()) {
+                log.debug("Dropping incomplete message. Parsed fields: [{}]", message.getFields());
+            }
+            return null;
+        }
+
         message.recordTiming(serverStatus, "parse", decodeTime);
 
         for (final RawMessage.SourceNode node : raw.getSourceNodes()) {
@@ -164,14 +173,11 @@ public class DecodingProcessor implements EventHandler<MessageEvent> {
             }
         }
 
-        for (RawMessage.SourceNode node : raw.getSourceNodes()) {
-            if (serverStatus.getNodeId().toString().equals(node.nodeId) && node.inputId != null) {
-                try {
-                    message.setSourceInput(inputCache.get(node.inputId));
-                } catch (RuntimeException e) {
-                    log.warn("Unable to find input with id " + node.inputId + ", not setting input id in this message.", e);
-                }
-                break;
+        if (inputIdOnCurrentNode != null) {
+            try {
+                message.setSourceInput(inputCache.get(inputIdOnCurrentNode));
+            } catch (RuntimeException e) {
+                log.warn("Unable to find input with id " + inputIdOnCurrentNode + ", not setting input id in this message.", e);
             }
         }
 
@@ -185,6 +191,8 @@ public class DecodingProcessor implements EventHandler<MessageEvent> {
                 message.addField("gl2_remote_hostname", remoteAddress.getHostName());
             }
         }
+
+        metricRegistry.meter(name(baseMetricName, "processedMessages")).mark();
         return message;
     }
 }

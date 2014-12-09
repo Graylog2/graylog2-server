@@ -16,26 +16,21 @@
  */
 package org.graylog2.shared.buffers;
 
-import com.codahale.metrics.InstrumentedExecutorService;
-import com.codahale.metrics.InstrumentedThreadFactory;
-import com.codahale.metrics.Meter;
-import com.codahale.metrics.MetricRegistry;
-import com.codahale.metrics.Timer;
+import com.codahale.metrics.*;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.lmax.disruptor.WaitStrategy;
 import com.lmax.disruptor.dsl.Disruptor;
 import com.lmax.disruptor.dsl.ProducerType;
-import org.graylog2.plugin.Message;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.buffers.Buffer;
 import org.graylog2.plugin.buffers.MessageEvent;
-import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.journal.RawMessage;
 import org.graylog2.shared.buffers.processors.DecodingProcessor;
 import org.graylog2.shared.buffers.processors.ProcessBufferProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -112,23 +107,9 @@ public class ProcessBuffer extends Buffer {
         ringBuffer = disruptor.start();
     }
 
-    private void prepareMessage(Message message, MessageInput sourceInput) {
-        message.setSourceInput(sourceInput);
-
-        final String source_input_name;
-
-        if (sourceInput != null)
-            source_input_name = sourceInput.getId();
-        else
-            source_input_name = "<nonexistent input>";
-
-        message.addField(SOURCE_INPUT_ATTR_NAME, source_input_name);
-        message.addField(SOURCE_NODE_ATTR_NAME, serverStatus.getNodeId());
-    }
-
-    public void insertBlocking(RawMessage rawMessage) {
-        long sequence = ringBuffer.next();
-        MessageEvent event = ringBuffer.get(sequence);
+    public void insertBlocking(@Nonnull RawMessage rawMessage) {
+        final long sequence = ringBuffer.next();
+        final MessageEvent event = ringBuffer.get(sequence);
         event.setRaw(rawMessage);
         ringBuffer.publish(sequence);
         afterInsert(1);
