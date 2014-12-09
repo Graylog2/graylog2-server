@@ -34,7 +34,6 @@ public class Version {
      * http://semver.org/
      */
 
-    public static final Version vDEV = new Version(0, 20, 0, "dev");
     public static final Version v0_20_0_PREVIEW_1 = new Version(0, 20, 0, "preview.1");
     public static final Version v0_20_0_PREVIEW_2 = new Version(0, 20, 0, "preview.2");
     public static final Version v0_20_0_PREVIEW_3 = new Version(0, 20, 0, "preview.3");
@@ -50,9 +49,6 @@ public class Version {
     public static final Version v0_20_0 = new Version(0, 20, 0);
     public static final Version v0_20_1 = new Version(0, 20, 1);
 
-    public static final Version v0_20_2_SNAPSHOT = new Version(0, 20, 2, "snapshot");
-
-    public static final Version v0_21_0_SNAPSHOT = new Version(0, 21, 0, "snapshot");
     public static final Version v0_21_0_BETA1 = new Version(0, 21, 0, "beta1");
     public static final Version v0_21_0_BETA2 = new Version(0, 21, 0, "beta2");
     public static final Version v0_21_0_BETA3 = new Version(0, 21, 0, "beta3");
@@ -66,13 +62,13 @@ public class Version {
     public static final Version v0_91_1 = new Version(0, 91, 1);
     public static final Version v0_91_2 = new Version(0, 91, 2);
 
-    public static final Version v0_92_0_SNAPSHOT = new Version(0, 92, 0, "snapshot");
     public static final Version v0_92_0_BETA_1 = new Version(0, 92, 0, "beta.1");
     public static final Version v0_92_0_RC_1 = new Version(0, 92, 0, "rc.1");
     public static final Version v0_92_0 = new Version(0, 92, 0);
+    public static final Version v0_92_1_RC_1 = new Version(0, 92, 1, "rc.1");
     public static final Version v0_92_1 = new Version(0, 92, 1);
 
-    public static final Version VERSION = v0_92_1;
+    public static final Version VERSION = v0_92_1_RC_1;
 
     @JsonProperty
     public int major;
