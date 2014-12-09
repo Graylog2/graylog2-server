@@ -1129,7 +1129,7 @@ function focusFirstFormInput(container) {
 
 // Animated change of numbers.
 (function($) {
-    $.fn.animatedIntChange = function(countTo, duration) {
+    $.fn.intChange = function(countTo) {
         return this.each(function() {
             var elem = $(this);
             var origStripped = elem.text().replace(/,/g, "");
@@ -1139,19 +1139,9 @@ function focusFirstFormInput(container) {
                 return;
             }
 
-            var countFrom = parseInt(origStripped);
-            $({value: countFrom}).animate({value: countTo}, {
-                easing: "linear",
-                duration: duration,
-                step: function() {
-                    elem.text(numeral(Math.floor(this.value)).format("0,0"));
-                },
-                complete: function() {
-                    if (parseInt(elem.text()) !== countTo) {
-                        elem.text(numeral(countTo).format("0,0"));
-                    }
-                }
-            });
+             if (parseInt(elem.text()) !== countTo) {
+                elem.text(numeral(countTo).format("0,0"));
+            }
         });
     };
 })(jQuery);
