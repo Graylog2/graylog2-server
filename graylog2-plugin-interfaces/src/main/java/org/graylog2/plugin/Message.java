@@ -180,11 +180,15 @@ public class Message {
             sb.append(message);
         }
 
+        sb.append(" { ");
+
         final Map<String, Object> filteredFields = Maps.newHashMap(fields);
         filteredFields.remove(FIELD_SOURCE);
         filteredFields.remove(FIELD_MESSAGE);
 
         Joiner.on(" | ").withKeyValueSeparator(": ").appendTo(sb, filteredFields);
+
+        sb.append(" }");
 
         return sb.toString();
     }
