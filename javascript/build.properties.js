@@ -9,14 +9,7 @@ module.exports = {
     scriptDestinationName: 'scripts.scala.html',
     entryPoints: ['./src/mount.jsx'],
     testEntryPoints: ['./test/src/suite.js'],
-    browserifyExcludes: ['jquery'],
-
-    test : {
-        unmockedModulePathPatterns: [
-            "<rootDir>/node_modules/react/",
-            "<rootDir>/node_modules/joi/"
-        ]
-    }
+    browserifyExcludes: ['jquery']
 };
 
 

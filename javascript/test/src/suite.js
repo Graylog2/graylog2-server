@@ -1,1 +1,2 @@
 require("./queryParserTests");
+require("./UserPreferencesButtonTest");

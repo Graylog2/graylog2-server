@@ -6,22 +6,7 @@
   "license": "GPL",
   "scripts": {
     "build": "./node_modules/.bin/gulp deploy-prod",
-    "jest-test": "./node_modules/.bin/jest",
     "test": "./node_modules/.bin/gulp bundle-tests && ./node_modules/karma/bin/karma start karma.ci.conf.js"
-  },
-  "jest": {
-    "scriptPreprocessor": "<rootDir>/jest-preprocessor.js",
-    "unmockedModulePathPatterns": [
-      "<rootDir>/node_modules/react/",
-      "<rootDir>/node_modules/joi/"
-    ],
-    "testPathIgnorePatterns": [
-      "node_modules"
-    ],
-    "moduleFileExtensions": [
-      "js",
-      "jsx"
-    ]
   },
   "dependencies": {
     "dc": "dc-js/dc.js",
@@ -60,8 +45,6 @@
     "karma-phantomjs-launcher": "*",
 
     "gulp-react": "^2.0.0",
-    "gulp-jest": "^0.2.2",
-    "jest-cli": "^0.1.18",
     "react-tools": "^0.12.1",
     "reactify": "0.16.*"
   }

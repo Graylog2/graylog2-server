@@ -16,7 +16,6 @@ var handlebars = require('gulp-compile-handlebars');
 var runSequence = require('run-sequence');
 var jshint = require('gulp-jshint');
 var source = require('vinyl-source-stream');
-var jest = require('gulp-jest');
 var debug = require('gulp-debug');
 var livereload = require('gulp-livereload');
 var config = require('./build.properties');
@@ -35,23 +34,6 @@ var reactOpts = {
     target: 'es5',
     stripTypes: true
 };
-
-gulp.task('test', function () {
-    return gulp.src('src', {read: false})
-        //.pipe(debug({verbose: false}))
-        .pipe(jest({
-            scriptPreprocessor: "<rootDir>/jest-preprocessor.js",
-            "rootDir": ".",
-            unmockedModulePathPatterns: config.test.unmockedModulePathPatterns,
-            testPathIgnorePatterns: [
-                "node_modules"
-            ],
-            moduleFileExtensions: [
-                "js",
-                "jsx"
-            ]
-        }));
-});
 
 var replaceRev = function (debug, noSync) {
     var manifest;
@@ -131,8 +113,6 @@ function browserifyCall(debug) {
 
     config.browserifyExcludes && config.browserifyExcludes.forEach(function(exclude) {
         b.exclude(exclude);
-        //b.ignore('jquery');
-        //b.external('jquery');
     });
     return b;
 }
@@ -160,11 +140,6 @@ gulp.task('bundle-tests', function () {
     b.plugin('tsify', {noImplicitAny: false}).on('error', function (err) {
         gutil.log(err);
         this.emit('end');
-    });
-    config.browserifyExcludes && config.browserifyExcludes.forEach(function(exclude) {
-        b.exclude(exclude);
-        //b.ignore('jquery');
-        //b.external('jquery');
     });
     return b.bundle()
         .pipe(source('tests.js'))
