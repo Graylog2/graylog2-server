@@ -400,7 +400,7 @@ public class Message {
 
         @Override
         public String toString() {
-            return name + ": " + TimeUnit.NANOSECONDS.toMillis(elapsedNanos) + "ms";
+            return name + ": " + TimeUnit.NANOSECONDS.toMicros(elapsedNanos) + "micros";
         }
     }
 
