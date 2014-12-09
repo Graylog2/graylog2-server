@@ -25,9 +25,9 @@ var EditDashboardModal = React.createClass({
         var body = (
             <fieldset>
                 <label>Title:</label>
-                <input type="text" onChange={this._onTitleChange} value={this.state.title}/>
+                <input type="text" onChange={this._onTitleChange} value={this.state.title} required/>
                 <label>Description:</label>
-                <input type="text" onChange={this._onDescriptionChange} value={this.state.description}/>
+                <input type="text" onChange={this._onDescriptionChange} value={this.state.description}  required/>
             </fieldset>
         );
         return (
@@ -35,12 +35,10 @@ var EditDashboardModal = React.createClass({
                 <button onClick={this.openModal} className="btn btn-mini">
                     <i className="icon-edit"></i> Edit
                 </button>
-                <form>
-                    <BootstrapModal ref="modal" onCancel={this._closeModal} onConfirm={this._save} cancel="Cancel" confirm="Save">
+                <BootstrapModal ref="modal" onCancel={this._closeModal} onConfirm={this._save} cancel="Cancel" confirm="Save">
                    {header}
                    {body}
-                    </BootstrapModal>
-                </form>
+                </BootstrapModal>
             </span>
         );
     },

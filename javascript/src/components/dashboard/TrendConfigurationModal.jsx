@@ -32,17 +32,15 @@ var TrendConfigurationModal = React.createClass({
         var body = (
             <fieldset>
                 <label>Description:</label>
-                <input type="text" onChange={this._onDescriptionChange} value={this.state.description}/>
+                <input type="text" onChange={this._onDescriptionChange} value={this.state.description} required/>
                 {this.state.supportsTrending ? trendOptions : null}
             </fieldset>
         );
         return (
-            <form>
-                <BootstrapModal ref="modal" onCancel={this.closeModal} onConfirm={this._save} cancel="Cancel" confirm="Save">
-                   {header}
-                   {body}
-                </BootstrapModal>
-            </form>
+            <BootstrapModal ref="modal" onCancel={this.closeModal} onConfirm={this._save} cancel="Cancel" confirm="Save">
+               {header}
+               {body}
+            </BootstrapModal>
         );
     },
     closeModal() {
