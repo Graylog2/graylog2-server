@@ -21,14 +21,12 @@ import com.github.joschi.jadconfig.RepositoryException;
 import com.github.joschi.jadconfig.ValidationException;
 import com.github.joschi.jadconfig.repositories.InMemoryRepository;
 import com.google.common.collect.Maps;
-import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -112,61 +110,4 @@ public class ConfigurationTest {
 
         Assert.assertEquals(2, configuration.getAmqpSubscribedQueues().size());
     }*/
-
-    @Test
-    public void testDefaultMessageCacheSpoolDir() throws RepositoryException, ValidationException {
-        Configuration configuration = new Configuration();
-        new JadConfig(new InMemoryRepository(validProperties), configuration).process();
-
-        Assert.assertEquals(configuration.getMessageCacheSpoolDir(), "spool", "Default message_cache_spool_dir is not 'spool'");
-    }
-
-    @Test
-    public void testMessageCacheSpoolDir() throws RepositoryException, ValidationException {
-        final HashMap<String, String> properties = Maps.newHashMap(validProperties);
-        properties.put("message_cache_spool_dir", "wat?/a/spool/dir");
-
-        Configuration configuration = new Configuration();
-        new JadConfig(new InMemoryRepository(properties), configuration).process();
-
-        Assert.assertEquals(configuration.getMessageCacheSpoolDir(), "wat?/a/spool/dir");
-    }
-
-    @Test
-    public void testDefaultMessageCacheCommitInterval() throws RepositoryException, ValidationException {
-        Configuration configuration = new Configuration();
-        new JadConfig(new InMemoryRepository(validProperties), configuration).process();
-
-        Assert.assertEquals(configuration.getMessageCacheCommitInterval(), 1000, "Default message_cache_commit_interval is not '1000'");
-    }
-
-    @Test
-    public void testMessageCacheCommitInterval() throws RepositoryException, ValidationException {
-        final HashMap<String, String> properties = Maps.newHashMap(validProperties);
-        properties.put("message_cache_commit_interval", "4000");
-
-        Configuration configuration = new Configuration();
-        new JadConfig(new InMemoryRepository(properties), configuration).process();
-
-        Assert.assertEquals(configuration.getMessageCacheCommitInterval(), 4000);
-    }
-
-    @Test
-    public void testDefaultMessageCacheOffHeap() throws RepositoryException, ValidationException {
-        Configuration configuration = new Configuration();
-        new JadConfig(new InMemoryRepository(validProperties), configuration).process();
-
-        Assert.assertEquals(configuration.isMessageCacheOffHeap(), true, "Default message_cache_off_heap is not 'true'");
-    }
-
-    @Test
-    public void testMessageCacheOffHeap() throws RepositoryException, ValidationException {
-        final HashMap<String, String> properties = Maps.newHashMap(validProperties);
-        properties.put("message_cache_off_heap", "false");
-
-        Configuration configuration = new Configuration();
-        new JadConfig(new InMemoryRepository(properties), configuration).process();
-
-        Assert.assertEquals(configuration.isMessageCacheOffHeap(), false);
-    }
 }

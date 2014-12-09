@@ -98,15 +98,6 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "output_module_timeout", validator = PositiveLongValidator.class)
     private long outputModuleTimeout = 10000;
 
-    @Parameter(value = "message_cache_spool_dir")
-    private String messageCacheSpoolDir = "spool";
-
-    @Parameter(value = "message_cache_commit_interval", validator = PositiveLongValidator.class)
-    private long messageCacheCommitInterval = 1000;
-
-    @Parameter(value = "message_cache_off_heap")
-    private boolean messageCacheOffHeap = true;
-
     @Parameter(value = "stale_master_timeout", validator = PositiveIntegerValidator.class)
     private int staleMasterTimeout = 2000;
 
@@ -118,9 +109,6 @@ public class Configuration extends BaseConfiguration {
 
     @Parameter(value = "gc_warning_threshold")
     private Duration gcWarningThreshold = Duration.seconds(1l);
-
-    @Parameter(value = "disable_output_cache")
-    private boolean disableOutputCache = true;
 
     @Parameter(value = "default_message_output_class")
     private String defaultMessageOutputClass = "";
@@ -218,18 +206,6 @@ public class Configuration extends BaseConfiguration {
         return outputModuleTimeout;
     }
 
-    public String getMessageCacheSpoolDir() {
-        return messageCacheSpoolDir;
-    }
-
-    public long getMessageCacheCommitInterval() {
-        return messageCacheCommitInterval;
-    }
-
-    public boolean isMessageCacheOffHeap() {
-        return messageCacheOffHeap;
-    }
-
     public int getStaleMasterTimeout() {
         return staleMasterTimeout;
     }
@@ -244,10 +220,6 @@ public class Configuration extends BaseConfiguration {
 
     public Duration getGcWarningThreshold() {
         return gcWarningThreshold;
-    }
-
-    public boolean isDisableOutputCache() {
-        return disableOutputCache;
     }
 
     public String getDefaultMessageOutputClass() {

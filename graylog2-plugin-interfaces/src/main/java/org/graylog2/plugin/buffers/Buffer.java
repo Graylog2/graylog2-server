@@ -24,9 +24,6 @@ package org.graylog2.plugin.buffers;
 
 import com.lmax.disruptor.RingBuffer;
 import org.graylog2.plugin.Message;
-import org.graylog2.plugin.inputs.MessageInput;
-
-import java.util.List;
 
 /**
  *
@@ -37,21 +34,8 @@ public abstract class Buffer {
     protected RingBuffer<MessageEvent> ringBuffer;
     protected int ringBufferSize;
 
-    public abstract void insertFailFast(Message message, MessageInput sourceInput) throws BufferOutOfCapacityException, ProcessingDisabledException;
-    public abstract void insertCached(Message message, MessageInput sourceInput);
-    public abstract void insertFailFast(List<Message> messages) throws BufferOutOfCapacityException, ProcessingDisabledException;
-    public abstract void insertCached(List<Message> messages);
-
     public boolean isEmpty() {
         return getUsage() == 0;
-    }
-
-    public boolean hasCapacity() {
-        return ringBuffer.hasAvailableCapacity(1);
-    }
-
-    public boolean hasCapacity(int n) {
-        return ringBuffer.hasAvailableCapacity(n);
     }
 
     public long getRemainingCapacity() {

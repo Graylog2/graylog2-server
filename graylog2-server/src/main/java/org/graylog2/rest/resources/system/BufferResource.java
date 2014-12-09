@@ -25,9 +25,6 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.Configuration;
 import org.graylog2.buffers.OutputBuffer;
-import org.graylog2.inputs.InputCache;
-import org.graylog2.inputs.OutputCache;
-import org.graylog2.plugin.buffers.BufferWatermark;
 import org.graylog2.rest.resources.RestResource;
 import org.graylog2.security.RestPermissions;
 import org.graylog2.shared.buffers.ProcessBuffer;
@@ -38,27 +35,20 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicLong;
 
 @RequiresAuthentication
 @Api(value = "System/Buffers", description = "Buffer information of this node.")
 @Path("/system/buffers")
 public class BufferResource extends RestResource {
 
-    private final InputCache inputCache;
-    private final OutputCache outputCache;
     private final Configuration configuration;
     private final ProcessBuffer processBuffer;
     private final OutputBuffer outputBuffer;
 
     @Inject
-    public BufferResource(InputCache inputCache,
-                          OutputCache outputCache,
-                          Configuration configuration,
+    public BufferResource(Configuration configuration,
                           ProcessBuffer processBuffer,
                           OutputBuffer outputBuffer) {
-        this.inputCache = inputCache;
-        this.outputCache = outputCache;
         this.configuration = configuration;
         this.processBuffer = processBuffer;
         this.outputBuffer = outputBuffer;
@@ -92,8 +82,9 @@ public class BufferResource extends RestResource {
         Map<String, Object> input = Maps.newHashMap();
         Map<String, Object> output = Maps.newHashMap();
 
-        input.put("size", inputCache.size());
-        output.put("size", outputCache.size());
+        // TODO Remove because caches do not exist anymore!
+        input.put("size", 0);
+        output.put("size", 0);
 
         caches.put("input", input);
         caches.put("output", output);

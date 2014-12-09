@@ -24,8 +24,6 @@ import org.graylog2.plugin.Message;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.filters.MessageFilter;
-import org.graylog2.plugin.inputs.MessageInput;
-import org.mockito.Matchers;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -33,8 +31,15 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static org.mockito.Mockito.*;
-import static org.testng.Assert.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.same;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.fail;
 
 public class ServerProcessBufferProcessorTest {
 
@@ -70,7 +75,6 @@ public class ServerProcessBufferProcessorTest {
         AtomicInteger processBufferWatermark = new AtomicInteger();
         OutputBuffer outputBuffer = mock(OutputBuffer.class);
         final Configuration configuration = mock(Configuration.class);
-        when(configuration.isDisableOutputCache()).thenReturn(false);
 
         final ServerProcessBufferProcessor emptyFilters =
                 new ServerProcessBufferProcessor(metricRegistry,
@@ -91,7 +95,6 @@ public class ServerProcessBufferProcessorTest {
         AtomicInteger processBufferWatermark = new AtomicInteger();
         OutputBuffer outputBuffer = mock(OutputBuffer.class);
         final Configuration configuration = mock(Configuration.class);
-        when(configuration.isDisableOutputCache()).thenReturn(false);
 
         MessageFilter filterOnlyFirst = new MessageFilter() {
             private boolean filterOut = true;
@@ -131,8 +134,8 @@ public class ServerProcessBufferProcessorTest {
             filterTest.handleMessage(filteredoutMessage);
             filterTest.handleMessage(unfilteredMessage);
 
-            verify(outputBuffer, times(0)).insertCached(same(filteredoutMessage), Matchers.<MessageInput>anyObject());
-            verify(outputBuffer, times(1)).insertCached(same(unfilteredMessage), Matchers.<MessageInput>anyObject());
+            verify(outputBuffer, times(0)).insertBlocking(same(filteredoutMessage));
+            verify(outputBuffer, times(1)).insertBlocking(same(unfilteredMessage));
             assertTrue(filteredoutMessage.getFilterOut());
             assertFalse(unfilteredMessage.getFilterOut());
 

@@ -105,8 +105,6 @@ public abstract class BaseConfiguration {
     @Parameter(value = "async_eventbus_processors")
     private int asyncEventbusProcessors = 2;
 
-    @Parameter(value = "input_cache_max_size")
-    private long inputCacheMaxSize = 0;
     @Parameter(value = "udp_recvbuffer_sizes", required = true, validator = PositiveIntegerValidator.class)
     private int udpRecvBufferSizes = 1048576;
 
@@ -254,10 +252,6 @@ public abstract class BaseConfiguration {
 
     public int getAsyncEventbusProcessors() {
         return asyncEventbusProcessors;
-    }
-
-    public long getInputCacheMaxSize() {
-        return inputCacheMaxSize;
     }
 
     public abstract String getNodeIdFile();

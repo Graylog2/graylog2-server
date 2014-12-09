@@ -18,7 +18,6 @@ package org.graylog2.radio.rest.resources.system;
 
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Maps;
-import org.graylog2.inputs.InputCache;
 import org.graylog2.radio.Configuration;
 import org.graylog2.radio.rest.resources.RestResource;
 import org.graylog2.shared.buffers.ProcessBuffer;
@@ -36,13 +35,11 @@ import java.util.Map;
 @Path("/system/buffers")
 public class BuffersResource extends RestResource {
     private final Configuration configuration;
-    private final InputCache inputCache;
     private final ProcessBuffer processBuffer;
 
     @Inject
-    public BuffersResource(Configuration configuration, InputCache inputCache, ProcessBuffer processBuffer) {
+    public BuffersResource(Configuration configuration, ProcessBuffer processBuffer) {
         this.configuration = configuration;
-        this.inputCache = inputCache;
         this.processBuffer = processBuffer;
     }
 
@@ -60,7 +57,8 @@ public class BuffersResource extends RestResource {
         Map<String, Object> caches = Maps.newHashMap();
         Map<String, Object> input = Maps.newHashMap();
 
-        input.put("size", inputCache.size());
+        // TODO Remove because cache does not exist anymore!
+        input.put("size", 0);
 
         caches.put("input", input);
 

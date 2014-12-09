@@ -113,13 +113,8 @@ public class ServerProcessBufferProcessor extends ProcessBufferProcessor {
             }
         }
 
-        if (configuration.isDisableOutputCache()) {
-            LOG.debug("Finished processing message. Writing to output buffer.");
-            outputBuffer.insertBlocking(msg);
-        } else {
-            LOG.debug("Finished processing message. Writing to output cache.");
-            outputBuffer.insertCached(msg, null);
-        }
+        LOG.debug("Finished processing message. Writing to output buffer.");
+        outputBuffer.insertBlocking(msg);
     }
 
     // default visibility for tests
