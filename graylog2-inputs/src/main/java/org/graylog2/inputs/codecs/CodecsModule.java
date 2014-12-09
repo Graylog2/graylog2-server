@@ -22,6 +22,7 @@
  */
 package org.graylog2.inputs.codecs;
 
+import com.google.inject.Scopes;
 import com.google.inject.multibindings.MapBinder;
 import org.graylog2.plugin.inject.Graylog2Module;
 import org.graylog2.plugin.inputs.codecs.Codec;
@@ -29,6 +30,9 @@ import org.graylog2.plugin.inputs.codecs.Codec;
 public class CodecsModule extends Graylog2Module {
     protected void configure() {
         final MapBinder<String, Codec.Factory<? extends Codec>> mapBinder = codecMapBinder();
+
+        // Aggregators must be singletons because codecs are instantiated in DecodingProcessor per message!
+        bind(GelfChunkAggregator.class).in(Scopes.SINGLETON);
 
         installCodec(mapBinder, RawCodec.class);
         installCodec(mapBinder, SyslogCodec.class);
