@@ -42,8 +42,17 @@ import org.jboss.netty.bootstrap.Bootstrap;
 import org.jboss.netty.bootstrap.ConnectionlessBootstrap;
 import org.jboss.netty.bootstrap.ServerBootstrap;
 import org.jboss.netty.buffer.ChannelBuffer;
-import org.jboss.netty.channel.*;
+import org.jboss.netty.channel.Channel;
+import org.jboss.netty.channel.ChannelHandler;
+import org.jboss.netty.channel.ChannelHandlerContext;
+import org.jboss.netty.channel.ChannelPipeline;
+import org.jboss.netty.channel.ChannelPipelineFactory;
+import org.jboss.netty.channel.Channels;
+import org.jboss.netty.channel.ExceptionEvent;
+import org.jboss.netty.channel.MessageEvent;
+import org.jboss.netty.channel.SimpleChannelHandler;
 import org.jboss.netty.channel.socket.DatagramChannel;
+import org.jboss.netty.channel.socket.ServerSocketChannelConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -130,6 +139,12 @@ public abstract class NettyTransport implements Transport {
                 acceptChannel = ((ConnectionlessBootstrap) bootstrap).bind(socketAddress);
             } else if (bootstrap instanceof ServerBootstrap) {
                 acceptChannel = ((ServerBootstrap) bootstrap).bind(socketAddress);
+
+
+                final ServerSocketChannelConfig channelConfig = (ServerSocketChannelConfig) acceptChannel.getConfig();
+                if(channelConfig.getReceiveBufferSize() != getRecvBufferSize()) {
+                    log.warn("receiveBufferSize (SO_RCVBUF) for {} should be {} but is {}.", acceptChannel, getRecvBufferSize(), channelConfig.getReceiveBufferSize());
+                }
             } else {
                 log.error("Unknown netty bootstrap class returned: {}. Cannot safely bind.", bootstrap);
                 throw new IllegalStateException("Unknown netty bootstrap class returned: " + bootstrap + ". Cannot safely bind.");
