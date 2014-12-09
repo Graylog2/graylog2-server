@@ -1,3 +1,5 @@
+'use strict';
+
 declare var $: any;
 
 declare var toastr: any;

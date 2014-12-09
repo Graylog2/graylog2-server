@@ -9,8 +9,7 @@ var $ = require('jquery');
 var d3 = require('d3');
 var dc = require('dc');
 
-var UniversalSearch = require('../search/UniversalSearch');
-
+var UniversalSearch = require('../../logic/search/UniversalSearch');
 
 var othersThreshold = 5;
 var othersName = "Others";

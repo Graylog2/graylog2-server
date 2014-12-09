@@ -1,3 +1,5 @@
+'use strict';
+
 declare var $: any;
 
 var DEFAULT_MAX_DATA_POINTS = 4000;

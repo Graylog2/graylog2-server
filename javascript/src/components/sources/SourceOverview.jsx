@@ -18,7 +18,7 @@ var SourceDataTable = require('./SourceDataTable');
 var SourcePieChart = require('./SourcePieChart');
 var SourceLineChart = require('./SourceLineChart');
 
-var UniversalSearch = require('../search/UniversalSearch');
+var UniversalSearch = require('../../logic/search/UniversalSearch');
 
 var daysToSeconds = (days) => moment.duration(days, 'days').as('seconds');
 var hoursToSeconds = (hours) => moment.duration(hours, 'hours').as('seconds');

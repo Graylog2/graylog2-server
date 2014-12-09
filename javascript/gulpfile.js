@@ -148,6 +148,29 @@ function browserifyIt(debug) {
         .pipe(gulp.dest('./dist/'));
 }
 
+gulp.task('bundle-tests', function () {
+    var b = browserify({
+        entries: config.testEntryPoints,
+        extensions: ['.jsx', '.js'],
+        "transform": [
+            ["reactify", reactOpts]
+        ],
+        debug: true
+    });
+    b.plugin('tsify', {noImplicitAny: false}).on('error', function (err) {
+        gutil.log(err);
+        this.emit('end');
+    });
+    config.browserifyExcludes && config.browserifyExcludes.forEach(function(exclude) {
+        b.exclude(exclude);
+        //b.ignore('jquery');
+        //b.external('jquery');
+    });
+    return b.bundle()
+        .pipe(source('tests.js'))
+        .pipe(gulp.dest('./dist/'));
+});
+
 gulp.task('prod-js', function () {
     return browserifyIt(false);
 });
@@ -182,10 +205,6 @@ gulp.task('deploy-prod', function (callback) {
 
 gulp.task('prepare-dev', function (callback) {
     runSequence('lint', 'clean-target', 'clean', 'replace-rev-dev', callback);
-});
-
-gulp.task('build-test', function (callback) {
-    runSequence('clean', 'debug-js', callback);
 });
 
 gulp.task('default', ['deploy-prod']);

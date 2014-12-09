@@ -20,7 +20,7 @@ before_script:
   - activator-${ACTIVATOR_VERSION}/activator update
   - pushd javascript && npm install && popd
 script:
-  - pushd javascript && node_modules/.bin/gulp deploy-prod && popd
+  - pushd javascript && npm test && node_modules/.bin/gulp deploy-prod && popd
   - activator-${ACTIVATOR_VERSION}/activator test
 after_success:
   - activator-${ACTIVATOR_VERSION}/activator universal:package-zip-tarball

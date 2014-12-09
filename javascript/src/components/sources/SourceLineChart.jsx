@@ -10,7 +10,7 @@ var $ = require('jquery');
 var dc = require('dc');
 var d3 = require('d3');
 
-var UniversalSearch = require('../search/UniversalSearch');
+var UniversalSearch = require('../../logic/search/UniversalSearch');
 
 var SourceLineChart = React.createClass({
     getInitialState() {

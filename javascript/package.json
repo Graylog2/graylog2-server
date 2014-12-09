@@ -6,7 +6,8 @@
   "license": "GPL",
   "scripts": {
     "build": "./node_modules/.bin/gulp deploy-prod",
-    "test": "./node_modules/.bin/jest"
+    "jest-test": "./node_modules/.bin/jest",
+    "test": "./node_modules/.bin/gulp bundle-tests && ./node_modules/karma/bin/karma start karma.ci.conf.js"
   },
   "jest": {
     "scriptPreprocessor": "<rootDir>/jest-preprocessor.js",
@@ -51,6 +52,12 @@
     "vinyl-source-stream": "*",
     "watchify": "*",
     "tsify": "*",
+
+    "karma": "*",
+    "karma-jasmine": "*",
+    "karma-chrome-launcher": "*",
+    "karma-html2js-preprocessor": "*",
+    "karma-phantomjs-launcher": "*",
 
     "gulp-react": "^2.0.0",
     "gulp-jest": "^0.2.2",

@@ -1,6 +1,6 @@
 declare var $: any;
 
-import UserNotification = require("../../UserNotification");
+import UserNotification = require("../../util/UserNotification");
 
 interface Preference {
     name: string;
