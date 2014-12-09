@@ -701,7 +701,7 @@
                     <mavenExecutorId>forked-path</mavenExecutorId>
                     <tagNameFormat>@{project.version}</tagNameFormat>
                     <preparationGoals>clean test</preparationGoals>
-                    <releaseProfiles>release-profile release</releaseProfiles>
+                    <releaseProfiles>release-profile,release</releaseProfiles>
                 </configuration>
             </plugin>
             <plugin>
