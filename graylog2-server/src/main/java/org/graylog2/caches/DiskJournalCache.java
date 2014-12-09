@@ -151,7 +151,7 @@ public abstract class DiskJournalCache implements InputCache, OutputCache {
         }
 
         if (db.isClosed()) {
-            LOG.debug("Database is closed. Not adding message.");
+            LOG.trace("Database is closed. Not adding message.");
             return;
         }
 
@@ -180,7 +180,7 @@ public abstract class DiskJournalCache implements InputCache, OutputCache {
         }
 
         if (db.isClosed()) {
-            LOG.debug("Database is closed. Not consuming message.");
+            LOG.trace("Database is closed. Not consuming message.");
             return null;
         }
 
@@ -208,7 +208,7 @@ public abstract class DiskJournalCache implements InputCache, OutputCache {
         }
 
         if (db.isClosed()) {
-            LOG.debug("Database is closed. Not consuming message.");
+            LOG.trace("Database is closed. Not consuming message.");
             return 0;
         }
 
@@ -237,7 +237,7 @@ public abstract class DiskJournalCache implements InputCache, OutputCache {
     @Override
     public int size() {
         if (db.isClosed()) {
-            LOG.debug("Database is closed. Not calculating size.");
+            LOG.trace("Database is closed. Not calculating size.");
             return 0;
         } else {
             return counter.intValue();
@@ -251,7 +251,7 @@ public abstract class DiskJournalCache implements InputCache, OutputCache {
 
     private void commit() {
         if (db.isClosed()) {
-            LOG.debug("Database is closed. Not committing to disk.");
+            LOG.trace("Database is closed. Not committing to disk.");
             return;
         }
 
@@ -265,7 +265,7 @@ public abstract class DiskJournalCache implements InputCache, OutputCache {
 
     private void compact() {
         if (db.isClosed()) {
-            LOG.debug("Database is closed. Not compacting.");
+            LOG.trace("Database is closed. Not compacting.");
             return;
         }
 
