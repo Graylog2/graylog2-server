@@ -728,6 +728,7 @@
                     <mavenExecutorId>forked-path</mavenExecutorId>
                     <tagNameFormat>@{project.version}</tagNameFormat>
                     <preparationGoals>clean test</preparationGoals>
+                    <releaseProfiles>release-profile,release</releaseProfiles>
                 </configuration>
             </plugin>
             <plugin>
@@ -889,6 +890,13 @@
                                 </goals>
                             </execution>
                         </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-release-plugin</artifactId>
+                        <configuration>
+                            <goals>deploy assembly:single</goals>
+                        </configuration>
                     </plugin>
                 </plugins>
             </build>
