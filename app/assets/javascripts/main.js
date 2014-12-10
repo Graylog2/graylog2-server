@@ -301,7 +301,23 @@ $(document).ready(function() {
     $.ajax({
         url: appPrefixed('/a/system/fields'),
         success: function(data) {
-            $(".typeahead-fields").typeahead({ source: data.fields, items: 6 });
+            var states = new Bloodhound({
+                datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value'),
+                queryTokenizer: Bloodhound.tokenizers.whitespace,
+                local: $.map(data.fields, function(data) { return { value: data }; })
+            });
+            states.initialize();
+
+            $('.typeahead-fields').typeahead({
+                    hint: true,
+                    highlight: true,
+                    minLength: 1
+                },
+                {
+                    name: 'fields',
+                    displayKey: 'value',
+                    source: states.ttAdapter()
+                });
         }
     });
 
