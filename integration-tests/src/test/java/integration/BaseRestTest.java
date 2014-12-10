@@ -16,8 +16,11 @@
  */
 package integration;
 
+import com.google.common.base.CaseFormat;
 import com.google.common.collect.Sets;
+import com.google.common.io.Resources;
 import com.jayway.restassured.RestAssured;
+import com.jayway.restassured.builder.RequestSpecBuilder;
 import com.jayway.restassured.config.MatcherConfig;
 import com.jayway.restassured.matcher.ResponseAwareMatcher;
 import com.jayway.restassured.response.Response;
@@ -27,11 +30,14 @@ import org.hamcrest.Matcher;
 import org.testng.SkipException;
 import org.testng.annotations.BeforeSuite;
 
+import java.io.IOException;
+import java.net.URL;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
 import static com.jayway.restassured.RestAssured.preemptive;
+import static com.jayway.restassured.http.ContentType.JSON;
 
 public class BaseRestTest {
     /**
@@ -74,9 +80,52 @@ public class BaseRestTest {
 
         // we want all the details for failed tests
         RestAssured.enableLoggingOfRequestAndResponseIfValidationFails();
+
         // we want to be able to describe mismatches in a custom way.
         final MatcherConfig matcherConfig = RestAssured.config().getMatcherConfig().errorDescriptionType(MatcherConfig.ErrorDescriptionType.HAMCREST);
         RestAssured.config = RestAssured.config().matcherConfig(matcherConfig);
+
+        // we usually send and receive JSON, so we preconfigure for that.
+        RestAssured.requestSpecification = new RequestSpecBuilder().build().accept(JSON).contentType(JSON);
+
+    }
+
+    /**
+     * Use this method to load a json file from the classpath.
+     * <p>
+     *     It will be looked for relative to the caller's object's class.
+     * </p>
+     * For example if you have a class in the package <code>integration.system.users</code> and call <code>jsonResource("abc.json")</code>
+     * on the instance of your test class (i.e. <code>this</code>), it will look for a file in <code>resources/integration/system/inputs/abc.json</code>.
+     * <p>
+     *     If the file does not exist or cannot be read, a {@link java.lang.IllegalStateException} will be raised which should cause your test to fail.
+     * </p>
+     * @param relativeFileName the name of the file relative to the caller's class.
+     * @return the bytes in that file.
+     */
+    protected byte[] jsonResource(String relativeFileName) {
+        final URL resource = Resources.getResource(this.getClass(), relativeFileName);
+        if (resource == null) {
+            throw new IllegalStateException("Unable to find JSON resource " + relativeFileName + " for test. This is a bug.");
+        }
+        try {
+            return Resources.toByteArray(resource);
+        } catch (IOException e) {
+            throw new IllegalStateException("Unable to read JSON resource " + relativeFileName + " for test. This is a bug.");
+        }
+    }
+
+    /**
+     * Same as @{link #jsonResource} but guesses the file name from the caller's method name. Be careful when refactoring.
+     * @return the bytes in that file
+     */
+    protected byte[] jsonResourceForMethod() {
+        final StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
+        final String testMethodName = stackTraceElements[2].getMethodName();
+
+        final String filename = CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_HYPHEN, testMethodName);
+
+        return jsonResource(filename + ".json");
     }
 
     private static class KeysPresentMatcher extends ResponseAwareMatcher<Response> {
