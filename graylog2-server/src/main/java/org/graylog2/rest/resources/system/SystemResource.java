@@ -118,6 +118,7 @@ public class SystemResource extends RestResource {
             fields = indices.getAllMessageFields();
         } else {
             fields = Sets.newHashSet();
+            addStandardFields(fields);
             int i = 0;
             for (String field : indices.getAllMessageFields()) {
                 if (i == limit) {
@@ -128,8 +129,13 @@ public class SystemResource extends RestResource {
                 i++;
             }
         }
-
         return ImmutableMap.of("fields", fields);
+    }
+
+    private void addStandardFields(Set<String> fields) {
+        fields.add("source");
+        fields.add("message");
+        fields.add("timestamp");
     }
 
     // TODO Change to @POST
