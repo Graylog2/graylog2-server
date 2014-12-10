@@ -186,9 +186,9 @@ $(document).ready(function() {
     }
 
     // Quickterms table row highlighting.
-    $(".quickvalues .terms tbody tr")
-        .live("mouseenter", highlightTermsBar)
-        .live("mouseleave", resetTermsBar);
+    $(document)
+        .on("mouseenter", ".quickvalues .terms tbody tr", highlightTermsBar)
+        .on("mouseleave", ".quickvalues .terms tbody tr", resetTermsBar);
 
     function highlightTermsBar() {
         var bar = $(".terms-bar-" + $(this).attr("data-i"));

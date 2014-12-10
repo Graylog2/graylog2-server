@@ -137,7 +137,7 @@ $(document).ready(function() {
 	});
 
 	// Go back in sidebar history / Show original sidebar.
-	$(".sidebar-back").live("click", function() {
+	$(document).on("click", ".sidebar-back", function() {
 		$("#sidebar-replacement").hide();
 		$("#sidebar-original").show();
 
@@ -149,11 +149,11 @@ $(document).ready(function() {
 	});
 
     // Hide sidebar completely.
-    $(".sidebar-hide").live("click", function() {
+    $(document).on("click", ".sidebar-hide", function() {
         hideSidebar();
     });
 
-    $(".sidebar-show").live("click", function() {
+    $(document).on("click", ".sidebar-show", function() {
         showSidebar();
     });
 
@@ -567,7 +567,7 @@ $(document).ready(function() {
     });
 
     // Create a search on the fly.
-    $(".search-link").live("click", function(e) {
+    $(document).on("click", ".search-link", function(e) {
         e.preventDefault();
 
         var field = $(this).attr("data-field");
