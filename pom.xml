@@ -48,6 +48,7 @@
         <module>graylog2-rest-routes</module>
         <module>graylog2-rest-client</module>
         <module>graylog2-bootstrap</module>
+        <module>integration-tests</module>
     </modules>
 
     <organization>
@@ -612,6 +613,18 @@
                 <groupId>org.mockito</groupId>
                 <artifactId>mockito-all</artifactId>
                 <version>1.9.5</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.jayway.restassured</groupId>
+                <artifactId>rest-assured</artifactId>
+                <version>2.4.0</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.jayway.restassured</groupId>
+                <artifactId>json-path</artifactId>
+                <version>2.4.0</version>
                 <scope>test</scope>
             </dependency>
         </dependencies>
