@@ -4,7 +4,7 @@ import UserNotification = require("../../util/UserNotification");
 
 interface Preference {
     name: string;
-    value: any
+    value: any;
 }
 
 interface PreferencesMap {

@@ -1,8 +1,16 @@
 'use strict';
 
-var $ = require('jquery'); // excluded and shimed
+declare var $: any;
 
-var processSourcesData = (sources) => {
+import UserNotification = require("../../util/UserNotification");
+
+interface Source {
+    name: string;
+    message_count: number;
+    percentage: number;
+}
+
+var processSourcesData = (sources: Array<Source>): Array<Source> => {
     var total = 0;
     sources.forEach((d) => total += d.message_count);
     sources.forEach((d) => {
@@ -14,7 +22,7 @@ var processSourcesData = (sources) => {
 var SourcesStore = {
     SOURCES_URL: '/a/sources',
 
-    loadSources(range, callback) {
+    loadSources(range: number, callback: (sources: Array<Source>) => void) {
         var url = this.SOURCES_URL;
         if (typeof range !== 'undefined') {
             url += "?range="+range;
@@ -24,10 +32,11 @@ var SourcesStore = {
             callback(sources);
         };
         var failCallback = (jqXHR, textStatus, errorThrown) => {
-            console.error("Loading of user sources failed with status: " + textStatus);
-            console.error("Error", errorThrown);
+            UserNotification.error("Loading of sources data failed with status: " + errorThrown + ". Try reloading the page.",
+                "Could not load sources data");
         };
         $.getJSON(url, successCallback).fail(failCallback);
     }
 };
-module.exports = SourcesStore;
+
+export = SourcesStore;

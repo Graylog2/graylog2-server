@@ -31,7 +31,8 @@ var HistogramDataStore = {
             url += "&q=" + q + "&rangetype=relative&relative=" + range + "&interval=" + interval;
         }
         var failCallback = (jqXHR, textStatus, errorThrown) => {
-            UserNotification.warning("Loading of histogram data failed with status: " + errorThrown, "Could not load histogram data");
+            UserNotification.warning("Loading of histogram data failed with status: " + errorThrown,
+                "Could not load histogram data");
         };
         $.getJSON(url, callback).fail(failCallback);
     }
