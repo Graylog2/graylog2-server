@@ -2,11 +2,13 @@
 
 declare var $: any;
 
+import UserNotification = require("../../util/UserNotification");
+
 var DEFAULT_MAX_DATA_POINTS = 4000;
 var HISTOGRAM_URL = '/a/search/histogram';
 
 var HistogramDataStore = {
-    loadHistogramData(range, sourceNames, maxDataPoints, callback) {
+    loadHistogramData(range: number, sourceNames: Array<string>, maxDataPoints: number, callback: (histogramData: any) => void) {
         var url = HISTOGRAM_URL;
         if (typeof maxDataPoints === 'undefined') {
             maxDataPoints = DEFAULT_MAX_DATA_POINTS;
@@ -26,11 +28,10 @@ var HistogramDataStore = {
                 // for months interval will be day
                 interval = 'hour';
             }
-            url += "&q=" + q + "&rangetype=relative&relative=" +  range + "&interval=" + interval;
+            url += "&q=" + q + "&rangetype=relative&relative=" + range + "&interval=" + interval;
         }
         var failCallback = (jqXHR, textStatus, errorThrown) => {
-            console.error("Loading of histogram data failed with status: " + textStatus);
-            console.error("Error", errorThrown);
+            UserNotification.warning("Loading of histogram data failed with status: " + errorThrown, "Could not load histogram data");
         };
         $.getJSON(url, callback).fail(failCallback);
     }
