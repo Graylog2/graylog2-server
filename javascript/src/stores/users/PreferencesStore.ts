@@ -51,8 +51,8 @@ var PreferencesStore = {
             UserNotification.success("User preferences successfully saved");
             callback(preferences);
         }).fail((jqXHR, textStatus, errorThrown) => {
-            UserNotification.error("Could not save user preferences",
-                "Saving of preferences for " + this._userName + " failed with status: " + errorThrown);
+            UserNotification.error("Saving of preferences for " + this._userName + " failed with status: " + errorThrown,
+                "Could not save user preferences");
         });
     },
     loadUserPreferences(userName: string, callback: (preferences: Array<any>) => void): void {
@@ -64,8 +64,9 @@ var PreferencesStore = {
             callback(sortedArray);
         };
         var failCallback = (jqXHR, textStatus, errorThrown) => {
-            UserNotification.error("Could not retrieve user preferences from server - try reloading the page",
-                "Loading of user preferences for " + userName + " failed with status: " + errorThrown);
+            UserNotification.error(
+                "Loading of user preferences for " + userName + " failed with status: " + errorThrown + ". Try reloading the page",
+                "Could not retrieve user preferences from server");
         };
         $.getJSON(url, successCallback).fail(failCallback);
     }
