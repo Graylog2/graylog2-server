@@ -17,6 +17,7 @@
 package org.graylog2.streams.outputs;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 
@@ -39,6 +40,7 @@ public abstract class CreateOutputRequest {
     @Nullable
     public abstract String contentPack();
 
+    @JsonCreator
     public static CreateOutputRequest create(@JsonProperty("title") String title,
                                              @JsonProperty("type") String type,
                                              @JsonProperty("configuration") Map<String, Object> configuration,
