@@ -43,9 +43,6 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
-import static com.google.common.base.Predicates.notNull;
-import static com.google.common.collect.Iterators.any;
-import static com.google.common.collect.Iterators.forArray;
 import static com.jayway.restassured.RestAssured.given;
 import static com.jayway.restassured.RestAssured.preemptive;
 import static com.jayway.restassured.http.ContentType.JSON;
@@ -53,7 +50,7 @@ import static com.jayway.restassured.http.ContentType.JSON;
 @Listeners(BaseRestTest.class)
 public class BaseRestTest implements IHookable {
     private static final Logger log = LoggerFactory.getLogger(BaseRestTest.class);
-    private Version serverUnderTestVersion;
+    private static Version serverUnderTestVersion;
 
     /**
      * Returns a {@link com.jayway.restassured.matcher.ResponseAwareMatcher} which checks that all given keys are present,
@@ -129,6 +126,9 @@ public class BaseRestTest implements IHookable {
                         description.appendText("parse the system under test's version number");
                     }
                 });
+        if (serverUnderTestVersion == null) {
+            throw new RuntimeException("");
+        }
     }
 
     /**
@@ -176,14 +176,15 @@ public class BaseRestTest implements IHookable {
         final RequiresVersion methodAnnotation = testResult.getMethod().getConstructorOrMethod()
                 .getMethod().getAnnotation(RequiresVersion.class);
         final RequiresVersion classAnnotation = (RequiresVersion) testResult.getTestClass().getRealClass().getAnnotation(RequiresVersion.class);
-        VersionRequirement versionRequirement = null;
+        String versionRequirement = null;
         if (classAnnotation != null) {
-            versionRequirement = new VersionRequirement(classAnnotation);
+            versionRequirement = classAnnotation.value();
         } else if (methodAnnotation != null) {
-            versionRequirement = new VersionRequirement(methodAnnotation);
+            versionRequirement = methodAnnotation.value();
         }
 
-        if (serverUnderTestVersion != null && versionRequirement != null && !versionRequirement.isMet(serverUnderTestVersion)) {
+        log.info("Checking {} against version {}: ", versionRequirement, serverUnderTestVersion, versionRequirement != null ? serverUnderTestVersion.satisfies(versionRequirement) : "skipped");
+        if (serverUnderTestVersion != null && versionRequirement != null && !serverUnderTestVersion.satisfies(versionRequirement)) {
 
             log.info("Skipping test <{}> because its version requirement <{}> does not meet the server's API version {}",
                      testResult.getName(), versionRequirement, serverUnderTestVersion);
@@ -191,49 +192,6 @@ public class BaseRestTest implements IHookable {
                                             " does not meet test requirement " + versionRequirement);
         }
         callBack.runTestMethod(testResult);
-    }
-
-    private static class VersionRequirement {
-
-        private final Version lessThan;
-        private final Version greaterThan;
-        private final Version orEarlier;
-        private final Version orLater;
-
-        public VersionRequirement(RequiresVersion rv) {
-            lessThan = rv.earlierThan().isEmpty() ? null : Version.valueOf(rv.earlierThan());
-            greaterThan = rv.laterThan().isEmpty() ? null : Version.valueOf(rv.laterThan());
-            orEarlier = rv.orEarlier().isEmpty() ? null : Version.valueOf(rv.orEarlier());
-            orLater = rv.orLater().isEmpty() ? null : Version.valueOf(rv.orLater());
-        }
-
-        public boolean isMet(Version version) {
-            // if none of the limits are set, the requirement matches
-            if (!any(forArray(lessThan, greaterThan, orEarlier, orLater), notNull())) {
-                return true;
-            }
-
-            boolean isMet = true;
-            if (lessThan != null) isMet = version.lessThan(lessThan);
-            if (greaterThan != null) isMet = isMet & version.greaterThan(greaterThan);
-            if (orEarlier != null) isMet = isMet & version.lessThanOrEqualTo(orEarlier);
-            if (orLater != null) isMet = isMet & version.greaterThanOrEqualTo(orLater);
-            return isMet;
-        }
-
-        @Override
-        public String toString() {
-            if (!any(forArray(lessThan, greaterThan, orEarlier, orLater), notNull())) {
-                return "any version";
-            }
-
-            final StringBuilder sb = new StringBuilder("version should be");
-            if (lessThan != null) sb.append(' ').append("less than ").append(lessThan);
-            if (greaterThan != null) sb.append(' ').append("greater than ").append(greaterThan);
-            if (orEarlier != null) sb.append(' ').append("less than or equal to ").append(orEarlier);
-            if (orLater != null) sb.append(' ').append("greater than or equal to ").append(orLater);
-            return sb.toString();
-        }
     }
 
     private static class KeysPresentMatcher extends ResponseAwareMatcher<Response> {
