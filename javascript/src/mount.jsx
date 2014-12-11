@@ -8,5 +8,5 @@ $(document).ready(() => {
     require('./components/start-page/mount');
     require('./components/sources/mount');
     require('./components/dashboard/mount');
-    require('./components/search/mount');
+    //require('./components/search/mount');
 });

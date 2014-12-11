@@ -297,17 +297,35 @@ $(document).ready(function() {
         });
     });
 
+    var substringMatcher = function(possibleMatches, displayKey, limit) {
+        return function findMatches(q, callback) {
+            var matches = [];
+
+            // code duplication is better than a shitty abstraction
+            possibleMatches.forEach(function(possibleMatch) {
+                if (matches.length < limit && possibleMatch.indexOf(q) === 0) {
+                    var match = {};
+                    match[displayKey] = possibleMatch;
+                    matches.push(match);
+                }
+            });
+
+            possibleMatches.forEach(function(possibleMatch) {
+                if (matches.length < limit && possibleMatch.indexOf(q) !== -1 && possibleMatch.indexOf(q) !== 0) {
+                    var match = {};
+                    match[displayKey] = possibleMatch;
+                    matches.push(match);
+                }
+            });
+
+            callback(matches);
+        };
+    };
+
     // Typeahead for message fields.
     $.ajax({
         url: appPrefixed('/a/system/fields'),
         success: function(data) {
-            var states = new Bloodhound({
-                datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value'),
-                queryTokenizer: Bloodhound.tokenizers.whitespace,
-                local: $.map(data.fields, function(data) { return { value: data }; })
-            });
-            states.initialize();
-
             $('.typeahead-fields').typeahead({
                     hint: true,
                     highlight: true,
@@ -316,7 +334,8 @@ $(document).ready(function() {
                 {
                     name: 'fields',
                     displayKey: 'value',
-                    source: states.ttAdapter()
+                    //source: states.ttAdapter()
+                    source: substringMatcher(data.fields, 'value', 6)
                 });
         }
     });

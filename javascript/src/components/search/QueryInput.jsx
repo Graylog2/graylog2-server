@@ -24,7 +24,7 @@ var QueryInput = React.createClass({
     },
 
     render() {
-        return (<input type="text" ref="input" id="universalsearch-query" name="q" value={this.state.query} onChange={this._onChange} autoComplete="off" placeholder="Type your search query here and press enter. (&quot;not found&quot; AND http) OR http_response_code:[400 TO 404]"/>);
+        return (<input type="text" ref="input" id="universalsearch-query" name="q" autoComplete="off" placeholder="Type your search query here and press enter. (&quot;not found&quot; AND http) OR http_response_code:[400 TO 404]"/>);
     }
 });
 
