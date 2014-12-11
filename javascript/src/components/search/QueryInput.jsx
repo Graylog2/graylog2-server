@@ -4,6 +4,8 @@ var React = require('react');
 
 var FieldsStore = require('../../stores/fields/FieldsStore');
 
+var $ = require('jquery');
+
 var QueryInput = React.createClass({
     getInitialState() {
         return {
