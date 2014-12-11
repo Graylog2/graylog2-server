@@ -1,10 +1,9 @@
 'use strict';
 
-var React = require('react/addons');
 var QueryInput = require('./QueryInput');
 
-var queryInputContainer = document.getElementById('react-query');
+var queryInputContainer = document.getElementById('universalsearch-query');
 if (queryInputContainer) {
-  var query = queryInputContainer.getAttribute("data-query");
-  React.render(<QueryInput query={query}/>, queryInputContainer);
+  var queryInput = new QueryInput(queryInputContainer);
+  queryInput.display();
 }

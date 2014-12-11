@@ -1,10 +1,9 @@
-'use strict';
+/// <reference path="../../../declarations/jquery/jquery.d.ts" />
 
-var $ = require('jquery'); // excluded and shimed
+'use strict';
 
 var initialized = false;
 
-// TODO: This really should be a react component, but right now jquery is still in charge
 var UniversalSearch = {
     init() {
         if (initialized) {
@@ -54,7 +53,7 @@ var UniversalSearch = {
         }
         var newQuery = "";
         if (typeof operator !== 'undefined' && oldQuery !== "") {
-            newQuery = `${oldQuery} ${operator} `;
+            newQuery = oldQuery + " " + operator + " ";
         }
         newQuery += segment;
         this.setQuery(newQuery);
@@ -72,8 +71,33 @@ var UniversalSearch = {
         if ($(document).scrollTop() > 50) {
             $("#scroll-to-search-hint").fadeIn("fast").delay(1500).fadeOut("fast");
         }
+    },
+    substringMatcher(possibleMatches, displayKey, limit) {
+        return function findMatches(q, callback) {
+            var matches = [];
+
+            // code duplication is better than a shitty abstraction
+            possibleMatches.forEach(function(possibleMatch) {
+                if (matches.length < limit && possibleMatch.indexOf(q) === 0) {
+                    var match = {};
+                    match[displayKey] = possibleMatch;
+                    matches.push(match);
+                }
+            });
+
+            possibleMatches.forEach(function(possibleMatch) {
+                if (matches.length < limit && possibleMatch.indexOf(q) !== -1 && possibleMatch.indexOf(q) !== 0) {
+                    var match = {};
+                    match[displayKey] = possibleMatch;
+                    matches.push(match);
+                }
+            });
+
+            callback(matches);
+        };
     }
+
 
 };
 
-module.exports = UniversalSearch;
+export = UniversalSearch;

@@ -334,7 +334,6 @@ $(document).ready(function() {
                 {
                     name: 'fields',
                     displayKey: 'value',
-                    //source: states.ttAdapter()
                     source: substringMatcher(data.fields, 'value', 6)
                 });
         }

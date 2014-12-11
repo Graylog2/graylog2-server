@@ -1,4 +1,4 @@
-/// <reference path="../../../declarations/jquery.d.ts" />
+/// <reference path="../../../declarations/jquery/jquery.d.ts" />
 
 'use strict';
 

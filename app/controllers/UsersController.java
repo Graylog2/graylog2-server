@@ -187,6 +187,7 @@ public class UsersController extends AuthenticatedController {
         // TODO: Move defaults into a static map once we have more preferences
         effectivePreferences.put("updateUnfocussed", false);
         effectivePreferences.put("disableExpensiveUpdates", false);
+        effectivePreferences.put("enableSmartSearch", false);
         if (preferences != null) {
             effectivePreferences.putAll(preferences);
         }
@@ -200,6 +201,8 @@ public class UsersController extends AuthenticatedController {
             if (preference.getKey().equals("updateUnfocussed")) {
                 normalizedPreferences.put(preference.getKey(), asBoolean(preference.getValue()));
             } else if (preference.getKey().equals("disableExpensiveUpdates")) {
+                normalizedPreferences.put(preference.getKey(), asBoolean(preference.getValue()));
+            } else if (preference.getKey().equals("enableSmartSearch")) {
                 normalizedPreferences.put(preference.getKey(), asBoolean(preference.getValue()));
             }
         }
