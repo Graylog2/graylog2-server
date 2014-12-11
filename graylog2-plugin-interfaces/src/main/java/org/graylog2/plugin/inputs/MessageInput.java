@@ -26,6 +26,7 @@ import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.MetricSet;
 import com.codahale.metrics.Timer;
+import com.fasterxml.jackson.annotation.JsonValue;
 import com.google.common.collect.Maps;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.AbstractDescriptor;
@@ -272,6 +273,7 @@ public abstract class MessageInput implements Stoppable {
         return result;
     }
 
+    @JsonValue
     public Map<String, Object> asMap() {
         final Map<String, Object> inputMap = Maps.newHashMap();
 

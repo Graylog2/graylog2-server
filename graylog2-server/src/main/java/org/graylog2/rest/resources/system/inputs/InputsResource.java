@@ -63,6 +63,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import java.net.URI;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -211,8 +212,11 @@ public class InputsResource extends RestResource {
     @Path("/types")
     @ApiOperation(value = "Get all available input types of this node")
     @Produces(MediaType.APPLICATION_JSON)
-    public Map<String, Map<String, InputDescription>> types() {
-        return ImmutableMap.of("types", inputRegistry.getAvailableInputs());
+    public Map<String, Map<String, String>> types() {
+        Map<String, String> types = new HashMap<>();
+        for (Map.Entry<String, InputDescription> entry : inputRegistry.getAvailableInputs().entrySet())
+            types.put(entry.getKey(), entry.getValue().getName());
+        return ImmutableMap.of("types", types);
     }
 
     @DELETE

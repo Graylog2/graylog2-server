@@ -23,6 +23,7 @@
 package org.graylog2.plugin;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.joda.time.DateTime;
 
 import java.util.UUID;
@@ -65,7 +66,7 @@ public class IOState<T extends Stoppable> {
         this.startedAt = Tools.iso8601();
     }
 
-
+    @JsonProperty("message_input")
     public T getStoppable() {
         return stoppable;
     }
