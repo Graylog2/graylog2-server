@@ -3,6 +3,7 @@
 declare var $: any;
 
 import UserNotification = require("../../util/UserNotification");
+import URLUtils = require("../../util/URLUtils");
 
 interface Source {
     name: string;
@@ -20,7 +21,7 @@ var processSourcesData = (sources: Array<Source>): Array<Source> => {
 };
 
 var SourcesStore = {
-    SOURCES_URL: '/a/sources',
+    SOURCES_URL: URLUtils.appPrefixed('/a/sources'),
 
     loadSources(range: number, callback: (sources: Array<Source>) => void) {
         var url = this.SOURCES_URL;

@@ -3,6 +3,7 @@
 declare var $: any;
 
 import UserNotification = require("../../util/UserNotification");
+import URLUtils = require("../../util/URLUtils");
 
 interface Dashboard {
     id: string;
@@ -11,7 +12,7 @@ interface Dashboard {
 }
 
 var DashboardStore = {
-    URL: '/dashboards',
+    URL: URLUtils.appPrefixed('/dashboards'),
     saveDashboard(dashboard: Dashboard, callback: () => void) {
         var url = this.URL + "/" + dashboard.id + "/update";
         $.ajax({

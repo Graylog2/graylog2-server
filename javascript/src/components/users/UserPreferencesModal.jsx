@@ -20,19 +20,21 @@ var UserPreferencesModal = React.createClass({
         var header = <h2>Preferences for user {this.props.userName}</h2>;
         // TODO: Add additional row where you can add a new preference
         // TODO: Add delete button
-        var body = (<table className="table table-hover">
-            <thead>
-                <tr><th>Name</th><th>Value</th></tr>
-            </thead>
-            <tbody>
+        var body = (
+            <div>
             {this.state.preferences.map((preference, index) => {
-                return (<tr key={index}><td>{preference.name}</td><td><div className="form-group"><input onChange={this._onPreferenceChanged.bind(this, preference.name)} className="form-control" required value={preference.value}/></div></td></tr>);
+                return (
+                    <div className="control-group" key={index}>
+                        <label htmlFor={preference.name+"-"+index} className="control-label">{preference.name}</label>
+                        <div className="controls">
+                            <input id={preference.name+"-"+index} onChange={this._onPreferenceChanged.bind(this, preference.name)} className="form-control" required value={preference.value} type="text"/>
+                        </div>
+                    </div>
+                );
             }, this)}
-
-            </tbody>
-        </table>);
+            </div>);
         return (
-            <BootstrapModal ref="modal" onCancel={this._closeModal} onConfirm={this._save} cancel="Cancel" confirm="Save">
+            <BootstrapModal ref="modal" onCancel={this._closeModal} onConfirm={this._save} cancel="Cancel" confirm="Save" formClass="form-horizontal">
                {header}
                {body}
             </BootstrapModal>

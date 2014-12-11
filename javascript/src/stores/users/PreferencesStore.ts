@@ -1,6 +1,7 @@
 declare var $: any;
 
 import UserNotification = require("../../util/UserNotification");
+import URLUtils = require("../../util/URLUtils");
 
 interface Preference {
     name: string;
@@ -16,7 +17,7 @@ interface Data {
 }
 
 var PreferencesStore = {
-    URL: '/a/system/user/',
+    URL: URLUtils.appPrefixed('/a/system/user/'),
     convertPreferenceMapToArray(preferencesAsMap: PreferencesMap): Array<Preference> {
         preferencesAsMap = preferencesAsMap || {};
         var preferences = Object.keys(preferencesAsMap).map((name) => {

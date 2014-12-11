@@ -3,13 +3,14 @@
 declare var $: any;
 
 import UserNotification = require("../../util/UserNotification");
+import URLUtils = require("../../util/URLUtils");
 
 var DEFAULT_MAX_DATA_POINTS = 4000;
 var HISTOGRAM_URL = '/a/search/histogram';
 
 var HistogramDataStore = {
     loadHistogramData(range: number, sourceNames: Array<string>, maxDataPoints: number, callback: (histogramData: any) => void) {
-        var url = HISTOGRAM_URL;
+        var url = URLUtils.appPrefixed(HISTOGRAM_URL);
         if (typeof maxDataPoints === 'undefined') {
             maxDataPoints = DEFAULT_MAX_DATA_POINTS;
         }
