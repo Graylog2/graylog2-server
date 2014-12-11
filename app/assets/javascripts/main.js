@@ -137,7 +137,7 @@ $(document).ready(function() {
 	});
 
 	// Go back in sidebar history / Show original sidebar.
-	$(".sidebar-back").live("click", function() {
+	$(document).on("click", ".sidebar-back", function() {
 		$("#sidebar-replacement").hide();
 		$("#sidebar-original").show();
 
@@ -149,11 +149,11 @@ $(document).ready(function() {
 	});
 
     // Hide sidebar completely.
-    $(".sidebar-hide").live("click", function() {
+    $(document).on("click", ".sidebar-hide", function() {
         hideSidebar();
     });
 
-    $(".sidebar-show").live("click", function() {
+    $(document).on("click", ".sidebar-show", function() {
         showSidebar();
     });
 
@@ -297,11 +297,46 @@ $(document).ready(function() {
         });
     });
 
+    var substringMatcher = function(possibleMatches, displayKey, limit) {
+        return function findMatches(q, callback) {
+            var matches = [];
+
+            // code duplication is better than a shitty abstraction
+            possibleMatches.forEach(function(possibleMatch) {
+                if (matches.length < limit && possibleMatch.indexOf(q) === 0) {
+                    var match = {};
+                    match[displayKey] = possibleMatch;
+                    matches.push(match);
+                }
+            });
+
+            possibleMatches.forEach(function(possibleMatch) {
+                if (matches.length < limit && possibleMatch.indexOf(q) !== -1 && possibleMatch.indexOf(q) !== 0) {
+                    var match = {};
+                    match[displayKey] = possibleMatch;
+                    matches.push(match);
+                }
+            });
+
+            callback(matches);
+        };
+    };
+
     // Typeahead for message fields.
     $.ajax({
         url: appPrefixed('/a/system/fields'),
         success: function(data) {
-            $(".typeahead-fields").typeahead({ source: data.fields, items: 6 });
+            $('.typeahead-fields').typeahead({
+                    hint: true,
+                    highlight: true,
+                    minLength: 1
+                },
+                {
+                    name: 'fields',
+                    displayKey: 'value',
+                    //source: states.ttAdapter()
+                    source: substringMatcher(data.fields, 'value', 6)
+                });
         }
     });
 
@@ -567,7 +602,7 @@ $(document).ready(function() {
     });
 
     // Create a search on the fly.
-    $(".search-link").live("click", function(e) {
+    $(document).on("click", ".search-link", function(e) {
         e.preventDefault();
 
         var field = $(this).attr("data-field");

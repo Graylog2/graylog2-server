@@ -335,7 +335,7 @@ $(document).ready(function() {
     }
 
     // Changing type of value graphs.
-    $(".field-graph-container ul.type-selector li a").live("click", function(e) {
+    $(document).on("click", ".field-graph-container ul.type-selector li a", function(e) {
         e.preventDefault();
 
         var field = $(this).closest("ul").attr("data-field");
@@ -373,7 +373,7 @@ $(document).ready(function() {
     });
 
     // Changing interpolation of value graphs.
-    $(".field-graph-container ul.interpolation-selector li a").live("click", function(e) {
+    $(document).on("click", ".field-graph-container ul.interpolation-selector li a", function(e) {
         e.preventDefault();
 
         var field = $(this).closest("ul").attr("data-field");
@@ -400,7 +400,7 @@ $(document).ready(function() {
     });
 
     // Changing interval of value graphs.
-    $(".field-graph-container ul.interval-selector li a").live("click", function(e) {
+    $(document).on("click", ".field-graph-container ul.interval-selector li a", function(e) {
         e.preventDefault();
         var field = $(this).closest("ul").attr("data-field");
         var graphContainer = $(this).closest(".field-graph-container");
@@ -418,7 +418,7 @@ $(document).ready(function() {
     });
 
     // Changing value type of value graphs.
-    $(".field-graph-container ul.valuetype-selector li a").live("click", function(e) {
+    $(document).on("click", ".field-graph-container ul.valuetype-selector li a", function(e) {
         e.preventDefault();
         var field = $(this).closest("ul").attr("data-field");
         var graphContainer = $(this).closest(".field-graph-container");
@@ -436,7 +436,7 @@ $(document).ready(function() {
     });
 
     // Removing a value graph.
-    $(".field-graph-container li a.hide").live("click", function(e) {
+    $(document).on("click", ".field-graph-container li a.hide", function(e) {
         e.preventDefault();
         var field = $(this).closest("ul").attr("data-field");
         var graphContainer = $(this).closest(".field-graph-container");
@@ -459,7 +459,7 @@ $(document).ready(function() {
         graphContainer.attr("data-lines", JSON.stringify(opts));
     }
 
-    $(".field-graph-container .pin").live("click", function(e) {
+    $(document).on("click", ".field-graph-container .pin", function(e) {
         e.preventDefault();
         var graphElem = $(this).closest(".field-graph-container");
 
@@ -480,7 +480,7 @@ $(document).ready(function() {
         $(".unpin", graphElem).show();
     });
 
-    $(".field-graph-container .unpin").live("click", function(e) {
+    $(document).on("click", ".field-graph-container .unpin", function(e) {
         e.preventDefault();
         var graphElem = $(this).closest(".field-graph-container");
         var graphOpts = chartOptionsFromContainer(graphElem);

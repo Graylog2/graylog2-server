@@ -96,7 +96,7 @@ $(document).ready(function() {
         }
     }
 
-    $("ul.dashboard-selector li a[data-dashboard-id]").live("click", function () {
+    $(document).on("click", "ul.dashboard-selector li a[data-dashboard-id]", function () {
         var elem = $(this).closest("ul.dashboard-selector");
         var widgetType = elem.attr("data-widget-type");
         var dashboardId = $(this).attr("data-dashboard-id");
@@ -111,7 +111,7 @@ $(document).ready(function() {
         }
     });
 
-    $(".dashboard .widget .remove-widget").live("click", function(e) {
+    $(document).on("click", ".dashboard .widget .remove-widget", function(e) {
         e.preventDefault();
 
         if(!confirm("Really remove widget? The page will reload after removing it.")) {
@@ -134,7 +134,7 @@ $(document).ready(function() {
         });
     });
 
-    $(".dashboard .widget .show-config").live("click", function(e) {
+    $(document).on("click", ".dashboard .widget .show-config", function(e) {
         var widget = $(this).closest(".widget");
 
         $(".widget-config[data-widget-id=" + widget.attr("data-widget-id") + "]").modal();
