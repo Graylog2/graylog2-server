@@ -17,10 +17,13 @@
 package integration.system.inputs;
 
 import integration.BaseRestTest;
+import integration.RequiresVersion;
 import org.testng.annotations.Test;
 
 import static com.jayway.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.notNullValue;
+
+@RequiresVersion(laterThan = "0.90.0")
 public class InputsTest extends BaseRestTest {
 
     @Test

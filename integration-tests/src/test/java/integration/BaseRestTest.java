@@ -16,6 +16,7 @@
  */
 package integration;
 
+import com.github.zafarkhaja.semver.Version;
 import com.google.common.base.CaseFormat;
 import com.google.common.collect.Sets;
 import com.google.common.io.Resources;
@@ -27,8 +28,14 @@ import com.jayway.restassured.response.Response;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.testng.IHookCallBack;
+import org.testng.IHookable;
+import org.testng.ITestResult;
 import org.testng.SkipException;
 import org.testng.annotations.BeforeSuite;
+import org.testng.annotations.Listeners;
 
 import java.io.IOException;
 import java.net.URL;
@@ -36,10 +43,18 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
+import static com.google.common.base.Predicates.notNull;
+import static com.google.common.collect.Iterators.any;
+import static com.google.common.collect.Iterators.forArray;
+import static com.jayway.restassured.RestAssured.given;
 import static com.jayway.restassured.RestAssured.preemptive;
 import static com.jayway.restassured.http.ContentType.JSON;
 
-public class BaseRestTest {
+@Listeners(BaseRestTest.class)
+public class BaseRestTest implements IHookable {
+    private static final Logger log = LoggerFactory.getLogger(BaseRestTest.class);
+    private Version serverUnderTestVersion;
+
     /**
      * Returns a {@link com.jayway.restassured.matcher.ResponseAwareMatcher} which checks that all given keys are present,
      * and that no additional keys are in the given path.
@@ -88,6 +103,32 @@ public class BaseRestTest {
         // we usually send and receive JSON, so we preconfigure for that.
         RestAssured.requestSpecification = new RequestSpecBuilder().build().accept(JSON).contentType(JSON);
 
+        // immediately query the server for its version number, we need it to be able to process the RequireVersion annotations.
+        given().when()
+                .get("/system")
+                .then()
+                .body("version", new BaseMatcher<Object>() {
+                    @Override
+                    public boolean matches(Object item) {
+                        if (item instanceof String) {
+                            String str = (String)item;
+                            try {
+                                // clean our slightly non-semver version number
+                                str = str.replaceAll("\\(.*?\\)", "").trim();
+                                serverUnderTestVersion = Version.valueOf(str);
+                                return true;
+                            } catch (RuntimeException e) {
+                                return false;
+                            }
+                        }
+                        return false;
+                    }
+
+                    @Override
+                    public void describeTo(Description description) {
+                        description.appendText("parse the system under test's version number");
+                    }
+                });
     }
 
     /**
@@ -126,6 +167,73 @@ public class BaseRestTest {
         final String filename = CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_HYPHEN, testMethodName);
 
         return jsonResource(filename + ".json");
+    }
+
+    @Override
+    public void run(IHookCallBack callBack, ITestResult testResult) {
+        log.trace("Running version check hook on test {}", testResult.getMethod());
+
+        final RequiresVersion methodAnnotation = testResult.getMethod().getConstructorOrMethod()
+                .getMethod().getAnnotation(RequiresVersion.class);
+        final RequiresVersion classAnnotation = (RequiresVersion) testResult.getTestClass().getRealClass().getAnnotation(RequiresVersion.class);
+        VersionRequirement versionRequirement = null;
+        if (classAnnotation != null) {
+            versionRequirement = new VersionRequirement(classAnnotation);
+        } else if (methodAnnotation != null) {
+            versionRequirement = new VersionRequirement(methodAnnotation);
+        }
+
+        if (serverUnderTestVersion != null && versionRequirement != null && !versionRequirement.isMet(serverUnderTestVersion)) {
+
+            log.info("Skipping test <{}> because its version requirement <{}> does not meet the server's API version {}",
+                     testResult.getName(), versionRequirement, serverUnderTestVersion);
+            throw new SkipException("API Version " + serverUnderTestVersion +
+                                            " does not meet test requirement " + versionRequirement);
+        }
+        callBack.runTestMethod(testResult);
+    }
+
+    private static class VersionRequirement {
+
+        private final Version lessThan;
+        private final Version greaterThan;
+        private final Version orEarlier;
+        private final Version orLater;
+
+        public VersionRequirement(RequiresVersion rv) {
+            lessThan = rv.earlierThan().isEmpty() ? null : Version.valueOf(rv.earlierThan());
+            greaterThan = rv.laterThan().isEmpty() ? null : Version.valueOf(rv.laterThan());
+            orEarlier = rv.orEarlier().isEmpty() ? null : Version.valueOf(rv.orEarlier());
+            orLater = rv.orLater().isEmpty() ? null : Version.valueOf(rv.orLater());
+        }
+
+        public boolean isMet(Version version) {
+            // if none of the limits are set, the requirement matches
+            if (!any(forArray(lessThan, greaterThan, orEarlier, orLater), notNull())) {
+                return true;
+            }
+
+            boolean isMet = true;
+            if (lessThan != null) isMet = version.lessThan(lessThan);
+            if (greaterThan != null) isMet = isMet & version.greaterThan(greaterThan);
+            if (orEarlier != null) isMet = isMet & version.lessThanOrEqualTo(orEarlier);
+            if (orLater != null) isMet = isMet & version.greaterThanOrEqualTo(orLater);
+            return isMet;
+        }
+
+        @Override
+        public String toString() {
+            if (!any(forArray(lessThan, greaterThan, orEarlier, orLater), notNull())) {
+                return "any version";
+            }
+
+            final StringBuilder sb = new StringBuilder("version should be");
+            if (lessThan != null) sb.append(' ').append("less than ").append(lessThan);
+            if (greaterThan != null) sb.append(' ').append("greater than ").append(greaterThan);
+            if (orEarlier != null) sb.append(' ').append("less than or equal to ").append(orEarlier);
+            if (orLater != null) sb.append(' ').append("greater than or equal to ").append(orLater);
+            return sb.toString();
+        }
     }
 
     private static class KeysPresentMatcher extends ResponseAwareMatcher<Response> {
