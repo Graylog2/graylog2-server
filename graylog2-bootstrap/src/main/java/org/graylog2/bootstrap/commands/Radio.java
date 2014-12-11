@@ -20,6 +20,7 @@ import com.google.common.util.concurrent.ServiceManager;
 import com.google.inject.Injector;
 import com.google.inject.Module;
 import com.google.inject.ProvisionException;
+import com.google.inject.spi.Message;
 import io.airlift.command.Command;
 import org.graylog2.bootstrap.Bootstrap;
 import org.graylog2.bootstrap.Main;
@@ -35,6 +36,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -95,9 +97,5 @@ public class Radio extends Bootstrap implements Runnable {
     @Override
     protected Class<? extends Runnable> shutdownHook() {
         return ShutdownHook.class;
-    }
-
-    @Override
-    protected void annotateProvisionException(ProvisionException e) {
     }
 }

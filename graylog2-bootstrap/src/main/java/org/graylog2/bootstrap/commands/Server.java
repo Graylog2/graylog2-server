@@ -47,6 +47,7 @@ import org.graylog2.configuration.VersionCheckConfiguration;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.ServerStatus;
+import org.graylog2.plugin.system.NodeIdPersistenceException;
 import org.graylog2.shared.system.activities.Activity;
 import org.graylog2.shared.system.activities.ActivityWriter;
 import org.graylog2.system.shutdown.GracefulShutdown;
@@ -55,6 +56,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -226,8 +228,9 @@ public class Server extends Bootstrap implements Runnable {
     }
 
     @Override
-    protected void annotateProvisionException(ProvisionException e) {
-        for (Message message : e.getErrorMessages()) {
+    protected void annotateInjectorExceptions(Collection<Message> messages) {
+        super.annotateInjectorExceptions(messages);
+        for (Message message : messages) {
             if (message.getCause() instanceof MongoException) {
                 LOG.error(UI.wallString("Unable to connect to MongoDB. Is it running and the configuration correct?"));
                 System.exit(-1);

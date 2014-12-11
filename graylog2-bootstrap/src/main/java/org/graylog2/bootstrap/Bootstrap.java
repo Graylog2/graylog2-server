@@ -33,14 +33,12 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.ServiceManager;
-import com.google.inject.AbstractModule;
-import com.google.inject.Binder;
-import com.google.inject.Injector;
-import com.google.inject.Module;
-import com.google.inject.ProvisionException;
+import com.google.inject.*;
 import com.google.inject.name.Names;
+import com.google.inject.spi.Message;
 import io.airlift.command.Option;
 import org.apache.log4j.Level;
+import org.graylog2.UI;
 import org.graylog2.plugin.BaseConfiguration;
 import org.graylog2.plugin.Plugin;
 import org.graylog2.plugin.PluginConfigBean;
@@ -51,6 +49,7 @@ import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.Version;
 import org.graylog2.plugin.inject.Graylog2Module;
 import org.graylog2.plugin.inputs.MessageInput;
+import org.graylog2.plugin.system.NodeIdPersistenceException;
 import org.graylog2.shared.bindings.GenericBindings;
 import org.graylog2.shared.bindings.GuiceInjectorHolder;
 import org.graylog2.shared.bindings.GuiceInstantiationService;
@@ -124,7 +123,6 @@ public abstract class Bootstrap implements Runnable {
     protected abstract List<Module> getCommandBindings();
     protected abstract List<Object> getCommandConfigurationBeans();
     protected abstract Class<? extends Runnable> shutdownHook();
-    protected abstract void annotateProvisionException(ProvisionException e);
 
     protected abstract boolean validateConfiguration();
 
@@ -367,6 +365,9 @@ public abstract class Bootstrap implements Runnable {
             instantiationService.setInjector(injector);
 
             return injector;
+        } catch (CreationException e) {
+            annotateInjectorCreationException(e);
+            return null;
         } catch (Exception e) {
             LOG.error("Injector creation failed!", e);
             return null;
@@ -433,5 +434,22 @@ public abstract class Bootstrap implements Runnable {
         }
 
         return sb.toString();
+    }
+
+    protected void annotateProvisionException(ProvisionException e) {
+        annotateInjectorExceptions(e.getErrorMessages());
+    }
+
+    protected void annotateInjectorCreationException(CreationException e) {
+        annotateInjectorExceptions(e.getErrorMessages());
+    }
+
+    protected void annotateInjectorExceptions(Collection<Message> messages) {
+        for (Message message : messages) {
+            if (message.getCause() instanceof NodeIdPersistenceException) {
+                LOG.error(UI.wallString("Unable to read or persist your NodeId file. This means your node id file (" + configuration.getNodeIdFile() + ") is not readable or writable by the current user. The following exception might give more information: " + message));
+                System.exit(-1);
+            }
+        }
     }
 }

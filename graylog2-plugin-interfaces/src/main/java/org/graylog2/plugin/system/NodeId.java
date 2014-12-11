@@ -61,8 +61,9 @@ public class NodeId {
         } catch (FileNotFoundException | NoSuchFileException e) {
             return generate();
         } catch (Exception e2) {
-            LOG.error("Could not read or generate node ID: ", e2);
-            throw new RuntimeException(e2);
+            final String msg = "Could not read or generate node ID!";
+            LOG.debug(msg, e2);
+            throw new NodeIdPersistenceException(msg, e2);
         }
     }
 
@@ -72,15 +73,15 @@ public class NodeId {
         return lines.size() > 0 ? lines.get(0) : "";
     }
 
-    private String generate() {
+    private String generate() throws NodeIdPersistenceException {
         String generated = Tools.generateServerId();
         LOG.info("No node ID file found. Generated: {}", generated);
 
         try {
             persist(generated);
         } catch (IOException e1) {
-            LOG.error("Could not persist node ID: ", e1);
-            throw new RuntimeException(e1);
+            LOG.debug("Could not persist node ID: ", e1);
+            throw new NodeIdPersistenceException("Unable to persist node ID", e1);
         }
 
         return generated;
