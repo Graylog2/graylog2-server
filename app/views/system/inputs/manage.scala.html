@@ -5,13 +5,6 @@
         localInputs: List[org.graylog2.restclient.models.InputState],
         inputTypes: Map[String, org.graylog2.restclient.models.api.responses.system.InputTypeSummaryResponse])
 
-@orderedGlobalInputs = @{
-    globalInputs.toSeq.sortWith(_._1.getTitle < _._1.getTitle)
-}
-@orderedLocalInputs = @{
-    localInputs.toSeq.sortBy(_.getInput.getTitle.toLowerCase)
-}
-
 @main("Inputs of node", views.html.system.sidebar(), "", currentUser) {
     @views.html.partials.breadcrumbs(breadcrumbs)
 
@@ -23,32 +16,6 @@
         You can launch and terminate inputs on your cluster <a href="@routes.InputsController.index()">here</a>.
     </div>
 
-    <div class="row-fluid input-list">
-        <h2><i class="icon icon-cogs"></i> Running global inputs</h2>
-        @if(globalInputs.size > 0) {
-            @for((input, nodeStates) <- orderedGlobalInputs) {
-                @views.html.system.inputs.partials.global_input_summary(input, nodeStates, inputTypes, node)
-            }
-        } else {
-            <div class="alert alert-info">There are no global inputs.</div>
-        }
-    </div>
-    <div class="row-fluid input-list">
-        <h2><i class="icon icon-cogs"></i> Running local inputs</h2>
-
-        @if(localInputs.size > 0) {
-            @for(inputState <- orderedLocalInputs) {
-                @views.html.system.inputs.partials.input_summary(inputState, inputTypes)
-            }
-        } else {
-            <div class="alert alert-info">There are no local inputs.</div>
-        }
-    </div>
-
-    <div class="alert alert-info">
-        Newly added input not appearing? You can find information about misfired inputs
-        in the <a href="@routes.SystemController.index()">system messages</a>.
-    </div>
-
+    @views.html.system.inputs.partials.input_summary_list(globalInputs, localInputs, inputTypes, node)
     @views.html.system.inputs.partials.add_static_field_form()
 }
