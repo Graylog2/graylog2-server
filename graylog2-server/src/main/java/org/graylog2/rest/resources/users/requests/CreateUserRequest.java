@@ -54,6 +54,10 @@ public abstract class CreateUserRequest {
     @Nullable
     public abstract Long sessionTimeoutMs();
 
+    @JsonProperty
+    @Nullable
+    public abstract Startpage startpage();
+
     @JsonCreator
     public static CreateUserRequest create(@JsonProperty("username") @NotEmpty String username,
                                            @JsonProperty("password") @NotEmpty String password,
@@ -61,7 +65,8 @@ public abstract class CreateUserRequest {
                                            @JsonProperty("full_name") @NotEmpty String fullName,
                                            @JsonProperty("permissions") @NotNull List<String> permissions,
                                            @JsonProperty("timezone") @Nullable String timezone,
-                                           @JsonProperty("session_timeout_ms") @Nullable @Min(1) Long sessionTimeoutMs) {
-        return new AutoValue_CreateUserRequest(username, password, email, fullName, permissions, timezone, sessionTimeoutMs);
+                                           @JsonProperty("session_timeout_ms") @Nullable @Min(1) Long sessionTimeoutMs,
+                                           @JsonProperty("startpage") @Nullable Startpage startpage) {
+        return new AutoValue_CreateUserRequest(username, password, email, fullName, permissions, timezone, sessionTimeoutMs, startpage);
     }
 }

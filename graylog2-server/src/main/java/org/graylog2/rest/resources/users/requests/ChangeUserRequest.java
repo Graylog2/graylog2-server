@@ -64,20 +64,4 @@ public abstract class ChangeUserRequest {
                                            @JsonProperty("session_timeout_ms") @Nullable @Min(1) Long sessionTimeoutMs) {
         return new AutoValue_ChangeUserRequest(email, fullName, permissions, timezone, startpage, sessionTimeoutMs);
     }
-
-    @JsonAutoDetect
-    @AutoValue
-    public static abstract class Startpage {
-        @JsonProperty
-        public abstract String type();
-
-        @JsonProperty
-        public abstract String id();
-
-        @JsonCreator
-        public static Startpage create(@JsonProperty("type") @NotEmpty String type,
-                                       @JsonProperty("id") @NotEmpty String id) {
-            return new AutoValue_ChangeUserRequest_Startpage(type, id);
-        }
-    }
 }
