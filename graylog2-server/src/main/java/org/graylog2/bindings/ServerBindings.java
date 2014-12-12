@@ -31,19 +31,7 @@ import org.graylog2.alerts.AlertSender;
 import org.graylog2.alerts.FormattedEmailAlertSender;
 import org.graylog2.alerts.types.FieldValueAlertCondition;
 import org.graylog2.alerts.types.MessageCountAlertCondition;
-import org.graylog2.bindings.providers.BundleExporterProvider;
-import org.graylog2.bindings.providers.BundleImporterProvider;
-import org.graylog2.bindings.providers.DefaultSecurityManagerProvider;
-import org.graylog2.bindings.providers.EsNodeProvider;
-import org.graylog2.bindings.providers.LdapConnectorProvider;
-import org.graylog2.bindings.providers.LdapUserAuthenticatorProvider;
-import org.graylog2.bindings.providers.MongoConnectionProvider;
-import org.graylog2.bindings.providers.RotationStrategyProvider;
-import org.graylog2.bindings.providers.RulesEngineProvider;
-import org.graylog2.bindings.providers.ServerInputRegistryProvider;
-import org.graylog2.bindings.providers.ServerObjectMapperProvider;
-import org.graylog2.bindings.providers.SystemJobFactoryProvider;
-import org.graylog2.bindings.providers.SystemJobManagerProvider;
+import org.graylog2.bindings.providers.*;
 import org.graylog2.buffers.processors.OutputBufferProcessor;
 import org.graylog2.buffers.processors.ServerProcessBufferProcessor;
 import org.graylog2.bundles.BundleService;
@@ -78,6 +66,7 @@ import org.graylog2.system.activities.SystemMessageActivityWriter;
 import org.graylog2.system.jobs.SystemJobFactory;
 import org.graylog2.system.jobs.SystemJobManager;
 import org.graylog2.system.shutdown.GracefulShutdown;
+import org.joda.time.Duration;
 
 import javax.ws.rs.container.ContainerResponseFilter;
 import javax.ws.rs.container.DynamicFeature;
@@ -149,6 +138,8 @@ public class ServerBindings extends AbstractModule {
 
         bind(String.class).annotatedWith(Names.named("journalDirectory")).toInstance(configuration.getMessageJournalDir());
         bind(Integer.class).annotatedWith(Names.named("journalSegmentSize")).toInstance(configuration.getMessageJournalSegmentSize());
+        bind(Long.class).annotatedWith(Names.named("journalMaxRetentionSize")).toInstance(configuration.getMessageJournalMaxSize());
+        bind(Duration.class).annotatedWith(Names.named("journalMaxRetentionAge")).toInstance(configuration.getMessageJournalMaxAge());
 
         bind(String[].class).annotatedWith(Names.named("RestControllerPackages")).toInstance(new String[]{
                 "org.graylog2.rest.resources",

@@ -24,6 +24,7 @@ import com.google.inject.Singleton;
 import com.google.inject.multibindings.Multibinder;
 import com.google.inject.name.Named;
 import org.graylog2.plugin.inject.Graylog2Module;
+import org.joda.time.Duration;
 
 import java.util.concurrent.ScheduledExecutorService;
 
@@ -41,7 +42,9 @@ public class KafkaJournalModule extends Graylog2Module {
     public KafkaJournal providesJournal(@Named("journalDirectory") String journalDirName,
                                         @Named("scheduler") ScheduledExecutorService scheduler,
                                         @Named("journalSegmentSize") int segmentSize,
+                                        @Named("journalMaxRetentionSize") long retentionSize,
+                                        @Named("journalMaxRetentionAge") Duration retentionAge,
                                         MetricRegistry metricRegistry) {
-        return new KafkaJournal(journalDirName, scheduler, segmentSize, metricRegistry);
+        return new KafkaJournal(journalDirName, scheduler, segmentSize, retentionSize, retentionAge, metricRegistry);
     }
 }

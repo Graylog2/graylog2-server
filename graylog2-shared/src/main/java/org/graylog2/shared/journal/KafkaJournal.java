@@ -42,6 +42,7 @@ import kafka.utils.KafkaScheduler;
 import kafka.utils.SystemTime$;
 import kafka.utils.Utils;
 import org.graylog2.shared.metrics.HdrTimer;
+import org.joda.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import scala.Option;
@@ -86,6 +87,8 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
     public KafkaJournal(@Named("journalDirectory") String journalDirName,
                         @Named("scheduler") ScheduledExecutorService scheduler,
                         @Named("journalSegmentSize") int segmentSize,
+                        @Named("journalMaxRetentionSize") long retentionSize,
+                        @Named("journalMaxRetentionAge") Duration retentionAge,
                         MetricRegistry metricRegistry) {
         this.scheduler = scheduler;
         this.metricRegistry = metricRegistry;
@@ -93,26 +96,25 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
         this.messagesWritten = metricRegistry.meter(name(this.getClass(), "messagesWritten"));
         this.messagesRead = metricRegistry.meter(name(this.getClass(), "messagesRead"));
 
-        writeTime = metricRegistry.register(name(this.getClass(), "writeTime"), new HdrTimer(1, TimeUnit.SECONDS, 3));
-        readTime = metricRegistry.register(name(this.getClass(), "readTime"), new HdrTimer(1, TimeUnit.SECONDS, 3));
+        writeTime = metricRegistry.register(name(this.getClass(), "writeTime"), new HdrTimer(1, TimeUnit.MINUTES, 1));
+        readTime = metricRegistry.register(name(this.getClass(), "readTime"), new HdrTimer(1, TimeUnit.MINUTES, 1));
 
-        // TODO all of these configuration values need tweaking
         // these are the default values as per kafka 0.8.1.1
         final LogConfig defaultConfig =
                 new LogConfig(
-                        segmentSize,
-                        Long.MAX_VALUE,
-                        Long.MAX_VALUE,
-                        Long.MAX_VALUE,
-                        Long.MAX_VALUE,
-                        Long.MAX_VALUE,
-                        Integer.MAX_VALUE,
-                        1024 * 1024,
-                        4096,
-                        60 * 1000,
-                        24 * 60 * 60 * 1000L,
-                        0.5,
-                        false
+                        segmentSize,            // segmentSize: The soft maximum for the size of a segment file in the log
+                        Long.MAX_VALUE,         // segmentMs: The soft maximum on the amount of time before a new log segment is rolled
+                        Long.MAX_VALUE,         // flushInterval: The number of messages that can be written to the log before a flush is forced
+                        Long.MAX_VALUE,         // flushMs: The amount of time the log can have dirty data before a flush is forced
+                        retentionSize,          // retentionSize: The approximate total number of bytes this log can use
+                        retentionAge.getMillis(), // retentionMs: The age approximate maximum age of the last segment that is retained
+                        Integer.MAX_VALUE,      // maxMessageSize: The maximum size of a message in the log
+                        1024 * 1024,            // maxIndexSize: The maximum size of an index file
+                        4096,                   // indexInterval: The approximate number of bytes between index entries
+                        60 * 1000,              // fileDeleteDelayMs: The time to wait before deleting a file from the filesystem
+                        24 * 60 * 60 * 1000L,   // deleteRetentionMs: The time to retain delete markers in the log. Only applicable for logs that are being compacted.
+                        0.5,                    // minCleanableRatio: The ratio of bytes that are available for cleaning to the bytes already cleaned
+                        false                   // compact: Should old segments in this log be deleted or deduplicated?
                 );
         // these are the default values as per kafka 0.8.1.1, except we don't turn on the cleaner
         // Cleaner really is log compaction with respect to "deletes" in the log.
@@ -158,7 +160,7 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
                     cleanerConfig,
                     TimeUnit.SECONDS.toMillis(60),
                     TimeUnit.SECONDS.toMillis(60),
-                    TimeUnit.SECONDS.toMillis(60),
+                    TimeUnit.SECONDS.toMillis(20),
                     kafkaScheduler, // TODO use our own scheduler here?
                     SystemTime$.MODULE$);
 
