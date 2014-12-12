@@ -24,7 +24,6 @@ package org.graylog2.plugin;
 
 import com.google.common.io.BaseEncoding;
 import com.google.common.primitives.Ints;
-import org.elasticsearch.search.SearchHit;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
@@ -318,18 +317,6 @@ public final class Tools {
                 .append(DateTimeFormat.forPattern(ES_DATE_FORMAT_NO_MS).withZoneUTC())
                 .appendOptional(ms)
                 .toFormatter();
-    }
-
-    public static int getTimestampOfMessage(SearchHit msg) {
-        Object field = msg.getSource().get("timestamp");
-        if (field == null) {
-            throw new RuntimeException("Document has no field timestamp.");
-        }
-
-        DateTimeFormatter formatter = DateTimeFormat.forPattern(ES_DATE_FORMAT).withZoneUTC();
-        DateTime dt = formatter.parseDateTime(field.toString());
-
-        return (int) (dt.getMillis() / 1000);
     }
 
     public static DateTime iso8601() {
