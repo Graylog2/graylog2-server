@@ -68,9 +68,12 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static com.google.common.base.MoreObjects.firstNonNull;
 
 @RequiresAuthentication
 @Api(value = "Streams", description = "Manage streams")
@@ -109,7 +112,8 @@ public class StreamResource extends RestResource {
 
         final String id = streamService.save(stream);
 
-        for (CreateStreamRuleRequest request : cr.rules()) {
+        final List<CreateStreamRuleRequest> rules = firstNonNull(cr.rules(), Collections.<CreateStreamRuleRequest>emptyList());
+        for (CreateStreamRuleRequest request : rules) {
             StreamRule streamRule = streamRuleService.create(id, request);
             streamRuleService.save(streamRule);
         }

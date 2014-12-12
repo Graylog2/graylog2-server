@@ -61,7 +61,6 @@ import java.util.List;
 @Api(value = "StreamRules", description = "Manage stream rules")
 @Path("/streams/{streamid}/rules")
 public class StreamRuleResource extends RestResource {
-    private static final Logger LOG = LoggerFactory.getLogger(StreamRuleResource.class);
     private final StreamRuleService streamRuleService;
     private final StreamService streamService;
 
@@ -78,20 +77,20 @@ public class StreamRuleResource extends RestResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response create(@ApiParam(name = "streamid", value = "The stream id this new rule belongs to.", required = true)
-                           @PathParam("streamid") String streamid,
+                           @PathParam("streamid") String streamId,
                            @ApiParam(name = "JSON body", required = true)
                            @Valid @NotNull CreateStreamRuleRequest cr) throws NotFoundException, ValidationException {
-        checkPermission(RestPermissions.STREAMS_EDIT, streamid);
+        checkPermission(RestPermissions.STREAMS_EDIT, streamId);
 
-        final Stream stream = streamService.load(streamid);
-        final StreamRule streamRule = streamRuleService.create(streamid, cr);
+        final Stream stream = streamService.load(streamId);
+        final StreamRule streamRule = streamRuleService.create(streamId, cr);
         final String id = streamService.save(streamRule);
 
         final SingleStreamRuleSummaryResponse response = SingleStreamRuleSummaryResponse.create(id);
 
         final URI streamRuleUri = UriBuilder.fromResource(StreamRuleResource.class)
                 .path("{streamRuleId}")
-                .build(id);
+                .build(streamId, id);
 
         return Response.created(streamRuleUri).entity(response).build();
     }

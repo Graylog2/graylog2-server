@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.graylog2.rest.resources.streams.rules.requests.CreateStreamRuleRequest;
+import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -32,9 +33,11 @@ public abstract class CreateStreamRequest {
     public abstract String title();
 
     @JsonProperty
+    @Nullable
     public abstract String description();
 
     @JsonProperty
+    @Nullable
     public abstract List<CreateStreamRuleRequest> rules();
 
     @JsonProperty
@@ -42,9 +45,9 @@ public abstract class CreateStreamRequest {
     public abstract String contentPack();
 
     @JsonCreator
-    public static CreateStreamRequest create(@JsonProperty("title") String title,
-                                             @JsonProperty("description") String description,
-                                             @JsonProperty("rules") List<CreateStreamRuleRequest> rules,
+    public static CreateStreamRequest create(@JsonProperty("title") @NotEmpty String title,
+                                             @JsonProperty("description") @Nullable String description,
+                                             @JsonProperty("rules") @Nullable List<CreateStreamRuleRequest> rules,
                                              @JsonProperty("content_pack") @Nullable String contentPack) {
         return new AutoValue_CreateStreamRequest(title, description, rules, contentPack);
     }
