@@ -11,15 +11,19 @@
 @import org.graylog2.restclient.lib.Tools
 @import org.graylog2.restclient.lib.plugin.configuration.DropdownField
 
-@main("Inputs of radio", views.html.system.sidebar(), "", currentUser) {
+@orderedGlobalInputs = @{
+    globalInputs.toSeq.sortWith(_._1.getTitle < _._1.getTitle)
+}
+@orderedLocalInputs = @{
+    localInputs.toSeq.sortBy(_.getInput.getTitle.toLowerCase)
+}
 
+@main("Inputs of radio", views.html.system.sidebar(), "", currentUser) {
     @views.html.partials.breadcrumbs(breadcrumbs)
 
     <div class="row-fluid">
         <h1>
-            <i class="icon icon-cloud-download"></i>
-            Inputs of radio @radio.getShortNodeId
-            / @radio.getHostname
+            <i class="icon icon-cloud-download"></i> Inputs of radio @radio.getShortNodeId / @radio.getHostname
         </h1>
         Graylog2 radios accept data via inputs and write it to <a href="http://kafka.apache.org/" target="_blank">Kafka</a> brokers. Launch or terminate as many inputs as you
         want here. Graylog2 server nodes will automatically spawn corresponding inputs that read the data from Kafka again. This gives you automatic load distribution and the
@@ -29,7 +33,7 @@
     <div class="row-fluid input-list">
         <h2><i class="icon icon-cogs"> Running global inputs</i></h2>
         @if(globalInputs.size > 0) {
-            @for((input, nodeStates) <- globalInputs.toSeq.sortWith(_._1.getTitle < _._1.getTitle)) {
+            @for((input, nodeStates) <- orderedGlobalInputs) {
                 @views.html.system.inputs.partials.global_input_summary(input, nodeStates, inputTypes, masterNode)
             }
         } else {
@@ -41,7 +45,7 @@
         <h2><i class="icon icon-cogs"></i> Running local inputs</h2>
 
         @if(localInputs.size > 0) {
-            @for(inputState <- localInputs.toSeq.sortBy(_.getInput.getTitle)) {
+            @for(inputState <- orderedLocalInputs) {
                 @views.html.system.inputs.partials.input_summary(inputState, inputTypes)
             }
         } else {
@@ -109,40 +113,5 @@
         </div>
     }
 
-    @***************************************************************
-    * Static field dialog                                          *
-    ***************************************************************@
-    <div class="input-add-static-field modal hide fade">
-        <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-            <h2>
-                <i class="icon-tag"></i>
-                Add static field
-            </h2>
-
-            Define a static field that is added to every message that comes in via this input. The field is
-            <strong>not</strong> overwritten If the message already has that key. Key must only contain
-            alphanumeric characters or underscores and not be a reserved field.
-        </div>
-
-        <form action="" method="POST" id="new-static-field-form">
-            <div class="modal-body">
-                <label>Key</label>
-                <input name="key" required="true" type="text" class="input-xlarge validatable" data-validate="alphanum_underscore">
-
-                <label>Value</label>
-                <input name="value" required="true" type="text" class="input-xlarge">
-            </div>
-
-            <div class="modal-footer">
-                <button type="button" class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
-                <button type="submit" class="btn btn-primary new-static-field">
-                    <i class="icon icon-pushpin"></i>
-                    Add field
-                </button>
-            </div>
-        </form>
-
-    </div>
-
+    @views.html.system.inputs.partials.add_static_field_form()
 }

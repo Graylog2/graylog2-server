@@ -5,15 +5,19 @@
         localInputs: List[org.graylog2.restclient.models.InputState],
         inputTypes: Map[String, org.graylog2.restclient.models.api.responses.system.InputTypeSummaryResponse])
 
-@main("Inputs of node", views.html.system.sidebar(), "", currentUser) {
+@orderedGlobalInputs = @{
+    globalInputs.toSeq.sortWith(_._1.getTitle < _._1.getTitle)
+}
+@orderedLocalInputs = @{
+    localInputs.toSeq.sortBy(_.getInput.getTitle.toLowerCase)
+}
 
+@main("Inputs of node", views.html.system.sidebar(), "", currentUser) {
     @views.html.partials.breadcrumbs(breadcrumbs)
 
     <div class="row-fluid">
         <h1>
-            <i class="icon icon-cloud-download"></i>
-            Inputs of @node.getShortNodeId
-            / @node.getHostname
+            <i class="icon icon-cloud-download"></i> Inputs of @node.getShortNodeId / @node.getHostname
         </h1>
         Graylog2 nodes accept data via inputs. On this page you can see which inputs are running on this node.
         You can launch and terminate inputs on your cluster <a href="@routes.InputsController.index()">here</a>.
@@ -22,7 +26,7 @@
     <div class="row-fluid input-list">
         <h2><i class="icon icon-cogs"></i> Running global inputs</h2>
         @if(globalInputs.size > 0) {
-            @for((input, nodeStates) <- globalInputs.toSeq.sortWith(_._1.getTitle < _._1.getTitle)) {
+            @for((input, nodeStates) <- orderedGlobalInputs) {
                 @views.html.system.inputs.partials.global_input_summary(input, nodeStates, inputTypes, node)
             }
         } else {
@@ -33,7 +37,7 @@
         <h2><i class="icon icon-cogs"></i> Running local inputs</h2>
 
         @if(localInputs.size > 0) {
-            @for(inputState <- localInputs.toSeq.sortBy(_.getInput.getTitle)) {
+            @for(inputState <- orderedLocalInputs) {
                 @views.html.system.inputs.partials.input_summary(inputState, inputTypes)
             }
         } else {
@@ -46,40 +50,5 @@
         in the <a href="@routes.SystemController.index()">system messages</a>.
     </div>
 
-    @***************************************************************
-    * Static field dialog                                          *
-    ***************************************************************@
-    <div class="input-add-static-field modal hide fade">
-        <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-            <h2>
-                <i class="icon-tag"></i>
-                Add static field
-            </h2>
-
-            Define a static field that is added to every message that comes in via this input. The field is
-            <strong>not</strong> overwritten If the message already has that key. Key must only contain
-            alphanumeric characters or underscores and not be a reserved field.
-        </div>
-
-        <form action="" method="POST" id="new-static-field-form">
-            <div class="modal-body">
-                <label>Key</label>
-                <input name="key" required="true" type="text" class="input-xlarge validatable" data-validate="alphanum_underscore">
-
-                <label>Value</label>
-                <input name="value" required="true" type="text" class="input-xlarge">
-            </div>
-
-            <div class="modal-footer">
-                <button type="button" class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
-                <button type="submit" class="btn btn-primary new-static-field">
-                    <i class="icon icon-pushpin"></i>
-                    Add field
-                </button>
-            </div>
-        </form>
-
-    </div>
-
+    @views.html.system.inputs.partials.add_static_field_form()
 }

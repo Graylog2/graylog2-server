@@ -5,106 +5,74 @@
         nodes: List[org.graylog2.restclient.models.Node],
         radios: List[org.graylog2.restclient.models.Radio],
         inputTypes: Map[String, org.graylog2.restclient.models.api.responses.system.InputTypeSummaryResponse],
-        masterNode: org.graylog2.restclient.models.Node
-)
+        masterNode: org.graylog2.restclient.models.Node)
 
 @import controllers.routes;
 @import lib.security.RestPermissions._;
 @import views.helpers.Permissions._;
 
-@main("Inputs in Cluster", views.html.system.sidebar(), "", currentUser) {
+@orderedInputTypes = @{
+    inputTypes.toSeq.sortBy(_._2.name)
+}
+@orderedGlobalInputs = @{
+    globalInputs.toSeq.sortWith(_._1.getTitle < _._1.getTitle)
+}
+@orderedLocalInputs = @{
+    localInputs.toSeq.sortBy(_.getInput.getTitle.toLowerCase)
+}
 
+@main("Inputs in Cluster", views.html.system.sidebar(), "", currentUser) {
     @views.html.partials.breadcrumbs(breadcrumbs)
 
     <div class="row-fluid">
         <h1>
-            <i class="icon icon-cloud-download"></i>
-            Inputs in Cluster
+            <i class="icon icon-cloud-download"></i> Inputs in Cluster
         </h1>
         Graylog2 nodes accept data via inputs. Launch or terminate as many inputs as you want here.
     </div>
     @if(isPermitted(INPUTS_CREATE)) {
-    <div class="row-fluid input-new">
+        <div class="row-fluid input-new">
 
-        <select id="input-type">
-            @for((inputType,info) <- inputTypes.toSeq.sortBy(_._2.name)) {
+            <select id="input-type">
+            @for((inputType, info) <- orderedInputTypes) {
                 <option value="@inputType">@info.name</option>
             }
-        </select>
+            </select>
 
-        <button id="configure-input" class="btn btn-success">Launch new input</button>
-    </div>
+            <button id="configure-input" class="btn btn-success">Launch new input</button>
+        </div>
     }
     @if(isPermitted(INPUTS_READ)) {
-    <div class="row-fluid input-list">
-        <h2><i class="icon icon-cogs"></i> Running global inputs</h2>
-        @if(globalInputs.size > 0) {
-            @for((input, nodeStates) <- globalInputs.toSeq.sortWith(_._1.getTitle < _._1.getTitle)) {
-                @views.html.system.inputs.partials.global_input_summary(input, nodeStates, inputTypes, masterNode)
+        <div class="row-fluid input-list">
+            <h2><i class="icon icon-cogs"></i> Running global inputs</h2>
+            @if(globalInputs.size > 0) {
+                @for((input, nodeStates) <- orderedGlobalInputs) {
+                    @views.html.system.inputs.partials.global_input_summary(input, nodeStates, inputTypes, masterNode)
+                }
+            } else {
+                <div class="alert alert-info">There are no global inputs.</div>
             }
-        } else {
-            <div class="alert alert-info">There are no global inputs.</div>
-        }
-    </div>
-    <div class="row-fluid input-list">
-        <h2><i class="icon icon-cogs"></i> Running local inputs</h2>
+        </div>
+        <div class="row-fluid input-list">
+            <h2><i class="icon icon-cogs"></i> Running local inputs</h2>
 
-        @if(localInputs.size > 0) {
-            @for(inputState <- localInputs.toSeq.sortBy(_.getInput.getTitle.toLowerCase)) {
-                @views.html.system.inputs.partials.input_summary(inputState, inputTypes)
+            @if(localInputs.size > 0) {
+                @for(inputState <- orderedLocalInputs) {
+                    @views.html.system.inputs.partials.input_summary(inputState, inputTypes)
+                }
+            } else {
+                <div class="alert alert-info">There are no local inputs.</div>
             }
-        } else {
-            <div class="alert alert-info">There are no local inputs.</div>
-        }
-    </div>
+        </div>
     }
     <div class="alert alert-info">
         Newly added input not appearing? You can find information about misfired inputs
         in the <a href="@routes.SystemController.index()">system messages</a>.
     </div>
 
-    @***************************************************************
-    * Pre-build all the modals showing the requested configuration *
-    ***************************************************************@
-
-    @for((inputType,info) <- inputTypes) {
+    @for((inputType, info) <- inputTypes) {
         @views.html.system.inputs.partials.create_input_form(inputType, info, nodes, radios)
     }
 
-    @***************************************************************
-    * Static field dialog                                          *
-    ***************************************************************@
-    <div class="input-add-static-field modal hide fade">
-        <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-            <h2>
-                <i class="icon-tag"></i>
-                Add static field
-            </h2>
-
-            Define a static field that is added to every message that comes in via this input. The field is
-            <strong>not</strong> overwritten If the message already has that key. Key must only contain
-            alphanumeric characters or underscores and not be a reserved field.
-        </div>
-
-        <form action="" method="POST" id="new-static-field-form">
-            <div class="modal-body">
-                <label>Key</label>
-                <input name="key" required="true" type="text" class="input-xlarge validatable" data-validate="alphanum_underscore">
-
-                <label>Value</label>
-                <input name="value" required="true" type="text" class="input-xlarge">
-            </div>
-
-            <div class="modal-footer">
-                <button type="button" class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
-                <button type="submit" class="btn btn-primary new-static-field">
-                    <i class="icon icon-pushpin"></i>
-                    Add field
-                </button>
-            </div>
-        </form>
-
-    </div>
-
+    @views.html.system.inputs.partials.add_static_field_form()
 }
