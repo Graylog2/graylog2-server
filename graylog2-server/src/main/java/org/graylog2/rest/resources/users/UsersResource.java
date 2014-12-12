@@ -32,6 +32,7 @@ import org.graylog2.rest.resources.users.requests.ChangePasswordRequest;
 import org.graylog2.rest.resources.users.requests.ChangeUserRequest;
 import org.graylog2.rest.resources.users.requests.CreateUserRequest;
 import org.graylog2.rest.resources.users.requests.PermissionEditRequest;
+import org.graylog2.rest.resources.users.requests.Startpage;
 import org.graylog2.rest.resources.users.responses.Token;
 import org.graylog2.rest.resources.users.responses.TokenList;
 import org.graylog2.rest.resources.users.responses.User;
@@ -153,8 +154,14 @@ public class UsersResource extends RestResource {
             user.setTimeZone(cr.timezone());
         }
 
-        if (cr.sessionTimeoutMs() != null) {
-            user.setSessionTimeoutMs(cr.sessionTimeoutMs());
+        final Long sessionTimeoutMs = cr.sessionTimeoutMs();
+        if (sessionTimeoutMs != null) {
+            user.setSessionTimeoutMs(sessionTimeoutMs);
+        }
+
+        final Startpage startpage = cr.startpage();
+        if(startpage != null) {
+            user.setStartpage(startpage.type(), startpage.id());
         }
 
         final String id = userService.save(user);
@@ -216,10 +223,11 @@ public class UsersResource extends RestResource {
             }
         }
 
-        final ChangeUserRequest.Startpage startpage = cr.startpage();
+        final Startpage startpage = cr.startpage();
         if (startpage != null) {
             user.setStartpage(startpage.type(), startpage.id());
         }
+
         if (isPermitted("*")) {
             final Long sessionTimeoutMs = cr.sessionTimeoutMs();
             if (sessionTimeoutMs != null && sessionTimeoutMs != 0) {
