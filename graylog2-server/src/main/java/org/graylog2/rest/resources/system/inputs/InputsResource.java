@@ -94,7 +94,7 @@ public class InputsResource extends RestResource {
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "No such input on this node.")
     })
-    public Map<String, Object> single(@ApiParam(name = "inputId", required = true)
+    public InputSummary single(@ApiParam(name = "inputId", required = true)
                                       @PathParam("inputId") String inputId) {
         checkPermission(RestPermissions.INPUTS_READ, inputId);
 
@@ -104,8 +104,18 @@ public class InputsResource extends RestResource {
             throw new NotFoundException();
         }
 
-        return input.asMap();
-
+        return InputSummary.create(input.getTitle(),
+                input.getPersistId(),
+                input.getGlobal(),
+                input.getName(),
+                input.getContentPack(),
+                input.getId(),
+                input.getCreatedAt(),
+                input.getClass().getCanonicalName(),
+                input.getCreatorUserId(),
+                input.getAttributesWithMaskedPasswords(),
+                input.getStaticFields()
+        );
     }
 
     @GET
@@ -146,7 +156,10 @@ public class InputsResource extends RestResource {
     @Timed
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    @ApiOperation(value = "Launch input on this node")
+    @ApiOperation(
+            value = "Launch input on this node",
+            response = InputCreated.class
+    )
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "No such input type registered"),
             @ApiResponse(code = 400, message = "Missing or invalid configuration"),
@@ -214,14 +227,11 @@ public class InputsResource extends RestResource {
         // Launch input. (this will run async and clean up itself in case of an error.)
         inputRegistry.launch(input, inputId);
 
-        final Map<String, String> result = ImmutableMap.of(
-                "input_id", inputId,
-                "persist_id", id);
         final URI inputUri = UriBuilder.fromResource(InputsResource.class)
                 .path("{inputId}")
                 .build(inputId);
 
-        return Response.created(inputUri).entity(result).build();
+        return Response.created(inputUri).entity(InputCreated.create(inputId, id)).build();
     }
 
     @GET
