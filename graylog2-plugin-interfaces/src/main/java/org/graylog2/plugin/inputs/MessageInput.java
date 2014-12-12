@@ -241,7 +241,7 @@ public abstract class MessageInput implements Stoppable {
     }
 
     @SuppressWarnings("unchecked")
-    public Object getAttributesWithMaskedPasswords() {
+    public Map<String, Object> getAttributesWithMaskedPasswords() {
         final ConfigurationRequest config = getRequestedConfiguration();
         if (config == null) {
             return Collections.emptyMap();
