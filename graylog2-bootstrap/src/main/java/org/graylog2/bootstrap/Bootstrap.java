@@ -194,7 +194,7 @@ public abstract class Bootstrap implements Runnable {
         final Injector injector = setupInjector(configModule, pluginModules);
 
         if (injector == null) {
-            LOG.error("Injector could not be created, exiting! (Please include the previous stacktraces in bug reports.)");
+            LOG.error("Injector could not be created, exiting! (Please include the previous error messages in bug reports.)");
             System.exit(1);
         }
 
@@ -451,6 +451,10 @@ public abstract class Bootstrap implements Runnable {
             if (message.getCause() instanceof NodeIdPersistenceException) {
                 LOG.error(UI.wallString("Unable to read or persist your NodeId file. This means your node id file (" + configuration.getNodeIdFile() + ") is not readable or writable by the current user. The following exception might give more information: " + message));
                 System.exit(-1);
+            } else {
+                // other guice error, still print the raw messages
+                // TODO this could potentially print duplicate messages depending on what a subclass does...
+                LOG.error("Guice error: {}", message.getMessage());
             }
         }
     }
