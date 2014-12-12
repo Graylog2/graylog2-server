@@ -97,15 +97,20 @@ gulp.task('lint-strict', ['prepare-lint'], function () {
 });
 
 function browserifyCall(debug) {
-    var b = browserify({
-        cache: {}, packageCache: {}, fullPaths: true,
+    var browserifyConfig = {
         entries: config.entryPoints,
         extensions: ['.jsx', '.js'],
         "transform": [
             ["reactify", reactOpts]
         ],
         debug: debug
-    });
+    };
+    if (debug) {
+        browserifyConfig.cache = {};
+        browserifyConfig.packageCache = {};
+        browserifyConfig.fullPaths = true;
+    }
+    var b = browserify(browserifyConfig);
     b.plugin('tsify', {noImplicitAny: false}).on('error', function (err) {
         gutil.log(err);
         this.emit('end');
