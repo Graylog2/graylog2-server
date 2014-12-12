@@ -7,6 +7,7 @@ module.exports = function(config) {
 
     files: [
       'test/shim/es5-shim.js',
+      'test/shim/server-side-global-vars.js',
       'dist/tests.js'
     ],
 

@@ -6,6 +6,7 @@ module.exports = function (config) {
     frameworks: ['jasmine'],
 
     files: [
+      'test/shim/server-side-global-vars.js',
       'dist/tests.js'
     ],
 
