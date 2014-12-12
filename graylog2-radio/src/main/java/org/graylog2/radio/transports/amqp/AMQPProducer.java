@@ -63,7 +63,7 @@ public class AMQPProducer implements RadioTransport {
         }
         public void send(Message msg) throws IOException {
             final int currentIndex = pointer.getAndIncrement();
-            senders[currentIndex % count].send(msg);
+            senders[Math.abs(currentIndex % count)].send(msg);
         }
     }
 
