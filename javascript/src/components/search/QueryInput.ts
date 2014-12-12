@@ -11,8 +11,13 @@ class QueryInput {
     }
     display() {
         FieldsStore.loadFields().done((fields) => {
-            // TODO: Add all the other pseudo-field stuff here
-            //fields.push("_missing_");
+            var possibleMatches = [];
+
+            fields.forEach((field) => {
+                possibleMatches.push(field + ":");
+                possibleMatches.push("_exists_:" + field);
+                possibleMatches.push("_missing_:" + field);
+            });
             $(this.queryInputContainer).typeahead(
                 {
                     hint: true,
@@ -22,7 +27,7 @@ class QueryInput {
                 {
                     name: 'fields',
                     displayKey: 'value',
-                    source: UniversalSearch.substringMatcher(fields, 'value', 6)
+                    source: UniversalSearch.substringMatcher(possibleMatches, 'value', 6)
                 });
         });
     }
