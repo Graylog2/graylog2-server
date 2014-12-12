@@ -438,10 +438,12 @@ public abstract class Bootstrap implements Runnable {
 
     protected void annotateProvisionException(ProvisionException e) {
         annotateInjectorExceptions(e.getErrorMessages());
+        throw e;
     }
 
     protected void annotateInjectorCreationException(CreationException e) {
         annotateInjectorExceptions(e.getErrorMessages());
+        throw e;
     }
 
     protected void annotateInjectorExceptions(Collection<Message> messages) {
