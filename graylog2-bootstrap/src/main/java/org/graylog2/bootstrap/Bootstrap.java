@@ -152,6 +152,15 @@ public abstract class Bootstrap implements Runnable {
 
     @Override
     public void run() {
+        // Are we in debug mode?
+        Level logLevel = Level.INFO;
+        if (isDebug()) {
+            LOG.info("Running in Debug mode");
+            logLevel = Level.DEBUG;
+        }
+        org.apache.log4j.Logger.getRootLogger().setLevel(logLevel);
+        org.apache.log4j.Logger.getLogger(Main.class.getPackage().getName()).setLevel(logLevel);
+
         String pluginPath = getPluginPath(getConfigFile());
 
         final JadConfig jadConfig = new JadConfig();
@@ -181,15 +190,6 @@ public abstract class Bootstrap implements Runnable {
             LOG.error("Validating configuration file failed - exiting.");
             System.exit(1);
         }
-
-        // Are we in debug mode?
-        Level logLevel = Level.INFO;
-        if (isDebug()) {
-            LOG.info("Running in Debug mode");
-            logLevel = Level.DEBUG;
-        }
-        org.apache.log4j.Logger.getRootLogger().setLevel(logLevel);
-        org.apache.log4j.Logger.getLogger(Main.class.getPackage().getName()).setLevel(logLevel);
 
         final Injector injector = setupInjector(configModule, pluginModules);
 
