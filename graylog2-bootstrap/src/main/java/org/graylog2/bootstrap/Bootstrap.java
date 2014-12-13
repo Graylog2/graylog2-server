@@ -159,7 +159,7 @@ public abstract class Bootstrap implements Runnable {
             logLevel = Level.DEBUG;
         }
         org.apache.log4j.Logger.getRootLogger().setLevel(logLevel);
-        org.apache.log4j.Logger.getLogger(Main.class.getPackage().getName()).setLevel(logLevel);
+        org.apache.log4j.Logger.getLogger("org.graylog2").setLevel(logLevel);
 
         String pluginPath = getPluginPath(getConfigFile());
 
