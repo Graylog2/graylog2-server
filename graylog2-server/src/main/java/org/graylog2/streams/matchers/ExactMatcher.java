@@ -26,7 +26,7 @@ public class ExactMatcher implements StreamRuleMatcher {
 
 	@Override
 	public boolean match(Message msg, StreamRule rule) {
-        if (!msg.getFields().containsKey(rule.getField())) {
+        if (!msg.hasField(rule.getField())) {
             return false;
         }
 

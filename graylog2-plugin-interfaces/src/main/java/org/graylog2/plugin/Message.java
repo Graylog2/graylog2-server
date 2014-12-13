@@ -40,6 +40,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
@@ -296,6 +297,14 @@ public class Message {
 
     public Map<String, Object> getFields() {
         return ImmutableMap.copyOf(fields);
+    }
+
+    public boolean hasField(String field) {
+        return fields.containsKey(field);
+    }
+
+    public Set<String> getFieldNames() {
+        return Collections.unmodifiableSet(fields.keySet());
     }
 
     public void setStreams(final List<Stream> streams) {

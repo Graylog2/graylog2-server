@@ -24,6 +24,7 @@ package org.graylog2.plugin;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.streams.Stream;
 import org.joda.time.DateTime;
@@ -33,6 +34,7 @@ import org.testng.annotations.Test;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import static org.mockito.Mockito.mock;
@@ -331,5 +333,30 @@ public class MessageTest {
         final Map<String, Object> fields = message.getFields();
 
         fields.put("foo", "bar");
+    }
+
+    @Test
+    public void testGetFieldNames() throws Exception {
+        assertTrue("Missing fields in set!", Sets.symmetricDifference(message.getFieldNames(), Sets.newHashSet("_id", "timestamp", "source", "message")).isEmpty());
+
+        message.addField("testfield", "testvalue");
+
+        assertTrue("Missing fields in set!", Sets.symmetricDifference(message.getFieldNames(), Sets.newHashSet("_id", "timestamp", "source", "message", "testfield")).isEmpty());
+    }
+
+    @Test(expectedExceptions = UnsupportedOperationException.class)
+    public void testGetFieldNamesReturnsUnmodifiableSet() throws Exception {
+        final Set<String> fieldNames = message.getFieldNames();
+
+        fieldNames.remove("_id");
+    }
+
+    @Test
+    public void testHasField() throws Exception {
+        assertFalse(message.hasField("__foo__"));
+
+        message.addField("__foo__", "bar");
+
+        assertTrue(message.hasField("__foo__"));
     }
 }

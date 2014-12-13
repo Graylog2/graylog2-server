@@ -31,6 +31,7 @@ import java.lang.reflect.Method;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
@@ -40,6 +41,7 @@ public abstract class PersistedImpl implements Persisted {
 
     protected final Map<String, Object> fields;
     protected final ObjectId id;
+    private final AtomicReference<String> hexId = new AtomicReference<>(null);
 
     protected PersistedImpl(Map<String, Object> fields) {
         this(new ObjectId(), fields);
@@ -63,7 +65,11 @@ public abstract class PersistedImpl implements Persisted {
 
     @Override
     public String getId() {
-        return getObjectId().toHexString();
+        // Performace - toHexString is expensive so we cache it.
+        if (hexId.get() == null) {
+            hexId.compareAndSet(null, getObjectId().toHexString());
+        }
+        return hexId.get();
     }
 
     @Override

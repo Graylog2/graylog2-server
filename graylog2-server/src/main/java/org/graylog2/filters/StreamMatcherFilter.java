@@ -20,7 +20,6 @@ import org.graylog2.plugin.Message;
 import org.graylog2.plugin.filters.MessageFilter;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.shared.stats.ThroughputStats;
-import org.graylog2.streams.CachedStreamRouter;
 import org.graylog2.streams.StreamRouter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,7 +38,7 @@ public class StreamMatcherFilter implements MessageFilter {
     private final ThroughputStats throughputStats;
 
     @Inject
-    public StreamMatcherFilter(CachedStreamRouter streamRouter,
+    public StreamMatcherFilter(StreamRouter streamRouter,
                                ThroughputStats throughputStats) {
         this.streamRouter = streamRouter;
         this.throughputStats = throughputStats;
