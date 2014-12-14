@@ -333,10 +333,25 @@ export interface ErrorObject {
     message: string;
 }
 
+interface Rule2Token {
+    [index: string]: TokenType[];
+}
+
+
 export class QueryParser {
+    private static firstSets: Rule2Token = {
+        termOrPhrase: [TokenType.TERM, TokenType.PHRASE],
+        expr: [TokenType.TERM, TokenType.PHRASE],
+        operator: [TokenType.OR, TokenType.AND]
+    };
+    private static followSets: Rule2Token = {
+        expr: QueryParser.firstSets["expr"].concat(QueryParser.firstSets["operator"])
+
+    };
     private lexer: QueryLexer;
-    private tokenBuffer: Array<Token>;
-    public errors: Array<ErrorObject> = [];
+    private tokenBuffer: Token[];
+    public errors: ErrorObject[] = [];
+    private ruleStack: string[] = [];
 
     constructor(private input: string) {
         this.lexer = new QueryLexer(input);
@@ -388,7 +403,8 @@ export class QueryParser {
         return skippedTokens;
     }
 
-    private unexpectedToken(...syncTo: TokenType[]) {
+    private unexpectedToken() {
+        var syncTo = this.currentFollowSet();
         this.errors.push({
             position: this.la().beginPos,
             message: "Unexpected input"
@@ -396,12 +412,57 @@ export class QueryParser {
         return this.syncTo(syncTo);
     }
 
-    private missingToken(tokenName: string, ...syncTo: TokenType[]) {
+    private missingToken(tokenName: string) {
+        var syncTo = this.currentFollowSet();
         this.errors.push({
             position: this.la().beginPos,
             message: "Missing " + tokenName
         });
         return this.syncTo(syncTo);
+    }
+
+    private enterRule(name: string) {
+        this.ruleStack.push(name);
+    }
+
+    private exitRule(name: string) {
+        var actualName = this.ruleStack.pop();
+        if (actualName !== name) {
+            throw new Error("Unmatched rule name (was " + actualName + ", but should have been " + name + ")");
+        }
+    }
+
+    private currentRule(): string {
+        var ruleName = this.ruleStack.pop();
+        if (ruleName) {
+            this.ruleStack.push(ruleName);
+        }
+        return ruleName;
+    }
+
+    private isFirstOf(tokenTypes: TokenType[]) {
+        return tokenTypes.some((tokenType) => this.la().type === tokenType);
+    }
+
+    private isInFirstSetOf(ruleName: string) {
+        return this.isFirstOf(QueryParser.firstSets[ruleName]);
+    }
+
+    private isExpr() {
+        return this.isInFirstSetOf("expr");
+    }
+
+    private isOperator() {
+        return this.isInFirstSetOf("operator");
+    }
+
+    currentFollowSet(): TokenType[] {
+        var currentRule = this.currentRule();
+        if (currentRule) {
+            return QueryParser.followSets[currentRule];
+        } else {
+            return QueryParser.firstSets["expr"];
+        }
     }
 
     parse(): AST {
@@ -420,90 +481,92 @@ export class QueryParser {
     }
 
     exprs(): AST {
-        var expr = this.expr();
+        this.enterRule("exprs");
+        try {
+            var expr = this.expr();
 
-        if (!this.isExpr()) {
-            return expr;
-        } else {
-            var expressionList = new ExpressionListAST();
-            expressionList.add(expr);
-            while (this.isExpr()) {
-                expr = this.expr();
+            if (!this.isExpr()) {
+                return expr;
+            } else {
+                var expressionList = new ExpressionListAST();
                 expressionList.add(expr);
+                while (this.isExpr()) {
+                    expr = this.expr();
+                    expressionList.add(expr);
+                }
+                return expressionList;
             }
-            return expressionList;
+        } finally {
+            this.exitRule("exprs");
         }
     }
 
     expr(): AST {
-        var left: TermAST = null;
-        var op: Token = null;
-        var right: AST = null;
+        this.enterRule("expr");
+        try {
+            var left: TermAST = null;
+            var op: Token = null;
+            var right: AST = null;
 
-        // left
-        if (this.isExpr()) {
-            left = this.termOrPhrase();
-            left.hiddenSuffix = left.hiddenSuffix.concat(this.skipHidden());
-        } else {
-            this.unexpectedToken(TokenType.EOF);
-        }
-
-        if (!this.isOperator()) {
-            return left;
-        } else {
-            op = this.la();
-            this.consume();
-            var prefix = this.skipHidden();
             if (this.isExpr()) {
-                right = this.expr();
+                left = this.termOrPhrase();
+                left.hiddenSuffix = left.hiddenSuffix.concat(this.skipHidden());
             } else {
-                this.missingToken("right side of expression", TokenType.EOF);
-                right = new MissingAST();
+                this.unexpectedToken();
             }
-            right.hiddenPrefix = prefix;
-            return new ExpressionAST(left, op, right);
+
+            if (!this.isOperator()) {
+                return left;
+            } else {
+                op = this.la();
+                this.consume();
+                var prefix = this.skipHidden();
+                if (this.isExpr()) {
+                    right = this.expr();
+                } else {
+                    this.missingToken("right side of expression");
+                    right = new MissingAST();
+                }
+                right.hiddenPrefix = prefix;
+                return new ExpressionAST(left, op, right);
+            }
+        } finally {
+            this.exitRule("expr");
         }
-    }
-
-    isFirstOf(...tokenTypes: TokenType[]) {
-        return tokenTypes.some((tokenType) => this.la().type === tokenType);
-    }
-
-    isExpr() {
-        return this.isFirstOf(TokenType.TERM, TokenType.PHRASE);
-    }
-
-    isOperator() {
-        return this.isFirstOf(TokenType.OR, TokenType.AND);
     }
 
     termOrPhrase() {
-        var termOrField = this.la();
-        this.consume();
-        var wsAfterTermOrField = this.skipHidden();
-        if (this.la().type === TokenType.COLON) {
-            var colon = this.la();
+        this.enterRule("expr");
+        try {
+            var termOrField = this.la();
             this.consume();
-            var prefixAfterColon = this.skipHidden();
-            if (this.la().type === TokenType.TERM || this.la().type === TokenType.PHRASE) {
-                var term = this.la();
+            var wsAfterTermOrField = this.skipHidden();
+            if (this.la().type === TokenType.COLON) {
+                var colon = this.la();
                 this.consume();
-                var ast = new TermWithFieldAST(termOrField, colon, term);
-                ast.hiddenColonPrefix = wsAfterTermOrField;
-                ast.hiddenColonSuffix = prefixAfterColon;
-                return ast;
-            } else {
-                var skippedTokens = this.missingToken("term or phrase for field", TokenType.EOF);
-                var ast = new TermWithFieldAST(termOrField, colon, null);
-                ast.hiddenColonPrefix = wsAfterTermOrField;
-                ast.hiddenColonSuffix = prefixAfterColon;
-                ast.hiddenSuffix = skippedTokens;
-                return ast;
+                var prefixAfterColon = this.skipHidden();
+                if (this.la().type === TokenType.TERM || this.la().type === TokenType.PHRASE) {
+                    var term = this.la();
+                    this.consume();
+                    var ast = new TermWithFieldAST(termOrField, colon, term);
+                    ast.hiddenColonPrefix = wsAfterTermOrField;
+                    ast.hiddenColonSuffix = prefixAfterColon;
+                    return ast;
+                } else {
+                    var skippedTokens = this.missingToken("term or phrase for field");
+                    var ast = new TermWithFieldAST(termOrField, colon, null);
+                    ast.hiddenColonPrefix = wsAfterTermOrField;
+                    ast.hiddenColonSuffix = prefixAfterColon;
+                    ast.hiddenSuffix = skippedTokens;
+                    return ast;
+                }
             }
+            var termAST = new TermAST(termOrField);
+            termAST.hiddenSuffix = wsAfterTermOrField;
+            return termAST;
+        } finally {
+            this.exitRule("expr");
         }
-        var termAST = new TermAST(termOrField);
-        termAST.hiddenSuffix = wsAfterTermOrField;
-        return termAST;
     }
 }
 
