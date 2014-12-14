@@ -4,7 +4,6 @@
 'use strict';
 
 import FieldsStore = require('../../stores/fields/FieldsStore');
-import UniversalSearch = require('../../logic/search/UniversalSearch');
 import queryParser = require('../../logic/search/queryParser');
 
 class QueryInput {
@@ -57,7 +56,9 @@ class QueryInput {
         if (parser.currentFollowSetContainsAny(queryParser.TokenType.PHRASE, queryParser.TokenType.TERM)) {
             possibleMatches = possibleMatches.concat(this.fieldsCompletions());
         }
-        // TODO: need to set the prefix to part of query already matched
+        // TODO: need to set the prefix to be part of query already matched
+        // completion will then suggest the complete query matches to far
+        // TODO: do we need to check the cursor position?
         var prefix = "";
         this.filter(prefix, query, possibleMatches, matches, true);
         this.filter(prefix, query, possibleMatches, matches, false);
