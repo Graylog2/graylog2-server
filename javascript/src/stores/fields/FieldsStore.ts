@@ -7,7 +7,7 @@ import URLUtils = require("../../util/URLUtils");
 
 var FieldsStore = {
     URL: URLUtils.appPrefixed('/a/system/fields'),
-    loadFields(): JQueryPromise<any> {
+    loadFields(): JQueryPromise<string[]> {
         var promise = $.getJSON(this.URL);
         promise.fail((jqXHR, textStatus, errorThrown) => {
             UserNotification.error("Loading field information failed with status: " + errorThrown,

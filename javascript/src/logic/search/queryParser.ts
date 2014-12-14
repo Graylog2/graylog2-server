@@ -465,6 +465,13 @@ export class QueryParser {
         }
     }
 
+    currentFollowSetContainsAny(...tokenTypes: TokenType[]): boolean  {
+        var followSet = this.currentFollowSet();
+        return tokenTypes.some((tokenType) => {
+            return followSet.some((followTokenType) => followTokenType === tokenType)
+        });
+    }
+
     parse(): AST {
         this.errors = [];
         var ast: AST;

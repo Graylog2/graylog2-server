@@ -12,4 +12,3 @@ if (editUserPreferences && editUserPreferencesButton) {
     var modal = React.render(<UserPreferencesModal userName={userName}/>, editUserPreferences);
     React.render(<UserPreferencesButton modal={modal} />, editUserPreferencesButton);
 }
-
