@@ -102,7 +102,7 @@ public abstract class MessageInput implements Stoppable {
 
     public MessageInput(MetricRegistry metricRegistry,
                         Transport transport,
-                        MetricRegistry localRegistry, Codec codec, Config config, Descriptor descriptor, ServerStatus serverStatus) {
+                        LocalMetricRegistry localRegistry, Codec codec, Config config, Descriptor descriptor, ServerStatus serverStatus) {
         if (metricRegistry == localRegistry) {
             LOG.error("########### Do not add the global metric registry twice, the localRegistry parameter is " +
                               "the same as the global metricRegistry. " +
