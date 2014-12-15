@@ -118,7 +118,9 @@ export class DumpVisitor extends BaseVisitor {
     visitExpressionAST(ast: ExpressionAST) {
         this.dumpPrefix(ast);
         this.visit(ast.left);
+        this.dumpHidden(ast.hiddenOpPrefix);
         this.dumpToken(ast.op);
+        this.dumpHidden(ast.hiddenOpSuffix);
         this.visit(ast.right);
         this.dumpSuffix(ast);
     }
@@ -182,6 +184,9 @@ export class MissingAST extends AST {
 }
 
 export class ExpressionAST extends AST {
+    hiddenOpPrefix: Array<Token> = [];
+    hiddenOpSuffix: Array<Token> = [];
+
     constructor(public left: TermAST, public op: Token,
                 public right: AST) {
         super();
@@ -558,28 +563,32 @@ export class QueryParser {
             var left: TermAST = null;
             var op: Token = null;
             var right: AST = null;
+            var hiddenOpPrefix = [];
 
             if (this.isExpr()) {
                 left = this.termOrPhrase();
-                left.hiddenSuffix = left.hiddenSuffix.concat(this.skipHidden());
+                hiddenOpPrefix = this.skipHidden();
             } else {
                 this.unexpectedToken();
             }
 
             if (!this.isOperator()) {
+                left.hiddenSuffix = left.hiddenSuffix.concat(hiddenOpPrefix);
                 return left;
             } else {
                 op = this.la();
                 this.consume();
-                var prefix = this.skipHidden();
+                var hiddenOpSuffix = this.skipHidden();
                 if (this.isExpr()) {
                     right = this.expr();
                 } else {
                     this.missingToken("right side of expression");
                     right = new MissingAST();
                 }
-                right.hiddenPrefix = prefix;
-                return new ExpressionAST(left, op, right);
+                var expressionAST = new ExpressionAST(left, op, right);
+                expressionAST.hiddenOpPrefix = hiddenOpPrefix;
+                expressionAST.hiddenOpSuffix = hiddenOpSuffix;
+                return expressionAST;
             }
         } finally {
             this.exitRule("expr");
