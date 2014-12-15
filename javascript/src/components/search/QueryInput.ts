@@ -6,6 +6,13 @@
 import FieldsStore = require('../../stores/fields/FieldsStore');
 import queryParser = require('../../logic/search/queryParser');
 
+interface Match {
+    match: string;
+    currentSegment: string;
+    prefix: string;
+    value: string;
+}
+
 class QueryInput {
     private typeAheadConfig: any;
     private typeAheadSource: any;
@@ -26,7 +33,16 @@ class QueryInput {
         this.typeAheadSource = {
             name: 'fields',
             displayKey: this.displayKey,
-            source: this.codeCompletionProvider.bind(this)
+            source: this.codeCompletionProvider.bind(this),
+            templates: {
+                suggestion: (match: Match) => {
+                    var previousTerms = match.prefix;
+                    var matchPrefix = match.match.substring(0, match.match.indexOf(match.currentSegment));
+                    var currentMatch = match.currentSegment;
+                    var matchSuffix = match.match.substring(match.match.indexOf(match.currentSegment) + match.currentSegment.length);
+                    return '<p><strong>' + previousTerms + '</strong>' + matchPrefix +  '<strong>' + currentMatch + '</strong>' + matchSuffix +'</p>';
+                }
+            }
         };
     }
     display() {
@@ -36,15 +52,18 @@ class QueryInput {
         });
     }
 
-    private filter(prefix: string, query: string, possibleMatches: string[], matches: Array<any>, config?: {prefixOnly: boolean}) {
+    private filter(prefix: string, query: string, possibleMatches: string[], matches: Array<Match>, config?: {prefixOnly: boolean}) {
         possibleMatches.forEach((possibleMatch) => {
             var isMatch = ((config && config.prefixOnly) ?
                                 possibleMatch.indexOf(query) === 0 :
                                 possibleMatch.indexOf(query) !== -1 && possibleMatch.indexOf(query) !== 0);
             if (matches.length < this.limit && isMatch) {
-                var match = {};
-                var matchString = (prefix + possibleMatch).trim();
-                match[this.displayKey] = matchString;
+                var match: Match = {
+                    value: (prefix + possibleMatch).trim(),
+                    match: possibleMatch,
+                    currentSegment: query,
+                    prefix: prefix
+                };
                 matches.push(match);
             }
         });
