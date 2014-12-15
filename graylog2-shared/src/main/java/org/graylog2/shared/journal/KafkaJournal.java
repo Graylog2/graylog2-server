@@ -241,14 +241,14 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
     @Override
     public long write(List<Entry> entries) {
         try (Timer.Context ignored = writeTime.time()) {
-            final long[] payloadSize = {0L};
+            long payloadSize = 0L;
 
             final List<Message> messages = Lists.newArrayList();
             for (final Entry entry : entries) {
                 final byte[] messageBytes = entry.getMessageBytes();
                 final byte[] idBytes = entry.getIdBytes();
 
-                payloadSize[0] += messageBytes.length;
+                payloadSize += messageBytes.length;
                 messages.add(new Message(messageBytes, idBytes));
 
                 if (log.isTraceEnabled()) {
@@ -260,7 +260,7 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
 
             final Log.LogAppendInfo appendInfo = kafkaLog.append(messageSet, true);
             log.debug("Wrote {} messages to journal: {} bytes, log position {} to {}",
-                      entries.size(), payloadSize[0], appendInfo.firstOffset(), appendInfo.lastOffset());
+                      entries.size(), payloadSize, appendInfo.firstOffset(), appendInfo.lastOffset());
             messagesWritten.mark(entries.size());
             return appendInfo.lastOffset();
         }
