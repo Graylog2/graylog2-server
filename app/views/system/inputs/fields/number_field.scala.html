@@ -1,4 +1,27 @@
-@(field: org.graylog2.restclient.lib.plugin.configuration.RequestedConfigurationField)
+@(field: org.graylog2.restclient.lib.plugin.configuration.RequestedConfigurationField,
+        value: Number = null)
+@import org.graylog2.restclient.lib.plugin.configuration.RequestedConfigurationField
+
+
+@htmlAttributes(field: RequestedConfigurationField) = {
+    name="configuration[@field.getTitle]"
+    @if(!field.isOptional) {
+        required
+    }
+    @if(!field.getAttributes.isEmpty) {
+        data-validate="@field.getAttributesAsJSValidationSpec"
+    }
+}
+
+@fieldValue(value: Number, defaultValue: AnyRef) = {
+    @if(value != null) {
+        value="@value"
+    } else {
+        @if(defaultValue != null && !defaultValue.toString.isEmpty) {
+            value="@Math.round(Float.parseFloat(defaultValue.toString))"
+        }
+    }
+}
 
 <label>
     @field.getHumanName
@@ -8,18 +31,7 @@
     }
 </label>
 <span class="help-block">@field.getDescription</span>
-<input name="configuration[@field.getTitle]"
-
-    @if(!field.isOptional) {
-        required
-    }
-
-    type="number" min="@Integer.MIN_VALUE" max="@Integer.MAX_VALUE"
-    @if(!field.getDefaultValue().toString().isEmpty()) {
-        value="@Math.round(Float.parseFloat(field.getDefaultValue().toString))"
-    }
-
-    @if(!field.getAttributes.isEmpty) {
-        data-validate="@field.getAttributesAsJSValidationSpec"
-    }
+<input type="number" min="@Integer.MIN_VALUE" max="@Integer.MAX_VALUE"
+    @htmlAttributes(field)
+    @fieldValue(value, field.getDefaultValue)
     class="input-xlarge validatable">

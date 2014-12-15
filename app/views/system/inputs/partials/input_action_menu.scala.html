@@ -11,6 +11,10 @@
         Action <span class="caret"></span>
     </a>
     <ul class="dropdown-menu">
+        @if(isPermitted(INPUTS_EDIT, input.getId)) {
+            <li><a href="#edit-input-@input.getId" data-toggle="modal">Edit input</a></li>
+        }
+
         @if(!targetNode.isInstanceOf[Radio] && isPermitted(INPUTS_EDIT, input.getId)) {
             <li><a href="@routes.ExtractorsController.manage(targetNode.getNodeId, input.getId)">Manage extractors</a></li>
         }

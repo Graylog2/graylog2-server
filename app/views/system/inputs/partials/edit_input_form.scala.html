@@ -1,0 +1,52 @@
+@(input: org.graylog2.restclient.models.Input,
+        inputType: String,
+        inputInfo: org.graylog2.restclient.models.api.responses.system.InputTypeSummaryResponse)
+
+@import org.graylog2.restclient.lib.plugin.configuration.DropdownField
+
+<div id="edit-input-@input.getId" class="edit-input-configuration modal hide fade">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h2>
+            <i class="icon-signin"></i> Edit input: <em>@input.getTitle</em> (@inputInfo.name)
+        </h2>
+    </div>
+
+    <form action="@routes.InputsController.launch()" method="POST">
+        <input type="hidden" name="type" value="@inputType" />
+
+        <fieldset>
+            <div class="modal-body">
+                <label>Title</label>
+                <span class="help-block">Name describing the input.</span>
+                <input name="title" required="true" type="text" value="@input.getTitle" class="input-xlarge">
+
+                @for(field <- inputInfo.getRequestedConfiguration) {
+
+                    @if(field.getType.equals("text")) {
+                        @views.html.system.inputs.fields.text_field(field, input.getAttributes.get(field.getTitle).asInstanceOf[String])
+                    }
+
+                    @if(field.getType.equals("number")) {
+                        @views.html.system.inputs.fields.number_field(field, input.getAttributes.get(field.getTitle).asInstanceOf[Number])
+                    }
+
+                    @if(field.getType.equals("boolean")) {
+                        @views.html.system.inputs.fields.boolean_field(field, input.getAttributes.get(field.getTitle) == true)
+                    }
+
+                    @if(field.getType.equals("dropdown")) {
+                        @views.html.system.inputs.fields.dropdown_field(field.asInstanceOf[DropdownField], input.getAttributes.get(field.getTitle).asInstanceOf[String]))
+                    }
+                }
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+                <button type="submit" class="btn btn-primary update-input" data-type="@inputType">
+                    <i class="icon icon-rocket"></i> Update input
+                </button>
+            </div>
+        </fieldset>
+    </form>
+</div>
