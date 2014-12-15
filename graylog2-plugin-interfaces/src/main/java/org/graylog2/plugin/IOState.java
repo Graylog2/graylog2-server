@@ -66,7 +66,6 @@ public class IOState<T extends Stoppable> {
         this.startedAt = Tools.iso8601();
     }
 
-    @JsonProperty("message_input")
     public T getStoppable() {
         return stoppable;
     }
