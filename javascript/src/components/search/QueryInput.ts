@@ -36,32 +36,48 @@ class QueryInput {
         });
     }
 
-    private filter(prefix: string, query: string, possibleMatches: string[], matches: Array<any>, startOnly: boolean=true) {
+    private filter(prefix: string, query: string, possibleMatches: string[], matches: Array<any>, config?: {prefixOnly: boolean}) {
         possibleMatches.forEach((possibleMatch) => {
-            var isMatch = (startOnly ?
-                            possibleMatch.indexOf(query) === 0 :
-                            possibleMatch.indexOf(query) !== -1 && possibleMatch.indexOf(query) !== 0)
+            var isMatch = ((config && config.prefixOnly) ?
+                                possibleMatch.indexOf(query) === 0 :
+                                possibleMatch.indexOf(query) !== -1 && possibleMatch.indexOf(query) !== 0);
             if (matches.length < this.limit && isMatch) {
                 var match = {};
-                match[this.displayKey] = prefix + possibleMatch;
+                var matchString = (prefix + possibleMatch).trim();
+                match[this.displayKey] = matchString;
                 matches.push(match);
             }
         });
     }
 
     private codeCompletionProvider(query: string, callback: (matches: Array<any>) => void) {
+        var prefix = "";
         var matches:Array<any> = [];
         var possibleMatches = [];
         var parser = new queryParser.QueryParser(query);
-        if (parser.currentFollowSetContainsAny(queryParser.TokenType.PHRASE, queryParser.TokenType.TERM)) {
+        var ast = parser.parse();
+        var visitor = new queryParser.SerializeVisitor();
+        visitor.visit(ast);
+        var serializedAst: queryParser.AST[] = visitor.result();
+
+        if (serializedAst.length === 0) {
             possibleMatches = possibleMatches.concat(this.fieldsCompletions());
+        } else {
+            var currentAST =  serializedAst.pop();
+            if (currentAST instanceof queryParser.TermAST) {
+                possibleMatches = possibleMatches.concat(this.fieldsCompletions());
+            }
+
+            var querySegmentVisitor = new queryParser.DumpVisitor();
+            querySegmentVisitor.visit(currentAST);
+            query = querySegmentVisitor.result();
+
+            var prefixVisitor = new queryParser.DumpVisitor(currentAST);
+            prefixVisitor.visit(ast);
+            prefix = prefixVisitor.result();
         }
-        // TODO: need to set the prefix to be part of query already matched
-        // completion will then suggest the complete query matches to far
-        // TODO: do we need to check the cursor position?
-        var prefix = "";
-        this.filter(prefix, query, possibleMatches, matches, true);
-        this.filter(prefix, query, possibleMatches, matches, false);
+        this.filter(prefix, query, possibleMatches, matches, {prefixOnly: true});
+        this.filter(prefix, query, possibleMatches, matches);
         callback(matches);
     }
 

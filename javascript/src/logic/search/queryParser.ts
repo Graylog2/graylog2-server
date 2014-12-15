@@ -9,7 +9,7 @@ export interface Visitor {
     visitMissingAST(ast: MissingAST);
     visitTermAST(ast: TermAST);
     visitTermWithFieldAST(ast: TermWithFieldAST);
-    visitExpressionList(ast: ExpressionAST);
+    visitExpressionAST(ast: ExpressionAST);
     visitExpressionListAST(ast: ExpressionListAST);
 }
 
@@ -20,7 +20,7 @@ export class BaseVisitor implements Visitor {
         } else if (ast instanceof ExpressionListAST) {
             this.visitExpressionListAST(<ExpressionListAST>ast);
         } else if (ast instanceof ExpressionAST) {
-            this.visitExpressionList(<ExpressionAST>ast);
+            this.visitExpressionAST(<ExpressionAST>ast);
         } else if (ast instanceof TermWithFieldAST) {
             this.visitTermWithFieldAST(<TermWithFieldAST>ast);
         } else if (ast instanceof TermAST) {
@@ -41,15 +41,66 @@ export class BaseVisitor implements Visitor {
     visitTermWithFieldAST(ast: TermWithFieldAST) {
     }
 
-    visitExpressionList(ast: ExpressionAST) {
+    visitExpressionAST(ast: ExpressionAST) {
     }
 
     visitExpressionListAST(ast: ExpressionListAST) {
     }
 }
 
-export class DumpVisitor extends BaseVisitor implements Visitor {
-    private buffer = [];
+export class SerializeVisitor extends BaseVisitor {
+    private serializedAST: AST[] = [];
+
+    visitMissingAST(ast: MissingAST) {
+        this.serialize(ast);
+    }
+
+    visitTermAST(ast: TermAST) {
+        this.serialize(ast);
+    }
+
+    visitTermWithFieldAST(ast: TermWithFieldAST) {
+        this.serialize(ast);
+    }
+
+    visitExpressionAST(ast: ExpressionAST) {
+        this.visit(ast.left);
+        this.serialize(ast);
+        this.visit(ast.right);
+    }
+
+    visitExpressionListAST(ast: ExpressionListAST) {
+        this.serialize(ast);
+        var exprList = <ExpressionListAST>ast;
+        exprList.expressions.forEach((expr) => this.visit(expr));
+    }
+
+    result() {
+        return this.serializedAST;
+    }
+
+    private serialize(ast) {
+        this.serializedAST.push(ast);
+    }
+
+}
+
+export class DumpVisitor extends BaseVisitor {
+    private buffer: string[] = [];
+    private skipASTs: AST[] = [];
+
+    constructor(...skipASTs: AST[]) {
+        super();
+        this.skipASTs = skipASTs;
+    }
+
+    visit(ast: AST) {
+        if (this.skipASTs.indexOf(ast) !== -1) {
+            return;
+        } else {
+            super.visit(ast);
+        }
+    }
 
     visitMissingAST(ast: MissingAST) {
         this.dumpPrefix(ast);
@@ -64,7 +115,7 @@ export class DumpVisitor extends BaseVisitor implements Visitor {
         this.dumpWithPrefixAndSuffixWithField(ast);
     }
 
-    visitExpressionList(ast: ExpressionAST) {
+    visitExpressionAST(ast: ExpressionAST) {
         this.dumpPrefix(ast);
         this.visit(ast.left);
         this.dumpToken(ast.op);
@@ -121,12 +172,12 @@ export enum TokenType {
     EOF, WS, TERM, PHRASE, AND, OR, NOT, COLON, ERROR
 }
 
-class AST {
+export class AST {
     hiddenPrefix: Array<Token> = [];
     hiddenSuffix: Array<Token> = [];
 }
 
-class MissingAST extends AST {
+export class MissingAST extends AST {
 
 }
 
@@ -456,20 +507,13 @@ export class QueryParser {
         return this.isInFirstSetOf("operator");
     }
 
-    currentFollowSet(): TokenType[] {
+    protected currentFollowSet(): TokenType[] {
         var currentRule = this.currentRule();
         if (currentRule) {
             return QueryParser.followSets[currentRule];
         } else {
             return QueryParser.firstSets["expr"];
         }
-    }
-
-    currentFollowSetContainsAny(...tokenTypes: TokenType[]): boolean  {
-        var followSet = this.currentFollowSet();
-        return tokenTypes.some((tokenType) => {
-            return followSet.some((followTokenType) => followTokenType === tokenType)
-        });
     }
 
     parse(): AST {
