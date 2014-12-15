@@ -19,7 +19,6 @@ package org.graylog2.bootstrap.commands;
 import com.google.common.util.concurrent.ServiceManager;
 import com.google.inject.Injector;
 import com.google.inject.Module;
-import com.google.inject.ProvisionException;
 import com.google.inject.spi.Message;
 import com.mongodb.MongoException;
 import io.airlift.command.Command;
@@ -42,12 +41,10 @@ import org.graylog2.cluster.NodeService;
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.configuration.EmailConfiguration;
 import org.graylog2.configuration.MongoDbConfiguration;
-import org.graylog2.configuration.TelemetryConfiguration;
 import org.graylog2.configuration.VersionCheckConfiguration;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.ServerStatus;
-import org.graylog2.plugin.system.NodeIdPersistenceException;
 import org.graylog2.shared.system.activities.Activity;
 import org.graylog2.shared.system.activities.ActivityWriter;
 import org.graylog2.system.shutdown.GracefulShutdown;
@@ -59,9 +56,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-/**
- * @author Dennis Oelkers <dennis@torch.sh>
- */
 @Command(name = "server", description = "Start the Graylog2 server")
 public class Server extends Bootstrap implements Runnable {
     private static final Logger LOG = LoggerFactory.getLogger(Server.class);
@@ -70,7 +64,6 @@ public class Server extends Bootstrap implements Runnable {
     private final ElasticsearchConfiguration elasticsearchConfiguration = new ElasticsearchConfiguration();
     private final EmailConfiguration emailConfiguration = new EmailConfiguration();
     private final MongoDbConfiguration mongoDbConfiguration = new MongoDbConfiguration();
-    private final TelemetryConfiguration telemetryConfiguration = new TelemetryConfiguration();
     private final VersionCheckConfiguration versionCheckConfiguration = new VersionCheckConfiguration();
 
     public Server() {
@@ -149,7 +142,6 @@ public class Server extends Bootstrap implements Runnable {
                 elasticsearchConfiguration,
                 emailConfiguration,
                 mongoDbConfiguration,
-                telemetryConfiguration,
                 versionCheckConfiguration);
     }
 
