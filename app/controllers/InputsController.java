@@ -354,6 +354,8 @@ public class InputsController extends AuthenticatedController {
             return redirect(routes.InputsController.index());
         }
 
+        // TODO: Add something reasonable here
+
         return redirect(routes.InputsController.index());
     }
 

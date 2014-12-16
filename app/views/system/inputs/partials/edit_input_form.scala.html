@@ -25,7 +25,7 @@
                         <span class="help-block">Global input (started on all nodes)</span>
                     </label>
                 } else {
-                    <label for="node">Running on node:</label>
+                    <label for="node">Started on node:</label>
                     <input name="node" type="text" value="@inputNode.getShortNodeId / @inputNode.getHostname" disabled="disabled" class="input-xlarge">
                 }
 
@@ -55,7 +55,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
-                <button type="submit" class="btn btn-primary update-input" data-type="@inputType">Update input</button>
+                <button type="submit" class="btn btn-primary update-input" data-input-id="@input.getId">Update input</button>
             </div>
         </fieldset>
     </form>

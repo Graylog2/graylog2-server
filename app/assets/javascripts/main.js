@@ -412,9 +412,13 @@ $(document).ready(function() {
         $('[data-inputtype="' + inputType + '"]').modal();
     });
 
-    // Check input configuration according to provided plugin attribues.
+    // Check input configuration according to provided plugin attributes.
     $(".launch-input").on("click", function() {
         return validate('[data-inputtype="' + $(this).attr("data-type") + '"] form');
+    });
+
+    $(".update-input").on("click", function() {
+        return validate('#edit-input-' + $(this).data("input-id") + ' form');
     });
 
     // Add static field to input.
