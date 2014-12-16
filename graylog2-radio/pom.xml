@@ -67,10 +67,6 @@
         </dependency>
 
         <dependency>
-            <groupId>com.beust</groupId>
-            <artifactId>jcommander</artifactId>
-        </dependency>
-        <dependency>
             <groupId>com.github.joschi</groupId>
             <artifactId>jadconfig</artifactId>
         </dependency>
