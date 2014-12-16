@@ -12,7 +12,7 @@
         </h2>
     </div>
 
-    <form action="@routes.InputsController.launch()" method="POST">
+    <form action="@routes.InputsController.update(input.getId)" method="POST">
         <input type="hidden" name="type" value="@inputType" />
 
         <fieldset>

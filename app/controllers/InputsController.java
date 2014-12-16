@@ -349,6 +349,14 @@ public class InputsController extends AuthenticatedController {
         }
     }
 
+    public Result update(String inputId) {
+        if (!Permissions.isPermitted(RestPermissions.INPUTS_EDIT, inputId)) {
+            return redirect(routes.InputsController.index());
+        }
+
+        return redirect(routes.InputsController.index());
+    }
+
     public Result terminate(String nodeId, String inputId) {
         if (!Permissions.isPermitted(RestPermissions.INPUTS_TERMINATE)) {
             return redirect(routes.StartpageController.redirect());
