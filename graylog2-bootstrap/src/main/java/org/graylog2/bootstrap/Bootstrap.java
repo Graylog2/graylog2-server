@@ -36,7 +36,7 @@ import com.google.common.util.concurrent.ServiceManager;
 import com.google.inject.*;
 import com.google.inject.name.Names;
 import com.google.inject.spi.Message;
-import io.airlift.command.Option;
+import io.airlift.airline.Option;
 import org.apache.log4j.Level;
 import org.graylog2.UI;
 import org.graylog2.plugin.BaseConfiguration;

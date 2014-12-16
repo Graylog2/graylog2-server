@@ -16,7 +16,7 @@
  */
 package org.graylog2.bootstrap.commands;
 
-import io.airlift.command.Command;
+import io.airlift.airline.Command;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.Version;
 

@@ -17,9 +17,9 @@
 package org.graylog2.bootstrap;
 
 import com.google.common.collect.ImmutableSet;
-import io.airlift.command.Cli;
-import io.airlift.command.Cli.CliBuilder;
-import io.airlift.command.Help;
+import io.airlift.airline.Cli;
+import io.airlift.airline.Cli.CliBuilder;
+import io.airlift.airline.Help;
 import org.graylog2.bootstrap.commands.Radio;
 import org.graylog2.bootstrap.commands.Server;
 import org.graylog2.bootstrap.commands.ShowVersion;
