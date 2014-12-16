@@ -95,11 +95,15 @@ public class HdrHistogram extends com.codahale.metrics.Histogram {
 
     @Override
     public void update(int value) {
-        hdrHistogram.recordValue(value);
+        update((long)value);
     }
 
     @Override
     public void update(long value) {
-        hdrHistogram.recordValue(value);
+        try {
+            hdrHistogram.recordValue(value);
+        } catch (ArrayIndexOutOfBoundsException e) {
+            log.debug("Ignoring value {} for HdrHistogram, it exceeds the highest trackable value {}", value, hdrHistogram.getHighestTrackableValue());
+        }
     }
 }

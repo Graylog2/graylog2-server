@@ -17,6 +17,7 @@
 package org.graylog2.filters;
 
 import com.codahale.metrics.MetricRegistry;
+import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.Tools;
@@ -33,9 +34,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.testng.Assert.assertEquals;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public class StaticFieldFilterTest {
 
     private FakeMessageCodecConfig fakeMessageCodecConfig;
@@ -55,10 +53,10 @@ public class StaticFieldFilterTest {
     public void testFilter() throws Exception {
         Message msg = new Message("hello", "junit", Tools.iso8601());
 
-        FakeInput fakeInput = new FakeInput(mock(MetricRegistry.class),mock(Transport.class),
-                                            mock(MetricRegistry.class),
-                                            mock(Codec.class),
-                                            fakeMessageCodecConfig, mock(MessageInput.Descriptor.class), null);
+        FakeInput fakeInput = new FakeInput(mock(MetricRegistry.class), mock(Transport.class),
+                mock(LocalMetricRegistry.class),
+                mock(Codec.class),
+                fakeMessageCodecConfig, mock(MessageInput.Descriptor.class), null);
         fakeInput.addStaticField("foo", "bar");
 
         msg.setSourceInput(fakeInput);
@@ -76,10 +74,10 @@ public class StaticFieldFilterTest {
         Message msg = new Message("hello", "junit", Tools.iso8601());
         msg.addField("foo", "IWILLSURVIVE");
 
-        FakeInput fakeInput = new FakeInput(mock(MetricRegistry.class),mock(Transport.class),
-                                            mock(MetricRegistry.class),
-                                            mock(Codec.class),
-                                            fakeMessageCodecConfig, mock(MessageInput.Descriptor.class), null);
+        FakeInput fakeInput = new FakeInput(mock(MetricRegistry.class), mock(Transport.class),
+                mock(LocalMetricRegistry.class),
+                mock(Codec.class),
+                fakeMessageCodecConfig, mock(MessageInput.Descriptor.class), null);
         fakeInput.addStaticField("foo", "bar");
 
         msg.setSourceInput(fakeInput);
@@ -96,7 +94,7 @@ public class StaticFieldFilterTest {
 
         public FakeInput(MetricRegistry metricRegistry,
                          Transport transport,
-                         MetricRegistry localRegistry, Codec codec, Config config, Descriptor descriptor, ServerStatus serverStatus) {
+                         LocalMetricRegistry localRegistry, Codec codec, Config config, Descriptor descriptor, ServerStatus serverStatus) {
             super(metricRegistry, transport, localRegistry, codec, config, descriptor, serverStatus);
         }
 
