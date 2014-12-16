@@ -170,12 +170,12 @@ public abstract class Bootstrap implements Runnable {
         final Set<Plugin> plugins = loadPlugins(pluginPath);
         final Set<PluginModule> pluginModules = new HashSet<>();
 
-        for (Plugin plugin : plugins)
-            for (PluginModule pluginModule : pluginModules) {
-                pluginModules.addAll(plugin.modules());
+        for (Plugin plugin : plugins) {
+            pluginModules.addAll(plugin.modules());
+            for (PluginModule pluginModule : plugin.modules())
                 for (PluginConfigBean configBean : pluginModule.getConfigBeans())
                     jadConfig.addConfigurationBean(configBean);
-            }
+        }
 
         PluginBindings pluginBindings = new PluginBindings(plugins);
 
