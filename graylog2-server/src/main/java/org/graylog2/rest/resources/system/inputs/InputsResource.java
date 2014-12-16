@@ -16,11 +16,8 @@
  */
 package org.graylog2.rest.resources.system.inputs;
 
-import com.beust.jcommander.internal.Sets;
 import com.codahale.metrics.annotation.Timed;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
@@ -39,7 +36,12 @@ import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationException;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.rest.resources.RestResource;
-import org.graylog2.rest.resources.system.inputs.responses.*;
+import org.graylog2.rest.resources.system.inputs.responses.InputCreated;
+import org.graylog2.rest.resources.system.inputs.responses.InputStateSummary;
+import org.graylog2.rest.resources.system.inputs.responses.InputSummary;
+import org.graylog2.rest.resources.system.inputs.responses.InputTypeInfo;
+import org.graylog2.rest.resources.system.inputs.responses.InputTypesSummary;
+import org.graylog2.rest.resources.system.inputs.responses.InputsList;
 import org.graylog2.security.RestPermissions;
 import org.graylog2.shared.inputs.InputDescription;
 import org.graylog2.shared.inputs.InputRegistry;
@@ -66,7 +68,9 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import java.net.URI;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 @RequiresAuthentication
 @Api(value = "System/Inputs", description = "Message inputs of this node")
