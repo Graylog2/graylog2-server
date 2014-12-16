@@ -1159,7 +1159,7 @@ function focusFirstFormInput(container) {
     if (!(parentElement instanceof jQuery)) {
         parentElement = this;
     }
-    $("input[type!=hidden]", parentElement).first().focus();
+    $("input[type!=hidden]:not(:disabled),select:not(:disabled)", parentElement).first().focus();
 }
 
 // Animated change of numbers.

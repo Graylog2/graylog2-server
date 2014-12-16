@@ -1,4 +1,5 @@
 @(input: org.graylog2.restclient.models.Input,
+        inputNode: org.graylog2.restclient.models.ClusterEntity,
         inputType: String,
         inputInfo: org.graylog2.restclient.models.api.responses.system.InputTypeSummaryResponse)
 
@@ -17,6 +18,17 @@
 
         <fieldset>
             <div class="modal-body">
+
+                @if(input.getGlobal) {
+                    <label class="checkbox">
+                        <input type="checkbox" class="input-global-checkbox" name="global" disabled="disabled" checked="checked">
+                        <span class="help-block">Global input (started on all nodes)</span>
+                    </label>
+                } else {
+                    <label for="node">Running on node:</label>
+                    <input name="node" type="text" value="@inputNode.getShortNodeId / @inputNode.getHostname" disabled="disabled" class="input-xlarge">
+                }
+
                 <label>Title</label>
                 <span class="help-block">Name describing the input.</span>
                 <input name="title" required="true" type="text" value="@input.getTitle" class="input-xlarge">
