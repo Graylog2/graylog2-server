@@ -10,8 +10,11 @@
 }
 
 @isSelected(value: String, selectedValue: String, defaultValue: AnyRef) = @{
-    (selectedValue != null && selectedValue.equals(value)) ||
-            (defaultValue != null && !defaultValue.toString.isEmpty && defaultValue.toString.equals(value))
+    if (selectedValue != null) {
+        selectedValue.equals(value)
+    } else {
+        defaultValue != null && !defaultValue.toString.isEmpty && defaultValue.toString.equals(value)
+    }
 }
 
     <label>
@@ -24,7 +27,7 @@
     <span class="help-block">@field.getDescription</span>
 
     <select @htmlAttributes(field) class="input-xlarge">
-    @for((k, v) <- field.getValues()) {
+    @for((k, v) <- field.getValues.toSeq.sortBy(_._2)) {
         <option value="@k" @if(isSelected(k, selected, field.getDefaultValue)) { selected="selected" }>
             @v
         </option>

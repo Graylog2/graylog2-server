@@ -1,9 +1,15 @@
 @(field: org.graylog2.restclient.lib.plugin.configuration.RequestedConfigurationField,
-        value: Boolean = false)
+        value: Boolean = null)
 
 @checked = {
-    @if(value || (field.getDefaultValue == true)) {
-        checked="checked"
+    @if(value != null) {
+        @if(value) {
+            checked="checked"
+        }
+    } else {
+        @if(field.getDefaultValue == true) {
+            checked="checked"
+        }
     }
 }
 

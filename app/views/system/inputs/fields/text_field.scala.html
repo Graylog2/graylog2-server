@@ -7,28 +7,28 @@
     @if(!field.isOptional) {
         required
     }
-    @if(field.hasAttribute("is_password")) {
+    @if(!field.hasAttribute("textarea") && field.hasAttribute("is_password")) {
         type="password"
     } else {
         type="text"
     }
 }
 
-@fieldValue(value: String, defaultValue: AnyRef, isPassword: Boolean, isTextArea: Boolean) = {
-    @if(!isPassword) {
-        @if(value != null) {
-            @if(isTextArea) {
-                @value
-            } else {
-                value="@value"
-            }
+@fieldValue(value: String, defaultValue: AnyRef, isPassword: Boolean, isTextArea: Boolean) = @{
+    if(isPassword) {
+        if(value != null) {
+            "******"
         } else {
-            @if(defaultValue != null && !defaultValue.toString.isEmpty) {
-                @if(isTextArea) {
-                    @defaultValue
-                } else {
-                    value="@defaultValue"
-                }
+            if(defaultValue != null && !defaultValue.toString.isEmpty) {
+                "******"
+            }
+        }
+    } else {
+        if(value != null) {
+            value
+        } else {
+            if(defaultValue != null && !defaultValue.toString.isEmpty) {
+                defaultValue
             }
         }
     }
@@ -43,11 +43,9 @@
 <span class="help-block">@field.getDescription</span>
 @if(field.hasAttribute("textarea")) {
     <textarea class="textarea-xlarge"
-            @htmlAttributes(field)>
-        @fieldValue(value, field.getDefaultValue, field.hasAttribute("is_password"), true)
-    </textarea>
+        @htmlAttributes(field)>@fieldValue(value, field.getDefaultValue, field.hasAttribute("is_password"), true)</textarea>
 } else {
     <input class="input-xlarge"
         @htmlAttributes(field)
-        @fieldValue(value, field.getDefaultValue, field.hasAttribute("is_password"), false)>
+        value="@fieldValue(value, field.getDefaultValue, field.hasAttribute("is_password"), false)">
 }
