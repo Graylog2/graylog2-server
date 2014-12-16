@@ -42,8 +42,6 @@ public abstract class InputRegistry {
     private final MessageInputFactory messageInputFactory;
     private final InputBuffer inputBuffer;
 
-    protected abstract void finishedTermination(IOState<MessageInput> state);
-
     protected abstract List<MessageInput> getAllPersisted();
 
     public abstract void cleanInput(MessageInput input);
@@ -217,7 +215,7 @@ public abstract class InputRegistry {
 
         if (inputState != null) {
             inputState.setState(IOState.Type.TERMINATED);
-            finishedTermination(inputState);
+            removeFromRunning(inputState);
         }
 
         return inputState;

@@ -89,7 +89,7 @@ public class RadioInputRegistry extends InputRegistry {
     public List<MessageInput> getAllPersisted() {
         final List<MessageInput> result = Lists.newArrayList();
 
-        List<InputSummaryResponse> response;
+        final List<InputSummaryResponse> response;
         try {
             response = inputService.getPersistedInputs();
         } catch (IOException e) {
@@ -110,10 +110,6 @@ public class RadioInputRegistry extends InputRegistry {
 
     @Override
     public void cleanInput(MessageInput input) {
-    }
-
-    @Override
-    protected void finishedTermination(IOState<MessageInput> state) {
     }
 
     @Override

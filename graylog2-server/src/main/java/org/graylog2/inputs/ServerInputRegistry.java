@@ -58,9 +58,8 @@ public class ServerInputRegistry extends InputRegistry {
         List<MessageInput> result = Lists.newArrayList();
 
         for (Input io : inputService.allOfThisNode(serverStatus.getNodeId().toString())) {
-            MessageInput input = null;
             try {
-                input = inputService.getMessageInput(io);
+                final MessageInput input = inputService.getMessageInput(io);
                 result.add(input);
             } catch (NoSuchInputTypeException e) {
                 LOG.warn("Cannot launch persisted input. No such type [{}].", io.getType());
@@ -79,10 +78,5 @@ public class ServerInputRegistry extends InputRegistry {
         } catch (NotFoundException e) {
             LOG.error("Unable to clean input <" + messageInput.getPersistId() + ">: ", e);
         }
-    }
-
-    @Override
-    protected void finishedTermination(IOState<MessageInput> state) {
-        removeFromRunning(state);
     }
 }
