@@ -96,8 +96,8 @@
 
         <metrics.version>3.1.0</metrics.version>
         <jackson.version>2.4.4</jackson.version>
-        <jersey.version>2.13</jersey.version>
-        <glassfish-hk2.version>2.3.0</glassfish-hk2.version>
+        <jersey.version>2.14</jersey.version>
+        <glassfish-hk2.version>2.4.0-b06</glassfish-hk2.version>
         <apache-directory-version>1.0.0-M20</apache-directory-version>
         <surefire.version>2.17</surefire.version>
         <guice.version>3.0</guice.version>
