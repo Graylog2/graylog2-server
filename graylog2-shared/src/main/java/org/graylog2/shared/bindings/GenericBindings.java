@@ -21,10 +21,13 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.util.concurrent.ServiceManager;
 import com.google.inject.AbstractModule;
 import com.google.inject.Scopes;
+import com.google.inject.TypeLiteral;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.name.Names;
+import org.graylog2.plugin.IOState;
 import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.buffers.InputBuffer;
+import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.util.ThroughputCounter;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.buffers.InputBufferImpl;
@@ -70,5 +73,6 @@ public class GenericBindings extends AbstractModule {
 
         bind(Semaphore.class).annotatedWith(Names.named("JournalSignal")).toInstance(new Semaphore(0));
 
+        install(new FactoryModuleBuilder().build(new TypeLiteral<IOState.Factory<MessageInput>>(){}));
     }
 }

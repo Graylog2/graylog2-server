@@ -20,8 +20,10 @@ import com.codahale.metrics.MetricRegistry;
 import org.graylog2.inputs.InputService;
 import org.graylog2.inputs.ServerInputRegistry;
 import org.graylog2.notifications.NotificationService;
+import org.graylog2.plugin.IOState;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.buffers.InputBuffer;
+import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.shared.inputs.InputRegistry;
 import org.graylog2.shared.inputs.MessageInputFactory;
 import org.graylog2.shared.system.activities.ActivityWriter;
@@ -33,16 +35,16 @@ public class ServerInputRegistryProvider implements Provider<InputRegistry> {
     private static ServerInputRegistry serverInputRegistry = null;
 
     @Inject
-    public ServerInputRegistryProvider(MessageInputFactory messageInputFactory,
+    public ServerInputRegistryProvider(IOState.Factory<MessageInput> inputStateFactory,
+                                       MessageInputFactory messageInputFactory,
                                        InputBuffer inputBuffer,
                                        ServerStatus serverStatus,
-                                       ActivityWriter activityWriter,
                                        InputService inputService,
                                        NotificationService notificationService,
                                        MetricRegistry metricRegistry) {
         if (serverInputRegistry == null) {
-            serverInputRegistry = new ServerInputRegistry(messageInputFactory, inputBuffer,
-                    serverStatus, activityWriter, inputService, notificationService, metricRegistry);
+            serverInputRegistry = new ServerInputRegistry(inputStateFactory, messageInputFactory, inputBuffer,
+                    serverStatus, inputService, notificationService, metricRegistry);
         }
     }
 

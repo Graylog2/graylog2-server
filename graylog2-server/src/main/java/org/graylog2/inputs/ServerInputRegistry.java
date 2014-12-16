@@ -40,18 +40,16 @@ public class ServerInputRegistry extends InputRegistry {
     protected final InputService inputService;
     protected final NotificationService notificationService;
     private final ServerStatus serverStatus;
-    private final ActivityWriter activityWriter;
 
-    public ServerInputRegistry(MessageInputFactory messageInputFactory,
+    public ServerInputRegistry(IOState.Factory<MessageInput> inputStateFactory,
+                               MessageInputFactory messageInputFactory,
                                InputBuffer inputBuffer,
                                ServerStatus serverStatus,
-                               ActivityWriter activityWriter,
                                InputService inputService,
                                NotificationService notificationService,
                                MetricRegistry metricRegistry) {
-        super(messageInputFactory, inputBuffer, metricRegistry);
+        super(inputStateFactory, messageInputFactory, inputBuffer, metricRegistry);
         this.serverStatus = serverStatus;
-        this.activityWriter = activityWriter;
         this.inputService = inputService;
         this.notificationService = notificationService;
     }
@@ -84,31 +82,7 @@ public class ServerInputRegistry extends InputRegistry {
     }
 
     @Override
-    protected void finishedLaunch(IOState<MessageInput> state) {
-        switch (state.getState()) {
-            case RUNNING:
-                notificationService.fixed(Notification.Type.NO_INPUT_RUNNING);
-                String msg = "Completed starting [" + state.getStoppable().getClass().getCanonicalName() + "] input with ID <" + state.getStoppable().getId() + ">";
-                activityWriter.write(new Activity(msg, InputRegistry.class));
-                break;
-            case FAILED:
-                activityWriter.write(new Activity(state.getDetailedMessage(), InputRegistry.class));
-                Notification notification = notificationService.buildNow();
-                notification.addType(Notification.Type.INPUT_FAILED_TO_START).addSeverity(Notification.Severity.NORMAL);
-                notification.addNode(serverStatus.getNodeId().toString());
-                notification.addDetail("input_id", state.getStoppable().getId());
-                notification.addDetail("reason", state.getDetailedMessage());
-                notificationService.publishIfFirst(notification);
-                break;
-        }
-    }
-
-    @Override
     protected void finishedTermination(IOState<MessageInput> state) {
         removeFromRunning(state);
-    }
-
-    @Override
-    protected void finishedStop(IOState<MessageInput> inputState) {
     }
 }

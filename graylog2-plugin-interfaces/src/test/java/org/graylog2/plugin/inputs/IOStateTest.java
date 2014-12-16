@@ -22,6 +22,7 @@
  */
 package org.graylog2.plugin.inputs;
 
+import com.google.common.eventbus.EventBus;
 import org.graylog2.plugin.IOState;
 import org.testng.annotations.Test;
 
@@ -37,22 +38,24 @@ import static org.testng.Assert.*;
 @Test
 public class IOStateTest {
     public void testEqualsDifferentId() throws Exception {
+        EventBus eventBus = mock(EventBus.class);
         MessageInput messageInput = mock(MessageInput.class);
 
-        IOState inputState1 = new IOState<MessageInput>(messageInput);
-        IOState inputState2 = new IOState<MessageInput>(messageInput);
+        IOState inputState1 = new IOState<MessageInput>(eventBus, messageInput);
+        IOState inputState2 = new IOState<MessageInput>(eventBus, messageInput);
 
         assertFalse(inputState1.equals(inputState2));
         assertFalse(inputState2.equals(inputState1));
     }
 
     public void testEqualsSameId() throws Exception {
+        EventBus eventBus = mock(EventBus.class);
         MessageInput messageInput = mock(MessageInput.class);
 
         String id = UUID.randomUUID().toString();
 
-        IOState inputState1 = new IOState<MessageInput>(messageInput, id);
-        IOState inputState2 = new IOState<MessageInput>(messageInput, id);
+        IOState inputState1 = new IOState<MessageInput>(eventBus, messageInput, id);
+        IOState inputState2 = new IOState<MessageInput>(eventBus, messageInput, id);
 
         assertTrue(inputState1.equals(inputState2));
         assertTrue(inputState2.equals(inputState1));

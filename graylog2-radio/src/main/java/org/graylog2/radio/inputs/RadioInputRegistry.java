@@ -46,13 +46,14 @@ public class RadioInputRegistry extends InputRegistry {
     protected final URI serverUrl;
     private final InputService inputService;
 
-    public RadioInputRegistry(MessageInputFactory messageInputFactory,
+    public RadioInputRegistry(IOState.Factory<MessageInput> inputStateFactory,
+                              MessageInputFactory messageInputFactory,
                               InputBuffer inputBuffer,
                               AsyncHttpClient httpclient,
                               URI serverUrl,
                               InputService inputService,
                               MetricRegistry metricRegistry) {
-        super(messageInputFactory, inputBuffer, metricRegistry);
+        super(inputStateFactory, messageInputFactory, inputBuffer, metricRegistry);
         this.httpclient = httpclient;
         this.serverUrl = serverUrl;
         this.inputService = inputService;
@@ -108,27 +109,11 @@ public class RadioInputRegistry extends InputRegistry {
     }
 
     @Override
-    protected void finishedLaunch(IOState<MessageInput> state) {
-    }
-
-    @Override
     public void cleanInput(MessageInput input) {
     }
 
     @Override
     protected void finishedTermination(IOState<MessageInput> state) {
-        MessageInput input = state.getStoppable();
-        try {
-            if (!input.getGlobal())
-                inputService.unregisterInCluster(input);
-        } catch (Exception e) {
-            LOG.error("Could not unregister input [{}], id <{}> on server cluster: {}", input.getName(), input.getId(), e);
-            return;
-        }
-
-        LOG.info("Unregistered input [{}], id <{}> on server cluster.", input.getName(), input.getId());
-
-        removeFromRunning(state);
     }
 
     @Override
@@ -144,9 +129,5 @@ public class RadioInputRegistry extends InputRegistry {
             }
         }
         return super.launch(input, id, register);
-    }
-
-    @Override
-    protected void finishedStop(IOState<MessageInput> inputState) {
     }
 }

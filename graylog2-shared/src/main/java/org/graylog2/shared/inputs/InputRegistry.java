@@ -38,22 +38,21 @@ public abstract class InputRegistry {
     private static final Logger LOG = LoggerFactory.getLogger(InputRegistry.class);
     protected final Set<IOState<MessageInput>> inputStates = new HashSet<>();
     protected final ExecutorService executor;
+    private IOState.Factory<MessageInput> inputStateFactory;
     private final MessageInputFactory messageInputFactory;
     private final InputBuffer inputBuffer;
 
-    protected abstract void finishedLaunch(IOState<MessageInput> state);
-
     protected abstract void finishedTermination(IOState<MessageInput> state);
-
-    protected abstract void finishedStop(IOState<MessageInput> inputState);
 
     protected abstract List<MessageInput> getAllPersisted();
 
     public abstract void cleanInput(MessageInput input);
 
-    public InputRegistry(MessageInputFactory messageInputFactory,
+    public InputRegistry(IOState.Factory<MessageInput> inputStateFactory,
+                         MessageInputFactory messageInputFactory,
                          InputBuffer inputBuffer,
                          MetricRegistry metricRegistry) {
+        this.inputStateFactory = inputStateFactory;
         this.messageInputFactory = messageInputFactory;
         this.inputBuffer = inputBuffer;
         this.executor = executorService(metricRegistry);
@@ -79,7 +78,7 @@ public abstract class InputRegistry {
     }
 
     public IOState<MessageInput> launch(final MessageInput input, String id, boolean register) {
-        final IOState<MessageInput> inputState = new IOState<MessageInput>(input, id);
+        final IOState<MessageInput> inputState = inputStateFactory.create(input, id);
         inputStates.add(inputState);
 
         return launch(input, inputState, register);
@@ -108,8 +107,6 @@ public abstract class InputRegistry {
                     LOG.info(msg);
                 } catch (Exception e) {
                     handleLaunchException(e, input, inputState);
-                } finally {
-                    finishedLaunch(inputState);
                 }
             }
         });
@@ -236,7 +233,6 @@ public abstract class InputRegistry {
                 LOG.warn("Stopping input <{}> failed, removing anyway: {}", input.getId(), e);
             }
             inputState.setState(IOState.Type.STOPPED);
-            finishedStop(inputState);
         }
 
         return inputState;

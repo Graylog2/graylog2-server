@@ -43,6 +43,7 @@ import org.graylog2.indexer.healing.FixDeflectorByMoveJob;
 import org.graylog2.indexer.indices.jobs.OptimizeIndexJob;
 import org.graylog2.indexer.ranges.CreateNewSingleIndexRangeJob;
 import org.graylog2.indexer.ranges.RebuildIndexRangesJob;
+import org.graylog2.inputs.converters.InputStateListener;
 import org.graylog2.jersey.container.netty.SecurityContextFactory;
 import org.graylog2.plugin.BaseConfiguration;
 import org.graylog2.plugin.PluginMetaData;
@@ -90,6 +91,7 @@ public class ServerBindings extends AbstractModule {
         bindContainerResponseFilters();
         bindExceptionMappers();
         bindPluginMetaData();
+        bindEventBusListeners();
     }
 
     private void bindProviders() {
@@ -179,5 +181,9 @@ public class ServerBindings extends AbstractModule {
 
     private void bindPluginMetaData() {
         Multibinder<PluginMetaData> setBinder = Multibinder.newSetBinder(binder(), PluginMetaData.class);
+    }
+
+    private void bindEventBusListeners() {
+        bind(InputStateListener.class).asEagerSingleton();
     }
 }

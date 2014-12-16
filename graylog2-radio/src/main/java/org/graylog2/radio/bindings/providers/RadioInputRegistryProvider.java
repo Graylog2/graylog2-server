@@ -18,7 +18,9 @@ package org.graylog2.radio.bindings.providers;
 
 import com.codahale.metrics.MetricRegistry;
 import com.ning.http.client.AsyncHttpClient;
+import org.graylog2.plugin.IOState;
 import org.graylog2.plugin.buffers.InputBuffer;
+import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.radio.Configuration;
 import org.graylog2.radio.cluster.InputService;
 import org.graylog2.radio.inputs.RadioInputRegistry;
@@ -32,14 +34,16 @@ public class RadioInputRegistryProvider implements Provider<InputRegistry> {
     private static RadioInputRegistry radioInputRegistry = null;
 
     @Inject
-    public RadioInputRegistryProvider(MessageInputFactory messageInputFactory,
+    public RadioInputRegistryProvider(IOState.Factory<MessageInput> inputStateFactory,
+                                      MessageInputFactory messageInputFactory,
                                       InputBuffer inputBuffer,
                                       AsyncHttpClient httpClient,
                                       Configuration configuration,
                                       InputService inputService,
                                       MetricRegistry metricRegistry) {
         if (radioInputRegistry == null) {
-            radioInputRegistry = new RadioInputRegistry(messageInputFactory,
+            radioInputRegistry = new RadioInputRegistry(inputStateFactory,
+                    messageInputFactory,
                     inputBuffer,
                     httpClient,
                     configuration.getGraylog2ServerUri(),
