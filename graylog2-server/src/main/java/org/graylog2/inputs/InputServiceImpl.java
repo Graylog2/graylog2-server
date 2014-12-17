@@ -270,7 +270,7 @@ public class InputServiceImpl extends PersistedServiceImpl implements InputServi
     }
 
     @Override
-    public MessageInput buildMessageInput(Input io) throws NoSuchInputTypeException {
+    public MessageInput getMessageInput(Input io) throws NoSuchInputTypeException {
         final Configuration configuration = new Configuration(io.getConfiguration());
         final MessageInput input = messageInputFactory.create(io.getType(), configuration);
 
@@ -291,10 +291,5 @@ public class InputServiceImpl extends PersistedServiceImpl implements InputServi
         input.setConfiguration(configuration);
 
         return input;
-    }
-
-    @Override
-    public MessageInput getMessageInput(Input io) throws NoSuchInputTypeException {
-        return buildMessageInput(io);
     }
 }

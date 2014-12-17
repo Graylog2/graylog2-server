@@ -54,6 +54,5 @@ public interface InputService extends PersistedService {
 
     void removeStaticField(Input input, String key);
 
-    MessageInput buildMessageInput(Input io) throws NoSuchInputTypeException;
     MessageInput getMessageInput(Input io) throws NoSuchInputTypeException;
 }
