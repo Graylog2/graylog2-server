@@ -153,7 +153,7 @@ public class InputService {
 
     public Map<Node, Map<String, String>> getAllInputTypes() throws IOException, APIException {
         Map<Node, Map<String, String>> result = Maps.newHashMap();
-        Map<Node, InputTypesResponse> inputTypesResponseMap = api.path(resource.types(), InputTypesResponse.class)
+        Map<Node, InputTypesResponse> inputTypesResponseMap = api.path(routes.InputTypesResource().types(), InputTypesResponse.class)
                 .fromAllNodes().executeOnAll();
 
         for (Map.Entry<Node, InputTypesResponse> entry : inputTypesResponseMap.entrySet())
@@ -163,7 +163,7 @@ public class InputService {
     }
 
     public InputTypeSummaryResponse getInputTypeInformation(Node node, String type) throws IOException, APIException {
-        return api.path(resource.info(type), InputTypeSummaryResponse.class).node(node).execute();
+        return api.path(routes.InputTypesResource().info(type), InputTypeSummaryResponse.class).node(node).execute();
     }
 
     public Map<String, InputTypeSummaryResponse> getAllInputTypeInformation() throws IOException, APIException {
