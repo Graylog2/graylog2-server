@@ -17,8 +17,10 @@
 package org.graylog2.shared.inputs;
 
 import com.google.common.collect.Maps;
+import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.inputs.MessageInput;
+import org.graylog2.shared.rest.resources.system.inputs.requests.InputLaunchRequest;
 
 import javax.inject.Inject;
 import java.util.Map;
@@ -37,6 +39,16 @@ public class MessageInputFactory {
             return factory.create(configuration);
         }
         throw new NoSuchInputTypeException("There is no input of type <" + type + "> registered.");
+    }
+
+    public MessageInput create(InputLaunchRequest lr, String user) throws NoSuchInputTypeException {
+        final MessageInput input = create(lr.type(), new Configuration(lr.configuration()));
+        input.setTitle(lr.title());
+        input.setGlobal(lr.global());
+        input.setCreatorUserId(user);
+        input.setCreatedAt(Tools.iso8601());
+
+        return input;
     }
 
     public Map<String, InputDescription> getAvailableInputs() {

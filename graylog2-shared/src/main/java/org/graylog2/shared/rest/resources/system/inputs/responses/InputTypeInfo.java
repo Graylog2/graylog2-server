@@ -14,11 +14,12 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.rest.resources.system.inputs.responses;
+package org.graylog2.shared.rest.resources.system.inputs.responses;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import org.graylog2.shared.inputs.InputDescription;
 
 import java.util.Map;
 
@@ -27,11 +28,19 @@ import java.util.Map;
  */
 @JsonAutoDetect
 @AutoValue
-public abstract class InputTypesSummary {
+public abstract class InputTypeInfo {
     @JsonProperty
-    public abstract Map<String, String> types();
+    public abstract String type();
+    @JsonProperty
+    public abstract String name();
+    @JsonProperty
+    public abstract boolean isExclusive();
+    @JsonProperty
+    public abstract Map<String, Map<String, Object>> requestedConfiguration();
+    @JsonProperty
+    public abstract String linkToDocs();
 
-    public static InputTypesSummary create(Map<String, String> types) {
-        return new AutoValue_InputTypesSummary(types);
+    public static InputTypeInfo create(String type, InputDescription description) {
+        return new AutoValue_InputTypeInfo(type, description.getName(), description.isExclusive(), description.getRequestedConfiguration(), description.getLinkToDocs());
     }
 }

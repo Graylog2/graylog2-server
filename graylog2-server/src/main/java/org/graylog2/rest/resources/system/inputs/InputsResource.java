@@ -39,11 +39,8 @@ import org.graylog2.rest.resources.RestResource;
 import org.graylog2.rest.resources.system.inputs.responses.InputCreated;
 import org.graylog2.rest.resources.system.inputs.responses.InputStateSummary;
 import org.graylog2.rest.resources.system.inputs.responses.InputSummary;
-import org.graylog2.rest.resources.system.inputs.responses.InputTypeInfo;
-import org.graylog2.rest.resources.system.inputs.responses.InputTypesSummary;
 import org.graylog2.rest.resources.system.inputs.responses.InputsList;
 import org.graylog2.security.RestPermissions;
-import org.graylog2.shared.inputs.InputDescription;
 import org.graylog2.shared.inputs.InputRegistry;
 import org.graylog2.shared.inputs.MessageInputFactory;
 import org.graylog2.shared.inputs.NoSuchInputTypeException;
@@ -69,7 +66,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import java.net.URI;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
@@ -113,7 +109,7 @@ public class InputsResource extends RestResource {
 
         return InputSummary.create(input.getTitle(),
                 input.getPersistId(),
-                input.getGlobal(),
+                input.isGlobal(),
                 input.getName(),
                 input.getContentPack(),
                 input.getId(),
@@ -143,7 +139,7 @@ public class InputsResource extends RestResource {
                     InputSummary.create(
                             messageInput.getTitle(),
                             messageInput.getPersistId(),
-                            messageInput.getGlobal(),
+                            messageInput.isGlobal(),
                             messageInput.getName(),
                             messageInput.getContentPack(),
                             messageInput.getId(),
@@ -182,12 +178,7 @@ public class InputsResource extends RestResource {
         // Build input.
         final MessageInput input;
         try {
-            input = messageInputFactory.create(lr.type(), inputConfig);
-            input.setTitle(lr.title());
-            input.setGlobal(lr.global());
-            input.setCreatorUserId(getCurrentUser().getName());
-            input.setCreatedAt(Tools.iso8601());
-            input.setConfiguration(inputConfig);
+            input = messageInputFactory.create(lr, getCurrentUser().getName());
 
             input.checkConfiguration();
         } catch (NoSuchInputTypeException e) {
@@ -206,25 +197,7 @@ public class InputsResource extends RestResource {
         }
 
         final String inputId = UUID.randomUUID().toString();
-
-        // Build MongoDB data
-        final Map<String, Object> inputData = Maps.newHashMap();
-        inputData.put(MessageInput.FIELD_INPUT_ID, inputId);
-        inputData.put(MessageInput.FIELD_TITLE, lr.title());
-        inputData.put(MessageInput.FIELD_TYPE, lr.type());
-        inputData.put(MessageInput.FIELD_CREATOR_USER_ID, getCurrentUser().getName());
-        inputData.put(MessageInput.FIELD_CONFIGURATION, lr.configuration());
-        inputData.put(MessageInput.FIELD_CREATED_AT, Tools.iso8601());
-
-        if (lr.global()) {
-            inputData.put(MessageInput.FIELD_GLOBAL, true);
-        } else {
-            inputData.put(MessageInput.FIELD_NODE_ID, serverStatus.getNodeId().toString());
-        }
-
-        // ... and check if it would pass validation. We don't need to go on if it doesn't.
-        final Input mongoInput = new InputImpl(inputData);
-
+        final Input mongoInput = getInput(input);
         // Persist input.
         String id = inputService.save(mongoInput);
         input.setPersistId(id);
@@ -241,16 +214,26 @@ public class InputsResource extends RestResource {
         return Response.created(inputUri).entity(InputCreated.create(inputId, id)).build();
     }
 
-    @GET
-    @Timed
-    @Path("/types")
-    @ApiOperation(value = "Get all available input types of this node")
-    @Produces(MediaType.APPLICATION_JSON)
-    public InputTypesSummary types() {
-        Map<String, String> types = new HashMap<>();
-        for (Map.Entry<String, InputDescription> entry : messageInputFactory.getAvailableInputs().entrySet())
-            types.put(entry.getKey(), entry.getValue().getName());
-        return InputTypesSummary.create(types);
+    private Input getInput(MessageInput input) throws ValidationException {
+        // Build MongoDB data
+        final Map<String, Object> inputData = Maps.newHashMap();
+        inputData.put(MessageInput.FIELD_INPUT_ID, input.getId());
+        inputData.put(MessageInput.FIELD_TITLE, input.getTitle());
+        inputData.put(MessageInput.FIELD_TYPE, input.getType());
+        inputData.put(MessageInput.FIELD_CREATOR_USER_ID, getCurrentUser().getName());
+        inputData.put(MessageInput.FIELD_CONFIGURATION, input.getConfiguration().getSource());
+        inputData.put(MessageInput.FIELD_CREATED_AT, Tools.iso8601());
+
+        if (input.isGlobal()) {
+            inputData.put(MessageInput.FIELD_GLOBAL, true);
+        } else {
+            inputData.put(MessageInput.FIELD_NODE_ID, serverStatus.getNodeId().toString());
+        }
+
+        // ... and check if it would pass validation. We don't need to go on if it doesn't.
+        final Input mongoInput = new InputImpl(inputData);
+
+        return mongoInput;
     }
 
     @DELETE
@@ -277,7 +260,7 @@ public class InputsResource extends RestResource {
 
         inputRegistry.terminate(messageInput);
 
-        if (serverStatus.hasCapability(ServerStatus.Capability.MASTER) || !messageInput.getGlobal()) {
+        if (serverStatus.hasCapability(ServerStatus.Capability.MASTER) || !messageInput.isGlobal()) {
             // Remove from list and mongo.
             try {
                 final Input input = inputService.find(messageInput.getId());
@@ -374,24 +357,5 @@ public class InputsResource extends RestResource {
         stop(inputId);
         launchExisting(inputId);
         return Response.status(Response.Status.ACCEPTED).build();
-    }
-
-    @GET
-    @Timed
-    @Path("/types/{inputType}")
-    @ApiOperation(value = "Get information about a single input type")
-    @Produces(MediaType.APPLICATION_JSON)
-    @ApiResponses(value = {
-            @ApiResponse(code = 404, message = "No such input type registered.")
-    })
-    public InputTypeInfo info(@ApiParam(name = "inputType", required = true) @PathParam("inputType") String inputType) {
-        final InputDescription description = messageInputFactory.getAvailableInputs().get(inputType);
-        if (description == null) {
-            final String message = "Unknown input type " + inputType + " requested.";
-            LOG.error(message);
-            throw new NotFoundException(message);
-        }
-
-        return InputTypeInfo.create(inputType, description);
     }
 }
