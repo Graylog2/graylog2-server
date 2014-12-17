@@ -37,6 +37,7 @@ import org.graylog2.shared.bindings.providers.EventBusProvider;
 import org.graylog2.shared.bindings.providers.MetricRegistryProvider;
 import org.graylog2.shared.bindings.providers.NodeIdProvider;
 import org.graylog2.shared.bindings.providers.ServiceManagerProvider;
+import org.graylog2.shared.inputs.InputRegistry;
 import org.graylog2.shared.stats.ThroughputStats;
 import org.jboss.netty.util.HashedWheelTimer;
 
@@ -74,5 +75,7 @@ public class GenericBindings extends AbstractModule {
         bind(Semaphore.class).annotatedWith(Names.named("JournalSignal")).toInstance(new Semaphore(0));
 
         install(new FactoryModuleBuilder().build(new TypeLiteral<IOState.Factory<MessageInput>>(){}));
+
+        bind(InputRegistry.class).asEagerSingleton();
     }
 }

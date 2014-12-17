@@ -22,6 +22,7 @@ import org.graylog2.plugin.configuration.ConfigurationException;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.radio.cluster.InputService;
 import org.graylog2.radio.inputs.api.InputSummaryResponse;
+import org.graylog2.radio.inputs.api.RegisterInputResponse;
 import org.graylog2.shared.inputs.MessageInputFactory;
 import org.graylog2.shared.inputs.NoSuchInputTypeException;
 import org.graylog2.shared.inputs.PersistedInputs;
@@ -93,5 +94,24 @@ public class PersistedInputsImpl implements PersistedInputs {
         }
 
         return result.iterator();
+    }
+
+    @Override
+    public boolean add(MessageInput input) {
+        try {
+            final RegisterInputResponse response = inputService.registerInCluster(input);
+            if (response != null)
+                input.setPersistId(response.persistId);
+        } catch (Exception e) {
+            LOG.error("Could not register input in Graylog2 cluster. It will be lost on next restart of this radio node.", e);
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public boolean remove(Object o) {
+        return false;
     }
 }

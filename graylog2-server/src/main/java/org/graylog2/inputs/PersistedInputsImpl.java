@@ -56,4 +56,14 @@ public class PersistedInputsImpl implements PersistedInputs {
 
         return result.iterator();
     }
+
+    @Override
+    public boolean add(MessageInput e) {
+        return false;
+    }
+
+    @Override
+    public boolean remove(Object o) {
+        return false;
+    }
 }

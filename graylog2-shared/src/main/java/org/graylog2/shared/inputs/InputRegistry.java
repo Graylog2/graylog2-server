@@ -70,6 +70,8 @@ public class InputRegistry {
     }
 
     public IOState<MessageInput> launch(final MessageInput input, String id, boolean register) {
+        if (register)
+            this.persistedInputs.add(input);
         final IOState<MessageInput> inputState = inputStateFactory.create(input, id);
         inputStates.add(inputState);
 
