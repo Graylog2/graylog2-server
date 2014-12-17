@@ -16,7 +16,6 @@
  */
 package org.graylog2.shared.bindings;
 
-import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Module;
 
@@ -25,11 +24,12 @@ import java.util.List;
 public final class GuiceInjectorHolder {
     private static Injector injector;
 
-    private GuiceInjectorHolder() {}
+    private GuiceInjectorHolder() {
+    }
 
     public static Injector createInjector(final List<Module> bindingsModules) {
         if (injector == null) {
-            injector = Guice.createInjector(bindingsModules);
+            injector = Hk2GuiceBridgeJitInjector.create(bindingsModules, "org.graylog2");
         }
 
         return injector;
