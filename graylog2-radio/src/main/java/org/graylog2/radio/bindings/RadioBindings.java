@@ -30,14 +30,16 @@ import org.graylog2.plugin.BaseConfiguration;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.radio.Configuration;
 import org.graylog2.radio.bindings.providers.AsyncHttpClientProvider;
-import org.graylog2.radio.bindings.providers.RadioInputRegistryProvider;
 import org.graylog2.radio.bindings.providers.RadioTransportProvider;
 import org.graylog2.radio.buffers.processors.RadioProcessBufferProcessor;
 import org.graylog2.radio.inputs.InputStateListener;
+import org.graylog2.radio.inputs.PersistedInputsImpl;
+import org.graylog2.radio.inputs.RadioInputRegistry;
 import org.graylog2.radio.system.activities.NullActivityWriter;
 import org.graylog2.radio.transports.RadioTransport;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.shared.inputs.InputRegistry;
+import org.graylog2.shared.inputs.PersistedInputs;
 import org.graylog2.shared.system.activities.ActivityWriter;
 
 import javax.ws.rs.container.ContainerResponseFilter;
@@ -66,8 +68,13 @@ public class RadioBindings extends AbstractModule {
         bindDynamicFeatures();
         bindContainerResponseFilters();
         bindExceptionMappers();
-        bind(ActivityWriter.class).to(NullActivityWriter.class);
+        bindInterfaces();
         bindEventBusListeners();
+    }
+
+    private void bindInterfaces() {
+        bind(ActivityWriter.class).to(NullActivityWriter.class);
+        bind(PersistedInputs.class).to(PersistedInputsImpl.class);
     }
 
     private void bindEventBusListeners() {
@@ -83,7 +90,7 @@ public class RadioBindings extends AbstractModule {
         capabilityBinder.addBinding().toInstance(ServerStatus.Capability.RADIO);
 
         bind(ServerStatus.class).in(Scopes.SINGLETON);
-        bind(InputRegistry.class).toProvider(RadioInputRegistryProvider.class).asEagerSingleton();
+        bind(InputRegistry.class).to(RadioInputRegistry.class).asEagerSingleton();
 
         bind(URI.class).annotatedWith(Names.named("ServerUri")).toInstance(configuration.getGraylog2ServerUri());
         bind(URI.class).annotatedWith(Names.named("OurRadioUri")).toInstance(configuration.getRestTransportUri());

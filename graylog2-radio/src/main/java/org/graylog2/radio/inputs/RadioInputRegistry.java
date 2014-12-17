@@ -30,11 +30,13 @@ import org.graylog2.radio.inputs.api.RegisterInputResponse;
 import org.graylog2.shared.inputs.InputRegistry;
 import org.graylog2.shared.inputs.MessageInputFactory;
 import org.graylog2.shared.inputs.NoSuchInputTypeException;
+import org.graylog2.shared.inputs.PersistedInputs;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
 import java.io.IOException;
 import java.net.URI;
 import java.util.List;
@@ -46,70 +48,19 @@ public class RadioInputRegistry extends InputRegistry {
     protected final URI serverUrl;
     private final InputService inputService;
 
+    @Inject
     public RadioInputRegistry(IOState.Factory<MessageInput> inputStateFactory,
                               MessageInputFactory messageInputFactory,
                               InputBuffer inputBuffer,
                               AsyncHttpClient httpclient,
                               URI serverUrl,
                               InputService inputService,
-                              MetricRegistry metricRegistry) {
-        super(inputStateFactory, messageInputFactory, inputBuffer, metricRegistry);
+                              MetricRegistry metricRegistry,
+                              PersistedInputs persistedInputs) {
+        super(inputStateFactory, messageInputFactory, inputBuffer, metricRegistry, persistedInputs);
         this.httpclient = httpclient;
         this.serverUrl = serverUrl;
         this.inputService = inputService;
-    }
-
-    private MessageInput getMessageInput(InputSummaryResponse isr) {
-        MessageInput input;
-        try {
-            Configuration inputConfig = new Configuration(isr.configuration);
-            input = this.create(isr.type, inputConfig);
-
-            // Add all standard fields.
-            input.setTitle(isr.title);
-            input.setCreatorUserId(isr.creatorUserId);
-            input.setPersistId(isr.id);
-            input.setCreatedAt(new DateTime(isr.createdAt, DateTimeZone.UTC));
-            input.setGlobal(isr.global);
-            input.setConfiguration(inputConfig);
-
-            input.checkConfiguration();
-        } catch (NoSuchInputTypeException e) {
-            LOG.warn("Cannot launch persisted input. No such type [{}]. Error: {}", isr.type, e);
-            return null;
-        } catch (ConfigurationException e) {
-            LOG.error("Missing or invalid input input configuration.", e);
-            return null;
-        }
-        return input;
-    }
-
-    // TODO make this use a generic ApiClient class that knows the graylog2-server node address(es) or something.
-    @Override
-    public List<MessageInput> getAllPersisted() {
-        final List<MessageInput> result = Lists.newArrayList();
-
-        final List<InputSummaryResponse> response;
-        try {
-            response = inputService.getPersistedInputs();
-        } catch (IOException e) {
-            LOG.error("Unable to get persisted inputs: ", e);
-            return result;
-        }
-
-        for (InputSummaryResponse isr : response) {
-            final MessageInput messageInput = getMessageInput(isr);
-            if (messageInput != null) {
-                LOG.debug("Loaded message input {}", messageInput);
-                result.add(messageInput);
-            }
-        }
-
-        return result;
-    }
-
-    @Override
-    public void cleanInput(MessageInput input) {
     }
 
     @Override

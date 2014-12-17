@@ -29,30 +29,31 @@ import org.graylog2.plugin.inputs.MessageInput;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 
-public abstract class InputRegistry {
+public class InputRegistry {
     private static final Logger LOG = LoggerFactory.getLogger(InputRegistry.class);
     protected final Set<IOState<MessageInput>> inputStates = new HashSet<>();
     protected final ExecutorService executor;
     private IOState.Factory<MessageInput> inputStateFactory;
     private final MessageInputFactory messageInputFactory;
     private final InputBuffer inputBuffer;
+    private PersistedInputs persistedInputs;
 
-    protected abstract List<MessageInput> getAllPersisted();
-
-    public abstract void cleanInput(MessageInput input);
-
+    @Inject
     public InputRegistry(IOState.Factory<MessageInput> inputStateFactory,
                          MessageInputFactory messageInputFactory,
                          InputBuffer inputBuffer,
-                         MetricRegistry metricRegistry) {
+                         MetricRegistry metricRegistry,
+                         PersistedInputs persistedInputs) {
         this.inputStateFactory = inputStateFactory;
         this.messageInputFactory = messageInputFactory;
         this.inputBuffer = inputBuffer;
+        this.persistedInputs = persistedInputs;
         this.executor = executorService(metricRegistry);
     }
 
@@ -204,7 +205,7 @@ public abstract class InputRegistry {
     }
 
     public void launchAllPersisted() {
-        for (MessageInput input : getAllPersisted()) {
+        for (MessageInput input : persistedInputs) {
             input.initialize();
             launchPersisted(input);
         }
@@ -255,7 +256,7 @@ public abstract class InputRegistry {
     }
 
     public MessageInput getPersisted(String inputId) {
-        for (MessageInput input : getAllPersisted()) {
+        for (MessageInput input : persistedInputs) {
             if (input.getId().equals(inputId))
                 return input;
         }

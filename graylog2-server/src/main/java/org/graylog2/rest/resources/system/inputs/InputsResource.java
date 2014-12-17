@@ -261,25 +261,30 @@ public class InputsResource extends RestResource {
     public void terminate(@ApiParam(name = "inputId", required = true) @PathParam("inputId") String inputId) {
         checkPermission(RestPermissions.INPUTS_TERMINATE, inputId);
 
-        MessageInput input = inputRegistry.getRunningInput(inputId);
+        MessageInput messageInput = inputRegistry.getRunningInput(inputId);
 
-        if (input == null) {
+        if (messageInput == null) {
             LOG.info("Cannot terminate input. Input not found.");
             throw new NotFoundException();
         }
 
-        final String msg = "Attempting to terminate input [" + input.getName() + "]. Reason: REST request.";
+        final String msg = "Attempting to terminate input [" + messageInput.getName() + "]. Reason: REST request.";
         LOG.info(msg);
         activityWriter.write(new Activity(msg, InputsResource.class));
 
-        inputRegistry.terminate(input);
+        inputRegistry.terminate(messageInput);
 
-        if (serverStatus.hasCapability(ServerStatus.Capability.MASTER) || !input.getGlobal()) {
+        if (serverStatus.hasCapability(ServerStatus.Capability.MASTER) || !messageInput.getGlobal()) {
             // Remove from list and mongo.
-            inputRegistry.cleanInput(input);
+            try {
+                final Input input = inputService.find(messageInput.getId());
+                inputService.destroy(input);
+            } catch (org.graylog2.database.NotFoundException e) {
+                LOG.warn("Input not found while deleting it: ", e);
+            }
         }
 
-        final String msg2 = "Terminated input [" + input.getName() + "]. Reason: REST request.";
+        final String msg2 = "Terminated input [" + messageInput.getName() + "]. Reason: REST request.";
         LOG.info(msg2);
         activityWriter.write(new Activity(msg2, InputsResource.class));
     }

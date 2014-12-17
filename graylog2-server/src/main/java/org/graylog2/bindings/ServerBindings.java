@@ -43,6 +43,7 @@ import org.graylog2.indexer.healing.FixDeflectorByMoveJob;
 import org.graylog2.indexer.indices.jobs.OptimizeIndexJob;
 import org.graylog2.indexer.ranges.CreateNewSingleIndexRangeJob;
 import org.graylog2.indexer.ranges.RebuildIndexRangesJob;
+import org.graylog2.inputs.PersistedInputsImpl;
 import org.graylog2.inputs.converters.InputStateListener;
 import org.graylog2.jersey.container.netty.SecurityContextFactory;
 import org.graylog2.plugin.BaseConfiguration;
@@ -60,6 +61,7 @@ import org.graylog2.security.ldap.LdapSettingsImpl;
 import org.graylog2.security.realm.LdapUserAuthenticator;
 import org.graylog2.shared.bindings.providers.AsyncHttpClientProvider;
 import org.graylog2.shared.inputs.InputRegistry;
+import org.graylog2.shared.inputs.PersistedInputs;
 import org.graylog2.shared.metrics.jersey2.MetricsDynamicBinding;
 import org.graylog2.shared.system.activities.ActivityWriter;
 import org.graylog2.streams.StreamRouter;
@@ -127,7 +129,7 @@ public class ServerBindings extends AbstractModule {
 
         bind(Node.class).toProvider(EsNodeProvider.class).in(Scopes.SINGLETON);
         bind(SystemJobManager.class).toProvider(SystemJobManagerProvider.class);
-        bind(InputRegistry.class).toProvider(ServerInputRegistryProvider.class).asEagerSingleton();
+        bind(InputRegistry.class).asEagerSingleton();
         bind(RulesEngine.class).toProvider(RulesEngineProvider.class);
         bind(LdapConnector.class).toProvider(LdapConnectorProvider.class);
         bind(LdapUserAuthenticator.class).toProvider(LdapUserAuthenticatorProvider.class);
@@ -157,6 +159,7 @@ public class ServerBindings extends AbstractModule {
         install(new FactoryModuleBuilder().implement(StreamRouterEngine.class, StreamRouterEngine.class).build(StreamRouterEngine.Factory.class));
         bind(FilterService.class).to(FilterServiceImpl.class).in(Scopes.SINGLETON);
         bind(ActivityWriter.class).to(SystemMessageActivityWriter.class);
+        bind(PersistedInputs.class).to(PersistedInputsImpl.class);
     }
 
     private void bindDynamicFeatures() {

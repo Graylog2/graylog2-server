@@ -169,7 +169,8 @@ public class BundleImporter {
 
             LOG.debug("Terminating message input {}", inputId);
             inputRegistry.terminate(messageInput);
-            inputRegistry.cleanInput(messageInput);
+            final org.graylog2.inputs.Input input = inputService.find(messageInput.getId());
+            inputService.destroy(input);
         }
     }
 
