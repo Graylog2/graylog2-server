@@ -37,10 +37,7 @@ import java.util.Map;
 import java.util.concurrent.Executors;
 
 import static org.mockito.Mockito.when;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertNotEquals;
-import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.*;
 
 public class StreamRouterEngineTest {
     private MetricRegistry metricRegistry = new MetricRegistry();
@@ -52,7 +49,7 @@ public class StreamRouterEngineTest {
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
 
-        when(streamFaultManager.getStreamProcessingTimeout()).thenReturn(10L);
+        when(streamFaultManager.getStreamProcessingTimeout()).thenReturn(50L);
     }
 
     private StreamRouterEngine newEngine(List<Stream> streams) {
