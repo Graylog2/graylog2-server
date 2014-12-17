@@ -226,7 +226,7 @@ public abstract class MessageInput implements Stoppable {
         this.configuration = configuration;
     }
 
-    public Boolean getGlobal() {
+    public Boolean isGlobal() {
         return global;
     }
 
@@ -288,7 +288,7 @@ public abstract class MessageInput implements Stoppable {
         inputMap.put(FIELD_CREATED_AT, Tools.getISO8601String(this.getCreatedAt()));
         inputMap.put(FIELD_ATTRIBUTES, this.getAttributesWithMaskedPasswords());
         inputMap.put(FIELD_STATIC_FIELDS, this.getStaticFields());
-        inputMap.put(FIELD_GLOBAL, this.getGlobal());
+        inputMap.put(FIELD_GLOBAL, this.isGlobal());
         inputMap.put(FIELD_CONTENT_PACK, this.getContentPack());
 
         return inputMap;
@@ -339,6 +339,10 @@ public abstract class MessageInput implements Stoppable {
 
         incomingMessages.mark();
         rawSize.mark(rawMessage.getPayload().length);
+    }
+
+    public String getType() {
+        return this.getClass().getCanonicalName();
     }
 
     public interface Factory<M> {
