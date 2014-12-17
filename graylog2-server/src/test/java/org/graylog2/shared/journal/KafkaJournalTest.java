@@ -18,12 +18,15 @@ package org.graylog2.shared.journal;
 
 import com.codahale.metrics.MetricRegistry;
 import com.google.common.collect.Iterators;
+import com.google.common.collect.Lists;
 import org.graylog2.Graylog2BaseTest;
 import org.joda.time.Duration;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import java.io.File;
+import java.io.FileFilter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -31,7 +34,10 @@ import java.util.List;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 import static com.google.common.base.Charsets.UTF_8;
+import static org.apache.commons.io.filefilter.FileFilterUtils.*;
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertTrue;
 
 public class KafkaJournalTest extends Graylog2BaseTest {
 
@@ -88,4 +94,82 @@ public class KafkaJournalTest extends Graylog2BaseTest {
         deleteDirectory(journalDir.toFile());
     }
 
+    private void createBulkChunks(KafkaJournal journal, int bulkCount) {
+        // perform multiple writes to make multiple segments
+        for (int currentBulk = 0; currentBulk < bulkCount; currentBulk++) {
+            final List<Journal.Entry> entries = Lists.newArrayList();
+            // write enough bytes in one go to be over the 1024 byte segment limit, which causes a segment roll
+            for (int i = 0; i < 200; i++) {
+                final byte[] idBytes = ("id" + i).getBytes(UTF_8);
+                final byte[] messageBytes = ("message " + i).getBytes(UTF_8);
+
+                entries.add(journal.createEntry(idBytes, messageBytes));
+
+            }
+            journal.write(entries);
+        }
+    }
+
+    private int countSegmentsInDir(File messageJournalFile) {
+        // let it throw
+        return messageJournalFile.list(and(fileFileFilter(), suffixFileFilter(".log"))).length;
+    }
+
+    @Test
+    public void segmentRotation() throws Exception {
+        final Path journalDir = Files.createTempDirectory("journal");
+        final File journalFile = journalDir.toFile();
+
+        final KafkaJournal journal = new KafkaJournal(journalFile.getAbsolutePath(),
+                                                      scheduler,
+                                                      1024,
+                                                      10 * 1024,
+                                                      Duration.standardDays(1),
+                                                      new MetricRegistry());
+
+        createBulkChunks(journal, 3);
+
+        final File[] files = journalFile.listFiles();
+        assertNotNull(files);
+        assertTrue(files.length > 0, "there should be files in the journal directory");
+
+        final File[] messageJournalDir = journalFile.listFiles((FileFilter) and(directoryFileFilter(),
+                                                                     nameFileFilter("messagejournal-0")));
+        assertTrue(messageJournalDir.length == 1);
+        final File[] logFiles = messageJournalDir[0].listFiles((FileFilter) and(fileFileFilter(),
+                                                                                suffixFileFilter(".log")));
+        assertEquals(logFiles.length, 3, "should have two journal segments");
+        deleteDirectory(journalFile);
+    }
+
+    @Test
+    public void segmentCleanup() throws Exception {
+        final Path journalDir = Files.createTempDirectory("journal");
+        final File journalFile = journalDir.toFile();
+
+        final KafkaJournal journal = new KafkaJournal(journalFile.getAbsolutePath(),
+                                                      scheduler,
+                                                      1024,
+                                                      10 * 1024,
+                                                      Duration.standardDays(1),
+                                                      new MetricRegistry());
+        final File messageJournalDir = new File(journalFile, "messagejournal-0");
+        assertTrue(messageJournalDir.exists());
+
+        // create enough chunks so that we exceed the maximum journal size we configured
+        createBulkChunks(journal, 3);
+
+        // make sure everything is on disk
+        journal.flushDirtyLogs();
+
+        assertEquals(countSegmentsInDir(messageJournalDir), 3);
+
+        final int cleanedLogs = journal.cleanupLogs();
+        assertEquals(cleanedLogs, 1);
+
+        final int numberOfSegments = countSegmentsInDir(messageJournalDir);
+        assertEquals(numberOfSegments, 2);
+
+        deleteDirectory(journalFile);
+    }
 }
