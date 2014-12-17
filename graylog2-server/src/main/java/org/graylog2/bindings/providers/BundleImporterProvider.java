@@ -25,6 +25,7 @@ import org.graylog2.inputs.InputService;
 import org.graylog2.inputs.extractors.ExtractorFactory;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.shared.inputs.InputRegistry;
+import org.graylog2.shared.inputs.MessageInputFactory;
 import org.graylog2.streams.OutputService;
 import org.graylog2.streams.StreamRuleService;
 import org.graylog2.streams.StreamService;
@@ -45,6 +46,7 @@ public class BundleImporterProvider implements Provider<BundleImporter> {
     private final ServerStatus serverStatus;
     private final MetricRegistry metricRegistry;
     private final Searches searches;
+    private final MessageInputFactory messageInputFactory;
 
     @Inject
     public BundleImporterProvider(final InputService inputService,
@@ -57,7 +59,8 @@ public class BundleImporterProvider implements Provider<BundleImporter> {
                                   final DashboardRegistry dashboardRegistry,
                                   final ServerStatus serverStatus,
                                   final MetricRegistry metricRegistry,
-                                  final Searches searches) {
+                                  final Searches searches,
+                                  final MessageInputFactory messageInputFactory) {
         this.inputService = inputService;
         this.inputRegistry = inputRegistry;
         this.extractorFactory = extractorFactory;
@@ -69,12 +72,13 @@ public class BundleImporterProvider implements Provider<BundleImporter> {
         this.serverStatus = serverStatus;
         this.metricRegistry = metricRegistry;
         this.searches = searches;
+        this.messageInputFactory = messageInputFactory;
     }
 
     @Override
     public BundleImporter get() {
         return new BundleImporter(inputService, inputRegistry, extractorFactory,
                 streamService, streamRuleService, outputService, dashboardService,
-                dashboardRegistry, serverStatus, metricRegistry, searches);
+                dashboardRegistry, serverStatus, metricRegistry, searches, messageInputFactory);
     }
 }

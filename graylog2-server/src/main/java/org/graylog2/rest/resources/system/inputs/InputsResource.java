@@ -45,6 +45,7 @@ import org.graylog2.rest.resources.system.inputs.responses.InputsList;
 import org.graylog2.security.RestPermissions;
 import org.graylog2.shared.inputs.InputDescription;
 import org.graylog2.shared.inputs.InputRegistry;
+import org.graylog2.shared.inputs.MessageInputFactory;
 import org.graylog2.shared.inputs.NoSuchInputTypeException;
 import org.graylog2.shared.rest.resources.system.inputs.requests.InputLaunchRequest;
 import org.graylog2.shared.system.activities.Activity;
@@ -82,12 +83,14 @@ public class InputsResource extends RestResource {
     private final InputService inputService;
     private final InputRegistry inputRegistry;
     private final ActivityWriter activityWriter;
+    private final MessageInputFactory messageInputFactory;
 
     @Inject
-    public InputsResource(InputService inputService, InputRegistry inputRegistry, ActivityWriter activityWriter) {
+    public InputsResource(InputService inputService, InputRegistry inputRegistry, ActivityWriter activityWriter, MessageInputFactory messageInputFactory) {
         this.inputService = inputService;
         this.inputRegistry = inputRegistry;
         this.activityWriter = activityWriter;
+        this.messageInputFactory = messageInputFactory;
     }
 
     @GET
@@ -179,7 +182,7 @@ public class InputsResource extends RestResource {
         // Build input.
         final MessageInput input;
         try {
-            input = inputRegistry.create(lr.type(), inputConfig);
+            input = messageInputFactory.create(lr.type(), inputConfig);
             input.setTitle(lr.title());
             input.setGlobal(lr.global());
             input.setCreatorUserId(getCurrentUser().getName());
@@ -245,7 +248,7 @@ public class InputsResource extends RestResource {
     @Produces(MediaType.APPLICATION_JSON)
     public InputTypesSummary types() {
         Map<String, String> types = new HashMap<>();
-        for (Map.Entry<String, InputDescription> entry : inputRegistry.getAvailableInputs().entrySet())
+        for (Map.Entry<String, InputDescription> entry : messageInputFactory.getAvailableInputs().entrySet())
             types.put(entry.getKey(), entry.getValue().getName());
         return InputTypesSummary.create(types);
     }
@@ -382,7 +385,7 @@ public class InputsResource extends RestResource {
             @ApiResponse(code = 404, message = "No such input type registered.")
     })
     public InputTypeInfo info(@ApiParam(name = "inputType", required = true) @PathParam("inputType") String inputType) {
-        final InputDescription description = inputRegistry.getAvailableInputs().get(inputType);
+        final InputDescription description = messageInputFactory.getAvailableInputs().get(inputType);
         if (description == null) {
             final String message = "Unknown input type " + inputType + " requested.";
             LOG.error(message);

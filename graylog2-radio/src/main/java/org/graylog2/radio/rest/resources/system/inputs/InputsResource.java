@@ -29,6 +29,7 @@ import org.graylog2.radio.cluster.InputService;
 import org.graylog2.radio.rest.resources.RestResource;
 import org.graylog2.shared.inputs.InputDescription;
 import org.graylog2.shared.inputs.InputRegistry;
+import org.graylog2.shared.inputs.MessageInputFactory;
 import org.graylog2.shared.inputs.NoSuchInputTypeException;
 import org.graylog2.shared.rest.resources.system.inputs.requests.InputLaunchRequest;
 import org.slf4j.Logger;
@@ -60,12 +61,12 @@ public class InputsResource extends RestResource {
     private static final Logger LOG = LoggerFactory.getLogger(InputsResource.class);
 
     private final InputRegistry inputRegistry;
-    private final InputService inputService;
+    private final MessageInputFactory messageInputFactory;
 
     @Inject
-    public InputsResource(InputRegistry inputRegistry, InputService inputService) {
+    public InputsResource(InputRegistry inputRegistry, MessageInputFactory messageInputFactory) {
         this.inputRegistry = inputRegistry;
-        this.inputService = inputService;
+        this.messageInputFactory = messageInputFactory;
     }
 
     @GET
@@ -117,7 +118,7 @@ public class InputsResource extends RestResource {
         // Build input.
         MessageInput input;
         try {
-            input = inputRegistry.create(lr.type(), inputConfig);
+            input = messageInputFactory.create(lr.type(), inputConfig);
             input.setTitle(lr.title());
             input.setCreatorUserId(lr.creatorUserId());
             input.setCreatedAt(Tools.iso8601());
@@ -178,7 +179,7 @@ public class InputsResource extends RestResource {
     @Path("/types")
     public String types() {
         final Map<String, Object> result = Maps.newHashMap();
-        final Map<String, InputDescription> availableInputs = inputRegistry.getAvailableInputs();
+        final Map<String, InputDescription> availableInputs = messageInputFactory.getAvailableInputs();
         final Map<String, String> inputs = Maps.newHashMap();
         for (final String key : availableInputs.keySet()) {
             inputs.put(key, availableInputs.get(key).getName());
@@ -193,7 +194,7 @@ public class InputsResource extends RestResource {
     @Timed
     @Path("/types/{inputType}")
     public String info(@PathParam("inputType") String inputType) {
-        final Map<String, InputDescription> availableInputs = inputRegistry.getAvailableInputs();
+        final Map<String, InputDescription> availableInputs = messageInputFactory.getAvailableInputs();
         if (!availableInputs.containsKey(inputType)) {
             LOG.error("Unknown input type {} requested.", inputType);
             throw new WebApplicationException(Response.Status.NOT_FOUND);

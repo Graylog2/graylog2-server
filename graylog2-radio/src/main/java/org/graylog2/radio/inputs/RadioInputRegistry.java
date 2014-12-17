@@ -50,14 +50,13 @@ public class RadioInputRegistry extends InputRegistry {
 
     @Inject
     public RadioInputRegistry(IOState.Factory<MessageInput> inputStateFactory,
-                              MessageInputFactory messageInputFactory,
                               InputBuffer inputBuffer,
                               AsyncHttpClient httpclient,
                               URI serverUrl,
                               InputService inputService,
                               MetricRegistry metricRegistry,
                               PersistedInputs persistedInputs) {
-        super(inputStateFactory, messageInputFactory, inputBuffer, metricRegistry, persistedInputs);
+        super(inputStateFactory, inputBuffer, metricRegistry, persistedInputs);
         this.httpclient = httpclient;
         this.serverUrl = serverUrl;
         this.inputService = inputService;

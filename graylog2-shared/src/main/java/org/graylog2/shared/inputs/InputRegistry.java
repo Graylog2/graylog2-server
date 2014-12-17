@@ -39,19 +39,16 @@ public class InputRegistry {
     private static final Logger LOG = LoggerFactory.getLogger(InputRegistry.class);
     protected final Set<IOState<MessageInput>> inputStates = new HashSet<>();
     protected final ExecutorService executor;
-    private IOState.Factory<MessageInput> inputStateFactory;
-    private final MessageInputFactory messageInputFactory;
+    private final IOState.Factory<MessageInput> inputStateFactory;
     private final InputBuffer inputBuffer;
-    private PersistedInputs persistedInputs;
+    private final PersistedInputs persistedInputs;
 
     @Inject
     public InputRegistry(IOState.Factory<MessageInput> inputStateFactory,
-                         MessageInputFactory messageInputFactory,
                          InputBuffer inputBuffer,
                          MetricRegistry metricRegistry,
                          PersistedInputs persistedInputs) {
         this.inputStateFactory = inputStateFactory;
-        this.messageInputFactory = messageInputFactory;
         this.inputBuffer = inputBuffer;
         this.persistedInputs = persistedInputs;
         this.executor = executorService(metricRegistry);
@@ -66,10 +63,6 @@ public class InputRegistry {
         return new InstrumentedThreadFactory(
                 new ThreadFactoryBuilder().setNameFormat("inputs-%d").build(),
                 metricRegistry);
-    }
-
-    public MessageInput create(String inputClass, Configuration configuration) throws NoSuchInputTypeException {
-        return messageInputFactory.create(inputClass, configuration);
     }
 
     public IOState<MessageInput> launch(final MessageInput input, String id) {
@@ -186,10 +179,6 @@ public class InputRegistry {
         }
 
         return false;
-    }
-
-    public Map<String, InputDescription> getAvailableInputs() {
-        return messageInputFactory.getAvailableInputs();
     }
 
     public int runningCount() {
