@@ -26,6 +26,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.common.io.Files;
 import com.google.common.util.concurrent.AbstractIdleService;
+import com.google.common.util.concurrent.Uninterruptibles;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import kafka.common.KafkaException;
@@ -41,9 +42,10 @@ import kafka.message.Message;
 import kafka.message.MessageAndOffset;
 import kafka.message.MessageSet;
 import kafka.utils.KafkaScheduler;
-import kafka.utils.SystemTime$;
+import kafka.utils.Time;
 import kafka.utils.Utils;
 import org.graylog2.shared.metrics.HdrTimer;
+import org.joda.time.DateTimeUtils;
 import org.joda.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,6 +64,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
@@ -72,7 +75,24 @@ import static java.util.concurrent.TimeUnit.NANOSECONDS;
 import static org.graylog2.plugin.Tools.bytesToHex;
 
 public class KafkaJournal extends AbstractIdleService implements Journal {
-    public static final SystemTime$ TIME = SystemTime$.MODULE$;
+    // this exists so we can use JodaTime's millis provider in tests.
+    // kafka really only cares about the milliseconds() method in here
+    private static final Time JODA_TIME = new Time() {
+        @Override
+        public long milliseconds() {
+            return DateTimeUtils.currentTimeMillis();
+        }
+
+        @Override
+        public long nanoseconds() {
+            return System.nanoTime();
+        }
+
+        @Override
+        public void sleep(long ms) {
+            Uninterruptibles.sleepUninterruptibly(ms, MILLISECONDS);
+        }
+    };
     private static final Logger log = LoggerFactory.getLogger(KafkaJournal.class);
     private static final long DEFAULT_COMMITTED_OFFSET = Long.MIN_VALUE;
     private final LogManager logManager;
@@ -81,13 +101,18 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
     private final AtomicLong committedOffset = new AtomicLong(DEFAULT_COMMITTED_OFFSET);
     private final ScheduledExecutorService scheduler;
     private final MetricRegistry metricRegistry;
-    private final OffsetFileFlusher offsetFlusher;
-
     private final Timer writeTime;
+
     private final Timer readTime;
     private final KafkaScheduler kafkaScheduler;
     private final Meter messagesWritten;
     private final Meter messagesRead;
+
+    private final OffsetFileFlusher offsetFlusher;
+    private final DirtyLogFlusher dirtyLogFlusher;
+    private final RecoveryCheckpointFlusher recoveryCheckpointFlusher;
+    private final LogRetentionCleaner logRetentionCleaner;
+
     private long nextReadOffset = 0L;
 
     @Inject
@@ -109,19 +134,32 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
         // these are the default values as per kafka 0.8.1.1
         final LogConfig defaultConfig =
                 new LogConfig(
-                        segmentSize,            // segmentSize: The soft maximum for the size of a segment file in the log
-                        Long.MAX_VALUE,         // segmentMs: The soft maximum on the amount of time before a new log segment is rolled
-                        Long.MAX_VALUE,         // flushInterval: The number of messages that can be written to the log before a flush is forced
-                        Long.MAX_VALUE,         // flushMs: The amount of time the log can have dirty data before a flush is forced
-                        retentionSize,          // retentionSize: The approximate total number of bytes this log can use
-                        retentionAge.getMillis(), // retentionMs: The age approximate maximum age of the last segment that is retained
-                        Integer.MAX_VALUE,      // maxMessageSize: The maximum size of a message in the log
-                        1024 * 1024,            // maxIndexSize: The maximum size of an index file
-                        4096,                   // indexInterval: The approximate number of bytes between index entries
-                        60 * 1000,              // fileDeleteDelayMs: The time to wait before deleting a file from the filesystem
-                        24 * 60 * 60 * 1000L,   // deleteRetentionMs: The time to retain delete markers in the log. Only applicable for logs that are being compacted.
-                        0.5,                    // minCleanableRatio: The ratio of bytes that are available for cleaning to the bytes already cleaned
-                        false                   // compact: Should old segments in this log be deleted or deduplicated?
+                        segmentSize,
+                        // segmentSize: The soft maximum for the size of a segment file in the log
+                        Long.MAX_VALUE,
+                        // segmentMs: The soft maximum on the amount of time before a new log segment is rolled
+                        Long.MAX_VALUE,
+                        // flushInterval: The number of messages that can be written to the log before a flush is forced
+                        Long.MAX_VALUE,
+                        // flushMs: The amount of time the log can have dirty data before a flush is forced
+                        retentionSize,
+                        // retentionSize: The approximate total number of bytes this log can use
+                        retentionAge.getMillis(),
+                        // retentionMs: The age approximate maximum age of the last segment that is retained
+                        Integer.MAX_VALUE,
+                        // maxMessageSize: The maximum size of a message in the log
+                        1024 * 1024,
+                        // maxIndexSize: The maximum size of an index file
+                        4096,
+                        // indexInterval: The approximate number of bytes between index entries
+                        60 * 1000,
+                        // fileDeleteDelayMs: The time to wait before deleting a file from the filesystem
+                        24 * 60 * 60 * 1000L,
+                        // deleteRetentionMs: The time to retain delete markers in the log. Only applicable for logs that are being compacted.
+                        0.5,
+                        // minCleanableRatio: The ratio of bytes that are available for cleaning to the bytes already cleaned
+                        false
+                        // compact: Should old segments in this log be deleted or deduplicated?
                 );
         // these are the default values as per kafka 0.8.1.1, except we don't turn on the cleaner
         // Cleaner really is log compaction with respect to "deletes" in the log.
@@ -172,7 +210,7 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
                     TimeUnit.SECONDS.toMillis(60),
                     TimeUnit.SECONDS.toMillis(20),
                     kafkaScheduler,
-                    TIME);
+                    JODA_TIME);
 
             final TopicAndPartition topicAndPartition = new TopicAndPartition("messagejournal", 0);
             final Option<Log> messageLog = logManager.getLog(topicAndPartition);
@@ -183,12 +221,17 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
             }
             log.info("Initialized Kafka based journal at {}", journalDirName);
             setupKafkaLogMetrics(metricRegistry);
+
             offsetFlusher = new OffsetFileFlusher();
+            dirtyLogFlusher = new DirtyLogFlusher();
+            recoveryCheckpointFlusher = new RecoveryCheckpointFlusher();
+            logRetentionCleaner = new LogRetentionCleaner();
         } catch (KafkaException e) {
             // most likely failed to grab lock
             log.error("Unable to start logmanager.", e);
             throw new RuntimeException(e);
         }
+
     }
 
     private void setupKafkaLogMetrics(final MetricRegistry metricRegistry) {
@@ -355,7 +398,8 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
             prev = committedOffset.get();
             // at least warn if this spins often, that would be a sign of very high contention, which should not happen
             if (++i % 10 == 0) {
-                log.warn("Committing journal offset spins {} times now, this might be a bug. Continuing to try update.", i);
+                log.warn("Committing journal offset spins {} times now, this might be a bug. Continuing to try update.",
+                         i);
             }
         } while (!committedOffset.compareAndSet(prev, Math.max(offset, prev)));
     }
@@ -370,7 +414,7 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
         for (final Map.Entry<TopicAndPartition, Log> topicAndPartitionLogEntry : entries) {
             final TopicAndPartition topicAndPartition = topicAndPartitionLogEntry.getKey();
             final Log kafkaLog = topicAndPartitionLogEntry.getValue();
-            final long timeSinceLastFlush = TIME.milliseconds() - kafkaLog.lastFlushTime();
+            final long timeSinceLastFlush = JODA_TIME.milliseconds() - kafkaLog.lastFlushTime();
             try {
                 log.debug(
                         "Checking if flush is needed on {} flush interval {} last flushed {} time since last flush: {}",
@@ -395,19 +439,19 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
         // /* don't call */ logManager.startup();
 
         // flush dirty logs regularly
-        scheduler.scheduleAtFixedRate(new DirtyLogFlusher(),
+        scheduler.scheduleAtFixedRate(dirtyLogFlusher,
                                       TimeUnit.SECONDS.toMillis(30),
                                       logManager.flushCheckMs(),
                                       MILLISECONDS);
 
         // write recovery checkpoint files
-        scheduler.scheduleAtFixedRate(new RecoveryCheckpointFlusher(),
+        scheduler.scheduleAtFixedRate(recoveryCheckpointFlusher,
                                       TimeUnit.SECONDS.toMillis(30),
                                       logManager.flushCheckpointMs(),
                                       MILLISECONDS);
 
         // custom log retention cleaner
-        scheduler.scheduleAtFixedRate(new LogRetentionCleaner(),
+        scheduler.scheduleAtFixedRate(logRetentionCleaner,
                                       TimeUnit.SECONDS.toMillis(30),
                                       logManager.retentionCheckMs(),
                                       MILLISECONDS);
@@ -422,6 +466,15 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
         logManager.shutdown();
         // final flush
         offsetFlusher.run();
+    }
+
+    public int cleanupLogs() {
+        try {
+            return logRetentionCleaner.call();
+        } catch (Exception e) {
+            log.error("Unable to delete expired segments.", e);
+            return 0;
+        }
     }
 
     public class OffsetFileFlusher implements Runnable {
@@ -449,30 +502,36 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
     /**
      * Java implementation of the Kafka log retention cleaner.
      */
-    public class LogRetentionCleaner implements Runnable {
+    public class LogRetentionCleaner implements Runnable, Callable<Integer> {
 
         private final Logger loggerForCleaner = LoggerFactory.getLogger(LogRetentionCleaner.class);
 
         @Override
         public void run() {
             try {
-                loggerForCleaner.debug("Beginning log cleanup");
-                int total = 0;
-                final Timer.Context ctx = new Timer().time();
-                for (final Log kafkaLog : JavaConversions.asJavaIterable(logManager.allLogs())) {
-                    if (kafkaLog.config().compact()) continue;
-                    loggerForCleaner.debug("Garbage collecting {}", kafkaLog.name());
-                    total += cleanupExpiredSegments(kafkaLog) +
-                            cleanupSegmentsToMaintainSize(kafkaLog) +
-                            cleanupSegmentsToRemoveCommitted(kafkaLog);
-                }
-
-                loggerForCleaner.debug("Log cleanup completed. {} files deleted in {} seconds",
-                          total,
-                          NANOSECONDS.toSeconds(ctx.stop()));
+                call();
             } catch (Exception e) {
                 loggerForCleaner.error("Unable to delete expired segments. Will try again.", e);
             }
+        }
+
+        @Override
+        public Integer call() throws Exception {
+            loggerForCleaner.debug("Beginning log cleanup");
+            int total = 0;
+            final Timer.Context ctx = new Timer().time();
+            for (final Log kafkaLog : JavaConversions.asJavaIterable(logManager.allLogs())) {
+                if (kafkaLog.config().compact()) continue;
+                loggerForCleaner.debug("Garbage collecting {}", kafkaLog.name());
+                total += cleanupExpiredSegments(kafkaLog) +
+                        cleanupSegmentsToMaintainSize(kafkaLog) +
+                        cleanupSegmentsToRemoveCommitted(kafkaLog);
+            }
+
+            loggerForCleaner.debug("Log cleanup completed. {} files deleted in {} seconds",
+                                   total,
+                                   NANOSECONDS.toSeconds(ctx.stop()));
+            return total;
         }
 
         private int cleanupExpiredSegments(final Log kafkaLog) {
@@ -483,7 +542,7 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
             return kafkaLog.deleteOldSegments(new AbstractFunction1<LogSegment, Object>() {
                 @Override
                 public Object apply(LogSegment segment) {
-                    final long segmentAge = TIME.milliseconds() - segment.lastModified();
+                    final long segmentAge = JODA_TIME.milliseconds() - segment.lastModified();
                     final boolean shouldDelete = segmentAge > kafkaLog.config().retentionMs();
                     if (shouldDelete) {
                         loggerForCleaner.debug(
@@ -502,7 +561,7 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
                 return 0;
             }
             final long[] diff = {kafkaLog.size() - retentionSize};
-            kafkaLog.deleteOldSegments(new AbstractFunction1<LogSegment, Object>() { // sigh scala
+            return kafkaLog.deleteOldSegments(new AbstractFunction1<LogSegment, Object>() { // sigh scala
                 @Override
                 public Object apply(LogSegment segment) {
                     if (diff[0] - segment.size() >= 0) {
@@ -519,8 +578,6 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
                     }
                 }
             });
-
-            return 0;
         }
 
         private int cleanupSegmentsToRemoveCommitted(Log kafkaLog) {
