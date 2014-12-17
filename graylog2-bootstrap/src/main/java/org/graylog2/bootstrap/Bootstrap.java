@@ -33,7 +33,12 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.ServiceManager;
-import com.google.inject.*;
+import com.google.inject.AbstractModule;
+import com.google.inject.Binder;
+import com.google.inject.CreationException;
+import com.google.inject.Injector;
+import com.google.inject.Module;
+import com.google.inject.ProvisionException;
 import com.google.inject.name.Names;
 import com.google.inject.spi.Message;
 import io.airlift.airline.Option;
@@ -58,7 +63,6 @@ import org.graylog2.shared.bindings.PluginBindings;
 import org.graylog2.shared.initializers.ServiceManagerListener;
 import org.graylog2.shared.journal.KafkaJournalModule;
 import org.graylog2.shared.journal.NoopJournalModule;
-import org.graylog2.shared.plugins.LegacyPluginLoader;
 import org.graylog2.shared.plugins.PluginLoader;
 import org.graylog2.shared.system.activities.Activity;
 import org.graylog2.shared.system.activities.ActivityWriter;
@@ -121,8 +125,11 @@ public abstract class Bootstrap implements Runnable {
     private boolean noPidFile = false;
 
     protected abstract void startNodeRegistration(Injector injector);
+
     protected abstract List<Module> getCommandBindings();
+
     protected abstract List<Object> getCommandConfigurationBeans();
+
     protected abstract Class<? extends Runnable> shutdownHook();
 
     protected abstract boolean validateConfiguration();
@@ -301,14 +308,6 @@ public abstract class Bootstrap implements Runnable {
     protected Set<Plugin> loadPlugins(String pluginPath) {
         final File pluginDir = new File(pluginPath);
         final Set<Plugin> plugins = new HashSet<>();
-
-        final LegacyPluginLoader legacyPluginLoader = new LegacyPluginLoader(pluginDir);
-        for (Plugin plugin : legacyPluginLoader.loadPlugins()) {
-            if (version.sameOrHigher(plugin.metadata().getRequiredVersion()))
-                plugins.add(plugin);
-            else
-                LOG.error("Plugin \"" + plugin.metadata().getName() + "\" requires version " + plugin.metadata().getRequiredVersion() + " - not loading!");
-        }
 
         final PluginLoader pluginLoader = new PluginLoader(pluginDir);
         for (Plugin plugin : pluginLoader.loadPlugins()) {
