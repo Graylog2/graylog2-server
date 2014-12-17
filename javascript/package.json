@@ -9,7 +9,7 @@
     "test": "./node_modules/.bin/gulp bundle-tests && ./node_modules/karma/bin/karma start karma.ci.conf.js"
   },
   "dependencies": {
-    "dc": "dc-js/dc.js",
+    "dc": "Graylog2/dc.js",
     "crossfilter": "1.x",
     "d3": "3.x",
     "joi": "^4.6.2",
