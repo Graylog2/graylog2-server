@@ -20,7 +20,11 @@ import com.codahale.metrics.MetricRegistry;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 import org.graylog2.Graylog2BaseTest;
+import org.graylog2.plugin.InstantMillisProvider;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeUtils;
 import org.joda.time.Duration;
+import org.joda.time.Period;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -35,12 +39,11 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 import static com.google.common.base.Charsets.UTF_8;
 import static org.apache.commons.io.filefilter.FileFilterUtils.*;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNotNull;
-import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.*;
 
 public class KafkaJournalTest extends Graylog2BaseTest {
 
+    public static final int BULK_SIZE = 200;
     private ScheduledThreadPoolExecutor scheduler;
 
     @BeforeClass
@@ -99,7 +102,7 @@ public class KafkaJournalTest extends Graylog2BaseTest {
         for (int currentBulk = 0; currentBulk < bulkCount; currentBulk++) {
             final List<Journal.Entry> entries = Lists.newArrayList();
             // write enough bytes in one go to be over the 1024 byte segment limit, which causes a segment roll
-            for (int i = 0; i < 200; i++) {
+            for (int i = 0; i < BULK_SIZE; i++) {
                 final byte[] idBytes = ("id" + i).getBytes(UTF_8);
                 final byte[] messageBytes = ("message " + i).getBytes(UTF_8);
 
@@ -143,7 +146,7 @@ public class KafkaJournalTest extends Graylog2BaseTest {
     }
 
     @Test
-    public void segmentCleanup() throws Exception {
+    public void segmentSizeCleanup() throws Exception {
         final Path journalDir = Files.createTempDirectory("journal");
         final File journalFile = journalDir.toFile();
 
@@ -169,6 +172,93 @@ public class KafkaJournalTest extends Graylog2BaseTest {
 
         final int numberOfSegments = countSegmentsInDir(messageJournalDir);
         assertEquals(numberOfSegments, 2);
+
+        deleteDirectory(journalFile);
+    }
+
+    @Test
+    public void segmentAgeCleanup() throws Exception {
+        final Path journalDir = Files.createTempDirectory("journal");
+        final File journalFile = journalDir.toFile();
+
+        final InstantMillisProvider clock = new InstantMillisProvider(DateTime.now());
+
+        DateTimeUtils.setCurrentMillisProvider(clock);
+        try {
+
+            final KafkaJournal journal = new KafkaJournal(journalFile.getAbsolutePath(),
+                                                          scheduler,
+                                                          1024,
+                                                          10 * 1024,
+                                                          Duration.standardMinutes(1),
+                                                          new MetricRegistry());
+            final File messageJournalDir = new File(journalFile, "messagejournal-0");
+            assertTrue(messageJournalDir.exists());
+
+            // create two chunks, 30 seconds apart
+            createBulkChunks(journal, 1);
+            clock.tick(Period.seconds(30));
+
+            createBulkChunks(journal, 1);
+
+            journal.flushDirtyLogs();
+
+            int cleanedLogs = journal.cleanupLogs();
+            assertEquals(cleanedLogs, 0, "no segments should've been cleaned");
+            assertEquals(countSegmentsInDir(messageJournalDir), 2, "two segments segment should remain");
+
+            // move clock beyond the retention period and clean again
+            clock.tick(Period.seconds(120));
+
+            cleanedLogs = journal.cleanupLogs();
+            assertEquals(cleanedLogs, 2, "two segments should've been cleaned (only one will actually be removed...)");
+            assertEquals(countSegmentsInDir(messageJournalDir), 1, "one segment should remain");
+
+        } finally {
+            DateTimeUtils.setCurrentMillisSystem();
+        }
+    }
+
+    @Test
+    public void segmentCommittedCleanup() throws Exception {
+        final Path journalDir = Files.createTempDirectory("journal");
+        final File journalFile = journalDir.toFile();
+
+        final KafkaJournal journal = new KafkaJournal(journalFile.getAbsolutePath(),
+                                                      scheduler,
+                                                      1024,
+                                                      1024 * 1024 * 1024, // never clean by size in this test
+                                                      Duration.standardDays(1),
+                                                      new MetricRegistry());
+        final File messageJournalDir = new File(journalFile, "messagejournal-0");
+        assertTrue(messageJournalDir.exists());
+
+        createBulkChunks(journal, 3);
+
+        // make sure everything is on disk
+        journal.flushDirtyLogs();
+
+        assertEquals(countSegmentsInDir(messageJournalDir), 3);
+
+        // we haven't committed any offsets, this should not touch anything.
+        final int cleanedLogs = journal.cleanupLogs();
+        assertEquals(cleanedLogs, 0);
+
+        final int numberOfSegments = countSegmentsInDir(messageJournalDir);
+        assertEquals(numberOfSegments, 3);
+
+        // mark first half of first segment committed, should not clean anything
+        journal.markJournalOffsetCommitted(BULK_SIZE / 2);
+        assertEquals(journal.cleanupLogs(), 0, "should not touch segments");
+        assertEquals(countSegmentsInDir(messageJournalDir), 3);
+
+        journal.markJournalOffsetCommitted(BULK_SIZE + 1);
+        assertEquals(journal.cleanupLogs(), 1, "first segment should've been purged");
+        assertEquals(countSegmentsInDir(messageJournalDir), 2);
+
+        journal.markJournalOffsetCommitted(BULK_SIZE * 4);
+        assertEquals(journal.cleanupLogs(), 1, "only purge one segment, not the active one");
+        assertEquals(countSegmentsInDir(messageJournalDir), 1);
 
         deleteDirectory(journalFile);
     }
