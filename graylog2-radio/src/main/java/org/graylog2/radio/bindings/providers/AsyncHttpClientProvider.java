@@ -30,7 +30,7 @@ public class AsyncHttpClientProvider implements Provider<AsyncHttpClient> {
     public AsyncHttpClientProvider() {
         if (asyncHttpClient == null) {
             AsyncHttpClientConfig.Builder builder = new AsyncHttpClientConfig.Builder();
-            builder.setAllowPoolingConnection(false);
+            builder.setAllowPoolingConnections(false);
             asyncHttpClient = new AsyncHttpClient(builder.build());
         }
     }
