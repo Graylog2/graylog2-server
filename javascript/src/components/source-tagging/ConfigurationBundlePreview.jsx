@@ -2,6 +2,7 @@
 
 var React = require('react');
 var Markdown = require('markdown').markdown;
+var URLUtils = require("../../util/URLUtils");
 
 var ConfigurationBundlePreview = React.createClass({
     _confirmDeletion() {
@@ -14,10 +15,10 @@ var ConfigurationBundlePreview = React.createClass({
 
         if (this.props.sourceTypeDescription) {
             preview = this.props.sourceTypeDescription;
-            apply_action = <form action={"/a/system/contentpacks/" + this.props.sourceTypeId + "/apply"} method="POST">
+            apply_action = <form action={URLUtils.appPrefixed("/a/system/contentpacks/" + this.props.sourceTypeId + "/apply")} method="POST">
                              <input type="submit" value="Apply content" className="btn btn-small btn-success"/>
                            </form>;
-            delete_action = <form action={"/a/system/contentpacks/" + this.props.sourceTypeId + "/delete"} method="POST" onSubmit={this._confirmDeletion} className="pull-right">
+            delete_action = <form action={URLUtils.appPrefixed("/a/system/contentpacks/" + this.props.sourceTypeId + "/delete")} method="POST" onSubmit={this._confirmDeletion} className="pull-right">
                               <input type="submit" value="Remove pack" className="btn btn-mini btn-warning"/>
                             </form>;
         }

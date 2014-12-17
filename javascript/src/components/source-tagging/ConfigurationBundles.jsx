@@ -5,6 +5,7 @@ var BootstrapAccordion = require('../bootstrap/BootstrapAccordion');
 var BootstrapAccordionGroup = require('../bootstrap/BootstrapAccordionGroup');
 var SourceType = require('./SourceType');
 var ConfigurationBundlePreview = require('./ConfigurationBundlePreview');
+var URLUtils = require("../../util/URLUtils");
 var $ = require('jquery'); // excluded and shimed
 
 var ConfigurationBundles = React.createClass({
@@ -20,7 +21,7 @@ var ConfigurationBundles = React.createClass({
     },
     // TODO: next time we touch this, we should create a store for this and preprocess the data
     componentDidMount() {
-        $.get('/a/system/contentpacks', (result) => {
+        $.get(URLUtils.appPrefixed('/a/system/contentpacks'), (result) => {
             if (this.isMounted()) {
                 this.setState({
                     bundles: result
@@ -75,7 +76,7 @@ var ConfigurationBundles = React.createClass({
                     <BootstrapAccordion>
                             {this._getCategoriesHtml()}
                         <BootstrapAccordionGroup name="Import content pack">
-                            <form method="POST" action="/a/system/contentpacks" className="form-inline upload" encType="multipart/form-data">
+                            <form method="POST" action={URLUtils.appPrefixed('/a/system/contentpacks')} className="form-inline upload" encType="multipart/form-data">
                                 <span className="help-block">Please apply the content pack after uploading it to make the changes effective.</span>
                                 <input type="file" name="bundle" />
                                 <button type="submit" className="btn btn-success">Upload</button>
