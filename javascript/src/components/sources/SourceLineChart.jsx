@@ -21,7 +21,7 @@ var SourceLineChart = React.createClass({
     renderLineChart(dimension, group, onDataFiltered) {
         var lineChartDomNode = $("#dc-sources-line-chart")[0];
         var width = $(lineChartDomNode).width();
-        $(lineChartDomNode).on('mouseup', (event) => {
+        $(document).on('mouseup', "#dc-sources-line-chart svg", (event) => {
             $(".timerange-selector-container").effect("bounce", {
                 complete: () => {
                     // Submit search directly if alt key is pressed.
