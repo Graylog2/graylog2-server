@@ -14,6 +14,9 @@
     <logger name="org.graylog2">
         <level value="info"/>
     </logger>
+    <logger name="com.github.joschi.jadconfig">
+        <level value="warn"/>
+    </logger>
     <!-- Disable messages from the version check -->
     <logger name="org.graylog2.periodical.VersionCheckThread">
         <level value="off"/>
