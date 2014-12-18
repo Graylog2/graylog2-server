@@ -49,6 +49,6 @@ public class InputStateListener {
 
         LOG.info("Unregistered input [{}], id <{}> on server cluster.", input.getName(), input.getId());
 
-        inputRegistry.removeFromRunning(state);
+        inputRegistry.remove(state);
     }
 }

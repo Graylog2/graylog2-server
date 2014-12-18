@@ -43,6 +43,7 @@ import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationException;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.rest.resources.dashboards.requests.WidgetPositions;
+import org.graylog2.shared.inputs.InputLauncher;
 import org.graylog2.shared.inputs.InputRegistry;
 import org.graylog2.shared.inputs.MessageInputFactory;
 import org.graylog2.shared.inputs.NoSuchInputTypeException;
@@ -81,6 +82,7 @@ public class BundleImporter {
     private final MetricRegistry metricRegistry;
     private final Searches searches;
     private final MessageInputFactory messageInputFactory;
+    private final InputLauncher inputLauncher;
 
     private final Map<String, MessageInput> createdInputs = new HashMap<>();
     private final Map<String, org.graylog2.plugin.streams.Output> createdOutputs = new HashMap<>();
@@ -101,7 +103,8 @@ public class BundleImporter {
                           final ServerStatus serverStatus,
                           final MetricRegistry metricRegistry,
                           final Searches searches,
-                          final MessageInputFactory messageInputFactory) {
+                          final MessageInputFactory messageInputFactory,
+                          final InputLauncher inputLauncher) {
         this.inputService = inputService;
         this.inputRegistry = inputRegistry;
         this.extractorFactory = extractorFactory;
@@ -114,6 +117,7 @@ public class BundleImporter {
         this.metricRegistry = metricRegistry;
         this.searches = searches;
         this.messageInputFactory = messageInputFactory;
+        this.inputLauncher = inputLauncher;
     }
 
     public void runImport(final ConfigurationBundle bundle, final String userName) {
@@ -172,7 +176,7 @@ public class BundleImporter {
             final MessageInput messageInput = entry.getValue();
 
             LOG.debug("Terminating message input {}", inputId);
-            inputRegistry.terminate(messageInput);
+            inputRegistry.remove(messageInput);
             final org.graylog2.inputs.Input input = inputService.find(messageInput.getId());
             inputService.destroy(input);
         }
@@ -210,7 +214,7 @@ public class BundleImporter {
             createdInputs.put(messageInput.getId(), messageInput);
 
             // Launch input. (this will run async and clean up itself in case of an error.)
-            inputRegistry.launch(messageInput, messageInput.getId());
+            inputLauncher.launch(messageInput, messageInput.getId());
         }
     }
 
@@ -228,7 +232,6 @@ public class BundleImporter {
         messageInput.setCreatedAt(createdAt);
         messageInput.setContentPack(bundleId);
 
-        messageInput.setConfiguration(inputConfig);
         messageInput.checkConfiguration();
 
         // Don't run if exclusive and another instance is already running.

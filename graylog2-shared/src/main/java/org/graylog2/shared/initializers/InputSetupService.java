@@ -24,6 +24,7 @@ import com.google.common.util.concurrent.Uninterruptibles;
 import org.graylog2.plugin.IOState;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.lifecycles.Lifecycle;
+import org.graylog2.shared.inputs.InputLauncher;
 import org.graylog2.shared.inputs.InputRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,15 +43,17 @@ public class InputSetupService extends AbstractExecutionThreadService {
     private static final Logger LOG = LoggerFactory.getLogger(InputSetupService.class);
     private final InputRegistry inputRegistry;
     private final EventBus eventBus;
+    private final InputLauncher inputLauncher;
 
     private final CountDownLatch startLatch = new CountDownLatch(1);
     private final CountDownLatch stopLatch = new CountDownLatch(1);
     private AtomicReference<Lifecycle> previousLifecycle = new AtomicReference<>(Lifecycle.UNINITIALIZED);
 
     @Inject
-    public InputSetupService(InputRegistry inputRegistry, EventBus eventBus) {
+    public InputSetupService(InputRegistry inputRegistry, EventBus eventBus, InputLauncher inputLauncher) {
         this.inputRegistry = inputRegistry;
         this.eventBus = eventBus;
+        this.inputLauncher = inputLauncher;
     }
 
     @Override
@@ -86,7 +89,7 @@ public class InputSetupService extends AbstractExecutionThreadService {
 
         if (previousLifecycle.get() == Lifecycle.RUNNING) {
             LOG.debug("Launching persisted inputs now.");
-            inputRegistry.launchAllPersisted();
+            inputLauncher.launchAllPersisted();
         } else {
             LOG.error("Not starting any inputs because lifecycle is: {}", previousLifecycle.get());
         }
