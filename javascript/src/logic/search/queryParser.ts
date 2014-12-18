@@ -334,7 +334,7 @@ class QueryLexer {
 
     not() {
         var startPos = this.pos;
-        this.consume(this.la() === '!' ? 1 : 3);
+        this.consume(this.lookAhead() === '!' ? 1 : 3);
         return new Token(this.input, TokenType.NOT, startPos, this.pos);
     }
 
@@ -609,7 +609,7 @@ export class QueryParser {
             var right: AST = null;
 
             var hiddenModifierPrefix = this.skipHidden();
-            modifier = this.la();
+            modifier = this.lookAhead();
             this.consume();
             var hiddenModifierSuffix = this.skipHidden();
 
