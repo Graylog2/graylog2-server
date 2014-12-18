@@ -34,6 +34,7 @@ import com.ning.http.client.AsyncCompletionHandler;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.AsyncHttpClientConfig;
 import com.ning.http.client.ListenableFuture;
+import com.ning.http.client.PerRequestConfig;
 import com.ning.http.client.Realm;
 import com.ning.http.client.Request;
 import com.ning.http.client.Response;
@@ -100,7 +101,7 @@ class ApiClientImpl implements ApiClient {
     @Override
     public void start() {
         AsyncHttpClientConfig.Builder builder = new AsyncHttpClientConfig.Builder();
-        builder.setAllowPoolingConnections(false);
+        builder.setAllowPoolingConnection(false);
         builder.setUserAgent("graylog2-web/" + Version.VERSION);
         client = new AsyncHttpClient(builder.build());
 
@@ -542,7 +543,7 @@ class ApiClientImpl implements ApiClient {
                         }
                     });
                     requests.put(currentNode, future);
-                } catch (Exception e) {
+                } catch (IOException e) {
                     LOG.error("Cannot execute request", e);
                     currentNode.markFailure();
                 }
@@ -601,7 +602,7 @@ class ApiClientImpl implements ApiClient {
             }
 
             applyBasicAuthentication(requestBuilder, userInfo);
-            requestBuilder.setRequestTimeout((int) timeoutUnit.toMillis(timeoutValue));
+            requestBuilder.setPerRequestConfig(new PerRequestConfig(null, (int) timeoutUnit.toMillis(timeoutValue)));
 
             if (body != null) {
                 if (method != Method.PUT && method != Method.POST) {

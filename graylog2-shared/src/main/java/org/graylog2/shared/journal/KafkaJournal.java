@@ -50,15 +50,14 @@ import org.joda.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import scala.Option;
-import scala.collection.Iterator;
-import scala.collection.JavaConversions;
-import scala.collection.Map$;
+import scala.collection.*;
 import scala.runtime.AbstractFunction1;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.SyncFailedException;
+import java.lang.Iterable;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -475,6 +474,11 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
             log.error("Unable to delete expired segments.", e);
             return 0;
         }
+    }
+
+    // default visibility for tests
+    Iterable<LogSegment> getSegments() {
+        return JavaConversions.asJavaIterable(kafkaLog.logSegments());
     }
 
     public class OffsetFileFlusher implements Runnable {
