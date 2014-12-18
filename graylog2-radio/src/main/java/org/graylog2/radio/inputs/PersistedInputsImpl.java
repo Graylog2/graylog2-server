@@ -59,7 +59,6 @@ public class PersistedInputsImpl implements PersistedInputs {
             input.setPersistId(isr.id);
             input.setCreatedAt(new DateTime(isr.createdAt, DateTimeZone.UTC));
             input.setGlobal(isr.global);
-            input.setConfiguration(inputConfig);
 
             input.checkConfiguration();
         } catch (NoSuchInputTypeException e) {
@@ -94,6 +93,17 @@ public class PersistedInputsImpl implements PersistedInputs {
         }
 
         return result.iterator();
+    }
+
+    @Override
+    public MessageInput get(String id) {
+        try {
+            return getMessageInput(inputService.getPersistedInput(id));
+        } catch (IOException e) {
+            LOG.warn("Unable to fetch Input information for id [{}]: {}", id, e);
+        }
+
+        return null;
     }
 
     @Override

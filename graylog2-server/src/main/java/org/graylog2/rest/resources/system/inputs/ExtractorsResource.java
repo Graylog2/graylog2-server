@@ -45,6 +45,7 @@ import org.graylog2.rest.resources.system.inputs.requests.CreateExtractorRequest
 import org.graylog2.rest.resources.system.inputs.requests.OrderExtractorsRequest;
 import org.graylog2.security.RestPermissions;
 import org.graylog2.shared.inputs.InputRegistry;
+import org.graylog2.shared.inputs.PersistedInputs;
 import org.graylog2.shared.system.activities.Activity;
 import org.graylog2.shared.system.activities.ActivityWriter;
 import org.slf4j.Logger;
@@ -79,18 +80,21 @@ public class ExtractorsResource extends RestResource {
     private final InputRegistry inputs;
     private final MetricRegistry metricRegistry;
     private final ExtractorFactory extractorFactory;
+    private final PersistedInputs persistedInputs;
 
     @Inject
     public ExtractorsResource(final InputService inputService,
                               final ActivityWriter activityWriter,
                               final InputRegistry inputs,
                               final MetricRegistry metricRegistry,
-                              final ExtractorFactory extractorFactory) {
+                              final ExtractorFactory extractorFactory,
+                              final PersistedInputs persistedInputs) {
         this.inputService = inputService;
         this.activityWriter = activityWriter;
         this.inputs = inputs;
         this.metricRegistry = metricRegistry;
         this.extractorFactory = extractorFactory;
+        this.persistedInputs = persistedInputs;
     }
 
     @POST
@@ -209,7 +213,7 @@ public class ExtractorsResource extends RestResource {
             @PathParam("extractorId") String extractorId) throws NotFoundException {
         checkPermission(RestPermissions.INPUTS_EDIT, inputId);
 
-        final MessageInput input = inputs.getPersisted(inputId);
+        final MessageInput input = persistedInputs.get(inputId);
         if (input == null) {
             LOG.error("Input <{}> not found.", inputId);
             throw new javax.ws.rs.NotFoundException("Couldn't find input " + inputId);

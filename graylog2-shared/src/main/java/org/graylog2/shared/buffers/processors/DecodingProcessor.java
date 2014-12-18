@@ -35,6 +35,7 @@ import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.codecs.Codec;
 import org.graylog2.plugin.journal.RawMessage;
 import org.graylog2.shared.inputs.InputRegistry;
+import org.graylog2.shared.inputs.PersistedInputs;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,6 +59,7 @@ public class DecodingProcessor implements EventHandler<MessageEvent> {
     private final Map<String, Codec.Factory<? extends Codec>> codecFactory;
     private final ServerStatus serverStatus;
     private final MetricRegistry metricRegistry;
+    private final PersistedInputs persistedInputs;
     private final Timer parseTime;
 
     @AssistedInject
@@ -65,11 +67,13 @@ public class DecodingProcessor implements EventHandler<MessageEvent> {
                              final InputRegistry inputRegistry,
                              final ServerStatus serverStatus,
                              final MetricRegistry metricRegistry,
+                             final PersistedInputs persistedInputs,
                              @Assisted("decodeTime") Timer decodeTime,
                              @Assisted("parseTime") Timer parseTime) {
         this.codecFactory = codecFactory;
         this.serverStatus = serverStatus;
         this.metricRegistry = metricRegistry;
+        this.persistedInputs = persistedInputs;
 
         // these metrics are global to all processors, thus they are passed in directly to avoid relying on the class name
         this.parseTime = parseTime;
@@ -82,7 +86,7 @@ public class DecodingProcessor implements EventHandler<MessageEvent> {
                 .build(new CacheLoader<String, MessageInput>() {
                     @Override
                     public MessageInput load(String inputId) throws Exception {
-                        return inputRegistry.getPersisted(inputId);
+                        return persistedInputs.get(inputId);
                     }
                 });
     }
