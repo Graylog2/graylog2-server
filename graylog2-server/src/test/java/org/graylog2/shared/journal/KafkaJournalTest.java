@@ -19,6 +19,7 @@ package org.graylog2.shared.journal;
 import com.codahale.metrics.MetricRegistry;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
+import kafka.log.LogSegment;
 import org.graylog2.Graylog2BaseTest;
 import org.graylog2.plugin.InstantMillisProvider;
 import org.joda.time.DateTime;
@@ -195,13 +196,26 @@ public class KafkaJournalTest extends Graylog2BaseTest {
             final File messageJournalDir = new File(journalFile, "messagejournal-0");
             assertTrue(messageJournalDir.exists());
 
+            // we need to fix up the last modified times of the actual files.
+            long lastModifiedTs[] = new long[2];
+
             // create two chunks, 30 seconds apart
             createBulkChunks(journal, 1);
+            journal.flushDirtyLogs();
+            lastModifiedTs[0] = clock.getMillis();
+
             clock.tick(Period.seconds(30));
 
             createBulkChunks(journal, 1);
-
             journal.flushDirtyLogs();
+            lastModifiedTs[1] = clock.getMillis();
+
+            int i = 0;
+            for (final LogSegment segment : journal.getSegments()) {
+                assertTrue(i < 2);
+                segment.lastModified_$eq(lastModifiedTs[i]);
+                i++;
+            }
 
             int cleanedLogs = journal.cleanupLogs();
             assertEquals(cleanedLogs, 0, "no segments should've been cleaned");
