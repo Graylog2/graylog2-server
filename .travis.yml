@@ -3,9 +3,9 @@ language:
   - node_js
 jdk:
   - oraclejdk7
+  - oraclejdk8
 env:
   global:
-  - ACTIVATOR_VERSION=1.2.10
   - secure: |-
       x85VA9iP+/ZkBaWiupbGeJBDM4MBTp98yBVnWIe+vbWMj07zmvrIfM6rsdgT
       hZ1uBgEzGfpZ/vnU8CQN6KYXmyG2Vy4j2RlOhHf7aChNh38VzCq+97gXmLCR
@@ -15,15 +15,13 @@ env:
       7SvCgLvni0ewVVs8P2F9dGeG7HZ0WRJ3tcdZCcJG9IBk6xNcWAQveZ2goBKJ
       0Y0YksLljdKHv8mn02KX2tZxLVYjgzq09Dvn0+bGOzQU+TLbkPY=
 before_script:
-  - wget -q http://downloads.typesafe.com/typesafe-activator/${ACTIVATOR_VERSION}/typesafe-activator-${ACTIVATOR_VERSION}.zip
-  - unzip -q typesafe-activator-${ACTIVATOR_VERSION}.zip
-  - activator-${ACTIVATOR_VERSION}/activator update
+  - sbt update
   - pushd javascript && npm install && popd
 script:
   - pushd javascript && npm test && node_modules/.bin/gulp deploy-prod && popd
-  - activator-${ACTIVATOR_VERSION}/activator test
+  - sbt test
 after_success:
-  - activator-${ACTIVATOR_VERSION}/activator universal:package-zip-tarball
+  - sbt universal:package-zip-tarball
 deploy:
   provider: s3
   access_key_id: AKIAIGYGO43W76PZMMVA
