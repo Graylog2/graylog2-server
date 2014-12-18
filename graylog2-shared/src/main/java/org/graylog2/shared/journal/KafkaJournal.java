@@ -496,6 +496,14 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
         return committedOffset.get();
     }
 
+    public void truncateTo(long offset) {
+        kafkaLog.truncateTo(offset);
+    }
+
+    public long getLogEndOffset() {
+        return kafkaLog.logEndOffset();
+    }
+
 
     public class OffsetFileFlusher implements Runnable {
         @Override

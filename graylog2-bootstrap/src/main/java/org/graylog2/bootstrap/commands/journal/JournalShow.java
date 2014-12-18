@@ -16,99 +16,48 @@
  */
 package org.graylog2.bootstrap.commands.journal;
 
-import com.google.inject.Module;
 import io.airlift.airline.Command;
 import io.airlift.airline.Option;
 import kafka.log.LogSegment;
-import org.graylog2.Configuration;
-import org.graylog2.bootstrap.CmdLineTool;
-import org.graylog2.plugin.KafkaJournalConfiguration;
-import org.graylog2.shared.bindings.SchedulerBindings;
 import org.graylog2.shared.journal.KafkaJournal;
-import org.graylog2.shared.journal.KafkaJournalModule;
 import org.joda.time.DateTime;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.util.Arrays;
-import java.util.List;
 
 @SuppressWarnings("LocalCanBeFinal")
 @Command(name = "show", description = "Shows information about the persisted message journal")
-public class JournalShow extends CmdLineTool {
-    private static final Logger log = LoggerFactory.getLogger(JournalShow.class);
-
-    private static final Configuration configuration = new Configuration();
-    private final KafkaJournalConfiguration kafkaJournalConfiguration = new KafkaJournalConfiguration();
+public class JournalShow extends AbstractJournalCommand {
 
     @Option(name = {"-s", "--show-segments"}, description = "Show detail information for all segments")
     private boolean showSegmentDetails = false;
 
-    public JournalShow() {
-        super(configuration);
-    }
-
     @Override
-    protected boolean validateConfiguration() {
-        if (kafkaJournalConfiguration.getMessageJournalDir() == null) {
-            log.error("No message journal path set. Please define message_journal_dir in your graylog2.conf.");
-            return false;
+    protected void runCommand() {
+        long sizeInBytes = journal.size();
+        int numSegments = journal.numberOfSegments();
+        long committedReadOffset = journal.getCommittedReadOffset();
+        final StringBuffer sb = new StringBuffer();
+
+        sb.append("Graylog2 message journal in directory: ").append(new File(kafkaJournalConfiguration.getMessageJournalDir()).getAbsolutePath()).append(
+                "\n");
+        sb.append("\t").append("Total size in bytes: ").append(sizeInBytes).append("\n");
+        sb.append("\t").append("Number of segments: ").append(numSegments).append("\n");
+        sb.append("\t").append("Log end offset: ").append(journal.getLogEndOffset()).append("\n");
+
+        if (showSegmentDetails) {
+            appendSegmentDetails(journal, sb);
         }
-        return true;
-    }
-
-    @Override
-    protected List<Module> getCommandBindings() {
-        return Arrays.<Module>asList(new SchedulerBindings(),
-                                     new KafkaJournalModule());
-    }
-
-    @Override
-    protected List<Object> getCommandConfigurationBeans() {
-        return Arrays.asList(configuration, kafkaJournalConfiguration);
-    }
-
-    @Override
-    protected boolean onlyLogErrors() {
-        // we don't want any non-error log output
-        return true;
-    }
-
-    @Override
-    protected void startCommand() {
-        KafkaJournal journal = null;
-        try {
-            journal = injector.getInstance(KafkaJournal.class);
-
-            long sizeInBytes = journal.size();
-            int numSegments = journal.numberOfSegments();
-            long committedReadOffset = journal.getCommittedReadOffset();
-            final StringBuffer sb = new StringBuffer();
-
-            sb.append("Graylog2 message journal in directory: ").append(new File(kafkaJournalConfiguration.getMessageJournalDir()).getAbsolutePath()).append(
-                    "\n");
-            sb.append("\t").append("Total size in bytes: ").append(sizeInBytes).append("\n");
-            sb.append("\t").append("Number of segments: ").append(numSegments).append("\n");
-            if (showSegmentDetails) {
-                appendSegmentDetails(journal, sb);
-            }
-            sb.append("\t").append("Committed read offset: ");
-            if (committedReadOffset == Long.MIN_VALUE) {
-                sb.append("nothing committed");
-            } else {
-                sb.append(committedReadOffset);
-            }
-            sb.append("\n");
-            sb.append("\n");
-
-            System.out.print(sb);
-            System.out.flush();
-        } catch (Exception e) {
-            System.err.println("Unable to read the message journal. Please make sure no other Graylog2 process is using the journal.");
-        } finally {
-            if (journal != null) journal.stopAsync().awaitTerminated();
+        sb.append("\t").append("Committed read offset: ");
+        if (committedReadOffset == Long.MIN_VALUE) {
+            sb.append("nothing committed");
+        } else {
+            sb.append(committedReadOffset);
         }
+        sb.append("\n");
+        sb.append("\n");
+
+        System.out.print(sb);
+        System.out.flush();
     }
 
     private void appendSegmentDetails(KafkaJournal journal, StringBuffer sb) {
