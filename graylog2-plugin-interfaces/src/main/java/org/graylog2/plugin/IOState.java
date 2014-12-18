@@ -36,8 +36,6 @@ public class IOState<T extends Stoppable> {
     public interface Factory<T extends Stoppable> {
         IOState<T> create(T stoppable);
         IOState<T> create(T stoppable, Type state);
-        IOState<T> create(T stoppable, String id);
-        IOState<T> create(T stoppable, Type state, String id);
     }
     public enum Type {
         CREATED,
@@ -51,7 +49,6 @@ public class IOState<T extends Stoppable> {
     }
 
     protected T stoppable;
-    protected final String id;
     private EventBus eventbus;
     protected Type state;
     protected DateTime startedAt;
@@ -64,20 +61,9 @@ public class IOState<T extends Stoppable> {
 
     @AssistedInject
     public IOState(EventBus eventbus, @Assisted T stoppable, @Assisted Type state) {
-        this(eventbus, stoppable, state, UUID.randomUUID().toString());
-    }
-
-    @AssistedInject
-    public IOState(EventBus eventbus, @Assisted T stoppable, @Assisted String id) {
-        this(eventbus, stoppable, Type.CREATED, id);
-    }
-
-    @AssistedInject
-    public IOState(EventBus eventbus, @Assisted T stoppable, @Assisted Type state, @Assisted String id) {
         this.eventbus = eventbus;
         this.state = state;
         this.stoppable = stoppable;
-        this.id = id;
         this.startedAt = Tools.iso8601();
     }
 
@@ -87,10 +73,6 @@ public class IOState<T extends Stoppable> {
 
     public void setStoppable(T stoppable) {
         this.stoppable = stoppable;
-    }
-
-    public String getId() {
-        return id;
     }
 
     public Type getState() {
@@ -123,7 +105,6 @@ public class IOState<T extends Stoppable> {
     public String toString() {
         return "InputState{" +
                 "stoppable=" + stoppable +
-                ", id='" + id + '\'' +
                 ", state=" + state +
                 ", startedAt=" + startedAt +
                 ", detailedMessage='" + detailedMessage + '\'' +
@@ -137,7 +118,6 @@ public class IOState<T extends Stoppable> {
 
         IOState that = (IOState) o;
 
-        if (!id.equals(that.id)) return false;
         if (!stoppable.equals(that.stoppable)) return false;
 
         return true;
@@ -146,7 +126,7 @@ public class IOState<T extends Stoppable> {
     @Override
     public int hashCode() {
         int result = stoppable.hashCode();
-        result = 31 * result + id.hashCode();
+        result = 31 * result + stoppable.hashCode();
         return result;
     }
 }

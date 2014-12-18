@@ -27,11 +27,9 @@ import com.google.auto.value.AutoValue;
 @AutoValue
 public abstract class InputCreated {
     @JsonProperty
-    public abstract String inputId();
-    @JsonProperty
-    public abstract String persistId();
+    public abstract String id();
 
-    public static InputCreated create(String inputId, String persistId) {
-        return new AutoValue_InputCreated(inputId, persistId);
+    public static InputCreated create(String id) {
+        return new AutoValue_InputCreated(id);
     }
 }

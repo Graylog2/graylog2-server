@@ -139,7 +139,7 @@ public class InputsResource extends RestResource {
                 continue;
             final MessageInput messageInput = inputState.getStoppable();
             inputStates.add(InputStateSummary.create(
-                    inputState.getId(),
+                    inputState.getStoppable().getId(),
                     inputState.getState().toString(),
                     inputState.getStartedAt(),
                     inputState.getDetailedMessage(),
@@ -216,9 +216,9 @@ public class InputsResource extends RestResource {
 
         final URI inputUri = UriBuilder.fromResource(InputsResource.class)
                 .path("{inputId}")
-                .build(inputId);
+                .build(id);
 
-        return Response.created(inputUri).entity(InputCreated.create(inputId, id)).build();
+        return Response.created(inputUri).entity(InputCreated.create(id)).build();
     }
 
     private Input getInput(MessageInput input) throws ValidationException {

@@ -37,25 +37,35 @@ import static org.testng.Assert.*;
  */
 @Test
 public class IOStateTest {
-    public void testEqualsDifferentId() throws Exception {
+    public void testNotEqualIfDifferentInput() throws Exception {
         EventBus eventBus = mock(EventBus.class);
-        MessageInput messageInput = mock(MessageInput.class);
+        MessageInput messageInput1 = mock(MessageInput.class);
+        MessageInput messageInput2 = mock(MessageInput.class);
 
-        IOState inputState1 = new IOState<MessageInput>(eventBus, messageInput);
-        IOState inputState2 = new IOState<MessageInput>(eventBus, messageInput);
+        IOState inputState1 = new IOState<MessageInput>(eventBus, messageInput1);
+        IOState inputState2 = new IOState<MessageInput>(eventBus, messageInput2);
 
         assertFalse(inputState1.equals(inputState2));
         assertFalse(inputState2.equals(inputState1));
     }
 
-    public void testEqualsSameId() throws Exception {
+    public void testEqualsSameState() throws Exception {
         EventBus eventBus = mock(EventBus.class);
         MessageInput messageInput = mock(MessageInput.class);
 
-        String id = UUID.randomUUID().toString();
+        IOState inputState1 = new IOState<MessageInput>(eventBus, messageInput, IOState.Type.RUNNING);
+        IOState inputState2 = new IOState<MessageInput>(eventBus, messageInput, IOState.Type.RUNNING);
 
-        IOState inputState1 = new IOState<MessageInput>(eventBus, messageInput, id);
-        IOState inputState2 = new IOState<MessageInput>(eventBus, messageInput, id);
+        assertTrue(inputState1.equals(inputState2));
+        assertTrue(inputState2.equals(inputState1));
+    }
+
+    public void testNotEqualIfDifferentState() throws Exception {
+        EventBus eventBus = mock(EventBus.class);
+        MessageInput messageInput = mock(MessageInput.class);
+
+        IOState inputState1 = new IOState<MessageInput>(eventBus, messageInput, IOState.Type.RUNNING);
+        IOState inputState2 = new IOState<MessageInput>(eventBus, messageInput, IOState.Type.STOPPED);
 
         assertTrue(inputState1.equals(inputState2));
         assertTrue(inputState2.equals(inputState1));
