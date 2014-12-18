@@ -114,7 +114,7 @@ public class StaticFieldsResource extends RestResource {
 
         final URI inputUri = UriBuilder.fromResource(InputsResource.class)
                 .path("{inputId}")
-                .build(mongoInput.getInputId());
+                .build(mongoInput.getId());
 
         return Response.created(inputUri).build();
     }
