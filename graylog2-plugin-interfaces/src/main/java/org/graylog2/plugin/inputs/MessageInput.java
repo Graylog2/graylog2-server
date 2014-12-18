@@ -97,12 +97,14 @@ public abstract class MessageInput implements Stoppable {
     protected Boolean global = false;
     protected String contentPack;
 
-    protected Configuration configuration;
+    protected final Configuration configuration;
     protected InputBuffer inputBuffer;
 
     public MessageInput(MetricRegistry metricRegistry,
+                        Configuration configuration,
                         Transport transport,
                         LocalMetricRegistry localRegistry, Codec codec, Config config, Descriptor descriptor, ServerStatus serverStatus) {
+        this.configuration = configuration;
         if (metricRegistry == localRegistry) {
             LOG.error("########### Do not add the global metric registry twice, the localRegistry parameter is " +
                               "the same as the global metricRegistry. " +
@@ -219,11 +221,6 @@ public abstract class MessageInput implements Stoppable {
 
     public Configuration getConfiguration() {
         return configuration;
-    }
-
-    // TODO pass in via constructor
-    public void setConfiguration(Configuration configuration) {
-        this.configuration = configuration;
     }
 
     public Boolean isGlobal() {

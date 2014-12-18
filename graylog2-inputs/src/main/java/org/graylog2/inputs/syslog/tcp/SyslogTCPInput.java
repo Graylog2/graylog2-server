@@ -58,9 +58,10 @@ public class SyslogTCPInput extends MessageInput {
                           Config config,
                           Descriptor descriptor, ServerStatus serverStatus) {
         super(metricRegistry,
-              tcpTransportFactory.create(configuration),
-              localRegistry, syslogCodecFactory.create(configuration),
-              config, descriptor, serverStatus);
+                configuration,
+                tcpTransportFactory.create(configuration),
+                localRegistry, syslogCodecFactory.create(configuration),
+                config, descriptor, serverStatus);
     }
 
     public interface Factory extends MessageInput.Factory<SyslogTCPInput> {

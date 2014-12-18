@@ -37,7 +37,7 @@ public class JsonPathInput extends MessageInput {
                          JsonPathCodec.Factory codec,
                          MetricRegistry metricRegistry,
                          LocalMetricRegistry localRegistry, Config config, Descriptor descriptor, ServerStatus serverStatus) {
-        super(metricRegistry, transport.create(configuration), localRegistry, codec.create(configuration), config,
+        super(metricRegistry, configuration, transport.create(configuration), localRegistry, codec.create(configuration), config,
               descriptor, serverStatus);
     }
 

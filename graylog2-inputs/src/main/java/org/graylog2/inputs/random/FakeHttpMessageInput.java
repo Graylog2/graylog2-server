@@ -37,9 +37,10 @@ public class FakeHttpMessageInput extends MessageInput {
                                 RandomHttpMessageCodec.Factory codecFactory,
                                 MetricRegistry metricRegistry, LocalMetricRegistry localRegistry, Config config, Descriptor descriptor, ServerStatus serverStatus) {
         super(metricRegistry,
-              transportFactory.create(configuration),
-              localRegistry, codecFactory.create(configuration),
-              config, descriptor, serverStatus);
+                configuration,
+                transportFactory.create(configuration),
+                localRegistry, codecFactory.create(configuration),
+                config, descriptor, serverStatus);
     }
 
     public interface Factory extends MessageInput.Factory<FakeHttpMessageInput> {

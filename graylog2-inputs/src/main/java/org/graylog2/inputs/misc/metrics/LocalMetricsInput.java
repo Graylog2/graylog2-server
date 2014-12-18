@@ -36,7 +36,7 @@ public class LocalMetricsInput extends MessageInput {
                              MetricRegistry metricRegistry,
                              LocalMetricsTransport.Factory transport,
                              GelfCodec.Factory codec, LocalMetricRegistry localRegistry, Config config, Descriptor descriptor, ServerStatus serverStatus) {
-        super(metricRegistry, transport.create(configuration), localRegistry, codec.create(configuration), config,
+        super(metricRegistry, configuration, transport.create(configuration), localRegistry, codec.create(configuration), config,
               descriptor, serverStatus);
     }
 

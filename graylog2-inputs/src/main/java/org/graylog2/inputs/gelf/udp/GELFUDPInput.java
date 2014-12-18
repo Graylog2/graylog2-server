@@ -36,7 +36,7 @@ public class GELFUDPInput extends MessageInput {
                         @Assisted Configuration configuration,
                         UdpTransport.Factory udpFactory,
                         GelfCodec.Factory gelfCodecFactory, LocalMetricRegistry localRegistry, Config config, Descriptor descriptor, ServerStatus serverStatus) {
-        super(metricRegistry, udpFactory.create(configuration), localRegistry, gelfCodecFactory.create(configuration),
+        super(metricRegistry, configuration, udpFactory.create(configuration), localRegistry, gelfCodecFactory.create(configuration),
               config, descriptor, serverStatus);
     }
 

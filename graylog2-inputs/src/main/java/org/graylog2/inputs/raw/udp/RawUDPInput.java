@@ -56,7 +56,7 @@ public class RawUDPInput extends MessageInput {
                        LocalMetricRegistry localRegistry,
                        Config config,
                        Descriptor descriptor, ServerStatus serverStatus) {
-        super(metricRegistry, udpTransportFactory.create(configuration),
+        super(metricRegistry, configuration, udpTransportFactory.create(configuration),
               localRegistry,
               rawCodecFactory.create(configuration), config, descriptor, serverStatus);
     }

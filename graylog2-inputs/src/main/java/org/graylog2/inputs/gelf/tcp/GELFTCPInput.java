@@ -39,7 +39,7 @@ public class GELFTCPInput extends MessageInput {
                         LocalMetricRegistry localRegistry,
                         Config config,
                         Descriptor descriptor, ServerStatus serverStatus) {
-        super(metricRegistry, tcpFactory.create(overrideDelimiter(configuration)), localRegistry, gelfCodecFactory.create(configuration),
+        super(metricRegistry, configuration, tcpFactory.create(overrideDelimiter(configuration)), localRegistry, gelfCodecFactory.create(configuration),
               config, descriptor, serverStatus);
     }
 

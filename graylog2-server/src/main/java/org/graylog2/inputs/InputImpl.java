@@ -59,7 +59,7 @@ public class InputImpl extends PersistedImpl implements Input {
     @Override
     public Map<String, Validator> getValidations() {
         final ImmutableMap.Builder<String, Validator> validations = ImmutableMap.builder();
-        validations.put(MessageInput.FIELD_INPUT_ID, new FilledStringValidator());
+        //validations.put(MessageInput.FIELD_INPUT_ID, new FilledStringValidator());
         validations.put(MessageInput.FIELD_TITLE, new FilledStringValidator());
         validations.put(MessageInput.FIELD_TYPE, new FilledStringValidator());
         validations.put(MessageInput.FIELD_CONFIGURATION, new MapValidator());

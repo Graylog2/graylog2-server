@@ -40,20 +40,22 @@ public class KafkaInput extends MessageInput {
                       Config config,
                       Descriptor descriptor, ServerStatus serverStatus) {
         this(metricRegistry,
-             transport.create(configuration),
-             codec.create(configuration),
-             localRegistry,
-             config,
-             descriptor, serverStatus);
+                configuration,
+                transport.create(configuration),
+                codec.create(configuration),
+                localRegistry,
+                config,
+                descriptor, serverStatus);
     }
 
     protected KafkaInput(MetricRegistry metricRegistry,
+                         Configuration configuration,
                          KafkaTransport radioKafkaTransport,
                          RadioMessageCodec radioMessageCodec,
                          LocalMetricRegistry localRegistry,
                          MessageInput.Config config,
                          MessageInput.Descriptor descriptor, ServerStatus serverStatus) {
-        super(metricRegistry, radioKafkaTransport, localRegistry, radioMessageCodec, config, descriptor, serverStatus);
+        super(metricRegistry, configuration, radioKafkaTransport, localRegistry, radioMessageCodec, config, descriptor, serverStatus);
     }
 
     public interface Factory extends MessageInput.Factory<KafkaInput> {

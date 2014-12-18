@@ -36,7 +36,7 @@ public class GELFHttpInput extends MessageInput {
                          @Assisted Configuration configuration,
                          HttpTransport.Factory httpTransportFactory,
                          GelfCodec.Factory gelfCodecFactory, LocalMetricRegistry localRegistry, Config config, Descriptor descriptor, ServerStatus serverStatus) {
-        super(metricRegistry, httpTransportFactory.create(configuration),
+        super(metricRegistry, configuration, httpTransportFactory.create(configuration),
               localRegistry,
               gelfCodecFactory.create(configuration), config, descriptor, serverStatus);
     }
