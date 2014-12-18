@@ -163,8 +163,8 @@ public class ExtractorsResource extends RestResource {
 
         final Map<String, String> result = ImmutableMap.of("extractor_id", id);
         final URI extractorUri = UriBuilder.fromResource(ExtractorsResource.class)
-                .path("{extractorId}")
-                .build(id);
+                .path("{inputId}")
+                .build(input.getId());
 
         return Response.created(extractorUri).entity(result).build();
     }

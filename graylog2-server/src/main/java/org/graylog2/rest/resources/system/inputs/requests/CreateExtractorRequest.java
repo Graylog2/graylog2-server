@@ -17,6 +17,7 @@
 package org.graylog2.rest.resources.system.inputs.requests;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.hibernate.validator.constraints.NotEmpty;
@@ -56,6 +57,7 @@ public abstract class CreateExtractorRequest {
     @JsonProperty
     public abstract int order();
 
+    @JsonCreator
     public static CreateExtractorRequest create(@JsonProperty("title") @NotEmpty String title,
                                                 @JsonProperty("cut_or_copy") String cutOrCopy,
                                                 @JsonProperty("source_field") @NotEmpty String sourceField,
