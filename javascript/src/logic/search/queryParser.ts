@@ -251,7 +251,7 @@ class QueryLexer {
 
     next(): Token {
         var token;
-        var la = this.la();
+        var la = this.lookAhead();
         if (la === null) {
             token = this.eofToken;
         } else if (this.isWhitespace(la)) {
@@ -284,12 +284,12 @@ class QueryLexer {
 
     isKeyword(keyword: string): boolean {
         for (var i = 0; i < keyword.length; i++) {
-            if (this.la(i) !== keyword[i]) {
+            if (this.lookAhead(i) !== keyword[i]) {
                 return false;
             }
         }
         // be sure that it is not a prefix of something else
-        return this.isWhitespace(this.la(i)) || this.la(i) === null;
+        return this.isWhitespace(this.lookAhead(i)) || this.lookAhead(i) === null;
     }
 
     or() {
@@ -300,16 +300,16 @@ class QueryLexer {
 
     and() {
         var startPos = this.pos;
-        this.consume(this.la() === '&' ? 2 : 3);
+        this.consume(this.lookAhead() === '&' ? 2 : 3);
         return new Token(this.input, TokenType.AND, startPos, this.pos);
     }
 
     whitespace() {
         var startPos = this.pos;
-        var la = this.la();
+        var la = this.lookAhead();
         while (this.isWhitespace(la)) {
             this.consume();
-            la = this.la();
+            la = this.lookAhead();
         }
         return new Token(this.input, TokenType.WS, startPos, this.pos);
     }
@@ -318,10 +318,10 @@ class QueryLexer {
         var startPos = this.pos;
         // consume start character
         this.consume();
-        var la = this.la();
+        var la = this.lookAhead();
         while (this.isTerm(la)) {
             this.consume();
-            la = this.la();
+            la = this.lookAhead();
         }
         return new Token(this.input, TokenType.TERM, startPos, this.pos);
     }
@@ -329,10 +329,10 @@ class QueryLexer {
     phrase() {
         var startPos = this.pos;
         this.consume(); // skip starting "
-        var la = this.la();
+        var la = this.lookAhead();
         while (la !== null && la !== '"') {
             this.consume();
-            la = this.la();
+            la = this.lookAhead();
         }
         this.consume(); // skip ending "
         return new Token(this.input, TokenType.PHRASE, startPos, this.pos);
@@ -370,7 +370,7 @@ class QueryLexer {
         this.pos += n;
     }
 
-    la(la: number = 0): string {
+    lookAhead(la: number = 0): string {
         var index = this.pos + la;
         var char = (this.input.length <= index) ? null : this.input[index];
         if (char === '\\') {
@@ -418,8 +418,8 @@ export class QueryParser {
         this.tokenBuffer.splice(0, 1);
     }
 
-    private la(la: number = 0): Token {
-        // fill token buffer until we can look far ahead
+    private lookAhead(la: number = 0): Token {
+        // fill token buffer until we can look ahead far enough
         while (la >= this.tokenBuffer.length) {
             var token = this.lexer.next();
             if (token.type === TokenType.EOF) {
@@ -443,8 +443,8 @@ export class QueryParser {
 
     private syncWhile(...syncWhile: TokenType[]): Array<Token> {
         var skippedTokens = [];
-        while (syncWhile.some((type) => type === this.la().type)) {
-            skippedTokens.push(this.la());
+        while (syncWhile.some((type) => type === this.lookAhead().type)) {
+            skippedTokens.push(this.lookAhead());
             this.consume();
         }
         return skippedTokens;
@@ -452,8 +452,8 @@ export class QueryParser {
 
     private syncTo(syncTo: TokenType[]): Array<Token> {
         var skippedTokens = [];
-        while (this.la().type !== TokenType.EOF && syncTo.every((type) => type !== this.la().type)) {
-            skippedTokens.push(this.la());
+        while (this.lookAhead().type !== TokenType.EOF && syncTo.every((type) => type !== this.lookAhead().type)) {
+            skippedTokens.push(this.lookAhead());
             this.consume();
         }
         return skippedTokens;
@@ -462,7 +462,7 @@ export class QueryParser {
     private unexpectedToken() {
         var syncTo = this.currentFollowSet();
         this.errors.push({
-            position: this.la().beginPos,
+            position: this.lookAhead().beginPos,
             message: "Unexpected input"
         });
         return this.syncTo(syncTo);
@@ -471,7 +471,7 @@ export class QueryParser {
     private missingToken(tokenName: string) {
         var syncTo = this.currentFollowSet();
         this.errors.push({
-            position: this.la().beginPos,
+            position: this.lookAhead().beginPos,
             message: "Missing " + tokenName
         });
         return this.syncTo(syncTo);
@@ -497,7 +497,7 @@ export class QueryParser {
     }
 
     private isFirstOf(tokenTypes: TokenType[]) {
-        return tokenTypes.some((tokenType) => this.la().type === tokenType);
+        return tokenTypes.some((tokenType) => this.lookAhead().type === tokenType);
     }
 
     private isInFirstSetOf(ruleName: string) {
@@ -576,7 +576,7 @@ export class QueryParser {
                 left.hiddenSuffix = left.hiddenSuffix.concat(hiddenOpPrefix);
                 return left;
             } else {
-                op = this.la();
+                op = this.lookAhead();
                 this.consume();
                 var hiddenOpSuffix = this.skipHidden();
                 if (this.isExpr()) {
@@ -598,15 +598,15 @@ export class QueryParser {
     termOrPhrase() {
         this.enterRule("expr");
         try {
-            var termOrField = this.la();
+            var termOrField = this.lookAhead();
             this.consume();
             var wsAfterTermOrField = this.skipHidden();
-            if (this.la().type === TokenType.COLON) {
-                var colon = this.la();
+            if (this.lookAhead().type === TokenType.COLON) {
+                var colon = this.lookAhead();
                 this.consume();
                 var prefixAfterColon = this.skipHidden();
-                if (this.la().type === TokenType.TERM || this.la().type === TokenType.PHRASE) {
-                    var term = this.la();
+                if (this.lookAhead().type === TokenType.TERM || this.lookAhead().type === TokenType.PHRASE) {
+                    var term = this.lookAhead();
                     this.consume();
                     var ast = new TermWithFieldAST(termOrField, colon, term);
                     ast.hiddenColonPrefix = wsAfterTermOrField;
