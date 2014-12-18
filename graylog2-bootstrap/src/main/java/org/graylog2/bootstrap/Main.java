@@ -20,6 +20,7 @@ import com.google.common.collect.ImmutableSet;
 import io.airlift.airline.Cli;
 import io.airlift.airline.Cli.CliBuilder;
 import io.airlift.airline.Help;
+import org.graylog2.bootstrap.commands.journal.JournalShow;
 import org.graylog2.bootstrap.commands.Radio;
 import org.graylog2.bootstrap.commands.Server;
 import org.graylog2.bootstrap.commands.ShowVersion;
@@ -38,6 +39,11 @@ public class Main {
                 .withDescription("Open source, centralized log management")
                 .withDefaultCommand(Help.class)
                 .withCommands(commands);
+
+        builder.withGroup("journal")
+                .withDescription("Manage the persisted message journal")
+                .withDefaultCommand(JournalShow.class)
+                .withCommands(JournalShow.class);
 
         final Cli<Runnable> cli = builder.build();
         final Runnable command = cli.parse(args);

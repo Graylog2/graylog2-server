@@ -28,6 +28,7 @@ import com.google.common.io.Files;
 import com.google.common.util.concurrent.AbstractIdleService;
 import com.google.common.util.concurrent.Uninterruptibles;
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import kafka.common.KafkaException;
 import kafka.common.OffsetOutOfRangeException;
@@ -50,14 +51,15 @@ import org.joda.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import scala.Option;
-import scala.collection.*;
+import scala.collection.Iterator;
+import scala.collection.JavaConversions;
+import scala.collection.Map$;
 import scala.runtime.AbstractFunction1;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.SyncFailedException;
-import java.lang.Iterable;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -73,6 +75,7 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.NANOSECONDS;
 import static org.graylog2.plugin.Tools.bytesToHex;
 
+@Singleton
 public class KafkaJournal extends AbstractIdleService implements Journal {
     // this exists so we can use JodaTime's millis provider in tests.
     // kafka really only cares about the milliseconds() method in here
@@ -115,11 +118,11 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
     private long nextReadOffset = 0L;
 
     @Inject
-    public KafkaJournal(@Named("journalDirectory") String journalDirName,
+    public KafkaJournal(@Named("message_journal_dir") String journalDirName,
                         @Named("scheduler") ScheduledExecutorService scheduler,
-                        @Named("journalSegmentSize") int segmentSize,
-                        @Named("journalMaxRetentionSize") long retentionSize,
-                        @Named("journalMaxRetentionAge") Duration retentionAge,
+                        @Named("message_journal_segment_size") int segmentSize,
+                        @Named("message_journal_max_size") long retentionSize,
+                        @Named("message_journal_max_age") Duration retentionAge,
                         MetricRegistry metricRegistry) {
         this.scheduler = scheduler;
         this.metricRegistry = metricRegistry;
@@ -133,32 +136,32 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
         // these are the default values as per kafka 0.8.1.1
         final LogConfig defaultConfig =
                 new LogConfig(
-                        segmentSize,
                         // segmentSize: The soft maximum for the size of a segment file in the log
-                        Long.MAX_VALUE,
+                        segmentSize,
                         // segmentMs: The soft maximum on the amount of time before a new log segment is rolled
                         Long.MAX_VALUE,
                         // flushInterval: The number of messages that can be written to the log before a flush is forced
                         Long.MAX_VALUE,
                         // flushMs: The amount of time the log can have dirty data before a flush is forced
-                        retentionSize,
+                        Long.MAX_VALUE,
                         // retentionSize: The approximate total number of bytes this log can use
-                        retentionAge.getMillis(),
+                        retentionSize,
                         // retentionMs: The age approximate maximum age of the last segment that is retained
-                        Integer.MAX_VALUE,
+                        retentionAge.getMillis(),
                         // maxMessageSize: The maximum size of a message in the log
-                        1024 * 1024,
+                        Integer.MAX_VALUE,
                         // maxIndexSize: The maximum size of an index file
-                        4096,
+                        1024 * 1024,
                         // indexInterval: The approximate number of bytes between index entries
-                        60 * 1000,
+                        4096,
                         // fileDeleteDelayMs: The time to wait before deleting a file from the filesystem
-                        24 * 60 * 60 * 1000L,
+                        60 * 1000,
                         // deleteRetentionMs: The time to retain delete markers in the log. Only applicable for logs that are being compacted.
-                        0.5,
+                        24 * 60 * 60 * 1000L,
                         // minCleanableRatio: The ratio of bytes that are available for cleaning to the bytes already cleaned
-                        false
+                        0.5,
                         // compact: Should old segments in this log be deleted or deduplicated?
+                        false
                 );
         // these are the default values as per kafka 0.8.1.1, except we don't turn on the cleaner
         // Cleaner really is log compaction with respect to "deletes" in the log.
@@ -477,9 +480,22 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
     }
 
     // default visibility for tests
-    Iterable<LogSegment> getSegments() {
+    public Iterable<LogSegment> getSegments() {
         return JavaConversions.asJavaIterable(kafkaLog.logSegments());
     }
+
+    public long size() {
+        return kafkaLog.size();
+    }
+
+    public int numberOfSegments() {
+        return kafkaLog.numberOfSegments();
+    }
+
+    public long getCommittedReadOffset() {
+        return committedOffset.get();
+    }
+
 
     public class OffsetFileFlusher implements Runnable {
         @Override

@@ -35,7 +35,7 @@ import org.graylog2.bindings.PersistenceServicesBindings;
 import org.graylog2.bindings.RotationStrategyBindings;
 import org.graylog2.bindings.ServerBindings;
 import org.graylog2.bindings.ServerMessageInputBindings;
-import org.graylog2.bootstrap.Bootstrap;
+import org.graylog2.bootstrap.ServerBootstrap;
 import org.graylog2.bootstrap.Main;
 import org.graylog2.cluster.NodeService;
 import org.graylog2.configuration.ElasticsearchConfiguration;
@@ -44,6 +44,7 @@ import org.graylog2.configuration.MongoDbConfiguration;
 import org.graylog2.configuration.VersionCheckConfiguration;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
+import org.graylog2.plugin.KafkaJournalConfiguration;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.shared.system.activities.Activity;
 import org.graylog2.shared.system.activities.ActivityWriter;
@@ -57,7 +58,7 @@ import java.util.Collection;
 import java.util.List;
 
 @Command(name = "server", description = "Start the Graylog2 server")
-public class Server extends Bootstrap implements Runnable {
+public class Server extends ServerBootstrap implements Runnable {
     private static final Logger LOG = LoggerFactory.getLogger(Server.class);
 
     private static final Configuration configuration = new Configuration();
@@ -65,6 +66,7 @@ public class Server extends Bootstrap implements Runnable {
     private final EmailConfiguration emailConfiguration = new EmailConfiguration();
     private final MongoDbConfiguration mongoDbConfiguration = new MongoDbConfiguration();
     private final VersionCheckConfiguration versionCheckConfiguration = new VersionCheckConfiguration();
+    private final KafkaJournalConfiguration kafkaJournalConfiguration = new KafkaJournalConfiguration();
 
     public Server() {
         super("Server", configuration);
@@ -142,7 +144,8 @@ public class Server extends Bootstrap implements Runnable {
                 elasticsearchConfiguration,
                 emailConfiguration,
                 mongoDbConfiguration,
-                versionCheckConfiguration);
+                versionCheckConfiguration,
+                kafkaJournalConfiguration);
     }
 
     @Override

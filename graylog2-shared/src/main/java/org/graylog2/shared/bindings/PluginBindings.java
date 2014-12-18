@@ -20,12 +20,10 @@ import com.google.inject.AbstractModule;
 import com.google.inject.multibindings.Multibinder;
 import org.graylog2.plugin.Plugin;
 import org.graylog2.plugin.PluginMetaData;
+import org.graylog2.plugin.PluginModule;
 
 import java.util.Set;
 
-/**
- * Created by dennis on 15/12/14.
- */
 public class PluginBindings extends AbstractModule {
     private final Set<Plugin> plugins;
 
@@ -35,10 +33,14 @@ public class PluginBindings extends AbstractModule {
 
     @Override
     protected void configure() {
-        Multibinder<Plugin> pluginbinder = Multibinder.newSetBinder(binder(), Plugin.class);
-        Multibinder<PluginMetaData> pluginMetaDataBinder = Multibinder.newSetBinder(binder(), PluginMetaData.class);
-        for (Plugin plugin : plugins) {
+        final Multibinder<Plugin> pluginbinder = Multibinder.newSetBinder(binder(), Plugin.class);
+        final Multibinder<PluginMetaData> pluginMetaDataBinder = Multibinder.newSetBinder(binder(), PluginMetaData.class);
+        for (final Plugin plugin : plugins) {
             pluginbinder.addBinding().toInstance(plugin);
+            for (final PluginModule pluginModule : plugin.modules()) {
+                binder().install(pluginModule);
+            }
+
             pluginMetaDataBinder.addBinding().toInstance(plugin.metadata());
         }
     }

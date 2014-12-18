@@ -25,8 +25,11 @@ package org.graylog2.plugin;
 import com.github.joschi.jadconfig.Parameter;
 import com.github.joschi.jadconfig.validators.InetPortValidator;
 import com.github.joschi.jadconfig.validators.PositiveIntegerValidator;
-import com.lmax.disruptor.*;
-import org.joda.time.Duration;
+import com.lmax.disruptor.BlockingWaitStrategy;
+import com.lmax.disruptor.BusySpinWaitStrategy;
+import com.lmax.disruptor.SleepingWaitStrategy;
+import com.lmax.disruptor.WaitStrategy;
+import com.lmax.disruptor.YieldingWaitStrategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -107,18 +110,6 @@ public abstract class BaseConfiguration {
 
     @Parameter("message_journal_enabled")
     private boolean messageJournalEnabled = false;
-
-    @Parameter("message_journal_dir")
-    private String messageJournalDir = "journal";
-
-    @Parameter("message_journal_segment_size")
-    private int messageJournalSegmentSize = 1024 * 1024 * 100; // 100 MB
-
-    @Parameter("message_journal_max_size")
-    private long messageJournalMaxSize = 1024 * 1024 * 1024 * 5l; // 5 GB
-
-    @Parameter("message_journal_max_age")
-    private Duration messageJournalMaxAge = Duration.standardHours(12);
 
     @Parameter("inputbuffer_processors")
     private int inputbufferProcessors = 2;
@@ -265,24 +256,8 @@ public abstract class BaseConfiguration {
         return messageJournalEnabled;
     }
 
-    public String getMessageJournalDir() {
-        return messageJournalDir;
-    }
-
     public int getInputbufferProcessors() {
         return inputbufferProcessors;
-    }
-
-    public int getMessageJournalSegmentSize() {
-        return messageJournalSegmentSize;
-    }
-
-    public Duration getMessageJournalMaxAge() {
-        return messageJournalMaxAge;
-    }
-
-    public long getMessageJournalMaxSize() {
-        return messageJournalMaxSize;
     }
 
     public int getShutdownTimeout() {

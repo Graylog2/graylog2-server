@@ -16,12 +16,18 @@
  */
 package org.graylog2.shared.journal;
 
+import com.google.common.util.concurrent.Service;
 import com.google.inject.Scopes;
+import com.google.inject.multibindings.Multibinder;
 import org.graylog2.plugin.inject.Graylog2Module;
 
-public class KafkaJournalModule extends Graylog2Module {
+public class JournalReaderModule extends Graylog2Module {
+
     @Override
     protected void configure() {
-        bind(Journal.class).to(KafkaJournal.class).in(Scopes.SINGLETON);
+        final Multibinder<Service> serviceBinder = Multibinder.newSetBinder(binder(), Service.class);
+        serviceBinder.addBinding().to(JournalReader.class).in(Scopes.SINGLETON);
+        serviceBinder.addBinding().to(KafkaJournal.class).in(Scopes.SINGLETON);
+
     }
 }
