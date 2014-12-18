@@ -3,7 +3,7 @@
 var queryParser = require("../../src/logic/search/queryParser");
 
 describe('Query Parser', function () {
-    var ExpressionAST, ExpressionListAST, TermAST, Token, QueryParser, TokenType;
+    var ExpressionAST, ExpressionListAST, ModifierAST, TermAST, Token, QueryParser, TokenType;
 
     var expectNoErrors = function (parser) {
         expect(parser.errors.length).toBe(0);
@@ -28,6 +28,7 @@ describe('Query Parser', function () {
         TokenType = queryParser.TokenType;
         ExpressionListAST = queryParser.ExpressionListAST;
         ExpressionAST = queryParser.ExpressionAST;
+        ModifierAST = queryParser.ModifierAST;
     });
 
     it('can parse a term', function () {
@@ -242,5 +243,50 @@ describe('Query Parser', function () {
         expectIdentityDump(query);
     });
 
+    it('can parse a unary NOT expression', function () {
+        var query = "NOT submit";
+        var parser = new QueryParser(query);
+        var ast = parser.parse();
+        expectNoErrors(parser);
+        expect(ast instanceof ModifierAST).toBeTruthy();
+        expect(ast.modifier.type).toBe(TokenType.NOT);
+        expect(ast.right instanceof TermAST).toBeTruthy();
+
+        expectIdentityDump(query);
+    });
+
+    it('can parse a complex expression with NOT, AND and OR', function() {
+        var query = "NOT submit AND action:login OR action:logout";
+        var parser = new QueryParser(query);
+        var ast = parser.parse();
+        expectNoErrors(parser);
+        expect(ast instanceof ModifierAST).toBeTruthy();
+        expect(ast.modifier.type).toBe(TokenType.NOT);
+        expect(ast.right instanceof ExpressionAST).toBeTruthy();
+
+        var andAST = ast.right;
+        expect(andAST instanceof ExpressionAST).toBeTruthy();
+        expect(andAST.left instanceof TermAST).toBeTruthy();
+        expect(andAST.op.type).toBe(TokenType.AND);
+        expect(andAST.right instanceof ExpressionAST).toBeTruthy();
+
+        var orAST = andAST.right;
+        expect(orAST instanceof ExpressionAST).toBeTruthy();
+        expect(orAST.left instanceof TermAST).toBeTruthy();
+        expect(orAST.op.type).toBe(TokenType.OR);
+        expect(orAST.right instanceof TermAST).toBeTruthy();
+
+        expectIdentityDump(query);
+    });
+
+    it('reports an error when NOT has no right part', function() {
+        var query = 'NOT ';
+        var parser = new QueryParser(query);
+        var ast = parser.parse();
+        expect(parser.errors.length).toBe(1);
+        expect(parser.errors[0].message).toBe("Missing right side of expression");
+        expect(parser.errors[0].position).toBe(3);
+        expectIdentityDump(query, true);
+    })
 });
 

@@ -21,6 +21,8 @@ export class BaseVisitor implements Visitor {
             this.visitExpressionListAST(<ExpressionListAST>ast);
         } else if (ast instanceof ExpressionAST) {
             this.visitExpressionAST(<ExpressionAST>ast);
+        } else if (ast instanceof ModifierAST) {
+            this.visitModifierAST(<ModifierAST>ast);
         } else if (ast instanceof TermWithFieldAST) {
             this.visitTermWithFieldAST(<TermWithFieldAST>ast);
         } else if (ast instanceof TermAST) {
@@ -39,6 +41,9 @@ export class BaseVisitor implements Visitor {
     }
 
     visitTermWithFieldAST(ast: TermWithFieldAST) {
+    }
+
+    visitModifierAST(ast: ModifierAST) {
     }
 
     visitExpressionAST(ast: ExpressionAST) {
@@ -61,6 +66,11 @@ export class SerializeVisitor extends BaseVisitor {
 
     visitTermWithFieldAST(ast: TermWithFieldAST) {
         this.serialize(ast);
+    }
+
+    visitModifierAST(ast: ModifierAST) {
+        this.serialize(ast);
+        this.visit(ast.right);
     }
 
     visitExpressionAST(ast: ExpressionAST) {
@@ -113,6 +123,13 @@ export class DumpVisitor extends BaseVisitor {
 
     visitTermWithFieldAST(ast: TermWithFieldAST) {
         this.dumpWithPrefixAndSuffixWithField(ast);
+    }
+
+    visitModifierAST(ast: ModifierAST) {
+        this.dumpHidden(ast.hiddenModifierPrefix);
+        this.dumpToken(ast.modifier);
+        this.dumpHidden(ast.hiddenModifierSuffix);
+        this.visit(ast.right);
     }
 
     visitExpressionAST(ast: ExpressionAST) {
@@ -181,6 +198,15 @@ export class AST {
 
 export class MissingAST extends AST {
 
+}
+
+export class ModifierAST extends AST {
+    hiddenModifierPrefix: Array<Token> = [];
+    hiddenModifierSuffix: Array<Token> = [];
+
+    constructor(public modifier: Token, public right: AST) {
+        super();
+    }
 }
 
 export class ExpressionAST extends AST {
@@ -260,6 +286,8 @@ class QueryLexer {
             token = this.or();
         } else if (this.isKeyword("AND") || this.isKeyword("&&")) {
             token = this.and();
+        } else if (this.isKeyword("NOT") || this.isKeyword("!")) {
+            token = this.not();
         } else if (la === '"') {
             token = this.phrase();
         } else if (la === ':') {
@@ -302,6 +330,12 @@ class QueryLexer {
         var startPos = this.pos;
         this.consume(this.lookAhead() === '&' ? 2 : 3);
         return new Token(this.input, TokenType.AND, startPos, this.pos);
+    }
+
+    not() {
+        var startPos = this.pos;
+        this.consume(this.la() === '!' ? 1 : 3);
+        return new Token(this.input, TokenType.NOT, startPos, this.pos);
     }
 
     whitespace() {
@@ -398,7 +432,8 @@ export class QueryParser {
     private static firstSets: Rule2Token = {
         termOrPhrase: [TokenType.TERM, TokenType.PHRASE],
         expr: [TokenType.TERM, TokenType.PHRASE],
-        operator: [TokenType.OR, TokenType.AND]
+        operator: [TokenType.OR, TokenType.AND],
+        modifier: [TokenType.NOT]
     };
     private static followSets: Rule2Token = {
         expr: QueryParser.firstSets["expr"].concat(QueryParser.firstSets["operator"])
@@ -512,6 +547,10 @@ export class QueryParser {
         return this.isInFirstSetOf("operator");
     }
 
+    private isModifier() {
+        return this.isInFirstSetOf("modifier");
+    }
+
     protected currentFollowSet(): TokenType[] {
         var currentRule = this.currentRule();
         if (currentRule) {
@@ -525,7 +564,7 @@ export class QueryParser {
         this.errors = [];
         var ast: AST;
         var prefix = this.skipHidden();
-        if (this.isExpr()) {
+        if (this.isExpr() || this.isModifier()) {
             ast = this.exprs();
         } else {
             ast = new MissingAST();
@@ -539,7 +578,13 @@ export class QueryParser {
     exprs(): AST {
         this.enterRule("exprs");
         try {
-            var expr = this.expr();
+            var expr: AST = null;
+
+            if (this.isExpr()) {
+                expr = this.expr();
+            } else if (this.isModifier()) {
+                expr = this.modifier();
+            }
 
             if (!this.isExpr()) {
                 return expr;
@@ -554,6 +599,32 @@ export class QueryParser {
             }
         } finally {
             this.exitRule("exprs");
+        }
+    }
+
+    modifier(): AST {
+        this.enterRule("modifier");
+        try {
+            var modifier: Token = null;
+            var right: AST = null;
+
+            var hiddenModifierPrefix = this.skipHidden();
+            modifier = this.la();
+            this.consume();
+            var hiddenModifierSuffix = this.skipHidden();
+
+            if (this.isExpr()) {
+                right = this.expr();
+            } else {
+                this.missingToken("right side of expression");
+                right = new MissingAST();
+            }
+            var modifierAST = new ModifierAST(modifier, right);
+            modifierAST.hiddenModifierPrefix = hiddenModifierPrefix;
+            modifierAST.hiddenModifierSuffix = hiddenModifierSuffix;
+            return modifierAST;
+        } finally {
+            this.exitRule("modifier");
         }
     }
 
