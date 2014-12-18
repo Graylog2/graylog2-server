@@ -214,7 +214,7 @@ public class BundleImporter {
             createdInputs.put(messageInput.getId(), messageInput);
 
             // Launch input. (this will run async and clean up itself in case of an error.)
-            inputLauncher.launch(messageInput, messageInput.getId());
+            inputLauncher.launch(messageInput);
         }
     }
 

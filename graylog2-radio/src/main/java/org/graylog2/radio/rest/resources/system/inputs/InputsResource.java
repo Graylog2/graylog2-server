@@ -154,7 +154,7 @@ public class InputsResource extends RestResource {
         input.initialize();
 
         // Launch input. (this will run async and clean up itself in case of an error.)
-        inputLauncher.launch(input, inputId, true);
+        inputLauncher.launch(input);
 
         final Map<String, String> result = ImmutableMap.of(
                 "input_id", inputId,
@@ -239,11 +239,7 @@ public class InputsResource extends RestResource {
 
         LOG.info("Launching existing input [" + input.getName() + "]. Reason: REST request.");
         input.initialize();
-        if (inputState != null) {
-            inputLauncher.launch(inputState);
-        } else {
-            inputLauncher.launchPersisted(input);
-        }
+        inputLauncher.launch(input);
         LOG.info("Launched existing input [" + input.getName() + "]. Reason: REST request.");
 
         final Map<String, String> result = ImmutableMap.of(

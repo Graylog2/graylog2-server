@@ -32,6 +32,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 public class InputLauncher {
     private static final Logger LOG = LoggerFactory.getLogger(InputLauncher.class);
     private final IOState.Factory<MessageInput> inputStateFactory;
@@ -61,29 +63,15 @@ public class InputLauncher {
                 metricRegistry);
     }
 
+    public IOState<MessageInput> launch(final MessageInput input) {
+        checkNotNull(input);
 
-    public IOState<MessageInput> launch(final MessageInput input, String id) {
-        return launch(input, id, false);
-    }
-
-    public IOState<MessageInput> launch(final MessageInput input, String id, boolean register) {
-        if (register)
-            this.persistedInputs.add(input);
-        final IOState<MessageInput> inputState = inputStateFactory.create(input);
-        inputRegistry.add(inputState);
-
-        return launch(input, inputState, register);
-    }
-
-    protected IOState<MessageInput> launch(final MessageInput input, final IOState<MessageInput> inputState, final boolean register) {
-        if (input == null)
-            throw new IllegalArgumentException("InputState has no MessageInput!");
-
-        if (!inputState.getStoppable().equals(input))
-            throw new IllegalArgumentException("Supplied InputState already has Input which is not the one supplied.");
-
-        if (inputState.getStoppable() == null)
-            inputState.setStoppable(input);
+        final IOState<MessageInput> inputState;
+        if (inputRegistry.getInputState(input.getId()) == null) {
+            inputState = inputStateFactory.create(input);
+            inputRegistry.add(inputState);
+        } else
+            inputState = inputRegistry.getInputState(input.getId());
 
         executor.submit(new Runnable() {
             @Override
@@ -97,7 +85,7 @@ public class InputLauncher {
                     String msg = "Completed starting [" + input.getClass().getCanonicalName() + "] input with ID <" + input.getId() + ">";
                     LOG.info(msg);
                 } catch (Exception e) {
-                    handleLaunchException(e, input, inputState);
+                    handleLaunchException(e, inputState);
                 }
             }
         });
@@ -105,7 +93,8 @@ public class InputLauncher {
         return inputState;
     }
 
-    protected void handleLaunchException(Throwable e, MessageInput input, IOState<MessageInput> inputState) {
+    protected void handleLaunchException(Throwable e, IOState<MessageInput> inputState) {
+        final MessageInput input = inputState.getStoppable();
         StringBuilder msg = new StringBuilder("The [" + input.getClass().getCanonicalName() + "] input with ID <" + input.getId() + "> misfired. Reason: ");
 
         String causeMsg = extractMessageCause(e);
@@ -138,24 +127,10 @@ public class InputLauncher {
         return causeMsg.toString();
     }
 
-    public IOState<MessageInput> launch(final MessageInput input) {
-        return launch(input, UUID.randomUUID().toString());
-    }
-
-    public IOState<MessageInput> launch(final IOState<MessageInput> inputState) {
-        final MessageInput input = inputState.getStoppable();
-
-        return launch(input, inputState, false);
-    }
-
-    public IOState<MessageInput> launchPersisted(MessageInput input) {
-        return launch(input);
-    }
-
     public void launchAllPersisted() {
         for (MessageInput input : persistedInputs) {
             input.initialize();
-            launchPersisted(input);
+            launch(input);
         }
     }
 }

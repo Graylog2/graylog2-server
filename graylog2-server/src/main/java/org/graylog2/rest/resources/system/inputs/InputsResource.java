@@ -212,7 +212,7 @@ public class InputsResource extends RestResource {
         input.initialize();
 
         // Launch input. (this will run async and clean up itself in case of an error.)
-        inputLauncher.launch(input, inputId);
+        inputLauncher.launch(input);
 
         final URI inputUri = UriBuilder.fromResource(InputsResource.class)
                 .path("{inputId}")
@@ -317,11 +317,7 @@ public class InputsResource extends RestResource {
         LOG.info(msg);
         activityWriter.write(new Activity(msg, InputsResource.class));
 
-        if (inputState == null) {
-            inputLauncher.launchPersisted(messageInput);
-        } else {
-            inputLauncher.launch(inputState);
-        }
+        inputLauncher.launch(messageInput);
 
         final String msg2 = "Launched existing input [" + messageInput.getName() + "]. Reason: REST request.";
         LOG.info(msg2);

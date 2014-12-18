@@ -47,12 +47,12 @@ public class InputRegistry extends HashSet<IOState<MessageInput>> {
     }
 
     public Set<IOState<MessageInput>> getRunningInputs() {
-        Set<IOState<MessageInput>> runningInputs = new HashSet<>();
+        ImmutableSet.Builder<IOState<MessageInput>> runningInputs = ImmutableSet.builder();
         for (IOState<MessageInput> inputState : this) {
             if (inputState.getState() == IOState.Type.RUNNING)
                 runningInputs.add(inputState);
         }
-        return ImmutableSet.copyOf(runningInputs);
+        return runningInputs.build();
     }
 
     public boolean hasTypeRunning(Class klazz) {
