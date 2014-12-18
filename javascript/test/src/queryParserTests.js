@@ -137,6 +137,29 @@ describe('Query Parser', function () {
         expectIdentityDump(query);
     });
 
+    it('can parse a complex AND expression', function () {
+        var query = "login AND submit AND action:login";
+        var parser = new QueryParser(query);
+        var ast = parser.parse();
+        expectNoErrors(parser);
+        expect(ast instanceof ExpressionAST).toBeTruthy();
+        expect(ast.left instanceof TermAST).toBeTruthy();
+        expect(ast.left.term.type).toBe(TokenType.TERM);
+
+        expect(ast.op.type).toBe(TokenType.AND);
+        expect(ast.right instanceof ExpressionAST).toBeTruthy();
+
+        var rightExpressionAST = ast.right;
+        expect(rightExpressionAST instanceof ExpressionAST).toBeTruthy();
+        expect(rightExpressionAST.left instanceof TermAST).toBeTruthy();
+        expect(rightExpressionAST.left.term.type).toBe(TokenType.TERM);
+
+        expect(rightExpressionAST.op.type).toBe(TokenType.AND);
+        expect(rightExpressionAST.right instanceof TermAST).toBeTruthy();
+
+        expectIdentityDump(query);
+    });
+
     it('can parse an && expression', function () {
         var query = "login && submit";
         var parser = new QueryParser(query);
