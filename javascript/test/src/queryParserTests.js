@@ -287,6 +287,68 @@ describe('Query Parser', function () {
         expect(parser.errors[0].message).toBe("Missing right side of expression");
         expect(parser.errors[0].position).toBe(3);
         expectIdentityDump(query, true);
-    })
+    });
+
+    it('can parse a NOT expression preceded by a term', function() {
+        var query = "login NOT submit";
+        var parser = new QueryParser(query);
+        var ast = parser.parse();
+        expectNoErrors(parser);
+        expect(ast instanceof ExpressionListAST).toBeTruthy();
+        expect(ast.expressions.length).toBe(2);
+
+        var firstExpr = ast.expressions[0];
+        expect(firstExpr instanceof TermAST).toBeTruthy();
+
+        var secondExpr = ast.expressions[1];
+        expect(secondExpr instanceof ModifierAST).toBeTruthy();
+        expect(secondExpr.modifier.type).toBe(TokenType.NOT);
+        expect(secondExpr.right instanceof TermAST).toBeTruthy();
+
+        expectIdentityDump(query);
+    });
+
+    it('can parse a NOT expression preceded by other expressions', function() {
+        var query = "action:login OR action:logout NOT submit";
+        var parser = new QueryParser(query);
+        var ast = parser.parse();
+        expectNoErrors(parser);
+        expect(ast instanceof ExpressionListAST).toBeTruthy();
+        expect(ast.expressions.length).toBe(2);
+
+        var firstExpr = ast.expressions[0];
+        expect(firstExpr instanceof ExpressionAST).toBeTruthy();
+        expect(firstExpr.left instanceof TermAST).toBeTruthy();
+        expect(firstExpr.op.type).toBe(TokenType.OR);
+        expect(firstExpr.right instanceof TermAST).toBeTruthy();
+
+        var secondExpr = ast.expressions[1];
+        expect(secondExpr instanceof ModifierAST).toBeTruthy();
+        expect(secondExpr.modifier.type).toBe(TokenType.NOT);
+        expect(secondExpr.right instanceof TermAST).toBeTruthy();
+
+        expectIdentityDump(query);
+    });
+
+    it('can parse a chain of NOT expressions', function() {
+        var query = "login NOT submit NOT logout NOT now";
+        var parser = new QueryParser(query);
+        var ast = parser.parse();
+        expectNoErrors(parser);
+        expect(ast instanceof ExpressionListAST).toBeTruthy();
+        expect(ast.expressions.length).toBe(4);
+
+        var firstExpr = ast.expressions[0];
+        expect(firstExpr instanceof TermAST).toBeTruthy();
+
+        for(var i = 1; i < ast.expressions.length; i++) {
+            var nextExpr = ast.expressions[i];
+            expect(nextExpr instanceof ModifierAST).toBeTruthy();
+            expect(nextExpr.modifier.type).toBe(TokenType.NOT);
+            expect(nextExpr.right instanceof TermAST).toBeTruthy();
+        }
+
+        expectIdentityDump(query);
+    });
 });
 

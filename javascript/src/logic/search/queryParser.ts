@@ -436,8 +436,8 @@ export class QueryParser {
         modifier: [TokenType.NOT]
     };
     private static followSets: Rule2Token = {
-        expr: QueryParser.firstSets["expr"].concat(QueryParser.firstSets["operator"])
-
+        expr: QueryParser.firstSets["expr"].concat(QueryParser.firstSets["operator"]).concat(QueryParser.firstSets["modifier"]),
+        modifier: QueryParser.firstSets["expr"].concat(QueryParser.firstSets["operator"]).concat(QueryParser.firstSets["modifier"])
     };
     private lexer: QueryLexer;
     private tokenBuffer: Token[];
@@ -586,16 +586,20 @@ export class QueryParser {
                 expr = this.modifier();
             }
 
-            if (!this.isExpr()) {
-                return expr;
-            } else {
+            if (this.isExpr() || this.isModifier()) {
                 var expressionList = new ExpressionListAST();
                 expressionList.add(expr);
-                while (this.isExpr()) {
-                    expr = this.expr();
+                while (this.isExpr() || this.isModifier()) {
+                    if (this.isExpr()) {
+                        expr = this.expr();
+                    } else {
+                        expr = this.modifier();
+                    }
                     expressionList.add(expr);
                 }
                 return expressionList;
+            } else {
+                return expr;
             }
         } finally {
             this.exitRule("exprs");
