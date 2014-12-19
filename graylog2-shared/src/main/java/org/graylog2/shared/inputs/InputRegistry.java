@@ -92,7 +92,7 @@ public class InputRegistry extends HashSet<IOState<MessageInput>> {
         if (inputState != null)
             inputState.setState(IOState.Type.TERMINATED);
 
-        return super.remove(input);
+        return super.remove(inputState);
     }
 
     public boolean remove(IOState<MessageInput> inputState) {
