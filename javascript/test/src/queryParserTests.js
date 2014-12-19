@@ -197,7 +197,17 @@ describe('Query Parser', function () {
         var ast = parser.parse();
         expect(parser.errors.length).toBe(1);
         expect(parser.errors[0].message).toBe("Missing right side of expression");
-        expect(parser.errors[0].position).toBe(9);
+        expect(parser.errors[0].position).toBe(10);
+        expectIdentityDump(query, true);
+    });
+
+    it('reports an error when left side of AND is missing', function () {
+        var query = " AND login";
+        var parser = new QueryParser(query);
+        var ast = parser.parse();
+        expect(parser.errors.length).toBe(1);
+        expect(parser.errors[0].message).toBe("Missing left side of expression");
+        expect(parser.errors[0].position).toBe(1);
         expectIdentityDump(query, true);
     });
 
@@ -207,7 +217,19 @@ describe('Query Parser', function () {
         var ast = parser.parse();
         expect(parser.errors.length).toBe(1);
         expect(parser.errors[0].message).toBe("Missing term or phrase for field");
-        expect(parser.errors[0].position).toBe(8);
+        expect(parser.errors[0].position).toBe(9);
+        expectIdentityDump(query, true);
+    });
+
+    it('reports an error two OR are together with no term in between', function () {
+        var query = 'login OR OR submit';
+        var parser = new QueryParser(query);
+        var ast = parser.parse();
+        expect(parser.errors.length).toBe(2);
+        expect(parser.errors[0].message).toBe("Missing right side of expression");
+        expect(parser.errors[0].position).toBe(9);
+        expect(parser.errors[1].message).toBe("Missing left side of expression");
+        expect(parser.errors[1].position).toBe(9);
         expectIdentityDump(query, true);
     });
 
@@ -285,7 +307,7 @@ describe('Query Parser', function () {
         var ast = parser.parse();
         expect(parser.errors.length).toBe(1);
         expect(parser.errors[0].message).toBe("Missing right side of expression");
-        expect(parser.errors[0].position).toBe(3);
+        expect(parser.errors[0].position).toBe(4);
         expectIdentityDump(query, true);
     });
 
@@ -395,6 +417,18 @@ describe('Query Parser', function () {
         expect(notExpression.right instanceof TermAST).toBeTruthy();
 
         expectIdentityDump(query);
+    });
+
+    it('reports an error when AND is used with NOT and no term follows', function() {
+        var query = 'AND NOT';
+        var parser = new QueryParser(query);
+        var ast = parser.parse();
+        expect(parser.errors.length).toBe(2);
+        expect(parser.errors[0].message).toBe("Missing left side of expression");
+        expect(parser.errors[0].position).toBe(0);
+        expect(parser.errors[1].message).toBe("Missing right side of expression");
+        expect(parser.errors[1].position).toBe(7);
+        expectIdentityDump(query, true);
     });
 });
 

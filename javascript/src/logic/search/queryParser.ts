@@ -28,7 +28,7 @@ export class BaseVisitor implements Visitor {
         } else if (ast instanceof TermAST) {
             this.visitTermAST(<TermAST>ast);
         } else if (ast instanceof MissingAST) {
-            this.visitMissingAST(ast);
+            this.visitMissingAST(<MissingAST>ast);
         } else {
             throw Error("Encountered AST of unknown type: " + JSON.stringify(ast));
         }
@@ -81,8 +81,7 @@ export class SerializeVisitor extends BaseVisitor {
 
     visitExpressionListAST(ast: ExpressionListAST) {
         this.serialize(ast);
-        var exprList = <ExpressionListAST>ast;
-        exprList.expressions.forEach((expr) => this.visit(expr));
+        ast.expressions.forEach((expr) => this.visit(expr));
     }
 
     result() {
@@ -197,7 +196,6 @@ export class AST {
 }
 
 export class MissingAST extends AST {
-
 }
 
 export class ModifierAST extends AST {
@@ -272,7 +270,7 @@ class QueryLexer {
 
     constructor(private input: string) {
         this.pos = 0;
-        this.eofToken = new Token(this.input, TokenType.EOF, input.length - 1, input.length - 1);
+        this.eofToken = new Token(this.input, TokenType.EOF, input.length, input.length);
     }
 
     next(): Token {
@@ -539,6 +537,10 @@ export class QueryParser {
         return this.isFirstOf(QueryParser.firstSets[ruleName]);
     }
 
+    private isOperatorOrExpression() {
+        return this.isInFirstSetOf("expr") || this.isInFirstSetOf("operator");
+    }
+
     private isExpr() {
         return this.isInFirstSetOf("expr");
     }
@@ -549,6 +551,10 @@ export class QueryParser {
 
     private isModifier() {
         return this.isInFirstSetOf("modifier");
+    }
+
+    private isEOF() {
+        return this.isFirstOf([TokenType.EOF]);
     }
 
     protected currentFollowSet(): TokenType[] {
@@ -564,10 +570,15 @@ export class QueryParser {
         this.errors = [];
         var ast: AST;
         var prefix = this.skipHidden();
-        if (this.isExpr() || this.isModifier()) {
+
+        if (this.isOperatorOrExpression() || this.isModifier()) {
             ast = this.exprs();
         } else {
             ast = new MissingAST();
+        }
+
+        if (!this.isEOF()) {
+            this.unexpectedToken();
         }
         ast.hiddenPrefix = ast.hiddenPrefix.concat(prefix);
         var trailingSuffix = this.skipHidden();
@@ -580,17 +591,17 @@ export class QueryParser {
         try {
             var expr: AST = null;
 
-            if (this.isExpr()) {
+            if (this.isOperatorOrExpression()) {
                 expr = this.expr();
             } else if (this.isModifier()) {
                 expr = this.modifier();
             }
 
-            if (this.isExpr() || this.isModifier()) {
+            if (this.isOperatorOrExpression() || this.isModifier()) {
                 var expressionList = new ExpressionListAST();
                 expressionList.add(expr);
-                while (this.isExpr() || this.isModifier()) {
-                    if (this.isExpr()) {
+                while (this.isOperatorOrExpression() || this.isModifier()) {
+                    if (this.isOperatorOrExpression()) {
                         expr = this.expr();
                     } else {
                         expr = this.modifier();
@@ -643,6 +654,9 @@ export class QueryParser {
             if (this.isExpr()) {
                 left = this.termOrPhrase();
                 hiddenOpPrefix = this.skipHidden();
+            } else if (this.isOperator()) {
+                this.missingToken("left side of expression");
+                right = new MissingAST();
             } else {
                 this.unexpectedToken();
             }
