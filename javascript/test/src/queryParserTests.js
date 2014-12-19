@@ -308,6 +308,25 @@ describe('Query Parser', function () {
         expectIdentityDump(query);
     });
 
+    it('can parse a ! as NOT expression', function() {
+        var query = "login ! submit";
+        var parser = new QueryParser(query);
+        var ast = parser.parse();
+        expectNoErrors(parser);
+        expect(ast instanceof ExpressionListAST).toBeTruthy();
+        expect(ast.expressions.length).toBe(2);
+
+        var firstExpr = ast.expressions[0];
+        expect(firstExpr instanceof TermAST).toBeTruthy();
+
+        var secondExpr = ast.expressions[1];
+        expect(secondExpr instanceof ModifierAST).toBeTruthy();
+        expect(secondExpr.modifier.type).toBe(TokenType.NOT);
+        expect(secondExpr.right instanceof TermAST).toBeTruthy();
+
+        expectIdentityDump(query);
+    });
+
     it('can parse a NOT expression preceded by other expressions', function() {
         var query = "action:login OR action:logout NOT submit";
         var parser = new QueryParser(query);
@@ -347,6 +366,33 @@ describe('Query Parser', function () {
             expect(nextExpr.modifier.type).toBe(TokenType.NOT);
             expect(nextExpr.right instanceof TermAST).toBeTruthy();
         }
+
+        expectIdentityDump(query);
+    });
+
+    it('can parse a query where AND is followed by NOT', function() {
+        var query = "quick OR brown AND fox AND NOT news";
+        var parser = new QueryParser(query);
+        var ast = parser.parse();
+        expectNoErrors(parser);
+        expect(ast instanceof ExpressionAST).toBeTruthy();
+        expect(ast.left instanceof TermAST).toBeTruthy();
+        expect(ast.op.type).toBe(TokenType.OR);
+        expect(ast.right instanceof ExpressionAST).toBeTruthy();
+
+        var firstAndExpression = ast.right;
+        expect(firstAndExpression.left instanceof TermAST).toBeTruthy();
+        expect(firstAndExpression.op.type).toBe(TokenType.AND);
+        expect(firstAndExpression.right instanceof ExpressionAST).toBeTruthy();
+
+        var secondAndExpression = firstAndExpression.right;
+        expect(secondAndExpression.left instanceof TermAST).toBeTruthy();
+        expect(secondAndExpression.op.type).toBe(TokenType.AND);
+        expect(secondAndExpression.right instanceof ModifierAST).toBeTruthy();
+
+        var notExpression = secondAndExpression.right;
+        expect(notExpression.modifier.type).toBe(TokenType.NOT);
+        expect(notExpression.right instanceof TermAST).toBeTruthy();
 
         expectIdentityDump(query);
     });

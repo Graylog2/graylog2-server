@@ -656,6 +656,8 @@ export class QueryParser {
                 var hiddenOpSuffix = this.skipHidden();
                 if (this.isExpr()) {
                     right = this.expr();
+                } else if (this.isModifier()) {
+                    right = this.modifier();
                 } else {
                     this.missingToken("right side of expression");
                     right = new MissingAST();
