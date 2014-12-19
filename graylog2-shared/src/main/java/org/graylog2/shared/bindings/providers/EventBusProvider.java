@@ -17,7 +17,6 @@
 package org.graylog2.shared.bindings.providers;
 
 import com.codahale.metrics.InstrumentedExecutorService;
-import com.codahale.metrics.InstrumentedThreadFactory;
 import com.codahale.metrics.MetricRegistry;
 import com.google.common.eventbus.AsyncEventBus;
 import com.google.common.eventbus.EventBus;
@@ -29,6 +28,8 @@ import javax.inject.Provider;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
+
+import static com.codahale.metrics.MetricRegistry.name;
 
 public class EventBusProvider implements Provider<EventBus> {
     private final BaseConfiguration configuration;
@@ -46,11 +47,10 @@ public class EventBusProvider implements Provider<EventBus> {
     }
 
     private ExecutorService executorService(int nThreads) {
-        return new InstrumentedExecutorService(Executors.newFixedThreadPool(nThreads, threadFactory()), metricRegistry);
-    }
-
-    private ThreadFactory threadFactory() {
-        return new InstrumentedThreadFactory(
-                new ThreadFactoryBuilder().setDaemon(true).setNameFormat("eventbus-handler-%d").build(), metricRegistry);
+        final ThreadFactory threadFactory = new ThreadFactoryBuilder().setDaemon(true).setNameFormat("eventbus-handler-%d").build();
+        return new InstrumentedExecutorService(
+                Executors.newFixedThreadPool(nThreads, threadFactory),
+                metricRegistry,
+                name(this.getClass(), "executor-service"));
     }
 }

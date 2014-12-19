@@ -18,7 +18,6 @@ package org.graylog2.buffers.processors;
 
 import com.codahale.metrics.Histogram;
 import com.codahale.metrics.InstrumentedExecutorService;
-import com.codahale.metrics.InstrumentedThreadFactory;
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
@@ -103,15 +102,12 @@ public class OutputBufferProcessor implements EventHandler<MessageEvent> {
 
     private ExecutorService executorService(final MetricRegistry metricRegistry, final String nameFormat,
                                             final int corePoolSize, final int maxPoolSize, final int keepAliveTime) {
-        return new InstrumentedExecutorService(new ThreadPoolExecutor(
-                corePoolSize, maxPoolSize, keepAliveTime, TimeUnit.MILLISECONDS,
-                new LinkedBlockingQueue<Runnable>(), threadFactory(metricRegistry, nameFormat)), metricRegistry);
-    }
-
-    private ThreadFactory threadFactory(final MetricRegistry metricRegistry, final String nameFormat) {
-        return new InstrumentedThreadFactory(
-                new ThreadFactoryBuilder().setNameFormat(nameFormat).build(),
-                metricRegistry);
+        final ThreadFactory threadFactory = new ThreadFactoryBuilder().setNameFormat(nameFormat).build();
+        return new InstrumentedExecutorService(
+                new ThreadPoolExecutor(corePoolSize, maxPoolSize, keepAliveTime, TimeUnit.MILLISECONDS,
+                        new LinkedBlockingQueue<Runnable>(), threadFactory),
+                metricRegistry,
+                name(this.getClass(), "executor-service"));
     }
 
     @Override

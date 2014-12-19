@@ -17,7 +17,6 @@
 package org.graylog2.shared.inputs;
 
 import com.codahale.metrics.InstrumentedExecutorService;
-import com.codahale.metrics.InstrumentedThreadFactory;
 import com.codahale.metrics.MetricRegistry;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.graylog2.plugin.IOState;
@@ -27,11 +26,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 
+import static com.codahale.metrics.MetricRegistry.name;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 public class InputLauncher {
@@ -53,14 +52,11 @@ public class InputLauncher {
     }
 
     private ExecutorService executorService(final MetricRegistry metricRegistry) {
+        final ThreadFactory threadFactory = new ThreadFactoryBuilder().setNameFormat("inputs-%d").build();
         return new InstrumentedExecutorService(
-                Executors.newCachedThreadPool(threadFactory(metricRegistry)), metricRegistry);
-    }
-
-    private ThreadFactory threadFactory(final MetricRegistry metricRegistry) {
-        return new InstrumentedThreadFactory(
-                new ThreadFactoryBuilder().setNameFormat("inputs-%d").build(),
-                metricRegistry);
+                Executors.newCachedThreadPool(threadFactory),
+                metricRegistry,
+                name(this.getClass(), "executor-service"));
     }
 
     public IOState<MessageInput> launch(final MessageInput input) {

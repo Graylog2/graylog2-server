@@ -46,7 +46,7 @@ public class Radio extends ServerBootstrap implements Runnable {
     private static final Configuration configuration = new Configuration();
 
     public Radio() {
-        super("Radio", configuration);
+        super("radio", configuration);
     }
 
     @Override

@@ -17,7 +17,6 @@
 package org.graylog2.buffers;
 
 import com.codahale.metrics.InstrumentedExecutorService;
-import com.codahale.metrics.InstrumentedThreadFactory;
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
@@ -63,14 +62,11 @@ public class OutputBuffer extends Buffer {
     }
 
     private ExecutorService executorService(final MetricRegistry metricRegistry) {
-        return new InstrumentedExecutorService(Executors.newCachedThreadPool(
-                threadFactory(metricRegistry)), metricRegistry);
-    }
-
-    private ThreadFactory threadFactory(MetricRegistry metricRegistry) {
-        return new InstrumentedThreadFactory(
-                new ThreadFactoryBuilder().setNameFormat("outputbufferprocessor-%d").build(),
-                metricRegistry);
+        final ThreadFactory threadFactory = new ThreadFactoryBuilder().setNameFormat("outputbufferprocessor-%d").build();
+        return new InstrumentedExecutorService(
+                Executors.newCachedThreadPool(threadFactory),
+                metricRegistry,
+                name(this.getClass(), "executor-service"));
     }
 
     public void initialize() {

@@ -17,7 +17,6 @@
 package org.graylog2.streams;
 
 import com.codahale.metrics.InstrumentedExecutorService;
-import com.codahale.metrics.InstrumentedThreadFactory;
 import com.codahale.metrics.MetricRegistry;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.inject.name.Named;
@@ -68,15 +67,14 @@ public class StreamRouter {
     }
 
     private ExecutorService executorService() {
-        return new InstrumentedExecutorService(Executors.newCachedThreadPool(threadFactory()), metricRegistry,
-                name(this.getClass(), "executorService"));
-    }
-
-    private ThreadFactory threadFactory() {
-        return new InstrumentedThreadFactory(new ThreadFactoryBuilder()
+        final ThreadFactory threadFactory = new ThreadFactoryBuilder()
                 .setNameFormat("stream-router-%d")
                 .setDaemon(true)
-                .build(), metricRegistry, name(this.getClass(), "executorServiceThreadFactory"));
+                .build();
+        return new InstrumentedExecutorService(
+                Executors.newCachedThreadPool(threadFactory),
+                metricRegistry,
+                name(this.getClass(), "executor-service"));
     }
 
     public List<Stream> route(final Message msg) {

@@ -28,6 +28,8 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.util.concurrent.Executors;
 
+import static com.codahale.metrics.MetricRegistry.name;
+
 @Singleton
 public class OutputSetupService extends AbstractIdleService {
     private static final Logger LOG = LoggerFactory.getLogger(OutputSetupService.class);
@@ -46,7 +48,10 @@ public class OutputSetupService extends AbstractIdleService {
             public void terminated(State from) {
                 OutputSetupService.this.shutDownRunningOutputs();
             }
-        }, new InstrumentedExecutorService(Executors.newSingleThreadExecutor(), metricRegistry));
+        }, new InstrumentedExecutorService(
+                Executors.newSingleThreadExecutor(),
+                metricRegistry, name(this.getClass(),
+                "executor-service")));
     }
 
     private void shutDownRunningOutputs() {

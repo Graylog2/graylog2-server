@@ -69,7 +69,7 @@ public class Server extends ServerBootstrap implements Runnable {
     private final KafkaJournalConfiguration kafkaJournalConfiguration = new KafkaJournalConfiguration();
 
     public Server() {
-        super("Server", configuration);
+        super("server", configuration);
     }
 
     @Option(name = {"-t", "--configtest"}, description = "Validate Graylog2 configuration and exit")
