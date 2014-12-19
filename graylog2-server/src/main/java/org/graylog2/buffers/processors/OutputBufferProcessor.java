@@ -103,9 +103,11 @@ public class OutputBufferProcessor implements EventHandler<MessageEvent> {
     private ExecutorService executorService(final MetricRegistry metricRegistry, final String nameFormat,
                                             final int corePoolSize, final int maxPoolSize, final int keepAliveTime) {
         final ThreadFactory threadFactory = new ThreadFactoryBuilder().setNameFormat(nameFormat).build();
-        return new InstrumentedExecutorService(new ThreadPoolExecutor(
-                corePoolSize, maxPoolSize, keepAliveTime, TimeUnit.MILLISECONDS,
-                new LinkedBlockingQueue<Runnable>(), threadFactory), metricRegistry);
+        return new InstrumentedExecutorService(
+                new ThreadPoolExecutor(corePoolSize, maxPoolSize, keepAliveTime, TimeUnit.MILLISECONDS,
+                        new LinkedBlockingQueue<Runnable>(), threadFactory),
+                metricRegistry,
+                name(this.getClass(), "executor-service"));
     }
 
     @Override

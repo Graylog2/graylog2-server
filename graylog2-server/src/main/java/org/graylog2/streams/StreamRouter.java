@@ -74,7 +74,7 @@ public class StreamRouter {
         return new InstrumentedExecutorService(
                 Executors.newCachedThreadPool(threadFactory),
                 metricRegistry,
-                name(this.getClass(), "executorService"));
+                name(this.getClass(), "executor-service"));
     }
 
     public List<Stream> route(final Message msg) {

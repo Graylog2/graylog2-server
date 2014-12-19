@@ -34,6 +34,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 
+import static com.codahale.metrics.MetricRegistry.name;
+
 public class SystemJobManager {
     private static final Logger LOG = LoggerFactory.getLogger(SystemJobManager.class);
     private static final int THREAD_POOL_SIZE = 15;
@@ -51,7 +53,10 @@ public class SystemJobManager {
 
     private ExecutorService executorService(final MetricRegistry metricRegistry) {
         final ThreadFactory threadFactory = new ThreadFactoryBuilder().setNameFormat("systemjob-executor-%d").build();
-        return new InstrumentedExecutorService(Executors.newFixedThreadPool(THREAD_POOL_SIZE, threadFactory), metricRegistry);
+        return new InstrumentedExecutorService(
+                Executors.newFixedThreadPool(THREAD_POOL_SIZE, threadFactory),
+                metricRegistry,
+                name(this.getClass(), "executor-service"));
     }
 
     public String submit(final SystemJob job) throws SystemJobConcurrencyException {
