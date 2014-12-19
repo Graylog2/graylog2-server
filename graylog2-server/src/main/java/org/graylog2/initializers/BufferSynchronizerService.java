@@ -32,6 +32,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import static com.codahale.metrics.MetricRegistry.name;
+
 @Singleton
 public class BufferSynchronizerService extends AbstractIdleService {
     private static final Logger LOG = LoggerFactory.getLogger(BufferSynchronizerService.class);
@@ -65,7 +67,10 @@ public class BufferSynchronizerService extends AbstractIdleService {
     protected void shutDown() throws Exception {
         LOG.debug("Stopping BufferSynchronizerService");
         if (indexerAvailable && cluster.isConnectedAndHealthy()) {
-            final ExecutorService executorService = new InstrumentedExecutorService(Executors.newFixedThreadPool(2), metricRegistry);
+            final ExecutorService executorService = new InstrumentedExecutorService(
+                    Executors.newFixedThreadPool(2),
+                    metricRegistry,
+                    name(this.getClass(), "executor-service"));
 
             executorService.submit(new Runnable() {
                 @Override

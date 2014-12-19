@@ -37,6 +37,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 
+import static com.codahale.metrics.MetricRegistry.name;
+
 public abstract class InputRegistry {
     private static final Logger LOG = LoggerFactory.getLogger(InputRegistry.class);
     protected final Set<InputState> inputStates = new HashSet<>();
@@ -64,7 +66,10 @@ public abstract class InputRegistry {
 
     private ExecutorService executorService(final MetricRegistry metricRegistry) {
         final ThreadFactory threadFactory = new ThreadFactoryBuilder().setNameFormat("inputs-%d").build();
-        return new InstrumentedExecutorService(Executors.newCachedThreadPool(threadFactory), metricRegistry);
+        return new InstrumentedExecutorService(
+                Executors.newCachedThreadPool(threadFactory),
+                metricRegistry,
+                name(this.getClass(), "executor-service"));
     }
 
     public MessageInput create(String inputClass, Configuration configuration) throws NoSuchInputTypeException {

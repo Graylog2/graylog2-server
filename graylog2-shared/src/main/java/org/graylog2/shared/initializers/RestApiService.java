@@ -73,6 +73,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 
+import static com.codahale.metrics.MetricRegistry.name;
 import static com.google.common.base.Strings.emptyToNull;
 import static com.google.common.base.Strings.isNullOrEmpty;
 
@@ -100,8 +101,8 @@ public class RestApiService extends AbstractIdleService {
                           Map<String, Set<PluginRestResource>> pluginRestResources) {
         this(configuration, metricRegistry, securityContextFactory, dynamicFeatures, containerResponseFilters,
                 exceptionMappers, pluginRestResources,
-                instrumentedExecutor("restapi-boss-%d", metricRegistry),
-                instrumentedExecutor("restapi-worker-%d", metricRegistry));
+                instrumentedExecutor("boss-executor-service", "restapi-boss-%d", metricRegistry),
+                instrumentedExecutor("worker-executor-service", "restapi-worker-%d", metricRegistry));
     }
 
     private RestApiService(final BaseConfiguration configuration,
@@ -135,9 +136,12 @@ public class RestApiService extends AbstractIdleService {
         this.bootstrap = bootstrap;
     }
 
-    private static ExecutorService instrumentedExecutor(final String nameFormat, final MetricRegistry metricRegistry) {
-        final ThreadFactory threadFactory = new ThreadFactoryBuilder().setNameFormat(nameFormat).build();
-        return new InstrumentedExecutorService(Executors.newCachedThreadPool(threadFactory), metricRegistry);
+    private static ExecutorService instrumentedExecutor(final String executorName, final String threadNameFormat, final MetricRegistry metricRegistry) {
+        final ThreadFactory threadFactory = new ThreadFactoryBuilder().setNameFormat(threadNameFormat).build();
+        return new InstrumentedExecutorService(
+                Executors.newCachedThreadPool(threadFactory),
+                metricRegistry,
+                name(RestApiService.class, executorName));
     }
 
     private static ServerBootstrap buildServerBootStrap(final ExecutorService bossExecutor, final ExecutorService workerExecutor) {
@@ -179,7 +183,10 @@ public class RestApiService extends AbstractIdleService {
         }
 
         // TODO Magic numbers
-        final ExecutorService executor = new InstrumentedExecutorService(new OrderedMemoryAwareThreadPoolExecutor(configuration.getRestThreadPoolSize(), 1048576, 1048576), metricRegistry);
+        final ExecutorService executor = new InstrumentedExecutorService(
+                new OrderedMemoryAwareThreadPoolExecutor(configuration.getRestThreadPoolSize(), 1048576, 1048576),
+                metricRegistry,
+                name(this.getClass(), "netty-executor-service"));
 
         bootstrap.setPipelineFactory(new ChannelPipelineFactory() {
             @Override

@@ -75,7 +75,10 @@ public class OutputBuffer extends Buffer {
 
     private ExecutorService executorService(final MetricRegistry metricRegistry) {
         final ThreadFactory threadFactory = new ThreadFactoryBuilder().setNameFormat("outputbufferprocessor-%d").build();
-        return new InstrumentedExecutorService(Executors.newCachedThreadPool(threadFactory), metricRegistry);
+        return new InstrumentedExecutorService(
+                Executors.newCachedThreadPool(threadFactory),
+                metricRegistry,
+                name(this.getClass(), "executor-service"));
     }
 
     public Cache getOverflowCache() {

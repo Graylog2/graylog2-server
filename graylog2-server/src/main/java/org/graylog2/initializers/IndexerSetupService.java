@@ -44,6 +44,7 @@ import java.util.Iterator;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 
+import static com.codahale.metrics.MetricRegistry.name;
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
@@ -77,7 +78,10 @@ public class IndexerSetupService extends AbstractIdleService {
                 // Properly close ElasticSearch node.
                 IndexerSetupService.this.node.close();
             }
-        }, new InstrumentedExecutorService(Executors.newSingleThreadExecutor(), metricRegistry));
+        }, new InstrumentedExecutorService(
+                Executors.newSingleThreadExecutor(),
+                metricRegistry,
+                name(this.getClass(), "executor-service")));
     }
 
     @Override

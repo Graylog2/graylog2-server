@@ -60,7 +60,10 @@ public class BatchedElasticSearchOutput extends ElasticSearchOutput {
         this.batchSize = metricRegistry.histogram(name(this.getClass(), "batchSize"));
         this.bufferFlushes = metricRegistry.meter(name(this.getClass(), "bufferFlushes"));
         this.bufferFlushesRequested = metricRegistry.meter(name(this.getClass(), "bufferFlushesRequested"));
-        this.flushThread = new InstrumentedExecutorService(Executors.newSingleThreadExecutor(), metricRegistry);
+        this.flushThread = new InstrumentedExecutorService(
+                Executors.newSingleThreadExecutor(),
+                metricRegistry,
+                name(this.getClass(), "executor-service"));
     }
 
     @Override

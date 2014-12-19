@@ -65,6 +65,8 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
+import static com.codahale.metrics.MetricRegistry.name;
+
 public class KafkaTransport extends ThrottleableTransport {
     public static final String GROUP_ID = "graylog2";
     public static final String CK_FETCH_MIN_BYTES = "fetch_min_bytes";
@@ -186,7 +188,10 @@ public class KafkaTransport extends ThrottleableTransport {
         final TopicFilter filter = new Whitelist(configuration.getString(CK_TOPIC_FILTER));
 
         final List<KafkaStream<byte[], byte[]>> streams = cc.createMessageStreamsByFilter(filter, numThreads);
-        final ExecutorService executor = new InstrumentedExecutorService(Executors.newFixedThreadPool(numThreads), metricRegistry);
+        final ExecutorService executor = new InstrumentedExecutorService(
+                Executors.newFixedThreadPool(numThreads),
+                metricRegistry,
+                name(this.getClass(), "executor-service"));
 
         // this is being used during shutdown to first stop all submitted jobs before committing the offsets back to zookeeper
         // and then shutting down the connection.
