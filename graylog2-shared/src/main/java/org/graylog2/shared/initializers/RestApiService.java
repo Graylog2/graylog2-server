@@ -17,7 +17,6 @@
 package org.graylog2.shared.initializers;
 
 import com.codahale.metrics.InstrumentedExecutorService;
-import com.codahale.metrics.InstrumentedThreadFactory;
 import com.codahale.metrics.MetricRegistry;
 import com.google.common.util.concurrent.AbstractIdleService;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
@@ -137,13 +136,8 @@ public class RestApiService extends AbstractIdleService {
     }
 
     private static ExecutorService instrumentedExecutor(final String nameFormat, final MetricRegistry metricRegistry) {
-        return new InstrumentedExecutorService(
-                Executors.newCachedThreadPool(threadFactory(nameFormat, metricRegistry)), metricRegistry);
-    }
-
-    private static ThreadFactory threadFactory(final String nameFormat, final MetricRegistry metricRegistry) {
-        return new InstrumentedThreadFactory(
-                new ThreadFactoryBuilder().setNameFormat(nameFormat).build(), metricRegistry);
+        final ThreadFactory threadFactory = new ThreadFactoryBuilder().setNameFormat(nameFormat).build();
+        return new InstrumentedExecutorService(Executors.newCachedThreadPool(threadFactory), metricRegistry);
     }
 
     private static ServerBootstrap buildServerBootStrap(final ExecutorService bossExecutor, final ExecutorService workerExecutor) {

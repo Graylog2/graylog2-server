@@ -17,7 +17,6 @@
 package org.graylog2.streams;
 
 import com.codahale.metrics.InstrumentedExecutorService;
-import com.codahale.metrics.InstrumentedThreadFactory;
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
@@ -90,14 +89,11 @@ public class StreamRouter {
     }
 
     private ExecutorService executorService() {
-        return new InstrumentedExecutorService(Executors.newCachedThreadPool(threadFactory()), metricRegistry);
-    }
-
-    private ThreadFactory threadFactory() {
-        return new InstrumentedThreadFactory(new ThreadFactoryBuilder()
+        final ThreadFactory threadFactory = new ThreadFactoryBuilder()
                 .setNameFormat("stream-router-%d")
                 .setDaemon(true)
-                .build(), metricRegistry);
+                .build();
+        return new InstrumentedExecutorService(Executors.newCachedThreadPool(threadFactory), metricRegistry);
     }
 
     private AtomicInteger getFaultCount(String streamId) {

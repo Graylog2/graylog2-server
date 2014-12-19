@@ -17,7 +17,6 @@
 package org.graylog2.caches;
 
 import com.codahale.metrics.InstrumentedScheduledExecutorService;
-import com.codahale.metrics.InstrumentedThreadFactory;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
@@ -134,14 +133,8 @@ public abstract class DiskJournalCache implements InputCache, OutputCache {
     }
 
     private ScheduledExecutorService commitExecutorService() {
-        return new InstrumentedScheduledExecutorService(
-                Executors.newSingleThreadScheduledExecutor(threadFactory()), metricRegistry);
-    }
-
-    private ThreadFactory threadFactory() {
-        return new InstrumentedThreadFactory(
-                new ThreadFactoryBuilder().setNameFormat("disk-journal-" + getDbFileName() + "-%d").build(),
-                metricRegistry);
+        final ThreadFactory threadFactory = new ThreadFactoryBuilder().setNameFormat("disk-journal-" + getDbFileName() + "-%d").build();
+        return new InstrumentedScheduledExecutorService(Executors.newSingleThreadScheduledExecutor(threadFactory), metricRegistry);
     }
 
     @Override
