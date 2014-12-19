@@ -225,8 +225,27 @@ public class Node extends ClusterEntity {
         return inputs().total;
     }
 
+    public InputLaunchResponse updateInput(String inputId, String title, String type, boolean global, Map<String, Object> configuration) {
+        final InputLaunchRequest request = new InputLaunchRequest();
+        request.title = title;
+        request.type = type;
+        request.global = global;
+        request.configuration = configuration;
+
+        try {
+            return api.path(routes.InputsResource().update(inputId), InputLaunchResponse.class)
+                    .node(this)
+                    .body(request)
+                    .expect(Http.Status.CREATED)
+                    .execute();
+        } catch (APIException | IOException e) {
+            LOG.error("Could not update input " + title, e);
+            return null;
+        }
+    }
+
     @Override
-    public InputLaunchResponse launchInput(String title, String type, Boolean global, Map<String, Object> configuration, User creator, boolean isExclusive) throws ExclusiveInputException {
+    public InputLaunchResponse launchInput(String title, String type, Boolean global, Map<String, Object> configuration, boolean isExclusive) throws ExclusiveInputException {
         if (isExclusive) {
             for (Input input : getInputs()) {
                 if (input.getType().equals(type)) {
@@ -235,24 +254,22 @@ public class Node extends ClusterEntity {
             }
         }
 
-        InputLaunchRequest request = new InputLaunchRequest();
+        final InputLaunchRequest request = new InputLaunchRequest();
         request.title = title;
         request.type = type;
         request.global = global;
         request.configuration = configuration;
-        request.creatorUserId = creator.getName();
 
-        InputLaunchResponse ilr = null;
         try {
-            ilr = api.path(routes.InputsResource().create(), InputLaunchResponse.class)
+            return api.path(routes.InputsResource().create(), InputLaunchResponse.class)
                     .node(this)
                     .body(request)
                     .expect(Http.Status.ACCEPTED)
                     .execute();
         } catch (Exception e) {
             LOG.error("Could not launch input " + title, e);
+            return null;
         }
-        return ilr;
     }
 
     public boolean launchExistingInput(String inputId) {

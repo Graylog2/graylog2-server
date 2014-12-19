@@ -25,6 +25,7 @@ import com.wordnik.swagger.annotations.ApiParam;
 import com.wordnik.swagger.annotations.ApiResponse;
 import com.wordnik.swagger.annotations.ApiResponses;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.bson.types.ObjectId;
 import org.graylog2.database.ValidationException;
 import org.graylog2.inputs.Input;
 import org.graylog2.inputs.InputImpl;
@@ -60,6 +61,7 @@ import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -73,6 +75,8 @@ import java.util.UUID;
 @RequiresAuthentication
 @Api(value = "System/Inputs", description = "Message inputs of this node")
 @Path("/system/inputs")
+@Produces(MediaType.APPLICATION_JSON)
+@Consumes(MediaType.APPLICATION_JSON)
 public class InputsResource extends RestResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(InputsResource.class);
@@ -98,7 +102,6 @@ public class InputsResource extends RestResource {
 
     @GET
     @Timed
-    @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Get information of a single input on this node")
     @Path("/{inputId}")
     @ApiResponses(value = {
@@ -131,7 +134,6 @@ public class InputsResource extends RestResource {
     @GET
     @Timed
     @ApiOperation(value = "Get all inputs of this node")
-    @Produces(MediaType.APPLICATION_JSON)
     public InputsList list() {
         final ImmutableSet.Builder<InputStateSummary> inputStates = ImmutableSet.builder();
         for (IOState<MessageInput> inputState : inputRegistry.getInputStates()) {
@@ -164,8 +166,6 @@ public class InputsResource extends RestResource {
 
     @POST
     @Timed
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(
             value = "Launch input on this node",
             response = InputCreated.class
@@ -178,9 +178,6 @@ public class InputsResource extends RestResource {
     public Response create(@ApiParam(name = "JSON body", required = true)
                            @Valid @NotNull InputLaunchRequest lr) throws ValidationException {
         checkPermission(RestPermissions.INPUTS_CREATE);
-
-        // Build a proper configuration from POST data.
-        final Configuration inputConfig = new Configuration(lr.configuration());
 
         // Build input.
         final MessageInput input;
@@ -203,10 +200,10 @@ public class InputsResource extends RestResource {
             throw new BadRequestException(error);
         }
 
-        final String inputId = UUID.randomUUID().toString();
         final Input mongoInput = getInput(input);
         // Persist input.
         String id = inputService.save(mongoInput);
+
         input.setPersistId(id);
 
         input.initialize();
@@ -238,7 +235,11 @@ public class InputsResource extends RestResource {
         }
 
         // ... and check if it would pass validation. We don't need to go on if it doesn't.
-        final Input mongoInput = new InputImpl(inputData);
+        final Input mongoInput;
+        if (input.getId() != null)
+            mongoInput = new InputImpl(new ObjectId(input.getId()), inputData);
+        else
+            mongoInput = new InputImpl(inputData);
 
         return mongoInput;
     }
@@ -247,7 +248,6 @@ public class InputsResource extends RestResource {
     @Timed
     @Path("/{inputId}")
     @ApiOperation(value = "Terminate input on this node")
-    @Produces(MediaType.APPLICATION_JSON)
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "No such input on this node.")
     })
@@ -280,6 +280,39 @@ public class InputsResource extends RestResource {
         final String msg2 = "Terminated input [" + messageInput.getName() + "]. Reason: REST request.";
         LOG.info(msg2);
         activityWriter.write(new Activity(msg2, InputsResource.class));
+    }
+
+    @PUT
+    @Timed
+    @Path("/{inputId}")
+    @ApiOperation(value = "Update input on this node")
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "No such input on this node."),
+            @ApiResponse(code = 400, message = "Missing or invalid input configuration.")
+    })
+    public Response update(@ApiParam(name = "JSON body", required = true) @Valid @NotNull InputLaunchRequest lr,
+                           @ApiParam(name = "inputId", required = true) @PathParam("inputId") String inputId) throws ValidationException {
+        checkPermission(RestPermissions.INPUTS_EDIT, inputId);
+
+        LOG.info("InputLaunchRequest: {}", lr);
+        try {
+            final MessageInput messageInput = messageInputFactory.create(lr, getCurrentUser().getName());
+            messageInput.setPersistId(inputId);
+            final Input mongoInput = getInput(messageInput);
+            inputService.save(mongoInput);
+
+            final IOState<MessageInput> oldInputState = inputRegistry.getInputState(messageInput.getId());
+            inputRegistry.remove(oldInputState.getStoppable());
+            inputLauncher.launch(messageInput);
+        } catch (NoSuchInputTypeException e) {
+            e.printStackTrace();
+        }
+
+        final URI inputUri = UriBuilder.fromResource(InputsResource.class)
+                .path("{inputId}")
+                .build(inputId);
+
+        return Response.created(inputUri).entity(InputCreated.create(inputId)).build();
     }
 
     @POST
