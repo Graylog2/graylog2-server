@@ -25,6 +25,10 @@ public class JournalTruncate extends AbstractJournalCommand {
     @Option(name = {"-o", "--offset"}, description = "Truncate journal up to this offset, no remaining offset will be larger than the given offset.", required = true)
     private long offset = Long.MIN_VALUE;
 
+    public JournalTruncate() {
+        super("truncate-journal");
+    }
+
     @Override
     protected void runCommand() {
         try {
