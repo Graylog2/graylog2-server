@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 
+import javax.annotation.Nullable;
 import java.util.Map;
 
 @JsonAutoDetect
@@ -33,6 +34,7 @@ public abstract class InputLaunchRequest {
     public abstract String type();
 
     @JsonProperty("creator_user_id")
+    @Nullable
     public abstract String creatorUserId();
 
     @JsonProperty

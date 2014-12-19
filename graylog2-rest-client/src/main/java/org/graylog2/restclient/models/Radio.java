@@ -280,7 +280,7 @@ public class Radio extends ClusterEntity {
     }
 
     @Override
-    public InputLaunchResponse launchInput(String title, String type, Boolean global, Map<String, Object> configuration, User creator, boolean isExclusive) throws ExclusiveInputException {
+    public InputLaunchResponse launchInput(String title, String type, Boolean global, Map<String, Object> configuration, boolean isExclusive) throws ExclusiveInputException {
         if (isExclusive) {
             for (Input input : getInputs()) {
                 if (input.getType().equals(type)) {
@@ -294,7 +294,6 @@ public class Radio extends ClusterEntity {
         request.type = type;
         request.global = global;
         request.configuration = configuration;
-        request.creatorUserId = creator.getName();
 
         InputLaunchResponse ilr = null;
         try {

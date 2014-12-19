@@ -64,7 +64,7 @@ public abstract class ClusterEntity {
     public abstract void markFailure();
     public abstract boolean terminateInput(String inputId);
     public abstract String getNodeId();
-    public abstract InputLaunchResponse launchInput(String title, String type, Boolean global, Map<String, Object> configuration, User creator, boolean isExclusive) throws ExclusiveInputException;
+    public abstract InputLaunchResponse launchInput(String title, String type, Boolean global, Map<String, Object> configuration, boolean isExclusive) throws ExclusiveInputException;
     public abstract InputTypeSummaryResponse getInputTypeInformation(String type) throws IOException, APIException;
     public abstract void stopInput(String inputId) throws IOException, APIException;
     public abstract void startInput(String inputId) throws IOException, APIException;

@@ -184,9 +184,9 @@ public class InputService {
         return types;
     }
 
-    public String launchGlobal(String title, String type, Map<String, Object> configuration, User creator, boolean isExclusive) throws ExclusiveInputException {
+    public String launchGlobal(String title, String type, Map<String, Object> configuration, boolean isExclusive) throws ExclusiveInputException {
         Node master = serverNodes.master();
-        InputLaunchResponse ilr = master.launchInput(title, type, true, configuration, creator, isExclusive);
+        InputLaunchResponse ilr = master.launchInput(title, type, true, configuration, isExclusive);
 
         if (ilr == null) {
             throw new RuntimeException("Unable to launch global input!");
