@@ -22,6 +22,7 @@ import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.google.common.base.Charsets;
 import com.google.common.base.Throwables;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.common.io.Files;
@@ -500,22 +501,60 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
         return JavaConversions.asJavaIterable(kafkaLog.logSegments());
     }
 
+    /**
+     * Returns the journal size in bytes, exluding index files.
+     * @return journal size in bytes
+     */
     public long size() {
         return kafkaLog.size();
     }
 
+    /**
+     * Returns the number of segments this journal consists of.
+     * @return number of segments
+     */
     public int numberOfSegments() {
         return kafkaLog.numberOfSegments();
     }
 
+    /**
+     * Returns the highest journal offset that has been writting to persistent storage by Graylog2.
+     *<p>
+     *     Every message at an offset prior to this one can be considered as processed and does not need to be held in
+     *     the journal any longer. By default Graylog2 will try to aggressively flush the journal to consume a smaller
+     *     amount of disk space.
+     *</p>
+     * @return the offset of the last message which has been successfully processed.
+     */
     public long getCommittedReadOffset() {
         return committedOffset.get();
     }
 
+    /**
+     * Discards all data in the journal prior to the given offset.
+     * @param offset offset to truncate to, so that no offset in the journal is larger than this.
+     */
     public void truncateTo(long offset) {
         kafkaLog.truncateTo(offset);
     }
 
+    /**
+     * Returns the first valid offset in the entire journal.
+     * @return first offset
+     */
+    public long getLogStartOffset() {
+        final Iterable<LogSegment> logSegments = JavaConversions.asJavaIterable(kafkaLog.logSegments());
+        final LogSegment segment = Iterables.getFirst(logSegments, null);
+        if (segment == null) {
+            return 0;
+        }
+        return segment.baseOffset();
+    }
+
+    /**
+     * returns the offset for the next value to be inserted in the entire journal.
+     * @return the next offset value (last valid offset is this number - 1)
+     */
     public long getLogEndOffset() {
         return kafkaLog.logEndOffset();
     }

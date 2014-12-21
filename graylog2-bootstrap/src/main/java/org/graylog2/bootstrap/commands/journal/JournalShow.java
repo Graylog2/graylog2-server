@@ -42,15 +42,16 @@ public class JournalShow extends AbstractJournalCommand {
         long committedReadOffset = journal.getCommittedReadOffset();
         final StringBuffer sb = new StringBuffer();
 
+        final long startOffset = journal.getLogStartOffset();
+        final long lastOffset = journal.getLogEndOffset() - 1;
+
         sb.append("Graylog2 message journal in directory: ").append(new File(kafkaJournalConfiguration.getMessageJournalDir()).getAbsolutePath()).append(
                 "\n");
         sb.append("\t").append("Total size in bytes: ").append(sizeInBytes).append("\n");
         sb.append("\t").append("Number of segments: ").append(numSegments).append("\n");
-        sb.append("\t").append("Log end offset: ").append(journal.getLogEndOffset()).append("\n");
-
-        if (showSegmentDetails) {
-            appendSegmentDetails(journal, sb);
-        }
+        sb.append("\t").append("Log start offset: ").append(startOffset).append("\n");
+        sb.append("\t").append("Log end offset: ").append(lastOffset).append("\n");
+        sb.append("\t").append("Number of messages: ").append(lastOffset - startOffset + 1).append("\n");
         sb.append("\t").append("Committed read offset: ");
         if (committedReadOffset == Long.MIN_VALUE) {
             sb.append("nothing committed");
@@ -58,6 +59,10 @@ public class JournalShow extends AbstractJournalCommand {
             sb.append(committedReadOffset);
         }
         sb.append("\n");
+
+        if (showSegmentDetails) {
+            appendSegmentDetails(journal, sb);
+        }
         sb.append("\n");
 
         System.out.print(sb);

@@ -23,6 +23,7 @@ import io.airlift.airline.Help;
 import org.graylog2.bootstrap.commands.Radio;
 import org.graylog2.bootstrap.commands.Server;
 import org.graylog2.bootstrap.commands.ShowVersion;
+import org.graylog2.bootstrap.commands.journal.JournalDecode;
 import org.graylog2.bootstrap.commands.journal.JournalShow;
 import org.graylog2.bootstrap.commands.journal.JournalTruncate;
 
@@ -44,7 +45,7 @@ public class Main {
         builder.withGroup("journal")
                 .withDescription("Manage the persisted message journal")
                 .withDefaultCommand(JournalShow.class)
-                .withCommands(JournalShow.class, JournalTruncate.class);
+                .withCommands(JournalShow.class, JournalTruncate.class, JournalDecode.class);
 
         final Cli<Runnable> cli = builder.build();
         final Runnable command = cli.parse(args);
