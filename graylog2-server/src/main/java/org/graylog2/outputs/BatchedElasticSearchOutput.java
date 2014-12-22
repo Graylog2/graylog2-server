@@ -16,18 +16,23 @@
  */
 package org.graylog2.outputs;
 
-import com.codahale.metrics.*;
+import com.codahale.metrics.Histogram;
+import com.codahale.metrics.InstrumentedExecutorService;
+import com.codahale.metrics.Meter;
+import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.Timer;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import org.graylog2.indexer.cluster.Cluster;
 import org.graylog2.indexer.messages.Messages;
 import org.graylog2.plugin.Message;
-import org.graylog2.shared.journal.Journal;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.streams.Stream;
+import org.graylog2.shared.journal.Journal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,6 +40,7 @@ import javax.inject.Inject;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
 
 import static com.codahale.metrics.MetricRegistry.name;
 
@@ -75,8 +81,15 @@ public class BatchedElasticSearchOutput extends ElasticSearchOutput {
         this.batchSize = metricRegistry.histogram(name(this.getClass(), "batchSize"));
         this.bufferFlushes = metricRegistry.meter(name(this.getClass(), "bufferFlushes"));
         this.bufferFlushesRequested = metricRegistry.meter(name(this.getClass(), "bufferFlushesRequested"));
-        this.flushThread = new InstrumentedExecutorService(
-                Executors.newSingleThreadExecutor(),
+        this.flushThread = executorService(metricRegistry);
+    }
+
+    private ExecutorService executorService(final MetricRegistry metricRegistry) {
+        final ThreadFactory threadFactory = new ThreadFactoryBuilder()
+                .setNameFormat("batched-elasticsearch-output-%d")
+                .build();
+        return new InstrumentedExecutorService(
+                Executors.newSingleThreadExecutor(threadFactory),
                 metricRegistry,
                 name(this.getClass(), "executor-service"));
     }
@@ -97,7 +110,7 @@ public class BatchedElasticSearchOutput extends ElasticSearchOutput {
     private void synchronousFlush(List<Message> messageBuffer) {
         LOG.debug("[{}] Starting flushing {} messages", Thread.currentThread(), messageBuffer.size());
 
-        try(Timer.Context context = this.processTime.time()) {
+        try (Timer.Context context = this.processTime.time()) {
             write(messageBuffer);
             this.batchSize.update(messageBuffer.size());
             this.bufferFlushes.mark();
@@ -157,7 +170,9 @@ public class BatchedElasticSearchOutput extends ElasticSearchOutput {
         @Override
         Descriptor getDescriptor();
     }
-    public static class Config extends ElasticSearchOutput.Config {}
+
+    public static class Config extends ElasticSearchOutput.Config {
+    }
 
     public static class Descriptor extends ElasticSearchOutput.Descriptor {
         public Descriptor() {
