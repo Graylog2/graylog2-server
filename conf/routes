@@ -78,6 +78,7 @@ GET         /system/inputs/radio/:radio_id                                      
 POST        /system/inputs/radio/:radio_id                                           @controllers.InputsController.launchRadio(radio_id: String)
 POST        /system/inputs/:node_id/:input_id/terminate                              @controllers.InputsController.terminate(node_id: String, input_id: String)
 POST        /system/inputs/radio/:radio_id/:input_id/terminate                       @controllers.InputsController.terminateRadio(radio_id: String, input_id: String)
+POST        /system/inputs/:input_id/update                                          @controllers.InputsController.update(input_id: String)
 POST        /system/inputs/:input_id/terminate                                       @controllers.InputsController.terminateGlobal(input_id: String)
 POST        /system/inputs/:node_id/:input_id/staticfields                           @controllers.InputsController.addStaticField(node_id: String, input_id: String)
 POST        /system/inputs/:input_id/staticfields                                    @controllers.InputsController.addStaticFieldGlobal(input_id: String)

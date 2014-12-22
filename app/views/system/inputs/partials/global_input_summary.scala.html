@@ -21,23 +21,20 @@
             @views.html.system.inputs.partials.input_state_controls.render(InputState.InputStateType.STOPPED, input)
         }
         @if(isPermitted(PROCESSING_CHANGESTATE)) {
-        <form action="@routes.InputsController.terminateGlobal(input.getId)" method="POST">
-            <button class="btn btn-danger btn-mini"
-            type="submit"
-            data-confirm="Do you really want to terminate this global input, stopping it permanently on all active nodes in the cluster?">
-                                        Terminate
-            </button>
-        </form>
+            <form action="@routes.InputsController.terminateGlobal(input.getId)" method="POST">
+                <button class="btn btn-danger btn-mini"
+                type="submit"
+                data-confirm="Do you really want to terminate this global input, stopping it permanently on all active nodes in the cluster?">
+                    <i class="icon icon-remove"></i> Delete
+                </button>
+            </form>
         }
         @views.html.system.inputs.partials.input_action_menu.render(masterNode, input)
     </span>
 
     <h3>
         @views.html.system.inputs.partials.input_list_title.render(input, inputTypes)
-
         @views.html.system.inputs.partials.global_input_states(nodeStates)
-
-    </span>
     </h3>
 
     @if(input.getReadBytes >= 0 && input.getWrittenBytes >= 0) {
@@ -65,8 +62,6 @@
                     <i class="icon icon-caret-down"></i>
                     <span>Show details</span>
                 </a>
-
-
         </div>
 
         <div class="global-input-io-details well well-small" style="display:none" data-input-id="@input.getId">
@@ -149,4 +144,5 @@
         </div>
     }
 
+    @views.html.system.inputs.partials.edit_input_form(input, masterNode, input.getType, inputTypes.get(input.getType))
 </div>

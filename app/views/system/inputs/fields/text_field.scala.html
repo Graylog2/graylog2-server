@@ -1,4 +1,38 @@
-@(field: org.graylog2.restclient.lib.plugin.configuration.RequestedConfigurationField)
+@(field: org.graylog2.restclient.lib.plugin.configuration.RequestedConfigurationField,
+        value: String = null)
+@import org.graylog2.restclient.lib.plugin.configuration.RequestedConfigurationField
+
+@htmlAttributes(field: RequestedConfigurationField) = {
+    name="configuration[@field.getTitle]"
+    @if(!field.isOptional) {
+        required
+    }
+    @if(!field.hasAttribute("textarea") && field.hasAttribute("is_password")) {
+        type="password"
+    } else {
+        type="text"
+    }
+}
+
+@fieldValue(value: String, defaultValue: AnyRef, isPassword: Boolean, isTextArea: Boolean) = @{
+    if(isPassword) {
+        if(value != null) {
+            "******"
+        } else {
+            if(defaultValue != null && !defaultValue.toString.isEmpty) {
+                "******"
+            }
+        }
+    } else {
+        if(value != null) {
+            value
+        } else {
+            if(defaultValue != null && !defaultValue.toString.isEmpty) {
+                defaultValue
+            }
+        }
+    }
+}
 
 <label>
     @field.getHumanName
@@ -9,27 +43,9 @@
 <span class="help-block">@field.getDescription</span>
 @if(field.hasAttribute("textarea")) {
     <textarea class="textarea-xlarge"
+        @htmlAttributes(field)>@fieldValue(value, field.getDefaultValue, field.hasAttribute("is_password"), true)</textarea>
 } else {
     <input class="input-xlarge"
+        @htmlAttributes(field)
+        value="@fieldValue(value, field.getDefaultValue, field.hasAttribute("is_password"), false)">
 }
-    name="configuration[@field.getTitle]"
-
-    @if(!field.isOptional) {
-        required
-    }
-
-    @if(field.hasAttribute("is_password")) {
-        type="password"
-    } else {
-        type="text"
-    }
-
-    @if(field.getDefaultValue() != null && !field.getDefaultValue().toString().isEmpty()) {
-        @if(!field.hasAttribute("textarea")) {
-            value="@field.getDefaultValue()">
-        } else {
-            >@field.getDefaultValue()</textarea>
-        }
-    } else {
-        >
-    }

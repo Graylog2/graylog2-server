@@ -412,9 +412,13 @@ $(document).ready(function() {
         $('[data-inputtype="' + inputType + '"]').modal();
     });
 
-    // Check input configuration according to provided plugin attribues.
+    // Check input configuration according to provided plugin attributes.
     $(".launch-input").on("click", function() {
         return validate('[data-inputtype="' + $(this).attr("data-type") + '"] form');
+    });
+
+    $(".update-input").on("click", function() {
+        return validate('#edit-input-' + $(this).data("input-id") + ' form');
     });
 
     // Add static field to input.
@@ -439,6 +443,7 @@ $(document).ready(function() {
     // Set the focus on the first element of modals
     $(".input-configuration.modal").on("shown", focusFirstFormInput);
     $(".input-add-static-field.modal").on("shown", focusFirstFormInput);
+    $(".edit-input-configuration.modal").on("shown", focusFirstFormInput);
 
 
     // Remove static field.
@@ -1158,7 +1163,7 @@ function focusFirstFormInput(container) {
     if (!(parentElement instanceof jQuery)) {
         parentElement = this;
     }
-    $("input[type!=hidden]", parentElement).first().focus();
+    $("input[type!=hidden],select", parentElement).not(":disabled").first().focus();
 }
 
 // Animated change of numbers.

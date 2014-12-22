@@ -1,10 +1,21 @@
-@(field: org.graylog2.restclient.lib.plugin.configuration.RequestedConfigurationField)
+@(field: org.graylog2.restclient.lib.plugin.configuration.RequestedConfigurationField,
+        value: Boolean = null)
 
-<label class="checkbox">
-    <input type="checkbox"
+@checked = {
+    @if(value != null) {
+        @if(value) {
+            checked="checked"
+        }
+    } else {
         @if(field.getDefaultValue == true) {
             checked="checked"
         }
+    }
+}
+
+<label class="checkbox">
+    <input type="checkbox"
+        @checked
         value="true"
         name="configuration[@field.getTitle]">
 

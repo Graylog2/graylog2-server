@@ -1,4 +1,5 @@
-@(inputState: org.graylog2.restclient.models.InputState, inputTypes: Map[String, org.graylog2.restclient.models.api.responses.system.InputTypeSummaryResponse])
+@(inputState: org.graylog2.restclient.models.InputState,
+        inputTypes: Map[String, org.graylog2.restclient.models.api.responses.system.InputTypeSummaryResponse])
 
 @import views.helpers.InputStateHelper
 @import views.helpers.Permissions._
@@ -19,15 +20,14 @@
                 &nbsp;
 
             @views.html.system.inputs.partials.input_state_controls.render(inputState.getState, input)
-
             @if(isPermitted(INPUTS_TERMINATE)) {
-            <form action="@routes.InputsController.terminate(inputState.getNode.getNodeId, input.getId)" method="POST">
-                <button class="btn btn-danger btn-mini"
-                type="submit"
-                data-confirm="Really delete input @input.getTitle?">
-                    <i class="icon icon-remove"></i> Delete
-                </button>
-            </form>
+                <form action="@routes.InputsController.terminate(inputState.getNode.getNodeId, input.getId)" method="POST">
+                    <button class="btn btn-danger btn-mini"
+                    type="submit"
+                    data-confirm="Really delete input @input.getTitle?">
+                        <i class="icon icon-remove"></i> Delete
+                    </button>
+                </form>
             }
             @views.html.system.inputs.partials.input_action_menu.render(inputState.getNode, input)
         </span>
@@ -114,5 +114,6 @@
             </div>
         }
 
-        </div>
+        @views.html.system.inputs.partials.edit_input_form(input, inputState.getNode, input.getType, inputTypes.get(input.getType))
+    </div>
 }
