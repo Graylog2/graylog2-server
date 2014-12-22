@@ -68,7 +68,7 @@ public class JournalReader extends AbstractExecutionThreadService {
     @Override
     protected void run() throws Exception {
         try {
-            requestedReadCount = metricRegistry.register(name(this.getClass(), "requestedReadCount"), new HdrHistogram(processBuffer.getRingBufferSize(), 3));
+            requestedReadCount = metricRegistry.register(name(this.getClass(), "requestedReadCount"), new HdrHistogram(processBuffer.getRingBufferSize() + 1, 3));
         } catch (IllegalArgumentException e) {
             log.warn("Metric already exists", e);
             throw e;
