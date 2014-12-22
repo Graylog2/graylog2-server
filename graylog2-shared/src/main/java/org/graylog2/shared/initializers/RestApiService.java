@@ -72,6 +72,7 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.TimeUnit;
 
 import static com.codahale.metrics.MetricRegistry.name;
 import static com.google.common.base.Strings.emptyToNull;
@@ -185,10 +186,16 @@ public class RestApiService extends AbstractIdleService {
         }
 
         // TODO Magic numbers
+        final ThreadFactory threadFactory = new ThreadFactoryBuilder().setNameFormat("restapi-execution-handler-%d").build();
         final ExecutorService executor = new InstrumentedExecutorService(
-                new OrderedMemoryAwareThreadPoolExecutor(configuration.getRestThreadPoolSize(), 1048576, 1048576),
+                new OrderedMemoryAwareThreadPoolExecutor(
+                        configuration.getRestThreadPoolSize(),
+                        1048576,
+                        1048576,
+                        30, TimeUnit.SECONDS,
+                        threadFactory),
                 metricRegistry,
-                name(this.getClass(), "netty-executor-service"));
+                name(this.getClass(), "restapi-execution-handler-executor-service"));
 
         bootstrap.setPipelineFactory(new ChannelPipelineFactory() {
             @Override
