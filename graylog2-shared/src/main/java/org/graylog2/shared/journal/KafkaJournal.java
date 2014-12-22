@@ -346,9 +346,16 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
 
         // Always read at least one!
         final long maximumCount = Math.max(1, requestedMaximumCount);
-        final long maxOffset = readOffset + maximumCount;
+        long maxOffset = readOffset + maximumCount;
         final List<JournalReadEntry> messages = Lists.newArrayListWithCapacity((int) (maximumCount));
         try (Timer.Context ignored = readTime.time()) {
+            final long logStartOffset = getLogStartOffset();
+            if (readOffset < logStartOffset) {
+                log.debug("Read offset {} before start of log at {}, starting to read from the beginning of the journal.",
+                          readOffset, logStartOffset);
+                readOffset = logStartOffset;
+                maxOffset = readOffset + maximumCount;
+            }
             log.debug("Requesting to read a maximum of {} messages (or 5MB) from the journal, offset interval [{}, {})",
                       maximumCount, readOffset, maxOffset);
             // TODO benchmark and make read-ahead strategy configurable for performance tuning
@@ -374,7 +381,8 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
                 }
                 totalBytes += payloadBytes.length;
                 messages.add(new JournalReadEntry(payloadBytes, messageAndOffset.offset()));
-                readOffset = messageAndOffset.nextOffset();
+                // remember where to read from
+                nextReadOffset = messageAndOffset.nextOffset();
             }
             if (messages.isEmpty()) {
                 log.debug("No messages available to read for offset interval [{}, {}).", readOffset, maxOffset);
