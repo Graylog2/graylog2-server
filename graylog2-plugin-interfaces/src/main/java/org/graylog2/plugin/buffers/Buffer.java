@@ -22,14 +22,22 @@
  */
 package org.graylog2.plugin.buffers;
 
+import com.lmax.disruptor.BlockingWaitStrategy;
+import com.lmax.disruptor.BusySpinWaitStrategy;
 import com.lmax.disruptor.RingBuffer;
+import com.lmax.disruptor.SleepingWaitStrategy;
+import com.lmax.disruptor.WaitStrategy;
+import com.lmax.disruptor.YieldingWaitStrategy;
 import org.graylog2.plugin.Message;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
 public abstract class Buffer {
+    private static final Logger log = LoggerFactory.getLogger(Buffer.class);
 
     protected RingBuffer<MessageEvent> ringBuffer;
     protected int ringBufferSize;
@@ -61,6 +69,23 @@ public abstract class Buffer {
 
         afterInsert(1);
 
+    }
+
+    protected WaitStrategy getWaitStrategy(String waitStrategyName, String configOptionName) {
+        switch (waitStrategyName) {
+            case "sleeping":
+                return new SleepingWaitStrategy();
+            case "yielding":
+                return new YieldingWaitStrategy();
+            case "blocking":
+                return new BlockingWaitStrategy();
+            case "busy_spinning":
+                return new BusySpinWaitStrategy();
+            default:
+                log.warn("Invalid setting for [{}]:"
+                                + " Falling back to default: BlockingWaitStrategy.", configOptionName);
+                return new BlockingWaitStrategy();
+        }
     }
 
     protected abstract void afterInsert(int n);

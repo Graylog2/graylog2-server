@@ -19,8 +19,6 @@ package org.graylog2.shared.journal;
 import com.codahale.metrics.Counter;
 import com.codahale.metrics.Histogram;
 import com.codahale.metrics.MetricRegistry;
-import com.google.common.eventbus.EventBus;
-import com.google.common.eventbus.Subscribe;
 import com.google.common.util.concurrent.AbstractExecutionThreadService;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
@@ -31,7 +29,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Semaphore;
 
 import static com.codahale.metrics.MetricRegistry.name;
@@ -39,35 +36,23 @@ import static com.codahale.metrics.MetricRegistry.name;
 public class JournalReader extends AbstractExecutionThreadService {
     private static final Logger log = LoggerFactory.getLogger(JournalReader.class);
     private final Journal journal;
-    private final EventBus eventBus;
     private final ProcessBuffer processBuffer;
     private final Semaphore journalFilled;
     private final MetricRegistry metricRegistry;
-    private final CountDownLatch startLatch = new CountDownLatch(1);
     private Histogram requestedReadCount;
     private final Counter readBlocked;
     private Thread executionThread;
 
     @Inject
-    public JournalReader(Journal journal, EventBus eventBus,
+    public JournalReader(Journal journal,
                          ProcessBuffer processBuffer,
                          @Named("JournalSignal") Semaphore journalFilled,
                          MetricRegistry metricRegistry) {
         this.journal = journal;
-        this.eventBus = eventBus;
         this.processBuffer = processBuffer;
         this.journalFilled = journalFilled;
         this.metricRegistry = metricRegistry;
         readBlocked = metricRegistry.counter(name(this.getClass(), "readBlocked"));
-        eventBus.register(this);
-    }
-
-    @Subscribe
-    public void listener(String notification) {
-        // TODO use a proper class here.
-        if ("ProcessBufferInitialized".equals(notification)) {
-            startLatch.countDown();
-        }
     }
 
     @Override
@@ -81,16 +66,7 @@ public class JournalReader extends AbstractExecutionThreadService {
     }
 
     @Override
-    protected void shutDown() throws Exception {
-        eventBus.unregister(this);
-    }
-
-    @Override
     protected void run() throws Exception {
-
-        // we need to wait for the ProcessBuffer to start its disruptor
-        startLatch.await();
-
         try {
             requestedReadCount = metricRegistry.register(name(this.getClass(), "requestedReadCount"), new HdrHistogram(processBuffer.getRingBufferSize(), 3));
         } catch (IllegalArgumentException e) {

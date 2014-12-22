@@ -53,8 +53,6 @@ import org.graylog2.shared.bindings.GuiceInjectorHolder;
 import org.graylog2.shared.bindings.GuiceInstantiationService;
 import org.graylog2.shared.bindings.InstantiationService;
 import org.graylog2.shared.bindings.PluginBindings;
-import org.graylog2.shared.journal.KafkaJournalModule;
-import org.graylog2.shared.journal.NoopJournalModule;
 import org.graylog2.shared.plugins.PluginLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -317,11 +315,6 @@ public abstract class CmdLineTool implements Runnable {
             modules.addAll(getSharedBindingsModules(instantiationService));
             modules.addAll(getCommandBindings());
             modules.addAll(Arrays.asList(otherModules));
-            if (configuration.isMessageJournalEnabled()) {
-                modules.add(new KafkaJournalModule());
-            } else {
-                modules.add(new NoopJournalModule());
-            }
             modules.add(new Module() {
                 @Override
                 public void configure(Binder binder) {

@@ -19,7 +19,7 @@ package org.graylog2.shared.buffers.processors;
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
-import com.lmax.disruptor.EventHandler;
+import com.lmax.disruptor.WorkHandler;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.buffers.MessageEvent;
 import org.slf4j.Logger;
@@ -30,7 +30,7 @@ import static com.codahale.metrics.MetricRegistry.name;
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
  */
-public abstract class ProcessBufferProcessor implements EventHandler<MessageEvent> {
+public abstract class ProcessBufferProcessor implements WorkHandler<MessageEvent> {
     private static final Logger LOG = LoggerFactory.getLogger(ProcessBufferProcessor.class);
 
     private final Meter incomingMessages;
@@ -39,15 +39,8 @@ public abstract class ProcessBufferProcessor implements EventHandler<MessageEven
 
     protected final MetricRegistry metricRegistry;
 
-    private final long ordinal;
-    private final long numberOfConsumers;
-
-    public ProcessBufferProcessor(MetricRegistry metricRegistry,
-                                  final long ordinal,
-                                  final long numberOfConsumers) {
+    public ProcessBufferProcessor(MetricRegistry metricRegistry) {
         this.metricRegistry = metricRegistry;
-        this.ordinal = ordinal;
-        this.numberOfConsumers = numberOfConsumers;
 
         incomingMessages = metricRegistry.meter(name(ProcessBufferProcessor.class, "incomingMessages"));
         outgoingMessages = metricRegistry.meter(name(ProcessBufferProcessor.class, "outgoingMessages"));
@@ -55,11 +48,7 @@ public abstract class ProcessBufferProcessor implements EventHandler<MessageEven
     }
 
     @Override
-    public void onEvent(MessageEvent event, long sequence, boolean endOfBatch) throws Exception {
-        // Because Trisha said so. (http://code.google.com/p/disruptor/wiki/FrequentlyAskedQuestions)
-        if ((sequence % numberOfConsumers) != ordinal) {
-            return;
-        }
+    public void onEvent(MessageEvent event) throws Exception {
         final Message msg = event.getMessage();
         if (msg == null) {
             // skip message events which could not be decoded properly
@@ -83,4 +72,5 @@ public abstract class ProcessBufferProcessor implements EventHandler<MessageEven
     }
 
     protected abstract void handleMessage(Message msg);
+
 }

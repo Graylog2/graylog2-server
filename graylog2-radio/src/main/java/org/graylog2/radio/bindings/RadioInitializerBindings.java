@@ -19,7 +19,6 @@ package org.graylog2.radio.bindings;
 import com.google.common.util.concurrent.Service;
 import com.google.inject.AbstractModule;
 import com.google.inject.multibindings.Multibinder;
-import org.graylog2.radio.initializers.RadioProcessBufferService;
 
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
@@ -28,6 +27,5 @@ public class RadioInitializerBindings extends AbstractModule {
     @Override
     protected void configure() {
         Multibinder<Service> serviceBinder = Multibinder.newSetBinder(binder(), Service.class);
-        serviceBinder.addBinding().to(RadioProcessBufferService.class);
     }
 }

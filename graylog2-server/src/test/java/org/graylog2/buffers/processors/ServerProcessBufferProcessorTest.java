@@ -31,15 +31,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.same;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
-import static org.testng.Assert.fail;
+import static org.mockito.Mockito.*;
+import static org.testng.Assert.*;
 
 public class ServerProcessBufferProcessorTest {
 
@@ -61,7 +54,7 @@ public class ServerProcessBufferProcessorTest {
                 first,
                 second);
         final ServerProcessBufferProcessor processor = new ServerProcessBufferProcessor(mock(
-                MetricRegistry.class), filters, mock(Configuration.class), serverStatus, 0, 1, mock(OutputBuffer.class));
+                MetricRegistry.class), filters, mock(Configuration.class), serverStatus, mock(OutputBuffer.class));
         final List<MessageFilter> filterRegistry = processor.getFilterRegistry();
 
         assertEquals(filterRegistry.get(0), first);
@@ -81,7 +74,6 @@ public class ServerProcessBufferProcessorTest {
                                                  Sets.<MessageFilter>newHashSet(),
                                                  configuration,
                                                  mock(ServerStatus.class),
-                                                 0, 1,
                                                  outputBuffer);
         try {
             emptyFilters.handleMessage(new Message("test", "source", Tools.iso8601()));
@@ -125,7 +117,6 @@ public class ServerProcessBufferProcessorTest {
                                                  Sets.newHashSet(filterOnlyFirst),
                                                  configuration,
                                                  serverStatus,
-                                                 0, 1,
                                                  outputBuffer);
         try {
             Message filteredoutMessage = new Message("filtered out", "source", Tools.iso8601());
