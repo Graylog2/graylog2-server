@@ -5,8 +5,8 @@
 
 import FieldsStore = require('../../stores/fields/FieldsStore');
 import queryParser = require('../../logic/search/queryParser');
-import SerializeVisitor = require('../../logic/search/visitors/serializeVisitor');
-import DumpVisitor = require('../../logic/search/visitors/dumpVisitor');
+import SerializeVisitor = require('../../logic/search/visitors/SerializeVisitor');
+import DumpVisitor = require('../../logic/search/visitors/DumpVisitor');
 
 interface Match {
     match: string;

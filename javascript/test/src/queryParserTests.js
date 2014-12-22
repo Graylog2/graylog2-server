@@ -1,7 +1,7 @@
 'use strict';
 
 var queryParser = require("../../src/logic/search/queryParser");
-var DumpVisitor = require("../../src/logic/search/visitors/dumpVisitor");
+var DumpVisitor = require("../../src/logic/search/visitors/DumpVisitor");
 
 describe('Query Parser', function () {
     var ExpressionAST, ExpressionListAST, ModifierAST, TermAST, Token, QueryParser, TokenType;
