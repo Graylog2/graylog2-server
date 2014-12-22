@@ -24,9 +24,13 @@
                         <input type="checkbox" class="input-global-checkbox" name="global" disabled="disabled" checked="checked">
                         <span class="help-block">Global input (started on all nodes)</span>
                     </label>
+                    <input type="hidden" name="global" value="true">
                 } else {
                     <label for="node">Started on node:</label>
-                    <input name="node" type="text" value="@inputNode.getShortNodeId / @inputNode.getHostname" disabled="disabled" class="input-xlarge">
+                    <select name="node" disabled="disabled" class="input-node-selector">
+                            <option value="@inputNode.getNodeId">@inputNode.getShortNodeId / @inputNode.getHostname</option>
+                    </select>
+                    <input type="hidden" name="node" value="@inputNode.getNodeId">
                 }
 
                 <label>Title</label>
