@@ -27,6 +27,7 @@ import java.net.URI;
 import static org.graylog2.plugin.Tools.getUriWithPort;
 import static org.graylog2.plugin.Tools.getUriWithScheme;
 
+@SuppressWarnings("FieldMayBeFinal")
 public class Configuration extends BaseConfiguration {
     private static final int RADIO_DEFAULT_PORT = 12950;
 
@@ -45,9 +46,6 @@ public class Configuration extends BaseConfiguration {
 
     @Parameter(value = "graylog2_server_uri", required = true)
     private URI graylog2ServerUri;
-
-    @Parameter(value = "rest_transport_uri")
-    private URI restTransportUri;
 
     @Parameter(value = "kafka_brokers")
     private String kafkaBrokers;

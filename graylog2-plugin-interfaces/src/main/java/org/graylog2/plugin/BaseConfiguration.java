@@ -37,6 +37,7 @@ import java.io.File;
 import java.net.InetAddress;
 import java.net.URI;
 
+@SuppressWarnings("FieldMayBeFinal")
 public abstract class BaseConfiguration {
     private static final Logger LOG = LoggerFactory.getLogger(BaseConfiguration.class);
     protected static final int GRAYLOG2_DEFAULT_PORT = 12900;
