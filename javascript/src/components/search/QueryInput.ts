@@ -5,6 +5,8 @@
 
 import FieldsStore = require('../../stores/fields/FieldsStore');
 import queryParser = require('../../logic/search/queryParser');
+import SerializeVisitor = require('../../logic/search/visitors/serializeVisitor');
+import DumpVisitor = require('../../logic/search/visitors/dumpVisitor');
 
 interface Match {
     match: string;
@@ -75,7 +77,7 @@ class QueryInput {
         var possibleMatches = [];
         var parser = new queryParser.QueryParser(query);
         var ast = parser.parse();
-        var visitor = new queryParser.SerializeVisitor();
+        var visitor = new SerializeVisitor();
         visitor.visit(ast);
         var serializedAst: queryParser.AST[] = visitor.result();
 
@@ -87,11 +89,11 @@ class QueryInput {
                 possibleMatches = possibleMatches.concat(this.fieldsCompletions());
             }
 
-            var querySegmentVisitor = new queryParser.DumpVisitor();
+            var querySegmentVisitor = new DumpVisitor();
             querySegmentVisitor.visit(currentAST);
             query = querySegmentVisitor.result();
 
-            var prefixVisitor = new queryParser.DumpVisitor(currentAST);
+            var prefixVisitor = new DumpVisitor(currentAST);
             prefixVisitor.visit(ast);
             prefix = prefixVisitor.result();
         }

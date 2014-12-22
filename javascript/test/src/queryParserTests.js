@@ -1,6 +1,7 @@
 'use strict';
 
 var queryParser = require("../../src/logic/search/queryParser");
+var DumpVisitor = require("../../src/logic/search/visitors/DumpVisitor");
 
 describe('Query Parser', function () {
     var ExpressionAST, ExpressionListAST, ModifierAST, TermAST, Token, QueryParser, TokenType;
@@ -12,7 +13,7 @@ describe('Query Parser', function () {
     function expectIdentityDump(query, ignoreErrors) {
         var parser = new QueryParser(query);
         var ast = parser.parse();
-        var dumpVisitor = new queryParser.DumpVisitor();
+        var dumpVisitor = new DumpVisitor();
         dumpVisitor.visit(ast);
         var dumped = dumpVisitor.result();
         if (!ignoreErrors) {
