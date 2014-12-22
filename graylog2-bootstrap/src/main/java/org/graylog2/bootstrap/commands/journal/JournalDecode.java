@@ -116,7 +116,7 @@ public class JournalDecode extends AbstractJournalCommand {
             final StringBuffer sb = new StringBuffer();
             sb.append("Message ").append(message.getId()).append(" in format ").append(raw.getCodecName())
                     .append(" received from ").append(message.getSource())
-                    .append(" contains ").append(message.getFields().keySet().size()).append(" fields.");
+                    .append(" contains ").append(message.getFieldNames().size()).append(" fields.");
             System.out.println(sb);
         }
 

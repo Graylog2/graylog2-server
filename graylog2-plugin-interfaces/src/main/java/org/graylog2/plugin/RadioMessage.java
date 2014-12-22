@@ -45,7 +45,7 @@ public class RadioMessage {
         Map<String, String> strings = Maps.newHashMap();
         Map<String, Double> doubles = Maps.newHashMap();
 
-        for(Map.Entry<String, Object> field : msg.getFields().entrySet()) {
+        for(Map.Entry<String, Object> field : msg.getFieldsEntries()) {
             if (field.getValue() instanceof String) {
                 strings.put(field.getKey(), (String) field.getValue());
             } else if (field.getValue() instanceof Long || field.getValue() instanceof Integer) {

@@ -27,6 +27,7 @@ import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.graylog2.plugin.inputs.MessageInput;
@@ -162,7 +163,7 @@ public class Message {
 
         obj.put(FIELD_MESSAGE, getMessage());
         obj.put(FIELD_SOURCE, getSource());
-        obj.putAll(getFields());
+        obj.putAll(fields);
 
         if (getField(FIELD_TIMESTAMP) instanceof DateTime) {
             obj.put(FIELD_TIMESTAMP, buildElasticSearchTimeFormat(((DateTime) getField(FIELD_TIMESTAMP)).withZone(UTC)));
@@ -297,6 +298,14 @@ public class Message {
 
     public Map<String, Object> getFields() {
         return ImmutableMap.copyOf(fields);
+    }
+
+    public Iterable<Map.Entry<String, Object>> getFieldsEntries() {
+        return Iterables.unmodifiableIterable(fields.entrySet());
+    }
+
+    public int getFieldCount() {
+        return fields.size();
     }
 
     public boolean hasField(String field) {
