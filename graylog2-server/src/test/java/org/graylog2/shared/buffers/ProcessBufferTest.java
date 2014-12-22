@@ -20,12 +20,11 @@ import com.codahale.metrics.Counter;
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
-import com.lmax.disruptor.BlockingWaitStrategy;
+import com.google.inject.Provider;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.journal.RawMessage;
 import org.graylog2.shared.buffers.processors.DecodingProcessor;
-import org.graylog2.shared.buffers.processors.ProcessBufferProcessor;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -61,13 +60,8 @@ public class ProcessBufferTest {
     }
 
     public void testBasicInsert() throws Exception {
-        ProcessBuffer processBuffer = new ProcessBuffer(metricRegistry, serverStatus, mock(DecodingProcessor.Factory.class));
-
-        ProcessBufferProcessor processBufferProcessor = mock(ProcessBufferProcessor.class);
-        ProcessBufferProcessor[] processBufferProcessors = new ProcessBufferProcessor[1];
-        processBufferProcessors[0] = processBufferProcessor;
-
-        processBuffer.initialize(processBufferProcessors, 1, new BlockingWaitStrategy());
+        ProcessBuffer processBuffer = new ProcessBuffer(metricRegistry, serverStatus, mock(DecodingProcessor.Factory.class),
+                                                        mock(Provider.class), 1, 1, "blocking");
 
         RawMessage message = mock(RawMessage.class);
         MessageInput messageInput = mock(MessageInput.class);

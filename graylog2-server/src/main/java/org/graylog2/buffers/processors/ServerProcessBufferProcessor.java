@@ -21,8 +21,7 @@ import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.google.common.collect.ComparisonChain;
 import com.google.common.collect.Ordering;
-import com.google.inject.assistedinject.Assisted;
-import com.google.inject.assistedinject.AssistedInject;
+import com.google.inject.Inject;
 import org.graylog2.Configuration;
 import org.graylog2.buffers.OutputBuffer;
 import org.graylog2.plugin.Message;
@@ -46,29 +45,19 @@ public class ServerProcessBufferProcessor extends ProcessBufferProcessor {
     private final Configuration configuration;
     private final ServerStatus serverStatus;
 
-    public interface Factory {
-        public ServerProcessBufferProcessor create(
-                OutputBuffer outputBuffer,
-                @Assisted("ordinal") final long ordinal,
-                @Assisted("numberOfConsumers") final long numberOfConsumers
-        );
-    }
-
     private static final Logger LOG = LoggerFactory.getLogger(ServerProcessBufferProcessor.class);
     private final OutputBuffer outputBuffer;
     private final Meter filteredOutMessages;
     private final List<MessageFilter> filterRegistry;
 
 
-    @AssistedInject
+    @Inject
     public ServerProcessBufferProcessor(MetricRegistry metricRegistry,
                                   Set<MessageFilter> filterRegistry,
                                   Configuration configuration,
                                   ServerStatus serverStatus,
-                                  @Assisted("ordinal") final long ordinal,
-                                  @Assisted("numberOfConsumers") final long numberOfConsumers,
-                                  @Assisted OutputBuffer outputBuffer) {
-        super(metricRegistry, ordinal, numberOfConsumers);
+                                  OutputBuffer outputBuffer) {
+        super(metricRegistry);
         this.configuration = configuration;
         this.serverStatus = serverStatus;
 

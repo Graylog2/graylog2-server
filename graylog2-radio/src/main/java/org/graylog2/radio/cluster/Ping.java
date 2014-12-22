@@ -21,6 +21,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import com.ning.http.client.AsyncHttpClient;
+import com.ning.http.client.Request;
 import com.ning.http.client.Response;
 import org.graylog2.plugin.ServerStatus;
 import org.slf4j.Logger;
@@ -53,14 +54,16 @@ public class Ping {
         final UriBuilder uriBuilder = UriBuilder.fromUri(server);
         uriBuilder.path("/system/radios/" + radioId + "/ping");
 
-        Future<Response> f = client.preparePut(uriBuilder.build().toString())
-                .setBody(rootNode.toString())
-                .execute();
+        final Request request = client.preparePut(uriBuilder.build().toString())
+                .setHeader("Content-Type", "application/json")
+                .setBody(rootNode.toString()).build();
+        Future<Response> f = client.executeRequest(request);
 
         Response r = f.get();
 
-        if (r.getStatusCode() != 200) {
-            throw new RuntimeException("Expected ping HTTP response [200] but got [" + r.getStatusCode() + "].");
+        // fail on a non-ok status
+        if (r.getStatusCode() > 299) {
+            throw new RuntimeException("Expected ping HTTP response OK but got [" + r.getStatusCode() + "]. Request was " + request.getUrl());
         }
     }
 
@@ -72,7 +75,7 @@ public class Ping {
         private final URI ourUri;
 
         @Inject
-        public Pinger(AsyncHttpClient httpClient, @Named("OurRadioUri") URI ourUri, @Named("ServerUri") URI serverUri, ServerStatus serverStatus) {
+        public Pinger(AsyncHttpClient httpClient, @Named("rest_transport_uri") URI ourUri, @Named("graylog2_server_uri") URI serverUri, ServerStatus serverStatus) {
             this.httpClient = httpClient;
             this.nodeId = serverStatus.getNodeId().toString();
             this.ourUri = ourUri;

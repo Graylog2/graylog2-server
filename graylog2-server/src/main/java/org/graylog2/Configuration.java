@@ -31,6 +31,7 @@ import static org.graylog2.plugin.Tools.getUriWithScheme;
 /**
  * Helper class to hold configuration of Graylog2
  */
+@SuppressWarnings("FieldMayBeFinal")
 public class Configuration extends BaseConfiguration {
     @Parameter(value = "is_master", required = true)
     private boolean isMaster = true;

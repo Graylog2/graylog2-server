@@ -18,8 +18,7 @@ package org.graylog2.radio.buffers.processors;
 
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
-import com.google.inject.assistedinject.Assisted;
-import com.google.inject.assistedinject.AssistedInject;
+import com.google.inject.Inject;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.radio.Configuration;
@@ -37,13 +36,6 @@ import static com.codahale.metrics.MetricRegistry.name;
  * @author Dennis Oelkers <dennis@torch.sh>
  */
 public class RadioProcessBufferProcessor extends ProcessBufferProcessor {
-    public interface Factory {
-        public RadioProcessBufferProcessor create(
-                @Assisted("ordinal") final long ordinal,
-                @Assisted("numberOfConsumers") final long numberOfConsumers
-        );
-    }
-
     private static final Logger LOG = LoggerFactory.getLogger(RadioProcessBufferProcessor.class);
     private static final AtomicInteger errorCount = new AtomicInteger(0);
     private final ThroughputStats throughputStats;
@@ -52,15 +44,13 @@ public class RadioProcessBufferProcessor extends ProcessBufferProcessor {
     private final int radioTransportMaxErrors;
     private final Meter erroredMessages;
 
-    @AssistedInject
+    @Inject
     public RadioProcessBufferProcessor(MetricRegistry metricRegistry,
                                        ThroughputStats throughputStats,
                                        RadioTransport radioTransport,
                                        ServerStatus serverStatus,
-                                       Configuration configuration,
-                                       @Assisted("ordinal") final long ordinal,
-                                       @Assisted("numberOfConsumers") final long numberOfConsumers) {
-        super(metricRegistry, ordinal, numberOfConsumers);
+                                       Configuration configuration) {
+        super(metricRegistry);
         this.throughputStats = throughputStats;
         this.radioTransport = radioTransport;
         this.serverStatus = serverStatus;

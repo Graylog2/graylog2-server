@@ -30,7 +30,6 @@ public class InitializerBindings extends AbstractModule {
         Multibinder<Service> serviceBinder = Multibinder.newSetBinder(binder(), Service.class);
         serviceBinder.addBinding().to(MetricsReporterService.class);
         serviceBinder.addBinding().to(DashboardRegistryService.class);
-        serviceBinder.addBinding().to(ProcessBufferService.class);
         serviceBinder.addBinding().to(IndexerSetupService.class);
         serviceBinder.addBinding().to(BufferSynchronizerService.class);
         serviceBinder.addBinding().to(OutputSetupService.class);

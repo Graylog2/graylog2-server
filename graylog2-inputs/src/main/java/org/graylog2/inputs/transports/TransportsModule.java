@@ -48,16 +48,6 @@ public class TransportsModule extends Graylog2Module {
                 .toInstance(Executors.newCachedThreadPool(new ThreadFactoryBuilder()
                                                                   .setNameFormat("transport-boss-%d")
                                                                   .build()));
-
-        // TODO Add instrumentation to ExecutorService and ThreadFactory
-        bind(Executor.class)
-                .annotatedWith(Names.named("cached"))
-                .toProvider(new Provider<Executor>() {
-                    @Override
-                    public Executor get() {
-                        return Executors.newCachedThreadPool();
-                    }
-                });
     }
 
 }

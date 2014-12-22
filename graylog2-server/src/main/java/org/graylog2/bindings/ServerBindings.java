@@ -43,7 +43,6 @@ import org.graylog2.bindings.providers.RulesEngineProvider;
 import org.graylog2.bindings.providers.ServerObjectMapperProvider;
 import org.graylog2.bindings.providers.SystemJobFactoryProvider;
 import org.graylog2.bindings.providers.SystemJobManagerProvider;
-import org.graylog2.buffers.processors.OutputBufferProcessor;
 import org.graylog2.buffers.processors.ServerProcessBufferProcessor;
 import org.graylog2.bundles.BundleService;
 import org.graylog2.database.MongoConnection;
@@ -71,7 +70,11 @@ import org.graylog2.security.ldap.LdapConnector;
 import org.graylog2.security.ldap.LdapSettingsImpl;
 import org.graylog2.security.realm.LdapUserAuthenticator;
 import org.graylog2.shared.bindings.providers.AsyncHttpClientProvider;
+import org.graylog2.shared.buffers.processors.ProcessBufferProcessor;
 import org.graylog2.shared.inputs.PersistedInputs;
+import org.graylog2.shared.journal.JournalReaderModule;
+import org.graylog2.shared.journal.KafkaJournalModule;
+import org.graylog2.shared.journal.NoopJournalModule;
 import org.graylog2.shared.metrics.jersey2.MetricsDynamicBinding;
 import org.graylog2.shared.system.activities.ActivityWriter;
 import org.graylog2.streams.StreamRouter;
@@ -111,8 +114,6 @@ public class ServerBindings extends AbstractModule {
     }
 
     private void bindFactoryModules() {
-        install(new FactoryModuleBuilder().build(OutputBufferProcessor.Factory.class));
-        install(new FactoryModuleBuilder().build(ServerProcessBufferProcessor.Factory.class));
         install(new FactoryModuleBuilder().build(RebuildIndexRangesJob.Factory.class));
         install(new FactoryModuleBuilder().build(OptimizeIndexJob.Factory.class));
         install(new FactoryModuleBuilder().build(CreateNewSingleIndexRangeJob.Factory.class));
@@ -136,6 +137,12 @@ public class ServerBindings extends AbstractModule {
             capabilityBinder.addBinding().toInstance(ServerStatus.Capability.MASTER);
         bind(ServerStatus.class).in(Scopes.SINGLETON);
 
+        if (configuration.isMessageJournalEnabled()) {
+            install(new KafkaJournalModule());
+            install(new JournalReaderModule());
+        } else {
+            install(new NoopJournalModule());
+        }
         bind(Node.class).toProvider(EsNodeProvider.class).in(Scopes.SINGLETON);
         bind(SystemJobManager.class).toProvider(SystemJobManagerProvider.class);
         bind(RulesEngine.class).toProvider(RulesEngineProvider.class);
@@ -163,6 +170,8 @@ public class ServerBindings extends AbstractModule {
         bind(FilterService.class).to(FilterServiceImpl.class).in(Scopes.SINGLETON);
         bind(ActivityWriter.class).to(SystemMessageActivityWriter.class);
         bind(PersistedInputs.class).to(PersistedInputsImpl.class);
+
+        bind(ProcessBufferProcessor.class).to(ServerProcessBufferProcessor.class);
     }
 
     private void bindDynamicFeatures() {

@@ -38,7 +38,7 @@ public class StaticFieldFilter implements MessageFilter {
             return false;
 
         for(Map.Entry<String, String> field : msg.getSourceInput().getStaticFields().entrySet()) {
-            if(!msg.getFields().containsKey(field.getKey())) {
+            if(!msg.hasField(field.getKey())) {
                 msg.addField(field.getKey(), field.getValue());
             } else {
                 LOG.debug("Message already contains field [{}]. Not overwriting.", field.getKey());

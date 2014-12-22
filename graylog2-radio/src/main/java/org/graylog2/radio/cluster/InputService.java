@@ -48,7 +48,7 @@ public class InputService {
     private final ServerStatus serverStatus;
 
     @Inject
-    public InputService(AsyncHttpClient httpclient, @Named("ServerUri") URI serverUrl, ServerStatus serverStatus) {
+    public InputService(AsyncHttpClient httpclient, @Named("graylog2_server_uri") URI serverUrl, ServerStatus serverStatus) {
         this.httpclient = httpclient;
         this.serverUrl = serverUrl;
         this.serverStatus = serverStatus;
@@ -58,7 +58,9 @@ public class InputService {
         final UriBuilder uriBuilder = UriBuilder.fromUri(serverUrl);
         uriBuilder.path("/system/radios/" + serverStatus.getNodeId().toString() + "/inputs");
 
-        final Request request = httpclient.prepareGet(uriBuilder.build().toString()).build();
+        final Request request = httpclient.prepareGet(uriBuilder.build().toString())
+                .setHeader("Content-Type", "application/json")
+                .build();
         LOG.debug("API Request {} {}", request.getMethod(), request.getUrl());
         final Future<Response> f = httpclient.executeRequest(request);
 
@@ -102,6 +104,7 @@ public class InputService {
         }
 
         Future<Response> f = httpclient.preparePost(uriBuilder.build().toString())
+                .setHeader("Content-Type", "application/json")
                 .setBody(json)
                 .execute();
 
@@ -123,7 +126,9 @@ public class InputService {
         final UriBuilder uriBuilder = UriBuilder.fromUri(serverUrl);
         uriBuilder.path("/system/radios/" + serverStatus.getNodeId().toString() + "/inputs/" + input.getPersistId());
 
-        Future<Response> f = httpclient.prepareDelete(uriBuilder.build().toString()).execute();
+        Future<Response> f = httpclient.prepareDelete(uriBuilder.build().toString())
+                .setHeader("Content-Type", "application/json")
+                .execute();
         Response r = f.get();
         if (r.getStatusCode() != 204) {
             throw new RuntimeException("Expected HTTP response [204] for input unregistration but got [" + r.getStatusCode() + "].");

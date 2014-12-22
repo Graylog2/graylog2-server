@@ -22,6 +22,7 @@ import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.google.common.base.Charsets;
 import com.google.common.base.Throwables;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.common.io.Files;
@@ -60,6 +61,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.SyncFailedException;
+import java.nio.channels.ClosedByInterruptException;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -337,15 +339,27 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
 
     @Override
     public List<JournalReadEntry> read(long requestedMaximumCount) {
+        return read(nextReadOffset, requestedMaximumCount);
+    }
+
+    public List<JournalReadEntry> read(long readOffset, long requestedMaximumCount) {
+
         // Always read at least one!
         final long maximumCount = Math.max(1, requestedMaximumCount);
-        final long maxOffset = nextReadOffset + maximumCount;
+        long maxOffset = readOffset + maximumCount;
         final List<JournalReadEntry> messages = Lists.newArrayListWithCapacity((int) (maximumCount));
         try (Timer.Context ignored = readTime.time()) {
+            final long logStartOffset = getLogStartOffset();
+            if (readOffset < logStartOffset) {
+                log.debug("Read offset {} before start of log at {}, starting to read from the beginning of the journal.",
+                          readOffset, logStartOffset);
+                readOffset = logStartOffset;
+                maxOffset = readOffset + maximumCount;
+            }
             log.debug("Requesting to read a maximum of {} messages (or 5MB) from the journal, offset interval [{}, {})",
-                      maximumCount, nextReadOffset, maxOffset);
+                      maximumCount, readOffset, maxOffset);
             // TODO benchmark and make read-ahead strategy configurable for performance tuning
-            final MessageSet messageSet = kafkaLog.read(nextReadOffset,
+            final MessageSet messageSet = kafkaLog.read(readOffset,
                                                         5 * 1024 * 1024,
                                                         Option.<Object>apply(maxOffset));
 
@@ -367,10 +381,11 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
                 }
                 totalBytes += payloadBytes.length;
                 messages.add(new JournalReadEntry(payloadBytes, messageAndOffset.offset()));
+                // remember where to read from
                 nextReadOffset = messageAndOffset.nextOffset();
             }
             if (messages.isEmpty()) {
-                log.debug("No messages available to read for offset interval [{}, {}).", nextReadOffset, maxOffset);
+                log.debug("No messages available to read for offset interval [{}, {}).", readOffset, maxOffset);
             } else {
                 log.debug("Read {} messages, total payload size {}, from journal, offset interval [{}, {}]",
                           messages.size(), totalBytes, firstOffset, lastOffset);
@@ -378,7 +393,17 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
 
         } catch (OffsetOutOfRangeException e) {
             // TODO how do we recover from this? the exception doesn't contain the next valid offset :(
-            log.warn("Offset out of range, no messages available starting at offset {}", nextReadOffset);
+            log.warn("Offset out of range, no messages available starting at offset {}", readOffset);
+        } catch (Exception e) {
+            // the scala code does not declare the IOException in kafkaLog.read() so we can't catch it here
+            // sigh.
+            //noinspection ConstantConditions
+            if (e instanceof ClosedByInterruptException) {
+                log.debug("Interrupted while reading from journal, during shutdown this is harmless and ignored.", e);
+            } else {
+                throw e;
+            }
+
         }
         messagesRead.mark(messages.size());
         return messages;
@@ -484,22 +509,60 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
         return JavaConversions.asJavaIterable(kafkaLog.logSegments());
     }
 
+    /**
+     * Returns the journal size in bytes, exluding index files.
+     * @return journal size in bytes
+     */
     public long size() {
         return kafkaLog.size();
     }
 
+    /**
+     * Returns the number of segments this journal consists of.
+     * @return number of segments
+     */
     public int numberOfSegments() {
         return kafkaLog.numberOfSegments();
     }
 
+    /**
+     * Returns the highest journal offset that has been writting to persistent storage by Graylog2.
+     *<p>
+     *     Every message at an offset prior to this one can be considered as processed and does not need to be held in
+     *     the journal any longer. By default Graylog2 will try to aggressively flush the journal to consume a smaller
+     *     amount of disk space.
+     *</p>
+     * @return the offset of the last message which has been successfully processed.
+     */
     public long getCommittedReadOffset() {
         return committedOffset.get();
     }
 
+    /**
+     * Discards all data in the journal prior to the given offset.
+     * @param offset offset to truncate to, so that no offset in the journal is larger than this.
+     */
     public void truncateTo(long offset) {
         kafkaLog.truncateTo(offset);
     }
 
+    /**
+     * Returns the first valid offset in the entire journal.
+     * @return first offset
+     */
+    public long getLogStartOffset() {
+        final Iterable<LogSegment> logSegments = JavaConversions.asJavaIterable(kafkaLog.logSegments());
+        final LogSegment segment = Iterables.getFirst(logSegments, null);
+        if (segment == null) {
+            return 0;
+        }
+        return segment.baseOffset();
+    }
+
+    /**
+     * returns the offset for the next value to be inserted in the entire journal.
+     * @return the next offset value (last valid offset is this number - 1)
+     */
     public long getLogEndOffset() {
         return kafkaLog.logEndOffset();
     }

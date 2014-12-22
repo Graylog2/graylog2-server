@@ -37,6 +37,7 @@ import java.io.File;
 import java.net.InetAddress;
 import java.net.URI;
 
+@SuppressWarnings("FieldMayBeFinal")
 public abstract class BaseConfiguration {
     private static final Logger LOG = LoggerFactory.getLogger(BaseConfiguration.class);
     protected static final int GRAYLOG2_DEFAULT_PORT = 12900;
@@ -68,7 +69,6 @@ public abstract class BaseConfiguration {
     @Parameter(value = "rest_enable_gzip")
     private boolean restEnableGzip = false;
 
-
     @Parameter(value = "rest_max_initial_line_length", required = true, validator = PositiveIntegerValidator.class)
     private int restMaxInitialLineLength = 4096;
 
@@ -92,6 +92,9 @@ public abstract class BaseConfiguration {
 
     @Parameter(value = "rest_tls_key_password")
     private String restTlsKeyPassword;
+
+    @Parameter(value = "rest_worker_threads_max_pool_size", required = true, validator = PositiveIntegerValidator.class)
+    private int restWorkerThreadsMaxPoolSize = 16;
 
     @Parameter(value = "groovy_shell_enable")
     private boolean groovyShellEnable = false;
@@ -230,6 +233,10 @@ public abstract class BaseConfiguration {
 
     public String getRestTlsKeyPassword() {
         return restTlsKeyPassword;
+    }
+
+    public int getRestWorkerThreadsMaxPoolSize() {
+        return restWorkerThreadsMaxPoolSize;
     }
 
     public boolean isGroovyShellEnable() {

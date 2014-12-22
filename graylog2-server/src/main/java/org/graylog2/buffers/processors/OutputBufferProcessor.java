@@ -22,12 +22,10 @@ import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import com.google.inject.assistedinject.Assisted;
-import com.google.inject.assistedinject.AssistedInject;
-import com.lmax.disruptor.EventHandler;
+import com.google.inject.Inject;
+import com.lmax.disruptor.WorkHandler;
 import org.graylog2.Configuration;
 import org.graylog2.outputs.CachedOutputRouter;
-import org.graylog2.outputs.OutputRegistry;
 import org.graylog2.outputs.OutputRouter;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.ServerStatus;
@@ -47,18 +45,13 @@ import java.util.concurrent.TimeUnit;
 
 import static com.codahale.metrics.MetricRegistry.name;
 
-public class OutputBufferProcessor implements EventHandler<MessageEvent> {
-    public interface Factory {
-        public OutputBufferProcessor create(@Assisted("ordinal") final long ordinal,
-                                            @Assisted("numberOfConsumers") final long numberOfCOnsumers);
-    }
+public class OutputBufferProcessor implements WorkHandler<MessageEvent> {
 
     private static final Logger LOG = LoggerFactory.getLogger(OutputBufferProcessor.class);
 
     private final ExecutorService executor;
 
     private final Configuration configuration;
-    private final OutputRegistry outputRegistry;
     private final ThroughputStats throughputStats;
     private final ServerStatus serverStatus;
 
@@ -69,27 +62,19 @@ public class OutputBufferProcessor implements EventHandler<MessageEvent> {
     private final Timer processTime;
 
     private final OutputRouter outputRouter;
-    private final long ordinal;
-    private final long numberOfConsumers;
 
-    @AssistedInject
+    @Inject
     public OutputBufferProcessor(Configuration configuration,
                                  MetricRegistry metricRegistry,
-                                 OutputRegistry outputRegistry,
                                  ThroughputStats throughputStats,
                                  ServerStatus serverStatus,
-                                 CachedOutputRouter outputRouter,
-                                 @Assisted("ordinal") final long ordinal,
-                                 @Assisted("numberOfConsumers") final long numberOfConsumers) {
+                                 CachedOutputRouter outputRouter) {
         this.configuration = configuration;
-        this.outputRegistry = outputRegistry;
         this.throughputStats = throughputStats;
         this.serverStatus = serverStatus;
         this.outputRouter = outputRouter;
-        this.ordinal = ordinal;
-        this.numberOfConsumers = numberOfConsumers;
 
-        final String nameFormat = "outputbuffer-processor-" + ordinal + "-executor-%d";
+        final String nameFormat = "outputbuffer-processor-executor-%d";
         final int corePoolSize = configuration.getOutputBufferProcessorThreadsCorePoolSize();
         final int maxPoolSize = configuration.getOutputBufferProcessorThreadsMaxPoolSize();
         final int keepAliveTime = configuration.getOutputBufferProcessorKeepAliveTime();
@@ -111,15 +96,14 @@ public class OutputBufferProcessor implements EventHandler<MessageEvent> {
     }
 
     @Override
-    public void onEvent(MessageEvent event, long sequence, boolean endOfBatch) throws Exception {
-        // Because Trisha said so. (http://code.google.com/p/disruptor/wiki/FrequentlyAskedQuestions)
-        if ((sequence % numberOfConsumers) != ordinal) {
-            return;
-        }
-
+    public void onEvent(MessageEvent event) throws Exception {
         incomingMessages.mark();
 
         final Message msg = event.getMessage();
+        if (msg == null) {
+            LOG.debug("Skipping null message.");
+            return;
+        }
         LOG.debug("Processing message <{}> from OutputBuffer.", msg.getId());
 
         final Set<MessageOutput> messageOutputs = outputRouter.getOutputsForMessage(msg);
@@ -144,7 +128,7 @@ public class OutputBufferProcessor implements EventHandler<MessageEvent> {
                 executor.submit(new Runnable() {
                     @Override
                     public void run() {
-                        try (Timer.Context context = processTime.time()) {
+                        try (Timer.Context ignored = processTime.time()) {
                             output.write(msg);
                         } catch (Exception e) {
                             LOG.error("Error in output [" + output.getClass() + "].", e);

@@ -79,7 +79,7 @@ public class LogMessageTest {
         map.put("aha", "pipes");
 
         lm.addFields(map);
-        assertEquals(7, lm.getFields().size());
+        assertEquals(7, lm.getFieldCount());
         assertEquals("wut", lm.getField("lol"));
         assertEquals("pipes", lm.getField("aha"));
         assertEquals("hai", lm.getField("ohai"));
@@ -93,7 +93,7 @@ public class LogMessageTest {
 
         lm.removeField("something_else");
 
-        assertEquals(5, lm.getFields().size());
+        assertEquals(5, lm.getFieldCount());
         assertEquals("foo", lm.getField("something"));
     }
 
@@ -105,7 +105,7 @@ public class LogMessageTest {
 
         lm.removeField("LOLIDONTEXIST");
 
-        assertEquals(6, lm.getFields().size());
+        assertEquals(6, lm.getFieldCount());
     }
     
     @Test
@@ -120,7 +120,7 @@ public class LogMessageTest {
         assertEquals("foo", lm.getField("message"));
         assertEquals("bar", lm.getField("source"));
         assertEquals(time, lm.getField("timestamp"));
-        assertEquals(4, lm.getFields().size());
+        assertEquals(4, lm.getFieldCount());
     }
 
     @Test

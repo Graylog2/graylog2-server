@@ -17,6 +17,7 @@
 package org.graylog2.security.ldap;
 
 import com.google.common.util.concurrent.SimpleTimeLimiter;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.common.util.concurrent.UncheckedTimeoutException;
 import org.apache.directory.api.ldap.model.cursor.CursorException;
 import org.apache.directory.api.ldap.model.cursor.EntryCursor;
@@ -37,6 +38,7 @@ import java.text.MessageFormat;
 import java.util.Iterator;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 
 public class LdapConnector {
@@ -58,7 +60,8 @@ public class LdapConnector {
         }
 
         // this will perform an anonymous bind if there were no system credentials
-        final SimpleTimeLimiter timeLimiter = new SimpleTimeLimiter(Executors.newSingleThreadExecutor());
+        final ThreadFactory threadFactory = new ThreadFactoryBuilder().setNameFormat("ldap-connector-%d").build();
+        final SimpleTimeLimiter timeLimiter = new SimpleTimeLimiter(Executors.newSingleThreadExecutor(threadFactory));
         @SuppressWarnings("unchecked")
         final Callable<Boolean> timeLimitedConnection = timeLimiter.newProxy(
                 new Callable<Boolean>() {
