@@ -20,7 +20,6 @@ import com.codahale.metrics.InstrumentedExecutorService;
 import com.codahale.metrics.MetricRegistry;
 import com.google.common.util.concurrent.AbstractIdleService;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import com.google.inject.internal.util.$Nullable;
 import org.glassfish.jersey.jackson.JacksonFeature;
 import org.glassfish.jersey.message.GZipEncoder;
 import org.glassfish.jersey.server.ContainerFactory;
@@ -54,6 +53,7 @@ import org.jboss.netty.handler.stream.ChunkedWriteHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.net.ssl.SSLException;
@@ -94,7 +94,7 @@ public class RestApiService extends AbstractIdleService {
     @Inject
     public RestApiService(BaseConfiguration configuration,
                           MetricRegistry metricRegistry,
-                          @$Nullable SecurityContextFactory securityContextFactory,
+                          @Nullable SecurityContextFactory securityContextFactory,
                           Set<Class<? extends DynamicFeature>> dynamicFeatures,
                           Set<Class<? extends ContainerResponseFilter>> containerResponseFilters,
                           Set<Class<? extends ExceptionMapper>> exceptionMappers,
@@ -114,8 +114,9 @@ public class RestApiService extends AbstractIdleService {
                            final Map<String, Set<PluginRestResource>> pluginRestResources,
                            final ExecutorService bossExecutor,
                            final ExecutorService workerExecutor) {
-        this(configuration, metricRegistry, securityContextFactory, dynamicFeatures, containerResponseFilters,
-                exceptionMappers, pluginRestResources, buildServerBootStrap(bossExecutor, workerExecutor));
+        this(configuration, metricRegistry, securityContextFactory, dynamicFeatures,
+                containerResponseFilters, exceptionMappers, pluginRestResources,
+                buildServerBootStrap(bossExecutor, workerExecutor, configuration.getRestWorkerThreadsMaxPoolSize()));
     }
 
     private RestApiService(final BaseConfiguration configuration,
@@ -144,8 +145,9 @@ public class RestApiService extends AbstractIdleService {
                 name(RestApiService.class, executorName));
     }
 
-    private static ServerBootstrap buildServerBootStrap(final ExecutorService bossExecutor, final ExecutorService workerExecutor) {
-        return new ServerBootstrap(new NioServerSocketChannelFactory(bossExecutor, workerExecutor));
+    private static ServerBootstrap buildServerBootStrap(final ExecutorService bossExecutor,
+                                                        final ExecutorService workerExecutor, final int workerCount) {
+        return new ServerBootstrap(new NioServerSocketChannelFactory(bossExecutor, workerExecutor, workerCount));
     }
 
     @Override
