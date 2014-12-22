@@ -81,13 +81,14 @@ class QueryInput {
         visitor.visit(ast);
         var serializedAst: queryParser.AST[] = visitor.result();
 
+        console.log(parser.errors);
+
         if (serializedAst.length === 0) {
             possibleMatches = possibleMatches.concat(this.fieldsCompletions());
+            possibleMatches = possibleMatches.concat(this.unaryOperatorsCompletions());
         } else {
-            var currentAST =  serializedAst.pop();
-            if (currentAST instanceof queryParser.TermAST) {
-                possibleMatches = possibleMatches.concat(this.fieldsCompletions());
-            }
+            var currentAST = serializedAst.pop();
+            var previousAST = serializedAst.pop();
 
             var querySegmentVisitor = new DumpVisitor();
             querySegmentVisitor.visit(currentAST);
@@ -96,6 +97,23 @@ class QueryInput {
             var prefixVisitor = new DumpVisitor(currentAST);
             prefixVisitor.visit(ast);
             prefix = prefixVisitor.result();
+
+            if (currentAST instanceof queryParser.TermAST) {
+                possibleMatches = possibleMatches.concat(this.fieldsCompletions());
+                if ((serializedAst.length > 1) && !(previousAST instanceof queryParser.ExpressionAST)) {
+                    possibleMatches = possibleMatches.concat(this.binaryOperatorsCompletions());
+                } else {
+                    possibleMatches = possibleMatches.concat(this.unaryOperatorsCompletions());
+                }
+            }
+
+            if (currentAST instanceof queryParser.MissingAST) {
+                if (prefix.charAt(prefix.length - 1) !== " ") {
+                    prefix += " ";
+                }
+                possibleMatches = possibleMatches.concat(this.fieldsCompletions());
+                possibleMatches = possibleMatches.concat(this.unaryOperatorsCompletions());
+            }
         }
         this.filter(prefix, query, possibleMatches, matches, {prefixOnly: true});
         this.filter(prefix, query, possibleMatches, matches);
@@ -113,6 +131,19 @@ class QueryInput {
         return possibleMatches;
     }
 
+    private unaryOperatorsCompletions(): string[] {
+        return ["NOT"];
+    }
+
+    private binaryOperatorsCompletions(): string[] {
+        var possibleMatches = [];
+
+        possibleMatches.push("AND");
+        possibleMatches.push("NOT");
+        possibleMatches.push("OR");
+
+        return possibleMatches;
+    }
 }
 
 export = QueryInput;
