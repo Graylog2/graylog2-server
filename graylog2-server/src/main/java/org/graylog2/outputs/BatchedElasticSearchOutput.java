@@ -24,6 +24,7 @@ import com.codahale.metrics.Timer;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.graylog2.Configuration;
 import org.graylog2.indexer.cluster.Cluster;
 import org.graylog2.indexer.messages.Messages;
@@ -35,6 +36,7 @@ import javax.inject.Inject;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
 
 import static com.codahale.metrics.MetricRegistry.name;
 
@@ -60,8 +62,15 @@ public class BatchedElasticSearchOutput extends ElasticSearchOutput {
         this.batchSize = metricRegistry.histogram(name(this.getClass(), "batchSize"));
         this.bufferFlushes = metricRegistry.meter(name(this.getClass(), "bufferFlushes"));
         this.bufferFlushesRequested = metricRegistry.meter(name(this.getClass(), "bufferFlushesRequested"));
-        this.flushThread = new InstrumentedExecutorService(
-                Executors.newSingleThreadExecutor(),
+        this.flushThread = executorService(metricRegistry);
+    }
+
+    private ExecutorService executorService(final MetricRegistry metricRegistry) {
+        final ThreadFactory threadFactory = new ThreadFactoryBuilder()
+                .setNameFormat("batched-elasticsearch-output-%d")
+                .build();
+        return new InstrumentedExecutorService(
+                Executors.newSingleThreadExecutor(threadFactory),
                 metricRegistry,
                 name(this.getClass(), "executor-service"));
     }
@@ -87,7 +96,7 @@ public class BatchedElasticSearchOutput extends ElasticSearchOutput {
     private void synchronousFlush(List<Message> messageBuffer) {
         LOG.debug("[{}] Starting flushing {} messages", Thread.currentThread(), messageBuffer.size());
 
-        try(Timer.Context context = this.processTime.time()) {
+        try (Timer.Context context = this.processTime.time()) {
             write(messageBuffer);
             this.batchSize.update(messageBuffer.size());
             this.bufferFlushes.mark();

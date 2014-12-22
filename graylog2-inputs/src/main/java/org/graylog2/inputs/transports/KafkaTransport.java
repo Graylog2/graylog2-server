@@ -22,6 +22,7 @@ import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.MetricSet;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.common.util.concurrent.Uninterruptibles;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
@@ -62,6 +63,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -188,10 +190,7 @@ public class KafkaTransport extends ThrottleableTransport {
         final TopicFilter filter = new Whitelist(configuration.getString(CK_TOPIC_FILTER));
 
         final List<KafkaStream<byte[], byte[]>> streams = cc.createMessageStreamsByFilter(filter, numThreads);
-        final ExecutorService executor = new InstrumentedExecutorService(
-                Executors.newFixedThreadPool(numThreads),
-                metricRegistry,
-                name(this.getClass(), "executor-service"));
+        final ExecutorService executor = executorService(numThreads);
 
         // this is being used during shutdown to first stop all submitted jobs before committing the offsets back to zookeeper
         // and then shutting down the connection.
@@ -278,6 +277,14 @@ public class KafkaTransport extends ThrottleableTransport {
                 lastSecBytesRead.set(lastSecBytesReadTmp.getAndSet(0));
             }
         }, 1, 1, TimeUnit.SECONDS);
+    }
+
+    private ExecutorService executorService(int numThreads) {
+        final ThreadFactory threadFactory = new ThreadFactoryBuilder().setNameFormat("kafka-transport-%d").build();
+        return new InstrumentedExecutorService(
+                Executors.newFixedThreadPool(numThreads, threadFactory),
+                metricRegistry,
+                name(this.getClass(), "executor-service"));
     }
 
     @Override

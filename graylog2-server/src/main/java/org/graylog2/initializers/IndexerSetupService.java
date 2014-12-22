@@ -23,6 +23,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Splitter;
 import com.google.common.net.HostAndPort;
 import com.google.common.util.concurrent.AbstractIdleService;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.ning.http.client.AsyncHttpClient;
@@ -42,7 +43,9 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
 
 import static com.codahale.metrics.MetricRegistry.name;
 import static com.google.common.base.Strings.isNullOrEmpty;
@@ -78,10 +81,15 @@ public class IndexerSetupService extends AbstractIdleService {
                 // Properly close ElasticSearch node.
                 IndexerSetupService.this.node.close();
             }
-        }, new InstrumentedExecutorService(
-                Executors.newSingleThreadExecutor(),
+        }, executorService(metricRegistry));
+    }
+
+    private ExecutorService executorService(MetricRegistry metricRegistry) {
+        final ThreadFactory threadFactory = new ThreadFactoryBuilder().setNameFormat("indexer-setup-service-%d").build();
+        return new InstrumentedExecutorService(
+                Executors.newSingleThreadExecutor(threadFactory),
                 metricRegistry,
-                name(this.getClass(), "executor-service")));
+                name(this.getClass(), "executor-service"));
     }
 
     @Override
