@@ -16,7 +16,10 @@
  */
 package org.graylog2.inputs.transports;
 
+import com.codahale.metrics.InstrumentedExecutorService;
+import com.codahale.metrics.MetricRegistry;
 import com.google.common.collect.Maps;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import org.graylog2.plugin.ConfigClass;
@@ -37,11 +40,13 @@ import org.jboss.netty.channel.ChannelHandler;
 import org.jboss.netty.handler.codec.frame.DelimiterBasedFrameDecoder;
 
 import javax.inject.Named;
-import javax.inject.Provider;
 import java.util.LinkedHashMap;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
 
+import static com.codahale.metrics.MetricRegistry.name;
 import static org.jboss.netty.handler.codec.frame.Delimiters.lineDelimiter;
 import static org.jboss.netty.handler.codec.frame.Delimiters.nulDelimiter;
 
@@ -55,11 +60,25 @@ public class TcpTransport extends AbstractTcpTransport {
     @AssistedInject
     public TcpTransport(@Assisted Configuration configuration,
                         @Named("bossPool") Executor bossPool,
-                        @Named("cached") Provider<Executor> workerPoolProvider,
                         ThroughputCounter throughputCounter,
                         ConnectionCounter connectionCounter,
                         LocalMetricRegistry localRegistry) {
-        super(configuration, throughputCounter, localRegistry, bossPool, workerPoolProvider, connectionCounter);
+        this(configuration,
+                bossPool,
+                executorService("worker", "tcp-transport-worker-%d", localRegistry),
+                throughputCounter,
+                connectionCounter,
+                localRegistry);
+
+    }
+
+    protected TcpTransport(final Configuration configuration,
+                           final Executor bossPool,
+                           final Executor workerPool,
+                           final ThroughputCounter throughputCounter,
+                           final ConnectionCounter connectionCounter,
+                           final LocalMetricRegistry localRegistry) {
+        super(configuration, throughputCounter, localRegistry, bossPool, workerPool, connectionCounter);
 
         final boolean nulDelimiter = configuration.getBoolean(CK_USE_NULL_DELIMITER);
         this.delimiter = nulDelimiter ? nulDelimiter() : lineDelimiter();
@@ -69,6 +88,14 @@ public class TcpTransport extends AbstractTcpTransport {
         } else {
             maxFrameLength = Config.DEFAULT_MAX_FRAME_LENGTH;
         }
+    }
+
+    private static Executor executorService(final String executorName, final String threadNameFormat, final MetricRegistry metricRegistry) {
+        final ThreadFactory threadFactory = new ThreadFactoryBuilder().setNameFormat(threadNameFormat).build();
+        return new InstrumentedExecutorService(
+                Executors.newCachedThreadPool(threadFactory),
+                metricRegistry,
+                name(TcpTransport.class, executorName, "executor-service"));
     }
 
     @Override
