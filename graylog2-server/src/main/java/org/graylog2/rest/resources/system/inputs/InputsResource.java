@@ -35,6 +35,7 @@ import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationException;
+import org.graylog2.plugin.inputs.Extractor;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.rest.resources.RestResource;
 import org.graylog2.rest.resources.system.inputs.responses.InputCreated;
@@ -69,6 +70,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import java.net.URI;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -182,7 +184,7 @@ public class InputsResource extends RestResource {
         // Build input.
         final MessageInput input;
         try {
-            input = messageInputFactory.create(lr, getCurrentUser().getName());
+            input = messageInputFactory.create(lr, getCurrentUser().getName(), serverStatus.getNodeId().toString());
 
             input.checkConfiguration();
         } catch (NoSuchInputTypeException e) {
@@ -220,19 +222,7 @@ public class InputsResource extends RestResource {
 
     private Input getInput(MessageInput input) throws ValidationException {
         // Build MongoDB data
-        final Map<String, Object> inputData = Maps.newHashMap();
-        inputData.put(MessageInput.FIELD_INPUT_ID, input.getId());
-        inputData.put(MessageInput.FIELD_TITLE, input.getTitle());
-        inputData.put(MessageInput.FIELD_TYPE, input.getType());
-        inputData.put(MessageInput.FIELD_CREATOR_USER_ID, getCurrentUser().getName());
-        inputData.put(MessageInput.FIELD_CONFIGURATION, input.getConfiguration().getSource());
-        inputData.put(MessageInput.FIELD_CREATED_AT, Tools.iso8601());
-
-        if (input.isGlobal()) {
-            inputData.put(MessageInput.FIELD_GLOBAL, true);
-        } else {
-            inputData.put(MessageInput.FIELD_NODE_ID, serverStatus.getNodeId().toString());
-        }
+        final Map<String, Object> inputData = input.asMap();
 
         // ... and check if it would pass validation. We don't need to go on if it doesn't.
         final Input mongoInput;
@@ -291,15 +281,25 @@ public class InputsResource extends RestResource {
             @ApiResponse(code = 400, message = "Missing or invalid input configuration.")
     })
     public Response update(@ApiParam(name = "JSON body", required = true) @Valid @NotNull InputLaunchRequest lr,
-                           @ApiParam(name = "inputId", required = true) @PathParam("inputId") String inputId) throws ValidationException {
+                           @ApiParam(name = "inputId", required = true) @PathParam("inputId") String inputId) throws ValidationException, org.graylog2.database.NotFoundException {
         checkPermission(RestPermissions.INPUTS_EDIT, inputId);
 
-        LOG.info("InputLaunchRequest: {}", lr);
         try {
-            final MessageInput messageInput = messageInputFactory.create(lr, getCurrentUser().getName());
+            final Input oldInput = inputService.find(inputId);
+            final MessageInput messageInput = messageInputFactory.create(lr, getCurrentUser().getName(), serverStatus.getNodeId().toString());
             messageInput.setPersistId(inputId);
             final Input mongoInput = getInput(messageInput);
+
+            final List<Extractor> extractors = inputService.getExtractors(oldInput);
+            final Map<String, String> staticFields = oldInput.getStaticFields();
+
             inputService.save(mongoInput);
+
+            for (Map.Entry<String, String> entry : staticFields.entrySet())
+                inputService.addStaticField(mongoInput, entry.getKey(), entry.getValue());
+
+            for (Extractor extractor : extractors)
+                inputService.addExtractor(mongoInput, extractor);
         } catch (NoSuchInputTypeException e) {
             e.printStackTrace();
         }

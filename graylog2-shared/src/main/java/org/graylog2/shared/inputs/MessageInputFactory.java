@@ -41,12 +41,14 @@ public class MessageInputFactory {
         throw new NoSuchInputTypeException("There is no input of type <" + type + "> registered.");
     }
 
-    public MessageInput create(InputLaunchRequest lr, String user) throws NoSuchInputTypeException {
+    public MessageInput create(InputLaunchRequest lr, String user, String nodeId) throws NoSuchInputTypeException {
         final MessageInput input = create(lr.type(), new Configuration(lr.configuration()));
         input.setTitle(lr.title());
         input.setGlobal(lr.global());
         input.setCreatorUserId(user);
         input.setCreatedAt(Tools.iso8601());
+        if (!lr.global())
+            input.setNodeId(nodeId);
 
         return input;
     }

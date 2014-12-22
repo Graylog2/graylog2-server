@@ -43,6 +43,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -50,6 +51,7 @@ public abstract class MessageInput implements Stoppable {
     private static final Logger LOG = LoggerFactory.getLogger(MessageInput.class);
 
     public static final String CK_OVERRIDE_SOURCE = "override_source";
+    public static final String FIELD_ID = "_id";
     public static final String FIELD_TYPE = "type";
     public static final String FIELD_INPUT_ID = "input_id";
     public static final String FIELD_PERSIST_ID = "persist_id";
@@ -99,6 +101,7 @@ public abstract class MessageInput implements Stoppable {
 
     protected final Configuration configuration;
     protected InputBuffer inputBuffer;
+    private String nodeId;
 
     public MessageInput(MetricRegistry metricRegistry,
                         Configuration configuration,
@@ -273,22 +276,39 @@ public abstract class MessageInput implements Stoppable {
     }
 
     @JsonValue
+    public Map<String, Object> asMapMasked() {
+        final Map<String, Object> result = asMap();
+        result.remove(FIELD_CONFIGURATION);
+        result.put(FIELD_ATTRIBUTES, getAttributesWithMaskedPasswords());
+
+        return result;
+    }
+
     public Map<String, Object> asMap() {
-        final Map<String, Object> inputMap = Maps.newHashMap();
+        final MessageInput messageInput = this;
+        return new HashMap<String, Object>() {{
+            put(FIELD_TYPE, messageInput.getClass().getCanonicalName());
+            put(FIELD_INPUT_ID, messageInput.getId());
+            put(FIELD_PERSIST_ID, messageInput.getPersistId());
+            put(FIELD_NAME, messageInput.getName());
+            put(FIELD_TITLE, messageInput.getTitle());
+            put(FIELD_CREATOR_USER_ID, messageInput.getCreatorUserId());
+            put(FIELD_GLOBAL, messageInput.isGlobal());
+            put(FIELD_CONTENT_PACK, messageInput.getContentPack());
+            put(FIELD_CONFIGURATION, messageInput.getConfiguration().getSource());
 
-        inputMap.put(FIELD_TYPE, this.getClass().getCanonicalName());
-        inputMap.put(FIELD_INPUT_ID, this.getId());
-        inputMap.put(FIELD_PERSIST_ID, this.getPersistId());
-        inputMap.put(FIELD_NAME, this.getName());
-        inputMap.put(FIELD_TITLE, this.getTitle());
-        inputMap.put(FIELD_CREATOR_USER_ID, this.getCreatorUserId());
-        inputMap.put(FIELD_CREATED_AT, Tools.getISO8601String(this.getCreatedAt()));
-        inputMap.put(FIELD_ATTRIBUTES, this.getAttributesWithMaskedPasswords());
-        inputMap.put(FIELD_STATIC_FIELDS, this.getStaticFields());
-        inputMap.put(FIELD_GLOBAL, this.isGlobal());
-        inputMap.put(FIELD_CONTENT_PACK, this.getContentPack());
+            if (messageInput.getCreatedAt() != null)
+                put(FIELD_CREATED_AT, messageInput.getCreatedAt());
+            else
+                put(FIELD_CREATED_AT, Tools.iso8601());
 
-        return inputMap;
+
+            if (messageInput.getStaticFields() != null && !messageInput.getStaticFields().isEmpty())
+                put(FIELD_STATIC_FIELDS, messageInput.getStaticFields());
+
+            if (!messageInput.isGlobal())
+                put(FIELD_NODE_ID, messageInput.getNodeId());
+        }};
     }
 
     public void addStaticField(String key, String value) {
@@ -340,6 +360,14 @@ public abstract class MessageInput implements Stoppable {
 
     public String getType() {
         return this.getClass().getCanonicalName();
+    }
+
+    public String getNodeId() {
+        return nodeId;
+    }
+
+    public void setNodeId(String nodeId) {
+        this.nodeId = nodeId;
     }
 
     public interface Factory<M> {
