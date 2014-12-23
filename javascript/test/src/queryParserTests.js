@@ -441,5 +441,55 @@ describe('Query Parser', function () {
         expect(parser.errors[1].position).toBe(7);
         expectIdentityDump(query, true);
     });
+
+    it('can parse a MUST expression', function () {
+        var query = "+submit";
+        var parser = new QueryParser(query);
+        var ast = parser.parse();
+        expectNoErrors(parser);
+        expect(ast instanceof ModifierAST).toBeTruthy();
+        expect(ast.modifier.type).toBe(TokenType.MUST);
+        expect(ast.right instanceof TermAST).toBeTruthy();
+
+        expectIdentityDump(query);
+    });
+
+    it('can parse a MUST_NOT expression', function () {
+        var query = "-submit";
+        var parser = new QueryParser(query);
+        var ast = parser.parse();
+        expectNoErrors(parser);
+        expect(ast instanceof ModifierAST).toBeTruthy();
+        expect(ast.modifier.type).toBe(TokenType.MUST_NOT);
+        expect(ast.right instanceof TermAST).toBeTruthy();
+
+        expectIdentityDump(query);
+    });
+
+    // TODO: This kind of query should not create any errors, the modifier seems to be silently ignored.
+    it('does not recognise MUST as modifier when followed by whitespace', function() {
+        var query = '+ login';
+        var parser = new QueryParser(query);
+        var ast = parser.parse();
+        expectIdentityDump(query, true);
+    });
+
+    it('reports an error on double MUST or MUST_NOT modifier', function() {
+        var query = '+-login';
+        var parser = new QueryParser(query);
+        var ast = parser.parse();
+        expect(parser.errors.length).toBe(1);
+        expect(parser.errors[0].message).toBe("Missing right side of expression");
+        expect(parser.errors[0].position).toBe(1);
+        expectIdentityDump(query, true);
+    });
+
+    it('+ and - only work as modifiers at the beginning of the term', function() {
+        var query = "start+-end";
+        var parser = new QueryParser(query);
+        var ast = parser.parse();
+        expectNoErrors(parser);
+        expect(ast instanceof TermAST).toBeTruthy();
+    })
 });
 

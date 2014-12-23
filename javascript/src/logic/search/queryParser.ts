@@ -5,7 +5,7 @@
 // Reference to original lucene query parser https://svn.apache.org/repos/asf/lucene/dev/trunk/lucene/queryparser/src/java/org/apache/lucene/queryparser/classic/QueryParser.jj
 
 export enum TokenType {
-    EOF, WS, TERM, PHRASE, AND, OR, NOT, COLON, ERROR
+    EOF, WS, TERM, PHRASE, AND, OR, NOT, COLON, MUST, MUST_NOT, ERROR
 }
 
 export class AST {
@@ -104,6 +104,10 @@ class QueryLexer {
             token = this.and();
         } else if (this.isKeyword("NOT") || this.isKeyword("!")) {
             token = this.not();
+        } else if (this.isPrefix("+")) {
+            token = this.must();
+        } else if (this.isPrefix("-")) {
+            token = this.mustNot();
         } else if (la === '"') {
             token = this.phrase();
         } else if (la === ':') {
@@ -126,14 +130,33 @@ class QueryLexer {
         return token;
     }
 
-    isKeyword(keyword: string): boolean {
+    // Check if the keyword is on the current position.
+    // Returns the keyword length if it was found, -1 in other case.
+    private lookAheadKeyword(keyword: string): number {
         for (var i = 0; i < keyword.length; i++) {
             if (this.lookAhead(i) !== keyword[i]) {
-                return false;
+                return -1;
             }
+        }
+        return i;
+    }
+
+    isKeyword(keyword: string): boolean {
+        var i = this.lookAheadKeyword(keyword);
+        if (i < 0) {
+            return false;
         }
         // be sure that it is not a prefix of something else
         return this.isWhitespace(this.lookAhead(i)) || this.lookAhead(i) === null;
+    }
+
+    isPrefix(keyword: string): boolean {
+        var i = this.lookAheadKeyword(keyword);
+        if (i < 0) {
+            return false;
+        }
+        // be sure that it is a prefix
+        return !this.isWhitespace(this.lookAhead(i)) && this.lookAhead(i) !== null;
     }
 
     or() {
@@ -152,6 +175,18 @@ class QueryLexer {
         var startPos = this.pos;
         this.consume(this.lookAhead() === '!' ? 1 : 3);
         return new Token(this.input, TokenType.NOT, startPos, this.pos);
+    }
+
+    must() {
+        var startPos = this.pos;
+        this.consume(1);
+        return new Token(this.input, TokenType.MUST, startPos, this.pos);
+    }
+
+    mustNot() {
+        var startPos = this.pos;
+        this.consume(1);
+        return new Token(this.input, TokenType.MUST_NOT, startPos, this.pos);
     }
 
     whitespace() {
@@ -226,7 +261,7 @@ class QueryLexer {
         if (char === '\\') {
             this.consume();
             if (this.input.length <= index) {
-                var escapedChar = this.input[index]
+                var escapedChar = this.input[index];
                 char += escapedChar;
             }
         }
@@ -249,7 +284,7 @@ export class QueryParser {
         termOrPhrase: [TokenType.TERM, TokenType.PHRASE],
         expr: [TokenType.TERM, TokenType.PHRASE],
         operator: [TokenType.OR, TokenType.AND],
-        modifier: [TokenType.NOT]
+        modifier: [TokenType.NOT, TokenType.MUST, TokenType.MUST_NOT]
     };
     private static followSets: Rule2Token = {
         expr: QueryParser.firstSets["expr"].concat(QueryParser.firstSets["operator"]).concat(QueryParser.firstSets["modifier"]),
