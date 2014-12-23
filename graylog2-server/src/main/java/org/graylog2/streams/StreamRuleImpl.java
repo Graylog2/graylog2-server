@@ -40,12 +40,12 @@ import static com.google.common.base.MoreObjects.firstNonNull;
  */
 @CollectionName("streamrules")
 public class StreamRuleImpl extends PersistedImpl implements StreamRule {
-    public static final String FIELD_TYPE = "type";
-    public static final String FIELD_VALUE = "value";
-    public static final String FIELD_FIELD = "field";
-    public static final String FIELD_INVERTED = "inverted";
-    public static final String FIELD_STREAM_ID = "stream_id";
-    public static final String FIELD_CONTENT_PACK = "content_pack";
+    public static final String FIELD_TYPE = "type".intern();
+    public static final String FIELD_VALUE = "value".intern();
+    public static final String FIELD_FIELD = "field".intern();
+    public static final String FIELD_INVERTED = "inverted".intern();
+    public static final String FIELD_STREAM_ID = "stream_id".intern();
+    public static final String FIELD_CONTENT_PACK = "content_pack".intern();
 
     public StreamRuleImpl(Map<String, Object> fields) {
         super(fields);
