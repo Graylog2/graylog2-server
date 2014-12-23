@@ -15,6 +15,11 @@ interface Match {
     value: string;
 }
 
+interface SplitQuery {
+    current: string;
+    prefix: string;
+}
+
 class QueryInput {
     private typeAheadConfig: any;
     private typeAheadSource: any;
@@ -37,16 +42,18 @@ class QueryInput {
             displayKey: this.displayKey,
             source: this.codeCompletionProvider.bind(this),
             templates: {
+                // TODO: highlight errors on suggestions once query parser is completed
                 suggestion: (match: Match) => {
                     var previousTerms = match.prefix;
                     var matchPrefix = match.match.substring(0, match.match.indexOf(match.currentSegment));
                     var currentMatch = match.currentSegment;
                     var matchSuffix = match.match.substring(match.match.indexOf(match.currentSegment) + match.currentSegment.length);
-                    return '<p><strong>' + previousTerms + '</strong>' + matchPrefix +  '<strong>' + currentMatch + '</strong>' + matchSuffix +'</p>';
+                    return '<p><strong>' + previousTerms + '</strong>' + matchPrefix + '<strong>' + currentMatch + '</strong>' + matchSuffix + '</p>';
                 }
             }
         };
     }
+
     display() {
         this.fieldsPromise.done((fields) => {
             this.fields = fields;
@@ -54,26 +61,9 @@ class QueryInput {
         });
     }
 
-    private filter(prefix: string, query: string, possibleMatches: string[], matches: Array<Match>, config?: {prefixOnly: boolean}) {
-        possibleMatches.forEach((possibleMatch) => {
-            var isMatch = ((config && config.prefixOnly) ?
-                                possibleMatch.indexOf(query) === 0 :
-                                possibleMatch.indexOf(query) !== -1 && possibleMatch.indexOf(query) !== 0);
-            if (matches.length < this.limit && isMatch) {
-                var match: Match = {
-                    value: (prefix + possibleMatch).trim(),
-                    match: possibleMatch,
-                    currentSegment: query,
-                    prefix: prefix
-                };
-                matches.push(match);
-            }
-        });
-    }
-
     private codeCompletionProvider(query: string, callback: (matches: Array<any>) => void) {
         var prefix = "";
-        var matches:Array<any> = [];
+        var matches: Array<any> = [];
         var possibleMatches = [];
         var parser = new queryParser.QueryParser(query);
         var ast = parser.parse();
@@ -81,28 +71,28 @@ class QueryInput {
         visitor.visit(ast);
         var serializedAst: queryParser.AST[] = visitor.result();
 
-        console.log(parser.errors);
-
         if (serializedAst.length === 0) {
             possibleMatches = possibleMatches.concat(this.fieldsCompletions());
             possibleMatches = possibleMatches.concat(this.unaryOperatorsCompletions());
         } else {
+            var astLength = serializedAst.length;
+
             var currentAST = serializedAst.pop();
             var previousAST = serializedAst.pop();
 
-            var querySegmentVisitor = new DumpVisitor();
-            querySegmentVisitor.visit(currentAST);
-            query = querySegmentVisitor.result();
-
-            var prefixVisitor = new DumpVisitor(currentAST);
-            prefixVisitor.visit(ast);
-            prefix = prefixVisitor.result();
+            var splitQuery = this.splitQuery(ast, currentAST);
+            query = splitQuery.current;
+            prefix = splitQuery.prefix;
 
             if (currentAST instanceof queryParser.TermAST) {
                 possibleMatches = possibleMatches.concat(this.fieldsCompletions());
-                if ((serializedAst.length > 1) && !(previousAST instanceof queryParser.ExpressionAST)) {
-                    possibleMatches = possibleMatches.concat(this.binaryOperatorsCompletions());
-                } else {
+                var offerBinaryOperatorsCompletion = (astLength > 1) && !(previousAST instanceof queryParser.ExpressionAST);
+                var offerUnaryOperatorsCompletion = (astLength >= 1) && !(previousAST instanceof queryParser.ModifierAST);
+
+                if (offerBinaryOperatorsCompletion) {
+                    var includeNotCompletion = (prefix.lastIndexOf("NOT") === prefix.length - "NOT".length);
+                    possibleMatches = possibleMatches.concat(this.binaryOperatorsCompletions(includeNotCompletion));
+                } else if (offerUnaryOperatorsCompletion) {
                     possibleMatches = possibleMatches.concat(this.unaryOperatorsCompletions());
                 }
             }
@@ -115,9 +105,21 @@ class QueryInput {
                 possibleMatches = possibleMatches.concat(this.unaryOperatorsCompletions());
             }
         }
-        this.filter(prefix, query, possibleMatches, matches, {prefixOnly: true});
-        this.filter(prefix, query, possibleMatches, matches);
+        this.filterCompletionMatches(prefix, query, possibleMatches, matches, {prefixOnly: true});
+        this.filterCompletionMatches(prefix, query, possibleMatches, matches);
         callback(matches);
+    }
+
+    private splitQuery(ast: queryParser.AST, currentAST: queryParser.AST): SplitQuery {
+        var querySegmentVisitor = new DumpVisitor();
+        querySegmentVisitor.visit(currentAST);
+        var query = querySegmentVisitor.result();
+
+        var prefixVisitor = new DumpVisitor(currentAST);
+        prefixVisitor.visit(ast);
+        var prefix = prefixVisitor.result();
+
+        return {current: query, prefix: prefix};
     }
 
     private fieldsCompletions(): string[] {
@@ -135,14 +137,33 @@ class QueryInput {
         return ["NOT"];
     }
 
-    private binaryOperatorsCompletions(): string[] {
+    private binaryOperatorsCompletions(includeNotCompletion?: boolean): string[] {
         var possibleMatches = [];
 
         possibleMatches.push("AND");
-        possibleMatches.push("NOT");
+        if (includeNotCompletion) {
+            possibleMatches.push("NOT");
+        }
         possibleMatches.push("OR");
 
         return possibleMatches;
+    }
+
+    private filterCompletionMatches(prefix: string, query: string, possibleMatches: string[], matches: Array<Match>, config?: {prefixOnly: boolean}) {
+        possibleMatches.forEach((possibleMatch) => {
+            var isMatch = ((config && config.prefixOnly) ?
+            possibleMatch.indexOf(query) === 0 :
+            possibleMatch.indexOf(query) !== -1 && possibleMatch.indexOf(query) !== 0);
+            if (matches.length < this.limit && isMatch) {
+                var match: Match = {
+                    value: (prefix + possibleMatch).trim(),
+                    match: possibleMatch,
+                    currentSegment: query,
+                    prefix: prefix
+                };
+                matches.push(match);
+            }
+        });
     }
 }
 
