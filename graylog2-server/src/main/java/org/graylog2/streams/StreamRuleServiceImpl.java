@@ -62,11 +62,11 @@ public class StreamRuleServiceImpl extends PersistedServiceImpl implements Strea
     @Override
     public StreamRule create(String streamid, CreateStreamRuleRequest cr) {
         Map<String, Object> streamRuleData = Maps.newHashMap();
-        streamRuleData.put("type", cr.type);
-        streamRuleData.put("value", cr.value);
-        streamRuleData.put("field", cr.field);
-        streamRuleData.put("inverted", cr.inverted);
-        streamRuleData.put("stream_id", new ObjectId(streamid));
+        streamRuleData.put(StreamRuleImpl.FIELD_TYPE, cr.type);
+        streamRuleData.put(StreamRuleImpl.FIELD_VALUE, cr.value);
+        streamRuleData.put(StreamRuleImpl.FIELD_FIELD, cr.field);
+        streamRuleData.put(StreamRuleImpl.FIELD_INVERTED, cr.inverted);
+        streamRuleData.put(StreamRuleImpl.FIELD_STREAM_ID, new ObjectId(streamid));
 
         return new StreamRuleImpl(streamRuleData);
     }
@@ -76,7 +76,7 @@ public class StreamRuleServiceImpl extends PersistedServiceImpl implements Strea
         ObjectId id = new ObjectId(streamId);
         final List<StreamRule> streamRules = new ArrayList<StreamRule>();
         final List<DBObject> respStreamRules = query(StreamRuleImpl.class,
-                new BasicDBObject("stream_id", id)
+                new BasicDBObject(StreamRuleImpl.FIELD_STREAM_ID, id)
         );
 
         for (DBObject streamRule : respStreamRules) {
