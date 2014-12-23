@@ -31,13 +31,14 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicReference;
 
 public abstract class PersistedImpl implements Persisted {
     private static final Logger LOG = LoggerFactory.getLogger(PersistedImpl.class);
 
     protected final Map<String, Object> fields;
     protected final ObjectId id;
-    private transient final String hexId;
+    private final AtomicReference<String> hexId = new AtomicReference<>(null);
 
     protected PersistedImpl(final Map<String, Object> fields) {
         this(new ObjectId(), fields);
@@ -45,8 +46,11 @@ public abstract class PersistedImpl implements Persisted {
 
     protected PersistedImpl(final ObjectId id, final Map<String, Object> fields) {
         this.id = id;
-        this.hexId = id == null ? null : id.toHexString();
         this.fields = fields;
+
+        if (null != this.id) {
+            hexId.set(this.id.toHexString());
+        }
 
         // Transform all java.util.Date's to JodaTime because MongoDB gives back java.util.Date's. #lol
         for (Map.Entry<String, Object> field : fields.entrySet()) {
@@ -62,7 +66,15 @@ public abstract class PersistedImpl implements Persisted {
 
     @Override
     public String getId() {
-        return hexId;
+        // Performance - toHexString is expensive so we cache it.
+        final String s = hexId.get();
+        if (s == null && id != null) {
+            final String hexString = getObjectId().toHexString();
+            hexId.compareAndSet(null, hexString);
+            return hexString;
+        }
+
+        return s;
     }
 
     @Override
@@ -72,11 +84,12 @@ public abstract class PersistedImpl implements Persisted {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (!(o instanceof PersistedImpl))
+    public boolean equals(final Object o) {
+        if (!(o instanceof PersistedImpl)) {
             return false;
+        }
 
-        PersistedImpl other = (PersistedImpl) o;
+        final PersistedImpl other = (PersistedImpl) o;
         return Objects.equals(fields, other.fields) && Objects.equals(getObjectId(), other.getObjectId());
     }
 
@@ -88,14 +101,14 @@ public abstract class PersistedImpl implements Persisted {
     @Override
     public String toString() {
         return this.getClass().getSimpleName() + "{" +
-                "fields=" + fields +
-                ", id=" + hexId +
+                "fields=" + getFields() +
+                ", id=" + getId() +
                 '}';
     }
 
     @Override
     public Map<String, Object> asMap() {
-        Map<String, Object> result = new HashMap<>();
+        final Map<String, Object> result = new HashMap<>();
         for (Method method : this.getClass().getMethods()) {
             if (method.getName().startsWith("get") && method.getParameterTypes().length == 0) {
                 final String fieldName = method.getName().substring(3).toLowerCase();
