@@ -21,6 +21,7 @@ interface SplitQuery {
 }
 
 class QueryInput {
+    private static DEBUG = true;
     private typeAheadConfig: any;
     private typeAheadSource: any;
     private fields: string[];
@@ -75,19 +76,31 @@ class QueryInput {
             possibleMatches = possibleMatches.concat(this.fieldsCompletions());
             possibleMatches = possibleMatches.concat(this.unaryOperatorsCompletions());
         } else {
-            var astLength = serializedAst.length;
-
-            var currentAST = serializedAst.pop();
-            var previousAST = serializedAst.pop();
+            var currentAST = serializedAst[serializedAst.length - 1];
+            var previousAST = serializedAst[serializedAst.length - 2];
+            var twoASTago = serializedAst[serializedAst.length - 3];
+            var firstAST = serializedAst[0];
 
             var splitQuery = this.splitQuery(ast, currentAST);
             query = splitQuery.current;
             prefix = splitQuery.prefix;
 
+            // TODO: disable debug once the completion is stable
+            if (QueryInput.DEBUG) {
+                console.log("ast length: " + serializedAst.length);
+                console.log("prefix: " + prefix);
+                console.log("query: " + query);
+                console.log(twoASTago);
+                console.log(previousAST);
+                console.log(currentAST);
+                console.log("no errors: " + parser.errors.length);
+                console.log(parser.errors);
+            }
+
             if (currentAST instanceof queryParser.TermAST) {
                 possibleMatches = possibleMatches.concat(this.fieldsCompletions());
-                var offerBinaryOperatorsCompletion = (astLength > 1) && !(previousAST instanceof queryParser.ExpressionAST);
-                var offerUnaryOperatorsCompletion = (astLength >= 1) && !(previousAST instanceof queryParser.ModifierAST);
+                var offerBinaryOperatorsCompletion = (serializedAst.length > 1) && !(previousAST instanceof queryParser.ExpressionAST);
+                var offerUnaryOperatorsCompletion = (serializedAst.length >= 1) && !(previousAST instanceof queryParser.ModifierAST);
 
                 if (offerBinaryOperatorsCompletion) {
                     var includeNotCompletion = (prefix.lastIndexOf("NOT") === prefix.length - "NOT".length);
@@ -97,7 +110,10 @@ class QueryInput {
                 }
             }
 
-            if (currentAST instanceof queryParser.MissingAST) {
+            // Don't offer completion on MissingAST when there are alternative MissingASTs (e.g. "foo AND AND AND")
+            // or when the query starts with an operator (e.g. "AND").
+            var completeMissingAST = (!(twoASTago instanceof queryParser.MissingAST) && !(firstAST instanceof queryParser.ExpressionAST));
+            if ((currentAST instanceof queryParser.MissingAST) && completeMissingAST) {
                 if (prefix.charAt(prefix.length - 1) !== " ") {
                     prefix += " ";
                 }
@@ -134,17 +150,18 @@ class QueryInput {
     }
 
     private unaryOperatorsCompletions(): string[] {
-        return ["NOT"];
+        var possibleMatches = ["+", "-", "!", "NOT"];
+        return possibleMatches;
     }
 
     private binaryOperatorsCompletions(includeNotCompletion?: boolean): string[] {
         var possibleMatches = [];
 
-        possibleMatches.push("AND");
+        possibleMatches.push("&&", "AND");
         if (includeNotCompletion) {
-            possibleMatches.push("NOT");
+            possibleMatches.push("!", "NOT");
         }
-        possibleMatches.push("OR");
+        possibleMatches.push("||", "OR");
 
         return possibleMatches;
     }
