@@ -107,7 +107,7 @@ public class ServerBindings extends AbstractModule {
     }
 
     private void bindProviders() {
-        bind(ObjectMapper.class).toProvider(ServerObjectMapperProvider.class);
+        bind(ObjectMapper.class).toProvider(ServerObjectMapperProvider.class).asEagerSingleton();
         bind(RotationStrategy.class).toProvider(RotationStrategyProvider.class);
     }
 

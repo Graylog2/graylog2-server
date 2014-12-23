@@ -25,9 +25,11 @@ import com.fasterxml.jackson.datatype.joda.JodaModule;
 import org.graylog2.shared.rest.RangeJsonSerializer;
 
 import javax.inject.Provider;
+import javax.inject.Singleton;
 import javax.ws.rs.ext.ContextResolver;
 
 @javax.ws.rs.ext.Provider
+@Singleton
 public class ObjectMapperProvider implements Provider<ObjectMapper>, ContextResolver<ObjectMapper> {
     private final ObjectMapper objectMapper;
 
