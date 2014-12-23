@@ -80,7 +80,7 @@ public class InputsResource extends RestResource {
 
     @GET
     @Timed
-    public String list() {
+    public Map<String, Object> list() {
         final List<IOState<MessageInput>> inputStates = Lists.newArrayList();
 
         for (IOState<MessageInput> inputState : inputRegistry.getInputStates()) {
@@ -91,7 +91,7 @@ public class InputsResource extends RestResource {
                 "inputs", inputStates,
                 "total", inputStates.size());
 
-        return json(result);
+        return result;
     }
 
     @GET
