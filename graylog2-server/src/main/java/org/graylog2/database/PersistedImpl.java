@@ -17,7 +17,6 @@
 package org.graylog2.database;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.google.common.base.Objects;
 import org.bson.types.ObjectId;
 import org.graylog2.plugin.database.Persisted;
 import org.joda.time.DateTime;
@@ -31,26 +30,26 @@ import java.lang.reflect.Method;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public abstract class PersistedImpl implements Persisted {
     private static final Logger LOG = LoggerFactory.getLogger(PersistedImpl.class);
 
     protected final Map<String, Object> fields;
     protected final ObjectId id;
+    private transient final String hexId;
 
-    protected PersistedImpl(Map<String, Object> fields) {
+    protected PersistedImpl(final Map<String, Object> fields) {
         this(new ObjectId(), fields);
     }
 
-    protected PersistedImpl(ObjectId id, Map<String, Object> fields) {
+    protected PersistedImpl(final ObjectId id, final Map<String, Object> fields) {
         this.id = id;
+        this.hexId = id == null ? null : id.toHexString();
         this.fields = fields;
 
         // Transform all java.util.Date's to JodaTime because MongoDB gives back java.util.Date's. #lol
-        for(Map.Entry<String, Object> field : fields.entrySet()) {
+        for (Map.Entry<String, Object> field : fields.entrySet()) {
             if (field.getValue() instanceof Date) {
                 fields.put(field.getKey(), new DateTime(field.getValue(), DateTimeZone.UTC));
             }
@@ -63,7 +62,7 @@ public abstract class PersistedImpl implements Persisted {
 
     @Override
     public String getId() {
-        return getObjectId().toHexString();
+        return hexId;
     }
 
     @Override
@@ -78,22 +77,23 @@ public abstract class PersistedImpl implements Persisted {
             return false;
 
         PersistedImpl other = (PersistedImpl) o;
-        return Objects.equal(fields, other.fields) && Objects.equal(getObjectId(), other.getObjectId());
+        return Objects.equals(fields, other.fields) && Objects.equals(getObjectId(), other.getObjectId());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(getObjectId(), fields);
+        return Objects.hash(getObjectId(), getFields());
     }
 
     @Override
     public String toString() {
         return this.getClass().getSimpleName() + "{" +
                 "fields=" + fields +
-                ", id=" + id +
+                ", id=" + hexId +
                 '}';
     }
 
+    @Override
     public Map<String, Object> asMap() {
         Map<String, Object> result = new HashMap<>();
         for (Method method : this.getClass().getMethods()) {
@@ -102,7 +102,7 @@ public abstract class PersistedImpl implements Persisted {
                 try {
                     result.put(fieldName, method.invoke(this));
                 } catch (IllegalAccessException | InvocationTargetException e) {
-                    e.printStackTrace();
+                    LOG.debug("Error while accessing field", e);
                 }
             }
         }
@@ -112,7 +112,7 @@ public abstract class PersistedImpl implements Persisted {
                 try {
                     result.put(field.getName(), field.get(this));
                 } catch (IllegalAccessException e) {
-                    e.printStackTrace();
+                    LOG.debug("Error while accessing field", e);
                 }
             }
         }
