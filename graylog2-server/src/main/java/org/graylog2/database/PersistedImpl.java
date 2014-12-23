@@ -17,7 +17,6 @@
 package org.graylog2.database;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.google.common.base.Objects;
 import org.bson.types.ObjectId;
 import org.graylog2.plugin.database.Persisted;
 import org.joda.time.DateTime;
@@ -31,11 +30,9 @@ import java.lang.reflect.Method;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public abstract class PersistedImpl implements Persisted {
     private static final Logger LOG = LoggerFactory.getLogger(PersistedImpl.class);
 
@@ -43,16 +40,20 @@ public abstract class PersistedImpl implements Persisted {
     protected final ObjectId id;
     private final AtomicReference<String> hexId = new AtomicReference<>(null);
 
-    protected PersistedImpl(Map<String, Object> fields) {
+    protected PersistedImpl(final Map<String, Object> fields) {
         this(new ObjectId(), fields);
     }
 
-    protected PersistedImpl(ObjectId id, Map<String, Object> fields) {
+    protected PersistedImpl(final ObjectId id, final Map<String, Object> fields) {
         this.id = id;
         this.fields = fields;
 
+        if (null != this.id) {
+            hexId.set(this.id.toHexString());
+        }
+
         // Transform all java.util.Date's to JodaTime because MongoDB gives back java.util.Date's. #lol
-        for(Map.Entry<String, Object> field : fields.entrySet()) {
+        for (Map.Entry<String, Object> field : fields.entrySet()) {
             if (field.getValue() instanceof Date) {
                 fields.put(field.getKey(), new DateTime(field.getValue(), DateTimeZone.UTC));
             }
@@ -65,11 +66,15 @@ public abstract class PersistedImpl implements Persisted {
 
     @Override
     public String getId() {
-        // Performace - toHexString is expensive so we cache it.
-        if (hexId.get() == null) {
-            hexId.compareAndSet(null, getObjectId().toHexString());
+        // Performance - toHexString is expensive so we cache it.
+        final String s = hexId.get();
+        if (s == null && id != null) {
+            final String hexString = getObjectId().toHexString();
+            hexId.compareAndSet(null, hexString);
+            return hexString;
         }
-        return hexId.get();
+
+        return s;
     }
 
     @Override
@@ -79,36 +84,38 @@ public abstract class PersistedImpl implements Persisted {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (!(o instanceof PersistedImpl))
+    public boolean equals(final Object o) {
+        if (!(o instanceof PersistedImpl)) {
             return false;
+        }
 
-        PersistedImpl other = (PersistedImpl) o;
-        return Objects.equal(fields, other.fields) && Objects.equal(getObjectId(), other.getObjectId());
+        final PersistedImpl other = (PersistedImpl) o;
+        return Objects.equals(fields, other.fields) && Objects.equals(getObjectId(), other.getObjectId());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(getObjectId(), fields);
+        return Objects.hash(getObjectId(), getFields());
     }
 
     @Override
     public String toString() {
         return this.getClass().getSimpleName() + "{" +
-                "fields=" + fields +
-                ", id=" + id +
+                "fields=" + getFields() +
+                ", id=" + getId() +
                 '}';
     }
 
+    @Override
     public Map<String, Object> asMap() {
-        Map<String, Object> result = new HashMap<>();
+        final Map<String, Object> result = new HashMap<>();
         for (Method method : this.getClass().getMethods()) {
             if (method.getName().startsWith("get") && method.getParameterTypes().length == 0) {
                 final String fieldName = method.getName().substring(3).toLowerCase();
                 try {
                     result.put(fieldName, method.invoke(this));
                 } catch (IllegalAccessException | InvocationTargetException e) {
-                    e.printStackTrace();
+                    LOG.debug("Error while accessing field", e);
                 }
             }
         }
@@ -118,7 +125,7 @@ public abstract class PersistedImpl implements Persisted {
                 try {
                     result.put(field.getName(), field.get(this));
                 } catch (IllegalAccessException e) {
-                    e.printStackTrace();
+                    LOG.debug("Error while accessing field", e);
                 }
             }
         }
