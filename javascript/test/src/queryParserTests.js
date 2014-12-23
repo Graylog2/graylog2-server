@@ -312,6 +312,16 @@ describe('Query Parser', function () {
         expectIdentityDump(query, true);
     });
 
+    it('reports an error on double NOT', function() {
+        var query = 'NOT NOT login';
+        var parser = new QueryParser(query);
+        var ast = parser.parse();
+        expect(parser.errors.length).toBe(1);
+        expect(parser.errors[0].message).toBe("Missing right side of expression");
+        expect(parser.errors[0].position).toBe(4);
+        expectIdentityDump(query, true);
+    });
+
     it('can parse a NOT expression preceded by a term', function() {
         var query = "login NOT submit";
         var parser = new QueryParser(query);
