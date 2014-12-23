@@ -1,6 +1,6 @@
 'use strict';
 
-import baseVisitor = require('./baseVisitor');
+import BaseVisitor = require('./BaseVisitor');
 import queryParser = require('../queryParser');
 import AST = queryParser.AST;
 import MissingAST = queryParser.MissingAST;
@@ -10,7 +10,7 @@ import ExpressionAST = queryParser.ExpressionAST;
 import ExpressionListAST = queryParser.ExpressionListAST;
 import ModifierAST = queryParser.ModifierAST;
 
-class SerializeVisitor extends baseVisitor.BaseVisitor {
+class SerializeVisitor extends BaseVisitor {
     private serializedAST: AST[] = [];
 
     visitMissingAST(ast: MissingAST) {

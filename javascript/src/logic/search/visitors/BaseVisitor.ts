@@ -1,6 +1,7 @@
 'use strict';
 
-import  queryParser = require('../queryParser');
+import Visitor = require('./Visitor');
+import queryParser = require('../queryParser');
 // TODO: Is there a better way of importing all these classes? I don't want to prepend the module name everywhere.
 import AST = queryParser.AST;
 import MissingAST = queryParser.MissingAST;
@@ -10,17 +11,7 @@ import ExpressionAST = queryParser.ExpressionAST;
 import ExpressionListAST = queryParser.ExpressionListAST;
 import ModifierAST = queryParser.ModifierAST;
 
-
-export interface Visitor {
-    visit(ast: AST);
-    visitMissingAST(ast: MissingAST);
-    visitTermAST(ast: TermAST);
-    visitTermWithFieldAST(ast: TermWithFieldAST);
-    visitExpressionAST(ast: ExpressionAST);
-    visitExpressionListAST(ast: ExpressionListAST);
-}
-
-export class BaseVisitor implements Visitor {
+class BaseVisitor implements Visitor {
     visit(ast: AST) {
         if (ast === null) {
             return;
@@ -59,3 +50,5 @@ export class BaseVisitor implements Visitor {
     visitExpressionListAST(ast: ExpressionListAST) {
     }
 }
+
+export = BaseVisitor;

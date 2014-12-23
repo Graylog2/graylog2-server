@@ -1,6 +1,6 @@
 'use strict';
 
-import baseVisitor = require('./baseVisitor');
+import BaseVisitor = require('./BaseVisitor');
 import queryParser = require('../queryParser');
 import AST = queryParser.AST;
 import MissingAST = queryParser.MissingAST;
@@ -11,7 +11,7 @@ import ExpressionListAST = queryParser.ExpressionListAST;
 import ModifierAST = queryParser.ModifierAST;
 import Token = queryParser.Token;
 
-class DumpVisitor extends baseVisitor.BaseVisitor {
+class DumpVisitor extends BaseVisitor {
     private buffer: string[] = [];
     private skipASTs: AST[] = [];
 
