@@ -91,6 +91,7 @@ public class ProcessBuffer extends Buffer {
                 ProducerType.MULTI,
                 waitStrategy
         );
+        disruptor.handleExceptionsWith(new LoggingExceptionHandler(LOG));
 
         LOG.info("Initialized ProcessBuffer with ring size <{}> "
                          + "and wait strategy <{}>.", ringBufferSize,

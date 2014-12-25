@@ -16,8 +16,10 @@
  */
 package org.graylog2.periodical;
 
+import com.codahale.metrics.MetricRegistry;
 import org.graylog2.Configuration;
 import org.graylog2.outputs.BatchedElasticSearchOutput;
+import org.graylog2.outputs.BlockingBatchedESOutput;
 import org.graylog2.outputs.OutputRegistry;
 import org.graylog2.plugin.outputs.MessageOutput;
 import org.graylog2.plugin.periodical.Periodical;
@@ -33,11 +35,13 @@ public class BatchedElasticSearchOutputFlushThread extends Periodical {
     private static final Logger LOG = LoggerFactory.getLogger(BatchedElasticSearchOutputFlushThread.class);
     private final OutputRegistry outputRegistry;
     private final Configuration configuration;
+    private MetricRegistry registry;
 
     @Inject
-    public BatchedElasticSearchOutputFlushThread(OutputRegistry outputRegistry, Configuration configuration) {
+    public BatchedElasticSearchOutputFlushThread(OutputRegistry outputRegistry, Configuration configuration, MetricRegistry registry) {
         this.outputRegistry = outputRegistry;
         this.configuration = configuration;
+        this.registry = registry;
     }
 
     @Override
@@ -84,6 +88,14 @@ public class BatchedElasticSearchOutputFlushThread extends Periodical {
                 try {
                     LOG.debug("Flushing output <{}>", batchedOutput);
                     batchedOutput.flush();
+                } catch (Exception e) {
+                    LOG.error("Caught exception while trying to flush output: {}", e);
+                }
+            }
+            if (output instanceof BlockingBatchedESOutput) {
+                try {
+                    LOG.debug("Flushing output <{}>", output);
+                    ((BlockingBatchedESOutput) output).forceFlushIfTimedout();
                 } catch (Exception e) {
                     LOG.error("Caught exception while trying to flush output: {}", e);
                 }

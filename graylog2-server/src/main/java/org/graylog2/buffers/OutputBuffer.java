@@ -29,6 +29,7 @@ import org.graylog2.buffers.processors.OutputBufferProcessor;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.buffers.Buffer;
 import org.graylog2.plugin.buffers.MessageEvent;
+import org.graylog2.shared.buffers.LoggingExceptionHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,7 +50,7 @@ public class OutputBuffer extends Buffer {
     @Inject
     public OutputBuffer(MetricRegistry metricRegistry,
                         Provider<OutputBufferProcessor> processorProvider,
-                        @Named("processbuffer_processors") int processorCount,
+                        @Named("outputbuffer_processors") int processorCount,
                         @Named("ring_size") int ringSize,
                         @Named("processor_wait_strategy") String waitStrategyName) {
         final ExecutorService executor = executorService(metricRegistry);
@@ -65,6 +66,7 @@ public class OutputBuffer extends Buffer {
                 ProducerType.MULTI,
                 waitStrategy
         );
+        disruptor.handleExceptionsWith(new LoggingExceptionHandler(LOG));
 
         LOG.info("Initialized OutputBuffer with ring size <{}> and wait strategy <{}>.",
                  ringBufferSize, waitStrategy.getClass().getSimpleName());
@@ -96,4 +98,5 @@ public class OutputBuffer extends Buffer {
     protected void afterInsert(int n) {
         incomingMessages.mark(n);
     }
+
 }

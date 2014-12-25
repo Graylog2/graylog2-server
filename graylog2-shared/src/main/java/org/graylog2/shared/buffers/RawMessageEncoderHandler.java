@@ -16,14 +16,27 @@
  */
 package org.graylog2.shared.buffers;
 
+import com.codahale.metrics.Meter;
+import com.codahale.metrics.MetricRegistry;
+import com.google.inject.Inject;
 import com.lmax.disruptor.WorkHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static com.codahale.metrics.MetricRegistry.name;
+
 public class RawMessageEncoderHandler implements WorkHandler<RawMessageEvent> {
     private static final Logger log = LoggerFactory.getLogger(RawMessageEncoderHandler.class);
+    private final Meter incomingMessages;
+
+    @Inject
+    public RawMessageEncoderHandler(MetricRegistry metricRegistry) {
+        incomingMessages = metricRegistry.meter(name(RawMessageEncoderHandler.class, "incomingMessages"));
+    }
+
     @Override
     public void onEvent(RawMessageEvent event) throws Exception {
+        incomingMessages.mark();
         event.encodedRawMessage = event.rawMessage.encode();
         if (log.isTraceEnabled()) {
             log.trace("Serialized message {} for journal, size {} bytes",

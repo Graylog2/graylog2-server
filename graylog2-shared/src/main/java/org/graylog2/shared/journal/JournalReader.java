@@ -18,6 +18,7 @@ package org.graylog2.shared.journal;
 
 import com.codahale.metrics.Counter;
 import com.codahale.metrics.Histogram;
+import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.google.common.util.concurrent.AbstractExecutionThreadService;
 import com.google.inject.Inject;
@@ -39,6 +40,7 @@ public class JournalReader extends AbstractExecutionThreadService {
     private final ProcessBuffer processBuffer;
     private final Semaphore journalFilled;
     private final MetricRegistry metricRegistry;
+    private final Meter readMessages;
     private Histogram requestedReadCount;
     private final Counter readBlocked;
     private Thread executionThread;
@@ -53,6 +55,7 @@ public class JournalReader extends AbstractExecutionThreadService {
         this.journalFilled = journalFilled;
         this.metricRegistry = metricRegistry;
         readBlocked = metricRegistry.counter(name(this.getClass(), "readBlocked"));
+        readMessages = metricRegistry.meter(name(this.getClass(), "readMessages"));
     }
 
     @Override
@@ -93,12 +96,15 @@ public class JournalReader extends AbstractExecutionThreadService {
                 // we don't care how many messages were inserted in the meantime, we'll read all of them eventually
                 journalFilled.drainPermits();
             } else {
+                readMessages.mark(encodedRawMessages.size());
                 log.debug("Processing {} messages from journal.", encodedRawMessages.size());
                 for (final Journal.JournalReadEntry encodedRawMessage : encodedRawMessages) {
                     final RawMessage rawMessage = RawMessage.decode(encodedRawMessage.getPayload(),
                                                                     encodedRawMessage.getOffset());
                     if (rawMessage == null) {
                         // never insert null objects into the ringbuffer, as that is useless
+                        log.error("Found null raw message!");
+                        journal.markJournalOffsetCommitted(encodedRawMessage.getOffset());
                         continue;
                     }
 

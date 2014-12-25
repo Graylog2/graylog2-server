@@ -30,9 +30,8 @@ import org.graylog2.plugin.Message;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.outputs.MessageOutput;
-import org.graylog2.plugin.outputs.MessageOutputConfigurationException;
-import org.graylog2.shared.journal.Journal;
 import org.graylog2.plugin.streams.Stream;
+import org.graylog2.shared.journal.Journal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -90,16 +89,14 @@ public class ElasticSearchOutput implements MessageOutput {
                                                                                          Message.ID_FUNCTION));
             LOG.trace("Writing message ids to [{}]: <{}>", NAME, Joiner.on(", ").join(sortedIds));
         }
-        long maxOffset = Long.MIN_VALUE;
-        for (final Message message : messageList) {
-            maxOffset = Math.max(message.getJournalOffset(), maxOffset);
-        }
 
         writes.mark(messageList.size());
         try (final Timer.Context ignored = processTime.time()) {
             messages.bulkIndex(messageList);
         }
-        journal.markJournalOffsetCommitted(maxOffset);
+        for (final Message message : messageList) {
+            journal.markJournalOffsetCommitted(message.getJournalOffset());
+        }
     }
 
     @Override

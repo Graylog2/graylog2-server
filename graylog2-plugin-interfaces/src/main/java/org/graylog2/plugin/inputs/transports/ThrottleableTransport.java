@@ -22,10 +22,12 @@
  */
 package org.graylog2.plugin.inputs.transports;
 
+import com.google.common.eventbus.Subscribe;
+import org.graylog2.plugin.ThrottleState;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
 
 /**
- * Placeholder class for implementing logic to throttle certain transports which support backpressure.
+ * Placeholder class for implementing logic to throttle certain transports which support back pressure.
  * The built in transports that support this by reading less are the Kafka and AMQP transports.
  * <br/>
  * Empty for now, since the process buffer provides natural throttling for now, but once that is async we need
@@ -37,6 +39,11 @@ public abstract class ThrottleableTransport implements Transport {
         public ConfigurationRequest getRequestedConfiguration() {
             return new ConfigurationRequest();
         }
+    }
+
+    @Subscribe
+    public void throttleState(ThrottleState throttleState) {
+
     }
 
 }

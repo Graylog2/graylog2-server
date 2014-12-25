@@ -17,7 +17,6 @@
 package org.graylog2.inputs.transports;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import com.google.inject.Provider;
 import com.google.inject.multibindings.MapBinder;
 import com.google.inject.name.Names;
 import org.graylog2.plugin.inject.Graylog2Module;
@@ -41,6 +40,7 @@ public class TransportsModule extends Graylog2Module {
         installTransport(mapBinder, "httppoll", HttpPollTransport.class);
         installTransport(mapBinder, "localmetrics", LocalMetricsTransport.class);
         installTransport(mapBinder, "syslog-tcp", SyslogTcpTransport.class);
+        installTransport(mapBinder, "localfile", FileSlurpTransport.class);
 
         // TODO Add instrumentation to ExecutorService and ThreadFactory
         bind(Executor.class)
