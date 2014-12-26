@@ -112,9 +112,9 @@ public class StreamOutputResource extends RestResource {
     public Response add(@ApiParam(name = "streamid", value = "The id of the stream whose outputs we want.", required = true)
                         @PathParam("streamid") String streamid,
                         @ApiParam(name = "JSON body", required = true)
-                        @Valid @NotNull AddOutputRequest request) throws ValidationException, NotFoundException {
+                        @Valid @NotNull AddOutputRequest aor) throws ValidationException, NotFoundException {
         final Stream stream = streamService.load(streamid);
-        for (String outputId : request.outputs()) {
+        for (String outputId : aor.outputs()) {
             final Output output = outputService.load(outputId);
             streamService.addOutput(stream, output);
         }

@@ -17,6 +17,7 @@
 package org.graylog2.rest.resources.streams.outputs;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.hibernate.validator.constraints.NotEmpty;
@@ -29,6 +30,7 @@ public abstract class AddOutputRequest {
     @JsonProperty
     public abstract Set<String> outputs();
 
+    @JsonCreator
     public static AddOutputRequest create(@JsonProperty("outputs") @NotEmpty Set<String> outputs) {
         return new AutoValue_AddOutputRequest(outputs);
     }
