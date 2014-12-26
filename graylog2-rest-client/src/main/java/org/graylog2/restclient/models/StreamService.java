@@ -145,8 +145,11 @@ public class StreamService {
     public List<Output> getOutputs(String streamId) throws APIException, IOException {
         OutputsResponse outputsResponse = api.path(routes.StreamOutputResource().get(streamId), OutputsResponse.class).execute();
         List<Output> result = new ArrayList<>();
-        for(OutputSummaryResponse response : outputsResponse.outputs)
-            result.add(outputFactory.fromSummaryResponse(response));
+
+        if(outputsResponse.outputs != null) {
+            for (OutputSummaryResponse response : outputsResponse.outputs)
+                result.add(outputFactory.fromSummaryResponse(response));
+        }
 
         return result;
     }
