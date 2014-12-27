@@ -18,17 +18,18 @@ package org.graylog2.inputs.transports;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.eventbus.EventBus;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import org.graylog2.inputs.random.generators.FakeHttpRawMessageGenerator;
-import org.graylog2.plugin.inputs.annotations.ConfigClass;
-import org.graylog2.plugin.inputs.annotations.FactoryClass;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.configuration.fields.ConfigurationField;
 import org.graylog2.plugin.configuration.fields.NumberField;
 import org.graylog2.plugin.configuration.fields.TextField;
 import org.graylog2.plugin.inputs.MessageInput;
+import org.graylog2.plugin.inputs.annotations.ConfigClass;
+import org.graylog2.plugin.inputs.annotations.FactoryClass;
 import org.graylog2.plugin.inputs.transports.GeneratorTransport;
 import org.graylog2.plugin.inputs.transports.Transport;
 import org.graylog2.plugin.journal.RawMessage;
@@ -55,7 +56,8 @@ public class RandomMessageTransport extends GeneratorTransport {
     private final ObjectMapper objectMapper;
 
     @AssistedInject
-    public RandomMessageTransport(@Assisted Configuration configuration, ObjectMapper objectMapper) {
+    public RandomMessageTransport(@Assisted Configuration configuration, EventBus eventBus, ObjectMapper objectMapper) {
+        super(eventBus, configuration);
         this.objectMapper = objectMapper;
 
         generator = new FakeHttpRawMessageGenerator(configuration.getString(CK_SOURCE));

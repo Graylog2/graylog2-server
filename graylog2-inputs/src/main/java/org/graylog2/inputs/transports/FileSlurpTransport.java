@@ -17,6 +17,7 @@
 package org.graylog2.inputs.transports;
 
 import com.google.common.base.Charsets;
+import com.google.common.eventbus.EventBus;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import org.apache.commons.io.IOUtils;
@@ -44,7 +45,8 @@ public class FileSlurpTransport extends GeneratorTransport {
     private final BufferedReader reader;
 
     @AssistedInject
-    public FileSlurpTransport(@Assisted Configuration configuration) {
+    public FileSlurpTransport(EventBus eventBus, @Assisted Configuration configuration) {
+        super(eventBus, configuration);
         final File file = new File(configuration.getString("file_path"));
         try {
             reader = new BufferedReader(new FileReader(file));

@@ -21,12 +21,11 @@ import com.codahale.metrics.MetricSet;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
+import com.google.common.eventbus.EventBus;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import org.graylog2.inputs.misc.metrics.agent.GELFTarget;
 import org.graylog2.inputs.misc.metrics.agent.Graylog2Reporter;
-import org.graylog2.plugin.inputs.annotations.ConfigClass;
-import org.graylog2.plugin.inputs.annotations.FactoryClass;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.configuration.fields.ConfigurationField;
@@ -35,6 +34,8 @@ import org.graylog2.plugin.configuration.fields.NumberField;
 import org.graylog2.plugin.configuration.fields.TextField;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.MisfireException;
+import org.graylog2.plugin.inputs.annotations.ConfigClass;
+import org.graylog2.plugin.inputs.annotations.FactoryClass;
 import org.graylog2.plugin.inputs.codecs.CodecAggregator;
 import org.graylog2.plugin.inputs.transports.ThrottleableTransport;
 import org.graylog2.plugin.inputs.transports.Transport;
@@ -68,7 +69,9 @@ public class LocalMetricsTransport extends ThrottleableTransport {
     public LocalMetricsTransport(@Assisted Configuration configuration,
                                  ObjectMapper mapper,
                                  MetricRegistry metricRegistry,
+                                 EventBus eventBus,
                                  @Named("daemonScheduler") ScheduledExecutorService scheduler) {
+        super(eventBus, configuration);
         this.configuration = configuration;
         this.mapper = mapper;
         this.metricRegistry = metricRegistry;
@@ -81,7 +84,7 @@ public class LocalMetricsTransport extends ThrottleableTransport {
     }
 
     @Override
-    public void launch(final MessageInput input) throws MisfireException {
+    public void doLaunch(final MessageInput input) throws MisfireException {
         reporter = Graylog2Reporter.forRegistry(metricRegistry)
                 .useSource(configuration.getString(CK_SOURCE))
                 .convertDurationsTo(TimeUnit.valueOf(configuration.getString(CK_DURATION_UNIT)))
@@ -91,6 +94,10 @@ public class LocalMetricsTransport extends ThrottleableTransport {
         scheduledFuture = scheduler.schedule(new Runnable() {
                                                  @Override
                                                  public void run() {
+                                                     if (isThrottled()) {
+                                                         // do not block, but simply skip this iteration
+                                                         log.debug("Skipping metric report this iteration because we are throttled.");
+                                                     }
                                                      reporter.report();
                                                  }
                                              },
@@ -99,7 +106,7 @@ public class LocalMetricsTransport extends ThrottleableTransport {
     }
 
     @Override
-    public void stop() {
+    public void doStop() {
         try {
             scheduledFuture.cancel(true);
         } catch (Exception ignored) {

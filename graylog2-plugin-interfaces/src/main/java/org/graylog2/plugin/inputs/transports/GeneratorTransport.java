@@ -23,8 +23,10 @@
 package org.graylog2.plugin.inputs.transports;
 
 import com.codahale.metrics.MetricSet;
+import com.google.common.eventbus.EventBus;
 import com.google.common.util.concurrent.AbstractExecutionThreadService;
 import com.google.common.util.concurrent.Service;
+import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.MisfireException;
@@ -33,10 +35,14 @@ import org.graylog2.plugin.journal.RawMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class GeneratorTransport implements Transport {
+public abstract class GeneratorTransport extends ThrottleableTransport {
     private static final Logger log = LoggerFactory.getLogger(GeneratorTransport.class);
 
     private Service generatorService;
+
+    public GeneratorTransport(EventBus eventBus, Configuration configuration) {
+        super(eventBus, configuration);
+    }
 
     @Override
     public void setMessageAggregator(CodecAggregator aggregator) {
@@ -46,12 +52,15 @@ public abstract class GeneratorTransport implements Transport {
     protected abstract RawMessage produceRawMessage(MessageInput input);
 
     @Override
-    public void launch(final MessageInput input) throws MisfireException {
+    public void doLaunch(final MessageInput input) throws MisfireException {
         generatorService = new AbstractExecutionThreadService() {
             @Override
             protected void run() throws Exception {
                 while (isRunning()) {
 
+                    if (isThrottled()) {
+                        blockUntilUnthrottled();
+                    }
                     final RawMessage rawMessage = GeneratorTransport.this.produceRawMessage(input);
                     if (rawMessage != null) {
                         input.processRawMessage(rawMessage);
@@ -64,7 +73,7 @@ public abstract class GeneratorTransport implements Transport {
     }
 
     @Override
-    public void stop() {
+    public void doStop() {
         if (generatorService == null || !generatorService.isRunning()) {
             log.error("Cannot stop generator transport, it isn't running.");
             return;

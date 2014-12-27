@@ -20,10 +20,14 @@ import com.codahale.metrics.Counter;
 import com.codahale.metrics.Histogram;
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
+import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
 import com.google.common.util.concurrent.AbstractExecutionThreadService;
+import com.google.common.util.concurrent.Uninterruptibles;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 import org.graylog2.plugin.journal.RawMessage;
+import org.graylog2.plugin.lifecycles.Lifecycle;
 import org.graylog2.shared.buffers.ProcessBuffer;
 import org.graylog2.shared.metrics.HdrHistogram;
 import org.slf4j.Logger;
@@ -33,6 +37,7 @@ import java.util.List;
 import java.util.concurrent.Semaphore;
 
 import static com.codahale.metrics.MetricRegistry.name;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 public class JournalReader extends AbstractExecutionThreadService {
     private static final Logger log = LoggerFactory.getLogger(JournalReader.class);
@@ -40,7 +45,9 @@ public class JournalReader extends AbstractExecutionThreadService {
     private final ProcessBuffer processBuffer;
     private final Semaphore journalFilled;
     private final MetricRegistry metricRegistry;
+    private final EventBus eventBus;
     private final Meter readMessages;
+    private volatile boolean shouldBeReading;
     private Histogram requestedReadCount;
     private final Counter readBlocked;
     private Thread executionThread;
@@ -49,23 +56,62 @@ public class JournalReader extends AbstractExecutionThreadService {
     public JournalReader(Journal journal,
                          ProcessBuffer processBuffer,
                          @Named("JournalSignal") Semaphore journalFilled,
-                         MetricRegistry metricRegistry) {
+                         MetricRegistry metricRegistry,
+                         EventBus eventBus) {
         this.journal = journal;
         this.processBuffer = processBuffer;
         this.journalFilled = journalFilled;
         this.metricRegistry = metricRegistry;
+        this.eventBus = eventBus;
+        shouldBeReading = false;
         readBlocked = metricRegistry.counter(name(this.getClass(), "readBlocked"));
         readMessages = metricRegistry.meter(name(this.getClass(), "readMessages"));
     }
 
     @Override
     protected void startUp() throws Exception {
+        eventBus.register(this);
         executionThread = Thread.currentThread();
+    }
+
+    @Override
+    protected void shutDown() throws Exception {
+        eventBus.unregister(this);
     }
 
     @Override
     protected void triggerShutdown() {
         executionThread.interrupt();
+    }
+
+    @Subscribe
+    public void listenForLifecycleChanges(Lifecycle lifecycle) {
+        switch (lifecycle) {
+            case UNINITIALIZED:
+                shouldBeReading = false;
+                break;
+            case STARTING:
+                shouldBeReading = false;
+                break;
+            case RUNNING:
+                shouldBeReading = true;
+                break;
+            case PAUSED:
+                shouldBeReading = false;
+                break;
+            case HALTING:
+                shouldBeReading = false;
+                break;
+            case FAILED:
+                triggerShutdown();
+                break;
+            case OVERRIDE_LB_DEAD:
+                // don't care, keep processing journal
+                break;
+            case OVERRIDE_LB_ALIVE:
+                // don't care, keep processing journal
+                break;
+        }
     }
 
     @Override
@@ -78,6 +124,12 @@ public class JournalReader extends AbstractExecutionThreadService {
         }
 
         while (isRunning()) {
+            // TODO interfere with reading if we are not 100% certain we should be reading, see #listenForLifecycleChanges
+            if (!shouldBeReading) {
+                Uninterruptibles.sleepUninterruptibly(100, MILLISECONDS);
+                // don't read immediately, but check if we should be shutting down.
+                continue;
+            }
             // approximate count to read from the journal to backfill the processing chain
             final long remainingCapacity = processBuffer.getRemainingCapacity();
             requestedReadCount.update(remainingCapacity);

@@ -131,6 +131,7 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
     private ScheduledFuture<?> dirtyLogFlushFuture;
     private ScheduledFuture<?> logRetentionFuture;
     private ScheduledFuture<?> offsetFlusherFuture;
+    private volatile boolean shuttingDown;
 
     @Inject
     public KafkaJournal(@Named("message_journal_dir") String journalDirName,
@@ -363,12 +364,14 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
     }
 
     public List<JournalReadEntry> read(long readOffset, long requestedMaximumCount) {
-
         // Always read at least one!
         final long maximumCount = Math.max(1, requestedMaximumCount);
         long maxOffset = readOffset + maximumCount;
         final List<JournalReadEntry> messages = Lists.newArrayListWithCapacity((int) (maximumCount));
 
+        if (shuttingDown) {
+            return messages;
+        }
         try (Timer.Context ignored = readTime.time()) {
             final long logStartOffset = getLogStartOffset();
 
@@ -427,6 +430,10 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
         } catch (Exception e) {
             // the scala code does not declare the IOException in kafkaLog.read() so we can't catch it here
             // sigh.
+            if (shuttingDown) {
+                log.debug("Caught exception during shutdown, ignoring it because we might have been blocked on a read.");
+                return Lists.newArrayList();
+            }
             //noinspection ConstantConditions
             if (e instanceof ClosedByInterruptException) {
                 log.debug("Interrupted while reading from journal, during shutdown this is harmless and ignored.", e);
@@ -521,6 +528,9 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
 
     @Override
     protected void shutDown() throws Exception {
+        log.warn("Shutting down journal!");
+        shuttingDown = true;
+
         throttleUpdaterFuture.cancel(false);
         offsetFlusherFuture.cancel(false);
         logRetentionFuture.cancel(false);
