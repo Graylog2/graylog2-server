@@ -105,6 +105,8 @@ public class EsNodeProviderTest {
                 "5s");
         esPropNames.put("action.auto_create_index", "false");
 
+        esPropNames.put("plugins.mandatory", "graylog2-monitor");
+
         ElasticsearchConfiguration config = setupConfig(settings);
 
         Map<String, String> nodeSettings = EsNodeProvider.readNodeSettings(config);
