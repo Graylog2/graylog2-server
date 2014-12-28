@@ -58,6 +58,7 @@ public class AmqpConsumer {
 
     private final MessageInput sourceInput;
     private final int parallelQueues;
+    private AmqpTransport amqpTransport;
 
     private AtomicLong totalBytesRead = new AtomicLong(0);
     private AtomicLong lastSecBytesRead = new AtomicLong(0);
@@ -65,7 +66,7 @@ public class AmqpConsumer {
 
     public AmqpConsumer(String hostname, int port, String virtualHost, String username, String password,
                         int prefetchCount, String queue, String exchange, String routingKey, int parallelQueues,
-                        MessageInput sourceInput, ScheduledExecutorService scheduler) {
+                        MessageInput sourceInput, ScheduledExecutorService scheduler, AmqpTransport amqpTransport) {
         this.hostname = hostname;
         this.port = port;
         this.virtualHost = virtualHost;
@@ -79,6 +80,7 @@ public class AmqpConsumer {
 
         this.sourceInput = sourceInput;
         this.parallelQueues = parallelQueues;
+        this.amqpTransport = amqpTransport;
 
         scheduler.scheduleAtFixedRate(new Runnable() {
             @Override
@@ -105,7 +107,12 @@ public class AmqpConsumer {
                         lastSecBytesReadTmp.addAndGet(body.length);
 
                         final RawMessage rawMessage = new RawMessage(body);
-                        // TODO implement throttling
+
+                        // TODO figure out if we want to unsubscribe after a certain time, or if simply blocking is enough here
+                        if (amqpTransport.isThrottled()) {
+                            amqpTransport.blockUntilUnthrottled();
+                        }
+
                         sourceInput.processRawMessage(rawMessage);
                         channel.basicAck(deliveryTag, false);
                     } catch (Exception e) {

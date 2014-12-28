@@ -149,7 +149,8 @@ public class AmqpTransport extends ThrottleableTransport {
                 configuration.getString(CK_ROUTING_KEY),
                 configuration.getInt(CK_PARALLEL_QUEUES),
                 input,
-                scheduler
+                scheduler,
+                this
         );
         eventBus.register(this);
         try {
