@@ -55,7 +55,8 @@ public class AMQPProducer implements RadioTransport {
                         String.format(configuration.getAmqpQueueName(), i),
                         configuration.getAmqpQueueType(),
                         String.format(configuration.getAmqpExchangeName(), i),
-                        String.format(configuration.getAmqpRoutingKey(), i)
+                        String.format(configuration.getAmqpRoutingKey(), i),
+                        configuration.isAmqpPersistentMessagesEnabled()
                 );
             }
 
