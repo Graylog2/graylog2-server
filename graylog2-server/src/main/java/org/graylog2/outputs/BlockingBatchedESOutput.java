@@ -35,6 +35,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
@@ -114,6 +115,15 @@ public class BlockingBatchedESOutput extends ElasticSearchOutput {
     }
 
     private void flush(List<Message> messages) {
+        if (!cluster.isConnectedAndHealthy()) {
+            try {
+                cluster.waitForConnectedAndHealthy().get();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+            }
+        }
         // never try to flush an empty buffer
         if (messages.size() == 0) {
             return;
@@ -135,6 +145,12 @@ public class BlockingBatchedESOutput extends ElasticSearchOutput {
     }
 
     public void forceFlushIfTimedout() {
+        if (!cluster.isConnectedAndHealthy()) {
+            // do not actually try to flush, because that will block until the cluster comes back.
+            // simply check and return.
+            log.debug("Cluster unavailable, but not blocking for periodic flush attempt. This will try again.");
+            return;
+        }
         // if we shouldn't flush at all based on the last flush time, no need to synchronize on this.
         if (lastFlushTime.get() != 0 &&
                 outputFlushInterval > NANOSECONDS.toSeconds(System.nanoTime() - lastFlushTime.get())) {

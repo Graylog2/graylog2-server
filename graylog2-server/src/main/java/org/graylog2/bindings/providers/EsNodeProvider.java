@@ -97,6 +97,8 @@ public class EsNodeProvider implements Provider<Node> {
             settings.put("network.publish_host", conf.getNetworkPublishHost());
         }
 
+        settings.put("plugins.mandatory", "graylog2-monitor");
+
         // Overwrite from a custom ElasticSearch config file.
         final File esConfigFile = conf.getConfigFile();
         if (esConfigFile != null) {

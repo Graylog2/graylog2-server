@@ -17,8 +17,10 @@
 package org.graylog2.indexer.cluster;
 
 import com.google.common.collect.Lists;
+import com.google.common.util.concurrent.SettableFuture;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.google.inject.name.Named;
 import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.action.admin.cluster.health.ClusterHealthRequest;
 import org.elasticsearch.action.admin.cluster.health.ClusterHealthResponse;
@@ -27,12 +29,19 @@ import org.elasticsearch.action.admin.cluster.node.info.NodeInfo;
 import org.elasticsearch.action.admin.cluster.node.info.NodesInfoRequest;
 import org.elasticsearch.action.admin.cluster.node.info.NodesInfoResponse;
 import org.elasticsearch.client.Client;
+import org.elasticsearch.cluster.node.DiscoveryNode;
 import org.elasticsearch.node.Node;
 import org.graylog2.indexer.Deflector;
+import org.graylog2.indexer.esplugin.ClusterStateMonitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.Future;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 
 @Singleton
 public class Cluster {
@@ -40,11 +49,17 @@ public class Cluster {
 
     private final Client c;
     private final Deflector deflector;
+    private final AtomicReference<Map<String, DiscoveryNode>> nodes = new AtomicReference<>();
+    private ScheduledExecutorService scheduler;
 
     @Inject
-    public Cluster(Node node, Deflector deflector) {
+    public Cluster(Node node, Deflector deflector, @Named("daemonScheduler") ScheduledExecutorService scheduler) {
+        this.scheduler = scheduler;
         this.c = node.client();
         this.deflector = deflector;
+        // unfortunately we can't use guice here, because elasticsearch and graylog2 use different injectors and we can't
+        // get to the instance to bridge.
+        ClusterStateMonitor.setCluster(this);
     }
 
     public String getName() {
@@ -130,16 +145,45 @@ public class Cluster {
 
     /**
      * Check if the Elasticsearch {@link Node} is connected and that the cluster health status
-     * is not {@link ClusterHealthStatus#RED}.
+     * is not {@link ClusterHealthStatus#RED} and that the {@link org.graylog2.indexer.Deflector#isUp() deflector is up}.
      *
-     * @return {@code true} if the Elasticsearch client is up and the cluster is healthy, {@code false} otherwise
+     * @return {@code true} if the Elasticsearch client is up and the cluster is healthy and the deflector is up, {@code false} otherwise
      */
     public boolean isConnectedAndHealthy() {
+        Map<String, DiscoveryNode> nodeMap = nodes.get();
+        if (nodeMap == null || nodeMap.isEmpty()) {
+            return false;
+        }
+        if (!deflector.isUp()) {
+            return false;
+        }
         try {
             return getHealth() != ClusterHealthStatus.RED;
         } catch (ElasticsearchException e) {
             LOG.trace("Couldn't determine Elasticsearch health properly", e);
             return false;
         }
+    }
+
+    public Future<Boolean> waitForConnectedAndHealthy() {
+        LOG.debug("Waiting until cluster connection comes back and cluster is healthy, checking once per second.");
+        final SettableFuture<Boolean> future = SettableFuture.create();
+        scheduler.scheduleAtFixedRate(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    if (isConnectedAndHealthy()) {
+                        LOG.debug("Cluster is healthy again, unblocking waiting threads.");
+                        future.set(true);
+                    }
+                } catch (Exception ignore) {} // to not cancel the schedule
+            }
+        }, 0, 1, TimeUnit.SECONDS); // TODO should this be configurable or via latch?
+        return future;
+    }
+
+    public void updateDataNodeList(Map<String, DiscoveryNode> nodes) {
+        LOG.debug("{} data nodes in cluster", nodes.size());
+        this.nodes.set(nodes);
     }
 }
