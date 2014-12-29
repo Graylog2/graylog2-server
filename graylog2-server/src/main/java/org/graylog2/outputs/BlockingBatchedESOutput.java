@@ -35,7 +35,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
@@ -117,11 +116,10 @@ public class BlockingBatchedESOutput extends ElasticSearchOutput {
     private void flush(List<Message> messages) {
         if (!cluster.isConnectedAndHealthy()) {
             try {
-                cluster.waitForConnectedAndHealthy().get();
+                cluster.waitForConnectedAndHealthy();
             } catch (InterruptedException e) {
-                e.printStackTrace();
-            } catch (ExecutionException e) {
-                e.printStackTrace();
+                log.warn("Error while waiting for healthy Elasticsearch cluster. Not flushing.", e);
+                return;
             }
         }
         // never try to flush an empty buffer

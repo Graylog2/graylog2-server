@@ -38,6 +38,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -165,21 +166,23 @@ public class Cluster {
         }
     }
 
-    public Future<Boolean> waitForConnectedAndHealthy() {
+    public void waitForConnectedAndHealthy() throws InterruptedException {
         LOG.debug("Waiting until cluster connection comes back and cluster is healthy, checking once per second.");
-        final SettableFuture<Boolean> future = SettableFuture.create();
+
+        final CountDownLatch latch = new CountDownLatch(1);
         scheduler.scheduleAtFixedRate(new Runnable() {
             @Override
             public void run() {
                 try {
                     if (isConnectedAndHealthy()) {
                         LOG.debug("Cluster is healthy again, unblocking waiting threads.");
-                        future.set(true);
+                        latch.countDown();
                     }
                 } catch (Exception ignore) {} // to not cancel the schedule
             }
-        }, 0, 1, TimeUnit.SECONDS); // TODO should this be configurable or via latch?
-        return future;
+        }, 0, 1, TimeUnit.SECONDS); // TODO should this be configurable?
+
+        latch.await();
     }
 
     public void updateDataNodeList(Map<String, DiscoveryNode> nodes) {
