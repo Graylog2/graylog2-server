@@ -23,27 +23,30 @@
 package org.graylog2.plugin;
 
 import com.github.joschi.jadconfig.Parameter;
+import com.github.joschi.jadconfig.util.Size;
 import org.joda.time.Duration;
+
+import java.io.File;
 
 public class KafkaJournalConfiguration {
 
-    @Parameter("message_journal_dir")
-    private String messageJournalDir = "journal";
+    @Parameter(value = "message_journal_dir", required = true)
+    private File messageJournalDir = new File("journal");
 
     @Parameter("message_journal_segment_size")
-    private int messageJournalSegmentSize = 1024 * 1024 * 100; // 100 MB
+    private Size messageJournalSegmentSize = Size.megabytes(100l);
 
     @Parameter("message_journal_max_size")
-    private long messageJournalMaxSize = 1024 * 1024 * 1024 * 5l; // 5 GB
+    private Size messageJournalMaxSize = Size.gigabytes(5l);
 
     @Parameter("message_journal_max_age")
     private Duration messageJournalMaxAge = Duration.standardHours(12);
 
-    public String getMessageJournalDir() {
+    public File getMessageJournalDir() {
         return messageJournalDir;
     }
 
-    public int getMessageJournalSegmentSize() {
+    public Size getMessageJournalSegmentSize() {
         return messageJournalSegmentSize;
     }
 
@@ -51,7 +54,7 @@ public class KafkaJournalConfiguration {
         return messageJournalMaxAge;
     }
 
-    public long getMessageJournalMaxSize() {
+    public Size getMessageJournalMaxSize() {
         return messageJournalMaxSize;
     }
 
