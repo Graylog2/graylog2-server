@@ -27,12 +27,7 @@ import javax.inject.Inject;
 import java.util.HashSet;
 import java.util.Set;
 
-/**
- * @author Lennart Koopmann <lennart@socketfeed.com>
- */
 public class OutputRouter {
-    private static final Logger LOG = LoggerFactory.getLogger(OutputRouter.class);
-
     private final MessageOutput defaultMessageOutput;
     private final OutputRegistry outputRegistry;
 
@@ -47,20 +42,27 @@ public class OutputRouter {
         Set<MessageOutput> result = new HashSet<>();
         for (Output output : stream.getOutputs()) {
             final MessageOutput messageOutput = outputRegistry.getOutputForIdAndStream(output.getId(), stream);
-            if (messageOutput != null)
+            if (messageOutput != null) {
                 result.add(messageOutput);
+            }
         }
 
         return result;
     }
 
-    public Set<MessageOutput> getOutputsForMessage(Message msg) {
-        Set<MessageOutput> result = new HashSet<>();
-
+    public Set<MessageOutput> getOutputsForMessage(final Message msg) {
+        final Set<MessageOutput> result = getStreamOutputsForMessage(msg);
         result.add(defaultMessageOutput);
 
-        for (Stream stream : msg.getStreams())
+        return result;
+    }
+
+    public Set<MessageOutput> getStreamOutputsForMessage(final Message msg) {
+        final Set<MessageOutput> result = new HashSet<>();
+
+        for (Stream stream : msg.getStreams()) {
             result.addAll(getMessageOutputsForStream(stream));
+        }
 
         return result;
     }

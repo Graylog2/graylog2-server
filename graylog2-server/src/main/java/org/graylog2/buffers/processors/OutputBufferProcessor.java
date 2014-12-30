@@ -21,6 +21,7 @@ import com.codahale.metrics.InstrumentedExecutorService;
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
+import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.common.util.concurrent.Uninterruptibles;
 import com.google.inject.Inject;
@@ -116,6 +117,7 @@ public class OutputBufferProcessor implements WorkHandler<MessageEvent> {
      * The default output, however, is allowed to block and is not subject to time limiting. This is important because it
      * can exert back pressure on the processing pipeline this way, making sure we don't run into excessive heap usage.
      * </p>
+     *
      * @param event the message to write to outputs
      * @throws Exception
      */
@@ -130,57 +132,14 @@ public class OutputBufferProcessor implements WorkHandler<MessageEvent> {
         }
         LOG.debug("Processing message <{}> from OutputBuffer.", msg.getId());
 
-        final Set<MessageOutput> messageOutputs = outputRouter.getOutputsForMessage(msg);
+        final Set<MessageOutput> messageOutputs = outputRouter.getStreamOutputsForMessage(msg);
         msg.recordCounter(serverStatus, "matched-outputs", messageOutputs.size());
 
-        // minus one, because the default output does not count against the time limited outputs, and is always included
-        final CountDownLatch streamOutputsDoneSignal = new CountDownLatch(messageOutputs.size() - 1);
+        final Future<?> defaultOutputCompletion = processMessage(msg, defaultMessageOutput);
 
-        Future<?> defaultOutputCompletion = null;
+        final CountDownLatch streamOutputsDoneSignal = new CountDownLatch(messageOutputs.size());
         for (final MessageOutput output : messageOutputs) {
-            if (output == null) {
-                LOG.error("Got null output!");
-                continue;
-            }
-            if (!output.isRunning()) {
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug("Skipping stopped output {}", output.getClass().getName());
-                }
-                continue;
-            }
-
-            final boolean isDefaultOutput = defaultMessageOutput.equals(output);
-
-            try {
-                LOG.debug("Writing message to [{}].", output.getClass());
-                if (LOG.isTraceEnabled()) {
-                    LOG.trace("Message id for [{}]: <{}>", output.getClass(), msg.getId());
-                }
-                final Future<?> future = executor.submit(new Runnable() {
-                    @Override
-                    public void run() {
-                        try (Timer.Context ignored = processTime.time()) {
-                            output.write(msg);
-                        } catch (Exception e) {
-                            LOG.error("Error in output [" + output.getClass() + "].", e);
-                        } finally {
-                            // do not touch the latch if this is the default output!
-                            // we use the returned future to block on its completion.
-                            if (!isDefaultOutput) {
-                                streamOutputsDoneSignal.countDown();
-                            }
-                        }
-                    }
-                });
-                if (isDefaultOutput) {
-                    // save the future so we can wait for its completion below, this implements the blocking behavior
-                    defaultOutputCompletion = future;
-                }
-
-            } catch (Exception e) {
-                LOG.error("Could not write message batch to output [" + output.getClass() + "].", e);
-                streamOutputsDoneSignal.countDown();
-            }
+            processMessage(msg, output, streamOutputsDoneSignal);
         }
 
         // Wait until all writer threads for stream outputs have finished or timeout is reached.
@@ -207,5 +166,44 @@ public class OutputBufferProcessor implements WorkHandler<MessageEvent> {
         throughputStats.getThroughputCounter().increment();
 
         LOG.debug("Wrote message <{}> to all outputs. Finished handling.", msg.getId());
+    }
+
+    private Future<?> processMessage(final Message msg, final MessageOutput defaultMessageOutput) {
+        return processMessage(msg, defaultMessageOutput, new CountDownLatch(0));
+    }
+
+    private Future<?> processMessage(final Message msg, final MessageOutput output, final CountDownLatch doneSignal) {
+        if (output == null) {
+            LOG.error("Output was null!");
+            return Futures.immediateCancelledFuture();
+        }
+        if (!output.isRunning()) {
+            LOG.debug("Skipping stopped output {}", output.getClass().getName());
+            return Futures.immediateCancelledFuture();
+        }
+
+        Future<?> future = null;
+        try {
+            LOG.debug("Writing message to [{}].", output.getClass());
+            if (LOG.isTraceEnabled()) {
+                LOG.trace("Message id for [{}]: <{}>", output.getClass(), msg.getId());
+            }
+            future = executor.submit(new Runnable() {
+                @Override
+                public void run() {
+                    try (Timer.Context ignored = processTime.time()) {
+                        output.write(msg);
+                    } catch (Exception e) {
+                        LOG.error("Error in output [" + output.getClass() + "].", e);
+                    } finally {
+                        doneSignal.countDown();
+                    }
+                }
+            });
+        } catch (Exception e) {
+            LOG.error("Could not write message batch to output [" + output.getClass() + "].", e);
+            doneSignal.countDown();
+        }
+        return future;
     }
 }
