@@ -22,6 +22,7 @@ import com.wordnik.swagger.annotations.ApiOperation;
 import org.graylog2.rest.resources.RestResource;
 import org.graylog2.shared.system.stats.StatsService;
 import org.graylog2.shared.system.stats.SystemStats;
+import org.graylog2.shared.system.stats.jvm.JvmStats;
 import org.graylog2.shared.system.stats.network.NetworkStats;
 import org.graylog2.shared.system.stats.os.OsStats;
 import org.graylog2.shared.system.stats.process.ProcessStats;
@@ -49,6 +50,15 @@ public class StatsResource extends RestResource {
             notes = "This resource returns information about the system this node is running on.")
     public SystemStats systemStats() {
         return statsService.systemStats();
+    }
+
+    @GET
+    @Path("/jvm")
+    @Timed
+    @ApiOperation(value = "JVM information about this node.",
+            notes = "This resource returns information about the Java Virtual Machine of this node.")
+    public JvmStats jvmStats() {
+        return statsService.jvmStats();
     }
 
     @GET
