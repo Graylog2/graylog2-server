@@ -54,7 +54,7 @@ import org.graylog2.indexer.indices.jobs.OptimizeIndexJob;
 import org.graylog2.indexer.ranges.CreateNewSingleIndexRangeJob;
 import org.graylog2.indexer.ranges.RebuildIndexRangesJob;
 import org.graylog2.inputs.PersistedInputsImpl;
-import org.graylog2.inputs.converters.InputStateListener;
+import org.graylog2.inputs.InputStateListener;
 import org.graylog2.jersey.container.netty.SecurityContextFactory;
 import org.graylog2.plugin.BaseConfiguration;
 import org.graylog2.plugin.PluginMetaData;
