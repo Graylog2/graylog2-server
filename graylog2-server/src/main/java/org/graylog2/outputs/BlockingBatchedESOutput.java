@@ -23,7 +23,6 @@ import com.codahale.metrics.Timer;
 import com.google.common.collect.Lists;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
-import com.google.inject.name.Named;
 import org.graylog2.indexer.cluster.Cluster;
 import org.graylog2.indexer.messages.Messages;
 import org.graylog2.plugin.Message;
@@ -35,7 +34,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.util.List;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -54,11 +52,9 @@ public class BlockingBatchedESOutput extends ElasticSearchOutput {
 
     private volatile List<Message> buffer;
 
-    private ScheduledExecutorService daemonExecutor;
-    private int processorCount;
     private static final AtomicInteger activeFlushThreads = new AtomicInteger(0);
     private final AtomicLong lastFlushTime = new AtomicLong();
-    private int outputFlushInterval;
+    private final int outputFlushInterval;
 
     @AssistedInject
     public BlockingBatchedESOutput(MetricRegistry metricRegistry,
@@ -66,24 +62,20 @@ public class BlockingBatchedESOutput extends ElasticSearchOutput {
                                    Cluster cluster,
                                    org.graylog2.Configuration serverConfiguration,
                                    Journal journal,
-                                   @Named("daemonScheduler") ScheduledExecutorService daemonExecutor,
                                    @Assisted Stream stream,
                                    @Assisted Configuration configuration) {
-        this(metricRegistry, messages, cluster, daemonExecutor, serverConfiguration, journal);
+        this(metricRegistry, messages, cluster, serverConfiguration, journal);
     }
 
     @Inject
     public BlockingBatchedESOutput(MetricRegistry metricRegistry,
                                    Messages messages,
                                    Cluster cluster,
-                                   @Named("daemonScheduler") ScheduledExecutorService daemonExecutor,
                                    org.graylog2.Configuration serverConfiguration,
                                    Journal journal) {
         super(metricRegistry, messages, journal);
         this.cluster = cluster;
-        this.daemonExecutor = daemonExecutor;
         this.maxBufferSize = serverConfiguration.getOutputBatchSize();
-        processorCount = serverConfiguration.getOutputBufferProcessors();
         outputFlushInterval = serverConfiguration.getOutputFlushInterval();
         this.processTime = metricRegistry.timer(name(this.getClass(), "processTime"));
         this.batchSize = metricRegistry.histogram(name(this.getClass(), "batchSize"));
