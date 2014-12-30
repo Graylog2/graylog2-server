@@ -44,6 +44,7 @@ public class IOState<T extends Stoppable> {
         STARTING,
         RUNNING,
         FAILED,
+        STOPPING,
         STOPPED,
         TERMINATED
     }

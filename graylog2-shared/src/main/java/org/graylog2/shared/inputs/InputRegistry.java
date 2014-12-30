@@ -104,6 +104,7 @@ public class InputRegistry extends HashSet<IOState<MessageInput>> {
         IOState<MessageInput> inputState = getRunningInputState(input.getId());
 
         if (inputState != null) {
+            inputState.setState(IOState.Type.STOPPING);
             try {
                 input.stop();
             } catch (Exception e) {

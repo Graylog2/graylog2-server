@@ -72,14 +72,14 @@ public class InputLauncher {
         executor.submit(new Runnable() {
             @Override
             public void run() {
-                LOG.info("Starting [{}] input with ID <{}>", input.getClass().getCanonicalName(), input.getId());
+                LOG.debug("Starting [{}] input with ID <{}>", input.getClass().getCanonicalName(), input.getId());
                 try {
                     input.checkConfiguration();
                     inputState.setState(IOState.Type.STARTING);
                     input.launch(inputBuffer);
                     inputState.setState(IOState.Type.RUNNING);
                     String msg = "Completed starting [" + input.getClass().getCanonicalName() + "] input with ID <" + input.getId() + ">";
-                    LOG.info(msg);
+                    LOG.debug(msg);
                 } catch (Exception e) {
                     handleLaunchException(e, inputState);
                 }

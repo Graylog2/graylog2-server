@@ -84,7 +84,7 @@ public class InputSetupService extends AbstractExecutionThreadService {
     @Override
     protected void run() throws Exception {
         // prevent launching persisted inputs too early.
-        LOG.debug("Delaying lauching persisted inputs until the node is in RUNNING state.");
+        LOG.debug("Delaying launching persisted inputs until the node is in RUNNING state.");
         Uninterruptibles.awaitUninterruptibly(startLatch);
 
         if (previousLifecycle.get() == Lifecycle.RUNNING) {

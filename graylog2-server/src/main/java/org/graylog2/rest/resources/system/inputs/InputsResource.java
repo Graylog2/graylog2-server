@@ -341,15 +341,7 @@ public class InputsResource extends RestResource {
             throw new NotFoundException(error);
         }
 
-        final String msg = "Launching existing input [" + messageInput.getName() + "]. Reason: REST request.";
-        LOG.info(msg);
-        activityWriter.write(new Activity(msg, InputsResource.class));
-
         inputLauncher.launch(messageInput);
-
-        final String msg2 = "Launched existing input [" + messageInput.getName() + "]. Reason: REST request.";
-        LOG.info(msg2);
-        activityWriter.write(new Activity(msg2, InputsResource.class));
     }
 
     @POST
@@ -366,15 +358,7 @@ public class InputsResource extends RestResource {
             throw new NotFoundException();
         }
 
-        final String msg = "Stopping input [" + input.getName() + "]. Reason: REST request.";
-        LOG.info(msg);
-        activityWriter.write(new Activity(msg, InputsResource.class));
-
         final IOState<MessageInput> inputState = inputRegistry.stop(input);
-
-        final String msg2 = "Stopped input [" + input.getName() + "]. Reason: REST request.";
-        LOG.info(msg2);
-        activityWriter.write(new Activity(msg2, InputsResource.class));
 
         return getInputStateSummary(inputState);
     }
