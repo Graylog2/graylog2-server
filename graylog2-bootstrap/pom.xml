@@ -14,10 +14,6 @@
         <version>0.93.0-SNAPSHOT</version>
     </parent>
 
-    <properties>
-        <mainClass>org.graylog2.bootstrap.Main</mainClass>
-    </properties>
-
     <name>graylog2-bootstrap</name>
     <url>http://www.graylog2.org/</url>
     <description>Graylog2 Single Binary Bootstrapper</description>
@@ -30,16 +26,18 @@
         </license>
     </licenses>
 
+    <properties>
+        <mainClass>org.graylog2.bootstrap.Main</mainClass>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.graylog2</groupId>
             <artifactId>graylog2-radio</artifactId>
-            <version>0.93.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.graylog2</groupId>
             <artifactId>graylog2-server</artifactId>
-            <version>0.93.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>io.airlift</groupId>

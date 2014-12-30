@@ -169,6 +169,16 @@
                 <artifactId>graylog2-shared</artifactId>
                 <version>${project.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.graylog2</groupId>
+                <artifactId>graylog2-server</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.graylog2</groupId>
+                <artifactId>graylog2-radio</artifactId>
+                <version>${project.version}</version>
+            </dependency>
 
             <dependency>
                 <groupId>com.google.guava</groupId>
