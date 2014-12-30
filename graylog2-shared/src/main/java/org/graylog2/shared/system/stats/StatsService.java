@@ -18,6 +18,8 @@ package org.graylog2.shared.system.stats;
 
 import org.graylog2.shared.system.stats.os.OsProbe;
 import org.graylog2.shared.system.stats.os.OsStats;
+import org.graylog2.shared.system.stats.process.ProcessProbe;
+import org.graylog2.shared.system.stats.process.ProcessStats;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -25,18 +27,23 @@ import javax.inject.Singleton;
 @Singleton
 public class StatsService {
     private final OsProbe osProbe;
+    private final ProcessProbe processProbe;
 
     @Inject
-    public StatsService(OsProbe osProbe) {
+    public StatsService(OsProbe osProbe, ProcessProbe processProbe) {
         this.osProbe = osProbe;
+        this.processProbe = processProbe;
     }
 
     public OsStats osStats() {
         return osProbe.osStats();
     }
 
+    public ProcessStats processStats() {
+        return processProbe.processStats();
+    }
 
     public SystemStats systemStats() {
-        return SystemStats.create(osProbe.osStats());
+        return SystemStats.create(osStats(), processStats());
     }
 }

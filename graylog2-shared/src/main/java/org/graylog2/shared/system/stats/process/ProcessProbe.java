@@ -14,24 +14,8 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.shared.system.stats;
+package org.graylog2.shared.system.stats.process;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.auto.value.AutoValue;
-import org.graylog2.shared.system.stats.os.OsStats;
-import org.graylog2.shared.system.stats.process.ProcessStats;
-
-@JsonAutoDetect
-@AutoValue
-public abstract class SystemStats {
-    @JsonProperty
-    public abstract OsStats osStats();
-
-    @JsonProperty
-    public abstract ProcessStats processStats();
-
-    public static SystemStats create(OsStats osStats, ProcessStats processStats) {
-        return new AutoValue_SystemStats(osStats, processStats);
-    }
+public interface ProcessProbe {
+    ProcessStats processStats();
 }

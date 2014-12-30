@@ -21,6 +21,9 @@ import org.graylog2.shared.system.stats.SigarService;
 import org.graylog2.shared.system.stats.os.JmxOsProbe;
 import org.graylog2.shared.system.stats.os.OsProbe;
 import org.graylog2.shared.system.stats.os.SigarOsProbe;
+import org.graylog2.shared.system.stats.process.JmxProcessProbe;
+import org.graylog2.shared.system.stats.process.ProcessProbe;
+import org.graylog2.shared.system.stats.process.SigarProcessProbe;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,6 +38,7 @@ public class SystemStatsBindings extends AbstractModule {
             if (sigarService.isReady()) {
                 bind(SigarService.class).toInstance(sigarService);
                 bind(OsProbe.class).to(SigarOsProbe.class).asEagerSingleton();
+                bind(ProcessProbe.class).to(SigarProcessProbe.class).asEagerSingleton();
                 sigarLoaded = true;
             }
         } catch (Throwable e) {
@@ -43,6 +47,7 @@ public class SystemStatsBindings extends AbstractModule {
 
         if (!sigarLoaded) {
             bind(OsProbe.class).to(JmxOsProbe.class).asEagerSingleton();
+            bind(ProcessProbe.class).to(JmxProcessProbe.class).asEagerSingleton();
         }
     }
 }

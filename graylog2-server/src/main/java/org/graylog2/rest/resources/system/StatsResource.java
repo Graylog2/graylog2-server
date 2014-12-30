@@ -19,13 +19,11 @@ package org.graylog2.rest.resources.system;
 import com.codahale.metrics.annotation.Timed;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
-import org.graylog2.cluster.NodeNotFoundException;
 import org.graylog2.rest.resources.RestResource;
 import org.graylog2.shared.system.stats.StatsService;
 import org.graylog2.shared.system.stats.SystemStats;
 import org.graylog2.shared.system.stats.os.OsStats;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.graylog2.shared.system.stats.process.ProcessStats;
 
 import javax.inject.Inject;
 import javax.ws.rs.GET;
@@ -48,7 +46,7 @@ public class StatsResource extends RestResource {
     @Timed
     @ApiOperation(value = "System information about this node.",
             notes = "This resource returns information about the system this node is running on.")
-    public SystemStats systemStats() throws NodeNotFoundException {
+    public SystemStats systemStats() {
         return statsService.systemStats();
     }
 
@@ -57,7 +55,16 @@ public class StatsResource extends RestResource {
     @Timed
     @ApiOperation(value = "OS information about this node.",
             notes = "This resource returns information about the operating system this node is running on.")
-    public OsStats osStats() throws NodeNotFoundException {
+    public OsStats osStats() {
         return statsService.osStats();
+    }
+
+    @GET
+    @Path("/process")
+    @Timed
+    @ApiOperation(value = "Process information about this node.",
+            notes = "This resource returns information about the process this node is running as.")
+    public ProcessStats processStats() {
+        return statsService.processStats();
     }
 }
