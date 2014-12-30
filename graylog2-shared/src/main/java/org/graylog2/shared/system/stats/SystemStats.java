@@ -27,16 +27,16 @@ import org.graylog2.shared.system.stats.process.ProcessStats;
 @JsonAutoDetect
 @AutoValue
 public abstract class SystemStats {
-    @JsonProperty
+    @JsonProperty("jvm")
     public abstract JvmStats jvmStats();
 
-    @JsonProperty
+    @JsonProperty("network")
     public abstract NetworkStats networkStats();
 
-    @JsonProperty
+    @JsonProperty("os")
     public abstract OsStats osStats();
 
-    @JsonProperty
+    @JsonProperty("process")
     public abstract ProcessStats processStats();
 
     public static SystemStats create(JvmStats jvmStats, NetworkStats networkStats, OsStats osStats, ProcessStats processStats) {
