@@ -22,6 +22,7 @@ import com.wordnik.swagger.annotations.ApiOperation;
 import org.graylog2.rest.resources.RestResource;
 import org.graylog2.shared.system.stats.StatsService;
 import org.graylog2.shared.system.stats.SystemStats;
+import org.graylog2.shared.system.stats.network.NetworkStats;
 import org.graylog2.shared.system.stats.os.OsStats;
 import org.graylog2.shared.system.stats.process.ProcessStats;
 
@@ -48,6 +49,15 @@ public class StatsResource extends RestResource {
             notes = "This resource returns information about the system this node is running on.")
     public SystemStats systemStats() {
         return statsService.systemStats();
+    }
+
+    @GET
+    @Path("/network")
+    @Timed
+    @ApiOperation(value = "Networking information about this node.",
+            notes = "This resource returns information about the networking system this node is running with.")
+    public NetworkStats networkStats() {
+        return statsService.networkStats();
     }
 
     @GET
