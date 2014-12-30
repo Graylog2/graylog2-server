@@ -14,10 +14,12 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.rest.resources.system.responses;
+package org.graylog2.rest.models.system.inputs.responses;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.auto.value.AutoValue;
+import org.graylog2.rest.models.system.responses.IOStateSummary;
 import org.joda.time.DateTime;
 
 import javax.annotation.Nullable;
@@ -26,14 +28,16 @@ import javax.annotation.Nullable;
  * Created by dennis on 12/12/14.
  */
 @JsonAutoDetect
-public abstract class IOStateSummary {
+@AutoValue
+public abstract class InputStateSummary extends IOStateSummary {
     @JsonProperty
-    public abstract String id();
-    @JsonProperty
-    public abstract String state();
-    @JsonProperty
-    public abstract DateTime startedAt();
-    @JsonProperty
-    @Nullable
-    public abstract String detailedMessage();
+    public abstract InputSummary messageInput();
+
+    public static InputStateSummary create(String id,
+                                           String state,
+                                           DateTime startedAt,
+                                           @Nullable String detailedMessage,
+                                           InputSummary messageInput) {
+        return new AutoValue_InputStateSummary(id, state, startedAt, detailedMessage, messageInput);
+    }
 }

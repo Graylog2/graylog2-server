@@ -18,7 +18,6 @@ package org.graylog2.rest.resources.system.inputs;
 
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Maps;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
@@ -32,16 +31,14 @@ import org.graylog2.inputs.InputImpl;
 import org.graylog2.inputs.InputService;
 import org.graylog2.plugin.IOState;
 import org.graylog2.plugin.ServerStatus;
-import org.graylog2.plugin.Tools;
-import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationException;
 import org.graylog2.plugin.inputs.Extractor;
 import org.graylog2.plugin.inputs.MessageInput;
+import org.graylog2.rest.models.system.inputs.responses.InputSummary;
 import org.graylog2.rest.resources.RestResource;
 import org.graylog2.rest.resources.system.inputs.responses.InputCreated;
-import org.graylog2.rest.resources.system.inputs.responses.InputStateSummary;
-import org.graylog2.rest.resources.system.inputs.responses.InputSummary;
-import org.graylog2.rest.resources.system.inputs.responses.InputsList;
+import org.graylog2.rest.models.system.inputs.responses.InputStateSummary;
+import org.graylog2.rest.models.system.inputs.responses.InputsList;
 import org.graylog2.security.RestPermissions;
 import org.graylog2.shared.inputs.InputLauncher;
 import org.graylog2.shared.inputs.InputRegistry;
@@ -72,7 +69,6 @@ import javax.ws.rs.core.UriBuilder;
 import java.net.URI;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 @RequiresAuthentication
 @Api(value = "System/Inputs", description = "Message inputs of this node")
@@ -141,29 +137,33 @@ public class InputsResource extends RestResource {
         for (IOState<MessageInput> inputState : inputRegistry.getInputStates()) {
             if (!isPermitted(RestPermissions.INPUTS_READ, inputState.getStoppable().getId()))
                 continue;
-            final MessageInput messageInput = inputState.getStoppable();
-            inputStates.add(InputStateSummary.create(
-                    inputState.getStoppable().getId(),
-                    inputState.getState().toString(),
-                    inputState.getStartedAt(),
-                    inputState.getDetailedMessage(),
-                    InputSummary.create(
-                            messageInput.getTitle(),
-                            messageInput.getPersistId(),
-                            messageInput.isGlobal(),
-                            messageInput.getName(),
-                            messageInput.getContentPack(),
-                            messageInput.getId(),
-                            messageInput.getCreatedAt(),
-                            messageInput.getClass().getCanonicalName(),
-                            messageInput.getCreatorUserId(),
-                            messageInput.getAttributesWithMaskedPasswords(),
-                            messageInput.getStaticFields()
-                    )
-            ));
+            inputStates.add(getInputStateSummary(inputState));
         }
 
         return InputsList.create(inputStates.build());
+    }
+
+    private InputStateSummary getInputStateSummary(IOState<MessageInput> inputState) {
+        final MessageInput messageInput = inputState.getStoppable();
+        return InputStateSummary.create(
+                messageInput.getId(),
+                inputState.getState().toString(),
+                inputState.getStartedAt(),
+                inputState.getDetailedMessage(),
+                InputSummary.create(
+                        messageInput.getTitle(),
+                        messageInput.getPersistId(),
+                        messageInput.isGlobal(),
+                        messageInput.getName(),
+                        messageInput.getContentPack(),
+                        messageInput.getId(),
+                        messageInput.getCreatedAt(),
+                        messageInput.getClass().getCanonicalName(),
+                        messageInput.getCreatorUserId(),
+                        messageInput.getAttributesWithMaskedPasswords(),
+                        messageInput.getStaticFields()
+                )
+        );
     }
 
     @POST
@@ -359,7 +359,7 @@ public class InputsResource extends RestResource {
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "No such input on this node.")
     })
-    public IOState<MessageInput> stop(@ApiParam(name = "inputId", required = true) @PathParam("inputId") String inputId) {
+    public InputStateSummary stop(@ApiParam(name = "inputId", required = true) @PathParam("inputId") String inputId) {
         final MessageInput input = inputRegistry.getRunningInput(inputId);
         if (input == null) {
             LOG.info("Cannot stop input. Input not found.");
@@ -376,7 +376,7 @@ public class InputsResource extends RestResource {
         LOG.info(msg2);
         activityWriter.write(new Activity(msg2, InputsResource.class));
 
-        return inputState;
+        return getInputStateSummary(inputState);
     }
 
     @POST
@@ -387,7 +387,8 @@ public class InputsResource extends RestResource {
             @ApiResponse(code = 404, message = "No such input on this node.")
     })
     public Response restart(@ApiParam(name = "inputId", required = true) @PathParam("inputId") String inputId) {
-        final IOState<MessageInput> oldState = stop(inputId);
+        final IOState<MessageInput> oldState = inputRegistry.getRunningInputState(inputId);
+        stop(inputId);
         inputRegistry.remove(oldState);
 
         launchExisting(inputId);

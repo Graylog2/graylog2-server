@@ -20,6 +20,7 @@ import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationException;
@@ -27,6 +28,9 @@ import org.graylog2.plugin.IOState;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.radio.cluster.InputService;
 import org.graylog2.radio.rest.resources.RestResource;
+import org.graylog2.rest.models.system.inputs.responses.InputStateSummary;
+import org.graylog2.rest.models.system.inputs.responses.InputSummary;
+import org.graylog2.rest.models.system.inputs.responses.InputsList;
 import org.graylog2.shared.inputs.InputDescription;
 import org.graylog2.shared.inputs.InputLauncher;
 import org.graylog2.shared.inputs.InputRegistry;
@@ -53,6 +57,7 @@ import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 @Path("/system/inputs")
@@ -80,18 +85,31 @@ public class InputsResource extends RestResource {
 
     @GET
     @Timed
-    public Map<String, Object> list() {
-        final List<IOState<MessageInput>> inputStates = Lists.newArrayList();
+    public InputsList list() {
+        final Set<InputStateSummary> inputStates = Sets.newHashSet();
 
         for (IOState<MessageInput> inputState : inputRegistry.getInputStates()) {
-            inputStates.add(inputState);
+            final MessageInput input = inputState.getStoppable();
+            inputStates.add(InputStateSummary.create(input.getId(),
+                    inputState.getState().toString(),
+                    inputState.getStartedAt(),
+                    inputState.getDetailedMessage(),
+                    InputSummary.create(input.getTitle(),
+                            input.getId(),
+                            input.isGlobal(),
+                            input.getName(),
+                            input.getContentPack(),
+                            input.getId(),
+                            input.getCreatedAt(),
+                            input.getType(),
+                            input.getCreatorUserId(),
+                            input.getAttributesWithMaskedPasswords(),
+                            input.getStaticFields()))
+            );
+
         }
 
-        final Map<String, Object> result = ImmutableMap.of(
-                "inputs", inputStates,
-                "total", inputStates.size());
-
-        return result;
+        return InputsList.create(inputStates);
     }
 
     @GET

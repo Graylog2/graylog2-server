@@ -49,6 +49,7 @@
         <module>graylog2-rest-client</module>
         <module>graylog2-bootstrap</module>
         <module>integration-tests</module>
+        <module>graylog2-rest-models</module>
     </modules>
 
     <organization>
@@ -177,6 +178,11 @@
             <dependency>
                 <groupId>org.graylog2</groupId>
                 <artifactId>graylog2-radio</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.graylog2</groupId>
+                <artifactId>graylog2-rest-models</artifactId>
                 <version>${project.version}</version>
             </dependency>
 

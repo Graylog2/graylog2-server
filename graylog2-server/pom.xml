@@ -58,6 +58,10 @@
             <groupId>org.graylog2</groupId>
             <artifactId>graylog2-shared</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.graylog2</groupId>
+            <artifactId>graylog2-rest-models</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>com.google.guava</groupId>
