@@ -91,6 +91,11 @@ public class InputServiceImpl extends PersistedServiceImpl implements InputServi
     }
 
     @Override
+    public Input create(String id, Map<String, Object> fields) {
+        return new InputImpl(new ObjectId(id), fields);
+    }
+
+    @Override
     public Input create(Map<String, Object> fields) {
         return new InputImpl(fields);
     }

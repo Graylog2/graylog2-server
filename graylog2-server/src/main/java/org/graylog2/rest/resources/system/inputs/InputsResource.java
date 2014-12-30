@@ -24,10 +24,8 @@ import com.wordnik.swagger.annotations.ApiParam;
 import com.wordnik.swagger.annotations.ApiResponse;
 import com.wordnik.swagger.annotations.ApiResponses;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.bson.types.ObjectId;
 import org.graylog2.database.ValidationException;
 import org.graylog2.inputs.Input;
-import org.graylog2.inputs.InputImpl;
 import org.graylog2.inputs.InputService;
 import org.graylog2.plugin.IOState;
 import org.graylog2.plugin.ServerStatus;
@@ -45,8 +43,6 @@ import org.graylog2.shared.inputs.InputRegistry;
 import org.graylog2.shared.inputs.MessageInputFactory;
 import org.graylog2.shared.inputs.NoSuchInputTypeException;
 import org.graylog2.shared.rest.resources.system.inputs.requests.InputLaunchRequest;
-import org.graylog2.shared.system.activities.Activity;
-import org.graylog2.shared.system.activities.ActivityWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -81,19 +77,16 @@ public class InputsResource extends RestResource {
 
     private final InputService inputService;
     private final InputRegistry inputRegistry;
-    private final ActivityWriter activityWriter;
     private final MessageInputFactory messageInputFactory;
     private final InputLauncher inputLauncher;
 
     @Inject
     public InputsResource(InputService inputService,
                           InputRegistry inputRegistry,
-                          ActivityWriter activityWriter,
                           MessageInputFactory messageInputFactory,
                           InputLauncher inputLauncher) {
         this.inputService = inputService;
         this.inputRegistry = inputRegistry;
-        this.activityWriter = activityWriter;
         this.messageInputFactory = messageInputFactory;
         this.inputLauncher = inputLauncher;
     }
@@ -227,9 +220,9 @@ public class InputsResource extends RestResource {
         // ... and check if it would pass validation. We don't need to go on if it doesn't.
         final Input mongoInput;
         if (input.getId() != null)
-            mongoInput = new InputImpl(new ObjectId(input.getId()), inputData);
+            mongoInput = inputService.create(input.getId(), inputData);
         else
-            mongoInput = new InputImpl(inputData);
+            mongoInput = inputService.create(inputData);
 
         return mongoInput;
     }
@@ -251,10 +244,6 @@ public class InputsResource extends RestResource {
             throw new NotFoundException();
         }
 
-        final String msg = "Attempting to terminate input [" + messageInput.getName() + "]. Reason: REST request.";
-        LOG.info(msg);
-        activityWriter.write(new Activity(msg, InputsResource.class));
-
         inputRegistry.remove(messageInput);
 
         if (serverStatus.hasCapability(ServerStatus.Capability.MASTER) || !messageInput.isGlobal()) {
@@ -266,10 +255,6 @@ public class InputsResource extends RestResource {
                 LOG.warn("Input not found while deleting it: ", e);
             }
         }
-
-        final String msg2 = "Terminated input [" + messageInput.getName() + "]. Reason: REST request.";
-        LOG.info(msg2);
-        activityWriter.write(new Activity(msg2, InputsResource.class));
     }
 
     @PUT

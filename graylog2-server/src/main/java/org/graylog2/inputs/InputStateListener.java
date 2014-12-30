@@ -81,6 +81,11 @@ public class InputStateListener {
                 LOG.info(stoppedMessage);
                 activityWriter.write(new Activity(stoppedMessage, InputStateListener.class));
                 break;
+            case TERMINATED:
+                final String terminatedMsg = "Terminated input [" + input.getName() + "].";
+                LOG.info(terminatedMsg);
+                activityWriter.write(new Activity(terminatedMsg, InputStateListener.class));
+                break;
         }
     }
 }
