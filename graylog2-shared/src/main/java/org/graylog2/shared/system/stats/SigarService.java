@@ -36,7 +36,8 @@ public class SigarService {
             Sigar.load();
             LOG.debug("Successfully loaded SIGAR {}", Sigar.VERSION_STRING);
         } catch (Throwable t) {
-            LOG.debug("Failed to load SIGAR", t);
+            LOG.info("Failed to load SIGAR. Falling back to JMX implementations.");
+            LOG.debug("Reason for SIGAR loading failure", t);
 
             if (sigar != null) {
                 try {
