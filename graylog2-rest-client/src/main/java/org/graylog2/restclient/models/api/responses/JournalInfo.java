@@ -16,13 +16,32 @@
  */
 package org.graylog2.restclient.models.api.responses;
 
-import java.util.Map;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import org.joda.time.DateTime;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
-public class BuffersResponse {
+import javax.annotation.Nullable;
 
-    public Map<String, BufferSummaryResponse> buffers;
+public class JournalInfo {
+    @JsonProperty(required = true)
+    public boolean enabled;
+
+    public long appendEventsPerSecond;
+
+    public long readEventsPerSecond;
+
+    public long uncommittedJournalEntries;
+
+    public long journalSize;
+
+    public long journalSizeLimit;
+
+    public int numberOfSegments;
+
+    @Nullable
+    public DateTime oldestSegment;
+
+    @Nullable
+    public KafkaJournalConfiguration journalConfig;
+
 
 }

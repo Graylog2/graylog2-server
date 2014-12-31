@@ -16,13 +16,23 @@
  */
 package org.graylog2.restclient.models.api.responses;
 
-import java.util.Map;
+import org.joda.time.Duration;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
-public class BuffersResponse {
+import java.io.File;
 
-    public Map<String, BufferSummaryResponse> buffers;
+public class KafkaJournalConfiguration {
+    public File directory;
+
+    public long segmentSize;
+
+    public Duration segmentAge;
+
+    public long maxSize;
+
+    public Duration maxAge;
+
+    public long flushInterval;
+
+    public Duration flushAge;
 
 }
