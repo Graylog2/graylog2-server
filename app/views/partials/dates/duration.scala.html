@@ -1,0 +1,2 @@
+@(duration: org.joda.time.Duration, formatter: org.joda.time.format.PeriodFormatter)
+<time datetime="@duration.toString" title="@duration.toString">@formatter.print(duration.toPeriod)</time>

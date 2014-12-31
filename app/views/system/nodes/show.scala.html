@@ -1,5 +1,6 @@
 @(currentUser: org.graylog2.restclient.models.User, breadcrumbs: lib.BreadcrumbList, node: org.graylog2.restclient.models.Node, installedPlugins: List[org.graylog2.restclient.models.Plugin])
 @import views.helpers.StringHelper._
+@import views.helpers.NumberHelper
 @import views.helpers.DateHelper
 @import controllers.routes;
 @import views.helpers.Permissions.isPermitted
@@ -100,7 +101,6 @@
                 <div class="bar bar-warning heap-used-percent" style="width: @node.jvm.usedMemoryPercentage()%;"></div>
                 <div class="bar heap-total-percent" style="width: @(node.jvm.totalMemoryPercentage()-node.jvm.usedMemoryPercentage)%"></div>
             </div>
-            Master caches: <strong><span class="input-master-cache">@node.getBufferInfo.getInputMasterCache.size</span></strong> IMC / <strong><span class="output-master-cache">@node.getBufferInfo.getOutputMasterCache.size</span></strong> OMC.
 
             The JVM is using <strong><span class="heap-used">@node.jvm.getUsedMemory.getMegabytes()</span> of <span class="heap-total">@node.jvm.getTotalMemory.getMegabytes()</span> MB</strong>
             heap space and will not attempt to use more than <strong><span class="heap-max">@node.jvm.getMaxMemory.getMegabytes()</span> MB</strong>.
@@ -117,7 +117,7 @@
                 <h3>Input buffer</h3>
 
                 <div class="progress node-buffer-usage">
-                    <div class="bar bar-warning" style="width: @node.getBufferInfo.getInputBuffer.utilizationPercent%;"></div>
+                    <div class="bar bar-warning" style="width: @node.getBufferInfo.getInputBuffer.utilizationPercent%;">@node.getBufferInfo.getInputBuffer.utilizationPercent%</div>
                 </div>
                 <strong>@node.getBufferInfo.getInputBuffer.utilization messages</strong> in input buffer.
                 (@node.getBufferInfo.getInputBuffer.utilizationPercent% utilized)
@@ -128,15 +128,54 @@
                 <h3>Output buffer</h3>
 
                 <div class="progress node-buffer-usage">
-                    <div class="bar bar-warning" style="width: @node.getBufferInfo.getOutputBuffer.utilizationPercent%;"></div>
+                    <div class="bar bar-warning" style="width: @node.getBufferInfo.getOutputBuffer.utilizationPercent%;">@node.getBufferInfo.getOutputBuffer.utilizationPercent%</div>
                 </div>
                 <strong>@node.getBufferInfo.getOutputBuffer.utilization messages</strong> in output buffer.
                 (@node.getBufferInfo.getOutputBuffer.utilizationPercent% utilized)
             </div>
         </div>
-        The buffers are built to cache small amounts of messages on their way through the different processors. Messages are written to the master caches
-        (IMC / OMC) when a buffer is full. The master caches are not limited in size and will accept messages until you run out of heap space to buffer
-        input backpressure as long as possible.
+        The buffers are built to cache small amounts of messages on their way through the different processors.
+    </div>
+
+    <hr />
+
+    <div class="row-fluid">
+        <h2><i class="icon icon-hdd"></i> Disk Journal</h2>
+        @if(node.getJournalInfo.enabled) {
+            <div class="row-fluid">
+                <div class="span6">
+                    <h3>Utilization</h3>
+                    <div class="progress node-journal-usage">
+                        <div class="bar bar-warning" style="width : @NumberHelper.asPercent(node.getJournalInfo.journalSize, node.getJournalInfo.journalSizeLimit, 0, true) ;">@NumberHelper.asPercent(node.getJournalInfo.journalSize, node.getJournalInfo.journalSizeLimit, 2, true)</div>
+                    </div>
+                    <strong>@node.getJournalInfo.uncommittedJournalEntries unprocessed messages</strong>
+                    are currently in the journal, in @node.getJournalInfo.numberOfSegments segments.<br/>
+                    <strong>@node.getJournalInfo.appendEventsPerSecond messages</strong>
+                    have been appended in the last second,
+                    <strong>@node.getJournalInfo.readEventsPerSecond messages</strong>
+                    have been read in the last second.
+                </div>
+                <div class="span6">
+                    <h3>Configuration</h3>
+                    <dl class="system-journal">
+                        <dt>Path:</dt>
+                        <dd>@node.getJournalInfo.journalConfig.directory</dd>
+                        <dt>Earliest entry: </dt>
+                        <dd>@DateHelper.readablePeriodFromNow(node.getJournalInfo.oldestSegment)</dd>
+                        <dt>Maximum size:</dt>
+                        <dd>@node.getJournalInfo.journalConfig.maxSize bytes</dd>
+                        <dt>Maximum age:</dt>
+                        <dd>@DateHelper.readableDuration(node.getJournalInfo.journalConfig.maxAge)</dd>
+                        <dt>Flush policy:</dt>
+                        <dd>Every @node.getJournalInfo.journalConfig.flushInterval messages or @DateHelper.readableDuration(node.getJournalInfo.journalConfig.flushAge)</dd>
+                    </dl>
+                </div>
+            </div>
+            Incoming messages are written to the disk journal to ensure they are kept safe in case of a server failure. The journal also helps keeping Graylog2 working if any of the outputs is too slow to keep up with the message rate
+            or whenever there is a peak in incoming messages. It makes sure that Graylog2 does not buffer all of those messages in main memory and avoids overly long garbage collection pauses that way.
+        } else {
+            The disk journal is disabled for this node.
+        }
     </div>
 
     <hr />

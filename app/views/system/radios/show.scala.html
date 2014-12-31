@@ -61,8 +61,6 @@
             <div class="bar heap-total-percent" style="width: @(radio.jvm.totalMemoryPercentage()-radio.jvm.usedMemoryPercentage)%"></div>
         </div>
 
-        <strong>@radio.getBuffers.getInputMasterCache.size</strong> messages in master cache.
-
         The JVM is using <strong><span class="heap-used">@radio.jvm.getUsedMemory.getMegabytes</span> of <span class="heap-total">@radio.jvm.getTotalMemory.getMegabytes</span> MB</strong>
         heap space and will not attempt to use more than <strong><span class="heap-max">@radio.jvm.getMaxMemory.getMegabytes</span> MB</strong>.
     </div>

@@ -283,8 +283,6 @@ public class SystemApiController extends AuthenticatedController {
         result.put("used", jvm.getUsedMemory().getMegabytes());
         result.put("used_percentage", jvm.usedMemoryPercentage());
         result.put("total_percentage", jvm.totalMemoryPercentage());
-        result.put("input_master_cache", bufferInfo.getInputMasterCache().size);
-        result.put("output_master_cache", bufferInfo.getOutputMasterCache().size);
 
         return result;
     }

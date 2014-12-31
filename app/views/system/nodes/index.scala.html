@@ -157,8 +157,6 @@
                     <div class="bar heap-total-percent" style="width: @(jvm.totalMemoryPercentage()-jvm.usedMemoryPercentage)%"></div>
                 </div>
 
-                <strong><span class="input-master-cache">@buffers.get(jvm.getNodeId).getInputMasterCache.size</span>
-                messages</strong> in master cache.
 
                 The JVM is using <strong><span class="heap-used">@jvm.getUsedMemory.getMegabytes()</span>
                 of <span class="heap-total">@jvm.getTotalMemory.getMegabytes()</span> MB</strong>
@@ -242,9 +240,6 @@
                         <div class="bar bar-warning heap-used-percent" style="width: @radio.jvm().usedMemoryPercentage()%;"></div>
                         <div class="bar heap-total-percent" style="width: @(radio.jvm().totalMemoryPercentage()-radio.jvm().usedMemoryPercentage)%"></div>
                     </div>
-
-                    <strong><span class="input-master-cache">@radio.getBuffers.getInputMasterCache.size</span>
-                    messages</strong> in master cache.
 
                     The JVM is using <strong><span class="heap-used">@radio.jvm().getUsedMemory.getMegabytes()</span>
                     of <span class="heap-total">@radio.jvm().getTotalMemory.getMegabytes()</span> MB</strong>

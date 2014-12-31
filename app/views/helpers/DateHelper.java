@@ -21,6 +21,9 @@ package views.helpers;
 
 import org.graylog2.restclient.lib.DateTools;
 import org.joda.time.DateTime;
+import org.joda.time.Duration;
+import org.joda.time.format.PeriodFormat;
+import org.joda.time.format.PeriodFormatter;
 import play.twirl.api.Html;
 
 /**
@@ -61,4 +64,10 @@ public class DateHelper {
         return views.html.partials.dates.readable_period.render(DateTools.inUserTimeZone(instant), classes);
     }
 
+    public static Html readableDuration(Duration duration) {
+        PeriodFormatter formatter = PeriodFormat.getDefault();
+
+        return views.html.partials.dates.duration.render(duration, formatter);
+        
+    }
 }
