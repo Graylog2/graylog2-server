@@ -16,8 +16,8 @@
  */
 package org.graylog2.indexer.counts;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import org.elasticsearch.action.count.CountRequest;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.node.Node;

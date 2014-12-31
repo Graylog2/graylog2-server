@@ -20,7 +20,7 @@ import java.util.List;
 
 import com.google.common.collect.Lists;
 
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.graylog2.restclient.models.Stream;
 import org.graylog2.restclient.models.StreamService;
 import org.graylog2.restclient.models.api.responses.streams.StreamSummaryResponse;

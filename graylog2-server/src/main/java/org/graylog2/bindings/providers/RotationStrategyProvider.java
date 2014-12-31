@@ -16,8 +16,8 @@
  */
 package org.graylog2.bindings.providers;
 
-import com.google.inject.Inject;
-import com.google.inject.Provider;
+import javax.inject.Inject;
+import javax.inject.Provider;
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.plugin.indexer.rotation.RotationStrategy;
 

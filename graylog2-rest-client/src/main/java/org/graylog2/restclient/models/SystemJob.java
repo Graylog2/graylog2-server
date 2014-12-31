@@ -16,7 +16,7 @@
  */
 package org.graylog2.restclient.models;
 
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import org.graylog2.restclient.models.api.responses.system.SystemJobSummaryResponse;

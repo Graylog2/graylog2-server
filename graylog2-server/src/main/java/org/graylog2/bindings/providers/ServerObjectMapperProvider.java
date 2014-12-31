@@ -18,7 +18,7 @@ package org.graylog2.bindings.providers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.graylog2.database.ObjectIdSerializer;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 

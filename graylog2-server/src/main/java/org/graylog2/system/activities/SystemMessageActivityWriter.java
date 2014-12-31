@@ -17,7 +17,7 @@
 package org.graylog2.system.activities;
 
 import com.google.common.collect.Maps;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.graylog2.database.ValidationException;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.ServerStatus;

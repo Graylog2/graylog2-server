@@ -17,7 +17,7 @@
 package org.graylog2.inputs.codecs;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
 import org.graylog2.inputs.random.generators.FakeHttpRawMessageGenerator;
 import org.graylog2.plugin.inputs.annotations.Codec;

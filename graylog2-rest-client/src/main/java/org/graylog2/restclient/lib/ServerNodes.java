@@ -17,9 +17,9 @@
 package org.graylog2.restclient.lib;
 
 import com.google.common.collect.*;
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
-import com.google.inject.name.Named;
+import javax.inject.Inject;
+import javax.inject.Singleton;
+import javax.inject.Named;
 import org.graylog2.restclient.models.Node;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

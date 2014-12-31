@@ -17,7 +17,7 @@
 package org.graylog2.system.shutdown;
 
 import com.google.common.util.concurrent.Uninterruptibles;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.graylog2.Configuration;
 import org.graylog2.initializers.BufferSynchronizerService;
 import org.graylog2.plugin.ServerStatus;

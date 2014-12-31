@@ -17,7 +17,7 @@
 package org.graylog2.inputs.extractors;
 
 import com.codahale.metrics.MetricRegistry;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.graylog2.ConfigurationException;
 import org.graylog2.plugin.inputs.Converter;
 import org.graylog2.plugin.inputs.Extractor;

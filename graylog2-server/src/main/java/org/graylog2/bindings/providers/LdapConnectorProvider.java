@@ -16,7 +16,7 @@
  */
 package org.graylog2.bindings.providers;
 
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.graylog2.Configuration;
 import org.graylog2.security.ldap.LdapConnector;
 
