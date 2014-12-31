@@ -14,10 +14,9 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.shared.bindings;
+package org.graylog2.shared.system.stats;
 
 import com.google.inject.AbstractModule;
-import org.graylog2.shared.system.stats.SigarService;
 import org.graylog2.shared.system.stats.fs.FsProbe;
 import org.graylog2.shared.system.stats.fs.JmxFsProbe;
 import org.graylog2.shared.system.stats.fs.SigarFsProbe;
@@ -34,24 +33,34 @@ import org.graylog2.shared.system.stats.process.SigarProcessProbe;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class SystemStatsBindings extends AbstractModule {
-    private static final Logger LOG = LoggerFactory.getLogger(SystemStatsBindings.class);
+public class SystemStatsModule extends AbstractModule {
+    private static final Logger LOG = LoggerFactory.getLogger(SystemStatsModule.class);
+    private final boolean disableSigar;
+
+    public SystemStatsModule(boolean disableSigar) {
+        this.disableSigar = disableSigar;
+    }
 
     @Override
     protected void configure() {
         boolean sigarLoaded = false;
-        try {
-            SigarService sigarService = new SigarService();
-            if (sigarService.isReady()) {
-                bind(SigarService.class).toInstance(sigarService);
-                bind(FsProbe.class).to(SigarFsProbe.class).asEagerSingleton();
-                bind(NetworkProbe.class).to(SigarNetworkProbe.class).asEagerSingleton();
-                bind(OsProbe.class).to(SigarOsProbe.class).asEagerSingleton();
-                bind(ProcessProbe.class).to(SigarProcessProbe.class).asEagerSingleton();
-                sigarLoaded = true;
+
+        if(disableSigar) {
+            LOG.debug("SIGAR disabled. Using JMX implementations.");
+        } else {
+            try {
+                SigarService sigarService = new SigarService();
+                if (sigarService.isReady()) {
+                    bind(SigarService.class).toInstance(sigarService);
+                    bind(FsProbe.class).to(SigarFsProbe.class).asEagerSingleton();
+                    bind(NetworkProbe.class).to(SigarNetworkProbe.class).asEagerSingleton();
+                    bind(OsProbe.class).to(SigarOsProbe.class).asEagerSingleton();
+                    bind(ProcessProbe.class).to(SigarProcessProbe.class).asEagerSingleton();
+                    sigarLoaded = true;
+                }
+            } catch (Throwable e) {
+                LOG.debug("Failed to load SIGAR. Falling back to JMX implementations.", e);
             }
-        } catch (Throwable e) {
-            LOG.debug("Failed to load SIGAR", e);
         }
 
         if (!sigarLoaded) {

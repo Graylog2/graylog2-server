@@ -34,6 +34,7 @@ import org.graylog2.shared.bindings.PluginBindings;
 import org.graylog2.shared.initializers.ServiceManagerListener;
 import org.graylog2.shared.system.activities.Activity;
 import org.graylog2.shared.system.activities.ActivityWriter;
+import org.graylog2.shared.system.stats.SystemStatsModule;
 import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -174,6 +175,9 @@ public abstract class ServerBootstrap extends CmdLineTool {
                 LOG.info("No constructor found for guice module {}", type);
             }
         }
+
+        result.add(new SystemStatsModule(configuration.isDisableSigar()));
+
         return result;
     }
 
