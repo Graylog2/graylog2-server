@@ -22,6 +22,7 @@ import com.wordnik.swagger.annotations.ApiOperation;
 import org.graylog2.rest.resources.RestResource;
 import org.graylog2.shared.system.stats.StatsService;
 import org.graylog2.shared.system.stats.SystemStats;
+import org.graylog2.shared.system.stats.fs.FsStats;
 import org.graylog2.shared.system.stats.jvm.JvmStats;
 import org.graylog2.shared.system.stats.network.NetworkStats;
 import org.graylog2.shared.system.stats.os.OsStats;
@@ -50,6 +51,15 @@ public class StatsResource extends RestResource {
             notes = "This resource returns information about the system this node is running on.")
     public SystemStats systemStats() {
         return statsService.systemStats();
+    }
+
+    @GET
+    @Path("/fs")
+    @Timed
+    @ApiOperation(value = "Filesystem information about this node.",
+            notes = "This resource returns information about the filesystems of this node.")
+    public FsStats fsStats() {
+        return statsService.fsStats();
     }
 
     @GET

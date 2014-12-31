@@ -14,13 +14,8 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.shared.system.stats.jvm;
+package org.graylog2.shared.system.stats.fs;
 
-import javax.inject.Singleton;
-
-@Singleton
-public class JvmProbe {
-    public JvmStats jvmStats() {
-        return JvmStats.INSTANCE;
-    }
+public interface FsProbe {
+    FsStats fsStats();
 }
