@@ -22,6 +22,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.datatype.guava.GuavaModule;
 import com.fasterxml.jackson.datatype.joda.JodaModule;
+import org.graylog2.shared.jackson.SizeSerializer;
 import org.graylog2.shared.rest.RangeJsonSerializer;
 
 import javax.inject.Provider;
@@ -39,7 +40,8 @@ public class ObjectMapperProvider implements Provider<ObjectMapper>, ContextReso
                 .setPropertyNamingStrategy(new PreserveLeadingUnderscoreStrategy())
                 .registerModule(new JodaModule())
                 .registerModule(new GuavaModule())
-                .registerModule(new SimpleModule().addSerializer(new RangeJsonSerializer()));
+                .registerModule(new SimpleModule().addSerializer(new RangeJsonSerializer()))
+                .registerModule(new SimpleModule().addSerializer(new SizeSerializer()));
     }
 
     @Override
