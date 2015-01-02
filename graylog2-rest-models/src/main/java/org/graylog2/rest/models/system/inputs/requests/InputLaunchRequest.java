@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.shared.rest.resources.system.inputs.requests;
+package org.graylog2.rest.models.system.inputs.requests;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -33,22 +33,22 @@ public abstract class InputLaunchRequest {
     @JsonProperty
     public abstract String type();
 
-    @JsonProperty("creator_user_id")
-    @Nullable
-    public abstract String creatorUserId();
-
     @JsonProperty
     public abstract boolean global();
 
     @JsonProperty
     public abstract Map<String, Object> configuration();
 
+    @JsonProperty
+    @Nullable
+    public abstract String node();
+
     @JsonCreator
     public static InputLaunchRequest create(@JsonProperty("title") String title,
                                             @JsonProperty("type") String type,
-                                            @JsonProperty("creator_user_id") String creatorUserId,
                                             @JsonProperty("global") boolean global,
-                                            @JsonProperty("configuration") Map<String, Object> configuration) {
-        return new AutoValue_InputLaunchRequest(title, type, creatorUserId, global, configuration);
+                                            @JsonProperty("configuration") Map<String, Object> configuration,
+                                            @JsonProperty("node") String node) {
+        return new AutoValue_InputLaunchRequest(title, type, global, configuration, node);
     }
 }

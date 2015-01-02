@@ -57,6 +57,13 @@ public abstract class ClusterEntity {
         return uri;
     }
 
+    public InputLaunchResponse launchInput(String title, String type, Boolean global, Map<String, Object> configuration, boolean isExclusive) throws ExclusiveInputException {
+        if (global)
+            return launchInput(title, type, global, configuration, isExclusive, null);
+        else
+            return launchInput(title, type, global, configuration, isExclusive, this.getNodeId());
+    }
+
     public abstract String getShortNodeId();
     public abstract String getHostname();
     public abstract String getTransportAddress();
@@ -64,7 +71,7 @@ public abstract class ClusterEntity {
     public abstract void markFailure();
     public abstract boolean terminateInput(String inputId);
     public abstract String getNodeId();
-    public abstract InputLaunchResponse launchInput(String title, String type, Boolean global, Map<String, Object> configuration, boolean isExclusive) throws ExclusiveInputException;
+    public abstract InputLaunchResponse launchInput(String title, String type, Boolean global, Map<String, Object> configuration, boolean isExclusive, String nodeId) throws ExclusiveInputException;    public abstract boolean launchExistingInput(String inputId);
     public abstract InputTypeSummaryResponse getInputTypeInformation(String type) throws IOException, APIException;
     public abstract void stopInput(String inputId) throws IOException, APIException;
     public abstract void startInput(String inputId) throws IOException, APIException;

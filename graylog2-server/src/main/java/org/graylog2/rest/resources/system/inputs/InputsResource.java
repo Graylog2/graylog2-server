@@ -42,7 +42,7 @@ import org.graylog2.shared.inputs.InputLauncher;
 import org.graylog2.shared.inputs.InputRegistry;
 import org.graylog2.shared.inputs.MessageInputFactory;
 import org.graylog2.shared.inputs.NoSuchInputTypeException;
-import org.graylog2.shared.rest.resources.system.inputs.requests.InputLaunchRequest;
+import org.graylog2.rest.models.system.inputs.requests.InputLaunchRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -177,7 +177,13 @@ public class InputsResource extends RestResource {
         // Build input.
         final MessageInput input;
         try {
-            input = messageInputFactory.create(lr, getCurrentUser().getName(), serverStatus.getNodeId().toString());
+            final String nodeId;
+            if (lr.node() != null)
+                nodeId = lr.node();
+            else
+                nodeId = serverStatus.getNodeId().toString();
+
+            input = messageInputFactory.create(lr, getCurrentUser().getName(), nodeId);
 
             input.checkConfiguration();
         } catch (NoSuchInputTypeException e) {
@@ -201,10 +207,12 @@ public class InputsResource extends RestResource {
 
         input.setPersistId(id);
 
-        input.initialize();
+        if (input.isGlobal() || input.getNodeId().equals(serverStatus.getNodeId().toString())) {
+            input.initialize();
 
-        // Launch input. (this will run async and clean up itself in case of an error.)
-        inputLauncher.launch(input);
+            // Launch input. (this will run async and clean up itself in case of an error.)
+            inputLauncher.launch(input);
+        }
 
         final URI inputUri = UriBuilder.fromResource(InputsResource.class)
                 .path("{inputId}")
@@ -310,7 +318,7 @@ public class InputsResource extends RestResource {
 
         if (inputState == null) {
             try {
-                final Input input = inputService.find(inputId);
+                final Input input = inputService.findForThisNodeOrGlobal(serverStatus.getNodeId().toString(), inputId);
                 messageInput = inputService.getMessageInput(input);
             } catch (NoSuchInputTypeException | org.graylog2.database.NotFoundException e) {
                 final String error = "Cannot launch input <" + inputId + ">. Input not found.";

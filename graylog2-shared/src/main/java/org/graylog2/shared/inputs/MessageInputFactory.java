@@ -20,7 +20,7 @@ import com.google.common.collect.Maps;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.inputs.MessageInput;
-import org.graylog2.shared.rest.resources.system.inputs.requests.InputLaunchRequest;
+import org.graylog2.rest.models.system.inputs.requests.InputLaunchRequest;
 
 import javax.inject.Inject;
 import java.util.Map;

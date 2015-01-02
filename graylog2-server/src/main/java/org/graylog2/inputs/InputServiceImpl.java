@@ -81,6 +81,7 @@ public class InputServiceImpl extends PersistedServiceImpl implements InputServi
     public List<Input> allOfRadio(Node radio) {
         final List<BasicDBObject> query = ImmutableList.of(
                 new BasicDBObject(MessageInput.FIELD_RADIO_ID, radio.getNodeId()),
+                new BasicDBObject(MessageInput.FIELD_NODE_ID, radio.getNodeId()),
                 new BasicDBObject(MessageInput.FIELD_GLOBAL, true));
 
         final ImmutableList.Builder<Input> inputs = ImmutableList.builder();

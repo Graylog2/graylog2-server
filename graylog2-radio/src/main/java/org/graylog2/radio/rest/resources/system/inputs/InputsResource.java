@@ -18,7 +18,6 @@ package org.graylog2.radio.rest.resources.system.inputs;
 
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.graylog2.plugin.Tools;
@@ -26,7 +25,6 @@ import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationException;
 import org.graylog2.plugin.IOState;
 import org.graylog2.plugin.inputs.MessageInput;
-import org.graylog2.radio.cluster.InputService;
 import org.graylog2.radio.rest.resources.RestResource;
 import org.graylog2.rest.models.system.inputs.responses.InputStateSummary;
 import org.graylog2.rest.models.system.inputs.responses.InputSummary;
@@ -37,7 +35,7 @@ import org.graylog2.shared.inputs.InputRegistry;
 import org.graylog2.shared.inputs.MessageInputFactory;
 import org.graylog2.shared.inputs.NoSuchInputTypeException;
 import org.graylog2.shared.inputs.PersistedInputs;
-import org.graylog2.shared.rest.resources.system.inputs.requests.InputLaunchRequest;
+import org.graylog2.rest.models.system.inputs.requests.InputLaunchRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,7 +53,6 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -147,7 +144,7 @@ public class InputsResource extends RestResource {
         try {
             input = messageInputFactory.create(lr.type(), inputConfig);
             input.setTitle(lr.title());
-            input.setCreatorUserId(lr.creatorUserId());
+            //input.setCreatorUserId(lr.creatorUserId());
             input.setCreatedAt(Tools.iso8601());
             input.setGlobal(lr.global());
 

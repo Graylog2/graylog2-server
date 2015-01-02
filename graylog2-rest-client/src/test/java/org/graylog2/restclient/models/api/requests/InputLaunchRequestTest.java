@@ -16,16 +16,20 @@
  */
 package org.graylog2.restclient.models.api.requests;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.graylog2.rest.models.system.inputs.requests.InputLaunchRequest;
 import org.testng.annotations.Test;
+
+import java.util.HashMap;
 
 import static org.testng.AssertJUnit.assertNotNull;
 
 public class InputLaunchRequestTest {
     @Test
-    public void testToJson() {
-        final InputLaunchRequest request = new InputLaunchRequest();
-        request.title = "title";
-        final String json = request.toJson();
+    public void testToJson() throws JsonProcessingException {
+        final InputLaunchRequest request = InputLaunchRequest.create("title", "type", true, new HashMap<String, Object>(), "foobar");
+        final String json = new ObjectMapper().writeValueAsString(request);
 
         assertNotNull(json);
     }

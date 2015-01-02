@@ -21,11 +21,11 @@ import com.google.common.collect.Maps;
 import com.google.common.net.MediaType;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
+import org.graylog2.rest.models.system.inputs.requests.InputLaunchRequest;
 import org.graylog2.restclient.lib.APIException;
 import org.graylog2.restclient.lib.ApiClient;
 import org.graylog2.restclient.lib.ExclusiveInputException;
 import org.graylog2.restclient.lib.metrics.Metric;
-import org.graylog2.restclient.models.api.requests.InputLaunchRequest;
 import org.graylog2.restclient.models.api.responses.BuffersResponse;
 import org.graylog2.restclient.models.api.responses.SystemOverviewResponse;
 import org.graylog2.restclient.models.api.responses.cluster.RadioSummaryResponse;
@@ -153,6 +153,7 @@ public class Radio extends ClusterEntity {
                 .execute();
     }
 
+    @Override
     public boolean launchExistingInput(String inputId) {
         try {
             api.path(routes.radio().InputsResource().launchExisting(inputId), InputLaunchResponse.class)
@@ -280,7 +281,7 @@ public class Radio extends ClusterEntity {
     }
 
     @Override
-    public InputLaunchResponse launchInput(String title, String type, Boolean global, Map<String, Object> configuration, boolean isExclusive) throws ExclusiveInputException {
+    public InputLaunchResponse launchInput(String title, String type, Boolean global, Map<String, Object> configuration, boolean isExclusive, String nodeId) throws ExclusiveInputException {
         if (isExclusive) {
             for (Input input : getInputs()) {
                 if (input.getType().equals(type)) {
@@ -289,11 +290,7 @@ public class Radio extends ClusterEntity {
             }
         }
 
-        final InputLaunchRequest request = new InputLaunchRequest();
-        request.title = title;
-        request.type = type;
-        request.global = global;
-        request.configuration = configuration;
+        final InputLaunchRequest request = InputLaunchRequest.create(title, type, global, configuration, nodeId);
 
         try {
             return api.path(routes.radio().InputsResource().launch(), InputLaunchResponse.class)

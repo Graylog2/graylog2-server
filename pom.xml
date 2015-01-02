@@ -186,6 +186,11 @@
                 <artifactId>graylog2-rest-models</artifactId>
                 <version>${project.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.graylog2</groupId>
+                <artifactId>graylog2-rest-routes</artifactId>
+                <version>${project.version}</version>
+            </dependency>
 
             <dependency>
                 <groupId>com.google.guava</groupId>

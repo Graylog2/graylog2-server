@@ -23,13 +23,15 @@ import org.graylog2.restclient.lib.APIException;
 import org.graylog2.restclient.lib.ApiClient;
 import org.graylog2.restclient.lib.ExclusiveInputException;
 import org.graylog2.restclient.lib.ServerNodes;
-import org.graylog2.restclient.models.api.requests.InputLaunchRequest;
-import org.graylog2.restclient.models.api.responses.system.*;
+import org.graylog2.restclient.models.api.responses.system.InputLaunchResponse;
+import org.graylog2.restclient.models.api.responses.system.InputStateSummaryResponse;
+import org.graylog2.restclient.models.api.responses.system.InputTypeSummaryResponse;
+import org.graylog2.restclient.models.api.responses.system.InputTypesResponse;
+import org.graylog2.restclient.models.api.responses.system.InputsResponse;
 import org.graylog2.restroutes.generated.InputsResource;
 import org.graylog2.restroutes.generated.routes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import play.mvc.Http;
 
 import java.io.IOException;
 import java.util.AbstractMap;
@@ -194,19 +196,17 @@ public class InputService {
 
         for (Node serverNode: serverNodes.all()) {
             if (!serverNode.isMaster())
-                serverNode.launchExistingInput(ilr.persistId);
+                serverNode.launchExistingInput(ilr.id);
         }
         try {
             for (Radio radio : nodeService.radios().values()) {
-                radio.launchExistingInput(ilr.persistId);
+                radio.launchExistingInput(ilr.id);
             }
-        } catch (APIException e) {
-            log.error("Unable to fetch list of radios: " + e);
-        } catch (IOException e) {
+        } catch (APIException | IOException e) {
             log.error("Unable to fetch list of radios: " + e);
         }
 
-        return ilr.persistId;
+        return ilr.id;
     }
 
     public Map<ClusterEntity, Boolean> terminateGlobal(String inputId) {

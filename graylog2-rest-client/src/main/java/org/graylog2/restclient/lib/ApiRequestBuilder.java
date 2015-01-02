@@ -64,7 +64,7 @@ public interface ApiRequestBuilder<T> {
 
     ApiRequestBuilder<T> unauthenticated();
 
-    ApiRequestBuilder<T> body(ApiRequest body);
+    ApiRequestBuilder<T> body(Object body);
 
     ApiRequestBuilder<T> expect(int... httpStatusCodes);
 
