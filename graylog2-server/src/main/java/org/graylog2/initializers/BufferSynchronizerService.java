@@ -83,7 +83,7 @@ public class BufferSynchronizerService extends AbstractIdleService {
     }
 
     private ExecutorService executorService(MetricRegistry metricRegistry) {
-        final ThreadFactory threadFactory = new ThreadFactoryBuilder().setNameFormat("output-setup-service-%d").build();
+        final ThreadFactory threadFactory = new ThreadFactoryBuilder().setNameFormat("buffer-synchronizer-service-%d").build();
         return new InstrumentedExecutorService(
                 Executors.newFixedThreadPool(2, threadFactory),
                 metricRegistry,
