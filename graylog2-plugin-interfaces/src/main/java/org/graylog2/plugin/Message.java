@@ -30,7 +30,6 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.streams.Stream;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -104,7 +103,7 @@ public class Message {
 
     private final Map<String, Object> fields = Maps.newHashMap();
     private List<Stream> streams = Lists.newArrayList();
-    private MessageInput sourceInput;
+    private String sourceInputId;
 
     // Used for drools to filter out messages.
     private boolean filterOut = false;
@@ -341,12 +340,12 @@ public class Message {
         return this.filterOut;
     }
 
-    public MessageInput getSourceInput() {
-        return sourceInput;
+    public void setSourceInputId(String sourceInputId) {
+        this.sourceInputId = sourceInputId;
     }
 
-    public void setSourceInput(final MessageInput input) {
-        this.sourceInput = input;
+    public String getSourceInputId() {
+        return sourceInputId;
     }
 
     // drools seems to need the "get" prefix

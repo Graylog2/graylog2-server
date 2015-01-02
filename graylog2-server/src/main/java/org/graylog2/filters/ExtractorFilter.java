@@ -19,7 +19,6 @@ package org.graylog2.filters;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.Lists;
-import javax.inject.Inject;
 import org.graylog2.inputs.Input;
 import org.graylog2.inputs.InputService;
 import org.graylog2.plugin.Message;
@@ -28,6 +27,7 @@ import org.graylog2.plugin.inputs.Extractor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -57,11 +57,11 @@ public class ExtractorFilter implements MessageFilter {
 
     @Override
     public boolean filter(Message msg) {
-        if (msg.getSourceInput() == null) {
+        if (msg.getSourceInputId() == null) {
             return false;
         }
 
-        for (Extractor extractor : loadExtractors(msg.getSourceInput().getId())) {
+        for (final Extractor extractor : loadExtractors(msg.getSourceInputId())) {
             try {
                 extractor.runExtractor(msg);
             } catch (Exception e) {
