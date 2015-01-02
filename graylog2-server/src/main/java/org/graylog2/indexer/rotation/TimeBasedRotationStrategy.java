@@ -16,15 +16,19 @@
  */
 package org.graylog2.indexer.rotation;
 
-import com.google.inject.Inject;
 import org.graylog2.Configuration;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.indexer.rotation.RotationStrategy;
-import org.joda.time.*;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeField;
+import org.joda.time.DateTimeFieldType;
+import org.joda.time.DateTimeZone;
+import org.joda.time.Period;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
+import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.text.MessageFormat;
 
@@ -93,10 +97,16 @@ public class TimeBasedRotationStrategy implements RotationStrategy {
         final DateTime now = Tools.iso8601();
 
         final DateTimeField field = largestStrideType.getField(now.getChronology());
-        final int periodValue = period.get(largestStrideType.getDurationType());
+        // use normalized here to make sure we actually have the largestStride type available! see https://github.com/Graylog2/graylog2-server/issues/836
+        int periodValue = normalized.get(largestStrideType.getDurationType());
         final long fieldValue = field.roundFloor(now.getMillis());
 
         final int fieldValueInUnit = field.get(fieldValue);
+        if (periodValue == 0) {
+            // https://github.com/Graylog2/graylog2-server/issues/836
+            log.warn("Determining stride length failed because of a 0 period. Defaulting back to 1 period to avoid crashing, but this is a bug!");
+            periodValue = 1;
+        }
         final long difference = (fieldValueInUnit % periodValue);
         final long newValue = field.add(fieldValue, -1 * difference);
         return new DateTime(newValue, DateTimeZone.UTC);
