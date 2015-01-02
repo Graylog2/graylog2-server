@@ -808,10 +808,11 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>${surefire.version}</version>
                 <configuration>
+                    <forkMode>once</forkMode>
+                    <argLine>-XX:-UseSplitVerifier -Djava.library.path=${project.basedir}/../lib/sigar-${sigar.version}</argLine>
                     <excludes>
                         <exclude>**/*IntegrationTest.java</exclude>
                     </excludes>
-                    <argLine>-XX:-UseSplitVerifier</argLine>
                     <includes>
                         <include>**/*Spec.class</include>
                         <include>**/*Test.class</include>
