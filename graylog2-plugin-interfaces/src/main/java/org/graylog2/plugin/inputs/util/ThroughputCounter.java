@@ -24,8 +24,6 @@ package org.graylog2.plugin.inputs.util;
 
 import com.codahale.metrics.Gauge;
 import com.google.common.collect.Maps;
-import org.jboss.netty.channel.ChannelHandlerContext;
-import org.jboss.netty.channel.ChannelStateEvent;
 import org.jboss.netty.handler.traffic.GlobalTrafficShapingHandler;
 import org.jboss.netty.handler.traffic.TrafficCounter;
 import org.jboss.netty.util.HashedWheelTimer;
@@ -77,13 +75,5 @@ public class ThroughputCounter extends GlobalTrafficShapingHandler {
         });
 
         return gauges;
-    }
-
-    @Override
-    public void channelConnected(ChannelHandlerContext ctx, ChannelStateEvent e)
-            throws Exception {
-        super.channelConnected(ctx, e);
-        // Ensure event propagation. GlobalTrafficShapingHandler does not do this!
-        ctx.sendUpstream(e);
     }
 }
