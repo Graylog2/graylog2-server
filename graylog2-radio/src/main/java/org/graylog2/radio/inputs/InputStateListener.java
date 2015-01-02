@@ -18,6 +18,7 @@ package org.graylog2.radio.inputs;
 
 import com.google.common.eventbus.Subscribe;
 import org.graylog2.plugin.IOState;
+import org.graylog2.plugin.events.inputs.IOStateChangedEvent;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.radio.cluster.InputService;
 import org.graylog2.shared.inputs.InputRegistry;
@@ -37,10 +38,11 @@ public class InputStateListener {
         this.inputRegistry = inputRegistry;
     }
 
-    @Subscribe public void inputStateChanged(IOState<MessageInput> state) {
+    @Subscribe public void inputStateChanged(IOStateChangedEvent<MessageInput> event) {
+        final IOState<MessageInput> state = event.changedState();
         MessageInput input = state.getStoppable();
         try {
-            if (!input.isGlobal())
+            if (!input.isGlobal() && event.newState() == IOState.Type.TERMINATED)
                 inputService.unregisterInCluster(input);
         } catch (Exception e) {
             LOG.error("Could not unregister input [{}], id <{}> on server cluster: {}", input.getName(), input.getId(), e);

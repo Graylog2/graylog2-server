@@ -23,6 +23,7 @@ import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.IOState;
 import org.graylog2.plugin.ServerStatus;
+import org.graylog2.plugin.events.inputs.IOStateChangedEvent;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.shared.inputs.InputRegistry;
 import org.graylog2.shared.system.activities.Activity;
@@ -47,21 +48,11 @@ public class InputStateListener {
         eventBus.register(this);
     }
 
-    @Subscribe public void inputStateChanged(IOState<MessageInput> state) {
+    @Subscribe public void inputStateChanged(IOStateChangedEvent<MessageInput> event) {
+        final IOState<MessageInput> state = event.changedState();
         final MessageInput input = state.getStoppable();
-        LOG.debug("Input State of {} changed to: {}", input.getTitle(), state.getState());
-        switch (state.getState()) {
-            case STARTING:
-                final String startingMsg = "Launching existing input [" + input.getName() + "].";
-                LOG.info(startingMsg);
-                activityWriter.write(new Activity(startingMsg, InputStateListener.class));
-                break;
-            case RUNNING:
-                notificationService.fixed(Notification.Type.NO_INPUT_RUNNING);
-                final String runningMsg = "Completed starting [" + input.getClass().getCanonicalName() + "] input with ID <" + state.getStoppable().getId() + ">";
-                LOG.info(runningMsg);
-                activityWriter.write(new Activity(runningMsg, InputRegistry.class));
-                break;
+        LOG.debug("Input State of {} changed: {} -> {}", input.getTitle(), event.oldState(), event.newState());
+        switch (event.newState()) {
             case FAILED:
                 activityWriter.write(new Activity(state.getDetailedMessage(), InputRegistry.class));
                 Notification notification = notificationService.buildNow();
@@ -71,20 +62,12 @@ public class InputStateListener {
                 notification.addDetail("reason", state.getDetailedMessage());
                 notificationService.publishIfFirst(notification);
                 break;
-            case STOPPING:
-                final String stoppingMsg = "Stopping input [" + input.getName() + "].";
-                LOG.info(stoppingMsg);
-                activityWriter.write(new Activity(stoppingMsg, InputStateListener.class));
-                break;
-            case STOPPED:
-                final String stoppedMessage = "Stopped input [" + input.getName() + "].";
-                LOG.info(stoppedMessage);
-                activityWriter.write(new Activity(stoppedMessage, InputStateListener.class));
-                break;
-            case TERMINATED:
-                final String terminatedMsg = "Terminated input [" + input.getName() + "].";
-                LOG.info(terminatedMsg);
-                activityWriter.write(new Activity(terminatedMsg, InputStateListener.class));
+            case RUNNING:
+                notificationService.fixed(Notification.Type.NO_INPUT_RUNNING);
+            default:
+                final String msg = "Input [" + input.getName() + "/" + input.getId() + "] is now " + event.newState().toString();
+                LOG.info(msg);
+                activityWriter.write(new Activity(msg, InputStateListener.class));
                 break;
         }
     }
