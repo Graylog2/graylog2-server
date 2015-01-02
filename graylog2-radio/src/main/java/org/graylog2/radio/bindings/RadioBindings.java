@@ -44,6 +44,7 @@ import org.graylog2.shared.system.activities.ActivityWriter;
 import javax.ws.rs.container.ContainerResponseFilter;
 import javax.ws.rs.container.DynamicFeature;
 import javax.ws.rs.ext.ExceptionMapper;
+import java.io.File;
 
 public class RadioBindings extends AbstractModule {
     private final Configuration configuration;
@@ -86,7 +87,9 @@ public class RadioBindings extends AbstractModule {
 
         bind(ServerStatus.class).in(Scopes.SINGLETON);
         install(new NoopJournalModule());
-
+        // make this null for radio for now, because we don't support journalling here yet.
+        bind(File.class).annotatedWith(Names.named("message_journal_dir")).toProvider(Providers.<File>of(null));
+        
         bind(String[].class).annotatedWith(Names.named("RestControllerPackages")).toInstance(new String[]{
                 "org.graylog2.radio.rest.resources",
                 "org.graylog2.shared.rest.resources"

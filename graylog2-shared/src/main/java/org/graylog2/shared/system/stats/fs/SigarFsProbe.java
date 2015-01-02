@@ -23,6 +23,7 @@ import org.hyperic.sigar.FileSystemUsage;
 import org.hyperic.sigar.Sigar;
 import org.hyperic.sigar.SigarException;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 import java.io.File;
@@ -37,11 +38,14 @@ public class SigarFsProbe implements FsProbe {
     private final Map<File, FileSystem> sigarFileSystems = new HashMap<>();
 
     @Inject
-    public SigarFsProbe(SigarService sigarService, @Named("message_journal_dir") File journalDirectory) {
+    public SigarFsProbe(SigarService sigarService, @Named("message_journal_dir") @Nullable File journalDirectory) {
         this.sigarService = sigarService;
         this.locations = new HashSet<>();
-
-        locations.add(journalDirectory);
+        
+        // nullable for radio bindings where we don't have journalling.
+        if (journalDirectory != null) {
+            locations.add(journalDirectory);
+        }
     }
 
     @Override
