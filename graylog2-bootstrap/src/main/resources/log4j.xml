@@ -6,22 +6,13 @@
     <appender name="console" class="org.apache.log4j.ConsoleAppender">
         <param name="Target" value="System.out"/>
         <layout class="org.apache.log4j.PatternLayout">
-            <param name="ConversionPattern" value="%d %-5p: [%-25t] %c - %m%n"/>
+            <param name="ConversionPattern" value="%d %-5p: %c - %m%n"/>
         </layout>
     </appender>
 
     <!-- Application Loggers -->
     <logger name="org.graylog2">
         <level value="info"/>
-    </logger>
-    <logger name="org.graylog2.shared.journal.JournalReader">
-        <level value="info"/>
-    </logger>
-    <logger name="org.graylog2.outputs.ElasticSearchOutput">
-        <level value="warn"/>
-    </logger>
-    <logger name="org.graylog2.outputs.BlockingBatchedESOutput">
-        <level value="warn"/>
     </logger>
     <logger name="com.github.joschi.jadconfig">
         <level value="warn"/>
