@@ -29,6 +29,7 @@ import org.graylog2.restclient.lib.metrics.Metric;
 import org.graylog2.restclient.models.api.requests.InputLaunchRequest;
 import org.graylog2.restclient.models.api.responses.BufferClassesResponse;
 import org.graylog2.restclient.models.api.responses.BuffersResponse;
+import org.graylog2.restclient.models.api.responses.JournalInfo;
 import org.graylog2.restclient.models.api.responses.SystemOverviewResponse;
 import org.graylog2.restclient.models.api.responses.cluster.NodeSummaryResponse;
 import org.graylog2.restclient.models.api.responses.metrics.MetricsListResponse;
@@ -145,6 +146,15 @@ public class Node extends ClusterEntity {
             return api.path(routes.BufferResource().getBufferClasses(), BufferClassesResponse.class).node(this).execute();
         } catch (Exception e) {
             LOG.error("Unable to read buffer class names from node " + this, e);
+        }
+        return null;
+    }
+
+    public JournalInfo getJournalInfo() {
+        try {
+            return api.path(routes.JournalResource().show(), JournalInfo.class).node(this).execute();
+        } catch (Exception e) {
+            LOG.error("Unable to read journal info from node " + this, e);
         }
         return null;
     }

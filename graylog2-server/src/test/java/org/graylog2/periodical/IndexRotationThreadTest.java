@@ -16,7 +16,7 @@
  */
 package org.graylog2.periodical;
 
-import com.google.inject.Provider;
+import javax.inject.Provider;
 import org.graylog2.indexer.Deflector;
 import org.graylog2.indexer.NoTargetIndexException;
 import org.graylog2.indexer.indices.Indices;

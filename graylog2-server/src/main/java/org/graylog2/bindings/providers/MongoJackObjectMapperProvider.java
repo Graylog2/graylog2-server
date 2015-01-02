@@ -17,7 +17,7 @@
 package org.graylog2.bindings.providers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.inject.Provider;
+import javax.inject.Provider;
 import org.mongojack.internal.MongoJackModule;
 
 import javax.inject.Inject;

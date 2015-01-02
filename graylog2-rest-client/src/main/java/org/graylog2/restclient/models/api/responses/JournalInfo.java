@@ -14,18 +14,34 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.indexer;
+package org.graylog2.restclient.models.api.responses;
 
-import javax.inject.Inject;
-import org.graylog2.database.MongoConnection;
-import org.graylog2.database.PersistedServiceImpl;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import org.joda.time.DateTime;
 
-/**
- * @author Dennis Oelkers <dennis@torch.sh>
- */
-public class PersistedDeadLetterServiceImpl extends PersistedServiceImpl implements PersistedDeadLetterService {
-    @Inject
-    public PersistedDeadLetterServiceImpl(MongoConnection mongoConnection) {
-        super(mongoConnection);
-    }
+import javax.annotation.Nullable;
+
+public class JournalInfo {
+    @JsonProperty(required = true)
+    public boolean enabled;
+
+    public long appendEventsPerSecond;
+
+    public long readEventsPerSecond;
+
+    public long uncommittedJournalEntries;
+
+    public long journalSize;
+
+    public long journalSizeLimit;
+
+    public int numberOfSegments;
+
+    @Nullable
+    public DateTime oldestSegment;
+
+    @Nullable
+    public KafkaJournalConfiguration journalConfig;
+
+
 }

@@ -18,7 +18,7 @@ package org.graylog2.inputs.codecs;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Maps;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.graylog2.inputs.codecs.gelf.GELFMessage;
 import org.graylog2.inputs.codecs.gelf.GELFMessageChunk;
 import org.graylog2.plugin.Tools;

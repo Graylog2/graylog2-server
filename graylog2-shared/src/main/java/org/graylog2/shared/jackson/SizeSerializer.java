@@ -14,18 +14,28 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.indexer;
+package org.graylog2.shared.jackson;
 
-import javax.inject.Inject;
-import org.graylog2.database.MongoConnection;
-import org.graylog2.database.PersistedServiceImpl;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.JsonSerializer;
+import com.fasterxml.jackson.databind.SerializerProvider;
+import com.github.joschi.jadconfig.util.Size;
+
+import java.io.IOException;
 
 /**
- * @author Dennis Oelkers <dennis@torch.sh>
+ * Serializes JadConfig's Size utility object to bytes.
  */
-public class PersistedDeadLetterServiceImpl extends PersistedServiceImpl implements PersistedDeadLetterService {
-    @Inject
-    public PersistedDeadLetterServiceImpl(MongoConnection mongoConnection) {
-        super(mongoConnection);
+public class SizeSerializer extends JsonSerializer<Size> {
+    @Override
+    public Class<Size> handledType() {
+        return Size.class;
+    }
+
+    @Override
+    public void serialize(Size value,
+                          JsonGenerator jgen,
+                          SerializerProvider provider) throws IOException {
+        jgen.writeNumber(value.toBytes());
     }
 }

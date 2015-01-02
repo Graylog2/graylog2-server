@@ -16,7 +16,7 @@
  */
 package org.graylog2.periodical;
 
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.graylog2.cluster.NodeNotFoundException;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;

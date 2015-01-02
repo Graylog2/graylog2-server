@@ -21,7 +21,7 @@ import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.google.common.collect.ComparisonChain;
 import com.google.common.collect.Ordering;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.graylog2.Configuration;
 import org.graylog2.buffers.OutputBuffer;
 import org.graylog2.plugin.Message;

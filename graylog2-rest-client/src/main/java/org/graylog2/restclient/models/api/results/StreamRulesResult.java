@@ -17,7 +17,7 @@
 package org.graylog2.restclient.models.api.results;
 
 import com.google.common.collect.Lists;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.graylog2.restclient.models.StreamRule;
 import org.graylog2.restclient.models.api.responses.streams.StreamRuleSummaryResponse;
 

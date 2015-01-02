@@ -110,6 +110,8 @@ public class RestPermissions {
     public static final String BUNDLE_DELETE = "bundle:delete";
     public static final String BUNDLE_IMPORT = "bundle:import";
     public static final String BUNDLE_EXPORT = "bundle:export";
+    public static final String JOURNAL_READ = "journal:read";
+    public static final String JOURNAL_EDIT = "journal:edit";
 
     private static Map<String, Collection<String>> allPermissions;
 

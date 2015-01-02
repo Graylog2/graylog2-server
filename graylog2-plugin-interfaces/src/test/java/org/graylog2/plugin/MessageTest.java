@@ -25,7 +25,6 @@ package org.graylog2.plugin;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.streams.Stream;
 import org.joda.time.DateTime;
 import org.testng.annotations.BeforeMethod;
@@ -39,11 +38,7 @@ import java.util.regex.Pattern;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.testng.AssertJUnit.assertEquals;
-import static org.testng.AssertJUnit.assertFalse;
-import static org.testng.AssertJUnit.assertNotNull;
-import static org.testng.AssertJUnit.assertNull;
-import static org.testng.AssertJUnit.assertTrue;
+import static org.testng.AssertJUnit.*;
 
 public class MessageTest {
     private Message message;
@@ -204,17 +199,6 @@ public class MessageTest {
         message.setFilterOut(false);
 
         assertFalse(message.getFilterOut());
-    }
-
-    @Test
-    public void testGetAndSetSourceInput() throws Exception {
-        assertNull(message.getSourceInput());
-
-        final MessageInput input = mock(MessageInput.class);
-
-        message.setSourceInput(input);
-
-        assertEquals(input, message.getSourceInput());
     }
 
     @Test

@@ -16,7 +16,7 @@
  */
 package org.graylog2.periodical;
 
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.graylog2.Configuration;
 import org.graylog2.alarmcallbacks.AlarmCallbackConfiguration;
 import org.graylog2.alarmcallbacks.AlarmCallbackConfigurationService;

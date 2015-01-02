@@ -18,7 +18,7 @@ package org.graylog2.shared.initializers;
 
 import com.google.common.base.Stopwatch;
 import com.google.common.util.concurrent.AbstractIdleService;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.graylog2.periodical.Periodicals;
 import org.graylog2.plugin.periodical.Periodical;
 import org.graylog2.plugin.ServerStatus;

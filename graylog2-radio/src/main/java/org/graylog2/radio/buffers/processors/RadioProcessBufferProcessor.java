@@ -18,7 +18,7 @@ package org.graylog2.radio.buffers.processors;
 
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.radio.Configuration;

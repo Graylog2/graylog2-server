@@ -61,8 +61,7 @@ public class BufferResource extends RestResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Map<String, Map<String, Object>> utilization() {
         return ImmutableMap.of(
-                "buffers", buffers(),
-                "master_caches", masterCaches());
+                "buffers", buffers());
     }
 
     @GET
@@ -75,21 +74,6 @@ public class BufferResource extends RestResource {
         return ImmutableMap.of(
                 "process_buffer", processBuffer.getClass().getCanonicalName(),
                 "output_buffer", outputBuffer.getClass().getCanonicalName());
-    }
-
-    private Map<String, Object> masterCaches() {
-        Map<String, Object> caches = Maps.newHashMap();
-        Map<String, Object> input = Maps.newHashMap();
-        Map<String, Object> output = Maps.newHashMap();
-
-        // TODO Remove because caches do not exist anymore!
-        input.put("size", 0);
-        output.put("size", 0);
-
-        caches.put("input", input);
-        caches.put("output", output);
-
-        return caches;
     }
 
     private Map<String, Object> buffers() {

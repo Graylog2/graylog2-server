@@ -19,7 +19,7 @@ package org.graylog2.restclient.models;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.google.common.net.MediaType;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import org.graylog2.restclient.lib.APIException;

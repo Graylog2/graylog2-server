@@ -17,7 +17,7 @@
 package org.graylog2.streams;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import com.google.inject.name.Named;
+import javax.inject.Named;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.streams.Stream;

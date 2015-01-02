@@ -19,7 +19,6 @@ package org.graylog2.restclient.models;
 import com.google.common.collect.Maps;
 import org.graylog2.restclient.models.api.responses.BufferSummaryResponse;
 import org.graylog2.restclient.models.api.responses.BuffersResponse;
-import org.graylog2.restclient.models.api.responses.MasterCacheSummaryResponse;
 
 import static org.graylog2.restclient.lib.Tools.firstNonNull;
 
@@ -29,14 +28,10 @@ import static org.graylog2.restclient.lib.Tools.firstNonNull;
 public class BufferInfo {
     private final BufferSummaryResponse inputBuffer;
     private final BufferSummaryResponse outputBuffer;
-    private final MasterCacheSummaryResponse inputMasterCache;
-    private final MasterCacheSummaryResponse outputMasterCache;
 
     public BufferInfo(BuffersResponse br) {
         inputBuffer = br.buffers.get("input");
         outputBuffer = br.buffers.get("output");
-        inputMasterCache = br.masterCaches.get("input");
-        outputMasterCache = br.masterCaches.get("output");
     }
 
     public BufferSummaryResponse getInputBuffer() {
@@ -47,19 +42,10 @@ public class BufferInfo {
         return firstNonNull(BufferSummaryResponse.EMPTY, outputBuffer);
     }
 
-    public MasterCacheSummaryResponse getInputMasterCache() {
-        return firstNonNull(MasterCacheSummaryResponse.EMPTY, inputMasterCache);
-    }
-
-    public MasterCacheSummaryResponse getOutputMasterCache() {
-        return firstNonNull(MasterCacheSummaryResponse.EMPTY, outputMasterCache);
-    }
-
     public static BufferInfo buildEmpty() {
         final BuffersResponse response = new BuffersResponse();
 
         response.buffers = Maps.newHashMap();
-        response.masterCaches = Maps.newHashMap();
 
         return new BufferInfo(response);
     }

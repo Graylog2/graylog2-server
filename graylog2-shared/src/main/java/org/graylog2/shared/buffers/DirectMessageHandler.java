@@ -16,7 +16,7 @@
  */
 package org.graylog2.shared.buffers;
 
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import com.lmax.disruptor.WorkHandler;
 
 class DirectMessageHandler implements WorkHandler<RawMessageEvent> {

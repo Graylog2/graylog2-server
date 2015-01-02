@@ -16,8 +16,6 @@
  */
 package org.graylog2.restclient.models.api.responses;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 import java.util.Map;
 
 /**
@@ -26,8 +24,5 @@ import java.util.Map;
 public class BuffersResponse {
 
     public Map<String, BufferSummaryResponse> buffers;
-
-    @JsonProperty("master_caches")
-    public Map<String, MasterCacheSummaryResponse> masterCaches;
 
 }

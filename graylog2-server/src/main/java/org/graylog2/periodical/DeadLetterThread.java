@@ -19,7 +19,7 @@ package org.graylog2.periodical;
 import com.codahale.metrics.Gauge;
 import com.codahale.metrics.MetricRegistry;
 import com.google.common.collect.Maps;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import com.mongodb.BasicDBObject;
 import org.elasticsearch.action.bulk.BulkItemResponse;
 import org.graylog2.Configuration;

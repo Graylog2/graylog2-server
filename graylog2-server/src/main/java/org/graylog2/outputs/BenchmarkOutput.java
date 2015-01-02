@@ -19,7 +19,7 @@ package org.graylog2.outputs;
 
 import com.codahale.metrics.*;
 import com.google.common.collect.ImmutableList;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import org.graylog2.plugin.Message;

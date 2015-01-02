@@ -17,7 +17,7 @@
 package org.graylog2.dashboards;
 
 import com.google.common.collect.Maps;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 
 import javax.inject.Singleton;
 import java.util.Map;

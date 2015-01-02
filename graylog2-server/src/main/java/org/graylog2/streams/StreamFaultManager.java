@@ -18,7 +18,7 @@
 package org.graylog2.streams;
 
 import com.google.common.collect.Maps;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.graylog2.Configuration;
 import org.graylog2.database.ValidationException;
 import org.graylog2.notifications.Notification;

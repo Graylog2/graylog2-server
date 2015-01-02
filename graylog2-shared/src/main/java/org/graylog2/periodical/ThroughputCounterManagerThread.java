@@ -16,7 +16,7 @@
  */
 package org.graylog2.periodical;
 
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.graylog2.plugin.periodical.Periodical;
 import org.graylog2.shared.stats.ThroughputStats;
 import org.slf4j.Logger;

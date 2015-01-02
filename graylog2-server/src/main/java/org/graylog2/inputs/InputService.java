@@ -56,4 +56,6 @@ public interface InputService extends PersistedService {
     void removeStaticField(Input input, String key);
 
     MessageInput getMessageInput(Input io) throws NoSuchInputTypeException;
+
+    List<Map.Entry<String, String>> getStaticFields(Input input);
 }

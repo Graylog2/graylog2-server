@@ -19,7 +19,7 @@ package org.graylog2.rules;
 import com.google.common.base.Charsets;
 import com.google.common.collect.Lists;
 import com.google.common.io.Files;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.drools.compiler.kie.builder.impl.InternalKieModule;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.RulesEngine;

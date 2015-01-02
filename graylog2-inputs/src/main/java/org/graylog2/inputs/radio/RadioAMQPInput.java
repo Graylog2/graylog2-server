@@ -17,7 +17,7 @@
 package org.graylog2.inputs.radio;
 
 import com.codahale.metrics.MetricRegistry;
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import org.graylog2.inputs.amqp.AMQPInput;

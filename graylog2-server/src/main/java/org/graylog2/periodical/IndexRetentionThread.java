@@ -16,7 +16,7 @@
  */
 package org.graylog2.periodical;
 
-import com.google.inject.Inject;
+import javax.inject.Inject;
 import org.elasticsearch.action.admin.indices.stats.IndexStats;
 import org.graylog2.Configuration;
 import org.graylog2.configuration.ElasticsearchConfiguration;
