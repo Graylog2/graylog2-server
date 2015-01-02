@@ -68,6 +68,15 @@ public class TimeBasedRotationStrategyTest extends Graylog2BaseTest {
         assertEquals(dayAnd6Hours.getHourOfDay(), 0);
         assertEquals(dayAnd6Hours.getMinuteOfHour(), 0);
         assertEquals(dayAnd6Hours.getSecondOfMinute(), 0);
+        
+        period = Period.days(30);
+        final DateTime thirtyDays = TimeBasedRotationStrategy.determineRotationPeriodAnchor(period);
+        assertEquals(thirtyDays.getYear(), 2014);
+        assertEquals(thirtyDays.getMonthOfYear(), 2);
+        assertEquals(thirtyDays.getDayOfMonth(), 17);
+        assertEquals(thirtyDays.getHourOfDay(), 0);
+        assertEquals(thirtyDays.getMinuteOfHour(), 0);
+        assertEquals(thirtyDays.getSecondOfMinute(), 0);
 
     }
 
