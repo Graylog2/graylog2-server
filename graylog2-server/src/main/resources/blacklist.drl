@@ -25,7 +25,7 @@ end
 rule "blacklist hostname inet mask"
     when
         $i : BlacklistIpMatcherCondition()
-        $m : Message( isSourceInetAddress == true, filterOut == false, $i.matchesInetAddress(inetAddress))
+        $m : Message( isSourceInetAddress == true, filterOut == false, $i.matchesInetAddress(getInetAddress()))
     then
         modify($m) { setFilterOut(true) }
 end

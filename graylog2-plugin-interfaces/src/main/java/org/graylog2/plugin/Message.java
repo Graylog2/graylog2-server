@@ -30,6 +30,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.net.InetAddresses;
 import org.graylog2.plugin.streams.Stream;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -107,7 +108,6 @@ public class Message {
 
     // Used for drools to filter out messages.
     private boolean filterOut = false;
-    private InetAddress inetAddress;
     /**
      * The offset the message originally had in the journal it was read from. This will be MIN_VALUE if no journal
      * was involved.
@@ -350,11 +350,19 @@ public class Message {
 
     // drools seems to need the "get" prefix
     public boolean getIsSourceInetAddress() {
-        return inetAddress != null;
+        return fields.containsKey("gl2_remote_ip");
     }
 
     public InetAddress getInetAddress() {
-        return inetAddress;
+        if (!fields.containsKey("gl2_remote_ip")) {
+            return null;
+        }
+        final String ipAddr = (String) fields.get("gl2_remote_ip");
+        try {
+            return InetAddresses.forString(ipAddr);
+        } catch (IllegalArgumentException ignored) {
+            return null;
+        }
     }
 
     public void setJournalOffset(long journalOffset) {
