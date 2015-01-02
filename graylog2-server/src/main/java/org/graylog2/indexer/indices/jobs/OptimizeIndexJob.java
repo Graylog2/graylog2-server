@@ -88,7 +88,7 @@ public class OptimizeIndexJob extends SystemJob {
 
     @Override
     public String getDescription() {
-        return "Optimises and index for read performance.";
+        return "Optimises an index for read performance.";
     }
 
     @Override

@@ -16,7 +16,7 @@
  */
 package org.graylog2.system.jobs;
 
-import com.codahale.metrics.InstrumentedExecutorService;
+import com.codahale.metrics.InstrumentedScheduledExecutorService;
 import com.codahale.metrics.MetricRegistry;
 import com.eaio.uuid.UUID;
 import com.google.common.base.Stopwatch;
@@ -29,8 +29,8 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 
@@ -41,7 +41,7 @@ public class SystemJobManager {
     private static final int THREAD_POOL_SIZE = 15;
 
     private final ActivityWriter activityWriter;
-    private final ExecutorService executor;
+    private final ScheduledExecutorService executor;
     private final Map<String, SystemJob> jobs;
 
     @Inject
@@ -51,20 +51,22 @@ public class SystemJobManager {
         this.jobs = new ConcurrentHashMap<>();
     }
 
-    private ExecutorService executorService(final MetricRegistry metricRegistry) {
+    private ScheduledExecutorService executorService(final MetricRegistry metricRegistry) {
         final ThreadFactory threadFactory = new ThreadFactoryBuilder().setNameFormat("systemjob-executor-%d").build();
-        return new InstrumentedExecutorService(
-                Executors.newFixedThreadPool(THREAD_POOL_SIZE, threadFactory),
+        return new InstrumentedScheduledExecutorService(
+                Executors.newScheduledThreadPool(THREAD_POOL_SIZE, threadFactory),
                 metricRegistry,
                 name(this.getClass(), "executor-service"));
     }
 
     public String submit(final SystemJob job) throws SystemJobConcurrencyException {
-        int concurrent = concurrentJobs(job.getClass());
+        return submitWithDelay(job, 0, TimeUnit.SECONDS);
+    }
 
-        if (concurrent >= job.maxConcurrency()) {
-            throw new SystemJobConcurrencyException("The maximum of parallel [" + job.getClass().getCanonicalName() + "] is locked " +
-                    "to <" + job.maxConcurrency() + "> but <" + concurrent + "> are running.");
+    public String submitWithDelay(final SystemJob job, final long delay, TimeUnit timeUnit) throws SystemJobConcurrencyException {
+        // for immediate jobs, check allowed concurrency right now
+        if (delay == 0) {
+            checkAllowedConcurrency(job);
         }
 
         final String jobClass = job.getClass().getCanonicalName();
@@ -72,26 +74,42 @@ public class SystemJobManager {
         job.setId(new UUID().toString());
         jobs.put(job.getId(), job);
 
-        executor.submit(new Runnable() {
+        executor.schedule(new Runnable() {
             @Override
             public void run() {
-                job.markStarted();
+                try {
+                    if (delay > 0) {
+                        checkAllowedConcurrency(job);
+                    }
+                    job.markStarted();
 
-                Stopwatch x = Stopwatch.createStarted();
+                    final Stopwatch x = Stopwatch.createStarted();
 
-                job.execute();  // ... blocks until it finishes.
-                x.stop();
+                    job.execute();  // ... blocks until it finishes.
+                    x.stop();
 
-                jobs.remove(job.getId());
-
-                String msg = "SystemJob <" + job.getId() + "> [" + jobClass + "] finished in " + x.elapsed(TimeUnit.MILLISECONDS) + "ms.";
-                LOG.info(msg);
-                activityWriter.write(new Activity(msg, SystemJobManager.class));
+                    final String msg = "SystemJob <" + job.getId() + "> [" + jobClass + "] finished in " + x.elapsed(
+                            TimeUnit.MILLISECONDS) + "ms.";
+                    LOG.info(msg);
+                    activityWriter.write(new Activity(msg, SystemJobManager.class));
+                } catch (SystemJobConcurrencyException ignored) {
+                } finally {
+                    jobs.remove(job.getId());
+                }
             }
-        });
+        }, delay, timeUnit);
 
         LOG.info("Submitted SystemJob <{}> [{}]", job.getId(), jobClass);
         return job.getId();
+    }
+
+    protected void checkAllowedConcurrency(SystemJob job) throws SystemJobConcurrencyException {
+        final int concurrent = concurrentJobs(job.getClass());
+
+        if (concurrent >= job.maxConcurrency()) {
+            throw new SystemJobConcurrencyException("The maximum of parallel [" + job.getClass().getCanonicalName() + "] is locked " +
+                                                            "to <" + job.maxConcurrency() + "> but <" + concurrent + "> are running.");
+        }
     }
 
     public Map<String, SystemJob> getRunningJobs() {
@@ -101,7 +119,7 @@ public class SystemJobManager {
     public int concurrentJobs(Class jobClass) {
         int concurrent = 0;
 
-        for (SystemJob job : jobs.values()) {
+        for (final SystemJob job : jobs.values()) {
             if (job.getClass().equals(jobClass)) {
                 concurrent += 1;
             }

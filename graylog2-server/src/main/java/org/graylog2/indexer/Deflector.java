@@ -22,11 +22,11 @@ import org.elasticsearch.action.admin.indices.stats.IndexStats;
 import org.elasticsearch.indices.InvalidAliasNameException;
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.indexer.indices.Indices;
-import org.graylog2.indexer.indices.jobs.OptimizeIndexJob;
 import org.graylog2.indexer.ranges.CreateNewSingleIndexRangeJob;
 import org.graylog2.indexer.ranges.RebuildIndexRangesJob;
 import org.graylog2.shared.system.activities.Activity;
 import org.graylog2.shared.system.activities.ActivityWriter;
+import org.graylog2.system.jobs.SystemJob;
 import org.graylog2.system.jobs.SystemJobConcurrencyException;
 import org.graylog2.system.jobs.SystemJobManager;
 import org.slf4j.Logger;
@@ -36,6 +36,7 @@ import javax.inject.Inject;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Format of actual indexes behind the Deflector:
@@ -53,19 +54,19 @@ public class Deflector { // extends Ablenkblech
     private final SystemJobManager systemJobManager;
     private final ActivityWriter activityWriter;
     private final RebuildIndexRangesJob.Factory rebuildIndexRangesJobFactory;
-    private final OptimizeIndexJob.Factory optimizeIndexJobFactory;
     private final CreateNewSingleIndexRangeJob.Factory createNewSingleIndexRangeJobFactory;
     private final String indexPrefix;
     private final String deflectorName;
     private final Indices indices;
     private final ElasticsearchConfiguration configuration;
+    private final SetIndexReadOnlyJob.Factory indexReadOnlyJobFactory;
 
     @Inject
     public Deflector(final SystemJobManager systemJobManager,
                      final ElasticsearchConfiguration configuration,
                      final ActivityWriter activityWriter,
                      final RebuildIndexRangesJob.Factory rebuildIndexRangesJobFactory,
-                     final OptimizeIndexJob.Factory optimizeIndexJobFactory,
+                     final SetIndexReadOnlyJob.Factory indexReadOnlyJobFactory,
                      final CreateNewSingleIndexRangeJob.Factory createNewSingleIndexRangeJobFactory,
                      final Indices indices) {
         this.configuration = configuration;
@@ -74,7 +75,7 @@ public class Deflector { // extends Ablenkblech
         this.systemJobManager = systemJobManager;
         this.activityWriter = activityWriter;
         this.rebuildIndexRangesJobFactory = rebuildIndexRangesJobFactory;
-        this.optimizeIndexJobFactory = optimizeIndexJobFactory;
+        this.indexReadOnlyJobFactory = indexReadOnlyJobFactory;
         this.createNewSingleIndexRangeJobFactory = createNewSingleIndexRangeJobFactory;
 
         this.deflectorName = buildName(configuration.getIndexPrefix());
@@ -151,21 +152,18 @@ public class Deflector { // extends Ablenkblech
         } else {
             // Re-pointing from existing old index to the new one.
             pointTo(newTarget, oldTarget);
-            LOG.info("Flushing old index <{}>.", oldTarget);
-            indices.flush(oldTarget);
 
-            LOG.info("Setting old index <{}> to read-only.", oldTarget);
-            indices.setReadOnly(oldTarget);
-            activity.setMessage("Cycled deflector from <" + oldTarget + "> to <" + newTarget + ">");
-
-            if (!configuration.isDisableIndexOptimization()) {
-                try {
-                    systemJobManager.submit(optimizeIndexJobFactory.create(oldTarget));
-                } catch (SystemJobConcurrencyException e) {
-                    // The concurrency limit is very high. This should never happen.
-                    LOG.error("Cannot optimize index <" + oldTarget + ">.", e);
-                }
+            // perform these steps after a delay, so we don't race with indexing into the alias
+            // it can happen that an index request still writes to the old deflector target, while we cycled it above.
+            // setting the index to readOnly would result in ClusterBlockExceptions in the indexing request.
+            // waiting 30 seconds to perform the background task should completely get rid of these errors.
+            final SystemJob makeReadOnlyJob = indexReadOnlyJobFactory.create(oldTarget);
+            try {
+                systemJobManager.submitWithDelay(makeReadOnlyJob, 30, TimeUnit.SECONDS);
+            } catch (SystemJobConcurrencyException e) {
+                LOG.error("Cannot set index <" + oldTarget + "> to read only. It won't be optimized.", e);
             }
+            activity.setMessage("Cycled deflector from <" + oldTarget + "> to <" + newTarget + ">");
         }
 
         if (configuration.isDisableIndexRangeCalculation() && oldTargetNumber != -1) {
@@ -298,4 +296,5 @@ public class Deflector { // extends Ablenkblech
     public boolean isGraylog2Index(final String indexName) {
         return !isDeflectorAlias(indexName) && indexName.startsWith(indexPrefix + SEPARATOR);
     }
+
 }
