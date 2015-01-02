@@ -18,9 +18,10 @@ package org.graylog2.inputs.converters;
 
 import org.graylog2.plugin.inputs.Converter;
 import org.testng.annotations.Test;
-import static org.testng.Assert.*;
 
 import java.util.HashMap;
+
+import static org.testng.Assert.*;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
@@ -38,10 +39,10 @@ public class FlexibleDateConverterTest {
         // Using startsWith here to avoid time zone problems in tests.
         assertTrue(c.convert("2014-3-12").toString().startsWith("2014-03-12T"));
         assertTrue(c.convert("2014-3-12 12:27").toString().startsWith("2014-03-12T12:27:00.000"));
-        assertTrue(c.convert("Mar 12").toString().startsWith("2014-03-12T"));
-        assertTrue(c.convert("Mar 12 2pm").toString().startsWith("2014-03-12T14:00:00.000"));
-        assertTrue(c.convert("Mar 12 14:45:38").toString().startsWith("2014-03-12T14:45:38.000"));
-        assertTrue(c.convert("Mar 2 13:48:18").toString().startsWith("2014-03-02T13:48:18.000"));
+        assertTrue(c.convert("Mar 12").toString().contains("-03-12T"));
+        assertTrue(c.convert("Mar 12 2pm").toString().contains("-03-12T14:00:00.000"));
+        assertTrue(c.convert("Mar 12 14:45:38").toString().contains("-03-12T14:45:38.000"));
+        assertTrue(c.convert("Mar 2 13:48:18").toString().contains("-03-02T13:48:18.000"));
     }
 
 }
