@@ -20,11 +20,9 @@ import com.codahale.metrics.MetricRegistry;
 import com.github.joschi.jadconfig.util.Size;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
-import com.google.common.eventbus.EventBus;
 import kafka.log.LogSegment;
 import org.graylog2.Graylog2BaseTest;
 import org.graylog2.plugin.InstantMillisProvider;
-import org.graylog2.shared.buffers.ProcessBuffer;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeUtils;
 import org.joda.time.Duration;
@@ -43,15 +41,8 @@ import java.util.List;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 import static com.google.common.base.Charsets.UTF_8;
-import static org.apache.commons.io.filefilter.FileFilterUtils.and;
-import static org.apache.commons.io.filefilter.FileFilterUtils.directoryFileFilter;
-import static org.apache.commons.io.filefilter.FileFilterUtils.fileFileFilter;
-import static org.apache.commons.io.filefilter.FileFilterUtils.nameFileFilter;
-import static org.apache.commons.io.filefilter.FileFilterUtils.suffixFileFilter;
-import static org.mockito.Mockito.mock;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNotNull;
-import static org.testng.Assert.assertTrue;
+import static org.apache.commons.io.filefilter.FileFilterUtils.*;
+import static org.testng.Assert.*;
 
 public class KafkaJournalTest extends Graylog2BaseTest {
     private static final int BULK_SIZE = 200;
@@ -90,9 +81,7 @@ public class KafkaJournalTest extends Graylog2BaseTest {
                                                  Duration.standardHours(1),
                                                  1_000_000,
                                                  Duration.standardMinutes(1),
-                                                 new EventBus(),
-                                                 new MetricRegistry(),
-                                                 mock(ProcessBuffer.class));
+                                                 new MetricRegistry());
 
         final byte[] idBytes = "id".getBytes(UTF_8);
         final byte[] messageBytes = "message".getBytes(UTF_8);
@@ -115,9 +104,7 @@ public class KafkaJournalTest extends Graylog2BaseTest {
                                                  Duration.standardHours(1),
                                                  1_000_000,
                                                  Duration.standardMinutes(1),
-                                                 new EventBus(),
-                                                 new MetricRegistry(),
-                                                 mock(ProcessBuffer.class));
+                                                 new MetricRegistry());
 
         final byte[] idBytes = "id".getBytes(UTF_8);
         final byte[] messageBytes = "message1".getBytes(UTF_8);
@@ -163,9 +150,7 @@ public class KafkaJournalTest extends Graylog2BaseTest {
                                                       Duration.standardDays(1),
                                                       1_000_000,
                                                       Duration.standardMinutes(1),
-                                                      new EventBus(),
-                                                      new MetricRegistry(),
-                                                      mock(ProcessBuffer.class));
+                                                      new MetricRegistry());
 
         createBulkChunks(journal, 3);
 
@@ -191,9 +176,7 @@ public class KafkaJournalTest extends Graylog2BaseTest {
                                                       Duration.standardDays(1),
                                                       1_000_000,
                                                       Duration.standardMinutes(1),
-                                                      new EventBus(),
-                                                      new MetricRegistry(),
-                                                      mock(ProcessBuffer.class));
+                                                      new MetricRegistry());
         final File messageJournalDir = new File(journalDirectory, "messagejournal-0");
         assertTrue(messageJournalDir.exists());
 
@@ -227,9 +210,7 @@ public class KafkaJournalTest extends Graylog2BaseTest {
                                                           Duration.standardMinutes(1),
                                                           1_000_000,
                                                           Duration.standardMinutes(1),
-                                                          new EventBus(),
-                                                          new MetricRegistry(),
-                                                          mock(ProcessBuffer.class));
+                                                          new MetricRegistry());
             final File messageJournalDir = new File(journalDirectory, "messagejournal-0");
             assertTrue(messageJournalDir.exists());
 
@@ -280,9 +261,7 @@ public class KafkaJournalTest extends Graylog2BaseTest {
                                                       Duration.standardDays(1),
                                                       1_000_000,
                                                       Duration.standardMinutes(1),
-                                                      new EventBus(),
-                                                      new MetricRegistry(),
-                                                      mock(ProcessBuffer.class));
+                                                      new MetricRegistry());
         final File messageJournalDir = new File(journalDirectory, "messagejournal-0");
         assertTrue(messageJournalDir.exists());
 

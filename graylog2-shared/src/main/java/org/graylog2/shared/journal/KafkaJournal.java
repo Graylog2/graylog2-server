@@ -26,15 +26,10 @@ import com.google.common.base.Throwables;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import com.google.common.eventbus.EventBus;
-import com.google.common.eventbus.Subscribe;
 import com.google.common.io.Files;
 import com.google.common.primitives.Ints;
 import com.google.common.util.concurrent.AbstractIdleService;
 import com.google.common.util.concurrent.Uninterruptibles;
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import javax.inject.Named;
 import kafka.common.KafkaException;
 import kafka.common.OffsetOutOfRangeException;
 import kafka.common.TopicAndPartition;
@@ -51,7 +46,6 @@ import kafka.utils.KafkaScheduler;
 import kafka.utils.Time;
 import kafka.utils.Utils;
 import org.graylog2.plugin.ThrottleState;
-import org.graylog2.shared.buffers.ProcessBuffer;
 import org.graylog2.shared.metrics.HdrTimer;
 import org.joda.time.DateTimeUtils;
 import org.joda.time.Duration;
@@ -63,6 +57,9 @@ import scala.collection.JavaConversions;
 import scala.collection.Map$;
 import scala.runtime.AbstractFunction1;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -88,7 +85,7 @@ import static org.graylog2.plugin.Tools.bytesToHex;
 @Singleton
 public class KafkaJournal extends AbstractIdleService implements Journal {
     private static final Logger LOG = LoggerFactory.getLogger(KafkaJournal.class);
-    private static final long DEFAULT_COMMITTED_OFFSET = Long.MIN_VALUE;
+    public static final long DEFAULT_COMMITTED_OFFSET = Long.MIN_VALUE;
 
     // this exists so we can use JodaTime's millis provider in tests.
     // kafka really only cares about the milliseconds() method in here
@@ -114,10 +111,6 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
     private final File committedReadOffsetFile;
     private final AtomicLong committedOffset = new AtomicLong(DEFAULT_COMMITTED_OFFSET);
     private final ScheduledExecutorService scheduler;
-    private final Size retentionSize;
-    private final EventBus eventBus;
-    private final MetricRegistry metricRegistry;
-    private ProcessBuffer processBuffer;
     private final Timer writeTime;
 
     private final Timer readTime;
@@ -129,11 +122,8 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
     private final DirtyLogFlusher dirtyLogFlusher;
     private final RecoveryCheckpointFlusher recoveryCheckpointFlusher;
     private final LogRetentionCleaner logRetentionCleaner;
-    private final ThrottleStateUpdater throttleStateUpdater;
 
     private long nextReadOffset = 0L;
-    private long lastWriteOffset = Long.MIN_VALUE;
-    private ScheduledFuture<?> throttleUpdaterFuture;
     private ScheduledFuture<?> checkpointFlusherFuture;
     private ScheduledFuture<?> dirtyLogFlushFuture;
     private ScheduledFuture<?> logRetentionFuture;
@@ -150,14 +140,8 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
                         @Named("message_journal_max_age") Duration retentionAge,
                         @Named("message_journal_flush_interval") long flushInterval,
                         @Named("message_journal_flush_age") Duration flushAge,
-                        EventBus eventBus,
-                        MetricRegistry metricRegistry,
-                        ProcessBuffer processBuffer) {
+                        MetricRegistry metricRegistry) {
         this.scheduler = scheduler;
-        this.retentionSize = retentionSize;
-        this.eventBus = eventBus;
-        this.metricRegistry = metricRegistry;
-        this.processBuffer = processBuffer;
 
         this.messagesWritten = metricRegistry.meter(name(this.getClass(), "messagesWritten"));
         this.messagesRead = metricRegistry.meter(name(this.getClass(), "messagesRead"));
@@ -259,7 +243,6 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
             dirtyLogFlusher = new DirtyLogFlusher();
             recoveryCheckpointFlusher = new RecoveryCheckpointFlusher();
             logRetentionCleaner = new LogRetentionCleaner();
-            throttleStateUpdater = new ThrottleStateUpdater();
         } catch (KafkaException e) {
             // most likely failed to grab lock
             LOG.error("Unable to start logmanager.", e);
@@ -347,7 +330,7 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
             final ByteBufferMessageSet messageSet = new ByteBufferMessageSet(JavaConversions.asScalaBuffer(messages));
 
             final Log.LogAppendInfo appendInfo = kafkaLog.append(messageSet, true);
-            lastWriteOffset = appendInfo.lastOffset();
+            long lastWriteOffset = appendInfo.lastOffset();
             LOG.debug("Wrote {} messages to journal: {} bytes, log position {} to {}",
                     entries.size(), payloadSize, appendInfo.firstOffset(), lastWriteOffset);
             messagesWritten.mark(entries.size());
@@ -504,6 +487,14 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
         }
     }
 
+    public long getCommittedOffset() {
+        return committedOffset.get();
+    }
+
+    public long getNextReadOffset() {
+        return nextReadOffset;
+    }
+
     @Override
     protected void startUp() throws Exception {
         // do NOT let Kafka's LogManager create its management threads, we will run them ourselves.
@@ -532,10 +523,6 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
 
         // regularly write the currently committed read offset to disk
         offsetFlusherFuture = scheduler.scheduleAtFixedRate(offsetFlusher, 1, 1, SECONDS);
-
-        throttleUpdaterFuture = scheduler.scheduleAtFixedRate(throttleStateUpdater, 1, 1, SECONDS);
-
-        eventBus.register(this);
     }
 
     @Override
@@ -543,9 +530,6 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
         LOG.warn("Shutting down journal!");
         shuttingDown = true;
 
-        eventBus.unregister(this);
-
-        throttleUpdaterFuture.cancel(false);
         offsetFlusherFuture.cancel(false);
         logRetentionFuture.cancel(false);
         checkpointFlusherFuture.cancel(false);
@@ -635,11 +619,6 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
         return kafkaLog.logEndOffset();
     }
 
-    @Subscribe
-    public void listenToThrottleState(ThrottleState state) {
-        this.throttleState.set(state);
-    }
-
     /**
      * For informational purposes this method provides access to the current state of the journal.
      *
@@ -648,68 +627,9 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
     public ThrottleState getThrottleState() {
         return throttleState.get();
     }
-
-    /**
-     * The ThrottleStateUpdater publishes the current state buffer state of the journal to other interested parties,
-     * chiefly the ThrottleableTransports.
-     * <p/>
-     * <p>
-     * It only includes the necessary information to make a decision about whether to throttle parts of the system,
-     * but does not send "throttle" commands. This allows for a flexible approach in picking a throttling strategy.
-     * </p>
-     * <p>
-     * The implementation expects to be called once per second to have a rough estimate about the events per second,
-     * over the last second.
-     * </p>
-     */
-    public class ThrottleStateUpdater implements Runnable {
-        private boolean firstRun = true;
-
-        private long logStartOffset;
-        private long logEndOffset;
-        private long previousLogEndOffset;
-        private long previousReadOffset;
-        private long currentReadOffset;
-        private long currentTs;
-        private long prevTs;
-
-        @Override
-        public void run() {
-            final ThrottleState throttleState = new ThrottleState();
-            final long committedOffset = KafkaJournal.this.committedOffset.get();
-
-            prevTs = currentTs;
-            currentTs = System.nanoTime();
-
-            previousLogEndOffset = logEndOffset;
-            previousReadOffset = currentReadOffset;
-            logStartOffset = getLogStartOffset();
-            logEndOffset = getLogEndOffset() - 1; // -1 because getLogEndOffset is the next offset that gets assigned
-            currentReadOffset = KafkaJournal.this.nextReadOffset - 1; // just to make it clear which field we read
-
-            // for the first run, don't send an update, there's no previous data available to calc rates
-            if (firstRun) {
-                firstRun = false;
-                return;
-            }
-
-            throttleState.appendEventsPerSec = (long) Math.floor((logEndOffset - previousLogEndOffset) / ((currentTs - prevTs) / 1.0E09));
-            throttleState.readEventsPerSec = (long) Math.floor((currentReadOffset - previousReadOffset) / ((currentTs - prevTs) / 1.0E09));
-
-            throttleState.journalSize = size();
-            throttleState.journalSizeLimit = retentionSize.toBytes();
-
-            throttleState.processBufferCapacity = processBuffer.getRemainingCapacity();
-
-            if (committedOffset == DEFAULT_COMMITTED_OFFSET) {
-                // nothing committed at all, the entire log is uncommitted, or completely empty.
-                throttleState.uncommittedJournalEntries = size() == 0 ? 0 : logEndOffset - logStartOffset;
-            } else {
-                throttleState.uncommittedJournalEntries = logEndOffset - committedOffset;
-            }
-            LOG.debug("ThrottleState: {}", throttleState);
-            eventBus.post(throttleState);
-        }
+    
+    public void setThrottleState(ThrottleState state) {
+        throttleState.set(state);
     }
 
 
