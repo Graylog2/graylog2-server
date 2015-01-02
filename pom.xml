@@ -107,6 +107,7 @@
         <mongojack.version>2.1.0</mongojack.version>
         <findbugs.version>3.0.0</findbugs.version>
         <swagger.version>1.3.11</swagger.version>
+        <sigar.version>1.6.4</sigar.version>
     </properties>
 
     <repositories>
@@ -618,6 +619,11 @@
                 <version>1.0-rc2</version>
                 <scope>provided</scope>
             </dependency>
+            <dependency>
+                <groupId>org.fusesource</groupId>
+                <artifactId>sigar</artifactId>
+                <version>${sigar.version}</version>
+            </dependency>
 
             <dependency>
                 <groupId>org.testng</groupId>
@@ -802,10 +808,11 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>${surefire.version}</version>
                 <configuration>
+                    <forkMode>once</forkMode>
+                    <argLine>-XX:-UseSplitVerifier -Djava.library.path=${project.basedir}/../lib/sigar-${sigar.version}</argLine>
                     <excludes>
                         <exclude>**/*IntegrationTest.java</exclude>
                     </excludes>
-                    <argLine>-XX:-UseSplitVerifier</argLine>
                     <includes>
                         <include>**/*Spec.class</include>
                         <include>**/*Test.class</include>

@@ -23,17 +23,18 @@ RADIO_CONF=${RADIO_CONF:=/etc/graylog2-radio.conf}
 RADIO_PID=${RADIO_PID:=/tmp/graylog2-radio.pid}
 LOG_FILE=${LOG_FILE:=log/graylog2-radio.log}
 LOG4J=${LOG4J:=}
+JAVA_OPTS="${JAVA_OPTS:=} -Djava.library.path=${GRAYLOG2CTL_DIR}/lib/sigar"
 
 start() {
     echo "Starting graylog2-radio ..."
     cd "$RADIOCTL_DIR/.."
-    $NOHUP java ${LOG4J} -jar ${RADIO_JAR} radio -f ${RADIO_CONF} -p ${RADIO_PID} >> ${LOG_FILE} &
+    $NOHUP ${JAVA_CMD} ${JAVA_OPTS} ${LOG4J} -jar ${RADIO_JAR} radio -f ${RADIO_CONF} -p ${RADIO_PID} >> ${LOG_FILE} &
 }
 
 run() {
     echo "Running graylog2-radio ..."
     cd "$RADIOCTL_DIR/.."
-    exec java ${LOG4J} -jar ${RADIO_JAR} radio -f ${RADIO_CONF} -p ${RADIO_PID}
+    exec ${JAVA_CMD} ${JAVA_OPTS} ${LOG4J} -jar ${RADIO_JAR} radio -f ${RADIO_CONF} -p ${RADIO_PID}
 }
 
 stop() {

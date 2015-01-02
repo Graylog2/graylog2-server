@@ -120,6 +120,9 @@ public abstract class BaseConfiguration {
     @Parameter("message_recordings_enable")
     private boolean messageRecordingsEnable = false;
 
+    @Parameter("disable_sigar")
+    private boolean disableSigar = false;
+
     public String getRestUriScheme() {
         return isRestEnableTls() ? "https" : "http";
     }
@@ -279,4 +282,7 @@ public abstract class BaseConfiguration {
         return messageRecordingsEnable;
     }
 
+    public boolean isDisableSigar() {
+        return disableSigar;
+    }
 }
