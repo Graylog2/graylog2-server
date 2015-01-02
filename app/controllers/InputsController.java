@@ -240,13 +240,14 @@ public class InputsController extends AuthenticatedController {
         return configuration;
     }
 
-    public Result launch(String nodeIdParam) {
+    public Result launch() {
         if (!Permissions.isPermitted(RestPermissions.INPUTS_EDIT)) {
             return redirect(routes.StartpageController.redirect());
         }
 
         final Form<LaunchInputRequest> form = launchInputRequestForm.bindFromRequest();
         final LaunchInputRequest request = form.get();
+        final String nodeIdParam = request.node;
 
         try {
             final InputTypeSummaryResponse inputInfo = getInputInfo(nodeIdParam, request);
@@ -265,7 +266,8 @@ public class InputsController extends AuthenticatedController {
                 if (request.global) {
                     result = (inputService.launchGlobal(request.title, request.type, configuration, inputInfo.isExclusive) != null);
                 } else {
-                    result = (node.launchInput(request.title, request.type, request.global, configuration, inputInfo.isExclusive) != null);
+                    final InputLaunchResponse response = nodeService.loadMasterNode().launchInput(request.title, request.type, request.global, configuration, inputInfo.isExclusive, nodeIdParam);
+                    result = node.launchExistingInput(response.id);
                 }
 
                 if (!result) {
@@ -288,8 +290,6 @@ public class InputsController extends AuthenticatedController {
     }
 
     private InputTypeSummaryResponse getInputInfo(String nodeIdParam, LaunchInputRequest request) throws NodeService.NodeNotFoundException, APIException, IOException {
-        InputTypeSummaryResponse inputInfo = null;
-
         final ClusterEntity node = getClusterEntity(nodeIdParam, request);
 
         if (node == null)
@@ -323,44 +323,6 @@ public class InputsController extends AuthenticatedController {
         return node;
     }
 
-    public Result launchRadio(String radioId) {
-        if (!Permissions.isPermitted(RestPermissions.INPUTS_EDIT)) {
-            return redirect(routes.StartpageController.redirect());
-        }
-        final Form<LaunchInputRequest> form = launchInputRequestForm.bindFromRequest();
-        final LaunchInputRequest request = form.get();
-
-        try {
-            final Radio radio = nodeService.loadRadio(radioId);
-            final InputTypeSummaryResponse inputInfo = radio.getInputTypeInformation(request.type);
-
-            final Map<String, Object> configuration;
-            try {
-                configuration = extractConfiguration(request.configuration, inputInfo);
-            } catch (IllegalArgumentException e) {
-                return status(400, views.html.errors.error.render("Invalid input configuration", new RuntimeException("Invalid configuration for input " + request.title), request()));
-            }
-
-            try {
-                if (radio.launchInput(request.title, request.type, false, configuration, inputInfo.isExclusive) == null) {
-                    return status(500, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, new RuntimeException("Could not launch input " + request.title), request()));
-                }
-            } catch (ExclusiveInputException e) {
-                flash("error", "This input is exclusive and already running.");
-                return redirect(routes.InputsController.index());
-            }
-
-            return redirect(routes.InputsController.index());
-        } catch (IOException e) {
-            return status(500, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
-        } catch (APIException e) {
-            String message = "Could not launch input. We expected HTTP 202, but got a HTTP " + e.getHttpCode() + ".";
-            return status(500, views.html.errors.error.render(message, e, request()));
-        } catch (NodeService.NodeNotFoundException e) {
-            return status(404, views.html.errors.error.render(ApiClient.ERROR_MSG_NODE_NOT_FOUND, e, request()));
-        }
-    }
-
     public Result update(String inputId) throws APIException, NodeService.NodeNotFoundException, IOException {
         if (!Permissions.isPermitted(RestPermissions.INPUTS_EDIT)) {
             return redirect(routes.StartpageController.redirect());
@@ -387,7 +349,7 @@ public class InputsController extends AuthenticatedController {
 
         try {
             final Node node = nodeService.loadMasterNode();
-            final InputLaunchResponse response = node.updateInput(inputId, request.title, request.type, request.global, configuration);
+            final InputLaunchResponse response = node.updateInput(inputId, request.title, request.type, request.global, configuration, request.node);
             inputService.restart(inputId);
         } catch (APIException | IOException e) {
             e.printStackTrace();
