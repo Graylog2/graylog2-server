@@ -690,7 +690,7 @@ $(document).ready(function() {
 
         $(".metric-list li").hide();
         $(".metric-list li").each(function(i) {
-            if ($(this).attr("data-metricname").match(new RegExp("^" + val + ".*", "g"))) {
+            if ($(this).attr("data-metricname").match(new RegExp(".*" + val + ".*", "gi"))) {
                $(this).show();
             }
         });
