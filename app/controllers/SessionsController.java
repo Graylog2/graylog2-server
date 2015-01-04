@@ -120,7 +120,8 @@ public class SessionsController extends BaseController {
                 flash("error", "Sorry, those credentials are invalid.");
             }
         } catch (IOException e) {
-            flash("error", "Unable to reach Graylog2 Server.");
+            flash("error", "We discovered Graylog2 servers but could not reach any. Please check your log file.(IOException)");
+            log.error("Error when trying to reach Graylog2 servers.", e);
         } catch (AuthenticationException e) {
         }
         return badRequest(views.html.sessions.login.render(loginRequest, !serverNodes.isConnected(), loginRequest.field("destination").value()));
