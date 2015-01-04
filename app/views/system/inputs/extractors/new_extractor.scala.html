@@ -38,6 +38,10 @@
                 @views.html.system.inputs.extractors.configurations.copy_input()
             }
 
+            @if(extractorType.equals(Extractor.Type.GROK)) {
+                @views.html.system.inputs.extractors.configurations.grok()
+            }
+            
             <label class="radio">
                 <input type="radio" name="condition_type" id="no-condition-type" value="none" checked />
                 Always try to extract
