@@ -278,6 +278,10 @@
         </dependency>
 
         <dependency>
+            <groupId>io.thekraken</groupId>
+            <artifactId>grok</artifactId>
+        </dependency>
+        <dependency>
             <groupId>com.atlassian.ip</groupId>
             <artifactId>atlassian-ip</artifactId>
         </dependency>

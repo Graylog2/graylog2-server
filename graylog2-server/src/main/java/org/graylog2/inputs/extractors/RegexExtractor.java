@@ -53,14 +53,14 @@ public class RegexExtractor extends Extractor {
     }
 
     @Override
-    protected Result run(String value) {
+    protected Result[] run(String value) {
         final Matcher matcher = pattern.matcher(value);
 
         if (!matcher.find() || matcher.groupCount() == 0 || matcher.start(1) == -1 || matcher.end(1) == -1) {
             return null;
         }
 
-        return new Result(value.substring(matcher.start(1), matcher.end(1)), matcher.start(1), matcher.end(1));
+        return new Result[] { new Result(value.substring(matcher.start(1), matcher.end(1)), matcher.start(1), matcher.end(1)) };
     }
 
 }

@@ -24,6 +24,9 @@ package org.graylog2.plugin.inputs;
 
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
+import com.google.common.base.Predicate;
+import com.google.common.collect.ComparisonChain;
+import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.graylog2.plugin.Message;
@@ -31,6 +34,8 @@ import org.graylog2.plugin.database.EmbeddedPersistable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
@@ -55,12 +60,14 @@ public abstract class Extractor implements EmbeddedPersistable {
     public static final String FIELD_CONVERTERS = "converters";
     public static final String FIELD_CONVERTER_TYPE = "type";
     public static final String FIELD_CONVERTER_CONFIG = "config";
+    public static final ResultPredicate VALUE_NULL_PREDICATE = new ResultPredicate();
 
     public enum Type {
         SUBSTRING,
         REGEX,
         SPLIT_AND_INDEX,
-        COPY_INPUT
+        COPY_INPUT,
+        GROK
     }
 
     public enum CursorStrategy {
@@ -96,7 +103,7 @@ public abstract class Extractor implements EmbeddedPersistable {
     private final String totalTimerName;
     private final String converterTimerName;
 
-    protected abstract Result run(String field);
+    protected abstract Result[] run(String field);
 
     protected final MetricRegistry metricRegistry;
 
@@ -148,7 +155,7 @@ public abstract class Extractor implements EmbeddedPersistable {
             return;
         }
 
-        String field = (String) msg.getField(sourceField);
+        final String field = (String) msg.getField(sourceField);
 
         // Decide if to extract at all.
         if (conditionType.equals(ConditionType.STRING)) {
@@ -163,28 +170,44 @@ public abstract class Extractor implements EmbeddedPersistable {
 
         final Timer.Context timerContext = metricRegistry.timer(getTotalTimerName()).time();
 
-        Result result = run(field);
+        final Result[] results = run(field);
 
-        if (result == null || result.getValue() == null) {
+        if (results == null || results.length == 0 || FluentIterable.of(results).anyMatch(VALUE_NULL_PREDICATE)) {
             timerContext.close();
             return;
+        } else if (results.length == 1) {
+            msg.addField(targetField, results[0].getValue());
         } else {
-            msg.addField(targetField, result.getValue());
+            for (final Result result : results) {
+                msg.addField(result.getTarget(), result.getValue());
+            }
         }
 
         // Remove original from message?
-        if (cursorStrategy.equals(CursorStrategy.CUT) && !targetField.equals(sourceField) && !Message.RESERVED_FIELDS.contains(sourceField)) {
-            StringBuilder sb = new StringBuilder(field);
+        if (cursorStrategy.equals(CursorStrategy.CUT) && !targetField.equals(sourceField) && !Message.RESERVED_FIELDS.contains(sourceField) && results[0].beginIndex != -1) {
+            final StringBuilder sb = new StringBuilder(field);
 
-            sb.delete(result.getBeginIndex(), result.getEndIndex());
+            final ImmutableList<Result> reverseList = FluentIterable.from(Arrays.asList(results)).toSortedList(new Comparator<Result>() {
+                @Override
+                public int compare(Result left, Result right) {
+                    // reversed!
+                    return -1 * ComparisonChain.start().compare(left.endIndex, right.endIndex).result();
+                }
+            });
+            // remove all from reverse so that the indices still match
+            for (final Result result : reverseList) {
+                sb.delete(result.getBeginIndex(), result.getEndIndex());
+            }
 
             String finalResult = sb.toString();
 
-            if (finalResult.isEmpty()) {
+            // also ignore pure whitespace
+            if (finalResult.trim().isEmpty()) {
                 finalResult = "fullyCutByExtractor";
             }
 
             msg.removeField(sourceField);
+            // TODO don't add an empty field back, or rather don't add fullyCutByExtractor
             msg.addField(sourceField, finalResult);
         }
 
@@ -212,7 +235,7 @@ public abstract class Extractor implements EmbeddedPersistable {
                     @SuppressWarnings("unchecked")
                     final Map<String, Object> convert =
                             (Map<String, Object>) converter.convert((String) msg.getField(targetField));
-                    for (String reservedField : Message.RESERVED_FIELDS) {
+                    for (final String reservedField : Message.RESERVED_FIELDS) {
                         if (convert.containsKey(reservedField)) {
                             if (LOG.isDebugEnabled()) {
                                 LOG.debug(
@@ -347,17 +370,27 @@ public abstract class Extractor implements EmbeddedPersistable {
     public static class Result {
 
         private final String value;
+        private final String target;
         private final int beginIndex;
         private final int endIndex;
 
         public Result(String value, int beginIndex, int endIndex) {
+            this(value, null, beginIndex, endIndex);
+        }
+        
+        public Result(String value, String target, int beginIndex, int endIndex) {
             this.value = value;
+            this.target = target;
             this.beginIndex = beginIndex;
             this.endIndex = endIndex;
         }
 
         public String getValue() {
             return value;
+        }
+
+        public String getTarget() {
+            return target;
         }
 
         public int getBeginIndex() {
@@ -368,5 +401,10 @@ public abstract class Extractor implements EmbeddedPersistable {
             return endIndex;
         }
 
+    }
+
+    private static class ResultPredicate implements Predicate<Result> {
+        @Override
+        public boolean apply(Result input) { return input.getValue() == null; }
     }
 }

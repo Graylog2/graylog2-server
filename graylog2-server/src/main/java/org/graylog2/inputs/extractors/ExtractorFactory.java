@@ -17,11 +17,11 @@
 package org.graylog2.inputs.extractors;
 
 import com.codahale.metrics.MetricRegistry;
-import javax.inject.Inject;
 import org.graylog2.ConfigurationException;
 import org.graylog2.plugin.inputs.Converter;
 import org.graylog2.plugin.inputs.Extractor;
 
+import javax.inject.Inject;
 import java.util.List;
 import java.util.Map;
 
@@ -36,7 +36,6 @@ public class ExtractorFactory {
         this.metricRegistry = metricRegistry;
     }
 
-    // TODO: This parameter list is growing a bit out of control.
     public Extractor factory(String id,
                                     String title,
                                     int order,
@@ -50,6 +49,7 @@ public class ExtractorFactory {
                                     String conditionValue)
             throws NoSuchExtractorException, Extractor.ReservedFieldException, ConfigurationException {
 
+        // TODO convert to guice factory
         switch (type) {
             case REGEX:
                 return new RegexExtractor(metricRegistry, id, title, order, cursorStrategy, sourceField, targetField, extractorConfig, creatorUserId, converters, conditionType, conditionValue);
@@ -59,6 +59,8 @@ public class ExtractorFactory {
                 return new SplitAndIndexExtractor(metricRegistry, id, title, order, cursorStrategy, sourceField, targetField, extractorConfig, creatorUserId, converters, conditionType, conditionValue);
             case COPY_INPUT:
                 return new CopyInputExtractor(metricRegistry, id, title, order, cursorStrategy, sourceField, targetField, extractorConfig, creatorUserId, converters, conditionType, conditionValue);
+            case GROK:
+                return new GrokExtrator(metricRegistry, id, title, order, cursorStrategy, sourceField, targetField, extractorConfig, creatorUserId, converters, conditionType, conditionValue);
             default:
                 throw new NoSuchExtractorException();
         }
