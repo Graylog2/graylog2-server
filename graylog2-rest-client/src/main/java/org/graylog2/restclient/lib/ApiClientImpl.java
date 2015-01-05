@@ -16,6 +16,8 @@
  */
 package org.graylog2.restclient.lib;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -89,6 +91,7 @@ class ApiClientImpl implements ApiClient {
                 new ObjectMapper()
                         .setPropertyNamingStrategy(PropertyNamingStrategy.CAMEL_CASE_TO_LOWER_CASE_WITH_UNDERSCORES)
                         .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+                        .setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY)
                         .registerModule(new GuavaModule())
                         .registerModule(new JodaModule()));
     }
