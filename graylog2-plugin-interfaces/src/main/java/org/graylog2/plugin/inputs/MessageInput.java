@@ -53,8 +53,6 @@ public abstract class MessageInput implements Stoppable {
     public static final String CK_OVERRIDE_SOURCE = "override_source";
     public static final String FIELD_ID = "_id";
     public static final String FIELD_TYPE = "type";
-    public static final String FIELD_INPUT_ID = "input_id";
-    public static final String FIELD_PERSIST_ID = "persist_id";
     public static final String FIELD_NODE_ID = "node_id";
     public static final String FIELD_RADIO_ID = "radio_id";
     public static final String FIELD_NAME = "name";
@@ -288,8 +286,6 @@ public abstract class MessageInput implements Stoppable {
         final MessageInput messageInput = this;
         return new HashMap<String, Object>() {{
             put(FIELD_TYPE, messageInput.getClass().getCanonicalName());
-            put(FIELD_INPUT_ID, messageInput.getId());
-            put(FIELD_PERSIST_ID, messageInput.getPersistId());
             put(FIELD_NAME, messageInput.getName());
             put(FIELD_TITLE, messageInput.getTitle());
             put(FIELD_CREATOR_USER_ID, messageInput.getCreatorUserId());

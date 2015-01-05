@@ -350,7 +350,6 @@ public class BundleImporter {
             final DateTime createdAt,
             final String bundleId) {
         final ImmutableMap.Builder<String, Object> inputData = ImmutableMap.builder();
-        inputData.put(MessageInput.FIELD_INPUT_ID, inputId.toString());
         inputData.put(MessageInput.FIELD_TITLE, input.getTitle());
         inputData.put(MessageInput.FIELD_TYPE, input.getType());
         inputData.put(MessageInput.FIELD_CREATOR_USER_ID, userName);
