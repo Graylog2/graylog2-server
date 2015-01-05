@@ -16,11 +16,16 @@
  */
 package org.graylog2.restclient.models.api.requests;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
  */
+
 public class SessionCreateRequest extends ApiRequest {
+    @JsonProperty
     private final String username;
+    @JsonProperty
     private final String password;
     private final String host;
 
