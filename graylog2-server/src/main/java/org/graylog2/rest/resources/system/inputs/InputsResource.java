@@ -279,7 +279,7 @@ public class InputsResource extends RestResource {
 
         try {
             final Input oldInput = inputService.find(inputId);
-            final MessageInput messageInput = messageInputFactory.create(lr, getCurrentUser().getName(), serverStatus.getNodeId().toString());
+            final MessageInput messageInput = messageInputFactory.create(lr, getCurrentUser().getName(), oldInput.getNodeId());
             messageInput.setPersistId(inputId);
             final Input mongoInput = getInput(messageInput);
 

@@ -38,6 +38,8 @@ import org.slf4j.LoggerFactory;
 import java.util.Collections;
 import java.util.Map;
 
+import static com.google.common.base.Strings.emptyToNull;
+
 @CollectionName("inputs")
 public class InputImpl extends PersistedImpl implements Input {
     private static final Logger LOG = LoggerFactory.getLogger(InputImpl.class);
@@ -152,5 +154,10 @@ public class InputImpl extends PersistedImpl implements Input {
     @Override
     public String getContentPack() {
         return (String) fields.get(MessageInput.FIELD_CONTENT_PACK);
+    }
+
+    @Override
+    public String getNodeId() {
+        return emptyToNull((String)fields.get(MessageInput.FIELD_NODE_ID));
     }
 }

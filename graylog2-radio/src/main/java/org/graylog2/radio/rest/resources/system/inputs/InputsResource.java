@@ -239,30 +239,22 @@ public class InputsResource extends RestResource {
     public Response launchExisting(@PathParam("inputId") String inputId) {
         final IOState<MessageInput> inputState = inputRegistry.getInputState(inputId);
 
-        final MessageInput input;
-        if (inputState == null) {
-            input = persistedInputs.get(inputId);
-        } else {
-            input = inputState.getStoppable();
+        if (inputState == null || inputState.getState() != IOState.Type.RUNNING) {
+            final MessageInput input = persistedInputs.get(inputId);
+
+            if (input == null) {
+                final String message = "Cannot launch input <" + inputId + ">. Input not found.";
+                LOG.info(message);
+                throw new NotFoundException(message);
+            }
+
+            LOG.info("Launching existing input [" + input.getName() + "]. Reason: REST request.");
+            //input.initialize();
+            inputLauncher.launch(input);
+            LOG.info("Launched existing input [" + input.getName() + "]. Reason: REST request.");
         }
-
-        if (input == null) {
-            final String message = "Cannot launch input <" + inputId + ">. Input not found.";
-            LOG.info(message);
-            throw new NotFoundException(message);
-        }
-
-        LOG.info("Launching existing input [" + input.getName() + "]. Reason: REST request.");
-        input.initialize();
-        inputLauncher.launch(input);
-        LOG.info("Launched existing input [" + input.getName() + "]. Reason: REST request.");
-
-        final Map<String, String> result = ImmutableMap.of(
-                "input_id", inputId,
-                "persist_id", inputId);
 
         return Response.accepted()
-                .entity(json(result))
                 .build();
     }
 
