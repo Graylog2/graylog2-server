@@ -4,7 +4,7 @@ var queryParser = require("../../src/logic/search/queryParser");
 var DumpVisitor = require("../../src/logic/search/visitors/DumpVisitor");
 
 describe('Query Parser', function () {
-    var ExpressionAST, ExpressionListAST, ModifierAST, TermAST, Token, QueryParser, TokenType;
+    var ExpressionAST, ExpressionListAST, ModifierAST, TermAST, TermWithFieldAST, Token, QueryParser, TokenType;
 
     var expectNoErrors = function (parser) {
         expect(parser.errors.length).toBe(0);
@@ -24,6 +24,7 @@ describe('Query Parser', function () {
 
     beforeEach(function () {
         TermAST = queryParser.TermAST;
+        TermWithFieldAST = queryParser.TermWithFieldAST;
         Token = queryParser.Token;
         QueryParser = queryParser.QueryParser;
         TokenType = queryParser.TokenType;
@@ -490,6 +491,72 @@ describe('Query Parser', function () {
         var ast = parser.parse();
         expectNoErrors(parser);
         expect(ast instanceof TermAST).toBeTruthy();
-    })
+    });
+
+    it('can parse an inclusive range search', function() {
+        var query = "[400 TO 500]";
+        var parser = new QueryParser(query);
+        var ast = parser.parse();
+        expectNoErrors(parser);
+        expect(ast instanceof TermAST).toBeTruthy();
+        expect(ast.term.type).toBe(TokenType.TERM);
+        expect(ast.isInclusiveRange()).toBeTruthy();
+        expect(ast.isExclusiveRange()).toBeFalsy();
+        expectIdentityDump(query);
+    });
+
+    it('can parse an inclusive range search preceded by a field', function() {
+        var query = "http_response_code:[400 TO 500]";
+        var parser = new QueryParser(query);
+        var ast = parser.parse();
+        expectNoErrors(parser);
+        expect(ast instanceof TermWithFieldAST).toBeTruthy();
+        expect(ast.field.type).toBe(TokenType.TERM);
+        expect(ast.term.type).toBe(TokenType.TERM);
+        expect(ast.isInclusiveRange()).toBeTruthy();
+        expect(ast.isExclusiveRange()).toBeFalsy();
+        expectIdentityDump(query);
+    });
+
+    it('can parse an exclusive range search', function() {
+        var query = "{alpha TO omega}";
+        var parser = new QueryParser(query);
+        var ast = parser.parse();
+        expectNoErrors(parser);
+        expect(ast instanceof TermAST).toBeTruthy();
+        expect(ast.term.type).toBe(TokenType.TERM);
+        expect(ast.isInclusiveRange()).toBeFalsy();
+        expect(ast.isExclusiveRange()).toBeTruthy();
+        expectIdentityDump(query);
+    });
+
+    it('can parse an exclusive range search preceded by a field', function() {
+        var query = "character:{alpha TO omega}";
+        var parser = new QueryParser(query);
+        var ast = parser.parse();
+        expectNoErrors(parser);
+        expect(ast instanceof TermWithFieldAST).toBeTruthy();
+        expect(ast.field.type).toBe(TokenType.TERM);
+        expect(ast.term.type).toBe(TokenType.TERM);
+        expect(ast.isInclusiveRange()).toBeFalsy();
+        expect(ast.isExclusiveRange()).toBeTruthy();
+        expectIdentityDump(query);
+    });
+
+    it('reports an error when the range brackets are not closed', function() {
+        var query = "[400 TO 500";
+        var parser = new QueryParser(query);
+        var ast = parser.parse();
+        expect(parser.errors.length).toBe(1);
+        expectIdentityDump(query, true);
+    });
+
+    it('reports an error when the range brackets do not match', function() {
+        var query = "{400 TO 500]";
+        var parser = new QueryParser(query);
+        var ast = parser.parse();
+        expect(parser.errors.length).toBe(1);
+        expectIdentityDump(query, true);
+    });
 });
 

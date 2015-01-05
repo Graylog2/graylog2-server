@@ -43,6 +43,14 @@ export class TermAST extends AST {
     isPhrase() {
         return this.term.asString().indexOf(" ") !== -1;
     }
+
+    isInclusiveRange() {
+        return this.term.asString().indexOf("[") === 0;
+    }
+
+    isExclusiveRange() {
+        return this.term.asString().indexOf("{") === 0;
+    }
 }
 
 export class TermWithFieldAST extends TermAST {
@@ -69,7 +77,6 @@ export class ExpressionListAST extends AST {
 }
 
 export class Token {
-    // for better readability
     public typeName: string;
 
     constructor(private input: string, public type: TokenType, public beginPos: number, public endPos: number) {
@@ -121,7 +128,11 @@ class QueryLexer {
             this.consume();
             token = new Token(this.input, TokenType.ERROR, startPos, this.pos);
         } else if (this.isTermStart(la)) {
-            token = this.term();
+            if (this.isRangeStart(la)) {
+                token = this.range();
+            } else {
+                token = this.term();
+            }
         } else {
             var startPos = this.pos;
             this.consume();
@@ -211,6 +222,28 @@ class QueryLexer {
         return new Token(this.input, TokenType.TERM, startPos, this.pos);
     }
 
+    range() {
+        var startPos = this.pos;
+        var rangeStartCharacter = this.lookAhead();
+        // consume start character
+        this.consume();
+        var rangeEndChecker = this.isExclusiveRangeStart(rangeStartCharacter) ? this.isExclusiveRangeEnd : this.isInclusiveRangeEnd;
+        var la = this.lookAhead();
+        while (la !== null && !rangeEndChecker(la)) {
+            this.consume();
+            la = this.lookAhead();
+        }
+
+        if (la === null) {
+            // We expect a closing bracket but we found EOF
+            return new Token(this.input, TokenType.ERROR, startPos, this.pos);
+        }
+
+        // consume range close bracket
+        this.consume();
+        return new Token(this.input, TokenType.TERM, startPos, this.pos);
+    }
+
     phrase() {
         var startPos = this.pos;
         this.consume(); // skip starting "
@@ -239,8 +272,28 @@ class QueryLexer {
         return this.isOneOf('+-!():^[]"{}~*?\\/', char);
     }
 
+    isRangeStart(char) {
+        return this.isInclusiveRangeStart(char) || this.isExclusiveRangeStart(char);
+    }
+
+    isInclusiveRangeStart(char) {
+        return char === '[';
+    }
+
+    isExclusiveRangeStart(char) {
+        return char === '{';
+    }
+
+    isInclusiveRangeEnd(char) {
+        return char === ']';
+    }
+
+    isExclusiveRangeEnd(char) {
+        return char === '}';
+    }
+
     isTermStart(char) {
-        return char !== null && !this.isWhitespace(char) && !this.isSpecial(char);
+        return char !== null && !this.isWhitespace(char) && (!this.isSpecial(char) || this.isRangeStart(char));
     }
 
     isTerm(char) {
@@ -540,7 +593,7 @@ export class QueryParser {
     }
 
     termOrPhrase() {
-        this.enterRule("expr");
+        this.enterRule("term");
         try {
             var termOrField = this.lookAhead();
             this.consume();
@@ -569,7 +622,7 @@ export class QueryParser {
             termAST.hiddenSuffix = wsAfterTermOrField;
             return termAST;
         } finally {
-            this.exitRule("expr");
+            this.exitRule("term");
         }
     }
 }
