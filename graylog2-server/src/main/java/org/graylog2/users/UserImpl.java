@@ -200,14 +200,22 @@ public class UserImpl extends PersistedImpl implements User {
                 return DateTimeZone.forID(o.toString());
             }
         } catch (IllegalArgumentException e) {
-            LOG.warn("Invalid timezone {} saved for user {}", o.toString(), getName());
+            LOG.warn("Invalid timezone \"{}\" saved for user \"{}\"", o, getName());
         }
         return null;
     }
 
     @Override
     public void setTimeZone(final String timeZone) {
-        fields.put(TIMEZONE, timeZone);
+        DateTimeZone dateTimeZone;
+        try {
+            dateTimeZone = DateTimeZone.forID(firstNonNull(timeZone, DateTimeZone.UTC.getID()));
+        } catch (IllegalArgumentException e) {
+            LOG.info("Invalid timezone \"{}\", falling back to UTC.", timeZone);
+            dateTimeZone = DateTimeZone.UTC;
+        }
+
+        setTimeZone(dateTimeZone);
     }
 
     @Override
