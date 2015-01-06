@@ -95,7 +95,7 @@ public class Configuration extends BaseConfiguration {
     private int loadBalancerRecognitionPeriodSeconds = 3;
 
     @Parameter(value = "http_proxy_uri")
-    private String httpProxyUri;
+    private URI httpProxyUri;
 
     @Parameter(value = "stream_processing_timeout", validator = PositiveLongValidator.class)
     private long streamProcessingTimeout = 2000;
@@ -198,7 +198,7 @@ public class Configuration extends BaseConfiguration {
         return metricsCollectionEnabled;
     }
 
-    public String getHttpProxyUri() {
+    public URI getHttpProxyUri() {
         return httpProxyUri;
     }
 

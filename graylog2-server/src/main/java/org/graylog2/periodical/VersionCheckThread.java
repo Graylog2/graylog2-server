@@ -89,9 +89,7 @@ public class VersionCheckThread extends Periodical {
                     .setConnectionRequestTimeout(versionCheckConfiguration.getConnectionRequestTimeOut());
             if (configuration.getHttpProxyUri() != null) {
                 try {
-                    final URIBuilder uriBuilder = new URIBuilder(configuration.getHttpProxyUri());
-                    final URI proxyURI = uriBuilder.build();
-
+                    final URI proxyURI = configuration.getHttpProxyUri();
                     configBuilder.setProxy(new HttpHost(proxyURI.getHost(), proxyURI.getPort(), proxyURI.getScheme()));
                 } catch (Exception e) {
                     LOG.error("Invalid version check proxy URI: " + configuration.getHttpProxyUri(), e);
