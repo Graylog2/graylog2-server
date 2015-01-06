@@ -22,7 +22,7 @@ import oi.thekraken.grok.api.Grok;
 import oi.thekraken.grok.api.Match;
 import oi.thekraken.grok.api.exception.GrokException;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.graylog2.inputs.extractors.GrokExtrator;
+import org.graylog2.inputs.extractors.GrokExtractor;
 import org.graylog2.rest.resources.RestResource;
 import org.graylog2.rest.resources.tools.responses.GrokTesterResponse;
 import org.hibernate.validator.constraints.NotEmpty;
@@ -48,7 +48,7 @@ public class GrokTesterResource extends RestResource {
                            @QueryParam("string") @NotNull String string) throws GrokException {
 
         final Grok grok = new Grok();
-        grok.addPatternFromReader(new StringReader(GrokExtrator.PATTERNS));
+        grok.addPatternFromReader(new StringReader(GrokExtractor.PATTERNS));
         grok.compile(pattern);
         final Match match = grok.match(string);
         match.captures();

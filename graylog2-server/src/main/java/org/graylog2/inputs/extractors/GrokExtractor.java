@@ -32,8 +32,8 @@ import java.io.StringReader;
 import java.util.List;
 import java.util.Map;
 
-public class GrokExtrator extends Extractor {
-    private static final Logger log = LoggerFactory.getLogger(GrokExtrator.class);
+public class GrokExtractor extends Extractor {
+    private static final Logger log = LoggerFactory.getLogger(GrokExtractor.class);
     public static final String PATTERNS = "USERNAME [a-zA-Z0-9._-]+\n" +
             "USER %{USERNAME}\n" +
             "INT (?:[+-]?(?:[0-9]+))\n" +
@@ -131,18 +131,18 @@ public class GrokExtrator extends Extractor {
 
     private final Grok grok = new Grok();
 
-    public GrokExtrator(MetricRegistry metricRegistry,
-                        String id,
-                        String title,
-                        int order,
-                        CursorStrategy cursorStrategy,
-                        String sourceField,
-                        String targetField,
-                        Map<String, Object> extractorConfig,
-                        String creatorUserId,
-                        List<Converter> converters,
-                        ConditionType conditionType,
-                        String conditionValue) throws ReservedFieldException, ConfigurationException {
+    public GrokExtractor(MetricRegistry metricRegistry,
+                         String id,
+                         String title,
+                         int order,
+                         CursorStrategy cursorStrategy,
+                         String sourceField,
+                         String targetField,
+                         Map<String, Object> extractorConfig,
+                         String creatorUserId,
+                         List<Converter> converters,
+                         ConditionType conditionType,
+                         String conditionValue) throws ReservedFieldException, ConfigurationException {
         super(metricRegistry,
               id,
               title,
@@ -172,6 +172,8 @@ public class GrokExtrator extends Extractor {
     @Override
     protected Result[] run(String value) {
 
+        // TODO did the patterns change, if so rebuild grok instance for this thread
+        
         final Match match = grok.match(value);
         match.captures();
         final Map<String, Object> matches = match.toMap();
