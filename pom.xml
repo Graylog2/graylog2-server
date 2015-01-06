@@ -354,7 +354,7 @@
             <dependency>
                 <groupId>com.beust</groupId>
                 <artifactId>jcommander</artifactId>
-                <version>1.35</version>
+                <version>1.47</version>
             </dependency>
             <dependency>
                 <groupId>com.github.joschi</groupId>
