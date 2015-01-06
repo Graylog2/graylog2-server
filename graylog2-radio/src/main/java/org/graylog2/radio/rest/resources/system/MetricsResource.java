@@ -31,9 +31,6 @@ import javax.ws.rs.core.MediaType;
 import java.util.List;
 import java.util.Map;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 @Path("/system/metrics")
 public class MetricsResource extends RestResource {
 
@@ -45,12 +42,8 @@ public class MetricsResource extends RestResource {
     @GET
     @Timed
     @Produces(MediaType.APPLICATION_JSON)
-    public String metrics() {
-        Map<String, Object> result = Maps.newHashMap();
-
-        result.put("metrics", metricRegistry.getMetrics());
-
-        return json(result);
+    public MetricRegistry metrics() {
+        return metricRegistry;
     }
 
     @GET @Timed
@@ -66,7 +59,7 @@ public class MetricsResource extends RestResource {
     @GET @Timed
     @Path("/{metricName}")
     @Produces(MediaType.APPLICATION_JSON)
-    public String singleMetric(@PathParam("metricName") String metricName) {
+    public Metric singleMetric(@PathParam("metricName") String metricName) {
         Metric metric = metricRegistry.getMetrics().get(metricName);
 
         if (metric == null) {
@@ -74,7 +67,7 @@ public class MetricsResource extends RestResource {
             throw new WebApplicationException(404);
         }
 
-        return json(metric);
+        return metric;
     }
 
     @POST @Timed

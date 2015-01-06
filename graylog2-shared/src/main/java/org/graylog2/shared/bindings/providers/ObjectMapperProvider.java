@@ -16,6 +16,7 @@
  */
 package org.graylog2.shared.bindings.providers;
 
+import com.codahale.metrics.json.MetricsModule;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -29,6 +30,7 @@ import org.graylog2.shared.rest.RangeJsonSerializer;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 import javax.ws.rs.ext.ContextResolver;
+import java.util.concurrent.TimeUnit;
 
 @javax.ws.rs.ext.Provider
 @Singleton
@@ -42,6 +44,7 @@ public class ObjectMapperProvider implements Provider<ObjectMapper>, ContextReso
                 .registerModule(new AfterburnerModule())
                 .registerModule(new JodaModule())
                 .registerModule(new GuavaModule())
+                .registerModule(new MetricsModule(TimeUnit.SECONDS, TimeUnit.SECONDS, false))
                 .registerModule(new SimpleModule()
                         .addSerializer(new RangeJsonSerializer())
                         .addSerializer(new SizeSerializer()));
