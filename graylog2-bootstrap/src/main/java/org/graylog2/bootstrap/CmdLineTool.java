@@ -24,6 +24,7 @@ import com.github.joschi.jadconfig.ParameterException;
 import com.github.joschi.jadconfig.Repository;
 import com.github.joschi.jadconfig.RepositoryException;
 import com.github.joschi.jadconfig.ValidationException;
+import com.github.joschi.jadconfig.guava.GuavaConverterFactory;
 import com.github.joschi.jadconfig.guice.NamedConfigParametersModule;
 import com.github.joschi.jadconfig.jodatime.JodaTimeConverterFactory;
 import com.github.joschi.jadconfig.repositories.EnvironmentRepository;
@@ -102,6 +103,7 @@ public abstract class CmdLineTool implements Runnable {
 
     protected CmdLineTool(String commandName, BaseConfiguration configuration) {
         jadConfig = new JadConfig();
+        jadConfig.addConverterFactory(new GuavaConverterFactory());
         jadConfig.addConverterFactory(new JodaTimeConverterFactory());
 
         if (commandName == null) {
