@@ -22,6 +22,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.datatype.guava.GuavaModule;
 import com.fasterxml.jackson.datatype.joda.JodaModule;
+import com.fasterxml.jackson.module.afterburner.AfterburnerModule;
 import org.graylog2.shared.jackson.SizeSerializer;
 import org.graylog2.shared.rest.RangeJsonSerializer;
 
@@ -38,10 +39,12 @@ public class ObjectMapperProvider implements Provider<ObjectMapper>, ContextReso
         objectMapper = new ObjectMapper()
                 .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
                 .setPropertyNamingStrategy(new PreserveLeadingUnderscoreStrategy())
+                .registerModule(new AfterburnerModule())
                 .registerModule(new JodaModule())
                 .registerModule(new GuavaModule())
-                .registerModule(new SimpleModule().addSerializer(new RangeJsonSerializer()))
-                .registerModule(new SimpleModule().addSerializer(new SizeSerializer()));
+                .registerModule(new SimpleModule()
+                        .addSerializer(new RangeJsonSerializer())
+                        .addSerializer(new SizeSerializer()));
     }
 
     @Override
