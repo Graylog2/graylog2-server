@@ -37,6 +37,12 @@ public class Main {
                 ShowVersion.class,
                 Help.class);
 
+        final Set<Class<? extends Runnable>> journalCommands = ImmutableSet.<Class<? extends Runnable>>of(
+                JournalShow.class,
+                JournalTruncate.class,
+                JournalDecode.class
+        );
+
         final CliBuilder<Runnable> builder = Cli.<Runnable>builder("graylog2")
                 .withDescription("Open source, centralized log management")
                 .withDefaultCommand(Help.class)
@@ -45,7 +51,7 @@ public class Main {
         builder.withGroup("journal")
                 .withDescription("Manage the persisted message journal")
                 .withDefaultCommand(JournalShow.class)
-                .withCommands(JournalShow.class, JournalTruncate.class, JournalDecode.class);
+                .withCommands(journalCommands);
 
         final Cli<Runnable> cli = builder.build();
         final Runnable command = cli.parse(args);
