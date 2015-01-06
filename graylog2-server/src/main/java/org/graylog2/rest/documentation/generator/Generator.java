@@ -369,7 +369,7 @@ public class Generator {
         return null;
     }
 
-    private static class Parameter {
+    public static class Parameter {
         private String name;
         private String description;
         private boolean isRequired;

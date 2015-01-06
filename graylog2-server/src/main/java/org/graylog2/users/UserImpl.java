@@ -38,6 +38,7 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
+import static com.google.common.base.Strings.nullToEmpty;
 
 @CollectionName("users")
 public class UserImpl extends PersistedImpl implements User {
@@ -52,6 +53,8 @@ public class UserImpl extends PersistedImpl implements User {
     public static final String TIMEZONE = "timezone";
     public static final String EXTERNAL_USER = "external_user";
     public static final String SESSION_TIMEOUT = "session_timeout_ms";
+    public static final String STARTPAGE = "startpage";
+    public static final String HASH_ALGORITHM = "SHA-1";
 
     public static final int MAX_USERNAME_LENGTH = 100;
     public static final int MAX_EMAIL_LENGTH = 254;
@@ -107,8 +110,7 @@ public class UserImpl extends PersistedImpl implements User {
 
     @Override
     public String getEmail() {
-        final Object email = fields.get(EMAIL);
-        return email == null ? "" : email.toString();
+        return nullToEmpty((String) fields.get(EMAIL));
     }
 
     @Override
@@ -142,9 +144,9 @@ public class UserImpl extends PersistedImpl implements User {
     public Map<String, String> getStartpage() {
         final Map<String, String> startpage = Maps.newHashMap();
 
-        if (fields.containsKey("startpage")) {
+        if (fields.containsKey(STARTPAGE)) {
             @SuppressWarnings("unchecked")
-            final Map<String, String> obj = (Map<String, String>) fields.get("startpage");
+            final Map<String, String> obj = (Map<String, String>) fields.get(STARTPAGE);
             startpage.put("type", obj.get("type"));
             startpage.put("id", obj.get("id"));
         }
@@ -181,14 +183,14 @@ public class UserImpl extends PersistedImpl implements User {
             // If no password is given, we leave the hashed password empty and we fail during validation.
             setHashedPassword("");
         } else {
-            final String newPassword = new SimpleHash("SHA-1", password, passwordSecret).toString();
+            final String newPassword = new SimpleHash(HASH_ALGORITHM, password, passwordSecret).toString();
             setHashedPassword(newPassword);
         }
     }
 
     @Override
     public boolean isUserPassword(final String password, final String passwordSecret) {
-        final String oldPasswordHash = new SimpleHash("SHA-1", password, passwordSecret).toString();
+        final String oldPasswordHash = new SimpleHash(HASH_ALGORITHM, password, passwordSecret).toString();
         return getHashedPassword().equals(oldPasswordHash);
     }
 
@@ -247,7 +249,7 @@ public class UserImpl extends PersistedImpl implements User {
             startpage.put("id", id);
         }
 
-        this.fields.put("startpage", startpage);
+        this.fields.put(STARTPAGE, startpage);
     }
 
     public static class LocalAdminUser extends UserImpl {
@@ -269,7 +271,7 @@ public class UserImpl extends PersistedImpl implements User {
         }
 
         public String getEmail() {
-            return "none";
+            return configuration.getRootEmail();
         }
 
         @Override
@@ -304,7 +306,7 @@ public class UserImpl extends PersistedImpl implements User {
 
         @Override
         public DateTimeZone getTimeZone() {
-            return null;
+            return configuration.getRootTimeZone();
         }
 
         @Override

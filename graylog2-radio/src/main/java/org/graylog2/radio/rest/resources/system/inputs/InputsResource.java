@@ -120,7 +120,18 @@ public class InputsResource extends RestResource {
             throw new NotFoundException();
         }
 
-        return json(input.asMap());
+        return json(InputSummary.create(input.getTitle(),
+                input.getPersistId(),
+                input.isGlobal(),
+                input.getName(),
+                input.getContentPack(),
+                input.getId(),
+                input.getCreatedAt(),
+                input.getClass().getCanonicalName(),
+                input.getCreatorUserId(),
+                input.getAttributesWithMaskedPasswords(),
+                input.getStaticFields()
+        ));
 
     }
 

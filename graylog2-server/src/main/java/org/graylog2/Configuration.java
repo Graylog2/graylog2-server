@@ -21,6 +21,7 @@ import com.github.joschi.jadconfig.util.Duration;
 import com.github.joschi.jadconfig.validators.PositiveIntegerValidator;
 import com.github.joschi.jadconfig.validators.PositiveLongValidator;
 import org.graylog2.plugin.BaseConfiguration;
+import org.joda.time.DateTimeZone;
 
 import java.net.URI;
 
@@ -74,6 +75,12 @@ public class Configuration extends BaseConfiguration {
 
     @Parameter(value = "root_password_sha2", required = true)
     private String rootPasswordSha2;
+
+    @Parameter(value = "root_timezone")
+    private DateTimeZone rootTimeZone = DateTimeZone.UTC;
+
+    @Parameter(value = "root_email")
+    private String rootEmail = "";
 
     @Parameter(value = "allow_leading_wildcard_searches")
     private boolean allowLeadingWildcardSearches = false;
@@ -169,6 +176,14 @@ public class Configuration extends BaseConfiguration {
 
     public String getRootPasswordSha2() {
         return rootPasswordSha2;
+    }
+
+    public DateTimeZone getRootTimeZone() {
+        return rootTimeZone;
+    }
+
+    public String getRootEmail() {
+        return rootEmail;
     }
 
     public boolean isAllowLeadingWildcardSearches() {

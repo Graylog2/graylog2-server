@@ -82,8 +82,8 @@ public class MetricsResource extends RestResource {
     @ApiOperation(value = "Get all metrics",
             notes = "Note that this might return a huge result set.")
     @Produces(MediaType.APPLICATION_JSON)
-    public String metrics() {
-        return json(ImmutableMap.of("metrics", metricRegistry.getMetrics()));
+    public MetricRegistry metrics() {
+        return metricRegistry;
     }
 
     @GET
