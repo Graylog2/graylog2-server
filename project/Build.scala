@@ -12,7 +12,7 @@ import com.typesafe.sbt.less.Import.LessKeys
 
 object ApplicationBuild extends Build {
   val appName         = "graylog2-web-interface"
-  val appVersion      = "0.93.0-SNAPSHOT"
+  val appVersion      = "0.93.0-grok-SNAPSHOT"
   val appDependencies = Seq(
     cache,
     javaCore,
