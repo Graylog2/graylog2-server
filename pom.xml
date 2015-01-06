@@ -99,7 +99,7 @@
         <jackson.version>2.5.0</jackson.version>
         <jersey.version>2.14</jersey.version>
         <glassfish-hk2.version>2.4.0-b06</glassfish-hk2.version>
-        <apache-directory-version>1.0.0-M20</apache-directory-version>
+        <apache-directory-version>1.0.0-M27</apache-directory-version>
         <surefire.version>2.17</surefire.version>
         <guice.version>3.0</guice.version>
         <drools.version>6.1.0.Final</drools.version>
