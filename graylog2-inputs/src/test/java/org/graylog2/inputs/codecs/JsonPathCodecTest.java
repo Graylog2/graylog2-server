@@ -25,10 +25,6 @@ import java.util.Map;
 import static org.graylog2.inputs.codecs.JsonPathCodec.CK_PATH;
 import static org.testng.AssertJUnit.assertEquals;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
-
 // TODO migrate test to use codec instead
 public class JsonPathCodecTest {
 
@@ -87,7 +83,7 @@ public class JsonPathCodecTest {
         fields.put("foo", "bar");
 
         JsonPathCodec selector = new JsonPathCodec(configOf(CK_PATH, "$.download_count"));
-        assertEquals("JSON API poll result: $.download_count -> {baz=9001, foo=bar}", selector.buildShortMessage(fields));
+        assertEquals("JSON API poll result: $['download_count'] -> {baz=9001, foo=bar}", selector.buildShortMessage(fields));
     }
 
     @Test
@@ -97,7 +93,7 @@ public class JsonPathCodecTest {
         fields.put("foo", "bargggdzrtdfgfdgldfsjgkfdlgjdflkjglfdjgljslfperitperoujglkdnfkndsbafdofhasdpfoöadjsFOO");
 
         JsonPathCodec selector = new JsonPathCodec(configOf(CK_PATH, "$.download_count"));
-        assertEquals("JSON API poll result: $.download_count -> {baz=9001, foo=bargggdzrtdfgfdgldfsjgkfdlgjdflkjgl[...]", selector.buildShortMessage(fields));
+        assertEquals("JSON API poll result: $['download_count'] -> {baz=9001, foo=bargggdzrtdfgfdgldfsjgkfdlgjdflkjgl[...]", selector.buildShortMessage(fields));
     }
 
 }

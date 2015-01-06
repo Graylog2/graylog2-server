@@ -279,7 +279,7 @@
             <dependency>
                 <groupId>com.jayway.jsonpath</groupId>
                 <artifactId>json-path</artifactId>
-                <version>0.9.1</version>
+                <version>1.2.0</version>
             </dependency>
             <dependency>
                 <groupId>com.ning</groupId>
