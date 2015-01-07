@@ -109,7 +109,7 @@ class QueryLexer {
             token = this.or();
         } else if (this.isKeyword("AND") || this.isKeyword("&&")) {
             token = this.and();
-        } else if (this.isKeyword("NOT") || this.isKeyword("!")) {
+        } else if (this.isKeyword("NOT") || this.isPrefix("!")) {
             token = this.not();
         } else if (this.isPrefix("+")) {
             token = this.must();

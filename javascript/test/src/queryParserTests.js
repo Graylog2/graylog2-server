@@ -71,7 +71,6 @@ describe('Query Parser', function () {
         expectIdentityDump(query);
     });
 
-
     it('can parse a phrase', function () {
         var query = '"login now"';
         var parser = new QueryParser(query);
@@ -343,7 +342,7 @@ describe('Query Parser', function () {
     });
 
     it('can parse a ! as NOT expression', function() {
-        var query = "login ! submit";
+        var query = "login !submit";
         var parser = new QueryParser(query);
         var ast = parser.parse();
         expectNoErrors(parser);
@@ -401,6 +400,17 @@ describe('Query Parser', function () {
             expect(nextExpr.right instanceof TermAST).toBeTruthy();
         }
 
+        expectIdentityDump(query);
+    });
+
+    it('can parse ! at the beginning of the query', function() {
+        var query = "!login";
+        var parser = new QueryParser(query);
+        var ast = parser.parse();
+        expectNoErrors(parser);
+        expect(ast instanceof ModifierAST).toBeTruthy();
+        expect(ast.modifier.type).toBe(TokenType.NOT);
+        expect(ast.right instanceof TermAST).toBeTruthy();
         expectIdentityDump(query);
     });
 
@@ -467,7 +477,7 @@ describe('Query Parser', function () {
         expectIdentityDump(query);
     });
 
-    // TODO: This kind of query should not create any errors, the modifier seems to be silently ignored.
+    // TODO: This kind of query should not create any errors, the modifier seems to be silently ignored. It applies to +, - and !
     it('does not recognise MUST as modifier when followed by whitespace', function() {
         var query = '+ login';
         var parser = new QueryParser(query);
