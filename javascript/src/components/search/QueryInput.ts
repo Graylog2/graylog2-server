@@ -99,13 +99,15 @@ class QueryInput {
 
             if (currentAST instanceof queryParser.TermAST) {
                 possibleMatches = possibleMatches.concat(this.fieldsCompletions());
-                var offerBinaryOperatorsCompletion = (serializedAst.length > 1) && !(previousAST instanceof queryParser.ExpressionAST);
-                var offerUnaryOperatorsCompletion = !(previousAST instanceof queryParser.ModifierAST);
 
-                if (offerBinaryOperatorsCompletion) {
-                    var includeNotCompletion = !((previousAST instanceof queryParser.ModifierAST) && ((<queryParser.ModifierAST>previousAST).isNOTModifier()));
-                    possibleMatches = possibleMatches.concat(this.binaryOperatorsCompletions(includeNotCompletion));
-                } else if (offerUnaryOperatorsCompletion) {
+                var offerOperatorsCompletion = !(previousAST instanceof queryParser.ModifierAST);
+                if (offerOperatorsCompletion) {
+                    var offerBinaryOperatorsCompletion = (serializedAst.length > 1) && !(previousAST instanceof queryParser.ExpressionAST);
+
+                    if (offerBinaryOperatorsCompletion) {
+                        var includeNotCompletion = !((previousAST instanceof queryParser.ModifierAST) && ((<queryParser.ModifierAST>previousAST).isNOTModifier()));
+                        possibleMatches = possibleMatches.concat(this.binaryOperatorsCompletions(includeNotCompletion));
+                    }
                     possibleMatches = possibleMatches.concat(this.unaryOperatorsCompletions());
                 }
             }
