@@ -23,14 +23,15 @@ import oi.thekraken.grok.api.Grok;
 import oi.thekraken.grok.api.Match;
 import oi.thekraken.grok.api.exception.GrokException;
 import org.graylog2.ConfigurationException;
+import org.graylog2.grok.GrokPattern;
 import org.graylog2.plugin.inputs.Converter;
 import org.graylog2.plugin.inputs.Extractor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.StringReader;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class GrokExtractor extends Extractor {
     private static final Logger log = LoggerFactory.getLogger(GrokExtractor.class);
@@ -132,6 +133,7 @@ public class GrokExtractor extends Extractor {
     private final Grok grok = new Grok();
 
     public GrokExtractor(MetricRegistry metricRegistry,
+                         Set<GrokPattern> grokPatterns,
                          String id,
                          String title,
                          int order,
@@ -161,7 +163,11 @@ public class GrokExtractor extends Extractor {
         }
 
         try {
-            grok.addPatternFromReader(new StringReader(PATTERNS));
+            // TODO we should really share this somehow, but unfortunately the extractors are reloaded every second.
+            for (final GrokPattern grokPattern : grokPatterns) {
+                grok.addPattern(grokPattern.name, grokPattern.pattern);
+            }
+
             grok.compile((String) extractorConfig.get("grok_pattern"));
         } catch (GrokException e) {
             log.error("Unable to parse grok patterns", e);
@@ -172,8 +178,7 @@ public class GrokExtractor extends Extractor {
     @Override
     protected Result[] run(String value) {
 
-        // TODO did the patterns change, if so rebuild grok instance for this thread
-        
+        // the extractor instance is rebuilt every second anyway
         final Match match = grok.match(value);
         match.captures();
         final Map<String, Object> matches = match.toMap();
