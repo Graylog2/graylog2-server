@@ -23,6 +23,10 @@ export class ModifierAST extends AST {
     constructor(public modifier: Token, public right: AST) {
         super();
     }
+
+    isNOTModifier() {
+        return this.modifier.type === TokenType.NOT;
+    }
 }
 
 export class ExpressionAST extends AST {

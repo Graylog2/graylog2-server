@@ -100,10 +100,10 @@ class QueryInput {
             if (currentAST instanceof queryParser.TermAST) {
                 possibleMatches = possibleMatches.concat(this.fieldsCompletions());
                 var offerBinaryOperatorsCompletion = (serializedAst.length > 1) && !(previousAST instanceof queryParser.ExpressionAST);
-                var offerUnaryOperatorsCompletion = (serializedAst.length >= 1) && !(previousAST instanceof queryParser.ModifierAST);
+                var offerUnaryOperatorsCompletion = !(previousAST instanceof queryParser.ModifierAST);
 
                 if (offerBinaryOperatorsCompletion) {
-                    var includeNotCompletion = (prefix.lastIndexOf("NOT") === prefix.length - "NOT".length);
+                    var includeNotCompletion = !((previousAST instanceof queryParser.ModifierAST) && ((<queryParser.ModifierAST>previousAST).isNOTModifier()));
                     possibleMatches = possibleMatches.concat(this.binaryOperatorsCompletions(includeNotCompletion));
                 } else if (offerUnaryOperatorsCompletion) {
                     possibleMatches = possibleMatches.concat(this.unaryOperatorsCompletions());
@@ -112,8 +112,9 @@ class QueryInput {
 
             // Don't offer completion on MissingAST when there are alternative MissingASTs (e.g. "foo AND AND AND")
             // or when the query starts with an operator (e.g. "AND").
-            var completeMissingAST = (!(twoASTago instanceof queryParser.MissingAST) && !(firstAST instanceof queryParser.ExpressionAST));
-            if ((currentAST instanceof queryParser.MissingAST) && completeMissingAST) {
+            var shouldCompleteMissingAST = !(twoASTago instanceof queryParser.MissingAST) && !(firstAST instanceof queryParser.ExpressionAST);
+            if ((currentAST instanceof queryParser.MissingAST) && shouldCompleteMissingAST) {
+                // TODO: Do not append extra white space for +, - and !
                 if (prefix.charAt(prefix.length - 1) !== " ") {
                     prefix += " ";
                 }
