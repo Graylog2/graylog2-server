@@ -349,11 +349,11 @@
                 <artifactId>jackson-module-jsonSchema</artifactId>
                 <version>${jackson.version}</version>
             </dependency>
-            <dependency>
+            <!-- Jersey repackages ASM and this conflicts... :( dependency>
                 <groupId>com.fasterxml.jackson.module</groupId>
-                <artifactId>jackson-module-afterburner</artifactId>
+                <artifactId>jackson-module-mrbean</artifactId>
                 <version>${jackson.version}</version>
-            </dependency>
+            </dependency -->
 
             <!-- Cmdline and configuration -->
             <dependency>
