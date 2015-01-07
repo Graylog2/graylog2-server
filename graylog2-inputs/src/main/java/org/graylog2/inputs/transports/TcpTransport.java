@@ -135,7 +135,7 @@ public class TcpTransport extends AbstractTcpTransport {
                             CK_USE_NULL_DELIMITER,
                             "Null frame delimiter?",
                             false,
-                            "Use null byte as frame delimiter? Default is newline."
+                            "Use null byte as frame delimiter? Otherwise newline delimiter is used."
                     )
             );
             x.addField(
