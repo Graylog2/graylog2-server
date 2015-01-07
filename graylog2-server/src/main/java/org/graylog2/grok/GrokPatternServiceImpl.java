@@ -19,6 +19,8 @@ package org.graylog2.grok;
 import com.google.common.base.Strings;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
+import oi.thekraken.grok.api.Grok;
+import oi.thekraken.grok.api.exception.GrokException;
 import org.bson.types.ObjectId;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
@@ -27,19 +29,21 @@ import org.graylog2.database.ValidationException;
 import org.mongojack.DBCursor;
 import org.mongojack.JacksonDBCollection;
 import org.mongojack.WriteResult;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.util.Set;
+import java.util.regex.PatternSyntaxException;
 
 public class GrokPatternServiceImpl implements GrokPatternService {
-
     public static final String GROK_PATTERNS = "grok_patterns";
-
+    private static final Logger log = LoggerFactory.getLogger(GrokPatternServiceImpl.class);
     private final JacksonDBCollection<GrokPattern, ObjectId> dbCollection;
 
     @Inject
     protected GrokPatternServiceImpl(MongoConnection mongoConnection,
-                                MongoJackObjectMapperProvider mapper) {
+                                     MongoJackObjectMapperProvider mapper) {
 
         dbCollection = JacksonDBCollection.wrap(
                 mongoConnection.getDatabase().getCollection(GROK_PATTERNS),
@@ -47,7 +51,7 @@ public class GrokPatternServiceImpl implements GrokPatternService {
                 ObjectId.class,
                 mapper.get());
     }
-    
+
     @Override
     public GrokPattern load(String patternId) throws NotFoundException {
         final GrokPattern pattern = dbCollection.findOneById(new ObjectId(patternId));
@@ -68,7 +72,7 @@ public class GrokPatternServiceImpl implements GrokPatternService {
     @Override
     public GrokPattern save(GrokPattern pattern) throws ValidationException {
         if (!validate(pattern)) {
-            throw new ValidationException("Missing fields in pattern " + pattern);
+            throw new ValidationException("Invalid pattern " + pattern);
         }
         final WriteResult<GrokPattern, ObjectId> result = dbCollection.save(pattern);
         return result.getSavedObject();
@@ -76,7 +80,18 @@ public class GrokPatternServiceImpl implements GrokPatternService {
 
     @Override
     public boolean validate(GrokPattern pattern) {
-        return !(Strings.isNullOrEmpty(pattern.name) || Strings.isNullOrEmpty(pattern.pattern));
+        final boolean fieldsMissing = !(Strings.isNullOrEmpty(pattern.name) || Strings.isNullOrEmpty(pattern.pattern));
+        try {
+            final Grok grok = new Grok();
+            grok.addPattern(pattern.name, pattern.pattern);
+            grok.compile("%{" + pattern.name + "}");
+        } catch (GrokException ignored) {
+            // this only checks for null or empty again.
+        } catch (PatternSyntaxException e) {
+            log.warn("Invalid regular expression syntax for '" + pattern.name + "' with pattern " + pattern.pattern, e);
+            return false;
+        }
+        return fieldsMissing;
     }
 
     @Override

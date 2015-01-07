@@ -26,6 +26,7 @@ import org.graylog2.database.ValidationException;
 import org.graylog2.grok.GrokPattern;
 import org.graylog2.grok.GrokPatternService;
 import org.graylog2.rest.resources.RestResource;
+import org.graylog2.rest.resources.system.responses.GrokPatternList;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
@@ -41,14 +42,13 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import java.net.URI;
-import java.util.Set;
 
 
 @RequiresAuthentication
 @Path("/system/grok")
 @Produces("application/json")
 @Consumes("application/json")
-@Api(value = "Grok patterns", description = "Manage grok patterns")
+@Api(value = "System/Grok", description = "Manage grok patterns")
 public class GrokResource extends RestResource {
 
     private final GrokPatternService grokPatternService;
@@ -60,8 +60,9 @@ public class GrokResource extends RestResource {
 
     @GET
     @Timed
-    public Set<GrokPattern> listGrokPatterns() {
-        return grokPatternService.loadAll();
+    @ApiOperation("Get all existing grok patterns")
+    public GrokPatternList listGrokPatterns() {
+        return GrokPatternList.create(grokPatternService.loadAll());
     }
     
     @GET
@@ -75,24 +76,26 @@ public class GrokResource extends RestResource {
     
     @POST
     @Timed
+    @ApiOperation("Add a new named pattern")
     public Response createPattern(@ApiParam(name = "pattern", required = true)
                                       @Valid @NotNull GrokPattern pattern) throws ValidationException {
         final GrokPattern newPattern = grokPatternService.save(pattern);
 
-        final URI patternUri = UriBuilder.fromResource(GrokPattern.class).path("{patternId").build(newPattern._id);
+        final URI patternUri = UriBuilder.fromMethod(GrokResource.class, "listPattern").build(newPattern.id);
         
         return Response.created(patternUri).entity(newPattern).build();
     }
 
     @PUT
     @Timed
-    public Response bulkUpdatePatterns(@ApiParam(name = "patterns", required = true) @NotNull Set<GrokPattern> patterns) throws ValidationException {
-        for (final GrokPattern pattern : patterns) {
+    @ApiOperation("Add a list of new patterns")
+    public Response bulkUpdatePatterns(@ApiParam(name = "patterns", required = true) @NotNull GrokPatternList patternList) throws ValidationException {
+        for (final GrokPattern pattern : patternList.patterns()) {
             if (!grokPatternService.validate(pattern)) {
                 throw new ValidationException("Invalid pattern " + pattern + ". Did not save any patterns.");
             }
         }
-        for (GrokPattern pattern : patterns) {
+        for (final GrokPattern pattern : patternList.patterns()) {
             grokPatternService.save(pattern);
         }
         return Response.accepted().build();
@@ -101,6 +104,7 @@ public class GrokResource extends RestResource {
     @PUT
     @Timed
     @Path("/{patternId}")
+    @ApiOperation("Update an existing pattern")
     public GrokPattern updatePattern(@ApiParam(name = "patternId", required = true)
                                      @PathParam("patternId") String patternId,
                                      @ApiParam(name = "pattern", required = true)
@@ -110,13 +114,13 @@ public class GrokResource extends RestResource {
         oldPattern.name = pattern.name;
         oldPattern.pattern = pattern.pattern;
 
-        final GrokPattern newPattern = grokPatternService.save(oldPattern);
-        return newPattern;
+        return grokPatternService.save(oldPattern);
     }
     
     @DELETE
     @Timed
     @Path("/{patternId}")
+    @ApiOperation("Remove an existing pattern by id")
     public void removePattern(@PathParam("patternId") String patternId) {
         if (grokPatternService.delete(patternId) == 0) {
             throw new javax.ws.rs.NotFoundException();

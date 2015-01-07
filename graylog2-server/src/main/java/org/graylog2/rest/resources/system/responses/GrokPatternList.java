@@ -14,23 +14,24 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.grok;
+package org.graylog2.rest.resources.system.responses;
 
-import com.google.inject.ImplementedBy;
-import org.graylog2.database.NotFoundException;
-import org.graylog2.database.ValidationException;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.auto.value.AutoValue;
+import org.graylog2.grok.GrokPattern;
 
-import java.util.Set;
+import java.util.Collection;
 
-@ImplementedBy(GrokPatternServiceImpl.class)
-public interface GrokPatternService {
-    GrokPattern load(String patternName) throws NotFoundException;
+@AutoValue
+@JsonAutoDetect
+public abstract class GrokPatternList {
+    
+    @JsonProperty
+    public abstract Collection<GrokPattern> patterns();
 
-    Set<GrokPattern> loadAll();
-
-    GrokPattern save(GrokPattern pattern) throws ValidationException;
-
-    boolean validate(GrokPattern pattern);
-
-    int delete(String patternName);
+    @JsonCreator
+    public static GrokPatternList create(@JsonProperty("patterns") Collection<GrokPattern> patternList) {return new AutoValue_GrokPatternList(patternList);}
+    
 }

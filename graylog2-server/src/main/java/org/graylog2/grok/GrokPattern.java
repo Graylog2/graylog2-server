@@ -26,11 +26,20 @@ public class GrokPattern {
 
     @Id
     @org.mongojack.ObjectId
-    public ObjectId _id;
+    public ObjectId id;
     
     public String name;
     
     public String pattern;
+
+    @Override
+    public String toString() {
+        return "GrokPattern{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", pattern='" + pattern + '\'' +
+                '}';
+    }
 
     @Override
     public boolean equals(Object o) {
