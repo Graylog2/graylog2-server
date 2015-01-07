@@ -23,6 +23,10 @@ export class ModifierAST extends AST {
     constructor(public modifier: Token, public right: AST) {
         super();
     }
+
+    isNOTModifier() {
+        return this.modifier.type === TokenType.NOT;
+    }
 }
 
 export class ExpressionAST extends AST {
@@ -109,7 +113,7 @@ class QueryLexer {
             token = this.or();
         } else if (this.isKeyword("AND") || this.isKeyword("&&")) {
             token = this.and();
-        } else if (this.isKeyword("NOT") || this.isKeyword("!")) {
+        } else if (this.isKeyword("NOT") || this.isPrefix("!")) {
             token = this.not();
         } else if (this.isPrefix("+")) {
             token = this.must();
