@@ -114,8 +114,9 @@ class QueryInput {
             // or when the query starts with an operator (e.g. "AND").
             var shouldCompleteMissingAST = !(twoASTago instanceof queryParser.MissingAST) && !(firstAST instanceof queryParser.ExpressionAST);
             if ((currentAST instanceof queryParser.MissingAST) && shouldCompleteMissingAST) {
-                // TODO: Do not append extra white space for +, - and !
-                if (prefix.charAt(prefix.length - 1) !== " ") {
+                var lastCharacter = prefix.charAt(prefix.length - 1);
+                var lastNonWSCharacter = prefix.trim().charAt(prefix.trim().length - 1);
+                if (lastCharacter !== " " && (["+", "-", "!"].indexOf(lastNonWSCharacter) === -1)) {
                     prefix += " ";
                 }
                 possibleMatches = possibleMatches.concat(this.fieldsCompletions());
