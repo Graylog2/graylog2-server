@@ -22,7 +22,6 @@
  */
 package org.graylog2.plugin;
 
-import com.google.common.collect.ImmutableSet;
 import com.google.common.util.concurrent.Service;
 import com.google.inject.TypeLiteral;
 import com.google.inject.multibindings.MapBinder;
@@ -35,23 +34,22 @@ import org.graylog2.plugin.outputs.MessageOutput;
 import org.graylog2.plugin.periodical.Periodical;
 import org.graylog2.plugin.rest.PluginRestResource;
 
+import java.util.Collections;
 import java.util.Set;
 
-/**
- * @author Dennis Oelkers <dennis@torch.sh>
- */
 public abstract class PluginModule extends Graylog2Module {
-    public Set<PluginConfigBean> getConfigBeans() {
-        return ImmutableSet.<PluginConfigBean>builder().build();
+    public Set<? extends PluginConfigBean> getConfigBeans() {
+        return Collections.emptySet();
     }
 
     /**
-     * @deprecated use {@link org.graylog2.plugin.inject.Graylog2Module#installInput(com.google.inject.multibindings.MapBinder, Class, Class)} instead
      * @param messageInputClass
+     * @deprecated use {@link Graylog2Module#installInput(MapBinder, Class, Class)} instead
      */
     @Deprecated
     protected void addMessageInput(Class<? extends MessageInput> messageInputClass) {
-        TypeLiteral<Class<? extends MessageInput>> typeLiteral = new TypeLiteral<Class<? extends MessageInput>>(){};
+        TypeLiteral<Class<? extends MessageInput>> typeLiteral = new TypeLiteral<Class<? extends MessageInput>>() {
+        };
         Multibinder<Class<? extends MessageInput>> messageInputs = Multibinder.newSetBinder(binder(), typeLiteral);
         messageInputs.addBinding().toInstance(messageInputClass);
     }
@@ -70,7 +68,8 @@ public abstract class PluginModule extends Graylog2Module {
         Multibinder<AlarmCallback> alarmCallbackInstanceBinder = Multibinder.newSetBinder(binder(), AlarmCallback.class);
         alarmCallbackInstanceBinder.addBinding().to(alarmCallbackClass);
 
-        TypeLiteral<Class<? extends AlarmCallback>> type = new TypeLiteral<Class<? extends AlarmCallback>>(){};
+        TypeLiteral<Class<? extends AlarmCallback>> type = new TypeLiteral<Class<? extends AlarmCallback>>() {
+        };
         Multibinder<Class<? extends AlarmCallback>> alarmCallbackBinder = Multibinder.newSetBinder(binder(), type);
         alarmCallbackBinder.addBinding().toInstance(alarmCallbackClass);
     }
@@ -81,7 +80,8 @@ public abstract class PluginModule extends Graylog2Module {
     }
 
     protected void addMessageOutput(Class<? extends MessageOutput> messageOutputClass) {
-        TypeLiteral<Class<? extends MessageOutput>> typeLiteral = new TypeLiteral<Class<? extends MessageOutput>>(){};
+        TypeLiteral<Class<? extends MessageOutput>> typeLiteral = new TypeLiteral<Class<? extends MessageOutput>>() {
+        };
         Multibinder<Class<? extends MessageOutput>> messageOutputs = Multibinder.newSetBinder(binder(), typeLiteral);
         messageOutputs.addBinding().toInstance(messageOutputClass);
     }
@@ -91,8 +91,10 @@ public abstract class PluginModule extends Graylog2Module {
         pluginRestResourceMapBinder.addBinding(this.getClass().getPackage().getName()).to(restResourceClass);
     }
 
-    protected void addConfigBean(PluginConfigBean pluginConfigBean) {
-        Multibinder<PluginConfigBean> pluginConfigBeans = Multibinder.newSetBinder(binder(), PluginConfigBean.class);
-        pluginConfigBeans.addBinding().toInstance(pluginConfigBean);
+    protected void registerConfigBeans() {
+        final Multibinder<PluginConfigBean> pluginConfigBeans = Multibinder.newSetBinder(binder(), PluginConfigBean.class);
+        for (PluginConfigBean pluginConfigBean : getConfigBeans()) {
+            pluginConfigBeans.addBinding().toInstance(pluginConfigBean);
+        }
     }
 }
