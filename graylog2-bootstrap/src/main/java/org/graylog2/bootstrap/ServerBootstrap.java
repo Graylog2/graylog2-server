@@ -16,9 +16,7 @@
  */
 package org.graylog2.bootstrap;
 
-import com.google.common.collect.Iterables;
 import com.google.common.util.concurrent.ServiceManager;
-import com.google.inject.AbstractModule;
 import com.google.inject.Injector;
 import com.google.inject.Module;
 import com.google.inject.ProvisionException;
@@ -26,27 +24,26 @@ import io.airlift.airline.Option;
 import org.graylog2.plugin.BaseConfiguration;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.Tools;
-import org.graylog2.plugin.inject.Graylog2Module;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.shared.bindings.GenericBindings;
+import org.graylog2.shared.bindings.GenericInitializerBindings;
 import org.graylog2.shared.bindings.InstantiationService;
-import org.graylog2.shared.bindings.PluginBindings;
+import org.graylog2.shared.bindings.MessageInputBindings;
+import org.graylog2.shared.bindings.PluginRestResourceBindings;
+import org.graylog2.shared.bindings.SchedulerBindings;
+import org.graylog2.shared.bindings.SharedPeriodicalBindings;
 import org.graylog2.shared.initializers.ServiceManagerListener;
 import org.graylog2.shared.system.activities.Activity;
 import org.graylog2.shared.system.activities.ActivityWriter;
 import org.graylog2.shared.system.stats.SystemStatsModule;
-import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
@@ -156,26 +153,13 @@ public abstract class ServerBootstrap extends CmdLineTool {
     @Override
     protected List<Module> getSharedBindingsModules(InstantiationService instantiationService) {
         final List<Module> result = super.getSharedBindingsModules(instantiationService);
-        result.add(new GenericBindings(instantiationService));
-        Reflections reflections = new Reflections("org.graylog2.shared.bindings");
-        final Set<Class<? extends AbstractModule>> generic = reflections.getSubTypesOf(AbstractModule.class);
-        final Set<Class<? extends Graylog2Module>> gl2Modules = reflections.getSubTypesOf(Graylog2Module.class);
-        for (Class<? extends Module> type : Iterables.concat(generic, gl2Modules)) {
-            // skip the some modules, because we have already instantiated it above, avoids a bogus log message
-            if (type.equals(GenericBindings.class) || type.equals(PluginBindings.class)) {
-                continue;
-            }
-            try {
-                Constructor<? extends Module> constructor = type.getConstructor();
-                Module module = constructor.newInstance();
-                result.add(module);
-            } catch (InstantiationException | InvocationTargetException | IllegalAccessException e) {
-                LOG.error("Unable to instantiate Module {}: {}", type, e);
-            } catch (NoSuchMethodException e) {
-                LOG.info("No constructor found for guice module {}", type);
-            }
-        }
 
+        result.add(new GenericBindings(instantiationService));
+        result.add(new SharedPeriodicalBindings());
+        result.add(new SchedulerBindings());
+        result.add(new GenericInitializerBindings());
+        result.add(new PluginRestResourceBindings());
+        result.add(new MessageInputBindings());
         result.add(new SystemStatsModule(configuration.isDisableSigar()));
 
         return result;

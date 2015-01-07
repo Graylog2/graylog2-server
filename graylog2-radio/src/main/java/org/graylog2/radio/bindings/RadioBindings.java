@@ -16,7 +16,6 @@
  */
 package org.graylog2.radio.bindings;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.AbstractModule;
 import com.google.inject.Scopes;
 import com.google.inject.TypeLiteral;
@@ -35,7 +34,6 @@ import org.graylog2.radio.inputs.InputStateListener;
 import org.graylog2.radio.inputs.PersistedInputsImpl;
 import org.graylog2.radio.system.activities.NullActivityWriter;
 import org.graylog2.radio.transports.RadioTransport;
-import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.shared.buffers.processors.ProcessBufferProcessor;
 import org.graylog2.shared.inputs.PersistedInputs;
 import org.graylog2.shared.journal.NoopJournalModule;
@@ -98,7 +96,6 @@ public class RadioBindings extends AbstractModule {
 
     private void bindProviders() {
         bind(AsyncHttpClient.class).toProvider(AsyncHttpClientProvider.class);
-        bind(ObjectMapper.class).toProvider(ObjectMapperProvider.class).asEagerSingleton();
     }
 
     private void bindTransport() {
