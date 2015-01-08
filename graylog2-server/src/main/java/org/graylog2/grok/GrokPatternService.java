@@ -18,7 +18,7 @@ package org.graylog2.grok;
 
 import com.google.inject.ImplementedBy;
 import org.graylog2.database.NotFoundException;
-import org.graylog2.database.ValidationException;
+import org.graylog2.plugin.database.ValidationException;
 
 import java.util.Set;
 

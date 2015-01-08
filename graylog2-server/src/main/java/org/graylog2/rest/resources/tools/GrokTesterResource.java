@@ -23,8 +23,8 @@ import oi.thekraken.grok.api.Match;
 import oi.thekraken.grok.api.exception.GrokException;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.inputs.extractors.GrokExtractor;
-import org.graylog2.rest.resources.RestResource;
 import org.graylog2.rest.resources.tools.responses.GrokTesterResponse;
+import org.graylog2.shared.rest.resources.RestResource;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.validation.constraints.NotNull;

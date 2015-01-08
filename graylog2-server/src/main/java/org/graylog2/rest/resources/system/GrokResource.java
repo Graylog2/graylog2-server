@@ -22,11 +22,11 @@ import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.database.NotFoundException;
-import org.graylog2.database.ValidationException;
 import org.graylog2.grok.GrokPattern;
 import org.graylog2.grok.GrokPatternService;
-import org.graylog2.rest.resources.RestResource;
+import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.rest.resources.system.responses.GrokPatternList;
+import org.graylog2.shared.rest.resources.RestResource;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
