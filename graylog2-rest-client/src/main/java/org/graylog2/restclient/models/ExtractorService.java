@@ -17,18 +17,20 @@
 package org.graylog2.restclient.models;
 
 import com.google.common.collect.Lists;
-import javax.inject.Inject;
 import org.graylog2.restclient.lib.APIException;
 import org.graylog2.restclient.lib.ApiClient;
 import org.graylog2.restclient.models.api.requests.ExtractorOrderRequest;
-import org.graylog2.restclient.models.api.responses.EmptyResponse;
+import org.graylog2.restclient.models.api.requests.GrokPatternUpdateRequest;
 import org.graylog2.restclient.models.api.responses.system.ExtractorSummaryResponse;
 import org.graylog2.restclient.models.api.responses.system.ExtractorsResponse;
+import org.graylog2.restclient.models.api.responses.system.GrokPatternResponse;
 import org.graylog2.restroutes.generated.ExtractorsResource;
 import org.graylog2.restroutes.generated.routes;
 import play.mvc.Http;
 
+import javax.inject.Inject;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 import java.util.SortedMap;
 
@@ -74,5 +76,38 @@ public class ExtractorService {
                 .onlyMasterNode()
                 .execute();
     }
+    
+    public Collection<GrokPattern> allGrokPatterns() throws APIException, IOException {
+        final GrokPatternResponse response = 
+                api.path(routes.GrokResource().listGrokPatterns(), GrokPatternResponse.class)
+                .expect(Http.Status.OK)
+                .execute();
+        
+        return response.patterns;
+    }
+    
+    public GrokPattern createGrokPattern(GrokPattern pattern) throws APIException, IOException {
+        final GrokPattern grokPattern = api.path(routes.GrokResource().createPattern(), GrokPattern.class)
+                .body(pattern)
+                .expect(Http.Status.CREATED)
+                .execute();
+        return grokPattern;
+    }
 
+    public void updateGrokPattern(GrokPattern pattern) throws APIException, IOException {
+        api.path(routes.GrokResource().updatePattern(pattern.id))
+                .body(pattern)
+                .execute();
+    }
+    
+    public void deleteGrokPattern(GrokPattern pattern) throws APIException, IOException {
+        api.path(routes.GrokResource().removePattern(pattern.id)).execute();
+    }
+    
+    public void bulkLoadGrokPatterns(Collection<GrokPattern> patterns) throws APIException, IOException {
+        api.path(routes.GrokResource().bulkUpdatePatterns())
+                .body(new GrokPatternUpdateRequest(patterns))
+                .execute();
+        
+    }
 }

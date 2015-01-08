@@ -16,7 +16,6 @@
  */
 package org.graylog2.bindings;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.AbstractModule;
 import com.google.inject.Scopes;
 import com.google.inject.TypeLiteral;
@@ -40,7 +39,6 @@ import org.graylog2.bindings.providers.LdapUserAuthenticatorProvider;
 import org.graylog2.bindings.providers.MongoConnectionProvider;
 import org.graylog2.bindings.providers.RotationStrategyProvider;
 import org.graylog2.bindings.providers.RulesEngineProvider;
-import org.graylog2.bindings.providers.ServerObjectMapperProvider;
 import org.graylog2.bindings.providers.SystemJobFactoryProvider;
 import org.graylog2.bindings.providers.SystemJobManagerProvider;
 import org.graylog2.buffers.processors.ServerProcessBufferProcessor;
@@ -54,8 +52,8 @@ import org.graylog2.indexer.healing.FixDeflectorByMoveJob;
 import org.graylog2.indexer.indices.jobs.OptimizeIndexJob;
 import org.graylog2.indexer.ranges.CreateNewSingleIndexRangeJob;
 import org.graylog2.indexer.ranges.RebuildIndexRangesJob;
-import org.graylog2.inputs.PersistedInputsImpl;
 import org.graylog2.inputs.InputStateListener;
+import org.graylog2.inputs.PersistedInputsImpl;
 import org.graylog2.jersey.container.netty.SecurityContextFactory;
 import org.graylog2.plugin.BaseConfiguration;
 import org.graylog2.plugin.PluginMetaData;
@@ -110,7 +108,6 @@ public class ServerBindings extends AbstractModule {
     }
 
     private void bindProviders() {
-        bind(ObjectMapper.class).toProvider(ServerObjectMapperProvider.class).asEagerSingleton();
         bind(RotationStrategy.class).toProvider(RotationStrategyProvider.class);
     }
 

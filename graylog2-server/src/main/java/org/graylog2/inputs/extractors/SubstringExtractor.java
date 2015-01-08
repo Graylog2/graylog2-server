@@ -60,8 +60,8 @@ public class SubstringExtractor extends Extractor {
     }
 
     @Override
-    protected Result run(String value) {
-        return new Result(Tools.safeSubstring(value, beginIndex, endIndex), beginIndex, endIndex);
+    protected Result[] run(String value) {
+        return new Result[]{new Result(Tools.safeSubstring(value, beginIndex, endIndex), beginIndex, endIndex)};
     }
 
 }

@@ -60,7 +60,7 @@ public class SplitAndIndexExtractor extends Extractor {
     }
 
     @Override
-    protected Result run(String value) {
+    protected Result[] run(String value) {
         String result = cut(value, splitChar, index);
 
         if (result == null) {
@@ -69,7 +69,7 @@ public class SplitAndIndexExtractor extends Extractor {
 
         int[] range = getCutIndices(value, splitChar, index);
 
-        return new Result(result, range[0], range[1]);
+        return new Result[]{new Result(result, range[0], range[1])};
     }
 
     public static String cut(String s, String splitChar, int index) {

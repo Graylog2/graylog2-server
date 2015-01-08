@@ -17,21 +17,45 @@
 package org.graylog2.bindings.providers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import javax.inject.Provider;
+import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import org.mongojack.internal.MongoJackModule;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 
 public class MongoJackObjectMapperProvider implements Provider<ObjectMapper> {
     private final ObjectMapper objectMapper;
 
     @Inject
     public MongoJackObjectMapperProvider(ObjectMapper objectMapper) {
-        this.objectMapper = objectMapper;
+        // add the mongojack specific stuff on a copy of the original ObjectMapper to avoid changing the singleton instance
+        this.objectMapper = objectMapper.copy()
+                .setPropertyNamingStrategy(new PreserveLeadingUnderscoreStrategy());
+        
+        MongoJackModule.configure(this.objectMapper);
     }
 
     @Override
     public ObjectMapper get() {
-        return MongoJackModule.configure(objectMapper);
+        return objectMapper;
+    }
+
+    /**
+     * This abomination is necessary because when using MongoJack to read "_id" object ids back from the database
+     * the property name isn't correctly mapped to the POJO using the LowerCaseWithUnderscoresStrategy.
+     * <p>
+     * Apparently no one in the world tried to use a different naming strategy with MongoJack.
+     * (one of my many useless talents is finding corner cases).
+     * </p>
+     */
+    public static class PreserveLeadingUnderscoreStrategy extends PropertyNamingStrategy.LowerCaseWithUnderscoresStrategy {
+        @Override
+        public String translate(String input) {
+            String translated = super.translate(input);
+            if (input.startsWith("_") && !translated.startsWith("_")) {
+                translated = "_" + translated; // lol underscore
+            }
+            return translated;
+        }
     }
 }

@@ -55,7 +55,8 @@ public class Extractor {
         SUBSTRING("Substring"),
         REGEX("Regular expression"),
         SPLIT_AND_INDEX("Split & Index"),
-        COPY_INPUT("Copy Input");
+        COPY_INPUT("Copy Input"),
+        GROK("Grok pattern");
         private final String description;
 
         Type(String description) {
@@ -201,6 +202,8 @@ public class Extractor {
                 break;
             case SPLIT_AND_INDEX:
                 loadSplitAndIndexConfig(form);
+            case GROK:
+                loadGrokConfig(form);
                 break;
         }
     }
@@ -332,6 +335,14 @@ public class Extractor {
 
         extractorConfig.put("split_by", form.get("split_by")[0]);
         extractorConfig.put("index", Integer.parseInt(form.get("index")[0]));
+    }
+    
+    private void loadGrokConfig(Map<String,String[]> form) {
+        if (!formFieldSet(form, "grok_pattern")) {
+            throw new RuntimeException("Missing extractor config: grok_pattern");
+        }
+
+        extractorConfig.put("grok_pattern", form.get("grok_pattern")[0]);
     }
 
     private boolean formFieldSet(Map<String,String[]> form, String key) {
