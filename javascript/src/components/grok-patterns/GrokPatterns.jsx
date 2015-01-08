@@ -30,7 +30,7 @@ var GrokPatterns = React.createClass({
             return pattern1.name.toLowerCase().localeCompare(pattern2.name.toLowerCase());
         });
         var filter = this.state.filter;
-        return patterns.filter((pattern) => { return pattern.name.toLowerCase().indexOf(filter) != -1 });
+        return patterns.filter((pattern) => { return pattern.name.toLowerCase().indexOf(filter) !== -1 });
     },
     
     _sortedFilteredPatternsHtml() {
