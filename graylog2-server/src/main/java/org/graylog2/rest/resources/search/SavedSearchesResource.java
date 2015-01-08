@@ -27,7 +27,7 @@ import com.wordnik.swagger.annotations.ApiResponses;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.database.NotFoundException;
-import org.graylog2.database.ValidationException;
+import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.indexer.searches.Searches;
 import org.graylog2.plugin.Tools;
 import org.graylog2.rest.resources.search.requests.CreateSavedSearchRequest;

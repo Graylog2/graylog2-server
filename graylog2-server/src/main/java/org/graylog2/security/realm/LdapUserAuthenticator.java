@@ -29,11 +29,11 @@ import org.apache.shiro.authc.credential.AllowAllCredentialsMatcher;
 import org.apache.shiro.realm.AuthenticatingRealm;
 import org.graylog2.security.TrustAllX509TrustManager;
 import org.graylog2.security.ldap.LdapConnector;
-import org.graylog2.security.ldap.LdapEntry;
-import org.graylog2.security.ldap.LdapSettings;
+import org.graylog2.shared.security.ldap.LdapEntry;
+import org.graylog2.shared.security.ldap.LdapSettings;
 import org.graylog2.security.ldap.LdapSettingsService;
-import org.graylog2.users.User;
-import org.graylog2.users.UserService;
+import org.graylog2.plugin.database.users.User;
+import org.graylog2.shared.users.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

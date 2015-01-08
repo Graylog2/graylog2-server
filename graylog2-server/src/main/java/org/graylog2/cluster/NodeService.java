@@ -16,7 +16,7 @@
  */
 package org.graylog2.cluster;
 
-import org.graylog2.database.PersistedService;
+import org.graylog2.plugin.database.PersistedService;
 import org.graylog2.plugin.system.NodeId;
 
 import java.net.URI;

@@ -28,7 +28,7 @@ import org.graylog2.indexer.Deflector;
 import org.graylog2.indexer.ranges.IndexRange;
 import org.graylog2.indexer.ranges.IndexRangeService;
 import org.graylog2.indexer.ranges.RebuildIndexRangesJob;
-import org.graylog2.rest.resources.RestResource;
+import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.rest.resources.system.responses.IndexRangesResponse;
 import org.graylog2.security.RestPermissions;
 import org.graylog2.system.jobs.SystemJob;

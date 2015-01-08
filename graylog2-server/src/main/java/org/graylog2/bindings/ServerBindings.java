@@ -65,7 +65,7 @@ import org.graylog2.plugin.indexer.rotation.RotationStrategy;
 import org.graylog2.rest.NotFoundExceptionMapper;
 import org.graylog2.rest.RestAccessLogFilter;
 import org.graylog2.rest.ValidationExceptionMapper;
-import org.graylog2.security.ShiroSecurityBinding;
+import org.graylog2.shared.security.ShiroSecurityBinding;
 import org.graylog2.security.ShiroSecurityContextFactory;
 import org.graylog2.security.ldap.LdapConnector;
 import org.graylog2.security.ldap.LdapSettingsImpl;

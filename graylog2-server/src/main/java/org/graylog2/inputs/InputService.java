@@ -18,8 +18,8 @@ package org.graylog2.inputs;
 
 import org.graylog2.cluster.Node;
 import org.graylog2.database.NotFoundException;
-import org.graylog2.database.PersistedService;
-import org.graylog2.database.ValidationException;
+import org.graylog2.plugin.database.PersistedService;
+import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.inputs.Extractor;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.shared.inputs.NoSuchInputTypeException;

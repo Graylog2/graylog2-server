@@ -29,7 +29,7 @@ import org.graylog2.indexer.messages.DocumentNotFoundException;
 import org.graylog2.indexer.messages.Messages;
 import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.plugin.Message;
-import org.graylog2.rest.resources.RestResource;
+import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.rest.resources.messages.responses.MessageTokens;
 import org.graylog2.security.RestPermissions;
 import org.hibernate.validator.constraints.NotEmpty;

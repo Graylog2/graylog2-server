@@ -19,7 +19,7 @@ package org.graylog2.bindings.providers;
 import org.graylog2.security.ldap.LdapConnector;
 import org.graylog2.security.ldap.LdapSettingsService;
 import org.graylog2.security.realm.LdapUserAuthenticator;
-import org.graylog2.users.UserService;
+import org.graylog2.shared.users.UserService;
 
 import javax.inject.Inject;
 import javax.inject.Provider;

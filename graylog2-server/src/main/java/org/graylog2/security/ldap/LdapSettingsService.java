@@ -16,7 +16,8 @@
  */
 package org.graylog2.security.ldap;
 
-import org.graylog2.database.PersistedService;
+import org.graylog2.plugin.database.PersistedService;
+import org.graylog2.shared.security.ldap.LdapSettings;
 
 /**
  * @author Dennis Oelkers <dennis@torch.sh>

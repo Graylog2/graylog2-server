@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.users;
+package org.graylog2.plugin.database.users;
 
 import org.graylog2.plugin.database.Persisted;
 import org.joda.time.DateTimeZone;

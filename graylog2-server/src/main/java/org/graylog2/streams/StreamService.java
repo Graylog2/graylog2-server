@@ -17,8 +17,8 @@
 package org.graylog2.streams;
 
 import org.graylog2.database.NotFoundException;
-import org.graylog2.database.PersistedService;
-import org.graylog2.database.ValidationException;
+import org.graylog2.plugin.database.PersistedService;
+import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.alarms.AlertCondition;
 import org.graylog2.plugin.streams.Output;
 import org.graylog2.plugin.streams.Stream;

@@ -24,7 +24,7 @@ import org.bson.types.ObjectId;
 import org.graylog2.Configuration;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PersistedServiceImpl;
-import org.graylog2.database.ValidationException;
+import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.system.NodeId;
 

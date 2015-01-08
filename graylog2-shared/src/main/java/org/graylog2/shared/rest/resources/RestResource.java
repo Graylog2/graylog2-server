@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.rest.resources;
+package org.graylog2.shared.rest.resources;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -26,9 +26,9 @@ import com.github.joschi.jadconfig.util.Size;
 import com.google.common.collect.ImmutableMap;
 import org.apache.shiro.subject.Subject;
 import org.graylog2.plugin.ServerStatus;
-import org.graylog2.security.ShiroSecurityContext;
-import org.graylog2.users.User;
-import org.graylog2.users.UserService;
+import org.graylog2.shared.security.ShiroSecurityContext;
+import org.graylog2.plugin.database.users.User;
+import org.graylog2.shared.users.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

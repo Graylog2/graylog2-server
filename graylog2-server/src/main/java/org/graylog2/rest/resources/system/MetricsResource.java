@@ -35,7 +35,7 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.metrics.MetricUtils;
-import org.graylog2.rest.resources.RestResource;
+import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.rest.resources.system.requests.MetricsReadRequest;
 import org.graylog2.security.RestPermissions;
 import org.slf4j.Logger;

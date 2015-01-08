@@ -16,7 +16,7 @@
  */
 package org.graylog2.system.activities;
 
-import org.graylog2.database.PersistedService;
+import org.graylog2.plugin.database.PersistedService;
 
 import java.util.List;
 import java.util.Map;

@@ -19,12 +19,12 @@ package org.graylog2.security.realm;
 import org.apache.shiro.authc.*;
 import org.apache.shiro.authc.credential.AllowAllCredentialsMatcher;
 import org.apache.shiro.realm.AuthenticatingRealm;
-import org.graylog2.database.ValidationException;
+import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.security.AccessToken;
 import org.graylog2.security.AccessTokenAuthToken;
 import org.graylog2.security.AccessTokenService;
-import org.graylog2.users.User;
-import org.graylog2.users.UserService;
+import org.graylog2.plugin.database.users.User;
+import org.graylog2.shared.users.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

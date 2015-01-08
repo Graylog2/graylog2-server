@@ -28,7 +28,7 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.indexer.IndexFailure;
 import org.graylog2.indexer.IndexFailureService;
-import org.graylog2.rest.resources.RestResource;
+import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.rest.resources.system.indexer.responses.FailureCount;
 import org.graylog2.security.RestPermissions;
 import org.hibernate.validator.constraints.NotEmpty;

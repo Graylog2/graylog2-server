@@ -25,11 +25,13 @@ import org.bson.types.ObjectId;
 import org.graylog2.Configuration;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PersistedServiceImpl;
-import org.graylog2.database.ValidationException;
+import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.database.Persisted;
+import org.graylog2.plugin.database.users.User;
 import org.graylog2.security.RestPermissions;
-import org.graylog2.security.ldap.LdapEntry;
-import org.graylog2.security.ldap.LdapSettings;
+import org.graylog2.shared.security.ldap.LdapEntry;
+import org.graylog2.shared.security.ldap.LdapSettings;
+import org.graylog2.shared.users.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -121,7 +123,7 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
     }
 
     @Override
-    public void updateFromLdap(UserImpl user, LdapEntry userEntry, LdapSettings ldapSettings, String username) {
+    public void updateFromLdap(User user, LdapEntry userEntry, LdapSettings ldapSettings, String username) {
         final String displayNameAttribute = ldapSettings.getDisplayNameAttribute();
         final String fullName = firstNonNull(userEntry.get(displayNameAttribute), username);
 
@@ -139,7 +141,7 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
 
         // TODO This is a crude hack until we have a proper way to distinguish LDAP users from normal users
         if (isNullOrEmpty(user.getHashedPassword())) {
-            user.setHashedPassword("User synced from LDAP.");
+            ((UserImpl)user).setHashedPassword("User synced from LDAP.");
         }
 
         // only touch the permissions if none existed for this account before

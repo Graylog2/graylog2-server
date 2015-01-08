@@ -14,30 +14,32 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.database;
+package org.graylog2.plugin.database;
 
-import org.graylog2.plugin.database.Persisted;
 import org.graylog2.plugin.database.validators.ValidationResult;
-import org.graylog2.plugin.database.validators.Validator;
 
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * @author Dennis Oelkers <dennis@torch.sh>
- */
-public interface PersistedService {
-    <T extends Persisted> int destroy(T model);
+public class ValidationException extends Exception {
+    private final Map<String, List<ValidationResult>> errors;
 
-    <T extends Persisted> int destroyAll(Class<T> modelClass);
+    public ValidationException(Map<String, List<ValidationResult>> errors) {
+        this.errors = errors;
+    }
 
-    <T extends Persisted> String save(T model) throws ValidationException;
+    public ValidationException(final String message) {
+        this("_", message);
+    }
 
-    <T extends Persisted> String saveWithoutValidation(T model);
+    public ValidationException(final String field, final String message) {
+        this.errors = new HashMap<>();
+        this.errors.put(field, Collections.<ValidationResult>singletonList(new ValidationResult.ValidationFailed(message)));
+    }
 
-    <T extends Persisted> Map<String, List<ValidationResult>> validate(T model, Map<String, Object> fields);
-
-    <T extends Persisted> Map<String, List<ValidationResult>> validate(T model);
-
-    Map<String, List<ValidationResult>> validate(Map<String, Validator> validators, Map<String, Object> fields);
+    public Map<String, List<ValidationResult>> getErrors() {
+        return errors;
+    }
 }

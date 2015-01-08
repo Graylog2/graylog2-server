@@ -17,7 +17,7 @@
 package org.graylog2.rest.resources.documentation;
 
 import com.google.common.io.Resources;
-import org.graylog2.rest.resources.RestResource;
+import org.graylog2.shared.rest.resources.RestResource;
 
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.GET;

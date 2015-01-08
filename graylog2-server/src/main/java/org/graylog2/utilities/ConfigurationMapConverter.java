@@ -17,7 +17,7 @@
 package org.graylog2.utilities;
 
 import com.google.common.collect.Maps;
-import org.graylog2.database.ValidationException;
+import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
 
 import java.util.Map;

@@ -16,7 +16,7 @@
  */
 package org.graylog2.alerts;
 
-import org.graylog2.database.PersistedService;
+import org.graylog2.plugin.database.PersistedService;
 import org.graylog2.plugin.alarms.AlertCondition;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.rest.resources.streams.alerts.requests.CreateConditionRequest;

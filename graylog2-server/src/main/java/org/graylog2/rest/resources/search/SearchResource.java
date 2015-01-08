@@ -31,7 +31,7 @@ import org.graylog2.indexer.results.SearchResult;
 import org.graylog2.indexer.searches.Searches;
 import org.graylog2.indexer.searches.Sorting;
 import org.graylog2.indexer.searches.timeranges.AbsoluteRange;
-import org.graylog2.rest.resources.RestResource;
+import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.rest.resources.search.responses.FieldStatsResult;
 import org.graylog2.rest.resources.search.responses.GenericError;
 import org.graylog2.rest.resources.search.responses.HistogramResult;

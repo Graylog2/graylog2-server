@@ -27,6 +27,7 @@ import org.graylog2.database.validators.FilledStringValidator;
 import org.graylog2.database.validators.LimitedOptionalStringValidator;
 import org.graylog2.database.validators.LimitedStringValidator;
 import org.graylog2.database.validators.ListValidator;
+import org.graylog2.plugin.database.users.User;
 import org.graylog2.plugin.database.validators.Validator;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;

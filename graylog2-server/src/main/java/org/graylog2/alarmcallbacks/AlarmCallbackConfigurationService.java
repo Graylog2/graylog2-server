@@ -16,7 +16,7 @@
  */
 package org.graylog2.alarmcallbacks;
 
-import org.graylog2.database.PersistedService;
+import org.graylog2.plugin.database.PersistedService;
 import org.graylog2.plugin.streams.Stream;
 
 import java.util.List;

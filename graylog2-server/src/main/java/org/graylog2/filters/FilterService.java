@@ -17,7 +17,7 @@
 package org.graylog2.filters;
 
 import org.graylog2.database.NotFoundException;
-import org.graylog2.database.ValidationException;
+import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.filters.blacklist.FilterDescription;
 
 import java.util.Set;

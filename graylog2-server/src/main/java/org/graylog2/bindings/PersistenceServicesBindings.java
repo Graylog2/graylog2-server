@@ -46,7 +46,7 @@ import org.graylog2.security.ldap.LdapSettingsServiceImpl;
 import org.graylog2.streams.*;
 import org.graylog2.system.activities.SystemMessageService;
 import org.graylog2.system.activities.SystemMessageServiceImpl;
-import org.graylog2.users.UserService;
+import org.graylog2.shared.users.UserService;
 import org.graylog2.users.UserServiceImpl;
 
 /**

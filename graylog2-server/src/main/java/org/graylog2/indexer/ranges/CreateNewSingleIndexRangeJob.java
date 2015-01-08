@@ -18,7 +18,7 @@ package org.graylog2.indexer.ranges;
 
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
-import org.graylog2.database.ValidationException;
+import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.indexer.Deflector;
 import org.graylog2.indexer.EmptyIndexException;
 import org.graylog2.indexer.searches.Searches;

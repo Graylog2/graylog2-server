@@ -26,7 +26,7 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.Configuration;
 import org.graylog2.plugin.KafkaJournalConfiguration;
 import org.graylog2.plugin.ThrottleState;
-import org.graylog2.rest.resources.RestResource;
+import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.rest.resources.system.responses.JournalSummaryResponse;
 import org.graylog2.security.RestPermissions;
 import org.graylog2.shared.journal.Journal;

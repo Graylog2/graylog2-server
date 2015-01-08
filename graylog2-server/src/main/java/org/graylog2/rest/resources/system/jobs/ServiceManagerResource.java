@@ -22,7 +22,7 @@ import com.google.common.util.concurrent.ServiceManager;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
-import org.graylog2.rest.resources.RestResource;
+import org.graylog2.shared.rest.resources.RestResource;
 
 import javax.inject.Inject;
 import javax.ws.rs.GET;

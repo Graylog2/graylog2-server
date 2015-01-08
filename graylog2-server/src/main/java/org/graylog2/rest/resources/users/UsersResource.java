@@ -26,8 +26,8 @@ import com.wordnik.swagger.annotations.ApiResponses;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.Configuration;
-import org.graylog2.database.ValidationException;
-import org.graylog2.rest.resources.RestResource;
+import org.graylog2.plugin.database.ValidationException;
+import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.rest.resources.users.requests.ChangePasswordRequest;
 import org.graylog2.rest.resources.users.requests.ChangeUserRequest;
 import org.graylog2.rest.resources.users.requests.CreateUserRequest;
@@ -40,7 +40,7 @@ import org.graylog2.rest.resources.users.responses.UserList;
 import org.graylog2.security.AccessToken;
 import org.graylog2.security.AccessTokenService;
 import org.graylog2.security.RestPermissions;
-import org.graylog2.users.UserService;
+import org.graylog2.shared.users.UserService;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
@@ -102,7 +102,7 @@ public class UsersResource extends RestResource {
     })
     public User get(@ApiParam(name = "username", value = "The username to return information for.", required = true)
                     @PathParam("username") String username) {
-        final org.graylog2.users.User user = userService.load(username);
+        final org.graylog2.plugin.database.users.User user = userService.load(username);
         if (user == null) {
             throw new NotFoundException();
         }
@@ -117,11 +117,11 @@ public class UsersResource extends RestResource {
     @RequiresPermissions(RestPermissions.USERS_LIST)
     @ApiOperation(value = "List all users", notes = "The permissions assigned to the users are always included.")
     public UserList listUsers() {
-        final List<org.graylog2.users.User> users = userService.loadAll();
+        final List<org.graylog2.plugin.database.users.User> users = userService.loadAll();
         final List<User> resultUsers = Lists.newArrayListWithCapacity(users.size() + 1);
         resultUsers.add(toUserResponse(userService.getAdminUser()));
 
-        for (org.graylog2.users.User user : users) {
+        for (org.graylog2.plugin.database.users.User user : users) {
             resultUsers.add(toUserResponse(user));
         }
 
@@ -143,7 +143,7 @@ public class UsersResource extends RestResource {
         }
 
         // Create user.
-        org.graylog2.users.User user = userService.create();
+        org.graylog2.plugin.database.users.User user = userService.create();
         user.setName(cr.username());
         user.setPassword(cr.password(), configuration.getPasswordSecret());
         user.setFullName(cr.fullName());
@@ -187,7 +187,7 @@ public class UsersResource extends RestResource {
                            @Valid @NotNull ChangeUserRequest cr) throws ValidationException {
         checkPermission(USERS_EDIT, username);
 
-        final org.graylog2.users.User user = userService.load(username);
+        final org.graylog2.plugin.database.users.User user = userService.load(username);
         if (user == null) {
             throw new NotFoundException();
         }
@@ -244,7 +244,7 @@ public class UsersResource extends RestResource {
     @ApiResponses({@ApiResponse(code = 400, message = "When attempting to remove a read only user (e.g. built-in or LDAP user).")})
     public void deleteUser(@ApiParam(name = "username", value = "The name of the user to delete.", required = true)
                            @PathParam("username") String username) {
-        final org.graylog2.users.User user = userService.load(username);
+        final org.graylog2.plugin.database.users.User user = userService.load(username);
         if (user == null) {
             throw new NotFoundException();
         }
@@ -267,7 +267,7 @@ public class UsersResource extends RestResource {
                                 @PathParam("username") String username,
                                 @ApiParam(name = "JSON body", value = "The list of permissions to assign to the user.", required = true)
                                 @Valid @NotNull PermissionEditRequest permissionRequest) throws ValidationException {
-        final org.graylog2.users.User user = userService.load(username);
+        final org.graylog2.plugin.database.users.User user = userService.load(username);
         if (user == null) {
             throw new NotFoundException();
         }
@@ -287,7 +287,7 @@ public class UsersResource extends RestResource {
                                 @PathParam("username") String username,
                                 @ApiParam(name = "JSON body", value = "The map of preferences to assign to the user.", required = true)
                                 @NotEmpty Map<String, Object> preferencesRequest) throws ValidationException {
-        final org.graylog2.users.User user = userService.load(username);
+        final org.graylog2.plugin.database.users.User user = userService.load(username);
 
         if (user == null) {
             throw new NotFoundException();
@@ -306,7 +306,7 @@ public class UsersResource extends RestResource {
     })
     public void deletePermissions(@ApiParam(name = "username", value = "The name of the user to modify.", required = true)
                                   @PathParam("username") String username) throws ValidationException {
-        final org.graylog2.users.User user = userService.load(username);
+        final org.graylog2.plugin.database.users.User user = userService.load(username);
         if (user == null) {
             throw new NotFoundException();
         }
@@ -329,7 +329,7 @@ public class UsersResource extends RestResource {
             @ApiParam(name = "JSON body", value = "The old and new passwords.", required = true)
             @Valid ChangePasswordRequest cr) throws ValidationException {
 
-        final org.graylog2.users.User user = userService.load(username);
+        final org.graylog2.plugin.database.users.User user = userService.load(username);
         if (user == null) {
             throw new NotFoundException();
         }
@@ -380,7 +380,7 @@ public class UsersResource extends RestResource {
     @ApiOperation("Retrieves the list of access tokens for a user")
     public TokenList listTokens(@ApiParam(name = "username", required = true)
                                 @PathParam("username") String username) {
-        final org.graylog2.users.User user = _tokensCheckAndLoadUser(username);
+        final org.graylog2.plugin.database.users.User user = _tokensCheckAndLoadUser(username);
 
         final ImmutableList.Builder<Token> tokenList = ImmutableList.builder();
         for (AccessToken token : accessTokenService.loadAll(user.getName())) {
@@ -397,7 +397,7 @@ public class UsersResource extends RestResource {
     public Token generateNewToken(
             @ApiParam(name = "username", required = true) @PathParam("username") String username,
             @ApiParam(name = "name", value = "Descriptive name for this token (e.g. 'cronjob') ", required = true) @PathParam("name") String name) {
-        final org.graylog2.users.User user = _tokensCheckAndLoadUser(username);
+        final org.graylog2.plugin.database.users.User user = _tokensCheckAndLoadUser(username);
         final AccessToken accessToken = accessTokenService.create(user.getName(), name);
 
         return Token.create(accessToken.getName(), accessToken.getToken(), accessToken.getLastAccess());
@@ -410,7 +410,7 @@ public class UsersResource extends RestResource {
     public void revokeToken(
             @ApiParam(name = "username", required = true) @PathParam("username") String username,
             @ApiParam(name = "access token", required = true) @PathParam("token") String token) {
-        final org.graylog2.users.User user = _tokensCheckAndLoadUser(username);
+        final org.graylog2.plugin.database.users.User user = _tokensCheckAndLoadUser(username);
         final AccessToken accessToken = accessTokenService.load(token);
 
         if (accessToken != null) {
@@ -420,8 +420,8 @@ public class UsersResource extends RestResource {
         }
     }
 
-    private org.graylog2.users.User _tokensCheckAndLoadUser(String username) {
-        final org.graylog2.users.User user = userService.load(username);
+    private org.graylog2.plugin.database.users.User _tokensCheckAndLoadUser(String username) {
+        final org.graylog2.plugin.database.users.User user = userService.load(username);
         if (user == null) {
             throw new NotFoundException("Unknown user " + username);
         }
@@ -431,11 +431,11 @@ public class UsersResource extends RestResource {
         return user;
     }
 
-    private User toUserResponse(org.graylog2.users.User user) {
+    private User toUserResponse(org.graylog2.plugin.database.users.User user) {
         return toUserResponse(user, true);
     }
 
-    private User toUserResponse(org.graylog2.users.User user, boolean includePermissions) {
+    private User toUserResponse(org.graylog2.plugin.database.users.User user, boolean includePermissions) {
         return User.create(
                 user.getId(),
                 user.getName(),

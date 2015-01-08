@@ -16,7 +16,7 @@
  */
 package org.graylog2.indexer;
 
-import org.graylog2.database.PersistedService;
+import org.graylog2.plugin.database.PersistedService;
 
 /**
  * @author Dennis Oelkers <dennis@torch.sh>

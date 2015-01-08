@@ -16,7 +16,7 @@
  */
 package org.graylog2.security;
 
-import org.graylog2.database.PersistedService;
+import org.graylog2.plugin.database.PersistedService;
 
 import java.util.Collection;
 

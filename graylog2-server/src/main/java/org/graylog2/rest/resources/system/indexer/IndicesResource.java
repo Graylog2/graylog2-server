@@ -32,7 +32,7 @@ import org.graylog2.indexer.cluster.Cluster;
 import org.graylog2.indexer.indices.IndexStatistics;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.ranges.RebuildIndexRangesJob;
-import org.graylog2.rest.resources.RestResource;
+import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.rest.resources.system.indexer.responses.ClosedIndices;
 import org.graylog2.rest.resources.system.indexer.responses.IndexInfo;
 import org.graylog2.rest.resources.system.indexer.responses.IndexStats;

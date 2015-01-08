@@ -243,11 +243,11 @@ public class Radio extends ClusterEntity {
     }
 
     public Map<String, String> getInputTypes() throws IOException, APIException {
-        return api.path(routes.radio().InputsResource().types(), InputTypesResponse.class).radio(this).execute().types;
+        return api.path(routes.radio().InputTypesResource().types(), InputTypesResponse.class).radio(this).execute().types;
     }
 
     public InputTypeSummaryResponse getInputTypeInformation(String type) throws IOException, APIException {
-        return api.path(routes.radio().InputsResource().info(type), InputTypeSummaryResponse.class).radio(this).execute();
+        return api.path(routes.radio().InputTypesResource().info(type), InputTypeSummaryResponse.class).radio(this).execute();
     }
 
     public List<Input> getInputs() {

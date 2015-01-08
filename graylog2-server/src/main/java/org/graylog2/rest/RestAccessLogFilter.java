@@ -17,7 +17,7 @@
 package org.graylog2.rest;
 
 import org.graylog2.jersey.container.netty.NettyContainer;
-import org.graylog2.security.ShiroSecurityContext;
+import org.graylog2.shared.security.ShiroSecurityContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -26,6 +26,7 @@ import org.graylog2.database.CollectionName;
 import org.graylog2.database.PersistedImpl;
 import org.graylog2.plugin.database.validators.Validator;
 import org.graylog2.security.AESTools;
+import org.graylog2.shared.security.ldap.LdapSettings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

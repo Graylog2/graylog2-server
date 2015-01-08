@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.rest.resources.system.inputs;
+package org.graylog2.shared.rest.resources.system.inputs;
 
 import com.codahale.metrics.annotation.Timed;
 import com.wordnik.swagger.annotations.Api;
@@ -23,7 +23,7 @@ import com.wordnik.swagger.annotations.ApiParam;
 import com.wordnik.swagger.annotations.ApiResponse;
 import com.wordnik.swagger.annotations.ApiResponses;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.graylog2.rest.resources.RestResource;
+import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.rest.resources.system.inputs.responses.InputTypeInfo;
 import org.graylog2.shared.rest.resources.system.inputs.responses.InputTypesSummary;
 import org.graylog2.shared.inputs.InputDescription;

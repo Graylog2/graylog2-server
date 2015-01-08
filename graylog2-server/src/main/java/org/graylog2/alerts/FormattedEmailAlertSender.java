@@ -23,7 +23,7 @@ import org.graylog2.plugin.alarms.AlertCondition;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.streams.StreamRuleService;
-import org.graylog2.users.UserService;
+import org.graylog2.shared.users.UserService;
 
 import javax.inject.Inject;
 import java.util.Collections;

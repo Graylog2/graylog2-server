@@ -35,7 +35,7 @@ import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.alarms.AlertCondition;
 import org.graylog2.plugin.streams.Stream;
-import org.graylog2.rest.resources.RestResource;
+import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.security.RestPermissions;
 import org.graylog2.streams.StreamService;
 import org.joda.time.DateTime;

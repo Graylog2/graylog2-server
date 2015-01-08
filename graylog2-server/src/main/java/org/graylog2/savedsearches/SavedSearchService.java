@@ -17,7 +17,7 @@
 package org.graylog2.savedsearches;
 
 import org.graylog2.database.NotFoundException;
-import org.graylog2.database.PersistedService;
+import org.graylog2.plugin.database.PersistedService;
 
 import java.util.List;
 

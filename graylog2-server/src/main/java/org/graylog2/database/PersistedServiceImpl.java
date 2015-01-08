@@ -25,6 +25,8 @@ import com.mongodb.DBObject;
 import org.bson.types.ObjectId;
 import org.graylog2.plugin.database.EmbeddedPersistable;
 import org.graylog2.plugin.database.Persisted;
+import org.graylog2.plugin.database.PersistedService;
+import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.database.validators.ValidationResult;
 import org.graylog2.plugin.database.validators.Validator;
 import org.graylog2.plugin.system.NodeId;

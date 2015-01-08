@@ -16,7 +16,7 @@
  */
 package org.graylog2.rest;
 
-import org.graylog2.database.ValidationException;
+import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.rest.ApiError;
 import org.graylog2.plugin.rest.ValidationApiError;
 

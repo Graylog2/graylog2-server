@@ -30,6 +30,7 @@ import org.apache.directory.api.ldap.model.message.ResultCodeEnum;
 import org.apache.directory.api.ldap.model.message.SearchScope;
 import org.apache.directory.ldap.client.api.LdapConnectionConfig;
 import org.apache.directory.ldap.client.api.LdapNetworkConnection;
+import org.graylog2.shared.security.ldap.LdapEntry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

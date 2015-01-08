@@ -17,7 +17,7 @@
 package org.graylog2.notifications;
 
 import org.graylog2.cluster.Node;
-import org.graylog2.database.PersistedService;
+import org.graylog2.plugin.database.PersistedService;
 
 import java.util.List;
 
