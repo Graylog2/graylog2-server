@@ -1,0 +1,14 @@
+@(currentUser: org.graylog2.restclient.models.User,
+        breadcrumbs: lib.BreadcrumbList,
+        patterns: java.util.TreeSet[org.graylog2.restclient.models.GrokPattern])
+
+@main("Grok patterns", views.html.system.sidebar(), "", currentUser) {
+        @views.html.partials.breadcrumbs(breadcrumbs)
+
+        <div class="row-fluid">
+                <h1><i class="icon icon-beaker"></i> Grok patterns</h1>
+
+                <div id="react-grok-patterns"></div>
+        </div>
+
+}
