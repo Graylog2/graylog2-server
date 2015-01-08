@@ -25,7 +25,6 @@ import com.fasterxml.jackson.jaxrs.cfg.ObjectWriterModifier;
 import com.github.joschi.jadconfig.util.Size;
 import com.google.common.collect.ImmutableMap;
 import org.apache.shiro.subject.Subject;
-import org.bson.types.ObjectId;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.security.ShiroSecurityContext;
 import org.graylog2.users.User;
@@ -34,7 +33,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import javax.ws.rs.BadRequestException;
 import javax.ws.rs.ForbiddenException;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
@@ -109,16 +107,6 @@ public abstract class RestResource {
     protected void checkPermission(String permission, String instanceId) {
         if (!isPermitted(permission, instanceId)) {
             throw new ForbiddenException("Not authorized to access resource id " + instanceId);
-        }
-    }
-
-    protected ObjectId loadObjectId(String id) {
-        try {
-            return new ObjectId(id);
-        } catch (IllegalArgumentException e) {
-            final String msg = "Invalid ObjectID \"" + id + "\".";
-            LOG.error(msg);
-            throw new BadRequestException(msg, e);
         }
     }
 
