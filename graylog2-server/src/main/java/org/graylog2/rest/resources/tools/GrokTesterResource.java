@@ -35,6 +35,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -70,7 +71,7 @@ public class GrokTesterResource extends RestResource {
 
         final GrokTesterResponse response;
         if (matches.isEmpty()) {
-            response = GrokTesterResponse.create(false, null, pattern, string);
+            response = GrokTesterResponse.create(false, Collections.<GrokTesterResponse.Match>emptyList(), pattern, string);
         } else {
             final List<GrokTesterResponse.Match> responseMatches = Lists.newArrayList();
             for (final Map.Entry<String, Object> entry : matches.entrySet()) {
