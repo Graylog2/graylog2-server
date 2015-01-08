@@ -55,6 +55,8 @@ import org.graylog2.shared.bindings.GuiceInstantiationService;
 import org.graylog2.shared.bindings.InstantiationService;
 import org.graylog2.shared.bindings.PluginBindings;
 import org.graylog2.shared.plugins.PluginLoader;
+import org.jboss.netty.logging.InternalLoggerFactory;
+import org.jboss.netty.logging.Slf4JLoggerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
@@ -191,6 +193,9 @@ public abstract class CmdLineTool implements Runnable {
         if (isDebug()) {
             LOG.info("Running in Debug mode");
             logLevel = Level.DEBUG;
+
+            // Enable logging for Netty when running in debug mode.
+            InternalLoggerFactory.setDefaultFactory(new Slf4JLoggerFactory());
         } else if (onlyLogErrors()) {
             logLevel = Level.ERROR;
         }
