@@ -84,6 +84,8 @@ GET         /system/inputs/:node_id/:input_id/staticfields/:key/delete          
 GET         /system/contentpacks                                                     @controllers.BundlesController.index()
 GET         /system/contentpacks/export                                              @controllers.BundlesController.exportForm()
 POST        /system/contentpacks/export                                              @controllers.BundlesController.export()
+GET         /system/grokpatterns                                                     @controllers.GrokPatternsController.index()
+GET         /system/grokpatterns/import                                              @controllers.GrokPatternsController.upload()
 
 # Outputs
 GET         /system/outputs                                                          @controllers.OutputsController.index()
@@ -212,6 +214,7 @@ GET         /a/tools/regex_test                                                 
 GET         /a/tools/substring_test                                                  @controllers.api.ToolsApiController.substringTest(start:Integer ?= 0, end:Integer ?= 0, string ?= "")
 GET         /a/tools/split_and_index_test                                            @controllers.api.ToolsApiController.splitAndIndexTest(split_by:String ?= "", index:Integer ?= 0, string ?= "")
 GET         /a/tools/natural_date_test                                               @controllers.api.ToolsApiController.naturalDateTest(string ?= "")
+GET         /a/tools/grok_test                                                       @controllers.api.ToolsApiController.grokTest(pattern ?= "", string ?= "")
 
 # API: Server Connection
 GET         /a/connection/available                                                  @controllers.LonesomeInterfaceController.checkServerAvailability()
@@ -248,6 +251,10 @@ POST        /a/system/contentpacks/:pack_id/delete                              
 # API: Sources
 GET         /a/sources                                                               @controllers.api.SourcesApiController.list(range: Integer ?= 86400)
 
+# Grok patterns
+GET         /a/system/grokpatterns                                                   @controllers.api.GrokPatternsApiController.index()
+POST        /a/system/grokpatterns/update                                            @controllers.api.GrokPatternsApiController.update()
+POST        /a/system/grokpatterns/create                                            @controllers.api.GrokPatternsApiController.create()
 
 # Map static resources from the /public folder to the /assets URL path
 GET         /assets/*file                                                            controllers.Assets.at(path="/public", file)

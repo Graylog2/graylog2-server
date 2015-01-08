@@ -21,6 +21,7 @@ package controllers.api;
 import com.google.inject.Inject;
 import controllers.AuthenticatedController;
 import lib.NaturalDateTest;
+import lib.extractors.testers.GrokTest;
 import lib.extractors.testers.RegexTest;
 import lib.extractors.testers.SplitAndIndexTest;
 import lib.extractors.testers.SubstringTest;
@@ -36,16 +37,19 @@ public class ToolsApiController extends AuthenticatedController {
     private final SubstringTest substringTest;
     private final SplitAndIndexTest splitAndIndexTest;
     private final NaturalDateTest naturalDateTest;
+    private final GrokTest grokTest;
 
     @Inject
     private ToolsApiController(RegexTest regexTest,
                                SubstringTest substringTest,
                                SplitAndIndexTest splitAndIndexTest,
-                               NaturalDateTest naturalDateTest) {
+                               NaturalDateTest naturalDateTest,
+                               GrokTest grokTest) {
         this.regexTest = regexTest;
         this.substringTest = substringTest;
         this.splitAndIndexTest = splitAndIndexTest;
         this.naturalDateTest = naturalDateTest;
+        this.grokTest = grokTest;
     }
 
     public Result regexTest(String regex, String string) {
@@ -97,6 +101,23 @@ public class ToolsApiController extends AuthenticatedController {
 
         try {
             return ok(Json.toJson(naturalDateTest.test(string)));
+        } catch (IOException e) {
+            return internalServerError("io exception");
+        } catch (APIException e) {
+            if (e.getHttpCode() == 422) {
+                return status(422);
+            }
+            return internalServerError("api exception " + e);
+        }
+    }
+
+    public Result grokTest(String pattern, String string) {
+        if (pattern.isEmpty() || string.isEmpty()) {
+            return badRequest();
+        }
+
+        try {
+            return ok(Json.toJson(grokTest.test(pattern, string)));
         } catch (IOException e) {
             return internalServerError("io exception");
         } catch (APIException e) {

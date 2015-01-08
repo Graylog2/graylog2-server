@@ -165,6 +165,49 @@ $(document).ready(function() {
         example.append(textAfterHighlight);
     }
 
+    // Try split&index against example.
+    $(".xtrc-try-grok").on("click", function() {
+        var button = $(this);
+
+        var warningText = "We were not able to run the grok extraction. Please check your parameters.";
+
+        button.html("<i class='icon-refresh icon-spin'></i> Trying...");
+        $.ajax({
+            url: appPrefixed('/a/tools/grok_test'),
+            data: {
+                "string":$("#xtrc-example").text(),
+                "pattern":$("#grok_pattern").val()
+            },
+            success: function(result) {
+                if(result.finds) {
+                    showGrokMatches(result);
+                } else {
+                    showWarning(warningText);
+                }
+            },
+            error: function() {
+                showError(warningText);
+            },
+            complete: function() {
+                button.html("Try!");
+            }
+        });
+    });
+
+    function showGrokMatches(result) {
+        var fields = $("#grok-matches");
+        
+        var matchesHtml = "<dl>";
+        for (var i = 0; i < result.matches.length; i++) {
+            matchesHtml += "<dt>" + htmlEscape(result.matches[i].name) +"</dt>";
+            matchesHtml += "<dd>" + htmlEscape(result.matches[i].value) +"</dd>";
+
+        }
+        matchesHtml += "</dl>";
+        
+        fields.html(matchesHtml);
+    }
+    
     // Add converter button.
     $("#add-converter-fields button").on("click", function() {
         var type = $("#add-converter").val();
