@@ -41,7 +41,7 @@ public class ElasticsearchConfiguration {
     private boolean dataNode = false;
 
     @Parameter(value = "elasticsearch_path_data")
-    private String pathData = "elasticsearch-data";
+    private String pathData = "data/elasticsearch";
 
     @Parameter(value = "elasticsearch_transport_tcp_port", validator = InetPortValidator.class)
     private int transportTcpPort = 9350;

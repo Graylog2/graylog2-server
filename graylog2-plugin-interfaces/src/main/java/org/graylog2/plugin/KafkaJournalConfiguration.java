@@ -34,7 +34,7 @@ public class KafkaJournalConfiguration {
 
     @Parameter(value = "message_journal_dir", required = true)
     @JsonProperty("directory")
-    private File messageJournalDir = new File("journal");
+    private File messageJournalDir = new File("data/journal");
 
     @Parameter("message_journal_segment_size")
     @JsonProperty("segment_size")

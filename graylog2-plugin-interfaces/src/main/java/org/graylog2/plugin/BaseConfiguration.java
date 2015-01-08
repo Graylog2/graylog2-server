@@ -55,10 +55,10 @@ public abstract class BaseConfiguration {
     private String processorWaitStrategy = "blocking";
 
     @Parameter(value = "ring_size", required = true, validator = PositiveIntegerValidator.class)
-    private int ringSize = 1024;
+    private int ringSize = 65536;
 
     @Parameter(value = "inputbuffer_ring_size", required = true, validator = PositiveIntegerValidator.class)
-    private int inputBufferRingSize = 8192;
+    private int inputBufferRingSize = 65536;
 
     @Parameter(value = "inputbuffer_wait_strategy", required = true)
     private String inputBufferWaitStrategy = "blocking";
