@@ -35,6 +35,7 @@ import org.graylog2.bindings.PersistenceServicesBindings;
 import org.graylog2.bindings.RotationStrategyBindings;
 import org.graylog2.bindings.ServerBindings;
 import org.graylog2.bindings.ServerMessageInputBindings;
+import org.graylog2.bindings.ServerObjectMapperModule;
 import org.graylog2.bootstrap.ServerBootstrap;
 import org.graylog2.bootstrap.Main;
 import org.graylog2.cluster.NodeService;
@@ -135,7 +136,8 @@ public class Server extends ServerBootstrap implements Runnable {
                 new InitializerBindings(),
                 new MessageOutputBindings(configuration),
                 new RotationStrategyBindings(),
-                new PeriodicalBindings());
+                new PeriodicalBindings(),
+                new ServerObjectMapperModule());
     }
 
     @Override

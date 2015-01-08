@@ -41,7 +41,7 @@ public class CopyInputExtractor extends Extractor {
     }
 
     @Override
-    protected Result run(String value) {
-        return new Result(value, 0, value.length());
+    protected Result[] run(String value) {
+        return new Result[] { new Result(value, 0, value.length())};
     }
 }
