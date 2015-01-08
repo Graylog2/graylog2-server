@@ -40,7 +40,6 @@ public class TransportsModule extends Graylog2Module {
         installTransport(mapBinder, "httppoll", HttpPollTransport.class);
         installTransport(mapBinder, "localmetrics", LocalMetricsTransport.class);
         installTransport(mapBinder, "syslog-tcp", SyslogTcpTransport.class);
-        installTransport(mapBinder, "localfile", FileSlurpTransport.class);
 
         // TODO Add instrumentation to ExecutorService and ThreadFactory
         bind(Executor.class)
