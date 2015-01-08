@@ -91,7 +91,7 @@ public abstract class PluginModule extends Graylog2Module {
         pluginRestResourceMapBinder.addBinding(this.getClass().getPackage().getName()).to(restResourceClass);
     }
 
-    protected void registerConfigBeans() {
+    protected void addConfigBeans() {
         final Multibinder<PluginConfigBean> pluginConfigBeans = Multibinder.newSetBinder(binder(), PluginConfigBean.class);
         for (PluginConfigBean pluginConfigBean : getConfigBeans()) {
             pluginConfigBeans.addBinding().toInstance(pluginConfigBean);
