@@ -175,7 +175,7 @@ public abstract class Extractor implements EmbeddedPersistable {
         if (results == null || results.length == 0 || FluentIterable.of(results).anyMatch(VALUE_NULL_PREDICATE)) {
             timerContext.close();
             return;
-        } else if (results.length == 1) {
+        } else if (results.length == 1 && results[0].target == null) { // results[0].target is null if this extractor cannot produce multiple fields use targetField in that case
             msg.addField(targetField, results[0].getValue());
         } else {
             for (final Result result : results) {
