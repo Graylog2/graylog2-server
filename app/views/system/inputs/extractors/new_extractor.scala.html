@@ -72,13 +72,15 @@
                 <div id="try-xtrc-condition-result" style="display: none;">Matches! Extractor would run against this example.</div>
             </div>
 
+            @if(!extractorType.equals(Extractor.Type.GROK)) {
             <label for="target_field">Store as field:</label>
             <input name="target_field" id="target_field" type="text" class="input-xlarge" required />
             <span class="help-block">
                 Choose a field name. The extracted value will be stored in it. Call it <em>http_response_code</em>
                 for example if you are extracting a HTTP response code.
             </span>
-
+            }
+            
             <label class="radio inline">
                 <input type="radio" name="cut_or_copy" value="copy" checked>
                 Copy
@@ -95,38 +97,39 @@
                 A descriptive name of this extractor.
             </span>
 
-            <div id="add-converter-fields">
-                <label for="add-converter">Add converter:</label>
-                <select id="add-converter">
-                    <option value="number">Numeric</option>
-                    <option value="date">Date</option>
-                    <option value="flexdate">Flexible date</option>
-                    <option value="hash">Hash</option>
-                    <option value="lowercase">Lowercase</option>
-                    <option value="uppercase">Uppercase</option>
-                    <option value="split-and-count">Split & Count</option>
-                    <option value="tokenizer">Key=Value pairs to fields</option>
-                    <option value="csv">CSV to fields</option>
-                    <option value="ip-anonymizer">Anonymize IPv4 addresses</option>
-                    <option value="syslog-pri-level">Syslog level from PRI</option>
-                    <option value="syslog-pri-facility">Syslog facility from PRI</option>
-                </select>
-                <button class="btn btn-info">Add</button>
-            </div>
+            @if(!extractorType.equals(Extractor.Type.GROK)) {
+                <div id="add-converter-fields">
+                    <label for="add-converter">Add converter:</label>
+                    <select id="add-converter">
+                        <option value="number">Numeric</option>
+                        <option value="date">Date</option>
+                        <option value="flexdate">Flexible date</option>
+                        <option value="hash">Hash</option>
+                        <option value="lowercase">Lowercase</option>
+                        <option value="uppercase">Uppercase</option>
+                        <option value="split-and-count">Split & Count</option>
+                        <option value="tokenizer">Key=Value pairs to fields</option>
+                        <option value="csv">CSV to fields</option>
+                        <option value="ip-anonymizer">Anonymize IPv4 addresses</option>
+                        <option value="syslog-pri-level">Syslog level from PRI</option>
+                        <option value="syslog-pri-facility">Syslog facility from PRI</option>
+                    </select>
+                    <button class="btn btn-info">Add</button>
+                </div>
 
-            @views.html.system.inputs.extractors.converters.numeric()
-            @views.html.system.inputs.extractors.converters.date()
-            @views.html.system.inputs.extractors.converters.hash()
-            @views.html.system.inputs.extractors.converters.syslog_pri_level()
-            @views.html.system.inputs.extractors.converters.syslog_pri_facility()
-            @views.html.system.inputs.extractors.converters.split_and_count()
-            @views.html.system.inputs.extractors.converters.ip_anonymizer()
-            @views.html.system.inputs.extractors.converters.tokenizer()
-            @views.html.system.inputs.extractors.converters.csv()
-            @views.html.system.inputs.extractors.converters.lowercase()
-            @views.html.system.inputs.extractors.converters.uppercase()
-            @views.html.system.inputs.extractors.converters.flexdate()
-
+                @views.html.system.inputs.extractors.converters.numeric()
+                @views.html.system.inputs.extractors.converters.date()
+                @views.html.system.inputs.extractors.converters.hash()
+                @views.html.system.inputs.extractors.converters.syslog_pri_level()
+                @views.html.system.inputs.extractors.converters.syslog_pri_facility()
+                @views.html.system.inputs.extractors.converters.split_and_count()
+                @views.html.system.inputs.extractors.converters.ip_anonymizer()
+                @views.html.system.inputs.extractors.converters.tokenizer()
+                @views.html.system.inputs.extractors.converters.csv()
+                @views.html.system.inputs.extractors.converters.lowercase()
+                @views.html.system.inputs.extractors.converters.uppercase()
+                @views.html.system.inputs.extractors.converters.flexdate()
+            }
             <div class="alert alert-info">
                 Please note that you cannot use the cutting feature on standard fields
                 like <em>message</em> and <em>source</em>.

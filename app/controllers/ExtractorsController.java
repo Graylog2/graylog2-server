@@ -134,7 +134,8 @@ public class ExtractorsController extends AuthenticatedController {
                         Extractor.CursorStrategy.valueOf(form.get("cut_or_copy")[0].toUpperCase()),
                         form.get("title")[0],
                         form.get("source_field")[0],
-                        form.get("target_field")[0],
+                        // grok extractor, for example, has no target field, so set it to source to satisf
+                        (form.get("target_field") == null ? form.get("source_field")[0] : form.get("target_field")[0]),
                         extractorType,
                         currentUser(),
                         Extractor.ConditionType.valueOf(form.get("condition_type")[0].toUpperCase()),
