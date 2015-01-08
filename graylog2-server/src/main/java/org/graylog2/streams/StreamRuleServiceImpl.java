@@ -39,8 +39,8 @@ public class StreamRuleServiceImpl extends PersistedServiceImpl implements Strea
     }
 
     @Override
-    public StreamRule load(ObjectId id) throws NotFoundException {
-        BasicDBObject o = (BasicDBObject) get(StreamRuleImpl.class, id);
+    public StreamRule load(String id) throws NotFoundException {
+        BasicDBObject o = (BasicDBObject) get(StreamRuleImpl.class, new ObjectId(id));
 
         if (o == null) {
             throw new NotFoundException();
@@ -80,7 +80,7 @@ public class StreamRuleServiceImpl extends PersistedServiceImpl implements Strea
         );
 
         for (DBObject streamRule : respStreamRules) {
-            streamRules.add(load((ObjectId) streamRule.get("_id")));
+            streamRules.add(load(streamRule.get("_id").toString()));
         }
 
         return streamRules;
