@@ -61,10 +61,13 @@
             Content Packs
         </a>
     </li>
-    <li>
-        <a href="@routes.GrokPatternsController.index()">
-            Grok Patterns
-        </a>
-    </li>
+
+    @if(Permissions.isPermitted(RestPermissions.INPUTS_EDIT)) {
+        <li>
+            <a href="@routes.GrokPatternsController.index()">
+                Grok Patterns
+            </a>
+        </li>
+    }
 
 </ul>
