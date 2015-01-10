@@ -96,7 +96,7 @@ public class Configuration extends BaseConfiguration {
     private boolean amqpPersistentMessagesEnabled = false;
 
     @Parameter(value = "ring_size", required = true, validator = PositiveIntegerValidator.class)
-    private int ringSize = 1024;
+    private int ringSize = 65536;
 
     @Parameter(value = "radio_transport_max_errors")
     private int radioTransportMaxErrors = 0;
