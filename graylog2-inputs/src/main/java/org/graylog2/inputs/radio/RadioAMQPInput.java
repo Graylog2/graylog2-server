@@ -17,10 +17,8 @@
 package org.graylog2.inputs.radio;
 
 import com.codahale.metrics.MetricRegistry;
-import javax.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
-import org.graylog2.inputs.amqp.AMQPInput;
 import org.graylog2.inputs.codecs.RadioMessageCodec;
 import org.graylog2.inputs.transports.RadioAmqpTransport;
 import org.graylog2.plugin.LocalMetricRegistry;
@@ -28,7 +26,9 @@ import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.inputs.MessageInput;
 
-public class RadioAMQPInput extends AMQPInput {
+import javax.inject.Inject;
+
+public class RadioAMQPInput extends MessageInput {
 
     private static final String NAME = "Graylog2 Radio Input (AMQP)";
 
@@ -41,8 +41,8 @@ public class RadioAMQPInput extends AMQPInput {
         super(metricRegistry,
                 configuration,
                 transport.create(configuration),
-                codec.create(configuration),
                 localRegistry,
+                codec.create(configuration),
                 config,
                 descriptor, serverStatus);
     }
