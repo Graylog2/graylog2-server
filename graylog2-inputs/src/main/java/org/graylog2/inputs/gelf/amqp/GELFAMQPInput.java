@@ -14,13 +14,14 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.inputs.radio;
+
+package org.graylog2.inputs.gelf.amqp;
 
 import com.codahale.metrics.MetricRegistry;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
-import org.graylog2.inputs.codecs.RadioMessageCodec;
-import org.graylog2.inputs.transports.RadioAmqpTransport;
+import org.graylog2.inputs.codecs.GelfCodec;
+import org.graylog2.inputs.transports.AmqpTransport;
 import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.configuration.Configuration;
@@ -28,28 +29,26 @@ import org.graylog2.plugin.inputs.MessageInput;
 
 import javax.inject.Inject;
 
-public class RadioAMQPInput extends MessageInput {
+public class GELFAMQPInput extends MessageInput {
 
-    private static final String NAME = "Graylog2 Radio Input (AMQP)";
+    private static final String NAME = "GELF AMQP";
 
     @AssistedInject
-    public RadioAMQPInput(@Assisted Configuration configuration,
-                          MetricRegistry metricRegistry,
-                          RadioAmqpTransport.Factory transport,
-                          RadioMessageCodec.Factory codec,
-                          LocalMetricRegistry localRegistry, Config config, Descriptor descriptor, ServerStatus serverStatus) {
-        super(metricRegistry,
-                configuration,
-                transport.create(configuration),
-                localRegistry,
-                codec.create(configuration),
-                config,
-                descriptor, serverStatus);
+    public GELFAMQPInput(final MetricRegistry metricRegistry,
+                         final @Assisted Configuration configuration,
+                         final AmqpTransport.Factory amqpFactory,
+                         final GelfCodec.Factory gelfCodecFactory,
+                         final LocalMetricRegistry localRegistry,
+                         final Config config,
+                         final Descriptor descriptor,
+                         final ServerStatus serverStatus) {
+        super(metricRegistry, configuration, amqpFactory.create(configuration), localRegistry,
+                gelfCodecFactory.create(configuration), config, descriptor, serverStatus);
     }
 
-    public interface Factory extends MessageInput.Factory<RadioAMQPInput> {
+    public interface Factory extends MessageInput.Factory<GELFAMQPInput> {
         @Override
-        RadioAMQPInput create(Configuration configuration);
+        GELFAMQPInput create(Configuration configuration);
 
         @Override
         Config getConfig();
@@ -67,7 +66,7 @@ public class RadioAMQPInput extends MessageInput {
 
     public static class Config extends MessageInput.Config {
         @Inject
-        public Config(RadioAmqpTransport.Factory transport, RadioMessageCodec.Factory codec) {
+        public Config(AmqpTransport.Factory transport, GelfCodec.Factory codec) {
             super(transport.getConfig(), codec.getConfig());
         }
     }
