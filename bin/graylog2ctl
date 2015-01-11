@@ -46,7 +46,7 @@ JAVA_OPTS="${JAVA_OPTS:=} -Djava.library.path=${GRAYLOG2CTL_DIR}/lib/sigar"
 start() {
     echo "Starting graylog2-server ..."
     cd "$GRAYLOG2CTL_DIR/.."
-    $NOHUP ${JAVA_CMD} ${JAVA_OPTS} ${LOG4J} -jar ${GRAYLOG2_SERVER_JAR} server -f ${GRAYLOG2_CONF} -p ${GRAYLOG2_PID}>> ${LOG_FILE} &
+    $NOHUP ${JAVA_CMD} ${JAVA_OPTS} ${LOG4J} -jar ${GRAYLOG2_SERVER_JAR} server -f ${GRAYLOG2_CONF} -p ${GRAYLOG2_PID} >> ${LOG_FILE} 2>> ${LOG_FILE} &
 }
 
 run() {
