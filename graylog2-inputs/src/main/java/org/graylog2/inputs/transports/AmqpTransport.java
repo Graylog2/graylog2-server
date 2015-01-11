@@ -302,7 +302,7 @@ public class AmqpTransport extends ThrottleableTransport {
                             CK_TLS,
                             "Enable TLS?",
                             false,
-                            "Enable transport encryption via TLS. (NEEDS correct TLS port setting!)"
+                            "Enable transport encryption via TLS. (requires valid TLS port setting)"
                     )
             );
 

@@ -138,10 +138,10 @@ public class AmqpConsumer {
 
         if (tls) {
             try {
-                LOG.info("Enable TLS for AMQP input [{}/{}].", sourceInput.getName(), sourceInput.getId());
+                LOG.info("Enabling TLS for AMQP input [{}/{}].", sourceInput.getName(), sourceInput.getId());
                 factory.useSslProtocol();
             } catch (NoSuchAlgorithmException | KeyManagementException e) {
-                throw new IOException(e);
+                throw new IOException("Couldn't enable TLS for AMQP input.", e);
             }
         }
 
