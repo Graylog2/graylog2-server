@@ -22,6 +22,7 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
+import org.graylog2.plugin.configuration.fields.BooleanField;
 import org.graylog2.plugin.inputs.annotations.ConfigClass;
 import org.graylog2.plugin.inputs.annotations.FactoryClass;
 import org.graylog2.plugin.LocalMetricRegistry;
@@ -54,6 +55,7 @@ public class AmqpTransport extends ThrottleableTransport {
     public static final String CK_QUEUE = "queue";
     public static final String CK_ROUTING_KEY = "routing_key";
     public static final String CK_PARALLEL_QUEUES = "parallel_queues";
+    public static final String CK_TLS = "tls";
 
     private static final Logger LOG = LoggerFactory.getLogger(AmqpTransport.class);
 
@@ -148,6 +150,7 @@ public class AmqpTransport extends ThrottleableTransport {
                 configuration.getString(CK_EXCHANGE),
                 configuration.getString(CK_ROUTING_KEY),
                 configuration.getInt(CK_PARALLEL_QUEUES),
+                configuration.getBoolean(CK_TLS),
                 input,
                 scheduler,
                 this
@@ -291,6 +294,15 @@ public class AmqpTransport extends ThrottleableTransport {
                             1,
                             "Number of parallel QUeues",
                             ConfigurationField.Optional.NOT_OPTIONAL
+                    )
+            );
+
+            cr.addField(
+                    new BooleanField(
+                            CK_TLS,
+                            "Enable TLS?",
+                            false,
+                            "Enable transport encryption via TLS. (requires valid TLS port setting)"
                     )
             );
 

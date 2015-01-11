@@ -31,6 +31,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
@@ -58,6 +60,7 @@ public class AmqpConsumer {
 
     private final MessageInput sourceInput;
     private final int parallelQueues;
+    private final boolean tls;
     private AmqpTransport amqpTransport;
 
     private AtomicLong totalBytesRead = new AtomicLong(0);
@@ -66,7 +69,7 @@ public class AmqpConsumer {
 
     public AmqpConsumer(String hostname, int port, String virtualHost, String username, String password,
                         int prefetchCount, String queue, String exchange, String routingKey, int parallelQueues,
-                        MessageInput sourceInput, ScheduledExecutorService scheduler, AmqpTransport amqpTransport) {
+                        boolean tls, MessageInput sourceInput, ScheduledExecutorService scheduler, AmqpTransport amqpTransport) {
         this.hostname = hostname;
         this.port = port;
         this.virtualHost = virtualHost;
@@ -80,6 +83,7 @@ public class AmqpConsumer {
 
         this.sourceInput = sourceInput;
         this.parallelQueues = parallelQueues;
+        this.tls = tls;
         this.amqpTransport = amqpTransport;
 
         scheduler.scheduleAtFixedRate(new Runnable() {
@@ -131,6 +135,15 @@ public class AmqpConsumer {
         factory.setHost(hostname);
         factory.setPort(port);
         factory.setVirtualHost(virtualHost);
+
+        if (tls) {
+            try {
+                LOG.info("Enabling TLS for AMQP input [{}/{}].", sourceInput.getName(), sourceInput.getId());
+                factory.useSslProtocol();
+            } catch (NoSuchAlgorithmException | KeyManagementException e) {
+                throw new IOException("Couldn't enable TLS for AMQP input.", e);
+            }
+        }
 
         // Authenticate?
         if(!isNullOrEmpty(username) && !isNullOrEmpty(password)) {
