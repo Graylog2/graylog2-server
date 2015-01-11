@@ -217,6 +217,10 @@ public class Message {
         return getFieldAs(String.class, FIELD_SOURCE);
     }
 
+    public void setSource(final String source) {
+        fields.put(FIELD_SOURCE, source);
+    }
+
     public void addField(final String key, final Object value) {
         // Don't accept protected keys. (some are allowed though lol)
         if (RESERVED_FIELDS.contains(key) && !RESERVED_SETTABLE_FIELDS.contains(key) || !validKey(key)) {
