@@ -44,10 +44,10 @@ public class LogMessageTest {
     @Test
     public void testIsCompleteFails() {
         Message lm = new Message("foo", null, Tools.iso8601());
-        assertFalse(lm.isComplete());
+        assertTrue(lm.isComplete());
 
         lm = new Message("foo", "", Tools.iso8601());
-        assertFalse(lm.isComplete());
+        assertTrue(lm.isComplete());
 
         lm = new Message(null, "bar", Tools.iso8601());
         assertFalse(lm.isComplete());

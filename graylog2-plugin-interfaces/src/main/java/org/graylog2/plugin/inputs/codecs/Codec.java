@@ -48,6 +48,8 @@ public interface Codec {
     }
 
     public interface Config {
+        public static final String CK_OVERRIDE_SOURCE = "override_source";
+
         ConfigurationRequest getRequestedConfiguration();
         void overrideDefaultValues(@Nonnull ConfigurationRequest cr);
     }

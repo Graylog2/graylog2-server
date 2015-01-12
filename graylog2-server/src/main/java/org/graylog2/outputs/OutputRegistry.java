@@ -18,11 +18,8 @@ package org.graylog2.outputs;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.outputs.MessageOutput;
 import org.graylog2.plugin.outputs.MessageOutputConfigurationException;
@@ -34,12 +31,9 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 
 /**
@@ -101,5 +95,9 @@ public class OutputRegistry {
         builder.addAll(this.runningMessageOutputs.asMap().values());
         builder.add(defaultMessageOutput);
         return ImmutableSet.copyOf(builder.build());
+    }
+
+    public void removeOutput(Output output) {
+        runningMessageOutputs.invalidate(output.getId());
     }
 }

@@ -14,42 +14,41 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.inputs.raw.file;
+
+package org.graylog2.inputs.gelf.amqp;
 
 import com.codahale.metrics.MetricRegistry;
-import javax.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
-import org.graylog2.inputs.codecs.RawCodec;
-import org.graylog2.inputs.transports.FileSlurpTransport;
+import org.graylog2.inputs.codecs.GelfCodec;
+import org.graylog2.inputs.transports.AmqpTransport;
 import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.inputs.MessageInput;
 
-public class RawFileInput extends MessageInput {
+import javax.inject.Inject;
 
-    private static final String NAME = "Raw/Plaintext File";
+public class GELFAMQPInput extends MessageInput {
+
+    private static final String NAME = "GELF AMQP";
 
     @AssistedInject
-    public RawFileInput(@Assisted final Configuration configuration,
-                        final FileSlurpTransport.Factory tcpTransportFactory,
-                        final RawCodec.Factory rawCodecFactory,
-                        final MetricRegistry metricRegistry,
-                        LocalMetricRegistry localRegistry,
-                        Config config,
-                        Descriptor descriptor,
-                        ServerStatus serverStatus) {
-        super(metricRegistry,
-              configuration,
-              tcpTransportFactory.create(configuration),
-              localRegistry, rawCodecFactory.create(configuration),
-              config, descriptor, serverStatus);
+    public GELFAMQPInput(final MetricRegistry metricRegistry,
+                         final @Assisted Configuration configuration,
+                         final AmqpTransport.Factory amqpFactory,
+                         final GelfCodec.Factory gelfCodecFactory,
+                         final LocalMetricRegistry localRegistry,
+                         final Config config,
+                         final Descriptor descriptor,
+                         final ServerStatus serverStatus) {
+        super(metricRegistry, configuration, amqpFactory.create(configuration), localRegistry,
+                gelfCodecFactory.create(configuration), config, descriptor, serverStatus);
     }
 
-    public interface Factory extends MessageInput.Factory<RawFileInput> {
+    public interface Factory extends MessageInput.Factory<GELFAMQPInput> {
         @Override
-        RawFileInput create(Configuration configuration);
+        GELFAMQPInput create(Configuration configuration);
 
         @Override
         Config getConfig();
@@ -67,7 +66,7 @@ public class RawFileInput extends MessageInput {
 
     public static class Config extends MessageInput.Config {
         @Inject
-        public Config(FileSlurpTransport.Factory transport, RawCodec.Factory codec) {
+        public Config(AmqpTransport.Factory transport, GelfCodec.Factory codec) {
             super(transport.getConfig(), codec.getConfig());
         }
     }

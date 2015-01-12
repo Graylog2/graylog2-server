@@ -276,10 +276,10 @@ public class MessageTest {
         assertTrue(message.isComplete());
 
         message = new Message("message", "", Tools.iso8601());
-        assertFalse(message.isComplete());
+        assertTrue(message.isComplete());
 
         message = new Message("message", null, Tools.iso8601());
-        assertFalse(message.isComplete());
+        assertTrue(message.isComplete());
 
         message = new Message("", "source", Tools.iso8601());
         assertFalse(message.isComplete());

@@ -17,7 +17,9 @@
 
 package org.graylog2.streams;
 
+import autovalue.shaded.com.google.common.common.collect.Sets;
 import com.google.common.collect.Lists;
+import org.graylog2.plugin.streams.Output;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.streams.StreamRule;
 import org.mockito.Mock;
@@ -34,8 +36,10 @@ public class StreamListFingerprintTest {
     @Mock StreamRule streamRule1;
     @Mock StreamRule streamRule2;
     @Mock StreamRule streamRule3;
+    @Mock Output output1;
+    @Mock Output output2;
 
-    private final String expectedFingerprint = "a9db40c7657f944412a5156bd5ba4d54d918e7af";
+    private final String expectedFingerprint = "8131e74d28b9068473e8b57517c03a5ea1158402";
     private final String expectedEmptyFingerprint = "da39a3ee5e6b4b0d3255bfef95601890afd80709";
 
     @BeforeMethod
@@ -47,9 +51,14 @@ public class StreamListFingerprintTest {
         when(streamRule1.getId()).thenReturn("rule-abc");
         when(streamRule2.getId()).thenReturn("rule-def");
         when(streamRule3.getId()).thenReturn("rule-xyz");
+        when(output1.getId()).thenReturn("output-def");
+        when(output2.getId()).thenReturn("output-xyz");
 
         when(stream1.getStreamRules()).thenReturn(Lists.newArrayList(streamRule1, streamRule2));
         when(stream2.getStreamRules()).thenReturn(Lists.newArrayList(streamRule3));
+        
+        when(stream1.getOutputs()).thenReturn(Sets.newHashSet(output1, output2));
+        when(stream2.getOutputs()).thenReturn(Sets.newHashSet(output2, output1));
     }
 
     @Test

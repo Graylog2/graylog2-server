@@ -3,6 +3,8 @@
 CMD=$1
 NOHUP=${NOHUP:=$(which nohup)}
 
+# default java
+JAVA_CMD=$(which java)
 
 # resolve links - $0 may be a softlink
 RADIOCTL="$0"

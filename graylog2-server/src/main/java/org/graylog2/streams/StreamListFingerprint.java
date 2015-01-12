@@ -21,6 +21,7 @@ import com.google.common.collect.ComparisonChain;
 import com.google.common.collect.Ordering;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.graylog2.plugin.streams.Output;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.streams.StreamRule;
 
@@ -48,9 +49,21 @@ public class StreamListFingerprint {
             for (StreamRule rule : Ordering.from(getStreamRuleComparator()).sortedCopy(stream.getStreamRules())) {
                 sha1Digest.update(rule.getId().getBytes());
             }
+            for (Output output : Ordering.from(getOutputComparator()).sortedCopy(stream.getOutputs())) {
+                sha1Digest.update(output.getId().getBytes());
+            }
         }
 
         return new String(Hex.encodeHex(sha1Digest.digest()));
+    }
+
+    private Comparator<Output> getOutputComparator() {
+        return new Comparator<Output>() {
+            @Override
+            public int compare(Output output1, Output stream2) {
+                return comparisonResult(output1.getId(), stream2.getId());
+            }
+        };
     }
 
     private Comparator<Stream> getStreamComparator() {

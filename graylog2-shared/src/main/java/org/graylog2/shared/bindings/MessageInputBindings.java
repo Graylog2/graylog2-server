@@ -17,8 +17,8 @@
 package org.graylog2.shared.bindings;
 
 import com.google.inject.multibindings.MapBinder;
-import org.graylog2.inputs.amqp.AMQPInput;
 import org.graylog2.inputs.codecs.CodecsModule;
+import org.graylog2.inputs.gelf.amqp.GELFAMQPInput;
 import org.graylog2.inputs.gelf.http.GELFHttpInput;
 import org.graylog2.inputs.gelf.tcp.GELFTCPInput;
 import org.graylog2.inputs.gelf.udp.GELFUDPInput;
@@ -26,7 +26,6 @@ import org.graylog2.inputs.kafka.KafkaInput;
 import org.graylog2.inputs.misc.jsonpath.JsonPathInput;
 import org.graylog2.inputs.misc.metrics.LocalMetricsInput;
 import org.graylog2.inputs.random.FakeHttpMessageInput;
-import org.graylog2.inputs.raw.file.RawFileInput;
 import org.graylog2.inputs.raw.tcp.RawTCPInput;
 import org.graylog2.inputs.raw.udp.RawUDPInput;
 import org.graylog2.inputs.syslog.tcp.SyslogTCPInput;
@@ -54,11 +53,10 @@ public class MessageInputBindings extends Graylog2Module {
         installInput(inputMapBinder, GELFTCPInput.class, GELFTCPInput.Factory.class);
         installInput(inputMapBinder, GELFHttpInput.class, GELFHttpInput.Factory.class);
         installInput(inputMapBinder, GELFUDPInput.class, GELFUDPInput.Factory.class);
+        installInput(inputMapBinder, GELFAMQPInput.class, GELFAMQPInput.Factory.class);
         installInput(inputMapBinder, KafkaInput.class, KafkaInput.Factory.class);
-        installInput(inputMapBinder, AMQPInput.class, AMQPInput.Factory.class);
         installInput(inputMapBinder, JsonPathInput.class, JsonPathInput.Factory.class);
         installInput(inputMapBinder, LocalMetricsInput.class, LocalMetricsInput.Factory.class);
-        installInput(inputMapBinder, RawFileInput.class, RawFileInput.Factory.class);
     }
 
 

@@ -192,7 +192,7 @@ public class RestApiService extends AbstractIdleService {
             tlsCertFile = ssc.certificate();
             tlsKeyFile = ssc.privateKey();
 
-            LOG.info("rest_tls_cert_file or rest_tls_key_file is empty. Using self-signed certificates instead.");
+            LOG.warn("rest_tls_cert_file or rest_tls_key_file is empty. Using self-signed certificates instead.");
             LOG.debug("rest_tls_cert_file = {}", tlsCertFile);
             LOG.debug("rest_tls_key_file = {}", tlsKeyFile);
         } else {

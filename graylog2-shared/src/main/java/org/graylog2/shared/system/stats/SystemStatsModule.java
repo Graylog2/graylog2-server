@@ -70,6 +70,6 @@ public class SystemStatsModule extends AbstractModule {
             bind(ProcessProbe.class).to(JmxProcessProbe.class).asEagerSingleton();
         }
 
-        bind(JvmProbe.class).toInstance(new JvmProbe());
+        bind(JvmProbe.class).asEagerSingleton();
     }
 }

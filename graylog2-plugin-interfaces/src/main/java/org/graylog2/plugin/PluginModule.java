@@ -29,6 +29,7 @@ import com.google.inject.multibindings.Multibinder;
 import org.graylog2.plugin.alarms.callbacks.AlarmCallback;
 import org.graylog2.plugin.filters.MessageFilter;
 import org.graylog2.plugin.inject.Graylog2Module;
+import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.outputs.MessageOutput;
 import org.graylog2.plugin.periodical.Periodical;
 import org.graylog2.plugin.rest.PluginRestResource;
@@ -40,7 +41,14 @@ public abstract class PluginModule extends Graylog2Module {
     public Set<? extends PluginConfigBean> getConfigBeans() {
         return Collections.emptySet();
     }
-    
+
+    protected void addMessageInput(Class<? extends MessageInput> messageInputClass) {
+        TypeLiteral<Class<? extends MessageInput>> typeLiteral = new TypeLiteral<Class<? extends MessageInput>>() {
+        };
+        Multibinder<Class<? extends MessageInput>> messageInputs = Multibinder.newSetBinder(binder(), typeLiteral);
+        messageInputs.addBinding().toInstance(messageInputClass);
+    }
+
     protected void addMessageFilter(Class<? extends MessageFilter> messageFilterClass) {
         Multibinder<MessageFilter> messageInputs = Multibinder.newSetBinder(binder(), MessageFilter.class);
         messageInputs.addBinding().to(messageFilterClass);

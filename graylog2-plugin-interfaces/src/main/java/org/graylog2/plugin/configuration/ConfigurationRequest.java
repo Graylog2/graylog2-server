@@ -133,13 +133,13 @@ public class ConfigurationRequest {
                     }
                     break;
                 case NumberField.FIELD_TYPE:
-                    if (!config.intIsSet(name)) {
+                    if (config.intIsSet(name)) {
                         values.put(name, config.getInt(name));
                     }
                     break;
                 case TextField.FIELD_TYPE:
                 case DropdownField.FIELD_TYPE:
-                    if (!config.stringIsSet(name)) {
+                    if (config.stringIsSet(name)) {
                         values.put(name, config.getString(name));
                     }
                     break;

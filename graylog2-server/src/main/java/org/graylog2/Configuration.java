@@ -44,7 +44,7 @@ public class Configuration extends BaseConfiguration {
     private URI restListenUri = URI.create("http://127.0.0.1:" + GRAYLOG2_DEFAULT_PORT + "/");
 
     @Parameter(value = "output_batch_size", required = true, validator = PositiveIntegerValidator.class)
-    private int outputBatchSize = 25;
+    private int outputBatchSize = 500;
 
     @Parameter(value = "output_flush_interval", required = true, validator = PositiveIntegerValidator.class)
     private int outputFlushInterval = 1;

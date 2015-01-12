@@ -21,6 +21,7 @@ import com.github.joschi.jadconfig.util.Size;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 import kafka.log.LogSegment;
+import kafka.utils.FileLock;
 import org.graylog2.Graylog2BaseTest;
 import org.graylog2.plugin.InstantMillisProvider;
 import org.joda.time.DateTime;
@@ -41,8 +42,14 @@ import java.util.List;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 import static com.google.common.base.Charsets.UTF_8;
-import static org.apache.commons.io.filefilter.FileFilterUtils.*;
-import static org.testng.Assert.*;
+import static org.apache.commons.io.filefilter.FileFilterUtils.and;
+import static org.apache.commons.io.filefilter.FileFilterUtils.directoryFileFilter;
+import static org.apache.commons.io.filefilter.FileFilterUtils.fileFileFilter;
+import static org.apache.commons.io.filefilter.FileFilterUtils.nameFileFilter;
+import static org.apache.commons.io.filefilter.FileFilterUtils.suffixFileFilter;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertTrue;
 
 public class KafkaJournalTest extends Graylog2BaseTest {
     private static final int BULK_SIZE = 200;
@@ -291,5 +298,24 @@ public class KafkaJournalTest extends Graylog2BaseTest {
         journal.markJournalOffsetCommitted(BULK_SIZE * 4);
         assertEquals(journal.cleanupLogs(), 1, "only purge one segment, not the active one");
         assertEquals(countSegmentsInDir(messageJournalDir), 1);
+    }
+
+    @Test(expectedExceptions = RuntimeException.class)
+    public void lockedJournalDir() throws Exception {
+        // Grab the lock before starting the KafkaJournal.
+        final File file = new File(journalDirectory, ".lock");
+        file.createNewFile();
+        final FileLock fileLock = new FileLock(file);
+        fileLock.tryLock();
+
+        final Journal journal = new KafkaJournal(journalDirectory,
+                scheduler,
+                Size.megabytes(100l),
+                Duration.standardHours(1),
+                Size.megabytes(5l),
+                Duration.standardHours(1),
+                1_000_000,
+                Duration.standardMinutes(1),
+                new MetricRegistry());
     }
 }

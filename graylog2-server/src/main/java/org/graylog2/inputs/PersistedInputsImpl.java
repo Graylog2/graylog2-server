@@ -44,36 +44,22 @@ public class PersistedInputsImpl implements PersistedInputs {
         this.serverStatus = serverStatus;
     }
 
-    class _Iterator implements Iterator<MessageInput> {
-        private final Iterator<Input> iterator;
+    @Override
+    public Iterator<MessageInput> iterator() {
+        List<MessageInput> result = Lists.newArrayList();
 
-        _Iterator(Iterator<Input> iterator) {
-            this.iterator = iterator;
-        }
-
-        @Override
-        public boolean hasNext() {
-            return iterator.hasNext();
-        }
-
-        @Override
-        public MessageInput next() {
+        for (Input io : inputService.allOfThisNode(serverStatus.getNodeId().toString())) {
             try {
-                return inputService.getMessageInput(iterator.next());
+                final MessageInput input = inputService.getMessageInput(io);
+                result.add(input);
             } catch (NoSuchInputTypeException e) {
-                throw new RuntimeException("Unable to instantiate MessageInput from input: ", e);
+                LOG.warn("Cannot instantiate persisted input. No such type [{}].", io.getType());
+            } catch (Throwable e) {
+                LOG.warn("Cannot instantiate persisted input. Exception caught: ", e);
             }
         }
 
-        @Override
-        public void remove() {
-            iterator.remove();
-        }
-    }
-
-    @Override
-    public Iterator<MessageInput> iterator() {
-        return new _Iterator(inputService.allOfThisNode(serverStatus.getNodeId().toString()).iterator());
+        return result.iterator();
     }
 
     @Override
