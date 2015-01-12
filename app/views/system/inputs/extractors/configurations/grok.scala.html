@@ -1,16 +1,30 @@
+@(extractor: org.graylog2.restclient.models.Extractor = null)
+
+@pattern_value = @{
+    if(extractor == null) {
+        ""
+    } else {
+        extractor.getExtractorConfig.get("grok_pattern")
+    }
+}
+
 <input type="hidden" name="extractor_type" value="grok" />
 
-<label for="grok_pattern">Grok pattern:</label>
-<input name="grok_pattern" id="grok_pattern" type="text" class="input-large" required />
-<button class="btn btn-info xtrc-try-grok" type="button">
-        Try!
-</button>
-
-<span class="help-block">
-    Matches the field against the current Grok pattern list, use <b>%{PATTERN-NAME}</b> to refer to a <a href="@routes.GrokPatternsController.index()">stored pattern</a>.
-</span>
+<div class="control-group">
+    <label for="grok_pattern">Grok pattern:</label>
+    <div class="controls">
+        <div class="form-inline">
+            <input name="grok_pattern" id="grok_pattern" type="text" class="input-large" value="@pattern_value" required />
+            <button class="btn btn-info xtrc-try-grok" type="button">
+                Try!
+            </button>
+        </div>
+        <span class="help-block">
+            Matches the field against the current Grok pattern list, use <b>%{PATTERN-NAME}</b>
+            to refer to a <a href="@routes.GrokPatternsController.index()">stored pattern</a>.
+        </span>
+    </div>
+</div>
 
 <div id="grok-matches">
 </div>
-
-<br /><br />

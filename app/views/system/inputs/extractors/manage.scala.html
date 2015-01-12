@@ -29,6 +29,7 @@
         as <em>http_response_code</em> to the message.
     </div>
 
+    @*Add extractor wizard *@
     <div class="row-fluid xtrc-select-message">
         <h2>
             <i class="icon icon-signin"></i>
@@ -115,6 +116,7 @@
         </form>
     </div>
 
+    @*Extractor list*@
     <div class="row-fluid xtrc-list-container">
         <span class="pull-right">
             <i class="icon icon-lightbulb"></i>
@@ -146,9 +148,13 @@
                         <span class="text">Added by @views.html.partials.links.to_user(extractor.getCreatorUser)</span>
                             &nbsp;
 
-                        <button class="btn btn-mini extractor-show-details" data-extractor-id="@extractor.getId">
+                        <button class="btn btn-mini extractor-show-details" type="button" data-extractor-id="@extractor.getId">
                                 Details
                         </button>
+
+                        <form action="@routes.ExtractorsController.editExtractor(node.getNodeId, input.getId, extractor.getId)" method="GET">
+                            <button class="btn btn-mini" type="submit">Edit</button>
+                        </form>
 
                         <form action="@routes.ExtractorsController.delete(node.getNodeId, input.getId, extractor.getId)" method="POST">
                             <button class="btn btn-danger btn-mini" type="submit" data-confirm="Really remove extractor?">

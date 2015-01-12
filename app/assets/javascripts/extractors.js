@@ -19,10 +19,10 @@ $(document).ready(function() {
         $(".xtrc-select-message").remove();
 
         var wizard = $(".xtrc-wizard");
-        $(".xtrc-wizard-field", wizard).html(field)
+        $(".xtrc-wizard-field", wizard).html(field);
         $(".xtrc-wizard-example", wizard).html(htmlEscape(value));
 
-        $("input[name=field]", wizard).val(field)
+        $("input[name=field]", wizard).val(field);
         $("input[name=example_id]", wizard).val(messageId);
         $("input[name=example_index]", wizard).val(messageIndex);
         wizard.show();
@@ -165,7 +165,7 @@ $(document).ready(function() {
         example.append(textAfterHighlight);
     }
 
-    // Try split&index against example.
+    // Try grok against example.
     $(".xtrc-try-grok").on("click", function() {
         var button = $(this);
 
@@ -237,28 +237,51 @@ $(document).ready(function() {
         $(".extractor-details-" + extractorId).toggle();
     });
 
-    // No condition type.
-    $("#no-condition-type").on("click", function() {
-        $("#condition-value-input").hide();
-    });
+    function activateCheckedConditionTypeForm(input) {
+        switch(input.val()) {
+            case "none":
+                noConditionTypeChecked();
+                break;
+            case "string":
+                stringConditionTypeChecked();
+                break;
+            case "regex":
+                regexConditionTypeChecked();
+                break;
+            default:
+                console.error("Invalid condition type");
+        }
+    }
 
-    // String condition type.
-    $("#string-condition-type").on("click", function() {
-        var div = $("#condition-value-input");
+    function noConditionTypeChecked() {
+        $("#condition-value-input").hide();
+    }
+
+    function stringConditionTypeChecked() {
+        var fieldContainer = $("#condition-value-input");
         $(".try-xtrc-condition").hide();
         $("#try-xtrc-condition-result").hide();
-        div.show();
-        $("input", div).attr("placeholder", "");
-        $("label", div).html("Field must include this string:");
-    });
+        fieldContainer.show();
+        $("input", fieldContainer).attr("placeholder", "");
+        $("label", fieldContainer).html("Field must include this string:");
+    }
 
-    // Regex condition type.
-    $("#regex-condition-type").on("click", function() {
+    function regexConditionTypeChecked() {
         var div = $("#condition-value-input");
         div.show();
         $("input", div).attr("placeholder", "^\d{3,}");
         $("label", div).html("Field must match this regular expression:");
         $(".try-xtrc-condition").show();
+    }
+
+    // If we are editing an extractor, we want to show the form for the selected condition type
+    var checkedConditionType = $(".extractor-form input[name='condition_type']:checked");
+    if (checkedConditionType.length !== 0) {
+        activateCheckedConditionTypeForm(checkedConditionType);
+    }
+
+    $(".extractor-form input[name='condition_type']").on("change", function(event) {
+        activateCheckedConditionTypeForm($(event.target));
     });
 
     // Try regex conditions.
@@ -315,7 +338,7 @@ $(document).ready(function() {
             var inputPersistId = $(this).attr("data-input-persist-id");
             var body = {
                 order: sorted
-            }
+            };
 
             $.ajax({
                 url: appPrefixed('/a/system/inputs/' + inputPersistId + '/extractors/order'),
