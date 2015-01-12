@@ -293,7 +293,7 @@ public class Radio extends ClusterEntity {
         final InputLaunchRequest request = InputLaunchRequest.create(title, type, global, configuration, nodeId);
 
         try {
-            return api.path(routes.radio().InputsResource().launch(), InputLaunchResponse.class)
+            return api.path(routes.radio().InputsResource().create(), InputLaunchResponse.class)
                     .radio(this)
                     .body(request)
                     .expect(Http.Status.ACCEPTED)

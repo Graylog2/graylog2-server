@@ -14,19 +14,22 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.rest.resources.system.responses;
+package org.graylog2.rest.models.system.inputs.responses;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 
+/**
+ * Created by dennis on 12/12/14.
+ */
 @JsonAutoDetect
 @AutoValue
-public abstract class Throughput {
+public abstract class InputCreated {
     @JsonProperty
-    public abstract long throughput();
+    public abstract String id();
 
-    public static Throughput create(long throughput) {
-        return new AutoValue_Throughput(throughput);
+    public static InputCreated create(String id) {
+        return new AutoValue_InputCreated(id);
     }
 }

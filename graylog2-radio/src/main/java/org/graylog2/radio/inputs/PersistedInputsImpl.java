@@ -35,6 +35,7 @@ import javax.inject.Inject;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 public class PersistedInputsImpl implements PersistedInputs {
     private static final Logger LOG = LoggerFactory.getLogger(PersistedInputsImpl.class);
@@ -122,6 +123,22 @@ public class PersistedInputsImpl implements PersistedInputs {
 
     @Override
     public boolean remove(Object o) {
+        if (o instanceof MessageInput) {
+            final MessageInput messageInput = (MessageInput)o;
+            try {
+                inputService.unregisterInCluster(messageInput);
+            } catch (ExecutionException | InterruptedException | IOException e) {
+                LOG.error("Could not unregister input in Graylog2 cluster: ", e);
+                return false;
+            }
+
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean update(String id, MessageInput newInput) {
         return false;
     }
 }

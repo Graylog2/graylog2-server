@@ -68,11 +68,14 @@ public class RadiosResource extends RestResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(RadiosResource.class);
 
-    @Inject
-    private NodeService nodeService;
+    private final NodeService nodeService;
+    private final InputService inputService;
 
     @Inject
-    private InputService inputService;
+    public RadiosResource(NodeService nodeService, InputService inputService) {
+        this.nodeService = nodeService;
+        this.inputService = inputService;
+    }
 
     @GET
     @Timed

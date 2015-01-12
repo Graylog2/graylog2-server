@@ -39,7 +39,7 @@ import org.graylog2.rest.resources.search.responses.HistogramResult;
 import org.graylog2.rest.resources.search.responses.SearchResponse;
 import org.graylog2.rest.resources.search.responses.TermsResult;
 import org.graylog2.rest.resources.search.responses.TermsStatsResult;
-import org.graylog2.security.RestPermissions;
+import org.graylog2.shared.security.RestPermissions;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

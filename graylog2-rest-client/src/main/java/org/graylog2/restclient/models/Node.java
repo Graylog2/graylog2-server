@@ -440,13 +440,13 @@ public class Node extends ClusterEntity {
     }
 
     public void pause() throws IOException, APIException {
-        api.path(routes.SystemResource().pauseProcessing())
+        api.path(routes.SystemProcessingResource().pauseProcessing())
                 .node(this)
                 .execute();
     }
 
     public void resume() throws IOException, APIException {
-        api.path(routes.SystemResource().resumeProcessing())
+        api.path(routes.SystemProcessingResource().resumeProcessing())
                 .node(this)
                 .execute();
     }
@@ -523,7 +523,7 @@ public class Node extends ClusterEntity {
     }
 
     public void shutdown() throws APIException, IOException {
-        api.path(routes.SystemResource().shutdown())
+        api.path(routes.SystemShutdownResource().shutdown())
                 .node(this)
                 .expect(Http.Status.ACCEPTED)
                 .execute();

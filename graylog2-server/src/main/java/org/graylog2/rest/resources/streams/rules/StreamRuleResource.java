@@ -32,7 +32,7 @@ import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.rest.resources.streams.responses.SingleStreamRuleSummaryResponse;
 import org.graylog2.rest.resources.streams.responses.StreamRuleListResponse;
 import org.graylog2.rest.resources.streams.rules.requests.CreateStreamRuleRequest;
-import org.graylog2.security.RestPermissions;
+import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.streams.StreamRuleService;
 import org.graylog2.streams.StreamService;
 import org.hibernate.validator.constraints.NotEmpty;

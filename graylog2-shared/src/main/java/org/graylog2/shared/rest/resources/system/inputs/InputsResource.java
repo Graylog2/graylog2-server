@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.rest.resources.system.inputs;
+package org.graylog2.shared.rest.resources.system.inputs;
 
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.ImmutableSet;
@@ -25,19 +25,17 @@ import com.wordnik.swagger.annotations.ApiResponse;
 import com.wordnik.swagger.annotations.ApiResponses;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.plugin.database.ValidationException;
-import org.graylog2.inputs.Input;
-import org.graylog2.inputs.InputService;
 import org.graylog2.plugin.IOState;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.configuration.ConfigurationException;
-import org.graylog2.plugin.inputs.Extractor;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.rest.models.system.inputs.responses.InputSummary;
+import org.graylog2.shared.inputs.PersistedInputs;
 import org.graylog2.shared.rest.resources.RestResource;
-import org.graylog2.rest.resources.system.inputs.responses.InputCreated;
+import org.graylog2.rest.models.system.inputs.responses.InputCreated;
 import org.graylog2.rest.models.system.inputs.responses.InputStateSummary;
 import org.graylog2.rest.models.system.inputs.responses.InputsList;
-import org.graylog2.security.RestPermissions;
+import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.shared.inputs.InputLauncher;
 import org.graylog2.shared.inputs.InputRegistry;
 import org.graylog2.shared.inputs.MessageInputFactory;
@@ -63,8 +61,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import java.net.URI;
-import java.util.List;
-import java.util.Map;
 
 @RequiresAuthentication
 @Api(value = "System/Inputs", description = "Message inputs of this node")
@@ -75,20 +71,20 @@ public class InputsResource extends RestResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(InputsResource.class);
 
-    private final InputService inputService;
     private final InputRegistry inputRegistry;
     private final MessageInputFactory messageInputFactory;
     private final InputLauncher inputLauncher;
+    private final PersistedInputs persistedInputs;
 
     @Inject
-    public InputsResource(InputService inputService,
-                          InputRegistry inputRegistry,
+    public InputsResource(InputRegistry inputRegistry,
                           MessageInputFactory messageInputFactory,
-                          InputLauncher inputLauncher) {
-        this.inputService = inputService;
+                          InputLauncher inputLauncher,
+                          PersistedInputs persistedInputs) {
         this.inputRegistry = inputRegistry;
         this.messageInputFactory = messageInputFactory;
         this.inputLauncher = inputLauncher;
+        this.persistedInputs = persistedInputs;
     }
 
     @GET
@@ -172,6 +168,7 @@ public class InputsResource extends RestResource {
     })
     public Response create(@ApiParam(name = "JSON body", required = true)
                            @Valid @NotNull InputLaunchRequest lr) throws ValidationException {
+        restrictToMaster();
         checkPermission(RestPermissions.INPUTS_CREATE);
 
         // Build input.
@@ -201,11 +198,8 @@ public class InputsResource extends RestResource {
             throw new BadRequestException(error);
         }
 
-        final Input mongoInput = getInput(input);
-        // Persist input.
-        String id = inputService.save(mongoInput);
-
-        input.setPersistId(id);
+        if (!persistedInputs.add(input))
+            throw new RuntimeException("Unable to persist input.");
 
         if (input.isGlobal() || input.getNodeId().equals(serverStatus.getNodeId().toString())) {
             input.initialize();
@@ -216,23 +210,9 @@ public class InputsResource extends RestResource {
 
         final URI inputUri = UriBuilder.fromResource(InputsResource.class)
                 .path("{inputId}")
-                .build(id);
+                .build(input.getId());
 
-        return Response.created(inputUri).entity(InputCreated.create(id)).build();
-    }
-
-    private Input getInput(MessageInput input) throws ValidationException {
-        // Build MongoDB data
-        final Map<String, Object> inputData = input.asMap();
-
-        // ... and check if it would pass validation. We don't need to go on if it doesn't.
-        final Input mongoInput;
-        if (input.getId() != null)
-            mongoInput = inputService.create(input.getId(), inputData);
-        else
-            mongoInput = inputService.create(inputData);
-
-        return mongoInput;
+        return Response.created(inputUri).entity(InputCreated.create(input.getId())).build();
     }
 
     @DELETE
@@ -255,13 +235,7 @@ public class InputsResource extends RestResource {
         inputRegistry.remove(messageInput);
 
         if (serverStatus.hasCapability(ServerStatus.Capability.MASTER) || !messageInput.isGlobal()) {
-            // Remove from list and mongo.
-            try {
-                final Input input = inputService.find(messageInput.getId());
-                inputService.destroy(input);
-            } catch (org.graylog2.database.NotFoundException e) {
-                LOG.warn("Input not found while deleting it: ", e);
-            }
+            persistedInputs.remove(messageInput);
         }
     }
 
@@ -274,27 +248,17 @@ public class InputsResource extends RestResource {
             @ApiResponse(code = 400, message = "Missing or invalid input configuration.")
     })
     public Response update(@ApiParam(name = "JSON body", required = true) @Valid @NotNull InputLaunchRequest lr,
-                           @ApiParam(name = "inputId", required = true) @PathParam("inputId") String inputId) throws ValidationException, org.graylog2.database.NotFoundException {
+                           @ApiParam(name = "inputId", required = true) @PathParam("inputId") String inputId) {
         checkPermission(RestPermissions.INPUTS_EDIT, inputId);
 
+        final MessageInput oldInput = persistedInputs.get(inputId);
+        final MessageInput messageInput;
         try {
-            final Input oldInput = inputService.find(inputId);
-            final MessageInput messageInput = messageInputFactory.create(lr, getCurrentUser().getName(), oldInput.getNodeId());
-            messageInput.setPersistId(inputId);
-            final Input mongoInput = getInput(messageInput);
-
-            final List<Extractor> extractors = inputService.getExtractors(oldInput);
-            final Map<String, String> staticFields = oldInput.getStaticFields();
-
-            inputService.save(mongoInput);
-
-            for (Map.Entry<String, String> entry : staticFields.entrySet())
-                inputService.addStaticField(mongoInput, entry.getKey(), entry.getValue());
-
-            for (Extractor extractor : extractors)
-                inputService.addExtractor(mongoInput, extractor);
+            messageInput = messageInputFactory.create(lr, getCurrentUser().getName(), oldInput.getNodeId());
+            persistedInputs.update(inputId, messageInput);
         } catch (NoSuchInputTypeException e) {
-            e.printStackTrace();
+            LOG.error("Unable to construct MessageInput: ", e);
+            return Response.status(Response.Status.BAD_REQUEST).build();
         }
 
         final URI inputUri = UriBuilder.fromResource(InputsResource.class)
@@ -316,16 +280,9 @@ public class InputsResource extends RestResource {
         final IOState<MessageInput> inputState = inputRegistry.getInputState(inputId);
         final MessageInput messageInput;
 
-        if (inputState == null) {
-            try {
-                final Input input = inputService.findForThisNodeOrGlobal(serverStatus.getNodeId().toString(), inputId);
-                messageInput = inputService.getMessageInput(input);
-            } catch (NoSuchInputTypeException | org.graylog2.database.NotFoundException e) {
-                final String error = "Cannot launch input <" + inputId + ">. Input not found.";
-                LOG.info(error);
-                throw new NotFoundException(error);
-            }
-        } else
+        if (inputState == null)
+            messageInput = persistedInputs.get(inputId);
+        else
             messageInput = inputState.getStoppable();
 
         if (messageInput == null) {

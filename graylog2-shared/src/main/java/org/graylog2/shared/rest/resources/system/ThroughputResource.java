@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.rest.resources.system;
+package org.graylog2.shared.rest.resources.system;
 
 import com.codahale.metrics.annotation.Timed;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
@@ -22,8 +22,8 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import org.graylog2.shared.rest.resources.RestResource;
-import org.graylog2.rest.resources.system.responses.Throughput;
-import org.graylog2.security.RestPermissions;
+import org.graylog2.rest.models.system.responses.Throughput;
+import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.shared.stats.ThroughputStats;
 
 import javax.inject.Inject;
