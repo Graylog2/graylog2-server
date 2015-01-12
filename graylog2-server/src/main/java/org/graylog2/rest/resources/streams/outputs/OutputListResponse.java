@@ -30,9 +30,9 @@ public abstract class OutputListResponse {
     public abstract long total();
 
     @JsonProperty
-    public abstract Collection<Output> streams();
+    public abstract Collection<Output> outputs();
 
-    public static OutputListResponse create(long total, Collection<Output> streams) {
-        return new AutoValue_OutputListResponse(total, streams);
+    public static OutputListResponse create(long total, Collection<Output> outputs) {
+        return new AutoValue_OutputListResponse(total, outputs);
     }
 }
