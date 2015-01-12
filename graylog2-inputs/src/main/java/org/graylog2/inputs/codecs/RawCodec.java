@@ -87,12 +87,7 @@ public class RawCodec extends AbstractCodec {
     }
 
     @ConfigClass
-    public static class Config implements AbstractCodec.Config {
-        @Override
-        public ConfigurationRequest getRequestedConfiguration() {
-            return new ConfigurationRequest();
-        }
-
+    public static class Config extends AbstractCodec.Config {
         @Override
         public void overrideDefaultValues(@Nonnull ConfigurationRequest cr) {
             if (cr.containsField(NettyTransport.CK_PORT)) {

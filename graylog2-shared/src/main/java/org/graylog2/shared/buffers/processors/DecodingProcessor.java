@@ -179,6 +179,10 @@ public class DecodingProcessor implements EventHandler<MessageEvent> {
             }
         }
 
+        if (codec.getConfiguration().stringIsSet(Codec.Config.CK_OVERRIDE_SOURCE)) {
+            message.setSource(codec.getConfiguration().getString(Codec.Config.CK_OVERRIDE_SOURCE));
+        }
+
         metricRegistry.meter(name(baseMetricName, "processedMessages")).mark();
         return message;
     }

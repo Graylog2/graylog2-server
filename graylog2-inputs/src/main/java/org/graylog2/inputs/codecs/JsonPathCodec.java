@@ -125,10 +125,10 @@ public class JsonPathCodec extends AbstractCodec {
     }
 
     @ConfigClass
-    public static class Config implements AbstractCodec.Config {
+    public static class Config extends AbstractCodec.Config {
         @Override
         public ConfigurationRequest getRequestedConfiguration() {
-            final ConfigurationRequest r = new ConfigurationRequest();
+            final ConfigurationRequest r = super.getRequestedConfiguration();
 
             r.addField(new TextField(
                     CK_PATH,

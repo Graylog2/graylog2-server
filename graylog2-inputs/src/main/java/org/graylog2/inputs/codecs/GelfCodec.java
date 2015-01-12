@@ -19,7 +19,6 @@ package org.graylog2.inputs.codecs;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import javax.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
 import org.graylog2.inputs.codecs.gelf.GELFMessage;
 import org.graylog2.inputs.transports.TcpTransport;
@@ -40,6 +39,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.inject.Inject;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -222,12 +222,7 @@ public class GelfCodec extends AbstractCodec {
     }
 
     @ConfigClass
-    public static class Config implements AbstractCodec.Config {
-        @Override
-        public ConfigurationRequest getRequestedConfiguration() {
-            return new ConfigurationRequest();
-        }
-
+    public static class Config extends AbstractCodec.Config {
         @Override
         public void overrideDefaultValues(@Nonnull ConfigurationRequest cr) {
             if (cr.containsField(NettyTransport.CK_PORT)) {
