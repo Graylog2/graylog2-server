@@ -68,7 +68,9 @@ public class Version {
 
     public static final Version v0_93_0_SNAPSHOT = new Version(0, 93, 0, "snapshot");
 
-    public static final Version VERSION = v0_93_0_SNAPSHOT;
+    public static final Version v1_0_0_BETA1 = new Version(1, 0, 0, "beta.1");
+
+    public static final Version VERSION = v1_0_0_BETA1;
 
     @JsonProperty
     public int major;
