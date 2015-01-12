@@ -22,6 +22,7 @@ import org.bson.types.ObjectId;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.database.PersistedServiceImpl;
+import org.graylog2.outputs.OutputRegistry;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.streams.Output;
@@ -37,12 +38,15 @@ import java.util.Set;
 
 public class OutputServiceImpl extends PersistedServiceImpl implements OutputService {
     private final StreamService streamService;
+    private final OutputRegistry outputRegistry;
 
     @Inject
     public OutputServiceImpl(MongoConnection mongoConnection,
-                             StreamService streamService) {
+                             StreamService streamService,
+                             OutputRegistry outputRegistry) {
         super(mongoConnection);
         this.streamService = streamService;
+        this.outputRegistry = outputRegistry;
     }
 
     @Override
@@ -102,6 +106,7 @@ public class OutputServiceImpl extends PersistedServiceImpl implements OutputSer
     @Override
     public void destroy(Output output) throws NotFoundException {
         streamService.removeOutputFromAllStreams(output);
+        outputRegistry.removeOutput(output);
         super.destroy(output);
     }
 }
