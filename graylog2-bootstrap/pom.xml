@@ -5,7 +5,7 @@
         <maven>3.0.1</maven>
     </prerequisites>
 
-    <artifactId>graylog2-bootstrap</artifactId>
+    <artifactId>graylog2</artifactId>
     <packaging>jar</packaging>
 
     <parent>
