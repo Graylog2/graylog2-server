@@ -140,7 +140,7 @@ public class TcpTransport extends AbstractTcpTransport {
 
         final LinkedHashMap<String, Callable<? extends ChannelHandler>> handlerList = Maps.newLinkedHashMap();
 
-        LOG.info("Enable TLS for input [{}/{}]. key-file=\"{}\" cert-file=\"{}\"", input.getName(), input.getId(), tlsKeyFile.toString(), tlsCertFile.toString());
+        LOG.info("Enabling TLS for input [{}/{}]. key-file=\"{}\" cert-file=\"{}\"", input.getName(), input.getId(), tlsKeyFile.toString(), tlsCertFile.toString());
 
         if (!tlsCertFile.exists() || !tlsKeyFile.exists()) {
             LOG.warn("TLS key file or certificate file does not exist, creating a self-signed certificate for input [{}/{}].", input.getName(), input.getId());
