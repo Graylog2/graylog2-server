@@ -1,6 +1,12 @@
-<div class="xtrc-converter xtrc-converter-hash">
-    <label class="checkbox">
-        <input type="checkbox" value="enabled" name="converter_hash">
-        Build MD5 hash from value
-    </label>
+@(enabled: Boolean = false)
+
+<div class="xtrc-converter xtrc-converter-hash" @if(!enabled) { style="display:none;" } >
+    <div class="control-group">
+        <div class="controls">
+            <label class="checkbox">
+                <input type="checkbox" value="enabled" name="converter_hash" @if(enabled) { checked="checked" } />
+                Build MD5 hash from value
+            </label>
+        </div>
+    </div>
 </div>

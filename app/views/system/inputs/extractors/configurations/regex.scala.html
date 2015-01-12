@@ -1,11 +1,28 @@
+@(extractor: org.graylog2.restclient.models.Extractor = null)
+
+@regex_value = @{
+    if(extractor == null) {
+        ""
+    } else {
+        extractor.getExtractorConfig.get("regex_value")
+    }
+}
+
 <input type="hidden" name="extractor_type" value="regex" />
 
-<div class="input-append">
+<div class="control-group">
     <label for="regex_value">Regular expression:</label>
-    <input name="regex_value" id="regex_value" type="text"
-        placeholder="^.*string(.+)$" class="input-xlarge" required />
-    <button class="btn btn-info xtrc-try-regex" type="button">
-        Try!
-    </button>
+    <div class="controls">
+        <div class="form-inline">
+            <input name="regex_value" id="regex_value" type="text"
+            placeholder="^.*string(.+)$" class="input-xlarge" value="@regex_value" required />
+            <button class="btn btn-info xtrc-try-regex" type="button">
+                Try!
+            </button>
+        </div>
+    </div>
+    <span class="help-block">
+        The regular expression used for extraction. First matcher group is used.
+        @views.html.partials.support.bubble.render("general/extractors")
+    </span>
 </div>
-<span class="help-block">The regular expression used for extraction. First matcher group is used. @views.html.partials.support.bubble.render("general/extractors")</span>

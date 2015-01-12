@@ -31,6 +31,7 @@ import org.graylog2.restclient.models.Input;
 import org.graylog2.restclient.models.MessagesService;
 import org.graylog2.restclient.models.Node;
 import org.graylog2.restclient.models.NodeService;
+import org.graylog2.restclient.models.api.requests.CreateExtractorRequest;
 import org.graylog2.restclient.models.api.requests.ExtractorImportRequest;
 import org.graylog2.restclient.models.api.requests.ExtractorListImportRequest;
 import org.graylog2.restclient.models.api.results.MessageResult;
@@ -122,33 +123,23 @@ public class ExtractorsController extends AuthenticatedController {
     }
 
     public Result create(String nodeId, String inputId) {
-        Map<String, String[]> form = request().body().asFormUrlEncoded();
-        Extractor.Type extractorType = Extractor.Type.valueOf(form.get("extractor_type")[0].toUpperCase());
-
-        Extractor extractor;
         try {
-            Node node = nodeService.loadNode(nodeId);
+            final Node node = nodeService.loadNode(nodeId);
+            final Input input = node.getInput(inputId);
+            final Map<String, String[]> form = request().body().asFormUrlEncoded();
+            final String title = form.get("title")[0];
 
+            CreateExtractorRequest request;
             try {
-                extractor = extractorFactory.forCreate(
-                        Extractor.CursorStrategy.valueOf(form.get("cut_or_copy")[0].toUpperCase()),
-                        form.get("title")[0],
-                        form.get("source_field")[0],
-                        // grok extractor, for example, has no target field, so set it to source to satisf
-                        (form.get("target_field") == null ? form.get("source_field")[0] : form.get("target_field")[0]),
-                        extractorType,
-                        currentUser(),
-                        Extractor.ConditionType.valueOf(form.get("condition_type")[0].toUpperCase()),
-                        form.get("condition_value")[0]
-                );
+                 request = this.generateCreateExtractorRequest(form);
             } catch (NullPointerException e) {
                 Logger.error("Cannot build extractor configuration.", e);
                 return badRequest();
             }
 
-            extractor.loadConfigFromForm(extractorType, form);
-            extractor.loadConvertersFromForm(form);
-            extractor.create(node, node.getInput(inputId));
+            extractorService.create(node, input, request);
+            flash("success", "Extractor \"" + title + "\" was created successfully");
+            return redirect(controllers.routes.ExtractorsController.manage(nodeId, inputId));
         } catch (IOException e) {
             return status(500, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
         } catch (APIException e) {
@@ -157,8 +148,6 @@ public class ExtractorsController extends AuthenticatedController {
         } catch (NodeService.NodeNotFoundException e) {
             return status(404, views.html.errors.error.render(ApiClient.ERROR_MSG_NODE_NOT_FOUND, e, request()));
         }
-
-        return redirect(controllers.routes.ExtractorsController.manage(nodeId, inputId));
     }
 
     public Result delete(String nodeId, String inputId, String extractorId) {
@@ -171,6 +160,61 @@ public class ExtractorsController extends AuthenticatedController {
             return status(500, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
         } catch (APIException e) {
             String message = "Could not delete extractor! We expected HTTP 204, but got a HTTP " + e.getHttpCode() + ".";
+            return status(500, views.html.errors.error.render(message, e, request()));
+        } catch (NodeService.NodeNotFoundException e) {
+            return status(404, views.html.errors.error.render(ApiClient.ERROR_MSG_NODE_NOT_FOUND, e, request()));
+        }
+    }
+
+    public Result editExtractor(String nodeId, String inputId, String extractorId) {
+        try {
+            final Node node = nodeService.loadNode(nodeId);
+            final Input input = node.getInput(inputId);
+            final Extractor extractor = extractorService.load(node, input, extractorId);
+            final MessageResult exampleMessage = input.getRecentlyReceivedMessage(nodeId);
+            final String example = exampleMessage.getFields().get(extractor.getSourceField()).toString();
+
+            return ok(views.html.system.inputs.extractors.edit_extractor.render(
+                            currentUser(),
+                            standardBreadcrumbs(node, input, extractor),
+                            node,
+                            input,
+                            extractor,
+                            example)
+            );
+        } catch (IOException e) {
+            return status(500, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
+        } catch (APIException e) {
+            String message = "Could not fetch system information. We expected HTTP 200, but got a HTTP " + e.getHttpCode() + ".";
+            return status(500, views.html.errors.error.render(message, e, request()));
+        } catch (NodeService.NodeNotFoundException e) {
+            return status(404, views.html.errors.error.render(ApiClient.ERROR_MSG_NODE_NOT_FOUND, e, request()));
+        }
+    }
+
+    public Result update(String nodeId, String inputId, String extractorId) {
+        try {
+            final Node node = nodeService.loadNode(nodeId);
+            final Input input = node.getInput(inputId);
+            final Extractor originalExtractor = extractorService.load(node, input, extractorId);
+            final Map<String, String[]> form = request().body().asFormUrlEncoded();
+            final String title = form.get("title")[0];
+
+            CreateExtractorRequest request;
+            try {
+                request = this.generateCreateExtractorRequest(form, originalExtractor);
+            } catch (NullPointerException e) {
+                Logger.error("Cannot build extractor configuration.", e);
+                return badRequest();
+            }
+
+            extractorService.update(extractorId, node, input, request);
+            flash("success", "Extractor \"" + title + "\" was updated successfully");
+            return redirect(controllers.routes.ExtractorsController.manage(nodeId, inputId));
+        } catch (IOException e) {
+            return status(500, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
+        } catch (APIException e) {
+            String message = "Could not update extractor! We expected HTTP 200, but got a HTTP " + e.getHttpCode() + ".";
             return status(500, views.html.errors.error.render(message, e, request()));
         } catch (NodeService.NodeNotFoundException e) {
             return status(404, views.html.errors.error.render(ApiClient.ERROR_MSG_NODE_NOT_FOUND, e, request()));
@@ -280,13 +324,12 @@ public class ExtractorsController extends AuthenticatedController {
                 extractor.loadConfigFromImport(type, importRequest.extractorConfig);
                 extractor.loadConvertersFromImport(importRequest.converters);
                 extractor.setOrder(importRequest.order);
-                extractor.create(node, node.getInput(inputId));
+                extractorService.create(node, node.getInput(inputId), extractor.toCreateExtractorRequest());
+                successes++;
             } catch (Exception e) {
                 Logger.error("Could not import extractor. Continuing.", e);
                 continue;
             }
-
-            successes++;
         }
 
         flash("success", "Successfully imported " + successes + " of " + elir.extractors.size() + " extractors.");
@@ -294,14 +337,48 @@ public class ExtractorsController extends AuthenticatedController {
     }
 
     private static BreadcrumbList standardBreadcrumbs(Node node, Input input) {
+        return standardBreadcrumbs(node, input, null);
+    }
+
+    private static BreadcrumbList standardBreadcrumbs(Node node, Input input, Extractor extractor) {
         BreadcrumbList bc = new BreadcrumbList();
         bc.addCrumb("System", controllers.routes.SystemController.index(0));
         bc.addCrumb("Nodes", controllers.routes.NodesController.nodes());
         bc.addCrumb(node.getShortNodeId(), controllers.routes.NodesController.node(node.getNodeId()));
         bc.addCrumb("Input: " + input.getTitle(), null);
         bc.addCrumb("Extractors", controllers.routes.ExtractorsController.manage(node.getNodeId(), input.getId()));
+        if (extractor != null) {
+            bc.addCrumb("Extractor: " + extractor.getTitle(), null);
+        }
 
         return bc;
+    }
+
+    private CreateExtractorRequest generateCreateExtractorRequest(Map<String, String[]> form) {
+        return generateCreateExtractorRequest(form, null);
+    }
+
+    private CreateExtractorRequest generateCreateExtractorRequest(Map<String, String[]> form, Extractor originalExtractor) {
+        final Extractor.Type extractorType = Extractor.Type.valueOf(form.get("extractor_type")[0].toUpperCase());
+
+        final Extractor extractor = extractorFactory.forCreate(
+                Extractor.CursorStrategy.valueOf(form.get("cut_or_copy")[0].toUpperCase()),
+                form.get("title")[0],
+                form.get("source_field")[0],
+                // grok extractor, for example, has no target field, so set it to source to satisf
+                (form.get("target_field") == null ? form.get("source_field")[0] : form.get("target_field")[0]),
+                extractorType,
+                currentUser(),
+                Extractor.ConditionType.valueOf(form.get("condition_type")[0].toUpperCase()),
+                form.get("condition_value")[0]
+        );
+        if (originalExtractor != null) {
+            extractor.setOrder(originalExtractor.getOrder());
+        }
+        extractor.loadConfigFromForm(extractorType, form);
+        extractor.loadConvertersFromForm(form);
+
+        return extractor.toCreateExtractorRequest();
     }
 
 }

@@ -1,6 +1,12 @@
-<div class="xtrc-converter xtrc-converter-lowercase">
-    <label class="checkbox">
-        <input type="checkbox" value="enabled" name="converter_lowercase">
-        Lowercase transform value
-    </label>
+@(enabled: Boolean = false)
+
+<div class="xtrc-converter xtrc-converter-lowercase" @if(!enabled) { style="display:none;" } >
+    <div class="control-group">
+        <div class="controls">
+            <label class="checkbox">
+                <input type="checkbox" value="enabled" name="converter_lowercase" @if(enabled) { checked="checked" } />
+                Lowercase transform value
+            </label>
+        </div>
+    </div>
 </div>

@@ -1,6 +1,12 @@
-<div class="xtrc-converter xtrc-converter-syslog-pri-level">
-    <label class="checkbox">
-        <input type="checkbox" value="enabled" name="converter_syslog_pri_level">
-        Convert from PRI to syslog priority
-    </label>
+@(enabled: Boolean = false)
+
+<div class="xtrc-converter xtrc-converter-syslog-pri-level" @if(!enabled) { style="display:none;" } >
+    <div class="control-group">
+        <div class="controls">
+            <label class="checkbox">
+                <input type="checkbox" value="enabled" name="converter_syslog_pri_level" @if(enabled) { checked="checked" } />
+                Convert from PRI to syslog priority
+            </label>
+        </div>
+    </div>
 </div>
