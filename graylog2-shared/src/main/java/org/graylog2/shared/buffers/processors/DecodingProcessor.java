@@ -19,6 +19,7 @@ package org.graylog2.shared.buffers.processors;
 
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
+import com.google.common.base.Strings;
 import com.google.common.collect.Iterables;
 import com.google.common.net.InetAddresses;
 import com.google.inject.assistedinject.Assisted;
@@ -170,17 +171,26 @@ public class DecodingProcessor implements EventHandler<MessageEvent> {
 
         final ResolvableInetSocketAddress remoteAddress = raw.getRemoteAddress();
         if (remoteAddress != null) {
-            message.addField("gl2_remote_ip", InetAddresses.toAddrString(remoteAddress.getAddress()));
+            final String addrString = InetAddresses.toAddrString(remoteAddress.getAddress());
+            message.addField("gl2_remote_ip", addrString);
             if (remoteAddress.getPort() > 0) {
                 message.addField("gl2_remote_port", remoteAddress.getPort());
             }
             if (remoteAddress.isReverseLookedUp()) { // avoid reverse lookup if the hostname is available
                 message.addField("gl2_remote_hostname", remoteAddress.getHostName());
             }
+            if (Strings.isNullOrEmpty(message.getSource())) {
+                message.setSource(addrString);
+            }
         }
 
         if (codec.getConfiguration().stringIsSet(Codec.Config.CK_OVERRIDE_SOURCE)) {
             message.setSource(codec.getConfiguration().getString(Codec.Config.CK_OVERRIDE_SOURCE));
+        }
+
+        // Make sure that there is a value for the source field.
+        if (Strings.isNullOrEmpty(message.getSource())) {
+            message.setSource("unknown");
         }
 
         metricRegistry.meter(name(baseMetricName, "processedMessages")).mark();

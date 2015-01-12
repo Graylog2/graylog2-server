@@ -97,7 +97,7 @@ public class Message {
     );
 
     private static final ImmutableSet<String> REQUIRED_FIELDS = ImmutableSet.of(
-            FIELD_MESSAGE, FIELD_SOURCE, FIELD_ID
+            FIELD_MESSAGE, FIELD_ID
     );
 
     public static final Function<Message, String> ID_FUNCTION = new MessageIdFunction();
