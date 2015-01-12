@@ -42,11 +42,6 @@ public abstract class PluginModule extends Graylog2Module {
         return Collections.emptySet();
     }
 
-    /**
-     * @param messageInputClass
-     * @deprecated use {@link Graylog2Module#installInput(MapBinder, Class, Class)} instead
-     */
-    @Deprecated
     protected void addMessageInput(Class<? extends MessageInput> messageInputClass) {
         TypeLiteral<Class<? extends MessageInput>> typeLiteral = new TypeLiteral<Class<? extends MessageInput>>() {
         };
