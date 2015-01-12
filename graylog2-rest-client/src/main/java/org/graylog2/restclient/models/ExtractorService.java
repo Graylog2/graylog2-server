@@ -53,6 +53,13 @@ public class ExtractorService {
                 .execute();
     }
 
+    public Extractor load(Node node, Input input, String extractorId) throws IOException, APIException {
+        final ExtractorSummaryResponse extractorSummaryResponse = api.path(resource.single(input.getId(), extractorId), ExtractorSummaryResponse.class)
+                .node(node)
+                .execute();
+
+        return extractorFactory.fromResponse(extractorSummaryResponse);
+    }
 
     public List<Extractor> all(Node node, Input input) throws IOException, APIException {
         List<Extractor> extractors = Lists.newArrayList();

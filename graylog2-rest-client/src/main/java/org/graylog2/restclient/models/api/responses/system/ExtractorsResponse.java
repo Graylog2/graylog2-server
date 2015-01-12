@@ -18,9 +18,6 @@ package org.graylog2.restclient.models.api.responses.system;
 
 import java.util.List;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public class ExtractorsResponse {
 
     public int total;
