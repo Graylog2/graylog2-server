@@ -224,9 +224,13 @@ public abstract class CmdLineTool implements Runnable {
         final Set<Plugin> plugins = loadPlugins(pluginPath);
         final PluginBindings pluginBindings = new PluginBindings(plugins, capabilities());
         for (final Plugin plugin : plugins) {
-            for (final PluginModule pluginModule : plugin.modules())
-                for (final PluginConfigBean configBean : pluginModule.getConfigBeans())
-                    jadConfig.addConfigurationBean(configBean);
+            if(capabilities().containsAll(plugin.metadata().getRequiredCapabilities())) {
+                for (final PluginModule pluginModule : plugin.modules()) {
+                    for (final PluginConfigBean configBean : pluginModule.getConfigBeans()) {
+                        jadConfig.addConfigurationBean(configBean);
+                    }
+                }
+            }
         }
         return pluginBindings;
     }
