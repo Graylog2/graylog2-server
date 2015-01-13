@@ -25,6 +25,10 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.Configuration;
 import org.graylog2.buffers.OutputBuffer;
+import org.graylog2.rest.models.system.buffers.responses.BufferClasses;
+import org.graylog2.rest.models.system.buffers.responses.BuffersUtilizationSummary;
+import org.graylog2.rest.models.system.buffers.responses.RingSummary;
+import org.graylog2.rest.models.system.buffers.responses.SingleRingUtilization;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.shared.buffers.ProcessBuffer;
@@ -39,16 +43,17 @@ import java.util.Map;
 @RequiresAuthentication
 @Api(value = "System/Buffers", description = "Buffer information of this node.")
 @Path("/system/buffers")
-public class BufferResource extends RestResource {
+@Produces(MediaType.APPLICATION_JSON)
+public class BuffersResource extends RestResource {
 
     private final Configuration configuration;
     private final ProcessBuffer processBuffer;
     private final OutputBuffer outputBuffer;
 
     @Inject
-    public BufferResource(Configuration configuration,
-                          ProcessBuffer processBuffer,
-                          OutputBuffer outputBuffer) {
+    public BuffersResource(Configuration configuration,
+                           ProcessBuffer processBuffer,
+                           OutputBuffer outputBuffer) {
         this.configuration = configuration;
         this.processBuffer = processBuffer;
         this.outputBuffer = outputBuffer;
@@ -58,10 +63,21 @@ public class BufferResource extends RestResource {
     @Timed
     @ApiOperation(value = "Get current utilization of buffers and caches of this node.")
     @RequiresPermissions(RestPermissions.BUFFERS_READ)
-    @Produces(MediaType.APPLICATION_JSON)
-    public Map<String, Map<String, Object>> utilization() {
-        return ImmutableMap.of(
-                "buffers", buffers());
+    public BuffersUtilizationSummary utilization() {
+        int ringSize = configuration.getRingSize();
+
+        final long inputSize = processBuffer.size();
+        final long inputUtil = inputSize/ringSize*100;
+
+        final long outputSize = outputBuffer.size();
+        final long outputUtil = outputSize/ringSize*100;
+
+        return BuffersUtilizationSummary.create(
+                RingSummary.create(
+                        SingleRingUtilization.create(inputSize, inputUtil),
+                        SingleRingUtilization.create(outputSize, outputUtil)
+                )
+        );
     }
 
     @GET
@@ -69,35 +85,8 @@ public class BufferResource extends RestResource {
     @Path("/classes")
     @ApiOperation(value = "Get classnames of current buffer implementations.")
     @RequiresPermissions(RestPermissions.BUFFERS_READ)
-    @Produces(MediaType.APPLICATION_JSON)
-    public Map<String, String> getBufferClasses() {
-        return ImmutableMap.of(
-                "process_buffer", processBuffer.getClass().getCanonicalName(),
-                "output_buffer", outputBuffer.getClass().getCanonicalName());
+    public BufferClasses getBufferClasses() {
+        return BufferClasses.create(processBuffer.getClass().getCanonicalName(),
+                outputBuffer.getClass().getCanonicalName());
     }
-
-    private Map<String, Object> buffers() {
-        Map<String, Object> buffers = Maps.newHashMap();
-        Map<String, Object> input = Maps.newHashMap();
-        Map<String, Object> output = Maps.newHashMap();
-
-        int ringSize = configuration.getRingSize();
-
-        final long inputSize = processBuffer.size();
-        final float inputUtil = inputSize/ringSize*100;
-        input.put("utilization_percent", inputUtil);
-        input.put("utilization", inputSize);
-
-        final long outputSize = outputBuffer.size();
-        final float outputUtil = outputSize/ringSize*100;
-        output.put("utilization_percent", outputUtil);
-        output.put("utilization", outputSize);
-
-        buffers.put("input", input);
-        buffers.put("output", output);
-
-        return buffers;
-    }
-
-
 }
