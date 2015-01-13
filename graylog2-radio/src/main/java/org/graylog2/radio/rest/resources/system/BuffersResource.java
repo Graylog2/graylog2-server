@@ -19,8 +19,8 @@ package org.graylog2.radio.rest.resources.system;
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Maps;
 import org.graylog2.radio.Configuration;
-import org.graylog2.radio.rest.resources.RestResource;
 import org.graylog2.shared.buffers.ProcessBuffer;
+import org.graylog2.shared.rest.resources.RestResource;
 
 import javax.inject.Inject;
 import javax.ws.rs.GET;
@@ -45,12 +45,12 @@ public class BuffersResource extends RestResource {
 
     @GET @Timed
     @Produces(MediaType.APPLICATION_JSON)
-    public String utilization() {
+    public Map<String, Object> utilization() {
         Map<String, Object> result = Maps.newHashMap();
         result.put("buffers", buffers());
         result.put("master_caches", masterCaches());
 
-        return json(result);
+        return result;
     }
 
     private Map<String, Object> masterCaches() {
