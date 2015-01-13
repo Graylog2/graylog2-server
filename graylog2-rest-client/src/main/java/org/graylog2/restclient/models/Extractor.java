@@ -202,6 +202,7 @@ public class Extractor {
                 break;
             case SPLIT_AND_INDEX:
                 loadSplitAndIndexConfig(form);
+                break;
             case GROK:
                 loadGrokConfig(form);
                 break;
