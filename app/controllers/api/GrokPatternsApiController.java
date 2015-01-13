@@ -40,7 +40,7 @@ public class GrokPatternsApiController extends AuthenticatedController {
     public GrokPatternsApiController(ExtractorService extractorService) {
         this.extractorService = extractorService;
     }
-    
+
     public Result index() {
         try {
             return ok(Json.toJson(extractorService.allGrokPatterns()));
@@ -87,6 +87,5 @@ public class GrokPatternsApiController extends AuthenticatedController {
             return internalServerError();
         }
         return ok();
-
     }
 }

@@ -85,7 +85,7 @@ GET         /system/contentpacks                                                
 GET         /system/contentpacks/export                                              @controllers.BundlesController.exportForm()
 POST        /system/contentpacks/export                                              @controllers.BundlesController.export()
 GET         /system/grokpatterns                                                     @controllers.GrokPatternsController.index()
-GET         /system/grokpatterns/import                                              @controllers.GrokPatternsController.upload()
+POST        /system/grokpatterns/import                                              @controllers.GrokPatternsController.upload()
 
 # Outputs
 GET         /system/outputs                                                          @controllers.OutputsController.index()

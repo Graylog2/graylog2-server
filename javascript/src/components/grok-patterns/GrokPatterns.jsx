@@ -3,6 +3,7 @@
 var React = require('react');
 //noinspection JSUnusedGlobalSymbols
 var EditPatternModal = require('./EditPatternModal');
+var BulkLoadPatternModal = require('./BulkLoadPatternModal');
 var GrokPatternsStore = require('../../stores/grok-patterns/GrokPatternsStore');
 
 var GrokPatterns = React.createClass({
@@ -74,15 +75,14 @@ var GrokPatterns = React.createClass({
 
     render() {
         return (
-            <div>
-                <div className="row-fluid">
-                    <div className="span4">
-                        <label htmlFor="grokfilter">Search for pattern names:</label>
-                        <input type="text" name="filter" id="grokfilter" value={this.state.filter} onChange={(event) => {this.setState({filter: event.target.value});}} />
-                    </div>
-                    <div className="pull-right">
-                        <EditPatternModal id={""} name={""} pattern={""} create={true} reload={this.loadData} savePattern={this.savePattern} />
-                    </div>
+            <div style={{paddingTop: 15}}>
+                <form className="form-inline pull-left">
+                    <label htmlFor="grokfilter" style={{marginRight: 5}}>Filter pattern names:</label>
+                    <input type="text" name="filter" id="grokfilter" value={this.state.filter} onChange={(event) => {this.setState({filter: event.target.value});}} />
+                </form>
+                <div className="pull-right">
+                    <BulkLoadPatternModal />
+                    <EditPatternModal id={""} name={""} pattern={""} create={true} reload={this.loadData} savePattern={this.savePattern} />
                 </div>
                 <div className="grok-patterns row-fluid">
                 {this._filteredPatternsHtml()}

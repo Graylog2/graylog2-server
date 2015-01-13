@@ -23,6 +23,9 @@ import org.graylog2.restclient.models.User;
 import org.graylog2.restclient.models.UserService;
 import play.mvc.Security.Authenticated;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+
 @Authenticated(RedirectAuthenticator.class)
 public class AuthenticatedController extends BaseController {
 
@@ -30,4 +33,12 @@ public class AuthenticatedController extends BaseController {
         return UserService.current();
 	}
 
+    protected String getRefererPath() {
+        try {
+            URL parser = new URL(request().getHeader(REFERER));
+            return parser.getPath();
+        } catch (MalformedURLException e) {
+            return "/";
+        }
+    }
 }

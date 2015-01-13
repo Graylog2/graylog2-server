@@ -32,8 +32,6 @@ import play.mvc.Result;
 import javax.inject.Inject;
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
 public class BundlesApiController extends AuthenticatedController {
@@ -97,12 +95,4 @@ public class BundlesApiController extends AuthenticatedController {
         return redirect(getRefererPath());
     }
 
-    private String getRefererPath() {
-        try {
-            URL parser = new URL(request().getHeader(REFERER));
-            return parser.getPath();
-        } catch (MalformedURLException e) {
-            return "/";
-        }
-    }
 }
