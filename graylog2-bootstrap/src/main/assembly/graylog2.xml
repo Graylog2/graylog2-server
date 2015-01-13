@@ -43,20 +43,21 @@
     <files>
         <file>
             <source>${project.build.directory}/graylog2.jar</source>
+            <destName>graylog.jar</destName>
             <outputDirectory>/</outputDirectory>
         </file>
         <file>
-            <source>${project.basedir}/../bin/graylog2ctl</source>
+            <source>${project.basedir}/../bin/graylogctl</source>
             <outputDirectory>bin/</outputDirectory>
             <fileMode>0755</fileMode>
         </file>
         <file>
             <source>${project.basedir}/../misc/graylog2.conf</source>
-            <destName>graylog2.conf.example</destName>
+            <destName>graylog.conf.example</destName>
             <outputDirectory>/</outputDirectory>
         </file>
         <file>
-            <source>${project.basedir}/../bin/graylog2-es-timestamp-fixup</source>
+            <source>${project.basedir}/../bin/graylog-es-timestamp-fixup</source>
             <outputDirectory>bin/</outputDirectory>
             <fileMode>0755</fileMode>
         </file>
@@ -67,7 +68,7 @@
         </file>
         <file>
             <source>${project.basedir}/../graylog2-radio/misc/graylog2-radio.conf</source>
-            <destName>graylog2-radio.conf.example</destName>
+            <destName>graylog-radio.conf.example</destName>
             <outputDirectory>/</outputDirectory>
         </file>
     </files>
