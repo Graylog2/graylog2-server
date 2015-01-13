@@ -22,27 +22,14 @@ import com.google.auto.value.AutoValue;
 
 @JsonAutoDetect
 @AutoValue
-public abstract class QueryParseError {
+public abstract class SearchError {
+    @JsonProperty
+    public abstract String message();
+
     @JsonProperty
     public abstract String query();
 
-    @JsonProperty
-    public abstract int beginColumn();
-
-    @JsonProperty
-    public abstract int beginLine();
-
-    @JsonProperty
-    public abstract int endColumn();
-
-    @JsonProperty
-    public abstract int endLine();
-
-    public static QueryParseError create(String query, int beginColumn, int beginLine, int endColumn, int endLine) {
-        return new AutoValue_QueryParseError(query, beginColumn, beginLine, endColumn, endLine);
-    }
-
-    public static QueryParseError create(String query) {
-        return new AutoValue_QueryParseError(query, 0, 0, 0, 0);
+    public static SearchError create(String message, String query) {
+        return new AutoValue_GenericError(message, query);
     }
 }
