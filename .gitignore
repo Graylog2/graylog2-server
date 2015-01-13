@@ -16,6 +16,7 @@ dist
 .ecltarget
 
 conf/graylog2-web-interface.conf
+conf/graylog-web-interface.conf
 
 .target
 .DS_Store

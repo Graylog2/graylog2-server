@@ -102,11 +102,11 @@ public class Global extends GlobalSettings {
 
         final String appSecret = app.configuration().getString("application.secret");
         if (appSecret == null || appSecret.isEmpty()) {
-            log.error("Please configure application.secret in your conf/graylog2-web-interface.conf");
+            log.error("Please configure application.secret in your conf/graylog-web-interface.conf");
             throw new IllegalStateException("No application.secret configured.");
         }
         if (appSecret.length() < 16) {
-            log.error("Please configure application.secret in your conf/graylog2-web-interface.conf to be longer than 16 characters. Suggested is using pwgen -N 1 -s 96 or similar");
+            log.error("Please configure application.secret in your conf/graylog-web-interface.conf to be longer than 16 characters. Suggested is using pwgen -N 1 -s 96 or similar");
             throw new IllegalStateException("application.secret is too short, use at least 16 characters! Suggested is to use pwgen -N 1 -s 96 or similar");
         }
 
@@ -249,7 +249,7 @@ public class Global extends GlobalSettings {
             return configuration;
         }
 
-        final File configFile = new File(file, "conf/graylog2-web-interface.conf");
+        final File configFile = new File(file, "conf/graylog-web-interface.conf");
         if (!isTest) {
             if (!configFile.exists()) {
                 log.error("Your configuration should be at {} but does not exist, cannot continue without it.", configFile.getAbsoluteFile());
@@ -265,7 +265,7 @@ public class Global extends GlobalSettings {
             throw new IllegalStateException("Empty configuration file " + configFile.getAbsolutePath());
         /*
          *
-         * This is merging the standard bundled application.conf with our graylog2-web-interface.conf.
+         * This is merging the standard bundled application.conf with our graylog-web-interface.conf.
          * The application.conf must always be empty when packaged so there is nothing hidden from the user.
          * We are merging, because the Configuration object already contains some information the web-interface needs.
          *
