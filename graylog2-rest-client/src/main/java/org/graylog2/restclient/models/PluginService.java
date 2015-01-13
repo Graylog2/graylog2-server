@@ -37,6 +37,6 @@ public class PluginService {
     }
 
     public List<Plugin> list(Node node) throws APIException, IOException {
-        return  api.path(routes.PluginResource().list(), ListPluginResponse.class).node(node).execute().plugins;
+        return  api.path(routes.SystemPluginResource().list(), ListPluginResponse.class).node(node).execute().plugins;
     }
 }

@@ -16,6 +16,7 @@
  */
 package org.graylog2.inputs;
 
+import com.google.common.collect.Lists;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.database.ValidationException;

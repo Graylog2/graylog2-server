@@ -38,7 +38,7 @@ import java.util.Set;
 @Api(value = "System/Plugin", description = "Plugin information")
 @Path("/system/plugins")
 @Produces(MediaType.APPLICATION_JSON)
-public class PluginResource extends RestResource {
+public class SystemPluginResource extends RestResource {
     private final Set<PluginMetaData> pluginMetaDataSet;
 
     static class PluginMetaDataValue {
@@ -62,7 +62,7 @@ public class PluginResource extends RestResource {
     }
 
     @Inject
-    public PluginResource(Set<PluginMetaData> pluginMetaDataSet) {
+    public SystemPluginResource(Set<PluginMetaData> pluginMetaDataSet) {
         this.pluginMetaDataSet = pluginMetaDataSet;
     }
 
