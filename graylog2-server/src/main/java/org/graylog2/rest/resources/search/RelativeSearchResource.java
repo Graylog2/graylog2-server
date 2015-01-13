@@ -168,6 +168,8 @@ public class RelativeSearchResource extends SearchResource {
         } catch (IndexHelper.InvalidRangeFormatException e) {
             LOG.warn("Invalid timerange parameters provided. Returning HTTP 400.", e);
             throw new BadRequestException("Invalid timerange parameters provided", e);
+        } catch (SearchPhaseExecutionException e) {
+            throw createRequestExceptionForParseFailure(query, e);
         }
     }
 
@@ -200,6 +202,8 @@ public class RelativeSearchResource extends SearchResource {
         } catch (IndexHelper.InvalidRangeFormatException e) {
             LOG.warn("Invalid timerange parameters provided. Returning HTTP 400.", e);
             throw new BadRequestException(e);
+        } catch (SearchPhaseExecutionException e) {
+            throw createRequestExceptionForParseFailure(query, e);
         }
     }
 
@@ -228,6 +232,8 @@ public class RelativeSearchResource extends SearchResource {
         } catch (IndexHelper.InvalidRangeFormatException e) {
             LOG.warn("Invalid timerange parameters provided. Returning HTTP 400.", e);
             throw new BadRequestException("Invalid timerange parameters provided", e);
+        } catch (SearchPhaseExecutionException e) {
+            throw createRequestExceptionForParseFailure(query, e);
         }
     }
 
@@ -264,6 +270,8 @@ public class RelativeSearchResource extends SearchResource {
         } catch (IndexHelper.InvalidRangeFormatException e) {
             LOG.warn("Invalid timerange parameters provided. Returning HTTP 400.", e);
             throw new BadRequestException("Invalid timerange parameters provided", e);
+        } catch (SearchPhaseExecutionException e) {
+            throw createRequestExceptionForParseFailure(query, e);
         }
     }
 
@@ -296,6 +304,8 @@ public class RelativeSearchResource extends SearchResource {
         } catch (IndexHelper.InvalidRangeFormatException e) {
             LOG.warn("Invalid timerange parameters provided. Returning HTTP 400.", e);
             throw new BadRequestException("Invalid timerange parameters provided", e);
+        } catch (SearchPhaseExecutionException e) {
+            throw createRequestExceptionForParseFailure(query, e);
         }
     }
 
