@@ -239,7 +239,7 @@ public class Server extends ServerBootstrap implements Runnable {
 
     @Override
     protected Set<ServerStatus.Capability> capabilities() {
-        if(configuration.isMaster()) {
+        if (configuration.isMaster()) {
             return EnumSet.of(ServerStatus.Capability.SERVER, ServerStatus.Capability.MASTER);
         } else {
             return EnumSet.of(ServerStatus.Capability.SERVER);
