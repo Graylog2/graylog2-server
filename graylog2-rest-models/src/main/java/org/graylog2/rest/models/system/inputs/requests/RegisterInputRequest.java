@@ -14,13 +14,12 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.shared.rest.resources.system.inputs.requests;
+package org.graylog2.rest.models.system.inputs.requests;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.graylog2.plugin.inputs.MessageInput;
 
 import javax.annotation.Nullable;
 import java.util.Map;
@@ -57,10 +56,4 @@ public abstract class RegisterInputRequest {
                                               @JsonProperty("creator_user_id") String creatorUserId) {
         return new AutoValue_RegisterInputRequest(inputId, title, type, configuration, radioId, creatorUserId);
     }
-
-    public static RegisterInputRequest create(MessageInput input, String radioId) {
-        return create(input.getId(), input.getTitle(), input.getClass().getCanonicalName(),
-                input.getConfiguration().getSource(), radioId, input.getCreatorUserId());
-    }
-
 }

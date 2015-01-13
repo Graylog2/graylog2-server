@@ -14,16 +14,22 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.radio.inputs.api;
+package org.graylog2.rest.models.radio.requests;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.auto.value.AutoValue;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
-public class RegisterInputResponse {
+@JsonAutoDetect
+@AutoValue
+public abstract class PingRequest {
+    @JsonProperty
+    public abstract String restTransportAddress();
 
-    @JsonProperty("persist_id")
-    public String persistId;
+    @JsonCreator
+    public static PingRequest create(@JsonProperty("rest_transport_address") String restTransportAddress) {
+        return new AutoValue_PingRequest(restTransportAddress);
+    }
 
 }

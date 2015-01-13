@@ -38,6 +38,7 @@ import org.graylog2.shared.bindings.providers.MetricRegistryProvider;
 import org.graylog2.shared.bindings.providers.NodeIdProvider;
 import org.graylog2.shared.bindings.providers.ServiceManagerProvider;
 import org.graylog2.shared.inputs.InputRegistry;
+import org.graylog2.shared.inputs.InputStateListener;
 import org.graylog2.shared.stats.ThroughputStats;
 import org.jboss.netty.util.HashedWheelTimer;
 
@@ -77,5 +78,11 @@ public class GenericBindings extends AbstractModule {
         install(new FactoryModuleBuilder().build(new TypeLiteral<IOState.Factory<MessageInput>>(){}));
 
         bind(InputRegistry.class).asEagerSingleton();
+
+        bindEventBusListeners();
+    }
+
+    private void bindEventBusListeners() {
+        bind(InputStateListener.class).asEagerSingleton();
     }
 }

@@ -14,14 +14,13 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.radio.inputs;
+package org.graylog2.shared.inputs;
 
+import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import org.graylog2.plugin.IOState;
 import org.graylog2.plugin.events.inputs.IOStateChangedEvent;
 import org.graylog2.plugin.inputs.MessageInput;
-import org.graylog2.radio.cluster.InputService;
-import org.graylog2.shared.inputs.InputRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,28 +28,17 @@ import javax.inject.Inject;
 
 public class InputStateListener {
     private static final Logger LOG = LoggerFactory.getLogger(InputStateListener.class);
-    private final InputService inputService;
-    private final InputRegistry inputRegistry;
 
     @Inject
-    public InputStateListener(InputService inputService, InputRegistry inputRegistry) {
-        this.inputService = inputService;
-        this.inputRegistry = inputRegistry;
+    public InputStateListener(EventBus eventBus) {
+        eventBus.register(this);
     }
 
     @Subscribe public void inputStateChanged(IOStateChangedEvent<MessageInput> event) {
         final IOState<MessageInput> state = event.changedState();
-        MessageInput input = state.getStoppable();
-        try {
-            if (!input.isGlobal() && event.newState() == IOState.Type.TERMINATED)
-                inputService.unregisterInCluster(input);
-        } catch (Exception e) {
-            LOG.error("Could not unregister input [{}], id <{}> on server cluster: {}", input.getName(), input.getId(), e);
-            return;
-        }
-
-        LOG.info("Unregistered input [{}], id <{}> on server cluster.", input.getName(), input.getId());
-
-        inputRegistry.remove(state);
+        final MessageInput input = state.getStoppable();
+        LOG.debug("Input State of {} changed: {} -> {}", input.getTitle(), event.oldState(), event.newState());
+        final String msg = "Input [" + input.getName() + "/" + input.getId() + "] is now " + event.newState().toString();
+        LOG.info(msg);
     }
 }
