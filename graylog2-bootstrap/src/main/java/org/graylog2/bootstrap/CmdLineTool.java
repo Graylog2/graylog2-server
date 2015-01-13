@@ -32,6 +32,7 @@ import com.github.joschi.jadconfig.repositories.PropertiesRepository;
 import com.github.joschi.jadconfig.repositories.SystemPropertiesRepository;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import com.google.inject.Binder;
 import com.google.inject.CreationException;
 import com.google.inject.Injector;
@@ -46,6 +47,7 @@ import org.graylog2.plugin.BaseConfiguration;
 import org.graylog2.plugin.Plugin;
 import org.graylog2.plugin.PluginConfigBean;
 import org.graylog2.plugin.PluginLoaderConfig;
+import org.graylog2.plugin.PluginMetaData;
 import org.graylog2.plugin.PluginModule;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.Tools;
@@ -222,15 +224,14 @@ public abstract class CmdLineTool implements Runnable {
 
     private PluginBindings installPluginConfigAndBindings(String pluginPath) {
         final Set<Plugin> plugins = loadPlugins(pluginPath);
-        final PluginBindings pluginBindings = new PluginBindings(plugins, capabilities());
+        final PluginBindings pluginBindings = new PluginBindings(plugins);
         for (final Plugin plugin : plugins) {
-            if(capabilities().containsAll(plugin.metadata().getRequiredCapabilities())) {
-                for (final PluginModule pluginModule : plugin.modules()) {
-                    for (final PluginConfigBean configBean : pluginModule.getConfigBeans()) {
-                        jadConfig.addConfigurationBean(configBean);
-                    }
+            for (final PluginModule pluginModule : plugin.modules()) {
+                for (final PluginConfigBean configBean : pluginModule.getConfigBeans()) {
+                    jadConfig.addConfigurationBean(configBean);
                 }
             }
+
         }
         return pluginBindings;
     }
@@ -258,10 +259,18 @@ public abstract class CmdLineTool implements Runnable {
 
         final PluginLoader pluginLoader = new PluginLoader(pluginDir);
         for (Plugin plugin : pluginLoader.loadPlugins()) {
-            if (version.sameOrHigher(plugin.metadata().getRequiredVersion()))
-                plugins.add(plugin);
-            else
-                LOG.error("Plugin \"" + plugin.metadata().getName() + "\" requires version " + plugin.metadata().getRequiredVersion() + " - not loading!");
+            final PluginMetaData metadata = plugin.metadata();
+            if(capabilities().containsAll(metadata.getRequiredCapabilities())) {
+                if (version.sameOrHigher(metadata.getRequiredVersion())) {
+                    plugins.add(plugin);
+                } else {
+                    LOG.error("Plugin \"" + metadata.getName() + "\" requires version " + metadata.getRequiredVersion() + " - not loading!");
+                }
+            } else {
+                LOG.debug("Skipping plugin \"{}\" because some capabilities are missing ({}).",
+                        metadata.getName(),
+                        Sets.difference(plugin.metadata().getRequiredCapabilities(), capabilities()));
+            }
         }
 
         LOG.debug("Loaded plugins: " + plugins);
