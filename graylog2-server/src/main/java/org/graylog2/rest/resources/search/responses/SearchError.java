@@ -30,6 +30,6 @@ public abstract class SearchError {
     public abstract String query();
 
     public static SearchError create(String message, String query) {
-        return new AutoValue_GenericError(message, query);
+        return new AutoValue_SearchError(message, query);
     }
 }
