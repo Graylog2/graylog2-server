@@ -67,7 +67,7 @@ var GrokPatterns = React.createClass({
         });
     },
     confirmedRemove(pattern) {
-        if (window.confirm("Really delete the grok pattern " + pattern.name + "?\nIt will be removed from the system and unavailable for any extractor. If it is still in uses extractors will fail to work.")) {
+        if (window.confirm("Really delete the grok pattern " + pattern.name + "?\nIt will be removed from the system and unavailable for any extractor. If it is still in use by extractors those will fail to work.")) {
             GrokPatternsStore.deletePattern(pattern, this.loadData);
         }
     },
