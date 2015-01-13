@@ -20,6 +20,7 @@ import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import org.graylog2.plugin.PluginMetaData;
+import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.Version;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
@@ -49,6 +50,7 @@ public class PluginResource extends RestResource {
         public final Version version;
         public final String description;
         public final Version required_version;
+        public final Set<ServerStatus.Capability> required_capabilities;
 
         PluginMetaDataValue(PluginMetaData pluginMetaData) {
             this.unique_id = pluginMetaData.getUniqueId();
@@ -58,6 +60,7 @@ public class PluginResource extends RestResource {
             this.version = pluginMetaData.getVersion();
             this.description = pluginMetaData.getDescription();
             this.required_version = pluginMetaData.getRequiredVersion();
+            this.required_capabilities = pluginMetaData.getRequiredCapabilities();
         }
     }
 
