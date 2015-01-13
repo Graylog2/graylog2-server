@@ -19,7 +19,6 @@ package org.graylog2.dashboards.widgets;
 import com.codahale.metrics.MetricRegistry;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
-import org.graylog2.indexer.IndexHelper;
 import org.graylog2.indexer.results.FieldStatsResult;
 import org.graylog2.indexer.searches.Searches;
 import org.graylog2.indexer.searches.timeranges.AbsoluteRange;
@@ -118,8 +117,6 @@ public class StatisticalCountWidget extends SearchResultCountWidget {
             } else {
                 return new ComputationResult(getStatisticalValue(fieldStatsResult), fieldStatsResult.took().millis());
             }
-        } catch (IndexHelper.InvalidRangeFormatException e) {
-            throw new RuntimeException("Invalid timerange format.", e);
         } catch (Searches.FieldTypeException e) {
             throw new RuntimeException("Invalid field provided.", e);
         }

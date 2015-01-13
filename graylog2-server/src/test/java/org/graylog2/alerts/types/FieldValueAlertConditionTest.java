@@ -17,7 +17,7 @@
 package org.graylog2.alerts.types;
 
 import org.graylog2.alerts.AlertConditionTest;
-import org.graylog2.indexer.IndexHelper;
+import org.graylog2.indexer.InvalidRangeFormatException;
 import org.graylog2.indexer.results.FieldStatsResult;
 import org.graylog2.indexer.searches.Searches;
 import org.graylog2.indexer.searches.timeranges.RelativeRange;
@@ -147,7 +147,7 @@ public class FieldValueAlertConditionTest extends AlertConditionTest {
     protected void fieldStatsShouldReturn(FieldStatsResult fieldStatsResult) {
         try {
             when(searches.fieldStats(anyString(), Matchers.eq("*"), anyString(), any(RelativeRange.class))).thenReturn(fieldStatsResult);
-        } catch (IndexHelper.InvalidRangeFormatException e) {
+        } catch (InvalidRangeFormatException e) {
             assertNotNull("This should not return an exception!", e);
         } catch (Searches.FieldTypeException e) {
             assertNotNull("This should not return an exception!", e);
