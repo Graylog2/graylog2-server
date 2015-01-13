@@ -94,9 +94,6 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "lb_recognition_period_seconds", validator = PositiveIntegerValidator.class)
     private int loadBalancerRecognitionPeriodSeconds = 3;
 
-    @Parameter(value = "http_proxy_uri")
-    private URI httpProxyUri;
-
     @Parameter(value = "stream_processing_timeout", validator = PositiveLongValidator.class)
     private long streamProcessingTimeout = 2000;
 
@@ -196,10 +193,6 @@ public class Configuration extends BaseConfiguration {
 
     public boolean isMetricsCollectionEnabled() {
         return metricsCollectionEnabled;
-    }
-
-    public URI getHttpProxyUri() {
-        return httpProxyUri;
     }
 
     public boolean isDeadLettersEnabled() {

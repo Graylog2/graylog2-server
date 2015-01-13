@@ -43,10 +43,6 @@
             <groupId>io.airlift</groupId>
             <artifactId>airline</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.graylog2.telemetry</groupId>
-            <artifactId>graylog2-telemetry-plugin</artifactId>
-        </dependency>
     </dependencies>
 
     <build>

@@ -17,7 +17,6 @@
 package org.graylog2.periodical;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import javax.inject.Inject;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
@@ -33,13 +32,16 @@ import org.graylog2.shared.ServerVersion;
 import org.graylog2.configuration.VersionCheckConfiguration;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
+import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.Version;
 import org.graylog2.plugin.periodical.Periodical;
-import org.graylog2.plugin.ServerStatus;
 import org.graylog2.versioncheck.VersionCheckResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
+import javax.inject.Inject;
+import javax.inject.Named;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.net.URI;
@@ -49,22 +51,22 @@ import java.nio.charset.Charset;
 import static java.util.concurrent.TimeUnit.MINUTES;
 
 public class VersionCheckThread extends Periodical {
-
     private static final Logger LOG = LoggerFactory.getLogger(VersionCheckThread.class);
+
     private final NotificationService notificationService;
     private final ServerStatus serverStatus;
     private final VersionCheckConfiguration versionCheckConfiguration;
-    private final Configuration configuration;
+    private final URI httpProxyUri;
 
     @Inject
     public VersionCheckThread(NotificationService notificationService,
                               ServerStatus serverStatus,
                               VersionCheckConfiguration versionCheckConfiguration,
-                              Configuration configuration) {
+                              @Named("http_proxy_uri") @Nullable URI httpProxyUri) {
         this.notificationService = notificationService;
         this.serverStatus = serverStatus;
         this.versionCheckConfiguration = versionCheckConfiguration;
-        this.configuration = configuration;
+        this.httpProxyUri = httpProxyUri;
     }
 
     @Override
@@ -78,21 +80,20 @@ public class VersionCheckThread extends Periodical {
 
             get = new HttpGet(uri.build());
             get.setHeader("User-Agent",
-                          "graylog2-server ("
-                                  + System.getProperty("java.vendor") + ", "
-                                  + System.getProperty("java.version") + ", "
-                                  + System.getProperty("os.name") + ", "
-                                  + System.getProperty("os.version") + ")");
+                    "graylog2-server ("
+                            + System.getProperty("java.vendor") + ", "
+                            + System.getProperty("java.version") + ", "
+                            + System.getProperty("os.name") + ", "
+                            + System.getProperty("os.version") + ")");
             final RequestConfig.Builder configBuilder = RequestConfig.custom()
                     .setConnectTimeout(versionCheckConfiguration.getConnectTimeOut())
                     .setSocketTimeout(versionCheckConfiguration.getSocketTimeOut())
                     .setConnectionRequestTimeout(versionCheckConfiguration.getConnectionRequestTimeOut());
-            if (configuration.getHttpProxyUri() != null) {
+            if (httpProxyUri != null) {
                 try {
-                    final URI proxyURI = configuration.getHttpProxyUri();
-                    configBuilder.setProxy(new HttpHost(proxyURI.getHost(), proxyURI.getPort(), proxyURI.getScheme()));
+                    configBuilder.setProxy(new HttpHost(httpProxyUri.getHost(), httpProxyUri.getPort(), httpProxyUri.getScheme()));
                 } catch (Exception e) {
-                    LOG.error("Invalid version check proxy URI: " + configuration.getHttpProxyUri(), e);
+                    LOG.error("Invalid version check proxy URI: " + httpProxyUri, e);
                     return;
                 }
             }
@@ -194,6 +195,4 @@ public class VersionCheckThread extends Periodical {
     public int getPeriodSeconds() {
         return (int) MINUTES.toSeconds(30);
     }
-
-
 }

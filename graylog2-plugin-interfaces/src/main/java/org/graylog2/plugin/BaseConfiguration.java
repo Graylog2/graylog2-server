@@ -123,6 +123,9 @@ public abstract class BaseConfiguration {
     @Parameter("disable_sigar")
     private boolean disableSigar = false;
 
+    @Parameter(value = "http_proxy_uri")
+    private URI httpProxyUri;
+
     public String getRestUriScheme() {
         return isRestEnableTls() ? "https" : "http";
     }
@@ -284,5 +287,9 @@ public abstract class BaseConfiguration {
 
     public boolean isDisableSigar() {
         return disableSigar;
+    }
+
+    public URI getHttpProxyUri() {
+        return httpProxyUri;
     }
 }
