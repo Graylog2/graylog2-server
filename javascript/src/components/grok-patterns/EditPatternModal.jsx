@@ -1,12 +1,8 @@
 'use strict';
 
-var $ = require('jquery'); // excluded and shimed
-
 var React = require('react/addons');
 //noinspection JSUnusedGlobalSymbols
 var BootstrapModal = require('../bootstrap/BootstrapModal');
-var URLUtils = require("../../util/URLUtils");
-
 
 var EditDashboardModal = React.createClass({
     getInitialState() {

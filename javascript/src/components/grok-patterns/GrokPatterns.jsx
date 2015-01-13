@@ -1,11 +1,9 @@
 'use strict';
 
 var React = require('react');
-var URLUtils = require("../../util/URLUtils");
 //noinspection JSUnusedGlobalSymbols
 var EditPatternModal = require('./EditPatternModal');
 var GrokPatternsStore = require('../../stores/grok-patterns/GrokPatternsStore');
-var $ = require('jquery'); // excluded and shimed
 
 var GrokPatterns = React.createClass({
     getInitialState() {
@@ -80,7 +78,7 @@ var GrokPatterns = React.createClass({
                 <div className="row-fluid">
                     <div className="span4">
                         <label htmlFor="grokfilter">Search for pattern names:</label>
-                        <input type="text" name="filter" id="grokfilter" value={this.state.filter} onChange={() => {this.setState({filter: event.target.value})}} />
+                        <input type="text" name="filter" id="grokfilter" value={this.state.filter} onChange={(event) => {this.setState({filter: event.target.value});}} />
                     </div>
                     <div className="pull-right">
                         <EditPatternModal id={""} name={""} pattern={""} create={true} reload={this.loadData} savePattern={this.savePattern} />
