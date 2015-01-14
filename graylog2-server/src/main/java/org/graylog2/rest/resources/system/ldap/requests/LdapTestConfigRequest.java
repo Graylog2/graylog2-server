@@ -20,7 +20,6 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.annotation.Nullable;
 import java.net.URI;
@@ -50,9 +49,11 @@ public abstract class LdapTestConfigRequest {
     public abstract boolean activeDirectory();
 
     @JsonProperty
+    @Nullable
     public abstract String searchBase();
 
     @JsonProperty
+    @Nullable
     public abstract String searchPattern();
 
     @JsonProperty
@@ -73,8 +74,8 @@ public abstract class LdapTestConfigRequest {
                                                @JsonProperty("use_start_tls") boolean useStartTls,
                                                @JsonProperty("trust_all_certificates") boolean trustAllCertificates,
                                                @JsonProperty("active_directory") boolean activeDirectory,
-                                               @JsonProperty("search_base") @NotEmpty String searchBase,
-                                               @JsonProperty("search_pattern") @NotEmpty String searchPattern,
+                                               @JsonProperty("search_base") @Nullable String searchBase,
+                                               @JsonProperty("search_pattern") @Nullable String searchPattern,
                                                @JsonProperty("principal") @Nullable String principal,
                                                @JsonProperty("password") @Nullable String password,
                                                @JsonProperty("test_connect_only") boolean testConnectOnly) {
