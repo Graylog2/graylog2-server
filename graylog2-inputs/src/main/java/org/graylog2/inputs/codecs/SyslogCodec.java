@@ -128,7 +128,17 @@ public class SyslogCodec extends AbstractCodec {
 
         }
 
-        final Message m = new Message(e.getMessage(), parseHost(e, remoteAddress), parseDate(e, receivedTimestamp));
+        // If the message is a structured one, we do not want the message ID and the structured data in the
+        // message string. See: https://github.com/Graylog2/graylog2-server/issues/845#issuecomment-69499719
+        final String syslogMessage;
+        if (e instanceof StructuredSyslogServerEvent) {
+            final String structMessage = ((StructuredSyslogServerEvent) e).getStructuredMessage().getMessage();
+            syslogMessage = isNullOrEmpty(structMessage) ? e.getMessage() : structMessage;
+        } else {
+            syslogMessage = e.getMessage();
+        }
+
+        final Message m = new Message(syslogMessage, parseHost(e, remoteAddress), parseDate(e, receivedTimestamp));
         m.addField("facility", Tools.syslogFacilityToReadable(e.getFacility()));
         m.addField("level", e.getLevel());
 

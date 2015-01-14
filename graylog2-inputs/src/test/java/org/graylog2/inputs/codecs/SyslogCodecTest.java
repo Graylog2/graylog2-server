@@ -42,6 +42,8 @@ import static org.testng.Assert.assertNull;
 public class SyslogCodecTest {
     private static final int YEAR = Tools.iso8601().getYear();
     public static String STRUCTURED = "<165>1 2012-12-25T22:14:15.003Z mymachine.example.com evntslog - ID47 [exampleSDID@32473 iut=\"3\" eventSource=\"Application\" eventID=\"1011\"] BOMAn application event log entry";
+    public static String STRUCTURED_ISSUE_845 = "<190>1 2015-01-06T20:56:33.287Z app-1 app - - [mdc@18060 ip=\"::ffff:132.123.15.30\" logger=\"{c.corp.Handler}\" session=\"4ot7\" user=\"user@example.com\" user-agent=\"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_5) AppleWebKit/600.2.5 (KHTML, like Gecko) Version/7.1.2 Safari/537.85.11\"] User page 13 requested";
+    public static String STRUCTURED_ISSUE_845_EMPTY = "<128>1 2015-01-11T16:35:21.335797+01:00 s000000.example.com - - - - tralala";
     private final String UNSTRUCTURED = "<45>Oct 21 12:09:37 c4dc57ba1ebb syslog-ng[7208]: syslog-ng starting up; version='3.5.3'";
 
     @Mock private Configuration configuration;
@@ -65,7 +67,7 @@ public class SyslogCodecTest {
         final Message message = codec.decode(buildRawMessage(STRUCTURED));
 
         assertNotNull(message);
-        assertEquals(message.getMessage(), "ID47 [exampleSDID@32473 iut=\"3\" eventSource=\"Application\" eventID=\"1011\"] BOMAn application event log entry");
+        assertEquals(message.getMessage(), "BOMAn application event log entry");
         assertEquals(((DateTime) message.getField("timestamp")).withZone(DateTimeZone.UTC), new DateTime("2012-12-25T22:14:15.003Z", DateTimeZone.UTC));
         assertEquals(message.getField("source"), "mymachine.example.com");
         assertEquals(message.getField("level"), 5);
@@ -77,13 +79,43 @@ public class SyslogCodecTest {
     }
 
     @Test
+    public void testDecodeStructuredIssue845() throws Exception {
+        final Message message = codec.decode(buildRawMessage(STRUCTURED_ISSUE_845));
+
+        assertNotNull(message);
+        assertEquals(message.getMessage(), "User page 13 requested");
+        assertEquals(((DateTime) message.getField("timestamp")).withZone(DateTimeZone.UTC), new DateTime("2015-01-06T20:56:33.287Z", DateTimeZone.UTC));
+        assertEquals(message.getField("source"), "app-1");
+        assertEquals(message.getField("level"), 6);
+        assertEquals(message.getField("facility"), "local7");
+        assertEquals(message.getField("ip"), "::ffff:132.123.15.30");
+        assertEquals(message.getField("logger"), "{c.corp.Handler}");
+        assertEquals(message.getField("session"), "4ot7");
+        assertEquals(message.getField("user"), "user@example.com");
+        assertEquals(message.getField("user-agent"), "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_5) AppleWebKit/600.2.5 (KHTML, like Gecko) Version/7.1.2 Safari/537.85.11");
+        assertEquals(message.getField("application_name"), "app");
+    }
+
+    @Test
+    public void testDecodeStructuredIssue845Empty() throws Exception {
+        final Message message = codec.decode(buildRawMessage(STRUCTURED_ISSUE_845_EMPTY));
+
+        assertNotNull(message);
+        assertEquals(message.getMessage(), "- - tralala");
+        assertEquals(((DateTime) message.getField("timestamp")).withZone(DateTimeZone.UTC), new DateTime("2015-01-11T15:35:21.335797Z", DateTimeZone.UTC));
+        assertEquals(message.getField("source"), "s000000.example.com");
+        assertEquals(message.getField("level"), 0);
+        assertEquals(message.getField("facility"), "local0");
+    }
+
+    @Test
     public void testDecodeStructuredWithFullMessage() throws Exception {
         when(configuration.getBoolean(SyslogCodec.CK_STORE_FULL_MESSAGE)).thenReturn(true);
 
         final Message message = codec.decode(buildRawMessage(STRUCTURED));
 
         assertNotNull(message);
-        assertEquals(message.getMessage(), "ID47 [exampleSDID@32473 iut=\"3\" eventSource=\"Application\" eventID=\"1011\"] BOMAn application event log entry");
+        assertEquals(message.getMessage(), "BOMAn application event log entry");
         assertEquals(((DateTime) message.getField("timestamp")).withZone(DateTimeZone.UTC), new DateTime("2012-12-25T22:14:15.003Z", DateTimeZone.UTC));
         assertEquals(message.getField("source"), "mymachine.example.com");
         assertEquals(message.getField("level"), 5);
