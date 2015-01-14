@@ -20,7 +20,7 @@ var BootstrapModal = React.createClass({
         modal.on("shown", () => $("input", this.refs.body.getDOMNode()).first().focus());
     },
     _submit(event) {
-        this.props.onConfirm();
+        this.props.onConfirm(event);
         event.preventDefault();
     },
     _modalNode() {
@@ -40,28 +40,41 @@ var BootstrapModal = React.createClass({
                 </a>
                 );
         }
-
-        return (
-            <div ref="modal" className="modal hide fade">
-                <form  onSubmit={this._submit} className={this.props.formClass}>
-                    <div className="modal-header">
-                        <button
+        var formContent = (
+            <div>
+                <div className="modal-header">
+                    <button
                         type="button"
                         className="close"
                         data-dismiss="modal"
                         onClick={this.props.onCancel}
                         dangerouslySetInnerHTML={{__html: '&times'}}
-                        />
+                    />
                             {Array.isArray(this.props.children) ? this.props.children[0] : this.props.children}
-                    </div>
-                    <div ref="body" className="modal-body">
-                            {this.props.children[1]}
-                    </div>
-                    <div className="modal-footer">
+                </div>
+                <div ref="body" className="modal-body">
+                    {this.props.children[1]}
+                </div>
+                <div className="modal-footer">
                           {cancelButton}
                           {confirmButton}
-                    </div>
-                </form>
+                </div>
+            </div>
+        );
+        var form = (
+            <form 
+                onSubmit={this._submit} 
+                className={this.props.formClass} 
+                encType={this.props.encType} 
+                method={this.props.method}
+                action={this.props.action}>
+                {formContent}
+            </form>
+        );
+        
+        return (
+            <div ref="modal" className="modal hide fade">
+                {form}
             </div>
             );
     }

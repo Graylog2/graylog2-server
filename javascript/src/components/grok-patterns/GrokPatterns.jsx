@@ -1,9 +1,10 @@
 'use strict';
 
 var React = require('react');
-var URLUtils = require("../../util/URLUtils");
+//noinspection JSUnusedGlobalSymbols
 var EditPatternModal = require('./EditPatternModal');
-var $ = require('jquery'); // excluded and shimed
+var BulkLoadPatternModal = require('./BulkLoadPatternModal');
+var GrokPatternsStore = require('../../stores/grok-patterns/GrokPatternsStore');
 
 var GrokPatterns = React.createClass({
     getInitialState() {
@@ -16,31 +17,32 @@ var GrokPatterns = React.createClass({
         this.loadData();
     },
     loadData() {
-        $.get(URLUtils.appPrefixed('/a/system/grokpatterns'), (result) => {
+        GrokPatternsStore.loadPatterns((patterns) => {
             if (this.isMounted()) {
                 this.setState({
-                    patterns: result
+                    patterns: patterns
                 });
             }
         });
     },
-    _getSortedFilteredPatterns() {
-        var patterns = this.state.patterns;
-        patterns.sort((pattern1, pattern2) => {
-            return pattern1.name.toLowerCase().localeCompare(pattern2.name.toLowerCase());
-        });
-        var filter = this.state.filter;
-        return patterns.filter((pattern) => { return pattern.name.toLowerCase().indexOf(filter) !== -1; });
+    _getFilteredPatterns() {
+        var filter = this.state.filter.toLowerCase().trim();
+        return this.state.patterns.filter((pattern) => { return pattern.name.toLowerCase().indexOf(filter) !== -1; });
     },
     
-    _sortedFilteredPatternsHtml() {
-        var patterns = this._getSortedFilteredPatterns();
+    _filteredPatternsHtml() {
+        var patterns = this._getFilteredPatterns();
         var jsx = patterns.map((pattern) => {
             return (
                 <tr key={pattern.id}>
                     <td>{pattern.name}</td>
                     <td>{pattern.pattern}</td>
-                    <td><EditPatternModal id={pattern.id} name={pattern.name} pattern={pattern.pattern} reload={this.loadData}/></td>
+                    <td>
+                        <button style={{marginRight: 5}} className="btn btn-mini" onClick={this.confirmedRemove.bind(this, pattern)}>
+                            <i className="icon icon-remove"></i> Delete
+                        </button>
+                        <EditPatternModal id={pattern.id} name={pattern.name} pattern={pattern.pattern} create={false} reload={this.loadData} savePattern={this.savePattern}/>
+                    </td>
                 </tr>
             );
         }, this);
@@ -51,7 +53,7 @@ var GrokPatterns = React.createClass({
                     <tr>
                         <th>Name</th>
                         <th>Pattern</th>
-                        <th></th>
+                        <th style={{width: 180}}>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -59,26 +61,31 @@ var GrokPatterns = React.createClass({
                 </tbody>
             </table>);
     },
-    
-    _updateFilter(event) {
-        var filter = event.target.value;
-        this.setState({filter: filter});
+    savePattern(pattern, callback) {
+        GrokPatternsStore.savePattern(pattern, () => {
+            callback();
+            this.loadData();
+        });
     },
-    
+    confirmedRemove(pattern) {
+        if (window.confirm("Really delete the grok pattern " + pattern.name + "?\nIt will be removed from the system and unavailable for any extractor. If it is still in use by extractors those will fail to work.")) {
+            GrokPatternsStore.deletePattern(pattern, this.loadData);
+        }
+    },
+
     render() {
         return (
-            <div>
-                <div className="row-fluid">
-                    <div className="span4">
-                        <label for="filter">Search for pattern names:</label>
-                        <input type="text" name="filter" value={this.state.filter} onChange={this._updateFilter}/>
-                    </div>
-                    <div className="pull-right">
-                        <EditPatternModal id={""} name={""} pattern={""} reload={this.loadData} />
-                    </div>
+            <div style={{paddingTop: 15}}>
+                <form className="form-inline pull-left">
+                    <label htmlFor="grokfilter" style={{marginRight: 5}}>Filter pattern names:</label>
+                    <input type="text" name="filter" id="grokfilter" value={this.state.filter} onChange={(event) => {this.setState({filter: event.target.value});}} />
+                </form>
+                <div className="pull-right">
+                    <BulkLoadPatternModal />
+                    <EditPatternModal id={""} name={""} pattern={""} create={true} reload={this.loadData} savePattern={this.savePattern} />
                 </div>
                 <div className="grok-patterns row-fluid">
-                {this._sortedFilteredPatternsHtml()}
+                {this._filteredPatternsHtml()}
                 </div>
             </div>
         );
