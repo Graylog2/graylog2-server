@@ -33,7 +33,7 @@ public abstract class InputTypeInfo {
     public abstract String type();
     @JsonProperty
     public abstract String name();
-    @JsonProperty
+    @JsonProperty("is_exclusive")
     public abstract boolean isExclusive();
     @JsonProperty
     public abstract Map<String, Map<String, Object>> requestedConfiguration();
