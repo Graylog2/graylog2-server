@@ -30,6 +30,8 @@ import org.graylog2.cluster.NodeNotFoundException;
 import org.graylog2.cluster.NodeService;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.system.NodeId;
+import org.graylog2.rest.models.system.cluster.responses.NodeSummary;
+import org.graylog2.rest.models.system.cluster.responses.NodeSummaryList;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,17 +67,15 @@ public class ClusterResource extends RestResource {
     @Timed
     @Path("/nodes")
     @ApiOperation(value = "List all active nodes in this cluster.")
-    public Map<String, Object> nodes() {
-        final List<Map<String, Object>> nodeList = Lists.newArrayList();
+    public NodeSummaryList nodes() {
+        final List<NodeSummary> nodeList = Lists.newArrayList();
 
         final Map<String, Node> nodes = nodeService.allActive(Node.Type.SERVER);
         for (Map.Entry<String, Node> e : nodes.entrySet()) {
             nodeList.add(nodeSummary(e.getValue()));
         }
 
-        return ImmutableMap.of(
-                "total", nodes.size(),
-                "nodes", nodeList);
+        return NodeSummaryList.create(nodeList);
     }
 
     @GET
@@ -84,8 +84,8 @@ public class ClusterResource extends RestResource {
     @ApiOperation(value = "Information about this node.",
             notes = "This is returning information of this node in context to its state in the cluster. " +
                     "Use the system API of the node itself to get system information.")
-    public Node node() throws NodeNotFoundException {
-        return nodeService.byNodeId(nodeId);
+    public NodeSummary node() throws NodeNotFoundException {
+        return nodeSummary(nodeService.byNodeId(nodeId));
     }
 
     @GET
@@ -97,27 +97,22 @@ public class ClusterResource extends RestResource {
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "Node not found.")
     })
-    public Node node(@ApiParam(name = "nodeId", required = true) @PathParam("nodeId") String nodeId) throws NodeNotFoundException {
+    public NodeSummary node(@ApiParam(name = "nodeId", required = true) @PathParam("nodeId") String nodeId) throws NodeNotFoundException {
         if (nodeId == null || nodeId.isEmpty()) {
             LOG.error("Missing nodeId. Returning HTTP 400.");
             throw new BadRequestException();
         }
 
-        return nodeService.byNodeId(nodeId);
+        return nodeSummary(nodeService.byNodeId(nodeId));
     }
 
-    private Map<String, Object> nodeSummary(Node node) {
-        Map<String, Object> m = Maps.newHashMap();
-
-        m.put("node_id", node.getNodeId());
-        m.put("type", node.getType().toString().toLowerCase());
-        m.put("is_master", node.isMaster());
-        m.put("transport_address", node.getTransportAddress());
-        m.put("last_seen", Tools.getISO8601String(node.getLastSeen()));
-
-        // Only meant to be used for representation. Not a real ID.
-        m.put("short_node_id", node.getShortNodeId());
-
-        return m;
+    private NodeSummary nodeSummary(Node node) {
+        return NodeSummary.create(node.getNodeId(),
+                node.getType().toString().toLowerCase(),
+                node.isMaster(),
+                node.getTransportAddress(),
+                Tools.getISO8601String(node.getLastSeen()),
+                node.getShortNodeId()
+        );
     }
 }
