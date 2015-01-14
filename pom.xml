@@ -300,6 +300,11 @@
                     </exclusion>
                 </exclusions>
             </dependency>
+            <dependency>
+                <groupId>com.squareup.okhttp</groupId>
+                <artifactId>okhttp</artifactId>
+                <version>2.2.0</version>
+            </dependency>
 
             <dependency>
                 <groupId>org.graylog2</groupId>
