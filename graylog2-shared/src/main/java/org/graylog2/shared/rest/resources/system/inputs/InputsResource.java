@@ -242,7 +242,10 @@ public class InputsResource extends RestResource {
     @PUT
     @Timed
     @Path("/{inputId}")
-    @ApiOperation(value = "Update input on this node")
+    @ApiOperation(
+            value = "Update input on this node",
+            response = InputCreated.class
+    )
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "No such input on this node."),
             @ApiResponse(code = 400, message = "Missing or invalid input configuration.")
