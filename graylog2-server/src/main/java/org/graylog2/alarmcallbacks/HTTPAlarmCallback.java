@@ -19,8 +19,11 @@ package org.graylog2.alarmcallbacks;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
-import com.ning.http.client.AsyncHttpClient;
-import com.ning.http.client.Response;
+import com.squareup.okhttp.MediaType;
+import com.squareup.okhttp.OkHttpClient;
+import com.squareup.okhttp.Request;
+import com.squareup.okhttp.RequestBody;
+import com.squareup.okhttp.Response;
 import org.graylog2.plugin.alarms.AlertCondition;
 import org.graylog2.plugin.alarms.callbacks.AlarmCallback;
 import org.graylog2.plugin.alarms.callbacks.AlarmCallbackConfigurationException;
@@ -37,19 +40,21 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
 public class HTTPAlarmCallback implements AlarmCallback {
     private static final String CK_URL = "url";
-    private final AsyncHttpClient asyncHttpClient;
+    private static final MediaType CONTENT_TYPE = MediaType.parse(APPLICATION_JSON);
+
+    private final OkHttpClient httpClient;
     private final ObjectMapper objectMapper;
     private Configuration configuration;
 
     @Inject
-    public HTTPAlarmCallback(final AsyncHttpClient asyncHttpClient, final ObjectMapper objectMapper) {
-        this.asyncHttpClient = asyncHttpClient;
+    public HTTPAlarmCallback(final OkHttpClient httpClient, final ObjectMapper objectMapper) {
+        this.httpClient = httpClient;
         this.objectMapper = objectMapper;
     }
 
@@ -66,21 +71,23 @@ public class HTTPAlarmCallback implements AlarmCallback {
 
         final Response r;
         try {
-            final String body = objectMapper.writeValueAsString(event);
+            final byte[] body = objectMapper.writeValueAsBytes(event);
             final URL url = new URL(configuration.getString(CK_URL));
-            r = asyncHttpClient.preparePost(url.toString())
-                    .setBody(body)
-                    .execute().get();
+            final Request request = new Request.Builder()
+                    .url(url)
+                    .post(RequestBody.create(CONTENT_TYPE, body))
+                    .build();
+            r = httpClient.newCall(request).execute();
         } catch (JsonProcessingException e) {
             throw new AlarmCallbackException("Unable to serialize alarm", e);
         } catch (MalformedURLException e) {
             throw new AlarmCallbackException("Malformed URL", e);
-        } catch (IOException | InterruptedException | ExecutionException e) {
+        } catch (IOException e) {
             throw new AlarmCallbackException(e.getMessage(), e);
         }
 
-        if (r.getStatusCode() != 200) {
-            throw new AlarmCallbackException("Expected ping HTTP response [200] but got [" + r.getStatusCode() + "].");
+        if (!r.isSuccessful()) {
+            throw new AlarmCallbackException("Expected successful HTTP response [2xx] but got [" + r.code() + "].");
         }
     }
 
