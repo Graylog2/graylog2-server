@@ -47,12 +47,15 @@ import javax.ws.rs.container.ContainerResponseFilter;
 import javax.ws.rs.container.DynamicFeature;
 import javax.ws.rs.ext.ExceptionMapper;
 import java.io.File;
+import java.util.Set;
 
 public class RadioBindings extends AbstractModule {
     private final Configuration configuration;
+    private final Set<ServerStatus.Capability> capabilities;
 
-    public RadioBindings(Configuration configuration) {
+    public RadioBindings(Configuration configuration, Set<ServerStatus.Capability> capabilities) {
         this.configuration = configuration;
+        this.capabilities = capabilities;
     }
 
     @Override
@@ -80,9 +83,10 @@ public class RadioBindings extends AbstractModule {
         bind(Configuration.class).toInstance(configuration);
         bind(BaseConfiguration.class).toInstance(configuration);
 
-        Multibinder<ServerStatus.Capability> capabilityBinder =
-                Multibinder.newSetBinder(binder(), ServerStatus.Capability.class);
-        capabilityBinder.addBinding().toInstance(ServerStatus.Capability.RADIO);
+        Multibinder<ServerStatus.Capability> capabilityBinder = Multibinder.newSetBinder(binder(), ServerStatus.Capability.class);
+        for(ServerStatus.Capability capability : capabilities) {
+            capabilityBinder.addBinding().toInstance(capability);
+        }
 
         bind(ServerStatus.class).in(Scopes.SINGLETON);
         install(new NoopJournalModule());

@@ -20,35 +20,35 @@ while [ -h "$RADIOCTL" ]; do
 done
 
 RADIOCTL_DIR=${RADIOCTL_DIR:=$(dirname "$RADIOCTL")}
-RADIO_JAR=${RADIO_JAR:=graylog2.jar}
-RADIO_CONF=${RADIO_CONF:=/etc/graylog2-radio.conf}
-RADIO_PID=${RADIO_PID:=/tmp/graylog2-radio.pid}
-LOG_FILE=${LOG_FILE:=log/graylog2-radio.log}
+RADIO_JAR=${RADIO_JAR:=graylog.jar}
+RADIO_CONF=${RADIO_CONF:=/etc/graylog-radio.conf}
+RADIO_PID=${RADIO_PID:=/tmp/graylog-radio.pid}
+LOG_FILE=${LOG_FILE:=log/graylog-radio.log}
 LOG4J=${LOG4J:=}
-JAVA_OPTS="${JAVA_OPTS:=} -Djava.library.path=${GRAYLOG2CTL_DIR}/lib/sigar"
+JAVA_OPTS="${JAVA_OPTS:=} -Djava.library.path=${RADIOCTL_DIR}/../lib/sigar"
 
 start() {
-    echo "Starting graylog2-radio ..."
+    echo "Starting graylog-radio ..."
     cd "$RADIOCTL_DIR/.."
     $NOHUP ${JAVA_CMD} ${JAVA_OPTS} ${LOG4J} -jar ${RADIO_JAR} radio -f ${RADIO_CONF} -p ${RADIO_PID} >> ${LOG_FILE} &
 }
 
 run() {
-    echo "Running graylog2-radio ..."
+    echo "Running graylog-radio ..."
     cd "$RADIOCTL_DIR/.."
     exec ${JAVA_CMD} ${JAVA_OPTS} ${LOG4J} -jar ${RADIO_JAR} radio -f ${RADIO_CONF} -p ${RADIO_PID}
 }
 
 stop() {
     PID=$(cat ${RADIO_PID})
-    echo "Stopping graylog2-radio ($PID) ..."
+    echo "Stopping graylog-radio ($PID) ..."
     if kill $PID; then
         rm ${RADIO_PID}
     fi
 }
 
 restart() {
-    echo "Restarting graylog2-radio ..."
+    echo "Restarting graylog-radio ..."
     stop
     start
 }
@@ -57,7 +57,7 @@ status() {
     pid=$(get_pid)
     if [ ! -z $pid ]; then
         if pid_running $pid; then
-            echo "graylog2-radio running as pid $pid"
+            echo "graylog-radio running as pid $pid"
             return 0
         else
             echo "Stale pid file with $pid - removing..."
@@ -65,7 +65,7 @@ status() {
         fi
     fi
 
-    echo "graylog2-radio not running"
+    echo "graylog-radio not running"
 }
 
 get_pid() {
