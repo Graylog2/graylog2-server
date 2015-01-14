@@ -142,7 +142,7 @@
                     </descriptors>
                     <!-- to make it easier to collect assemblies, we put them into the _parent's_ build directory -->
                     <outputDirectory>${project.parent.build.directory}/assembly</outputDirectory>
-                    <finalName>graylog2-${project.version}-${maven.build.timestamp}</finalName>
+                    <finalName>graylog-${project.version}-${maven.build.timestamp}</finalName>
                 </configuration>
             </plugin>
             <plugin>

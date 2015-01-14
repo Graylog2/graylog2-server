@@ -1,0 +1,5 @@
+#!/bin/bash
+
+GRAYLOG_JAR="$(dirname $0)/../graylog.jar"
+
+exec java -cp $GRAYLOG_JAR org.graylog2.ESTimestampFixup "$@"

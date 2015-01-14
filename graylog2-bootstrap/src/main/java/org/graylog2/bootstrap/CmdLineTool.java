@@ -32,6 +32,7 @@ import com.github.joschi.jadconfig.repositories.PropertiesRepository;
 import com.github.joschi.jadconfig.repositories.SystemPropertiesRepository;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import com.google.inject.Binder;
 import com.google.inject.CreationException;
 import com.google.inject.Injector;
@@ -46,7 +47,9 @@ import org.graylog2.plugin.BaseConfiguration;
 import org.graylog2.plugin.Plugin;
 import org.graylog2.plugin.PluginConfigBean;
 import org.graylog2.plugin.PluginLoaderConfig;
+import org.graylog2.plugin.PluginMetaData;
 import org.graylog2.plugin.PluginModule;
+import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.Version;
 import org.graylog2.plugin.system.NodeIdPersistenceException;
@@ -64,6 +67,7 @@ import org.slf4j.bridge.SLF4JBridgeHandler;
 import java.io.File;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -222,9 +226,12 @@ public abstract class CmdLineTool implements Runnable {
         final Set<Plugin> plugins = loadPlugins(pluginPath);
         final PluginBindings pluginBindings = new PluginBindings(plugins);
         for (final Plugin plugin : plugins) {
-            for (final PluginModule pluginModule : plugin.modules())
-                for (final PluginConfigBean configBean : pluginModule.getConfigBeans())
+            for (final PluginModule pluginModule : plugin.modules()) {
+                for (final PluginConfigBean configBean : pluginModule.getConfigBeans()) {
                     jadConfig.addConfigurationBean(configBean);
+                }
+            }
+
         }
         return pluginBindings;
     }
@@ -252,10 +259,18 @@ public abstract class CmdLineTool implements Runnable {
 
         final PluginLoader pluginLoader = new PluginLoader(pluginDir);
         for (Plugin plugin : pluginLoader.loadPlugins()) {
-            if (version.sameOrHigher(plugin.metadata().getRequiredVersion()))
-                plugins.add(plugin);
-            else
-                LOG.error("Plugin \"" + plugin.metadata().getName() + "\" requires version " + plugin.metadata().getRequiredVersion() + " - not loading!");
+            final PluginMetaData metadata = plugin.metadata();
+            if(capabilities().containsAll(metadata.getRequiredCapabilities())) {
+                if (version.sameOrHigher(metadata.getRequiredVersion())) {
+                    plugins.add(plugin);
+                } else {
+                    LOG.error("Plugin \"" + metadata.getName() + "\" requires version " + metadata.getRequiredVersion() + " - not loading!");
+                }
+            } else {
+                LOG.debug("Skipping plugin \"{}\" because some capabilities are missing ({}).",
+                        metadata.getName(),
+                        Sets.difference(plugin.metadata().getRequiredCapabilities(), capabilities()));
+            }
         }
 
         LOG.debug("Loaded plugins: " + plugins);
@@ -358,5 +373,9 @@ public abstract class CmdLineTool implements Runnable {
                 LOG.error("Guice error: {}", message.getMessage());
             }
         }
+    }
+
+    protected Set<ServerStatus.Capability> capabilities() {
+        return Collections.emptySet();
     }
 }

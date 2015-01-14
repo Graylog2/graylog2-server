@@ -35,6 +35,7 @@ public class PluginBindings extends AbstractModule {
     protected void configure() {
         final Multibinder<Plugin> pluginbinder = Multibinder.newSetBinder(binder(), Plugin.class);
         final Multibinder<PluginMetaData> pluginMetaDataBinder = Multibinder.newSetBinder(binder(), PluginMetaData.class);
+
         for (final Plugin plugin : plugins) {
             pluginbinder.addBinding().toInstance(plugin);
             for (final PluginModule pluginModule : plugin.modules()) {

@@ -23,6 +23,7 @@
 package org.graylog2.plugin;
 
 import java.net.URI;
+import java.util.Set;
 
 public interface PluginMetaData {
     String getUniqueId();
@@ -38,4 +39,6 @@ public interface PluginMetaData {
     String getDescription();
 
     Version getRequiredVersion();
+
+    Set<ServerStatus.Capability> getRequiredCapabilities();
 }
