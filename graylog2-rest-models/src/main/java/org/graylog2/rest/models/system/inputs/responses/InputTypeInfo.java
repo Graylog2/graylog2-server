@@ -14,12 +14,12 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.shared.rest.resources.system.inputs.responses;
+package org.graylog2.rest.models.system.inputs.responses;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.graylog2.shared.inputs.InputDescription;
 
 import java.util.Map;
 
@@ -40,7 +40,12 @@ public abstract class InputTypeInfo {
     @JsonProperty
     public abstract String linkToDocs();
 
-    public static InputTypeInfo create(String type, InputDescription description) {
-        return new AutoValue_InputTypeInfo(type, description.getName(), description.isExclusive(), description.getRequestedConfiguration(), description.getLinkToDocs());
+    @JsonCreator
+    public static InputTypeInfo create(@JsonProperty("type") String type,
+                                       @JsonProperty("name") String name,
+                                       @JsonProperty("is_exclusive") boolean isExclusive,
+                                       @JsonProperty("requested_configuration") Map<String, Map<String, Object>> requestedConfiguration,
+                                       @JsonProperty("link_to_docs") String linkToDocs) {
+        return new AutoValue_InputTypeInfo(type, name, isExclusive, requestedConfiguration, linkToDocs);
     }
 }
