@@ -2,7 +2,7 @@
 graylog2-server.uris=""
 
 # Learn how to configure custom logging in the documentation:
-#    http://support.torch.sh/help/kb/graylog2-web-interface/configuring-web-interface-logging
+#    https://www.graylog2.org/resources/documentation/setup/webinterface
 
 # Secret key
 # ~~~~~

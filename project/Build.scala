@@ -11,7 +11,7 @@ import com.typesafe.sbt.web.SbtWeb.autoImport._
 import com.typesafe.sbt.less.Import.LessKeys
 
 object ApplicationBuild extends Build {
-  val appName         = "graylog2-web-interface"
+  val appName         = "graylog-web-interface"
   val appVersion      = "1.0.0-beta.1"
   val appDependencies = Seq(
     cache,
@@ -76,7 +76,7 @@ object ApplicationBuild extends Build {
     },
     sources in doc in Compile := List(),
     includeFilter in (Assets, LessKeys.less) := "*.less",
-    mappings in Universal in packageZipTarball += file("misc/graylog2-web-interface.conf.example") -> "conf/graylog2-web-interface.conf",
+    mappings in Universal in packageZipTarball += file("misc/graylog-web-interface.conf.example") -> "conf/graylog-web-interface.conf",
     name in Universal := {
       val originalName = (name in Universal).value
       if (isSnapshot) {
