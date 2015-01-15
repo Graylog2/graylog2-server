@@ -16,8 +16,11 @@
  */
 package org.graylog2.inputs;
 
+import com.google.common.base.Optional;
+import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
@@ -265,6 +268,23 @@ public class InputServiceImpl extends PersistedServiceImpl implements InputServi
         }
 
         return listBuilder.build();
+    }
+
+    @Override
+    public Extractor getExtractor(final Input input, final String extractorId) throws NotFoundException {
+        final Optional<Extractor> extractor = Iterables.tryFind(this.getExtractors(input), new Predicate<Extractor>() {
+            @Override
+            public boolean apply(Extractor extractor) {
+                return extractor.getId().equals(extractorId);
+            }
+        });
+
+        if (!extractor.isPresent()) {
+            LOG.error("Extractor <{}> not found.", extractorId);
+            throw new javax.ws.rs.NotFoundException("Couldn't find extractor " + extractorId);
+        }
+
+        return extractor.get();
     }
 
     @SuppressWarnings("unchecked")

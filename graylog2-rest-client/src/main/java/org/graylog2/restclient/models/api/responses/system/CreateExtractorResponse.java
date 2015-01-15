@@ -16,11 +16,9 @@
  */
 package org.graylog2.restclient.models.api.responses.system;
 
-import java.util.List;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class ExtractorsResponse {
-
-    public int total;
-    public List<ExtractorSummaryResponse> extractors;
-
+public class CreateExtractorResponse {
+    @JsonProperty("extractor_id")
+    public String extractorId;
 }
