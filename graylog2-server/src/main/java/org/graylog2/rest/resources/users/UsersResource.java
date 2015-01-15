@@ -27,12 +27,12 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.Configuration;
 import org.graylog2.plugin.database.ValidationException;
-import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.rest.resources.users.requests.ChangePasswordRequest;
 import org.graylog2.rest.resources.users.requests.ChangeUserRequest;
 import org.graylog2.rest.resources.users.requests.CreateUserRequest;
 import org.graylog2.rest.resources.users.requests.PermissionEditRequest;
 import org.graylog2.rest.resources.users.requests.Startpage;
+import org.graylog2.rest.resources.users.requests.UpdateUserPreferences;
 import org.graylog2.rest.resources.users.responses.Token;
 import org.graylog2.rest.resources.users.responses.TokenList;
 import org.graylog2.rest.resources.users.responses.User;
@@ -40,8 +40,8 @@ import org.graylog2.rest.resources.users.responses.UserList;
 import org.graylog2.security.AccessToken;
 import org.graylog2.security.AccessTokenService;
 import org.graylog2.security.RestPermissions;
+import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.users.UserService;
-import org.hibernate.validator.constraints.NotEmpty;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -66,7 +66,6 @@ import javax.ws.rs.core.UriBuilder;
 import java.net.URI;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
 import static org.graylog2.security.RestPermissions.USERS_EDIT;
@@ -286,14 +285,14 @@ public class UsersResource extends RestResource {
     public void savePreferences(@ApiParam(name = "username", value = "The name of the user to modify.", required = true)
                                 @PathParam("username") String username,
                                 @ApiParam(name = "JSON body", value = "The map of preferences to assign to the user.", required = true)
-                                @NotEmpty Map<String, Object> preferencesRequest) throws ValidationException {
+                                UpdateUserPreferences preferencesRequest) throws ValidationException {
         final org.graylog2.plugin.database.users.User user = userService.load(username);
 
         if (user == null) {
             throw new NotFoundException();
         }
 
-        user.setPreferences(preferencesRequest);
+        user.setPreferences(preferencesRequest.preferences());
         userService.save(user);
     }
 
