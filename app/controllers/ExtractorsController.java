@@ -22,6 +22,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 import lib.BreadcrumbList;
+import lib.security.RestPermissions;
 import org.graylog2.restclient.lib.APIException;
 import org.graylog2.restclient.lib.ApiClient;
 import org.graylog2.restclient.lib.Version;
@@ -38,6 +39,7 @@ import org.graylog2.restclient.models.api.results.MessageResult;
 import play.Logger;
 import play.libs.Json;
 import play.mvc.Result;
+import views.helpers.Permissions;
 
 import java.io.IOException;
 import java.util.List;
@@ -55,6 +57,9 @@ public class ExtractorsController extends AuthenticatedController {
     private MessagesService messagesService;
 
     public Result manage(String nodeId, String inputId) {
+        if (!Permissions.isPermitted(RestPermissions.INPUTS_EDIT, inputId)) {
+            return redirect(routes.StartpageController.redirect());
+        }
         try {
             Node node = nodeService.loadNode(nodeId);
             Input input = node.getInput(inputId);
@@ -77,6 +82,9 @@ public class ExtractorsController extends AuthenticatedController {
     }
 
     public Result manageGlobal(String inputId) {
+        if (!Permissions.isPermitted(RestPermissions.INPUTS_EDIT, inputId)) {
+            return redirect(routes.StartpageController.redirect());
+        }
         try {
             Node node = nodeService.loadMasterNode();
             Input input = node.getInput(inputId);
@@ -97,6 +105,9 @@ public class ExtractorsController extends AuthenticatedController {
     }
 
     public Result newExtractor(String nodeId, String inputId, String extractorType, String field, String exampleIndex, String exampleId) {
+        if (!Permissions.isPermitted(RestPermissions.INPUTS_EDIT, inputId)) {
+            return redirect(routes.StartpageController.redirect());
+        }
         try {
             Node node = nodeService.loadNode(nodeId);
             Input input = node.getInput(inputId);
@@ -123,6 +134,9 @@ public class ExtractorsController extends AuthenticatedController {
     }
 
     public Result create(String nodeId, String inputId) {
+        if (!Permissions.isPermitted(RestPermissions.INPUTS_EDIT, inputId)) {
+            return redirect(routes.StartpageController.redirect());
+        }
         try {
             final Node node = nodeService.loadNode(nodeId);
             final Input input = node.getInput(inputId);
@@ -151,6 +165,9 @@ public class ExtractorsController extends AuthenticatedController {
     }
 
     public Result delete(String nodeId, String inputId, String extractorId) {
+        if (!Permissions.isPermitted(RestPermissions.INPUTS_EDIT, inputId)) {
+            return redirect(routes.StartpageController.redirect());
+        }
         try {
             Node node = nodeService.loadNode(nodeId);
             extractorService.delete(node, node.getInput(inputId), extractorId);
@@ -167,6 +184,9 @@ public class ExtractorsController extends AuthenticatedController {
     }
 
     public Result editExtractor(String nodeId, String inputId, String extractorId) {
+        if (!Permissions.isPermitted(RestPermissions.INPUTS_EDIT, inputId)) {
+            return redirect(routes.StartpageController.redirect());
+        }
         try {
             final Node node = nodeService.loadNode(nodeId);
             final Input input = node.getInput(inputId);
@@ -193,6 +213,9 @@ public class ExtractorsController extends AuthenticatedController {
     }
 
     public Result update(String nodeId, String inputId, String extractorId) {
+        if (!Permissions.isPermitted(RestPermissions.INPUTS_EDIT, inputId)) {
+            return redirect(routes.StartpageController.redirect());
+        }
         try {
             final Node node = nodeService.loadNode(nodeId);
             final Input input = node.getInput(inputId);
@@ -222,6 +245,9 @@ public class ExtractorsController extends AuthenticatedController {
     }
 
     public Result exportExtractors(String nodeId, String inputId) {
+        if (!Permissions.isPermitted(RestPermissions.INPUTS_READ, inputId)) {
+            return redirect(routes.StartpageController.redirect());
+        }
         try {
             Node node = nodeService.loadNode(nodeId);
             Input input = node.getInput(inputId);
@@ -257,6 +283,9 @@ public class ExtractorsController extends AuthenticatedController {
     }
 
     public Result importExtractorsPage(String nodeId, String inputId) {
+        if (!Permissions.isPermitted(RestPermissions.INPUTS_EDIT, inputId)) {
+            return redirect(routes.StartpageController.redirect());
+        }
         try {
             Node node = nodeService.loadNode(nodeId);
             Input input = node.getInput(inputId);
@@ -281,6 +310,9 @@ public class ExtractorsController extends AuthenticatedController {
     }
 
     public Result importExtractors(String nodeId, String inputId) {
+        if (!Permissions.isPermitted(RestPermissions.INPUTS_EDIT, inputId)) {
+            return redirect(routes.StartpageController.redirect());
+        }
         Map<String, String> form = flattenFormUrlEncoded(request().body().asFormUrlEncoded());
 
         if (!form.containsKey("extractors") || form.get("extractors").isEmpty()) {
