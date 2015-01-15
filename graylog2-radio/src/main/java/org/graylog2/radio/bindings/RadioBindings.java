@@ -64,8 +64,6 @@ public class RadioBindings extends AbstractModule {
         bindSingletons();
         bindTransport();
         bind(ProcessBufferProcessor.class).to(RadioProcessBufferProcessor.class);
-        //SecurityContextFactory instance = null;
-        //bind(SecurityContextFactory.class).toProvider(Providers.of(instance));
         bindDynamicFeatures();
         bindContainerResponseFilters();
         bindExceptionMappers();

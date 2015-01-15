@@ -16,6 +16,7 @@
  */
 package org.graylog2.rest.models.system.metrics.requests;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
@@ -23,6 +24,7 @@ import com.google.auto.value.AutoValue;
 import java.util.Collection;
 
 @AutoValue
+@JsonAutoDetect
 public abstract class MetricsSummaryResponse {
     @JsonProperty
     public abstract int total();

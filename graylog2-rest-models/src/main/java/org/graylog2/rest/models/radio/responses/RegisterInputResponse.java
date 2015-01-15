@@ -16,14 +16,13 @@
  */
 package org.graylog2.rest.models.radio.responses;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 @AutoValue
+@JsonAutoDetect
 public abstract class RegisterInputResponse {
     @JsonProperty
     public abstract String persistId();
