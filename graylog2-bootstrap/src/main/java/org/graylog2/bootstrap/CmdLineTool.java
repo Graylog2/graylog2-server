@@ -30,6 +30,7 @@ import com.github.joschi.jadconfig.jodatime.JodaTimeConverterFactory;
 import com.github.joschi.jadconfig.repositories.EnvironmentRepository;
 import com.github.joschi.jadconfig.repositories.PropertiesRepository;
 import com.github.joschi.jadconfig.repositories.SystemPropertiesRepository;
+import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -65,6 +66,7 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
 import java.io.File;
+import java.lang.management.ManagementFactory;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -164,6 +166,9 @@ public abstract class CmdLineTool implements Runnable {
             LOG.error("Validating configuration file failed - exiting.");
             System.exit(1);
         }
+
+        final List<String> arguments = ManagementFactory.getRuntimeMXBean().getInputArguments();
+        LOG.info("Running with JVM arguments: {}", Joiner.on(' ').join(arguments));
 
         injector = setupInjector(configModule, pluginBindings);
 

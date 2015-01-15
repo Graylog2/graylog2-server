@@ -24,14 +24,14 @@ import com.google.common.base.Splitter;
 import com.google.common.net.HostAndPort;
 import com.google.common.util.concurrent.AbstractIdleService;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import javax.inject.Inject;
-import javax.inject.Singleton;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.ListenableFuture;
 import com.ning.http.client.Response;
 import org.elasticsearch.ElasticsearchTimeoutException;
 import org.elasticsearch.Version;
 import org.elasticsearch.action.admin.cluster.health.ClusterHealthRequest;
+import org.elasticsearch.action.admin.cluster.health.ClusterHealthResponse;
+import org.elasticsearch.action.admin.cluster.health.ClusterHealthStatus;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.node.Node;
 import org.graylog2.UI;
@@ -40,6 +40,8 @@ import org.graylog2.plugin.Tools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.concurrent.ExecutionException;
@@ -102,7 +104,27 @@ public class IndexerSetupService extends AbstractIdleService {
 
             final Client client = node.client();
             try {
-                client.admin().cluster().health(new ClusterHealthRequest().waitForYellowStatus()).actionGet(configuration.getClusterDiscoveryTimeout(), MILLISECONDS);
+                /* try to determine the cluster health. if this times out we could not connect and try to determine if there's
+                   anything listening at all. if that happens this usually has these reasons:
+                    1. cluster.name is different
+                    2. network.publish_host is not reachable
+                    3. wrong address configured
+                    4. multicast in use but broken in this environment
+                   we handle a red cluster state differently because if we can get that result it means the cluster itself
+                   is reachable, which is a completely different problem from not being able to join at all.
+                 */
+                final ClusterHealthRequest atLeastRed = new ClusterHealthRequest().waitForStatus(ClusterHealthStatus.RED);
+                final ClusterHealthResponse health = client.admin()
+                        .cluster()
+                        .health(atLeastRed)
+                        .actionGet(configuration.getClusterDiscoveryTimeout(), MILLISECONDS);
+                // we don't get here if we couldn't join the cluster. just check for red cluster state
+                if (ClusterHealthStatus.RED.equals(health.getStatus())) {
+                    UI.exitHardWithWall(
+                            "The Elasticsearch cluster state is RED which means shards are unassigned. " +
+                                    "This usually indicates a crashed and corrupt cluster and needs to be investigated. Graylog will shut down.", "http://www.graylog2.org/resources/documentation/setup/elasticsearch");
+
+                }
             } catch (ElasticsearchTimeoutException e) {
                 final String hosts = node.settings().get("discovery.zen.ping.unicast.hosts");
 
@@ -147,8 +169,9 @@ public class IndexerSetupService extends AbstractIdleService {
                 }
 
                 UI.exitHardWithWall(
-                        "Could not successfully connect to Elasticsearch. Check that your cluster state is not RED " +
-                                "and that Elasticsearch is running properly.", "http://www.graylog2.org/resources/documentation/setup/elasticsearch");
+                        "Could not successfully connect to Elasticsearch, if you use multicast check that it is working in your network" +
+                                " and that Elasticsearch is running properly and is reachable. Also check that the cluster.name setting is correct.",
+                        "http://www.graylog2.org/resources/documentation/setup/elasticsearch");
             }
         } catch (Exception e) {
             bufferSynchronizerService.setIndexerUnavailable();
