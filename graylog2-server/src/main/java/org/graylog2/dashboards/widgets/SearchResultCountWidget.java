@@ -19,7 +19,6 @@ package org.graylog2.dashboards.widgets;
 import com.codahale.metrics.MetricRegistry;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
-import org.graylog2.indexer.IndexHelper;
 import org.graylog2.indexer.results.CountResult;
 import org.graylog2.indexer.searches.Searches;
 import org.graylog2.indexer.searches.timeranges.AbsoluteRange;
@@ -76,25 +75,21 @@ public class SearchResultCountWidget extends DashboardWidget {
     }
 
     protected ComputationResult computeInternal(String filter) {
-        try {
-            CountResult cr = searches.count(query, timeRange, filter);
-            if (trend && timeRange instanceof RelativeRange) {
-                DateTime toPrevious = timeRange.getFrom();
-                DateTime fromPrevious = toPrevious.minus(Seconds.seconds(((RelativeRange) timeRange).getRange()));
-                TimeRange previousTimeRange = new AbsoluteRange(fromPrevious, toPrevious);
-                CountResult previousCr = searches.count(query, previousTimeRange);
+        CountResult cr = searches.count(query, timeRange, filter);
+        if (trend && timeRange instanceof RelativeRange) {
+            DateTime toPrevious = timeRange.getFrom();
+            DateTime fromPrevious = toPrevious.minus(Seconds.seconds(((RelativeRange) timeRange).getRange()));
+            TimeRange previousTimeRange = new AbsoluteRange(fromPrevious, toPrevious);
+            CountResult previousCr = searches.count(query, previousTimeRange);
 
-                Map<String, Object> results = Maps.newHashMap();
-                results.put("now", cr.getCount());
-                results.put("previous", previousCr.getCount());
-                long tookMs = cr.getTookMs() + previousCr.getTookMs();
+            Map<String, Object> results = Maps.newHashMap();
+            results.put("now", cr.getCount());
+            results.put("previous", previousCr.getCount());
+            long tookMs = cr.getTookMs() + previousCr.getTookMs();
 
-                return new ComputationResult(results, tookMs);
-            } else {
-                return new ComputationResult(cr.getCount(), cr.getTookMs());
-            }
-        } catch (IndexHelper.InvalidRangeFormatException e) {
-            throw new RuntimeException("Invalid timerange format.", e);
+            return new ComputationResult(results, tookMs);
+        } else {
+            return new ComputationResult(cr.getCount(), cr.getTookMs());
         }
     }
 }

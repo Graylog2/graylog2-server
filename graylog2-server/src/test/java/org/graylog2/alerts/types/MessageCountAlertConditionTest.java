@@ -17,7 +17,7 @@
 package org.graylog2.alerts.types;
 
 import org.graylog2.alerts.AlertConditionTest;
-import org.graylog2.indexer.IndexHelper;
+import org.graylog2.indexer.InvalidRangeFormatException;
 import org.graylog2.indexer.results.CountResult;
 import org.graylog2.indexer.searches.timeranges.TimeRange;
 import org.graylog2.plugin.Tools;
@@ -110,7 +110,7 @@ public class MessageCountAlertConditionTest extends AlertConditionTest {
 
         try {
             verify(searches, never()).count(anyString(), any(TimeRange.class), anyString());
-        } catch (IndexHelper.InvalidRangeFormatException e) {
+        } catch (InvalidRangeFormatException e) {
             assertNull("This should not throw an exception", e);
         }
 
@@ -142,7 +142,7 @@ public class MessageCountAlertConditionTest extends AlertConditionTest {
 
         try {
             when(searches.count(anyString(), any(TimeRange.class), anyString())).thenReturn(countResult);
-        } catch (IndexHelper.InvalidRangeFormatException e) {
+        } catch (InvalidRangeFormatException e) {
             assertNotNull("This should not return an exception!", e);
         }
     }

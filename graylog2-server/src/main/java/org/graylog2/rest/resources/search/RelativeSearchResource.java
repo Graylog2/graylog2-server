@@ -25,7 +25,6 @@ import com.wordnik.swagger.annotations.ApiResponses;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.elasticsearch.action.search.SearchPhaseExecutionException;
 import org.glassfish.jersey.server.ChunkedOutput;
-import org.graylog2.indexer.IndexHelper;
 import org.graylog2.indexer.results.ScrollResult;
 import org.graylog2.indexer.searches.Searches;
 import org.graylog2.indexer.searches.SearchesConfig;
@@ -82,7 +81,7 @@ public class RelativeSearchResource extends SearchResource {
             @ApiParam(name = "offset", value = "Offset", required = false) @QueryParam("offset") int offset,
             @ApiParam(name = "filter", value = "Filter", required = false) @QueryParam("filter") String filter,
             @ApiParam(name = "fields", value = "Comma separated list of fields to return", required = false) @QueryParam("fields") String fields,
-            @ApiParam(name = "sort", value = "Sorting (field:asc / field:desc)", required = false) @QueryParam("sort") String sort) throws IndexHelper.InvalidRangeFormatException {
+            @ApiParam(name = "sort", value = "Sorting (field:asc / field:desc)", required = false) @QueryParam("sort") String sort) {
         checkSearchPermission(filter, RestPermissions.SEARCHES_RELATIVE);
 
         final List<String> fieldList = parseOptionalFields(fields);
@@ -140,8 +139,6 @@ public class RelativeSearchResource extends SearchResource {
             return output;
         } catch (SearchPhaseExecutionException e) {
             throw createRequestExceptionForParseFailure(query, e);
-        } catch (IndexHelper.InvalidRangeFormatException e) {
-            throw new BadRequestException(e);
         }
     }
 
@@ -160,14 +157,11 @@ public class RelativeSearchResource extends SearchResource {
             @QueryParam("query") @NotEmpty String query,
             @ApiParam(name = "size", value = "Maximum number of terms to return", required = false) @QueryParam("size") int size,
             @ApiParam(name = "range", value = "Relative timeframe to search in. See search method description.", required = true) @QueryParam("range") int range,
-            @ApiParam(name = "filter", value = "Filter", required = false) @QueryParam("filter") String filter) throws IndexHelper.InvalidRangeFormatException {
+            @ApiParam(name = "filter", value = "Filter", required = false) @QueryParam("filter") String filter) {
         checkSearchPermission(filter, RestPermissions.SEARCHES_RELATIVE);
 
         try {
             return buildTermsResult(searches.terms(field, size, query, filter, buildRelativeTimeRange(range)));
-        } catch (IndexHelper.InvalidRangeFormatException e) {
-            LOG.warn("Invalid timerange parameters provided. Returning HTTP 400.", e);
-            throw new BadRequestException("Invalid timerange parameters provided", e);
         } catch (SearchPhaseExecutionException e) {
             throw createRequestExceptionForParseFailure(query, e);
         }
@@ -192,16 +186,13 @@ public class RelativeSearchResource extends SearchResource {
             @QueryParam("query") @NotEmpty String query,
             @ApiParam(name = "size", value = "Maximum number of terms to return", required = false) @QueryParam("size") int size,
             @ApiParam(name = "range", value = "Relative timeframe to search in. See search method description.", required = true) @QueryParam("range") int range,
-            @ApiParam(name = "filter", value = "Filter", required = false) @QueryParam("filter") String filter) throws IndexHelper.InvalidRangeFormatException {
+            @ApiParam(name = "filter", value = "Filter", required = false) @QueryParam("filter") String filter) {
         checkSearchPermission(filter, RestPermissions.SEARCHES_RELATIVE);
 
         try {
             return buildTermsStatsResult(
                     searches.termsStats(keyField, valueField, Searches.TermsStatsOrder.valueOf(order.toUpperCase()), size, query, filter, buildRelativeTimeRange(range))
             );
-        } catch (IndexHelper.InvalidRangeFormatException e) {
-            LOG.warn("Invalid timerange parameters provided. Returning HTTP 400.", e);
-            throw new BadRequestException(e);
         } catch (SearchPhaseExecutionException e) {
             throw createRequestExceptionForParseFailure(query, e);
         }
@@ -229,9 +220,6 @@ public class RelativeSearchResource extends SearchResource {
 
         try {
             return buildFieldStatsResult(fieldStats(field, query, filter, buildRelativeTimeRange(range)));
-        } catch (IndexHelper.InvalidRangeFormatException e) {
-            LOG.warn("Invalid timerange parameters provided. Returning HTTP 400.", e);
-            throw new BadRequestException("Invalid timerange parameters provided", e);
         } catch (SearchPhaseExecutionException e) {
             throw createRequestExceptionForParseFailure(query, e);
         }
@@ -267,9 +255,6 @@ public class RelativeSearchResource extends SearchResource {
                             buildRelativeTimeRange(range)
                     )
             );
-        } catch (IndexHelper.InvalidRangeFormatException e) {
-            LOG.warn("Invalid timerange parameters provided. Returning HTTP 400.", e);
-            throw new BadRequestException("Invalid timerange parameters provided", e);
         } catch (SearchPhaseExecutionException e) {
             throw createRequestExceptionForParseFailure(query, e);
         }
@@ -301,9 +286,6 @@ public class RelativeSearchResource extends SearchResource {
 
         try {
             return buildHistogramResult(fieldHistogram(field, query, interval, filter, buildRelativeTimeRange(range)));
-        } catch (IndexHelper.InvalidRangeFormatException e) {
-            LOG.warn("Invalid timerange parameters provided. Returning HTTP 400.", e);
-            throw new BadRequestException("Invalid timerange parameters provided", e);
         } catch (SearchPhaseExecutionException e) {
             throw createRequestExceptionForParseFailure(query, e);
         }

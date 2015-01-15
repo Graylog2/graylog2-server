@@ -26,7 +26,7 @@ import com.wordnik.swagger.annotations.ApiResponse;
 import com.wordnik.swagger.annotations.ApiResponses;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.graylog2.indexer.IndexHelper;
+import org.graylog2.indexer.InvalidRangeFormatException;
 import org.graylog2.indexer.results.TermsResult;
 import org.graylog2.indexer.searches.Searches;
 import org.graylog2.indexer.searches.timeranges.InvalidRangeParametersException;
@@ -90,7 +90,7 @@ public class SourcesResource extends RestResource {
                 public TermsResult call() throws Exception {
                     try {
                         return searches.terms("source", 5000, "*", new RelativeRange(range));
-                    } catch (InvalidRangeParametersException | IndexHelper.InvalidRangeFormatException e) {
+                    } catch (InvalidRangeParametersException | InvalidRangeFormatException e) {
                         throw new ExecutionException(e);
                     }
                 }
