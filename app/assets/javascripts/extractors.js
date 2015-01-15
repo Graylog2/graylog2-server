@@ -36,7 +36,7 @@ $(document).ready(function() {
         $.ajax({
             url: appPrefixed('/a/tools/regex_test'),
             data: {
-                "string":$("#xtrc-example").text(),
+                "string":URI.encode($("#xtrc-example").text()),
                 "regex":$("#regex_value").val()
             },
             success: function(matchResult) {
