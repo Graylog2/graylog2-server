@@ -65,8 +65,8 @@ public class Radio extends ServerBootstrap implements Runnable {
     @Override
     protected void startNodeRegistration(Injector injector) {
         // register node by initiating first ping. if the node isn't registered, loading persisted inputs will fail silently, for example
-        Ping.Pinger pinger = injector.getInstance(Ping.Pinger.class);
-        pinger.ping();
+        Ping pinger = injector.getInstance(Ping.class);
+        pinger.run();
     }
 
     @Override

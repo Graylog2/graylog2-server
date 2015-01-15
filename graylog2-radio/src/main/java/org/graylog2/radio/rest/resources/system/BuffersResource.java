@@ -17,17 +17,18 @@
 package org.graylog2.radio.rest.resources.system;
 
 import com.codahale.metrics.annotation.Timed;
-import com.google.common.collect.Maps;
 import org.graylog2.radio.Configuration;
-import org.graylog2.radio.rest.resources.RestResource;
+import org.graylog2.rest.models.system.buffers.responses.RingSummary;
+import org.graylog2.rest.models.system.buffers.responses.SingleRingUtilization;
+import org.graylog2.rest.models.system.buffers.responses.BuffersUtilizationSummary;
 import org.graylog2.shared.buffers.ProcessBuffer;
+import org.graylog2.shared.rest.resources.RestResource;
 
 import javax.inject.Inject;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
-import java.util.Map;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
@@ -45,40 +46,14 @@ public class BuffersResource extends RestResource {
 
     @GET @Timed
     @Produces(MediaType.APPLICATION_JSON)
-    public String utilization() {
-        Map<String, Object> result = Maps.newHashMap();
-        result.put("buffers", buffers());
-        result.put("master_caches", masterCaches());
-
-        return json(result);
-    }
-
-    private Map<String, Object> masterCaches() {
-        Map<String, Object> caches = Maps.newHashMap();
-        Map<String, Object> input = Maps.newHashMap();
-
-        // TODO Remove because cache does not exist anymore!
-        input.put("size", 0);
-
-        caches.put("input", input);
-
-        return caches;
-    }
-
-    private Map<String, Object> buffers() {
-        Map<String, Object> buffers = Maps.newHashMap();
-        Map<String, Object> input = Maps.newHashMap();
-
+    public BuffersUtilizationSummary utilization() {
         final int ringSize = configuration.getRingSize();
         final long inputSize = processBuffer.size();
         final long inputUtil = inputSize/ringSize*100;
 
-        input.put("utilization_percent", inputUtil);
-        input.put("utilization", inputSize);
-
-        buffers.put("input", input);
-
-        return buffers;
+        return BuffersUtilizationSummary.create(
+                RingSummary.create(
+                        SingleRingUtilization.create(inputSize, inputUtil)
+                ));
     }
-
 }

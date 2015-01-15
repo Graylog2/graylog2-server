@@ -34,7 +34,7 @@ import org.graylog2.rest.resources.search.requests.CreateSavedSearchRequest;
 import org.graylog2.savedsearches.SavedSearch;
 import org.graylog2.savedsearches.SavedSearchImpl;
 import org.graylog2.savedsearches.SavedSearchService;
-import org.graylog2.security.RestPermissions;
+import org.graylog2.shared.security.RestPermissions;
 
 import javax.inject.Inject;
 import javax.validation.Valid;

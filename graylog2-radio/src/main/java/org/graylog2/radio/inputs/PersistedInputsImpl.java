@@ -21,8 +21,8 @@ import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationException;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.radio.cluster.InputService;
-import org.graylog2.radio.inputs.api.InputSummaryResponse;
-import org.graylog2.radio.inputs.api.RegisterInputResponse;
+import org.graylog2.rest.models.radio.responses.RegisterInputResponse;
+import org.graylog2.rest.models.radio.responses.PersistedInputsResponse;
 import org.graylog2.shared.inputs.MessageInputFactory;
 import org.graylog2.shared.inputs.NoSuchInputTypeException;
 import org.graylog2.shared.inputs.PersistedInputs;
@@ -35,6 +35,7 @@ import javax.inject.Inject;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 public class PersistedInputsImpl implements PersistedInputs {
     private static final Logger LOG = LoggerFactory.getLogger(PersistedInputsImpl.class);
@@ -47,22 +48,22 @@ public class PersistedInputsImpl implements PersistedInputs {
         this.messageInputFactory = messageInputFactory;
     }
 
-    private MessageInput getMessageInput(InputSummaryResponse isr) {
+    private MessageInput getMessageInput(PersistedInputsResponse isr) {
         MessageInput input;
         try {
-            Configuration inputConfig = new Configuration(isr.configuration);
-            input = this.messageInputFactory.create(isr.type, inputConfig);
+            Configuration inputConfig = new Configuration(isr.configuration());
+            input = this.messageInputFactory.create(isr.type(), inputConfig);
 
             // Add all standard fields.
-            input.setTitle(isr.title);
-            input.setCreatorUserId(isr.creatorUserId);
-            input.setPersistId(isr.id);
-            input.setCreatedAt(new DateTime(isr.createdAt, DateTimeZone.UTC));
-            input.setGlobal(isr.global);
+            input.setTitle(isr.title());
+            input.setCreatorUserId(isr.creatorUserId());
+            input.setPersistId(isr.id());
+            input.setCreatedAt(new DateTime(isr.createdAt(), DateTimeZone.UTC));
+            input.setGlobal(isr.global());
 
             input.checkConfiguration();
         } catch (NoSuchInputTypeException e) {
-            LOG.warn("Cannot launch persisted input. No such type [{}]. Error: {}", isr.type, e);
+            LOG.warn("Cannot launch persisted input. No such type [{}]. Error: {}", isr.type(), e);
             return null;
         } catch (ConfigurationException e) {
             LOG.error("Missing or invalid input input configuration.", e);
@@ -76,7 +77,7 @@ public class PersistedInputsImpl implements PersistedInputs {
     public Iterator<MessageInput> iterator() {
         final List<MessageInput> result = Lists.newArrayList();
 
-        final List<InputSummaryResponse> response;
+        final List<PersistedInputsResponse> response;
         try {
             response = inputService.getPersistedInputs();
         } catch (IOException e) {
@@ -84,7 +85,7 @@ public class PersistedInputsImpl implements PersistedInputs {
             return result.iterator();
         }
 
-        for (InputSummaryResponse isr : response) {
+        for (PersistedInputsResponse isr : response) {
             final MessageInput messageInput = getMessageInput(isr);
             if (messageInput != null) {
                 LOG.debug("Loaded message input {}", messageInput);
@@ -111,7 +112,7 @@ public class PersistedInputsImpl implements PersistedInputs {
         try {
             final RegisterInputResponse response = inputService.registerInCluster(input);
             if (response != null)
-                input.setPersistId(response.persistId);
+                input.setPersistId(response.persistId());
         } catch (Exception e) {
             LOG.error("Could not register input in Graylog2 cluster. It will be lost on next restart of this radio node.", e);
             return false;
@@ -122,6 +123,22 @@ public class PersistedInputsImpl implements PersistedInputs {
 
     @Override
     public boolean remove(Object o) {
+        if (o instanceof MessageInput) {
+            final MessageInput messageInput = (MessageInput)o;
+            try {
+                inputService.unregisterInCluster(messageInput);
+            } catch (ExecutionException | InterruptedException | IOException e) {
+                LOG.error("Could not unregister input in Graylog2 cluster: ", e);
+                return false;
+            }
+
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean update(String id, MessageInput newInput) {
         return false;
     }
 }

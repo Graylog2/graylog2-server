@@ -24,7 +24,7 @@ import com.mongodb.MongoException;
 import io.airlift.airline.Command;
 import io.airlift.airline.Option;
 import org.graylog2.Configuration;
-import org.graylog2.ServerVersion;
+import org.graylog2.shared.ServerVersion;
 import org.graylog2.UI;
 import org.graylog2.bindings.AlarmCallbackBindings;
 import org.graylog2.bindings.InitializerBindings;

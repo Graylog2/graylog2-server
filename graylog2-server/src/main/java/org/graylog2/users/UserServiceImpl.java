@@ -28,7 +28,7 @@ import org.graylog2.database.PersistedServiceImpl;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.database.Persisted;
 import org.graylog2.plugin.database.users.User;
-import org.graylog2.security.RestPermissions;
+import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.shared.security.ldap.LdapEntry;
 import org.graylog2.shared.security.ldap.LdapSettings;
 import org.graylog2.shared.users.UserService;

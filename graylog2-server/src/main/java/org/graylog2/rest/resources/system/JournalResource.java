@@ -28,7 +28,7 @@ import org.graylog2.plugin.KafkaJournalConfiguration;
 import org.graylog2.plugin.ThrottleState;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.rest.resources.system.responses.JournalSummaryResponse;
-import org.graylog2.security.RestPermissions;
+import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.shared.journal.Journal;
 import org.graylog2.shared.journal.KafkaJournal;
 import org.joda.time.DateTime;
