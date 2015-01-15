@@ -20,6 +20,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import org.graylog2.shared.ServerVersion;
+import org.graylog2.shared.rest.documentation.generator.Generator;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 

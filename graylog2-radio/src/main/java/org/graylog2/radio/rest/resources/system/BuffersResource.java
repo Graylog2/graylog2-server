@@ -17,6 +17,8 @@
 package org.graylog2.radio.rest.resources.system;
 
 import com.codahale.metrics.annotation.Timed;
+import com.wordnik.swagger.annotations.Api;
+import com.wordnik.swagger.annotations.ApiOperation;
 import org.graylog2.radio.Configuration;
 import org.graylog2.rest.models.system.buffers.responses.RingSummary;
 import org.graylog2.rest.models.system.buffers.responses.SingleRingUtilization;
@@ -33,6 +35,7 @@ import javax.ws.rs.core.MediaType;
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
+@Api(value = "System/Buffers", description = "Buffer information of this node.")
 @Path("/system/buffers")
 public class BuffersResource extends RestResource {
     private final Configuration configuration;
@@ -45,6 +48,7 @@ public class BuffersResource extends RestResource {
     }
 
     @GET @Timed
+    @ApiOperation(value = "Get current utilization of buffers and caches of this node.")
     @Produces(MediaType.APPLICATION_JSON)
     public BuffersUtilizationSummary utilization() {
         final int ringSize = configuration.getRingSize();

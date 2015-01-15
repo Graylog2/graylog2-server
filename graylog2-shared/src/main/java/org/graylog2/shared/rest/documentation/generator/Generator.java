@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.rest.documentation.generator;
+package org.graylog2.shared.rest.documentation.generator;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -82,12 +82,16 @@ public class Generator {
 
     private final ObjectMapper mapper;
 
-    public Generator(String packageName, ObjectMapper mapper) {
+    public Generator(String[] packageNames, ObjectMapper mapper) {
         this.mapper = mapper;
 
         if (reflections == null) {
-            reflections = new Reflections(packageName);
+            reflections = new Reflections(packageNames);
         }
+    }
+
+    public Generator(String packageName, ObjectMapper mapper) {
+        this(new String[]{packageName}, mapper);
     }
 
     public synchronized Map<String, Object> generateOverview() {
