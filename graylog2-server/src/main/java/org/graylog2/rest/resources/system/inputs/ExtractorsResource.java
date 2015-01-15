@@ -108,36 +108,10 @@ public class ExtractorsResource extends RestResource {
             throw new javax.ws.rs.NotFoundException();
         }
 
-        // Build extractor.
-        final String id = new com.eaio.uuid.UUID().toString();
-        Extractor extractor;
-        try {
-            extractor = extractorFactory.factory(
-                    id,
-                    cer.title(),
-                    cer.order(),
-                    Extractor.CursorStrategy.valueOf(cer.cutOrCopy().toUpperCase()),
-                    Extractor.Type.valueOf(cer.extractorType().toUpperCase()),
-                    cer.sourceField(),
-                    cer.targetField(),
-                    cer.extractorConfig(),
-                    getCurrentUser().getName(),
-                    loadConverters(cer.converters()),
-                    Extractor.ConditionType.valueOf(cer.conditionType().toUpperCase()),
-                    cer.conditionValue()
-            );
-        } catch (ExtractorFactory.NoSuchExtractorException e) {
-            LOG.error("No such extractor type.", e);
-            throw new BadRequestException(e);
-        } catch (Extractor.ReservedFieldException e) {
-            LOG.error("Cannot create extractor. Field is reserved.", e);
-            throw new BadRequestException(e);
-        } catch (ConfigurationException e) {
-            LOG.error("Cannot create extractor. Missing configuration.", e);
-            throw new BadRequestException(e);
-        }
-
         final Input mongoInput = inputService.find(input.getPersistId());
+        final String id = new com.eaio.uuid.UUID().toString();
+        final Extractor extractor = buildExtractorFromRequest(cer, id);
+
         try {
             inputService.addExtractor(mongoInput, extractor);
         } catch (ValidationException e) {
@@ -155,6 +129,52 @@ public class ExtractorsResource extends RestResource {
                 .build(input.getId());
 
         return Response.created(extractorUri).entity(result).build();
+    }
+
+    @PUT
+    @Timed
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @ApiOperation(value = "Update an extractor")
+    @Path("/{extractorId}")
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "No such input on this node."),
+            @ApiResponse(code = 404, message = "No such extractor on this input."),
+            @ApiResponse(code = 400, message = "No such extractor type."),
+            @ApiResponse(code = 400, message = "Field the extractor should write on is reserved."),
+            @ApiResponse(code = 400, message = "Missing or invalid configuration.")
+    })
+    public Map<String, Object> update(@ApiParam(name = "inputId", required = true)
+                                      @PathParam("inputId") String inputId,
+                                      @ApiParam(name = "extractorId", required = true)
+                                      @PathParam("extractorId") String extractorId,
+                                      @ApiParam(name = "JSON body", required = true)
+                                      @Valid @NotNull CreateExtractorRequest cer) throws NotFoundException {
+        checkPermission(RestPermissions.INPUTS_EDIT, inputId);
+
+        final MessageInput input = persistedInputs.get(inputId);
+        if (input == null) {
+            LOG.error("Input <{}> not found.", inputId);
+            throw new javax.ws.rs.NotFoundException("Couldn't find input " + inputId);
+        }
+
+        final Input mongoInput = inputService.find(input.getPersistId());
+        final Extractor originalExtractor = inputService.getExtractor(mongoInput, extractorId);
+        final Extractor extractor = buildExtractorFromRequest(cer, originalExtractor.getId());
+
+        inputService.removeExtractor(mongoInput, originalExtractor.getId());
+        try {
+            inputService.addExtractor(mongoInput, extractor);
+        } catch (ValidationException e) {
+            LOG.error("Extractor persist validation failed.", e);
+            throw new BadRequestException(e);
+        }
+
+        final String msg = "Updated extractor <" + originalExtractor.getId() + "> of type [" + cer.extractorType() + "] in input <" + inputId + ">.";
+        LOG.info(msg);
+        activityWriter.write(new Activity(msg, ExtractorsResource.class));
+
+        return toMap(extractor);
     }
 
     @GET
@@ -319,5 +339,35 @@ public class ExtractorsResource extends RestResource {
         }
 
         return converters;
+    }
+
+    private Extractor buildExtractorFromRequest(CreateExtractorRequest cer, String id) {
+        Extractor extractor;
+        try {
+            extractor = extractorFactory.factory(
+                    id,
+                    cer.title(),
+                    cer.order(),
+                    Extractor.CursorStrategy.valueOf(cer.cutOrCopy().toUpperCase()),
+                    Extractor.Type.valueOf(cer.extractorType().toUpperCase()),
+                    cer.sourceField(),
+                    cer.targetField(),
+                    cer.extractorConfig(),
+                    getCurrentUser().getName(),
+                    loadConverters(cer.converters()),
+                    Extractor.ConditionType.valueOf(cer.conditionType().toUpperCase()),
+                    cer.conditionValue()
+            );
+        } catch (ExtractorFactory.NoSuchExtractorException e) {
+            LOG.error("No such extractor type.", e);
+            throw new BadRequestException(e);
+        } catch (Extractor.ReservedFieldException e) {
+            LOG.error("Cannot create extractor. Field is reserved.", e);
+            throw new BadRequestException(e);
+        } catch (ConfigurationException e) {
+            LOG.error("Cannot create extractor. Missing configuration.", e);
+            throw new BadRequestException(e);
+        }
+        return extractor;
     }
 }
