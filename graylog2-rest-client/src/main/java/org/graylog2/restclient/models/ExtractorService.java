@@ -19,8 +19,10 @@ package org.graylog2.restclient.models;
 import com.google.common.collect.Lists;
 import org.graylog2.restclient.lib.APIException;
 import org.graylog2.restclient.lib.ApiClient;
+import org.graylog2.restclient.models.api.requests.CreateExtractorRequest;
 import org.graylog2.restclient.models.api.requests.ExtractorOrderRequest;
 import org.graylog2.restclient.models.api.requests.GrokPatternUpdateRequest;
+import org.graylog2.restclient.models.api.responses.system.CreateExtractorResponse;
 import org.graylog2.restclient.models.api.responses.system.ExtractorSummaryResponse;
 import org.graylog2.restclient.models.api.responses.system.ExtractorsResponse;
 import org.graylog2.restclient.models.api.responses.system.GrokPatternResponse;
@@ -44,6 +46,23 @@ public class ExtractorService {
     private ExtractorService(ApiClient api, Extractor.Factory extractorFactory) {
         this.api = api;
         this.extractorFactory = extractorFactory;
+    }
+
+    public String create(Node node, Input input, CreateExtractorRequest request) throws IOException, APIException {
+        final CreateExtractorResponse response = api.path(routes.ExtractorsResource().create(input.getId()), CreateExtractorResponse.class)
+                .node(node)
+                .expect(Http.Status.CREATED)
+                .body(request)
+                .execute();
+        return response.extractorId;
+    }
+
+    public void update(String extractorId, Node node, Input input, CreateExtractorRequest request) throws IOException, APIException {
+        api.path(resource.update(input.getId(), extractorId))
+                .node(node)
+                .expect(Http.Status.OK)
+                .body(request)
+                .execute();
     }
 
     public void delete(Node node, Input input, String extractorId) throws IOException, APIException {
