@@ -38,6 +38,9 @@ import static org.testng.Assert.*;
 
 @Test
 public class OutputRegistryTest {
+    private static final long CK_DEFAULTFAULTCOUNTTHRESHOLD = 5;
+    private static final long CK_DEFAULTFAULTPENALTYSECONDS = 30;
+
     @Mock
     private MessageOutput messageOutput;
     @Mock
@@ -46,14 +49,18 @@ public class OutputRegistryTest {
     private Output output;
     @Mock
     private OutputService outputService;
+    @Mock
+    private org.graylog2.Configuration configuration;
 
     @BeforeMethod
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
+        when(configuration.getOutputFaultCountThreshold()).thenReturn(CK_DEFAULTFAULTCOUNTTHRESHOLD);
+        when(configuration.getOutputFaultPenaltySeconds()).thenReturn(CK_DEFAULTFAULTPENALTYSECONDS);
     }
 
     public void testMessageOutputsIncludesDefault() {
-        OutputRegistry registry = new OutputRegistry(messageOutput, null, null);
+        OutputRegistry registry = new OutputRegistry(messageOutput, null, null, configuration);
 
         Set<MessageOutput> outputs = registry.getMessageOutputs();
         assertSame(Iterables.getOnlyElement(outputs, null), messageOutput, "we should only have the default MessageOutput");
@@ -62,7 +69,7 @@ public class OutputRegistryTest {
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void testThrowExceptionForUnknownOutputType() throws MessageOutputConfigurationException {
         when(messageOutputFactory.fromStreamOutput(eq(output), any(Stream.class), any(Configuration.class))).thenReturn(null);
-        OutputRegistry registry = new OutputRegistry(null, null, messageOutputFactory);
+        OutputRegistry registry = new OutputRegistry(null, null, messageOutputFactory, configuration);
 
         registry.launchOutput(output, null);
 
@@ -75,7 +82,7 @@ public class OutputRegistryTest {
         when(messageOutputFactory.fromStreamOutput(eq(output), eq(stream), any(Configuration.class))).thenReturn(messageOutput);
         when(outputService.load(eq(outputId))).thenReturn(output);
 
-        final OutputRegistry outputRegistry = new OutputRegistry(null, outputService, messageOutputFactory);
+        final OutputRegistry outputRegistry = new OutputRegistry(null, outputService, messageOutputFactory, configuration);
         assertEquals(outputRegistry.getRunningMessageOutputs().size(), 0);
 
         MessageOutput result = outputRegistry.getOutputForIdAndStream(outputId, stream);
@@ -90,7 +97,7 @@ public class OutputRegistryTest {
         final Stream stream = mock(Stream.class);
         when(outputService.load(eq(outputId))).thenThrow(NotFoundException.class);
 
-        final OutputRegistry outputRegistry = new OutputRegistry(null, outputService, null);
+        final OutputRegistry outputRegistry = new OutputRegistry(null, outputService, null, configuration);
 
         MessageOutput messageOutput = outputRegistry.getOutputForIdAndStream(outputId, stream);
 
@@ -104,7 +111,7 @@ public class OutputRegistryTest {
         when(messageOutputFactory.fromStreamOutput(eq(output), any(Stream.class), any(Configuration.class))).thenThrow(new MessageOutputConfigurationException());
         when(outputService.load(eq(outputId))).thenReturn(output);
 
-        final OutputRegistry outputRegistry = new OutputRegistry(null, outputService, messageOutputFactory);
+        final OutputRegistry outputRegistry = new OutputRegistry(null, outputService, messageOutputFactory, configuration);
         assertEquals(outputRegistry.getRunningMessageOutputs().size(), 0);
 
         MessageOutput result = outputRegistry.getOutputForIdAndStream(outputId, stream);

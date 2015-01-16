@@ -103,6 +103,12 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "output_module_timeout", validator = PositiveLongValidator.class)
     private long outputModuleTimeout = 10000;
 
+    @Parameter(value = "output_fault_count_threshold", validator = PositiveLongValidator.class)
+    private long outputFaultCountThreshold = 5;
+
+    @Parameter(value = "output_fault_penalty_seconds", validator = PositiveLongValidator.class)
+    private long outputFaultPenaltySeconds = 30;
+
     @Parameter(value = "stale_master_timeout", validator = PositiveIntegerValidator.class)
     private int staleMasterTimeout = 2000;
 
@@ -213,6 +219,14 @@ public class Configuration extends BaseConfiguration {
 
     public long getOutputModuleTimeout() {
         return outputModuleTimeout;
+    }
+
+    public long getOutputFaultCountThreshold() {
+        return outputFaultCountThreshold;
+    }
+
+    public long getOutputFaultPenaltySeconds() {
+        return outputFaultPenaltySeconds;
     }
 
     public int getStaleMasterTimeout() {
