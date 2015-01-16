@@ -72,4 +72,14 @@
             <outputDirectory>/</outputDirectory>
         </file>
     </files>
+
+    <dependencySets>
+        <dependencySet>
+            <scope>provided</scope>
+            <outputDirectory>/plugin</outputDirectory>
+            <includes>
+                <include>org.graylog.telemetry:graylog-telemetry-plugin</include>
+            </includes>
+        </dependencySet>
+    </dependencySets>
 </assembly>
