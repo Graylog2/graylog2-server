@@ -7,6 +7,19 @@ PS=${PS:=$(which ps)}
 # default java
 JAVA_CMD=${JAVA_CMD:=$(which java)}
 
+get_pid() {
+    cat "${GRAYLOG_PID}" 2> /dev/null
+}
+
+pid_running() {
+    kill -0 $1 2> /dev/null
+}
+
+die() {
+    echo $*
+    exit 1
+}
+
 if [ -n "$JAVA_HOME" ]
 then
     # try to use $JAVA_HOME
@@ -89,19 +102,6 @@ status() {
     fi
 
     die "graylog-server not running"
-}
-
-get_pid() {
-    cat "${GRAYLOG_PID}" 2> /dev/null
-}
-
-pid_running() {
-    kill -0 $1 2> /dev/null
-}
-
-die() {
-    echo $*
-    exit 1
 }
 
 case "$CMD" in
