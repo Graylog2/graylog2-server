@@ -2,23 +2,36 @@
 
 CMD=$1
 NOHUP=${NOHUP:=$(which nohup)}
+PS=${PS:=$(which ps)}
 
 # default java
-JAVA_CMD=$(which java)
+JAVA_CMD=${JAVA_CMD:=$(which java)}
+
+if [ -n "$JAVA_HOME" ]
+then
+    # try to use $JAVA_HOME
+    if [ -x "$JAVA_HOME"/bin/java ]
+    then
+        JAVA_CMD="$JAVA_HOME"/bin/java
+    else
+        die "$JAVA_HOME"/bin/java is not executable
+    fi
+fi
 
 # resolve links - $0 may be a softlink
 RADIOCTL="$0"
 
 while [ -h "$RADIOCTL" ]; do
-  ls=$(ls -ld "$RADIOCTL")
-  link=$(expr "$ls" : '.*-> \(.*\)$')
-  if expr "$link" : '/.*' > /dev/null; then
-    RADIOCTL="$link"
-  else
-    RADIOCTL=$(dirname "$RADIOCTL")/"$link"
-  fi
+    ls=$(ls -ld "$RADIOCTL")
+    link=$(expr "$ls" : '.*-> \(.*\)$')
+    if expr "$link" : '/.*' > /dev/null; then
+        RADIOCTL="$link"
+    else
+        RADIOCTL=$(dirname "$RADIOCTL")/"$link"
+    fi
 done
 
+# take variables from environment if set
 RADIOCTL_DIR=${RADIOCTL_DIR:=$(dirname "$RADIOCTL")}
 RADIO_JAR=${RADIO_JAR:=graylog.jar}
 RADIO_CONF=${RADIO_CONF:=/etc/graylog-radio.conf}
@@ -30,21 +43,31 @@ JAVA_OPTS="${JAVA_OPTS:=} -Djava.library.path=${RADIOCTL_DIR}/../lib/sigar"
 start() {
     echo "Starting graylog-radio ..."
     cd "$RADIOCTL_DIR/.."
-    $NOHUP ${JAVA_CMD} ${JAVA_OPTS} ${LOG4J} -jar ${RADIO_JAR} radio -f ${RADIO_CONF} -p ${RADIO_PID} >> ${LOG_FILE} &
+    "${NOHUP}" "${JAVA_CMD}" ${JAVA_OPTS} ${LOG4J} -jar "${RADIO_JAR}" radio -f "${RADIO_CONF}" -p "${RADIO_PID}" >> "${LOG_FILE}" 2>> "${LOG_FILE}" &
 }
 
 run() {
     echo "Running graylog-radio ..."
     cd "$RADIOCTL_DIR/.."
-    exec ${JAVA_CMD} ${JAVA_OPTS} ${LOG4J} -jar ${RADIO_JAR} radio -f ${RADIO_CONF} -p ${RADIO_PID}
+    exec "${JAVA_CMD}" "${JAVA_OPTS}" ${LOG4J} -jar "${RADIO_JAR}" radio -f "${RADIO_CONF}" -p "${RADIO_PID}"
 }
 
 stop() {
-    PID=$(cat ${RADIO_PID})
-    echo "Stopping graylog-radio ($PID) ..."
-    if kill $PID; then
-        rm ${RADIO_PID}
+    if [ ! -f "${RADIO_PID}" ]; then
+      die "Not stopping. PID file not found: ${RADIO_PID}"
     fi
+
+    PID=$(get_pid)
+
+    echo "Stopping graylog-radio ($PID) ..."
+    echo "Waiting for graylog-radio to halt."
+
+    kill $PID
+
+    while "$PS" -p $PID > /dev/null; do sleep 1; done;
+    rm "${RADIO_PID}"
+
+    echo "graylog-radio stopped"
 }
 
 restart() {
@@ -54,26 +77,31 @@ restart() {
 }
 
 status() {
-    pid=$(get_pid)
-    if [ ! -z $pid ]; then
-        if pid_running $pid; then
-            echo "graylog-radio running as pid $pid"
+    PID=$(get_pid)
+    if [ ! -z $PID ]; then
+        if pid_running $PID; then
+            echo "graylog-radio running with PID ${PID}"
             return 0
         else
-            echo "Stale pid file with $pid - removing..."
-            rm ${RADIO_PID}
+            rm "${RADIO_PID}"
+            die "Removed stale PID file ${RADIO_PID} with ${PID}."
         fi
     fi
 
-    echo "graylog-radio not running"
+    die "graylog-radio not running"
 }
 
 get_pid() {
-    cat ${RADIO_PID} 2> /dev/null
+    cat "${RADIO_PID}" 2> /dev/null
 }
 
 pid_running() {
     kill -0 $1 2> /dev/null
+}
+
+die() {
+    echo $*
+    exit 1
 }
 
 case "$CMD" in
@@ -94,5 +122,4 @@ case "$CMD" in
         ;;
     *)
         echo "Usage $0 {start|stop|restart|status|run}"
-        RETVAL=1
 esac
