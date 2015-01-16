@@ -18,7 +18,7 @@ package org.graylog2.dashboards.widgets;
 
 import com.codahale.metrics.MetricRegistry;
 import com.google.common.collect.ImmutableMap;
-import org.graylog2.indexer.IndexHelper;
+import org.graylog2.indexer.InvalidRangeFormatException;
 import org.graylog2.indexer.results.HistogramResult;
 import org.graylog2.indexer.searches.Searches;
 import org.graylog2.indexer.searches.timeranges.TimeRange;
@@ -97,10 +97,6 @@ public class FieldChartWidget extends DashboardWidget {
             return new ComputationResult(histogramResult.getResults(), histogramResult.took().millis(), histogramResult.getHistogramBoundaries());
         } catch (Searches.FieldTypeException e) {
             String msg = "Could not calculate [" + this.getClass().getCanonicalName() + "] widget <" + getId() + ">. Not a numeric field? The field was [" + config.get("field") + "]";
-            LOG.error(msg, e);
-            throw new RuntimeException(msg);
-        } catch (IndexHelper.InvalidRangeFormatException e) {
-            String msg = "Could not calculate [" + this.getClass().getCanonicalName() + "] widget <" + getId() + ">. Invalid time range.";
             LOG.error(msg, e);
             throw new RuntimeException(msg);
         }

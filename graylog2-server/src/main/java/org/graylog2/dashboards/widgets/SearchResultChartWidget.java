@@ -18,7 +18,6 @@ package org.graylog2.dashboards.widgets;
 
 import com.codahale.metrics.MetricRegistry;
 import com.google.common.collect.ImmutableMap;
-import org.graylog2.indexer.IndexHelper;
 import org.graylog2.indexer.results.HistogramResult;
 import org.graylog2.indexer.searches.Searches;
 import org.graylog2.indexer.searches.timeranges.TimeRange;
@@ -90,11 +89,7 @@ public class SearchResultChartWidget extends DashboardWidget {
             filter = "streams:" + streamId;
         }
 
-        try {
-            HistogramResult histogram = searches.histogram(query, interval, filter, timeRange);
-            return new ComputationResult(histogram.getResults(), histogram.took().millis(), histogram.getHistogramBoundaries());
-        } catch (IndexHelper.InvalidRangeFormatException e) {
-            throw new RuntimeException("Invalid timerange format.", e);
-        }
+        HistogramResult histogram = searches.histogram(query, interval, filter, timeRange);
+        return new ComputationResult(histogram.getResults(), histogram.took().millis(), histogram.getHistogramBoundaries());
     }
 }

@@ -69,6 +69,7 @@ public class Version {
     public static final Version v0_93_0_SNAPSHOT = new Version(0, 93, 0, "snapshot");
 
     public static final Version v1_0_0_BETA1 = new Version(1, 0, 0, "beta.1");
+    public static final Version v1_0_0_BETA2 = new Version(1, 0, 0, "beta.2");
 
     public static final Version v1_1_0_SNAPSHOT = new Version(1, 1, 0, "snapshot");
 

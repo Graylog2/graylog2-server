@@ -1,37 +1,47 @@
 #!/bin/bash
 
 CMD=$1
-
 NOHUP=${NOHUP:=$(which nohup)}
 PS=${PS:=$(which ps)}
 
 # default java
-JAVA_CMD=$(which java)
+JAVA_CMD=${JAVA_CMD:=$(which java)}
 
+get_pid() {
+    cat "${GRAYLOG_PID}" 2> /dev/null
+}
+
+pid_running() {
+    kill -0 $1 2> /dev/null
+}
+
+die() {
+    echo $*
+    exit 1
+}
 
 if [ -n "$JAVA_HOME" ]
 then
-	# try to use $JAVA_HOME
-	if [ -x "$JAVA_HOME"/bin/java ]
-	then
-		JAVA_CMD="$JAVA_HOME"/bin/java
-	else
-		echo "$JAVA_HOME"/bin/java is not executable
-		exit 1
-	fi
+    # try to use $JAVA_HOME
+    if [ -x "$JAVA_HOME"/bin/java ]
+    then
+        JAVA_CMD="$JAVA_HOME"/bin/java
+    else
+        die "$JAVA_HOME"/bin/java is not executable
+    fi
 fi
 
 # resolve links - $0 may be a softlink
 GRAYLOGCTL="$0"
 
 while [ -h "$GRAYLOGCTL" ]; do
-  ls=$(ls -ld "$GRAYLOGCTL")
-  link=$(expr "$ls" : '.*-> \(.*\)$')
-  if expr "$link" : '/.*' > /dev/null; then
-    GRAYLOGCTL="$link"
-  else
-    GRAYLOGCTL=$(dirname "$GRAYLOGCTL")/"$link"
-  fi
+    ls=$(ls -ld "$GRAYLOGCTL")
+    link=$(expr "$ls" : '.*-> \(.*\)$')
+    if expr "$link" : '/.*' > /dev/null; then
+        GRAYLOGCTL="$link"
+    else
+        GRAYLOGCTL=$(dirname "$GRAYLOGCTL")/"$link"
+    fi
 done
 
 # take variables from environment if set
@@ -46,32 +56,31 @@ JAVA_OPTS="${JAVA_OPTS:=} -Djava.library.path=${GRAYLOGCTL_DIR}/../lib/sigar"
 start() {
     echo "Starting graylog-server ..."
     cd "$GRAYLOGCTL_DIR/.."
-    $NOHUP ${JAVA_CMD} ${JAVA_OPTS} ${LOG4J} -jar ${GRAYLOG_SERVER_JAR} server -f ${GRAYLOG_CONF} -p ${GRAYLOG_PID} >> ${LOG_FILE} 2>> ${LOG_FILE} &
+    "${NOHUP}" "${JAVA_CMD}" ${JAVA_OPTS} ${LOG4J} -jar "${GRAYLOG_SERVER_JAR}" server -f "${GRAYLOG_CONF}" -p "${GRAYLOG_PID}" >> "${LOG_FILE}" 2>> "${LOG_FILE}" &
 }
 
 run() {
     echo "Running graylog-server ..."
     cd "$GRAYLOGCTL_DIR/.."
-    exec ${JAVA_CMD} ${JAVA_OPTS} ${LOG4J} -jar ${GRAYLOG_SERVER_JAR} server -f ${GRAYLOG_CONF} -p ${GRAYLOG_PID}
+    exec "${JAVA_CMD}" ${JAVA_OPTS} ${LOG4J} -jar "${GRAYLOG_SERVER_JAR}" server -f "${GRAYLOG_CONF}" -p "${GRAYLOG_PID}"
 }
 
 stop() {
-    if [ ! -f $GRAYLOG_PID ]; then
-      echo "Not stopping. Pidfile not found: $GRAYLOG_PID"
-      return
+    if [ ! -f "${GRAYLOG_PID}" ]; then
+      die "Not stopping. PID file not found: ${GRAYLOG_PID}"
     fi
 
-    PID=$(cat ${GRAYLOG_PID})
+    PID=$(get_pid)
 
     echo "Stopping graylog-server ($PID) ..."
     echo "Waiting for graylog-server to halt."
 
     kill $PID
 
-    while $PS -p $PID > /dev/null; do sleep 1; done;
-    rm ${GRAYLOG_PID}
+    while "$PS" -p $PID > /dev/null; do sleep 1; done;
+    rm "${GRAYLOG_PID}"
 
-    echo "graylog-server is dead"
+    echo "graylog-server stopped"
 }
 
 restart() {
@@ -81,26 +90,18 @@ restart() {
 }
 
 status() {
-    pid=$(get_pid)
-    if [ ! -z $pid ]; then
-        if pid_running $pid; then
-            echo "graylog-server running as pid $pid"
+    PID=$(get_pid)
+    if [ ! -z $PID ]; then
+        if pid_running $PID; then
+            echo "graylog-server running with PID ${PID}"
             return 0
         else
-            echo "Stale pid file with $pid - removing..."
-            rm ${GRAYLOG_PID}
+            rm "${GRAYLOG_PID}"
+            die "Removed stale PID file ${GRAYLOG_PID} with ${PID}."
         fi
     fi
 
-    echo "graylog-server not running"
-}
-
-get_pid() {
-    cat ${GRAYLOG_PID} 2> /dev/null
-}
-
-pid_running() {
-    kill -0 $1 2> /dev/null
+    die "graylog-server not running"
 }
 
 case "$CMD" in
@@ -121,5 +122,4 @@ case "$CMD" in
         ;;
     *)
         echo "Usage $0 {start|stop|restart|status|run}"
-        RETVAL=1
 esac

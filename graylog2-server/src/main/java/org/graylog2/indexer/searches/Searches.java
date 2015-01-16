@@ -17,8 +17,6 @@
 package org.graylog2.indexer.searches;
 
 import com.google.common.collect.Sets;
-import javax.inject.Inject;
-import javax.inject.Singleton;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
@@ -33,7 +31,6 @@ import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.QueryStringQueryBuilder;
 import org.elasticsearch.node.Node;
 import org.elasticsearch.search.SearchHit;
-import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogram;
 import org.elasticsearch.search.facet.FacetBuilders;
 import org.elasticsearch.search.facet.datehistogram.DateHistogramFacet;
 import org.elasticsearch.search.facet.datehistogram.DateHistogramFacetBuilder;
@@ -63,6 +60,8 @@ import org.joda.time.Period;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.io.IOException;
 import java.util.List;
 import java.util.Set;
@@ -131,11 +130,11 @@ public class Searches {
         this.c = node.client();
     }
 
-    public CountResult count(String query, TimeRange range) throws IndexHelper.InvalidRangeFormatException {
+    public CountResult count(String query, TimeRange range) {
         return count(query, range, null);
     }
 
-    public CountResult count(String query, TimeRange range, String filter) throws IndexHelper.InvalidRangeFormatException {
+    public CountResult count(String query, TimeRange range, String filter) {
         Set<String> indices = IndexHelper.determineAffectedIndices(indexRangeService, deflector, range);
 
         SearchRequest request;
@@ -150,7 +149,7 @@ public class Searches {
         return new CountResult(r.getHits().getTotalHits(), r.getTookInMillis(), r.getHits());
     }
 
-    public ScrollResult scroll(String query, TimeRange range, int limit, int offset, List<String> fields, String filter) throws IndexHelper.InvalidRangeFormatException {
+    public ScrollResult scroll(String query, TimeRange range, int limit, int offset, List<String> fields, String filter) {
         final Set<String> indices = IndexHelper.determineAffectedIndices(indexRangeService, deflector, range);
         final SearchRequestBuilder srb = standardSearchRequest(query, indices, limit, offset, range, null, false);
         if (range != null && filter != null) {
@@ -181,11 +180,11 @@ public class Searches {
         return new ScrollResult(c, query, request.source(), r, fields);
     }
 
-    public SearchResult search(String query, TimeRange range, int limit, int offset, Sorting sorting) throws IndexHelper.InvalidRangeFormatException {
+    public SearchResult search(String query, TimeRange range, int limit, int offset, Sorting sorting) {
         return search(query, null, range, limit, offset, sorting);
     }
 
-    public SearchResult search(String query, String filter, TimeRange range, int limit, int offset, Sorting sorting) throws IndexHelper.InvalidRangeFormatException {
+    public SearchResult search(String query, String filter, TimeRange range, int limit, int offset, Sorting sorting) {
         final SearchesConfig searchesConfig = SearchesConfigBuilder.newConfig()
                 .setQuery(query)
                 .setFilter(filter)
@@ -198,7 +197,7 @@ public class Searches {
         return search(searchesConfig);
     }
 
-    public SearchResult search(SearchesConfig config) throws IndexHelper.InvalidRangeFormatException {
+    public SearchResult search(SearchesConfig config) {
         Set<IndexRange> indices = IndexHelper.determineAffectedIndicesWithRanges(indexRangeService, deflector, config.range());
 
         Set<String> indexNames = Sets.newHashSet();
@@ -212,7 +211,7 @@ public class Searches {
         return new SearchResult(r.getHits(), indices, config.query(), request.source(), r.getTook());
     }
 
-    public TermsResult terms(String field, int size, String query, String filter, TimeRange range) throws IndexHelper.InvalidRangeFormatException {
+    public TermsResult terms(String field, int size, String query, String filter, TimeRange range) {
         if (size == 0) {
             size = 50;
         }
@@ -244,11 +243,11 @@ public class Searches {
         );
     }
 
-    public TermsResult terms(String field, int size, String query, TimeRange range) throws IndexHelper.InvalidRangeFormatException {
+    public TermsResult terms(String field, int size, String query, TimeRange range) {
         return terms(field, size, query, null, range);
     }
 
-    public TermsStatsResult termsStats(String keyField, String valueField, TermsStatsOrder order, int size, String query, String filter, TimeRange range) throws IndexHelper.InvalidRangeFormatException {
+    public TermsStatsResult termsStats(String keyField, String valueField, TermsStatsOrder order, int size, String query, String filter, TimeRange range) {
         if (size == 0) {
             size = 50;
         }
@@ -282,15 +281,15 @@ public class Searches {
         );
     }
 
-    public TermsStatsResult termsStats(String keyField, String valueField, TermsStatsOrder order, int size, String query, TimeRange range) throws IndexHelper.InvalidRangeFormatException {
+    public TermsStatsResult termsStats(String keyField, String valueField, TermsStatsOrder order, int size, String query, TimeRange range) {
         return termsStats(keyField, valueField, order, size, query, null, range);
     }
 
-    public FieldStatsResult fieldStats(String field, String query, TimeRange range) throws FieldTypeException, IndexHelper.InvalidRangeFormatException {
+    public FieldStatsResult fieldStats(String field, String query, TimeRange range) throws FieldTypeException {
         return fieldStats(field, query, null, range);
     }
 
-    public FieldStatsResult fieldStats(String field, String query, String filter, TimeRange range) throws FieldTypeException, IndexHelper.InvalidRangeFormatException {
+    public FieldStatsResult fieldStats(String field, String query, String filter, TimeRange range) throws FieldTypeException {
         SearchRequestBuilder srb;
 
         if (filter == null) {
@@ -326,11 +325,11 @@ public class Searches {
         );
     }
 
-    public HistogramResult histogram(String query, DateHistogramInterval interval, TimeRange range) throws IndexHelper.InvalidRangeFormatException {
+    public HistogramResult histogram(String query, DateHistogramInterval interval, TimeRange range) {
         return histogram(query, interval, null, range);
     }
 
-    public HistogramResult histogram(String query, DateHistogramInterval interval, String filter, TimeRange range) throws IndexHelper.InvalidRangeFormatException {
+    public HistogramResult histogram(String query, DateHistogramInterval interval, String filter, TimeRange range) {
         DateHistogramFacetBuilder fb = FacetBuilders.dateHistogramFacet("histogram")
                 .field("timestamp")
                 .interval(interval.toString().toLowerCase());
@@ -353,7 +352,7 @@ public class Searches {
                 interval, r.getTook());
     }
 
-    public HistogramResult fieldHistogram(String query, String field, DateHistogramInterval interval, String filter, TimeRange range) throws FieldTypeException, IndexHelper.InvalidRangeFormatException {
+    public HistogramResult fieldHistogram(String query, String field, DateHistogramInterval interval, String filter, TimeRange range) throws FieldTypeException {
         DateHistogramFacetBuilder fb = FacetBuilders.dateHistogramFacet("histogram")
                 .keyField("timestamp")
                 .valueField(field)
@@ -390,7 +389,7 @@ public class Searches {
         return oneOfIndex(index, matchAllQuery(), SortOrder.ASC);
     }
 
-    private SearchRequestBuilder searchRequest(SearchesConfig config, Set<String> indices) throws IndexHelper.InvalidRangeFormatException {
+    private SearchRequestBuilder searchRequest(SearchesConfig config, Set<String> indices) {
         final SearchRequestBuilder request;
 
         if (config.filter() == null) {
@@ -411,11 +410,11 @@ public class Searches {
         return request;
     }
 
-    private SearchRequestBuilder standardSearchRequest(String query, Set<String> indices) throws IndexHelper.InvalidRangeFormatException {
+    private SearchRequestBuilder standardSearchRequest(String query, Set<String> indices) {
         return standardSearchRequest(query, indices, 0, 0, null, null);
     }
 
-    private SearchRequestBuilder standardSearchRequest(String query, Set<String> indices, TimeRange range) throws IndexHelper.InvalidRangeFormatException {
+    private SearchRequestBuilder standardSearchRequest(String query, Set<String> indices, TimeRange range) {
         return standardSearchRequest(query, indices, 0, 0, range, null);
     }
 
@@ -424,7 +423,7 @@ public class Searches {
                                                        int limit,
                                                        int offset,
                                                        TimeRange range,
-                                                       Sorting sort) throws IndexHelper.InvalidRangeFormatException {
+                                                       Sorting sort) {
         return standardSearchRequest(query, indices, limit, offset, range, sort, true);
     }
 
@@ -435,7 +434,7 @@ public class Searches {
             int offset,
             TimeRange range,
             Sorting sort,
-            boolean highlight) throws IndexHelper.InvalidRangeFormatException {
+            boolean highlight) {
         if (query == null || query.trim().isEmpty()) {
             query = "*";
         }
@@ -473,15 +472,15 @@ public class Searches {
         return srb;
     }
 
-    private SearchRequestBuilder filteredSearchRequest(String query, String filter, Set<String> indices) throws IndexHelper.InvalidRangeFormatException {
+    private SearchRequestBuilder filteredSearchRequest(String query, String filter, Set<String> indices) {
         return filteredSearchRequest(query, filter, indices, 0, 0, null, null);
     }
 
-    private SearchRequestBuilder filteredSearchRequest(String query, String filter, Set<String> indices, TimeRange range) throws IndexHelper.InvalidRangeFormatException {
+    private SearchRequestBuilder filteredSearchRequest(String query, String filter, Set<String> indices, TimeRange range) {
         return filteredSearchRequest(query, filter, indices, 0, 0, range, null);
     }
 
-    private SearchRequestBuilder filteredSearchRequest(String query, String filter, Set<String> indices, int limit, int offset, TimeRange range, Sorting sort) throws IndexHelper.InvalidRangeFormatException {
+    private SearchRequestBuilder filteredSearchRequest(String query, String filter, Set<String> indices, int limit, int offset, TimeRange range, Sorting sort) {
         SearchRequestBuilder srb = standardSearchRequest(query, indices, limit, offset, range, sort);
 
         if (range != null && filter != null) {
@@ -506,7 +505,7 @@ public class Searches {
         }
     }
 
-    private BoolFilterBuilder standardFilters(TimeRange range, String filter) throws IndexHelper.InvalidRangeFormatException {
+    private BoolFilterBuilder standardFilters(TimeRange range, String filter) {
         BoolFilterBuilder bfb = FilterBuilders.boolFilter();
 
         boolean set = false;

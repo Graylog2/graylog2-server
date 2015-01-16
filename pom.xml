@@ -669,9 +669,9 @@
                 <scope>test</scope>
             </dependency>
             <dependency>
-                <groupId>org.graylog2.telemetry</groupId>
-                <artifactId>graylog2-telemetry-plugin</artifactId>
-                <version>1.0.0-SNAPSHOT</version>
+                <groupId>org.graylog.telemetry</groupId>
+                <artifactId>graylog-telemetry-plugin</artifactId>
+                <version>1.0.0-beta.1</version>
                 <scope>provided</scope>
             </dependency>
         </dependencies>

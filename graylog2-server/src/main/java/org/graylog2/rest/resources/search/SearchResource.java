@@ -25,7 +25,7 @@ import org.elasticsearch.action.search.SearchPhaseExecutionException;
 import org.elasticsearch.action.search.ShardSearchFailure;
 import org.elasticsearch.search.SearchParseException;
 import org.glassfish.jersey.server.ChunkedOutput;
-import org.graylog2.indexer.IndexHelper;
+import org.graylog2.indexer.InvalidRangeFormatException;
 import org.graylog2.indexer.results.ScrollResult;
 import org.graylog2.indexer.results.SearchResult;
 import org.graylog2.indexer.searches.Searches;
@@ -101,7 +101,7 @@ public abstract class SearchResource extends RestResource {
     }
 
     protected org.graylog2.indexer.results.FieldStatsResult fieldStats(String field, String query, String filter,
-                                                                       org.graylog2.indexer.searches.timeranges.TimeRange timeRange) throws IndexHelper.InvalidRangeFormatException {
+                                                                       org.graylog2.indexer.searches.timeranges.TimeRange timeRange) throws InvalidRangeFormatException {
         try {
             return searches.fieldStats(field, query, filter, timeRange);
         } catch (Searches.FieldTypeException e) {
@@ -111,7 +111,7 @@ public abstract class SearchResource extends RestResource {
     }
 
     protected org.graylog2.indexer.results.HistogramResult fieldHistogram(String field, String query, String interval,
-                                                                          String filter, org.graylog2.indexer.searches.timeranges.TimeRange timeRange) throws IndexHelper.InvalidRangeFormatException {
+                                                                          String filter, org.graylog2.indexer.searches.timeranges.TimeRange timeRange) throws InvalidRangeFormatException {
         try {
             return searches.fieldHistogram(
                     query,

@@ -32,9 +32,9 @@
  */
 package org.graylog2.restclient.models;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
-import javax.inject.Inject;
+import org.apache.shiro.subject.SimplePrincipalCollection;
+import org.apache.shiro.subject.Subject;
 import org.graylog2.restclient.lib.APIException;
 import org.graylog2.restclient.lib.ApiClient;
 import org.graylog2.restclient.lib.Graylog2ServerUnavailableException;
@@ -42,14 +42,13 @@ import org.graylog2.restclient.models.api.requests.ApiRequest;
 import org.graylog2.restclient.models.api.requests.CreateUserRequest;
 import org.graylog2.restclient.models.api.responses.system.UserResponse;
 import org.graylog2.restclient.models.api.responses.system.UsersListResponse;
-import org.apache.shiro.subject.SimplePrincipalCollection;
-import org.apache.shiro.subject.Subject;
 import org.graylog2.restroutes.generated.UsersResource;
 import org.graylog2.restroutes.generated.routes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import play.mvc.Http;
 
+import javax.inject.Inject;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
@@ -126,13 +125,7 @@ public class UserService {
 
     public boolean savePreferences(String username, Map<String, Object> preferences) {
         try {
-            ObjectMapper m = new ObjectMapper();
-            final String body = m.writeValueAsString(preferences);
-            api.path(resource.savePreferences(username)).body(new ApiRequest() {
-                public String toJson() {
-                    return body;
-                }
-            }).expect(Http.Status.NO_CONTENT).execute();
+            api.path(resource.savePreferences(username)).body(new UserPreferences(preferences)).expect(Http.Status.NO_CONTENT).execute();
         } catch (Exception e) {
             log.error("Could not save preferences for " + username, e);
             return false;
@@ -206,5 +199,14 @@ public class UserService {
         }
 
         return result;
+    }
+
+    private static class UserPreferences extends ApiRequest {
+        private final Map<String, Object> preferences;
+
+        public UserPreferences(Map<String, Object> preferences) {
+            this.preferences = preferences;
+        }
+
     }
 }

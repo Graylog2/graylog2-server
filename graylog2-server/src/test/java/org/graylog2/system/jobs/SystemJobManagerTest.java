@@ -17,6 +17,7 @@
 package org.graylog2.system.jobs;
 
 import com.codahale.metrics.MetricRegistry;
+import org.graylog2.plugin.ServerStatus;
 import org.graylog2.system.activities.SystemMessageActivityWriter;
 import org.testng.annotations.Test;
 
@@ -95,6 +96,7 @@ public class SystemJobManagerTest {
         private int maxConcurrency = 9001;
 
         public LongRunningJob(int seconds) {
+            super(mock(ServerStatus.class));
             this.seconds = seconds;
         }
 
@@ -152,6 +154,7 @@ public class SystemJobManagerTest {
         private int seconds;
 
         public AnotherLongRunningJob(int seconds) {
+            super(mock(ServerStatus.class));
             this.seconds = seconds;
         }
 
