@@ -11,7 +11,7 @@
     <parent>
         <artifactId>graylog2-parent</artifactId>
         <groupId>org.graylog2</groupId>
-        <version>1.0.0-beta.3-SSNAPSHOT</version>
+        <version>1.0.0-beta.3-SNAPSHOT</version>
     </parent>
 
     <name>graylog2-rest-models</name>
