@@ -141,7 +141,7 @@ public class AlarmCallbackResource extends RestResource {
         final Map<String, String> result = ImmutableMap.of("alarmcallback_id", id);
         final URI alarmCallbackUri = UriBuilder.fromResource(AlarmCallbackResource.class)
                 .path("{alarmCallbackId}")
-                .build(id);
+                .build(streamid, id);
 
         return Response.created(alarmCallbackUri).entity(result).build();
     }
