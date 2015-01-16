@@ -89,10 +89,12 @@ status() {
         else
             echo "Stale pid file with $pid - removing..."
             rm ${GRAYLOG_PID}
+            exit 1
         fi
     fi
 
     echo "graylog-server not running"
+    exit 1
 }
 
 get_pid() {
