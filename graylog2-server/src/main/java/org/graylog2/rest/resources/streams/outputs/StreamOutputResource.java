@@ -25,6 +25,7 @@ import com.wordnik.swagger.annotations.ApiResponses;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.database.NotFoundException;
+import org.graylog2.outputs.OutputRegistry;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.streams.Output;
 import org.graylog2.plugin.streams.Stream;
@@ -57,11 +58,13 @@ public class StreamOutputResource extends RestResource {
 
     private final OutputService outputService;
     private final StreamService streamService;
+    private final OutputRegistry outputRegistry;
 
     @Inject
-    public StreamOutputResource(OutputService outputService, StreamService streamService) {
+    public StreamOutputResource(OutputService outputService, StreamService streamService, OutputRegistry outputRegistry) {
         this.outputService = outputService;
         this.streamService = streamService;
+        this.outputRegistry = outputRegistry;
     }
 
     @GET
@@ -139,5 +142,6 @@ public class StreamOutputResource extends RestResource {
         final Output output = outputService.load(outputId);
 
         streamService.removeOutput(stream, output);
+        outputRegistry.removeOutput(output);
     }
 }

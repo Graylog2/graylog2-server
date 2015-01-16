@@ -18,9 +18,13 @@ package org.graylog2.outputs;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import org.graylog2.plugin.configuration.Configuration;
+import com.google.common.util.concurrent.UncheckedExecutionException;
+import org.graylog2.Configuration;
+import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.outputs.MessageOutput;
 import org.graylog2.plugin.outputs.MessageOutputConfigurationException;
 import org.graylog2.plugin.streams.Output;
@@ -35,6 +39,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
@@ -47,24 +53,59 @@ public class OutputRegistry {
     private final MessageOutput defaultMessageOutput;
     private final OutputService outputService;
     private final MessageOutputFactory messageOutputFactory;
+    private final Configuration configuration;
+    private final LoadingCache<String, AtomicInteger> faultCounters;
+    private final long faultCountThreshold;
+    private final long faultPenaltySeconds;
 
     @Inject
     public OutputRegistry(@DefaultMessageOutput MessageOutput defaultMessageOutput,
                           final OutputService outputService,
-                          MessageOutputFactory messageOutputFactory) {
+                          MessageOutputFactory messageOutputFactory,
+                          Configuration configuration) {
         this.defaultMessageOutput = defaultMessageOutput;
         this.outputService = outputService;
         this.messageOutputFactory = messageOutputFactory;
+        this.configuration = configuration;
         this.runningMessageOutputs = CacheBuilder.newBuilder().build();
+        this.faultCountThreshold = configuration.getOutputFaultCountThreshold();
+        this.faultPenaltySeconds = configuration.getOutputFaultPenaltySeconds();
+        this.faultCounters = CacheBuilder.newBuilder()
+                .expireAfterWrite(this.faultPenaltySeconds, TimeUnit.SECONDS)
+                .build(new CacheLoader<String, AtomicInteger>() {
+                    @Override
+                    public AtomicInteger load(String key) throws Exception {
+                        return new AtomicInteger(0);
+                    }
+                });
     }
 
     public MessageOutput getOutputForIdAndStream(String id, Stream stream) {
+        final AtomicInteger faultCount;
         try {
-            return this.runningMessageOutputs.get(id, loadForIdAndStream(id, stream));
+            faultCount = this.faultCounters.get(id);
         } catch (ExecutionException e) {
-            LOG.error("Unable to fetch output: ", e);
+            LOG.error("Unable to retrieve output fault counter: ", e);
             return null;
         }
+
+        try {
+            if (faultCount.get() < faultCountThreshold)
+                return this.runningMessageOutputs.get(id, loadForIdAndStream(id, stream));
+        } catch (ExecutionException | UncheckedExecutionException e) {
+            if (!(e.getCause() instanceof NotFoundException)) {
+                final int number = faultCount.addAndGet(1);
+                LOG.error("Unable to fetch output {}, fault #{}: ", id, number, e);
+                if (number >= faultCountThreshold)
+                    LOG.error("Output {} has crossed threshold of {} faults in {} seconds. Disabling for {} seconds.",
+                            id,
+                            faultCountThreshold,
+                            faultPenaltySeconds,
+                            faultPenaltySeconds
+                    );
+            }
+        }
+        return null;
     }
 
     public Callable<MessageOutput> loadForIdAndStream(final String id, final Stream stream) {
@@ -78,7 +119,10 @@ public class OutputRegistry {
     }
 
     protected MessageOutput launchOutput(Output output, Stream stream) throws MessageOutputConfigurationException {
-        final MessageOutput messageOutput = messageOutputFactory.fromStreamOutput(output, stream, new Configuration(output.getConfiguration()));
+        final MessageOutput messageOutput = messageOutputFactory.fromStreamOutput(output,
+                stream,
+                new org.graylog2.plugin.configuration.Configuration(output.getConfiguration())
+        );
         if (messageOutput == null)
             throw new IllegalArgumentException("Failed to instantiate MessageOutput from Output: " + output);
 
@@ -98,6 +142,9 @@ public class OutputRegistry {
     }
 
     public void removeOutput(Output output) {
+        final MessageOutput messageOutput = runningMessageOutputs.getIfPresent(output.getId());
+        if (messageOutput != null)
+            messageOutput.stop();
         runningMessageOutputs.invalidate(output.getId());
     }
 }

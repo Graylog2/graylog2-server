@@ -27,7 +27,6 @@ import com.google.common.util.concurrent.Uninterruptibles;
 import javax.inject.Inject;
 import com.lmax.disruptor.WorkHandler;
 import org.graylog2.Configuration;
-import org.graylog2.outputs.CachedOutputRouter;
 import org.graylog2.outputs.DefaultMessageOutput;
 import org.graylog2.outputs.OutputRouter;
 import org.graylog2.plugin.Message;
@@ -73,7 +72,7 @@ public class OutputBufferProcessor implements WorkHandler<MessageEvent> {
                                  MetricRegistry metricRegistry,
                                  ThroughputStats throughputStats,
                                  ServerStatus serverStatus,
-                                 CachedOutputRouter outputRouter,
+                                 OutputRouter outputRouter,
                                  @DefaultMessageOutput MessageOutput defaultMessageOutput) {
         this.configuration = configuration;
         this.throughputStats = throughputStats;
