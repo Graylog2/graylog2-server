@@ -101,7 +101,7 @@ public class StreamAlertConditionResource extends RestResource {
         final Map<String, String> result = ImmutableMap.of("alert_condition_id", alertCondition.getId());
         final URI alertConditionUri = UriBuilder.fromResource(StreamAlertConditionResource.class)
                 .path("{conditionId}")
-                .build(alertCondition.getId());
+                .build(stream.getId(), alertCondition.getId());
 
         return Response.created(alertConditionUri).entity(result).build();
     }
