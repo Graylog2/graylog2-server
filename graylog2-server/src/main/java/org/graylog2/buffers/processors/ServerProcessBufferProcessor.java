@@ -21,17 +21,18 @@ import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.google.common.collect.ComparisonChain;
 import com.google.common.collect.Ordering;
-import javax.inject.Inject;
 import org.graylog2.Configuration;
 import org.graylog2.buffers.OutputBuffer;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.filters.MessageFilter;
 import org.graylog2.shared.buffers.processors.ProcessBufferProcessor;
+import org.graylog2.shared.journal.Journal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
+import javax.inject.Inject;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
@@ -44,6 +45,7 @@ import static com.codahale.metrics.MetricRegistry.name;
 public class ServerProcessBufferProcessor extends ProcessBufferProcessor {
     private final Configuration configuration;
     private final ServerStatus serverStatus;
+    private final Journal journal;
 
     private static final Logger LOG = LoggerFactory.getLogger(ServerProcessBufferProcessor.class);
     private final OutputBuffer outputBuffer;
@@ -56,10 +58,12 @@ public class ServerProcessBufferProcessor extends ProcessBufferProcessor {
                                   Set<MessageFilter> filterRegistry,
                                   Configuration configuration,
                                   ServerStatus serverStatus,
-                                  OutputBuffer outputBuffer) {
+                                  OutputBuffer outputBuffer,
+                                  Journal journal) {
         super(metricRegistry);
         this.configuration = configuration;
         this.serverStatus = serverStatus;
+        this.journal = journal;
 
         // we need to keep this sorted properly, so that the filters run in the correct order
         this.filterRegistry = Ordering.from(new Comparator<MessageFilter>() {
@@ -93,6 +97,7 @@ public class ServerProcessBufferProcessor extends ProcessBufferProcessor {
                 if (filter.filter(msg)) {
                     LOG.debug("Filter [{}] marked message <{}> to be discarded. Dropping message.", filter.getName(), msg.getId());
                     filteredOutMessages.mark();
+                    journal.markJournalOffsetCommitted(msg.getJournalOffset());
                     return;
                 }
             } catch (Exception e) {

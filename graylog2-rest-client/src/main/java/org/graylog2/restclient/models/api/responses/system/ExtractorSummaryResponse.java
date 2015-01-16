@@ -22,9 +22,6 @@ import org.graylog2.restclient.models.api.responses.metrics.TimerRateMetricsResp
 import java.util.List;
 import java.util.Map;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public class ExtractorSummaryResponse {
 
     public String id;
