@@ -137,6 +137,11 @@ public class StaticEmailAlertSender implements AlertSender {
     }
 
     protected String buildStreamDetailsURL(URI baseUri, AlertCondition.CheckResult checkResult, Stream stream) {
+        // Return an empty string if the transport_email_web_interface_url setting has not been set in the config.
+        if (baseUri == null) {
+            return "";
+        }
+
         StringBuilder sb = new StringBuilder();
 
         int time = 5;

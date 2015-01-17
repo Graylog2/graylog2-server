@@ -78,7 +78,7 @@ stop() {
     kill $PID
 
     while "$PS" -p $PID > /dev/null; do sleep 1; done;
-    rm "${RADIO_PID}"
+    rm -f "${RADIO_PID}"
 
     echo "graylog-radio stopped"
 }

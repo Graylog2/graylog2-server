@@ -36,7 +36,7 @@ public class FormattedEmailAlertSender extends StaticEmailAlertSender implements
             "Date: ${check_result.triggeredAt}\n" +
             "Stream ID: ${stream.id}\n" +
             "Stream title: ${stream.title}\n" +
-            "Stream URL: ${stream_url}\n" +
+            "${if stream_url}Stream URL: ${stream_url}${end}\n" +
             "\n" +
             "Triggered condition: ${check_result.triggeredCondition}\n" +
             "##########\n\n" +
