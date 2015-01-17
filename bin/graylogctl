@@ -78,7 +78,7 @@ stop() {
     kill $PID
 
     while "$PS" -p $PID > /dev/null; do sleep 1; done;
-    rm "${GRAYLOG_PID}"
+    rm -f "${GRAYLOG_PID}"
 
     echo "graylog-server stopped"
 }
