@@ -27,16 +27,17 @@ import com.wordnik.swagger.annotations.ApiResponses;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.database.NotFoundException;
-import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.outputs.MessageOutputFactory;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.configuration.fields.TextField;
+import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.outputs.MessageOutput;
 import org.graylog2.plugin.outputs.MessageOutputConfigurationException;
 import org.graylog2.plugin.streams.Output;
-import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.rest.resources.streams.outputs.AvailableOutputSummary;
 import org.graylog2.security.RestPermissions;
+import org.graylog2.shared.rest.resources.RestResource;
+import org.graylog2.streams.OutputImpl;
 import org.graylog2.streams.OutputService;
 import org.graylog2.streams.outputs.CreateOutputRequest;
 import org.graylog2.utilities.ConfigurationMapConverter;
@@ -63,6 +64,7 @@ import java.util.Set;
 @Path("/system/outputs")
 public class OutputResource extends RestResource {
     private static final Logger LOG = LoggerFactory.getLogger(OutputResource.class);
+    private static final String PASSWORD_ATTRIBUTE = TextField.Attribute.IS_PASSWORD.toString().toLowerCase();
 
     private final OutputService outputService;
     private final MessageOutputFactory messageOutputFactory;
@@ -185,17 +187,27 @@ public class OutputResource extends RestResource {
     }
 
     // This is so ugly!
-    // TODO: Remove this once we implemented proper types for input/ouput configuration.
+    // TODO: Remove this once we implemented proper types for input/output configuration.
     private Map<String, Object> filterPasswordFields(final Output output) throws MessageOutputConfigurationException {
         final Map<String, Object> data = output.asMap();
         final MessageOutput.Factory factory = messageOutputFactory.get(output.getType());
-        final ConfigurationRequest requestedConfiguration = factory.getConfig().getRequestedConfiguration();
+
+        if (null == factory) {
+            throw new MessageOutputConfigurationException("Couldn't find output of type " + output.getType());
+        }
+
+        final ConfigurationRequest requestedConfiguration;
+        try {
+            requestedConfiguration = factory.getConfig().getRequestedConfiguration();
+        } catch (Exception e) {
+            throw new MessageOutputConfigurationException("Couldn't retrieve requested configuration for output " + output.getTitle());
+        }
 
         if (data.containsKey("configuration")) {
             final Map<String, Object> c = (Map<String, Object>) data.get("configuration");
 
             for (Map.Entry<String, Object> entry : c.entrySet()) {
-                if (requestedConfiguration.getField(entry.getKey()).getAttributes().contains(TextField.Attribute.IS_PASSWORD.toString().toLowerCase())) {
+                if (requestedConfiguration.getField(entry.getKey()).getAttributes().contains(PASSWORD_ATTRIBUTE)) {
                     c.put(entry.getKey(), "********");
                 }
             }

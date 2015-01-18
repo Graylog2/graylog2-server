@@ -61,7 +61,8 @@ public class OutputImpl implements Output {
         this(title, type, configuration, createdAt, creatorUserId, null);
     }
 
-    public OutputImpl(String title, String type, Map<String, Object> configuration, Date createdAt, String creatorUserId, String contentPack) {
+    public OutputImpl(String title, String type, Map<String, Object> configuration, Date createdAt, String creatorUserId,
+                      @Nullable String contentPack) {
         this._id = new ObjectId();
         this.title = title;
         this.type = type;
