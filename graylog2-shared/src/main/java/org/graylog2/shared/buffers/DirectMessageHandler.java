@@ -16,8 +16,9 @@
  */
 package org.graylog2.shared.buffers;
 
-import javax.inject.Inject;
 import com.lmax.disruptor.WorkHandler;
+
+import javax.inject.Inject;
 
 class DirectMessageHandler implements WorkHandler<RawMessageEvent> {
 
@@ -30,7 +31,9 @@ class DirectMessageHandler implements WorkHandler<RawMessageEvent> {
 
     @Override
     public void onEvent(RawMessageEvent event) throws Exception {
-        processBuffer.insertBlocking(event.rawMessage);
+        processBuffer.insertBlocking(event.getRawMessage());
+        // clear out for gc and to avoid promoting the raw message event to a tenured gen
+        event.setRawMessage(null);
     }
 
 

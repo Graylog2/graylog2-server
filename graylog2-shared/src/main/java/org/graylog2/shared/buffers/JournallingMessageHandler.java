@@ -20,14 +20,14 @@ import com.codahale.metrics.Counter;
 import com.codahale.metrics.MetricRegistry;
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
-import javax.inject.Inject;
-import javax.inject.Named;
 import com.lmax.disruptor.EventHandler;
 import org.graylog2.shared.journal.Journal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
+import javax.inject.Inject;
+import javax.inject.Named;
 import java.util.List;
 import java.util.concurrent.Semaphore;
 
@@ -80,15 +80,21 @@ public class JournallingMessageHandler implements EventHandler<RawMessageEvent> 
         @Override
         public Journal.Entry apply(RawMessageEvent input) {
             if (log.isTraceEnabled()) {
-                log.trace("Journalling message {}", input.rawMessage.getId());
+                log.trace("Journalling message {}", input.getMessageId());
             }
+            final byte[] messageIdBytes = input.getMessageIdBytes();
+            final byte[] encodedRawMessage = input.getEncodedRawMessage();
+
             // stats
-            final int size = input.encodedRawMessage.length;
+            final int size = encodedRawMessage.length;
             bytesWritten += size;
             byteCounter.inc(size);
 
+            // clear for gc and to avoid promotion to tenured space
+            input.setMessageIdBytes(null);
+            input.setEncodedRawMessage(null);
             // convert to journal entry
-            return journal.createEntry(input.rawMessage.getIdBytes(), input.encodedRawMessage);
+            return journal.createEntry(messageIdBytes, encodedRawMessage);
         }
     }
 }
