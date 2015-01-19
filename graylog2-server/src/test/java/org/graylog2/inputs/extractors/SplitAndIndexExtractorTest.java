@@ -286,6 +286,27 @@ public class SplitAndIndexExtractorTest extends AbstractExtractorTest {
         assertEquals("The short message", msg.getField("message"));
     }
 
+    @Test
+    public void testCutChecksBounds() throws Exception {
+        String result = SplitAndIndexExtractor.cut("foobar", " ", 1);
+
+        assertNull(result);
+    }
+
+    @Test
+    public void testCutWorksWithNull() throws Exception {
+        assertNull(SplitAndIndexExtractor.cut(null, " ", 1));
+        assertNull(SplitAndIndexExtractor.cut("foobar", null, 1));
+        assertNull(SplitAndIndexExtractor.cut("foobar", " ", -1));
+    }
+
+    @Test
+    public void testCutReturnsCorrectPart() throws Exception {
+        String result = SplitAndIndexExtractor.cut("foobar foobaz quux", " ", 2);
+
+        assertEquals("quux", result);
+    }
+
     public static Map<String, Object> config(final Object splitChar, final Object targetIndex) {
         return new HashMap<String, Object>() {{
             put("index", targetIndex);
