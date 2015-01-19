@@ -36,12 +36,16 @@ $(document).ready(function() {
         $.ajax({
             url: appPrefixed('/a/tools/regex_test'),
             data: {
-                "string":$("#xtrc-example").text(),
+                "string":URI.encode($("#xtrc-example").text()),
                 "regex":$("#regex_value").val()
             },
             success: function(matchResult) {
-                if(matchResult.finds) {
-                    highlightMatchResult(matchResult);
+                if (matchResult.finds) {
+                    if (matchResult.match != null) {
+                        highlightMatchResult(matchResult);
+                    } else {
+                        showWarning("Regular expression does not contain any matcher group to extract.");
+                    }
                 } else {
                     showWarning("Regular expression did not match.");
                 }

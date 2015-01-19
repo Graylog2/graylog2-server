@@ -727,16 +727,25 @@ $(document).ready(function() {
     $(".index-description .index-details").on("click", function(e) {
         e.preventDefault();
 
-        $(".index-info", $(this).closest(".index-description")).toggle();
-        var icon = $(this).children().first();
+        var linkElem = $(this);
+        var index = $(this).data('index-name');
+        
+        $.get(appPrefixed("/a/system/indices/index_info/" + index + "/partial"), function(data) {
+            var holderElem = $(".index-info-holder", linkElem.closest(".index-description"));
+            holderElem.html(data);
+            holderElem.toggle();
+            
+            var icon = linkElem.children().first();
 
-        if(icon.hasClass("icon-caret-right")) {
-            icon.removeClass("icon-caret-right");
-            icon.addClass("icon-caret-down");
-        } else {
-            icon.removeClass("icon-caret-down");
-            icon.addClass("icon-caret-right");
-        }
+            if(icon.hasClass("icon-caret-right")) {
+                icon.removeClass("icon-caret-right");
+                icon.addClass("icon-caret-down");
+            } else {
+                icon.removeClass("icon-caret-down");
+                icon.addClass("icon-caret-right");
+            }
+        });
+
     });
 
     $(".nolink").on("live", function(e) {

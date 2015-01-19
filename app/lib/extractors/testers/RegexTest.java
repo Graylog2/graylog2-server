@@ -46,17 +46,17 @@ public class RegexTest {
                 .queryParam("string", string)
                 .execute();
 
-        Map<String, Object> match = Maps.newHashMap();
-        match.put("start", r.match.start);
-        match.put("end", r.match.end);
-        match.put("match", r.match.match);
-
         Map<String, Object> result = Maps.newHashMap();
         result.put("string", r.string);
         result.put("regex", r.regex);
         result.put("finds", r.matched);
 
-        if (r.matched) {
+        if (r.matched && r.match != null) {
+            Map<String, Object> match = Maps.newHashMap();
+            match.put("start", r.match.start);
+            match.put("end", r.match.end);
+            match.put("match", r.match.match);
+
             result.put("match", match);
         }
 
