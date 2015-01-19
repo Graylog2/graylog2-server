@@ -20,11 +20,74 @@
     <build>
         <plugins>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <configuration>
-                    <finalName>graylog2-rest-client</finalName>
-                </configuration>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>1.3.2</version>
+                <executions>
+                    <execution>
+                        <id>GenerateSources</id>
+                        <goals>
+                            <goal>java</goal>
+                        </goals>
+                        <phase>generate-sources</phase>
+                        <configuration>
+                            <sourceRoot>${project.build.directory}/generated-sources</sourceRoot>
+                            <arguments>
+                                <argument>${project.build.directory}/generated-sources</argument>
+                            </arguments>
+                            <classpathScope>compile</classpathScope>
+                            <includePluginDependencies>true</includePluginDependencies>
+                            <mainClass>org.graylog2.restroutes.GenerateRoutes</mainClass>
+                        </configuration>
+                    </execution>
+                </executions>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.graylog2</groupId>
+                        <artifactId>graylog2-rest-routes</artifactId>
+                        <version>${project.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.graylog2</groupId>
+                        <artifactId>graylog2-server</artifactId>
+                        <version>${project.version}</version>
+                        <exclusions>
+                            <exclusion>
+                                <groupId>org.slf4j</groupId>
+                                <artifactId>slf4j-log4j12</artifactId>
+                            </exclusion>
+                        </exclusions>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.graylog2</groupId>
+                        <artifactId>graylog2-radio</artifactId>
+                        <version>${project.version}</version>
+                        <exclusions>
+                            <exclusion>
+                                <groupId>org.slf4j</groupId>
+                                <artifactId>slf4j-log4j12</artifactId>
+                            </exclusion>
+                        </exclusions>
+                    </dependency>
+                </dependencies>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>1.9</version>
+                <executions>
+                    <execution>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>add-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>${project.build.directory}/generated-sources</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
@@ -40,13 +103,8 @@
     <dependencies>
         <dependency>
             <groupId>org.graylog2</groupId>
-            <artifactId>graylog2-rest-routes</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.graylog2</groupId>
             <artifactId>graylog2-rest-models</artifactId>
         </dependency>
-
         <dependency>
             <groupId>com.google.inject</groupId>
             <artifactId>guice</artifactId>

@@ -97,6 +97,13 @@ public class GenerateRoutes {
 
         try {
             File dest = new File(argv[0]);
+
+            if(!dest.exists()) {
+                if(!dest.mkdirs()) {
+                    throw new RuntimeException("Output directory " + dest + " doesn't exist and couldn't be created.");
+                }
+            }
+
             codeModel.build(dest);
         } catch (IOException e) {
             e.printStackTrace();
