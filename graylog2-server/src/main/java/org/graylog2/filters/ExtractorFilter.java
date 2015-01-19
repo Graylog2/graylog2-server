@@ -35,13 +35,8 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public class ExtractorFilter implements MessageFilter {
-
     private static final Logger LOG = LoggerFactory.getLogger(ExtractorFilter.class);
-
     private static final String NAME = "Extractor";
 
     private Cache<String, List<Extractor>> cache = CacheBuilder.newBuilder()
@@ -66,8 +61,7 @@ public class ExtractorFilter implements MessageFilter {
                 extractor.runExtractor(msg);
             } catch (Exception e) {
                 extractor.incrementExceptions();
-                LOG.error("Could not apply extractor.", e);
-                continue;
+                LOG.error("Could not apply extractor " + extractor.getTitle() + " (id=" + extractor.getId() + ")", e);
             }
         }
 
