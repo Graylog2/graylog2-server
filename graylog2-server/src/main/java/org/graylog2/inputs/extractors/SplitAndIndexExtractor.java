@@ -25,9 +25,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
+import static com.google.common.base.Strings.emptyToNull;
+
 public class SplitAndIndexExtractor extends Extractor {
 
     public final String splitChar;
@@ -52,7 +51,7 @@ public class SplitAndIndexExtractor extends Extractor {
         }
 
         try {
-            index = ((Integer) extractorConfig.get("index"))-1;
+            index = ((Integer) extractorConfig.get("index")) - 1;
             splitChar = (String) extractorConfig.get("split_by");
         } catch (ClassCastException e) {
             throw new ConfigurationException("Parameters cannot be casted.");
@@ -73,19 +72,16 @@ public class SplitAndIndexExtractor extends Extractor {
     }
 
     public static String cut(String s, String splitChar, int index) {
-        String[] parts = s.split(Pattern.quote(splitChar));
-
-        if (parts == null || parts.length < index) {
+        if (s == null || splitChar == null || index < 0) {
             return null;
         }
 
-        String result = parts[index];
-
-        if (result == null || result.isEmpty()) {
+        final String[] parts = s.split(Pattern.quote(splitChar));
+        if (parts.length <= index) {
             return null;
         }
 
-        return result;
+        return emptyToNull(parts[index]);
     }
 
     public static int[] getCutIndices(String s, String splitChar, int index) {
@@ -93,28 +89,28 @@ public class SplitAndIndexExtractor extends Extractor {
         char target = splitChar.charAt(0);
 
         for (int i = 0; i < s.length(); i++) {
-            if(s.charAt(i) == target) {
+            if (s.charAt(i) == target) {
                 found++;
             }
 
             if (found == index) {
                 int begin = i;
                 if (begin != 0) {
-                    begin+=1;
+                    begin += 1;
                 }
 
-                int end = s.indexOf(target, i+1);
+                int end = s.indexOf(target, i + 1);
 
                 // End will be -1 if this is the last last token in the string and there is no other occurence.
                 if (end == -1) {
                     end = s.length();
                 }
 
-                return new int[]{begin,end};
+                return new int[]{begin, end};
             }
         }
 
-        return new int[]{0,0};
+        return new int[]{0, 0};
     }
 
 }
