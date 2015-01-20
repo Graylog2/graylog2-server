@@ -27,23 +27,51 @@ import org.graylog2.shared.inputs.NoSuchInputTypeException;
 import java.util.List;
 import java.util.Map;
 
-/**
- * @author Dennis Oelkers <dennis@torch.sh>
- */
 public interface InputService extends PersistedService {
     List<Input> allOfThisNode(String nodeId);
 
     List<Input> allOfRadio(Node radio);
 
     Input create(String id, Map<String, Object> fields);
+
     Input create(Map<String, Object> fields);
 
     Input find(String id) throws NotFoundException;
 
     Input findForThisNode(String nodeId, String id) throws NotFoundException;
+
     Input findForThisRadio(String radioId, String id) throws NotFoundException;
+
     Input findForThisNodeOrGlobal(String nodeId, String id) throws NotFoundException;
+
     Input findForThisRadioOrGlobal(String radioId, String id) throws NotFoundException;
+
+    /**
+     * @return the total number of inputs in the cluster (including global inputs).
+     */
+    long totalInputCount();
+
+    /**
+     * @return the number of global inputs in the cluster.
+     */
+    long globalInputCount();
+
+    /**
+     * @return the number of node-specific inputs in the cluster.
+     */
+    long nodeInputsCount();
+
+    /**
+     * @param nodeId the node ID to query
+     * @return the number of inputs on the specified node
+     */
+    long nodeInputsCount(String nodeId);
+
+    /**
+     * @param nodeId the node ID to query
+     * @return the number of inputs on the specified node (including global inputs)
+     */
+    long totalNodeInputsCount(String nodeId);
 
     void addExtractor(Input input, Extractor extractor) throws ValidationException;
 

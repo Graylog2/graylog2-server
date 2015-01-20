@@ -31,11 +31,11 @@ import org.graylog2.cluster.Node;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.database.PersistedServiceImpl;
-import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.inputs.converters.ConverterFactory;
 import org.graylog2.inputs.extractors.ExtractorFactory;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.database.EmbeddedPersistable;
+import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.inputs.Converter;
 import org.graylog2.plugin.inputs.Extractor;
 import org.graylog2.plugin.inputs.MessageInput;
@@ -216,7 +216,7 @@ public class InputServiceImpl extends PersistedServiceImpl implements InputServi
             try {
                 final Map.Entry<String, String> staticField =
                         Maps.immutableEntry((String) ex.get(InputImpl.FIELD_STATIC_FIELD_KEY),
-                                            (String) ex.get(InputImpl.FIELD_STATIC_FIELD_VALUE));
+                                (String) ex.get(InputImpl.FIELD_STATIC_FIELD_VALUE));
                 listBuilder.add(staticField);
             } catch (Exception e) {
                 LOG.error("Cannot build static field from persisted data. Skipping.", e);
@@ -339,5 +339,43 @@ public class InputServiceImpl extends PersistedServiceImpl implements InputServi
         input.addStaticFields(io.getStaticFields());
 
         return input;
+    }
+
+    @Override
+    public long totalInputCount() {
+        return totalCount(InputImpl.class);
+    }
+
+    @Override
+    public long globalInputCount() {
+        return count(InputImpl.class, new BasicDBObject(MessageInput.FIELD_GLOBAL, true));
+    }
+
+    @Override
+    public long nodeInputsCount() {
+        return count(InputImpl.class, new BasicDBObject(MessageInput.FIELD_GLOBAL, false));
+    }
+
+    @Override
+    public long nodeInputsCount(String nodeId) {
+        final List<BasicDBObject> forThisNode = ImmutableList.of(
+                new BasicDBObject(MessageInput.FIELD_NODE_ID, nodeId),
+                new BasicDBObject(MessageInput.FIELD_RADIO_ID, nodeId));
+
+        final List<BasicDBObject> query = ImmutableList.of(
+                new BasicDBObject(MessageInput.FIELD_GLOBAL, false),
+                new BasicDBObject("$or", forThisNode));
+
+        return count(InputImpl.class, new BasicDBObject("$and", query));
+    }
+
+    @Override
+    public long totalNodeInputsCount(String nodeId) {
+        final List<BasicDBObject> query = ImmutableList.of(
+                new BasicDBObject(MessageInput.FIELD_GLOBAL, true),
+                new BasicDBObject(MessageInput.FIELD_NODE_ID, nodeId),
+                new BasicDBObject(MessageInput.FIELD_RADIO_ID, nodeId));
+
+        return count(InputImpl.class, new BasicDBObject("$or", query));
     }
 }
