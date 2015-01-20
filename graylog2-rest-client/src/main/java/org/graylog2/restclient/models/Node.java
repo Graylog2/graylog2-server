@@ -90,6 +90,10 @@ public class Node extends ClusterEntity {
 
     private AtomicInteger failureCount = new AtomicInteger(0);
 
+    private BufferInfo bufferInfo;
+    private BufferClassesResponse bufferClasses;
+    private JournalInfo journalInfo;
+
     /* for initial set up in test */
     public Node(NodeSummaryResponse r) {
         this(null, null, null, r);
@@ -129,7 +133,14 @@ public class Node extends ClusterEntity {
         fromConfiguration = true;
     }
 
-    public BufferInfo getBufferInfo() {
+    public synchronized BufferInfo getBufferInfo() {
+        if (this.bufferInfo == null) {
+            this.bufferInfo = loadBufferInfo();
+        }
+        return this.bufferInfo;
+    }
+    
+    public BufferInfo loadBufferInfo() {
         try {
             return new BufferInfo(
                     api.path(routes.BuffersResource().utilization(), BuffersResponse.class)
@@ -138,25 +149,39 @@ public class Node extends ClusterEntity {
         } catch (Exception e) {
             LOG.error("Unable to read buffer info from node " + this, e);
         }
-        return null;
+        return BufferInfo.buildEmpty();
     }
 
-    public BufferClassesResponse getBufferClasses() {
+    public synchronized BufferClassesResponse getBufferClasses() {
+        if (this.bufferClasses == null) {
+            this.bufferClasses = loadBufferClasses();
+        }
+        return this.bufferClasses;
+    }
+    
+    public BufferClassesResponse loadBufferClasses() {
         try {
             return api.path(routes.BuffersResource().getBufferClasses(), BufferClassesResponse.class).node(this).execute();
         } catch (Exception e) {
             LOG.error("Unable to read buffer class names from node " + this, e);
         }
-        return null;
+        return BufferClassesResponse.buildEmpty();
     }
 
-    public JournalInfo getJournalInfo() {
+    public synchronized JournalInfo getJournalInfo() {
+        if (this.journalInfo == null) {
+            this.journalInfo = loadJournalInfo();
+        }
+        return this.journalInfo;
+    }
+    
+    public JournalInfo loadJournalInfo() {
         try {
             return api.path(routes.JournalResource().show(), JournalInfo.class).node(this).execute();
         } catch (Exception e) {
             LOG.error("Unable to read journal info from node " + this, e);
         }
-        return null;
+        return JournalInfo.buildEmpty();
     }
 
     public Map<String, InternalLoggerSubsystem> allLoggerSubsystems() {
@@ -584,11 +609,15 @@ public class Node extends ClusterEntity {
     }
 
     public void requireSystemInfo() {
-        this.systemInfo = firstNonNull(loadSystemInformation(), SystemOverviewResponse.buildEmpty());
+        if (this.systemInfo == null) {
+            this.systemInfo = firstNonNull(loadSystemInformation(), SystemOverviewResponse.buildEmpty());
+        }
     }
 
     public void requireJVMInfo() {
-        this.jvmInfo = firstNonNull(loadJVMInformation(), NodeJVMStats.buildEmpty());
+        if (this.jvmInfo == null) {
+            this.jvmInfo = firstNonNull(loadJVMInformation(), NodeJVMStats.buildEmpty());
+        }
     }
 
     @Override

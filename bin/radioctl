@@ -51,7 +51,7 @@ RADIO_CONF=${RADIO_CONF:=/etc/graylog-radio.conf}
 RADIO_PID=${RADIO_PID:=/tmp/graylog-radio.pid}
 LOG_FILE=${LOG_FILE:=log/graylog-radio.log}
 LOG4J=${LOG4J:=}
-DEFAULT_JAVA_OPTS="-Djava.library.path=${RADIOCTL_DIR}/../lib/sigar -Xms1g -Xmx1g -XX:PermSize=128m -XX:MaxPermSize=256m -server -XX:+ResizeTLAB -XX:+UseConcMarkSweepGC -XX:+CMSConcurrentMTEnabled -XX:+CMSClassUnloadingEnabled -XX:+UseParNewGC -XX:-OmitStackTraceInFastThrow"
+DEFAULT_JAVA_OPTS="-Djava.library.path=${RADIOCTL_DIR}/../lib/sigar -Xms1g -Xmx1g -XX:NewRatio=1 -XX:PermSize=128m -XX:MaxPermSize=256m -server -XX:+ResizeTLAB -XX:+UseConcMarkSweepGC -XX:+CMSConcurrentMTEnabled -XX:+CMSClassUnloadingEnabled -XX:+UseParNewGC -XX:-OmitStackTraceInFastThrow"
 JAVA_OPTS="${JAVA_OPTS:="$DEFAULT_JAVA_OPTS"}"
 
 start() {

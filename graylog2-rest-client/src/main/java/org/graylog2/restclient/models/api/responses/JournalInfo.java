@@ -44,4 +44,9 @@ public class JournalInfo {
     public KafkaJournalConfiguration journalConfig;
 
 
+    public static JournalInfo buildEmpty() {
+        final JournalInfo journalInfo = new JournalInfo();
+        journalInfo.journalConfig = new KafkaJournalConfiguration();
+        return journalInfo;
+    }
 }

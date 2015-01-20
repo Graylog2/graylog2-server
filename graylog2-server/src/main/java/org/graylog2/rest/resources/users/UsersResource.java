@@ -277,7 +277,6 @@ public class UsersResource extends RestResource {
 
     @PUT
     @Path("{username}/preferences")
-    @RequiresPermissions(USERS_EDIT)
     @ApiOperation("Update a user's preferences set.")
     @ApiResponses({
             @ApiResponse(code = 400, message = "Missing or invalid permission data.")
@@ -287,6 +286,7 @@ public class UsersResource extends RestResource {
                                 @ApiParam(name = "JSON body", value = "The map of preferences to assign to the user.", required = true)
                                 UpdateUserPreferences preferencesRequest) throws ValidationException {
         final org.graylog2.plugin.database.users.User user = userService.load(username);
+        checkPermission(RestPermissions.USERS_EDIT, username);
 
         if (user == null) {
             throw new NotFoundException();
