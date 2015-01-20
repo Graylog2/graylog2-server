@@ -1612,6 +1612,22 @@ form.node-processing-change input {
     margin-bottom: 7px;
 }
 
+.node-buffer-usage .bar[data-percentage^="0."] {
+    color: #00466A;
+    background: transparent;
+    box-shadow: none;
+    padding-left: 2px;
+}
+
+.node-buffer-usage .bar[data-percentage^="1."],
+.node-buffer-usage .bar[data-percentage^="2."],
+.node-buffer-usage .bar[data-percentage^="3."],
+.node-buffer-usage .bar[data-percentage^="4."],
+.node-buffer-usage .bar[data-percentage^="5."] {
+    color: #00466A;
+    padding-left: 2px;
+}
+
 .node-journal-usage {
     margin-top: 3px;
     margin-bottom: 7px;

@@ -116,22 +116,26 @@
                 <a href="@routes.MetricsController.ofNode(node.getNodeId, node.getBufferClasses.processBufferClass)" class="btn btn-info btn-mini pull-right">Metrics</a>
                 <h3>Input buffer</h3>
 
-                <div class="progress node-buffer-usage">
-                    <div class="bar bar-warning" style="width: @node.getBufferInfo.getInputBuffer.utilizationPercent%;">@node.getBufferInfo.getInputBuffer.utilizationPercent%</div>
-                </div>
-                <strong>@node.getBufferInfo.getInputBuffer.utilization messages</strong> in input buffer.
-                (@node.getBufferInfo.getInputBuffer.utilizationPercent% utilized)
+                @defining(node.getBufferInfo.getInputBuffer.utilizationPercent) { utilizationPercent =>
+                    <div class="progress node-buffer-usage">
+                        <div class="bar bar-warning" data-percentage="@utilizationPercent" style="width : @utilizationPercent% ;">@utilizationPercent%</div>
+                    </div>
+                    <strong>@node.getBufferInfo.getInputBuffer.utilization messages</strong> in input buffer.
+                    (@utilizationPercent% utilized)
+                }
             </div>
 
             <div class="span6">
                 <a href="@routes.MetricsController.ofNode(node.getNodeId, node.getBufferClasses.outputBufferClass)" class="btn btn-info btn-mini pull-right">Metrics</a>
                 <h3>Output buffer</h3>
 
-                <div class="progress node-buffer-usage">
-                    <div class="bar bar-warning" style="width: @node.getBufferInfo.getOutputBuffer.utilizationPercent%;">@node.getBufferInfo.getOutputBuffer.utilizationPercent%</div>
-                </div>
-                <strong>@node.getBufferInfo.getOutputBuffer.utilization messages</strong> in output buffer.
-                (@node.getBufferInfo.getOutputBuffer.utilizationPercent% utilized)
+                @defining(node.getBufferInfo.getOutputBuffer.utilizationPercent) { utilizationPercent =>
+                    <div class="progress node-buffer-usage">
+                        <div class="bar bar-warning" data-percentage="@utilizationPercent" style="width : @utilizationPercent% ;">@utilizationPercent%</div>
+                    </div>
+                    <strong>@node.getBufferInfo.getOutputBuffer.utilization messages</strong> in output buffer.
+                    (@utilizationPercent% utilized)
+                }
             </div>
         </div>
         The buffers are built to cache small amounts of messages on their way through the different processors.
