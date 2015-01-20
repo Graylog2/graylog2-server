@@ -19,8 +19,11 @@ package org.graylog2.system.stats;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import org.graylog2.plugin.inputs.Extractor;
 import org.graylog2.system.stats.elasticsearch.ElasticsearchStats;
 import org.graylog2.system.stats.mongo.MongoStats;
+
+import java.util.Map;
 
 @JsonAutoDetect
 @AutoValue
@@ -31,8 +34,70 @@ public abstract class ClusterStats {
     @JsonProperty("mongo")
     public abstract MongoStats mongoStats();
 
+    @JsonProperty
+    public abstract long streamCount();
+
+    @JsonProperty
+    public abstract long streamRuleCount();
+
+    @JsonProperty
+    public abstract Map<String, Long> streamRuleCountByStream();
+
+    @JsonProperty
+    public abstract long userCount();
+
+    @JsonProperty
+    public abstract long outputCount();
+
+    @JsonProperty
+    public abstract Map<String, Long> outputCountByType();
+
+    @JsonProperty
+    public abstract long dashboardCount();
+
+    @JsonProperty
+    public abstract long inputCount();
+
+    @JsonProperty
+    public abstract long globalInputCount();
+
+    @JsonProperty
+    public abstract long extractorCount();
+
+    @JsonProperty
+    public abstract Map<Extractor.Type, Long> extractorCountByType();
+
+    @JsonProperty
+    public abstract long contentPackCount();
+
     public static ClusterStats create(ElasticsearchStats elasticsearchStats,
-                                      MongoStats mongoStats) {
-        return new AutoValue_ClusterStats(elasticsearchStats, mongoStats);
+                                      MongoStats mongoStats,
+                                      long streamCount,
+                                      long streamRuleCount,
+                                      Map<String, Long> streamRuleCountByStream,
+                                      long userCount,
+                                      long outputCount,
+                                      Map<String, Long> outputCountByType,
+                                      long dashboardCount,
+                                      long inputCount,
+                                      long globalInputCount,
+                                      long extractorCount,
+                                      Map<Extractor.Type, Long> extractorCountByType,
+                                      long contentPackCount) {
+        return new AutoValue_ClusterStats(
+                elasticsearchStats,
+                mongoStats,
+                streamCount,
+                streamRuleCount,
+                streamRuleCountByStream,
+                userCount,
+                outputCount,
+                outputCountByType,
+                dashboardCount,
+                inputCount,
+                globalInputCount,
+                extractorCount,
+                extractorCountByType,
+                contentPackCount);
     }
 }
