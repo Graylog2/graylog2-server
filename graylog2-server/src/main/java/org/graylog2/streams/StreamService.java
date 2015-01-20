@@ -17,9 +17,9 @@
 package org.graylog2.streams;
 
 import org.graylog2.database.NotFoundException;
+import org.graylog2.plugin.alarms.AlertCondition;
 import org.graylog2.plugin.database.PersistedService;
 import org.graylog2.plugin.database.ValidationException;
-import org.graylog2.plugin.alarms.AlertCondition;
 import org.graylog2.plugin.streams.Output;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.streams.StreamRule;
@@ -28,32 +28,49 @@ import org.graylog2.rest.resources.streams.requests.CreateStreamRequest;
 import java.util.List;
 import java.util.Map;
 
-/**
- * @author Dennis Oelkers <dennis@torch.sh>
- */
 public interface StreamService extends PersistedService {
     Stream create(Map<String, Object> fields);
+
     Stream create(CreateStreamRequest request, String userId);
+
     Stream load(String id) throws NotFoundException;
+
     void destroy(Stream stream) throws NotFoundException;
+
     List<Stream> loadAll();
+
     List<Stream> loadAllEnabled();
+
+    /**
+     * @return the total number of streams
+     */
+    long streamCount();
+
     void pause(Stream stream) throws ValidationException;
+
     void resume(Stream stream) throws ValidationException;
+
     List<StreamRule> getStreamRules(Stream stream) throws NotFoundException;
+
     List<Stream> loadAllWithConfiguredAlertConditions();
 
     List<AlertCondition> getAlertConditions(Stream stream);
+
     AlertCondition getAlertCondition(Stream stream, String conditionId) throws NotFoundException;
+
     void addAlertCondition(Stream stream, AlertCondition condition) throws ValidationException;
+
     void updateAlertCondition(Stream stream, AlertCondition condition) throws ValidationException;
 
     void removeAlertCondition(Stream stream, String conditionId);
 
     void addAlertReceiver(Stream stream, String type, String name);
+
     void removeAlertReceiver(Stream stream, String type, String name);
 
     void addOutput(Stream stream, Output output);
+
     void removeOutput(Stream stream, Output output);
+
     void removeOutputFromAllStreams(Output output);
 }
