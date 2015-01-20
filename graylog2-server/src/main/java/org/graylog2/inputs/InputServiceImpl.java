@@ -344,22 +344,22 @@ public class InputServiceImpl extends PersistedServiceImpl implements InputServi
     }
 
     @Override
-    public long totalInputCount() {
+    public long totalCount() {
         return totalCount(InputImpl.class);
     }
 
     @Override
-    public long globalInputCount() {
+    public long globalCount() {
         return count(InputImpl.class, new BasicDBObject(MessageInput.FIELD_GLOBAL, true));
     }
 
     @Override
-    public long nodeInputsCount() {
+    public long localCount() {
         return count(InputImpl.class, new BasicDBObject(MessageInput.FIELD_GLOBAL, false));
     }
 
     @Override
-    public long nodeInputsCount(String nodeId) {
+    public long localCountForNode(String nodeId) {
         final List<BasicDBObject> forThisNode = ImmutableList.of(
                 new BasicDBObject(MessageInput.FIELD_NODE_ID, nodeId),
                 new BasicDBObject(MessageInput.FIELD_RADIO_ID, nodeId));
@@ -372,7 +372,7 @@ public class InputServiceImpl extends PersistedServiceImpl implements InputServi
     }
 
     @Override
-    public long totalNodeInputsCount(String nodeId) {
+    public long totalCountForNode(String nodeId) {
         final List<BasicDBObject> query = ImmutableList.of(
                 new BasicDBObject(MessageInput.FIELD_GLOBAL, true),
                 new BasicDBObject(MessageInput.FIELD_NODE_ID, nodeId),

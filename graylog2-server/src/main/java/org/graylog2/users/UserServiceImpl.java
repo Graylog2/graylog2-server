@@ -170,7 +170,7 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
     }
 
     @Override
-    public long userCount() {
+    public long count() {
         return totalCount(UserImpl.class);
     }
 }

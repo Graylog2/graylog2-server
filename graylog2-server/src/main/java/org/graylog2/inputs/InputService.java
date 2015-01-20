@@ -49,29 +49,29 @@ public interface InputService extends PersistedService {
     /**
      * @return the total number of inputs in the cluster (including global inputs).
      */
-    long totalInputCount();
+    long totalCount();
 
     /**
      * @return the number of global inputs in the cluster.
      */
-    long globalInputCount();
+    long globalCount();
 
     /**
      * @return the number of node-specific inputs in the cluster.
      */
-    long nodeInputsCount();
+    long localCount();
 
     /**
      * @param nodeId the node ID to query
      * @return the number of inputs on the specified node
      */
-    long nodeInputsCount(String nodeId);
+    long localCountForNode(String nodeId);
 
     /**
      * @param nodeId the node ID to query
      * @return the number of inputs on the specified node (including global inputs)
      */
-    long totalNodeInputsCount(String nodeId);
+    long totalCountForNode(String nodeId);
 
     /**
      * @return the total number of extractors in the cluster (including global inputs).

@@ -112,12 +112,12 @@ public class OutputServiceImpl extends PersistedServiceImpl implements OutputSer
     }
 
     @Override
-    public long outputCount() {
+    public long count() {
         return totalCount(OutputImpl.class);
     }
 
     @Override
-    public Map<String, Long> outputCountByType() {
+    public Map<String, Long> countByType() {
         final DBCursor outputTypes = collection(OutputImpl.class).find(null, new BasicDBObject(OutputImpl.FIELD_TYPE, 1));
 
         final Map<String, Long> outputsCountByType = new HashMap<>(outputTypes.count());

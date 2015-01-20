@@ -45,10 +45,10 @@ public interface OutputService extends PersistedService {
     /**
      * @return the total number of outputs
      */
-    long outputCount();
+    long count();
 
     /**
      * @return the total number of outputs grouped by type
      */
-    Map<String, Long> outputCountByType();
+    Map<String, Long> countByType();
 }

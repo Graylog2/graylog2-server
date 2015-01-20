@@ -145,7 +145,7 @@ public class DashboardServiceImpl extends PersistedServiceImpl implements Dashbo
     }
 
     @Override
-    public long dashboardCount() {
+    public long count() {
         return totalCount(DashboardImpl.class);
     }
 }

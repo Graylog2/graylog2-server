@@ -42,5 +42,5 @@ public interface DashboardService extends PersistedService {
     /**
      * @return the total number of dashboards
      */
-    long dashboardCount();
+    long count();
 }

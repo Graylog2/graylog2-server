@@ -179,7 +179,7 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
     }
 
     @Override
-    public long streamCount() {
+    public long count() {
         return totalCount(StreamImpl.class);
     }
 

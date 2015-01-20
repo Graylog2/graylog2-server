@@ -36,5 +36,5 @@ public interface UserService extends PersistedService {
 
     User getAdminUser();
 
-    long userCount();
+    long count();
 }
