@@ -18,11 +18,15 @@ package org.graylog2.rest.resources.streams.requests;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 
+import java.util.List;
+
 @JsonAutoDetect
 @AutoValue
+@JsonIgnoreProperties(ignoreUnknown = true)
 public abstract class UpdateStreamRequest {
     @JsonProperty
     public abstract String title();
@@ -32,7 +36,8 @@ public abstract class UpdateStreamRequest {
 
     @JsonCreator
     public static UpdateStreamRequest create(@JsonProperty("title") String title,
-                                             @JsonProperty("description") String description) {
+                                             @JsonProperty("description") String description,
+                                             @JsonProperty("rules") List rules) {
         return new AutoValue_UpdateStreamRequest(title, description);
     }
 }
