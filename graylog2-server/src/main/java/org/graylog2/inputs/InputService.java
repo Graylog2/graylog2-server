@@ -27,23 +27,61 @@ import org.graylog2.shared.inputs.NoSuchInputTypeException;
 import java.util.List;
 import java.util.Map;
 
-/**
- * @author Dennis Oelkers <dennis@torch.sh>
- */
 public interface InputService extends PersistedService {
     List<Input> allOfThisNode(String nodeId);
 
     List<Input> allOfRadio(Node radio);
 
     Input create(String id, Map<String, Object> fields);
+
     Input create(Map<String, Object> fields);
 
     Input find(String id) throws NotFoundException;
 
     Input findForThisNode(String nodeId, String id) throws NotFoundException;
+
     Input findForThisRadio(String radioId, String id) throws NotFoundException;
+
     Input findForThisNodeOrGlobal(String nodeId, String id) throws NotFoundException;
+
     Input findForThisRadioOrGlobal(String radioId, String id) throws NotFoundException;
+
+    /**
+     * @return the total number of inputs in the cluster (including global inputs).
+     */
+    long totalCount();
+
+    /**
+     * @return the number of global inputs in the cluster.
+     */
+    long globalCount();
+
+    /**
+     * @return the number of node-specific inputs in the cluster.
+     */
+    long localCount();
+
+    /**
+     * @param nodeId the node ID to query
+     * @return the number of inputs on the specified node
+     */
+    long localCountForNode(String nodeId);
+
+    /**
+     * @param nodeId the node ID to query
+     * @return the number of inputs on the specified node (including global inputs)
+     */
+    long totalCountForNode(String nodeId);
+
+    /**
+     * @return the total number of extractors in the cluster (including global inputs).
+     */
+    long totalExtractorCount();
+
+    /**
+     * @return the total number of extractors in the cluster (including global inputs) grouped by type.
+     */
+    Map<Extractor.Type, Long> totalExtractorCountByType();
 
     void addExtractor(Input input, Extractor extractor) throws ValidationException;
 

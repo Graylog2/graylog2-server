@@ -34,13 +34,13 @@ import java.util.Map;
 
 @CollectionName("outputs")
 public class OutputImpl implements Output {
-    private static final String FIELD_ID = "_id";
-    private static final String FIELD_TITLE = "title";
-    private static final String FIELD_TYPE = "type";
-    private static final String FIELD_CONFIGURATION = "configuration";
-    private static final String FIELD_CREATOR_USER_ID = "creator_user_id";
-    private static final String FIELD_CREATED_AT = "created_at";
-    private static final String FIELD_CONTENT_PACK = "content_pack";
+    static final String FIELD_ID = "_id";
+    static final String FIELD_TITLE = "title";
+    static final String FIELD_TYPE = "type";
+    static final String FIELD_CONFIGURATION = "configuration";
+    static final String FIELD_CREATOR_USER_ID = "creator_user_id";
+    static final String FIELD_CREATED_AT = "created_at";
+    static final String FIELD_CONTENT_PACK = "content_pack";
 
     private ObjectId _id;
     private String title;

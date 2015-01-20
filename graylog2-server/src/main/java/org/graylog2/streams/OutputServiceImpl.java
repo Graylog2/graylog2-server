@@ -17,14 +17,15 @@
 package org.graylog2.streams;
 
 import com.mongodb.BasicDBObject;
+import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import org.bson.types.ObjectId;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.database.PersistedServiceImpl;
 import org.graylog2.outputs.OutputRegistry;
-import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.Tools;
+import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.streams.Output;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.streams.outputs.CreateOutputRequest;
@@ -108,5 +109,27 @@ public class OutputServiceImpl extends PersistedServiceImpl implements OutputSer
         streamService.removeOutputFromAllStreams(output);
         outputRegistry.removeOutput(output);
         super.destroy(output);
+    }
+
+    @Override
+    public long count() {
+        return totalCount(OutputImpl.class);
+    }
+
+    @Override
+    public Map<String, Long> countByType() {
+        final DBCursor outputTypes = collection(OutputImpl.class).find(null, new BasicDBObject(OutputImpl.FIELD_TYPE, 1));
+
+        final Map<String, Long> outputsCountByType = new HashMap<>(outputTypes.count());
+        for (DBObject outputType : outputTypes) {
+            final String type = (String) outputType.get(OutputImpl.FIELD_TYPE);
+            if (type != null) {
+                final Long oldValue = outputsCountByType.get(type);
+                final Long newValue = (oldValue == null) ? 1 : oldValue + 1;
+                outputsCountByType.put(type, newValue);
+            }
+        }
+
+        return outputsCountByType;
     }
 }
