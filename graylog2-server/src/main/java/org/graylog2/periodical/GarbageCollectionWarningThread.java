@@ -110,6 +110,14 @@ public class GarbageCollectionWarningThread extends Periodical {
     @Override
     public void doRun() {
         for (final GarbageCollectorMXBean gc : garbageCollectors) {
+            switch (gc.getName()) {
+                case "ParNew":
+                case "ConcurrentMarkSweep":
+                    LOG.debug("Skipping GC warning listener for concurrent collector {}.", gc.getName());
+                    continue;
+            }
+            LOG.debug("Installing GC warning listener for collector {}, total runtime threshold is {}.", gc.getName(), gcWarningThreshold);
+
             final NotificationEmitter emitter = (NotificationEmitter) gc;
             final NotificationListener listener = new NotificationListener() {
                 @Override
