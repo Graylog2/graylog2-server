@@ -121,4 +121,8 @@ public class BundleService {
         final BundleExporter bundleExporter = bundleExporterProvider.get();
         return bundleExporter.export(exportBundle);
     }
+
+    public long bundleCount() {
+        return dbCollection.count();
+    }
 }
