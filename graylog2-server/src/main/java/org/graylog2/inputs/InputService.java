@@ -73,6 +73,16 @@ public interface InputService extends PersistedService {
      */
     long totalNodeInputsCount(String nodeId);
 
+    /**
+     * @return the total number of extractors in the cluster (including global inputs).
+     */
+    long totalExtractorCount();
+
+    /**
+     * @return the total number of extractors in the cluster (including global inputs) grouped by type.
+     */
+    Map<Extractor.Type, Long> totalExtractorCountByType();
+
     void addExtractor(Input input, Extractor extractor) throws ValidationException;
 
     void addStaticField(Input input, String key, String value) throws ValidationException;
