@@ -22,6 +22,7 @@ import com.rabbitmq.client.ConnectionFactory;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.RadioMessage;
 import org.graylog2.radio.Configuration;
+import org.joda.time.Duration;
 import org.msgpack.MessagePack;
 
 import javax.inject.Inject;
@@ -47,6 +48,7 @@ public class AMQPSender {
     private final String exchangeName;
     private final String routingKey;
     private final boolean amqpPersistentMessagesEnabled;
+    private final Duration connectTimeout;
 
     private Connection connection;
     private Channel channel;
@@ -62,12 +64,14 @@ public class AMQPSender {
                       String queueType,
                       String exchangeName,
                       String routingKey,
-                      boolean amqpPersistentMessagesEnabled) {
+                      boolean amqpPersistentMessagesEnabled, 
+                      Duration amqpConnectTimeout) {
         this.queueName = queueName;
         this.queueType = queueType;
         this.exchangeName = exchangeName;
         this.routingKey = routingKey;
         this.amqpPersistentMessagesEnabled = amqpPersistentMessagesEnabled;
+        connectTimeout = amqpConnectTimeout;
         pack = new MessagePack();
 
         this.hostname = hostname;
@@ -88,7 +92,8 @@ public class AMQPSender {
                 configuration.getAmqpQueueType(),
                 configuration.getAmqpExchangeName(),
                 configuration.getAmqpRoutingKey(),
-                configuration.isAmqpPersistentMessagesEnabled());
+                configuration.isAmqpPersistentMessagesEnabled(),
+                configuration.getAmqpConnectTimeout());
     }
 
     public void send(Message msg) throws IOException {
@@ -117,6 +122,8 @@ public class AMQPSender {
             factory.setUsername(username);
             factory.setPassword(password);
         }
+        
+        factory.setConnectionTimeout((int) connectTimeout.getMillis());
 
         connection = factory.newConnection();
         channel = connection.createChannel();

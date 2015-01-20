@@ -21,6 +21,7 @@ import com.github.joschi.jadconfig.validators.InetPortValidator;
 import com.github.joschi.jadconfig.validators.PositiveIntegerValidator;
 import org.graylog2.plugin.BaseConfiguration;
 import org.graylog2.plugin.Tools;
+import org.joda.time.Duration;
 
 import java.net.URI;
 
@@ -94,6 +95,9 @@ public class Configuration extends BaseConfiguration {
 
     @Parameter(value = "amqp_persistent_messages_enabled")
     private boolean amqpPersistentMessagesEnabled = false;
+    
+    @Parameter(value = "amqp_broker_connect_timeout")
+    private Duration amqpConnectTimeout = Duration.standardSeconds(5);
 
     @Parameter(value = "ring_size", required = true, validator = PositiveIntegerValidator.class)
     private int ringSize = 65536;
@@ -188,5 +192,9 @@ public class Configuration extends BaseConfiguration {
 
     public int getRadioTransportMaxErrors() {
         return radioTransportMaxErrors;
+    }
+
+    public Duration getAmqpConnectTimeout() {
+        return amqpConnectTimeout;
     }
 }
