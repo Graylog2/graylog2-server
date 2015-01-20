@@ -43,13 +43,11 @@ import java.nio.charset.StandardCharsets;
 @Produces(AdditionalMediaType.TEXT_CSV)
 public class SearchResponseCsvWriter implements MessageBodyWriter<SearchResponse> {
 
-    public static final MediaType TEXT_CSV = new MediaType("text", "csv");
-
     private static final Logger LOG = LoggerFactory.getLogger(SearchResponseCsvWriter.class);
 
     @Override
     public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
-        return SearchResponse.class.equals(type) && TEXT_CSV.isCompatible(mediaType);
+        return SearchResponse.class.equals(type) && AdditionalMediaType.TEXT_CSV_TYPE.isCompatible(mediaType);
     }
 
     @Override

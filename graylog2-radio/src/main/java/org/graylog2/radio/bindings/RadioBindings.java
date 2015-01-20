@@ -68,6 +68,7 @@ public class RadioBindings extends AbstractModule {
         bindDynamicFeatures();
         bindContainerResponseFilters();
         bindExceptionMappers();
+        bindAdditionalJerseyComponents();
         bindInterfaces();
         bindEventBusListeners();
     }
@@ -124,5 +125,9 @@ public class RadioBindings extends AbstractModule {
     private void bindExceptionMappers() {
         TypeLiteral<Class<? extends ExceptionMapper>> type = new TypeLiteral<Class<? extends ExceptionMapper>>(){};
         Multibinder<Class<? extends ExceptionMapper>> setBinder = Multibinder.newSetBinder(binder(), type);
+    }
+
+    private void bindAdditionalJerseyComponents() {
+        Multibinder<Class> componentBinder = Multibinder.newSetBinder(binder(), Class.class, Names.named("additionalJerseyComponents"));
     }
 }

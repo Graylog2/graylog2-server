@@ -62,6 +62,7 @@ import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.indexer.rotation.RotationStrategy;
 import org.graylog2.rest.NotFoundExceptionMapper;
 import org.graylog2.rest.RestAccessLogFilter;
+import org.graylog2.rest.ScrollChunkWriter;
 import org.graylog2.rest.ValidationExceptionMapper;
 import org.graylog2.security.ShiroSecurityContextFactory;
 import org.graylog2.security.ldap.LdapConnector;
@@ -107,6 +108,7 @@ public class ServerBindings extends AbstractModule {
         bindDynamicFeatures();
         bindContainerResponseFilters();
         bindExceptionMappers();
+        bindAdditionalJerseyComponents();
         bindPluginMetaData();
         bindEventBusListeners();
     }
@@ -199,6 +201,11 @@ public class ServerBindings extends AbstractModule {
         Multibinder<Class<? extends ExceptionMapper>> setBinder = Multibinder.newSetBinder(binder(), type);
         setBinder.addBinding().toInstance(NotFoundExceptionMapper.class);
         setBinder.addBinding().toInstance(ValidationExceptionMapper.class);
+    }
+
+    private void bindAdditionalJerseyComponents() {
+        Multibinder<Class> componentBinder = Multibinder.newSetBinder(binder(), Class.class, Names.named("additionalJerseyComponents"));
+        componentBinder.addBinding().toInstance(ScrollChunkWriter.class);
     }
 
     private void bindPluginMetaData() {
