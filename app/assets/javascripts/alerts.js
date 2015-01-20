@@ -32,6 +32,22 @@ $(document).ready(function() {
         $("#alert-condition-" + conditionId).toggle();
         e.preventDefault();
     });
+
+    var usernamesTypeaheadField = $("#add-alert-receivers #user");
+    var usernameList = usernamesTypeaheadField.data("source");
+
+    usernamesTypeaheadField.typeahead(
+        {
+            hint: true,
+            highlight: true,
+            minLength: 1
+        },
+        {
+            name: 'usernames',
+            displayKey: 'value',
+            source: substringMatcher(usernameList, 'value')
+        }
+    );
 });
 
 function fillAlertAnnotator(chart, annotator) {

@@ -297,31 +297,6 @@ $(document).ready(function() {
         });
     });
 
-    var substringMatcher = function(possibleMatches, displayKey, limit) {
-        return function findMatches(q, callback) {
-            var matches = [];
-
-            // code duplication is better than a shitty abstraction
-            possibleMatches.forEach(function(possibleMatch) {
-                if (matches.length < limit && possibleMatch.indexOf(q) === 0) {
-                    var match = {};
-                    match[displayKey] = possibleMatch;
-                    matches.push(match);
-                }
-            });
-
-            possibleMatches.forEach(function(possibleMatch) {
-                if (matches.length < limit && possibleMatch.indexOf(q) !== -1 && possibleMatch.indexOf(q) !== 0) {
-                    var match = {};
-                    match[displayKey] = possibleMatch;
-                    matches.push(match);
-                }
-            });
-
-            callback(matches);
-        };
-    };
-
     // Typeahead for message fields.
     $.ajax({
         url: appPrefixed('/a/system/fields'),
@@ -1173,6 +1148,34 @@ function focusFirstFormInput(container) {
         parentElement = this;
     }
     $("input[type!=hidden],select", parentElement).not(":disabled").first().focus();
+}
+
+function substringMatcher(possibleMatches, displayKey, limit) {
+    if (typeof limit === 'undefined' || limit === 0) {
+        limit = Number.MAX_VALUE;
+    }
+    return function findMatches(q, callback) {
+        var matches = [];
+
+        // code duplication is better than a shitty abstraction
+        possibleMatches.forEach(function(possibleMatch) {
+            if (matches.length < limit && possibleMatch.indexOf(q) === 0) {
+                var match = {};
+                match[displayKey] = possibleMatch;
+                matches.push(match);
+            }
+        });
+
+        possibleMatches.forEach(function(possibleMatch) {
+            if (matches.length < limit && possibleMatch.indexOf(q) !== -1 && possibleMatch.indexOf(q) !== 0) {
+                var match = {};
+                match[displayKey] = possibleMatch;
+                matches.push(match);
+            }
+        });
+
+        callback(matches);
+    };
 }
 
 // Animated change of numbers.

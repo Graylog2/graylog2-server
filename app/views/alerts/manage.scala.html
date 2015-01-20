@@ -117,18 +117,16 @@
     }
 
     @if(isPermitted(STREAMS_EDIT, stream.getId)) {
-        <div class="row-fluid" style="margin-top: 15px;">
+        <div id="add-alert-receivers" class="row-fluid">
             <div class="span6">
                 <form action="@routes.AlertsController.addReceiverUser(stream.getId)" method="POST">
                     <label for="user">Username:</label>
                     <input name="username"
-                    style="margin-bottom: 0px;"
-                    type="text"
-                    id="user"
-                    class="input-large"
-                    autocomplete="off"
-                    data-provide="typeahead"
-                    data-source="@users" />
+                        type="text"
+                        id="user"
+                        class="input-large"
+                        autocomplete="off"
+                        data-source="@users" />
 
                     <button type="submit" class="btn btn-success">Subscribe</button>
                 </form>
@@ -137,11 +135,7 @@
             <div class="span6">
                 <form action="@routes.AlertsController.addReceiverEmail(stream.getId)" method="POST">
                     <label for="email">Email address:</label>
-                    <input name="email"
-                    style="margin-bottom: 0px;"
-                    type="text"
-                    id="email"
-                    class="input-large" />
+                    <input name="email" type="text" id="email" class="input-large" />
 
                     <button type="submit" class="btn btn-success">Subscribe</button>
                 </form>
