@@ -14,27 +14,11 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.shared.users;
+package org.graylog2.shared.rest;
 
-import org.graylog2.plugin.database.PersistedService;
-import org.graylog2.plugin.database.users.User;
-import org.graylog2.shared.security.ldap.LdapEntry;
-import org.graylog2.shared.security.ldap.LdapSettings;
+import javax.ws.rs.core.MediaType;
 
-import java.util.List;
-
-public interface UserService extends PersistedService {
-    User load(String username);
-
-    User create();
-
-    List<User> loadAll();
-
-    User syncFromLdapEntry(LdapEntry userEntry, LdapSettings ldapSettings, String username);
-
-    void updateFromLdap(User user, LdapEntry userEntry, LdapSettings ldapSettings, String username);
-
-    User getAdminUser();
-
-    long count();
+public class AdditionalMediaType {
+    public final static String TEXT_CSV = "text/csv";
+    public final static MediaType TEXT_CSV_TYPE = new MediaType("text", "csv");
 }

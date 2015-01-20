@@ -38,6 +38,7 @@ import org.graylog2.rest.resources.search.responses.HistogramResult;
 import org.graylog2.rest.resources.search.responses.SearchResponse;
 import org.graylog2.rest.resources.search.responses.TermsResult;
 import org.graylog2.rest.resources.search.responses.TermsStatsResult;
+import org.graylog2.shared.rest.AdditionalMediaType;
 import org.graylog2.shared.security.RestPermissions;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.slf4j.Logger;
@@ -108,7 +109,7 @@ public class KeywordSearchResource extends SearchResource {
     @Timed
     @ApiOperation(value = "Message search with keyword as timerange.",
             notes = "Search for messages in a timerange defined by a keyword like \"yesterday\" or \"2 weeks ago to wednesday\".")
-    @Produces("text/csv")
+    @Produces(AdditionalMediaType.TEXT_CSV)
     @ApiResponses(value = {
             @ApiResponse(code = 400, message = "Invalid keyword provided.")
     })

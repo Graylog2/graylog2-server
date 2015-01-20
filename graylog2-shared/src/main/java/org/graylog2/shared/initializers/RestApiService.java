@@ -91,6 +91,7 @@ public class RestApiService extends AbstractIdleService {
     private final Set<Class<? extends DynamicFeature>> dynamicFeatures;
     private final Set<Class<? extends ContainerResponseFilter>> containerResponseFilters;
     private final Set<Class<? extends ExceptionMapper>> exceptionMappers;
+    private final Set<Class> additionalComponents;
     private final Map<String, Set<PluginRestResource>> pluginRestResources;
 
     private final ServerBootstrap bootstrap;
@@ -104,11 +105,12 @@ public class RestApiService extends AbstractIdleService {
                           Set<Class<? extends DynamicFeature>> dynamicFeatures,
                           Set<Class<? extends ContainerResponseFilter>> containerResponseFilters,
                           Set<Class<? extends ExceptionMapper>> exceptionMappers,
+                          @Named("additionalJerseyComponents") Set<Class> additionalComponents,
                           Map<String, Set<PluginRestResource>> pluginRestResources,
                           @Named("RestControllerPackages") String[] restControllerPackages,
                           Provider<ObjectMapper> objectMapperProvider) {
         this(configuration, metricRegistry, securityContextFactory, dynamicFeatures, containerResponseFilters,
-                exceptionMappers, pluginRestResources,
+                exceptionMappers, additionalComponents, pluginRestResources,
                 instrumentedExecutor("boss-executor-service", "restapi-boss-%d", metricRegistry),
                 instrumentedExecutor("worker-executor-service", "restapi-worker-%d", metricRegistry),
                 restControllerPackages, objectMapperProvider);
@@ -120,13 +122,14 @@ public class RestApiService extends AbstractIdleService {
                            final Set<Class<? extends DynamicFeature>> dynamicFeatures,
                            final Set<Class<? extends ContainerResponseFilter>> containerResponseFilters,
                            final Set<Class<? extends ExceptionMapper>> exceptionMappers,
+                           final Set<Class> additionalComponents,
                            final Map<String, Set<PluginRestResource>> pluginRestResources,
                            final ExecutorService bossExecutor,
                            final ExecutorService workerExecutor,
                            final String[] restControllerPackages,
                            Provider<ObjectMapper> objectMapperProvider) {
         this(configuration, metricRegistry, securityContextFactory, dynamicFeatures,
-                containerResponseFilters, exceptionMappers, pluginRestResources,
+                containerResponseFilters, exceptionMappers, additionalComponents, pluginRestResources,
                 buildServerBootStrap(bossExecutor, workerExecutor, configuration.getRestWorkerThreadsMaxPoolSize()),
                 restControllerPackages, objectMapperProvider);
     }
@@ -137,6 +140,7 @@ public class RestApiService extends AbstractIdleService {
                            final Set<Class<? extends DynamicFeature>> dynamicFeatures,
                            final Set<Class<? extends ContainerResponseFilter>> containerResponseFilters,
                            final Set<Class<? extends ExceptionMapper>> exceptionMappers,
+                           final Set<Class> additionalComponents,
                            final Map<String, Set<PluginRestResource>> pluginRestResources,
                            final ServerBootstrap bootstrap,
                            final String[] restControllerPackages,
@@ -151,6 +155,7 @@ public class RestApiService extends AbstractIdleService {
         this.bootstrap = bootstrap;
         this.restControllerPackages = restControllerPackages;
         this.objectMapperProvider = objectMapperProvider;
+        this.additionalComponents = additionalComponents;
     }
 
     private static ExecutorService instrumentedExecutor(final String executorName, final String threadNameFormat, final MetricRegistry metricRegistry) {
@@ -287,6 +292,9 @@ public class RestApiService extends AbstractIdleService {
         for (Class<? extends ContainerResponseFilter> responseFilter : containerResponseFilters) {
             rc.registerClasses(responseFilter);
         }
+
+        for (Class additionalComponent : additionalComponents)
+            rc.registerClasses(additionalComponent);
 
         if (enableGzip) {
             EncodingFilter.enableFor(rc, GZipEncoder.class);

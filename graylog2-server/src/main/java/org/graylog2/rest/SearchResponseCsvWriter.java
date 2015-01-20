@@ -22,6 +22,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.rest.resources.search.responses.SearchResponse;
+import org.graylog2.shared.rest.AdditionalMediaType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,16 +40,14 @@ import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 
 @Provider
-@Produces("text/csv")
+@Produces(AdditionalMediaType.TEXT_CSV)
 public class SearchResponseCsvWriter implements MessageBodyWriter<SearchResponse> {
-
-    public static final MediaType TEXT_CSV = new MediaType("text", "csv");
 
     private static final Logger LOG = LoggerFactory.getLogger(SearchResponseCsvWriter.class);
 
     @Override
     public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
-        return SearchResponse.class.equals(type) && TEXT_CSV.isCompatible(mediaType);
+        return SearchResponse.class.equals(type) && AdditionalMediaType.TEXT_CSV_TYPE.isCompatible(mediaType);
     }
 
     @Override

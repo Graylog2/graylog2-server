@@ -38,4 +38,9 @@ public interface DashboardService extends PersistedService {
     void updateWidgetDescription(Dashboard dashboard, DashboardWidget widget, String newDescription) throws ValidationException;
 
     void updateWidgetCacheTime(Dashboard dashboard, DashboardWidget widget, int cacheTime) throws ValidationException;
+
+    /**
+     * @return the total number of dashboards
+     */
+    long count();
 }

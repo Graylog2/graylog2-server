@@ -19,6 +19,7 @@ package org.graylog2.rest;
 import au.com.bytecode.opencsv.CSVWriter;
 import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.indexer.results.ScrollResult;
+import org.graylog2.shared.rest.AdditionalMediaType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,7 +38,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @Provider
-@Produces("text/csv")
+@Produces(AdditionalMediaType.TEXT_CSV)
 public class ScrollChunkWriter implements MessageBodyWriter<ScrollResult.ScrollChunk> {
     private static final Logger LOG = LoggerFactory.getLogger(ScrollChunkWriter.class);
 

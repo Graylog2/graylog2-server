@@ -67,7 +67,21 @@ public abstract class Extractor implements EmbeddedPersistable {
         REGEX,
         SPLIT_AND_INDEX,
         COPY_INPUT,
-        GROK
+        GROK;
+
+        /**
+         * Just like {@link #valueOf(String)} but uses the upper case string and doesn't throw exceptions.
+         *
+         * @param s the string representation of the extractor type.
+         * @return the actual {@link org.graylog2.plugin.inputs.Extractor.Type} or {@code null}.
+         */
+        public static Type fuzzyValueOf(String s) {
+            try {
+                return valueOf(s.toUpperCase());
+            } catch (Exception e) {
+                return null;
+            }
+        }
     }
 
     public enum CursorStrategy {
@@ -377,7 +391,7 @@ public abstract class Extractor implements EmbeddedPersistable {
         public Result(String value, int beginIndex, int endIndex) {
             this(value, null, beginIndex, endIndex);
         }
-        
+
         public Result(String value, String target, int beginIndex, int endIndex) {
             this.value = value;
             this.target = target;
@@ -405,6 +419,8 @@ public abstract class Extractor implements EmbeddedPersistable {
 
     private static class ResultPredicate implements Predicate<Result> {
         @Override
-        public boolean apply(Result input) { return input.getValue() == null; }
+        public boolean apply(Result input) {
+            return input.getValue() == null;
+        }
     }
 }

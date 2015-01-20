@@ -40,7 +40,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import java.net.InetSocketAddress;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -96,7 +95,7 @@ public class GelfOutput implements MessageOutput {
         final int port = configuration.getInt(CK_PORT);
 
 
-        final GelfConfiguration gelfConfiguration = new GelfConfiguration(new InetSocketAddress(hostname, port))
+        final GelfConfiguration gelfConfiguration = new GelfConfiguration(hostname, port)
                 .transport(GelfTransports.valueOf(protocol.toUpperCase()));
 
         LOG.debug("Initializing GELF sender and connecting to {}://{}:{}", protocol, hostname, port);
