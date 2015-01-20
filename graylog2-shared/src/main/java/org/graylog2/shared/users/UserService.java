@@ -35,4 +35,6 @@ public interface UserService extends PersistedService {
     void updateFromLdap(User user, LdapEntry userEntry, LdapSettings ldapSettings, String username);
 
     User getAdminUser();
+
+    long userCount();
 }

@@ -93,4 +93,9 @@ public class NullUserServiceImpl implements UserService {
     public Map<String, List<ValidationResult>> validate(Map<String, Validator> validators, Map<String, Object> fields) {
         return null;
     }
+
+    @Override
+    public long userCount() {
+        return 0;
+    }
 }
