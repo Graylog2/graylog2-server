@@ -32,7 +32,6 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.net.HttpHeaders;
 import com.google.common.net.MediaType;
-import javax.inject.Named;
 import com.ning.http.client.AsyncCompletionHandler;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.AsyncHttpClientConfig;
@@ -46,13 +45,13 @@ import org.graylog2.restclient.models.Node;
 import org.graylog2.restclient.models.Radio;
 import org.graylog2.restclient.models.User;
 import org.graylog2.restclient.models.UserService;
-import org.graylog2.restclient.models.api.requests.ApiRequest;
 import org.graylog2.restclient.models.api.responses.EmptyResponse;
 import org.graylog2.restroutes.PathMethod;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.ws.rs.core.UriBuilder;
 import java.io.IOException;
@@ -642,7 +641,12 @@ class ApiClientImpl implements ApiClient {
 
             URI builtUrl;
             try {
-                String path = MessageFormat.format(pathTemplate, pathParams.toArray());
+                String path;
+                if (pathParams.isEmpty()) {
+                    path = pathTemplate;
+                } else {
+                    path = MessageFormat.format(pathTemplate, pathParams.toArray());
+                }
                 final UriBuilder uriBuilder = UriBuilder.fromUri(target.getTransportAddress());
                 uriBuilder.path(path);
                 for (String key : queryParams.keySet()) {

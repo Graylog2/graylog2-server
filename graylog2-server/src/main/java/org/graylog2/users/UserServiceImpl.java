@@ -18,15 +18,14 @@ package org.graylog2.users;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import javax.inject.Inject;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import org.bson.types.ObjectId;
 import org.graylog2.Configuration;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PersistedServiceImpl;
-import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.database.Persisted;
+import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.security.RestPermissions;
 import org.graylog2.shared.security.ldap.LdapEntry;
@@ -35,6 +34,7 @@ import org.graylog2.shared.users.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
 import java.util.List;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
@@ -141,7 +141,7 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
 
         // TODO This is a crude hack until we have a proper way to distinguish LDAP users from normal users
         if (isNullOrEmpty(user.getHashedPassword())) {
-            ((UserImpl)user).setHashedPassword("User synced from LDAP.");
+            ((UserImpl) user).setHashedPassword("User synced from LDAP.");
         }
 
         // only touch the permissions if none existed for this account before
@@ -167,5 +167,10 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
     @Override
     public User getAdminUser() {
         return new UserImpl.LocalAdminUser(configuration);
+    }
+
+    @Override
+    public long count() {
+        return totalCount(UserImpl.class);
     }
 }

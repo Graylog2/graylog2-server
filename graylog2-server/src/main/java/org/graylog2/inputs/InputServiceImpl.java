@@ -24,6 +24,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
+import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.QueryBuilder;
 import org.bson.types.ObjectId;
@@ -31,11 +32,11 @@ import org.graylog2.cluster.Node;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.database.PersistedServiceImpl;
-import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.inputs.converters.ConverterFactory;
 import org.graylog2.inputs.extractors.ExtractorFactory;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.database.EmbeddedPersistable;
+import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.inputs.Converter;
 import org.graylog2.plugin.inputs.Extractor;
 import org.graylog2.plugin.inputs.MessageInput;
@@ -47,6 +48,7 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -216,7 +218,7 @@ public class InputServiceImpl extends PersistedServiceImpl implements InputServi
             try {
                 final Map.Entry<String, String> staticField =
                         Maps.immutableEntry((String) ex.get(InputImpl.FIELD_STATIC_FIELD_KEY),
-                                            (String) ex.get(InputImpl.FIELD_STATIC_FIELD_VALUE));
+                                (String) ex.get(InputImpl.FIELD_STATIC_FIELD_VALUE));
                 listBuilder.add(staticField);
             } catch (Exception e) {
                 LOG.error("Cannot build static field from persisted data. Skipping.", e);
@@ -339,5 +341,79 @@ public class InputServiceImpl extends PersistedServiceImpl implements InputServi
         input.addStaticFields(io.getStaticFields());
 
         return input;
+    }
+
+    @Override
+    public long totalCount() {
+        return totalCount(InputImpl.class);
+    }
+
+    @Override
+    public long globalCount() {
+        return count(InputImpl.class, new BasicDBObject(MessageInput.FIELD_GLOBAL, true));
+    }
+
+    @Override
+    public long localCount() {
+        return count(InputImpl.class, new BasicDBObject(MessageInput.FIELD_GLOBAL, false));
+    }
+
+    @Override
+    public long localCountForNode(String nodeId) {
+        final List<BasicDBObject> forThisNode = ImmutableList.of(
+                new BasicDBObject(MessageInput.FIELD_NODE_ID, nodeId),
+                new BasicDBObject(MessageInput.FIELD_RADIO_ID, nodeId));
+
+        final List<BasicDBObject> query = ImmutableList.of(
+                new BasicDBObject(MessageInput.FIELD_GLOBAL, false),
+                new BasicDBObject("$or", forThisNode));
+
+        return count(InputImpl.class, new BasicDBObject("$and", query));
+    }
+
+    @Override
+    public long totalCountForNode(String nodeId) {
+        final List<BasicDBObject> query = ImmutableList.of(
+                new BasicDBObject(MessageInput.FIELD_GLOBAL, true),
+                new BasicDBObject(MessageInput.FIELD_NODE_ID, nodeId),
+                new BasicDBObject(MessageInput.FIELD_RADIO_ID, nodeId));
+
+        return count(InputImpl.class, new BasicDBObject("$or", query));
+    }
+
+    @Override
+    public long totalExtractorCount() {
+        final DBObject query = new BasicDBObject(InputImpl.EMBEDDED_EXTRACTORS, new BasicDBObject("$exists", true));
+        final DBCursor inputs = collection(InputImpl.class).find(query, new BasicDBObject(InputImpl.EMBEDDED_EXTRACTORS, 1));
+
+        long extractorsCount = 0;
+        for (DBObject input : inputs) {
+            final BasicDBList extractors = (BasicDBList) input.get(InputImpl.EMBEDDED_EXTRACTORS);
+            extractorsCount += extractors.size();
+        }
+
+        return extractorsCount;
+    }
+
+    @Override
+    public Map<Extractor.Type, Long> totalExtractorCountByType() {
+        final Map<Extractor.Type, Long> extractorsCountByType = new HashMap<>();
+        final DBObject query = new BasicDBObject(InputImpl.EMBEDDED_EXTRACTORS, new BasicDBObject("$exists", true));
+        final DBCursor inputs = collection(InputImpl.class).find(query, new BasicDBObject(InputImpl.EMBEDDED_EXTRACTORS, 1));
+
+        for (DBObject input : inputs) {
+            final BasicDBList extractors = (BasicDBList) input.get(InputImpl.EMBEDDED_EXTRACTORS);
+            for (Object fuckYouMongoDb : extractors) {
+                final DBObject extractor = (DBObject) fuckYouMongoDb;
+                final Extractor.Type type = Extractor.Type.fuzzyValueOf(((String) extractor.get(Extractor.FIELD_TYPE)));
+                if (type != null) {
+                    final Long oldValue = extractorsCountByType.get(type);
+                    final Long newValue = (oldValue == null) ? 1 : oldValue + 1;
+                    extractorsCountByType.put(type, newValue);
+                }
+            }
+        }
+
+        return extractorsCountByType;
     }
 }

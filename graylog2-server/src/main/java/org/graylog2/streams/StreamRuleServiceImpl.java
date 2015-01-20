@@ -17,8 +17,8 @@
 package org.graylog2.streams;
 
 import com.google.common.collect.Maps;
-import javax.inject.Inject;
 import com.mongodb.BasicDBObject;
+import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import org.bson.types.ObjectId;
 import org.graylog2.database.MongoConnection;
@@ -28,7 +28,9 @@ import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.streams.StreamRule;
 import org.graylog2.rest.resources.streams.rules.requests.CreateStreamRuleRequest;
 
+import javax.inject.Inject;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -81,6 +83,33 @@ public class StreamRuleServiceImpl extends PersistedServiceImpl implements Strea
 
         for (DBObject streamRule : respStreamRules) {
             streamRules.add(load(streamRule.get("_id").toString()));
+        }
+
+        return streamRules;
+    }
+
+    @Override
+    public long totalStreamRuleCount() {
+        return totalCount(StreamRuleImpl.class);
+    }
+
+    @Override
+    public long streamRuleCount(String streamId) {
+        return streamRuleCount(new ObjectId(streamId));
+    }
+
+    private long streamRuleCount(ObjectId streamId) {
+        return count(StreamRuleImpl.class, new BasicDBObject(StreamRuleImpl.FIELD_STREAM_ID, streamId));
+    }
+
+    @Override
+    public Map<String, Long> streamRuleCountByStream() {
+        final DBCursor streamIds = collection(StreamImpl.class).find(new BasicDBObject(), new BasicDBObject("_id", 1));
+
+        final Map<String, Long> streamRules = new HashMap<>(streamIds.size());
+        for (DBObject keys : streamIds) {
+            final ObjectId streamId = (ObjectId) keys.get("_id");
+            streamRules.put(streamId.toHexString(), streamRuleCount(streamId));
         }
 
         return streamRules;

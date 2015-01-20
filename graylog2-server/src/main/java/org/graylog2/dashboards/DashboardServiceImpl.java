@@ -143,4 +143,9 @@ public class DashboardServiceImpl extends PersistedServiceImpl implements Dashbo
         removeWidget(dashboard, widget);
         addWidget(dashboard, widget);
     }
+
+    @Override
+    public long count() {
+        return totalCount(DashboardImpl.class);
+    }
 }

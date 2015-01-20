@@ -66,7 +66,7 @@ public class RouteClassGenerator {
             for (Map.Entry<PathParam, Class<?>> entry : route.getPathParams().entrySet()) {
                 String fieldName = entry.getKey().value();
                 method.param(entry.getValue(), fieldName);
-                path = path.replace("{" + fieldName + "}", "\"+"+fieldName+"+\"");
+                path = path.replace("{" + fieldName + "}", "\"+com.google.common.net.UrlEscapers.urlPathSegmentEscaper().escape("+fieldName+")+\"");
 
             }
             JBlock block = method.body();
