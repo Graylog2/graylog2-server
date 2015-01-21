@@ -70,6 +70,8 @@ public class NotificationTypeFactory {
                 return new JournalUtilizationTooHighNotification(notification);
             case JOURNAL_UNCOMMITTED_MESSAGES_DELETED:
                 return new JournalUncommitedMessagesDeletedNotification(notification);
+            case OUTPUT_DISABLED:
+                return new OutputDisabledNotification(notification);
         }
 
         throw new RuntimeException("No notification registered for " + notification.getType());
