@@ -42,9 +42,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 @Singleton
 public class OutputRegistry {
     private static final Logger LOG = LoggerFactory.getLogger(OutputRegistry.class);
@@ -53,7 +50,6 @@ public class OutputRegistry {
     private final MessageOutput defaultMessageOutput;
     private final OutputService outputService;
     private final MessageOutputFactory messageOutputFactory;
-    private final Configuration configuration;
     private final LoadingCache<String, AtomicInteger> faultCounters;
     private final long faultCountThreshold;
     private final long faultPenaltySeconds;
@@ -66,7 +62,6 @@ public class OutputRegistry {
         this.defaultMessageOutput = defaultMessageOutput;
         this.outputService = outputService;
         this.messageOutputFactory = messageOutputFactory;
-        this.configuration = configuration;
         this.runningMessageOutputs = CacheBuilder.newBuilder().build();
         this.faultCountThreshold = configuration.getOutputFaultCountThreshold();
         this.faultPenaltySeconds = configuration.getOutputFaultPenaltySeconds();
