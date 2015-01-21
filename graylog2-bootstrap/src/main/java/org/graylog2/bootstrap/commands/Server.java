@@ -59,6 +59,7 @@ import java.util.Collection;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 @Command(name = "server", description = "Start the Graylog2 server")
 public class Server extends ServerBootstrap implements Runnable {
@@ -159,10 +160,10 @@ public class Server extends ServerBootstrap implements Runnable {
         final ServerStatus serverStatus = injector.getInstance(ServerStatus.class);
         final ActivityWriter activityWriter = injector.getInstance(ActivityWriter.class);
         nodeService.registerServer(serverStatus.getNodeId().toString(), configuration.isMaster(), configuration.getRestTransportUri());
-
+        serverStatus.setLocalMode(isLocal());
         if (configuration.isMaster() && !nodeService.isOnlyMaster(serverStatus.getNodeId())) {
             LOG.warn("Detected another master in the cluster. Retrying in {} seconds to make sure it is not "
-                    + "an old stale instance.", configuration.getStaleMasterTimeout());
+                    + "an old stale instance.", TimeUnit.MILLISECONDS.toSeconds(configuration.getStaleMasterTimeout()));
             try {
                 Thread.sleep(configuration.getStaleMasterTimeout());
             } catch (InterruptedException e) { /* nope */ }
