@@ -62,6 +62,7 @@ $(document).ready(function() {
         }
 
         renderFieldChart(opts);
+        askBeforeUnload();
     });
 
     function renderFieldChart(opts) {
@@ -594,6 +595,19 @@ $(document).ready(function() {
         var pinned = getPinnedCharts();
         delete pinned[id];
         setPinnedCharts(pinned);
+    }
+
+    function askBeforeUnload() {
+        window.addEventListener("beforeunload", function(e) {
+            var numFieldCharts = $(".field-graph-container").length - 1;
+            var numPinnedCharts = Object.keys(getPinnedCharts()).length;
+
+            if (numFieldCharts > 0 && numFieldCharts != numPinnedCharts) {
+                var confirmationMessage = "Some field graphs are not pinned and will be lost.";
+                e.returnValue = confirmationMessage;
+                return confirmationMessage;
+            }
+        });
     }
 
 });
