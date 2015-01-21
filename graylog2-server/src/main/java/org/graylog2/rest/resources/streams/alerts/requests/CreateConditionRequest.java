@@ -21,19 +21,21 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 
+import javax.annotation.Nullable;
 import java.util.Map;
 
 @JsonAutoDetect
 @AutoValue
 public abstract class CreateConditionRequest {
     @JsonProperty
+    @Nullable
     public abstract String type();
 
     @JsonProperty
     public abstract Map<String, Object> parameters();
 
     @JsonCreator
-    public static CreateConditionRequest create(@JsonProperty("type") String type,
+    public static CreateConditionRequest create(@JsonProperty("type") @Nullable String type,
                                                 @JsonProperty("parameters") Map<String, Object> parameters) {
         return new AutoValue_CreateConditionRequest(type, parameters);
     }
