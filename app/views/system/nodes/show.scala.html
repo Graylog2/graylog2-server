@@ -149,15 +149,27 @@
             <div class="row-fluid">
                 <div class="span6">
                     <h3>Utilization</h3>
-                    <div class="progress node-journal-usage">
-                        <div class="bar bar-warning" style="width : @NumberHelper.asPercent(node.getJournalInfo.journalSize, node.getJournalInfo.journalSizeLimit, 0, true) ;">@NumberHelper.asPercent(node.getJournalInfo.journalSize, node.getJournalInfo.journalSizeLimit, 2, true)</div>
-                    </div>
-                    <strong>@node.getJournalInfo.uncommittedJournalEntries unprocessed messages</strong>
-                    are currently in the journal, in @node.getJournalInfo.numberOfSegments segments.<br/>
-                    <strong>@node.getJournalInfo.appendEventsPerSecond messages</strong>
-                    have been appended in the last second,
-                    <strong>@node.getJournalInfo.readEventsPerSecond messages</strong>
-                    have been read in the last second.
+                    @defining(NumberHelper.asPercent(node.getJournalInfo.journalSize, node.getJournalInfo.journalSizeLimit, 1, false)) { utilizationPercent =>
+                        <div class="progress node-journal-usage">
+                            @if(utilizationPercent.toDouble <= 100.0) {
+                                <div class="bar bar-warning" data-percentage="@utilizationPercent" style="width : @utilizationPercent%;">
+                            } else {
+                                <div class="bar bar-warning" data-percentage="100" style="width : 100%;">
+                            }
+                                @utilizationPercent%
+                            </div>
+                        </div>
+                        @if(utilizationPercent.toDouble > 100) {
+                            <strong>Warning!</strong> The journal utilization is exceeding the maximum size
+                            defined. <a href="@routes.SystemController.index()">Click here</a> for more information.<br/>
+                        }
+                        <strong>@node.getJournalInfo.uncommittedJournalEntries unprocessed messages</strong>
+                        are currently in the journal, in @node.getJournalInfo.numberOfSegments segments.<br/>
+                        <strong>@node.getJournalInfo.appendEventsPerSecond messages</strong>
+                        have been appended in the last second,
+                        <strong>@node.getJournalInfo.readEventsPerSecond messages</strong>
+                        have been read in the last second.
+                    }
                 </div>
                 <div class="span6">
                     <h3>Configuration</h3>
