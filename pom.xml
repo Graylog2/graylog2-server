@@ -26,7 +26,7 @@
 
     <groupId>org.graylog2</groupId>
     <artifactId>graylog2-parent</artifactId>
-    <version>1.0.0-beta.3-SNAPSHOT</version>
+    <version>1.0.0-beta.3</version>
     <packaging>pom</packaging>
     <name>Graylog2</name>
     <url>http://graylog2.org/</url>
@@ -60,7 +60,7 @@
         <connection>scm:git:git://github.com/Graylog2/graylog2-server.git</connection>
         <developerConnection>scm:git:git@github.com:Graylog2/graylog2-server.git</developerConnection>
         <url>https://github.com/Graylog2/graylog2-server</url>
-        <tag>HEAD</tag>
+        <tag>1.0.0-beta.3</tag>
     </scm>
 
     <issueManagement>
