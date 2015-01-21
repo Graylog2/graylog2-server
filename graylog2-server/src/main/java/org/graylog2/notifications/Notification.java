@@ -22,9 +22,6 @@ import org.joda.time.DateTime;
 
 import java.util.Map;
 
-/**
- * @author Dennis Oelkers <dennis@torch.sh>
- */
 public interface Notification extends Persisted {
     Notification addType(Type type);
 
@@ -43,6 +40,7 @@ public interface Notification extends Persisted {
     String getNodeId();
 
     Notification addDetail(String key, Object value);
+
     Object getDetail(String key);
 
     Map<String, Object> asMap();
@@ -61,7 +59,10 @@ public interface Notification extends Persisted {
         EMAIL_TRANSPORT_CONFIGURATION_INVALID,
         EMAIL_TRANSPORT_FAILED,
         STREAM_PROCESSING_DISABLED,
-        GC_TOO_LONG
+        GC_TOO_LONG,
+        JOURNAL_UTILIZATION_TOO_HIGH,
+        JOURNAL_UNCOMMITTED_MESSAGES_DELETED,
+        OUTPUT_DISABLED
     }
 
     public enum Severity {
