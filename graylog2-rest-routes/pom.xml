@@ -11,7 +11,7 @@
     <parent>
         <groupId>org.graylog2</groupId>
         <artifactId>graylog2-parent</artifactId>
-        <version>1.0.0-beta.3</version>
+        <version>1.0.0-beta.4-SNAPSHOT</version>
     </parent>
 
     <build>
