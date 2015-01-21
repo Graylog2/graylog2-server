@@ -18,6 +18,9 @@ package org.graylog2.periodical;
 
 import com.github.joschi.jadconfig.util.Size;
 import com.google.common.eventbus.EventBus;
+import org.graylog2.notifications.Notification;
+import org.graylog2.notifications.NotificationService;
+import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.ThrottleState;
 import org.graylog2.plugin.periodical.Periodical;
 import org.graylog2.shared.buffers.ProcessBuffer;
@@ -48,6 +51,8 @@ public class ThrottleStateUpdaterThread extends Periodical {
     private final ProcessBuffer processBuffer;
     private final EventBus eventBus;
     private final Size retentionSize;
+    private final NotificationService notificationService;
+    private final ServerStatus serverStatus;
 
     private boolean firstRun = true;
 
@@ -63,10 +68,14 @@ public class ThrottleStateUpdaterThread extends Periodical {
     public ThrottleStateUpdaterThread(Journal journal,
                                       ProcessBuffer processBuffer,
                                       EventBus eventBus,
+                                      NotificationService notificationService,
+                                      ServerStatus serverStatus,
                                       @Named("message_journal_max_size") Size retentionSize) {
         this.processBuffer = processBuffer;
         this.eventBus = eventBus;
         this.retentionSize = retentionSize;
+        this.notificationService = notificationService;
+        this.serverStatus = serverStatus;
         // leave this.journal null, we'll say "don't start" in that case, see startOnThisNode() below.
         if (journal instanceof KafkaJournal) {
             this.journal = (KafkaJournal) journal;
@@ -158,5 +167,24 @@ public class ThrottleStateUpdaterThread extends Periodical {
         // publish to interested parties
         eventBus.post(throttleState);
 
+        // Abusing the current thread to send notifications from KafkaJournal in the graylog2-shared module
+        final double journalUtilizationPercentage = throttleState.journalSizeLimit > 0 ? (throttleState.journalSize * 100) / throttleState.journalSizeLimit : 0.0;
+
+        if (journalUtilizationPercentage > KafkaJournal.NOTIFY_ON_UTILIZATION_PERCENTAGE) {
+            Notification notification = notificationService.buildNow()
+                    .addNode(serverStatus.getNodeId().toString())
+                    .addType(Notification.Type.JOURNAL_UTILIZATION_TOO_HIGH)
+                    .addSeverity(Notification.Severity.URGENT)
+                    .addDetail("journal_utilization_percentage", journalUtilizationPercentage);
+            notificationService.publishIfFirst(notification);
+        }
+
+        if (journal.getPurgedSegmentsInLastRetention() > 0) {
+            Notification notification = notificationService.buildNow()
+                    .addNode(serverStatus.getNodeId().toString())
+                    .addType(Notification.Type.JOURNAL_UNCOMMITTED_MESSAGES_DELETED)
+                    .addSeverity(Notification.Severity.URGENT);
+            notificationService.publishIfFirst(notification);
+        }
     }
 }

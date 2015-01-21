@@ -33,11 +33,7 @@ import com.google.common.util.concurrent.Uninterruptibles;
 import kafka.common.KafkaException;
 import kafka.common.OffsetOutOfRangeException;
 import kafka.common.TopicAndPartition;
-import kafka.log.CleanerConfig;
-import kafka.log.Log;
-import kafka.log.LogConfig;
-import kafka.log.LogManager;
-import kafka.log.LogSegment;
+import kafka.log.*;
 import kafka.message.ByteBufferMessageSet;
 import kafka.message.Message;
 import kafka.message.MessageAndOffset;
@@ -65,15 +61,12 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.SyncFailedException;
 import java.nio.channels.ClosedByInterruptException;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -86,6 +79,7 @@ import static org.graylog2.plugin.Tools.bytesToHex;
 public class KafkaJournal extends AbstractIdleService implements Journal {
     private static final Logger LOG = LoggerFactory.getLogger(KafkaJournal.class);
     public static final long DEFAULT_COMMITTED_OFFSET = Long.MIN_VALUE;
+    public static final int NOTIFY_ON_UTILIZATION_PERCENTAGE = 95;
 
     // this exists so we can use JodaTime's millis provider in tests.
     // kafka really only cares about the milliseconds() method in here
@@ -130,6 +124,7 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
     private ScheduledFuture<?> offsetFlusherFuture;
     private volatile boolean shuttingDown;
     private final AtomicReference<ThrottleState> throttleState = new AtomicReference<>();
+    private final AtomicInteger purgedSegmentsInLastRetention = new AtomicInteger();
 
     @Inject
     public KafkaJournal(@Named("message_journal_dir") File journalDirectory,
@@ -249,6 +244,10 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
             throw new RuntimeException(e);
         }
 
+    }
+
+    public int getPurgedSegmentsInLastRetention() {
+        return purgedSegmentsInLastRetention.get();
     }
 
     private void setupKafkaLogMetrics(final MetricRegistry metricRegistry) {
@@ -693,9 +692,10 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
         private int cleanupExpiredSegments(final Log kafkaLog) {
             // don't run if nothing will be done
             if (kafkaLog.size() == 0 && kafkaLog.numberOfSegments() < 1) {
+                KafkaJournal.this.purgedSegmentsInLastRetention.set(0);
                 return 0;
             }
-            return kafkaLog.deleteOldSegments(new AbstractFunction1<LogSegment, Object>() {
+            int deletedSegments = kafkaLog.deleteOldSegments(new AbstractFunction1<LogSegment, Object>() {
                 @Override
                 public Object apply(LogSegment segment) {
                     final long segmentAge = JODA_TIME.milliseconds() - segment.lastModified();
@@ -709,15 +709,24 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
                     return shouldDelete;
                 }
             });
+            KafkaJournal.this.purgedSegmentsInLastRetention.set(deletedSegments);
+            return deletedSegments;
         }
 
         private int cleanupSegmentsToMaintainSize(Log kafkaLog) {
             final long retentionSize = kafkaLog.config().retentionSize();
-            if (retentionSize < 0 || kafkaLog.size() < retentionSize) {
+            final long currentSize = kafkaLog.size();
+            final double utilizationPercentage = retentionSize > 0 ? (currentSize * 100) / retentionSize : 0.0;
+            if (utilizationPercentage > KafkaJournal.NOTIFY_ON_UTILIZATION_PERCENTAGE) {
+                LOG.warn("Journal utilization ({}%) has gone over {}%.", utilizationPercentage,
+                        KafkaJournal.NOTIFY_ON_UTILIZATION_PERCENTAGE);
+            }
+            if (retentionSize < 0 || currentSize < retentionSize) {
+                KafkaJournal.this.purgedSegmentsInLastRetention.set(0);
                 return 0;
             }
-            final long[] diff = {kafkaLog.size() - retentionSize};
-            return kafkaLog.deleteOldSegments(new AbstractFunction1<LogSegment, Object>() { // sigh scala
+            final long[] diff = {currentSize - retentionSize};
+            int deletedSegments = kafkaLog.deleteOldSegments(new AbstractFunction1<LogSegment, Object>() { // sigh scala
                 @Override
                 public Object apply(LogSegment segment) {
                     if (diff[0] - segment.size() >= 0) {
@@ -734,6 +743,8 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
                     }
                 }
             });
+            KafkaJournal.this.purgedSegmentsInLastRetention.set(deletedSegments);
+            return deletedSegments;
         }
 
         private int cleanupSegmentsToRemoveCommitted(Log kafkaLog) {

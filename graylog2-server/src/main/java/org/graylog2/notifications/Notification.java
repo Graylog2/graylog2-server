@@ -61,7 +61,9 @@ public interface Notification extends Persisted {
         EMAIL_TRANSPORT_CONFIGURATION_INVALID,
         EMAIL_TRANSPORT_FAILED,
         STREAM_PROCESSING_DISABLED,
-        GC_TOO_LONG
+        GC_TOO_LONG,
+        JOURNAL_UTILIZATION_TOO_HIGH,
+        JOURNAL_UNCOMMITTED_MESSAGES_DELETED
     }
 
     public enum Severity {
