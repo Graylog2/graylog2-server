@@ -37,7 +37,8 @@ public class Notification {
         STREAM_PROCESSING_DISABLED,
         GC_TOO_LONG,
         JOURNAL_UTILIZATION_TOO_HIGH,
-        JOURNAL_UNCOMMITTED_MESSAGES_DELETED;
+        JOURNAL_UNCOMMITTED_MESSAGES_DELETED,
+        OUTPUT_DISABLED;
 
         public static Type fromString(String name) {
             return valueOf(name.toUpperCase());
