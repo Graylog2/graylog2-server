@@ -52,6 +52,11 @@ public class KafkaProducer implements RadioTransport {
     public KafkaProducer(ServerStatus serverStatus, Configuration configuration, MetricRegistry metricRegistry) {
         pack = new MessagePack();
 
+        // Use a separate class loader for msgpack to avoid generation of duplicate class names.
+        // The JavaassistTemplateBuilder used by MessagePack uses a sequence number for class naming
+        // and is not thread-safe.
+        pack.setClassLoader(new ClassLoader(Thread.currentThread().getContextClassLoader()) {});
+
         Properties props = new Properties();
         props.put("metadata.broker.list", configuration.getKafkaBrokers());
         props.put("partitioner.class", "kafka.producer.DefaultPartitioner");

@@ -34,6 +34,11 @@ public class MessagePackProvider implements Provider<MessagePack> {
     public MessagePack get() {
         final MessagePack messagePack = new MessagePack();
 
+        // Use a separate class loader for msgpack to avoid generation of duplicate class names.
+        // The JavaassistTemplateBuilder used by MessagePack uses a sequence number for class naming
+        // and is not thread-safe.
+        messagePack.setClassLoader(new ClassLoader(Thread.currentThread().getContextClassLoader()) {});
+
         try {
             // Eagerly generate RadioMessage classes in the MessagePack object to avoid doing it on runtime.
             // The generated code is thread-safe, but generating it is not.

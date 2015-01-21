@@ -74,6 +74,11 @@ public class AMQPSender {
         connectTimeout = amqpConnectTimeout;
         pack = new MessagePack();
 
+        // Use a separate class loader for msgpack to avoid generation of duplicate class names.
+        // The JavaassistTemplateBuilder used by MessagePack uses a sequence number for class naming
+        // and is not thread-safe.
+        pack.setClassLoader(new ClassLoader(Thread.currentThread().getContextClassLoader()) {});
+
         this.hostname = hostname;
         this.port = port;
         this.vHost = vHost;
