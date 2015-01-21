@@ -292,7 +292,7 @@ public class AmqpTransport extends ThrottleableTransport {
                             CK_PARALLEL_QUEUES,
                             "Number of Queues",
                             1,
-                            "Number of parallel QUeues",
+                            "Number of parallel Queues",
                             ConfigurationField.Optional.NOT_OPTIONAL
                     )
             );
