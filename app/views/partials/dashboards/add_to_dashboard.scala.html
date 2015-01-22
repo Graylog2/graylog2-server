@@ -1,4 +1,6 @@
 @(widgetType: String, params: Array[String])
+@import lib.security.RestPermissions
+@import views.helpers.Permissions
 
 <div class="btn-group">
     <a data-toggle="dropdown" href="#" class="add-to-dashboard" data-widget-type="@widgetType">
@@ -14,8 +16,10 @@
             }
         }
     >
-        <li>
-            <a href="@routes.DashboardsController.newDashboard()">No dashboards. Create one?</a>
-        </li>
+        @if(Permissions.isPermitted(RestPermissions.DASHBOARDS_CREATE)) {
+            <li>
+                <a href="@routes.DashboardsController.newDashboard()">No dashboards. Create one?</a>
+            </li>
+        }
     </ul>
 </div>

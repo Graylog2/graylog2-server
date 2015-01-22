@@ -64,23 +64,33 @@ $(document).ready(function() {
             dashboardGrid.add_widget(item, columns, rows, col, row);
         });
     } else {
-        $(".unlock-dashboard-widgets").hide()
+        $(".unlock-dashboard-widgets").hide();
         $(".lock-dashboard-widgets").hide()
     }
 
     function applyDashboardsToAllSelectors() {
+        var dashboardSelectors = $(".dashboard-selector[data-widget-type]");
         if (Object.keys(globalDashboards).length > 0) {
-            $(".dashboard-selector[data-widget-type]").each(function() {
+            dashboardSelectors.each(function() {
                 var dashboardList = $(this);
                 $("li", dashboardList).remove();
 
                 for (var key in globalDashboards) {
                     var dashboard = globalDashboards[key];
-                    var link = "<li><a href='#' data-dashboard-id='" + key + "'>" + htmlEscape(dashboard.title) + "</a></li>"
+                    var link = "<li><a href='#' data-dashboard-id='" + key + "'>" + htmlEscape(dashboard.title) + "</a></li>";
                     dashboardList.append(link);
                 }
             });
         }
+
+        // Show helper message if there are no options in the dropdown
+        dashboardSelectors.each(function() {
+            var dashboardSelector = $(this);
+            if (dashboardSelector.children().length === 0) {
+                var link = "<li><a href='#'>You cannot add widgets to any dashboard</a></li>";
+                dashboardSelector.append(link);
+            }
+        });
     }
 
     function configuration(widgetType, element, callback) {
