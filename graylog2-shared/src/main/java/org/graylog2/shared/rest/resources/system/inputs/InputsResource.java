@@ -283,9 +283,10 @@ public class InputsResource extends RestResource {
         final IOState<MessageInput> inputState = inputRegistry.getInputState(inputId);
         final MessageInput messageInput;
 
-        if (inputState == null)
+        if (inputState == null) {
             messageInput = persistedInputs.get(inputId);
-        else
+            messageInput.initialize();
+        } else
             messageInput = inputState.getStoppable();
 
         if (messageInput == null) {
