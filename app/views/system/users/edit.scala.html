@@ -39,45 +39,45 @@
                         <input name="email" id="email" type="email" value="@form("email").value()" required maxlength="254"/>
                     </div>
                 </div>
-                @if(!isPermitted(user, "*")) {
-                <div class="control-group">
-                    <label class="control-label" for="streampermissions">Streams Permissions</label>
-                    <div class="controls">
-                        <select id="streampermissions" name="streampermissions[]" data-placeholder="Choose read permissions..." multiple>
-                        @for(stream <- streams.sortBy(_.getTitle)) {
-                            <option @if(isPermitted(user, STREAMS_READ, stream.getId)) {selected} value="@stream.getId">@stream.getTitle</option>
-                        }
-                        </select>
-                        <span class="help-inline">Choose streams the user can <strong>view</strong>. Removing read access will remove edit access, too.</span>
+                @if(isPermitted(USERS_EDIT)) {
+                    <div class="control-group">
+                        <label class="control-label" for="streampermissions">Streams Permissions</label>
+                        <div class="controls">
+                            <select id="streampermissions" name="streampermissions[]" data-placeholder="Choose read permissions..." multiple>
+                            @for(stream <- streams.sortBy(_.getTitle)) {
+                                <option @if(isPermitted(user, STREAMS_READ, stream.getId)) {selected} value="@stream.getId">@stream.getTitle</option>
+                            }
+                            </select>
+                            <span class="help-inline">Choose streams the user can <strong>view</strong>. Removing read access will remove edit access, too.</span>
 
 
-                        <select class="streameditpermissions" name="streameditpermissions[]" id="streameditpermissions" data-placeholder="Choose edit permissions..." multiple>
-                        @for(stream <- streams.sortBy(_.getTitle)) {
-                            <option @if(isPermitted(user, STREAMS_EDIT, stream.getId)) {selected} value="@stream.getId">@stream.getTitle</option>
-                        }
-                        </select>
-                        <span class="help-inline">Choose the streams the user can <strong>edit</strong>. Values chosen here will enable read access, too.</span>
+                            <select class="streameditpermissions" name="streameditpermissions[]" id="streameditpermissions" data-placeholder="Choose edit permissions..." multiple>
+                            @for(stream <- streams.sortBy(_.getTitle)) {
+                                <option @if(isPermitted(user, STREAMS_EDIT, stream.getId)) {selected} value="@stream.getId">@stream.getTitle</option>
+                            }
+                            </select>
+                            <span class="help-inline">Choose the streams the user can <strong>edit</strong>. Values chosen here will enable read access, too.</span>
 
+                        </div>
                     </div>
-                </div>
-                <div class="control-group">
-                    <label class="control-label" for="dashboardpermissions">Dashboard Permissions</label>
-                    <div class="controls">
-                        <select id="dashboardpermissions" name="dashboardpermissions[]" data-placeholder="Choose read permissions..." multiple>
-                        @for(dashboard <- dashboards.sortBy(_.getTitle)) {
-                            <option @if(isPermitted(user, DASHBOARDS_READ, dashboard.getId)) {selected} value="@dashboard.getId">@dashboard.getTitle</option>
-                        }
-                        </select>
-                        <span class="help-inline">Choose dashboards the user can <strong>view</strong>. Removing read access will remove edit access, too.</span>
+                    <div class="control-group">
+                        <label class="control-label" for="dashboardpermissions">Dashboard Permissions</label>
+                        <div class="controls">
+                            <select id="dashboardpermissions" name="dashboardpermissions[]" data-placeholder="Choose read permissions..." multiple>
+                            @for(dashboard <- dashboards.sortBy(_.getTitle)) {
+                                <option @if(isPermitted(user, DASHBOARDS_READ, dashboard.getId)) {selected} value="@dashboard.getId">@dashboard.getTitle</option>
+                            }
+                            </select>
+                            <span class="help-inline">Choose dashboards the user can <strong>view</strong>. Removing read access will remove edit access, too.</span>
 
-                        <select class="dashboardeditpermissions" id="dashboardeditpermissions" name="dashboardeditpermissions[]" data-placeholder="Choose edit permissions..." multiple>
-                        @for(dashboard <- dashboards.sortBy(_.getTitle)) {
-                            <option @if(isPermitted(user, DASHBOARDS_EDIT, dashboard.getId)) {selected} value="@dashboard.getId">@dashboard.getTitle</option>
-                        }
-                        </select>
-                        <span class="help-inline">Choose dashboards the user can <strong>edit</strong>. Values chosen here will enable read access, too.</span>
+                            <select class="dashboardeditpermissions" id="dashboardeditpermissions" name="dashboardeditpermissions[]" data-placeholder="Choose edit permissions..." multiple>
+                            @for(dashboard <- dashboards.sortBy(_.getTitle)) {
+                                <option @if(isPermitted(user, DASHBOARDS_EDIT, dashboard.getId)) {selected} value="@dashboard.getId">@dashboard.getTitle</option>
+                            }
+                            </select>
+                            <span class="help-inline">Choose dashboards the user can <strong>edit</strong>. Values chosen here will enable read access, too.</span>
+                        </div>
                     </div>
-                </div>
                 }
                 <div class="control-group">
                     <label class="control-label" for="timezone">Time Zone</label>
