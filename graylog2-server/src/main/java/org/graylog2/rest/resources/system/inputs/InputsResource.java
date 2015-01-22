@@ -320,6 +320,7 @@ public class InputsResource extends RestResource {
             try {
                 final Input input = inputService.findForThisNodeOrGlobal(serverStatus.getNodeId().toString(), inputId);
                 messageInput = inputService.getMessageInput(input);
+                messageInput.initialize();
             } catch (NoSuchInputTypeException | org.graylog2.database.NotFoundException e) {
                 final String error = "Cannot launch input <" + inputId + ">. Input not found.";
                 LOG.info(error);

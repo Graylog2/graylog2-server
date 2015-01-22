@@ -225,7 +225,8 @@ public class InputsResource extends RestResource {
             }
 
             LOG.info("Launching existing input [" + input.getName() + "]. Reason: REST request.");
-            //input.initialize();
+            if (inputState == null)
+                input.initialize();
             inputLauncher.launch(input);
             LOG.info("Launched existing input [" + input.getName() + "]. Reason: REST request.");
         }
