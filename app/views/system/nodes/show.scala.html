@@ -1,4 +1,5 @@
 @(currentUser: org.graylog2.restclient.models.User, breadcrumbs: lib.BreadcrumbList, node: org.graylog2.restclient.models.Node, installedPlugins: List[org.graylog2.restclient.models.Plugin])
+@import org.graylog2.restclient.models.api.responses.JournalInfo
 @import views.helpers.StringHelper._
 @import views.helpers.NumberHelper
 @import views.helpers.DateHelper
@@ -7,6 +8,10 @@
 @import lib.security.RestPermissions._
 @import org.joda.time.DateTime
 @import org.joda.time.DateTimeZone
+
+@journalIsOvercommitted(journalInfo: JournalInfo) = @{
+    journalInfo.journalSizeLimit == 0 || ((journalInfo.journalSize * 100.0) / journalInfo.journalSizeLimit >= 100.0)
+}
 
 @main("Node " + node.getNodeId, views.html.system.sidebar(), "", currentUser) {
 
@@ -151,15 +156,15 @@
                     <h3>Utilization</h3>
                     @defining(NumberHelper.asPercent(node.getJournalInfo.journalSize, node.getJournalInfo.journalSizeLimit, 1, false)) { utilizationPercent =>
                         <div class="progress node-journal-usage">
-                            @if(utilizationPercent.toDouble <= 100.0) {
-                                <div class="bar bar-warning" data-percentage="@utilizationPercent" style="width : @utilizationPercent%;">
-                            } else {
+                            @if(journalIsOvercommitted(node.getJournalInfo)) {
                                 <div class="bar bar-warning" data-percentage="100" style="width : 100%;">
+                            } else {
+                                <div class="bar bar-warning" data-percentage="@utilizationPercent" style="width : @utilizationPercent%;">
                             }
                                 @utilizationPercent%
                             </div>
                         </div>
-                        @if(utilizationPercent.toDouble > 100) {
+                        @if(journalIsOvercommitted(node.getJournalInfo)) {
                             <strong>Warning!</strong> The journal utilization is exceeding the maximum size
                             defined. <a href="@routes.SystemController.index()">Click here</a> for more information.<br/>
                         }
