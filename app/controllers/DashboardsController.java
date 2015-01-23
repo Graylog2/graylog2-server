@@ -1,6 +1,4 @@
 /**
- * Copyright 2013 Lennart Koopmann <lennart@torch.sh>
- *
  * This file is part of Graylog2.
  *
  * Graylog2 is free software: you can redistribute it and/or modify
@@ -15,11 +13,11 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 package controllers;
 
 import com.google.inject.Inject;
+import lib.security.RestPermissions;
 import org.graylog2.restclient.lib.APIException;
 import org.graylog2.restclient.lib.ApiClient;
 import lib.BreadcrumbList;
@@ -35,14 +33,12 @@ import org.slf4j.LoggerFactory;
 import play.data.Form;
 import play.mvc.BodyParser;
 import play.mvc.Result;
+import views.helpers.Permissions;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public class DashboardsController extends AuthenticatedController {
     private static final Logger log = LoggerFactory.getLogger(DashboardsController.class);
 
@@ -97,6 +93,9 @@ public class DashboardsController extends AuthenticatedController {
     }
 
     public Result newDashboard() {
+        if (!Permissions.isPermitted(RestPermissions.DASHBOARDS_CREATE)) {
+            return redirect(routes.StartpageController.redirect());
+        }
         final BreadcrumbList bc = new BreadcrumbList();
         bc.addCrumb("Dashboards", routes.DashboardsController.index());
         bc.addCrumb("Create", routes.DashboardsController.newDashboard());

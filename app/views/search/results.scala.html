@@ -260,9 +260,11 @@
 
                             data-widget-type="field_chart"
                         >
-                            <li>
-                                <a href="@routes.DashboardsController.newDashboard()">No dashboards. Create one?</a>
-                            </li>
+                            @if(Permissions.isPermitted(RestPermissions.DASHBOARDS_CREATE)) {
+                                <li>
+                                    <a href="@routes.DashboardsController.newDashboard()">No dashboards. Create one?</a>
+                                </li>
+                            }
                         </ul>
                     </li>
 

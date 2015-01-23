@@ -1147,7 +1147,7 @@ function focusFirstFormInput(container) {
     if (!(parentElement instanceof jQuery)) {
         parentElement = this;
     }
-    $("input[type!=hidden],select", parentElement).not(":disabled").first().focus();
+    $("input[type!=hidden],select", parentElement).not(".tt-hint").not(":disabled").first().focus();
 }
 
 function substringMatcher(possibleMatches, displayKey, limit) {

@@ -107,6 +107,9 @@ public class UsersController extends AuthenticatedController {
     }
 
     public Result newUserForm() {
+        if (!Permissions.isPermitted(RestPermissions.USERS_CREATE)) {
+            return redirect(routes.StartpageController.redirect());
+        }
         BreadcrumbList bc = breadcrumbs();
         bc.addCrumb("New", routes.UsersController.newUserForm());
 
@@ -130,6 +133,9 @@ public class UsersController extends AuthenticatedController {
     }
 
     public Result editUserForm(String username) {
+        if (!Permissions.isPermitted(RestPermissions.USERS_EDIT, username)) {
+            return redirect(routes.StartpageController.redirect());
+        }
         BreadcrumbList bc = breadcrumbs();
         bc.addCrumb("Edit " + username, routes.UsersController.editUserForm(username));
 

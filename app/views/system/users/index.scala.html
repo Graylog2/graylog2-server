@@ -56,10 +56,12 @@
                     <td>
                         <div class="pull-right">
                             @if(!user.isReadonly) {
-                            <form class="edit-user-form" data-username="@user.getName" method="POST" action="@routes.UsersController.delete(user.getName)">
-                                <button id="delete-user" type="submit" class="btn btn-mini" title="Delete" data-confirm="Really delete user @user.getName?"><i class="icon-remove icon-large"></i></button>
+                                @if(isPermitted(USERS_EDIT)) {
+                                    <form class="edit-user-form" data-username="@user.getName" method="POST" action="@routes.UsersController.delete(user.getName)">
+                                        <button id="delete-user" type="submit" class="btn btn-mini" title="Delete" data-confirm="Really delete user @user.getName?"><i class="icon-remove icon-large"></i></button>
+                                    </form>
+                                }
                                 <a id="edit-user" href="@routes.UsersController.editUserForm(user.getName)" class="btn btn-mini" title="Edit"><i class="icon-edit icon-large"></i></a>
-                            </form>
                             }
                         </div>
                     </td>

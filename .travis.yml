@@ -16,6 +16,7 @@ env:
       0Y0YksLljdKHv8mn02KX2tZxLVYjgzq09Dvn0+bGOzQU+TLbkPY=
 before_script:
   - sbt update
+  - npm --version
   - pushd javascript && npm install && popd
 script:
   - pushd javascript && npm test && node_modules/.bin/gulp deploy-prod && popd

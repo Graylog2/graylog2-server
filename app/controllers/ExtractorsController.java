@@ -191,8 +191,14 @@ public class ExtractorsController extends AuthenticatedController {
             final Node node = nodeService.loadNode(nodeId);
             final Input input = node.getInput(inputId);
             final Extractor extractor = extractorService.load(node, input, extractorId);
-            final MessageResult exampleMessage = input.getRecentlyReceivedMessage(nodeId);
-            final String example = exampleMessage.getFields().get(extractor.getSourceField()).toString();
+            final String sourceField = extractor.getSourceField();
+            String example;
+            try {
+                final MessageResult exampleMessage = input.getRecentlyReceivedMessage(nodeId);
+                example = exampleMessage.getFields().get(sourceField).toString();
+            } catch (Exception e) {
+                example = null;
+            }
 
             return ok(views.html.system.inputs.extractors.edit_extractor.render(
                             currentUser(),

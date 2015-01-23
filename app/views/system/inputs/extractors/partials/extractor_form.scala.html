@@ -45,9 +45,15 @@
 <form class="extractor-form" action="@action" method="POST">
     <span id="xtrc-original-example" style="display : none ;">@example</span>
 
-    <div class="well well-small xtrc-new-example">
-        <span id="xtrc-example">@example</span>
-    </div>
+    @if(example == null) {
+        <div class="alert alert-warning xtrc-no-example">
+            Could not load an example of field '@field'. It is not possible to test the extractor before updating it.
+        </div>
+    } else {
+        <div class="well well-small xtrc-new-example">
+            <span id="xtrc-example">@example</span>
+        </div>
+    }
 
     @if(extractorType.equals(Extractor.Type.REGEX)) {
         @views.html.system.inputs.extractors.configurations.regex(extractor)
