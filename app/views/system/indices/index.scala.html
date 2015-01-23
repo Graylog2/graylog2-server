@@ -5,6 +5,7 @@
         clusterHealth: org.graylog2.restclient.models.ESClusterHealth,
         deflectorTarget: String,
         deflectorConfig: org.graylog2.restclient.models.api.responses.system.indices.DeflectorConfigResponse)
+@import org.joda.time.format.PeriodFormat
 
 @import controllers.routes
 @import org.graylog2.restclient.lib.Tools
@@ -35,8 +36,18 @@
         documentation</a>. Closed indices can be re-opened at any time.
 
         <br />
-        <strong>Your current configuration is <span class="number-format" data-format="0,0">@deflectorConfig.maxDocsPerIndex</span>
-        documents per index and a maximum number of @deflectorConfig.maxNumberOfIndices indices.</strong>
+        @if("size".equals(deflectorConfig.`type`)) {
+            <strong>Your current configuration is <span class="number-format" data-format="0,0">@deflectorConfig.maxSizePerIndex</span>
+                bytes per index and a maximum number of @deflectorConfig.maxNumberOfIndices indices.</strong>
+        }
+        @if("time".equals(deflectorConfig.`type`)) {
+            <strong>Your current configuration rotates the indices every @{PeriodFormat.getDefault().print(deflectorConfig.maxTimePerIndex)}
+                and keeps a maximum number of @deflectorConfig.maxNumberOfIndices indices.</strong>
+        }
+        @if("count".equals(deflectorConfig.`type`)) {
+            <strong>Your current configuration is <span class="number-format" data-format="0,0">@deflectorConfig.maxDocsPerIndex</span>
+                documents per index and a maximum number of @deflectorConfig.maxNumberOfIndices indices.</strong>
+        }
     </div>
 
     <div class="row-fluid">
