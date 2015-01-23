@@ -24,15 +24,24 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.indexer.Deflector;
-import org.graylog2.shared.rest.resources.RestResource;
+import org.graylog2.indexer.rotation.MessageCountRotationStrategy;
+import org.graylog2.indexer.rotation.SizeBasedRotationStrategy;
+import org.graylog2.indexer.rotation.TimeBasedRotationStrategy;
+import org.graylog2.plugin.indexer.rotation.RotationStrategy;
+import org.graylog2.rest.resources.system.responses.DeflectorConfigResponse;
+import org.graylog2.rest.resources.system.responses.MessageCountRotationStrategyResponse;
+import org.graylog2.rest.resources.system.responses.SizeBasedRotationStrategyResponse;
 import org.graylog2.security.RestPermissions;
+import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.system.activities.Activity;
 import org.graylog2.shared.system.activities.ActivityWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 import javax.ws.rs.GET;
+import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -48,14 +57,17 @@ public class DeflectorResource extends RestResource {
 
     private final Deflector deflector;
     private final ActivityWriter activityWriter;
+    private final Provider<RotationStrategy> rotationStrategyProvider;
     private final ElasticsearchConfiguration configuration;
 
     @Inject
     public DeflectorResource(Deflector deflector,
                              ActivityWriter activityWriter,
+                             Provider<RotationStrategy> rotationStrategyProvider,
                              ElasticsearchConfiguration configuration) {
         this.deflector = deflector;
         this.activityWriter = activityWriter;
+        this.rotationStrategyProvider = rotationStrategyProvider;
         this.configuration = configuration;
     }
 
@@ -76,12 +88,25 @@ public class DeflectorResource extends RestResource {
     @RequiresPermissions(RestPermissions.DEFLECTOR_READ)
     @Path("/config")
     @Produces(MediaType.APPLICATION_JSON)
-    public Map<String, Integer> config() {
+    public DeflectorConfigResponse config() {
         restrictToMaster();
 
-        return ImmutableMap.of(
-                "max_docs_per_index", configuration.getMaxDocsPerIndex(),
-                "max_number_of_indices", configuration.getMaxNumberOfIndices());
+        final RotationStrategy strategy = rotationStrategyProvider.get();
+        DeflectorConfigResponse response = null;
+
+        if (strategy instanceof MessageCountRotationStrategy) {
+            response = new MessageCountRotationStrategyResponse(configuration.getMaxDocsPerIndex());
+        } else if (strategy instanceof SizeBasedRotationStrategy) {
+            response = new SizeBasedRotationStrategyResponse(configuration.getMaxSizePerIndex());
+        } else if (strategy instanceof TimeBasedRotationStrategy) {
+            response = new TimeBasedRotationStrategyResponse(configuration.getMaxTimePerIndex());
+        } else {
+            throw new InternalServerErrorException("Unknown rotation strategy!");
+        }
+
+        response.maxNumberOfIndices = configuration.getMaxNumberOfIndices();
+
+        return response;
     }
 
     @POST

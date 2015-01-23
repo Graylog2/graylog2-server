@@ -14,29 +14,18 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.restclient.models.api.responses.system.indices;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+package org.graylog2.rest.resources.system;
+
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import org.graylog2.rest.resources.system.responses.DeflectorConfigResponse;
 import org.joda.time.Period;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
-public class DeflectorConfigResponse {
+@JsonAutoDetect
+public class TimeBasedRotationStrategyResponse extends DeflectorConfigResponse {
+    public final Period maxTimePerIndex;
 
-    @JsonProperty("type")
-    public String type;
-
-    @JsonProperty("max_docs_per_index")
-    public int maxDocsPerIndex;
-
-    @JsonProperty("max_time_per_index")
-    public Period maxTimePerIndex;
-
-    @JsonProperty("max_size_per_index")
-    public int maxSizePerIndex;
-
-    @JsonProperty("max_number_of_indices")
-    public int maxNumberOfIndices;
-
+    public TimeBasedRotationStrategyResponse(Period maxTimePerIndex) {
+        this.maxTimePerIndex = maxTimePerIndex;
+    }
 }
