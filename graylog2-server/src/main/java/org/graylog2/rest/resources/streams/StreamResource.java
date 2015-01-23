@@ -106,8 +106,6 @@ public class StreamResource extends RestResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response create(@ApiParam(name = "JSON body", required = true) final CreateStreamRequest cr) throws ValidationException {
-        checkPermission(RestPermissions.STREAMS_CREATE);
-
         // Create stream.
         final Stream stream = streamService.create(cr, getCurrentUser().getName());
         stream.setDisabled(true);
@@ -181,7 +179,6 @@ public class StreamResource extends RestResource {
     @Timed
     @Path("/{streamId}")
     @ApiOperation(value = "Update a stream")
-    @RequiresPermissions(RestPermissions.STREAMS_EDIT)
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @ApiResponses(value = {
@@ -284,7 +281,6 @@ public class StreamResource extends RestResource {
     @Path("/{streamId}/clone")
     @Timed
     @ApiOperation(value = "Clone a stream")
-    @RequiresPermissions(RestPermissions.STREAMS_CREATE)
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "Stream not found."),
             @ApiResponse(code = 400, message = "Invalid or missing Stream id.")
