@@ -18,11 +18,11 @@
  */
 package views.helpers;
 
+import java.util.Locale;
+
 public class NumberHelper {
     
     public static String asPercent(double numerator, double denominator, int digits, boolean includePercentSign) {
-        
-        return String.format("%" + (digits == 0 ? "" : "." + digits) + "f" + (includePercentSign ? "%%": ""), (numerator / denominator) * 100);
-        
+        return String.format(Locale.ENGLISH, "%" + (digits == 0 ? "" : "." + digits) + "f" + (includePercentSign ? "%%": ""), (numerator / denominator) * 100);
     }
 }
