@@ -46,7 +46,7 @@
 
         @if((inputState.getState == InputState.InputStateType.FAILED) && (inputState.getDetailedMessage != null) && (!inputState.getDetailedMessage.isEmpty)) {
             <div class="alert alert-error">
-                @inputState.getDetailedMessage
+                <strong>Error starting input:</strong> @inputState.getDetailedMessage
             </div>
         }
 
