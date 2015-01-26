@@ -38,7 +38,7 @@ var GrokPatterns = React.createClass({
                     <td>{pattern.name}</td>
                     <td>{pattern.pattern}</td>
                     <td>
-                        <button style={{marginRight: 5}} className="btn btn-mini" onClick={this.confirmedRemove.bind(this, pattern)}>
+                        <button style={{marginRight: 5}} className="btn btn-danger btn-small" onClick={this.confirmedRemove.bind(this, pattern)}>
                             <i className="icon icon-remove"></i> Delete
                         </button>
                         <EditPatternModal id={pattern.id} name={pattern.name} pattern={pattern.pattern} create={false} reload={this.loadData} savePattern={this.savePattern}/>
