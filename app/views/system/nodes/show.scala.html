@@ -156,6 +156,27 @@
             </p>
             <div class="row-fluid">
                 <div class="span6">
+                    <h3>Configuration</h3>
+                    <dl class="system-journal">
+                        <dt>Path:</dt>
+                        <dd>@node.getJournalInfo.journalConfig.directory</dd>
+                        <dt>Earliest entry: </dt>
+                        <dd>@DateHelper.readablePeriodFromNow(node.getJournalInfo.oldestSegment)</dd>
+                        <dt>Maximum size:</dt>
+                        <dd>
+                            <span class="number-format" data-format="0,0">@node.getJournalInfo.journalConfig.maxSize</span>
+                            bytes
+                        </dd>
+                        <dt>Maximum age:</dt>
+                        <dd>@DateHelper.readableDuration(node.getJournalInfo.journalConfig.maxAge)</dd>
+                        <dt>Flush policy:</dt>
+                        <dd>
+                            Every <span class="number-format" data-format="0,0">@node.getJournalInfo.journalConfig.flushInterval</span>
+                            messages or @DateHelper.readableDuration(node.getJournalInfo.journalConfig.flushAge)
+                        </dd>
+                    </dl>
+                </div>
+                <div class="span6">
                     <h3>Utilization</h3>
                     @defining(NumberHelper.asPercent(node.getJournalInfo.journalSize, node.getJournalInfo.journalSizeLimit, 1, false)) { utilizationPercent =>
                         <div class="progress node-journal-usage">
@@ -178,21 +199,6 @@
                         <strong>@node.getJournalInfo.readEventsPerSecond messages</strong>
                         have been read in the last second.
                     }
-                </div>
-                <div class="span6">
-                    <h3>Configuration</h3>
-                    <dl class="system-journal">
-                        <dt>Path:</dt>
-                        <dd>@node.getJournalInfo.journalConfig.directory</dd>
-                        <dt>Earliest entry: </dt>
-                        <dd>@DateHelper.readablePeriodFromNow(node.getJournalInfo.oldestSegment)</dd>
-                        <dt>Maximum size:</dt>
-                        <dd>@node.getJournalInfo.journalConfig.maxSize bytes</dd>
-                        <dt>Maximum age:</dt>
-                        <dd>@DateHelper.readableDuration(node.getJournalInfo.journalConfig.maxAge)</dd>
-                        <dt>Flush policy:</dt>
-                        <dd>Every @node.getJournalInfo.journalConfig.flushInterval messages or @DateHelper.readableDuration(node.getJournalInfo.journalConfig.flushAge)</dd>
-                    </dl>
                 </div>
             </div>
        } else {
