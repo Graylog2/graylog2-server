@@ -25,9 +25,6 @@ import play.twirl.api.Html;
 import java.util.Map;
 import java.util.Random;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public class Tools {
 
     private Tools() { /* pure utility class */ }
