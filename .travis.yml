@@ -39,6 +39,9 @@ deploy:
   on:
     repo: Graylog2/graylog2-web-interface
     jdk: oraclejdk7
+    branch:
+      - master
+      - 1.0
 addons:
 notifications:
   slack:
