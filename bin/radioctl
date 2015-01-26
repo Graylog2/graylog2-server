@@ -63,7 +63,7 @@ start() {
 run() {
     echo "Running graylog-radio ..."
     cd "$RADIOCTL_DIR/.."
-    exec "${JAVA_CMD}" "${JAVA_OPTS}" ${LOG4J} -jar "${RADIO_JAR}" radio -f "${RADIO_CONF}" -p "${RADIO_PID}"
+    exec "${JAVA_CMD}" ${JAVA_OPTS} ${LOG4J} -jar "${RADIO_JAR}" radio -f "${RADIO_CONF}" -p "${RADIO_PID}"
 }
 
 stop() {
