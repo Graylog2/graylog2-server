@@ -151,6 +151,9 @@
     <div class="row-fluid">
         <h2><i class="icon icon-hdd"></i> Disk Journal</h2>
         @if(node.getJournalInfo.enabled) {
+            <p>Incoming messages are written to the disk journal to ensure they are kept safe in case of a server failure. The journal also helps keeping Graylog2 working if any of the outputs is too slow to keep up with the message rate
+            or whenever there is a peak in incoming messages. It makes sure that Graylog2 does not buffer all of those messages in main memory and avoids overly long garbage collection pauses that way.
+            </p>
             <div class="row-fluid">
                 <div class="span6">
                     <h3>Utilization</h3>
@@ -192,9 +195,7 @@
                     </dl>
                 </div>
             </div>
-            Incoming messages are written to the disk journal to ensure they are kept safe in case of a server failure. The journal also helps keeping Graylog2 working if any of the outputs is too slow to keep up with the message rate
-            or whenever there is a peak in incoming messages. It makes sure that Graylog2 does not buffer all of those messages in main memory and avoids overly long garbage collection pauses that way.
-        } else {
+       } else {
             The disk journal is disabled for this node.
         }
     </div>
