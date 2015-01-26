@@ -526,7 +526,7 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
 
     @Override
     protected void shutDown() throws Exception {
-        LOG.warn("Shutting down journal!");
+        LOG.debug("Shutting down journal!");
         shuttingDown = true;
 
         offsetFlusherFuture.cancel(false);
