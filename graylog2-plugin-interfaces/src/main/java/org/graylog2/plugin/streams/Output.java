@@ -34,6 +34,8 @@ public interface Output extends Persisted {
 
     public String getType();
 
+    public String getCreatorUserId();
+
     public Map<String, Object> getConfiguration();
 
     public Date getCreatedAt();

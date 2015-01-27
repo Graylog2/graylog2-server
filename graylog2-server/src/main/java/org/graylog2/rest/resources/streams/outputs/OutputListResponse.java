@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.graylog2.plugin.streams.Output;
+import org.graylog2.rest.models.system.outputs.responses.OutputSummary;
 
 import java.util.Collection;
 
@@ -30,9 +31,13 @@ public abstract class OutputListResponse {
     public abstract long total();
 
     @JsonProperty
-    public abstract Collection<Output> outputs();
+    public abstract Collection<OutputSummary> outputs();
 
-    public static OutputListResponse create(long total, Collection<Output> outputs) {
+    public static OutputListResponse create(long total, Collection<OutputSummary> outputs) {
         return new AutoValue_OutputListResponse(total, outputs);
+    }
+
+    public static OutputListResponse create(Collection<OutputSummary> outputs) {
+        return new AutoValue_OutputListResponse(outputs.size(), outputs);
     }
 }
