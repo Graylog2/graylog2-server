@@ -125,7 +125,7 @@
                         }
                     } else {
                         Contains messages up to @DateHelper.readablePeriodFromNow(index.getRange.getStarts)
-                        @if(index.getName.equals(deflectorTarget) &&  index.getInfo != null) {
+                        @if(index.getName.equals(deflectorTarget) && index.getInfo != null) {
                             (@Tools.byteToHuman(index.getInfo.getStoreSizeBytes) /
                             <span class="number-format" data-format="0,0">@index.getInfo.getDocuments.count</span> messages)
                         }
