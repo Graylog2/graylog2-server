@@ -42,6 +42,7 @@ import org.graylog2.plugin.inputs.Extractor;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.shared.inputs.MessageInputFactory;
 import org.graylog2.shared.inputs.NoSuchInputTypeException;
+import org.graylog2.streams.OutputImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -356,6 +357,23 @@ public class InputServiceImpl extends PersistedServiceImpl implements InputServi
     @Override
     public long localCount() {
         return count(InputImpl.class, new BasicDBObject(MessageInput.FIELD_GLOBAL, false));
+    }
+
+    @Override
+    public Map<String, Long> totalCountByType() {
+        final DBCursor inputTypes = collection(InputImpl.class).find(null, new BasicDBObject(MessageInput.FIELD_TYPE, 1));
+
+        final Map<String, Long> inputCountByType = new HashMap<>(inputTypes.count());
+        for (DBObject inputType : inputTypes) {
+            final String type = (String) inputType.get(MessageInput.FIELD_TYPE);
+            if (type != null) {
+                final Long oldValue = inputCountByType.get(type);
+                final Long newValue = (oldValue == null) ? 1 : oldValue + 1;
+                inputCountByType.put(type, newValue);
+            }
+        }
+
+        return inputCountByType;
     }
 
     @Override
