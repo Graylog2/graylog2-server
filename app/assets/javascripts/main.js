@@ -708,6 +708,11 @@ $(document).ready(function() {
         $.get(appPrefixed("/a/system/indices/index_info/" + index + "/partial"), function(data) {
             var holderElem = $(".index-info-holder", linkElem.closest(".index-description"));
             holderElem.html(data);
+            // Format numbers that were just loaded into the html document
+            $(".number-format", holderElem).each(function() {
+                $(this).text(numeral($(this).text()).format($(this).attr("data-format")));
+            });
+
             holderElem.toggle();
             
             var icon = linkElem.children().first();
