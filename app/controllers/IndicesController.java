@@ -21,6 +21,7 @@ import com.google.inject.Inject;
 import lib.BreadcrumbList;
 import org.graylog2.restclient.lib.APIException;
 import org.graylog2.restclient.lib.ApiClient;
+import org.graylog2.restclient.lib.Tools;
 import org.graylog2.restclient.models.ClusterService;
 import org.graylog2.restclient.models.ESClusterHealth;
 import org.graylog2.restclient.models.IndexService;
@@ -31,6 +32,7 @@ import play.mvc.Result;
 
 import java.io.IOException;
 import java.util.HashSet;
+import java.util.concurrent.TimeoutException;
 
 public class IndicesController extends AuthenticatedController {
 
@@ -47,10 +49,26 @@ public class IndicesController extends AuthenticatedController {
 
         try {
             ESClusterHealth clusterHealth = clusterService.getESClusterHealth();
-            DeflectorInformationResponse deflector = indexService.getDeflectorInfo();
-            DeflectorConfigResponse deflectorConfig = indexService.getDeflectorConfig();
-            ClosedIndicesResponse closedIndices = indexService.getClosedIndices();
-            ClosedIndicesResponse reopenedIndices = indexService.getReopenedIndices();
+            DeflectorInformationResponse deflector;
+            DeflectorConfigResponse deflectorConfig;
+            ClosedIndicesResponse closedIndices;
+            ClosedIndicesResponse reopenedIndices;
+            try {
+                deflector = indexService.getDeflectorInfo();
+                deflectorConfig = indexService.getDeflectorConfig();
+                closedIndices = indexService.getClosedIndices();
+                reopenedIndices = indexService.getReopenedIndices();
+            } catch (APIException e) {
+                if (Tools.rootCause(e) instanceof TimeoutException) {
+                    return ok(views.html.system.indices.index_cluster_unavailable.render(
+                            currentUser(),
+                            bc,
+                            clusterHealth
+                    ));
+                }
+                throw e;
+            }
+
             final HashSet<String> reopenedSet = Sets.newHashSet(reopenedIndices.indices);
 
             return ok(views.html.system.indices.index.render(
