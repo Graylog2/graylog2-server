@@ -224,7 +224,7 @@ var SourceOverview = React.createClass({
             activateTimerangeChooser("relative", $('.timerange-selector-container .dropdown-menu a[data-selector-name="relative"]'));
             $('#relative-timerange-selector').val(0);
         } else {
-            var selectedOptions = rangeSelectBox.selectedOptions;
+            var selectedOptions = $(":selected", rangeSelectBox);
             var text = selectedOptions && selectedOptions[0] && selectedOptions[0].text;
             activateTimerangeChooser("keyword", $('.timerange-selector-container .dropdown-menu a[data-selector-name="keyword"]'));
             $('#universalsearch .timerange-selector.keyword > input').val(text);
