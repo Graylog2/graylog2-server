@@ -45,6 +45,13 @@ public class Radio extends ServerBootstrap implements Runnable {
     private static final Logger LOG = LoggerFactory.getLogger(Radio.class);
     private static final Configuration configuration = new Configuration();
 
+    static {
+        // If this is not done, the default from BaseConfiguration will enable journaling on radio,
+        // but the actual Journal implementation there is the NoopJournal. This lead to discarding all incoming messages.
+        // see https://github.com/Graylog2/graylog2-server/issues/927
+        configuration.setMessageJournalEnabled(false);
+    }
+
     public Radio() {
         super("radio", configuration);
     }

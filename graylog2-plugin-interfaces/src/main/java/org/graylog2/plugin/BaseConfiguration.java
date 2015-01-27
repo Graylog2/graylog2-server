@@ -269,6 +269,10 @@ public abstract class BaseConfiguration {
         return messageJournalEnabled;
     }
 
+    public void setMessageJournalEnabled(boolean messageJournalEnabled) {
+        this.messageJournalEnabled = messageJournalEnabled;
+    }
+
     public int getInputbufferProcessors() {
         return inputbufferProcessors;
     }
