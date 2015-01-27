@@ -27,6 +27,7 @@ import org.graylog2.indexer.searches.Searches;
 import org.graylog2.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.MessageSummary;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.streams.Stream;
 import org.joda.time.DateTime;
@@ -90,13 +91,16 @@ public class FieldValueAlertCondition extends AbstractAlertCondition {
     @Override
     protected CheckResult runCheck() {
         this.searchHits = Collections.emptyList();
+        final List<MessageSummary> summaries = Lists.newArrayList();
         try {
             String filter = "streams:" + stream.getId();
             FieldStatsResult fieldStatsResult = searches.fieldStats(field, "*", filter, new RelativeRange(time * 60));
             if (getBacklog() != null && getBacklog() > 0) {
                 this.searchHits = Lists.newArrayList();
                 for (ResultMessage resultMessage : fieldStatsResult.getSearchHits()) {
-                    this.searchHits.add(new Message(resultMessage.getMessage()));
+                    final Message msg = new Message(resultMessage.getMessage());
+                    this.searchHits.add(msg);
+                    summaries.add(new MessageSummary(resultMessage.getIndex(), msg));
                 }
             }
 
@@ -150,7 +154,7 @@ public class FieldValueAlertCondition extends AbstractAlertCondition {
                         + decimalFormat.format(result) + " in the last " + time + " minutes with trigger condition "
                         + thresholdType + " than " + decimalFormat.format(threshold) + ". "
                         + "(Current grace time: " + grace + " minutes)";
-                return new CheckResult(true, this, resultDescription, Tools.iso8601());
+                return new CheckResult(true, this, resultDescription, Tools.iso8601(), summaries);
             } else {
                 return new CheckResult(false);
             }
