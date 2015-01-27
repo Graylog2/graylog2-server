@@ -55,11 +55,11 @@ import static org.joda.time.DateTimeZone.UTC;
 public class Message {
     private static final Logger LOG = LoggerFactory.getLogger(Message.class);
 
-    private static final String FIELD_ID = "_id";
-    private static final String FIELD_MESSAGE = "message";
-    private static final String FIELD_SOURCE = "source";
-    private static final String FIELD_TIMESTAMP = "timestamp";
-    private static final String FIELD_STREAMS = "streams";
+    public static final String FIELD_ID = "_id";
+    public static final String FIELD_MESSAGE = "message";
+    public static final String FIELD_SOURCE = "source";
+    public static final String FIELD_TIMESTAMP = "timestamp";
+    public static final String FIELD_STREAMS = "streams";
 
     private static final Pattern VALID_KEY_CHARS = Pattern.compile("^[\\w\\.\\-]*$");
 
@@ -164,6 +164,10 @@ public class Message {
 
     public String getId() {
         return getFieldAs(String.class, FIELD_ID);
+    }
+
+    public DateTime getTimestamp() {
+        return getFieldAs(DateTime.class, FIELD_TIMESTAMP).withZone(UTC);
     }
 
     public Map<String, Object> toElasticSearchObject() {

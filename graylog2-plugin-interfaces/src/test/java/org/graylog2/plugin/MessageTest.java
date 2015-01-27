@@ -42,10 +42,12 @@ import static org.testng.AssertJUnit.*;
 
 public class MessageTest {
     private Message message;
+    private DateTime originalTimestamp;
 
     @BeforeMethod
     public void setUp() {
-        message = new Message("foo", "bar", Tools.iso8601());
+        originalTimestamp = Tools.iso8601();
+        message = new Message("foo", "bar", originalTimestamp);
     }
 
     @Test
@@ -206,6 +208,17 @@ public class MessageTest {
         final Pattern pattern = Pattern.compile("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}");
 
         assertTrue(pattern.matcher(message.getId()).matches());
+    }
+
+    @Test
+    public void testGetTimestamp() {
+        try {
+            final DateTime timestamp = message.getTimestamp();
+            assertNotNull(timestamp);
+            assertEquals(originalTimestamp.getZone(), timestamp.getZone());
+        } catch (ClassCastException e) {
+            fail("timestamp wasn't a DateTime " + e.getMessage());
+        }
     }
 
     @Test

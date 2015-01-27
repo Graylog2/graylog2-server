@@ -42,7 +42,7 @@ public class DummyAlertCondition extends AbstractAlertCondition {
 
     @Override
     public CheckResult runCheck() {
-        return new CheckResult(true, this, this.description, Tools.iso8601());
+        return new CheckResult(true, this, this.description, Tools.iso8601(), null);
     }
 
     @Override
