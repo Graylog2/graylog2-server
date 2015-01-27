@@ -125,6 +125,28 @@ public class IndicesResource extends RestResource {
 
         return ClosedIndices.create(closedIndices, closedIndices.size());
     }
+    
+    @GET
+    @Timed
+    @Path("/reopened")
+    @ApiOperation(value = "Get a list of reopened indices, which will not be cleaned by retention cleaning")
+    @Produces(MediaType.APPLICATION_JSON)
+    public ClosedIndices reopened() {
+        final Set<String> reopenedIndices;
+        try {
+            reopenedIndices = Sets.filter(indices.getReopenedIndices(), new Predicate<String>() {
+                @Override
+                public boolean apply(String indexName) {
+                    return isPermitted(RestPermissions.INDICES_READ, indexName);
+                }
+            });
+        } catch (Exception e) {
+            LOG.error("Could not get reopened indices.", e);
+            throw new InternalServerErrorException(e);
+        }
+
+        return ClosedIndices.create(reopenedIndices, reopenedIndices.size()); 
+    }
 
     @POST
     @Timed
