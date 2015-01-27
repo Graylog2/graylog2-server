@@ -96,12 +96,12 @@ $(document).ready(function() {
         $("#sr-result-category", modalBody).text(new_val);
     });
 
-    $(document.body).on("click", "button.streamrule-form-submit", function(e) {
-        var form = $(this).closest("form#streamrule-form");
+    $(document.body).on("submit", "form#streamrule-form", function(e) {
+        var form = $(this);
         var streamId = form.attr("data-stream-id");
         var streamRuleId = form.attr("data-streamrule-id");
         var modalBody = form.find(".modal-body");
-        var dialog = $(this).closest("div.modal");
+        var dialog = form.find("div.modal");
 
         rule = {
             field: $("#sr-field", modalBody).val(),
