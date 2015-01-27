@@ -32,7 +32,7 @@
                 </tr>
             </thead>
             <tbody>
-            @for(user <- users.sortBy(_.getFullName).filter(user => isPermitted(USERS_EDIT, user.getName))) {
+            @for(user <- users.filter(user => isPermitted(USERS_EDIT, user.getName)).sortBy(_.getFullName)) {
                 <tr class="@{
                     if(user.getName.equals(currentUser.getName)) "info" else ""
                 }">
