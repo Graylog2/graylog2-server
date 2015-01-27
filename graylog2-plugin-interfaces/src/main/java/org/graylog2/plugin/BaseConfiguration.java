@@ -112,7 +112,7 @@ public abstract class BaseConfiguration {
     private int udpRecvBufferSizes = 1048576;
 
     @Parameter("message_journal_enabled")
-    private boolean messageJournalEnabled = false;
+    private boolean messageJournalEnabled = true;
 
     @Parameter("inputbuffer_processors")
     private int inputbufferProcessors = 2;
