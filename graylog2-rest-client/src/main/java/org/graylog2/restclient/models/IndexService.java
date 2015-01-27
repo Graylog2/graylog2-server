@@ -17,12 +17,16 @@
 package org.graylog2.restclient.models;
 
 import com.google.common.collect.Lists;
-import javax.inject.Inject;
 import org.graylog2.restclient.lib.APIException;
 import org.graylog2.restclient.lib.ApiClient;
-import org.graylog2.restclient.models.api.responses.system.indices.*;
+import org.graylog2.restclient.models.api.responses.system.indices.ClosedIndicesResponse;
+import org.graylog2.restclient.models.api.responses.system.indices.DeflectorConfigResponse;
+import org.graylog2.restclient.models.api.responses.system.indices.DeflectorInformationResponse;
+import org.graylog2.restclient.models.api.responses.system.indices.IndexRangeSummary;
+import org.graylog2.restclient.models.api.responses.system.indices.IndexRangesResponse;
 import org.graylog2.restroutes.generated.routes;
 
+import javax.inject.Inject;
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -69,6 +73,11 @@ public class IndexService {
 
     public ClosedIndicesResponse getClosedIndices() throws APIException, IOException {
         return api.path(routes.IndicesResource().closed(), ClosedIndicesResponse.class)
+                .execute();
+    }
+
+    public ClosedIndicesResponse getReopenedIndices() throws APIException, IOException {
+        return api.path(routes.IndicesResource().reopened(), ClosedIndicesResponse.class)
                 .execute();
     }
 

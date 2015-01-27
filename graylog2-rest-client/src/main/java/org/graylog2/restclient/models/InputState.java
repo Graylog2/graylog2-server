@@ -37,9 +37,11 @@ public class InputState {
     public enum InputStateType {
         CREATED,
         INITIALIZED,
+        INVALID_CONFIGURATION,
         STARTING,
         RUNNING,
         FAILED,
+        STOPPING,
         STOPPED,
         TERMINATED;
 

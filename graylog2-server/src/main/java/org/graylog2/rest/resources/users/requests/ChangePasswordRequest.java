@@ -22,17 +22,20 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.hibernate.validator.constraints.NotEmpty;
 
+import javax.annotation.Nullable;
+
 @JsonAutoDetect
 @AutoValue
 public abstract class ChangePasswordRequest {
     @JsonProperty
+    @Nullable
     public abstract String oldPassword();
 
     @JsonProperty
     public abstract String password();
 
     @JsonCreator
-    public static ChangePasswordRequest create(@JsonProperty("old_password") @NotEmpty String oldPassword,
+    public static ChangePasswordRequest create(@JsonProperty("old_password") @Nullable String oldPassword,
                                                @JsonProperty("password") @NotEmpty String password) {
         return new AutoValue_ChangePasswordRequest(oldPassword, password);
     }
