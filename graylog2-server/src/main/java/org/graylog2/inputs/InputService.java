@@ -62,6 +62,11 @@ public interface InputService extends PersistedService {
     long localCount();
 
     /**
+     * @return the total number of inputs in the cluster grouped by type.
+     */
+    Map<String, Long> totalCountByType();
+
+    /**
      * @param nodeId the node ID to query
      * @return the number of inputs on the specified node
      */
