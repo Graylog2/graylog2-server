@@ -17,18 +17,23 @@
 
 package org.graylog2.streams;
 
-import autovalue.shaded.com.google.common.common.collect.Sets;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
+import org.bson.types.ObjectId;
 import org.graylog2.plugin.streams.Output;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.streams.StreamRule;
+import org.joda.time.DateTime;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import static org.mockito.Mockito.when;
+import java.util.HashMap;
+
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNotEquals;
 
 public class StreamListFingerprintTest {
     @Mock Stream stream1;
@@ -39,26 +44,43 @@ public class StreamListFingerprintTest {
     @Mock Output output1;
     @Mock Output output2;
 
-    private final String expectedFingerprint = "8131e74d28b9068473e8b57517c03a5ea1158402";
+    private final String expectedFingerprint = "944fc39a2e1db9d13ef7c7323a670ebd426e37c1";
     private final String expectedEmptyFingerprint = "da39a3ee5e6b4b0d3255bfef95601890afd80709";
 
     @BeforeMethod
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
+        output1 = makeOutput(1, "output1");
+        output2 = makeOutput(2, "output2");
 
-        when(stream1.getId()).thenReturn("stream-xyz");
-        when(stream2.getId()).thenReturn("stream-abc");
-        when(streamRule1.getId()).thenReturn("rule-abc");
-        when(streamRule2.getId()).thenReturn("rule-def");
-        when(streamRule3.getId()).thenReturn("rule-xyz");
-        when(output1.getId()).thenReturn("output-def");
-        when(output2.getId()).thenReturn("output-xyz");
+        streamRule1 = makeStreamRule(1, "field1");
+        streamRule2 = makeStreamRule(2, "field2");
+        streamRule3 = makeStreamRule(3, "field3");
 
-        when(stream1.getStreamRules()).thenReturn(Lists.newArrayList(streamRule1, streamRule2));
-        when(stream2.getStreamRules()).thenReturn(Lists.newArrayList(streamRule3));
-        
-        when(stream1.getOutputs()).thenReturn(Sets.newHashSet(output1, output2));
-        when(stream2.getOutputs()).thenReturn(Sets.newHashSet(output2, output1));
+        stream1 = makeStream(1, "title1", new StreamRule[] {streamRule1, streamRule2}, new Output[] {output1, output2});
+        stream2 = makeStream(2, "title2", new StreamRule[] {streamRule3}, new Output[] {output2, output1});
+    }
+
+    private static Stream makeStream(int id, String title, StreamRule[] rules, Output[] outputs) {
+        final HashMap<String, Object> fields = Maps.newHashMap();
+        fields.put(StreamImpl.FIELD_TITLE, title);
+        return new StreamImpl(new ObjectId(String.format("%024d", id)), fields, Lists.newArrayList(rules), Sets.newHashSet(
+                outputs));
+    }
+
+    private static StreamRule makeStreamRule(int id, String field) {
+        final HashMap<String, Object> fields = Maps.newHashMap();
+        fields.put(StreamRuleImpl.FIELD_FIELD, field);
+        return new StreamRuleImpl(new ObjectId(String.format("%024d", id)), fields);
+    }
+
+    private static Output makeOutput(int id, String field) {
+        final HashMap<String, Object> fields = Maps.newHashMap();
+        fields.put(OutputImpl.FIELD_TITLE, field);
+        fields.put(OutputImpl.FIELD_TYPE, "foo");
+        fields.put(OutputImpl.FIELD_CREATED_AT, DateTime.parse("2015-01-01T00:00:00Z").toDate());
+        fields.put(OutputImpl.FIELD_CREATOR_USER_ID, "user1");
+        return new OutputImpl(new ObjectId(String.format("%024d", id)), fields);
     }
 
     @Test
@@ -66,6 +88,16 @@ public class StreamListFingerprintTest {
         final StreamListFingerprint fingerprint = new StreamListFingerprint(Lists.newArrayList(stream1, stream2));
 
         assertEquals(fingerprint.getFingerprint(), expectedFingerprint);
+    }
+
+    @Test
+    public void testIdenticalStreams() throws Exception {
+        final StreamListFingerprint fingerprint1 = new StreamListFingerprint(Lists.newArrayList(stream1));
+        final StreamListFingerprint fingerprint2 = new StreamListFingerprint(Lists.newArrayList(stream1));
+        final StreamListFingerprint fingerprint3 = new StreamListFingerprint(Lists.newArrayList(stream2));
+
+        assertEquals(fingerprint1.getFingerprint(), fingerprint2.getFingerprint());
+        assertNotEquals(fingerprint1.getFingerprint(), fingerprint3.getFingerprint());
     }
 
     @Test

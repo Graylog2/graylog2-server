@@ -43,18 +43,18 @@ public class StreamListFingerprint {
     private String buildFingerprint(List<Stream> streams) {
         final MessageDigest sha1Digest = DigestUtils.getSha1Digest();
 
+        final StringBuilder sb = new StringBuilder();
         for (Stream stream : Ordering.from(getStreamComparator()).sortedCopy(streams)) {
-            sha1Digest.update(stream.getId().getBytes());
+            sb.append(stream.hashCode());
 
             for (StreamRule rule : Ordering.from(getStreamRuleComparator()).sortedCopy(stream.getStreamRules())) {
-                sha1Digest.update(rule.getId().getBytes());
+                sb.append(rule.hashCode());
             }
             for (Output output : Ordering.from(getOutputComparator()).sortedCopy(stream.getOutputs())) {
-                sha1Digest.update(output.getId().getBytes());
+                sb.append(output.hashCode());
             }
         }
-
-        return new String(Hex.encodeHex(sha1Digest.digest()));
+        return String.valueOf(Hex.encodeHex(sha1Digest.digest(sb.toString().getBytes())));
     }
 
     private Comparator<Output> getOutputComparator() {
