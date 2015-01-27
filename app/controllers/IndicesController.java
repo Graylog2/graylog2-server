@@ -16,6 +16,7 @@
  */
 package controllers;
 
+import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import lib.BreadcrumbList;
 import org.graylog2.restclient.lib.APIException;
@@ -29,6 +30,7 @@ import org.graylog2.restclient.models.api.responses.system.indices.DeflectorInfo
 import play.mvc.Result;
 
 import java.io.IOException;
+import java.util.HashSet;
 
 public class IndicesController extends AuthenticatedController {
 
@@ -48,12 +50,15 @@ public class IndicesController extends AuthenticatedController {
             DeflectorInformationResponse deflector = indexService.getDeflectorInfo();
             DeflectorConfigResponse deflectorConfig = indexService.getDeflectorConfig();
             ClosedIndicesResponse closedIndices = indexService.getClosedIndices();
+            ClosedIndicesResponse reopenedIndices = indexService.getReopenedIndices();
+            final HashSet<String> reopenedSet = Sets.newHashSet(reopenedIndices.indices);
 
             return ok(views.html.system.indices.index.render(
                     currentUser(),
                     bc,
                     indexService.all(),
                     closedIndices.indices,
+                    reopenedSet,
                     clusterHealth,
                     deflector.currentTarget,
                     deflectorConfig

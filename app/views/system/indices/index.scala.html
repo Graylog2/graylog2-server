@@ -2,6 +2,7 @@
         breadcrumbs: lib.BreadcrumbList,
         indices: List[org.graylog2.restclient.models.Index],
         closedIndices: List[String],
+        reopenedSet: Set[String],
         clusterHealth: org.graylog2.restclient.models.ESClusterHealth,
         deflectorTarget: String,
         deflectorConfig: org.graylog2.restclient.models.api.responses.system.indices.DeflectorConfigResponse)
@@ -112,7 +113,7 @@
 
                 @index.getName
 
-                @if(index.getName.equals(deflectorTarget) && index.getInfo != null && index.getInfo.isReopened) {
+                @if(reopenedSet.contains(index.getName)) {
                     <i class="icon icon-retweet" title="Reopened index"></i>
                 }
 
