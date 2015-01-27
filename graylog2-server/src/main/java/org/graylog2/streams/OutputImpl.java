@@ -143,6 +143,37 @@ public class OutputImpl implements Output {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof OutputImpl)) return false;
+
+        OutputImpl output = (OutputImpl) o;
+
+        if (!_id.equals(output._id)) return false;
+        if (configuration != null ? !configuration.equals(output.configuration) : output.configuration != null)
+            return false;
+        if (contentPack != null ? !contentPack.equals(output.contentPack) : output.contentPack != null) return false;
+        if (!createdAt.equals(output.createdAt)) return false;
+        if (!creatorUserId.equals(output.creatorUserId)) return false;
+        if (!title.equals(output.title)) return false;
+        if (!type.equals(output.type)) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = _id.hashCode();
+        result = 31 * result + title.hashCode();
+        result = 31 * result + type.hashCode();
+        result = 31 * result + (configuration != null ? configuration.hashCode() : 0);
+        result = 31 * result + createdAt.hashCode();
+        result = 31 * result + creatorUserId.hashCode();
+        result = 31 * result + (contentPack != null ? contentPack.hashCode() : 0);
+        return result;
+    }
+
+    @Override
     @JsonValue
     public Map<String, Object> asMap() {
         final Map<String, Object> fields = getFields();
