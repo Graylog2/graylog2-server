@@ -74,18 +74,28 @@ var GrokPatterns = React.createClass({
     },
 
     render() {
+        var patterns;
+
+        if (this.state.patterns.length === 0) {
+            patterns = <div><div className="alert alert-info">There are no grok patterns.</div></div>;
+        } else {
+            patterns = this._filteredPatternsHtml();
+        }
+
         return (
             <div style={{paddingTop: 15}}>
-                <form className="form-inline pull-left">
-                    <label htmlFor="grokfilter" style={{marginRight: 5}}>Filter pattern names:</label>
-                    <input type="text" name="filter" id="grokfilter" value={this.state.filter} onChange={(event) => {this.setState({filter: event.target.value});}} />
-                </form>
-                <div className="pull-right">
-                    <BulkLoadPatternModal />
-                    <EditPatternModal id={""} name={""} pattern={""} create={true} reload={this.loadData} savePattern={this.savePattern} />
+                <div class="row-fluid">
+                    <form className="form-inline grok-filter-form">
+                        <label htmlFor="grokfilter">Filter pattern names:</label>
+                        <input type="text" name="filter" id="grokfilter" value={this.state.filter} onChange={(event) => {this.setState({filter: event.target.value});}} />
+                    </form>
+                    <div className="pull-right">
+                        <BulkLoadPatternModal />
+                        <EditPatternModal id={""} name={""} pattern={""} create={true} reload={this.loadData} savePattern={this.savePattern} />
+                    </div>
                 </div>
                 <div className="grok-patterns row-fluid">
-                {this._filteredPatternsHtml()}
+                    {patterns}
                 </div>
             </div>
         );
