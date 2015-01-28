@@ -18,12 +18,7 @@ package org.graylog2.rest.resources.search;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
-import org.apache.lucene.queryparser.classic.ParseException;
-import org.apache.lucene.queryparser.classic.Token;
-import org.elasticsearch.ExceptionsHelper;
 import org.elasticsearch.action.search.SearchPhaseExecutionException;
-import org.elasticsearch.action.search.ShardSearchFailure;
-import org.elasticsearch.search.SearchParseException;
 import org.glassfish.jersey.server.ChunkedOutput;
 import org.graylog2.indexer.InvalidRangeFormatException;
 import org.graylog2.indexer.results.ScrollResult;
@@ -31,16 +26,15 @@ import org.graylog2.indexer.results.SearchResult;
 import org.graylog2.indexer.searches.Searches;
 import org.graylog2.indexer.searches.Sorting;
 import org.graylog2.indexer.searches.timeranges.AbsoluteRange;
-import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.rest.resources.search.responses.FieldStatsResult;
-import org.graylog2.rest.resources.search.responses.GenericError;
+import org.graylog2.rest.resources.search.responses.SearchError;
 import org.graylog2.rest.resources.search.responses.HistogramResult;
-import org.graylog2.rest.resources.search.responses.QueryParseError;
 import org.graylog2.rest.resources.search.responses.SearchResponse;
 import org.graylog2.rest.resources.search.responses.TermsResult;
 import org.graylog2.rest.resources.search.responses.TermsStatsResult;
 import org.graylog2.rest.resources.search.responses.TimeRange;
-import org.graylog2.security.RestPermissions;
+import org.graylog2.shared.rest.resources.RestResource;
+import org.graylog2.shared.security.RestPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -177,52 +171,10 @@ public abstract class SearchResource extends RestResource {
     }
 
     protected BadRequestException createRequestExceptionForParseFailure(String query, SearchPhaseExecutionException e) {
-        LOG.warn("Unable to execute search: {}", e.getMessage());
-        // we won't actually iterate over all of the shard failures, only the first one,
-        // since we assume that parse errors happen on all of the shards.
-        for (ShardSearchFailure failure : e.shardFailures()) {
-            Throwable unwrapped = ExceptionsHelper.unwrapCause(failure.failure());
-            if (!(unwrapped instanceof SearchParseException)) {
-                LOG.warn("Unhandled ShardSearchFailure", e);
-                return new BadRequestException();
-            }
-            Throwable rootCause = ((SearchParseException) unwrapped).getRootCause();
-            if (rootCause instanceof ParseException) {
-                Token currentToken = ((ParseException) rootCause).currentToken;
-                final QueryParseError queryParseError;
-                if (currentToken == null) {
-                    LOG.warn("No position/token available for ParseException.");
-                    queryParseError = QueryParseError.create(query);
-                } else {
-                    // scan for first usable token with position information
-                    int beginColumn = 0;
-                    int beginLine = 0;
-                    int endColumn = 0;
-                    int endLine = 0;
-                    while (currentToken != null && beginLine == 0) {
-                        beginColumn = currentToken.beginColumn;
-                        beginLine = currentToken.beginLine;
-                        endColumn = currentToken.endColumn;
-                        endLine = currentToken.endLine;
+        LOG.warn("Unable to execute search query '{}'", query);
 
-                        currentToken = currentToken.next;
-                    }
-
-                    queryParseError = QueryParseError.create(query, beginColumn, beginLine, endColumn, endLine);
-                }
-
-                return new BadRequestException(Response.status(Response.Status.BAD_REQUEST).entity(queryParseError).build());
-            } else if (rootCause instanceof NumberFormatException) {
-                final GenericError genericError = GenericError.create(query, rootCause.getClass().getCanonicalName(), rootCause.getMessage());
-                return new BadRequestException(Response.status(Response.Status.BAD_REQUEST).entity(genericError).build());
-            } else {
-                LOG.info("Root cause of SearchParseException has unexpected, generic type!" + rootCause.getClass());
-                final GenericError genericError = GenericError.create(query, rootCause.getClass().getCanonicalName(), rootCause.getMessage());
-                return new BadRequestException(Response.status(Response.Status.BAD_REQUEST).entity(genericError).build());
-            }
-        }
-
-        return new BadRequestException();
+        final SearchError searchError = SearchError.create(e.getMessage(), query);
+        return new BadRequestException(Response.status(Response.Status.BAD_REQUEST).entity(searchError).build());
     }
 
     public void checkSearchPermission(String filter, String searchPermission) {

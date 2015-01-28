@@ -34,10 +34,13 @@ import org.graylog2.inputs.Input;
 import org.graylog2.inputs.InputImpl;
 import org.graylog2.inputs.InputService;
 import org.graylog2.plugin.Tools;
+import org.graylog2.rest.models.radio.responses.PersistedInputsResponse;
+import org.graylog2.rest.models.radio.responses.PersistedInputsSummaryResponse;
+import org.graylog2.rest.models.radio.responses.RegisterInputResponse;
 import org.graylog2.shared.rest.resources.RestResource;
-import org.graylog2.rest.resources.system.radio.requests.PingRequest;
+import org.graylog2.rest.models.radio.requests.PingRequest;
 import org.graylog2.rest.resources.system.radio.responses.RadioSummary;
-import org.graylog2.shared.rest.resources.system.inputs.requests.RegisterInputRequest;
+import org.graylog2.rest.models.system.inputs.requests.RegisterInputRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,11 +71,14 @@ public class RadiosResource extends RestResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(RadiosResource.class);
 
-    @Inject
-    private NodeService nodeService;
+    private final NodeService nodeService;
+    private final InputService inputService;
 
     @Inject
-    private InputService inputService;
+    public RadiosResource(NodeService nodeService, InputService inputService) {
+        this.nodeService = nodeService;
+        this.inputService = inputService;
+    }
 
     @GET
     @Timed
@@ -144,6 +150,7 @@ public class RadiosResource extends RestResource {
             throw new NotFoundException();
         }
 
+        // TODO: Make this cleaner.
         final Map<String, Object> inputData = Maps.newHashMap();
         if (rir.inputId() != null) {
             inputData.put("input_id", rir.inputId());
@@ -163,12 +170,11 @@ public class RadiosResource extends RestResource {
         // Write to database.
         final String id = inputService.save(mongoInput);
 
-        final Map<String, String> result = ImmutableMap.of("persist_id", id);
         final URI radioUri = UriBuilder.fromResource(RadiosResource.class)
                 .path("{radioId}")
                 .build(id);
 
-        return Response.created(radioUri).entity(result).build();
+        return Response.created(radioUri).entity(RegisterInputResponse.create(id)).build();
     }
 
     @DELETE
@@ -211,7 +217,7 @@ public class RadiosResource extends RestResource {
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "Radio not found.")
     })
-    public Map<String, Object> persistedInputs(@ApiParam(name = "radioId", required = true)
+    public PersistedInputsSummaryResponse persistedInputs(@ApiParam(name = "radioId", required = true)
                                                @PathParam("radioId") String radioId) {
         Node radio = null;
         try {
@@ -220,26 +226,14 @@ public class RadiosResource extends RestResource {
             LOG.debug("Radio <{}> not found.", radioId);
         }
 
-        final List<Map<String, Object>> inputs = Lists.newArrayList();
+        final List<PersistedInputsResponse> inputs = Lists.newArrayList();
         if (radio != null) {
-            for (Input input : inputService.allOfRadio(radio)) {
-                Map<String, Object> inputSummary = Maps.newHashMap();
-
-                inputSummary.put("type", input.getType());
-                inputSummary.put("id", input.getId());
-                inputSummary.put("title", input.getTitle());
-                inputSummary.put("configuration", input.getConfiguration());
-                inputSummary.put("creator_user_id", input.getCreatorUserId());
-                inputSummary.put("created_at", Tools.getISO8601String(input.getCreatedAt()));
-                inputSummary.put("global", input.isGlobal());
-
-                inputs.add(inputSummary);
-            }
+            for (Input input : inputService.allOfRadio(radio))
+                inputs.add(PersistedInputsResponse.create(input.getType(), input.getId(), input.getTitle(),
+                        input.getCreatorUserId(), Tools.getISO8601String(input.getCreatedAt()), input.isGlobal(), input.getConfiguration()));
         }
 
-        return ImmutableMap.of(
-                "inputs", inputs,
-                "total", inputs.size());
+        return PersistedInputsSummaryResponse.create(inputs);
     }
 
 

@@ -135,6 +135,7 @@ public class InputServiceImpl extends PersistedServiceImpl implements InputServi
     public Input findForThisRadioOrGlobal(final String radioId, String id) throws NotFoundException {
         final List<DBObject> radioIdOrGlobal = ImmutableList.<DBObject>of(
                 new BasicDBObject(MessageInput.FIELD_RADIO_ID, radioId),
+                new BasicDBObject(MessageInput.FIELD_NODE_ID, radioId),
                 new BasicDBObject(MessageInput.FIELD_GLOBAL, true));
 
         final List<DBObject> query = ImmutableList.<DBObject>of(

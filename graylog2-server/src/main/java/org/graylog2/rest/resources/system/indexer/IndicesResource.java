@@ -37,7 +37,7 @@ import org.graylog2.rest.resources.system.indexer.responses.ClosedIndices;
 import org.graylog2.rest.resources.system.indexer.responses.IndexInfo;
 import org.graylog2.rest.resources.system.indexer.responses.IndexStats;
 import org.graylog2.rest.resources.system.indexer.responses.ShardRouting;
-import org.graylog2.security.RestPermissions;
+import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.system.jobs.SystemJob;
 import org.graylog2.system.jobs.SystemJobConcurrencyException;
 import org.graylog2.system.jobs.SystemJobManager;

@@ -30,7 +30,7 @@ import org.graylog2.indexer.IndexFailure;
 import org.graylog2.indexer.IndexFailureService;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.rest.resources.system.indexer.responses.FailureCount;
-import org.graylog2.security.RestPermissions;
+import org.graylog2.shared.security.RestPermissions;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;

@@ -44,7 +44,7 @@ import org.graylog2.rest.resources.streams.requests.UpdateStreamRequest;
 import org.graylog2.rest.resources.streams.responses.StreamListResponse;
 import org.graylog2.rest.resources.streams.responses.TestMatchResponse;
 import org.graylog2.rest.resources.streams.rules.requests.CreateStreamRuleRequest;
-import org.graylog2.security.RestPermissions;
+import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.shared.stats.ThroughputStats;
 import org.graylog2.streams.StreamRouterEngine;
 import org.graylog2.streams.StreamRuleService;

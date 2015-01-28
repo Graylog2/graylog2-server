@@ -30,8 +30,9 @@ import org.graylog2.radio.Configuration;
 import org.graylog2.radio.bindings.providers.AsyncHttpClientProvider;
 import org.graylog2.radio.bindings.providers.RadioTransportProvider;
 import org.graylog2.radio.buffers.processors.RadioProcessBufferProcessor;
-import org.graylog2.radio.inputs.InputStateListener;
+import org.graylog2.shared.inputs.InputStateListener;
 import org.graylog2.radio.inputs.PersistedInputsImpl;
+import org.graylog2.radio.security.RadioSecurityContextFactory;
 import org.graylog2.radio.system.activities.NullActivityWriter;
 import org.graylog2.radio.transports.RadioTransport;
 import org.graylog2.radio.users.NullUserServiceImpl;
@@ -63,24 +64,18 @@ public class RadioBindings extends AbstractModule {
         bindSingletons();
         bindTransport();
         bind(ProcessBufferProcessor.class).to(RadioProcessBufferProcessor.class);
-        SecurityContextFactory instance = null;
-        bind(SecurityContextFactory.class).toProvider(Providers.of(instance));
         bindDynamicFeatures();
         bindContainerResponseFilters();
         bindExceptionMappers();
         bindAdditionalJerseyComponents();
         bindInterfaces();
-        bindEventBusListeners();
     }
 
     private void bindInterfaces() {
         bind(ActivityWriter.class).to(NullActivityWriter.class);
         bind(PersistedInputs.class).to(PersistedInputsImpl.class);
         bind(UserService.class).to(NullUserServiceImpl.class);
-    }
-
-    private void bindEventBusListeners() {
-        bind(InputStateListener.class).asEagerSingleton();
+        bind(SecurityContextFactory.class).to(RadioSecurityContextFactory.class);
     }
 
     private void bindSingletons() {

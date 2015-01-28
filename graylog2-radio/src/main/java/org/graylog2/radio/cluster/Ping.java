@@ -17,13 +17,13 @@
 package org.graylog2.radio.cluster;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import javax.inject.Inject;
 import javax.inject.Named;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.Request;
 import com.ning.http.client.Response;
 import org.graylog2.plugin.ServerStatus;
+import org.graylog2.rest.models.radio.requests.PingRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,7 +36,7 @@ import java.util.concurrent.Future;
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-public class Ping {
+public class Ping implements Runnable {
 
     /*
      * This is extremely simple. Once we do more than just the ping API calls
@@ -45,19 +45,31 @@ public class Ping {
 
     private static final Logger LOG = LoggerFactory.getLogger(Ping.class);
 
-    public static void ping(AsyncHttpClient client, URI server, URI ourUri, String radioId) throws IOException, ExecutionException, InterruptedException {
-        ObjectMapper mapper = new ObjectMapper();
+    private final ObjectMapper objectMapper;
+    private final AsyncHttpClient httpClient;
+    private final String nodeId;
+    private final URI serverUri;
+    private final URI ourUri;
 
-        ObjectNode rootNode = mapper.createObjectNode();
-        rootNode.put("rest_transport_address", ourUri.toString());
+    @Inject
+    public Ping(ObjectMapper objectMapper, AsyncHttpClient httpClient, @Named("rest_transport_uri") URI ourUri, @Named("graylog2_server_uri") URI serverUri, ServerStatus serverStatus) {
+        this.objectMapper = objectMapper;
+        this.httpClient = httpClient;
+        this.nodeId = serverStatus.getNodeId().toString();
+        this.ourUri = ourUri;
+        this.serverUri = serverUri;
+    }
 
-        final UriBuilder uriBuilder = UriBuilder.fromUri(server);
-        uriBuilder.path("/system/radios/" + radioId + "/ping");
+    public void ping() throws IOException, ExecutionException, InterruptedException {
+        final PingRequest pingRequest = PingRequest.create(ourUri.toString());
 
-        final Request request = client.preparePut(uriBuilder.build().toString())
+        final UriBuilder uriBuilder = UriBuilder.fromUri(serverUri);
+        uriBuilder.path("/system/radios/" + nodeId + "/ping");
+
+        final Request request = httpClient.preparePut(uriBuilder.build().toString())
                 .setHeader("Content-Type", "application/json")
-                .setBody(rootNode.toString()).build();
-        Future<Response> f = client.executeRequest(request);
+                .setBody(objectMapper.writeValueAsString(pingRequest)).build();
+        Future<Response> f = httpClient.executeRequest(request);
 
         Response r = f.get();
 
@@ -67,35 +79,12 @@ public class Ping {
         }
     }
 
-    public static class Pinger implements Runnable {
-
-        private final AsyncHttpClient httpClient;
-        private final String nodeId;
-        private final URI serverUri;
-        private final URI ourUri;
-
-        @Inject
-        public Pinger(AsyncHttpClient httpClient, @Named("rest_transport_uri") URI ourUri, @Named("graylog2_server_uri") URI serverUri, ServerStatus serverStatus) {
-            this.httpClient = httpClient;
-            this.nodeId = serverStatus.getNodeId().toString();
-            this.ourUri = ourUri;
-            this.serverUri = serverUri;
-        }
-
-        @Override
-        public void run() {
+    @Override
+    public void run() {
+        try {
             ping();
+        } catch (IOException | ExecutionException | InterruptedException e) {
+            LOG.error("Pinging the master node failed: ", e);
         }
-
-        public void ping() {
-            LOG.debug("Updating (ping) this radio instance [{}] in the Graylog2 cluster at [{}]", nodeId, serverUri);
-            try {
-                Ping.ping(httpClient, serverUri, ourUri, nodeId);
-            } catch (Exception e) {
-                LOG.error("Cluster ping failed.", e);
-            }
-        }
-
     }
-
 }
