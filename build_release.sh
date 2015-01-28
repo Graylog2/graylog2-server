@@ -23,6 +23,7 @@ fi
 
 # Prepare JavaScript
 pushd javascript
+npm install
 npm test
 node_modules/.bin/gulp deploy-prod
 popd
