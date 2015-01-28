@@ -41,10 +41,10 @@ import javax.inject.Singleton;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.nio.file.Path;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
+import org.apache.commons.io.FilenameUtils;
 
 @Singleton
 public class DroolsEngine implements RulesEngine {
@@ -207,8 +207,7 @@ public class DroolsEngine implements RulesEngine {
             }
         }
         for (URL builtinRuleUrl : builtinRuleUrls) {
-            final Path rulesPath = new File(builtinRuleUrl.getPath()).toPath();
-            final String path = "src/main/resources/" + rulesPath.getFileName();
+            final String path = "src/main/resources/" + FilenameUtils.getName(builtinRuleUrl.getPath());
             final Resource resource = ResourceFactory
                     .newUrlResource(builtinRuleUrl)
                     .setSourcePath(path)
