@@ -19,7 +19,7 @@ package org.graylog2.rules;
 import com.google.common.base.Charsets;
 import com.google.common.collect.Lists;
 import com.google.common.io.Files;
-import javax.inject.Inject;
+import org.apache.commons.io.FilenameUtils;
 import org.drools.compiler.kie.builder.impl.InternalKieModule;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.RulesEngine;
@@ -37,11 +37,11 @@ import org.kie.internal.io.ResourceFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.nio.file.Path;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
@@ -207,8 +207,8 @@ public class DroolsEngine implements RulesEngine {
             }
         }
         for (URL builtinRuleUrl : builtinRuleUrls) {
-            final Path rulesPath = new File(builtinRuleUrl.getPath()).toPath();
-            final String path = "src/main/resources/" + rulesPath.getFileName();
+            final String rulesFileName = FilenameUtils.getName(builtinRuleUrl.getPath());
+            final String path = "src/main/resources/" + rulesFileName;
             final Resource resource = ResourceFactory
                     .newUrlResource(builtinRuleUrl)
                     .setSourcePath(path)
