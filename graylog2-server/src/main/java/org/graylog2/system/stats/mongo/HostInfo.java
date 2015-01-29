@@ -102,6 +102,7 @@ public abstract class HostInfo {
     @AutoValue
     public abstract static class Extra {
         @JsonProperty
+        @Nullable
         public abstract String versionString();
 
         @JsonProperty
@@ -113,9 +114,11 @@ public abstract class HostInfo {
         public abstract String kernelVersion();
 
         @JsonProperty
+        @Nullable
         public abstract String cpuFrequencyMHz();
 
         @JsonProperty
+        @Nullable
         public abstract String cpuFeatures();
 
         @JsonProperty
@@ -126,16 +129,18 @@ public abstract class HostInfo {
         public abstract long pageSize();
 
         @JsonProperty
+        @Nullable
         public abstract long numPages();
 
         @JsonProperty
+        @Nullable
         public abstract long maxOpenFiles();
 
-        public static Extra create(String versionString,
+        public static Extra create(@Nullable String versionString,
                                    @Nullable String libcVersion,
                                    @Nullable String kernelVersion,
-                                   String cpuFrequencyMHz,
-                                   String cpuFeatures,
+                                   @Nullable String cpuFrequencyMHz,
+                                   @Nullable String cpuFeatures,
                                    @Nullable String scheduler,
                                    long pageSize,
                                    long numPages,

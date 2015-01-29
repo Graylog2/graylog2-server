@@ -75,12 +75,12 @@ public class MongoProbe {
             final BasicDBObject extraMap = (BasicDBObject) hostInfoResult.get("extra");
             final HostInfo.Extra extra = HostInfo.Extra.create(
                     extraMap.getString("versionString"),
-                    extraMap.getString("libcVersion", null),
-                    extraMap.getString("kernelVersion", null),
+                    extraMap.getString("libcVersion"),
+                    extraMap.getString("kernelVersion"),
                     extraMap.getString("cpuFrequencyMHz"),
                     extraMap.getString("cpuFeatures"),
-                    extraMap.getString("scheduler", null),
-                    extraMap.getLong("pageSize"),
+                    extraMap.getString("scheduler"),
+                    extraMap.getLong("pageSize", -1l),
                     extraMap.getLong("numPages", -1l),
                     extraMap.getLong("maxOpenFiles", -1l)
             );
