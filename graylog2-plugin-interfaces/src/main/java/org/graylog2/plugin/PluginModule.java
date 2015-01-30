@@ -30,6 +30,8 @@ import org.graylog2.plugin.alarms.callbacks.AlarmCallback;
 import org.graylog2.plugin.filters.MessageFilter;
 import org.graylog2.plugin.inject.Graylog2Module;
 import org.graylog2.plugin.inputs.MessageInput;
+import org.graylog2.plugin.inputs.codecs.Codec;
+import org.graylog2.plugin.inputs.transports.Transport;
 import org.graylog2.plugin.outputs.MessageOutput;
 import org.graylog2.plugin.periodical.Periodical;
 import org.graylog2.plugin.rest.PluginRestResource;
@@ -43,10 +45,12 @@ public abstract class PluginModule extends Graylog2Module {
     }
 
     protected void addMessageInput(Class<? extends MessageInput> messageInputClass) {
-        TypeLiteral<Class<? extends MessageInput>> typeLiteral = new TypeLiteral<Class<? extends MessageInput>>() {
-        };
-        Multibinder<Class<? extends MessageInput>> messageInputs = Multibinder.newSetBinder(binder(), typeLiteral);
-        messageInputs.addBinding().toInstance(messageInputClass);
+        installInput(inputsMapBinder(), messageInputClass);
+    }
+
+    protected <T extends MessageInput> void addMessageInput(Class<T> messageInputClass,
+                                                            Class<? extends MessageInput.Factory<T>> factoryClass) {
+        installInput(inputsMapBinder(), messageInputClass, factoryClass);
     }
 
     protected void addMessageFilter(Class<? extends MessageFilter> messageFilterClass) {
@@ -91,5 +95,27 @@ public abstract class PluginModule extends Graylog2Module {
         for (PluginConfigBean pluginConfigBean : getConfigBeans()) {
             pluginConfigBeans.addBinding().toInstance(pluginConfigBean);
         }
+    }
+
+    protected void addTransport(String name, Class<? extends Transport> transportClass) {
+        installTransport(transportMapBinder(), name, transportClass);
+    }
+
+    protected void addTransport(String name,
+                                Class<? extends Transport> transportClass,
+                                Class<? extends Transport.Config> configClass,
+                                Class<? extends Transport.Factory<? extends Transport>> factoryClass) {
+        installTransport(transportMapBinder(), name, transportClass, configClass, factoryClass);
+    }
+
+    protected void addCodec(String name, Class<? extends Codec> codecClass) {
+        installCodec(codecMapBinder(), name, codecClass);
+    }
+
+    protected void addCodec(String name,
+                            Class<? extends Codec> codecClass,
+                            Class<? extends Codec.Config> configClass,
+                            Class<? extends Codec.Factory<? extends Codec>> factoryClass) {
+        installCodec(codecMapBinder(), name, codecClass, configClass, factoryClass);
     }
 }
