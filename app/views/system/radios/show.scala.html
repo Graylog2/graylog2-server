@@ -70,15 +70,28 @@
     <div class="row-fluid">
         <h2><i class="icon icon-shield"></i> Buffers</h2>
         <div class="row-fluid">
-            <a href="@routes.MetricsController.ofRadio(radio.getId, "org.graylog2.radio.buffers.ProcessBuffer")" class="btn btn-info btn-mini pull-right">Metrics</a>
-            <h3>Input buffer</h3>
+            <div class="span6">
+                <a href="@routes.MetricsController.ofRadio(radio.getId, "org.graylog2.shared.buffers.InputBuffer")" class="btn btn-info btn-mini pull-right">Metrics</a>
+                <h3>Input buffer</h3>
 
-            <div class="progress node-buffer-usage">
-                <div class="bar bar-warning" style="width: @radio.getBuffers.getInputBuffer.utilizationPercent%;"></div>
+                <div class="progress progress-percentage node-buffer-usage">
+                    <div class="bar bar-warning" data-percentage="@radio.getBuffers.getInputBuffer.utilizationPercent" style="width: @radio.getBuffers.getInputBuffer.utilizationPercent%;"><span class="number-format" data-format="0.0%">@radio.getBuffers.getInputBuffer.utilizationPercent%</span></div>
+                </div>
+                <strong>@radio.getBuffers.getInputBuffer.utilization messages</strong> in input buffer.
+                (<span class="number-format" data-format="0.0%">@radio.getBuffers.getInputBuffer.utilizationPercent%</span> utilized)
             </div>
-            <strong>@radio.getBuffers.getInputBuffer.utilization messages</strong> in input buffer.
-            (@radio.getBuffers.getInputBuffer.utilizationPercent% utilized)
+            <div class="span6">
+                <a href="@routes.MetricsController.ofRadio(radio.getId, "org.graylog2.shared.buffers.ProcessBuffer")" class="btn btn-info btn-mini pull-right">Metrics</a>
+                <h3>Process buffer</h3>
+
+                <div class="progress progress-percentage node-buffer-usage">
+                    <div class="bar bar-warning" data-percentage="@radio.getBuffers.getProcessBuffer.utilizationPercent" style="width: @radio.getBuffers.getProcessBuffer.utilizationPercent%;"><span class="number-format" data-format="0.0%">@radio.getBuffers.getProcessBuffer.utilizationPercent%</span></div>
+                </div>
+                <strong>@radio.getBuffers.getProcessBuffer.utilization messages</strong> in process buffer.
+                (<span class="number-format" data-format="0.0%">@radio.getBuffers.getProcessBuffer.utilizationPercent%</span> utilized)
+            </div>
         </div>
+
         The buffers are built to cache small amounts of messages on their way through the different processors.
     </div>
 

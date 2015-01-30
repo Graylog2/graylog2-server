@@ -117,29 +117,42 @@
     <div class="row-fluid">
         <h2><i class="icon icon-shield"></i> Buffers</h2>
         <div class="row-fluid">
-            <div class="span6">
-                <a href="@routes.MetricsController.ofNode(node.getNodeId, node.getBufferClasses.processBufferClass)" class="btn btn-info btn-mini pull-right">Metrics</a>
+            <div class="span4">
+                <a href="@routes.MetricsController.ofNode(node.getNodeId, node.getBufferClasses.inputBufferClass)" class="btn btn-info btn-mini pull-right">Metrics</a>
                 <h3>Input buffer</h3>
 
                 @defining(node.getBufferInfo.getInputBuffer.utilizationPercent) { utilizationPercent =>
-                    <div class="progress node-buffer-usage">
-                        <div class="bar bar-warning" data-percentage="@utilizationPercent" style="width : @utilizationPercent% ;">@utilizationPercent%</div>
+                    <div class="progress progress-percentage node-buffer-usage">
+                        <div class="bar bar-warning" data-percentage="@utilizationPercent" style="width : @utilizationPercent% ;"><span class="number-format" data-format="0.0%">@utilizationPercent%</span></div>
                     </div>
                     <strong>@node.getBufferInfo.getInputBuffer.utilization messages</strong> in input buffer.
-                    (@utilizationPercent% utilized)
+                    (<span class="number-format" data-format="0.0%">@utilizationPercent%</span> utilized)
                 }
             </div>
 
-            <div class="span6">
+            <div class="span4">
+                <a href="@routes.MetricsController.ofNode(node.getNodeId, node.getBufferClasses.processBufferClass)" class="btn btn-info btn-mini pull-right">Metrics</a>
+                <h3>Process buffer</h3>
+
+                @defining(node.getBufferInfo.getProcessBuffer.utilizationPercent) { utilizationPercent =>
+                    <div class="progress progress-percentage node-buffer-usage">
+                        <div class="bar bar-warning" data-percentage="@utilizationPercent" style="width : @utilizationPercent% ;"><span class="number-format" data-format="0.0%">@utilizationPercent%</span></div>
+                    </div>
+                    <strong>@node.getBufferInfo.getProcessBuffer.utilization messages</strong> in process buffer.
+                    (<span class="number-format" data-format="0.0%">@utilizationPercent%</span> utilized)
+                }
+            </div>
+
+            <div class="span4">
                 <a href="@routes.MetricsController.ofNode(node.getNodeId, node.getBufferClasses.outputBufferClass)" class="btn btn-info btn-mini pull-right">Metrics</a>
                 <h3>Output buffer</h3>
 
                 @defining(node.getBufferInfo.getOutputBuffer.utilizationPercent) { utilizationPercent =>
-                    <div class="progress node-buffer-usage">
-                        <div class="bar bar-warning" data-percentage="@utilizationPercent" style="width : @utilizationPercent% ;">@utilizationPercent%</div>
+                    <div class="progress progress-percentage node-buffer-usage">
+                        <div class="bar bar-warning" data-percentage="@utilizationPercent" style="width : @utilizationPercent% ;"><span class="number-format" data-format="0.0%">@utilizationPercent%</span></div>
                     </div>
                     <strong>@node.getBufferInfo.getOutputBuffer.utilization messages</strong> in output buffer.
-                    (@utilizationPercent% utilized)
+                    (<span class="number-format" data-format="0.0%">@utilizationPercent%</span> utilized)
                 }
             </div>
         </div>
@@ -179,13 +192,13 @@
                 <div class="span6">
                     <h3>Utilization</h3>
                     @defining(NumberHelper.asPercent(node.getJournalInfo.journalSize, node.getJournalInfo.journalSizeLimit, 1, false)) { utilizationPercent =>
-                        <div class="progress node-journal-usage">
+                        <div class="progress progress-percentage node-journal-usage">
                             @if(journalIsOvercommitted(node.getJournalInfo)) {
                                 <div class="bar bar-warning" data-percentage="100" style="width : 100%;">
                             } else {
                                 <div class="bar bar-warning" data-percentage="@utilizationPercent" style="width : @utilizationPercent%;">
                             }
-                                @utilizationPercent%
+                                <span class="number-format" data-format="0.0%">@utilizationPercent%</span>
                             </div>
                         </div>
                         @if(journalIsOvercommitted(node.getJournalInfo)) {

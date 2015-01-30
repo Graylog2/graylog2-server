@@ -686,7 +686,9 @@ $(document).ready(function() {
     });
 
     $(".number-format").each(function() {
-        $(this).text(numeral($(this).text()).format($(this).attr("data-format")));
+        try {
+            $(this).text(numeral($(this).text()).format($(this).attr("data-format")));
+        } catch(e) {}
     });
 
     $(".moment-from-now").each(function() {
@@ -710,7 +712,9 @@ $(document).ready(function() {
             holderElem.html(data);
             // Format numbers that were just loaded into the html document
             $(".number-format", holderElem).each(function() {
-                $(this).text(numeral($(this).text()).format($(this).attr("data-format")));
+                try {
+                    $(this).text(numeral($(this).text()).format($(this).attr("data-format")));
+                } catch(e) {}
             });
 
             holderElem.toggle();
