@@ -30,6 +30,8 @@ import org.graylog2.plugin.alarms.callbacks.AlarmCallback;
 import org.graylog2.plugin.filters.MessageFilter;
 import org.graylog2.plugin.inject.Graylog2Module;
 import org.graylog2.plugin.inputs.MessageInput;
+import org.graylog2.plugin.inputs.codecs.Codec;
+import org.graylog2.plugin.inputs.transports.Transport;
 import org.graylog2.plugin.outputs.MessageOutput;
 import org.graylog2.plugin.periodical.Periodical;
 import org.graylog2.plugin.rest.PluginRestResource;
@@ -91,5 +93,13 @@ public abstract class PluginModule extends Graylog2Module {
         for (PluginConfigBean pluginConfigBean : getConfigBeans()) {
             pluginConfigBeans.addBinding().toInstance(pluginConfigBean);
         }
+    }
+
+    protected void addTransport(String name, Class<? extends Transport> transportClass) {
+        installTransport(transportMapBinder(), name, transportClass);
+    }
+
+    protected void addCodec(String name, Class<? extends Codec> codecClass) {
+        installCodec(codecMapBinder(), name, codecClass);
     }
 }
