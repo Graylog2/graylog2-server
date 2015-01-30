@@ -45,10 +45,12 @@ public abstract class PluginModule extends Graylog2Module {
     }
 
     protected void addMessageInput(Class<? extends MessageInput> messageInputClass) {
-        TypeLiteral<Class<? extends MessageInput>> typeLiteral = new TypeLiteral<Class<? extends MessageInput>>() {
-        };
-        Multibinder<Class<? extends MessageInput>> messageInputs = Multibinder.newSetBinder(binder(), typeLiteral);
-        messageInputs.addBinding().toInstance(messageInputClass);
+        installInput(inputsMapBinder(), messageInputClass);
+    }
+
+    protected <T extends MessageInput> void addMessageInput(Class<T> messageInputClass,
+                                                            Class<? extends MessageInput.Factory<T>> factoryClass) {
+        installInput(inputsMapBinder(), messageInputClass, factoryClass);
     }
 
     protected void addMessageFilter(Class<? extends MessageFilter> messageFilterClass) {
@@ -99,7 +101,21 @@ public abstract class PluginModule extends Graylog2Module {
         installTransport(transportMapBinder(), name, transportClass);
     }
 
+    protected void addTransport(String name,
+                                Class<? extends Transport> transportClass,
+                                Class<? extends Transport.Config> configClass,
+                                Class<? extends Transport.Factory<? extends Transport>> factoryClass) {
+        installTransport(transportMapBinder(), name, transportClass, configClass, factoryClass);
+    }
+
     protected void addCodec(String name, Class<? extends Codec> codecClass) {
         installCodec(codecMapBinder(), name, codecClass);
+    }
+
+    protected void addCodec(String name,
+                            Class<? extends Codec> codecClass,
+                            Class<? extends Codec.Config> configClass,
+                            Class<? extends Codec.Factory<? extends Codec>> factoryClass) {
+        installCodec(codecMapBinder(), name, codecClass, configClass, factoryClass);
     }
 }

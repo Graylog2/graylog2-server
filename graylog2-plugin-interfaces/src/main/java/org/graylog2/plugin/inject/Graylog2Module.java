@@ -40,7 +40,7 @@ import javax.annotation.Nullable;
 import java.lang.annotation.Annotation;
 
 public abstract class Graylog2Module extends AbstractModule {
-    private static final Logger log = LoggerFactory.getLogger(Graylog2Module.class);
+    private static final Logger LOG = LoggerFactory.getLogger(Graylog2Module.class);
 
     protected void installTransport(
             MapBinder<String, Transport.Factory<? extends Transport>> mapBinder,
@@ -56,13 +56,13 @@ public abstract class Graylog2Module extends AbstractModule {
                         findInnerClassAnnotatedWith(FactoryClass.class, transportClass, Transport.Factory.class);
 
         if (configClass == null) {
-            log.error("Unable to find an inner class annotated with @ConfigClass in transport {}. This transport will not be available!",
-                      transportClass);
+            LOG.error("Unable to find an inner class annotated with @ConfigClass in transport {}. This transport will not be available!",
+                    transportClass);
             return;
         }
         if (factoryClass == null) {
-            log.error("Unable to find an inner class annotated with @FactoryClass in transport {}. This transport will not be available!",
-                      transportClass);
+            LOG.error("Unable to find an inner class annotated with @FactoryClass in transport {}. This transport will not be available!",
+                    transportClass);
             return;
         }
         installTransport(mapBinder, name, transportClass, configClass, factoryClass);
@@ -76,9 +76,9 @@ public abstract class Graylog2Module extends AbstractModule {
             Class<? extends Transport.Factory<? extends Transport>> factoryClass) {
         final Key<? extends Transport.Factory<? extends Transport>> factoryKey = Key.get(factoryClass);
         install(new FactoryModuleBuilder()
-                        .implement(Transport.class, transportClass)
-                        .implement(Transport.Config.class, configClass)
-                        .build(factoryClass));
+                .implement(Transport.class, transportClass)
+                .implement(Transport.Config.class, configClass)
+                .build(factoryClass));
 
         mapBinder.addBinding(name).to(factoryKey);
     }
@@ -88,8 +88,8 @@ public abstract class Graylog2Module extends AbstractModule {
             final org.graylog2.plugin.inputs.annotations.Codec a = codecClass.getAnnotation(org.graylog2.plugin.inputs.annotations.Codec.class);
             installCodec(mapBinder, a.name(), codecClass);
         } else {
-            log.error("Codec {} not annotated with {}. Cannot determine its id. This is a bug, please use that annotation, this codec will not be available",
-                      codecClass, org.graylog2.plugin.inputs.annotations.Codec.class);
+            LOG.error("Codec {} not annotated with {}. Cannot determine its id. This is a bug, please use that annotation, this codec will not be available",
+                    codecClass, org.graylog2.plugin.inputs.annotations.Codec.class);
         }
     }
 
@@ -107,13 +107,13 @@ public abstract class Graylog2Module extends AbstractModule {
                         findInnerClassAnnotatedWith(FactoryClass.class, codecClass, Codec.Factory.class);
 
         if (configClass == null) {
-            log.error("Unable to find an inner class annotated with @ConfigClass in codec {}. This codec will not be available!",
-                      codecClass);
+            LOG.error("Unable to find an inner class annotated with @ConfigClass in codec {}. This codec will not be available!",
+                    codecClass);
             return;
         }
         if (factoryClass == null) {
-            log.error("Unable to find an inner class annotated with @FactoryClass in codec {}. This codec will not be available!",
-                      codecClass);
+            LOG.error("Unable to find an inner class annotated with @FactoryClass in codec {}. This codec will not be available!",
+                    codecClass);
             return;
         }
         installCodec(mapBinder, name, codecClass, configClass, factoryClass);
@@ -129,9 +129,9 @@ public abstract class Graylog2Module extends AbstractModule {
         final Key<? extends Codec.Factory<? extends Codec>> factoryKey = Key.get(factoryClass);
 
         install(new FactoryModuleBuilder()
-                        .implement(Codec.class, codecClass)
-                        .implement(Codec.Config.class, configClass)
-                        .build(factoryClass));
+                .implement(Codec.class, codecClass)
+                .implement(Codec.Config.class, configClass)
+                .build(factoryClass));
 
         mapBinder.addBinding(name).to(factoryKey);
     }
@@ -148,13 +148,13 @@ public abstract class Graylog2Module extends AbstractModule {
             }
             if (targetClass.isAssignableFrom(declaredClass)) {
                 if (annotatedClass != null) {
-                    log.error("Multiple annotations for {} found in {}. This is invalid.", annotatedClass.getSimpleName(), containingClass);
+                    LOG.error("Multiple annotations for {} found in {}. This is invalid.", annotatedClass.getSimpleName(), containingClass);
                     return null;
                 }
                 annotatedClass = declaredClass;
             } else {
-                log.error("{} annotated as {} is not extending the expected {}. Did you forget to implement the correct interface?",
-                          declaredClass, annotationClass.getSimpleName(), targetClass);
+                LOG.error("{} annotated as {} is not extending the expected {}. Did you forget to implement the correct interface?",
+                        declaredClass, annotationClass.getSimpleName(), targetClass);
                 return null;
             }
         }
@@ -163,23 +163,23 @@ public abstract class Graylog2Module extends AbstractModule {
 
     protected MapBinder<String, Codec.Factory<? extends Codec>> codecMapBinder() {
         return MapBinder.newMapBinder(binder(),
-                                      TypeLiteral.get(String.class),
-                                      new TypeLiteral<Codec.Factory<? extends Codec>>() {
-                                      });
+                TypeLiteral.get(String.class),
+                new TypeLiteral<Codec.Factory<? extends Codec>>() {
+                });
     }
 
     protected MapBinder<String, Transport.Factory<? extends Transport>> transportMapBinder() {
         return MapBinder.newMapBinder(binder(),
-                                      TypeLiteral.get(String.class),
-                                      new TypeLiteral<Transport.Factory<? extends Transport>>() {
-                                      });
+                TypeLiteral.get(String.class),
+                new TypeLiteral<Transport.Factory<? extends Transport>>() {
+                });
     }
 
     protected MapBinder<String, MessageInput.Factory<? extends MessageInput>> inputsMapBinder() {
         return MapBinder.newMapBinder(binder(),
-                               TypeLiteral.get(String.class),
-                               new TypeLiteral<MessageInput.Factory<? extends MessageInput>>() {
-                               });
+                TypeLiteral.get(String.class),
+                new TypeLiteral<MessageInput.Factory<? extends MessageInput>>() {
+                });
     }
 
     protected <T extends MessageInput> void installInput(MapBinder<String, MessageInput.Factory<? extends MessageInput>> inputMapBinder,
@@ -187,6 +187,20 @@ public abstract class Graylog2Module extends AbstractModule {
                                                          Class<? extends MessageInput.Factory<T>> targetFactory) {
         install(new FactoryModuleBuilder().implement(MessageInput.class, target).build(targetFactory));
         inputMapBinder.addBinding(target.getCanonicalName()).to(Key.get(targetFactory));
+    }
+
+    protected <T extends MessageInput> void installInput(MapBinder<String, MessageInput.Factory<? extends MessageInput>> inputMapBinder,
+                                                         Class<T> target) {
+        Class<? extends MessageInput.Factory<T>> factoryClass =
+                (Class<? extends MessageInput.Factory<T>>) findInnerClassAnnotatedWith(FactoryClass.class, target, MessageInput.Factory.class);
+
+        if (factoryClass == null) {
+            LOG.error("Unable to find an inner class annotated with @FactoryClass in input {}. This input will not be available!", target);
+            return;
+        }
+
+        install(new FactoryModuleBuilder().implement(MessageInput.class, target).build(factoryClass));
+        inputMapBinder.addBinding(target.getCanonicalName()).to(Key.get(factoryClass));
     }
 
     protected MapBinder<String, MessageOutput.Factory<? extends MessageOutput>> outputsMapBinder() {
