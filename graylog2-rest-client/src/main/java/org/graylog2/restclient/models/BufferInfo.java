@@ -26,15 +26,21 @@ import org.graylog2.restclient.models.api.responses.BuffersResponse;
  */
 public class BufferInfo {
     private final BufferSummaryResponse inputBuffer;
+    private final BufferSummaryResponse processBuffer;
     private final BufferSummaryResponse outputBuffer;
 
     public BufferInfo(BuffersResponse br) {
         inputBuffer = br.buffers.get("input");
+        processBuffer = br.buffers.get("process");
         outputBuffer = br.buffers.get("output");
     }
 
     public BufferSummaryResponse getInputBuffer() {
         return MoreObjects.firstNonNull(inputBuffer, BufferSummaryResponse.EMPTY);
+    }
+
+    public BufferSummaryResponse getProcessBuffer() {
+        return MoreObjects.firstNonNull(processBuffer, BufferSummaryResponse.EMPTY);
     }
 
     public BufferSummaryResponse getOutputBuffer() {

@@ -17,10 +17,9 @@
 package org.graylog2.shared.buffers;
 
 import com.codahale.metrics.InstrumentedExecutorService;
+import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import javax.inject.Inject;
-import javax.inject.Provider;
 import com.lmax.disruptor.RingBuffer;
 import com.lmax.disruptor.dsl.Disruptor;
 import com.lmax.disruptor.dsl.ProducerType;
@@ -30,6 +29,8 @@ import org.graylog2.plugin.journal.RawMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -43,6 +44,7 @@ public class InputBufferImpl implements InputBuffer {
     private static final Logger LOG = LoggerFactory.getLogger(InputBufferImpl.class);
 
     private final RingBuffer<RawMessageEvent> ringBuffer;
+    private final Meter incomingMessages;
 
     @Inject
     public InputBufferImpl(MetricRegistry metricRegistry,
@@ -79,6 +81,8 @@ public class InputBufferImpl implements InputBuffer {
 
         ringBuffer = disruptor.start();
 
+        incomingMessages = metricRegistry.meter(name(InputBufferImpl.class, "incomingMessages"));
+
         LOG.info("Initialized {} with ring size <{}> and wait strategy <{}>, running {} parallel message handlers.",
                 this.getClass().getSimpleName(),
                 configuration.getInputBufferRingSize(),
@@ -88,6 +92,12 @@ public class InputBufferImpl implements InputBuffer {
 
     public void insert(RawMessage message) {
         ringBuffer.publishEvent(RawMessageEvent.TRANSLATOR, message);
+        incomingMessages.mark();
+    }
+
+    @Override
+    public long size() {
+        return ringBuffer.getBufferSize() - ringBuffer.remainingCapacity();
     }
 
     private ExecutorService executorService(final MetricRegistry metricRegistry) {

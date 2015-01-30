@@ -18,6 +18,7 @@ package org.graylog2.radio.rest.resources.system;
 
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Maps;
+import org.graylog2.plugin.buffers.InputBuffer;
 import org.graylog2.radio.Configuration;
 import org.graylog2.radio.rest.resources.RestResource;
 import org.graylog2.shared.buffers.ProcessBuffer;
@@ -35,11 +36,13 @@ import java.util.Map;
 @Path("/system/buffers")
 public class BuffersResource extends RestResource {
     private final Configuration configuration;
+    private final InputBuffer inputBuffer;
     private final ProcessBuffer processBuffer;
 
     @Inject
-    public BuffersResource(Configuration configuration, ProcessBuffer processBuffer) {
+    public BuffersResource(Configuration configuration, InputBuffer inputBuffer, ProcessBuffer processBuffer) {
         this.configuration = configuration;
+        this.inputBuffer = inputBuffer;
         this.processBuffer = processBuffer;
     }
 
@@ -48,35 +51,31 @@ public class BuffersResource extends RestResource {
     public String utilization() {
         Map<String, Object> result = Maps.newHashMap();
         result.put("buffers", buffers());
-        result.put("master_caches", masterCaches());
 
         return json(result);
-    }
-
-    private Map<String, Object> masterCaches() {
-        Map<String, Object> caches = Maps.newHashMap();
-        Map<String, Object> input = Maps.newHashMap();
-
-        // TODO Remove because cache does not exist anymore!
-        input.put("size", 0);
-
-        caches.put("input", input);
-
-        return caches;
     }
 
     private Map<String, Object> buffers() {
         Map<String, Object> buffers = Maps.newHashMap();
         Map<String, Object> input = Maps.newHashMap();
+        Map<String, Object> process = Maps.newHashMap();
 
-        final int ringSize = configuration.getRingSize();
-        final long inputSize = processBuffer.size();
-        final long inputUtil = inputSize/ringSize*100;
-
+        final int inputBufferCapacity = configuration.getInputBufferRingSize();
+        final long inputSize = inputBuffer.size();
+        final float inputUtil = ((float) inputSize / inputBufferCapacity) * 100;
         input.put("utilization_percent", inputUtil);
         input.put("utilization", inputSize);
 
         buffers.put("input", input);
+
+        final int processBufferCapacity = configuration.getRingSize();
+        final long processSize = processBuffer.size();
+        final float processUtil = ((float) processSize / processBufferCapacity) * 100;
+
+        process.put("utilization_percent", processUtil);
+        process.put("utilization", processSize);
+
+        buffers.put("process", process);
 
         return buffers;
     }

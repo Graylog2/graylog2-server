@@ -25,9 +25,10 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.Configuration;
 import org.graylog2.buffers.OutputBuffer;
-import org.graylog2.shared.rest.resources.RestResource;
+import org.graylog2.plugin.buffers.InputBuffer;
 import org.graylog2.security.RestPermissions;
 import org.graylog2.shared.buffers.ProcessBuffer;
+import org.graylog2.shared.rest.resources.RestResource;
 
 import javax.inject.Inject;
 import javax.ws.rs.GET;
@@ -42,14 +43,17 @@ import java.util.Map;
 public class BufferResource extends RestResource {
 
     private final Configuration configuration;
+    private final InputBuffer inputBuffer;
     private final ProcessBuffer processBuffer;
     private final OutputBuffer outputBuffer;
 
     @Inject
     public BufferResource(Configuration configuration,
+                          InputBuffer inputBuffer,
                           ProcessBuffer processBuffer,
                           OutputBuffer outputBuffer) {
         this.configuration = configuration;
+        this.inputBuffer = inputBuffer;
         this.processBuffer = processBuffer;
         this.outputBuffer = outputBuffer;
     }
@@ -72,6 +76,7 @@ public class BufferResource extends RestResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Map<String, String> getBufferClasses() {
         return ImmutableMap.of(
+                "input_buffer", inputBuffer.getClass().getCanonicalName(),
                 "process_buffer", processBuffer.getClass().getCanonicalName(),
                 "output_buffer", outputBuffer.getClass().getCanonicalName());
     }
@@ -79,21 +84,29 @@ public class BufferResource extends RestResource {
     private Map<String, Object> buffers() {
         Map<String, Object> buffers = Maps.newHashMap();
         Map<String, Object> input = Maps.newHashMap();
+        Map<String, Object> process = Maps.newHashMap();
         Map<String, Object> output = Maps.newHashMap();
 
-        int ringSize = configuration.getRingSize();
+        long ringSize = configuration.getRingSize();
+        long inputRingSize = configuration.getInputBufferRingSize();
 
-        final long inputSize = processBuffer.size();
-        final float inputUtil = inputSize/ringSize*100;
+        final long inputSize = inputBuffer.size();
+        final float inputUtil = ((float) inputSize / inputRingSize) * 100;
         input.put("utilization_percent", inputUtil);
         input.put("utilization", inputSize);
 
+        final long processSize = processBuffer.size();
+        final float processUtil = ((float) processSize / ringSize) * 100;
+        process.put("utilization_percent", processUtil);
+        process.put("utilization", processSize);
+
         final long outputSize = outputBuffer.size();
-        final float outputUtil = outputSize/ringSize*100;
+        final float outputUtil = ((float) outputSize / ringSize) * 100;
         output.put("utilization_percent", outputUtil);
         output.put("utilization", outputSize);
 
         buffers.put("input", input);
+        buffers.put("process", process);
         buffers.put("output", output);
 
         return buffers;

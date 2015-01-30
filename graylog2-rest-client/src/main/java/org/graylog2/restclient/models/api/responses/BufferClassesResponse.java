@@ -22,6 +22,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * @author Dennis Oelkers <dennis@torch.sh>
  */
 public class BufferClassesResponse {
+    @JsonProperty("input_buffer")
+    public String inputBufferClass;
     @JsonProperty("process_buffer")
     public String processBufferClass;
     @JsonProperty("output_buffer")
