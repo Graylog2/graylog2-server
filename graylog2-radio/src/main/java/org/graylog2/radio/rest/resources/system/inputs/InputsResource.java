@@ -204,6 +204,8 @@ public class InputsResource extends RestResource {
 
         LOG.info("Attempting to terminate input [" + input.getName() + "]. Reason: REST request.");
         inputRegistry.remove(input);
+        if (!input.isGlobal())
+            persistedInputs.remove(input);
         LOG.info("Terminated input [" + input.getName() + "]. Reason: REST request.");
 
         return Response.accepted().build();

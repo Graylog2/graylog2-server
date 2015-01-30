@@ -35,6 +35,7 @@ import javax.inject.Inject;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 public class PersistedInputsImpl implements PersistedInputs {
     private static final Logger LOG = LoggerFactory.getLogger(PersistedInputsImpl.class);
@@ -122,6 +123,17 @@ public class PersistedInputsImpl implements PersistedInputs {
 
     @Override
     public boolean remove(Object o) {
-        return false;
+        try {
+            if (o instanceof MessageInput) {
+                final MessageInput input = (MessageInput) o;
+                inputService.unregisterInCluster(input);
+                return true;
+            } else {
+                return false;
+            }
+        } catch (InterruptedException | ExecutionException | IOException e) {
+            LOG.warn("Failed to unregister input in cluster: ", e);
+            return false;
+        }
     }
 }
