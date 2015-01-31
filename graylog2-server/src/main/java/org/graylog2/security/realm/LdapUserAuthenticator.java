@@ -20,40 +20,35 @@ import org.apache.directory.api.ldap.model.cursor.CursorException;
 import org.apache.directory.api.ldap.model.exception.LdapException;
 import org.apache.directory.ldap.client.api.LdapConnectionConfig;
 import org.apache.directory.ldap.client.api.LdapNetworkConnection;
-import org.apache.shiro.authc.AuthenticationException;
-import org.apache.shiro.authc.AuthenticationInfo;
-import org.apache.shiro.authc.AuthenticationToken;
-import org.apache.shiro.authc.SimpleAccount;
-import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.authc.*;
 import org.apache.shiro.authc.credential.AllowAllCredentialsMatcher;
 import org.apache.shiro.realm.AuthenticatingRealm;
+import org.graylog2.plugin.database.users.User;
 import org.graylog2.security.TrustAllX509TrustManager;
 import org.graylog2.security.ldap.LdapConnector;
+import org.graylog2.security.ldap.LdapSettingsService;
 import org.graylog2.shared.security.ldap.LdapEntry;
 import org.graylog2.shared.security.ldap.LdapSettings;
-import org.graylog2.security.ldap.LdapSettingsService;
-import org.graylog2.plugin.database.users.User;
 import org.graylog2.shared.users.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.concurrent.atomic.AtomicReference;
 
 public class LdapUserAuthenticator extends AuthenticatingRealm {
     private static final Logger LOG = LoggerFactory.getLogger(LdapUserAuthenticator.class);
 
     private final LdapConnector ldapConnector;
 
-    private final AtomicReference<LdapSettings> settings;
+    private final LdapSettingsService ldapSettingsService;
     private final UserService userService;
 
     public LdapUserAuthenticator(LdapConnector ldapConnector, LdapSettingsService ldapSettingsService, UserService userService) {
         this.ldapConnector = ldapConnector;
         this.userService = userService;
+        this.ldapSettingsService = ldapSettingsService;
         setAuthenticationTokenClass(UsernamePasswordToken.class);
         setCredentialsMatcher(new AllowAllCredentialsMatcher());
-        this.settings = new AtomicReference<LdapSettings>(ldapSettingsService.load());
     }
 
     @Override
@@ -62,7 +57,7 @@ public class LdapUserAuthenticator extends AuthenticatingRealm {
         UsernamePasswordToken token = (UsernamePasswordToken) authtoken;
 
         final LdapConnectionConfig config = new LdapConnectionConfig();
-        final LdapSettings ldapSettings = settings.get();
+        final LdapSettings ldapSettings = ldapSettingsService.load();
         if (ldapSettings == null || !ldapSettings.isEnabled()) {
             LOG.trace("LDAP is disabled, skipping");
             return null;
@@ -133,10 +128,6 @@ public class LdapUserAuthenticator extends AuthenticatingRealm {
     }
 
     public boolean isEnabled() {
-        return settings.get().isEnabled();
-    }
-
-    public void applySettings(LdapSettings ldapSettings) {
-        settings.set(ldapSettings);
+        return ldapSettingsService.load().isEnabled();
     }
 }
