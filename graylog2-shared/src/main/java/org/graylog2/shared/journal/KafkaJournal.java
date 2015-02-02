@@ -18,6 +18,8 @@ package org.graylog2.shared.journal;
 
 import com.codahale.metrics.Gauge;
 import com.codahale.metrics.Meter;
+import com.codahale.metrics.Metric;
+import com.codahale.metrics.MetricFilter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.github.joschi.jadconfig.util.Size;
@@ -33,7 +35,11 @@ import com.google.common.util.concurrent.Uninterruptibles;
 import kafka.common.KafkaException;
 import kafka.common.OffsetOutOfRangeException;
 import kafka.common.TopicAndPartition;
-import kafka.log.*;
+import kafka.log.CleanerConfig;
+import kafka.log.Log;
+import kafka.log.LogConfig;
+import kafka.log.LogManager;
+import kafka.log.LogSegment;
 import kafka.message.ByteBufferMessageSet;
 import kafka.message.Message;
 import kafka.message.MessageAndOffset;
@@ -61,7 +67,13 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.SyncFailedException;
 import java.nio.channels.ClosedByInterruptException;
-import java.util.*;
+import java.nio.file.AccessDeniedException;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.SortedMap;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -141,8 +153,9 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
         this.messagesWritten = metricRegistry.meter(name(this.getClass(), "messagesWritten"));
         this.messagesRead = metricRegistry.meter(name(this.getClass(), "messagesRead"));
 
-        this.writeTime = metricRegistry.register(name(this.getClass(), "writeTime"), new HdrTimer(1, TimeUnit.MINUTES, 1));
-        this.readTime = metricRegistry.register(name(this.getClass(), "readTime"), new HdrTimer(1, TimeUnit.MINUTES, 1));
+        // the registerHdrTimer helper doesn't throw on existing metrics
+        this.writeTime = registerHdrTimer(metricRegistry, name(this.getClass(), "writeTime"));
+        this.readTime = registerHdrTimer(metricRegistry, name(this.getClass(), "readTime"));
 
         // these are the default values as per kafka 0.8.1.1
         final LogConfig defaultConfig =
@@ -192,6 +205,7 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
         if (!journalDirectory.exists() && !journalDirectory.mkdirs()) {
             LOG.error("Cannot create journal directory at {}, please check the permissions",
                     journalDirectory.getAbsolutePath());
+            Throwables.propagate(new AccessDeniedException(journalDirectory.getAbsolutePath(), null, "Could not create journal directory."));
         }
 
         // TODO add check for directory, etc
@@ -207,8 +221,10 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
                 }
             }
         } catch (IOException e) {
-            LOG.error("Cannot access offset file", e);
-            Throwables.propagate(e);
+            LOG.error("Cannot access offset file: {}", e.getMessage());
+            Throwables.propagate(new AccessDeniedException(committedReadOffsetFile.getAbsolutePath(),
+                                                           null,
+                                                           e.getMessage()));
         }
         try {
             kafkaScheduler = new KafkaScheduler(2, "kafka-journal-scheduler-", false); // TODO make thread count configurable
@@ -244,6 +260,22 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
             throw new RuntimeException(e);
         }
 
+    }
+
+    private Timer registerHdrTimer(MetricRegistry metricRegistry, final String metricName) {
+        Timer timer;
+        try {
+            timer = metricRegistry.register(metricName, new HdrTimer(1, TimeUnit.MINUTES, 1));
+        } catch (IllegalArgumentException e) {
+            final SortedMap<String, Timer> timers = metricRegistry.getTimers(new MetricFilter() {
+                @Override
+                public boolean matches(String name, Metric metric) {
+                    return metricName.equals(name);
+                }
+            });
+            timer = Iterables.getOnlyElement(timers.values());
+        }
+        return timer;
     }
 
     public int getPurgedSegmentsInLastRetention() {

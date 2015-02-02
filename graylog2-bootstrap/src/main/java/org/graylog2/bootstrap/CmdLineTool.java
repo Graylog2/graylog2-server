@@ -59,6 +59,7 @@ import org.graylog2.shared.bindings.GuiceInstantiationService;
 import org.graylog2.shared.bindings.InstantiationService;
 import org.graylog2.shared.bindings.PluginBindings;
 import org.graylog2.shared.plugins.PluginLoader;
+import org.graylog2.shared.utilities.ExceptionUtils;
 import org.jboss.netty.logging.InternalLoggerFactory;
 import org.jboss.netty.logging.Slf4JLoggerFactory;
 import org.slf4j.Logger;
@@ -67,6 +68,7 @@ import org.slf4j.bridge.SLF4JBridgeHandler;
 
 import java.io.File;
 import java.lang.management.ManagementFactory;
+import java.nio.file.AccessDeniedException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -368,14 +370,20 @@ public abstract class CmdLineTool implements Runnable {
 
     protected void annotateInjectorExceptions(Collection<Message> messages) {
         for (Message message : messages) {
-            if (message.getCause() instanceof NodeIdPersistenceException) {
+            //noinspection ThrowableResultOfMethodCallIgnored
+            final Throwable rootCause = ExceptionUtils.getRootCause(message.getCause());
+            if (rootCause instanceof NodeIdPersistenceException) {
                 LOG.error(UI.wallString(
                         "Unable to read or persist your NodeId file. This means your node id file (" + configuration.getNodeIdFile() + ") is not readable or writable by the current user. The following exception might give more information: " + message));
                 System.exit(-1);
+            } else if (rootCause instanceof AccessDeniedException) {
+                    LOG.error(UI.wallString("Unable to access file " + rootCause.getMessage()));
+                System.exit(-2);
             } else {
                 // other guice error, still print the raw messages
                 // TODO this could potentially print duplicate messages depending on what a subclass does...
-                LOG.error("Guice error: {}", message.getMessage());
+                LOG.error("Guice error (more detail on log level debug): {}", message.getMessage());
+                LOG.debug(" Stacktrace:", rootCause);
             }
         }
     }
