@@ -32,6 +32,7 @@ import org.graylog2.rest.models.system.buffers.responses.SingleRingUtilization;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.shared.buffers.ProcessBuffer;
+import org.graylog2.shared.rest.resources.RestResource;
 
 import javax.inject.Inject;
 import javax.ws.rs.GET;
@@ -47,6 +48,7 @@ import java.util.Map;
 public class BuffersResource extends RestResource {
 
     private final Configuration configuration;
+    private final InputBuffer inputBuffer;
     private final ProcessBuffer processBuffer;
     private final OutputBuffer outputBuffer;
 
@@ -55,6 +57,7 @@ public class BuffersResource extends RestResource {
                            ProcessBuffer processBuffer,
                            OutputBuffer outputBuffer) {
         this.configuration = configuration;
+        this.inputBuffer = inputBuffer;
         this.processBuffer = processBuffer;
         this.outputBuffer = outputBuffer;
     }
@@ -68,6 +71,11 @@ public class BuffersResource extends RestResource {
 
         final long inputSize = processBuffer.size();
         final long inputUtil = inputSize/ringSize*100;
+
+        final long processSize = processBuffer.size();
+        final float processUtil = ((float) processSize / ringSize) * 100;
+        process.put("utilization_percent", processUtil);
+        process.put("utilization", processSize);
 
         final long outputSize = outputBuffer.size();
         final long outputUtil = outputSize/ringSize*100;

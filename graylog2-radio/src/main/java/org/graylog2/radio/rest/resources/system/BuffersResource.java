@@ -39,11 +39,13 @@ import javax.ws.rs.core.MediaType;
 @Path("/system/buffers")
 public class BuffersResource extends RestResource {
     private final Configuration configuration;
+    private final InputBuffer inputBuffer;
     private final ProcessBuffer processBuffer;
 
     @Inject
-    public BuffersResource(Configuration configuration, ProcessBuffer processBuffer) {
+    public BuffersResource(Configuration configuration, InputBuffer inputBuffer, ProcessBuffer processBuffer) {
         this.configuration = configuration;
+        this.inputBuffer = inputBuffer;
         this.processBuffer = processBuffer;
     }
 

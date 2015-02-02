@@ -211,7 +211,6 @@ public class LdapResource extends RestResource {
         ldapSettings.setDefaultGroup(request.defaultGroup());
 
         ldapSettingsService.save(ldapSettings);
-        ldapAuthenticator.applySettings(ldapSettings);
     }
 
     @DELETE
@@ -220,6 +219,5 @@ public class LdapResource extends RestResource {
     @Path("/settings")
     public void deleteLdapSettings() {
         ldapSettingsService.delete();
-        ldapAuthenticator.applySettings(null);
     }
 }
