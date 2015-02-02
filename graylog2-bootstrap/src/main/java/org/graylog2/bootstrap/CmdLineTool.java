@@ -267,7 +267,7 @@ public abstract class CmdLineTool implements Runnable {
         final PluginLoader pluginLoader = new PluginLoader(pluginDir);
         for (Plugin plugin : pluginLoader.loadPlugins()) {
             final PluginMetaData metadata = plugin.metadata();
-            if(capabilities().containsAll(metadata.getRequiredCapabilities())) {
+            if (capabilities().containsAll(metadata.getRequiredCapabilities())) {
                 if (version.sameOrHigher(metadata.getRequiredVersion())) {
                     plugins.add(plugin);
                 } else {
@@ -377,13 +377,15 @@ public abstract class CmdLineTool implements Runnable {
                         "Unable to read or persist your NodeId file. This means your node id file (" + configuration.getNodeIdFile() + ") is not readable or writable by the current user. The following exception might give more information: " + message));
                 System.exit(-1);
             } else if (rootCause instanceof AccessDeniedException) {
-                    LOG.error(UI.wallString("Unable to access file " + rootCause.getMessage()));
+                LOG.error(UI.wallString("Unable to access file " + rootCause.getMessage()));
                 System.exit(-2);
             } else {
                 // other guice error, still print the raw messages
                 // TODO this could potentially print duplicate messages depending on what a subclass does...
                 LOG.error("Guice error (more detail on log level debug): {}", message.getMessage());
-                LOG.debug("Stacktrace:", rootCause);
+                if (rootCause != null) {
+                    LOG.debug("Stacktrace:", rootCause);
+                }
             }
         }
     }
