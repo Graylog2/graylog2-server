@@ -49,7 +49,9 @@ var EditDashboardModal = React.createClass({
     _save() {
         var pattern = this.state;
         this.props.savePattern(pattern, this._closeModal);
-        this.setState({name: "", pattern: ""});
+        if (this.props.create) {
+            this.setState({name: "", pattern: ""});
+        }
     }
 });
 

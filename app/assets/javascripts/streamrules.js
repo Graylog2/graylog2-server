@@ -11,12 +11,15 @@ $(document).ready(function() {
         var modalBody = $(this).closest("form#streamrule-form").find(".modal-body");
 
         if ($(this).attr("id") == "sr-type") {
+            var streamRuleValue = $("#sr-value", modalBody);
             if (parseInt(value) == 5) {
-                $("#sr-value", modalBody).hide();
+                streamRuleValue.prop('disabled', true);
+                streamRuleValue.hide();
                 $("#sr-label-value", modalBody).hide();
                 $("#sr-result-value", modalBody).hide();
             } else {
-                $("#sr-value", modalBody).show();
+                streamRuleValue.prop('disabled', false);
+                streamRuleValue.show();
                 $("#sr-label-value", modalBody).show();
                 $("#sr-result-value", modalBody).show();
             }
