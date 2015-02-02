@@ -199,8 +199,7 @@ public abstract class Graylog2Module extends AbstractModule {
             return;
         }
 
-        install(new FactoryModuleBuilder().implement(MessageInput.class, target).build(factoryClass));
-        inputMapBinder.addBinding(target.getCanonicalName()).to(Key.get(factoryClass));
+        installInput(inputMapBinder, target, factoryClass);
     }
 
     protected MapBinder<String, MessageOutput.Factory<? extends MessageOutput>> outputsMapBinder() {
@@ -215,5 +214,18 @@ public abstract class Graylog2Module extends AbstractModule {
                                                            Class<? extends MessageOutput.Factory<T>> targetFactory) {
         install(new FactoryModuleBuilder().implement(MessageOutput.class, target).build(targetFactory));
         outputMapBinder.addBinding(target.getCanonicalName()).to(Key.get(targetFactory));
+    }
+
+    protected <T extends MessageOutput> void installOutput(MapBinder<String, MessageOutput.Factory<? extends MessageOutput>> outputMapBinder,
+                                                           Class<T> target) {
+        Class<? extends MessageOutput.Factory<T>> factoryClass =
+                (Class<? extends MessageOutput.Factory<T>>) findInnerClassAnnotatedWith(FactoryClass.class, target, MessageOutput.Factory.class);
+
+        if (factoryClass == null) {
+            LOG.error("Unable to find an inner class annotated with @FactoryClass in output {}. This output will not be available!", target);
+            return;
+        }
+
+        installOutput(outputMapBinder, target, factoryClass);
     }
 }

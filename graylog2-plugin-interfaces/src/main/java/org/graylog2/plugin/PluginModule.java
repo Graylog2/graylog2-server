@@ -79,10 +79,12 @@ public abstract class PluginModule extends Graylog2Module {
     }
 
     protected void addMessageOutput(Class<? extends MessageOutput> messageOutputClass) {
-        TypeLiteral<Class<? extends MessageOutput>> typeLiteral = new TypeLiteral<Class<? extends MessageOutput>>() {
-        };
-        Multibinder<Class<? extends MessageOutput>> messageOutputs = Multibinder.newSetBinder(binder(), typeLiteral);
-        messageOutputs.addBinding().toInstance(messageOutputClass);
+        installOutput(outputsMapBinder(), messageOutputClass);
+    }
+
+    protected <T extends MessageOutput> void addMessageOutput(Class<T> messageOutputClass,
+                                                              Class<? extends MessageOutput.Factory<T>> factory) {
+        installOutput(outputsMapBinder(), messageOutputClass, factory);
     }
 
     protected void addRestResource(Class<? extends PluginRestResource> restResourceClass) {

@@ -20,6 +20,7 @@ import org.graylog2.restclient.lib.APIException;
 import org.graylog2.restclient.lib.ExclusiveInputException;
 import org.graylog2.restclient.models.api.responses.system.InputLaunchResponse;
 import org.graylog2.restclient.models.api.responses.system.InputTypeSummaryResponse;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
@@ -27,53 +28,72 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Map;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
-public abstract class ClusterEntity {
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Strings.isNullOrEmpty;
 
-    private static final org.slf4j.Logger log = LoggerFactory.getLogger(ClusterEntity.class);
+public abstract class ClusterEntity implements Comparable<ClusterEntity> {
+    private static final Logger LOG = LoggerFactory.getLogger(ClusterEntity.class);
 
     protected ClusterEntity() { /* what you gonna do */ }
 
     protected URI normalizeUriPath(String address) {
-        final URI uri = URI.create(address);
-        return normalizeUriPath(uri);
+        return normalizeUriPath(URI.create(address));
     }
 
     protected URI normalizeUriPath(URI uri) {
-        if (uri.getPath() == null || uri.getPath().isEmpty()) {
+        if (isNullOrEmpty(uri.getPath())) {
             return uri;
         }
-        if (uri.getPath().equals("/")) {
+
+        if ("/".equals(uri.getPath())) {
             try {
                 return new URI(uri.getScheme(), uri.getUserInfo(), uri.getHost(), uri.getPort(), "", uri.getQuery(), uri.getFragment());
             } catch (URISyntaxException e) { // sigh exception.
-                log.error("Could not process transportAddress {}, invalid URI syntax", uri.toASCIIString());
+                LOG.warn("Could not process transportAddress {}, invalid URI syntax", uri);
                 return uri;
             }
         }
-        log.info("Could not normalize path on node transport address, it contained some unrecognized path: {}", uri.toASCIIString());
+
+        LOG.warn("Could not normalize path on node transport address, it contained some unrecognized path: {}", uri);
         return uri;
     }
 
     public InputLaunchResponse launchInput(String title, String type, Boolean global, Map<String, Object> configuration, boolean isExclusive) throws ExclusiveInputException {
-        if (global)
-            return launchInput(title, type, global, configuration, isExclusive, null);
-        else
-            return launchInput(title, type, global, configuration, isExclusive, this.getNodeId());
+        return launchInput(title, type, global, configuration, isExclusive, global ? null : this.getNodeId());
     }
 
     public abstract String getShortNodeId();
+
     public abstract String getHostname();
+
     public abstract String getTransportAddress();
+
     public abstract void touch();
+
     public abstract void markFailure();
+
     public abstract boolean terminateInput(String inputId);
+
     public abstract String getNodeId();
-    public abstract InputLaunchResponse launchInput(String title, String type, Boolean global, Map<String, Object> configuration, boolean isExclusive, String nodeId) throws ExclusiveInputException;    public abstract boolean launchExistingInput(String inputId);
+
+    public abstract InputLaunchResponse launchInput(String title, String type, Boolean global, Map<String, Object> configuration, boolean isExclusive, String nodeId) throws ExclusiveInputException;
+
+    public abstract boolean launchExistingInput(String inputId);
+
     public abstract InputTypeSummaryResponse getInputTypeInformation(String type) throws IOException, APIException;
+
     public abstract void stopInput(String inputId) throws IOException, APIException;
+
     public abstract void startInput(String inputId) throws IOException, APIException;
+
     public abstract void restartInput(String inputId) throws IOException, APIException;
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int compareTo(ClusterEntity o) {
+        final ClusterEntity other = checkNotNull(o, "ClusterEntity must not be null.");
+        return getNodeId().compareTo(other.getNodeId());
+    }
 }
