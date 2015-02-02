@@ -25,7 +25,7 @@ var EditDashboardModal = React.createClass({
                 <label>Name:</label>
                 <input type="text" onChange={this._onNameChange} value={this.state.name} required/>
                 <label>Pattern:</label>
-                <input type="text" onChange={this._onPatternChange} value={this.state.pattern} required/>
+                <textarea onChange={this._onPatternChange} required>{this.state.pattern}</textarea>
             </fieldset>
         );
         return (
