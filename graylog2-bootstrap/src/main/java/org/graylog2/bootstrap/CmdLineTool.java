@@ -383,7 +383,7 @@ public abstract class CmdLineTool implements Runnable {
                 // other guice error, still print the raw messages
                 // TODO this could potentially print duplicate messages depending on what a subclass does...
                 LOG.error("Guice error (more detail on log level debug): {}", message.getMessage());
-                LOG.debug(" Stacktrace:", rootCause);
+                LOG.debug("Stacktrace:", rootCause);
             }
         }
     }
