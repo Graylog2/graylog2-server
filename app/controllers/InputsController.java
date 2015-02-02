@@ -19,6 +19,7 @@
 package controllers;
 
 import com.google.common.base.Joiner;
+import com.google.common.collect.ImmutableSortedMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import lib.BreadcrumbList;
@@ -46,6 +47,7 @@ import javax.inject.Inject;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedMap;
 
 public class InputsController extends AuthenticatedController {
 
@@ -76,8 +78,10 @@ public class InputsController extends AuthenticatedController {
             }
 
             for (Map.Entry<Input, Map<ClusterEntity, InputState>> entry : inputService.loadAllInputStatesByInput().entrySet()) {
-                if (entry.getKey().getGlobal())
-                    globalInputs.put(entry.getKey(), entry.getValue());
+                if (entry.getKey().getGlobal()) {
+                    final SortedMap<ClusterEntity, InputState> inputStates = ImmutableSortedMap.copyOf(entry.getValue());
+                    globalInputs.put(entry.getKey(), inputStates);
+                }
             }
 
             List<Node> nodes = servernodes.all();
@@ -311,14 +315,13 @@ public class InputsController extends AuthenticatedController {
 
         if (request.global)
             node = nodeService.loadMasterNode();
-        else
-            if (nodeId != null) {
-                try {
-                    node = nodeService.loadNode(nodeId);
-                } catch (NodeService.NodeNotFoundException e) {
-                    node = nodeService.loadRadio(nodeId);
-                }
+        else if (nodeId != null) {
+            try {
+                node = nodeService.loadNode(nodeId);
+            } catch (NodeService.NodeNotFoundException e) {
+                node = nodeService.loadRadio(nodeId);
             }
+        }
 
         return node;
     }
