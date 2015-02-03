@@ -84,7 +84,7 @@ var GrokPatterns = React.createClass({
 
         return (
             <div style={{paddingTop: 15}}>
-                <div class="row-fluid">
+                <div className="row-fluid">
                     <form className="form-inline grok-filter-form">
                         <label htmlFor="grokfilter">Filter pattern names:</label>
                         <input type="text" name="filter" id="grokfilter" value={this.state.filter} onChange={(event) => {this.setState({filter: event.target.value});}} />
