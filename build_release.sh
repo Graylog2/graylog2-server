@@ -21,8 +21,12 @@ fi
 # Clean working directory
 "${ACTIVATOR_BIN}" clean
 
+# Install the same npm version we use in travis
+npm install -g npm@2.1.18
+
 # Prepare JavaScript
 pushd javascript
+rm -rf ./node_modules
 npm install
 npm test
 node_modules/.bin/gulp deploy-prod
