@@ -4,8 +4,6 @@ ACTIVATOR_URL="http://downloads.typesafe.com/typesafe-activator/${ACTIVATOR_VERI
 
 ACTIVATOR_BIN=$(which activator)
 
-NPM_EXEC="node_modules/.bin/npm"
-
 if [[ -z "${ACTIVATOR_BIN}" ]]; then
   ACTIVATOR_BIN="${ACTIVATOR_PATH}/activator"
 
@@ -25,11 +23,15 @@ fi
 
 # Prepare JavaScript
 pushd javascript
+
+# Install same npm version as we use in travis
 rm -rf ./node_modules
 npm install npm@2.1.18
-$NPM_EXEC install
-$NPM_EXEC test
-$NPM_EXEC deploy-prod
+PATH="$(pwd)/node_modules/.bin/":$PATH
+
+npm install
+npm test
+gulp deploy-prod
 popd
 
 # Build universal .tar.gz
