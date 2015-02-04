@@ -37,7 +37,7 @@ public class OutdatedVersionNotification implements NotificationType {
     public OutdatedVersionNotification(Notification notification) {
         this.notification = notification;
         DESCRIPTION = "The most recent stable Graylog version is <em>" + notification.getDetail("current_version")
-                + "</em>. Get it from <a href=\"http://www.graylog2.org/\" target=\"_blank\">http://www.graylog2.org/</a>.";
+                + "</em>. Get it from <a href=\"https://www.graylog.org/\" target=\"_blank\">https://www.graylog.org/</a>.";
 
         TITLE = "You are running an outdated Graylog version.";
     }
