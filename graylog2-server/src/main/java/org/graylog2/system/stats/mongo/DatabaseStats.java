@@ -20,6 +20,8 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 
+import javax.annotation.Nullable;
+
 /**
  * @see <a href="http://docs.mongodb.org/manual/reference/command/dbStats/">Diagnostic Commands &gt; dbStats</a>
  */
@@ -60,9 +62,11 @@ public abstract class DatabaseStats {
     public abstract long nsSizeMB();
 
     @JsonProperty
+    @Nullable
     public abstract ExtentFreeList extentFreeList();
 
     @JsonProperty
+    @Nullable
     public abstract DataFileVersion dataFileVersion();
 
     public static DatabaseStats create(String db,
@@ -76,8 +80,8 @@ public abstract class DatabaseStats {
                                        long indexSize,
                                        long fileSize,
                                        long nsSizeMB,
-                                       ExtentFreeList extentFreeList,
-                                       DataFileVersion dataFileVersion) {
+                                       @Nullable ExtentFreeList extentFreeList,
+                                       @Nullable DataFileVersion dataFileVersion) {
         return new AutoValue_DatabaseStats(db, collections, objects, avgObjSize, dataSize, storageSize, numExtents,
                 indexes, indexSize, fileSize, nsSizeMB, extentFreeList, dataFileVersion);
     }

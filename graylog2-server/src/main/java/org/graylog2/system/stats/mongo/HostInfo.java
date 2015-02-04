@@ -126,15 +126,15 @@ public abstract class HostInfo {
         public abstract String scheduler();
 
         @JsonProperty
-        public abstract long pageSize();
+        public abstract Long pageSize();
 
         @JsonProperty
         @Nullable
-        public abstract long numPages();
+        public abstract Long numPages();
 
         @JsonProperty
         @Nullable
-        public abstract long maxOpenFiles();
+        public abstract Long maxOpenFiles();
 
         public static Extra create(@Nullable String versionString,
                                    @Nullable String libcVersion,
@@ -143,8 +143,8 @@ public abstract class HostInfo {
                                    @Nullable String cpuFeatures,
                                    @Nullable String scheduler,
                                    long pageSize,
-                                   long numPages,
-                                   long maxOpenFiles) {
+                                   @Nullable Long numPages,
+                                   @Nullable Long maxOpenFiles) {
             return new AutoValue_HostInfo_Extra(versionString, libcVersion, kernelVersion, cpuFrequencyMHz, cpuFeatures,
                     scheduler, pageSize, numPages, maxOpenFiles);
         }

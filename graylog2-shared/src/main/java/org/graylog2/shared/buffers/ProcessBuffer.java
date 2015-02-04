@@ -96,11 +96,11 @@ public class ProcessBuffer extends Buffer {
 
         final ProcessBufferProcessor[] processors = new ProcessBufferProcessor[processorCount];
         for (int i = 0; i < processorCount; i++) {
+            // TODO The provider should be converted to a factory so we can pass the DecodingProcessor instead of using a setter after object creation.
             processors[i] = bufferProcessorFactory.get();
+            processors[i].setDecodingProcessor(decodingProcessorFactory.create(decodeTime, parseTime));
         }
-        disruptor
-                .handleEventsWith(decodingProcessorFactory.create(decodeTime, parseTime))
-                .thenHandleEventsWithWorkerPool(processors);
+        disruptor.handleEventsWithWorkerPool(processors);
 
         ringBuffer = disruptor.start();
     }

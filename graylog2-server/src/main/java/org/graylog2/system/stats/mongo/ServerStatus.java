@@ -21,6 +21,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.joda.time.DateTime;
 
+import javax.annotation.Nullable;
+
 /**
  * @see <a href="http://docs.mongodb.org/manual/reference/command/serverStatus/">Diagnostic Commands &gt; serverStatus</a>
  */
@@ -85,11 +87,12 @@ public abstract class ServerStatus {
         public abstract int available();
 
         @JsonProperty
-        public abstract long totalCreated();
+        @Nullable
+        public abstract Long totalCreated();
 
         public static Connections create(int current,
                                          int available,
-                                         long totalCreated) {
+                                         @Nullable long totalCreated) {
             return new AutoValue_ServerStatus_Connections(current, available, totalCreated);
         }
     }
