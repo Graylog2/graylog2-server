@@ -20,13 +20,15 @@ import com.codahale.metrics.Counter;
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
-import javax.inject.Provider;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.journal.RawMessage;
 import org.graylog2.shared.buffers.processors.DecodingProcessor;
+import org.graylog2.shared.buffers.processors.ProcessBufferProcessor;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
+
+import javax.inject.Provider;
 
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
@@ -60,8 +62,11 @@ public class ProcessBufferTest {
     }
 
     public void testBasicInsert() throws Exception {
+        final Provider provider = mock(Provider.class);
+        when(provider.get()).thenReturn(mock(ProcessBufferProcessor.class));
         ProcessBuffer processBuffer = new ProcessBuffer(metricRegistry, serverStatus, mock(DecodingProcessor.Factory.class),
-                                                        mock(Provider.class), 1, 1, "blocking");
+                provider, 1, 1, "blocking");
+
 
         RawMessage message = mock(RawMessage.class);
         MessageInput messageInput = mock(MessageInput.class);
