@@ -605,10 +605,10 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
     }
 
     /**
-     * Returns the highest journal offset that has been writting to persistent storage by Graylog2.
+     * Returns the highest journal offset that has been writting to persistent storage by Graylog.
      * <p>
      * Every message at an offset prior to this one can be considered as processed and does not need to be held in
-     * the journal any longer. By default Graylog2 will try to aggressively flush the journal to consume a smaller
+     * the journal any longer. By default Graylog will try to aggressively flush the journal to consume a smaller
      * amount of disk space.
      * </p>
      *

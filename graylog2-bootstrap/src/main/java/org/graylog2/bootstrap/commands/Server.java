@@ -61,7 +61,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-@Command(name = "server", description = "Start the Graylog2 server")
+@Command(name = "server", description = "Start the Graylog server")
 public class Server extends ServerBootstrap implements Runnable {
     private static final Logger LOG = LoggerFactory.getLogger(Server.class);
 
@@ -76,10 +76,10 @@ public class Server extends ServerBootstrap implements Runnable {
         super("server", configuration);
     }
 
-    @Option(name = {"-t", "--configtest"}, description = "Validate Graylog2 configuration and exit")
+    @Option(name = {"-t", "--configtest"}, description = "Validate Graylog configuration and exit")
     private boolean configTest = false;
 
-    @Option(name = {"-l", "--local"}, description = "Run Graylog2 in local mode. Only interesting for Graylog2 developers.")
+    @Option(name = {"-l", "--local"}, description = "Run Graylog in local mode. Only interesting for Graylog developers.")
     private boolean local = false;
 
     @Option(name = {"-s", "--statistics"}, description = "Print utilization statistics to STDOUT")

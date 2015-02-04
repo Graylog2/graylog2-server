@@ -43,7 +43,7 @@ public class Main {
                 JournalDecode.class
         );
 
-        final CliBuilder<Runnable> builder = Cli.<Runnable>builder("graylog2")
+        final CliBuilder<Runnable> builder = Cli.<Runnable>builder("graylog")
                 .withDescription("Open source, centralized log management")
                 .withDefaultCommand(Help.class)
                 .withCommands(commands);

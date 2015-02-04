@@ -61,7 +61,7 @@ import java.util.Map;
 import java.util.SortedSet;
 
 @RequiresAuthentication
-@Api(value = "System/Metrics", description = "Internal Graylog2 metrics")
+@Api(value = "System/Metrics", description = "Internal Graylog metrics")
 @Path("/system/metrics")
 public class MetricsResource extends RestResource {
 

@@ -119,7 +119,7 @@ public class Generator {
             }
         });
         Map<String, String> info = Maps.newHashMap();
-        info.put("title", "Graylog2 REST API");
+        info.put("title", "Graylog REST API");
 
         overviewResult.put("apiVersion", ServerVersion.VERSION.toString());
         overviewResult.put("swaggerVersion", EMULATED_SWAGGER_VERSION);

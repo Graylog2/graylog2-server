@@ -55,7 +55,7 @@ public abstract class ServerBootstrap extends CmdLineTool {
         this.commandName = commandName;
     }
 
-    @Option(name = {"-p", "--pidfile"}, description = "File containing the PID of Graylog2")
+    @Option(name = {"-p", "--pidfile"}, description = "File containing the PID of Graylog")
     private String pidFile = TMPDIR + FILE_SEPARATOR + "graylog2.pid";
 
     @Option(name = {"-np", "--no-pid-file"}, description = "Do not write a PID file (overrides -p/--pidfile)")
@@ -73,7 +73,7 @@ public abstract class ServerBootstrap extends CmdLineTool {
 
     @Override
     protected void startCommand() {
-        LOG.info("Graylog2 " + commandName + " {} starting up. (JRE: {})", version, Tools.getSystemInformation());
+        LOG.info("Graylog " + commandName + " {} starting up. (JRE: {})", version, Tools.getSystemInformation());
 
         // Do not use a PID file if the user requested not to
         if (!isNoPidFile()) {
@@ -117,13 +117,13 @@ public abstract class ServerBootstrap extends CmdLineTool {
             } catch (TimeoutException timeoutException) {
                 LOG.error("Unable to shutdown properly on time. {}", serviceManager.servicesByState());
             }
-            LOG.error("Graylog2 startup failed. Exiting. Exception was:", e);
+            LOG.error("Graylog startup failed. Exiting. Exception was:", e);
             System.exit(-1);
         }
         LOG.info("Services started, startup times in ms: {}", serviceManager.startupTimes());
 
         activityWriter.write(new Activity("Started up.", Main.class));
-        LOG.info("Graylog2 " + commandName + " up and running.");
+        LOG.info("Graylog " + commandName + " up and running.");
 
         // Block forever.
         try {

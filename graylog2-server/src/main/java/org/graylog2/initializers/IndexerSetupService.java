@@ -120,9 +120,9 @@ public class IndexerSetupService extends AbstractIdleService {
                         .actionGet(configuration.getClusterDiscoveryTimeout(), MILLISECONDS);
                 // we don't get here if we couldn't join the cluster. just check for red cluster state
                 if (ClusterHealthStatus.RED.equals(health.getStatus())) {
-                    UI.exitHardWithWall(
-                            "The Elasticsearch cluster state is RED which means shards are unassigned. " +
-                                    "This usually indicates a crashed and corrupt cluster and needs to be investigated. Graylog will shut down.", "http://www.graylog2.org/resources/documentation/setup/elasticsearch");
+                    UI.exitHardWithWall("The Elasticsearch cluster state is RED which means shards are unassigned. "
+                                    + "This usually indicates a crashed and corrupt cluster and needs to be investigated. Graylog will shut down.",
+                            "https://www.graylog.org/documentation/setup/elasticsearch/");
 
                 }
             } catch (ElasticsearchTimeoutException e) {
@@ -171,7 +171,7 @@ public class IndexerSetupService extends AbstractIdleService {
                 UI.exitHardWithWall(
                         "Could not successfully connect to Elasticsearch, if you use multicast check that it is working in your network" +
                                 " and that Elasticsearch is running properly and is reachable. Also check that the cluster.name setting is correct.",
-                        "http://www.graylog2.org/resources/documentation/setup/elasticsearch");
+                        "https://www.graylog.org/documentation/setup/elasticsearch/");
             }
         } catch (Exception e) {
             bufferSynchronizerService.setIndexerUnavailable();
@@ -189,8 +189,8 @@ public class IndexerSetupService extends AbstractIdleService {
 
     private void checkClusterName(String clusterName) {
         if (!node.settings().get("cluster.name").equals(clusterName)) {
-            LOG.error("Elasticsearch cluster name is different, Graylog2 uses `{}`, Elasticsearch cluster uses `{}`. "
-                            + "Please check the `cluster.name` setting of both Graylog2 and Elasticsearch.",
+            LOG.error("Elasticsearch cluster name is different, Graylog uses `{}`, Elasticsearch cluster uses `{}`. "
+                            + "Please check the `cluster.name` setting of both Graylog and Elasticsearch.",
                     node.settings().get("cluster.name"),
                     clusterName);
         }

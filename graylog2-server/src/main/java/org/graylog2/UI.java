@@ -19,14 +19,11 @@ package org.graylog2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public class UI {
 
-    private static final String HELP_DOCS = "http://graylog2.org/resources/documentation";
-    private static final String HELP_COMMUNITY = "http://graylog2.org/resources/community-support";
-    private static final String HELP_COMMERCIAL = "http://graylog2.org/products";
+    private static final String HELP_DOCS = "https://www.graylog.org/documentation/intro/";
+    private static final String HELP_COMMUNITY = "https://www.graylog.org/community-support/";
+    private static final String HELP_COMMERCIAL = "https://www.graylog.com/support/";
 
     private static final Logger LOG = LoggerFactory.getLogger(UI.class);
 

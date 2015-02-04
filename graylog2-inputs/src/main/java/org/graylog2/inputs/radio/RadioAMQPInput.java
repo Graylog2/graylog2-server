@@ -30,7 +30,7 @@ import javax.inject.Inject;
 
 public class RadioAMQPInput extends MessageInput {
 
-    private static final String NAME = "Graylog2 Radio Input (AMQP)";
+    private static final String NAME = "Graylog Radio Input (AMQP)";
 
     @AssistedInject
     public RadioAMQPInput(@Assisted Configuration configuration,

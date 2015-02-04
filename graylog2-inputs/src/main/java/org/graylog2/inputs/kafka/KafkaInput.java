@@ -72,7 +72,7 @@ public class KafkaInput extends MessageInput {
     public static class Descriptor extends MessageInput.Descriptor {
         @Inject
         public Descriptor() {
-            super(NAME, false, "http://www.graylog2.org/resources/documentation/sending/kafka");
+            super(NAME, false, "https://www.graylog.org/documentation/sending/kafka/");
         }
     }
 

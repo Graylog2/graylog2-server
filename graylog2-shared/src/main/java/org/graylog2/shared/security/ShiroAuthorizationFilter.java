@@ -49,7 +49,7 @@ public class ShiroAuthorizationFilter implements ContainerRequestFilter {
             new ContextAwarePermissionAnnotationHandler(context).assertAuthorized(annotation);
         } catch (AuthorizationException e) {
             LOG.info("User not authorized.", e);
-            throw new NotAuthorizedException(e, "Basic realm=\"Graylog2 Server\"");
+            throw new NotAuthorizedException(e, "Basic realm=\"Graylog Server\"");
         }
     }
 }

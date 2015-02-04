@@ -23,13 +23,13 @@ import org.graylog2.plugin.Version;
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
  */
-@Command(name = "version", description = "Show the Graylog2 and JVM versions")
+@Command(name = "version", description = "Show the Graylog and JVM versions")
 public class ShowVersion implements Runnable {
     private final Version version = Version.CURRENT_CLASSPATH;
 
     @Override
     public void run() {
-        System.out.println("Graylog2 " + version);
+        System.out.println("Graylog " + version);
         System.out.println("JRE: " + Tools.getSystemInformation());
     }
 }

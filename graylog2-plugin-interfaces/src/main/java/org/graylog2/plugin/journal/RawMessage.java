@@ -50,7 +50,7 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 import static org.graylog2.plugin.journal.JournalMessages.JournalMessage;
 
 /**
- * A raw message is the unparsed data Graylog2 was handed by an input.
+ * A raw message is the unparsed data Graylog was handed by an input.
  * <p>
  * Typically this is a copy of the exact bytes received over the network, after all de-chunking, removal of transport
  * headers, etc has been performed, but before any parsing, decoding, checking of the actual payload has been performed.

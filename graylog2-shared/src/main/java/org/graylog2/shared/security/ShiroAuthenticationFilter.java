@@ -51,10 +51,10 @@ public class ShiroAuthenticationFilter implements ContainerRequestFilter {
 
             } catch (LockedAccountException e) {
                 LOG.debug("Unable to authenticate user, account is locked.", e);
-                throw new NotAuthorizedException(e, "Basic realm=\"Graylog2 Server\"");
+                throw new NotAuthorizedException(e, "Basic realm=\"Graylog Server\"");
             } catch (AuthenticationException e) {
                 LOG.debug("Unable to authenticate user.", e);
-                throw new NotAuthorizedException(e, "Basic realm=\"Graylog2 Server\"");
+                throw new NotAuthorizedException(e, "Basic realm=\"Graylog Server\"");
             }
         }
     }

@@ -30,7 +30,7 @@ import org.graylog2.plugin.inputs.MessageInput;
 
 public class RadioKafkaInput extends KafkaInput {
 
-    private static final String NAME = "Graylog2 Radio Input (Kafka)";
+    private static final String NAME = "Graylog Radio Input (Kafka)";
 
     @AssistedInject
     public RadioKafkaInput(@Assisted Configuration configuration,

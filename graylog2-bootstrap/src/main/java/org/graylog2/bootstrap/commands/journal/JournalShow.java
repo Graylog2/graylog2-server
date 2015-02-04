@@ -45,7 +45,7 @@ public class JournalShow extends AbstractJournalCommand {
         final long startOffset = journal.getLogStartOffset();
         final long lastOffset = journal.getLogEndOffset() - 1;
 
-        sb.append("Graylog2 message journal in directory: ").append(kafkaJournalConfiguration.getMessageJournalDir().getAbsolutePath()).append(
+        sb.append("Graylog message journal in directory: ").append(kafkaJournalConfiguration.getMessageJournalDir().getAbsolutePath()).append(
                 "\n");
         sb.append("\t").append("Total size in bytes: ").append(sizeInBytes).append("\n");
         sb.append("\t").append("Number of segments: ").append(numSegments).append("\n");

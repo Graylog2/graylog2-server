@@ -40,7 +40,7 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 
-@Command(name = "radio", description = "Start the Graylog2 radio")
+@Command(name = "radio", description = "Start the Graylog radio")
 public class Radio extends ServerBootstrap implements Runnable {
     private static final Logger LOG = LoggerFactory.getLogger(Radio.class);
     private static final Configuration configuration = new Configuration();

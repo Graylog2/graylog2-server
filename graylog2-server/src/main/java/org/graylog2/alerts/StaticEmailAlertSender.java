@@ -101,7 +101,7 @@ public class StaticEmailAlertSender implements AlertSender {
             sb.append(config.getSubjectPrefix()).append(" ");
         }
 
-        sb.append("Graylog2 alert for stream: ").append(stream.getTitle());
+        sb.append("Graylog alert for stream: ").append(stream.getTitle());
 
         return sb.toString();
     }

@@ -490,7 +490,7 @@ class ApiClientImpl implements ApiClient {
                 throw new RuntimeException("Malformed URL.", e);
             } catch (ExecutionException e) {
                 if (e.getCause() instanceof ConnectException) {
-                    LOG.warn("Graylog2 server unavailable. Connection refused.");
+                    LOG.warn("Graylog server unavailable. Connection refused.");
                     target.markFailure();
                     throw new Graylog2ServerUnavailableException(e);
                 }

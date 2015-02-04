@@ -47,7 +47,7 @@ public class LdapSettingsServiceImpl extends PersistedServiceImpl implements Lda
         }
         if (results.size() > 1) {
             LOG.error(
-                    "Graylog2 does not yet support multiple LDAP backends, but {} configurations were found. This is a bug, ignoring LDAP config.",
+                    "Graylog does not yet support multiple LDAP backends, but {} configurations were found. This is a bug, ignoring LDAP config.",
                     results.size());
             return null;
         }

@@ -43,7 +43,7 @@ import java.util.List;
 import java.util.Map;
 
 @RequiresAuthentication
-@Api(value = "System/Messages", description = "Internal Graylog2 messages")
+@Api(value = "System/Messages", description = "Internal Graylog messages")
 @Path("/system/messages")
 public class MessagesResource extends RestResource {
 
@@ -58,7 +58,7 @@ public class MessagesResource extends RestResource {
 
     @GET
     @Timed
-    @ApiOperation(value = "Get internal Graylog2 system messages")
+    @ApiOperation(value = "Get internal Graylog system messages")
     @RequiresPermissions(RestPermissions.SYSTEMMESSAGES_READ)
     @Produces(MediaType.APPLICATION_JSON)
     public Map<String, Object> all(@ApiParam(name = "page", value = "Page", required = false) @QueryParam("page") int page) {

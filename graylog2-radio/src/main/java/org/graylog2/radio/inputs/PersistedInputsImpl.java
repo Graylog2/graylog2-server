@@ -114,7 +114,7 @@ public class PersistedInputsImpl implements PersistedInputs {
             if (response != null)
                 input.setPersistId(response.persistId);
         } catch (Exception e) {
-            LOG.error("Could not register input in Graylog2 cluster. It will be lost on next restart of this radio node.", e);
+            LOG.error("Could not register input in Graylog cluster. It will be lost on next restart of this radio node.", e);
             return false;
         }
 

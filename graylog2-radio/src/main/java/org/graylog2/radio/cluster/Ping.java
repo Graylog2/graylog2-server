@@ -88,7 +88,7 @@ public class Ping {
         }
 
         public void ping() {
-            LOG.debug("Updating (ping) this radio instance [{}] in the Graylog2 cluster at [{}]", nodeId, serverUri);
+            LOG.debug("Updating (ping) this radio instance [{}] in the Graylog cluster at [{}]", nodeId, serverUri);
             try {
                 Ping.ping(httpClient, serverUri, ourUri, nodeId);
             } catch (Exception e) {

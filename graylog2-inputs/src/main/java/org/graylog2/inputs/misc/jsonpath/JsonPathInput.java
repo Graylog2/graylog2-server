@@ -55,7 +55,7 @@ public class JsonPathInput extends MessageInput {
     public static class Descriptor extends MessageInput.Descriptor {
         @Inject
         public Descriptor() {
-            super(NAME, false, "http://graylog2.org/resources/documentation/sending/jsonpath");
+            super(NAME, false, "https://www.graylog.org/documentation/sending/jsonpath/");
         }
     }
 

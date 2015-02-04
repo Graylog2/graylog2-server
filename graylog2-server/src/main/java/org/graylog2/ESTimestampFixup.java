@@ -68,7 +68,7 @@ public class ESTimestampFixup {
     private static final String ENVIRONMENT_PREFIX = "GRAYLOG2_";
     private static final String PROPERTIES_PREFIX = "graylog2.";
 
-    @Parameters(commandDescription = "Graylog2 ES fixup tool")
+    @Parameters(commandDescription = "Graylog ES fixup tool")
     public static class CommandLineOptions {
         @Parameter(names = {"-F", "--fix"}, description = "Fix problems")
         private boolean fix = false;

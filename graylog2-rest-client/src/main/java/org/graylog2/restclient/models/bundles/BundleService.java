@@ -47,7 +47,7 @@ public class BundleService {
         } catch (APIException e) {
             LOG.error("Unable to get bundle list from server", e);
         } catch (IOException e) {
-            LOG.error("Unable to communicate with Graylog2 server", e);
+            LOG.error("Unable to communicate with Graylog server", e);
         }
         return ArrayListMultimap.create();
     }
@@ -60,7 +60,7 @@ public class BundleService {
             LOG.error("Unable to create bundle", e);
             return false;
         } catch (IOException e) {
-            LOG.error("Unable to communicate with Graylog2 server", e);
+            LOG.error("Unable to communicate with Graylog server", e);
             return false;
         }
     }
@@ -84,7 +84,7 @@ public class BundleService {
             LOG.error("Unable to export bundle", e);
             throw e;
         } catch (IOException e) {
-            LOG.error("Unable to communicate with Graylog2 server", e);
+            LOG.error("Unable to communicate with Graylog server", e);
             throw e;
         }
     }

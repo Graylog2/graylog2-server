@@ -42,7 +42,7 @@ import java.util.Enumeration;
 import java.util.Map;
 
 @RequiresAuthentication
-@Api(value = "System/Loggers", description = "Internal Graylog2 loggers")
+@Api(value = "System/Loggers", description = "Internal Graylog loggers")
 @Path("/system/loggers")
 public class LoggersResource extends RestResource {
 
