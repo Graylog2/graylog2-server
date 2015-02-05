@@ -74,7 +74,7 @@ public class ElasticsearchConfiguration {
     private boolean disableVersionCheck = false;
 
     @Parameter(value = "elasticsearch_config_file", validator = FileReadableValidator.class)
-    private File configFile; // = "/etc/graylog2-elasticsearch.yml";
+    private File configFile; // = "/etc/graylog/server/elasticsearch.yml";
 
     @Parameter(value = "elasticsearch_index_prefix", required = true)
     private String indexPrefix = "graylog2";

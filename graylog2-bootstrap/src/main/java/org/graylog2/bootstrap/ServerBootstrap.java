@@ -56,7 +56,7 @@ public abstract class ServerBootstrap extends CmdLineTool {
     }
 
     @Option(name = {"-p", "--pidfile"}, description = "File containing the PID of Graylog")
-    private String pidFile = TMPDIR + FILE_SEPARATOR + "graylog2.pid";
+    private String pidFile = TMPDIR + FILE_SEPARATOR + "graylog.pid";
 
     @Option(name = {"-np", "--no-pid-file"}, description = "Do not write a PID file (overrides -p/--pidfile)")
     private boolean noPidFile = false;
