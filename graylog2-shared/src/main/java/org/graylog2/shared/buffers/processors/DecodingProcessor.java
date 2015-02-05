@@ -43,7 +43,7 @@ import java.util.concurrent.ExecutionException;
 import static com.codahale.metrics.MetricRegistry.name;
 
 public class DecodingProcessor implements EventHandler<MessageEvent> {
-    private static final Logger log = LoggerFactory.getLogger(DecodingProcessor.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DecodingProcessor.class);
 
     private final Timer decodeTime;
 
@@ -58,10 +58,8 @@ public class DecodingProcessor implements EventHandler<MessageEvent> {
 
     @AssistedInject
     public DecodingProcessor(Map<String, Codec.Factory<? extends Codec>> codecFactory,
-                             final InputRegistry inputRegistry,
                              final ServerStatus serverStatus,
                              final MetricRegistry metricRegistry,
-                             final PersistedInputs persistedInputs,
                              @Assisted("decodeTime") Timer decodeTime,
                              @Assisted("parseTime") Timer parseTime) {
         this.codecFactory = codecFactory;
@@ -91,11 +89,17 @@ public class DecodingProcessor implements EventHandler<MessageEvent> {
 
     private Message processMessage(RawMessage raw) throws ExecutionException {
         if (raw == null) {
-            log.warn("Ignoring null message");
+            LOG.warn("Ignoring null message");
             return null;
         }
 
-        final Codec codec = codecFactory.get(raw.getCodecName()).create(raw.getCodecConfig());
+        final Codec.Factory<? extends Codec> factory = codecFactory.get(raw.getCodecName());
+        if(factory == null) {
+            LOG.warn("Couldn't find factory for codec {}, skipping message.", raw.getCodecName());
+            return null;
+        }
+
+        final Codec codec = factory.create(raw.getCodecConfig());
 
         // for backwards compatibility: the last source node should contain the input we use.
         // this means that extractors etc defined on the prior inputs are silently ignored.
@@ -132,8 +136,8 @@ public class DecodingProcessor implements EventHandler<MessageEvent> {
         }
         if (!message.isComplete()) {
             metricRegistry.meter(name(baseMetricName, "incomplete")).mark();
-            if (log.isDebugEnabled()) {
-                log.debug("Dropping incomplete message. Parsed fields: [{}]", message.getFields());
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Dropping incomplete message. Parsed fields: [{}]", message.getFields());
             }
             return null;
         }
@@ -165,7 +169,7 @@ public class DecodingProcessor implements EventHandler<MessageEvent> {
             try {
                 message.setSourceInputId(inputIdOnCurrentNode);
             } catch (RuntimeException e) {
-                log.warn("Unable to find input with id " + inputIdOnCurrentNode + ", not setting input id in this message.", e);
+                LOG.warn("Unable to find input with id " + inputIdOnCurrentNode + ", not setting input id in this message.", e);
             }
         }
 
