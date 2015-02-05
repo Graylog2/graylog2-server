@@ -99,7 +99,7 @@ public class IndicesController extends AuthenticatedController {
             return ok(views.html.system.indices.failures.render(
                     currentUser(),
                     bc,
-                    clusterService.getIndexerFailures(0,0).total,
+                    clusterService.getIndexerFailures(1,0).total,
                     page
             ));
         } catch (APIException e) {
