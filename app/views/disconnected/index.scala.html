@@ -5,16 +5,16 @@
             <div class="row">
                 <div class="span8 offset2 well" id="disconnected-box-content">
                     <legend>
-                        <i class="icon-group"></i> Graylog2 Web Interface is disconnected.
+                        <i class="icon-group"></i> Graylog Web Interface is disconnected.
                     </legend>
 
                     <div class="row-fluid">
                         <div class="alert alert-danger">
                         @if(nodesEverConnectedTo.isEmpty) {
-                            <p>The web interface was unable to connect to any Graylog2 node in the cluster so far.</p>
+                            <p>The web interface was unable to connect to any Graylog node in the cluster so far.</p>
                             <p>Please check that the configured nodes shown on the left hand side are correct and that the servers are reachable.</p>
                         } else {
-                            <p>The web interface could not connect to any of the Graylog2 nodes it has been connected to before.</p>
+                            <p>The web interface could not connect to any of the Graylog nodes it has been connected to before.</p>
                             <p>Please check that the servers shown to the right are running and reachable.</p>
                         }
                         </div>

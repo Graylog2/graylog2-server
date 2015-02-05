@@ -39,7 +39,7 @@
 
     <div class="row-fluid">
         <h1><i class="icon icon-sitemap"></i> Node @node.getHostname / @node.getShortNodeId</h1>
-        This page shows details of a Graylog2 server node that is active and reachable in your cluster.
+        This page shows details of a Graylog server node that is active and reachable in your cluster.
     </div>
 
     <div class="row-fluid">
@@ -164,8 +164,8 @@
     <div class="row-fluid">
         <h2><i class="icon icon-hdd"></i> Disk Journal</h2>
         @if(node.getJournalInfo.enabled) {
-            <p>Incoming messages are written to the disk journal to ensure they are kept safe in case of a server failure. The journal also helps keeping Graylog2 working if any of the outputs is too slow to keep up with the message rate
-            or whenever there is a peak in incoming messages. It makes sure that Graylog2 does not buffer all of those messages in main memory and avoids overly long garbage collection pauses that way.
+            <p>Incoming messages are written to the disk journal to ensure they are kept safe in case of a server failure. The journal also helps keeping Graylog working if any of the outputs is too slow to keep up with the message rate
+            or whenever there is a peak in incoming messages. It makes sure that Graylog does not buffer all of those messages in main memory and avoids overly long garbage collection pauses that way.
             </p>
             <div class="row-fluid">
                 <div class="span6">

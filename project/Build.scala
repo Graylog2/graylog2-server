@@ -35,8 +35,8 @@ object ApplicationBuild extends Build {
   )
   val repositories = Seq(
     "Local Maven Repository" at "file:///" + Path.userHome.absolutePath + "/.m2/repository",
-    Resolver.url("Graylog2 Play Repository", url("http://graylog2.github.io/play2-graylog2/releases/"))(Resolver.ivyStylePatterns),
-    Resolver.url("Graylog2 Play Snapshot Repository", url("http://graylog2.github.io/play2-graylog2/snapshots/"))(Resolver.ivyStylePatterns),
+    Resolver.url("Graylog Play Repository", url("http://graylog2.github.io/play2-graylog2/releases/"))(Resolver.ivyStylePatterns),
+    Resolver.url("Graylog Play Snapshot Repository", url("http://graylog2.github.io/play2-graylog2/snapshots/"))(Resolver.ivyStylePatterns),
     Resolver.sonatypeRepo("releases"),
     ("Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots"),
     ("Typesafe Releases" at "http://repo.typesafe.com/typesafe/releases/")

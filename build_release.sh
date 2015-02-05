@@ -23,9 +23,15 @@ fi
 
 # Prepare JavaScript
 pushd javascript
+
+# Install same npm version as we use in travis
+rm -rf ./node_modules
+npm install npm@2.1.18
+PATH="$(pwd)/node_modules/.bin/":$PATH
+
 npm install
 npm test
-node_modules/.bin/gulp deploy-prod
+gulp deploy-prod
 popd
 
 # Build universal .tar.gz

@@ -1,20 +1,20 @@
 /*
- * Copyright 2013 TORCH UG
+ * Copyright 2012-2015 TORCH GmbH, 2015 Graylog, Inc.
  *
- * This file is part of Graylog2.
+ * This file is part of Graylog.
  *
- * Graylog2 is free software: you can redistribute it and/or modify
+ * Graylog is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * Graylog2 is distributed in the hope that it will be useful,
+ * Graylog is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
+ * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
 package controllers;
 
@@ -28,8 +28,8 @@ public class OpenSearchController extends BaseController  {
         String content =
                 "<OpenSearchDescription xmlns=\"http://a9.com/-/spec/opensearch/1.1/\"\n" +
                 "                       xmlns:moz=\"http://www.mozilla.org/2006/browser/search/\">\n" +
-                "    <ShortName>Graylog2</ShortName>\n" +
-                "    <Description>Search Graylog2 (last hour)</Description>\n" +
+                "    <ShortName>Graylog</ShortName>\n" +
+                "    <Description>Search Graylog (last hour)</Description>\n" +
                 "    <InputEncoding>UTF-8</InputEncoding>\n" +
                 "    <Url type=\"text/html\" method=\"get\" template=\""+ unescaped +"\"/>\n" +
                 "    <moz:SearchForm>"+unescaped+"</moz:SearchForm>\n" +
