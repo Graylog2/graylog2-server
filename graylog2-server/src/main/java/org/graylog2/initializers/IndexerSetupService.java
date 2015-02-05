@@ -1,18 +1,18 @@
 /**
- * This file is part of Graylog2.
+ * This file is part of Graylog.
  *
- * Graylog2 is free software: you can redistribute it and/or modify
+ * Graylog is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * Graylog2 is distributed in the hope that it will be useful,
+ * Graylog is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
+ * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
 package org.graylog2.initializers;
 
@@ -120,9 +120,9 @@ public class IndexerSetupService extends AbstractIdleService {
                         .actionGet(configuration.getClusterDiscoveryTimeout(), MILLISECONDS);
                 // we don't get here if we couldn't join the cluster. just check for red cluster state
                 if (ClusterHealthStatus.RED.equals(health.getStatus())) {
-                    UI.exitHardWithWall(
-                            "The Elasticsearch cluster state is RED which means shards are unassigned. " +
-                                    "This usually indicates a crashed and corrupt cluster and needs to be investigated. Graylog will shut down.", "http://www.graylog2.org/resources/documentation/setup/elasticsearch");
+                    UI.exitHardWithWall("The Elasticsearch cluster state is RED which means shards are unassigned. "
+                                    + "This usually indicates a crashed and corrupt cluster and needs to be investigated. Graylog will shut down.",
+                            "https://www.graylog.org/documentation/setup/elasticsearch/");
 
                 }
             } catch (ElasticsearchTimeoutException e) {
@@ -171,7 +171,7 @@ public class IndexerSetupService extends AbstractIdleService {
                 UI.exitHardWithWall(
                         "Could not successfully connect to Elasticsearch, if you use multicast check that it is working in your network" +
                                 " and that Elasticsearch is running properly and is reachable. Also check that the cluster.name setting is correct.",
-                        "http://www.graylog2.org/resources/documentation/setup/elasticsearch");
+                        "https://www.graylog.org/documentation/setup/elasticsearch/");
             }
         } catch (Exception e) {
             bufferSynchronizerService.setIndexerUnavailable();
@@ -189,8 +189,8 @@ public class IndexerSetupService extends AbstractIdleService {
 
     private void checkClusterName(String clusterName) {
         if (!node.settings().get("cluster.name").equals(clusterName)) {
-            LOG.error("Elasticsearch cluster name is different, Graylog2 uses `{}`, Elasticsearch cluster uses `{}`. "
-                            + "Please check the `cluster.name` setting of both Graylog2 and Elasticsearch.",
+            LOG.error("Elasticsearch cluster name is different, Graylog uses `{}`, Elasticsearch cluster uses `{}`. "
+                            + "Please check the `cluster.name` setting of both Graylog and Elasticsearch.",
                     node.settings().get("cluster.name"),
                     clusterName);
         }

@@ -15,8 +15,7 @@
     </parent>
 
     <name>graylog2-plugin</name>
-    <url>http://www.graylog2.org/</url>
-    <description>Graylog2 interfaces for plugin development</description>
+    <description>Graylog interfaces for plugin development</description>
 
     <licenses>
         <license>

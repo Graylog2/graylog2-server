@@ -1,10 +1,10 @@
-# graylog2-server
+# Graylog
 
 [![Build Status](https://travis-ci.org/Graylog2/graylog2-server.svg?branch=master)](https://travis-ci.org/Graylog2/graylog2-server)
 
-This is Graylog2.
+This is Graylog, an open source log management solution.
 
-Please follow the release announcements and documentation links on http://graylog2.org/download for details.
+Please follow the release announcements and documentation links on https//graylog.org/ for details.
 
 ![YourKit](https://s3.amazonaws.com/graylog2public/images/yourkit.png)
 
