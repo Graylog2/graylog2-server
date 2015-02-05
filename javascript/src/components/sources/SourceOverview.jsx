@@ -315,7 +315,7 @@ var SourceOverview = React.createClass({
                         <h1><i className="icon icon-download-alt"></i> Sources</h1>
                     </div>
                     <p style={{"marginTop": "15px"}}>
-                        This is a list of all sources that sent in messages to Graylog2. Use the table and charts to interact
+                        This is a list of all sources that sent in messages to Graylog. Use the table and charts to interact
                         with the different sources and get a better understanding of them.
                         &nbsp;Note that the list is cached for a few seconds so you might have to wait a bit until a new source
                         appears.

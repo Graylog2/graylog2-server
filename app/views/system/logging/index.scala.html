@@ -6,7 +6,7 @@
 
     <div class="row-fluid">
         <h1><i class="icon icon-inbox"></i> Logging</h1>
-        This section controls logging of the Graylog2 architecture and allows you to change log
+        This section controls logging of the Graylog architecture and allows you to change log
         levels on the fly. Note that log levels are reset to their defaults after you restart
         the affected service.
     </div>
@@ -34,7 +34,7 @@
 
             <div class="subsystems">
                 <div class="subsystems-row">
-                    @views.html.system.logging.partials.subsystem(node.getNodeId, "Graylog2", "graylog2", "All messages from graylog2-owned systems.", subsystems.get(node).get("graylog2"))
+                    @views.html.system.logging.partials.subsystem(node.getNodeId, "Graylog", "graylog2", "All messages from graylog2-owned systems.", subsystems.get(node).get("graylog2"))
                     @views.html.system.logging.partials.subsystem(node.getNodeId, "Indexer", "indexer", "All messages related to indexing and searching.", subsystems.get(node).get("indexer"))
                     <br style="clear: both;" />
                 </div>

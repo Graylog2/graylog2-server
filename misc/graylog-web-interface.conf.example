@@ -2,7 +2,7 @@
 graylog2-server.uris=""
 
 # Learn how to configure custom logging in the documentation:
-#    https://www.graylog2.org/resources/documentation/setup/webinterface
+#    https://www.graylog.org/documentation/setup/webinterface/
 
 # Secret key
 # ~~~~~
@@ -12,8 +12,8 @@ graylog2-server.uris=""
 application.secret=""
 
 # Web interface timezone
-# Graylog2 stores all timestamps in UTC. To properly display times, set the default timezone of the interface.
-# If you leave this out, Graylog2 will pick your system default as the timezone. Usually you will want to configure it explicitly.
+# Graylog stores all timestamps in UTC. To properly display times, set the default timezone of the interface.
+# If you leave this out, Graylog will pick your system default as the timezone. Usually you will want to configure it explicitly.
 # timezone="Europe/Berlin"
 
 # Message field limit
@@ -22,7 +22,7 @@ application.secret=""
 # search result sidebar or for autocompletion of field names.
 field_list_limit=100
 
-# Use this to run Graylog2 with a path prefix
+# Use this to run Graylog with a path prefix
 #application.context=/graylog2
 
 # You usually do not want to change this.

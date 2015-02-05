@@ -1,4 +1,4 @@
-# Graylog2 Web Interface
+# Graylog Web Interface
 [![Build Status](https://travis-ci.org/Graylog2/graylog2-web-interface.png)](https://travis-ci.org/Graylog2/graylog2-web-interface)
 
 ## Development Setup

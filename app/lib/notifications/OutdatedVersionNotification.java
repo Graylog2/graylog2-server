@@ -1,20 +1,20 @@
 /**
- * Copyright 2014 Lennart Koopmann <lennart@torch.sh>
+ * Copyright 2012-2015 TORCH GmbH, 2015 Graylog, Inc.
  *
- * This file is part of Graylog2.
+ * This file is part of Graylog.
  *
- * Graylog2 is free software: you can redistribute it and/or modify
+ * Graylog is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * Graylog2 is distributed in the hope that it will be useful,
+ * Graylog is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
+ * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
 package lib.notifications;
@@ -36,10 +36,10 @@ public class OutdatedVersionNotification implements NotificationType {
 
     public OutdatedVersionNotification(Notification notification) {
         this.notification = notification;
-        DESCRIPTION = "The most recent stable Graylog2 version is <em>" + notification.getDetail("current_version")
-                + "</em>. Get it from <a href=\"http://www.graylog2.org/\" target=\"_blank\">http://www.graylog2.org/</a>.";
+        DESCRIPTION = "The most recent stable Graylog version is <em>" + notification.getDetail("current_version")
+                + "</em>. Get it from <a href=\"https://www.graylog.org/\" target=\"_blank\">https://www.graylog.org/</a>.";
 
-        TITLE = "You are running an outdated Graylog2 version.";
+        TITLE = "You are running an outdated Graylog version.";
     }
 
     @Override
