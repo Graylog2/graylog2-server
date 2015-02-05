@@ -88,15 +88,6 @@ public class Server extends ServerBootstrap implements Runnable {
     @Option(name = {"-r", "--no-retention"}, description = "Do not automatically remove messages from index that are older than the retention time")
     private boolean noRetention = false;
 
-    @Option(name = {"-x", "--install-plugin"}, description = "Install plugin with provided short name from graylog2.org")
-    private String pluginShortname;
-
-    @Option(name = {"-v", "--plugin-version"}, description = "Install plugin with this version")
-    private String pluginVersion = ServerVersion.VERSION.toString();
-
-    @Option(name = {"-m", "--force-plugin"}, description = "Force plugin installation even if this version of graylog2-server is not officially supported.")
-    private boolean forcePlugin = false;
-
     public boolean isConfigTest() {
         return configTest;
     }
@@ -111,22 +102,6 @@ public class Server extends ServerBootstrap implements Runnable {
 
     public boolean performRetention() {
         return !noRetention;
-    }
-
-    public boolean isInstallPlugin() {
-        return pluginShortname != null && !pluginShortname.isEmpty();
-    }
-
-    public String getPluginShortname() {
-        return pluginShortname;
-    }
-
-    public String getPluginVersion() {
-        return pluginVersion;
-    }
-
-    public boolean isForcePlugin() {
-        return forcePlugin;
     }
 
     @Override
