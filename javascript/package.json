@@ -1,5 +1,5 @@
 {
-  "name": "graylog2-web-interface",
+  "name": "graylog-web-interface",
   "version": "1.0.0-rc.4-SNAPSHOT",
   "description": "Graylog Web Interface",
   "author": "torch",
