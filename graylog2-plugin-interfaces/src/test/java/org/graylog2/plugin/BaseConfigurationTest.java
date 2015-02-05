@@ -45,7 +45,7 @@ public class BaseConfigurationTest {
         private URI restListenUri = URI.create("http://127.0.0.1:12900/");
 
         @Parameter(value = "node_id_file", required = false)
-        private String nodeIdFile = "/etc/graylog2-server-node-id";
+        private String nodeIdFile = "/etc/graylog/server/node-id";
 
         @Override
         public String getNodeIdFile() {

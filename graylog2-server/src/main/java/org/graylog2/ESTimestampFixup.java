@@ -73,8 +73,8 @@ public class ESTimestampFixup {
         @Parameter(names = {"-F", "--fix"}, description = "Fix problems")
         private boolean fix = false;
 
-        @Parameter(names = {"-f", "--configfile"}, description = "Configuration file for Graylog2")
-        private String configFile = "/etc/graylog2.conf";
+        @Parameter(names = {"-f", "--configfile"}, description = "Configuration file for Graylog")
+        private String configFile = "/etc/graylog/server/server.conf";
 
         @Parameter(names = {"-i", "--indices"}, description = "Indices to process (required)", variableArity = true)
         private List<String> indices = Lists.newArrayList();

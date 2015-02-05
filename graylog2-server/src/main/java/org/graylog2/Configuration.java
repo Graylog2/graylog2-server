@@ -68,7 +68,7 @@ public class Configuration extends BaseConfiguration {
     private String droolsRulesFile;
 
     @Parameter(value = "node_id_file")
-    private String nodeIdFile = "/etc/graylog2-server-node-id";
+    private String nodeIdFile = "/etc/graylog/server/node-id";
 
     @Parameter(value = "root_username")
     private String rootUsername = "admin";

@@ -100,8 +100,8 @@ public abstract class CmdLineTool implements Runnable {
     @Option(name = {"-d", "--debug"}, description = "Run Graylog in debug mode")
     private boolean debug = false;
 
-    @Option(name = {"-f", "--configfile"}, description = "Configuration file for Graylog2")
-    private String configFile = "/etc/graylog2.conf";
+    @Option(name = {"-f", "--configfile"}, description = "Configuration file for Graylog")
+    private String configFile = "/etc/graylog/server/server.conf";
 
     protected String commandName = "command";
 

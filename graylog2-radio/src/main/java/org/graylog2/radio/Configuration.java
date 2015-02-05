@@ -37,7 +37,7 @@ public class Configuration extends BaseConfiguration {
     }
 
     @Parameter(value = "node_id_file")
-    private String nodeIdFile = "/etc/graylog2-radio-node-id";
+    private String nodeIdFile = "/etc/graylog/radio/node-id";
 
     @Parameter(value = "transport_type", required = true)
     private String transportType = "amqp";
