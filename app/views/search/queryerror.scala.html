@@ -1,7 +1,6 @@
-@(currentUser: org.graylog2.restclient.models.User, query: String, searchResult: org.graylog2.restclient.models.api.results.SearchResult, savedSearch: org.graylog2.restclient.models.SavedSearch, fields: String)(implicit stream: org.graylog2.restclient.models.Stream)
+@(currentUser: org.graylog2.restclient.models.User, query: String, error: org.graylog2.restclient.models.api.responses.QueryParseError, savedSearch: org.graylog2.restclient.models.SavedSearch, fields: String)(implicit stream: org.graylog2.restclient.models.Stream)
 
 @import views.helpers.QueryErrorHelper
-@import org.graylog2.restclient.models.api.responses.SearchResultResponse.GenericError
 
 @main("Query error", sidebars.standard(currentUser), query, currentUser) {
 
@@ -18,20 +17,20 @@
         Your search could not be executed. <strong>Take a look at the @views.html.partials.search_query_documentation() if you need help with the search syntax.</strong>
     </p>
 
-    @if(QueryErrorHelper.canMarkupParseError(searchResult.getError)) {
+    @if(QueryErrorHelper.canMarkupParseError(error)) {
     <p>
         Your query was malformed at the following position: (highlighted red)
     </p>
-    <pre>@Html(QueryErrorHelper.markupOriginalQuery(searchResult))</pre>
+    <pre>@Html(QueryErrorHelper.markupOriginalQuery(error))</pre>
     }
 
-    @if(QueryErrorHelper.isGenericError(searchResult.getError)) {
+    @if(QueryErrorHelper.isGenericError(error)) {
     <p>
         Your query was malformed and executing it caused the following error:
     </p>
     <div class="query-exception alert alert-error">
-        <b>@{searchResult.getError.asInstanceOf[GenericError].exceptionName}</b><br>
-        @{searchResult.getError.asInstanceOf[GenericError].message}
+        <b>@{error.exceptionName}</b><br>
+        @{error.message}
     </div>
     }
     @views.html.partials.support_sources()
