@@ -16,14 +16,14 @@
  */
 package org.graylog2.restclient.models.api.responses;
 
-import org.graylog2.restclient.models.api.responses.system.indices.IndexRangeSummary;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.graylog2.restclient.models.api.responses.system.indices.IndexRangeSummary;
 import org.joda.time.DateTime;
 
+import javax.annotation.Nullable;
 import java.util.List;
 
 public class SearchResultResponse {
-
     public int time;
     public String query;
     public long total_results;
@@ -36,43 +36,14 @@ public class SearchResultResponse {
     @JsonProperty("built_query")
     public String builtQuery;
 
-    public ParseError error;
-
-    @JsonProperty("generic_error")
-    public GenericError genericError;
-
     public String from;
-
     public String to;
 
     public DateTime getFromDataTime() {
         return from != null ? DateTime.parse(from) : null;
     }
+
     public DateTime getToDataTime() {
         return to != null ? DateTime.parse(to) : null;
     }
-
-    public abstract static class QueryError {}
-
-    public static class ParseError extends QueryError {
-        @JsonProperty("begin_column")
-        public int beginColumn;
-
-        @JsonProperty("begin_line")
-        public int beginLine;
-
-        @JsonProperty("end_column")
-        public int endColumn;
-
-        @JsonProperty("end_line")
-        public int endLine;
-    }
-
-    public static class GenericError extends QueryError {
-        @JsonProperty("exception_name")
-        public String exceptionName;
-
-        public String message;
-    }
-
 }

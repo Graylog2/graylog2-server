@@ -130,12 +130,11 @@ public class UniversalSearch {
         if (selectedFields != null && !selectedFields.isEmpty()) {
             builder.queryParam("fields", Joiner.on(',').skipNulls().join(selectedFields));
         }
-        final T result = builder
+        return builder
                 .accept(mediaType)
                 .timeout(KEITH, TimeUnit.SECONDS)
                 .expect(200, 400)
                 .execute();
-        return result;
     }
 
     public SearchResult search() throws IOException, APIException {
@@ -145,7 +144,7 @@ public class UniversalSearch {
             throw new APIException(null, null, new RuntimeException("Empty search response, this is likely a bug in exception handling."));
         }
 
-        SearchResult result = new SearchResult(
+        return new SearchResult(
                 query,
                 response.builtQuery,
                 timeRange,
@@ -154,13 +153,10 @@ public class UniversalSearch {
                 response.messages,
                 response.fields,
                 response.usedIndices,
-                response.error != null ? response.error : response.genericError,
                 response.getFromDataTime(),
                 response.getToDataTime(),
                 fieldMapper
         );
-
-        return result;
     }
 
     public String searchAsCsv(Set<String> selectedFields) throws IOException, APIException {
