@@ -24,11 +24,7 @@ import java.util.Map;
 
 import static org.testng.Assert.assertNull;
 import static org.testng.AssertJUnit.assertEquals;
-import static org.testng.AssertJUnit.assertTrue;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public class TokenizerConverterTest {
 
     @Test
@@ -42,6 +38,7 @@ public class TokenizerConverterTest {
     @Test
     public void testBasic() {
         TokenizerConverter f = new TokenizerConverter(new HashMap<String, Object>());
+        @SuppressWarnings("unchecked")
         Map<String, String> result = (Map<String, String>) f.convert("Ohai I am a message k1=v1 k2=v2 Awesome!");
 
         assertEquals(2, result.size());
@@ -53,6 +50,7 @@ public class TokenizerConverterTest {
     @Test
     public void testFilterWithKVAtBeginning() {
         TokenizerConverter f = new TokenizerConverter(new HashMap<String, Object>());
+        @SuppressWarnings("unchecked")
         Map<String, String> result = (Map<String, String>) f.convert("k1=v1 k2=v2 Awesome!");
 
         assertEquals(2, result.size());
@@ -63,6 +61,7 @@ public class TokenizerConverterTest {
     @Test
     public void testFilterWithKVAtEnd() {
         TokenizerConverter f = new TokenizerConverter(new HashMap<String, Object>());
+        @SuppressWarnings("unchecked")
         Map<String, String> result = (Map<String, String>) f.convert("lolwat Awesome! k1=v1");
 
         assertEquals(1, result.size());
@@ -72,6 +71,7 @@ public class TokenizerConverterTest {
     @Test
     public void testFilterWithStringInBetween() {
         TokenizerConverter f = new TokenizerConverter(new HashMap<String, Object>());
+        @SuppressWarnings("unchecked")
         Map<String, String> result = (Map<String, String>) f.convert("foo k2=v2 lolwat Awesome! k1=v1");
 
         assertEquals(2, result.size());
@@ -82,6 +82,7 @@ public class TokenizerConverterTest {
     @Test
     public void testFilterWithKVOnly() {
         TokenizerConverter f = new TokenizerConverter(new HashMap<String, Object>());
+        @SuppressWarnings("unchecked")
         Map<String, String> result = (Map<String, String>) f.convert("k1=v1");
 
         assertEquals(1, result.size());
@@ -91,6 +92,7 @@ public class TokenizerConverterTest {
     @Test
     public void testFilterWithInvalidKVPairs() {
         TokenizerConverter f = new TokenizerConverter(new HashMap<String, Object>());
+        @SuppressWarnings("unchecked")
         Map<String, String> result = (Map<String, String>) f.convert("Ohai I am a message and this is a URL: index.php?foo=bar&baz=bar");
 
         assertEquals(0, result.size());
@@ -99,6 +101,7 @@ public class TokenizerConverterTest {
     @Test
     public void testFilterWithoutKVPairs() {
         TokenizerConverter f = new TokenizerConverter(new HashMap<String, Object>());
+        @SuppressWarnings("unchecked")
         Map<String, String> result = (Map<String, String>) f.convert("trolololololol");
 
 
@@ -108,6 +111,7 @@ public class TokenizerConverterTest {
     @Test
     public void testFilterWithOneInvalidKVPair() {
         TokenizerConverter f = new TokenizerConverter(new HashMap<String, Object>());
+        @SuppressWarnings("unchecked")
         Map<String, String> result = (Map<String, String>) f.convert("Ohai I am a message and this is a URL: index.php?foo=bar");
 
         assertEquals(0, result.size());
@@ -116,6 +120,7 @@ public class TokenizerConverterTest {
     @Test
     public void testFilterWithWhitespaceAroundKVNoException() {
         TokenizerConverter f = new TokenizerConverter(new HashMap<String, Object>());
+        @SuppressWarnings("unchecked")
         Map<String, String> result = (Map<String, String>) f.convert("k1 = ");
 
         assertEquals(0, result.size());
@@ -124,6 +129,7 @@ public class TokenizerConverterTest {
     @Test
     public void testFilterWithWhitespaceAroundKV() {
         TokenizerConverter f = new TokenizerConverter(new HashMap<String, Object>());
+        @SuppressWarnings("unchecked")
         Map<String, String> result = (Map<String, String>) f.convert("otters in k1 = v1 k2= v2 k3 =v3 k4=v4 more otters");
 
         assertEquals(4, result.size());
@@ -136,6 +142,7 @@ public class TokenizerConverterTest {
     @Test
     public void testFilterWithQuotedValue() {
         TokenizerConverter f = new TokenizerConverter(new HashMap<String, Object>());
+        @SuppressWarnings("unchecked")
         Map<String, String> result = (Map<String, String>) f.convert("otters in k1=\"v1\" more otters");
 
         assertEquals(1, result.size());
@@ -145,9 +152,10 @@ public class TokenizerConverterTest {
     @Test
     public void testFilterWithIDAdditionalField() {
         TokenizerConverter f = new TokenizerConverter(new HashMap<String, Object>());
+        @SuppressWarnings("unchecked")
         Map<String, String> result = (Map<String, String>) f.convert("otters _id=123 more otters");
 
-        assertTrue(result.get("_id") != "123");
+        assertEquals(1, result.size());
+        assertEquals("123", result.get("_id"));
     }
-
 }
