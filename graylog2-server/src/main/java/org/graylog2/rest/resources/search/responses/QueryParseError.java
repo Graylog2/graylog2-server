@@ -20,6 +20,8 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 
+import javax.annotation.Nullable;
+
 @JsonAutoDetect
 @AutoValue
 public abstract class QueryParseError {
@@ -27,22 +29,39 @@ public abstract class QueryParseError {
     public abstract String query();
 
     @JsonProperty
-    public abstract int beginColumn();
+    @Nullable
+    public abstract Integer beginColumn();
 
     @JsonProperty
-    public abstract int beginLine();
+    @Nullable
+    public abstract Integer beginLine();
 
     @JsonProperty
-    public abstract int endColumn();
+    @Nullable
+    public abstract Integer endColumn();
 
     @JsonProperty
-    public abstract int endLine();
+    @Nullable
+    public abstract Integer endLine();
 
-    public static QueryParseError create(String query, int beginColumn, int beginLine, int endColumn, int endLine) {
-        return new AutoValue_QueryParseError(query, beginColumn, beginLine, endColumn, endLine);
+    @JsonProperty
+    @Nullable
+    public abstract String message();
+
+    @JsonProperty
+    public abstract String exceptionName();
+
+    public static QueryParseError create(String query,
+                                         @Nullable Integer beginColumn,
+                                         @Nullable Integer beginLine,
+                                         @Nullable Integer endColumn,
+                                         @Nullable Integer endLine,
+                                         @Nullable String message,
+                                         String exceptionName) {
+        return new AutoValue_QueryParseError(query, beginColumn, beginLine, endColumn, endLine, message, exceptionName);
     }
 
-    public static QueryParseError create(String query) {
-        return new AutoValue_QueryParseError(query, 0, 0, 0, 0);
+    public static QueryParseError create(String query, @Nullable String message, String exceptionName) {
+        return create(query, null, null, null, null, message, exceptionName);
     }
 }
