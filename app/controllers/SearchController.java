@@ -18,6 +18,7 @@
  */
 package controllers;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
@@ -39,6 +40,7 @@ import org.graylog2.restclient.models.SavedSearchService;
 import org.graylog2.restclient.models.SearchSort;
 import org.graylog2.restclient.models.Stream;
 import org.graylog2.restclient.models.UniversalSearch;
+import org.graylog2.restclient.models.api.responses.QueryParseError;
 import org.graylog2.restclient.models.api.responses.system.indices.IndexRangeSummary;
 import org.graylog2.restclient.models.api.results.DateHistogramResult;
 import org.graylog2.restclient.models.api.results.SearchResult;
@@ -66,6 +68,8 @@ public class SearchController extends AuthenticatedController {
     protected SavedSearchService savedSearchService;
     @Inject
     private ServerNodes serverNodes;
+    @Inject
+    private ObjectMapper objectMapper;
 
     public Result globalSearch() {
         // User would not be allowed to do any global searches anyway, so we can redirect him to the streams page to avoid confusion.
@@ -106,21 +110,16 @@ public class SearchController extends AuthenticatedController {
 
         SearchResult searchResult;
         DateHistogramResult histogramResult;
-        SavedSearch savedSearch;
+        SavedSearch savedSearch = null;
         Set<String> selectedFields = getSelectedFields(fields);
         String formattedHistogramResults;
 
         try {
             if (savedSearchId != null && !savedSearchId.isEmpty()) {
                 savedSearch = savedSearchService.get(savedSearchId);
-            } else {
-                savedSearch = null;
             }
 
             searchResult = search.search();
-            if (searchResult.getError() != null) {
-                return ok(views.html.search.queryerror.render(currentUser(), q, searchResult, savedSearch, fields, stream));
-            }
             searchResult.setAllFields(getAllFields());
 
             // histogram resolution (strangely aka interval)
@@ -132,6 +131,15 @@ public class SearchController extends AuthenticatedController {
         } catch (IOException e) {
             return status(504, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
         } catch (APIException e) {
+            if (e.getHttpCode() == 400) {
+                try {
+                    QueryParseError qpe = objectMapper.readValue(e.getResponseBody(), QueryParseError.class);
+                    return ok(views.html.search.queryerror.render(currentUser(), q, qpe, savedSearch, fields, stream));
+                } catch (IOException ioe) {
+                    // Ignore
+                }
+            }
+
             String message = "There was a problem with your search. We expected HTTP 200, but got a HTTP " + e.getHttpCode() + ".";
             return status(504, views.html.errors.error.render(message, e, request()));
         }

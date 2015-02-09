@@ -18,37 +18,42 @@
  */
 package views.helpers;
 
+import org.graylog2.restclient.models.api.responses.QueryParseError;
 import org.graylog2.restclient.models.api.responses.SearchResultResponse;
 import org.graylog2.restclient.models.api.results.SearchResult;
 import play.twirl.api.HtmlFormat;
 
+import static com.google.common.base.MoreObjects.firstNonNull;
+
 public class QueryErrorHelper {
 
-    public static String markupOriginalQuery(SearchResult response) {
-        final String query = response.getOriginalQuery();
-        if (!(response.getError() instanceof SearchResultResponse.ParseError)) {
+    public static String markupOriginalQuery(QueryParseError error) {
+        final String query = error.query;
+        if (isGenericError(error)) {
             return query;
         }
-        final SearchResultResponse.ParseError error = (SearchResultResponse.ParseError) response.getError();
 
         // TODO we don't highlight multiline queries yet
-        if (error.beginLine > 1 || error.beginLine != error.endLine) {
+        if (error.beginLine != null && (error.beginLine > 1 || !error.beginLine.equals(error.endLine))) {
             return query;
         }
-        final int beginColumn = error.beginColumn;
-        final int endColumn = error.endColumn;
+        final int beginColumn = firstNonNull(error.beginColumn, 1);
+        final int endColumn = firstNonNull(error.endColumn, 1);
 
         return HtmlFormat.escape(query.substring(0, beginColumn))
                 + "<span class=\"parse-error\">" + HtmlFormat.escape(query.substring(beginColumn, endColumn)) + "</span>"
                 + HtmlFormat.escape(query.substring(endColumn, query.length()));
     }
 
-    public static boolean canMarkupParseError(SearchResultResponse.QueryError error) {
-        return error instanceof SearchResultResponse.ParseError;
+    public static boolean canMarkupParseError(QueryParseError error) {
+        return error.beginColumn != null
+                && error.beginLine != null
+                && error.endColumn != null
+                && error.endLine != null;
     }
 
-    public static boolean isGenericError(SearchResultResponse.QueryError error) {
-        return error instanceof SearchResultResponse.GenericError;
+    public static boolean isGenericError(QueryParseError error) {
+        return !canMarkupParseError(error);
     }
 
 
