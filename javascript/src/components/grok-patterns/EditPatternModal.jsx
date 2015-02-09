@@ -46,12 +46,15 @@ var EditDashboardModal = React.createClass({
     openModal() {
         this.refs.modal.open();
     },
-    _save() {
-        var pattern = this.state;
-        this.props.savePattern(pattern, this._closeModal);
+    _saved() {
+        this._closeModal();
         if (this.props.create) {
             this.setState({name: "", pattern: ""});
         }
+    },
+    _save() {
+        var pattern = this.state;
+        this.props.savePattern(pattern, this._saved);
     }
 });
 
