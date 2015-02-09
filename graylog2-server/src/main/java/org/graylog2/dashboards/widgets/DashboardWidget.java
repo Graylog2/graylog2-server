@@ -19,8 +19,8 @@ package org.graylog2.dashboards.widgets;
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
+import com.google.common.base.Supplier;
+import com.google.common.base.Suppliers;
 import com.google.common.collect.ImmutableMap;
 import com.mongodb.BasicDBObject;
 import org.graylog2.indexer.searches.Searches;
@@ -41,9 +41,15 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
-public abstract class DashboardWidget implements EmbeddedPersistable {
+import static com.google.common.base.MoreObjects.firstNonNull;
 
-    private final MetricRegistry metricRegistry;
+public abstract class DashboardWidget implements EmbeddedPersistable {
+    private static final String FIELD_ID = "id";
+    private static final String FIELD_TYPE = "type";
+    private static final String FIELD_DESCRIPTION = "description";
+    private static final String FIELD_CACHE_TIME = "cache_time";
+    private static final String FIELD_CREATOR_USER_ID = "creator_user_id";
+    private static final String FIELD_CONFIG = "config";
 
     public enum Type {
         SEARCH_RESULT_COUNT,
@@ -54,18 +60,16 @@ public abstract class DashboardWidget implements EmbeddedPersistable {
         STATS_COUNT
     }
 
-    private static final String RESULT_CACHE_KEY = "result";
-
     public static final int DEFAULT_CACHE_TIME = 10;
 
+    private final MetricRegistry metricRegistry;
     private final Type type;
     private final String id;
     private final Map<String, Object> config;
     private final String creatorUserId;
     private int cacheTime;
     private String description;
-
-    private Cache<String, ComputationResult> cache;
+    private Supplier<ComputationResult> cachedResult;
 
     protected DashboardWidget(MetricRegistry metricRegistry, Type type, String id, String description, int cacheTimeS, Map<String, Object> config, String creatorUserId) {
         this.metricRegistry = metricRegistry;
@@ -74,21 +78,8 @@ public abstract class DashboardWidget implements EmbeddedPersistable {
         this.config = config;
         this.creatorUserId = creatorUserId;
         this.description = description;
-
-        if (cacheTimeS < 1) {
-            this.cacheTime = DEFAULT_CACHE_TIME;
-        } else {
-            this.cacheTime = cacheTimeS;
-        }
-
-        this.cache = buildCache(this.cacheTime);
-    }
-
-    private Cache<String, ComputationResult> buildCache(int cacheTime) {
-        return CacheBuilder.newBuilder()
-                .maximumSize(1)
-                .expireAfterWrite(cacheTime, TimeUnit.SECONDS)
-                .build();
+        this.cacheTime = cacheTimeS < 1 ? DEFAULT_CACHE_TIME : cacheTimeS;
+        this.cachedResult = Suppliers.memoizeWithExpiration(new ComputationResultSupplier(), this.cacheTime, TimeUnit.SECONDS);
     }
 
     public static DashboardWidget fromRequest(MetricRegistry metricRegistry, Searches searches, AddWidgetRequest awr, String userId) throws NoSuchWidgetTypeException, InvalidRangeParametersException, InvalidWidgetConfigurationException {
@@ -102,13 +93,12 @@ public abstract class DashboardWidget implements EmbeddedPersistable {
         String id = UUID.randomUUID().toString();
 
         // Build timerange.
-        TimeRange timeRange;
-
-        if (!awr.config().containsKey("range_type")) {
+        final String rangeType = (String) awr.config().get("range_type");
+        if (rangeType == null) {
             throw new InvalidRangeParametersException("range_type not set");
         }
 
-        String rangeType = (String) awr.config().get("range_type");
+        final TimeRange timeRange;
         if (rangeType.equals("relative")) {
             timeRange = new RelativeRange(Integer.parseInt((String) awr.config().get("range")));
         } else if (rangeType.equals("keyword")) {
@@ -126,29 +116,27 @@ public abstract class DashboardWidget implements EmbeddedPersistable {
     public static DashboardWidget fromPersisted(MetricRegistry metricRegistry, Searches searches, BasicDBObject fields) throws NoSuchWidgetTypeException, InvalidRangeParametersException, InvalidWidgetConfigurationException {
         Type type;
         try {
-            type = Type.valueOf(((String) fields.get("type")).toUpperCase());
+            type = Type.valueOf(((String) fields.get(FIELD_TYPE)).toUpperCase());
         } catch (IllegalArgumentException e) {
             throw new NoSuchWidgetTypeException();
         }
 
-        BasicDBObject config = (BasicDBObject) fields.get("config");
+        BasicDBObject config = (BasicDBObject) fields.get(FIELD_CONFIG);
 
         // Build timerange.
         BasicDBObject timerangeConfig = (BasicDBObject) config.get("timerange");
-        TimeRange timeRange;
 
-        if (!timerangeConfig.containsField("type")) {
+        final String rangeType = (String) timerangeConfig.get(FIELD_TYPE);
+        if (rangeType == null) {
             throw new InvalidRangeParametersException("range type not set");
         }
 
-        String rangeType = (String) timerangeConfig.get("type");
-
+        TimeRange timeRange;
         if (rangeType.equals("relative")) {
             timeRange = new RelativeRange((Integer) timerangeConfig.get("range"));
         } else if (rangeType.equals("keyword")) {
             timeRange = new KeywordRange((String) timerangeConfig.get("keyword"));
         } else if (rangeType.equals("absolute")) {
-
             String from = new DateTime(timerangeConfig.get("from"), DateTimeZone.UTC).toString(Tools.ES_DATE_FORMAT);
             String to = new DateTime(timerangeConfig.get("to"), DateTimeZone.UTC).toString(Tools.ES_DATE_FORMAT);
 
@@ -157,20 +145,11 @@ public abstract class DashboardWidget implements EmbeddedPersistable {
             throw new InvalidRangeParametersException("range_type not recognized");
         }
 
-        // Is a description set?
-        String description = null;
-        if (fields.containsField("description")) {
-            description = (String) fields.get("description");
-        }
+        final String description = (String) fields.get(FIELD_DESCRIPTION);
+        final int cacheTime = (int) firstNonNull(fields.get(FIELD_CACHE_TIME), 0);
 
-        // Do we have a configured cache time?
-        int cacheTime = 0;
-        if (fields.containsField("cache_time")) {
-            cacheTime = (Integer) fields.get("cache_time");
-        }
-
-        return buildDashboardWidget(type, metricRegistry, searches, (String) fields.get("id"), description, cacheTime,
-                config, (String) config.get("query"), timeRange, (String) fields.get("creator_user_id"));
+        return buildDashboardWidget(type, metricRegistry, searches, (String) fields.get(FIELD_ID), description, cacheTime,
+                config, (String) config.get("query"), timeRange, (String) fields.get(FIELD_CREATOR_USER_ID));
     }
 
     public static DashboardWidget buildDashboardWidget(
@@ -261,8 +240,8 @@ public abstract class DashboardWidget implements EmbeddedPersistable {
     }
 
     public void setCacheTime(int cacheTime) {
-        this.cache = buildCache(cacheTime);
         this.cacheTime = cacheTime;
+        this.cachedResult = Suppliers.memoizeWithExpiration(new ComputationResultSupplier(), this.cacheTime, TimeUnit.SECONDS);
     }
 
     public int getCacheTime() {
@@ -279,33 +258,17 @@ public abstract class DashboardWidget implements EmbeddedPersistable {
 
     public Map<String, Object> getPersistedFields() {
         return ImmutableMap.<String, Object>builder()
-                .put("id", id)
-                .put("type", type.toString().toLowerCase())
-                .put("description", description)
-                .put("cache_time", cacheTime)
-                .put("creator_user_id", creatorUserId)
-                .put("config", getPersistedConfig())
+                .put(FIELD_ID, id)
+                .put(FIELD_TYPE, type.toString().toLowerCase())
+                .put(FIELD_DESCRIPTION, description)
+                .put(FIELD_CACHE_TIME, cacheTime)
+                .put(FIELD_CREATOR_USER_ID, creatorUserId)
+                .put(FIELD_CONFIG, getPersistedConfig())
                 .build();
     }
 
     public ComputationResult getComputationResult() throws ExecutionException {
-        return cache.get(RESULT_CACHE_KEY, new Callable<ComputationResult>() {
-            @Override
-            public ComputationResult call() throws Exception {
-                ComputationResult result;
-
-                Timer.Context timer = getCalculationTimer().time();
-                try {
-                    result = compute();
-                } finally {
-                    timer.stop();
-                }
-
-                getCalculationMeter().mark();
-
-                return result;
-            }
-        });
+        return cachedResult.get();
     }
 
     public abstract Map<String, Object> getPersistedConfig();
@@ -322,7 +285,6 @@ public abstract class DashboardWidget implements EmbeddedPersistable {
     }
 
     public static class NoSuchWidgetTypeException extends Exception {
-
         public NoSuchWidgetTypeException() {
             super();
         }
@@ -330,6 +292,16 @@ public abstract class DashboardWidget implements EmbeddedPersistable {
         public NoSuchWidgetTypeException(String msg) {
             super(msg);
         }
+    }
 
+    private class ComputationResultSupplier implements Supplier<ComputationResult> {
+        @Override
+        public ComputationResult get() {
+            try (Timer.Context timer = getCalculationTimer().time()) {
+                return compute();
+            } finally {
+                getCalculationMeter().mark();
+            }
+        }
     }
 }
