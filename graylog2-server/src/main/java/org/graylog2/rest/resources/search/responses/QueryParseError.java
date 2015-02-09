@@ -1,24 +1,26 @@
 /**
- * This file is part of Graylog2.
+ * This file is part of Graylog.
  *
- * Graylog2 is free software: you can redistribute it and/or modify
+ * Graylog is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * Graylog2 is distributed in the hope that it will be useful,
+ * Graylog is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
+ * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
 package org.graylog2.rest.resources.search.responses;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+
+import javax.annotation.Nullable;
 
 @JsonAutoDetect
 @AutoValue
@@ -27,22 +29,39 @@ public abstract class QueryParseError {
     public abstract String query();
 
     @JsonProperty
-    public abstract int beginColumn();
+    @Nullable
+    public abstract Integer beginColumn();
 
     @JsonProperty
-    public abstract int beginLine();
+    @Nullable
+    public abstract Integer beginLine();
 
     @JsonProperty
-    public abstract int endColumn();
+    @Nullable
+    public abstract Integer endColumn();
 
     @JsonProperty
-    public abstract int endLine();
+    @Nullable
+    public abstract Integer endLine();
 
-    public static QueryParseError create(String query, int beginColumn, int beginLine, int endColumn, int endLine) {
-        return new AutoValue_QueryParseError(query, beginColumn, beginLine, endColumn, endLine);
+    @JsonProperty
+    @Nullable
+    public abstract String message();
+
+    @JsonProperty
+    public abstract String exceptionName();
+
+    public static QueryParseError create(String query,
+                                         @Nullable Integer beginColumn,
+                                         @Nullable Integer beginLine,
+                                         @Nullable Integer endColumn,
+                                         @Nullable Integer endLine,
+                                         @Nullable String message,
+                                         String exceptionName) {
+        return new AutoValue_QueryParseError(query, beginColumn, beginLine, endColumn, endLine, message, exceptionName);
     }
 
-    public static QueryParseError create(String query) {
-        return new AutoValue_QueryParseError(query, 0, 0, 0, 0);
+    public static QueryParseError create(String query, @Nullable String message, String exceptionName) {
+        return create(query, null, null, null, null, message, exceptionName);
     }
 }

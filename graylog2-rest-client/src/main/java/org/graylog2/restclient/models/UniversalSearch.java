@@ -1,18 +1,18 @@
 /**
- * This file is part of Graylog2.
+ * This file is part of Graylog.
  *
- * Graylog2 is free software: you can redistribute it and/or modify
+ * Graylog is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * Graylog2 is distributed in the hope that it will be useful,
+ * Graylog is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
+ * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
 package org.graylog2.restclient.models;
 
@@ -130,12 +130,11 @@ public class UniversalSearch {
         if (selectedFields != null && !selectedFields.isEmpty()) {
             builder.queryParam("fields", Joiner.on(',').skipNulls().join(selectedFields));
         }
-        final T result = builder
+        return builder
                 .accept(mediaType)
                 .timeout(KEITH, TimeUnit.SECONDS)
                 .expect(200, 400)
                 .execute();
-        return result;
     }
 
     public SearchResult search() throws IOException, APIException {
@@ -145,7 +144,7 @@ public class UniversalSearch {
             throw new APIException(null, null, new RuntimeException("Empty search response, this is likely a bug in exception handling."));
         }
 
-        SearchResult result = new SearchResult(
+        return new SearchResult(
                 query,
                 response.builtQuery,
                 timeRange,
@@ -154,13 +153,10 @@ public class UniversalSearch {
                 response.messages,
                 response.fields,
                 response.usedIndices,
-                response.error != null ? response.error : response.genericError,
                 response.getFromDataTime(),
                 response.getToDataTime(),
                 fieldMapper
         );
-
-        return result;
     }
 
     public String searchAsCsv(Set<String> selectedFields) throws IOException, APIException {

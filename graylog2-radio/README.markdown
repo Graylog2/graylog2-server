@@ -1,5 +1,5 @@
-# graylog2-radio
+# Graylog Radio
 
-Graylog2 Radio is part of the Graylog2 project.
+Graylog Radio is part of the Graylog project.
 
-Please see http://www.graylog2.org/ for more information and documentation. Thank you.
+Please see https://www.graylog.org/ for more information and documentation. Thank you.

@@ -1,18 +1,18 @@
 /**
- * This file is part of Graylog2.
+ * This file is part of Graylog.
  *
- * Graylog2 is free software: you can redistribute it and/or modify
+ * Graylog is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * Graylog2 is distributed in the hope that it will be useful,
+ * Graylog is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
+ * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
 package org.graylog2.bootstrap;
 
@@ -55,8 +55,8 @@ public abstract class ServerBootstrap extends CmdLineTool {
         this.commandName = commandName;
     }
 
-    @Option(name = {"-p", "--pidfile"}, description = "File containing the PID of Graylog2")
-    private String pidFile = TMPDIR + FILE_SEPARATOR + "graylog2.pid";
+    @Option(name = {"-p", "--pidfile"}, description = "File containing the PID of Graylog")
+    private String pidFile = TMPDIR + FILE_SEPARATOR + "graylog.pid";
 
     @Option(name = {"-np", "--no-pid-file"}, description = "Do not write a PID file (overrides -p/--pidfile)")
     private boolean noPidFile = false;
@@ -73,7 +73,7 @@ public abstract class ServerBootstrap extends CmdLineTool {
 
     @Override
     protected void startCommand() {
-        LOG.info("Graylog2 " + commandName + " {} starting up. (JRE: {})", version, Tools.getSystemInformation());
+        LOG.info("Graylog " + commandName + " {} starting up. (JRE: {})", version, Tools.getSystemInformation());
 
         // Do not use a PID file if the user requested not to
         if (!isNoPidFile()) {
@@ -117,13 +117,13 @@ public abstract class ServerBootstrap extends CmdLineTool {
             } catch (TimeoutException timeoutException) {
                 LOG.error("Unable to shutdown properly on time. {}", serviceManager.servicesByState());
             }
-            LOG.error("Graylog2 startup failed. Exiting. Exception was:", e);
+            LOG.error("Graylog startup failed. Exiting. Exception was:", e);
             System.exit(-1);
         }
         LOG.info("Services started, startup times in ms: {}", serviceManager.startupTimes());
 
         activityWriter.write(new Activity("Started up.", Main.class));
-        LOG.info("Graylog2 " + commandName + " up and running.");
+        LOG.info("Graylog " + commandName + " up and running.");
 
         // Block forever.
         try {

@@ -1,34 +1,34 @@
 /**
- * This file is part of Graylog2.
+ * This file is part of Graylog.
  *
- * Graylog2 is free software: you can redistribute it and/or modify
+ * Graylog is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * Graylog2 is distributed in the hope that it will be useful,
+ * Graylog is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
+ * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
 /*
- * This file is part of Graylog2.
+ * This file is part of Graylog.
  *
- * Graylog2 is free software: you can redistribute it and/or modify
+ * Graylog is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * Graylog2 is distributed in the hope that it will be useful,
+ * Graylog is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
+ * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
 package org.graylog2.restclient.models.api.results;
 
@@ -51,7 +51,6 @@ public class SearchResult {
     private final long totalResultCount;
     private final int tookMs;
     private final List<MessageResult> results;
-    private final SearchResultResponse.QueryError error;
     private final List<Field> fields;
     private final List<IndexRangeSummary> usedIndices;
     private List<Field> allFields;
@@ -66,7 +65,6 @@ public class SearchResult {
                         List<MessageSummaryResponse> summaryResponses,
                         List<String> fields,
                         List<IndexRangeSummary> usedIndices,
-                        SearchResultResponse.QueryError error,
                         DateTime fromDateTime,
                         DateTime toDateTime,
                         FieldMapper fieldMapper) {
@@ -75,7 +73,6 @@ public class SearchResult {
         this.timeRange = timeRange;
         this.totalResultCount = totalResultCount;
         this.tookMs = tookMs;
-        this.error = error;
         this.fields = buildFields(fields);
         this.usedIndices = usedIndices;
         this.fromDateTime = fromDateTime;
@@ -141,10 +138,6 @@ public class SearchResult {
 
     public String getBuiltQuery() {
         return builtQuery;
-    }
-
-    public SearchResultResponse.QueryError getError() {
-        return error;
     }
 
     public DateTime getFromDateTime() {

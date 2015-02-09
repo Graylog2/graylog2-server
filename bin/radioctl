@@ -47,7 +47,7 @@ done
 # take variables from environment if set
 RADIOCTL_DIR=${RADIOCTL_DIR:=$(dirname "$RADIOCTL")}
 RADIO_JAR=${RADIO_JAR:=graylog.jar}
-RADIO_CONF=${RADIO_CONF:=/etc/graylog-radio.conf}
+RADIO_CONF=${RADIO_CONF:=/etc/graylog/radio/radio.conf}
 RADIO_PID=${RADIO_PID:=/tmp/graylog-radio.pid}
 LOG_FILE=${LOG_FILE:=log/graylog-radio.log}
 LOG4J=${LOG4J:=}

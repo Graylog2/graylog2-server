@@ -1,6 +1,6 @@
 {
   "name": "nginx",
-  "description": "This content pack will create two inputs for the nginx `error_log` and the `access_log`. Extractors are applied to effectively read the most important data into message fields. You will be able to do searches for all requests of a given remote IP, all requests that were answered with a HTTP 400 or just all requests that were slow.\n\nFind nginx setup instructions and more details [here](http://www.graylog2.org/content-packs/547b5021e4b0a06d87eea01e)",
+  "description": "This content pack will create two inputs for the nginx `error_log` and the `access_log`. Extractors are applied to effectively read the most important data into message fields. You will be able to do searches for all requests of a given remote IP, all requests that were answered with a HTTP 400 or just all requests that were slow.\n\nFind nginx setup instructions and more details [here](https://www.graylog.org/resource/content-pack/547b5021e4b0a06d87eea01e/)",
   "category": "Web Servers",
   "inputs": [
     {

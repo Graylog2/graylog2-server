@@ -1,18 +1,18 @@
 /**
- * This file is part of Graylog2.
+ * This file is part of Graylog.
  *
- * Graylog2 is free software: you can redistribute it and/or modify
+ * Graylog is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * Graylog2 is distributed in the hope that it will be useful,
+ * Graylog is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
+ * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
 package org.graylog2.rest.resources.search;
 
@@ -31,15 +31,14 @@ import org.graylog2.indexer.results.SearchResult;
 import org.graylog2.indexer.searches.Searches;
 import org.graylog2.indexer.searches.Sorting;
 import org.graylog2.indexer.searches.timeranges.AbsoluteRange;
-import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.rest.resources.search.responses.FieldStatsResult;
-import org.graylog2.rest.resources.search.responses.GenericError;
 import org.graylog2.rest.resources.search.responses.HistogramResult;
 import org.graylog2.rest.resources.search.responses.QueryParseError;
 import org.graylog2.rest.resources.search.responses.SearchResponse;
 import org.graylog2.rest.resources.search.responses.TermsResult;
 import org.graylog2.rest.resources.search.responses.TermsStatsResult;
 import org.graylog2.rest.resources.search.responses.TimeRange;
+import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -178,9 +177,12 @@ public abstract class SearchResource extends RestResource {
 
     protected BadRequestException createRequestExceptionForParseFailure(String query, SearchPhaseExecutionException e) {
         LOG.warn("Unable to execute search: {}", e.getMessage());
+        QueryParseError errorMessage = QueryParseError.create(query, e.getMessage(), e.getClass().getCanonicalName());
+
         // we won't actually iterate over all of the shard failures, only the first one,
         // since we assume that parse errors happen on all of the shards.
         for (ShardSearchFailure failure : e.shardFailures()) {
+            //noinspection ThrowableResultOfMethodCallIgnored
             Throwable unwrapped = ExceptionsHelper.unwrapCause(failure.failure());
             if (!(unwrapped instanceof SearchParseException)) {
                 LOG.warn("Unhandled ShardSearchFailure", e);
@@ -189,10 +191,9 @@ public abstract class SearchResource extends RestResource {
             Throwable rootCause = ((SearchParseException) unwrapped).getRootCause();
             if (rootCause instanceof ParseException) {
                 Token currentToken = ((ParseException) rootCause).currentToken;
-                final QueryParseError queryParseError;
                 if (currentToken == null) {
-                    LOG.warn("No position/token available for ParseException.");
-                    queryParseError = QueryParseError.create(query);
+                    LOG.warn("No position/token available for ParseException.", rootCause);
+                    errorMessage = QueryParseError.create(query, rootCause.getMessage(), rootCause.getClass().getCanonicalName());
                 } else {
                     // scan for first usable token with position information
                     int beginColumn = 0;
@@ -204,25 +205,28 @@ public abstract class SearchResource extends RestResource {
                         beginLine = currentToken.beginLine;
                         endColumn = currentToken.endColumn;
                         endLine = currentToken.endLine;
-
                         currentToken = currentToken.next;
                     }
 
-                    queryParseError = QueryParseError.create(query, beginColumn, beginLine, endColumn, endLine);
+                    errorMessage = QueryParseError.create(
+                            query,
+                            beginColumn,
+                            beginLine,
+                            endColumn,
+                            endLine,
+                            rootCause.getMessage(),
+                            rootCause.getClass().getCanonicalName());
                 }
-
-                return new BadRequestException(Response.status(Response.Status.BAD_REQUEST).entity(queryParseError).build());
-            } else if (rootCause instanceof NumberFormatException) {
-                final GenericError genericError = GenericError.create(query, rootCause.getClass().getCanonicalName(), rootCause.getMessage());
-                return new BadRequestException(Response.status(Response.Status.BAD_REQUEST).entity(genericError).build());
             } else {
-                LOG.info("Root cause of SearchParseException has unexpected, generic type!" + rootCause.getClass());
-                final GenericError genericError = GenericError.create(query, rootCause.getClass().getCanonicalName(), rootCause.getMessage());
-                return new BadRequestException(Response.status(Response.Status.BAD_REQUEST).entity(genericError).build());
+                LOG.debug("Root cause of SearchParseException has unexpected, generic type: " + rootCause.getClass(), rootCause);
+                errorMessage = QueryParseError.create(query, rootCause.getMessage(), rootCause.getClass().getCanonicalName());
             }
         }
 
-        return new BadRequestException();
+        return new BadRequestException(Response
+                .status(Response.Status.BAD_REQUEST)
+                .entity(errorMessage)
+                .build());
     }
 
     public void checkSearchPermission(String filter, String searchPermission) {

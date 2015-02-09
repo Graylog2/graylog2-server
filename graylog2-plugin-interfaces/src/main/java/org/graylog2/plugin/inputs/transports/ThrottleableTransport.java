@@ -1,6 +1,6 @@
 /**
  * The MIT License
- * Copyright (c) 2012 TORCH GmbH
+ * Copyright (c) 2012 Graylog, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -61,7 +61,7 @@ public abstract class ThrottleableTransport implements Transport {
                     CK_THROTTLING_ALLOWED,
                     "Allow throttling this input.",
                     false,
-                    "If enabled, no new messages will be read from this input until Graylog2 catches up with its message load. " +
+                    "If enabled, no new messages will be read from this input until Graylog catches up with its message load. " +
                             "This is typically useful for inputs reading from files or message queue systems like AMQP or Kafka. " +
                             "If you regularly poll an external system, e.g. via HTTP, you normally want to leave this disabled."
 

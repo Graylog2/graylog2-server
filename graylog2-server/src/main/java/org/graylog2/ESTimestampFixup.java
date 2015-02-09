@@ -1,18 +1,18 @@
 /**
- * This file is part of Graylog2.
+ * This file is part of Graylog.
  *
- * Graylog2 is free software: you can redistribute it and/or modify
+ * Graylog is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * Graylog2 is distributed in the hope that it will be useful,
+ * Graylog is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
+ * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
 package org.graylog2;
 
@@ -68,13 +68,13 @@ public class ESTimestampFixup {
     private static final String ENVIRONMENT_PREFIX = "GRAYLOG2_";
     private static final String PROPERTIES_PREFIX = "graylog2.";
 
-    @Parameters(commandDescription = "Graylog2 ES fixup tool")
+    @Parameters(commandDescription = "Graylog ES fixup tool")
     public static class CommandLineOptions {
         @Parameter(names = {"-F", "--fix"}, description = "Fix problems")
         private boolean fix = false;
 
-        @Parameter(names = {"-f", "--configfile"}, description = "Configuration file for Graylog2")
-        private String configFile = "/etc/graylog2.conf";
+        @Parameter(names = {"-f", "--configfile"}, description = "Configuration file for Graylog")
+        private String configFile = "/etc/graylog/server/server.conf";
 
         @Parameter(names = {"-i", "--indices"}, description = "Indices to process (required)", variableArity = true)
         private List<String> indices = Lists.newArrayList();

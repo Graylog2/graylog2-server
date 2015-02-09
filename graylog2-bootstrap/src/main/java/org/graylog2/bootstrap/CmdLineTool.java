@@ -1,18 +1,18 @@
 /**
- * This file is part of Graylog2.
+ * This file is part of Graylog.
  *
- * Graylog2 is free software: you can redistribute it and/or modify
+ * Graylog is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * Graylog2 is distributed in the hope that it will be useful,
+ * Graylog is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
+ * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
 package org.graylog2.bootstrap;
 
@@ -91,17 +91,17 @@ public abstract class CmdLineTool implements Runnable {
     protected final JadConfig jadConfig;
     protected final BaseConfiguration configuration;
 
-    @Option(name = "--dump-config", description = "Show the effective Graylog2 configuration and exit")
+    @Option(name = "--dump-config", description = "Show the effective Graylog configuration and exit")
     protected boolean dumpConfig = false;
 
     @Option(name = "--dump-default-config", description = "Show the default configuration and exit")
     protected boolean dumpDefaultConfig = false;
 
-    @Option(name = {"-d", "--debug"}, description = "Run Graylog2 in debug mode")
+    @Option(name = {"-d", "--debug"}, description = "Run Graylog in debug mode")
     private boolean debug = false;
 
-    @Option(name = {"-f", "--configfile"}, description = "Configuration file for Graylog2")
-    private String configFile = "/etc/graylog2.conf";
+    @Option(name = {"-f", "--configfile"}, description = "Configuration file for Graylog")
+    private String configFile = "/etc/graylog/server/server.conf";
 
     protected String commandName = "command";
 

@@ -47,7 +47,7 @@ done
 # take variables from environment if set
 GRAYLOGCTL_DIR=${GRAYLOGCTL_DIR:=$(dirname "$GRAYLOGCTL")}
 GRAYLOG_SERVER_JAR=${GRAYLOG_SERVER_JAR:=graylog.jar}
-GRAYLOG_CONF=${GRAYLOG_CONF:=/etc/graylog.conf}
+GRAYLOG_CONF=${GRAYLOG_CONF:=/etc/graylog/server/server.conf}
 GRAYLOG_PID=${GRAYLOG_PID:=/tmp/graylog.pid}
 LOG_FILE=${LOG_FILE:=log/graylog-server.log}
 LOG4J=${LOG4J:=}

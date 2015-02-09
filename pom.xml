@@ -1,23 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright 2012-2014 TORCH GmbH
+  ~ Copyright 2012-2015 TORCH GmbH, 2015 Graylog, Inc.
   ~
-  ~ This file is part of Graylog2.
+  ~ This file is part of Graylog.
   ~
-  ~ Graylog2 is free software: you can redistribute it and/or modify
+  ~ Graylog is free software: you can redistribute it and/or modify
   ~ it under the terms of the GNU General Public License as published by
   ~ the Free Software Foundation, either version 3 of the License, or
   ~ (at your option) any later version.
   ~
-  ~ Graylog2 is distributed in the hope that it will be useful,
+  ~ Graylog is distributed in the hope that it will be useful,
   ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
   ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
   ~ GNU General Public License for more details.
   ~
   ~ You should have received a copy of the GNU General Public License
-  ~ along with Graylog2.  If not, see <http://www.gnu.org/licenses />.
+  ~ along with Graylog.  If not, see <http://www.gnu.org/licenses />.
   -->
-
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <prerequisites>
@@ -28,8 +27,8 @@
     <artifactId>graylog2-parent</artifactId>
     <version>1.1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
-    <name>Graylog2</name>
-    <url>http://graylog2.org/</url>
+    <name>Graylog</name>
+    <url>https://www.graylog.org/</url>
     <inceptionYear>2012</inceptionYear>
 
     <parent>
@@ -52,8 +51,8 @@
     </modules>
 
     <organization>
-        <name>TORCH GmbH</name>
-        <url>https://www.torch.sh/</url>
+        <name>Graylog, Inc.</name>
+        <url>https://www.graylog.com/</url>
     </organization>
 
     <scm>
@@ -75,7 +74,7 @@
 
     <mailingLists>
         <mailingList>
-            <name>Graylog2 User List</name>
+            <name>Graylog User List</name>
             <subscribe>graylog2+subscribe@googlegroups.com</subscribe>
             <unsubscribe>graylog2+unsubscribe@googlegroups.com</unsubscribe>
             <post>graylog2@googlegroups.com</post>
@@ -767,7 +766,7 @@
                         <header>com/mycila/maven/plugin/license/templates/GPL-3.txt</header>
                         <properties>
                             <owner>${project.organization.name}</owner>
-                            <project.name>Graylog2</project.name>
+                            <project.name>Graylog</project.name>
                         </properties>
                         <includes>
                             <include>**/src/main/java/**</include>
