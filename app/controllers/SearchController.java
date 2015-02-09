@@ -250,7 +250,7 @@ public class SearchController extends AuthenticatedController {
 
         // TODO streaming the result
         response().setContentType(MediaType.CSV_UTF_8.toString());
-        response().setHeader("Content-Disposition", "attachment; filename=graylog2-searchresult.csv");
+        response().setHeader("Content-Disposition", "attachment; filename=graylog-searchresult.csv");
         return ok(s);
     }
 

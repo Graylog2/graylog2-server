@@ -48,12 +48,12 @@ var GrokPatterns = React.createClass({
         }, this);
 
         return (
-            <table className="table table-striped">
+            <table className="table table-striped grok-patterns-table">
                 <thead>
                     <tr>
-                        <th>Name</th>
+                        <th className="name">Name</th>
                         <th>Pattern</th>
-                        <th style={{width: 180}}>Actions</th>
+                        <th className="actions">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
