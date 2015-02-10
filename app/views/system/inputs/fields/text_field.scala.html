@@ -15,21 +15,11 @@
 }
 
 @fieldValue(value: String, defaultValue: AnyRef, isPassword: Boolean, isTextArea: Boolean) = @{
-    if(isPassword) {
-        if(value != null) {
-            "******"
-        } else {
-            if(defaultValue != null && !defaultValue.toString.isEmpty) {
-                "******"
-            }
-        }
+    if(value != null) {
+        value
     } else {
-        if(value != null) {
-            value
-        } else {
-            if(defaultValue != null && !defaultValue.toString.isEmpty) {
-                defaultValue
-            }
+        if(defaultValue != null && !defaultValue.toString.isEmpty) {
+            defaultValue
         }
     }
 }
