@@ -22,18 +22,13 @@
  */
 package org.graylog2.plugin;
 
-import org.graylog2.plugin.Version;
 import org.testng.annotations.Test;
 
 import static org.testng.AssertJUnit.assertEquals;
 import static org.testng.AssertJUnit.assertFalse;
 import static org.testng.AssertJUnit.assertTrue;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public class VersionTest {
-
     @Test
     public void testGetName() throws Exception {
         assertEquals("0.20.0", new Version(0, 20, 0).toString());
@@ -132,5 +127,60 @@ public class VersionTest {
         assertFalse(v.sameOrHigher(new Version(2, 19, 0, "rc.1")));
         assertTrue(v.sameOrHigher(new Version(0, 0, 0)));
         assertFalse(v.sameOrHigher(new Version(Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE)));
+    }
+
+    @Test
+    public void testCompareTo() {
+        Version v = new Version(0, 20, 2);
+
+        assertTrue(v.compareTo(new Version(0, 19, 0)) > 0);
+        assertTrue(v.compareTo(new Version(0, 18, 2)) > 0);
+        assertTrue(v.compareTo(new Version(0, 19, 9001)) > 0);
+
+        assertTrue(v.compareTo(new Version(0, 20, 2)) == 0);
+        assertTrue(v.compareTo(new Version(0, 20, 0)) > 0);
+        assertTrue(v.compareTo(new Version(1, 0, 0)) < 0);
+        assertTrue(v.compareTo(new Version(1, 0, 9001)) < 0);
+        assertTrue(v.compareTo(new Version(1, 20, 0)) < 0);
+        assertTrue(v.compareTo(new Version(1, 1, 0)) < 0);
+        assertTrue(v.compareTo(new Version(3, 2, 1)) < 0);
+
+        assertTrue(v.compareTo(new Version(0, 19, 0, "rc.1")) > 0);
+        assertTrue(v.compareTo(new Version(1, 19, 0, "rc.1")) < 0);
+        assertTrue(v.compareTo(new Version(0, 21, 0, "rc.1")) < 0);
+        assertTrue(v.compareTo(new Version(0, 20, 1, "rc.1")) > 0);
+        assertTrue(v.compareTo(new Version(0, 20, 0, "rc.1")) > 0);
+        assertTrue(v.compareTo(new Version(0, 20, 2, "rc.1")) > 0);
+        assertTrue(v.compareTo(new Version(0, 20, 3, "rc.1")) < 0);
+
+        v = new Version(1, 5, 0);
+
+        assertTrue(v.compareTo(new Version(0, 19, 0)) > 0);
+        assertTrue(v.compareTo(new Version(1, 0, 0)) > 0);
+        assertTrue(v.compareTo(new Version(0, 19, 9001)) > 0);
+        assertTrue(v.compareTo(new Version(1, 5, 0)) == 0);
+        assertTrue(v.compareTo(new Version(1, 4, 9)) > 0);
+
+        assertTrue(v.compareTo(new Version(1, 6, 0)) < 0);
+        assertTrue(v.compareTo(new Version(3, 0, 0)) < 0);
+        assertTrue(v.compareTo(new Version(1, 5, 9001)) < 0);
+        assertTrue(v.compareTo(new Version(1, 20, 0)) < 0);
+        assertTrue(v.compareTo(new Version(1, 20, 5)) < 0);
+        assertTrue(v.compareTo(new Version(3, 2, 1)) < 0);
+
+        assertTrue(v.compareTo(new Version(0, 19, 0, "rc.1")) > 0);
+        assertTrue(v.compareTo(new Version(2, 19, 0, "rc.1")) < 0);
+        assertTrue(v.compareTo(new Version(0, 0, 0)) > 0);
+        assertTrue(v.compareTo(new Version(Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE)) < 0);
+
+        v = new Version(1, 0, 0, "beta.2");
+        assertTrue(v.compareTo(new Version(1, 0, 0, "beta.1")) > 0);
+        assertTrue(v.compareTo(new Version(1, 0, 0, "beta.2")) == 0);
+        assertTrue(v.compareTo(new Version(1, 0, 0, "beta.3")) < 0);
+        assertTrue(v.compareTo(new Version(1, 0, 0, "alpha.1")) > 0);
+        assertTrue(v.compareTo(new Version(1, 0, 0, "alpha.3")) > 0);
+        assertTrue(v.compareTo(new Version(1, 0, 0, "rc.1")) < 0);
+        assertTrue(v.compareTo(new Version(1, 0, 0, "rc.3")) < 0);
+        assertTrue(v.compareTo(new Version(1, 0, 0)) < 0);
     }
 }

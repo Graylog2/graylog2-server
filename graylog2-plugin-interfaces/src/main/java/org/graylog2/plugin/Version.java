@@ -22,6 +22,7 @@
  */
 package org.graylog2.plugin;
 
+import com.google.common.collect.ComparisonChain;
 import com.google.common.io.Resources;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,14 +33,16 @@ import java.util.Objects;
 import java.util.Properties;
 
 import static com.google.common.base.Charsets.UTF_8;
+import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static com.google.common.base.Strings.nullToEmpty;
 
 /**
  * Following semantic versioning.
- *
+ * <p/>
  * http://semver.org/
  */
-public class Version {
+public class Version implements Comparable<Version> {
     private static final Logger LOG = LoggerFactory.getLogger(Version.class);
 
     public final int major;
@@ -52,6 +55,7 @@ public class Version {
      * Reads the current version from the classpath, using version.properties and git.properties.
      */
     public static final Version CURRENT_CLASSPATH;
+
     static {
         Version tmpVersion;
         try {
@@ -150,5 +154,20 @@ public class Version {
     @Override
     public int hashCode() {
         return Objects.hash(major, minor, patch, additional, abbrevCommitSha);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int compareTo(Version that) {
+        checkNotNull(that);
+        return ComparisonChain.start()
+                .compare(this.major, that.major)
+                .compare(this.minor, that.minor)
+                .compare(this.patch, that.patch)
+                .compareFalseFirst(isNullOrEmpty(this.additional), isNullOrEmpty(that.additional))
+                .compare(nullToEmpty(this.additional), nullToEmpty(that.additional))
+                .result();
     }
 }
