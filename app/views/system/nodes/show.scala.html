@@ -125,7 +125,7 @@
                     <div class="progress progress-percentage node-buffer-usage">
                         <div class="bar bar-warning" data-percentage="@utilizationPercent" style="width : @utilizationPercent% ;"><span class="number-format" data-format="0.0%">@utilizationPercent%</span></div>
                     </div>
-                    <strong>@node.getBufferInfo.getInputBuffer.utilization messages</strong> in input buffer.
+                    <strong><span class="number-format" data-format="0,0">@node.getBufferInfo.getInputBuffer.utilization</span> messages</strong> in input buffer.
                     (<span class="number-format" data-format="0.0%">@utilizationPercent%</span> utilized)
                 }
             </div>
@@ -138,7 +138,7 @@
                     <div class="progress progress-percentage node-buffer-usage">
                         <div class="bar bar-warning" data-percentage="@utilizationPercent" style="width : @utilizationPercent% ;"><span class="number-format" data-format="0.0%">@utilizationPercent%</span></div>
                     </div>
-                    <strong>@node.getBufferInfo.getProcessBuffer.utilization messages</strong> in process buffer.
+                    <strong><span class="number-format" data-format="0,0">@node.getBufferInfo.getProcessBuffer.utilization</span> messages</strong> in process buffer.
                     (<span class="number-format" data-format="0.0%">@utilizationPercent%</span> utilized)
                 }
             </div>
@@ -151,7 +151,7 @@
                     <div class="progress progress-percentage node-buffer-usage">
                         <div class="bar bar-warning" data-percentage="@utilizationPercent" style="width : @utilizationPercent% ;"><span class="number-format" data-format="0.0%">@utilizationPercent%</span></div>
                     </div>
-                    <strong>@node.getBufferInfo.getOutputBuffer.utilization messages</strong> in output buffer.
+                    <strong><span class="number-format" data-format="0,0">@node.getBufferInfo.getOutputBuffer.utilization</span> messages</strong> in output buffer.
                     (<span class="number-format" data-format="0.0%">@utilizationPercent%</span> utilized)
                 }
             </div>
@@ -205,11 +205,11 @@
                             <strong>Warning!</strong> The journal utilization is exceeding the maximum size
                             defined. <a href="@routes.SystemController.index()">Click here</a> for more information.<br/>
                         }
-                        <strong>@node.getJournalInfo.uncommittedJournalEntries unprocessed messages</strong>
+                        <strong><span class="number-format" data-format="0,0">@node.getJournalInfo.uncommittedJournalEntries</span> unprocessed messages</strong>
                         are currently in the journal, in @node.getJournalInfo.numberOfSegments segments.<br/>
-                        <strong>@node.getJournalInfo.appendEventsPerSecond messages</strong>
+                        <strong><span class="number-format" data-format="0,0">@node.getJournalInfo.appendEventsPerSecond</span> messages</strong>
                         have been appended in the last second,
-                        <strong>@node.getJournalInfo.readEventsPerSecond messages</strong>
+                        <strong><span class="number-format" data-format="0,0">@node.getJournalInfo.readEventsPerSecond</span> messages</strong>
                         have been read in the last second.
                     }
                 </div>
