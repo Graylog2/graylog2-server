@@ -26,9 +26,9 @@
 
     <div class="well well-small">
         You can pause message processing at any time. The process buffers will not accept any new messages until you
-        resume it. It is important to keep in mind that incoming messages (except those from inputs that support rejecting
-        messages, like AMQP) are buffered in memory. This means that they will be lost if you stop or restart the server
-        until they are processed or you run out of memory. Messages already accepted will be processed completely.
+        resume it. If the message journal is enabled for a node, which it is by default, incoming messages will be
+        persisted to disk, even when processing is disabled. If it is disabled, you might lose messages sent to inputs
+        that do not support buffering, such as TCP and UDP-based inputs.
     </div>
 
     <h2><i class="icon icon-code-fork"></i> Server nodes</h2>

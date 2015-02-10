@@ -4,6 +4,7 @@
 var $ = require('jquery');
 
 var dc = require('dc');
+var numeral = require('numeral');
 
 var React = require('react');
 
@@ -16,6 +17,7 @@ var SourcePieChart = React.createClass({
             .renderLabel(false)
             .dimension(dimension)
             .group(group)
+            .title((d) => { return d.key + ": " + numeral(d.value).format("0,0"); })
             .renderlet((chart) => {
                 chart.selectAll(".pie-slice").on("click", () => {
                     onDataFiltered();

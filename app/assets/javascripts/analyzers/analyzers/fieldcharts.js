@@ -235,7 +235,7 @@ $(document).ready(function() {
                         var dateMoment = momentHelper.toUserTimeZone(new Date(x * 1000 ));
                         var date = '<span class="date">' + dateMoment.format('ddd MMM DD YYYY HH:mm:ss ZZ') + '</span>';
                         var swatch = '<span class="detail_swatch" style="background-color: ' + series.color + '"></span>';
-                        var content = swatch + '[' + series.valuetype + '] ' + series.field + ': ' + numeral(y).format('0.[000]') + '<br>' + date;
+                        var content = swatch + '[' + series.valuetype + '] ' + series.field + ': ' + numeral(y).format('0,0.[000]') + '<br>' + date;
                         return content;
                     }
                 });

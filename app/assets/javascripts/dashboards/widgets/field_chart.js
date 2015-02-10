@@ -111,7 +111,7 @@ function updateWidget_field_chart(widget, data) {
             var dateMoment = momentHelper.toUserTimeZone(new Date(x * 1000 ));
             var date = '<span class="date">' + dateMoment.format('ddd MMM DD YYYY HH:mm:ss ZZ') + '</span>';
             var swatch = '<span class="detail_swatch"></span>';
-            var content = '[' + graphElem.attr("data-config-valuetype") + '] ' + field + ': ' + numeral(y).format('0.[000]') + '<br>' + date;
+            var content = '[' + graphElem.attr("data-config-valuetype") + '] ' + field + ': ' + numeral(y).format('0,0.[000]') + '<br>' + date;
             return content;
         }
     });

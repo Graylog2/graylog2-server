@@ -8,6 +8,7 @@ var $ = require('jquery');
 
 var d3 = require('d3');
 var dc = require('dc');
+var numeral = require('numeral');
 
 var UniversalSearch = require('../../logic/search/UniversalSearch');
 
@@ -31,7 +32,7 @@ var SourceDataTable = React.createClass({
                 (d) => "<button class='btn btn-mini btn-link dc-search-button' title='Search for this source'><i class='icon icon-search'></i></button>",
                 (d) => "<a href='javascript:undefined' class='dc-filter-link' title='Filter this source'>" + d.name +"</a>",
                 (d) => d.percentage.toFixed(2) + "%",
-                (d) => d.message_count
+                (d) => numeral(d.message_count).format("0,0")
             ])
             .sortBy((d) => d.message_count)
             .order(d3.descending)
