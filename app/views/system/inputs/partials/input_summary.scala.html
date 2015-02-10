@@ -85,7 +85,7 @@
 
         <div class="well well-small">
             <ul>
-            @for((k,v) <- input.getAttributes) {
+            @for((k,v) <- input.getAttributes(inputTypes.get(input.getType))) {
                 <li>@k: @v</li>
             }
             </ul>
