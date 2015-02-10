@@ -37,7 +37,6 @@ import org.joda.time.DateTimeZone;
 
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
@@ -99,14 +98,18 @@ public abstract class DashboardWidget implements EmbeddedPersistable {
         }
 
         final TimeRange timeRange;
-        if (rangeType.equals("relative")) {
-            timeRange = new RelativeRange(Integer.parseInt((String) awr.config().get("range")));
-        } else if (rangeType.equals("keyword")) {
-            timeRange = new KeywordRange((String) awr.config().get("keyword"));
-        } else if (rangeType.equals("absolute")) {
-            timeRange = new AbsoluteRange((String) awr.config().get("from"), (String) awr.config().get("to"));
-        } else {
-            throw new InvalidRangeParametersException("range_type not recognized");
+        switch (rangeType) {
+            case "relative":
+                timeRange = new RelativeRange(Integer.parseInt((String) awr.config().get("range")));
+                break;
+            case "keyword":
+                timeRange = new KeywordRange((String) awr.config().get("keyword"), true);
+                break;
+            case "absolute":
+                timeRange = new AbsoluteRange((String) awr.config().get("from"), (String) awr.config().get("to"));
+                break;
+            default:
+                throw new InvalidRangeParametersException("range_type not recognized");
         }
 
         return buildDashboardWidget(type, metricRegistry, searches, id, awr.description(), 0, awr.config(),
@@ -132,17 +135,21 @@ public abstract class DashboardWidget implements EmbeddedPersistable {
         }
 
         TimeRange timeRange;
-        if (rangeType.equals("relative")) {
-            timeRange = new RelativeRange((Integer) timerangeConfig.get("range"));
-        } else if (rangeType.equals("keyword")) {
-            timeRange = new KeywordRange((String) timerangeConfig.get("keyword"));
-        } else if (rangeType.equals("absolute")) {
-            String from = new DateTime(timerangeConfig.get("from"), DateTimeZone.UTC).toString(Tools.ES_DATE_FORMAT);
-            String to = new DateTime(timerangeConfig.get("to"), DateTimeZone.UTC).toString(Tools.ES_DATE_FORMAT);
+        switch (rangeType) {
+            case "relative":
+                timeRange = new RelativeRange((Integer) timerangeConfig.get("range"));
+                break;
+            case "keyword":
+                timeRange = new KeywordRange((String) timerangeConfig.get("keyword"), true);
+                break;
+            case "absolute":
+                String from = new DateTime(timerangeConfig.get("from"), DateTimeZone.UTC).toString(Tools.ES_DATE_FORMAT);
+                String to = new DateTime(timerangeConfig.get("to"), DateTimeZone.UTC).toString(Tools.ES_DATE_FORMAT);
 
-            timeRange = new AbsoluteRange(from, to);
-        } else {
-            throw new InvalidRangeParametersException("range_type not recognized");
+                timeRange = new AbsoluteRange(from, to);
+                break;
+            default:
+                throw new InvalidRangeParametersException("range_type not recognized");
         }
 
         final String description = (String) fields.get(FIELD_DESCRIPTION);
