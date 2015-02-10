@@ -71,7 +71,7 @@ resultHistogram = {
                 var dateMoment = momentHelper.toUserTimeZone(new Date(x * 1000 ));
                 var date = '<span class="date">' + dateMoment.format('ddd MMM DD YYYY HH:mm:ss ZZ') + '</span>';
                 var swatch = '<span class="detail_swatch"></span>';
-                var content = parseInt(y) + ' messages<br>' + date;
+                var content = numeral(parseInt(y)).format("0,0") + ' messages<br>' + date;
                 return content;
             },
             xFormatter: function(x) {
