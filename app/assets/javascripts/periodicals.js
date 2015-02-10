@@ -13,7 +13,7 @@ $(document).ready(function() {
                 url: appPrefixed('/a/messagecounts/total'),
                 headers: { "X-Graylog2-No-Session-Extension" : "true"},
                 success: function(data) {
-                    $(".total-events").intChange(data.events)
+                    $(".total-events").intChange(numeral(data.events).format("0,0"))
                 },
                 error: function() {
                     $(".total-events").text("?");
@@ -35,7 +35,7 @@ $(document).ready(function() {
                 url: appPrefixed('/a/system/throughput'),
                 headers: { "X-Graylog2-No-Session-Extension" : "true"},
                 success: function(data) {
-                    $(".total-throughput").text(data.throughput);
+                    $(".total-throughput").text(numeral(data.throughput).format("0,0"));
 
                     if (data.nodecount > 1) {
                         $(".total-nodes").html(" across <strong>" + data.nodecount + "</strong> nodes");
@@ -76,7 +76,7 @@ $(document).ready(function() {
                     url: appPrefixed(url),
                     headers: { "X-Graylog2-No-Session-Extension" : "true"},
                     success: function(data) {
-                        thisNodeT.text(data.throughput);
+                        thisNodeT.text(numeral(data.throughput).format("0,0"));
                     },
                     error: function() {
                         thisNodeT.text("?");
@@ -89,7 +89,7 @@ $(document).ready(function() {
                     }
                 });
             });
-        };
+        }
     })();
 
     // Node heap usage.
@@ -116,9 +116,9 @@ $(document).ready(function() {
                         $(".progress .heap-used-percent", thisHeap).css("width", data.used_percentage + "%");
                         $(".progress .heap-total-percent", thisHeap).css("width", total_percentage + "%");
 
-                        $(".heap-used", thisHeap).text(data.used);
-                        $(".heap-total", thisHeap).text(data.total);
-                        $(".heap-max", thisHeap).text(data.max);
+                        $(".heap-used", thisHeap).text(numeral(data.used).format("0,0"));
+                        $(".heap-total", thisHeap).text(numeral(data.total).format("0,0"));
+                        $(".heap-max", thisHeap).text(numeral(data.max).format("0,0"));
                     },
                     complete: function() {
                         // Trigger next call of the whole function when we updated the last element.
@@ -374,7 +374,7 @@ $(document).ready(function() {
                     url: appPrefixed('/a/system/internallogs/' + encodeURIComponent(nodeId)),
                     headers: { "X-Graylog2-No-Session-Extension" : "true"},
                     success: function(data) {
-                        logs.intChange(data.total);
+                        logs.intChange(numeral(data.total).format("0,0"));
                     }
                 });
 
@@ -399,9 +399,9 @@ $(document).ready(function() {
                         for (var level in data) {
                             var metrics = data[level];
                             var list = $("dl.loglevel-metrics-list[data-level=" + level + "]", theseMetrics);
-                            $(".loglevel-metric-total", list).intChange(metrics.total);
-                            $(".loglevel-metric-mean", list).intChange(metrics.mean_rate);
-                            $(".loglevel-metric-1min", list).intChange(metrics.one_min_rate);
+                            $(".loglevel-metric-total", list).intChange(numeral(metrics.total).format("0,0"));
+                            $(".loglevel-metric-mean", list).intChange(numeral(metrics.mean_rate).format("0,0.[00]"));
+                            $(".loglevel-metric-1min", list).intChange(numeral(metrics.one_min_rate).format("0,0.[00]"));
                         }
                     }
                 });
