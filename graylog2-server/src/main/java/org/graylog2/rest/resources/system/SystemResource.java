@@ -142,8 +142,8 @@ public class SystemResource extends RestResource {
     @PUT
     @Timed
     @ApiOperation(value = "Pauses message processing",
-            notes = "Inputs that are able to reject or requeue messages will do so, others will buffer messages in " +
-                    "memory. Keep an eye on the heap space utilization while message processing is paused.")
+            notes = "If the message journal is enabled, incoming messages will be spooled on disk, if it is disabled, " +
+                    "you might lose messages from inputs which cannot buffer themselves, like AMQP or Kafka-based inputs.")
     @Path("/processing/pause")
     public void pauseProcessing() {
         checkPermission(RestPermissions.PROCESSING_CHANGESTATE, serverStatus.getNodeId().toString());
