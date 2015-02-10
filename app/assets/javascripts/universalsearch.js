@@ -78,9 +78,11 @@ $(document).ready(function() {
                 },
                 success: function(data) {
                     $(".not-recognized").hide();
+                    var fromMoment = momentHelper.toUserTimeZone(data.from);
+                    var toMoment = momentHelper.toUserTimeZone(data.to);
 
-                    $(".from", preview).text(data.from);
-                    $(".to", preview).text(data.to);
+                    $(".from", preview).text(fromMoment.format("YYYY-MM-DD HH:mm:ss"));
+                    $(".to", preview).text(toMoment.format("YYYY-MM-DD HH:mm:ss"));
                     $(".fromto", preview).show();
                 },
                 statusCode: { 422: function() {
