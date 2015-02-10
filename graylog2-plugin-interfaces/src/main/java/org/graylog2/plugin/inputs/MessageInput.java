@@ -37,7 +37,6 @@ import org.graylog2.plugin.buffers.InputBuffer;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationException;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
-import org.graylog2.plugin.configuration.fields.TextField;
 import org.graylog2.plugin.inputs.codecs.Codec;
 import org.graylog2.plugin.inputs.transports.Transport;
 import org.graylog2.plugin.journal.RawMessage;
@@ -45,9 +44,7 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public abstract class MessageInput implements Stoppable {
@@ -253,37 +250,9 @@ public abstract class MessageInput implements Stoppable {
         this.contentPack = contentPack;
     }
 
-    @SuppressWarnings("unchecked")
+    @Deprecated
     public Map<String, Object> getAttributesWithMaskedPasswords() {
-        final ConfigurationRequest config = getRequestedConfiguration();
-        if (config == null) {
-            return Collections.emptyMap();
-        }
-
-        final Map<String, Object> attributes = configuration.getSource();
-        final Map<String, Object> result = Maps.newHashMapWithExpectedSize(attributes.size());
-        for (Map.Entry<String, Object> attribute : attributes.entrySet()) {
-            Object value = attribute.getValue();
-
-            final Map<String, Map<String, Object>> configAsList = config.asList();
-            final Map<String, Object> attributesForConfigSetting = configAsList.get(attribute.getKey());
-
-            if (attributesForConfigSetting != null) {
-                // we know the config setting, check its attributes
-                final List<String> attrs = (List<String>) attributesForConfigSetting.get("attributes");
-                if (attrs.contains(TextField.Attribute.IS_PASSWORD.toString().toLowerCase())) {
-                    value = "********";
-                }
-            } else {
-                // safety measure, although this is bad.
-                LOG.warn("Unknown input configuration setting {}={} found. Not trying to mask its value," +
-                        " though this is likely a bug.", attribute, value);
-            }
-
-            result.put(attribute.getKey(), value);
-        }
-
-        return result;
+        return configuration.getSource();
     }
 
     @JsonValue

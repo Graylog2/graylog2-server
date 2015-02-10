@@ -17,12 +17,14 @@
 package org.graylog2.restclient.models;
 
 import com.google.common.base.Joiner;
+import com.google.common.collect.Maps;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import org.graylog2.restclient.lib.APIException;
 import org.graylog2.restclient.lib.ApiClient;
 import org.graylog2.restclient.lib.metrics.Gauge;
 import org.graylog2.restclient.lib.metrics.Metric;
+import org.graylog2.restclient.lib.plugin.configuration.RequestedConfigurationField;
 import org.graylog2.restclient.lib.timeranges.InvalidRangeParametersException;
 import org.graylog2.restclient.lib.timeranges.RelativeRange;
 import org.graylog2.restclient.models.api.requests.AddStaticFieldRequest;
@@ -30,6 +32,7 @@ import org.graylog2.restclient.models.api.requests.MultiMetricRequest;
 import org.graylog2.restclient.models.api.responses.metrics.GaugeResponse;
 import org.graylog2.restclient.models.api.responses.metrics.MetricsListResponse;
 import org.graylog2.restclient.models.api.responses.system.InputSummaryResponse;
+import org.graylog2.restclient.models.api.responses.system.InputTypeSummaryResponse;
 import org.graylog2.restclient.models.api.results.MessageResult;
 import org.graylog2.restroutes.generated.routes;
 import org.joda.time.DateTime;
@@ -260,6 +263,19 @@ public class Input {
 
     public Map<String, Object> getAttributes() {
         return attributes;
+    }
+    public Map<String, Object> getAttributes(InputTypeSummaryResponse typeSummaryResponse ) {
+        Map<String, Object> result = Maps.newHashMapWithExpectedSize(attributes.size());
+
+        for (RequestedConfigurationField configurationField : typeSummaryResponse.getRequestedConfiguration()) {
+            if (configurationField.getAttributes().contains("is_password")) {
+                result.put(configurationField.getTitle(), "*******");
+            } else {
+                result.put(configurationField.getTitle(), attributes.get(configurationField.getTitle()));
+            }
+        }
+
+        return result;
     }
 
     public Boolean getGlobal() {
