@@ -62,7 +62,9 @@
                                 <i class="icon icon-external-link" style="font-size: 11px;"></i>
                             </a>
                         </li>
-                        <li><a href="@routes.NodesController.threadDump(jvm.getNodeId)">Get thread dump</a></li>
+                        @if(isPermitted(THREADS_DUMP)) {
+                            <li><a href="@routes.NodesController.threadDump(jvm.getNodeId)">Get thread dump</a></li>
+                        }
 
                         @if(isPermitted(PROCESSING_CHANGESTATE) || isPermitted(LBSTATUS_CHANGE) || isPermitted(NODE_SHUTDOWN)) {
                             <li class="divider"></li>
@@ -187,7 +189,9 @@
                             <li><a href="@routes.RadiosController.show(radio.getId)">Details</a></li>
                             <li><a href="@routes.InputsController.manageRadio(radio.getId)">Inputs</a></li>
                             <li><a href="@routes.MetricsController.ofRadio(radio.getId)">Metrics</a></li>
-                            <li><a href="@routes.RadiosController.threadDump(radio.getId)">Get thread dump</a></li>
+                            @if(isPermitted(THREADS_DUMP)) {
+                                <li><a href="@routes.RadiosController.threadDump(radio.getId)">Get thread dump</a></li>
+                            }
 
                             @if(isPermitted(LBSTATUS_CHANGE)) {
                                 <li class="divider"></li>

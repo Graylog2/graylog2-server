@@ -22,9 +22,13 @@
                 <span class="caret"></span>
             </a>
             <ul class="dropdown-menu">
-                <li><a href="@routes.NodesController.threadDump(node.getNodeId)">Get thread dump</a></li>
+                @if(isPermitted(THREADS_DUMP)) {
+                    <li><a href="@routes.NodesController.threadDump(node.getNodeId)">Get thread dump</a></li>
+                }
                 <li><a href="@routes.MetricsController.ofNode(node.getNodeId)">Metrics</a></li>
-                <li><a href="@routes.LoggingController.index()">Internal logging</a></li>
+                @if(isPermitted(LOGGERS_READ)) {
+                    <li><a href="@routes.LoggingController.index()">Internal logging</a></li>
+                }
                 <li>
                     <a href="@node.getTransportAddress/api-browser" target="_blank">
                         API Browser
