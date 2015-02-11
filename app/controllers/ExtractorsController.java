@@ -18,6 +18,7 @@
  */
 package controllers;
 
+import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.inject.Inject;
@@ -42,6 +43,7 @@ import play.mvc.Result;
 import views.helpers.Permissions;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -145,7 +147,7 @@ public class ExtractorsController extends AuthenticatedController {
 
             CreateExtractorRequest request;
             try {
-                 request = this.generateCreateExtractorRequest(form);
+                request = this.generateCreateExtractorRequest(form);
             } catch (NullPointerException e) {
                 Logger.error("Cannot build extractor configuration.", e);
                 return badRequest();
@@ -342,6 +344,7 @@ public class ExtractorsController extends AuthenticatedController {
          */
 
         int successes = 0;
+        List<String> failedExtractors = new ArrayList<>();
         for (ExtractorImportRequest importRequest : elir.extractors) {
             try {
                 Node node = nodeService.loadNode(nodeId);
@@ -365,9 +368,15 @@ public class ExtractorsController extends AuthenticatedController {
                 extractorService.create(node, node.getInput(inputId), extractor.toCreateExtractorRequest());
                 successes++;
             } catch (Exception e) {
-                Logger.error("Could not import extractor. Continuing.", e);
-                continue;
+                failedExtractors.add(importRequest.title);
+                Logger.error("Could not import extractor \"" + importRequest.title + "\": " + e.getMessage());
+                Logger.debug("Details for failing to import extractor \"" + importRequest.title + "\":", e);
             }
+        }
+
+        if (!failedExtractors.isEmpty()) {
+            flash("error", "Failed to import " + failedExtractors.size() + " extractors: "
+                    + Joiner.on(',').useForNull("[null title]").join(failedExtractors));
         }
 
         flash("success", "Successfully imported " + successes + " of " + elir.extractors.size() + " extractors.");
