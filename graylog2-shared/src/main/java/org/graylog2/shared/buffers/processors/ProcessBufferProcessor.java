@@ -25,6 +25,8 @@ import org.graylog2.plugin.buffers.MessageEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
+
 import static com.codahale.metrics.MetricRegistry.name;
 
 /**
@@ -52,28 +54,27 @@ public abstract class ProcessBufferProcessor implements WorkHandler<MessageEvent
     public void onEvent(MessageEvent event) throws Exception {
         // Decode the RawMessage to a Message object. The DecodingProcessor used to be a separate handler in the
         // ProcessBuffer. Due to performance problems discovered during 1.0.0 testing, we decided to move this here.
-        // TODO The DecodingProcessor does not need to be a EventHandler. We decided to do it like this to keep the change as small as possible for 1.0.0.
-        decodingProcessor.onEvent(event, 0L, false);
+        final List<Message> messages = decodingProcessor.decodeRaw(event);
 
-        final Message msg = event.getMessage();
-        if (msg == null) {
+        if (messages == null) {
             // skip message events which could not be decoded properly
             return;
         }
         incomingMessages.mark();
-        final Timer.Context tcx = processTime.time();
+        for (Message msg : messages) {
+            final Timer.Context tcx = processTime.time();
 
+            LOG.debug("Starting to process message <{}>.", msg.getId());
 
-        LOG.debug("Starting to process message <{}>.", msg.getId());
-
-        try {
-            LOG.debug("Finished processing message <{}>. Writing to output buffer.", msg.getId());
-            handleMessage(msg);
-        } catch (Exception e) {
-            LOG.warn("Unable to process message <{}>: {}", msg.getId(), e);
-        } finally {
-            outgoingMessages.mark();
-            tcx.stop();
+            try {
+                LOG.debug("Finished processing message <{}>. Writing to output buffer.", msg.getId());
+                handleMessage(msg);
+            } catch (Exception e) {
+                LOG.warn("Unable to process message <{}>: {}", msg.getId(), e);
+            } finally {
+                outgoingMessages.mark();
+                tcx.stop();
+            }
         }
     }
 
