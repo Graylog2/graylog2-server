@@ -24,7 +24,6 @@
     }
 
     function assertUpdateEnabled(callback) {
-
         if (!focussed) {
             setTimeout(callback, recheckInterval);
         }
@@ -41,12 +40,7 @@
     }
 
     function assertExpensiveUpdateEnabled(callback) {
-        var enabled = focussed && expensiveUpdatesEnabled;
-
-        if (!enabled) {
-            setTimeout(callback, recheckInterval);
-        }
-        return enabled;
+        return expensiveUpdatesEnabled;
     }
 
     exports.assertUpdateEnabled = assertUpdateEnabled;
