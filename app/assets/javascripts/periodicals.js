@@ -3,7 +3,7 @@ $(document).ready(function() {
     (function updateTotalEvents() {
         if ($(".total-events").length > 0) {
             var interval = 2500;
-            if (!assertExpensiveUpdateEnabled(updateTotalEvents)) {
+            if (!assertExpensiveUpdateEnabled()) {
                 $(".expensive-update").hide();
                 return;
             }
