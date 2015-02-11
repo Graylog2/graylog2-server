@@ -153,6 +153,8 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
         this.messagesWritten = metricRegistry.meter(name(this.getClass(), "messagesWritten"));
         this.messagesRead = metricRegistry.meter(name(this.getClass(), "messagesRead"));
 
+        registerUncommittedGauge(metricRegistry, name(this.getClass(), "uncommittedMessages"));
+
         // the registerHdrTimer helper doesn't throw on existing metrics
         this.writeTime = registerHdrTimer(metricRegistry, name(this.getClass(), "writeTime"));
         this.readTime = registerHdrTimer(metricRegistry, name(this.getClass(), "readTime"));
@@ -276,6 +278,20 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
             timer = Iterables.getOnlyElement(timers.values());
         }
         return timer;
+    }
+
+    private void registerUncommittedGauge(MetricRegistry metricRegistry, String name) {
+        try {
+            metricRegistry.register(name,
+                                    new Gauge<Long>() {
+                                        @Override
+                                        public Long getValue() {
+                                            return Math.max(0, getLogEndOffset() - 1 - committedOffset.get());
+                                        }
+                                    });
+        } catch (IllegalArgumentException ignored) {
+            // already registered, we'll ignore that.
+        }
     }
 
     public int getPurgedSegmentsInLastRetention() {
@@ -489,6 +505,7 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
                         i);
             }
         } while (!committedOffset.compareAndSet(prev, Math.max(offset, prev)));
+
     }
 
     /**
