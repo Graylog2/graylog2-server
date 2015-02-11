@@ -62,31 +62,7 @@ public class Cluster {
         ClusterStateMonitor.setCluster(this);
     }
 
-    public String getName() {
-        return health().getClusterName();
-    }
-
-    public ClusterHealthStatus getHealth() {
-        return health().getStatus();
-    }
-
-    public int getActiveShards() {
-        return health().getActiveShards();
-    }
-
-    public int getInitializingShards() {
-        return health().getInitializingShards();
-    }
-
-    public int getUnassignedShards() {
-        return health().getUnassignedShards();
-    }
-
-    public int getRelocatingShards() {
-        return health().getRelocatingShards();
-    }
-
-    private ClusterHealthResponse health() {
+    public ClusterHealthResponse health() {
         String[] indices = deflector.getAllDeflectorIndexNames();
         return c.admin().cluster().health(new ClusterHealthRequest(indices)).actionGet();
     }
@@ -158,7 +134,7 @@ public class Cluster {
             return false;
         }
         try {
-            return getHealth() != ClusterHealthStatus.RED;
+            return health().getStatus() != ClusterHealthStatus.RED;
         } catch (ElasticsearchException e) {
             LOG.trace("Couldn't determine Elasticsearch health properly", e);
             return false;
