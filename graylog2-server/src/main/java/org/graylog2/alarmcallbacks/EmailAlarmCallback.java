@@ -17,7 +17,6 @@
 package org.graylog2.alarmcallbacks;
 
 import com.google.common.collect.Lists;
-import javax.inject.Inject;
 import org.graylog2.alerts.AlertSender;
 import org.graylog2.alerts.FormattedEmailAlertSender;
 import org.graylog2.notifications.Notification;
@@ -38,6 +37,7 @@ import org.graylog2.shared.utilities.ExceptionStringFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
 import java.util.List;
 import java.util.Map;
 
@@ -114,7 +114,7 @@ public class EmailAlarmCallback implements AlarmCallback {
         ConfigurationRequest configurationRequest = new ConfigurationRequest();
         configurationRequest.addField(new TextField("sender",
                 "Sender",
-                "graylog2@example.org",
+                "graylog@example.org",
                 "The sender of sent out mail alerts",
                 ConfigurationField.Optional.NOT_OPTIONAL));
 
