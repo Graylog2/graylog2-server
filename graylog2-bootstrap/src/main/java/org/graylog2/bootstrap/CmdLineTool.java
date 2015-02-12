@@ -280,7 +280,7 @@ public abstract class CmdLineTool implements Runnable {
             }
         }
 
-        LOG.debug("Loaded plugins: " + plugins);
+        LOG.info("Loaded plugins: " + plugins);
         return plugins;
     }
 
