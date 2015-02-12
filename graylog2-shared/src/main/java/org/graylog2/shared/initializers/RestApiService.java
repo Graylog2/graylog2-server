@@ -272,8 +272,6 @@ public class RestApiService extends AbstractIdleService {
                 .property(NettyContainer.PROPERTY_BASE_URI, listenUri)
                 .registerClasses(
                         JacksonJaxbJsonProvider.class,
-                        MessageBodyReader.class,
-                        MessageBodyWriter.class,
                         JsonProcessingExceptionMapper.class,
                         JacksonPropertyExceptionMapper.class,
                         AnyExceptionClassMapper.class,
