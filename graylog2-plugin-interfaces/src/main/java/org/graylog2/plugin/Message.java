@@ -61,7 +61,7 @@ public class Message {
     public static final String FIELD_TIMESTAMP = "timestamp";
     public static final String FIELD_STREAMS = "streams";
 
-    private static final Pattern VALID_KEY_CHARS = Pattern.compile("^[\\w\\.\\-]*$");
+    private static final Pattern VALID_KEY_CHARS = Pattern.compile("^[\\w\\.\\-@]*$");
 
     public static final ImmutableSet<String> RESERVED_FIELDS = ImmutableSet.of(
             // ElasticSearch fields.
