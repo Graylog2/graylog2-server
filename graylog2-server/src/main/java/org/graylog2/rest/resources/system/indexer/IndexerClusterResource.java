@@ -21,6 +21,7 @@ import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.elasticsearch.action.admin.cluster.health.ClusterHealthResponse;
 import org.graylog2.indexer.cluster.Cluster;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.rest.resources.system.indexer.responses.ClusterHealth;
@@ -48,7 +49,7 @@ public class IndexerClusterResource extends RestResource {
     @ApiOperation(value = "Get the cluster name")
     @Produces(MediaType.APPLICATION_JSON)
     public ClusterName clusterName() {
-        return ClusterName.create(cluster.getName());
+        return ClusterName.create(cluster.health().getClusterName());
     }
 
     @GET
@@ -58,12 +59,13 @@ public class IndexerClusterResource extends RestResource {
     @RequiresPermissions(RestPermissions.INDEXERCLUSTER_READ)
     @Produces(MediaType.APPLICATION_JSON)
     public ClusterHealth clusterHealth() {
+        final ClusterHealthResponse health = cluster.health();
         final ClusterHealth.ShardStatus shards = ClusterHealth.ShardStatus.create(
-                cluster.getActiveShards(),
-                cluster.getInitializingShards(),
-                cluster.getRelocatingShards(),
-                cluster.getUnassignedShards());
+                health.getActiveShards(),
+                health.getInitializingShards(),
+                health.getRelocatingShards(),
+                health.getUnassignedShards());
 
-        return ClusterHealth.create(cluster.getHealth().toString().toLowerCase(), shards);
+        return ClusterHealth.create(health.getStatus().toString().toLowerCase(), shards);
     }
 }

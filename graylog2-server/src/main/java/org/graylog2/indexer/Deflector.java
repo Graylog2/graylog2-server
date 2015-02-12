@@ -289,6 +289,10 @@ public class Deflector { // extends Ablenkblech
         return deflectorName;
     }
 
+    public String getDeflectorWildcard() {
+        return indexPrefix + SEPARATOR + "*";
+    }
+
     public boolean isDeflectorAlias(final String indexName) {
         return getName().equals(indexName);
     }
