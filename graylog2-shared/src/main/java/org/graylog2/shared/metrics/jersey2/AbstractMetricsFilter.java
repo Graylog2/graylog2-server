@@ -16,6 +16,8 @@
  */
 package org.graylog2.shared.metrics.jersey2;
 
+import javax.annotation.Priority;
+import javax.ws.rs.Priorities;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.ContainerResponseContext;
@@ -25,6 +27,7 @@ import java.lang.reflect.Method;
 
 import static com.codahale.metrics.MetricRegistry.name;
 
+@Priority(Priorities.HEADER_DECORATOR)
 public abstract class AbstractMetricsFilter implements ContainerRequestFilter, ContainerResponseFilter {
 
     protected String chooseName(String explicitName, boolean absolute, Method method, String... suffixes) {

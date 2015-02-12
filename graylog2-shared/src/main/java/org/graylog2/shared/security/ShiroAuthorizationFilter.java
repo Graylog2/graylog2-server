@@ -22,12 +22,15 @@ import org.apache.shiro.subject.Subject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Priority;
 import javax.ws.rs.NotAuthorizedException;
+import javax.ws.rs.Priorities;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.core.SecurityContext;
 import java.io.IOException;
 
+@Priority(Priorities.AUTHORIZATION)
 public class ShiroAuthorizationFilter implements ContainerRequestFilter {
     private static final Logger LOG = LoggerFactory.getLogger(ShiroAuthorizationFilter.class);
     private final RequiresPermissions annotation;
