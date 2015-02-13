@@ -51,11 +51,4 @@ public class LoginRequest {
         this.password = password;
     }
 
-    public boolean isNoStartpage() {
-        return noStartpage;
-    }
-
-    public void setNoStartpage(boolean noStartpage) {
-        this.noStartpage = noStartpage;
-    }
 }
