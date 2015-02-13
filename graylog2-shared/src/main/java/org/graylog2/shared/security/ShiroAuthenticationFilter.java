@@ -21,21 +21,18 @@ import org.apache.shiro.authc.LockedAccountException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Priority;
 import javax.ws.rs.NotAuthorizedException;
+import javax.ws.rs.Priorities;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.core.SecurityContext;
 import java.io.IOException;
 
-/**
- * @author Kay Roepke <kay@torch.sh>
- */
+@Priority(Priorities.AUTHENTICATION)
 public class ShiroAuthenticationFilter implements ContainerRequestFilter {
     private static final Logger LOG = LoggerFactory.getLogger(ShiroAuthenticationFilter.class);
 
-    public ShiroAuthenticationFilter() {
-
-    }
     @Override
     public void filter(ContainerRequestContext requestContext) throws IOException {
         final SecurityContext securityContext = requestContext.getSecurityContext();
@@ -48,7 +45,6 @@ public class ShiroAuthenticationFilter implements ContainerRequestFilter {
             try {
                 LOG.trace("Logging in {}", context.getSubject());
                 context.loginSubject();
-
             } catch (LockedAccountException e) {
                 LOG.debug("Unable to authenticate user, account is locked.", e);
                 throw new NotAuthorizedException(e, "Basic realm=\"Graylog Server\"");

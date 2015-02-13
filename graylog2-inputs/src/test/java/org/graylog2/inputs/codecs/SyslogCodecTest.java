@@ -97,6 +97,27 @@ public class SyslogCodecTest {
     }
 
     @Test
+    public void testDecodeStructuredIssue845WithExpandStructuredData() throws Exception {
+        when(configuration.getBoolean(SyslogCodec.CK_EXPAND_STRUCTURED_DATA)).thenReturn(true);
+
+        final SyslogCodec codec = new SyslogCodec(configuration, metricRegistry);
+        final Message message = codec.decode(buildRawMessage(STRUCTURED_ISSUE_845));
+
+        assertNotNull(message);
+        assertEquals(message.getMessage(), "User page 13 requested");
+        assertEquals(((DateTime) message.getField("timestamp")).withZone(DateTimeZone.UTC), new DateTime("2015-01-06T20:56:33.287Z", DateTimeZone.UTC));
+        assertEquals(message.getField("source"), "app-1");
+        assertEquals(message.getField("level"), 6);
+        assertEquals(message.getField("facility"), "local7");
+        assertEquals(message.getField("mdc@18060_ip"), "::ffff:132.123.15.30");
+        assertEquals(message.getField("mdc@18060_logger"), "{c.corp.Handler}");
+        assertEquals(message.getField("mdc@18060_session"), "4ot7");
+        assertEquals(message.getField("mdc@18060_user"), "user@example.com");
+        assertEquals(message.getField("mdc@18060_user-agent"), "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_5) AppleWebKit/600.2.5 (KHTML, like Gecko) Version/7.1.2 Safari/537.85.11");
+        assertEquals(message.getField("application_name"), "app");
+    }
+
+    @Test
     public void testDecodeStructuredIssue845Empty() throws Exception {
         final Message message = codec.decode(buildRawMessage(STRUCTURED_ISSUE_845_EMPTY));
 

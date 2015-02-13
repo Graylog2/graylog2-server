@@ -16,27 +16,28 @@
  */
 package org.graylog2.restclient.models;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
-import org.graylog2.restclient.lib.ApiClient;
 import org.graylog2.restclient.models.api.requests.CreateExtractorRequest;
 import org.graylog2.restclient.models.api.responses.system.ExtractorSummaryResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
+import static com.google.common.base.Preconditions.checkNotNull;
+
 public class Extractor {
-    private static final Logger log = LoggerFactory.getLogger(Extractor.class);
+    private static final Logger LOG = LoggerFactory.getLogger(Extractor.class);
 
     public interface Factory {
         Extractor fromResponse(ExtractorSummaryResponse esr);
+
         Extractor forCreate(CursorStrategy cursorStrategy,
                             @Assisted("title") String title,
                             @Assisted("sourceField") String sourceField,
@@ -77,6 +78,7 @@ public class Extractor {
         }
 
     }
+
     public enum ConditionType {
         NONE,
         STRING,
@@ -85,10 +87,7 @@ public class Extractor {
         public static ConditionType fromString(String name) {
             return valueOf(name.toUpperCase());
         }
-
     }
-    private final ApiClient api;
-    private final UserService userService;
 
     private String id;
     private final String title;
@@ -108,10 +107,7 @@ public class Extractor {
     private int order;
 
     @AssistedInject
-    private Extractor(ApiClient api, UserService userService, @Assisted ExtractorSummaryResponse esr) {
-        this.api = api;
-        this.userService = userService;
-
+    private Extractor(UserService userService, @Assisted ExtractorSummaryResponse esr) {
         this.id = esr.id;
         this.title = esr.title;
         this.cursorStrategy = CursorStrategy.fromString(esr.cursorStrategy);
@@ -129,20 +125,16 @@ public class Extractor {
         this.order = esr.order;
     }
 
+    @VisibleForTesting
     @AssistedInject
-    private Extractor(ApiClient api,
-                     UserService userService,
-                     @Assisted CursorStrategy cursorStrategy,
-                     @Assisted("title") String title,
-                     @Assisted("sourceField") String sourceField,
-                     @Assisted("targetField") String targetField,
-                     @Assisted Type type,
-                     @Assisted User creatorUser,
-                     @Assisted ConditionType conditionType,
-                     @Assisted("conditionValue") String conditionValue) {
-        this.api = api;
-        this.userService = userService;
-
+    Extractor(@Assisted CursorStrategy cursorStrategy,
+              @Assisted("title") String title,
+              @Assisted("sourceField") String sourceField,
+              @Assisted("targetField") String targetField,
+              @Assisted Type type,
+              @Assisted User creatorUser,
+              @Assisted ConditionType conditionType,
+              @Assisted("conditionValue") String conditionValue) {
         this.id = null;
         this.title = title;
         this.cursorStrategy = cursorStrategy;
@@ -182,7 +174,7 @@ public class Extractor {
         return request;
     }
 
-    public void loadConfigFromForm(Type extractorType, Map<String,String[]> form) {
+    public void loadConfigFromForm(Type extractorType, Map<String, String[]> form) {
         switch (extractorType) {
             case REGEX:
                 loadRegexConfig(form);
@@ -200,18 +192,25 @@ public class Extractor {
     }
 
     public void loadConfigFromImport(Type type, Map<String, Object> extractorConfig) {
+        checkNotNull(type, "Extractor type must not be null.");
+        checkNotNull(extractorConfig, "Extractor configuration must not be null.");
+
         // we go the really easy way here.
-        Map<String, String[]> looksLikeForm = Maps.newHashMap();
+        Map<String, String[]> looksLikeForm = Maps.newHashMapWithExpectedSize(extractorConfig.size());
 
         for (Map.Entry<String, Object> e : extractorConfig.entrySet()) {
-            looksLikeForm.put(e.getKey(), new String[]{ e.getValue().toString() });
+            looksLikeForm.put(e.getKey(), new String[]{e.getValue().toString()});
         }
 
         loadConfigFromForm(type, looksLikeForm);
     }
 
-    public void loadConvertersFromForm(Map<String,String[]> form) {
-        for(String name : extractSelectedConverters(form)) {
+    public void loadConvertersFromForm(Map<String, String[]> form) {
+        if (form == null || form.isEmpty()) {
+            return;
+        }
+
+        for (String name : extractSelectedConverters(form)) {
             Converter.Type converterType = Converter.Type.valueOf(name.toUpperCase());
             Map<String, Object> converterConfig = extractConverterConfig(converterType, form);
 
@@ -219,18 +218,19 @@ public class Extractor {
         }
     }
 
+    @SuppressWarnings("unchecked")
     public void loadConvertersFromImport(List<Map<String, Object>> imports) {
-        for (Map<String, Object> imp : imports) {
-            Converter converter = new Converter(
-                    Converter.Type.valueOf(((String) imp.get("type")).toUpperCase()),
-                    (Map<String, Object>) imp.get("config")
-            );
+        if (imports == null || imports.isEmpty()) {
+            return;
+        }
 
-            converters.add(converter);
+        for (Map<String, Object> imp : imports) {
+            final Converter.Type type = Converter.Type.valueOf(((String) imp.get("type")).toUpperCase());
+            converters.add(new Converter(type, (Map<String, Object>) imp.get("config")));
         }
     }
 
-    private Map<String, Object> extractConverterConfig(Converter.Type converterType, Map<String,String[]> form) {
+    private Map<String, Object> extractConverterConfig(Converter.Type converterType, Map<String, String[]> form) {
         Map<String, Object> config = Maps.newHashMap();
         switch (converterType) {
             case DATE:
@@ -255,16 +255,23 @@ public class Extractor {
                     } else if (csv_separator.length() == 2) {
                         if (csv_separator.charAt(0) == '\\') {
                             switch (csv_separator.charAt(1)) {
-                                case 'n': c = '\n'; break;
-                                case 't': c = '\t'; break;
-                                case '\\': c = '\\'; break;
-                                default: log.error("Unknown escape sequence {}, cannot create CSV converter", csv_separator);
+                                case 'n':
+                                    c = '\n';
+                                    break;
+                                case 't':
+                                    c = '\t';
+                                    break;
+                                case '\\':
+                                    c = '\\';
+                                    break;
+                                default:
+                                    LOG.error("Unknown escape sequence {}, cannot create CSV converter", csv_separator);
                             }
                         } else {
-                            log.error("Illegal escape sequence '{}', cannot create CSV converter", csv_separator);
+                            LOG.error("Illegal escape sequence '{}', cannot create CSV converter", csv_separator);
                         }
                     } else {
-                        log.error("No valid separator, cannot create CSV converter.");
+                        LOG.error("No valid separator, cannot create CSV converter.");
                     }
                     config.put("separator", c);
                 }
@@ -287,22 +294,25 @@ public class Extractor {
     }
 
     private List<String> extractSelectedConverters(Map<String, String[]> form) {
-        List<String> result = Lists.newArrayList();
+        if (form == null || form.isEmpty()) {
+            return Collections.emptyList();
+        }
 
-        for (Map.Entry<String,String[]> f : form.entrySet()) {
+        final List<String> result = Lists.newArrayListWithCapacity(form.size());
+        for (Map.Entry<String, String[]> f : form.entrySet()) {
             try {
                 if (f.getKey().startsWith("converter_") && f.getValue()[0].equals("enabled")) {
                     result.add(f.getKey().substring("converter_".length()));
                 }
-            } catch(Exception e) {
-                continue;
+            } catch (Exception e) {
+                // Ignore
             }
         }
 
         return result;
     }
 
-    private void loadRegexConfig(Map<String,String[]> form) {
+    private void loadRegexConfig(Map<String, String[]> form) {
         if (!formFieldSet(form, "regex_value")) {
             throw new RuntimeException("Missing extractor config: regex_value");
         }
@@ -310,7 +320,7 @@ public class Extractor {
         extractorConfig.put("regex_value", form.get("regex_value")[0]);
     }
 
-    private void loadSubstringConfig(Map<String,String[]> form) {
+    private void loadSubstringConfig(Map<String, String[]> form) {
         if (!formFieldSet(form, "begin_index") || !formFieldSet(form, "end_index")) {
             throw new RuntimeException("Missing extractor config: begin_index or end_index.");
         }
@@ -319,7 +329,7 @@ public class Extractor {
         extractorConfig.put("end_index", Integer.parseInt(form.get("end_index")[0]));
     }
 
-    private void loadSplitAndIndexConfig(Map<String,String[]> form) {
+    private void loadSplitAndIndexConfig(Map<String, String[]> form) {
         if (!formFieldSet(form, "split_by") || !formFieldSet(form, "index")) {
             throw new RuntimeException("Missing extractor config: split_by or index.");
         }
@@ -327,8 +337,8 @@ public class Extractor {
         extractorConfig.put("split_by", form.get("split_by")[0]);
         extractorConfig.put("index", Integer.parseInt(form.get("index")[0]));
     }
-    
-    private void loadGrokConfig(Map<String,String[]> form) {
+
+    private void loadGrokConfig(Map<String, String[]> form) {
         if (!formFieldSet(form, "grok_pattern")) {
             throw new RuntimeException("Missing extractor config: grok_pattern");
         }
@@ -336,14 +346,18 @@ public class Extractor {
         extractorConfig.put("grok_pattern", form.get("grok_pattern")[0]);
     }
 
-    private boolean formFieldSet(Map<String,String[]> form, String key) {
+    private boolean formFieldSet(Map<String, String[]> form, String key) {
         return form.get(key) != null && form.get(key)[0] != null && !form.get(key)[0].isEmpty();
     }
 
+    @SuppressWarnings("unchecked")
     private List<Converter> buildConverterList(List<Map<String, Object>> converters) {
-        List<Converter> cl = Lists.newArrayList();
+        if (converters == null || converters.isEmpty()) {
+            return Collections.emptyList();
+        }
 
-        for(Map<String, Object> converterSummary : converters) {
+        final List<Converter> cl = Lists.newArrayListWithCapacity(converters.size());
+        for (Map<String, Object> converterSummary : converters) {
             cl.add(new Converter(
                     Converter.Type.fromString(converterSummary.get("type").toString()),
                     (Map<String, Object>) converterSummary.get("config")
