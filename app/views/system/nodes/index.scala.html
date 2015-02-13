@@ -170,6 +170,13 @@
 
 
     <h2 class="radios-head"><i class="icon icon-double-angle-down"></i> Radio nodes</h2>
+
+    <div class="alert alert-warning">
+        The Graylog Radio components are deprecated and will not be supported in future versions. Read more about this
+        topic and how to adapt your infrastructure
+        <a href="http://docs.graylog.org/en/latest/pages/architecture.html#highly-available-setup-with-graylog-radio">here</a>.
+    </div>
+
     @if(!radios.isEmpty) {
         @for(radio <- radios.values()) {
             <div class="row-fluid message-processing-host node-row">
