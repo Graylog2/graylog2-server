@@ -16,30 +16,32 @@ ul {
 }
 
 h1, h2, h3, h4, h5, h6 {
-	font-weight: normal;
-	padding: 0;
-	margin: 0;
+  font-weight: normal;
+  padding: 0;
+  margin: 0;
+  color: #333
 }
 
 h1 {
-	font-size: 26px;
-	line-height: 28px;
-    margin-bottom: 3px;
+  font-size: 28px;
 }
 
 h2 {
-	font-size: 18px;
-	line-height: 26px;
+  font-size: 21px;
 }
 
 h3 {
-	font-size: 15px;
-	line-height: 26px;
+  font-size: 18px;
 }
 
 h4 {
-    font-size: 13px;
-    line-height: 20px;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+h4 {
+  font-size: 14px;
+  font-weight: normal;
 }
 
 h1.username {
@@ -121,10 +123,38 @@ a:active, select:active, input[type="file"]:active, input[type="radio"]:active, 
 	font-size: 12px;
 }
 
-#main-content, #sidebar-inner, #universalsearch {
+#sidebar-inner, #universalsearch {
 	padding: 15px;
 	background-color: #fff;
     border: 1px solid #D1D1D1;
+}
+
+.content {
+  padding-top: 15px;
+  padding-bottom: 15px;
+  background-color: #fff;
+  border: 1px solid #D1D1D1;
+  margin-bottom: 10px;
+}
+
+.content-head {
+  padding-bottom: 0px;
+}
+
+.content-head p.description {
+  color: #16ace3;
+}
+
+.content-head p {
+  margin-top: 15px;
+}
+
+.content-head p.description-tooltips .fa-stack {
+  margin-right: 3px;
+}
+
+#main-content {
+  padding: 15px;
 }
 
 #sidebar {

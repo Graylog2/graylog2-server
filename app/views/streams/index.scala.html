@@ -8,106 +8,123 @@
 
 @main("Streams", views.html.sidebars.standard(currentUser), "", currentUser, false) {
 
-    @if(isPermitted(STREAMS_CREATE)) {
-        <a href="@routes.StreamsController.newStream()" class="btn btn-success pull-right">Create stream</a>
-    }
+    <div class="row content content-head">
+        <div class="col-md-10">
+            <h1>Streams</h1>
 
-    <div class="row-fluid">
-        <h1><i class="icon icon-barcode"></i> Streams</h1>
+            <p class="description">
+                You can route incoming messages into streams by applying rules against them. If a message
+                matches all rules of a stream it is routed into it. A message can be routed into multiple
+                streams. You can for example create a stream that contains all SSH logins and configure
+                to be alerted whenever there are more logins than usual.
+            </p>
 
-        You can route incoming messages into streams by applying rules against them. If a message
-        matches all rules of a stream it is routed into it. A message can be routed into multiple
-        streams. You can for example create a stream that contains all SSH logins and configure
-        to be alerted whenever there are more logins than usual.
-    </div>
-
-    @for(stream <- streams.filter(stream => isPermitted(STREAMS_READ, stream.getId)).sortBy(_.getTitle)) {
-        <div class="row-fluid node-row stream-row" data-stream-id="@stream.getId">
-            <span class="pull-right node-row-info">
-                Created by @views.html.partials.links.to_user.render(stream.getCreatorUser)
-                @DateHelper.readablePeriodFromNow(stream.getCreatedAt)
-
-                &nbsp;@if(isPermitted(STREAMS_EDIT, stream.getId)) {
-                    <button class="btn btn-danger btn-mini remove-stream" type="submit"
-                    data-removeUrl="@routes.StreamsController.delete(stream.getId)">
-                        <i class="icon icon-remove"></i> Delete
-                    </button>
-                }
-
-                <div class="btn-group">
-                    @views.html.partials.streams.action_menu.render(stream, nodes, currentUser, "btn-mini")
-                </div>
-            </span>
-
-            <h3>
-                <i class="icon icon-ellipsis-vertical"></i>
-                @if(stream.getContentPack != null) {
-                    <span title="Created from content pack"><i class="icon-gift created-from-content-pack"></i></span>
-                }
-                <a class="added-width-search-link" href="@routes.StreamSearchController.index(stream.getId, "*", "relative", 300)">
-                    @stream.getTitle
-                </a>
-
-                @if(stream.getDisabled) {
-                    <span class="label label-important">Paused</span>
-                }
-            </h3>
-
-            <div class="stream-row-details">
-                <div class="stream-description">
-                    @if(stream.getDescription != null && !stream.getDescription.isEmpty) {
-                        <strong>Description:</strong> @stream.getDescription
-                    } else {
-                        No description set.
-                    }
-                </div>
-
-                <span class="throughput">
-                    <span>
-                        IO:
-                        <i class="icon icon-caret-right"></i>
-                        <span class="value node-throughput" data-node-type="stream" data-stream-id="@stream.getId">?</span>
-                        messages/second,
-                    </span>
+            <p class="description-tooltips">
+                <span class="fa-stack fa-lg">
+                    <i class="fa fa-circle fa-stack-2x"></i>
+                    <i class="fa fa-lightbulb-o fa-stack-1x fa-inverse"></i>
                 </span>
 
-                @if(stream.getStreamRules.isEmpty) {
-                    no configured rules.
-                    @if(isPermitted(STREAMS_EDIT, stream.getId)) {
-                    <a href="@routes.StreamRulesController.index(stream.getId)">
-                        Edit rules
-                    </a>
-                    }
-                } else {
-                    <span class="stream-rule-count" data-stream-id="@stream.getId">@stream.getStreamRules.size()</span> configured @pluralize("rule", stream.getStreamRules.size()).
+                <strong>
+                    Take a look at the
+                    <a href="http://docs.graylog.org/en/latest/pages/external_dashboards.html" style="color: #7b7d7d ;" target="_blank">Graylog stream dashboards</a>
+                    for wall-mounted displays or other integrations.
+                </strong>
+            </p>
+        </div>
 
-                    <a href="#" class="trigger-stream-rules">
-                        <i class="icon icon-caret-down"></i>
-                        <span>Show Rules</span>
-                    </a>
-                }
-            </div>
+        <div class="col-md-2" style="text-align: center; margin-top: 50px;">
+            @if(isPermitted(STREAMS_CREATE)) {
+                <a href="@routes.StreamsController.newStream()" class="btn btn-primary">Create stream</a>
+            }
+        </div>
+    </div>
 
-            <div class="streamrules-list-container" data-stream-id="@stream.getId">
-                <div class="streamrules-details" style="display: none;">
-                @views.html.partials.streamrules.list_well.render(stream.getStreamRules)
+    <div class="row content">
+        <div class="col-md-12">
+            @for(stream <- streams.filter(stream => isPermitted(STREAMS_READ, stream.getId)).sortBy(_.getTitle)) {
+                <div class="row-fluid node-row stream-row" data-stream-id="@stream.getId">
+                    <span class="pull-right node-row-info">
+                        Created by @views.html.partials.links.to_user.render(stream.getCreatorUser)
+                        @DateHelper.readablePeriodFromNow(stream.getCreatedAt)
+
+                        &nbsp;@if(isPermitted(STREAMS_EDIT, stream.getId)) {
+                            <button class="btn btn-danger btn-mini remove-stream" type="submit"
+                            data-removeUrl="@routes.StreamsController.delete(stream.getId)">
+                                <i class="icon icon-remove"></i> Delete
+                            </button>
+                        }
+
+                        <div class="btn-group">
+                            @views.html.partials.streams.action_menu.render(stream, nodes, currentUser, "btn-mini")
+                        </div>
+                    </span>
+
+                    <h3>
+                        <i class="icon icon-ellipsis-vertical"></i>
+                        @if(stream.getContentPack != null) {
+                            <span title="Created from content pack"><i class="icon-gift created-from-content-pack"></i></span>
+                        }
+                        <a class="added-width-search-link" href="@routes.StreamSearchController.index(stream.getId, "*", "relative", 300)">
+                            @stream.getTitle
+                        </a>
+
+                        @if(stream.getDisabled) {
+                            <span class="label label-important">Paused</span>
+                        }
+                    </h3>
+
+                    <div class="stream-row-details">
+                        <div class="stream-description">
+                            @if(stream.getDescription != null && !stream.getDescription.isEmpty) {
+                                <strong>Description:</strong> @stream.getDescription
+                            } else {
+                                No description set.
+                            }
+                        </div>
+
+                        <span class="throughput">
+                            <span>
+                                IO:
+                                <i class="icon icon-caret-right"></i>
+                                <span class="value node-throughput" data-node-type="stream" data-stream-id="@stream.getId">?</span>
+                                messages/second,
+                            </span>
+                        </span>
+
+                        @if(stream.getStreamRules.isEmpty) {
+                            no configured rules.
+                            @if(isPermitted(STREAMS_EDIT, stream.getId)) {
+                            <a href="@routes.StreamRulesController.index(stream.getId)">
+                                Edit rules
+                            </a>
+                            }
+                        } else {
+                            <span class="stream-rule-count" data-stream-id="@stream.getId">@stream.getStreamRules.size()</span> configured @pluralize("rule", stream.getStreamRules.size()).
+
+                            <a href="#" class="trigger-stream-rules">
+                                <i class="icon icon-caret-down"></i>
+                                <span>Show Rules</span>
+                            </a>
+                        }
+                    </div>
+
+                    <div class="streamrules-list-container" data-stream-id="@stream.getId">
+                        <div class="streamrules-details" style="display: none;">
+                        @views.html.partials.streamrules.list_well.render(stream.getStreamRules)
+                        </div>
+                        @views.html.partials.streamrules.stream_rule_form.render(stream.getId, null)
+                    </div>
+
                 </div>
-                @views.html.partials.streamrules.stream_rule_form.render(stream.getId, null)
-            </div>
+            }
 
+            @if(streams.isEmpty && isPermitted(STREAMS_CREATE)) {
+                <div class="alert alert-warn">
+                    <i class="icon icon-info-sign"></i>
+                    No streams configured. <a href="@routes.StreamsController.create()">Create one now</a>.
+                </div>
+            }
         </div>
-    }
-
-    @if(streams.isEmpty && isPermitted(STREAMS_CREATE)) {
-        <div class="alert alert-warn">
-            <i class="icon icon-info-sign"></i>
-            No streams configured. <a href="@routes.StreamsController.create()">Create one now</a>.
-        </div>
-    }
-
-    <div class="alert alert-info">
-        <i class="icon icon-lightbulb"></i> Also take a look at the
-        <a href="https://github.com/Graylog2/graylog2-stream-dashboard" target="_blank">Graylog stream dashboards</a>
-        for wall-mounted displays.
     </div>
 }
