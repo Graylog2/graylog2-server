@@ -1,20 +1,20 @@
 /*
- * Copyright 2013 TORCH UG
+ * Copyright 2012-2015 TORCH GmbH, 2015 Graylog, Inc.
  *
- * This file is part of Graylog2.
+ * This file is part of Graylog.
  *
- * Graylog2 is free software: you can redistribute it and/or modify
+ * Graylog is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * Graylog2 is distributed in the hope that it will be useful,
+ * Graylog is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
+ * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
 package lib.extractors.testers;
 
@@ -46,17 +46,17 @@ public class RegexTest {
                 .queryParam("string", string)
                 .execute();
 
-        Map<String, Object> match = Maps.newHashMap();
-        match.put("start", r.match.start);
-        match.put("end", r.match.end);
-        match.put("match", r.match.match);
-
         Map<String, Object> result = Maps.newHashMap();
         result.put("string", r.string);
         result.put("regex", r.regex);
         result.put("finds", r.matched);
 
-        if (r.matched) {
+        if (r.matched && r.match != null) {
+            Map<String, Object> match = Maps.newHashMap();
+            match.put("start", r.match.start);
+            match.put("end", r.match.end);
+            match.put("match", r.match.match);
+
             result.put("match", match);
         }
 

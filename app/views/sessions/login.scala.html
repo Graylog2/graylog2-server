@@ -1,13 +1,11 @@
 @(loginForm: Form[LoginRequest], disconnected: Boolean, destination: String)
 
-@loggedout(title = "Welcome to Graylog2 - Sign in") {
+@loggedout(title = "Welcome to Graylog - Sign in") {
 
 <div class="container" id="login-box">
 	<div class="row">
 		<div class="span4 offset4 well" id="login-box-content">
-			<legend>
-                <i class="icon-group"></i> Welcome to Graylog2
-            </legend>
+			<legend><i class="icon-group"></i> Welcome to Graylog</legend>
 
             @if(flash.get("error") != null && !flash.get("error").isEmpty()) {
                 <div class="alert alert-error">

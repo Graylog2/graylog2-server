@@ -297,31 +297,6 @@ $(document).ready(function() {
         });
     });
 
-    var substringMatcher = function(possibleMatches, displayKey, limit) {
-        return function findMatches(q, callback) {
-            var matches = [];
-
-            // code duplication is better than a shitty abstraction
-            possibleMatches.forEach(function(possibleMatch) {
-                if (matches.length < limit && possibleMatch.indexOf(q) === 0) {
-                    var match = {};
-                    match[displayKey] = possibleMatch;
-                    matches.push(match);
-                }
-            });
-
-            possibleMatches.forEach(function(possibleMatch) {
-                if (matches.length < limit && possibleMatch.indexOf(q) !== -1 && possibleMatch.indexOf(q) !== 0) {
-                    var match = {};
-                    match[displayKey] = possibleMatch;
-                    matches.push(match);
-                }
-            });
-
-            callback(matches);
-        };
-    };
-
     // Typeahead for message fields.
     $.ajax({
         url: appPrefixed('/a/system/fields'),
@@ -711,7 +686,9 @@ $(document).ready(function() {
     });
 
     $(".number-format").each(function() {
-        $(this).text(numeral($(this).text()).format($(this).attr("data-format")));
+        try {
+            $(this).text(numeral($(this).text()).format($(this).attr("data-format")));
+        } catch(e) {}
     });
 
     $(".moment-from-now").each(function() {
@@ -727,16 +704,32 @@ $(document).ready(function() {
     $(".index-description .index-details").on("click", function(e) {
         e.preventDefault();
 
-        $(".index-info", $(this).closest(".index-description")).toggle();
-        var icon = $(this).children().first();
+        var linkElem = $(this);
+        var index = $(this).data('index-name');
+        
+        $.get(appPrefixed("/a/system/indices/index_info/" + index + "/partial"), function(data) {
+            var holderElem = $(".index-info-holder", linkElem.closest(".index-description"));
+            holderElem.html(data);
+            // Format numbers that were just loaded into the html document
+            $(".number-format", holderElem).each(function() {
+                try {
+                    $(this).text(numeral($(this).text()).format($(this).attr("data-format")));
+                } catch(e) {}
+            });
 
-        if(icon.hasClass("icon-caret-right")) {
-            icon.removeClass("icon-caret-right");
-            icon.addClass("icon-caret-down");
-        } else {
-            icon.removeClass("icon-caret-down");
-            icon.addClass("icon-caret-right");
-        }
+            holderElem.toggle();
+            
+            var icon = linkElem.children().first();
+
+            if(icon.hasClass("icon-caret-right")) {
+                icon.removeClass("icon-caret-right");
+                icon.addClass("icon-caret-down");
+            } else {
+                icon.removeClass("icon-caret-down");
+                icon.addClass("icon-caret-right");
+            }
+        });
+
     });
 
     $(".nolink").on("live", function(e) {
@@ -1163,7 +1156,35 @@ function focusFirstFormInput(container) {
     if (!(parentElement instanceof jQuery)) {
         parentElement = this;
     }
-    $("input[type!=hidden],select", parentElement).not(":disabled").first().focus();
+    $("input[type!=hidden],select", parentElement).not(".tt-hint").not(":disabled").first().focus();
+}
+
+function substringMatcher(possibleMatches, displayKey, limit) {
+    if (typeof limit === 'undefined' || limit === 0) {
+        limit = Number.MAX_VALUE;
+    }
+    return function findMatches(q, callback) {
+        var matches = [];
+
+        // code duplication is better than a shitty abstraction
+        possibleMatches.forEach(function(possibleMatch) {
+            if (matches.length < limit && possibleMatch.indexOf(q) === 0) {
+                var match = {};
+                match[displayKey] = possibleMatch;
+                matches.push(match);
+            }
+        });
+
+        possibleMatches.forEach(function(possibleMatch) {
+            if (matches.length < limit && possibleMatch.indexOf(q) !== -1 && possibleMatch.indexOf(q) !== 0) {
+                var match = {};
+                match[displayKey] = possibleMatch;
+                matches.push(match);
+            }
+        });
+
+        callback(matches);
+    };
 }
 
 // Animated change of numbers.

@@ -1,7 +1,7 @@
 {
-  "name": "graylog2-web-interface",
-  "version": "1.0.0-beta.1",
-  "description": "Graylog2 Web Interface",
+  "name": "graylog-web-interface",
+  "version": "1.1.0-SNAPSHOT",
+  "description": "Graylog Web Interface",
   "author": "torch",
   "license": "GPL",
   "scripts": {
@@ -9,13 +9,14 @@
     "test": "./node_modules/.bin/gulp bundle-tests && ./node_modules/karma/bin/karma start karma.ci.conf.js"
   },
   "dependencies": {
-    "dc": "Graylog2/dc.js",
     "crossfilter": "1.x",
     "d3": "3.x",
+    "dc": "Graylog2/dc.js",
     "joi": "^4.6.2",
-    "react": "^0.12.1",
     "markdown": "^0.5.0",
-    "qs": "2.2.2"
+    "numeral": "1.5.3",
+    "qs": "2.2.2",
+    "react": "^0.12.1"
   },
   "devDependencies": {
     "browserify": "*",

@@ -1,24 +1,25 @@
 /*
- * Copyright 2013 TORCH UG
+ * Copyright 2012-2015 TORCH GmbH, 2015 Graylog, Inc.
  *
- * This file is part of Graylog2.
+ * This file is part of Graylog.
  *
- * Graylog2 is free software: you can redistribute it and/or modify
+ * Graylog is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * Graylog2 is distributed in the hope that it will be useful,
+ * Graylog is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
+ * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
 package controllers;
 
 import com.google.common.base.Joiner;
+import com.google.common.collect.ImmutableSortedMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import lib.BreadcrumbList;
@@ -46,6 +47,7 @@ import javax.inject.Inject;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedMap;
 
 public class InputsController extends AuthenticatedController {
 
@@ -76,8 +78,10 @@ public class InputsController extends AuthenticatedController {
             }
 
             for (Map.Entry<Input, Map<ClusterEntity, InputState>> entry : inputService.loadAllInputStatesByInput().entrySet()) {
-                if (entry.getKey().getGlobal())
-                    globalInputs.put(entry.getKey(), entry.getValue());
+                if (entry.getKey().getGlobal()) {
+                    final SortedMap<ClusterEntity, InputState> inputStates = ImmutableSortedMap.copyOf(entry.getValue());
+                    globalInputs.put(entry.getKey(), inputStates);
+                }
             }
 
             List<Node> nodes = servernodes.all();
@@ -311,14 +315,13 @@ public class InputsController extends AuthenticatedController {
 
         if (request.global)
             node = nodeService.loadMasterNode();
-        else
-            if (nodeId != null) {
-                try {
-                    node = nodeService.loadNode(nodeId);
-                } catch (NodeService.NodeNotFoundException e) {
-                    node = nodeService.loadRadio(nodeId);
-                }
+        else if (nodeId != null) {
+            try {
+                node = nodeService.loadNode(nodeId);
+            } catch (NodeService.NodeNotFoundException e) {
+                node = nodeService.loadRadio(nodeId);
             }
+        }
 
         return node;
     }

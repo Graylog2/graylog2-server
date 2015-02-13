@@ -1,25 +1,27 @@
 /**
- * This file is part of Graylog2.
+ * This file is part of Graylog.
  *
- * Graylog2 is free software: you can redistribute it and/or modify
+ * Graylog is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * Graylog2 is distributed in the hope that it will be useful,
+ * Graylog is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
+ * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
 package controllers;
 
+import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import lib.BreadcrumbList;
 import org.graylog2.restclient.lib.APIException;
 import org.graylog2.restclient.lib.ApiClient;
+import org.graylog2.restclient.lib.Tools;
 import org.graylog2.restclient.models.ClusterService;
 import org.graylog2.restclient.models.ESClusterHealth;
 import org.graylog2.restclient.models.IndexService;
@@ -29,6 +31,8 @@ import org.graylog2.restclient.models.api.responses.system.indices.DeflectorInfo
 import play.mvc.Result;
 
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.concurrent.TimeoutException;
 
 public class IndicesController extends AuthenticatedController {
 
@@ -45,15 +49,34 @@ public class IndicesController extends AuthenticatedController {
 
         try {
             ESClusterHealth clusterHealth = clusterService.getESClusterHealth();
-            DeflectorInformationResponse deflector = indexService.getDeflectorInfo();
-            DeflectorConfigResponse deflectorConfig = indexService.getDeflectorConfig();
-            ClosedIndicesResponse closedIndices = indexService.getClosedIndices();
+            DeflectorInformationResponse deflector;
+            DeflectorConfigResponse deflectorConfig;
+            ClosedIndicesResponse closedIndices;
+            ClosedIndicesResponse reopenedIndices;
+            try {
+                deflector = indexService.getDeflectorInfo();
+                deflectorConfig = indexService.getDeflectorConfig();
+                closedIndices = indexService.getClosedIndices();
+                reopenedIndices = indexService.getReopenedIndices();
+            } catch (APIException e) {
+                if (Tools.rootCause(e) instanceof TimeoutException) {
+                    return ok(views.html.system.indices.index_cluster_unavailable.render(
+                            currentUser(),
+                            bc,
+                            clusterHealth
+                    ));
+                }
+                throw e;
+            }
+
+            final HashSet<String> reopenedSet = Sets.newHashSet(reopenedIndices.indices);
 
             return ok(views.html.system.indices.index.render(
                     currentUser(),
                     bc,
                     indexService.all(),
                     closedIndices.indices,
+                    reopenedSet,
                     clusterHealth,
                     deflector.currentTarget,
                     deflectorConfig
@@ -76,7 +99,7 @@ public class IndicesController extends AuthenticatedController {
             return ok(views.html.system.indices.failures.render(
                     currentUser(),
                     bc,
-                    clusterService.getIndexerFailures(0,0).total,
+                    clusterService.getIndexerFailures(1,0).total,
                     page
             ));
         } catch (APIException e) {

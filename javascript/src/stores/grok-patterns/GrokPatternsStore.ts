@@ -16,8 +16,8 @@ var GrokPatternsStore = {
     
     loadPatterns(callback: (patterns: Array<GrokPattern>) => void) {
         var failCallback = (jqXHR, textStatus, errorThrown) => {
-            UserNotification.warning("Loading Grok patterns failed with status: " + errorThrown,
-                "Could not load grok patterns");
+            UserNotification.error("Loading Grok patterns failed with status: " + errorThrown,
+                "Could not load Grok patterns");
         };
         // get the current list of patterns and sort it by name
         $.getJSON(this.URL, (patterns: Array<GrokPattern>) => {
@@ -29,6 +29,11 @@ var GrokPatternsStore = {
     },
     
     savePattern(pattern: GrokPattern, callback: () => void) {
+        var failCallback = (jqXHR, textStatus, errorThrown) => {
+            UserNotification.error("Saving Grok pattern \"" + pattern.name + "\" failed with status: " + errorThrown,
+                "Could not save Grok pattern");
+        };
+
         var url;
         if (pattern.id === "") {
             url = this.URL + '/create';
@@ -42,19 +47,24 @@ var GrokPatternsStore = {
             data: JSON.stringify(pattern)
         }).done(() => {
             callback();
-        }).fail((jqXHR, textStatus, errorThrown) => {
-            console.log("could not update pattern " + pattern + ": " + errorThrown);
-        });
+            var action = pattern.id === "" ? "created" : "updated";
+            var message = "Grok pattern \"" + pattern.name + "\" successfully " + action;
+            UserNotification.success(message);
+        }).fail(failCallback);
     },
     
     deletePattern(pattern: GrokPattern, callback: () => void) {
+        var failCallback = (jqXHR, textStatus, errorThrown) => {
+            UserNotification.error("Deleting Grok pattern \"" + pattern.name + "\" failed with status: " + errorThrown,
+                "Could not delete Grok pattern");
+        };
         $.ajax({
             type: "DELETE",
             url: this.URL + "/" + pattern.id
-        }).done(callback)
-            .fail((jqXHR, textStatus, errorThrown) => {
-                console.log("Unable not delete pattern " + pattern + ": " + errorThrown);
-            });
+        }).done(() => {
+            callback();
+            UserNotification.success("Grok pattern \"" + pattern.name + "\" successfully deleted");
+        }).fail(failCallback);
     }
 };
 

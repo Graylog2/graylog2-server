@@ -36,7 +36,8 @@
                     value="@streamRule.getField"
                 }
                 placeholder="user_id"
-                autocomplete="off"/>
+                autocomplete="off"
+                required />
 
                 <label id="sr-label-type">Type</label>
                 <select name="category"
@@ -44,7 +45,7 @@
                 class="sr-input validatable"
                 data-reflect="#sr-result-category"
                 data-validate="defined"
-                required="true">
+                required>
                     @for((rule) <- StreamRule.Type.values()) {
                         <option value="@rule.getId()"
                             @if(streamRule != null && streamRule.getType == rule) {
@@ -63,7 +64,8 @@
                 @if(streamRule != null) {
                     value="@streamRule.getValue"
                 }
-                placeholder="19983" />
+                placeholder="19983"
+                required />
 
                 <label id="sr-label-inverted" class="checkbox">
                     <input type="checkbox"

@@ -4,6 +4,8 @@ language:
 jdk:
   - oraclejdk7
   - oraclejdk8
+node_js:
+  - "0.10"
 env:
   global:
   - secure: |-
@@ -16,6 +18,9 @@ env:
       0Y0YksLljdKHv8mn02KX2tZxLVYjgzq09Dvn0+bGOzQU+TLbkPY=
 before_script:
   - sbt update
+  - node --version
+  - npm --version
+  - npm install -g npm@2.1.18
   - pushd javascript && npm install && popd
 script:
   - pushd javascript && npm test && node_modules/.bin/gulp deploy-prod && popd
@@ -34,6 +39,9 @@ deploy:
   on:
     repo: Graylog2/graylog2-web-interface
     jdk: oraclejdk7
+    branch:
+      - master
+      - 1.0
 addons:
 notifications:
   slack:

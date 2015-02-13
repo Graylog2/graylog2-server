@@ -17,7 +17,7 @@
     @if(isPermitted(NOTIFICATIONS_READ)) {
     <div class="row-fluid">
         <h2><i class="icon icon-random"></i> Notifications</h2>
-        Notifications are triggered by Graylog2 and indicate a situation you need to act upon.
+        Notifications are triggered by Graylog and indicate a situation you need to act upon.
 
         @for(notification <- notifications) {
             <div class="notification alert alert-error">

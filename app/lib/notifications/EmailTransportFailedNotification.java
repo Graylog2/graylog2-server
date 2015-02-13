@@ -28,7 +28,7 @@ public class EmailTransportFailedNotification implements NotificationType {
 
     @Override
     public String getDescription() {
-        return "The Graylog2 server encountered an error while trying to send an email. " +
+        return "The Graylog server encountered an error while trying to send an email. " +
                 "This is the detailed error message: " + notification.getDetail("exception");
     }
 

@@ -28,7 +28,7 @@ function updateWidget_quickvalues(widget, data) {
             var val = terms[key];
             var percent = (val/total*100);
 
-            rows.append("<tr><td>" + htmlEscape(key) + "</td><td>" + percent.toFixed(2) + "</td><td>" + htmlEscape(val) + "</td></tr>");
+            rows.append("<tr><td>" + htmlEscape(key) + "</td><td>" + percent.toFixed(2) + "</td><td>" + numeral(htmlEscape(val)).format("0,0") + "</td></tr>");
         }
     } else {
         rows.append("<tr><td colspan='3'>No values.</td></tr>");

@@ -1,4 +1,5 @@
 @(currentUser: org.graylog2.restclient.models.User, breadcrumbs: lib.BreadcrumbList, node: org.graylog2.restclient.models.Node, installedPlugins: List[org.graylog2.restclient.models.Plugin])
+@import org.graylog2.restclient.models.api.responses.JournalInfo
 @import views.helpers.StringHelper._
 @import views.helpers.NumberHelper
 @import views.helpers.DateHelper
@@ -7,6 +8,10 @@
 @import lib.security.RestPermissions._
 @import org.joda.time.DateTime
 @import org.joda.time.DateTimeZone
+
+@journalIsOvercommitted(journalInfo: JournalInfo) = @{
+    journalInfo.journalSizeLimit == 0 || ((journalInfo.journalSize * 100.0) / journalInfo.journalSizeLimit >= 100.0)
+}
 
 @main("Node " + node.getNodeId, views.html.system.sidebar(), "", currentUser) {
 
@@ -17,9 +22,13 @@
                 <span class="caret"></span>
             </a>
             <ul class="dropdown-menu">
-                <li><a href="@routes.NodesController.threadDump(node.getNodeId)">Get thread dump</a></li>
+                @if(isPermitted(THREADS_DUMP)) {
+                    <li><a href="@routes.NodesController.threadDump(node.getNodeId)">Get thread dump</a></li>
+                }
                 <li><a href="@routes.MetricsController.ofNode(node.getNodeId)">Metrics</a></li>
-                <li><a href="@routes.LoggingController.index()">Internal logging</a></li>
+                @if(isPermitted(LOGGERS_READ)) {
+                    <li><a href="@routes.LoggingController.index()">Internal logging</a></li>
+                }
                 <li>
                     <a href="@node.getTransportAddress/api-browser" target="_blank">
                         API Browser
@@ -34,7 +43,7 @@
 
     <div class="row-fluid">
         <h1><i class="icon icon-sitemap"></i> Node @node.getHostname / @node.getShortNodeId</h1>
-        This page shows details of a Graylog2 server node that is active and reachable in your cluster.
+        This page shows details of a Graylog server node that is active and reachable in your cluster.
     </div>
 
     <div class="row-fluid">
@@ -112,26 +121,43 @@
     <div class="row-fluid">
         <h2><i class="icon icon-shield"></i> Buffers</h2>
         <div class="row-fluid">
-            <div class="span6">
-                <a href="@routes.MetricsController.ofNode(node.getNodeId, node.getBufferClasses.processBufferClass)" class="btn btn-info btn-mini pull-right">Metrics</a>
+            <div class="span4">
+                <a href="@routes.MetricsController.ofNode(node.getNodeId, node.getBufferClasses.inputBufferClass)" class="btn btn-info btn-mini pull-right">Metrics</a>
                 <h3>Input buffer</h3>
 
-                <div class="progress node-buffer-usage">
-                    <div class="bar bar-warning" style="width: @node.getBufferInfo.getInputBuffer.utilizationPercent%;">@node.getBufferInfo.getInputBuffer.utilizationPercent%</div>
-                </div>
-                <strong>@node.getBufferInfo.getInputBuffer.utilization messages</strong> in input buffer.
-                (@node.getBufferInfo.getInputBuffer.utilizationPercent% utilized)
+                @defining(node.getBufferInfo.getInputBuffer.utilizationPercent) { utilizationPercent =>
+                    <div class="progress progress-percentage node-buffer-usage">
+                        <div class="bar bar-warning" data-percentage="@utilizationPercent" style="width : @utilizationPercent% ;"><span class="number-format" data-format="0.0%">@utilizationPercent%</span></div>
+                    </div>
+                    <strong><span class="number-format" data-format="0,0">@node.getBufferInfo.getInputBuffer.utilization</span> messages</strong> in input buffer.
+                    (<span class="number-format" data-format="0.0%">@utilizationPercent%</span> utilized)
+                }
             </div>
 
-            <div class="span6">
+            <div class="span4">
+                <a href="@routes.MetricsController.ofNode(node.getNodeId, node.getBufferClasses.processBufferClass)" class="btn btn-info btn-mini pull-right">Metrics</a>
+                <h3>Process buffer</h3>
+
+                @defining(node.getBufferInfo.getProcessBuffer.utilizationPercent) { utilizationPercent =>
+                    <div class="progress progress-percentage node-buffer-usage">
+                        <div class="bar bar-warning" data-percentage="@utilizationPercent" style="width : @utilizationPercent% ;"><span class="number-format" data-format="0.0%">@utilizationPercent%</span></div>
+                    </div>
+                    <strong><span class="number-format" data-format="0,0">@node.getBufferInfo.getProcessBuffer.utilization</span> messages</strong> in process buffer.
+                    (<span class="number-format" data-format="0.0%">@utilizationPercent%</span> utilized)
+                }
+            </div>
+
+            <div class="span4">
                 <a href="@routes.MetricsController.ofNode(node.getNodeId, node.getBufferClasses.outputBufferClass)" class="btn btn-info btn-mini pull-right">Metrics</a>
                 <h3>Output buffer</h3>
 
-                <div class="progress node-buffer-usage">
-                    <div class="bar bar-warning" style="width: @node.getBufferInfo.getOutputBuffer.utilizationPercent%;">@node.getBufferInfo.getOutputBuffer.utilizationPercent%</div>
-                </div>
-                <strong>@node.getBufferInfo.getOutputBuffer.utilization messages</strong> in output buffer.
-                (@node.getBufferInfo.getOutputBuffer.utilizationPercent% utilized)
+                @defining(node.getBufferInfo.getOutputBuffer.utilizationPercent) { utilizationPercent =>
+                    <div class="progress progress-percentage node-buffer-usage">
+                        <div class="bar bar-warning" data-percentage="@utilizationPercent" style="width : @utilizationPercent% ;"><span class="number-format" data-format="0.0%">@utilizationPercent%</span></div>
+                    </div>
+                    <strong><span class="number-format" data-format="0,0">@node.getBufferInfo.getOutputBuffer.utilization</span> messages</strong> in output buffer.
+                    (<span class="number-format" data-format="0.0%">@utilizationPercent%</span> utilized)
+                }
             </div>
         </div>
         The buffers are built to cache small amounts of messages on their way through the different processors.
@@ -142,19 +168,10 @@
     <div class="row-fluid">
         <h2><i class="icon icon-hdd"></i> Disk Journal</h2>
         @if(node.getJournalInfo.enabled) {
+            <p>Incoming messages are written to the disk journal to ensure they are kept safe in case of a server failure. The journal also helps keeping Graylog working if any of the outputs is too slow to keep up with the message rate
+            or whenever there is a peak in incoming messages. It makes sure that Graylog does not buffer all of those messages in main memory and avoids overly long garbage collection pauses that way.
+            </p>
             <div class="row-fluid">
-                <div class="span6">
-                    <h3>Utilization</h3>
-                    <div class="progress node-journal-usage">
-                        <div class="bar bar-warning" style="width : @NumberHelper.asPercent(node.getJournalInfo.journalSize, node.getJournalInfo.journalSizeLimit, 0, true) ;">@NumberHelper.asPercent(node.getJournalInfo.journalSize, node.getJournalInfo.journalSizeLimit, 2, true)</div>
-                    </div>
-                    <strong>@node.getJournalInfo.uncommittedJournalEntries unprocessed messages</strong>
-                    are currently in the journal, in @node.getJournalInfo.numberOfSegments segments.<br/>
-                    <strong>@node.getJournalInfo.appendEventsPerSecond messages</strong>
-                    have been appended in the last second,
-                    <strong>@node.getJournalInfo.readEventsPerSecond messages</strong>
-                    have been read in the last second.
-                </div>
                 <div class="span6">
                     <h3>Configuration</h3>
                     <dl class="system-journal">
@@ -163,17 +180,45 @@
                         <dt>Earliest entry: </dt>
                         <dd>@DateHelper.readablePeriodFromNow(node.getJournalInfo.oldestSegment)</dd>
                         <dt>Maximum size:</dt>
-                        <dd>@node.getJournalInfo.journalConfig.maxSize bytes</dd>
+                        <dd>
+                            <span class="number-format" data-format="0,0">@node.getJournalInfo.journalConfig.maxSize</span>
+                            bytes
+                        </dd>
                         <dt>Maximum age:</dt>
                         <dd>@DateHelper.readableDuration(node.getJournalInfo.journalConfig.maxAge)</dd>
                         <dt>Flush policy:</dt>
-                        <dd>Every @node.getJournalInfo.journalConfig.flushInterval messages or @DateHelper.readableDuration(node.getJournalInfo.journalConfig.flushAge)</dd>
+                        <dd>
+                            Every <span class="number-format" data-format="0,0">@node.getJournalInfo.journalConfig.flushInterval</span>
+                            messages or @DateHelper.readableDuration(node.getJournalInfo.journalConfig.flushAge)
+                        </dd>
                     </dl>
                 </div>
+                <div class="span6">
+                    <h3>Utilization</h3>
+                    @defining(NumberHelper.asPercent(node.getJournalInfo.journalSize, node.getJournalInfo.journalSizeLimit, 1, false)) { utilizationPercent =>
+                        <div class="progress progress-percentage node-journal-usage">
+                            @if(journalIsOvercommitted(node.getJournalInfo)) {
+                                <div class="bar bar-warning" data-percentage="100" style="width : 100%;">
+                            } else {
+                                <div class="bar bar-warning" data-percentage="@utilizationPercent" style="width : @utilizationPercent%;">
+                            }
+                                <span class="number-format" data-format="0.0%">@utilizationPercent%</span>
+                            </div>
+                        </div>
+                        @if(journalIsOvercommitted(node.getJournalInfo)) {
+                            <strong>Warning!</strong> The journal utilization is exceeding the maximum size
+                            defined. <a href="@routes.SystemController.index()">Click here</a> for more information.<br/>
+                        }
+                        <strong><span class="number-format" data-format="0,0">@node.getJournalInfo.uncommittedJournalEntries</span> unprocessed messages</strong>
+                        are currently in the journal, in @node.getJournalInfo.numberOfSegments segments.<br/>
+                        <strong><span class="number-format" data-format="0,0">@node.getJournalInfo.appendEventsPerSecond</span> messages</strong>
+                        have been appended in the last second,
+                        <strong><span class="number-format" data-format="0,0">@node.getJournalInfo.readEventsPerSecond</span> messages</strong>
+                        have been read in the last second.
+                    }
+                </div>
             </div>
-            Incoming messages are written to the disk journal to ensure they are kept safe in case of a server failure. The journal also helps keeping Graylog2 working if any of the outputs is too slow to keep up with the message rate
-            or whenever there is a peak in incoming messages. It makes sure that Graylog2 does not buffer all of those messages in main memory and avoids overly long garbage collection pauses that way.
-        } else {
+       } else {
             The disk journal is disabled for this node.
         }
     </div>
@@ -225,35 +270,37 @@
     <div class="row-fluid">
         <h2><i class="icon icon-cloud-download"></i> Installed Plugins <span style="font-size: 12px;">@installedPlugins.size() @pluralize("plugin", installedPlugins.size) installed.</span></h2>
 
-        <table class="table table-striped table-hover table-condensed">
-            <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Author</th>
-                    <th>Version</th>
-                    <th>Description</th>
-                </tr>
-            </thead>
+        @if(installedPlugins.size() > 0) {
+            <table class="table table-striped table-hover table-condensed">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Author</th>
+                        <th>Version</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
 
-            <tbody>
-            @for(plugin <- installedPlugins.sortBy(_.name)) {
-                <tr>
-                    <td>@plugin.name</td>
-                    <td>@plugin.author</td>
-                    <td>@plugin.version</td>
-                    <td>@plugin.description
-                        @if(plugin.url != null) {
-                            <a href="@plugin.url" target="_blank">
-                                <i class="icon icon-external-link"></i> Homepage
-                            </a>
-                        } else {
-                                &nbsp;
-                        }
-                    </td>
-                </tr>
-            }
-            </tbody>
-        </table>
+                <tbody>
+                @for(plugin <- installedPlugins.sortBy(_.name)) {
+                    <tr>
+                        <td>@plugin.name</td>
+                        <td>@plugin.author</td>
+                        <td>@plugin.version</td>
+                        <td>@plugin.description
+                            @if(plugin.url != null) {
+                                <a href="@plugin.url" target="_blank">
+                                    <i class="icon icon-external-link"></i> Homepage
+                                </a>
+                            } else {
+                                    &nbsp;
+                            }
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        }
     </div>
 
     <hr />

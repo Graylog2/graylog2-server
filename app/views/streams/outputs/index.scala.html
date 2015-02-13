@@ -15,11 +15,11 @@
             <i class="icon icon-download-alt"></i>
             Outputs for Stream &raquo;@stream.getTitle&laquo;
         </h1>
-        Graylog2 nodes can forward messages of streams via outputs. Launch or terminate as many outputs as you want here.
+        Graylog nodes can forward messages of streams via outputs. Launch or terminate as many outputs as you want here.
         You can also reuse outputs that are already running for other streams.
 
         A global view of all configured outputs is available <a href="@routes.OutputsController.index()">here</a>.
-        You can find output plugins on <a href="http://www.graylog2.org/" target="_blank">the Graylog2 website</a>.
+        You can find output plugins on <a href="https://www.graylog.org/" target="_blank">the Graylog website</a>.
 
         <br /><br />
         <i>Removing</i> an output removes it from this stream but it will still be in the list of available outputs.
@@ -68,7 +68,7 @@
             }
         } else {
             <div class="alert alert-info">
-                There are no configured outputs for this stream but all messages are written to the Graylog2 search
+                There are no configured outputs for this stream but all messages are written to the Graylog search
                 indices by default.
             </div>
         }

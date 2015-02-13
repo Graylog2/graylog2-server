@@ -46,7 +46,7 @@
 
         @if((inputState.getState == InputState.InputStateType.FAILED) && (inputState.getDetailedMessage != null) && (!inputState.getDetailedMessage.isEmpty)) {
             <div class="alert alert-error">
-                @inputState.getDetailedMessage
+                <strong>Error starting input:</strong> @inputState.getDetailedMessage
             </div>
         }
 
@@ -85,7 +85,7 @@
 
         <div class="well well-small">
             <ul>
-            @for((k,v) <- input.getAttributes) {
+            @for((k,v) <- input.getAttributes(inputTypes.get(input.getType))) {
                 <li>@k: @v</li>
             }
             </ul>

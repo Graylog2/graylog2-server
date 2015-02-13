@@ -2,9 +2,11 @@
         breadcrumbs: lib.BreadcrumbList,
         indices: List[org.graylog2.restclient.models.Index],
         closedIndices: List[String],
+        reopenedSet: Set[String],
         clusterHealth: org.graylog2.restclient.models.ESClusterHealth,
         deflectorTarget: String,
         deflectorConfig: org.graylog2.restclient.models.api.responses.system.indices.DeflectorConfigResponse)
+@import org.joda.time.format.PeriodFormat
 
 @import controllers.routes
 @import org.graylog2.restclient.lib.Tools
@@ -29,14 +31,24 @@
 
     <div class="row-fluid">
         <h1><i class="icon icon-reorder"></i> Indices</h1>
-        This is an overview of all indices (message stores) Graylog2 is currently taking in account
+        This is an overview of all indices (message stores) Graylog is currently taking in account
         for searches and analysis. You can learn more about the index model in the
-        <a href="http://www.graylog2.org/resources/documentation/general/indexmodel" target="_blank">
+        <a href="https://www.graylog.org/documentation/general/indexmodel/" target="_blank">
         documentation</a>. Closed indices can be re-opened at any time.
 
         <br />
-        <strong>Your current configuration is <span class="number-format" data-format="0,0">@deflectorConfig.maxDocsPerIndex</span>
-        documents per index and a maximum number of @deflectorConfig.maxNumberOfIndices indices.</strong>
+        @if("size".equals(deflectorConfig.`type`)) {
+            <strong>Your current configuration is <span class="number-format" data-format="0,0">@deflectorConfig.maxSizePerIndex</span>
+                bytes per index and a maximum number of @deflectorConfig.maxNumberOfIndices indices.</strong>
+        }
+        @if("time".equals(deflectorConfig.`type`)) {
+            <strong>Your current configuration rotates the indices every @{PeriodFormat.getDefault().print(deflectorConfig.maxTimePerIndex)}
+                and keeps a maximum number of @deflectorConfig.maxNumberOfIndices indices.</strong>
+        }
+        @if("count".equals(deflectorConfig.`type`)) {
+            <strong>Your current configuration is <span class="number-format" data-format="0,0">@deflectorConfig.maxDocsPerIndex</span>
+                documents per index and a maximum number of @deflectorConfig.maxNumberOfIndices indices.</strong>
+        }
     </div>
 
     <div class="row-fluid">
@@ -101,89 +113,38 @@
 
                 @index.getName
 
-                @if(index.getInfo != null && index.getInfo.isReopened) {
+                @if(reopenedSet.contains(index.getName)) {
                     <i class="icon icon-retweet" title="Reopened index"></i>
                 }
 
                 <span class="starts">
                     @if(index.getRange.getStarts.isEqual(0)) {
-                        Contains no messages,
-                        @if(index.getInfo != null) {
-                            @Tools.byteToHuman(index.getInfo.getStoreSizeBytes)
+                        Contains no messages
+                        @if(index.getName.equals(deflectorTarget) && index.getInfo != null) {
+                            , @Tools.byteToHuman(index.getInfo.getStoreSizeBytes)
                         }
                     } else {
-                        Contains messages up to @DateHelper.readablePeriodFromNow(index.getRange.getStarts),
-                        @if(index.getInfo != null) {
-                            @Tools.byteToHuman(index.getInfo.getStoreSizeBytes) /
-                            <span class="number-format" data-format="0,0">@index.getInfo.getDocuments.count</span> messages
+                        Contains messages up to @DateHelper.readablePeriodFromNow(index.getRange.getStarts)
+                        @if(index.getName.equals(deflectorTarget) && index.getInfo != null) {
+                            (@Tools.byteToHuman(index.getInfo.getStoreSizeBytes) /
+                            <span class="number-format" data-format="0,0">@index.getInfo.getDocuments.count</span> messages)
                         }
                     }
 
                     @if(!index.getName.equals(deflectorTarget)) {
-                        <a href="#" class="index-details"><i class="icon icon-caret-right"></i> Details / Actions</a>
+                        <a href="#" class="index-details" data-index-name="@index.getName"><i class="icon icon-caret-right"></i>  Load Details / Actions</a>
                     }
                 </span>
             </h3>
 
-            <div class="index-info"
+            <div class="index-info-holder"
                 @if(!index.getName.equals(deflectorTarget)) {
                     style="display: none;"
-                }
-            >
-                @if(index.getRange.isProvidesCalculationInfo) {
-                    Range re-calculated @DateHelper.readablePeriodFromNow(index.getRange.getCalculatedAt)
-                    in @(index.getRange.getCalculationTookMs)ms.
-                }
-
-                @if(index.getInfo == null) {
-                    <div class="alert alert-info"><i class="icon icon-info-sign"></i> Index information is not available at the moment, please try again later.</div>
-                } else {
-                    @index.getInfo.getSegments segments,
-                    @index.getInfo.getOpenSearchContexts open search contexts,
-                    @index.getInfo.getDocuments.deleted deleted messages
-
-                    <div class="row-fluid" style="margin-bottom: 10px;">
-                        @views.html.system.indices.partials.shard_meters.render("Primary shard operations", index.getInfo.getPrimaryShards)
-                        @views.html.system.indices.partials.shard_meters.render("Total shard operations", index.getInfo.getAllShards)
-                    </div>
-
-                    <div class="shard-routing">
-                        <h3 class="u-light" style="display: inline;">Shard routing</h3>
-
-                        <ul class="shards">
-                            @for(route <- index.getInfo.getShardRouting.sortBy(_.id)) {
-                                <li class="shard shard-@route.state
-                                    @if(route.primary) {
-                                        shard-primary
-                                    }"
-
-                                    data-title="State: <i>@route.state</i> on @route.nodeHostname (@route.nodeName)"
-                                    data-html="true"
-                                >
-                                    <span class="id">S@route.id</span>
-                                </li>
-                            }
-                        </ul>
-
-                        <br style="clear: both;" />
-                        <div class="description span10">
-                            Bold shards are primaries, others are replicas. Replicas are elected to primaries automatically
-                            when primaries leave the cluster. Size and document counts only reflect primary shards and no
-                            possible replica duplication.
-                        </div>
-                        <br style="clear: both;" />
-                    </div>
-
-                    <hr style="margin-bottom: 5px; margin-top: 10px;">
-
-                    @if(index.getName.equals(deflectorTarget)) {
-                        <a href="#" class="btn btn-mini btn-warning" disabled>Deflector index cannot be closed</a>
-                        <a href="#" class="btn btn-mini btn-danger" disabled>Deflector index cannot be deleted</a>
-                    } else {
-                        <a href="@routes.IndicesController.closeIndex(index.getName)" class="btn btn-mini btn-warning" data-confirm="Really close index @index.getName?">Close index</a>
-                        <a href="@routes.IndicesController.deleteIndex(index.getName)" class="btn btn-mini btn-danger" data-confirm="Really delete index @index.getName?">Delete index</a>
                     }
-                }
+            >
+            @if(index.getName.equals(deflectorTarget)) {
+                @views.html.partials.indices.index_info.render(deflectorTarget, index)
+            }
             </div>
         </div>
     }

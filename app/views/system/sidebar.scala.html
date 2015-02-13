@@ -56,11 +56,15 @@
         </a>
     </li>
 
-    <li>
-        <a href="@routes.BundlesController.index()">
-            Content Packs
-        </a>
-    </li>
+    @if(Permissions.isPermitted(RestPermissions.DASHBOARDS_CREATE) &&
+            Permissions.isPermitted(RestPermissions.INPUTS_CREATE) &&
+            Permissions.isPermitted(RestPermissions.STREAMS_CREATE)) {
+        <li>
+            <a href="@routes.BundlesController.index()">
+                Content Packs
+            </a>
+        </li>
+    }
 
     @if(Permissions.isPermitted(RestPermissions.INPUTS_EDIT)) {
         <li>

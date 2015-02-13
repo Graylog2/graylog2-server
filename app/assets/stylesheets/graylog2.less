@@ -594,6 +594,7 @@ form #stream-rules {
 
 .xtrc-message-fields dd {
     margin-left: 10px;
+    word-wrap: break-word;
 }
 
 .xtrc-message .well {
@@ -610,11 +611,21 @@ form #stream-rules {
     font-style: italic;
 }
 
+.xtrc-wizard-example {
+    word-wrap: break-word;
+}
+
 .xtrc-new-example {
     margin-top: 15px;
     margin-bottom: 12px;
     font-family: monospace;
     font-size: 14px;
+    word-wrap: break-word;
+}
+
+.xtrc-no-example {
+    margin-top: 15px;
+    margin-bottom: 12px;
 }
 
 .xtrc-hl {
@@ -731,11 +742,6 @@ form #stream-rules {
 .extractor-condition-summary {
     margin-left: 5px;
     margin-top: 10px;
-}
-
-#try-xtrc-condition-result {
-    position: relative;
-    top: -5px;
 }
 
 .success-match {
@@ -1263,6 +1269,7 @@ form #stream-rules {
 .metric-list li .name {
     font-size: 13px;
     font-family: monospace;
+    word-break: break-all;
 }
 
 .metric-list li .metric {
@@ -1343,6 +1350,7 @@ dl.metric-histogram dd {
 }
 
 .edit-user-form {
+    display: inline-block;
     margin-bottom: 0px;
 }
 
@@ -1610,6 +1618,22 @@ form.node-processing-change input {
     margin-bottom: 7px;
 }
 
+.progress-percentage .bar[data-percentage^="0."] {
+    color: #00466A;
+    background: transparent;
+    box-shadow: none;
+    padding-left: 2px;
+}
+
+.progress-percentage .bar[data-percentage^="1."],
+.progress-percentage .bar[data-percentage^="2."],
+.progress-percentage .bar[data-percentage^="3."],
+.progress-percentage .bar[data-percentage^="4."],
+.progress-percentage .bar[data-percentage^="5."] {
+    color: #00466A;
+    padding-left: 2px;
+}
+
 .node-journal-usage {
     margin-top: 3px;
     margin-bottom: 7px;
@@ -1621,6 +1645,10 @@ form.node-processing-change input {
 
 .system-system dd {
     margin-left: 75px;
+}
+
+dl.system-journal {
+    margin-bottom: 0px;
 }
 
 .system-journal dt {
@@ -1709,6 +1737,14 @@ dl.sample-message-fields {
 
 .configured-streamrules {
     margin-bottom: 5px;
+}
+
+dl.message-fields {
+    margin-bottom: 0;
+}
+
+dl.message-fields .description {
+    word-wrap: break-word;
 }
 
 .message-streams {
@@ -1958,6 +1994,20 @@ form.edit-dashboard-form {
   display: none;
   font-size: 14px;
   margin-top: 15px;
+}
+
+#add-alert-receivers {
+    margin-top: 15px;
+}
+
+#add-alert-receivers span.twitter-typeahead {
+    vertical-align: middle;
+}
+
+#add-alert-receivers input {
+    display: inline-block;
+    margin-bottom: 0;
+    vertical-align: middle;
 }
 
 .threshold-type {
@@ -2432,4 +2482,24 @@ form.extractor-form .control-group label {
 
 .configuration-bundles input[type="file"] {
   line-height: inherit !important;
+}
+
+.grok-filter-form {
+    display: inline-block;
+}
+
+.grok-filter-form label {
+    margin-right: 5px;
+}
+
+.grok-patterns-table th.name {
+    min-width: 120px;
+}
+
+.grok-patterns-table th.actions {
+    min-width: 140px;
+}
+
+.grok-patterns-table td {
+    word-break: break-all;
 }

@@ -1,31 +1,32 @@
 /**
- * Copyright 2013 Lennart Koopmann <lennart@torch.sh>
+ * Copyright 2012-2015 TORCH GmbH, 2015 Graylog, Inc.
  *
- * This file is part of Graylog2.
+ * This file is part of Graylog.
  *
- * Graylog2 is free software: you can redistribute it and/or modify
+ * Graylog is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * Graylog2 is distributed in the hope that it will be useful,
+ * Graylog is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
+ * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
 package controllers;
 
 import com.google.common.collect.Maps;
 import com.google.inject.Inject;
+import lib.BreadcrumbList;
 import org.graylog2.restclient.lib.APIException;
 import org.graylog2.restclient.lib.ApiClient;
-import lib.BreadcrumbList;
 import org.graylog2.restclient.lib.ServerNodes;
 import org.graylog2.restclient.models.*;
+import play.Logger;
 import play.mvc.Result;
 
 import java.io.IOException;
@@ -62,11 +63,21 @@ public class NodesController extends AuthenticatedController {
 
         List<NodeJVMStats> serverJvmStats = isPermitted(JVMSTATS_READ) ? clusterService.getClusterJvmStats() : Collections.<NodeJVMStats>emptyList();
         Map<String, Node> nodes = serverNodes.asMap();
+        Map<String, Node> updatedNodes = Maps.newHashMap();
+
+        for (String nodeId : nodes.keySet()) {
+            try {
+                updatedNodes.put(nodeId, nodeService.loadNode(nodeId));
+            } catch (NodeService.NodeNotFoundException e) {
+                Logger.error("Could not load node information", e);
+            }
+        }
+
         Map<String, BufferInfo> bufferInfo = Maps.newHashMap();
 
         if (isPermitted(BUFFERS_READ)) {
             // Ask every node for buffer info.
-            for(Node node : nodes.values()) {
+            for(Node node : updatedNodes.values()) {
                 bufferInfo.put(node.getNodeId(), node.getBufferInfo());
             }
         }
@@ -81,7 +92,7 @@ public class NodesController extends AuthenticatedController {
             return status(504, views.html.errors.error.render(message, e, request()));
         }
 
-        return ok(views.html.system.nodes.index.render(currentUser(), bc, serverJvmStats, nodes, radios, bufferInfo));
+        return ok(views.html.system.nodes.index.render(currentUser(), bc, serverJvmStats, updatedNodes, radios, bufferInfo));
     }
 
     public Result node(String nodeId) {

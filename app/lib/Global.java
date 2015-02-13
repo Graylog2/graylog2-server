@@ -1,20 +1,20 @@
 /*
- * Copyright 2013-2014 TORCH GmbH
+ * Copyright 2013-2012-2015 TORCH GmbH, 2015 Graylog, Inc.
  *
- * This file is part of Graylog2.
+ * This file is part of Graylog.
  *
- * Graylog2 is free software: you can redistribute it and/or modify
+ * Graylog is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * Graylog2 is distributed in the hope that it will be useful,
+ * Graylog is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
+ * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
 package lib;
 
@@ -98,15 +98,15 @@ public class Global extends GlobalSettings {
 
     @Override
     public void onStart(Application app) {
-        log.info("Graylog2 web interface version {} starting up.", Version.VERSION);
+        log.info("Graylog web interface version {} starting up.", Version.VERSION);
 
         final String appSecret = app.configuration().getString("application.secret");
         if (appSecret == null || appSecret.isEmpty()) {
-            log.error("Please configure application.secret in your conf/graylog2-web-interface.conf");
+            log.error("Please configure application.secret in your conf/graylog-web-interface.conf");
             throw new IllegalStateException("No application.secret configured.");
         }
         if (appSecret.length() < 16) {
-            log.error("Please configure application.secret in your conf/graylog2-web-interface.conf to be longer than 16 characters. Suggested is using pwgen -N 1 -s 96 or similar");
+            log.error("Please configure application.secret in your conf/graylog-web-interface.conf to be longer than 16 characters. Suggested is using pwgen -N 1 -s 96 or similar");
             throw new IllegalStateException("application.secret is too short, use at least 16 characters! Suggested is to use pwgen -N 1 -s 96 or similar");
         }
 
@@ -249,7 +249,7 @@ public class Global extends GlobalSettings {
             return configuration;
         }
 
-        final File configFile = new File(file, "conf/graylog2-web-interface.conf");
+        final File configFile = new File(file, "conf/graylog-web-interface.conf");
         if (!isTest) {
             if (!configFile.exists()) {
                 log.error("Your configuration should be at {} but does not exist, cannot continue without it.", configFile.getAbsoluteFile());
@@ -265,7 +265,7 @@ public class Global extends GlobalSettings {
             throw new IllegalStateException("Empty configuration file " + configFile.getAbsolutePath());
         /*
          *
-         * This is merging the standard bundled application.conf with our graylog2-web-interface.conf.
+         * This is merging the standard bundled application.conf with our graylog-web-interface.conf.
          * The application.conf must always be empty when packaged so there is nothing hidden from the user.
          * We are merging, because the Configuration object already contains some information the web-interface needs.
          *

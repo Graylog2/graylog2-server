@@ -9,6 +9,13 @@ $(document).ready(function() {
         showStatistics($(this).attr("data-field"), container);
     });
 
+    function normalizeNumber(number) {
+        if (number === null || isNaN(number)) {
+            return number;
+        }
+        return numeral(number).format("0,0.[00]");
+    }
+
     function showStatistics(field, container) {
         var statistics = $(".statistics", container);
 
@@ -20,7 +27,7 @@ $(document).ready(function() {
             "rangetype": rangeType,
             "q": query,
             "field": field
-        }
+        };
 
         if(!!container.attr("data-stream-id")) {
             params["stream_id"] = container.attr("data-stream-id");
@@ -45,14 +52,14 @@ $(document).ready(function() {
             success: function(data) {
                 statistics.show();
                 $(".analyzer-content", container).show();
-                $("dd.count", statistics).text(data.count);
-                $("dd.mean", statistics).text(data.mean.toFixed(2));
-                $("dd.stddev", statistics).text(data.std_deviation.toFixed(2));
-                $("dd.min", statistics).text(data.min);
-                $("dd.max", statistics).text(data.max);
-                $("dd.sum", statistics).text(data.sum.toFixed(2));
-                $("dd.variance", statistics).text(data.variance.toFixed(2));
-                $("dd.squares", statistics).text(data.sum_of_squares.toFixed(2));
+                $("dd.count", statistics).text(normalizeNumber(data.count));
+                $("dd.mean", statistics).text(normalizeNumber(data.mean.toFixed(2)));
+                $("dd.stddev", statistics).text(normalizeNumber(data.std_deviation.toFixed(2)));
+                $("dd.min", statistics).text(normalizeNumber(data.min));
+                $("dd.max", statistics).text(normalizeNumber(data.max));
+                $("dd.sum", statistics).text(normalizeNumber(data.sum.toFixed(2)));
+                $("dd.variance", statistics).text(normalizeNumber(data.variance.toFixed(2)));
+                $("dd.squares", statistics).text(normalizeNumber(data.sum_of_squares.toFixed(2)));
             },
             statusCode: { 400: function() {
                 $(".wrong-type", statistics).show();

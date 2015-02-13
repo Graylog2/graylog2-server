@@ -224,7 +224,7 @@ var SourceOverview = React.createClass({
             activateTimerangeChooser("relative", $('.timerange-selector-container .dropdown-menu a[data-selector-name="relative"]'));
             $('#relative-timerange-selector').val(0);
         } else {
-            var selectedOptions = rangeSelectBox.selectedOptions;
+            var selectedOptions = $(":selected", rangeSelectBox);
             var text = selectedOptions && selectedOptions[0] && selectedOptions[0].text;
             activateTimerangeChooser("keyword", $('.timerange-selector-container .dropdown-menu a[data-selector-name="keyword"]'));
             $('#universalsearch .timerange-selector.keyword > input').val(text);
@@ -315,7 +315,7 @@ var SourceOverview = React.createClass({
                         <h1><i className="icon icon-download-alt"></i> Sources</h1>
                     </div>
                     <p style={{"marginTop": "15px"}}>
-                        This is a list of all sources that sent in messages to Graylog2. Use the table and charts to interact
+                        This is a list of all sources that sent in messages to Graylog. Use the table and charts to interact
                         with the different sources and get a better understanding of them.
                         &nbsp;Note that the list is cached for a few seconds so you might have to wait a bit until a new source
                         appears.

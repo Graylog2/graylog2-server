@@ -1,23 +1,24 @@
 /*
- * Copyright 2013 TORCH UG
+ * Copyright 2012-2015 TORCH GmbH, 2015 Graylog, Inc.
  *
- * This file is part of Graylog2.
+ * This file is part of Graylog.
  *
- * Graylog2 is free software: you can redistribute it and/or modify
+ * Graylog is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * Graylog2 is distributed in the hope that it will be useful,
+ * Graylog is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
+ * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
 package controllers;
 
+import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.inject.Inject;
@@ -42,6 +43,7 @@ import play.mvc.Result;
 import views.helpers.Permissions;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -145,7 +147,7 @@ public class ExtractorsController extends AuthenticatedController {
 
             CreateExtractorRequest request;
             try {
-                 request = this.generateCreateExtractorRequest(form);
+                request = this.generateCreateExtractorRequest(form);
             } catch (NullPointerException e) {
                 Logger.error("Cannot build extractor configuration.", e);
                 return badRequest();
@@ -191,8 +193,14 @@ public class ExtractorsController extends AuthenticatedController {
             final Node node = nodeService.loadNode(nodeId);
             final Input input = node.getInput(inputId);
             final Extractor extractor = extractorService.load(node, input, extractorId);
-            final MessageResult exampleMessage = input.getRecentlyReceivedMessage(nodeId);
-            final String example = exampleMessage.getFields().get(extractor.getSourceField()).toString();
+            final String sourceField = extractor.getSourceField();
+            String example;
+            try {
+                final MessageResult exampleMessage = input.getRecentlyReceivedMessage(nodeId);
+                example = exampleMessage.getFields().get(sourceField).toString();
+            } catch (Exception e) {
+                example = null;
+            }
 
             return ok(views.html.system.inputs.extractors.edit_extractor.render(
                             currentUser(),
@@ -336,6 +344,7 @@ public class ExtractorsController extends AuthenticatedController {
          */
 
         int successes = 0;
+        List<String> failedExtractors = new ArrayList<>();
         for (ExtractorImportRequest importRequest : elir.extractors) {
             try {
                 Node node = nodeService.loadNode(nodeId);
@@ -359,9 +368,15 @@ public class ExtractorsController extends AuthenticatedController {
                 extractorService.create(node, node.getInput(inputId), extractor.toCreateExtractorRequest());
                 successes++;
             } catch (Exception e) {
-                Logger.error("Could not import extractor. Continuing.", e);
-                continue;
+                failedExtractors.add(importRequest.title);
+                Logger.error("Could not import extractor \"" + importRequest.title + "\": " + e.getMessage());
+                Logger.debug("Details for failing to import extractor \"" + importRequest.title + "\":", e);
             }
+        }
+
+        if (!failedExtractors.isEmpty()) {
+            flash("error", "Failed to import " + failedExtractors.size() + " extractors: "
+                    + Joiner.on(',').useForNull("[null title]").join(failedExtractors));
         }
 
         flash("success", "Successfully imported " + successes + " of " + elir.extractors.size() + " extractors.");

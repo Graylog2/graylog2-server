@@ -62,6 +62,7 @@ $(document).ready(function() {
         }
 
         renderFieldChart(opts);
+        askBeforeUnload();
     });
 
     function renderFieldChart(opts) {
@@ -234,7 +235,7 @@ $(document).ready(function() {
                         var dateMoment = momentHelper.toUserTimeZone(new Date(x * 1000 ));
                         var date = '<span class="date">' + dateMoment.format('ddd MMM DD YYYY HH:mm:ss ZZ') + '</span>';
                         var swatch = '<span class="detail_swatch" style="background-color: ' + series.color + '"></span>';
-                        var content = swatch + '[' + series.valuetype + '] ' + series.field + ': ' + numeral(y).format('0.[000]') + '<br>' + date;
+                        var content = swatch + '[' + series.valuetype + '] ' + series.field + ': ' + numeral(y).format('0,0.[000]') + '<br>' + date;
                         return content;
                     }
                 });
@@ -594,6 +595,19 @@ $(document).ready(function() {
         var pinned = getPinnedCharts();
         delete pinned[id];
         setPinnedCharts(pinned);
+    }
+
+    function askBeforeUnload() {
+        window.addEventListener("beforeunload", function(e) {
+            var numFieldCharts = $(".field-graph-container").length - 1;
+            var numPinnedCharts = Object.keys(getPinnedCharts()).length;
+
+            if (numFieldCharts > 0 && numFieldCharts != numPinnedCharts) {
+                var confirmationMessage = "Some field graphs are not pinned and will be lost.";
+                e.returnValue = confirmationMessage;
+                return confirmationMessage;
+            }
+        });
     }
 
 });

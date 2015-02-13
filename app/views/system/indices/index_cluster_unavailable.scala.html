@@ -1,0 +1,29 @@
+@(currentUser: org.graylog2.restclient.models.User,
+        breadcrumbs: lib.BreadcrumbList,
+        clusterHealth: org.graylog2.restclient.models.ESClusterHealth)
+
+@main("Indices", views.html.system.sidebar(), "", currentUser) {
+
+  @views.html.partials.breadcrumbs(breadcrumbs)
+
+  <div class="row-fluid">
+    <h1><i class="icon icon-reorder"></i> Indices</h1>
+    This is an overview of all indices (message stores) Graylog is currently taking in account
+    for searches and analysis. You can learn more about the index model in the
+    <a href="https://www.graylog.org/documentation/general/indexmodel/" target="_blank">
+      documentation</a>. Closed indices can be re-opened at any time.
+
+    <br />
+  </div>
+
+  <div class="row-fluid">
+    @views.html.partials.es_cluster_health.render(clusterHealth)
+
+    <div class="index-info">
+      <div class="alert alert-error">
+        <i class="icon icon-info-sign"></i> Indices information is not available at the moment.
+        @if(clusterHealth == null) {Please check again once the cluster is available.}
+      </div>
+    </div>
+  </div>
+}

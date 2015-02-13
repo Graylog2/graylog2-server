@@ -9,7 +9,7 @@
     <!DOCTYPE html>
 <html lang="en">
     <head>
-        <title>Graylog2 - @title</title>
+        <title>Graylog - @title</title>
         <script type="text/javascript">
             var userPreferences = @Html(Json.stringify(Json.toJson(currentUser.getPreferences)));
         </script>
@@ -77,7 +77,7 @@
 	   </div>
 
        <div id="footer">
-            graylog2-web-interface v@Version.VERSION
+            graylog-web-interface v@Version.VERSION
             (@System.getProperty("java.vendor") @System.getProperty("java.version") / @System.getProperty("os.name") @System.getProperty("os.version"))
             on @lib.Localhost.NAME
        </div>

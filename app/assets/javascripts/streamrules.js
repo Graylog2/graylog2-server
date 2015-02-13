@@ -11,12 +11,15 @@ $(document).ready(function() {
         var modalBody = $(this).closest("form#streamrule-form").find(".modal-body");
 
         if ($(this).attr("id") == "sr-type") {
+            var streamRuleValue = $("#sr-value", modalBody);
             if (parseInt(value) == 5) {
-                $("#sr-value", modalBody).hide();
+                streamRuleValue.prop('disabled', true);
+                streamRuleValue.hide();
                 $("#sr-label-value", modalBody).hide();
                 $("#sr-result-value", modalBody).hide();
             } else {
-                $("#sr-value", modalBody).show();
+                streamRuleValue.prop('disabled', false);
+                streamRuleValue.show();
                 $("#sr-label-value", modalBody).show();
                 $("#sr-result-value", modalBody).show();
             }
@@ -96,12 +99,12 @@ $(document).ready(function() {
         $("#sr-result-category", modalBody).text(new_val);
     });
 
-    $(document.body).on("click", "button.streamrule-form-submit", function(e) {
-        var form = $(this).closest("form#streamrule-form");
+    $(document.body).on("submit", "form#streamrule-form", function(e) {
+        var form = $(this);
         var streamId = form.attr("data-stream-id");
         var streamRuleId = form.attr("data-streamrule-id");
         var modalBody = form.find(".modal-body");
-        var dialog = $(this).closest("div.modal");
+        var dialog = form.find("div.modal");
 
         rule = {
             field: $("#sr-field", modalBody).val(),

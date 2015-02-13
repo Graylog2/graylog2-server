@@ -240,6 +240,7 @@ GET         /a/streams/alerts/allowed                                           
 
 # API: Indices
 GET         /a/system/indices/failures/dynatable                                     @controllers.api.IndicesApiController.failures(perPage:Integer ?= 50, offset:Integer ?= 0)
+GET         /a/system/indices/index_info/:index_name/partial                         @controllers.api.IndicesApiController.indexInfo(index_name: String)
 
 # API: Extractors
 POST        /a/system/inputs/:input_id/extractors/order                              @controllers.api.ExtractorsApiController.order(input_id: String)

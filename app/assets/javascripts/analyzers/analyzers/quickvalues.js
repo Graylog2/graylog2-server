@@ -161,7 +161,7 @@ $(document).ready(function() {
 
                     var searchLink = "<a href='#' title='Search for this value. (Press alt to search immediately, shift to negate)' class='search-link' data-field='" + htmlEscape(field) + "' data-value='" + htmlEscape(key) + "'><i class='icon icon-search'></i></a>";
 
-                    $(".terms tbody", quickvalues).append("<tr data-i='" + i + "' data-name='" + htmlEscape(key) + "'><td>"+ searchLink +"</td><td>" + htmlEscape(key) + "</td><td>" + percent.toFixed(2) + "%</td><td>" + htmlEscape(val) + "</td></tr>");
+                    $(".terms tbody", quickvalues).append("<tr data-i='" + i + "' data-name='" + htmlEscape(key) + "'><td>"+ searchLink +"</td><td>" + htmlEscape(key) + "</td><td>" + percent.toFixed(2) + "%</td><td>" + numeral(htmlEscape(val)).format("0,0") + "</td></tr>");
                     $(".terms-distribution", quickvalues).append("<div class='terms-bar terms-bar-" + i + "' style='width: " + percent + "%; background-color: " + colors(i) + ";'></div>");
                 }
             },

@@ -15,7 +15,7 @@
 
     <div class="row-fluid">
         <h1><i class="icon icon-sitemap"></i> Nodes</h1>
-        This page provides a realtime overview of the nodes in your Graylog2 cluster.
+        This page provides a realtime overview of the nodes in your Graylog cluster.
     </div>
 
     <div class="row-fluid">
@@ -26,9 +26,9 @@
 
     <div class="well well-small">
         You can pause message processing at any time. The process buffers will not accept any new messages until you
-        resume it. It is important to keep in mind that incoming messages (except those from inputs that support rejecting
-        messages, like AMQP) are buffered in memory. This means that they will be lost if you stop or restart the server
-        until they are processed or you run out of memory. Messages already accepted will be processed completely.
+        resume it. If the message journal is enabled for a node, which it is by default, incoming messages will be
+        persisted to disk, even when processing is disabled. If it is disabled, you might lose messages sent to inputs
+        that do not support buffering, such as TCP and UDP-based inputs.
     </div>
 
     <h2><i class="icon icon-code-fork"></i> Server nodes</h2>
@@ -62,7 +62,9 @@
                                 <i class="icon icon-external-link" style="font-size: 11px;"></i>
                             </a>
                         </li>
-                        <li><a href="@routes.NodesController.threadDump(jvm.getNodeId)">Get thread dump</a></li>
+                        @if(isPermitted(THREADS_DUMP)) {
+                            <li><a href="@routes.NodesController.threadDump(jvm.getNodeId)">Get thread dump</a></li>
+                        }
 
                         @if(isPermitted(PROCESSING_CHANGESTATE) || isPermitted(LBSTATUS_CHANGE) || isPermitted(NODE_SHUTDOWN)) {
                             <li class="divider"></li>
@@ -194,7 +196,9 @@
                             <li><a href="@routes.RadiosController.show(radio.getId)">Details</a></li>
                             <li><a href="@routes.InputsController.manageRadio(radio.getId)">Inputs</a></li>
                             <li><a href="@routes.MetricsController.ofRadio(radio.getId)">Metrics</a></li>
-                            <li><a href="@routes.RadiosController.threadDump(radio.getId)">Get thread dump</a></li>
+                            @if(isPermitted(THREADS_DUMP)) {
+                                <li><a href="@routes.RadiosController.threadDump(radio.getId)">Get thread dump</a></li>
+                            }
 
                             @if(isPermitted(LBSTATUS_CHANGE)) {
                                 <li class="divider"></li>
@@ -256,7 +260,7 @@
             </div>
         }
     } else {
-        <div class="alert alert-info no-active-nodes">No registered Graylog2 radio instances.</div>
+        <div class="alert alert-info no-active-nodes">No registered Graylog radio instances.</div>
     }
 
     @if(jvms.isEmpty && radios.isEmpty) {

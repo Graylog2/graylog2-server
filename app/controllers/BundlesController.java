@@ -1,18 +1,18 @@
 /**
- * This file is part of Graylog2.
+ * This file is part of Graylog.
  *
- * Graylog2 is free software: you can redistribute it and/or modify
+ * Graylog is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * Graylog2 is distributed in the hope that it will be useful,
+ * Graylog is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with Graylog2.  If not, see <http://www.gnu.org/licenses/>.
+ * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
 package controllers;
 
@@ -121,7 +121,7 @@ public class BundlesController extends AuthenticatedController {
             ObjectWriter ow = m.writer().withDefaultPrettyPrinter();
             return ok(ow.writeValueAsString(bundle));
         } catch (IOException e) {
-            flash("error", "Could not reach Graylog2 server");
+            flash("error", "Could not reach Graylog server");
         } catch (Exception e) {
             flash("error", "Unexpected error exporting configuration bundle, please try again later");
         }
@@ -144,7 +144,7 @@ public class BundlesController extends AuthenticatedController {
         } catch (APIException e) {
             Logger.error("Could not fetch data. We expected HTTP 200, but got a HTTP " + e.getHttpCode());
         } catch (IOException e) {
-            Logger.error("Could not connect to Graylog2 server. " + e);
+            Logger.error("Could not connect to Graylog server. " + e);
         }
 
         return data;

@@ -11,7 +11,7 @@ import com.typesafe.sbt.web.SbtWeb.autoImport._
 import com.typesafe.sbt.less.Import.LessKeys
 
 object ApplicationBuild extends Build {
-  val appName         = "graylog2-web-interface"
+  val appName         = "graylog-web-interface"
   val appVersion      = "1.1.0-SNAPSHOT"
   val appDependencies = Seq(
     cache,
@@ -35,8 +35,8 @@ object ApplicationBuild extends Build {
   )
   val repositories = Seq(
     "Local Maven Repository" at "file:///" + Path.userHome.absolutePath + "/.m2/repository",
-    Resolver.url("Graylog2 Play Repository", url("http://graylog2.github.io/play2-graylog2/releases/"))(Resolver.ivyStylePatterns),
-    Resolver.url("Graylog2 Play Snapshot Repository", url("http://graylog2.github.io/play2-graylog2/snapshots/"))(Resolver.ivyStylePatterns),
+    Resolver.url("Graylog Play Repository", url("http://graylog2.github.io/play2-graylog2/releases/"))(Resolver.ivyStylePatterns),
+    Resolver.url("Graylog Play Snapshot Repository", url("http://graylog2.github.io/play2-graylog2/snapshots/"))(Resolver.ivyStylePatterns),
     Resolver.sonatypeRepo("releases"),
     ("Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots"),
     ("Typesafe Releases" at "http://repo.typesafe.com/typesafe/releases/")
@@ -76,7 +76,7 @@ object ApplicationBuild extends Build {
     },
     sources in doc in Compile := List(),
     includeFilter in (Assets, LessKeys.less) := "*.less",
-    mappings in Universal in packageZipTarball += file("misc/graylog2-web-interface.conf.example") -> "conf/graylog2-web-interface.conf",
+    mappings in Universal in packageZipTarball += file("misc/graylog-web-interface.conf.example") -> "conf/graylog-web-interface.conf",
     name in Universal := {
       val originalName = (name in Universal).value
       if (isSnapshot) {

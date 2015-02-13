@@ -260,9 +260,11 @@
 
                             data-widget-type="field_chart"
                         >
-                            <li>
-                                <a href="@routes.DashboardsController.newDashboard()">No dashboards. Create one?</a>
-                            </li>
+                            @if(Permissions.isPermitted(RestPermissions.DASHBOARDS_CREATE)) {
+                                <li>
+                                    <a href="@routes.DashboardsController.newDashboard()">No dashboards. Create one?</a>
+                                </li>
+                            }
                         </ul>
                     </li>
 
@@ -394,7 +396,7 @@
             <li><a class="search-view-state" href="@route(i)">@i</a></li>
         }
 
-        <li class="active"><a class="search-view-state" href="#">@page</a></li>
+        <li class="active"><a class="search-view-state" href="@route(page)">@page</a></li>
 
         @for(i <- page+1 to highestPage()) {
             <li><a class="search-view-state" href="@route(i)">@i</a></li>

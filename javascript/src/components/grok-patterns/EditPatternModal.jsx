@@ -25,12 +25,12 @@ var EditDashboardModal = React.createClass({
                 <label>Name:</label>
                 <input type="text" onChange={this._onNameChange} value={this.state.name} required/>
                 <label>Pattern:</label>
-                <input type="text" onChange={this._onPatternChange} value={this.state.pattern} required/>
+                <textarea onChange={this._onPatternChange} value={this.state.pattern} required></textarea>
             </fieldset>
         );
         return (
             <span>
-                <button onClick={this.openModal} className="btn btn-mini">
+                <button onClick={this.openModal} className={this.props.create ? "btn btn-small btn-success" : "btn btn-small"}>
                     <i className="icon-edit"></i> {this.props.create ? "Create pattern" : "Edit"}
                 </button>
                 <BootstrapModal ref="modal" onCancel={this._closeModal} onConfirm={this._save} cancel="Cancel" confirm="Save">
@@ -46,9 +46,15 @@ var EditDashboardModal = React.createClass({
     openModal() {
         this.refs.modal.open();
     },
+    _saved() {
+        this._closeModal();
+        if (this.props.create) {
+            this.setState({name: "", pattern: ""});
+        }
+    },
     _save() {
         var pattern = this.state;
-        this.props.savePattern(pattern, this._closeModal);
+        this.props.savePattern(pattern, this._saved);
     }
 });
 
