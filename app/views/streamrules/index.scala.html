@@ -17,21 +17,29 @@
 
 
     <div class="row content">
-        <div class="col-md-12">
+        <div class="col-md-12 streamrule-sample-message">
             <h2>
                 1. Load a message to test rules
             </h2>
 
             <div class="manual-selector">
-                <div class="subcontainer">
+                <p style="margin-top: 5px;">
                     Start by loading a sample message, so we have some data to work on. This allows you to see the effect
                     of your stream rules immediately and enables you to tweak them to the desired result.
                     <strong>This step is optional but makes it easy to immediately see matching of your rules.</strong>
-                </div>
+                </p>
 
                 <form class="form-inline manual-selector-form" style="margin-bottom: 10px; margin-top: 10px;" id="message-selector">
-                    <input type="text" name="message_id" class="input-xlarge" placeholder="Message ID" required="true">
-                    <input type="text" name="index" class="input-medium" placeholder="Index" required="true">
+
+                    <div class="form-group">
+                        <input type="text" class="form-control" name="message_id" placeholder="Message ID" required="true" style="width: 300px;">
+                    </div>
+
+                    <div class="form-group">
+                        <input type="text" name="index" class="form-control" placeholder="Index" required="true">
+                    </div>
+
+
                     <button type="submit" class="btn btn-info manual-selector-load" data-stream-id="@stream.getId">
                         <i class="icon icon-magic"></i> Load message
                     </button>
@@ -43,10 +51,11 @@
 
             <div class="sample-message-display" style="display: none; margin-top: 5px;">
                 <strong>Next step:</strong>
-                Add/delete/modify the configured stream rules to see if matching is successful or not.
+                Add/delete/modify stream rules in step 2 and see if the example message would have been routed into the stream or not.
 
-                <div class="well well-small" id="sample-message" style="margin-top: 5px; margin-bottom: 0px;">
-                    <h2>Message {{messageId}}<span></span></h2>
+                <div class="alert alert-info" id="sample-message" style="margin-top: 10px; margin-bottom: 0px;">
+                    <h3>Message {{messageId}}<span></span></h3>
+
                     <dl class="sample-message-fields">
                         <dt data-field="{{field}}" data-value="{{raw-value}}" data-occurrence="repeat">{{field}}</dt><dd data-occurrence="repeat">{{value}}</dd>
                     </dl>
@@ -66,17 +75,12 @@
                 2. Manage stream rules
             </h2>
 
-            Load a message above to test rules. Rules with green background matched, others did not.
+            The example message would have been routed into this stream if every rule below has a green background.
 
             <div class="streamrules-list-container streamrule-checker" data-stream-id="@stream.getId">
                 @views.html.partials.streamrules.list_well.render(streamrules)
                 @views.html.partials.streamrules.stream_rule_form.render(stream.getId, null)
             </div>
-
-            <p style="margin-top: 5px; margin-left: 5px;">
-                <i class="icon icon-info"></i>&nbsp;
-                The example message would have been routed into this stream if everything is green.
-            </p>
 
             <a href="@routes.StreamsController.index()" class="btn btn-success">I'm done!</a>
         </div>
