@@ -3,11 +3,11 @@
 }
 
 body {
-	background-color: #e3e3e3;
-	font-family: 'Open Sans', sans-serif;
-	margin-top: 50px;
-	font-size: 12px;
-	overflow-x: hidden;
+  background-color: #e3e3e3;
+  font-family: 'Open Sans', sans-serif;
+  margin-top: 50px;
+  font-size: 12px;
+  overflow-x: hidden;
 }
 
 ul {
@@ -46,6 +46,10 @@ h4 {
 
 h1.username {
     word-wrap: break-word;
+}
+
+a {
+  color: #16ace3;
 }
 
 /* Remove boostrap outline */
@@ -142,7 +146,7 @@ a:active, select:active, input[type="file"]:active, input[type="radio"]:active, 
 }
 
 .content-head p.description {
-  color: #16ace3;
+  color: #939393;
 }
 
 .content-head p {
@@ -1534,20 +1538,6 @@ table#users-list td.limited {
     padding-top: 1px;
 }
 
-.stream-row h3 a {
-    color: #000;
-    font-size: 17px;
-    margin-bottom: 2px;
-}
-
-.stream-row h3 .label {
-    position: relative;
-    top: -2px;
-    left: 2px;
-    font-family: "Arial", sans-serif;
-    font-size: 11px;
-}
-
 h2.radios-head {
     margin-top: 15px;
 }
@@ -1739,10 +1729,6 @@ dl.system-time {
     margin-bottom: 0px;
 }
 
-.stream-row-details {
-    margin-left: 5px;
-}
-
 .streamrule-checker .streamrules-list li {
     padding: 8px;
     padding-left: 10px;
@@ -1818,11 +1804,6 @@ input#save-search-title {
 
 .dashboard-row h3 a {
     color: #000;
-}
-
-.stream-row .throughput .value {
-    font-family: monospace;
-    font-size: 12px;
 }
 
 form.edit-dashboard-form {
@@ -2505,11 +2486,6 @@ form.extractor-form .control-group label {
   font-size: 10px;
 }
 
-.created-from-content-pack {
-  margin-left: 1px;
-  font-size: 18px;
-}
-
 .configuration-bundles input[type="file"] {
   line-height: inherit !important;
 }
@@ -2532,4 +2508,40 @@ form.extractor-form .control-group label {
 
 .grok-patterns-table td {
     word-break: break-all;
+}
+
+ul.streams {
+  padding: 0;
+  margin: 0;
+}
+
+ul.streams li.stream {
+  padding: 15px 5px;
+  border-bottom: 1px solid #6dcff6;
+}
+
+ul.streams li.stream .stream-data {
+  margin-top: 8px;
+}
+
+ul.streams li.stream .stream-description {
+  margin-bottom: 3px;
+}
+
+ul.streams li.stream .streamrules-details {
+  margin-top: 15px;
+}
+
+ul.streams li.stream .streamrules-list {
+  margin: 0;
+  padding: 0;
+}
+
+ul.streams li.stream .streamrules-list li {
+  margin-bottom: 3px;
+}
+
+.stream-stopped {
+  position: relative;
+  top: -3px;
 }

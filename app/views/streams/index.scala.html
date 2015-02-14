@@ -2,8 +2,6 @@
 
 @import lib.security.RestPermissions._
 @import views.helpers.Permissions._
-@import views.helpers.StringHelper._
-@import views.helpers.DateHelper
 @import controllers.routes
 
 @main("Streams", views.html.sidebars.standard(currentUser), "", currentUser, false) {
@@ -17,6 +15,8 @@
                 matches all rules of a stream it is routed into it. A message can be routed into multiple
                 streams. You can for example create a stream that contains all SSH logins and configure
                 to be alerted whenever there are more logins than usual.
+
+                Read more about streams in <a href="http://docs.graylog.org/en/latest/pages/streams.html" target="_blank">the documentation</a>.
             </p>
 
             <p class="description-tooltips">
@@ -27,7 +27,7 @@
 
                 <strong>
                     Take a look at the
-                    <a href="http://docs.graylog.org/en/latest/pages/external_dashboards.html" style="color: #7b7d7d ;" target="_blank">Graylog stream dashboards</a>
+                    <a href="http://docs.graylog.org/en/latest/pages/external_dashboards.html" target="_blank">Graylog stream dashboards</a>
                     for wall-mounted displays or other integrations.
                 </strong>
             </p>
@@ -42,86 +42,15 @@
 
     <div class="row content">
         <div class="col-md-12">
-            @for(stream <- streams.filter(stream => isPermitted(STREAMS_READ, stream.getId)).sortBy(_.getTitle)) {
-                <div class="row-fluid node-row stream-row" data-stream-id="@stream.getId">
-                    <span class="pull-right node-row-info">
-                        Created by @views.html.partials.links.to_user.render(stream.getCreatorUser)
-                        @DateHelper.readablePeriodFromNow(stream.getCreatedAt)
-
-                        &nbsp;@if(isPermitted(STREAMS_EDIT, stream.getId)) {
-                            <button class="btn btn-danger btn-mini remove-stream" type="submit"
-                            data-removeUrl="@routes.StreamsController.delete(stream.getId)">
-                                <i class="icon icon-remove"></i> Delete
-                            </button>
-                        }
-
-                        <div class="btn-group">
-                            @views.html.partials.streams.action_menu.render(stream, nodes, currentUser, "btn-mini")
-                        </div>
-                    </span>
-
-                    <h3>
-                        <i class="icon icon-ellipsis-vertical"></i>
-                        @if(stream.getContentPack != null) {
-                            <span title="Created from content pack"><i class="icon-gift created-from-content-pack"></i></span>
-                        }
-                        <a class="added-width-search-link" href="@routes.StreamSearchController.index(stream.getId, "*", "relative", 300)">
-                            @stream.getTitle
-                        </a>
-
-                        @if(stream.getDisabled) {
-                            <span class="label label-important">Paused</span>
-                        }
-                    </h3>
-
-                    <div class="stream-row-details">
-                        <div class="stream-description">
-                            @if(stream.getDescription != null && !stream.getDescription.isEmpty) {
-                                <strong>Description:</strong> @stream.getDescription
-                            } else {
-                                No description set.
-                            }
-                        </div>
-
-                        <span class="throughput">
-                            <span>
-                                IO:
-                                <i class="icon icon-caret-right"></i>
-                                <span class="value node-throughput" data-node-type="stream" data-stream-id="@stream.getId">?</span>
-                                messages/second,
-                            </span>
-                        </span>
-
-                        @if(stream.getStreamRules.isEmpty) {
-                            no configured rules.
-                            @if(isPermitted(STREAMS_EDIT, stream.getId)) {
-                            <a href="@routes.StreamRulesController.index(stream.getId)">
-                                Edit rules
-                            </a>
-                            }
-                        } else {
-                            <span class="stream-rule-count" data-stream-id="@stream.getId">@stream.getStreamRules.size()</span> configured @pluralize("rule", stream.getStreamRules.size()).
-
-                            <a href="#" class="trigger-stream-rules">
-                                <i class="icon icon-caret-down"></i>
-                                <span>Show Rules</span>
-                            </a>
-                        }
-                    </div>
-
-                    <div class="streamrules-list-container" data-stream-id="@stream.getId">
-                        <div class="streamrules-details" style="display: none;">
-                        @views.html.partials.streamrules.list_well.render(stream.getStreamRules)
-                        </div>
-                        @views.html.partials.streamrules.stream_rule_form.render(stream.getId, null)
-                    </div>
-
-                </div>
-            }
+            <ul class="streams">
+                @for(stream <- streams.filter(stream => isPermitted(STREAMS_READ, stream.getId)).sortBy(_.getTitle)) {
+                    @views.html.streams.stream.render(stream, nodes, currentUser)
+                }
+            </ul>
 
             @if(streams.isEmpty && isPermitted(STREAMS_CREATE)) {
-                <div class="alert alert-warn">
-                    <i class="icon icon-info-sign"></i>
+                <div class="alert alert-warning">
+                    <i class="fa fa-info-circle"></i>&nbsp;
                     No streams configured. <a href="@routes.StreamsController.create()">Create one now</a>.
                 </div>
             }

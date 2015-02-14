@@ -1,0 +1,85 @@
+@(stream: org.graylog2.restclient.models.Stream, nodes: Map[String, org.graylog2.restclient.models.Node], currentUser: org.graylog2.restclient.models.User)
+
+@import lib.security.RestPermissions._
+@import views.helpers.Permissions._
+@import views.helpers.StringHelper._
+@import views.helpers.DateHelper
+
+<li class="stream" data-stream-id="@stream.getId">
+    <h2>
+        <a href="@routes.StreamSearchController.index(stream.getId, "*", "relative", 300)">@stream.getTitle</a>
+
+        @if(isPermitted(STREAMS_CHANGESTATE, stream.getId)) {
+            @if(stream.getDisabled) {
+                <a href="@routes.StreamsController.resume(stream.getId)" title="Click to start stream" data-confirm="Really start stream?">
+                    <span class="badge alert-danger stream-stopped">stopped</span>
+                </a>
+            }
+        } else {
+            @if(stream.getDisabled) {
+                <span class="badge alert-danger stream-stopped">stopped</span>
+            }
+        }
+    </h2>
+
+    <div class="stream-data">
+
+        <div class="stream-actions pull-right">
+            @if(isPermitted(STREAMS_EDIT, stream.getId)) {
+                <a href="@routes.StreamRulesController.index(stream.getId)" class="btn btn-info">Edit rules</a>
+
+                @if(isPermitted(STREAM_OUTPUTS_READ)) {
+                    <a href="@routes.StreamOutputsController.index(stream.getId)" class="btn btn-info">Manage outputs</a>
+                }
+            }
+
+            <a href="@routes.AlertsController.index(stream.getId)" class="btn btn-info">Manage alerts</a>
+
+            @if(isPermitted(STREAMS_EDIT, stream.getId)) {
+                <a href="@routes.StreamsController.delete(stream.getId)"  data-confirm="Really delete stream?" class="btn btn-primary" style="margin-left: 15px; margin-right: 15px;">
+                    <i class="fa fa-trash"></i>
+                </a>
+            }
+
+            <div class="btn-group">
+                @views.html.partials.streams.action_menu.render(stream, nodes, currentUser, "btn-mini")
+            </div>
+        </div>
+
+        <div class="stream-description">
+            @if(stream.getContentPack != null) {
+                <i class="fa fa-cube" title="Created from content pack"></i>
+            }
+
+            @stream.getDescription
+        </div>
+
+        <div class="stream-metadata">
+            <span class="value node-throughput" data-node-type="stream" data-stream-id="@stream.getId">?</span> messages/second,
+
+            @if(stream.getStreamRules.isEmpty) {
+                no configured rules.
+
+                @if(isPermitted(STREAMS_EDIT, stream.getId)) {
+                    <a href="@routes.StreamRulesController.index(stream.getId)">
+                        &nbsp;<i class="fa fa-caret-right"></i> edit rules
+                    </a>
+                }
+            } else {
+                <span class="stream-rule-count" data-stream-id="@stream.getId">@stream.getStreamRules.size()</span> configured @pluralize("rule", stream.getStreamRules.size()).
+
+                <a href="#" class="trigger-stream-rules">
+                        &nbsp;<i class="fa fa-caret-down"></i> <span>show rules</span>
+                </a>
+            }
+
+            <div class="streamrules-list-container" data-stream-id="@stream.getId">
+                <div class="streamrules-details" style="display: none;">
+                    @views.html.partials.streamrules.list_well.render(stream.getStreamRules)
+                </div>
+
+                @views.html.partials.streamrules.stream_rule_form.render(stream.getId, null)
+            </div>
+        </div>
+    </div>
+</li>

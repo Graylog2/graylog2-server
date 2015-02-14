@@ -562,21 +562,21 @@ $(document).ready(function() {
     });
 
     // Show configured stream rules in streams list.
-    $(".stream-row .trigger-stream-rules").on("click", function(e) {
+    $("ul.streams li.stream .trigger-stream-rules").on("click", function(e) {
         e.preventDefault();
 
-        var rules = $('.streamrules-list-container[data-stream-id="' + $(this).closest(".stream-row").attr("data-stream-id") + '"]').find("div.streamrules-details");
+        var rules = $('.streamrules-list-container[data-stream-id="' + $(this).closest("ul.streams li.stream").attr("data-stream-id") + '"]').find("div.streamrules-details");
 
         if (rules.is(":visible")) {
             rules.hide();
-            $(".icon", this).removeClass("icon-caret-up");
-            $(".icon", this).addClass("icon-caret-down");
-            $("span", this).text("Show rules");
+            $(".fa", this).removeClass("fa-caret-up");
+            $(".fa", this).addClass("fa-caret-down");
+            $("span", this).text("show rules");
         } else {
             rules.show();
-            $(".icon", this).removeClass("icon-caret-down");
-            $(".icon", this).addClass("icon-caret-up");
-            $("span", this).text("Hide rules");
+            $(".fa", this).removeClass("fa-caret-down");
+            $(".fa", this).addClass("fa-caret-up");
+            $("span", this).text("hide rules");
         }
     });
 

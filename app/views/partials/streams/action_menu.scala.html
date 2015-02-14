@@ -6,18 +6,14 @@
 @import lib.security.RestPermissions._
 @import views.helpers.Permissions._
 
-<a class="btn @buttonClass dropdown-toggle" data-toggle="dropdown" href="#">
-                            Stream
-    <span class="caret"></span>
-</a>
-<ul class="dropdown-menu">
+<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+    More actions <span class="caret"></span>
+</button>
+
+
+<ul class="dropdown-menu" role="menu">
     @if(isPermitted(STREAMS_EDIT, stream.getId)) {
         <li><a href="@routes.StreamsController.edit(stream.getId)">Edit stream</a></li>
-        <li><a href="@routes.StreamRulesController.index(stream.getId)">Edit rules</a></li>
-        @if(isPermitted(STREAM_OUTPUTS_READ)) {
-            <li><a href="@routes.StreamOutputsController.index(stream.getId)">Manage outputs</a></li>
-        }
-
         <li @if(stream.getStreamRules.isEmpty) { class="disabled" } >
         @if(!stream.getStreamRules.isEmpty) {
             <a href="#" data-stream-id="@stream.getId" class="show-stream-rule">
@@ -29,29 +25,15 @@
         </li>
     }
 
-    <li><a href="@routes.AlertsController.index(stream.getId)">Manage alerts</a></li>
-    @if(isPermitted(METRICS_READ, "org.graylog2.plugin.streams.Stream." + stream.getId)) {
-        <li class="dropdown-submenu">
-            <a href="#">Show Metrics on</a>
-            <ul class="dropdown-menu valuetype-selector">
-            @for(node <- nodes.values()) {
-                <li>
-                    <a href="@routes.MetricsController.ofNode(node.getNodeId, "org.graylog2.plugin.streams.Stream." + stream.getId)">
-                        <i class="icon icon-code-fork"></i>
-                        @node.getShortNodeId / @node.getHostname
-                    </a>
-                </li>
-            }
-            </ul>
-        </li>
-        @if(isPermitted(STREAMS_CHANGESTATE, stream.getId)) {
-            @if(stream.getDisabled == false) {
-                <li><a href="@routes.StreamsController.pause(stream.getId)" data-confirm="Really pause stream?">Pause this stream</a></li>
-            } else {
-                <li><a href="@routes.StreamsController.resume(stream.getId)">Resume this stream</a></li>
-            }
+
+    @if(isPermitted(STREAMS_CHANGESTATE, stream.getId)) {
+        @if(stream.getDisabled == false) {
+            <li><a href="@routes.StreamsController.pause(stream.getId)" data-confirm="Really stop stream?">Stop this stream</a></li>
+        } else {
+            <li><a href="@routes.StreamsController.resume(stream.getId)">Start this stream</a></li>
         }
     }
+
     @if(isPermitted(STREAMS_CREATE) && isPermitted(STREAMS_READ, stream.getId)) {
         <li><a href="@routes.StreamsController.cloneStreamForm(stream.getId)">Clone this stream</a></li>
     }
