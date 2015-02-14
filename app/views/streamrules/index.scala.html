@@ -64,7 +64,7 @@
 
             <hr />
 
-            <div class="buttons pull-right" style="position: relative; top: 15px;">
+            <div class="buttons pull-right">
                 <button class="btn btn-success btn-small show-stream-rule" data-stream-id="@stream.getId">
                     Add stream rule
                 </button>
@@ -82,7 +82,9 @@
                 @views.html.partials.streamrules.stream_rule_form.render(stream.getId, null)
             </div>
 
-            <a href="@routes.StreamsController.index()" class="btn btn-success">I'm done!</a>
+            <p style="margin-top: 10px;">
+                <a href="@routes.StreamsController.index()" class="btn btn-success">I'm done!</a>
+            </p>
         </div>
     </div>
 
