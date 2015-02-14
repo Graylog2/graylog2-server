@@ -1,8 +1,8 @@
 @(crumbs: lib.BreadcrumbList)
 
-<ul class="breadcrumb">
+<ol class="breadcrumb">
     <li>
-        <i class="icon icon-anchor"></i>&nbsp;&nbsp;
+        <i class="fa fa-anchor"></i>&nbsp;&nbsp;
     </li>
 
     @for(crumb <- crumbs.get()) {
@@ -12,11 +12,6 @@
             } else {
                 @crumb.getTitle
             }
-
-            @if(!crumb.isLast) {
-                <span class="divider">/</span>
-            }
         </li>
     }
-
-</ul>
+</ol>
