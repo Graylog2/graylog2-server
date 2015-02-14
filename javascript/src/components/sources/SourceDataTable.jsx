@@ -36,28 +36,32 @@ var SourceDataTable = React.createClass({
             ])
             .sortBy((d) => d.message_count)
             .order(d3.descending)
-            .renderlet((table) => {
-                table.selectAll("td.dc-table-column._0 button.dc-search-button").on("click", () => {
-                    // d3 doesn't pass any data to the onclick event as the buttons do not
-                    // have any. Instead, we need to get it from the table element.
-                    var parentTdElement = $(d3.event.target).parents("td.dc-table-column._0");
-                    var datum = d3.selectAll(parentTdElement).datum();
-                    var source = datum.name;
-                    UniversalSearch.addSegment(UniversalSearch.createSourceQuery(source), UniversalSearch.orOperator());
-                    if (d3.event.altKey) {
-                        UniversalSearch.submit();
-                    }
-                });
-            })
-            .renderlet((table) => {
-                table.selectAll("td.dc-table-column._1 a.dc-filter-link").on("click", () => {
-                    var parentTdElement = $(d3.event.target).parents("td.dc-table-column._1");
-                    var datum = d3.selectAll(parentTdElement).datum();
+            .on('renderlet', (table) => {
+                table.selectAll(".dc-table-group").classed("info", true);
+                this._addSourceToSearchBarListener(table);
+                this._filterSourceListener(table, onDataFiltered);
+            });
+    },
+    _addSourceToSearchBarListener(table) {
+        table.selectAll("td.dc-table-column._0 button.dc-search-button").on("click", () => {
+            // d3 doesn't pass any data to the onclick event as the buttons do not
+            // have any. Instead, we need to get it from the table element.
+            var parentTdElement = $(d3.event.target).parents("td.dc-table-column._0");
+            var datum = d3.selectAll(parentTdElement).datum();
+            var source = datum.name;
+            UniversalSearch.addSegment(UniversalSearch.createSourceQuery(source), UniversalSearch.orOperator());
+            if (d3.event.altKey) {
+                UniversalSearch.submit();
+            }
+        });
+    },
+    _filterSourceListener(table, onDataFiltered) {
+        table.selectAll("td.dc-table-column._1 a.dc-filter-link").on("click", () => {
+            var parentTdElement = $(d3.event.target).parents("td.dc-table-column._1");
+            var datum = d3.selectAll(parentTdElement).datum();
 
-                    onDataFiltered(datum.name);
-                });
-            })
-            .renderlet((table) => table.selectAll(".dc-table-group").classed("info", true));
+            onDataFiltered(datum.name);
+        });
     },
     redraw() {
         this._dataTable.redraw();

@@ -18,7 +18,7 @@ var SourcePieChart = React.createClass({
             .dimension(dimension)
             .group(group)
             .title((d) => { return d.key + ": " + numeral(d.value).format("0,0"); })
-            .renderlet((chart) => {
+            .on('renderlet', (chart) => {
                 chart.selectAll(".pie-slice").on("click", () => {
                     onDataFiltered();
                 });
