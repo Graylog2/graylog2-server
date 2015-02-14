@@ -36,7 +36,7 @@
             <a href="@routes.AlertsController.index(stream.getId)" class="btn btn-info">Manage alerts</a>
 
             @if(isPermitted(STREAMS_EDIT, stream.getId)) {
-                <a href="@routes.StreamsController.delete(stream.getId)"  data-confirm="Really delete stream?" class="btn btn-primary" style="margin-left: 15px; margin-right: 15px;">
+                <a href="@routes.StreamsController.delete(stream.getId)"  data-confirm="Really delete stream?" class="btn btn-danger" style="margin-left: 15px; margin-right: 15px;">
                     <i class="fa fa-trash"></i>
                 </a>
             }
