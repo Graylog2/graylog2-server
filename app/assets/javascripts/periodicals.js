@@ -326,23 +326,6 @@ $(document).ready(function() {
                 var count = data.length;
                 if (count > 0) {
                     notificationBadgeElement.text(count);
-                    var urgent = data.filter(function(x) { return x.severity == "URGENT"});
-                    if (urgent.length > 0) {
-                        if (!notificationBadgeElement.data("bouncing")) {
-                            var bouncer = setInterval(function() {
-                                if (notificationBadgeElement.data("bouncing")) {
-                                    notificationBadgeElement.effect("fade", "fast");
-                                }
-                            }, 750);
-
-                            $("#notification-badge").data("bouncing", bouncer);
-                        }
-                    } else {
-                        if (notificationBadgeElement.data("bouncing")) {
-                            clearInterval(notificationBadgeElement.data("bouncing"));
-                            notificationBadgeElement.data("bouncing", undefined);
-                        }
-                    }
                     notificationBadgeElement.show();
                 } else {
                     // Badges are collapsing when empty so we make a 0 collapse.
