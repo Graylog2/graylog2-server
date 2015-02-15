@@ -18,12 +18,11 @@ package org.graylog2.rest.resources.search;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
+import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.queryparser.classic.ParseException;
+import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.queryparser.classic.Token;
-import org.elasticsearch.ExceptionsHelper;
 import org.elasticsearch.action.search.SearchPhaseExecutionException;
-import org.elasticsearch.action.search.ShardSearchFailure;
-import org.elasticsearch.search.SearchParseException;
 import org.glassfish.jersey.server.ChunkedOutput;
 import org.graylog2.indexer.InvalidRangeFormatException;
 import org.graylog2.indexer.results.ScrollResult;
@@ -177,23 +176,22 @@ public abstract class SearchResource extends RestResource {
 
     protected BadRequestException createRequestExceptionForParseFailure(String query, SearchPhaseExecutionException e) {
         LOG.warn("Unable to execute search: {}", e.getMessage());
-        QueryParseError errorMessage = QueryParseError.create(query, e.getMessage(), e.getClass().getCanonicalName());
 
-        // we won't actually iterate over all of the shard failures, only the first one,
-        // since we assume that parse errors happen on all of the shards.
-        for (ShardSearchFailure failure : e.shardFailures()) {
-            //noinspection ThrowableResultOfMethodCallIgnored
-            Throwable unwrapped = ExceptionsHelper.unwrapCause(failure.failure());
-            if (!(unwrapped instanceof SearchParseException)) {
-                LOG.warn("Unhandled ShardSearchFailure", e);
-                return new BadRequestException();
-            }
-            Throwable rootCause = ((SearchParseException) unwrapped).getRootCause();
-            if (rootCause instanceof ParseException) {
-                Token currentToken = ((ParseException) rootCause).currentToken;
+        QueryParseError errorMessage = QueryParseError.create(query, "Unable to execute search", e.getClass().getCanonicalName());
+
+        // We're so going to hell for this…
+        if(e.getMessage().contains("nested: ParseException")) {
+            final QueryParser queryParser = new QueryParser("", new StandardAnalyzer());
+            try {
+                queryParser.parse(query);
+            } catch (ParseException parseException) {
+                Token currentToken = parseException.currentToken;
                 if (currentToken == null) {
-                    LOG.warn("No position/token available for ParseException.", rootCause);
-                    errorMessage = QueryParseError.create(query, rootCause.getMessage(), rootCause.getClass().getCanonicalName());
+                    LOG.warn("No position/token available for ParseException.", parseException);
+                    errorMessage = QueryParseError.create(
+                            query,
+                            parseException.getMessage(),
+                            parseException.getClass().getCanonicalName());
                 } else {
                     // scan for first usable token with position information
                     int beginColumn = 0;
@@ -214,12 +212,9 @@ public abstract class SearchResource extends RestResource {
                             beginLine,
                             endColumn,
                             endLine,
-                            rootCause.getMessage(),
-                            rootCause.getClass().getCanonicalName());
+                            parseException.getMessage(),
+                            parseException.getClass().getCanonicalName());
                 }
-            } else {
-                LOG.debug("Root cause of SearchParseException has unexpected, generic type: " + rootCause.getClass(), rootCause);
-                errorMessage = QueryParseError.create(query, rootCause.getMessage(), rootCause.getClass().getCanonicalName());
             }
         }
 
