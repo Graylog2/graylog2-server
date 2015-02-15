@@ -19,6 +19,7 @@
 package controllers;
 
 import com.google.inject.Inject;
+import lib.BreadcrumbList;
 import org.graylog2.restclient.lib.APIException;
 import org.graylog2.restclient.lib.ApiClient;
 import org.graylog2.restclient.lib.ServerNodes;
@@ -58,13 +59,21 @@ public class StreamsController extends AuthenticatedController {
 	}
 
     public Result newStream() {
-        return ok(views.html.streams.new_stream.render(currentUser()));
+        BreadcrumbList bc = new BreadcrumbList();
+        bc.addCrumb("Streams", routes.StreamsController.index());
+        bc.addCrumb("New stream", null);
+
+        return ok(views.html.streams.new_stream.render(currentUser(), bc));
     }
 
     public Result edit(String streamId) {
+        BreadcrumbList bc = new BreadcrumbList();
+        bc.addCrumb("Streams", routes.StreamsController.index());
+        bc.addCrumb("Edit stream", null);
+
         try {
             Stream stream = streamService.get(streamId);
-            return ok(views.html.streams.edit.render(currentUser(), stream));
+            return ok(views.html.streams.edit.render(currentUser(), stream, bc));
         } catch (IOException e) {
             return status(504, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
         } catch (APIException e) {
@@ -97,7 +106,11 @@ public class StreamsController extends AuthenticatedController {
     }
 
     public Result cloneStreamForm(String stream_id) {
-        return ok(clone_stream.render(currentUser(), stream_id));
+        BreadcrumbList bc = new BreadcrumbList();
+        bc.addCrumb("Streams", routes.StreamsController.index());
+        bc.addCrumb("Clone stream", null);
+
+        return ok(clone_stream.render(currentUser(), stream_id, bc));
     }
 
     public Result cloneStream(String stream_id) {

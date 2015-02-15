@@ -189,7 +189,7 @@ $(document).ready(function() {
         testStreamRules(message, streamId,
             function(result) {
                 // All matched.
-                container.switchClass("alert-info alert-error", "alert-success");
+                container.switchClass("alert-info alert-danger", "alert-success");
                 $("li", container).addClass("alert-success");
                 var matchStatus = $("i.match-status");
                 matchStatus.show();
@@ -197,7 +197,7 @@ $(document).ready(function() {
             },
             function (result) {
                 // Not all matched.
-                container.switchClass("alert-info alert-success", "alert-error");
+                container.switchClass("alert-info alert-success", "alert-danger");
                 colorizeRuleResults(result.rules, $(".streamrules-list")[0]);
             });
     }

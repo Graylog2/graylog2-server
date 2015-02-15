@@ -91,7 +91,7 @@ public class StreamRulesController extends AuthenticatedController {
 
     private static BreadcrumbList standardBreadcrumbs(Stream stream) {
         BreadcrumbList bc = new BreadcrumbList();
-        bc.addCrumb("All Streams", routes.StreamsController.index());
+        bc.addCrumb("Streams", routes.StreamsController.index());
         bc.addCrumb("Stream: " + stream.getTitle(), null);
         bc.addCrumb("Rules", null);
 

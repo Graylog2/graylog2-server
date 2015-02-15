@@ -1,36 +1,29 @@
 @(submitUrl: Call, stream: org.graylog2.restclient.models.Stream, buttonText: String)
 
 <form id="new-stream" action="@submitUrl" method="POST">
-    <fieldset>
+
+    <div class="form-group">
         <label>Title</label>
         <input name="title"
-            required
-            type="text"
-            class="input-xxlarge"
+        required
+        type="text"
+        class="form-control"
             @if(stream != null) {
                 value="@stream.getTitle"
             }
-            placeholder="A descriptive name of the new stream" />
+        placeholder="A descriptive name of the new stream" />
+    </div>
 
+    <div class="form-group">
         <label>Description</label>
         <input name="description"
-            type="text"
-            class="input-xxlarge"
+        type="text"
+        class="form-control"
             @if(stream != null) {
                 value="@stream.getDescription"
             }
-            placeholder="What kind of messages are routed into this stream?" />
+        placeholder="What kind of messages are routed into this stream?" />
+    </div>
 
-        <br /><br />
-
-        <p>
-            <button type="submit" class="btn btn-success">@buttonText</button>
-        </p>
-    </fieldset>
+    <button type="submit" class="btn btn-success">@buttonText</button>
 </form>
-
-@if(stream == null) {
-    @views.html.partials.streamrules.stream_rule_form.render(null, null)
-} else {
-    @views.html.partials.streamrules.stream_rule_form.render(stream.getId, null)
-}
