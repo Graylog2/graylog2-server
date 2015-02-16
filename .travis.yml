@@ -20,7 +20,7 @@ before_script:
   - sbt update
   - node --version
   - npm --version
-  - npm install -g npm@2.1.18
+  - npm install -g npm@latest
   - pushd javascript && npm install && popd
 script:
   - pushd javascript && npm test && node_modules/.bin/gulp deploy-prod && popd
