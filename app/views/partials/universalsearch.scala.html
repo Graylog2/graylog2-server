@@ -4,7 +4,7 @@
 @import lib.security.RestPermissions.SAVEDSEARCHES_READ
 
 <div class="row-fluid no-bm">
-    <div class="span12" id="universalsearch">
+    <div class="col-md-12" id="universalsearch">
 
         <form class="universalsearch-form" action="@if(stream == null) { @controllers.routes.SearchController.index() } else { @controllers.routes.StreamSearchController.index(stream.getId) }" method="GET">
             <input type="hidden" name="rangetype"
@@ -38,7 +38,7 @@
             <div class="timerange-selector-container" style="float: left;">
                 <div class="btn-group timerange-chooser">
                     <a class="btn btn-info dropdown-toggle" data-toggle="dropdown" href="#">
-                        <i class="icon icon-time"></i>
+                        <i class="fa fa-clock-o"></i>
                         <span class="caret"></span>
                     </a>
                     <ul class="dropdown-menu">
@@ -74,7 +74,7 @@
                 <div class="pull-right search-help">
                     @views.html.partials.support.bubble.render("general/queries")
                 </div>
-                <button type="submit" class="btn btn-success icon-search pull-left"></button>
+                <button type="submit" class="btn btn-success pull-left"><i class="fa fa-search"></i></button>
                 <div class="query">
                     <input type="text" id="universalsearch-query" name="q" value="@searchQuery" placeholder='Type your search query here and press enter. ("not found" AND http) OR http_response_code:[400 TO 404]' />
                 </div>
