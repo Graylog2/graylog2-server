@@ -685,11 +685,13 @@ $(document).ready(function() {
         $(document).toggleFullScreen();
     });
 
-    $(".number-format").each(function() {
+    function formatNumberWithDataFormat() {
         try {
             $(this).text(numeral($(this).text()).format($(this).attr("data-format")));
-        } catch(e) {}
-    });
+        } catch (e) {}
+    }
+
+    $(".number-format").each(formatNumberWithDataFormat);
 
     $(".moment-from-now").each(function() {
         $(this).text(moment($(this).text()).fromNow());
@@ -711,11 +713,7 @@ $(document).ready(function() {
             var holderElem = $(".index-info-holder", linkElem.closest(".index-description"));
             holderElem.html(data);
             // Format numbers that were just loaded into the html document
-            $(".number-format", holderElem).each(function() {
-                try {
-                    $(this).text(numeral($(this).text()).format($(this).attr("data-format")));
-                } catch(e) {}
-            });
+            $(".number-format", holderElem).each(formatNumberWithDataFormat);
 
             holderElem.toggle();
             
@@ -922,19 +920,6 @@ $(document).ready(function() {
 
     function onResizedWindow(){
         redrawGraphs();
-    }
-
-    // Set up numeral language.
-    try {
-        var browserLang = navigator.language || navigator.userLanguage;
-        if (browserLang.indexOf("-") > 0) {
-            var userShortLanguage = browserLang.substr(0, browserLang.indexOf("-"));
-            numeral.language(userShortLanguage);
-        } else {
-            numeral.language(browserLang);
-        }
-    } catch(err) {
-        numeral.language("en");
     }
 
     $(".remove-stream").on("click", function(event) {
