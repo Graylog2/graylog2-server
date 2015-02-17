@@ -51,5 +51,5 @@ public class ServerVersion {
     public static final Version v0_21_0_SNAPSHOT = new Version(0, 21, 0, "SNAPSHOT");
     public static final Version v0_21_0_BETA1 = new Version(0, 21, 0, "beta1");
     public static final Version VERSION = Version.CURRENT_CLASSPATH;
-    public static final String CODENAME = "Moose";
+    public static final String CODENAME = "Jever";
 }
