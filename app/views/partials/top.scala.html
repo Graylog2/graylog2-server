@@ -19,23 +19,23 @@ gl2UserTimeZoneOffset = @DateTools.getUserTimeZoneOffset(UserService.current());
 
             <ul id="topmenu">
                 @if((isPermitted(SEARCHES_ABSOLUTE) || isPermitted(SEARCHES_RELATIVE) || isPermitted(SEARCHES_KEYWORD))) {
-                    <li><a href="@routes.SearchController.globalSearch()">Search</a></li>
+                    <li @if(request.path().equals("/") || request.path().startsWith("/search")) { class="active" }><a href="@routes.SearchController.globalSearch()">Search</a></li>
                 }
 
-            <li><a href="@routes.StreamsController.index()">Streams</a></li>
-            <li class="active"><a href="@routes.DashboardsController.index()">Dashboards</a></li>
+                <li @if(request.path().startsWith("/streams")) { class="active" }><a href="@routes.StreamsController.index()">Streams</a></li>
+                <li @if(request.path().startsWith("/dashboards")) { class="active" }><a href="@routes.DashboardsController.index()">Dashboards</a></li>
 
-                @if(isPermitted(SOURCES_READ)) {
-                    <li><a href="@routes.SourcesController.list()">Sources</a></li>
-                }
+                    @if(isPermitted(SOURCES_READ)) {
+                        <li @if(request.path().startsWith("/sources")) { class="active" }><a href="@routes.SourcesController.list()">Sources</a></li>
+                    }
 
-            <li><a href="@routes.SystemController.index(0)">System</a></li>
+                <li @if(request.path().startsWith("/system")) { class="active" }><a href="@routes.SystemController.index(0)">System</a></li>
 
-            <li>
-                <a href="@routes.SystemController.index(0)" class="notification-badge-link">
-                    <span class="badge" style="background-color: #ff3b00;" id="notification-badge"></span>
-                </a>
-            </li>
+                <li>
+                    <a href="@routes.SystemController.index(0)" class="notification-badge-link">
+                        <span class="badge" style="background-color: #ff3b00;" id="notification-badge"></span>
+                    </a>
+                </li>
             </ul>
 
                 <!--<div class="pull-right">
