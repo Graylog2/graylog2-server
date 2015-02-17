@@ -697,9 +697,11 @@ $(document).ready(function() {
         $(this).text(moment($(this).text()).fromNow());
     });
 
-    $(".moment-humanize").each(function() {
+    function momentHumanize() {
         $(this).text(moment.duration(parseInt($(this).text()), $(this).attr("data-unit")).humanize());
-    });
+    }
+
+    $(".moment-humanize").each(momentHumanize);
 
     $(".shard-routing .shards .shard").tooltip();
 
@@ -714,6 +716,7 @@ $(document).ready(function() {
             holderElem.html(data);
             // Format numbers that were just loaded into the html document
             $(".number-format", holderElem).each(formatNumberWithDataFormat);
+            $(".moment-humanize").each(momentHumanize);
 
             holderElem.toggle();
             
