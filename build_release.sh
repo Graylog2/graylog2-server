@@ -26,7 +26,7 @@ pushd javascript
 
 # Install same npm version as we use in travis
 rm -rf ./node_modules
-npm install npm@2.1.18
+npm install npm@latest
 PATH="$(pwd)/node_modules/.bin/":$PATH
 
 npm install
