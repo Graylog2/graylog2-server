@@ -58,6 +58,15 @@
             <div class="gridster" data-dashboard-id="@dashboard.getId">
                 <ul>
                 @for(widget <- dashboard.getWidgets.values()) {
+                    @if(widget.getType.equals(DashboardWidget.Type.SEARCH_RESULT_COUNT) ||
+                            widget.getType.equals(DashboardWidget.Type.STREAM_SEARCH_RESULT_COUNT) ||
+                            widget.getType.equals(DashboardWidget.Type.STATS_COUNT)) {
+                        <li data-row="@widget.getRow" data-col="@widget.getCol" data-sizex="@widget.getWidth" data-sizey="@widget.getHeight">
+                            <div class="react-widget" data-widget-type="count"
+                                                      data-dashboard-id="@widget.getDashboard.getId"
+                                                      data-widget-id="@widget.getId"></div>
+                        </li>
+                    }
                     <li data-row="@widget.getRow" data-col="@widget.getCol" data-sizex="@widget.getWidth" data-sizey="@widget.getHeight">
                         <div class="widget" data-cache-time="@widget.getCacheTime"
                                             data-widget-type="@widget.getType.toString.toLowerCase"

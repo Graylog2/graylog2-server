@@ -128,6 +128,30 @@ public class DashboardsApiController extends AuthenticatedController {
         return ok();
     }
 
+    public Result widget(String dashboardId, String widgetId) {
+        try {
+            Dashboard dashboard = dashboardService.get(dashboardId);
+            DashboardWidget widget = dashboard.getWidget(widgetId);
+
+            Map<String, Object> result = Maps.newHashMap();
+            result.put("type", widget.getType());
+            result.put("id", widget.getId());
+            result.put("dashboard_id", widget.getDashboard().getId());
+            result.put("description", widget.getDescription());
+            result.put("cache_time", widget.getCacheTime());
+            result.put("creator_user_id", widget.getCreatorUserId());
+            result.put("query", widget.getQuery());
+            result.put("timerange", widget.getTimerange());
+
+            return ok(Json.toJson(result));
+        } catch (APIException e) {
+            String message = "Could not get dashboard. We expected HTTP 200, but got a HTTP " + e.getHttpCode() + ".";
+            return status(504, views.html.errors.error.render(message, e, request()));
+        } catch (IOException e) {
+            return status(504, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
+        }
+    }
+
     public Result widgetValue(String dashboardId, String widgetId, int resolution) {
         try {
             Dashboard dashboard = dashboardService.get(dashboardId);

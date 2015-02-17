@@ -12,6 +12,7 @@ $(document).ready(() => {
     require('./components/dashboard/mount');
     require('./components/extractors/mount');
     require('./components/grok-patterns/mount');
+    require('./components/widgets/mount');
     if (userPreferences.enableSmartSearch) {
         require('./components/search/mount');
     }
