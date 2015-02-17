@@ -140,8 +140,7 @@ public class DashboardsApiController extends AuthenticatedController {
             result.put("description", widget.getDescription());
             result.put("cache_time", widget.getCacheTime());
             result.put("creator_user_id", widget.getCreatorUserId());
-            result.put("query", widget.getQuery());
-            result.put("timerange", widget.getTimerange());
+            result.putAll(widget.getConfig());
 
             return ok(Json.toJson(result));
         } catch (APIException e) {

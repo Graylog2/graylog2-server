@@ -68,13 +68,11 @@ var CountWidget = React.createClass({
                         widgetId={this.props.widgetId}
                         loadValueCallback={this.loadValue}
                         calculatedAt={this.state.calculatedAt}>
-                <div className="search_result_count">
+                <div className="count">
                     <div className="text-center">
-                        <a href="#" className="replay-link">
-                            <span className="value" style={{fontSize: this._calculateFontSize()}}>
-                                {this._formatResultValue()}
-                            </span>
-                        </a>
+                        <span className="value" style={{fontSize: this._calculateFontSize()}}>
+                            {this._formatResultValue()}
+                        </span>
                     </div>
                 </div>
             </BaseWidget>
