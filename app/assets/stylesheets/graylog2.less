@@ -5,9 +5,9 @@
 body {
   background-color: #e3e3e3;
   font-family: 'Open Sans', sans-serif;
-  margin-top: 40px;
   font-size: 12px;
   overflow-x: hidden;
+  margin-top: 45px;
 }
 
 ul {
@@ -75,29 +75,49 @@ label {
 }
 
 #top {
-	height: 40px;
-	background-image: url(../images/topbg.png);
-	background-repeat: repeat-x;
-	color: #fff !important;
+  height: 45px !important;
+  background-color: #111;
+  color: #fff !important;
+  margin-bottom: 0px;
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  width: 100%;
+  z-index: 2002;
 }
 
 #toplogo {
-	margin-top: 7px;
-	float: left;
+  margin-top: 10px;
+  margin-left: 10px;
+  float: left;
 }
 
 #topmenu {
-	list-style-type: none;
-	margin: 0;
-	padding-top: 9px;
-	margin-left: 125px;
+  list-style-type: none;
+  margin: 0;
+  padding-top: 8px;
+  margin-left: 125px;
+  height: 45px;
 }
 
 #topmenu li {
-	float: left;
-	margin-right: 15px;
-	margin-left: 15px;
-	font-size: 13px;
+  float: left;
+  margin-right: 5px;
+  margin-left: 5px;
+  padding-right: 10px;
+  padding-left: 10px;
+  padding-top: 6px;
+  font-size: 12px;
+  height: 38px;
+  font-weight: bold;
+}
+
+#topmenu li.active {
+  background-color: #e3e3e3;
+}
+
+#topmenu li.active a {
+  color: #000;
 }
 
 #topmenu a {
@@ -106,9 +126,8 @@ label {
 }
 
 #topmenu a:hover {
-	text-decoration: none;
-	color: #4DBCE9;
-	border-bottom: 1px dotted #4DBCE9;
+  text-decoration: none;
+  color: #16ace3;
 }
 
 #footer {

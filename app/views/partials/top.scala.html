@@ -12,39 +12,39 @@ gl2UserTimeZone = "@DateTools.getUserTimeZone(UserService.current())";
 gl2UserTimeZoneOffset = @DateTools.getUserTimeZoneOffset(UserService.current());
 </script>
 
-<div id="top" class="navbar navbar-fixed-top">
+<div id="top">
  	<div class="container-fluid">
-	  	<div class="row-fluid">
-	  		<a href="@routes.SearchController.globalSearch()"><img src="@routes.Assets.at("images/toplogo.png")" id="toplogo" /></a>
-	  		
-	  		<ul id="topmenu">
+	  	<div class="row">
+            <a href="@routes.SearchController.globalSearch()"><img src="@routes.Assets.at("images/toplogo.png")" id="toplogo" /></a>
+
+            <ul id="topmenu">
                 @if((isPermitted(SEARCHES_ABSOLUTE) || isPermitted(SEARCHES_RELATIVE) || isPermitted(SEARCHES_KEYWORD))) {
-	  			    <li><a href="@routes.SearchController.globalSearch()">Search</a></li>
+                    <li><a href="@routes.SearchController.globalSearch()">Search</a></li>
                 }
 
-	  			<li><a href="@routes.StreamsController.index()">Streams</a></li>
-                <li><a href="@routes.DashboardsController.index()">Dashboards</a></li>
+            <li><a href="@routes.StreamsController.index()">Streams</a></li>
+            <li class="active"><a href="@routes.DashboardsController.index()">Dashboards</a></li>
 
                 @if(isPermitted(SOURCES_READ)) {
                     <li><a href="@routes.SourcesController.list()">Sources</a></li>
                 }
 
-	  			<li><a href="@routes.SystemController.index(0)">System</a></li>
+            <li><a href="@routes.SystemController.index(0)">System</a></li>
 
-                <li>
-                    <a href="@routes.SystemController.index(0)" class="notification-badge-link">
-                        <span class="badge" style="background-color: #ff3b00;" id="notification-badge"></span>
-                    </a>
-                </li>
-	  		</ul>
+            <li>
+                <a href="@routes.SystemController.index(0)" class="notification-badge-link">
+                    <span class="badge" style="background-color: #ff3b00;" id="notification-badge"></span>
+                </a>
+            </li>
+            </ul>
 
-            <div class="pull-right">
+                <!--<div class="pull-right">
                 <span id="global-throughput">
                     <strong class="total-throughput focuslimit"></strong> msg/s<span class="total-nodes"></span>.
                 </span>
 
                 <a href="@routes.SessionsController.destroy()" title="Logout" id="logout" class="btn btn-small btn-danger"><i class="icon-off"></i></a>
-            </div>
+        </div>-->
         </div>
  	</div>
 </div>
