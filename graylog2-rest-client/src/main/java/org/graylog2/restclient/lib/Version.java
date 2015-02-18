@@ -74,6 +74,8 @@ public class Version {
     public static final Version v1_0_0_RC1 = new Version(1, 0, 0, "rc.1");
     public static final Version v1_0_0_RC2 = new Version(1, 0, 0, "rc.2");
     public static final Version v1_0_0_RC3 = new Version(1, 0, 0, "rc.3");
+    public static final Version v1_0_0_RC4 = new Version(1, 0, 0, "rc.4");
+    public static final Version v1_0_0 = new Version(1, 0, 0);
 
     public static final Version v1_1_0_SNAPSHOT = new Version(1, 1, 0, "snapshot");
 
