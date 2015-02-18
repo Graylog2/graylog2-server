@@ -126,26 +126,6 @@ public class MongoConnection {
         return db;
     }
 
-
-    /**
-     * Get the message_counts collection. Lazily checks if correct indices are set.
-     *
-     * @return The messages collection
-     */
-    public DBCollection getMessageCountsColl() {
-        if (this.messageCountsCollection != null) {
-            return this.messageCountsCollection;
-        }
-
-        // Collection has not been cached yet. Do it now.
-        DBCollection coll = getDatabase().getCollection("message_counts");
-
-        coll.createIndex(new BasicDBObject("timestamp", 1));
-
-        this.messageCountsCollection = coll;
-        return coll;
-    }
-
     public void setUser(String mongoUser) {
         this.username = mongoUser;
     }
