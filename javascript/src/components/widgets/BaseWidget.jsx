@@ -76,25 +76,29 @@ var BaseWidget = React.createClass({
     render() {
         var widget = (
             <div className="widget">
-                <div className="widget-title">
-                    {this.state.description}
-                </div>
-                <div className="widget-calculated-at" title={this.props.calculatedAt}>
-                    {moment(this.props.calculatedAt).fromNow()}
+                <div>
+                    <div className="widget-title">
+                        {this.state.description}
+                    </div>
+                    <div className="widget-calculated-at" title={this.props.calculatedAt}>
+                        {moment(this.props.calculatedAt).fromNow()}
+                    </div>
                 </div>
 
                 {this.props.children}
 
                 <div>
-                    <div className="widget-info">
-                        <a href="#">
-                            <i className="icon icon-info-sign"></i>
-                        </a>
-                    </div>
-                    <div className="widget-replay">
-                        <a href={this.replayUrl()}>
-                            <i className="icon icon-play-sign"></i>
-                        </a>
+                    <div className="actions">
+                        <div className="widget-replay">
+                            <a href={this.replayUrl()}>
+                                <i className="icon icon-play-sign"></i>
+                            </a>
+                        </div>
+                        <div className="widget-info">
+                            <a href="#">
+                                <i className="icon icon-info-sign"></i>
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
