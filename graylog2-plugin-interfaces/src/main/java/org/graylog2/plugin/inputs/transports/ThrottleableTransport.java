@@ -215,7 +215,7 @@ public abstract class ThrottleableTransport implements Transport {
         try {
             blockLatch.await();
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            // ignore
         }
     }
 }

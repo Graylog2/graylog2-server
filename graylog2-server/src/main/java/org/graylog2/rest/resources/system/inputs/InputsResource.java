@@ -294,7 +294,7 @@ public class InputsResource extends RestResource {
             for (Extractor extractor : extractors)
                 inputService.addExtractor(mongoInput, extractor);
         } catch (NoSuchInputTypeException e) {
-            e.printStackTrace();
+            throw new BadRequestException("Couldn't find provided input type", e);
         }
 
         final URI inputUri = UriBuilder.fromResource(InputsResource.class)
