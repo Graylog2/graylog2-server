@@ -16,9 +16,6 @@
  */
 package org.graylog2.database;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.MongoClient;
@@ -28,6 +25,8 @@ import com.mongodb.ServerAddress;
 import com.mongodb.WriteConcern;
 import org.graylog2.configuration.MongoDbConfiguration;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.net.UnknownHostException;
 import java.util.List;
 
@@ -125,42 +124,4 @@ public class MongoConnection {
     public DB getDatabase() {
         return db;
     }
-
-    public void setUser(String mongoUser) {
-        this.username = mongoUser;
-    }
-
-    public void setReplicaSet(List<ServerAddress> mongoReplicaSet) {
-        this.replicaServers = mongoReplicaSet;
-    }
-
-    public void setThreadsAllowedToBlockMultiplier(
-            int mongoThreadsAllowedToBlockMultiplier) {
-        this.threadsAllowedToBlockMultiplier = mongoThreadsAllowedToBlockMultiplier;
-    }
-
-    public void setUseAuth(boolean mongoUseAuth) {
-        this.useAuth = mongoUseAuth;
-    }
-
-    public void setMaxConnections(int mongoMaxConnections) {
-        this.maxConnections = mongoMaxConnections;
-    }
-
-    public void setDatabase(String mongoDatabase) {
-        this.database = mongoDatabase;
-    }
-
-    public void setPassword(String mongoPassword) {
-        this.password = mongoPassword;
-    }
-
-    public void setHost(String mongoHost) {
-        this.host = mongoHost;
-    }
-
-    public void setPort(int mongoPort) {
-        this.port = mongoPort;
-    }
-
 }
