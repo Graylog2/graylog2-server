@@ -207,7 +207,9 @@ public class Server extends ServerBootstrap implements Runnable {
         super.annotateInjectorExceptions(messages);
         for (Message message : messages) {
             if (message.getCause() instanceof MongoException) {
-                LOG.error(UI.wallString("Unable to connect to MongoDB. Is it running and the configuration correct?"));
+                MongoException e = (MongoException) message.getCause();
+                LOG.error(UI.wallString("Unable to connect to MongoDB. Is it running and the configuration correct?\n" +
+                        "Details: " + e.getMessage()));
                 System.exit(-1);
             }
         }
