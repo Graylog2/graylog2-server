@@ -67,6 +67,14 @@
                                                       data-widget-id="@widget.getId"></div>
                         </li>
                     }
+
+                    @if(widget.getType.equals(DashboardWidget.Type.SEARCH_RESULT_CHART)) {
+                        <li data-row="@widget.getRow" data-col="@widget.getCol" data-sizex="@widget.getWidth" data-sizey="@widget.getHeight">
+                            <div class="react-widget" data-widget-type="histogram"
+                                                      data-dashboard-id="@widget.getDashboard.getId"
+                                                      data-widget-id="@widget.getId"></div>
+                        </li>
+                    }
                     <li data-row="@widget.getRow" data-col="@widget.getCol" data-sizex="@widget.getWidth" data-sizey="@widget.getHeight">
                         <div class="widget" data-cache-time="@widget.getCacheTime"
                                             data-widget-type="@widget.getType.toString.toLowerCase"

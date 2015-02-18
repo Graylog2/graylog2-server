@@ -47,7 +47,7 @@ var BaseWidget = React.createClass({
     loadValue() {
         if (!assertUpdateEnabled(this.loadValue)) { return; }
 
-        this.props.loadValueCallback();
+        this.props.loadValueCallback(this.state.interval);
         setTimeout(this.loadValue, this.state.cacheTime * 1000);
     },
     _getUrlPath() {
