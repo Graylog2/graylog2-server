@@ -33,7 +33,7 @@ var HistogramVisualization = React.createClass({
         this.histogram = dc.barChart(histogramDomNode);
         this.histogram
             .width(800)
-            .height(100)
+            .height(120)
             .margins({left: 45, right: 20, top: 10, bottom: 30})
             .dimension(this.dimension)
             .group(this.group)

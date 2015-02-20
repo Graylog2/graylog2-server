@@ -116,8 +116,6 @@ var Widget = React.createClass({
                 <WidgetHeader title={this.state.title} calculatedAt={this.state.calculatedAt}/>
 
                 {this.getVisualization()}
-
-                <WidgetFooter replayUrl={this.replayUrl()}/>
             </div>
         );
         return widget;
