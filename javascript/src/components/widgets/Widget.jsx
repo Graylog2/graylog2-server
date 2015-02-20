@@ -7,7 +7,6 @@ var Qs = require('qs');
 var URLUtils = require("../../util/URLUtils");
 
 var WidgetHeader = require('./WidgetHeader');
-var WidgetFooter = require('./WidgetFooter');
 var CountVisualization = require('../visualizations/CountVisualization');
 var HistogramVisualization = require('../visualizations/HistogramVisualization');
 
