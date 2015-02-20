@@ -28,7 +28,7 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.shared.rest.resources.RestResource;
-import org.graylog2.security.RestPermissions;
+import org.graylog2.shared.security.RestPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

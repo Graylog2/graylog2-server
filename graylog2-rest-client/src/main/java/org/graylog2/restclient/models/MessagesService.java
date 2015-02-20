@@ -65,7 +65,7 @@ public class MessagesService {
             return Cache.getOrElse(MESSAGE_FIELDS_CACHE_KEY, new Callable<Set<String>>() {
                 @Override
                 public Set<String> call() throws Exception {
-                    final MessageFieldResponse response = api.path(routes.SystemResource().fields(), MessageFieldResponse.class)
+                    final MessageFieldResponse response = api.path(routes.SystemFieldsResource().fields(), MessageFieldResponse.class)
                             .queryParam("limit", Configuration.getFieldListLimit())
                             .execute();
                     return response.fields;

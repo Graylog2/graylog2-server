@@ -22,10 +22,10 @@ import com.ning.http.client.Request;
 import com.ning.http.client.Response;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.inputs.MessageInput;
-import org.graylog2.radio.inputs.api.InputSummaryResponse;
-import org.graylog2.radio.inputs.api.PersistedInputsResponse;
-import org.graylog2.radio.inputs.api.RegisterInputResponse;
-import org.graylog2.shared.rest.resources.system.inputs.requests.RegisterInputRequest;
+import org.graylog2.rest.models.radio.responses.RegisterInputResponse;
+import org.graylog2.rest.models.radio.responses.PersistedInputsResponse;
+import org.graylog2.rest.models.radio.responses.PersistedInputsSummaryResponse;
+import org.graylog2.rest.models.system.inputs.requests.RegisterInputRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,7 +54,7 @@ public class InputService {
         this.serverStatus = serverStatus;
     }
 
-    public List<InputSummaryResponse> getPersistedInputs() throws IOException {
+    public List<PersistedInputsResponse> getPersistedInputs() throws IOException {
         final UriBuilder uriBuilder = UriBuilder.fromUri(serverUrl);
         uriBuilder.path("/system/radios/" + serverStatus.getNodeId().toString() + "/inputs");
 
@@ -76,14 +76,14 @@ public class InputService {
             throw new RuntimeException("Expected HTTP response [200] for list of persisted input but got [" + r.getStatusCode() + "].");
         }
         final String responseBody = r.getResponseBody();
-        PersistedInputsResponse persistedInputsResponse = mapper.readValue(responseBody,
-                PersistedInputsResponse.class);
-        return persistedInputsResponse.inputs;
+        PersistedInputsSummaryResponse persistedInputsResponse = mapper.readValue(responseBody,
+                PersistedInputsSummaryResponse.class);
+        return persistedInputsResponse.inputs();
     }
 
-    public InputSummaryResponse getPersistedInput(String inputId) throws IOException {
-        for (InputSummaryResponse inputSummaryResponse : getPersistedInputs())
-            if (inputSummaryResponse.id.equals(inputId))
+    public PersistedInputsResponse getPersistedInput(String inputId) throws IOException {
+        for (PersistedInputsResponse inputSummaryResponse : getPersistedInputs())
+            if (inputSummaryResponse.id().equals(inputId))
                 return inputSummaryResponse;
 
         return null;
@@ -94,7 +94,8 @@ public class InputService {
         final UriBuilder uriBuilder = UriBuilder.fromUri(serverUrl);
         uriBuilder.path("/system/radios/" + serverStatus.getNodeId().toString() + "/inputs");
 
-        RegisterInputRequest rir = RegisterInputRequest.create(input, serverStatus.getNodeId().toString());
+        RegisterInputRequest rir = RegisterInputRequest.create(input.getId(), input.getTitle(), input.getType(), input.getConfiguration().getSource(),
+                serverStatus.getNodeId().toString(), input.getCreatorUserId());
 
         String json;
         try {
@@ -113,7 +114,7 @@ public class InputService {
         RegisterInputResponse response = mapper.readValue(r.getResponseBody(), RegisterInputResponse.class);
 
         // Set the ID that was generated in the server as persist ID of this input.
-        input.setPersistId(response.persistId);
+        input.setPersistId(response.persistId());
 
         if (r.getStatusCode() != 201) {
             throw new RuntimeException("Expected HTTP response [201] for input registration but got [" + r.getStatusCode() + "].");

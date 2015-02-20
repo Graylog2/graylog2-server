@@ -46,7 +46,7 @@ import org.graylog2.rest.resources.dashboards.requests.UpdateDashboardRequest;
 import org.graylog2.rest.resources.dashboards.requests.UpdateWidgetRequest;
 import org.graylog2.rest.resources.dashboards.requests.WidgetPositions;
 import org.graylog2.rest.resources.dashboards.responses.DashboardList;
-import org.graylog2.security.RestPermissions;
+import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.shared.system.activities.Activity;
 import org.graylog2.shared.system.activities.ActivityWriter;
 import org.slf4j.Logger;

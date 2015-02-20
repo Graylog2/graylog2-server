@@ -52,7 +52,6 @@ public class GenerateRoutes {
     public static void main(String[] argv) {
         // Just "touching" class in server jar so it gets loaded.
         RestResource resource = null;
-        org.graylog2.radio.rest.resources.RestResource radioResource = null;
 
         JCodeModel codeModel = new JCodeModel();
 
