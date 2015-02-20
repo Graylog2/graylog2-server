@@ -88,7 +88,7 @@ var Widget = React.createClass({
         return visualization;
     },
     _getUrlPath() {
-        if (this.state.streamId === undefined) {
+        if (this.state.streamId === undefined || this.state.streamId === null) {
             return "/search";
         } else {
             return "/streams/" + this.state.streamId + "/messages";
@@ -97,7 +97,7 @@ var Widget = React.createClass({
     _getUrlQueryString() {
         var query = {
             q: this.state.query,
-            rangeType: this.state.rangeType,
+            rangetype: this.state.rangeType,
             interval: this.state.interval
         };
         query[this.state.rangeType] = this.state.range;
