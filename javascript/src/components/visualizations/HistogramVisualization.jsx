@@ -42,17 +42,17 @@ var HistogramVisualization = React.createClass({
             .elasticY(true)
             .renderHorizontalGridLines(true)
             .brushOn(false)
-            .xAxisLabel(this._capitalizeInterval())
+            .xAxisLabel(this._formatInterval())
             .yAxisLabel("Messages")
             .renderTitle(false)
             .colors(D3Utils.glColourPalette())
             // TODO: Extract this to a colour palette
-            .on('renderlet', (graph) => {
-                d3.selectAll('.bar').attr('data-content', (d) => {
+            .on('renderlet', (_) => {
+                d3.selectAll('.bar').attr('title', (d) => {
                     return numeral(d.y).format("0,0") + " messages<br>" + d.x.format(momentHelper.DATE_FORMAT_TZ);
                 });
 
-                $('svg .bar').popover({
+                $('svg .bar').tooltip({
                     'trigger': 'hover',
                     'container': 'body',
                     'placement': 'top',
@@ -70,8 +70,8 @@ var HistogramVisualization = React.createClass({
             .tickFormat(d3.format("s"));
         dc.renderAll();
     },
-    _capitalizeInterval() {
-        return this.props.interval.charAt(0).toUpperCase() + this.props.interval.slice(1);
+    _formatInterval() {
+        return this.props.interval.charAt(0).toUpperCase() + this.props.interval.slice(1) + "s";
     },
     processData(data) {
         var formattedData = [];
