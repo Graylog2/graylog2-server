@@ -24,7 +24,7 @@ import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.rest.resources.count.responses.MessageCountResponse;
-import org.graylog2.security.RestPermissions;
+import org.graylog2.shared.security.RestPermissions;
 
 import javax.inject.Inject;
 import javax.ws.rs.GET;

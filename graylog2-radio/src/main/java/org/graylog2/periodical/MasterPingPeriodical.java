@@ -16,35 +16,21 @@
  */
 package org.graylog2.periodical;
 
-import com.ning.http.client.AsyncHttpClient;
 import org.graylog2.plugin.periodical.Periodical;
-import org.graylog2.radio.Configuration;
 import org.graylog2.radio.cluster.Ping;
-import org.graylog2.plugin.ServerStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import java.io.IOException;
-import java.util.concurrent.ExecutionException;
 
-/**
- * @author Dennis Oelkers <dennis@torch.sh>
- */
 public class MasterPingPeriodical extends Periodical {
     private static final Logger LOG = LoggerFactory.getLogger(MasterPingPeriodical.class);
 
-    private final ServerStatus serverStatus;
-    private final Configuration configuration;
-    private final AsyncHttpClient httpClient;
+    private final Ping ping;
 
     @Inject
-    public MasterPingPeriodical(ServerStatus serverStatus,
-                                Configuration configuration,
-                                AsyncHttpClient httpClient) {
-        this.serverStatus = serverStatus;
-        this.configuration = configuration;
-        this.httpClient = httpClient;
+    public MasterPingPeriodical(Ping ping) {
+        this.ping = ping;
     }
 
     @Override
@@ -84,14 +70,7 @@ public class MasterPingPeriodical extends Periodical {
 
     @Override
     public void doRun() {
-        try {
-            Ping.ping(httpClient,
-                    configuration.getGraylog2ServerUri(),
-                    configuration.getRestTransportUri(),
-                    serverStatus.getNodeId().toString());
-        } catch (IOException | ExecutionException | InterruptedException e) {
-            LOG.error("Master ping failed.", e);
-        }
+        ping.run();
     }
 
     @Override

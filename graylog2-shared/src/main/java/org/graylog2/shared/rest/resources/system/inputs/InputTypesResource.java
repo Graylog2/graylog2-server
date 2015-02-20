@@ -24,8 +24,8 @@ import com.wordnik.swagger.annotations.ApiResponse;
 import com.wordnik.swagger.annotations.ApiResponses;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.shared.rest.resources.RestResource;
-import org.graylog2.shared.rest.resources.system.inputs.responses.InputTypeInfo;
-import org.graylog2.shared.rest.resources.system.inputs.responses.InputTypesSummary;
+import org.graylog2.rest.models.system.inputs.responses.InputTypeInfo;
+import org.graylog2.rest.models.system.inputs.responses.InputTypesSummary;
 import org.graylog2.shared.inputs.InputDescription;
 import org.graylog2.shared.inputs.MessageInputFactory;
 import org.slf4j.Logger;
@@ -79,6 +79,6 @@ public class InputTypesResource extends RestResource {
             throw new NotFoundException(message);
         }
 
-        return InputTypeInfo.create(inputType, description);
+        return InputTypeInfo.create(inputType, description.getName(), description.isExclusive(), description.getRequestedConfiguration(), description.getLinkToDocs());
     }
 }

@@ -38,8 +38,8 @@ import org.graylog2.rest.resources.search.responses.SearchResponse;
 import org.graylog2.rest.resources.search.responses.TermsResult;
 import org.graylog2.rest.resources.search.responses.TermsStatsResult;
 import org.graylog2.rest.resources.search.responses.TimeRange;
-import org.graylog2.security.RestPermissions;
 import org.graylog2.shared.rest.resources.RestResource;
+import org.graylog2.shared.security.RestPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

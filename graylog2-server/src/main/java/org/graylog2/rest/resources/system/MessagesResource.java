@@ -27,7 +27,7 @@ import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
 import org.graylog2.shared.rest.resources.RestResource;
-import org.graylog2.security.RestPermissions;
+import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.system.activities.SystemMessage;
 import org.graylog2.system.activities.SystemMessageService;
 import org.slf4j.Logger;

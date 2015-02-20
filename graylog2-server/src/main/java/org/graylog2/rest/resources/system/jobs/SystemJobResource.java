@@ -27,7 +27,7 @@ import com.wordnik.swagger.annotations.ApiResponses;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.rest.resources.system.jobs.requests.TriggerRequest;
-import org.graylog2.security.RestPermissions;
+import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.system.jobs.NoSuchJobException;
 import org.graylog2.system.jobs.SystemJob;
 import org.graylog2.system.jobs.SystemJobConcurrencyException;

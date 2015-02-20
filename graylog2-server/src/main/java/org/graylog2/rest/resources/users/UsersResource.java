@@ -39,7 +39,7 @@ import org.graylog2.rest.resources.users.responses.User;
 import org.graylog2.rest.resources.users.responses.UserList;
 import org.graylog2.security.AccessToken;
 import org.graylog2.security.AccessTokenService;
-import org.graylog2.security.RestPermissions;
+import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.users.UserService;
 import org.joda.time.DateTimeZone;
@@ -68,8 +68,8 @@ import java.util.Collections;
 import java.util.List;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
-import static org.graylog2.security.RestPermissions.USERS_EDIT;
-import static org.graylog2.security.RestPermissions.USERS_PERMISSIONSEDIT;
+import static org.graylog2.shared.security.RestPermissions.USERS_EDIT;
+import static org.graylog2.shared.security.RestPermissions.USERS_PERMISSIONSEDIT;
 
 @RequiresAuthentication
 @Path("/users")

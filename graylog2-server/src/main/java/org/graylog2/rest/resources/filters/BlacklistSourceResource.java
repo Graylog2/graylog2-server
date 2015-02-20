@@ -25,7 +25,7 @@ import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.filters.FilterService;
 import org.graylog2.filters.blacklist.FilterDescription;
 import org.graylog2.shared.rest.resources.RestResource;
-import org.graylog2.security.RestPermissions;
+import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.plugin.database.users.User;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.slf4j.Logger;

@@ -24,12 +24,14 @@ import com.google.inject.Scopes;
 import com.google.inject.TypeLiteral;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.name.Names;
+import com.squareup.okhttp.OkHttpClient;
 import org.graylog2.plugin.IOState;
 import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.buffers.InputBuffer;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.util.ThroughputCounter;
 import org.graylog2.plugin.system.NodeId;
+import org.graylog2.shared.bindings.providers.OkHttpClientProvider;
 import org.graylog2.shared.bindings.providers.EventBusProvider;
 import org.graylog2.shared.bindings.providers.MessagePackProvider;
 import org.graylog2.shared.bindings.providers.MetricRegistryProvider;
@@ -39,6 +41,7 @@ import org.graylog2.shared.buffers.InputBufferImpl;
 import org.graylog2.shared.buffers.ProcessBuffer;
 import org.graylog2.shared.buffers.processors.DecodingProcessor;
 import org.graylog2.shared.inputs.InputRegistry;
+import org.graylog2.shared.inputs.InputStateListener;
 import org.graylog2.shared.stats.ThroughputStats;
 import org.jboss.netty.util.HashedWheelTimer;
 import org.msgpack.MessagePack;
@@ -80,6 +83,13 @@ public class GenericBindings extends AbstractModule {
 
         bind(InputRegistry.class).asEagerSingleton();
 
+        bindEventBusListeners();
+        
         bind(MessagePack.class).toProvider(MessagePackProvider.class).in(Scopes.SINGLETON);
+        bind(OkHttpClient.class).toProvider(OkHttpClientProvider.class).asEagerSingleton();
+    }
+
+    private void bindEventBusListeners() {
+        bind(InputStateListener.class).asEagerSingleton();
     }
 }
