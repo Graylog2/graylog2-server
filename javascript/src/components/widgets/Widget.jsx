@@ -1,26 +1,33 @@
 /* global assertUpdateEnabled */
-
 'use strict';
 
 var React = require('react');
 
-var URLUtils = require("../../util/URLUtils");
 var Qs = require('qs');
+var URLUtils = require("../../util/URLUtils");
+
+var WidgetHeader = require('./WidgetHeader');
+var WidgetFooter = require('./WidgetFooter');
+var CountVisualization = require('../visualizations/CountVisualization');
+var HistogramVisualization = require('../visualizations/HistogramVisualization');
 
 var WidgetsStore = require('../../stores/widgets/WidgetsStore');
 
-var BaseWidget = React.createClass({
+var Widget = React.createClass({
     LOAD_WIDGET_DATA_INTERVAL: 30 * 1000,
 
     getInitialState() {
         return {
-            description: "",
+            type: undefined,
+            title: "",
             cacheTime: 10,
             query: undefined,
             streamId: undefined,
             rangeType: "",
             range: 0,
-            interval: undefined
+            interval: undefined,
+            result: undefined,
+            calculatedAt: undefined
         };
     },
     componentDidMount() {
@@ -33,7 +40,8 @@ var BaseWidget = React.createClass({
         var widgetPromise = WidgetsStore.loadWidget(this.props.dashboardId, this.props.widgetId);
         widgetPromise.done((widget) => {
             this.setState({
-                description: widget.description,
+                type: widget.type,
+                title: widget.description,
                 cacheTime: widget.cache_time,
                 query: widget.query,
                 streamId: widget.stream_id,
@@ -47,8 +55,37 @@ var BaseWidget = React.createClass({
     loadValue() {
         if (!assertUpdateEnabled(this.loadValue)) { return; }
 
-        this.props.loadValueCallback(this.state.interval);
+        var dataPromise = WidgetsStore.loadValue(this.props.dashboardId, this.props.widgetId);
+        dataPromise.done((value) => {
+            this.setState({
+                result: value.result,
+                calculatedAt: value.calculated_at
+            });
+        });
+
         setTimeout(this.loadValue, this.state.cacheTime * 1000);
+    },
+    getVisualization() {
+        if (this.state.type === undefined) { return; }
+
+        var visualization;
+
+        switch(this.state.type) {
+            case 'SEARCH_RESULT_COUNT':
+            case 'STREAM_SEARCH_RESULT_COUNT':
+            case 'STATS_COUNT':
+                visualization = <CountVisualization data={this.state.result}/>;
+                break;
+            case 'SEARCH_RESULT_CHART':
+                visualization = <HistogramVisualization id={this.props.widgetId}
+                                                        data={this.state.result}
+                                                        interval={this.state.interval}/>;
+                break;
+            default:
+                throw("Error: Widget type '" + this.state.type + "' not supported");
+        }
+
+        return visualization;
     },
     _getUrlPath() {
         if (this.state.streamId === undefined) {
@@ -60,7 +97,7 @@ var BaseWidget = React.createClass({
     _getUrlQueryString() {
         var query = {
             q: this.state.query,
-            rangetype: this.state.rangeType,
+            rangeType: this.state.rangeType,
             interval: this.state.interval
         };
         query[this.state.rangeType] = this.state.range;
@@ -76,35 +113,15 @@ var BaseWidget = React.createClass({
     render() {
         var widget = (
             <div className="widget">
-                <div>
-                    <div className="widget-title">
-                        {this.state.description}
-                    </div>
-                    <div className="widget-calculated-at" title={this.props.calculatedAt}>
-                        {moment(this.props.calculatedAt).fromNow()}
-                    </div>
-                </div>
+                <WidgetHeader title={this.state.title} calculatedAt={this.state.calculatedAt}/>
 
-                {this.props.children}
+                {this.getVisualization()}
 
-                <div>
-                    <div className="actions">
-                        <div className="widget-replay">
-                            <a href={this.replayUrl()}>
-                                <i className="icon icon-play-sign"></i>
-                            </a>
-                        </div>
-                        <div className="widget-info">
-                            <a href="#">
-                                <i className="icon icon-info-sign"></i>
-                            </a>
-                        </div>
-                    </div>
-                </div>
+                <WidgetFooter replayUrl={this.replayUrl()}/>
             </div>
         );
         return widget;
     }
 });
 
-module.exports = BaseWidget;
+module.exports = Widget;
