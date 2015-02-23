@@ -16,6 +16,7 @@
  */
 package org.graylog2.indexer.searches.timeranges;
 
+import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableMap;
 import org.graylog2.plugin.Tools;
 import org.joda.time.DateTime;
@@ -63,5 +64,14 @@ public class RelativeRange implements TimeRange {
     @Override
     public DateTime getTo() {
         return Tools.iso8601();
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("range", range)
+                .add("from", getFrom())
+                .add("to", getTo())
+                .toString();
     }
 }

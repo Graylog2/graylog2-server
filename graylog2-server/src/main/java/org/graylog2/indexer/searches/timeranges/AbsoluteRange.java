@@ -16,6 +16,7 @@
  */
 package org.graylog2.indexer.searches.timeranges;
 
+import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableMap;
 import org.graylog2.plugin.Tools;
 import org.joda.time.DateTime;
@@ -79,5 +80,13 @@ public class AbsoluteRange implements TimeRange {
         return ImmutableMap.of(
                 "from", getFrom(),
                 "to", getTo());
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("from", getFrom())
+                .add("to", getTo())
+                .toString();
     }
 }

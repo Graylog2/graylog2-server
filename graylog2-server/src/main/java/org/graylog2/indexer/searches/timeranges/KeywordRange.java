@@ -16,6 +16,7 @@
  */
 package org.graylog2.indexer.searches.timeranges;
 
+import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableMap;
 import org.graylog2.utilities.date.NaturalDateParser;
 import org.joda.time.DateTime;
@@ -91,6 +92,15 @@ public class KeywordRange implements TimeRange {
             // This should never happen
             return to;
         }
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("keyword", getKeyword())
+                .add("from", getFrom())
+                .add("to", getTo())
+                .toString();
     }
 }
 
