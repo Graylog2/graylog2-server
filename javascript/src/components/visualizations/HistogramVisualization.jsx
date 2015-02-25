@@ -46,7 +46,6 @@ var HistogramVisualization = React.createClass({
             .yAxisLabel("Messages")
             .renderTitle(false)
             .colors(D3Utils.glColourPalette())
-            // TODO: Extract this to a colour palette
             .on('renderlet', (_) => {
                 d3.selectAll('.bar').attr('title', (d) => {
                     return numeral(d.y).format("0,0") + " messages<br>" + d.x.format(momentHelper.DATE_FORMAT_TZ);
