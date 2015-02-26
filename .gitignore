@@ -1,0 +1,9 @@
+target/
+dependency-reduced-pom.xml
+pom.xml.releaseBackup
+
+out/
+.idea/
+*.iml
+*.iws
+*.ipr
