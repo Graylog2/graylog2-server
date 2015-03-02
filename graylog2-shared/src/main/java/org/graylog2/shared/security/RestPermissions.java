@@ -123,6 +123,7 @@ public class RestPermissions {
             FIELDNAMES_READ,
             INDEXERCLUSTER_READ,
             INPUTS_READ,
+            JOURNAL_READ,
             JVMSTATS_READ,
             MESSAGECOUNT_READ,
             MESSAGES_READ,
