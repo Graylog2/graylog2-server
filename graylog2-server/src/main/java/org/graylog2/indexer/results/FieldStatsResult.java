@@ -19,13 +19,10 @@ package org.graylog2.indexer.results;
 import org.elasticsearch.common.bytes.BytesReference;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.search.SearchHits;
-import org.elasticsearch.search.facet.statistical.StatisticalFacet;
+import org.elasticsearch.search.aggregations.metrics.stats.extended.ExtendedStats;
 
 import java.util.List;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public class FieldStatsResult extends IndexQueryResult {
 
     private final long count;
@@ -38,20 +35,20 @@ public class FieldStatsResult extends IndexQueryResult {
     private final double stdDeviation;
     private List<ResultMessage> searchHits;
 
-    public FieldStatsResult(StatisticalFacet f, String originalQuery, BytesReference builtQuery, TimeValue took) {
+    public FieldStatsResult(ExtendedStats f, String originalQuery, BytesReference builtQuery, TimeValue took) {
         super(originalQuery, builtQuery, took);
 
         this.count = f.getCount();
-        this.sum = f.getTotal();
+        this.sum = f.getSum();
         this.sumOfSquares = f.getSumOfSquares();
-        this.mean = f.getMean();
+        this.mean = f.getAvg();
         this.min = f.getMin();
         this.max = f.getMax();
         this.variance = f.getVariance();
         this.stdDeviation = f.getStdDeviation();
     }
 
-    public FieldStatsResult(StatisticalFacet facet, SearchHits searchHits, String query, BytesReference source, TimeValue took) {
+    public FieldStatsResult(ExtendedStats facet, SearchHits searchHits, String query, BytesReference source, TimeValue took) {
         this(facet, query, source, took);
         this.searchHits = buildResults(searchHits);
     }

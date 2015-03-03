@@ -19,36 +19,33 @@ package org.graylog2.indexer.results;
 import com.google.common.collect.Maps;
 import org.elasticsearch.common.bytes.BytesReference;
 import org.elasticsearch.common.unit.TimeValue;
-import org.elasticsearch.search.facet.terms.TermsFacet;
+import org.elasticsearch.search.aggregations.bucket.missing.Missing;
+import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 
 import java.util.List;
 import java.util.Map;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public class TermsResult extends IndexQueryResult {
 
     private final long total;
     private final long missing;
     private final long other;
-    private final Map<String, Integer> terms;
+    private final Map<String, Long> terms;
 
-    public TermsResult(TermsFacet f, String originalQuery, BytesReference builtQuery, TimeValue took) {
+    public TermsResult(Terms f, Missing m, long totalCount, String originalQuery, BytesReference builtQuery, TimeValue took) {
         super(originalQuery, builtQuery, took);
 
-        this.total = f.getTotalCount();
-        this.missing = f.getMissingCount();
-        this.other = f.getOtherCount();
-
-        this.terms = buildTermsMap(f.getEntries());
+        this.total = totalCount;
+        this.missing = m.getDocCount();
+        this.other = f.getSumOfOtherDocCounts();
+        this.terms = buildTermsMap(f.getBuckets());
     }
 
-    private Map<String, Integer> buildTermsMap(List<? extends TermsFacet.Entry> entries) {
-        Map<String, Integer> terms = Maps.newHashMap();
+    private Map<String, Long> buildTermsMap(List<Terms.Bucket> entries) {
+        Map<String, Long> terms = Maps.newHashMap();
 
-        for(TermsFacet.Entry term : entries) {
-            terms.put(term.getTerm().string(), term.getCount());
+        for(Terms.Bucket bucket : entries) {
+            terms.put(bucket.getKey(), bucket.getDocCount());
         }
 
         return terms;
@@ -66,7 +63,7 @@ public class TermsResult extends IndexQueryResult {
         return other;
     }
 
-    public Map<String, Integer> getTerms() {
+    public Map<String, Long> getTerms() {
         return terms;
     }
 
