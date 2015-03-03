@@ -34,6 +34,7 @@ import org.graylog2.restclient.models.Radio;
 import org.graylog2.restclient.models.Stream;
 import org.graylog2.restclient.models.StreamService;
 import org.graylog2.restclient.models.SystemJob;
+import org.graylog2.restclient.models.api.responses.JournalInfo;
 import play.libs.F;
 import play.libs.Json;
 import play.mvc.BodyParser;
@@ -172,6 +173,20 @@ public class SystemApiController extends AuthenticatedController {
             Node node = nodeService.loadNode(nodeId);
 
             return ok(Json.toJson(jvmMap(node.jvm(), node.getBufferInfo())));
+        } catch (NodeService.NodeNotFoundException e) {
+            return status(404, "node not found");
+        }
+    }
+
+    public Result journal(String nodeId) {
+        try {
+            final Map<String, Object> result = Maps.newHashMap();
+            final Node node = nodeService.loadNode(nodeId);
+            final JournalInfo journalInfo = node.getJournalInfo();
+
+            result.put("uncommitted_entries", journalInfo.uncommittedJournalEntries);
+
+            return ok(Json.toJson(result));
         } catch (NodeService.NodeNotFoundException e) {
             return status(404, "node not found");
         }

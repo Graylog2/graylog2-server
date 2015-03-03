@@ -131,6 +131,38 @@ $(document).ready(function() {
         };
     })();
 
+    // Node journal usage.
+    (function updateNodeJournalUsage() {
+        if ($(".node-journal-usage").length > 0) {
+            var interval = 1000;
+            if (!assertUpdateEnabled(updateNodeJournalUsage)) return;
+
+            $(".node-journal-usage").each(function(i) {
+                var url = "/a/system/node/" + $(this).attr("data-node-id") + "/journal";
+
+                var thisJournal = $(this);
+                $.ajax({
+                    url: appPrefixed(url),
+                    headers: { "X-Graylog2-No-Session-Extension" : "true"},
+                    success: function(data) {
+                        var journal = $(".journal-uncommitted", thisJournal);
+
+                        if (journal.length > 0) {
+                            journal.text(numeral(data.uncommitted_entries).format("0,0"));
+                        }
+                    },
+                    complete: function() {
+                        // Trigger next call of the whole function when we updated the last element.
+                        if (i == $(".node-journal-usage").length-1) {
+                            setTimeout(updateNodeJournalUsage, interval);
+                        }
+                    }
+                });
+            });
+        };
+    })();
+
+
     // IO of input.
     (function updateInputIO() {
         var interval = 1000;

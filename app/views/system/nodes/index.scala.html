@@ -165,6 +165,10 @@
                 heap space and will not attempt to use more than
                 <strong><span class="heap-max">@jvm.getMaxMemory.getMegabytes()</span> MB</strong>.
             </div>
+
+            <div class="node-journal-usage" data-node-id="@jvm.getNodeId">
+                <strong><span class="journal-uncommitted">@nodes.get(jvm.getNodeId).getJournalInfo().uncommittedJournalEntries</span> unprocessed messages</strong> in the journal.
+            </div>
         </div>
     }
 
