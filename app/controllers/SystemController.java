@@ -55,6 +55,10 @@ public class SystemController extends AuthenticatedController {
 
     public Result index(Integer page) {
         try {
+            if (page == 0) {
+                page = 1;
+            }
+
             List<NotificationType> notifications = Lists.newArrayList();
             if (isPermitted(NOTIFICATIONS_READ)) {
                 for (Notification notification : clusterService.allNotifications())
@@ -63,7 +67,7 @@ public class SystemController extends AuthenticatedController {
             List<SystemJob> systemJobs = isPermitted(SYSTEMJOBS_READ) ? clusterService.allSystemJobs() : Collections.<SystemJob>emptyList();
             final Boolean permittedSystemMessages = isPermitted(SYSTEMMESSAGES_READ);
             int totalSystemMessages = permittedSystemMessages ? clusterService.getNumberOfSystemMessages() : 0;
-            List<SystemMessage> systemMessages = permittedSystemMessages ? clusterService.getSystemMessages(page - 1) : Collections.<SystemMessage>emptyList();
+            List<SystemMessage> systemMessages = permittedSystemMessages ? clusterService.getSystemMessages(page) : Collections.<SystemMessage>emptyList();
             ESClusterHealth clusterHealth = isPermitted(INDEXERCLUSTER_READ) ? clusterService.getESClusterHealth() : null;
             long indexFailureCount = isPermitted(INDICES_FAILURES) ? clusterService.getIndexerFailureCountLast24Hours() : -1;
             String masterTimezone = nodeService.loadMasterNode().getTimezone();

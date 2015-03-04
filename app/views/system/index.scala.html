@@ -14,20 +14,10 @@
 
 @main("System", views.html.system.sidebar(), "", currentUser, false) {
 
-    <div class="row content content-head">
-        <div class="col-md-10">
-            <h1>System overview</h1>
+    @if(isPermitted(NOTIFICATIONS_READ)) {
+        <div class="row content">
+            <div class="col-md-12">
 
-            <p class="description">
-                wahwahwah
-            </p>
-
-        </div>
-    </div>
-
-    <div class="row content">
-        <div class="col-md-12">
-            @if(isPermitted(NOTIFICATIONS_READ)) {
                 <h2>
                     @if(notifications != null && !notifications.isEmpty) {
                         @if(notifications.size == 1) {
@@ -67,110 +57,128 @@
                 }
 
                 @if(notifications.isEmpty) {
-                    <div class="alert alert-info notifications-none">
+                    <div class="alert alert-success notifications-none">
                         <i class="fa fa-check-circle"></i>
                         &nbsp;No notifications
                     </div>
                 }
-            }
+
+            </div>
         </div>
-    </div>
+    }
+
+    @if(isPermitted(SYSTEMJOBS_READ)) {
+        <div class="row content">
+            <div class="col-md-12">
+                <h2>System jobs</h2>
+
+                <p class="description">
+                    A system job is a long-running task a graylog-server node executes for maintenance reasons. Some jobs
+                    provide progress information or can be stopped.
+                </p>
+
+                @for(job <- jobs) {
+                    <div class="systemjob systemjob-progress systemjob-active" id="job-@job.getId()" data-job-id="@job.getId()">
+                        <i class="icon icon-cog"></i>
+                        Started @job.getName
+                        on @partials.links.to_node(job.getNode)
+                        at @DateHelper.timestampShortTZ(job.getStartedAt())
+
+                        <span class="label label-success finished">Finished!</span>
+
+                        <div class="progress">
+                            <div class="progress-bar progress-bar-info active" role="progressbar" style="width: @job.getPercentComplete()%;">
+                                @job.getPercentComplete()%
+                            </div>
+                        </div>
+                    </div>
+                }
+
+                @if(jobs.isEmpty) {
+                    <div class="alert alert-info systemjobs-none">
+                        <i class="fa fa-info-circle"></i>
+                        &nbsp;No active system jobs.
+                    </div>
+                }
+            </div>
+        </div>
+    }
+
+    @if(isPermitted(INDEXERCLUSTER_READ)) {
+        <div class="row content">
+            <div class="col-md-12">
+                <h2><i class="icon icon-tasks"></i> Elasticsearch cluster</h2>
+
+                @views.html.partials.support.list_small.render("The possible Elasticsearch cluster states and more related information " +
+                        "is available in the <a href='http://docs.graylog.org/en/latest/pages/configuring_es.html' target='_blank'>Graylog documentation</a>.")
+
+                @views.html.partials.es_cluster_health.render(clusterHealth)
+            </div>
+        </div>
+    }
+
+
+    @if(isPermitted(INDICES_FAILURES)) {
+        <div class="row content">
+            <div class="col-md-12">
+                <h2><i class="icon icon-truck"></i> Indexer failures</h2>
+
+                @views.html.partials.support.list_small.render("Every message that was not successfully indexed will be logged as an indexer failure. " +
+                        "You can learn more about this feature in the <a href='http://docs.graylog.org/en/latest/pages/indexer_failures.html' target='_blank'>Graylog documentation</a>.")
+
+                @views.html.partials.indexer_failures.render(indexFailureCount)
+            </div>
+        </div>
+    }
 
     <div class="row content">
         <div class="col-md-12">
-            @if(isPermitted(SYSTEMJOBS_READ)) {
-                <div class="row-fluid">
-                    <h2>System jobs</h2>
+            <h2><i class="icon icon-time"></i> Time configuration</h2>
 
-                    <p class="description">
-                        A system job is a long-running task a graylog-server node executes for maintenance reasons. Some jobs
-                        provide progress information or can be stopped.
-                    </p>
-
-                    @for(job <- jobs) {
-                        <div class="systemjob systemjob-progress systemjob-active" id="job-@job.getId()" data-job-id="@job.getId()">
-                            <i class="icon icon-cog"></i>
-                            Started @job.getName
-                            on @partials.links.to_node(job.getNode)
-                            at @DateHelper.timestampShortTZ(job.getStartedAt())
-
-                            <span class="label label-success finished">Finished!</span>
-
-                            <div class="progress">
-                                <div class="progress-bar progress-bar-info active" role="progressbar" style="width: @job.getPercentComplete()%;">
-                                    @job.getPercentComplete()%
-                                </div>
-                            </div>
-                        </div>
-                    }
-
-                    @if(jobs.isEmpty) {
-                        <div class="alert alert-info systemjobs-none">
-                            <i class="fa fa-info-circle"></i>
-                            &nbsp;No active system jobs.
-                        </div>
-                    }
-                </div>
-            }
+            @views.html.partials.dates.time_configuration.render(currentUser, masterTimeZone)
         </div>
-    </div>
-
-    <!--
-    @if(isPermitted(INDEXERCLUSTER_READ)) {
-        <div class="row-fluid">
-            @partials.support.head_bubble("general/elasticsearch-cluster-status-explained")
-            <h2><i class="icon icon-tasks"></i> Elasticsearch cluster</h2>
-
-            @views.html.partials.es_cluster_health.render(clusterHealth)
-        </div>
-    }
-
-    @if(isPermitted(INDICES_FAILURES)) {
-        <div class="row-fluid">
-            @partials.support.head_bubble("general/indexerfailures")
-            <h2><i class="icon icon-truck"></i> Indexer failures</h2>
-
-            @views.html.partials.indexer_failures.render(indexFailureCount)
-        </div>
-    }
-
-    <div class="row-fluid">
-        <h2><i class="icon icon-time"></i> Time configuration</h2>
-
-        @views.html.partials.dates.time_configuration.render(currentUser, masterTimeZone)
     </div>
 
     @if(isPermitted(SYSTEMMESSAGES_READ)) {
-        <div class="row-fluid">
-            <h2><i class="icon icon-comments-alt"></i> System messages</h2>
+        <div class="row content">
+            <div class="col-md-12">
+                <h2><i class="icon icon-comments-alt"></i> System messages</h2>
 
-            <table class="system-messages table table-striped table-hover table-condensed">
-                <thead>
-                    <tr>
-                        <th style="width: 170px;">Timestamp</th>
-                        <th>Node</th>
-                        <th>Message</th>
-                    </tr>
-                </thead>
+                <p class="description">
+                    System messages are generated by graylog-server nodes on certain events that may be interesting for
+                    the Graylog administrators. You don't need to actively act upon any message in here because notifications
+                    will be raised for any events that required action.
+                </p>
 
-                <tbody>
-                    @for(message <- systemMessages) {
+                <table class="system-messages table table-striped table-hover table-condensed">
+                    <thead>
                         <tr>
-                            <td>@DateHelper.timestampShortTZ(message.getTimestamp)</td>
-                            <td>
-                                <a href="@routes.NodesController.node(message.getNodeId)">
-                                    @message.getNodeId
-                                </a>
-                            </td>
-                            <td>@message.getContent</td>
+                            <th style="width: 200px;">Timestamp</th>
+                            <th>Node</th>
+                            <th>Message</th>
                         </tr>
-                    }
-                </tbody>
+                    </thead>
 
-            </table>
+                    <tbody>
+                        @for(message <- systemMessages) {
+                            <tr>
+                                <td>@DateHelper.timestampShortTZ(message.getTimestamp)</td>
+                                <td>
+                                    <i class="fa fa-code-fork"></i>
+                                    <a href="@routes.NodesController.node(message.getNodeId)">
+                                        @message.getNodeId
+                                    </a>
+                                </td>
+                                <td>@message.getContent</td>
+                            </tr>
+                        }
+                    </tbody>
 
-            @partials.paginator(page, SystemMessage.PER_PAGE, totalSystemMessages, routes.SystemController.index(_))
+                </table>
+
+                @partials.paginator(page, SystemMessage.PER_PAGE, totalSystemMessages, routes.SystemController.index(_))
+            </div>
         </div>
     }
-    -->
+
 }
