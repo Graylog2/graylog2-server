@@ -16,10 +16,8 @@
  */
 package org.graylog2.restclient.models;
 
-import com.google.common.collect.Maps;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
-import org.graylog2.restclient.lib.plugin.configuration.RequestedConfigurationField;
 import org.graylog2.restclient.models.api.responses.alarmcallbacks.AlarmCallbackSummaryResponse;
 import org.graylog2.restclient.models.api.responses.alarmcallbacks.GetSingleAvailableAlarmCallbackResponse;
 import org.joda.time.DateTime;
@@ -29,7 +27,7 @@ import java.util.Map;
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
  */
-public class AlarmCallback {
+public class AlarmCallback extends ConfigurableEntity {
     public interface Factory {
         public AlarmCallback fromSummaryResponse(String streamId, AlarmCallbackSummaryResponse response);
     }
@@ -69,21 +67,13 @@ public class AlarmCallback {
         return type;
     }
 
+    @Override
     public Map<String, Object> getConfiguration() {
         return configuration;
     }
 
     public Map<String, Object> getConfiguration(GetSingleAvailableAlarmCallbackResponse typeSummaryResponse) {
-        final Map<String, Object> result = Maps.newHashMapWithExpectedSize(configuration.size());
-
-        for (final RequestedConfigurationField configurationField : typeSummaryResponse.getRequestedConfiguration()) {
-            if (configurationField.getAttributes().contains("is_password")) {
-                result.put(configurationField.getTitle(), "*******");
-            } else {
-                result.put(configurationField.getTitle(), configuration.get(configurationField.getTitle()));
-            }
-        }
-        return result;
+        return getConfiguration(typeSummaryResponse.getRequestedConfiguration());
     }
 
     public DateTime getCreatedAt() {

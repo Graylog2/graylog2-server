@@ -43,7 +43,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
-public class Input {
+public class Input extends ConfigurableEntity {
 
     private static final org.slf4j.Logger log = LoggerFactory.getLogger(Input.class);
 
@@ -264,18 +264,17 @@ public class Input {
     public Map<String, Object> getAttributes() {
         return attributes;
     }
+    public Map<String, Object> getAttributes(List<RequestedConfigurationField> typeSummaryResponse ) {
+        return getConfiguration(typeSummaryResponse);
+    }
+
     public Map<String, Object> getAttributes(InputTypeSummaryResponse typeSummaryResponse ) {
-        Map<String, Object> result = Maps.newHashMapWithExpectedSize(attributes.size());
+        return getAttributes(typeSummaryResponse.getRequestedConfiguration());
+    }
 
-        for (RequestedConfigurationField configurationField : typeSummaryResponse.getRequestedConfiguration()) {
-            if (configurationField.getAttributes().contains("is_password")) {
-                result.put(configurationField.getTitle(), "*******");
-            } else {
-                result.put(configurationField.getTitle(), attributes.get(configurationField.getTitle()));
-            }
-        }
-
-        return result;
+    @Override
+    public Map<String, Object> getConfiguration() {
+        return getAttributes();
     }
 
     public Boolean getGlobal() {
