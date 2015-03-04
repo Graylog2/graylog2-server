@@ -9,21 +9,34 @@ var EditDashboardModal = React.createClass({
         return {
             id: this.props.id,
             name: this.props.name,
-            pattern: this.props.pattern
+            pattern: this.props.pattern,
+            _error: false,
+            _error_message: ""
         };
     },
     _onPatternChange(event) {
         this.setState({pattern: event.target.value});
     },
     _onNameChange(event) {
-        this.setState({name: event.target.value});
+        var name = event.target.value;
+
+        if (! this.props.validPatternName(name)) {
+            this.setState({name: name, _error: true, _error_message: "Pattern with that name already exists!"});
+        } else {
+            this.setState({name: name, _error: false, _error_message: ""});
+        }
     },
     render() {
         var header = <h2>{this.props.create ? "Create" : "Edit"} Grok Pattern {this.state.name}</h2>;
         var body = (
             <fieldset>
-                <label>Name:</label>
-                <input type="text" onChange={this._onNameChange} value={this.state.name} required/>
+                <div className={this.state._error ? "control-group error" : "control-group"}>
+                    <label>Name:</label>
+                    <div className="controls">
+                        <input type="text" onChange={this._onNameChange} value={this.state.name} required/>
+                        <span className="help-inline">{this.state._error_message}</span>
+                    </div>
+                </div>
                 <label>Pattern:</label>
                 <textarea onChange={this._onPatternChange} value={this.state.pattern} required></textarea>
             </fieldset>
@@ -54,7 +67,10 @@ var EditDashboardModal = React.createClass({
     },
     _save() {
         var pattern = this.state;
-        this.props.savePattern(pattern, this._saved);
+
+        if (! pattern._error) {
+            this.props.savePattern(pattern, this._saved);
+        }
     }
 });
 
