@@ -334,9 +334,11 @@ $(document).ready(function() {
 
                         if (!included) {
                             $(this).removeClass("systemjob-progress");
-                            $(".progress .bar", $(this)).css("width", "100%");
-                            $(".progress", $(this)).removeClass("active");
-                            $(".progress", $(this)).addClass("progress-success");
+                            $(".progress-bar", $(this)).css("width", "100%");
+                            $(".progress-bar", $(this)).text("100% complete (success)");
+                            $(".progress-bar", $(this)).removeClass("active");
+                            $(".progress-bar", $(this)).removeClass("progress-bar-info");
+                            $(".progress-bar", $(this)).addClass("progress-bar-success");
                             $(".finished", $(this)).show();
                         }
                     });
@@ -346,7 +348,8 @@ $(document).ready(function() {
 
                         // Only update those jobs that provide progress.
                         if (el.hasClass("systemjob-progress")) {
-                            $(".progress .bar", el).css("width", job.percent_complete + "%");
+                            $(".progress .progress-bar", el).css("width", job.percent_complete + "%");
+                            $(".progress .progress-bar", el).text(job.percent_complete + "% complete");
                         }
                     });
                 },
