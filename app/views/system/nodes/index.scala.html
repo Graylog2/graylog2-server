@@ -153,21 +153,28 @@
                 }
             </h3>
 
-            <div class="node-heap-usage" data-node-id="@jvm.getNodeId">
-                <div class="progress">
-                    <div class="bar bar-warning heap-used-percent" style="width: @jvm.usedMemoryPercentage()%;"></div>
-                    <div class="bar heap-total-percent" style="width: @(jvm.totalMemoryPercentage()-jvm.usedMemoryPercentage)%"></div>
+            <div class="node-information">
+                <div class="node-heap-usage" data-node-id="@jvm.getNodeId">
+                    <div class="progress">
+                        <div class="bar bar-warning heap-used-percent" style="width: @jvm.usedMemoryPercentage()%;"></div>
+                        <div class="bar heap-total-percent" style="width: @(jvm.totalMemoryPercentage()-jvm.usedMemoryPercentage)%"></div>
+                    </div>
+
+
+                    The JVM is using <strong><span class="heap-used">@jvm.getUsedMemory.getMegabytes()</span>
+                    of <span class="heap-total">@jvm.getTotalMemory.getMegabytes()</span> MB</strong>
+                    heap space and will not attempt to use more than
+                    <strong><span class="heap-max">@jvm.getMaxMemory.getMegabytes()</span> MB</strong>.
                 </div>
 
-
-                The JVM is using <strong><span class="heap-used">@jvm.getUsedMemory.getMegabytes()</span>
-                of <span class="heap-total">@jvm.getTotalMemory.getMegabytes()</span> MB</strong>
-                heap space and will not attempt to use more than
-                <strong><span class="heap-max">@jvm.getMaxMemory.getMegabytes()</span> MB</strong>.
-            </div>
-
-            <div class="node-journal-usage" data-node-id="@jvm.getNodeId">
-                <strong><span class="journal-uncommitted">@nodes.get(jvm.getNodeId).getJournalInfo().uncommittedJournalEntries</span> unprocessed messages</strong> in the journal.
+                @if(nodes.get(jvm.getNodeId).getJournalInfo.enabled) {
+                    <div class="node-journal-usage" data-node-id="@jvm.getNodeId">
+                        There are
+                        <strong><span class="journal-uncommitted">@nodes.get(jvm.getNodeId).getJournalInfo().uncommittedJournalEntries</span>
+                            unprocessed messages</strong>
+                        in the journal.
+                    </div>
+                }
             </div>
         </div>
     }
