@@ -1,38 +1,45 @@
 @(currentUser: org.graylog2.restclient.models.User, breadcrumbs: lib.BreadcrumbList, totalFailures: Long, page: Integer)
 
-@main("Indexer failures", views.html.system.sidebar(), "", currentUser) {
+@main("Indexer failures", views.html.system.sidebar(), "", currentUser, false) {
 
     @views.html.partials.breadcrumbs(breadcrumbs)
 
-    <div class="row-fluid">
-        <h1><i class="icon icon-truck"></i> Indexer failures</h1>
+    <div class="row content content-head">
+        <div class="col-md-10">
+            <h1>Indexer failures</h1>
 
-        This is a list of bulk message index attempts that failed. A failure means that a message you sent to Graylog
-        was properly processed but writing it to the Elasticsearch cluster failed. Note that the list is capped to a
-        size of 50 MB so it will contain a lot of failure logs but not necessarily all that ever occurred.
+            <p class="description">
+                This is a list of message index attempts that failed. A failure means that a message you sent to Graylog
+                was properly processed but writing it to the Elasticsearch cluster failed. Note that the list is capped to a
+                size of 50 MB so it will contain a lot of failure logs but not necessarily all that ever occurred.
+            </p>
+
+            @views.html.partials.support.list_small() {
+                Collection containing a total of <em class="number-format" data-format="0,0">@totalFailures</em> indexer failures.
+                Read more about this topic in the <a href="http://docs.graylog.org/en/1.0/pages/indexer_failures.html" target="_blank">documentation</a>.
+            }
+        </div>
     </div>
 
-    <div class="row-fluid">
-        Collection containing a total of <em class="number-format" data-format="0,0">@totalFailures</em> indexer failures.
-        Read more about this topic in the
-        <a href="https://www.graylog.org/documentation/general/indexerfailures/" target="_blank">documentation</a>.
-    </div>
-
-    <div class="scrollable-table">
-        <table class="indexer-failures table table-striped table-hover table-condensed">
-            <thead>
-                <tr>
-                    <th style="width: 200px;">Timestamp</th>
-                    <th>Index</th>
-                    <th>Dead-letter</th>
-                    <th>Letter ID</th>
-                    <th>Error message</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- filled by dynatable -->
-            </tbody>
-        </table>
+    <div class="row content">
+        <div class="col-md-12">
+            <div class="scrollable-table">
+                <table class="indexer-failures table table-striped table-hover table-condensed">
+                    <thead>
+                        <tr>
+                            <th style="width: 200px;">Timestamp</th>
+                            <th>Index</th>
+                            <th>Dead-letter</th>
+                            <th>Letter ID</th>
+                            <th>Error message</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- filled by dynatable -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 
 }

@@ -17,7 +17,6 @@
     @if(isPermitted(NOTIFICATIONS_READ)) {
         <div class="row content">
             <div class="col-md-12">
-
                 <h2>
                     @if(notifications != null && !notifications.isEmpty) {
                         @if(notifications.size == 1) {
@@ -62,7 +61,6 @@
                         &nbsp;No notifications
                     </div>
                 }
-
             </div>
         </div>
     }
@@ -109,8 +107,10 @@
             <div class="col-md-12">
                 <h2><i class="icon icon-tasks"></i> Elasticsearch cluster</h2>
 
-                @views.html.partials.support.list_small.render("The possible Elasticsearch cluster states and more related information " +
-                        "is available in the <a href='http://docs.graylog.org/en/latest/pages/configuring_es.html' target='_blank'>Graylog documentation</a>.")
+                @views.html.partials.support.list_small() {
+                    The possible Elasticsearch cluster states and more related information is available in the
+                    <a href='http://docs.graylog.org/en/latest/pages/configuring_es.html' target='_blank'>Graylog documentation</a>.
+                }
 
                 @views.html.partials.es_cluster_health.render(clusterHealth)
             </div>
@@ -123,8 +123,10 @@
             <div class="col-md-12">
                 <h2><i class="icon icon-truck"></i> Indexer failures</h2>
 
-                @views.html.partials.support.list_small.render("Every message that was not successfully indexed will be logged as an indexer failure. " +
-                        "You can learn more about this feature in the <a href='http://docs.graylog.org/en/latest/pages/indexer_failures.html' target='_blank'>Graylog documentation</a>.")
+                @views.html.partials.support.list_small() {
+                    Every message that was not successfully indexed will be logged as an indexer failure. You can learn more about this feature in the
+                    <a href='http://docs.graylog.org/en/latest/pages/indexer_failures.html' target='_blank'>Graylog documentation</a>.
+                }
 
                 @views.html.partials.indexer_failures.render(indexFailureCount)
             </div>

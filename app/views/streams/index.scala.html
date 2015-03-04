@@ -19,18 +19,11 @@
                 Read more about streams in <a href="http://docs.graylog.org/en/latest/pages/streams.html" target="_blank">the documentation</a>.
             </p>
 
-            <p class="description-tooltips">
-                <span class="fa-stack fa-lg">
-                    <i class="fa fa-circle fa-stack-2x"></i>
-                    <i class="fa fa-lightbulb-o fa-stack-1x fa-inverse"></i>
-                </span>
-
-                <strong>
-                    Take a look at the
-                    <a href="http://docs.graylog.org/en/latest/pages/external_dashboards.html" target="_blank">Graylog stream dashboards</a>
-                    for wall-mounted displays or other integrations.
-                </strong>
-            </p>
+            @views.html.partials.support.list() {
+                Take a look at the
+                <a href="http://docs.graylog.org/en/latest/pages/external_dashboards.html" target="_blank">Graylog stream dashboards</a>
+                for wall-mounted displays or other integrations.
+            }
         </div>
 
         <div class="col-md-2" style="text-align: center; margin-top: 35px;">
