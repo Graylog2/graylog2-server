@@ -18,29 +18,43 @@ package org.graylog2.inputs.transports;
 
 import com.codahale.metrics.InstrumentedExecutorService;
 import com.codahale.metrics.MetricRegistry;
+import com.github.joschi.jadconfig.util.Size;
 import com.google.common.collect.Maps;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
-import org.graylog2.plugin.inputs.annotations.ConfigClass;
-import org.graylog2.plugin.inputs.annotations.FactoryClass;
 import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.configuration.fields.BooleanField;
+import org.graylog2.plugin.configuration.fields.ConfigurationField;
+import org.graylog2.plugin.configuration.fields.NumberField;
 import org.graylog2.plugin.inputs.MessageInput;
+import org.graylog2.plugin.inputs.annotations.ConfigClass;
+import org.graylog2.plugin.inputs.annotations.FactoryClass;
 import org.graylog2.plugin.inputs.transports.AbstractTcpTransport;
 import org.graylog2.plugin.inputs.transports.Transport;
 import org.graylog2.plugin.inputs.util.ConnectionCounter;
 import org.graylog2.plugin.inputs.util.ThroughputCounter;
 import org.jboss.netty.buffer.ChannelBuffer;
-import org.jboss.netty.channel.*;
-import org.jboss.netty.handler.codec.http.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.jboss.netty.channel.Channel;
+import org.jboss.netty.channel.ChannelFuture;
+import org.jboss.netty.channel.ChannelFutureListener;
+import org.jboss.netty.channel.ChannelHandler;
+import org.jboss.netty.channel.ChannelHandlerContext;
+import org.jboss.netty.channel.MessageEvent;
+import org.jboss.netty.channel.SimpleChannelHandler;
+import org.jboss.netty.handler.codec.http.DefaultHttpResponse;
+import org.jboss.netty.handler.codec.http.HttpContentDecompressor;
+import org.jboss.netty.handler.codec.http.HttpMethod;
+import org.jboss.netty.handler.codec.http.HttpRequest;
+import org.jboss.netty.handler.codec.http.HttpRequestDecoder;
+import org.jboss.netty.handler.codec.http.HttpResponse;
+import org.jboss.netty.handler.codec.http.HttpResponseEncoder;
+import org.jboss.netty.handler.codec.http.HttpResponseStatus;
+import org.jboss.netty.handler.codec.http.HttpVersion;
 
 import javax.inject.Named;
-import javax.inject.Provider;
 import java.util.LinkedHashMap;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Executor;
@@ -49,15 +63,23 @@ import java.util.concurrent.ThreadFactory;
 
 import static com.codahale.metrics.MetricRegistry.name;
 import static org.jboss.netty.channel.Channels.fireMessageReceived;
-import static org.jboss.netty.handler.codec.http.HttpHeaders.*;
-import static org.jboss.netty.handler.codec.http.HttpResponseStatus.*;
+import static org.jboss.netty.handler.codec.http.HttpHeaders.Names;
+import static org.jboss.netty.handler.codec.http.HttpHeaders.Values;
+import static org.jboss.netty.handler.codec.http.HttpHeaders.isKeepAlive;
+import static org.jboss.netty.handler.codec.http.HttpResponseStatus.ACCEPTED;
+import static org.jboss.netty.handler.codec.http.HttpResponseStatus.METHOD_NOT_ALLOWED;
+import static org.jboss.netty.handler.codec.http.HttpResponseStatus.NOT_FOUND;
 
 public class HttpTransport extends AbstractTcpTransport {
-    private static final Logger log = LoggerFactory.getLogger(HttpTransport.class);
+    static final int DEFAULT_MAX_INITIAL_LINE_LENGTH = 4096;
+    static final int DEFAULT_MAX_HEADER_SIZE = 8192;
+    static final int DEFAULT_MAX_CHUNK_SIZE = (int) Size.kilobytes(64L).toBytes();
 
-    public static final String CK_ENABLE_CORS = "enable_cors";
+    static final String CK_ENABLE_CORS = "enable_cors";
+    static final String CK_MAX_CHUNK_SIZE = "max_chunk_size";
 
     private final boolean enableCors;
+    private final int maxChunkSize;
 
     @AssistedInject
     public HttpTransport(@Assisted Configuration configuration,
@@ -73,6 +95,9 @@ public class HttpTransport extends AbstractTcpTransport {
               connectionCounter);
 
         enableCors = configuration.getBoolean(CK_ENABLE_CORS);
+
+        int maxChunkSize = configuration.intIsSet(CK_MAX_CHUNK_SIZE) ? configuration.getInt(CK_MAX_CHUNK_SIZE) : DEFAULT_MAX_CHUNK_SIZE;
+        this.maxChunkSize = maxChunkSize <= 0 ? DEFAULT_MAX_CHUNK_SIZE : maxChunkSize;
     }
 
     private static Executor executorService(final String executorName, final String threadNameFormat, final MetricRegistry metricRegistry) {
@@ -91,7 +116,7 @@ public class HttpTransport extends AbstractTcpTransport {
         baseChannelHandlers.put("decoder", new Callable<ChannelHandler>() {
             @Override
             public ChannelHandler call() throws Exception {
-                return new HttpRequestDecoder();
+                return new HttpRequestDecoder(DEFAULT_MAX_INITIAL_LINE_LENGTH, DEFAULT_MAX_HEADER_SIZE, maxChunkSize);
             }
         });
         baseChannelHandlers.put("encoder", new Callable<ChannelHandler>() {
@@ -143,6 +168,11 @@ public class HttpTransport extends AbstractTcpTransport {
                                         "Enable CORS",
                                         true,
                                         "Input sends CORS headers to satisfy browser security policies"));
+            r.addField(new NumberField(CK_MAX_CHUNK_SIZE,
+                                        "Max. HTTP chunk size",
+                                        DEFAULT_MAX_CHUNK_SIZE,
+                                        "The maximum HTTP chunk size in bytes (e. g. length of HTTP request body)",
+                                        ConfigurationField.Optional.OPTIONAL));
             return r;
         }
     }
