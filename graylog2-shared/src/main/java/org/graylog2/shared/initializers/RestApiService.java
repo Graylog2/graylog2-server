@@ -66,8 +66,6 @@ import javax.ws.rs.container.DynamicFeature;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.ExceptionMapper;
-import javax.ws.rs.ext.MessageBodyReader;
-import javax.ws.rs.ext.MessageBodyWriter;
 import java.io.File;
 import java.net.InetSocketAddress;
 import java.net.URI;

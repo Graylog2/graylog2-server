@@ -25,6 +25,7 @@ import com.fasterxml.jackson.jaxrs.cfg.ObjectWriterModifier;
 import com.github.joschi.jadconfig.util.Size;
 import com.google.common.collect.ImmutableMap;
 import org.apache.shiro.subject.Subject;
+import org.graylog2.plugin.BaseConfiguration;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.shared.security.ShiroSecurityContext;
 import org.graylog2.plugin.database.users.User;
@@ -36,10 +37,16 @@ import javax.inject.Inject;
 import javax.ws.rs.ForbiddenException;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.SecurityContext;
+import javax.ws.rs.core.UriBuilder;
+import javax.ws.rs.core.UriInfo;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.security.Principal;
+import java.util.List;
 import java.util.Map;
 
 public abstract class RestResource {
@@ -54,8 +61,14 @@ public abstract class RestResource {
     @Inject
     protected ServerStatus serverStatus;
 
+    @Inject
+    private BaseConfiguration configuration;
+
     @Context
     SecurityContext securityContext;
+
+    @Context
+    UriInfo uriInfo;
 
     @QueryParam("pretty")
     public void setPrettyPrint(boolean prettyPrint) {
@@ -160,5 +173,12 @@ public abstract class RestResource {
         }
 
         return user;
+    }
+
+    protected UriBuilder getUriBuilderToSelf() {
+        if (configuration.getRestTransportUri() != null) {
+            return UriBuilder.fromUri(configuration.getRestTransportUri());
+        } else
+            return uriInfo.getBaseUriBuilder();
     }
 }

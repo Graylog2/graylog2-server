@@ -50,7 +50,6 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriBuilder;
 import java.net.URI;
 
 @RequiresAuthentication
@@ -112,7 +111,7 @@ public class StaticFieldsResource extends RestResource {
         LOG.info(msg);
         activityWriter.write(new Activity(msg, StaticFieldsResource.class));
 
-        final URI inputUri = UriBuilder.fromResource(InputsResource.class)
+        final URI inputUri = getUriBuilderToSelf().path(InputsResource.class)
                 .path("{inputId}")
                 .build(mongoInput.getId());
 
