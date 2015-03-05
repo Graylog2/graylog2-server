@@ -34,12 +34,14 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 import java.net.URI;
 
@@ -95,7 +97,9 @@ public class GrokResource extends RestResource {
     @PUT
     @Timed
     @ApiOperation("Add a list of new patterns")
-    public Response bulkUpdatePatterns(@ApiParam(name = "patterns", required = true) @NotNull GrokPatternList patternList) throws ValidationException {
+    public Response bulkUpdatePatterns(@ApiParam(name = "patterns", required = true) @NotNull GrokPatternList patternList,
+                                       @ApiParam(name = "replace", value = "Replace all patterns with the new ones.")
+                                       @QueryParam("replace") @DefaultValue("false") boolean replace) throws ValidationException {
         checkPermission(RestPermissions.INPUTS_CREATE);
 
         for (final GrokPattern pattern : patternList.patterns()) {
@@ -103,9 +107,9 @@ public class GrokResource extends RestResource {
                 throw new ValidationException("Invalid pattern " + pattern + ". Did not save any patterns.");
             }
         }
-        for (final GrokPattern pattern : patternList.patterns()) {
-            grokPatternService.save(pattern);
-        }
+
+        grokPatternService.saveAll(patternList.patterns(), replace);
+
         return Response.accepted().build();
     }
     

@@ -20,6 +20,8 @@ import com.google.inject.ImplementedBy;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.database.ValidationException;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 
 @ImplementedBy(GrokPatternServiceImpl.class)
@@ -30,7 +32,11 @@ public interface GrokPatternService {
 
     GrokPattern save(GrokPattern pattern) throws ValidationException;
 
+    List<GrokPattern> saveAll(Collection<GrokPattern> patterns, boolean replace) throws ValidationException;
+
     boolean validate(GrokPattern pattern);
 
     int delete(String patternName);
+
+    int deleteAll();
 }
