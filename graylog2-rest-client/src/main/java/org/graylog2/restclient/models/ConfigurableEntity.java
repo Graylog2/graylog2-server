@@ -16,6 +16,7 @@
  */
 package org.graylog2.restclient.models;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 import org.graylog2.restclient.lib.plugin.configuration.RequestedConfigurationField;
 import org.graylog2.restclient.models.api.responses.alarmcallbacks.GetSingleAvailableAlarmCallbackResponse;
@@ -30,10 +31,12 @@ public abstract class ConfigurableEntity {
         final Map<String, Object> result = Maps.newHashMapWithExpectedSize(getConfiguration().size());
 
         for (final RequestedConfigurationField configurationField : typeResponses) {
-            if (configurationField.getAttributes().contains("is_password")) {
-                result.put(configurationField.getTitle(), "*******");
-            } else {
-                result.put(configurationField.getTitle(), getConfiguration().get(configurationField.getTitle()));
+            if (getConfiguration().get(configurationField.getTitle()) != null) {
+                if (configurationField.getAttributes().contains("is_password")) {
+                    result.put(configurationField.getTitle(), "*******");
+                } else {
+                    result.put(configurationField.getTitle(), getConfiguration().get(configurationField.getTitle()));
+                }
             }
         }
         return result;
