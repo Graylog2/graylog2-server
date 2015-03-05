@@ -196,6 +196,14 @@ public class MongoProbe {
                     memoryMap.getInt("mappedWithJournal")
             );
 
+            final BasicDBObject storageEngineMap = (BasicDBObject) serverStatusResult.get("storageEngine");
+            final ServerStatus.StorageEngine storageEngine;
+            if (storageEngineMap == null) {
+                storageEngine = ServerStatus.StorageEngine.DEFAULT;
+            } else {
+                storageEngine = ServerStatus.StorageEngine.create(storageEngineMap.getString("name"));
+            }
+
             serverStatus = ServerStatus.create(
                     serverStatusResult.getString("host"),
                     serverStatusResult.getString("version"),
@@ -207,7 +215,8 @@ public class MongoProbe {
                     new DateTime(serverStatusResult.getDate("localTime")),
                     connections,
                     network,
-                    memory);
+                    memory,
+                    storageEngine);
         } else {
             serverStatus = null;
         }
