@@ -16,7 +16,6 @@
  */
 package org.graylog2.rest.resources.system.outputs;
 
-import autovalue.shaded.com.google.common.common.collect.Sets;
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.ImmutableMap;
 import com.wordnik.swagger.annotations.Api;
@@ -54,7 +53,6 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriBuilder;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -150,7 +148,7 @@ public class OutputResource extends RestResource {
         );
 
         final Output output = outputService.create(createOutputRequest, getCurrentUser().getName());
-        final URI outputUri = UriBuilder.fromResource(OutputResource.class)
+        final URI outputUri = getUriBuilderToSelf().path(OutputResource.class)
                 .path("{outputId}")
                 .build(output.getId());
 

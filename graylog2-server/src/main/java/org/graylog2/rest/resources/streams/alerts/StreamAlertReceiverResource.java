@@ -53,7 +53,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriBuilder;
 import java.net.URI;
 import java.util.Collections;
 import java.util.List;
@@ -106,7 +105,7 @@ public class StreamAlertReceiverResource extends RestResource {
         final Stream stream = streamService.load(streamid);
 
         // TODO What's the actual URI of the created resource?
-        final URI streamAlertUri = UriBuilder.fromResource(StreamAlertResource.class).build(streamid);
+        final URI streamAlertUri = getUriBuilderToSelf().path(StreamAlertResource.class).build(streamid);
 
         // Maybe the list already contains this receiver?
         if (stream.getAlertReceivers().containsKey(type) || stream.getAlertReceivers().get(type) != null) {

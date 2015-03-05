@@ -130,8 +130,9 @@ public class ExtractorService {
         api.path(routes.GrokResource().removePattern(pattern.id)).execute();
     }
     
-    public void bulkLoadGrokPatterns(Collection<GrokPattern> patterns) throws APIException, IOException {
+    public void bulkLoadGrokPatterns(Collection<GrokPattern> patterns, boolean replace) throws APIException, IOException {
         api.path(routes.GrokResource().bulkUpdatePatterns())
+                .queryParam("replace", String.valueOf(replace))
                 .body(new GrokPatternUpdateRequest(patterns))
                 .execute();
         

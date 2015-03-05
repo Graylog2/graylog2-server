@@ -47,7 +47,6 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriBuilder;
 import java.net.URI;
 
 @RequiresAuthentication
@@ -78,7 +77,7 @@ public class BundleResource extends RestResource {
             final ConfigurationBundle configurationBundle) {
         checkPermission(RestPermissions.BUNDLE_CREATE);
         final ConfigurationBundle bundle = bundleService.insert(configurationBundle);
-        final URI bundleUri = UriBuilder.fromResource(BundleResource.class)
+        final URI bundleUri = getUriBuilderToSelf().path(BundleResource.class)
                 .path("{bundleId}")
                 .build(bundle.getId());
 

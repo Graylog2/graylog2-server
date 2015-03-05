@@ -59,7 +59,6 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriBuilder;
 import java.net.URI;
 
 @RequiresAuthentication
@@ -208,7 +207,7 @@ public class InputsResource extends RestResource {
             inputLauncher.launch(input);
         }
 
-        final URI inputUri = UriBuilder.fromResource(InputsResource.class)
+        final URI inputUri = getUriBuilderToSelf().path(InputsResource.class)
                 .path("{inputId}")
                 .build(input.getId());
 
@@ -264,7 +263,7 @@ public class InputsResource extends RestResource {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
 
-        final URI inputUri = UriBuilder.fromResource(InputsResource.class)
+        final URI inputUri = getUriBuilderToSelf().path(InputsResource.class)
                 .path("{inputId}")
                 .build(inputId);
 
