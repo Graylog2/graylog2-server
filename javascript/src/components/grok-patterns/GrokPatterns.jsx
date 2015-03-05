@@ -63,7 +63,7 @@ var GrokPatterns = React.createClass({
     },
     validPatternName(name) {
         // Check if patterns already contain a pattern with the given name.
-        return this.state.patterns.map((p) => p.name).indexOf(name) === -1;
+        return !this.state.patterns.some((p) => p.name === name);
     },
     savePattern(pattern, callback) {
         GrokPatternsStore.savePattern(pattern, () => {
