@@ -20,6 +20,7 @@ import com.google.common.collect.Maps;
 import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.cluster.ClusterChangedEvent;
 import org.elasticsearch.cluster.ClusterService;
+import org.elasticsearch.cluster.ClusterState;
 import org.elasticsearch.cluster.ClusterStateListener;
 import org.elasticsearch.cluster.node.DiscoveryNode;
 import org.elasticsearch.common.hppc.cursors.ObjectObjectCursor;
@@ -50,6 +51,11 @@ public class ClusterStateMonitor extends org.elasticsearch.common.component.Abst
 
     @Override
     public void clusterChanged(ClusterChangedEvent event) {
+        if(event.previousState().status() != ClusterState.ClusterStateStatus.APPLIED) {
+            // Only process fully applied cluster states
+            return;
+        }
+
         if (event.state().getNodes().masterAndDataNodes().isEmpty()) {
             log.warn("No Elasticsearch data nodes in cluster, cluster is completely offline.");
         }
