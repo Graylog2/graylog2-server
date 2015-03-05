@@ -72,8 +72,8 @@ public class AlarmCallback extends ConfigurableEntity {
         return configuration;
     }
 
-    public Map<String, Object> getConfiguration(GetSingleAvailableAlarmCallbackResponse typeSummaryResponse) {
-        return getConfiguration(typeSummaryResponse.getRequestedConfiguration());
+    public Map<String, Object> getConfiguration(GetSingleAvailableAlarmCallbackResponse availableAlarmCallbackResponse) {
+        return getConfiguration(availableAlarmCallbackResponse.getRequestedConfiguration());
     }
 
     public DateTime getCreatedAt() {

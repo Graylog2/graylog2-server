@@ -27,10 +27,10 @@ import java.util.Map;
 public abstract class ConfigurableEntity {
     public abstract Map<String, Object> getConfiguration();
 
-    public Map<String, Object> getConfiguration(List<RequestedConfigurationField> typeResponses) {
+    public Map<String, Object> getConfiguration(List<RequestedConfigurationField> configurationFields) {
         final Map<String, Object> result = Maps.newHashMapWithExpectedSize(getConfiguration().size());
 
-        for (final RequestedConfigurationField configurationField : typeResponses) {
+        for (final RequestedConfigurationField configurationField : configurationFields) {
             if (getConfiguration().get(configurationField.getTitle()) != null) {
                 if (configurationField.getAttributes().contains("is_password")) {
                     result.put(configurationField.getTitle(), "*******");
