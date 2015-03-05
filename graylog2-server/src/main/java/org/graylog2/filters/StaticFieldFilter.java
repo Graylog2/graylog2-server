@@ -18,6 +18,7 @@ package org.graylog2.filters;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import org.graylog2.database.NotFoundException;
 import org.graylog2.inputs.Input;
 import org.graylog2.inputs.InputService;
 import org.graylog2.plugin.Message;
@@ -75,8 +76,13 @@ public class StaticFieldFilter implements MessageFilter {
                 @Override
                 public List<Map.Entry<String, String>> call() throws Exception {
                     LOG.debug("Re-loading static fields for input <{}> into cache.", inputId);
-                    final Input input = inputService.find(inputId);
-                    return inputService.getStaticFields(input);
+                    try {
+                        final Input input = inputService.find(inputId);
+                        return inputService.getStaticFields(input);
+                    } catch (NotFoundException e) {
+                        LOG.warn("Unable to load input: {}", e.getMessage());
+                        return Collections.emptyList();
+                    }
                 }
             });
         } catch (ExecutionException e) {
