@@ -38,9 +38,6 @@ import static lib.security.RestPermissions.BUFFERS_READ;
 import static lib.security.RestPermissions.JVMSTATS_READ;
 import static views.helpers.Permissions.isPermitted;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public class NodesController extends AuthenticatedController {
 
     private final NodeService nodeService;
@@ -108,7 +105,8 @@ public class NodesController extends AuthenticatedController {
 
             return ok(views.html.system.nodes.show.render(currentUser(), bc, node, installedPlugins));
         } catch (NodeService.NodeNotFoundException e) {
-            return status(404, views.html.errors.error.render(ApiClient.ERROR_MSG_NODE_NOT_FOUND, e, request()));
+            flash("error", "Could not find node '" + nodeId + "'");
+            return redirect(routes.NodesController.nodes());
         } catch (IOException e) {
             return status(504, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
         } catch (APIException e) {
