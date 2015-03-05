@@ -31,6 +31,7 @@ import org.graylog2.plugin.inputs.annotations.ConfigClass;
 import org.graylog2.plugin.inputs.annotations.FactoryClass;
 import org.graylog2.plugin.inputs.codecs.AbstractCodec;
 import org.graylog2.plugin.inputs.codecs.CodecAggregator;
+import org.graylog2.plugin.inputs.codecs.MultiMessageAwareCodec;
 import org.graylog2.plugin.inputs.transports.NettyTransport;
 import org.graylog2.plugin.journal.RawMessage;
 import org.joda.time.DateTime;
@@ -40,11 +41,10 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 
 @Codec(name = "gelf", displayName = "GELF")
-public class GelfCodec extends AbstractCodec {
+public class GelfCodec extends AbstractCodec implements MultiMessageAwareCodec {
     private static final Logger log = LoggerFactory.getLogger(GelfCodec.class);
 
     private final GelfChunkAggregator aggregator;
@@ -105,6 +105,25 @@ public class GelfCodec extends AbstractCodec {
     @Nullable
     @Override
     public Message decode(@Nonnull final RawMessage rawMessage) {
+        final JsonNode node = getJsonNode(rawMessage);
+        return createMessage(rawMessage.getTimestamp(), node);
+    }
+
+    @Nullable
+    @Override
+    public List<Message> decodeMultiple(@Nonnull final RawMessage rawMessage) {
+        final JsonNode node = getJsonNode(rawMessage);
+        if (node.isArray() == false) {
+            return Arrays.asList(createMessage(rawMessage.getTimestamp(), node));
+        }
+        List<Message> messages = new ArrayList<>();
+        for (int i = 0; i < node.size(); i++) {
+            messages.add(createMessage(rawMessage.getTimestamp(), node.get(i)));
+        }
+        return messages;
+    }
+
+    private JsonNode getJsonNode(RawMessage rawMessage) {
         final GELFMessage gelfMessage = new GELFMessage(rawMessage.getPayload());
         final String json = gelfMessage.getJSON();
 
@@ -116,12 +135,15 @@ public class GelfCodec extends AbstractCodec {
             log.error("Could not parse JSON!", e);
             throw new IllegalStateException("JSON is null/could not be parsed (invalid JSON)", e);
         }
+        return node;
+    }
 
+    private Message createMessage(DateTime rawTimestamp, JsonNode node) {
         // Timestamp.
         final double messageTimestamp = doubleValue(node, "timestamp");
         final DateTime timestamp;
         if (messageTimestamp <= 0) {
-            timestamp = rawMessage.getTimestamp();
+            timestamp = rawTimestamp;
         } else {
             // we treat this as a unix timestamp
             timestamp = Tools.dateTimeFromDouble(messageTimestamp);
@@ -202,7 +224,6 @@ public class GelfCodec extends AbstractCodec {
 
             message.addField(key, fieldValue);
         }
-
         return message;
     }
 

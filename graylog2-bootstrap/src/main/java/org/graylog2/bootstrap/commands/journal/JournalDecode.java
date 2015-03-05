@@ -28,6 +28,7 @@ import org.graylog2.bindings.ServerObjectMapperModule;
 import org.graylog2.inputs.codecs.CodecsModule;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.inputs.codecs.Codec;
+import org.graylog2.plugin.inputs.codecs.MultiMessageAwareCodec;
 import org.graylog2.plugin.journal.RawMessage;
 import org.graylog2.shared.journal.Journal;
 import org.slf4j.helpers.MessageFormatter;
@@ -97,20 +98,22 @@ public class JournalDecode extends AbstractJournalCommand {
             }
 
             final Codec codec = codecFactory.get(raw.getCodecName()).create(raw.getCodecConfig());
-            final Message message = codec.decode(raw);
-            if (message == null) {
+            final List<Message> messages = MultiMessageAwareCodec.Helper.decode(codec, raw);
+            if (messages == null || messages.isEmpty()) {
                 System.err.println(MessageFormatter.format(
                         "Could not use codec {} to decode raw message id {} at offset {}",
                         new Object[]{raw.getCodecName(), raw.getId(), entry.getOffset()}));
                 continue;
             }
-            message.setJournalOffset(raw.getJournalOffset());
+            for (Message message : messages) {
+                message.setJournalOffset(raw.getJournalOffset());
 
-            final StringBuffer sb = new StringBuffer();
-            sb.append("Message ").append(message.getId()).append(" in format ").append(raw.getCodecName())
-                    .append(" received from ").append(message.getSource())
-                    .append(" contains ").append(message.getFieldNames().size()).append(" fields.");
-            System.out.println(sb);
+                final StringBuffer sb = new StringBuffer();
+                sb.append("Message ").append(message.getId()).append(" in format ").append(raw.getCodecName())
+                        .append(" received from ").append(message.getSource())
+                        .append(" contains ").append(message.getFieldNames().size()).append(" fields.");
+                System.out.println(sb);
+            }
         }
 
     }
