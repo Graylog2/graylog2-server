@@ -16,10 +16,8 @@
  */
 package org.graylog2.restclient.models;
 
-import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 import org.graylog2.restclient.lib.plugin.configuration.RequestedConfigurationField;
-import org.graylog2.restclient.models.api.responses.alarmcallbacks.GetSingleAvailableAlarmCallbackResponse;
 
 import java.util.List;
 import java.util.Map;
