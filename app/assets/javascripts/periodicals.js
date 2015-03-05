@@ -94,11 +94,11 @@ $(document).ready(function() {
 
     // Node heap usage.
     (function updateNodeHeapUsage() {
-        if ($(".node-heap-usage").length > 0) {
+        if ($(".graylog-node-heap").length > 0) {
             var interval = 1000;
             if (!assertUpdateEnabled(updateNodeHeapUsage)) return;
 
-            $(".node-heap-usage").each(function(i) {
+            $(".graylog-node-heap").each(function(i) {
                 var nodeType = $(this).attr("data-node-type");
                 var url;
                 if (!!nodeType && $(this).attr("data-node-type") == "radio") {
@@ -122,7 +122,7 @@ $(document).ready(function() {
                     },
                     complete: function() {
                         // Trigger next call of the whole function when we updated the last element.
-                        if (i == $(".node-heap-usage").length-1) {
+                        if (i == $(".graylog-node-heap").length-1) {
                             setTimeout(updateNodeHeapUsage, interval);
                         }
                     }
