@@ -54,6 +54,7 @@ public class AmqpConsumer {
     private final String queue;
     private final String exchange;
     private final String routingKey;
+    private final boolean requeueInvalid;
 
     private Connection connection;
     private Channel channel;
@@ -69,7 +70,8 @@ public class AmqpConsumer {
 
     public AmqpConsumer(String hostname, int port, String virtualHost, String username, String password,
                         int prefetchCount, String queue, String exchange, String routingKey, int parallelQueues,
-                        boolean tls, MessageInput sourceInput, ScheduledExecutorService scheduler, AmqpTransport amqpTransport) {
+                        boolean tls, boolean requeueInvalid, MessageInput sourceInput,
+                        ScheduledExecutorService scheduler, AmqpTransport amqpTransport) {
         this.hostname = hostname;
         this.port = port;
         this.virtualHost = virtualHost;
@@ -84,6 +86,7 @@ public class AmqpConsumer {
         this.sourceInput = sourceInput;
         this.parallelQueues = parallelQueues;
         this.tls = tls;
+        this.requeueInvalid = requeueInvalid;
         this.amqpTransport = amqpTransport;
 
         scheduler.scheduleAtFixedRate(new Runnable() {
@@ -120,9 +123,17 @@ public class AmqpConsumer {
                         sourceInput.processRawMessage(rawMessage);
                         channel.basicAck(deliveryTag, false);
                     } catch (Exception e) {
-                        LOG.error("Error while trying to process AMQP message, requeuing message", e);
+                        LOG.error("Error while trying to process AMQP message", e);
                         if (channel.isOpen()) {
-                            channel.basicNack(deliveryTag, false, true);
+                            channel.basicNack(deliveryTag, false, requeueInvalid);
+
+                            if (LOG.isDebugEnabled()) {
+                                if (requeueInvalid) {
+                                    LOG.debug("Re-queue message with delivery tag {}", deliveryTag);
+                                } else {
+                                    LOG.debug("Message with delivery tag {} not re-queued", deliveryTag);
+                                }
+                            }
                         }
                     }
                 }
