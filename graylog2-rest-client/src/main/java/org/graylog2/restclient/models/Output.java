@@ -84,8 +84,8 @@ public class Output extends ConfigurableEntity {
         return configuration;
     }
 
-    public Map<String, Object> getConfiguration(AvailableOutputSummary typesRespons) {
-        return getConfiguration(typesRespons.getRequestedConfiguration());
+    public Map<String, Object> getConfiguration(AvailableOutputSummary availableOutputSummary) {
+        return getConfiguration(availableOutputSummary.getRequestedConfiguration());
     }
 
     public String getType() {
