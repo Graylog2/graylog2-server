@@ -56,10 +56,12 @@ public abstract class DatabaseStats {
     public abstract long indexSize();
 
     @JsonProperty
-    public abstract long fileSize();
+    @Nullable
+    public abstract Long fileSize();
 
     @JsonProperty
-    public abstract long nsSizeMB();
+    @Nullable
+    public abstract Long nsSizeMB();
 
     @JsonProperty
     @Nullable
@@ -78,8 +80,8 @@ public abstract class DatabaseStats {
                                        long numExtents,
                                        long indexes,
                                        long indexSize,
-                                       long fileSize,
-                                       long nsSizeMB,
+                                       @Nullable Long fileSize,
+                                       @Nullable Long nsSizeMB,
                                        @Nullable ExtentFreeList extentFreeList,
                                        @Nullable DataFileVersion dataFileVersion) {
         return new AutoValue_DatabaseStats(db, collections, objects, avgObjSize, dataSize, storageSize, numExtents,
