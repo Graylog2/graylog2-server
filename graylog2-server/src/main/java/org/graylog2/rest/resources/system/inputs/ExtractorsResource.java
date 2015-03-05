@@ -52,7 +52,6 @@ import javax.validation.constraints.NotNull;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriBuilder;
 import java.net.URI;
 import java.util.List;
 import java.util.Map;
@@ -124,7 +123,7 @@ public class ExtractorsResource extends RestResource {
         activityWriter.write(new Activity(msg, ExtractorsResource.class));
 
         final Map<String, String> result = ImmutableMap.of("extractor_id", id);
-        final URI extractorUri = UriBuilder.fromResource(ExtractorsResource.class)
+        final URI extractorUri = getUriBuilderToSelf().path(ExtractorsResource.class)
                 .path("{inputId}")
                 .build(input.getId());
 

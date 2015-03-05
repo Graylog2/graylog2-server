@@ -62,7 +62,6 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriBuilder;
 import java.net.URI;
 import java.util.Collections;
 import java.util.List;
@@ -166,7 +165,7 @@ public class UsersResource extends RestResource {
         final String id = userService.save(user);
         LOG.debug("Saved user {} with id {}", user.getName(), id);
 
-        final URI userUri = UriBuilder.fromResource(UsersResource.class)
+        final URI userUri = getUriBuilderToSelf().path(UsersResource.class)
                 .path("{username}")
                 .build(user.getName());
 

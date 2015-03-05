@@ -55,7 +55,6 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriBuilder;
 import java.net.URI;
 import java.util.List;
 import java.util.Map;
@@ -164,7 +163,7 @@ public class RadiosResource extends RestResource {
         final String id = inputService.save(mongoInput);
 
         final Map<String, String> result = ImmutableMap.of("persist_id", id);
-        final URI radioUri = UriBuilder.fromResource(RadiosResource.class)
+        final URI radioUri = getUriBuilderToSelf().path(RadiosResource.class)
                 .path("{radioId}")
                 .build(id);
 

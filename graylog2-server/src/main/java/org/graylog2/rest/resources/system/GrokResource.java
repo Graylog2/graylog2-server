@@ -41,7 +41,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriBuilder;
 import java.net.URI;
 
 
@@ -88,7 +87,7 @@ public class GrokResource extends RestResource {
 
         final GrokPattern newPattern = grokPatternService.save(pattern);
 
-        final URI patternUri = UriBuilder.fromMethod(GrokResource.class, "listPattern").build(newPattern.id);
+        final URI patternUri = getUriBuilderToSelf().path(GrokResource.class, "listPattern").build(newPattern.id);
         
         return Response.created(patternUri).entity(newPattern).build();
     }

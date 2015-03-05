@@ -66,7 +66,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriBuilder;
 import java.net.URI;
 import java.util.List;
 import java.util.Map;
@@ -122,7 +121,7 @@ public class DashboardsResource extends RestResource {
         dashboardRegistry.add(dashboard);
 
         final Map<String, String> result = ImmutableMap.of("dashboard_id", id);
-        final URI dashboardUri = UriBuilder.fromResource(DashboardsResource.class)
+        final URI dashboardUri = getUriBuilderToSelf().path(DashboardsResource.class)
                 .path("{dashboardId}")
                 .build(id);
 
@@ -286,7 +285,7 @@ public class DashboardsResource extends RestResource {
         }
 
         final Map<String, String> result = ImmutableMap.of("widget_id", widget.getId());
-        final URI widgetUri = UriBuilder.fromResource(DashboardsResource.class)
+        final URI widgetUri = getUriBuilderToSelf().path(DashboardsResource.class)
                 .path("{dashboardId}/widgets/{widgetId}")
                 .build(dashboardId, widget.getId());
 

@@ -66,7 +66,6 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriBuilder;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -119,7 +118,7 @@ public class StreamResource extends RestResource {
         }
 
         final Map<String, String> result = ImmutableMap.of("stream_id", id);
-        final URI streamUri = UriBuilder.fromResource(StreamResource.class)
+        final URI streamUri = getUriBuilderToSelf().path(StreamResource.class)
                 .path("{streamId}")
                 .build(id);
 
@@ -337,7 +336,7 @@ public class StreamResource extends RestResource {
         }
 
         final Map<String, String> result = ImmutableMap.of("stream_id", id);
-        final URI streamUri = UriBuilder.fromResource(StreamResource.class)
+        final URI streamUri = getUriBuilderToSelf().path(StreamResource.class)
                 .path("{streamId}")
                 .build(id);
 

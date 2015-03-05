@@ -46,7 +46,6 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriBuilder;
 import java.net.URI;
 import java.util.Collections;
 import java.util.Set;
@@ -83,7 +82,7 @@ public class BlacklistSourceResource extends RestResource {
 
         final FilterDescription savedFilter = filterService.save(filterDescription);
 
-        final URI filterUri = UriBuilder.fromResource(BlacklistSourceResource.class)
+        final URI filterUri = getUriBuilderToSelf().path(BlacklistSourceResource.class)
                 .path("{filterId}")
                 .build(savedFilter._id);
 

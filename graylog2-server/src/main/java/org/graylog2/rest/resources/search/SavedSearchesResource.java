@@ -47,7 +47,6 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriBuilder;
 import java.net.URI;
 import java.util.List;
 import java.util.Map;
@@ -83,7 +82,7 @@ public class SavedSearchesResource extends SearchResource {
         final SavedSearch search = new SavedSearchImpl(searchData);
         final String id = savedSearchService.save(search);
 
-        final URI searchUri = UriBuilder.fromResource(SavedSearchesResource.class)
+        final URI searchUri = getUriBuilderToSelf().path(SavedSearchesResource.class)
                 .path("{searchId}")
                 .build(id);
 
