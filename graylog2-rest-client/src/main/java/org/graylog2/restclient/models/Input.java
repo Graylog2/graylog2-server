@@ -264,8 +264,8 @@ public class Input extends ConfigurableEntity {
     public Map<String, Object> getAttributes() {
         return attributes;
     }
-    public Map<String, Object> getAttributes(List<RequestedConfigurationField> typeSummaryResponse ) {
-        return getConfiguration(typeSummaryResponse);
+    public Map<String, Object> getAttributes(List<RequestedConfigurationField> configurationFields ) {
+        return getConfiguration(configurationFields);
     }
 
     public Map<String, Object> getAttributes(InputTypeSummaryResponse typeSummaryResponse ) {
