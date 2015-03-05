@@ -16,71 +16,38 @@
  */
 package org.graylog2.database;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import com.mongodb.BasicDBObject;
+import com.mongodb.CommandFailureException;
+import com.mongodb.CommandResult;
 import com.mongodb.DB;
-import com.mongodb.DBCollection;
 import com.mongodb.MongoClient;
-import com.mongodb.MongoClientOptions;
-import com.mongodb.MongoClientOptions.Builder;
-import com.mongodb.ServerAddress;
+import com.mongodb.MongoClientURI;
+import com.mongodb.MongoException;
 import com.mongodb.WriteConcern;
 import org.graylog2.configuration.MongoDbConfiguration;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.net.UnknownHostException;
-import java.util.List;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * MongoDB connection singleton
  */
 @Singleton
 public class MongoConnection {
-    private MongoClient m;
-    private DB db;
-    private DBCollection messageCountsCollection;
-    private String username;
-    private List<ServerAddress> replicaServers;
-    private int threadsAllowedToBlockMultiplier;
-    private boolean useAuth;
-    private int maxConnections;
-    private String database;
-    private String password;
-    private String host;
-    private int port;
+    private final MongoClientURI mongoClientURI;
+
+    private MongoClient m = null;
+    private DB db = null;
 
     @Inject
     public MongoConnection(final MongoDbConfiguration configuration) {
-        this(
-                configuration.getDatabase(),
-                configuration.getHost(),
-                configuration.getPort(),
-                configuration.getReplicaSet(),
-                configuration.isUseAuth(),
-                configuration.getUser(),
-                configuration.getPassword(),
-                configuration.getMaxConnections(),
-                configuration.getThreadsAllowedToBlockMultiplier());
+        this(configuration.getMongoClientURI());
     }
 
-    public MongoConnection(final String database,
-                           final String host,
-                           final int port,
-                           final List<ServerAddress> replicaServers,
-                           final boolean useAuth,
-                           final String username,
-                           final String password,
-                           final int maxConnections,
-                           final int threadsAllowedToBlockMultiplier) {
-        this.host = host;
-        this.port = port;
-        this.database = database;
-        this.replicaServers = replicaServers;
-        this.useAuth = useAuth;
-        this.username = username;
-        this.password = password;
-        this.maxConnections = maxConnections;
-        this.threadsAllowedToBlockMultiplier = threadsAllowedToBlockMultiplier;
+    MongoConnection(MongoClientURI mongoClientURI) {
+        this.mongoClientURI = checkNotNull(mongoClientURI);
     }
 
     /**
@@ -88,32 +55,25 @@ public class MongoConnection {
      */
     public synchronized MongoClient connect() {
         if (m == null) {
-            Builder options = new MongoClientOptions.Builder();
-            options.connectionsPerHost(maxConnections);
-            options.threadsAllowedToBlockForConnectionMultiplier(threadsAllowedToBlockMultiplier);
-
             try {
-
-                // Connect to replica servers if given. Else the standard way to one server.
-                if (replicaServers != null && replicaServers.size() > 0) {
-                    m = new MongoClient(replicaServers, options.build());
-                } else {
-                    ServerAddress address = new ServerAddress(host, port);
-                    m = new MongoClient(address, options.build());
-                }
-                db = m.getDB(database);
+                m = new MongoClient(mongoClientURI);
+                db = m.getDB(mongoClientURI.getDatabase());
                 db.setWriteConcern(WriteConcern.SAFE);
-
-                // Try to authenticate if configured.
-                if (useAuth) {
-                    if (!db.authenticate(username, password.toCharArray())) {
-                        throw new RuntimeException("Could not authenticate to database '" + database + "' with user '" + username + "'.");
-                    }
-                }
             } catch (UnknownHostException e) {
                 throw new RuntimeException("Cannot resolve host name for MongoDB", e);
             }
         }
+
+        try {
+            db.command("{ ping: 1 }");
+        } catch (CommandFailureException e) {
+            if(e.getCode() == 18) {
+                throw new MongoException("Couldn't connect to MongoDB. Please check the authentication credentials.", e);
+            } else {
+                throw new MongoException("Couldn't connect to MongoDB: " + e.getMessage(), e);
+            }
+        }
+
         return m;
     }
 
@@ -125,62 +85,4 @@ public class MongoConnection {
     public DB getDatabase() {
         return db;
     }
-
-
-    /**
-     * Get the message_counts collection. Lazily checks if correct indices are set.
-     *
-     * @return The messages collection
-     */
-    public DBCollection getMessageCountsColl() {
-        if (this.messageCountsCollection != null) {
-            return this.messageCountsCollection;
-        }
-
-        // Collection has not been cached yet. Do it now.
-        DBCollection coll = getDatabase().getCollection("message_counts");
-
-        coll.createIndex(new BasicDBObject("timestamp", 1));
-
-        this.messageCountsCollection = coll;
-        return coll;
-    }
-
-    public void setUser(String mongoUser) {
-        this.username = mongoUser;
-    }
-
-    public void setReplicaSet(List<ServerAddress> mongoReplicaSet) {
-        this.replicaServers = mongoReplicaSet;
-    }
-
-    public void setThreadsAllowedToBlockMultiplier(
-            int mongoThreadsAllowedToBlockMultiplier) {
-        this.threadsAllowedToBlockMultiplier = mongoThreadsAllowedToBlockMultiplier;
-    }
-
-    public void setUseAuth(boolean mongoUseAuth) {
-        this.useAuth = mongoUseAuth;
-    }
-
-    public void setMaxConnections(int mongoMaxConnections) {
-        this.maxConnections = mongoMaxConnections;
-    }
-
-    public void setDatabase(String mongoDatabase) {
-        this.database = mongoDatabase;
-    }
-
-    public void setPassword(String mongoPassword) {
-        this.password = mongoPassword;
-    }
-
-    public void setHost(String mongoHost) {
-        this.host = mongoHost;
-    }
-
-    public void setPort(int mongoPort) {
-        this.port = mongoPort;
-    }
-
 }

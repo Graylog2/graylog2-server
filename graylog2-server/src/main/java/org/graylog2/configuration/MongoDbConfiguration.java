@@ -22,7 +22,10 @@ import com.github.joschi.jadconfig.ValidatorMethod;
 import com.github.joschi.jadconfig.converters.StringListConverter;
 import com.github.joschi.jadconfig.validators.InetPortValidator;
 import com.github.joschi.jadconfig.validators.PositiveIntegerValidator;
+import com.google.common.base.Joiner;
 import com.google.common.net.HostAndPort;
+import com.mongodb.MongoClientOptions;
+import com.mongodb.MongoClientURI;
 import com.mongodb.ServerAddress;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,22 +40,28 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 public class MongoDbConfiguration {
     private static final Logger LOG = LoggerFactory.getLogger(MongoDbConfiguration.class);
 
-    @Parameter(value = "mongodb_useauth", required = true)
+    @Parameter("mongodb_useauth")
+    @Deprecated
     private boolean useAuth = false;
 
-    @Parameter(value = "mongodb_user")
+    @Parameter("mongodb_user")
+    @Deprecated
     private String user;
 
-    @Parameter(value = "mongodb_password")
+    @Parameter("mongodb_password")
+    @Deprecated
     private String password;
 
-    @Parameter(value = "mongodb_database", required = true)
+    @Parameter("mongodb_database")
+    @Deprecated
     private String database = "graylog2";
 
-    @Parameter(value = "mongodb_host", required = true)
+    @Parameter("mongodb_host")
+    @Deprecated
     private String host = "127.0.0.1";
 
-    @Parameter(value = "mongodb_port", required = true, validator = InetPortValidator.class)
+    @Parameter(value = "mongodb_port", validator = InetPortValidator.class)
+    @Deprecated
     private int port = 27017;
 
     @Parameter(value = "mongodb_max_connections", validator = PositiveIntegerValidator.class)
@@ -62,29 +71,39 @@ public class MongoDbConfiguration {
     private int threadsAllowedToBlockMultiplier = 5;
 
     @Parameter(value = "mongodb_replica_set", converter = StringListConverter.class)
+    @Deprecated
     private List<String> replicaSet;
 
+    @Parameter("mongodb_uri")
+    private String uri = null;
 
+
+    @Deprecated
     public boolean isUseAuth() {
         return useAuth;
     }
 
+    @Deprecated
     public String getUser() {
         return user;
     }
 
+    @Deprecated
     public String getPassword() {
         return password;
     }
 
+    @Deprecated
     public String getDatabase() {
         return database;
     }
 
+    @Deprecated
     public int getPort() {
         return port;
     }
 
+    @Deprecated
     public String getHost() {
         return host;
     }
@@ -97,7 +116,37 @@ public class MongoDbConfiguration {
         return threadsAllowedToBlockMultiplier;
     }
 
+    public String getUri() {
+        return uri;
+    }
 
+    public MongoClientURI getMongoClientURI() {
+        if(isNullOrEmpty(uri)) {
+            final StringBuilder sb = new StringBuilder("mongodb://");
+
+            if(isUseAuth()) {
+                sb.append(getUser()).append(':').append(getPassword()).append('@');
+            }
+
+            final List<ServerAddress> replicas = getReplicaSet();
+            if(replicas == null) {
+                sb.append(getHost()).append(':').append(getPort());
+            } else {
+                Joiner.on(',').skipNulls().appendTo(sb, replicas);
+            }
+
+            sb.append('/').append(getDatabase());
+            uri = sb.toString();
+        }
+
+        final MongoClientOptions.Builder mongoClientOptionsBuilder = MongoClientOptions.builder()
+                .connectionsPerHost(getMaxConnections())
+                .threadsAllowedToBlockForConnectionMultiplier(getThreadsAllowedToBlockMultiplier());
+
+        return new MongoClientURI(uri, mongoClientOptionsBuilder);
+    }
+
+    @Deprecated
     public List<ServerAddress> getReplicaSet() {
         if (replicaSet == null || replicaSet.isEmpty()) {
             return null;
@@ -124,6 +173,15 @@ public class MongoDbConfiguration {
 
     @ValidatorMethod
     public void validate() throws ValidationException {
+        if((isNullOrEmpty(getHost()) || isNullOrEmpty(getDatabase())) && isNullOrEmpty(getUri())) {
+            throw new ValidationException("Either mongodb_uri OR mongodb_host and mongodb_database must not be empty");
+        }
+
+        if(isNullOrEmpty(getUri())) {
+            LOG.info("You're using deprecated configuration options for MongoDB. Please use mongodb_uri.");
+            LOG.info("Suggested value for mongodb_uri = {}", getMongoClientURI());
+        }
+
         if (isUseAuth() && (isNullOrEmpty(getUser()) || isNullOrEmpty(getPassword()))) {
             throw new ValidationException("mongodb_user and mongodb_password have to be set if mongodb_useauth is true");
         }
