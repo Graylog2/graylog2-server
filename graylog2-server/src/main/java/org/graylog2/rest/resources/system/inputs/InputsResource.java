@@ -371,14 +371,4 @@ public class InputsResource extends RestResource {
         launchExisting(inputId);
         return Response.status(Response.Status.ACCEPTED).build();
     }
-
-    @GET
-    @Timed
-    @Path("/locationtest")
-    public Response locationtest() {
-        return Response.created(getUriBuilderToSelf().path(InputsResource.class)
-                        .path("{inputId}")
-                        .build("3ed45367fe")
-        ).build();
-    }
 }
