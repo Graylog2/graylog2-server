@@ -97,4 +97,14 @@ public class MessageSummary {
 
         return genericFields;
     }
+
+    @JsonIgnore
+    public boolean hasField(String key) {
+        return message.hasField(key);
+    }
+
+    @JsonIgnore
+    public Object getField(String key) {
+        return message.getField(key);
+    }
 }
