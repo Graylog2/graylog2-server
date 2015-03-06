@@ -25,7 +25,6 @@ package org.graylog2.plugin.inputs;
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.MetricSet;
-import com.codahale.metrics.Timer;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.google.common.collect.Maps;
 import org.graylog2.plugin.AbstractDescriptor;
@@ -74,11 +73,7 @@ public abstract class MessageInput implements Stoppable {
     private final Codec codec;
     private final Descriptor descriptor;
     private final ServerStatus serverStatus;
-    private final Meter failures;
-    private final Meter incompleteMessages;
     private final Meter incomingMessages;
-    private final Meter processedMessages;
-    private final Timer parseTime;
     private final Meter rawSize;
     private final Map<String, String> staticFields = Maps.newConcurrentMap();
     private final ConfigurationRequest requestedConfiguration;
@@ -120,10 +115,6 @@ public abstract class MessageInput implements Stoppable {
         this.serverStatus = serverStatus;
         this.requestedConfiguration = config.combinedRequestedConfiguration();
         this.codecConfig = config.codecConfig.getRequestedConfiguration().filter(codec.getConfiguration());
-        parseTime = localRegistry.timer("parseTime");
-        processedMessages = localRegistry.meter("processedMessages");
-        failures = localRegistry.meter("failures");
-        incompleteMessages = localRegistry.meter("incompleteMessages");
         rawSize = localRegistry.meter("rawSize");
         incomingMessages = localRegistry.meter("incomingMessages");
     }
