@@ -32,7 +32,7 @@
 
             <div class="well well-small">
                 <dl>
-                @for((k,v) <- callback.getConfiguration) {
+                @for((k,v) <- callback.getConfiguration(availableAlarmCallbacks.get(callback.getType))) {
                     <dt>@k:</dt><dd>@for(line <- v.toString.split("\n")) {
                         @line
                         <br/>
