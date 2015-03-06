@@ -19,6 +19,7 @@ package org.graylog2.restclient.models;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import org.graylog2.restclient.models.api.responses.alarmcallbacks.AlarmCallbackSummaryResponse;
+import org.graylog2.restclient.models.api.responses.alarmcallbacks.GetSingleAvailableAlarmCallbackResponse;
 import org.joda.time.DateTime;
 
 import java.util.Map;
@@ -26,7 +27,7 @@ import java.util.Map;
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
  */
-public class AlarmCallback {
+public class AlarmCallback extends ConfigurableEntity {
     public interface Factory {
         public AlarmCallback fromSummaryResponse(String streamId, AlarmCallbackSummaryResponse response);
     }
@@ -66,8 +67,13 @@ public class AlarmCallback {
         return type;
     }
 
+    @Override
     public Map<String, Object> getConfiguration() {
         return configuration;
+    }
+
+    public Map<String, Object> getConfiguration(GetSingleAvailableAlarmCallbackResponse availableAlarmCallbackResponse) {
+        return getConfiguration(availableAlarmCallbackResponse.getRequestedConfiguration());
     }
 
     public DateTime getCreatedAt() {
