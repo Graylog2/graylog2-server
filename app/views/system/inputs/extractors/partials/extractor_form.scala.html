@@ -42,8 +42,9 @@
     extractor != null && get_converter(converterType) != null
 }
 
+<div id="react-extractor-example-message" data-field="@field" data-example="@example"></div>
+
 <form class="extractor-form" action="@action" method="POST">
-    <div id="react-extractor-example-message" data-field="@field" data-example="@example"></div>
 
     @if(extractorType.equals(Extractor.Type.REGEX)) {
         @views.html.system.inputs.extractors.configurations.regex(extractor)
