@@ -38,7 +38,7 @@
 
     @if(outputs.size > 0) {
         @for(output <- outputs.toSeq.sortBy(_.getTitle)) {
-            @views.html.system.outputs.partials.output_summary.render(output, null)
+            @views.html.system.outputs.partials.output_summary.render(output, null, availableOutputs.get(output.getType))
         }
     } else {
         <div class="alert alert-info">There are no outputs.</div>
