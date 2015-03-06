@@ -27,7 +27,11 @@
 
             <h3>
                 <i class="icon icon-ellipsis-vertical"></i>
-                @availableAlarmCallbacks.get(callback.getType).name
+                @if(availableAlarmCallbacks.get(callback.getType) != null) {
+                    @availableAlarmCallbacks.get(callback.getType).name
+                } else {
+                    -- Alarmcallback plugin (@callback.getType) not available --
+                }
             </h3>
 
             <div class="well well-small">
