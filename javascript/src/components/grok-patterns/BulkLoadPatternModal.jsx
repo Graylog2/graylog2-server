@@ -15,6 +15,9 @@ var BulkLoadPatternModal = React.createClass({
             <div>
                 <span className="help-block">A file containing Grok patterns, one per line. Name and patterns should be separated by whitespace.</span>
                 <input type="file" name="patterns" required/>
+                <label className="checkbox">
+                    <input type="checkbox" name="replace"/> Replace all existing patterns?
+                </label>
             </div>
         );
         return (
