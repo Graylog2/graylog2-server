@@ -85,6 +85,9 @@ public class GrokPatternsController extends AuthenticatedController {
         String path = getRefererPath();
         Http.MultipartFormData body = request().body().asMultipartFormData();
         Http.MultipartFormData.FilePart patterns = body.getFile("patterns");
+        final String[] replaceParam = body.asFormUrlEncoded().get("replace");
+        boolean replace = replaceParam != null;
+
         if (patterns != null) {
 
             Collection<GrokPattern> grokPatterns = Lists.newArrayList();
@@ -111,7 +114,7 @@ public class GrokPatternsController extends AuthenticatedController {
                 return redirect(path);
             }
             try {
-                extractorService.bulkLoadGrokPatterns(grokPatterns);
+                extractorService.bulkLoadGrokPatterns(grokPatterns, replace);
                 flash("success", "Grok patterns added successfully.");
             } catch (APIException | IOException e) {
                 flash("error", "There was an error adding the grok patterns, please check the file format.");
