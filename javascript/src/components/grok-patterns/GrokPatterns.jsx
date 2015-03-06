@@ -41,7 +41,7 @@ var GrokPatterns = React.createClass({
                         <button style={{marginRight: 5}} className="btn btn-danger btn-small" onClick={this.confirmedRemove.bind(this, pattern)}>
                             <i className="icon icon-remove"></i> Delete
                         </button>
-                        <EditPatternModal id={pattern.id} name={pattern.name} pattern={pattern.pattern} create={false} reload={this.loadData} savePattern={this.savePattern}/>
+                        <EditPatternModal id={pattern.id} name={pattern.name} pattern={pattern.pattern} create={false} reload={this.loadData} savePattern={this.savePattern} validPatternName={this.validPatternName}/>
                     </td>
                 </tr>
             );
@@ -60,6 +60,10 @@ var GrokPatterns = React.createClass({
                     {jsx}
                 </tbody>
             </table>);
+    },
+    validPatternName(name) {
+        // Check if patterns already contain a pattern with the given name.
+        return !this.state.patterns.some((p) => p.name === name);
     },
     savePattern(pattern, callback) {
         GrokPatternsStore.savePattern(pattern, () => {
@@ -91,7 +95,7 @@ var GrokPatterns = React.createClass({
                     </form>
                     <div className="pull-right">
                         <BulkLoadPatternModal />
-                        <EditPatternModal id={""} name={""} pattern={""} create={true} reload={this.loadData} savePattern={this.savePattern} />
+                        <EditPatternModal id={""} name={""} pattern={""} create={true} reload={this.loadData} savePattern={this.savePattern} validPatternName={this.validPatternName}/>
                     </div>
                 </div>
                 <div className="grok-patterns row-fluid">
