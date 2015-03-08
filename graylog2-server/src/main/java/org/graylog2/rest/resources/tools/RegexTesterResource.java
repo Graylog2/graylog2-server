@@ -44,7 +44,7 @@ public class RegexTesterResource extends RestResource {
 
         // Get the first matched group.
         final RegexTesterResponse.Match match;
-        if (matcher.groupCount() > 0) {
+        if (matched && matcher.groupCount() > 0) {
             match = RegexTesterResponse.Match.create(matcher.group(1), matcher.start(1), matcher.end(1));
         } else {
             match = null;
