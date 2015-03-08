@@ -20,6 +20,7 @@ import com.codahale.metrics.MetricRegistry;
 import com.github.joschi.jadconfig.util.Size;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
+import com.google.common.primitives.Ints;
 import kafka.log.LogSegment;
 import kafka.utils.FileLock;
 import org.graylog2.plugin.InstantMillisProvider;
@@ -48,10 +49,9 @@ import static org.apache.commons.io.filefilter.FileFilterUtils.suffixFileFilter;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assume.assumeTrue;
 
 public class KafkaJournalTest {
-    private static final int BULK_SIZE = 200;
-
     @Rule
     public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
@@ -118,20 +118,27 @@ public class KafkaJournalTest {
         assertEquals(new String(firstMessage.getPayload(), UTF_8), "message1");
     }
 
-    private void createBulkChunks(KafkaJournal journal, int bulkCount) {
+    private int createBulkChunks(KafkaJournal journal, Size segmentSize, int bulkCount) {
+        // Magic numbers deduced by magic…
+        int bulkSize = Ints.saturatedCast(segmentSize.toBytes() / (2L * 16L));
         // perform multiple writes to make multiple segments
         for (int currentBulk = 0; currentBulk < bulkCount; currentBulk++) {
-            final List<Journal.Entry> entries = Lists.newArrayList();
-            // write enough bytes in one go to be over the 1024 byte segment limit, which causes a segment roll
-            for (int i = 0; i < BULK_SIZE; i++) {
+            final List<Journal.Entry> entries = Lists.newArrayListWithExpectedSize(bulkSize);
+            long writtenBytes = 0L;
+            for (int i = 0; i < bulkSize; i++) {
                 final byte[] idBytes = ("id" + i).getBytes(UTF_8);
                 final byte[] messageBytes = ("message " + i).getBytes(UTF_8);
 
+                writtenBytes += 3 * (idBytes.length + messageBytes.length);
+                if (writtenBytes > segmentSize.toBytes()) {
+                    break;
+                }
                 entries.add(journal.createEntry(idBytes, messageBytes));
-
             }
             journal.write(entries);
         }
+
+        return bulkSize;
     }
 
     private int countSegmentsInDir(File messageJournalFile) {
@@ -141,9 +148,10 @@ public class KafkaJournalTest {
 
     @Test
     public void segmentRotation() throws Exception {
+        final Size segmentSize = Size.kilobytes(1l);
         final KafkaJournal journal = new KafkaJournal(journalDirectory,
                 scheduler,
-                Size.kilobytes(1l),
+                segmentSize,
                 Duration.standardHours(1),
                 Size.kilobytes(10l),
                 Duration.standardDays(1),
@@ -151,7 +159,7 @@ public class KafkaJournalTest {
                 Duration.standardMinutes(1),
                 new MetricRegistry());
 
-        createBulkChunks(journal, 3);
+        createBulkChunks(journal, segmentSize, 3);
 
         final File[] files = journalDirectory.listFiles();
         assertNotNull(files);
@@ -167,11 +175,12 @@ public class KafkaJournalTest {
 
     @Test
     public void segmentSizeCleanup() throws Exception {
+        final Size segmentSize = Size.kilobytes(1l);
         final KafkaJournal journal = new KafkaJournal(journalDirectory,
                 scheduler,
-                Size.kilobytes(1l),
+                segmentSize,
                 Duration.standardHours(1),
-                Size.kilobytes(10l),
+                Size.kilobytes(1l),
                 Duration.standardDays(1),
                 1_000_000,
                 Duration.standardMinutes(1),
@@ -180,18 +189,18 @@ public class KafkaJournalTest {
         assertTrue(messageJournalDir.exists());
 
         // create enough chunks so that we exceed the maximum journal size we configured
-        createBulkChunks(journal, 3);
+        createBulkChunks(journal, segmentSize, 3);
 
         // make sure everything is on disk
         journal.flushDirtyLogs();
 
-        assertEquals(countSegmentsInDir(messageJournalDir), 3);
+        assertEquals(3, countSegmentsInDir(messageJournalDir));
 
         final int cleanedLogs = journal.cleanupLogs();
-        assertEquals(cleanedLogs, 1);
+        assertEquals(1, cleanedLogs);
 
         final int numberOfSegments = countSegmentsInDir(messageJournalDir);
-        assertEquals(numberOfSegments, 2);
+        assertEquals(2, numberOfSegments);
     }
 
     @Test
@@ -200,10 +209,10 @@ public class KafkaJournalTest {
 
         DateTimeUtils.setCurrentMillisProvider(clock);
         try {
-
+            final Size segmentSize = Size.kilobytes(1l);
             final KafkaJournal journal = new KafkaJournal(journalDirectory,
                     scheduler,
-                    Size.kilobytes(1l),
+                    segmentSize,
                     Duration.standardHours(1),
                     Size.kilobytes(10l),
                     Duration.standardMinutes(1),
@@ -217,13 +226,13 @@ public class KafkaJournalTest {
             long lastModifiedTs[] = new long[2];
 
             // create two chunks, 30 seconds apart
-            createBulkChunks(journal, 1);
+            createBulkChunks(journal, segmentSize, 1);
             journal.flushDirtyLogs();
             lastModifiedTs[0] = clock.getMillis();
 
             clock.tick(Period.seconds(30));
 
-            createBulkChunks(journal, 1);
+            createBulkChunks(journal, segmentSize, 1);
             journal.flushDirtyLogs();
             lastModifiedTs[1] = clock.getMillis();
 
@@ -252,9 +261,10 @@ public class KafkaJournalTest {
 
     @Test
     public void segmentCommittedCleanup() throws Exception {
+        final Size segmentSize = Size.kilobytes(1l);
         final KafkaJournal journal = new KafkaJournal(journalDirectory,
                 scheduler,
-                Size.kilobytes(1l),
+                segmentSize,
                 Duration.standardHours(1),
                 Size.petabytes(1l), // never clean by size in this test
                 Duration.standardDays(1),
@@ -264,7 +274,7 @@ public class KafkaJournalTest {
         final File messageJournalDir = new File(journalDirectory, "messagejournal-0");
         assertTrue(messageJournalDir.exists());
 
-        createBulkChunks(journal, 3);
+        final int bulkSize = createBulkChunks(journal, segmentSize, 3);
 
         // make sure everything is on disk
         journal.flushDirtyLogs();
@@ -279,15 +289,15 @@ public class KafkaJournalTest {
         assertEquals(numberOfSegments, 3);
 
         // mark first half of first segment committed, should not clean anything
-        journal.markJournalOffsetCommitted(BULK_SIZE / 2);
+        journal.markJournalOffsetCommitted(bulkSize / 2);
         assertEquals("should not touch segments", journal.cleanupLogs(), 0);
         assertEquals(countSegmentsInDir(messageJournalDir), 3);
 
-        journal.markJournalOffsetCommitted(BULK_SIZE + 1);
+        journal.markJournalOffsetCommitted(bulkSize + 1);
         assertEquals("first segment should've been purged", journal.cleanupLogs(), 1);
         assertEquals(countSegmentsInDir(messageJournalDir), 2);
 
-        journal.markJournalOffsetCommitted(BULK_SIZE * 4);
+        journal.markJournalOffsetCommitted(bulkSize * 4);
         assertEquals("only purge one segment, not the active one", journal.cleanupLogs(), 1);
         assertEquals(countSegmentsInDir(messageJournalDir), 1);
     }
@@ -296,11 +306,11 @@ public class KafkaJournalTest {
     public void lockedJournalDir() throws Exception {
         // Grab the lock before starting the KafkaJournal.
         final File file = new File(journalDirectory, ".lock");
-        file.createNewFile();
+        assumeTrue(file.createNewFile());
         final FileLock fileLock = new FileLock(file);
-        fileLock.tryLock();
+        assumeTrue(fileLock.tryLock());
 
-        final Journal journal = new KafkaJournal(journalDirectory,
+        new KafkaJournal(journalDirectory,
                 scheduler,
                 Size.megabytes(100l),
                 Duration.standardHours(1),
@@ -309,19 +319,5 @@ public class KafkaJournalTest {
                 1_000_000,
                 Duration.standardMinutes(1),
                 new MetricRegistry());
-    }
-
-    public static void deleteDirectory(File folder) {
-        File[] files = folder.listFiles();
-        if (files != null) { //some JVMs return null for empty dirs
-            for (File f : files) {
-                if (f.isDirectory()) {
-                    deleteDirectory(f);
-                } else {
-                    f.delete();
-                }
-            }
-        }
-        folder.delete();
     }
 }
