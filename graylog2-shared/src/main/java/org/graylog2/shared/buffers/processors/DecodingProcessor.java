@@ -31,14 +31,13 @@ import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.buffers.MessageEvent;
 import org.graylog2.plugin.inputs.codecs.Codec;
 import org.graylog2.plugin.journal.RawMessage;
-import org.graylog2.shared.inputs.InputRegistry;
-import org.graylog2.shared.inputs.PersistedInputs;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
 import static com.codahale.metrics.MetricRegistry.name;
 
@@ -115,7 +114,6 @@ public class DecodingProcessor implements EventHandler<MessageEvent> {
 
         final Message message;
 
-        // TODO Create parse times per codec as well. (add some more metrics too)
         final Timer.Context decodeTimeCtx = parseTime.time();
         final long decodeTime;
         try {
@@ -143,6 +141,7 @@ public class DecodingProcessor implements EventHandler<MessageEvent> {
         }
 
         message.recordTiming(serverStatus, "parse", decodeTime);
+        metricRegistry.timer(name(baseMetricName, "parseTime")).update(decodeTime, TimeUnit.NANOSECONDS);
 
         for (final RawMessage.SourceNode node : raw.getSourceNodes()) {
             switch (node.type) {
