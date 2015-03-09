@@ -20,7 +20,7 @@
         }
 
         @if(!input.getGlobal) {
-            <li><a href="@routes.MetricsController.ofNode(targetNode.getNodeId, input.getType + "." + input.getId)">Show metrics</a></li>
+            <li><a href="@routes.MetricsController.ofNode(targetNode.getNodeId, ".*." + input.getId)">Show metrics</a></li>
         }
 
         @if(!targetNode.isInstanceOf[Radio] && isPermitted(INPUTS_EDIT, input.getId)) {
