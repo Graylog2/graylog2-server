@@ -29,6 +29,9 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.bson.types.ObjectId;
 import org.cliffc.high_scale_lib.Counter;
+import org.graylog2.alarmcallbacks.AlarmCallbackConfiguration;
+import org.graylog2.alarmcallbacks.AlarmCallbackConfigurationService;
+import org.graylog2.alarmcallbacks.CreateAlarmCallbackRequest;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.Message;
@@ -86,16 +89,19 @@ public class StreamResource extends RestResource {
     private final StreamRuleService streamRuleService;
     private final StreamRouterEngine.Factory streamRouterEngineFactory;
     private final ThroughputStats throughputStats;
+    private final AlarmCallbackConfigurationService alarmCallbackConfigurationService;
 
     @Inject
     public StreamResource(StreamService streamService,
                           StreamRuleService streamRuleService,
                           StreamRouterEngine.Factory streamRouterEngineFactory,
-                          ThroughputStats throughputStats) {
+                          ThroughputStats throughputStats,
+                          AlarmCallbackConfigurationService alarmCallbackConfigurationService) {
         this.streamService = streamService;
         this.streamRuleService = streamRuleService;
         this.streamRouterEngineFactory = streamRouterEngineFactory;
         this.throughputStats = throughputStats;
+        this.alarmCallbackConfigurationService = alarmCallbackConfigurationService;
     }
 
     @POST
@@ -323,6 +329,14 @@ public class StreamResource extends RestResource {
 
         for (AlertCondition alertCondition : streamService.getAlertConditions(sourceStream)) {
             streamService.addAlertCondition(stream, alertCondition);
+        }
+
+        for (AlarmCallbackConfiguration alarmCallbackConfiguration : alarmCallbackConfigurationService.getForStream(sourceStream)) {
+            final CreateAlarmCallbackRequest request = new CreateAlarmCallbackRequest();
+            request.type = alarmCallbackConfiguration.getType();
+            request.configuration = alarmCallbackConfiguration.getConfiguration().getSource();
+            final AlarmCallbackConfiguration alarmCallback = alarmCallbackConfigurationService.create(stream.getId(), request, getCurrentUser().getName());
+            alarmCallbackConfigurationService.save(alarmCallback);
         }
 
         for (Map.Entry<String, List<String>> entry : sourceStream.getAlertReceivers().entrySet()) {
