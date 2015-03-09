@@ -294,6 +294,7 @@
                         }
                     </h3>
 
+            <div class="node-information">
                     <div class="node-heap-usage" data-node-id="@jvm.getNodeId">
                         <div class="progress">
                             <div class="bar bar-warning heap-used-percent" style="width: @jvm.usedMemoryPercentage()%;"></div>
@@ -306,6 +307,16 @@
                         heap space and will not attempt to use more than
                         <strong><span class="heap-max">@jvm.getMaxMemory.getMegabytes()</span> MB</strong>.
                     </div>
+
+                @if(nodes.get(jvm.getNodeId).getJournalInfo.enabled) {
+                    <div class="node-journal-usage" data-node-id="@jvm.getNodeId">
+                        There are
+                        <strong><span class="journal-uncommitted">@nodes.get(jvm.getNodeId).getJournalInfo().uncommittedJournalEntries</span>
+                            unprocessed messages</strong>
+                        in the journal.
+                    </div>
+                }
+            </div>
                 </div>
             }-->
         </div>

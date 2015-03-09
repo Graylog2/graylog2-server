@@ -193,6 +193,7 @@ GET         /a/system/throughput/stream/:stream_id                              
 PUT         /a/system/processing/pause                                               @controllers.api.SystemApiController.pauseMessageProcessing()
 PUT         /a/system/processing/resume                                              @controllers.api.SystemApiController.resumeMessageProcessing()
 GET         /a/system/node/:node_id/heap                                             @controllers.api.SystemApiController.heap(node_id: String)
+GET         /a/system/node/:node_id/journal                                          @controllers.api.SystemApiController.journal(node_id: String)
 GET         /a/system/radio/:radio_id/heap                                           @controllers.api.SystemApiController.radioHeap(radio_id: String)
 GET         /a/system/internallogs/:node_id                                          @controllers.api.SystemApiController.internalLogsOfNode(node_id: String)
 GET         /a/system/internallogs/:node_id/metrics                                  @controllers.api.SystemApiController.internalLogMetricsOfNode(node_id: String)
@@ -259,6 +260,8 @@ GET         /a/system/grokpatterns                                              
 POST        /a/system/grokpatterns/update                                            @controllers.api.GrokPatternsApiController.update()
 POST        /a/system/grokpatterns/create                                            @controllers.api.GrokPatternsApiController.create()
 DELETE      /a/system/grokpatterns/:pattern_id                                       @controllers.api.GrokPatternsApiController.delete(pattern_id: String)
+
+GET         /robots.txt                                                              controllers.Assets.at(path="/public", file="robots.txt")
 
 # Map static resources from the /public folder to the /assets URL path
 GET         /assets/*file                                                            controllers.Assets.at(path="/public", file)
