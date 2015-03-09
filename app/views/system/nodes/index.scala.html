@@ -168,7 +168,7 @@
                 </div>
 
                 @if(nodes.get(jvm.getNodeId).getJournalInfo.enabled) {
-                    <div class="node-journal-usage" data-node-id="@jvm.getNodeId">
+                    <div class="node-journal-information" data-node-id="@jvm.getNodeId">
                         There are
                         <strong><span class="journal-uncommitted">@nodes.get(jvm.getNodeId).getJournalInfo().uncommittedJournalEntries</span>
                             unprocessed messages</strong>

@@ -133,11 +133,12 @@ $(document).ready(function() {
 
     // Node journal usage.
     (function updateNodeJournalUsage() {
-        if ($(".node-journal-usage").length > 0) {
+        var nodeJournalInformation = $(".node-journal-information");
+        if (nodeJournalInformation.length > 0) {
             var interval = 1000;
             if (!assertUpdateEnabled(updateNodeJournalUsage)) return;
 
-            $(".node-journal-usage").each(function(i) {
+            nodeJournalInformation.each(function(i) {
                 var url = "/a/system/node/" + $(this).attr("data-node-id") + "/journal";
 
                 var thisJournal = $(this);
@@ -153,7 +154,7 @@ $(document).ready(function() {
                     },
                     complete: function() {
                         // Trigger next call of the whole function when we updated the last element.
-                        if (i == $(".node-journal-usage").length-1) {
+                        if (i == nodeJournalInformation.length-1) {
                             setTimeout(updateNodeJournalUsage, interval);
                         }
                     }
