@@ -18,14 +18,14 @@ package org.graylog2.restclient.models;
 
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
-import org.graylog2.restclient.models.api.responses.system.SystemJobSummaryResponse;
+import org.graylog2.rest.models.system.SystemJobSummary;
 import org.joda.time.DateTime;
 
 import java.util.UUID;
 
 public class SystemJob {
     public interface Factory {
-        SystemJob fromSummaryResponse(SystemJobSummaryResponse r);
+        SystemJob fromSummaryResponse(SystemJobSummary r);
     }
 
     // Some known SystemJob types that can be triggered manually from the web interface.
@@ -49,18 +49,18 @@ public class SystemJob {
     private final boolean providesProgress;
 
     @AssistedInject
-    public SystemJob(NodeService nodeService, @Assisted SystemJobSummaryResponse s) {
-        this.id = UUID.fromString(s.id);
-        this.name = s.name;
-        this.description = s.description;
-        this.info = s.info;
-        this.startedAt = DateTime.parse(s.startedAt);
-        this.percentComplete = s.percentComplete;
-        this.isCancelable = s.isCancelable;
-        this.providesProgress = s.providesProgress;
+    public SystemJob(NodeService nodeService, @Assisted SystemJobSummary s) {
+        this.id = s.id();
+        this.name = s.name();
+        this.description = s.description();
+        this.info = s.info();
+        this.startedAt = s.startedAt();
+        this.percentComplete = s.percentComplete();
+        this.isCancelable = s.isCancelable();
+        this.providesProgress = s.providesProgress();
 
         try {
-            this.node = nodeService.loadNode(s.nodeId);
+            this.node = nodeService.loadNode(s.nodeId());
         } catch (NodeService.NodeNotFoundException e) {
             throw new RuntimeException(e);
         }

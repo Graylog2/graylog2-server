@@ -58,7 +58,6 @@ public class FixDeflectorByDeleteJob extends SystemJob {
                                    ActivityWriter activityWriter,
                                    Buffers bufferSynchronizer,
                                    NotificationService notificationService) {
-        super(serverStatus);
         this.deflector = deflector;
         this.indices = indices;
         this.serverStatus = serverStatus;

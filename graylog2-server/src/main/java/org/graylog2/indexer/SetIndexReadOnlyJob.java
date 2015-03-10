@@ -52,9 +52,7 @@ public class SetIndexReadOnlyJob extends SystemJob {
                                SystemJobManager systemJobManager,
                                OptimizeIndexJob.Factory optimizeIndexJobFactory,
                                ActivityWriter activityWriter,
-                               ServerStatus serverStatus,
                                @Assisted String index) {
-        super(serverStatus);
         this.indices = indices;
         this.disableIndexOptimization = disableIndexOptimization;
         this.optimizeIndexJobFactory = optimizeIndexJobFactory;

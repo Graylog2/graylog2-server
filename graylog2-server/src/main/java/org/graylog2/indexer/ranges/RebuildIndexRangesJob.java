@@ -60,11 +60,9 @@ public class RebuildIndexRangesJob extends SystemJob {
 
     @AssistedInject
     public RebuildIndexRangesJob(@Assisted Deflector deflector,
-                                 ServerStatus serverStatus,
                                  Searches searches,
                                  ActivityWriter activityWriter,
                                  IndexRangeService indexRangeService) {
-        super(serverStatus);
         this.deflector = deflector;
         this.searches = searches;
         this.activityWriter = activityWriter;

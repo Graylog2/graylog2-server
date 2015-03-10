@@ -40,11 +40,9 @@ public class OptimizeIndexJob extends SystemJob {
     private final Indices indices;
 
     @AssistedInject
-    public OptimizeIndexJob(ServerStatus serverStatus,
-                            Indices indices,
+    public OptimizeIndexJob(Indices indices,
                             ActivityWriter activityWriter,
                             @Assisted String index) {
-        super(serverStatus);
         this.indices = indices;
         this.activityWriter = activityWriter;
         this.index = index;
