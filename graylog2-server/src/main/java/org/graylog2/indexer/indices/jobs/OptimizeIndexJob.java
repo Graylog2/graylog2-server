@@ -26,9 +26,6 @@ import org.graylog2.system.jobs.SystemJob;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public class OptimizeIndexJob extends SystemJob {
     public interface Factory {
         OptimizeIndexJob create(String index);
@@ -43,11 +40,9 @@ public class OptimizeIndexJob extends SystemJob {
     private final Indices indices;
 
     @AssistedInject
-    public OptimizeIndexJob(ServerStatus serverStatus,
-                            Indices indices,
+    public OptimizeIndexJob(Indices indices,
                             ActivityWriter activityWriter,
                             @Assisted String index) {
-        super(serverStatus);
         this.indices = indices;
         this.activityWriter = activityWriter;
         this.index = index;
@@ -88,7 +83,7 @@ public class OptimizeIndexJob extends SystemJob {
 
     @Override
     public String getDescription() {
-        return "Optimises an index for read performance.";
+        return "Optimizes an index for read performance.";
     }
 
     @Override
@@ -96,4 +91,8 @@ public class OptimizeIndexJob extends SystemJob {
         return this.getClass().getCanonicalName();
     }
 
+    @Override
+    public String getInfo() {
+        return "Optimizing index " + index + ".";
+    }
 }
