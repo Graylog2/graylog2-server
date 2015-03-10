@@ -18,20 +18,16 @@ package org.graylog2.indexer.ranges;
 
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
-import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.indexer.Deflector;
 import org.graylog2.indexer.EmptyIndexException;
 import org.graylog2.indexer.searches.Searches;
-import org.graylog2.plugin.ServerStatus;
+import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.shared.system.activities.ActivityWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 
-/**
- * @author Dennis Oelkers <dennis@torch.sh>
- */
 public class CreateNewSingleIndexRangeJob extends RebuildIndexRangesJob {
     private static final Logger LOG = LoggerFactory.getLogger(CreateNewSingleIndexRangeJob.class);
     private final String indexName;
@@ -44,16 +40,20 @@ public class CreateNewSingleIndexRangeJob extends RebuildIndexRangesJob {
     public CreateNewSingleIndexRangeJob(@Assisted Deflector deflector,
                                         @Assisted String indexName,
                                         Searches searches,
-                                        ServerStatus serverStatus,
                                         ActivityWriter activityWriter,
                                         IndexRangeService indexRangeService) {
-        super(deflector, serverStatus, searches, activityWriter, indexRangeService);
+        super(deflector, searches, activityWriter, indexRangeService);
         this.indexName = indexName;
     }
 
     @Override
     public String getDescription() {
         return "Creates new single index range information.";
+    }
+
+    @Override
+    public String getInfo() {
+        return "Calculating ranges for index " + indexName + ".";
     }
 
     @Override

@@ -16,13 +16,10 @@
  */
 package org.graylog2.restclient.models.api.responses.system;
 
+import org.graylog2.rest.models.system.SystemJobSummary;
+
 import java.util.List;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public class GetSystemJobsResponse {
-
-    public List<SystemJobSummaryResponse> jobs;
-
+    public List<SystemJobSummary> jobs;
 }

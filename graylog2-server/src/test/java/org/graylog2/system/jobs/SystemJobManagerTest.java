@@ -17,9 +17,12 @@
 package org.graylog2.system.jobs;
 
 import com.codahale.metrics.MetricRegistry;
+import com.google.common.util.concurrent.Uninterruptibles;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.system.activities.SystemMessageActivityWriter;
 import org.testng.annotations.Test;
+
+import java.util.concurrent.TimeUnit;
 
 import static org.mockito.Mockito.mock;
 import static org.testng.AssertJUnit.assertEquals;
@@ -96,18 +99,12 @@ public class SystemJobManagerTest {
         private int maxConcurrency = 9001;
 
         public LongRunningJob(int seconds) {
-            super(mock(ServerStatus.class));
             this.seconds = seconds;
         }
 
         @Override
         public void execute() {
-            try {
-                Thread.sleep(seconds * 1000);
-            } catch (InterruptedException e) {
-                // That's fine.
-                return;
-            }
+            Uninterruptibles.sleepUninterruptibly(seconds, TimeUnit.SECONDS);
         }
 
         void setMaxConcurrency(int maxConcurrency) {
@@ -154,18 +151,12 @@ public class SystemJobManagerTest {
         private int seconds;
 
         public AnotherLongRunningJob(int seconds) {
-            super(mock(ServerStatus.class));
             this.seconds = seconds;
         }
 
         @Override
         public void execute() {
-            try {
-                Thread.sleep(seconds * 1000);
-            } catch (InterruptedException e) {
-                // That's fine.
-                return;
-            }
+            Uninterruptibles.sleepUninterruptibly(seconds, TimeUnit.SECONDS);
         }
 
         @Override

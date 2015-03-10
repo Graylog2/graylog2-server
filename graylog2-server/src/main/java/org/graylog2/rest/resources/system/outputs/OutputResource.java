@@ -28,9 +28,7 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.outputs.MessageOutputFactory;
 import org.graylog2.plugin.database.ValidationException;
-import org.graylog2.plugin.outputs.MessageOutputConfigurationException;
 import org.graylog2.plugin.streams.Output;
-import org.graylog2.rest.helpers.OutputFilter;
 import org.graylog2.rest.models.system.outputs.responses.OutputSummary;
 import org.graylog2.rest.resources.streams.outputs.AvailableOutputSummary;
 import org.graylog2.rest.resources.streams.outputs.OutputListResponse;
@@ -67,15 +65,12 @@ public class OutputResource extends RestResource {
 
     private final OutputService outputService;
     private final MessageOutputFactory messageOutputFactory;
-    private final OutputFilter outputFilter;
 
     @Inject
     public OutputResource(OutputService outputService,
-                          MessageOutputFactory messageOutputFactory,
-                          OutputFilter outputFilter) {
+                          MessageOutputFactory messageOutputFactory) {
         this.outputService = outputService;
         this.messageOutputFactory = messageOutputFactory;
-        this.outputFilter = outputFilter;
     }
 
     @GET
@@ -98,7 +93,7 @@ public class OutputResource extends RestResource {
                     output.getContentPack()
             ));
 
-        return OutputListResponse.create(outputFilter.filterPasswordFields(outputs));
+        return OutputListResponse.create(outputs);
     }
 
     @GET
@@ -112,15 +107,8 @@ public class OutputResource extends RestResource {
     })
     public OutputSummary get(@ApiParam(name = "outputId", value = "The id of the output we want.", required = true) @PathParam("outputId") String outputId) throws NotFoundException {
         checkPermission(RestPermissions.OUTPUTS_READ, outputId);
-        try {
-            final Output output = outputService.load(outputId);
-            return outputFilter.filterPasswordFields(
-                    OutputSummary.create(output.getId(), output.getTitle(), output.getType(), output.getCreatorUserId(), new DateTime(output.getCreatedAt()), output.getConfiguration(), output.getContentPack())
-            );
-        } catch (MessageOutputConfigurationException e) {
-            LOG.error("Unable to filter configuration fields of output {}: ", outputId, e);
-            return null;
-        }
+        final Output output = outputService.load(outputId);
+        return OutputSummary.create(output.getId(), output.getTitle(), output.getType(), output.getCreatorUserId(), new DateTime(output.getCreatedAt()), output.getConfiguration(), output.getContentPack());
     }
 
     @POST
@@ -152,24 +140,17 @@ public class OutputResource extends RestResource {
                 .path("{outputId}")
                 .build(output.getId());
 
-        try {
-            return Response.created(outputUri).entity(
-                    outputFilter.filterPasswordFields(
-                            OutputSummary.create(
-                                    output.getId(),
-                                    output.getTitle(),
-                                    output.getType(),
-                                    output.getCreatorUserId(),
-                                    new DateTime(output.getCreatedAt()),
-                                    new HashMap<>(output.getConfiguration()),
-                                    output.getContentPack()
-                            )
-                    )
-            ).build();
-        } catch (MessageOutputConfigurationException e) {
-            LOG.error("Unable to filter configuration fields for output {}: ", output.getId(), e);
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
-        }
+        return Response.created(outputUri).entity(
+                        OutputSummary.create(
+                                output.getId(),
+                                output.getTitle(),
+                                output.getType(),
+                                output.getCreatorUserId(),
+                                new DateTime(output.getCreatedAt()),
+                                new HashMap<>(output.getConfiguration()),
+                                output.getContentPack()
+                        )
+        ).build();
     }
 
     @DELETE

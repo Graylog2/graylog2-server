@@ -25,6 +25,8 @@ import com.wordnik.swagger.annotations.ApiParam;
 import com.wordnik.swagger.annotations.ApiResponse;
 import com.wordnik.swagger.annotations.ApiResponses;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.graylog2.plugin.system.NodeId;
+import org.graylog2.rest.models.system.SystemJobSummary;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.rest.resources.system.jobs.requests.TriggerRequest;
 import org.graylog2.shared.security.RestPermissions;
@@ -53,9 +55,10 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 @RequiresAuthentication
-@Api(value = "System/Jobs", description = "Systemjobs")
+@Api(value = "System/Jobs", description = "System Jobs")
 @Path("/system/jobs")
 public class SystemJobResource extends RestResource {
 
@@ -63,25 +66,39 @@ public class SystemJobResource extends RestResource {
 
     private final SystemJobFactory systemJobFactory;
     private final SystemJobManager systemJobManager;
+    private final NodeId nodeId;
 
     @Inject
     public SystemJobResource(SystemJobFactory systemJobFactory,
-                             SystemJobManager systemJobManager) {
+                             SystemJobManager systemJobManager,
+                             NodeId nodeId) {
         this.systemJobFactory = systemJobFactory;
         this.systemJobManager = systemJobManager;
+        this.nodeId = nodeId;
     }
 
     @GET
     @Timed
     @ApiOperation(value = "List currently running jobs")
     @Produces(MediaType.APPLICATION_JSON)
-    public Map<String, List<Map<String, Object>>> list() {
-        final List<Map<String, Object>> jobs = Lists.newArrayList();
+    public Map<String, List<SystemJobSummary>> list() {
+        final List<SystemJobSummary> jobs = Lists.newArrayListWithCapacity(systemJobManager.getRunningJobs().size());
 
         for (Map.Entry<String, SystemJob> entry : systemJobManager.getRunningJobs().entrySet()) {
             // TODO jobId is ephemeral, this is not a good key for permission checks. we should use the name of the job type (but there is no way to get it yet)
             if (isPermitted(RestPermissions.SYSTEMJOBS_READ, entry.getKey())) {
-                jobs.add(entry.getValue().toMap());
+                final SystemJob systemJob = entry.getValue();
+                jobs.add(SystemJobSummary.create(
+                        UUID.fromString(systemJob.getId()),
+                        systemJob.getDescription(),
+                        systemJob.getClassName(),
+                        systemJob.getInfo(),
+                        nodeId.toString(),
+                        systemJob.getStartedAt(),
+                        systemJob.getProgress(),
+                        systemJob.isCancelable(),
+                        systemJob.providesProgress()
+                ));
             }
         }
 
@@ -96,18 +113,28 @@ public class SystemJobResource extends RestResource {
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "Job not found.")
     })
-    public Map<String, Object> get(@ApiParam(name = "jobId", required = true)
+    public SystemJobSummary get(@ApiParam(name = "jobId", required = true)
                                    @PathParam("jobId") @NotEmpty String jobId) {
         // TODO jobId is ephemeral, this is not a good key for permission checks. we should use the name of the job type (but there is no way to get it yet)
         checkPermission(RestPermissions.SYSTEMJOBS_READ, jobId);
 
-        SystemJob job = systemJobManager.getRunningJobs().get(jobId);
-        if (job == null) {
+        SystemJob systemJob = systemJobManager.getRunningJobs().get(jobId);
+        if (systemJob == null) {
             LOG.error("No system job with ID <{}> found.", jobId);
             throw new NotFoundException("No system job with ID <" + jobId + "> found");
         }
 
-        return job.toMap();
+        return SystemJobSummary.create(
+                UUID.fromString(systemJob.getId()),
+                systemJob.getDescription(),
+                systemJob.getClassName(),
+                systemJob.getInfo(),
+                nodeId.toString(),
+                systemJob.getStartedAt(),
+                systemJob.getProgress(),
+                systemJob.isCancelable(),
+                systemJob.providesProgress()
+        );
     }
 
     @POST

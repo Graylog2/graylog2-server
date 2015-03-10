@@ -16,7 +16,6 @@
  */
 package org.graylog2.rest.resources.streams.outputs;
 
-import autovalue.shaded.com.google.common.common.collect.Sets;
 import com.codahale.metrics.annotation.Timed;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
@@ -28,10 +27,8 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.outputs.OutputRegistry;
 import org.graylog2.plugin.database.ValidationException;
-import org.graylog2.plugin.outputs.MessageOutputConfigurationException;
 import org.graylog2.plugin.streams.Output;
 import org.graylog2.plugin.streams.Stream;
-import org.graylog2.rest.helpers.OutputFilter;
 import org.graylog2.rest.models.system.outputs.responses.OutputSummary;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
@@ -66,14 +63,12 @@ public class StreamOutputResource extends RestResource {
     private final OutputService outputService;
     private final StreamService streamService;
     private final OutputRegistry outputRegistry;
-    private final OutputFilter outputFilter;
 
     @Inject
-    public StreamOutputResource(OutputService outputService, StreamService streamService, OutputRegistry outputRegistry, OutputFilter outputFilter) {
+    public StreamOutputResource(OutputService outputService, StreamService streamService, OutputRegistry outputRegistry) {
         this.outputService = outputService;
         this.streamService = streamService;
         this.outputRegistry = outputRegistry;
-        this.outputFilter = outputFilter;
     }
 
     @GET
@@ -103,7 +98,7 @@ public class StreamOutputResource extends RestResource {
                     output.getContentPack()
             ));
 
-        return OutputListResponse.create(outputFilter.filterPasswordFields(outputs));
+        return OutputListResponse.create(outputs);
     }
 
     @GET
@@ -122,14 +117,9 @@ public class StreamOutputResource extends RestResource {
 
         final Output output =  outputService.load(outputId);
 
-        try {
-            return outputFilter.filterPasswordFields(
-                    OutputSummary.create(output.getId(), output.getTitle(), output.getType(), output.getCreatorUserId(), new DateTime(output.getCreatedAt()), output.getConfiguration(), output.getContentPack())
-            );
-        } catch (MessageOutputConfigurationException e) {
-            LOG.error("Unable to filter configuration fields for output {}: ", output.getId(), e);
-            return null;
-        }
+        return OutputSummary.create(
+                output.getId(), output.getTitle(), output.getType(), output.getCreatorUserId(), new DateTime(output.getCreatedAt()), output.getConfiguration(), output.getContentPack()
+        );
     }
 
     @POST

@@ -33,11 +33,12 @@ import javax.inject.Named;
 
 public class SetIndexReadOnlyJob extends SystemJob {
     private static final Logger log = LoggerFactory.getLogger(SetIndexReadOnlyJob.class);
-    
+
     public interface Factory {
         SetIndexReadOnlyJob create(String index);
-        
+
     }
+
     private final Indices indices;
     private final boolean disableIndexOptimization;
     private final OptimizeIndexJob.Factory optimizeIndexJobFactory;
@@ -51,9 +52,7 @@ public class SetIndexReadOnlyJob extends SystemJob {
                                SystemJobManager systemJobManager,
                                OptimizeIndexJob.Factory optimizeIndexJobFactory,
                                ActivityWriter activityWriter,
-                               ServerStatus serverStatus,
                                @Assisted String index) {
-        super(serverStatus);
         this.indices = indices;
         this.disableIndexOptimization = disableIndexOptimization;
         this.optimizeIndexJobFactory = optimizeIndexJobFactory;
@@ -115,5 +114,10 @@ public class SetIndexReadOnlyJob extends SystemJob {
     @Override
     public String getClassName() {
         return this.getClass().getCanonicalName();
+    }
+
+    @Override
+    public String getInfo() {
+        return "Setting index " + index + "to read-only.";
     }
 }
