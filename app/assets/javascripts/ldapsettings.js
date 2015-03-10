@@ -1,4 +1,5 @@
 $(document).ready(function() {
+    var ldapEnabled = $("#ldap-enabled");
 
     var uri = new URI($(".uri-edit-component").data("uri"));
     var updateSchemeElement = function(uri) {
@@ -10,15 +11,32 @@ $(document).ready(function() {
         $("#ldap-uri").val(uri.toString());
     };
 
+    var connectTestButton = $("#ldap-test-connection");
+    var ldapUriHost = $("#ldap-uri-host");
+    var ldapUriPort = $("#ldap-uri-port");
+
     var resetConnectTestButton = function() {
-        $("#ldap-test-connection").removeClass().addClass("btn btn-warning").text("Test Server connection");
+        connectTestButton.removeClass().addClass("btn btn-warning").text("Test Server connection");
+    };
+
+    var toggleConnectTestButton = function () {
+        var enabled = ldapEnabled.is(":checked") && (ldapUriHost.val() !== "") && (ldapUriPort.val() !== "");
+        connectTestButton.prop("disabled", !enabled);
+    };
+
+    var ldapTestLoginButton = $("#ldap-test-login");
+    var ldapTestUsername = $("#ldap-test-username");
+
+    var toggleTestLoginButton = function() {
+        var enabled = ldapEnabled.is(":checked") && ldapTestUsername.val() !== "";
+        ldapTestLoginButton.prop("disabled", !enabled);
     };
 
     // initialize editor from data-uri attribute
     (function(){
         updateSchemeElement(uri);
-        $("#ldap-uri-host").attr("value", uri.hostname());
-        $("#ldap-uri-port").attr("value", uri.port());
+        ldapUriHost.attr("value", uri.hostname());
+        ldapUriPort.attr("value", uri.port());
         if (uri.scheme() === "ldaps") {
             $("#ldap-uri-ssl").prop("checked", true)
         }
@@ -44,27 +62,30 @@ $(document).ready(function() {
         updateUriField(uri);
     });
 
-    $("#ldap-uri-host").change(function() {
+    ldapUriHost.on("keyup change", function() {
         uri.hostname($(this).val());
         updateUriField(uri);
         resetConnectTestButton();
+        toggleConnectTestButton();
     });
-    $("#ldap-uri-port").change(function() {
+    ldapUriPort.on("keyup change", function() {
         uri.port($(this).val());
         updateUriField(uri);
         resetConnectTestButton();
+        toggleConnectTestButton();
     });
 
     var toggleFormEditableState = function(enabled){
         // toggle the disabled state of all input fields
-        $("form#ldap-settings input").not("#ldap-enabled").prop("disabled", !enabled);
-        $("#ldap-test-connection").prop("disabled", !enabled);
+        $("form#ldap-settings input").not(ldapEnabled).prop("disabled", !enabled);
+        toggleConnectTestButton();
+        toggleTestLoginButton();
     };
-    $("#ldap-enabled").change(function(){
+    ldapEnabled.change(function(){
         var enabledState = $(this).is(":checked");
         toggleFormEditableState(enabledState);
     });
-    toggleFormEditableState($("#ldap-enabled").is(":checked"));
+    toggleFormEditableState(ldapEnabled.is(":checked"));
 
     var displayLdapHelp = function () {
         var ldapForm = $("#ldap-settings");
@@ -90,7 +111,7 @@ $(document).ready(function() {
         }
     })();
 
-    $("#ldap-test-connection").on("click", function() {
+    connectTestButton.on("click", function() {
         $(this).text("Testing connection...").removeClass().addClass("btn").prop("disabled", true);
         $.ajax({
             type: "POST",
@@ -106,24 +127,28 @@ $(document).ready(function() {
             },
             success: function(connectResult) {
                 if (connectResult.connected) {
-                    $("#ldap-test-connection").removeClass().addClass("btn btn-success").text("Connection ok!");
+                    connectTestButton.removeClass().addClass("btn btn-success").text("Connection ok!");
                     $("#ldap-connectionfailure-reason").addClass("hidden").text("");
                 } else {
-                    $("#ldap-test-connection").removeClass().addClass("btn btn-danger").text("Connection failed!");
+                    connectTestButton.removeClass().addClass("btn btn-danger").text("Connection failed!");
                     $("#ldap-connectionfailure-reason").removeClass("hidden").text(connectResult.exception);
                 }
             },
             complete: function() {
-                $("#ldap-test-connection").prop("disabled", false);
+                connectTestButton.prop("disabled", false);
             },
             error: function() {
-                $("#ldap-test-connection").removeClass().addClass("btn btn-danger").text("Test Server connection");
+                connectTestButton.removeClass().addClass("btn btn-danger").text("Test Server connection");
                 $("#ldap-connectionfailure-reason").removeClass("hidden").text("Unable to check connection, please try again.");
             }
         });
     });
 
-    $("#ldap-test-login").on("click", function() {
+    ldapTestUsername.on("keyup change", function() {
+        toggleTestLoginButton();
+    });
+
+    ldapTestLoginButton.on("click", function() {
         $(this).prop("disabled", true);
         $("#ldap-entry-attributes").html("");
         $("#attr-well").addClass("hidden");
@@ -145,7 +170,7 @@ $(document).ready(function() {
             },
             success: function(loginResult) {
                 if (loginResult.connected && (loginResult.login_authenticated || loginResult.entry) ) {
-                    $("#ldap-test-login").removeClass().addClass("btn btn-success").text("Check ok!");
+                    ldapTestLoginButton.removeClass().addClass("btn btn-success").text("Check ok!");
 
                     Object.keys(loginResult.entry).forEach(function(element) {
                         $("#ldap-entry-attributes")
@@ -180,7 +205,7 @@ $(document).ready(function() {
                     }
                     $("#attr-well").removeClass("hidden");
                 } else {
-                    $("#ldap-test-login").removeClass().addClass("btn btn-danger").text("Login failed!");
+                    ldapTestLoginButton.removeClass().addClass("btn btn-danger").text("Login failed!");
                     if (loginResult.exception) {
                         $("#login-exception").removeClass("hidden").text(loginResult.exception);
                     }
@@ -188,11 +213,11 @@ $(document).ready(function() {
                 }
             },
             complete: function() {
-                $("#ldap-test-login").prop("disabled", false);
+                ldapTestLoginButton.prop("disabled", false);
             },
             error: function() {
                 $("#attr-well").addClass("hidden");
-                $("#ldap-test-login").removeClass().addClass("btn btn-danger").text("Test login");
+                ldapTestLoginButton.removeClass().addClass("btn btn-danger").text("Test login");
             }
         });
     });

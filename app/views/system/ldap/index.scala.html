@@ -74,7 +74,7 @@
             </div>
 
             <div class="form-actions">
-                <button type="button" id="ldap-test-connection" class="btn btn-warning">Test Server Connection</button>
+                <button type="button" id="ldap-test-connection" class="btn btn-warning" disabled>Test Server Connection</button>
                 <span class="help-inline">Performs a background connection check with the address and credentials above.</span>
                 <span class="help-block" id="ldap-connectionfailure-reason"></span>
             </div>
@@ -126,7 +126,7 @@
                 <p>Optionally you can perform a login test here. If you omit the password, just the LDAP entry will be loaded and shown below and no authentication attempt will be made.</p>
                 <input type="text" id="ldap-test-username" value="" placeholder="Username for login test">
                 <input type="password" id="ldap-test-password" value="" placeholder="Password">
-                <button type="button" id="ldap-test-login" class="btn btn-warning">Test login</button>
+                <button type="button" id="ldap-test-login" class="btn btn-warning" disabled>Test login</button>
                 <span class="help-inline">Loads the LDAP entry for the given user name.</span>
                 <span class="help-block" id="ldap-loginfailure-reason"></span>
                 <div class="well hidden" id="attr-well">
