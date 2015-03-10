@@ -10,6 +10,7 @@ $(document).ready(() => {
     require('./components/start-page/mount');
     require('./components/sources/mount');
     require('./components/dashboard/mount');
+    require('./components/extractors/mount');
     require('./components/grok-patterns/mount');
     if (userPreferences.enableSmartSearch) {
         require('./components/search/mount');
