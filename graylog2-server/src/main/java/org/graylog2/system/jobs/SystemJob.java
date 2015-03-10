@@ -50,6 +50,10 @@ public abstract class SystemJob {
 
     public abstract String getClassName();
 
+    public String getInfo() {
+        return "No further information available.";
+    }
+
     //protected Core core;
     protected String id;
     protected DateTime startedAt;
@@ -83,6 +87,7 @@ public abstract class SystemJob {
                 .put("id", id)
                 .put("name", getClassName()) // getting the concrete class, not this abstract one
                 .put("description", getDescription())
+                .put("info", getInfo())
                 .put("started_at", Tools.getISO8601String(getStartedAt()))
                 .put("percent_complete", getProgress())
                 .put("provides_progress", providesProgress())

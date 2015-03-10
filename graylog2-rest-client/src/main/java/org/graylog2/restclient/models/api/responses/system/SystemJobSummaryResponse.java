@@ -18,14 +18,12 @@ package org.graylog2.restclient.models.api.responses.system;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public class SystemJobSummaryResponse {
 
     public String id;
     public String description;
     public String name;
+    public String info;
 
     @JsonProperty("node_id")
     public String nodeId;

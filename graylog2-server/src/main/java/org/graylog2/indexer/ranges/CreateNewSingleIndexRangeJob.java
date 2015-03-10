@@ -55,6 +55,11 @@ public class CreateNewSingleIndexRangeJob extends RebuildIndexRangesJob {
     public String getDescription() {
         return "Creates new single index range information.";
     }
+    
+    @Override
+    public String getInfo() {
+        return "Calculating ranges for index " + indexName + ".";
+    }
 
     @Override
     public void execute() {
