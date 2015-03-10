@@ -169,7 +169,9 @@ $(document).ready(function() {
                 password: $("#ldap-test-password").val()
             },
             success: function(loginResult) {
-                if (loginResult.connected && (loginResult.login_authenticated || loginResult.entry) ) {
+                var isEmptyEntry = $.isEmptyObject(loginResult.entry);
+
+                if (loginResult.connected && (loginResult.login_authenticated || !isEmptyEntry) ) {
                     ldapTestLoginButton.removeClass().addClass("btn btn-success").text("Check ok!");
 
                     Object.keys(loginResult.entry).forEach(function(element) {
@@ -189,10 +191,10 @@ $(document).ready(function() {
                             login_auth_classes = "icon-meh ldap-failure";
                         }
                     }
-                    if (loginResult.entry) {
-                        entry_exists_classes = "icon-ok ldap-success";
-                    } else {
+                    if (isEmptyEntry) {
                         entry_exists_classes = "icon-meh ldap-failure";
+                    } else {
+                        entry_exists_classes = "icon-ok ldap-success";
                     }
 
                     $("#login-authenticated").attr('class', login_auth_classes);
