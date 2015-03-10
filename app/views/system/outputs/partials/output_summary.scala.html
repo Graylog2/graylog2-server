@@ -1,4 +1,4 @@
-@(output: org.graylog2.restclient.models.Output, stream: org.graylog2.restclient.models.Stream)
+@(output: org.graylog2.restclient.models.Output, stream: org.graylog2.restclient.models.Stream, outputType: org.graylog2.restclient.models.api.responses.AvailableOutputSummary)
 
 @import lib.security.RestPermissions._;
 @import views.helpers.Permissions._;
@@ -40,7 +40,7 @@
         @if(output.getConfiguration == null || output.getConfiguration.isEmpty) {
             <li>-- no configuration --</li>
         } else {
-            @for((k,v) <- output.getConfiguration) {
+            @for((k,v) <- output.getConfiguration(outputType.getRequestedConfiguration)) {
                 <li>@k: @v</li>
             }
         }

@@ -64,7 +64,7 @@
 
         @if(outputs.size > 0) {
             @for(output <- outputs.toSeq.sortBy(_.getTitle.toLowerCase)) {
-                @views.html.system.outputs.partials.output_summary.render(output, stream)
+                @views.html.system.outputs.partials.output_summary.render(output, stream, availableOutputs.get(output.getType))
             }
         } else {
             <div class="alert alert-info">
