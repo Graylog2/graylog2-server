@@ -174,48 +174,10 @@
 
     <build>
         <plugins>
-        	<plugin>
-                <groupId>pl.project13.maven</groupId>
-                <artifactId>git-commit-id-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <phase>generate-resources</phase>
-                        <goals>
-                            <goal>revision</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <prefix>git</prefix>
-                    <dateFormat>dd.MM.yyyy '@' HH:mm:ss z</dateFormat>
-                    <verbose>false</verbose>
-                    <useNativeGit>true</useNativeGit>
-                    <dotGitDirectory>${project.parent.relativePath}/.git</dotGitDirectory>
-                    <skipPoms>true</skipPoms>
-                    <failOnNoGitDirectory>false</failOnNoGitDirectory>
-                    <abbrevLength>7</abbrevLength>
-                    <skip>false</skip>
-                </configuration>
-            </plugin>
             <plugin>
                 <groupId>com.mycila</groupId>
                 <artifactId>license-maven-plugin</artifactId>
             </plugin>
         </plugins>
-
-        <resources>
-            <resource>
-                <!-- git-commit-id-plugin depends on resource filtering to write the
-                    git.properties and version.properties files-->
-                <directory>src/main/resources</directory>
-                <filtering>true</filtering>
-                <includes>
-                    <include>**/*.properties</include>
-                </includes>
-            </resource>
-            <resource>
-                <directory>src/main/resources</directory>
-            </resource>
-        </resources>
     </build>
 </project>
