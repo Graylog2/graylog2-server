@@ -79,7 +79,9 @@
                 <i class="icon icon-cog"></i>
                 Started <span data-toggle="tooltip" title="@job.getInfo">@job.getName</span>
                 on @partials.links.to_node(job.getNode)
-                at @DateHelper.timestampShortTZ(job.getStartedAt)
+                @if(job.getStartedAt != null) {
+                    at @DateHelper.timestampShortTZ(job.getStartedAt)
+                }
 
                 <span class="label label-success finished">Finished!</span>
 
