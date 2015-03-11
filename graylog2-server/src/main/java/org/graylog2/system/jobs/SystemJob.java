@@ -16,11 +16,8 @@
  */
 package org.graylog2.system.jobs;
 
-import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.Tools;
 import org.joda.time.DateTime;
-
-import javax.annotation.Nonnull;
 
 import static com.google.common.base.Preconditions.checkState;
 
@@ -52,7 +49,6 @@ public abstract class SystemJob {
         return "No further information available.";
     }
 
-    //protected Core core;
     protected String id;
     protected DateTime startedAt;
 
