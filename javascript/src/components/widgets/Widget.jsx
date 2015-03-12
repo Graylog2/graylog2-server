@@ -7,6 +7,10 @@ var Qs = require('qs');
 var URLUtils = require("../../util/URLUtils");
 
 var WidgetHeader = require('./WidgetHeader');
+var WidgetFooter = require('./WidgetFooter');
+
+var BootstrapModal = require('../bootstrap/BootstrapModal');
+
 var CountVisualization = require('../visualizations/CountVisualization');
 var HistogramVisualization = require('../visualizations/HistogramVisualization');
 
@@ -17,14 +21,12 @@ var Widget = React.createClass({
 
     getInitialState() {
         return {
-            type: undefined,
+            type: "",
             title: "",
             cacheTime: 10,
-            query: undefined,
-            streamId: undefined,
-            rangeType: "",
-            range: 0,
-            interval: undefined,
+            creatorUserId: "",
+            boundToStream: false,
+            config: {},
             result: undefined,
             calculatedAt: undefined
         };
@@ -42,11 +44,9 @@ var Widget = React.createClass({
                 type: widget.type,
                 title: widget.description,
                 cacheTime: widget.cache_time,
-                query: widget.query,
-                streamId: widget.stream_id,
-                rangeType: widget.range_type,
-                range: widget.range,
-                interval: widget.interval
+                creatorUserId: widget.creator_user_id,
+                config: widget.config,
+                boundToStream: "stream_id" in widget.config
             });
         });
         setTimeout(this.loadData, this.LOAD_WIDGET_DATA_INTERVAL);
@@ -65,7 +65,7 @@ var Widget = React.createClass({
         setTimeout(this.loadValue, this.state.cacheTime * 1000);
     },
     getVisualization() {
-        if (this.state.type === undefined) { return; }
+        if (this.state.type === "") { return; }
 
         var visualization;
 
@@ -73,12 +73,12 @@ var Widget = React.createClass({
             case 'SEARCH_RESULT_COUNT':
             case 'STREAM_SEARCH_RESULT_COUNT':
             case 'STATS_COUNT':
-                visualization = <CountVisualization data={this.state.result}/>;
+                visualization = <CountVisualization data={this.state.result} config={this.state.config}/>;
                 break;
             case 'SEARCH_RESULT_CHART':
                 visualization = <HistogramVisualization id={this.props.widgetId}
                                                         data={this.state.result}
-                                                        interval={this.state.interval}/>;
+                                                        interval={this.state.config.interval}/>;
                 break;
             default:
                 throw("Error: Widget type '" + this.state.type + "' not supported");
@@ -87,19 +87,24 @@ var Widget = React.createClass({
         return visualization;
     },
     _getUrlPath() {
-        if (this.state.streamId === undefined || this.state.streamId === null) {
-            return "/search";
+        if (this.state.boundToStream) {
+            return "/streams/" + this.state.config.stream_id + "/messages";
         } else {
-            return "/streams/" + this.state.streamId + "/messages";
+            return "/search";
         }
     },
     _getUrlQueryString() {
         var query = {
-            q: this.state.query,
-            rangetype: this.state.rangeType,
-            interval: this.state.interval
+            q: this.state.config.query,
+            rangetype: this.state.config.range_type,
+            interval: this.state.config.interval
         };
-        query[this.state.rangeType] = this.state.range;
+        if (this.state.config.range_type !== "absolute") {
+            query[this.state.config.range_type] = this.state.config.range;
+        } else {
+            query["from"] = this.state.config.from;
+            query["to"] = this.state.config.to;
+        }
 
         return Qs.stringify(query);
     },
@@ -109,15 +114,103 @@ var Widget = React.createClass({
 
         return URLUtils.appPrefixed(path + "?" + queryString);
     },
+    metricsUrl() {
+        var url = "/system/metrics/master";
+        var query = {
+            prefilter: "org.graylog2.dashboards.widgets.*." + this.props.widgetId
+        };
+
+        return URLUtils.appPrefixed(url + "?" + Qs.stringify(query));
+    },
+    _replaySearch() {
+        window.location = this.replayUrl();
+    },
+    _showConfig() {
+        this.refs.configModal.open();
+    },
+    _hideConfig() {
+        this.refs.configModal.close();
+    },
+    _goToWidgetMetrics() {
+        window.location = this.metricsUrl();
+    },
+    _getBasicConfiguration() {
+        var basicConfigurationMessage;
+        if (this.state.boundToStream) {
+            basicConfigurationMessage = (
+                <p>
+                    Type: {this.state.type.toLowerCase()}, cached for {this.state.cacheTime} seconds.&nbsp;
+                    Widget is bound to stream {this.state.config.stream_id}.
+                </p>
+            );
+        } else {
+            basicConfigurationMessage = (
+                <p>
+                    Type: {this.state.type.toLowerCase()}, cached for {this.state.cacheTime} seconds.&nbsp;
+                    Widget is <strong>not</strong> bound to a stream.
+                </p>
+            );
+        }
+
+        return basicConfigurationMessage;
+    },
+    _formatConfigurationKey(key) {
+        return key.replace(/_/g, " ");
+    },
+    _formatConfigurationValue(key, value) {
+        return key === "query" && value === "" ? "*" : String(value);
+    },
+    _getConfigAsDescriptionList() {
+        var configKeys = Object.keys(this.state.config);
+        if (configKeys.length === 0) {
+            return [];
+        }
+        var configListElements = [];
+
+        configKeys.forEach((key) => {
+            configListElements.push(<dt key={key}>{this._formatConfigurationKey(key)}:</dt>);
+            configListElements.push(<dd key={key + "-value"}>{this._formatConfigurationValue(key, this.state.config[key])}</dd>);
+        });
+
+        return configListElements;
+    },
     render() {
-        var widget = (
+        var configModalHeader = <h2>Widget "{this.state.title}" configuration</h2>;
+        var configModalBody = (
+            <div className="configuration">
+                {this._getBasicConfiguration()}
+                <div>More details:
+                    <dl className="dl-horizontal">
+                        <dt>Widget ID:</dt>
+                        <dd>{this.props.widgetId}</dd>
+                        <dt>Dashboard ID:</dt>
+                        <dd>{this.props.dashboardId}</dd>
+                        <dt>Created by:</dt>
+                        <dd>{this.state.creatorUserId}</dd>
+                        {this._getConfigAsDescriptionList()}
+                    </dl>
+                </div>
+            </div>
+        );
+
+        return (
             <div className="widget">
                 <WidgetHeader title={this.state.title} calculatedAt={this.state.calculatedAt}/>
 
                 {this.getVisualization()}
+
+                <WidgetFooter onReplaySearch={this._replaySearch} onShowConfig={this._showConfig}/>
+
+                <BootstrapModal ref="configModal"
+                                onCancel={this._hideConfig}
+                                onConfirm={this._goToWidgetMetrics}
+                                cancel="Cancel"
+                                confirm="Show widget metrics">
+                   {configModalHeader}
+                   {configModalBody}
+                </BootstrapModal>
             </div>
         );
-        return widget;
     }
 });
 
