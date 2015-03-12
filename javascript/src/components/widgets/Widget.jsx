@@ -195,7 +195,7 @@ var Widget = React.createClass({
         );
 
         return (
-            <div className="widget">
+            <div className="widget" data-widget-id={this.props.widgetId}>
                 <WidgetHeader title={this.state.title} calculatedAt={this.state.calculatedAt}/>
 
                 {this.getVisualization()}
