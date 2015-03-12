@@ -25,11 +25,13 @@ var Widget = React.createClass({
             title: "",
             cacheTime: 10,
             creatorUserId: "",
-            boundToStream: false,
             config: {},
             result: undefined,
             calculatedAt: undefined
         };
+    },
+    _isBoundToStream() {
+        return ("stream_id" in this.state.config) && (this.state.config.stream_id !== null);
     },
     componentDidMount() {
         this.loadData();
@@ -45,8 +47,7 @@ var Widget = React.createClass({
                 title: widget.description,
                 cacheTime: widget.cache_time,
                 creatorUserId: widget.creator_user_id,
-                config: widget.config,
-                boundToStream: "stream_id" in widget.config
+                config: widget.config
             });
         });
         setTimeout(this.loadData, this.LOAD_WIDGET_DATA_INTERVAL);
@@ -87,7 +88,7 @@ var Widget = React.createClass({
         return visualization;
     },
     _getUrlPath() {
-        if (this.state.boundToStream) {
+        if (this._isBoundToStream()) {
             return "/streams/" + this.state.config.stream_id + "/messages";
         } else {
             return "/search";
@@ -136,7 +137,7 @@ var Widget = React.createClass({
     },
     _getBasicConfiguration() {
         var basicConfigurationMessage;
-        if (this.state.boundToStream) {
+        if (this._isBoundToStream()) {
             basicConfigurationMessage = (
                 <p>
                     Type: {this.state.type.toLowerCase()}, cached for {this.state.cacheTime} seconds.&nbsp;
