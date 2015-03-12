@@ -3,19 +3,29 @@
 var React = require('react');
 
 var WidgetFooter = React.createClass({
+    _replaySearch() {
+        this.props.onReplaySearch();
+    },
+    _showConfig() {
+        this.props.onShowConfig();
+    },
     render() {
         return (
             <div>
                 <div className="actions">
                     <div className="widget-replay">
-                        <a href={this.props.replayUrl}>
-                            <i className="icon icon-play-sign"></i>
-                        </a>
+                        <button className="btn btn-mini btn-link btn-text"
+                                title="Replay search"
+                                onClick={this._replaySearch}>
+                            <i className="icon icon-play"></i>
+                        </button>
                     </div>
                     <div className="widget-info">
-                        <a href="#">
-                            <i className="icon icon-info-sign"></i>
-                        </a>
+                        <button className="btn btn-mini btn-link btn-text"
+                                title="Show widget configuration"
+                                onClick={this._showConfig}>
+                            <i className="icon icon-cog"></i>
+                        </button>
                     </div>
                 </div>
             </div>
