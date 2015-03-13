@@ -79,6 +79,8 @@ function displayTrendIndicators(widget, nowCount, previousCount) {
     higherIndicators.children().css("color", grey);
     lowerIndicators.children().css("color", grey);
 
+    console.log("previous: " + previousCount + " now: " + nowCount + " percentage: " + percentage);
+
     if (nowCount > previousCount) {
         higherIndicators.filter(function (index) {
             return indicatorsFilter(index, percentage, true)
