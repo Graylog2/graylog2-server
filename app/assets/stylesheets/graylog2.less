@@ -191,7 +191,7 @@ label {
 	font-size: 12px;
 }
 
-#sidebar-inner, #universalsearch {
+#universalsearch {
 	padding: 15px;
 	background-color: #fff;
     border: 1px solid #D1D1D1;
@@ -235,16 +235,25 @@ label {
   margin-top: 10px;
 }
 
-#main-content {
-  padding: 15px;
+.content-col {
+  padding-top: 15px;
+  padding-bottom: 15px;
+  background-color: #fff;
+  border: 1px solid #D1D1D1;
+  margin-top: 15px;
 }
 
 #sidebar {
-	height: 100%;
+  padding: 0px 15px 0px 0px;
 }
 
 #sidebar-inner {
-	margin-left: -25px;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+#main-content {
+  padding: 15px;
 }
 
 #universalsearch {
@@ -344,24 +353,9 @@ label {
     width: 40px;
 }
 
-#sidebar-inner.affix {
-    width: 31%;
-    top: 50px;
-    margin-top: 5px;
-}
 
 .messages tbody > tr {
 	cursor: pointer;
-}
-
-.sidebar-alert {
-	display: block;
-	margin-bottom: 0;
-}
-
-#sidebar-inner .rickshaw_graph .detail .item.active {
-	margin-left: -200px;
-	text-align: right;
 }
 
 .search-result-fields li {
@@ -373,41 +367,6 @@ label {
 	display: inline;
 	position: relative;
 	top: 3px;	
-}
-
-.sidebar-back, .sidebar-hide {
-    background-color: #F5F5F5;
-    border-radius: 3px;
-    border: 1px solid #DDD;
-    cursor: pointer;
-    padding: 15px 8px;
-}
-
-.sidebar-back:hover, .sidebar-hide:hover {
-    background-color: #F9F9F9;
-}
-
-#sidebar-activator {
-    right: 0px;
-    margin-top: 15px;
-    position: fixed;
-}
-
-.sidebar-show {
-    background-color: #333;
-    border-bottom-left-radius: 3px;
-    border-top-left-radius: 3px;
-    box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.2);
-    color: #FFF;
-    cursor: pointer;
-    opacity: 0.8;
-    padding: 15px 8px;
-}
-
-.sidebar-show:hover {
-    background-color: #222;
-    padding: 15px 40px 15px 8px;
-    opacity: 0.8;
 }
 
 .message-highlighted {
@@ -586,11 +545,6 @@ form #stream-rules {
     top: 38px;
 }
 
-#sidebar .rickshaw_graph .x_tick {
-    position: relative;
-    top: 22px;
-}
-
 .graph-resolution-selector {
     margin-top: 30px;
     margin-bottom: 30px;
@@ -598,10 +552,6 @@ form #stream-rules {
 
 .selected-resolution {
     font-weight: bold;
-}
-
-#sidebar-graph {
-    border-bottom: 2px solid #ccc;
 }
 
 .search-result-fields .icon-cog {
