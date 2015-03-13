@@ -17,7 +17,15 @@ var BootstrapModal = React.createClass({
     open() {
         var modal = this._modalNode();
         modal.modal('show');
-        modal.on("shown", () => $("input", this.refs.body.getDOMNode()).first().focus());
+        modal.on("shown", () => {
+            var element = $("input", this.refs.body.getDOMNode()).first();
+
+            if (element.length === 0) {
+                element = $("input, button", this.refs.footer.getDOMNode()).first();
+            }
+
+            element.focus();
+        });
     },
     _submit(event) {
         this.props.onConfirm(event);
@@ -35,9 +43,9 @@ var BootstrapModal = React.createClass({
         }
         if (this.props.cancel && this.props.onCancel) {
             cancelButton = (
-                <a role="button" className="btn" onClick={this.props.onCancel}>
+                <button type="button" className="btn" onClick={this.props.onCancel}>
                       {this.props.cancel}
-                </a>
+                </button>
                 );
         }
         var formContent = (
@@ -55,7 +63,7 @@ var BootstrapModal = React.createClass({
                 <div ref="body" className="modal-body">
                     {this.props.children[1]}
                 </div>
-                <div className="modal-footer">
+                <div ref="footer" className="modal-footer">
                           {cancelButton}
                           {confirmButton}
                 </div>
