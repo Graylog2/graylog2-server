@@ -8,8 +8,7 @@ var URLUtils = require("../../util/URLUtils");
 
 var WidgetHeader = require('./WidgetHeader');
 var WidgetFooter = require('./WidgetFooter');
-
-var BootstrapModal = require('../bootstrap/BootstrapModal');
+var WidgetConfigModal = require('./WidgetConfigModal');
 
 var CountVisualization = require('../visualizations/CountVisualization');
 var HistogramVisualization = require('../visualizations/HistogramVisualization');
@@ -32,6 +31,17 @@ var Widget = React.createClass({
     },
     _isBoundToStream() {
         return ("stream_id" in this.state.config) && (this.state.config.stream_id !== null);
+    },
+    _getWidgetData() {
+        return {
+            widgetId: this.props.widgetId,
+            dashboardId: this.props.dashboardId,
+            title: this.state.title,
+            type: this.state.type,
+            cacheTime: this.state.cacheTime,
+            creatorUserId: this.state.creatorUserId,
+            config: this.state.config
+        };
     },
     componentDidMount() {
         this.loadData();
@@ -126,74 +136,13 @@ var Widget = React.createClass({
     _replaySearch() {
         window.location = this.replayUrl();
     },
-    _showConfig() {
-        this.refs.configModal.open();
-    },
-    _hideConfig() {
-        this.refs.configModal.close();
-    },
     _goToWidgetMetrics() {
         window.location = this.metricsUrl();
     },
-    _getBasicConfiguration() {
-        var basicConfigurationMessage;
-        if (this._isBoundToStream()) {
-            basicConfigurationMessage = (
-                <p>
-                    Type: {this.state.type.toLowerCase()}, cached for {this.state.cacheTime} seconds.&nbsp;
-                    Widget is bound to stream {this.state.config.stream_id}.
-                </p>
-            );
-        } else {
-            basicConfigurationMessage = (
-                <p>
-                    Type: {this.state.type.toLowerCase()}, cached for {this.state.cacheTime} seconds.&nbsp;
-                    Widget is <strong>not</strong> bound to a stream.
-                </p>
-            );
-        }
-
-        return basicConfigurationMessage;
-    },
-    _formatConfigurationKey(key) {
-        return key.replace(/_/g, " ");
-    },
-    _formatConfigurationValue(key, value) {
-        return key === "query" && value === "" ? "*" : String(value);
-    },
-    _getConfigAsDescriptionList() {
-        var configKeys = Object.keys(this.state.config);
-        if (configKeys.length === 0) {
-            return [];
-        }
-        var configListElements = [];
-
-        configKeys.forEach((key) => {
-            configListElements.push(<dt key={key}>{this._formatConfigurationKey(key)}:</dt>);
-            configListElements.push(<dd key={key + "-value"}>{this._formatConfigurationValue(key, this.state.config[key])}</dd>);
-        });
-
-        return configListElements;
+    _showConfig() {
+        this.refs.configModal.open();
     },
     render() {
-        var configModalHeader = <h2>Widget "{this.state.title}" configuration</h2>;
-        var configModalBody = (
-            <div className="configuration">
-                {this._getBasicConfiguration()}
-                <div>More details:
-                    <dl className="dl-horizontal">
-                        <dt>Widget ID:</dt>
-                        <dd>{this.props.widgetId}</dd>
-                        <dt>Dashboard ID:</dt>
-                        <dd>{this.props.dashboardId}</dd>
-                        <dt>Created by:</dt>
-                        <dd>{this.state.creatorUserId}</dd>
-                        {this._getConfigAsDescriptionList()}
-                    </dl>
-                </div>
-            </div>
-        );
-
         return (
             <div className="widget" data-widget-id={this.props.widgetId}>
                 <WidgetHeader title={this.state.title} calculatedAt={this.state.calculatedAt}/>
@@ -201,15 +150,10 @@ var Widget = React.createClass({
                 {this.getVisualization()}
 
                 <WidgetFooter onReplaySearch={this._replaySearch} onShowConfig={this._showConfig}/>
-
-                <BootstrapModal ref="configModal"
-                                onCancel={this._hideConfig}
-                                onConfirm={this._goToWidgetMetrics}
-                                cancel="Cancel"
-                                confirm="Show widget metrics">
-                   {configModalHeader}
-                   {configModalBody}
-                </BootstrapModal>
+                <WidgetConfigModal ref="configModal"
+                    {...this._getWidgetData()}
+                    boundToStream={this._isBoundToStream()}
+                    metricsAction={this._goToWidgetMetrics}/>
             </div>
         );
     }
