@@ -23,11 +23,12 @@ var CountVisualization = React.createClass({
     componentWillReceiveProps(newProps) {
         var result = newProps.data;
         if (typeof result === 'object') {
+            var normalizedNowCount = NumberUtils.normalizeNumber(result.now);
             var normalizedPreviousCount = NumberUtils.normalizeNumber(result.previous);
             this.setState({
-                nowCount: result.now,
+                nowCount: normalizedNowCount,
                 previousCount: normalizedPreviousCount,
-                percentage: this._calculatePercentage(result.now, normalizedPreviousCount)
+                percentage: this._calculatePercentage(normalizedNowCount, normalizedPreviousCount)
             }, this._calculatePercentage);
         } else {
             this.setState({nowCount: result});
@@ -86,10 +87,13 @@ var CountVisualization = React.createClass({
     _formatData() {
         try {
             return numeral(this.state.nowCount).format("0,0.[00]");
-        } catch(e) {}
+        } catch(e) {
+            return String(this.state.nowCount);
+        }
     },
     _isIndicatorActive(index, trendIndicatorType) {
-        if ((this.state.nowCount >= this.state.previousCount && trendIndicatorType !== TrendIndicatorType.HIGHER) ||
+        if ((this.state.percentage === 0) ||
+            (this.state.nowCount >= this.state.previousCount && trendIndicatorType !== TrendIndicatorType.HIGHER) ||
             (this.state.nowCount <= this.state.previousCount && trendIndicatorType !== TrendIndicatorType.LOWER)) {
             return false;
         }
