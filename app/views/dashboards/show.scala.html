@@ -58,74 +58,71 @@
             <div class="gridster" data-dashboard-id="@dashboard.getId">
                 <ul>
                 @for(widget <- dashboard.getWidgets.values()) {
-                    @if(widget.getType.equals(DashboardWidget.Type.SEARCH_RESULT_COUNT) ||
-                            widget.getType.equals(DashboardWidget.Type.STREAM_SEARCH_RESULT_COUNT) ||
-                            widget.getType.equals(DashboardWidget.Type.STATS_COUNT) ||
-                            widget.getType.equals(DashboardWidget.Type.SEARCH_RESULT_CHART)) {
+                    @if(currentUser.getPreferences.get("enableNewWidgets").asInstanceOf[Boolean]) {
                         <li data-row="@widget.getRow" data-col="@widget.getCol" data-sizex="@widget.getWidth" data-sizey="@widget.getHeight">
                             <div class="react-widget" data-dashboard-id="@widget.getDashboard.getId"
                                                       data-widget-id="@widget.getId"></div>
                         </li>
-                    }
+                    } else {
+                        <li data-row="@widget.getRow" data-col="@widget.getCol" data-sizex="@widget.getWidth" data-sizey="@widget.getHeight">
+                            <div class="widget" data-cache-time="@widget.getCacheTime"
+                                                data-widget-type="@widget.getType.toString.toLowerCase"
+                                                data-dashboard-id="@widget.getDashboard.getId"
+                                                data-widget-id="@widget.getId"
+                                                data-fixed-time-axis="@widget.hasFixedTimeAxis">
 
-                    <li data-row="@widget.getRow" data-col="@widget.getCol" data-sizex="@widget.getWidth" data-sizey="@widget.getHeight">
-                        <div class="widget" data-cache-time="@widget.getCacheTime"
-                                            data-widget-type="@widget.getType.toString.toLowerCase"
-                                            data-dashboard-id="@widget.getDashboard.getId"
-                                            data-widget-id="@widget.getId"
-                                            data-fixed-time-axis="@widget.hasFixedTimeAxis">
+                                <div class="pull-left widget-top controls only-unlocked">
+                                    <a href="#" class="remove-widget"><i class="icon icon-remove"></i></a>
+                                </div>
 
-                            <div class="pull-left widget-top controls only-unlocked">
-                                <a href="#" class="remove-widget"><i class="icon icon-remove"></i></a>
-                            </div>
-
-                            <div class="pull-left widget-top controls hidden-unlocked widget-top" style="display: block;">
-                                <a href="#" class="show-config">
-                                    <i class="icon icon-calendar-empty" title="Show widget config"></i>
-                                </a>
-                            </div>
-
-                            <div class="pull-right widget-top info">
-                                <span class="reloading">&middot;</span>
-                                <span class="calculated-at hidden-unlocked"></span>
-                                <span class="cache-info only-unlocked">
-                                    <span class="cache-time">
-                                        <span class="cache-time-value">@widget.getCacheTime</span>
-                                        seconds cached
-                                    </span>
-
-                                    <a href="#" class="edit-cache-time">
-                                        <i class="icon icon-edit"></i>
+                                <div class="pull-left widget-top controls hidden-unlocked widget-top" style="display : block ;">
+                                    <a href="#" class="show-config">
+                                        <i class="icon icon-calendar-empty" title="Show widget config"></i>
                                     </a>
-                                </span>
+                                </div>
+
+                                <div class="pull-right widget-top info">
+                                    <span class="reloading">&middot;</span>
+                                    <span class="calculated-at hidden-unlocked"></span>
+                                    <span class="cache-info only-unlocked">
+                                        <span class="cache-time">
+                                            <span class="cache-time-value">@widget.getCacheTime</span>
+                                            seconds cached
+                                        </span>
+
+                                        <a href="#" class="edit-cache-time">
+                                            <i class="icon icon-edit"></i>
+                                        </a>
+                                    </span>
+                                </div>
+
+                                @if(widget.getType.equals(DashboardWidget.Type.SEARCH_RESULT_COUNT)) {
+                                    @views.html.dashboards.widgets.search_result_count(widget.asInstanceOf[SearchResultCountWidget])
+                                }
+
+                                @if(widget.getType.equals(DashboardWidget.Type.STREAM_SEARCH_RESULT_COUNT)) {
+                                    @views.html.dashboards.widgets.search_result_count(widget.asInstanceOf[SearchResultCountWidget])
+                                }
+
+                                @if(widget.getType.equals(DashboardWidget.Type.FIELD_CHART)) {
+                                    @views.html.dashboards.widgets.field_chart(widget.asInstanceOf[FieldChartWidget])
+                                }
+
+                                @if(widget.getType.equals(DashboardWidget.Type.QUICKVALUES)) {
+                                    @views.html.dashboards.widgets.quickvalues(widget.asInstanceOf[QuickvaluesWidget])
+                                }
+
+                                @if(widget.getType.equals(DashboardWidget.Type.SEARCH_RESULT_CHART)) {
+                                    @views.html.dashboards.widgets.search_result_chart(widget.asInstanceOf[SearchResultChartWidget])
+                                }
+
+                                @if(widget.getType.equals(DashboardWidget.Type.STATS_COUNT)) {
+                                    @views.html.dashboards.widgets.search_result_count(widget.asInstanceOf[SearchResultCountWidget])
+                                }
+
                             </div>
-
-                            @if(widget.getType.equals(DashboardWidget.Type.SEARCH_RESULT_COUNT)) {
-                                @views.html.dashboards.widgets.search_result_count(widget.asInstanceOf[SearchResultCountWidget])
-                            }
-
-                            @if(widget.getType.equals(DashboardWidget.Type.STREAM_SEARCH_RESULT_COUNT)) {
-                                @views.html.dashboards.widgets.search_result_count(widget.asInstanceOf[SearchResultCountWidget])
-                            }
-
-                            @if(widget.getType.equals(DashboardWidget.Type.FIELD_CHART)) {
-                                @views.html.dashboards.widgets.field_chart(widget.asInstanceOf[FieldChartWidget])
-                            }
-
-                            @if(widget.getType.equals(DashboardWidget.Type.QUICKVALUES)) {
-                                @views.html.dashboards.widgets.quickvalues(widget.asInstanceOf[QuickvaluesWidget])
-                            }
-
-                            @if(widget.getType.equals(DashboardWidget.Type.SEARCH_RESULT_CHART)) {
-                                @views.html.dashboards.widgets.search_result_chart(widget.asInstanceOf[SearchResultChartWidget])
-                            }
-
-                            @if(widget.getType.equals(DashboardWidget.Type.STATS_COUNT)) {
-                                @views.html.dashboards.widgets.search_result_count(widget.asInstanceOf[SearchResultCountWidget])
-                            }
-
-                        </div>
-                    </li>
+                        </li>
+                    }
                 }
                 </ul>
             </div>

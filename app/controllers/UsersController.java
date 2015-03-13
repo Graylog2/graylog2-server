@@ -202,6 +202,7 @@ public class UsersController extends AuthenticatedController {
         effectivePreferences.put("updateUnfocussed", false);
         effectivePreferences.put("disableExpensiveUpdates", false);
         effectivePreferences.put("enableSmartSearch", false);
+        effectivePreferences.put("enableNewWidgets", false);
         if (preferences != null) {
             effectivePreferences.putAll(preferences);
         }
@@ -217,6 +218,8 @@ public class UsersController extends AuthenticatedController {
             } else if (preference.getKey().equals("disableExpensiveUpdates")) {
                 normalizedPreferences.put(preference.getKey(), asBoolean(preference.getValue()));
             } else if (preference.getKey().equals("enableSmartSearch")) {
+                normalizedPreferences.put(preference.getKey(), asBoolean(preference.getValue()));
+            } else if (preference.getKey().equals("enableNewWidgets")) {
                 normalizedPreferences.put(preference.getKey(), asBoolean(preference.getValue()));
             }
         }
