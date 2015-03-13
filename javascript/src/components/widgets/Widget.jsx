@@ -26,7 +26,9 @@ var Widget = React.createClass({
             creatorUserId: "",
             config: {},
             result: undefined,
-            calculatedAt: undefined
+            calculatedAt: undefined,
+            error: false,
+            errorMessage: undefined
         };
     },
     _isBoundToStream() {
@@ -66,10 +68,18 @@ var Widget = React.createClass({
         if (!assertUpdateEnabled(this.loadValue)) { return; }
 
         var dataPromise = WidgetsStore.loadValue(this.props.dashboardId, this.props.widgetId);
+        dataPromise.fail((jqXHR, textStatus, errorThrown) => {
+            this.setState({
+                error: true,
+                errorMessage: "Error loading widget value: " + errorThrown
+            });
+        });
         dataPromise.done((value) => {
             this.setState({
                 result: value.result,
-                calculatedAt: value.calculated_at
+                calculatedAt: value.calculated_at,
+                error: false,
+                errorMessage: undefined
             });
         });
 
@@ -145,7 +155,10 @@ var Widget = React.createClass({
     render() {
         return (
             <div className="widget" data-widget-id={this.props.widgetId}>
-                <WidgetHeader title={this.state.title} calculatedAt={this.state.calculatedAt}/>
+                <WidgetHeader title={this.state.title}
+                              calculatedAt={this.state.calculatedAt}
+                              error={this.state.error}
+                              errorMessage={this.state.errorMessage}/>
 
                 {this.getVisualization()}
 

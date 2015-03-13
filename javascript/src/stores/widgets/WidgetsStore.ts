@@ -19,10 +19,6 @@ var WidgetsStore = {
     loadValue(dashboardId: string, widgetId: string): JQueryPromise<string[]> {
         var url = URLUtils.appPrefixed('/a/dashboards/' + dashboardId + '/widgets/' + widgetId + '/value');
         var promise = $.getJSON(url);
-        promise.fail((jqXHR, textStatus, errorThrown) => {
-            UserNotification.error("Loading widget value failed with status: " + errorThrown,
-                "Could not load widget value");
-        });
         return promise;
     }
 };
