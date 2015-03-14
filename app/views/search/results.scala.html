@@ -141,9 +141,9 @@
     Found <span class="number-format" data-format="0,0">@searchResult.getTotalResultCount</span> messages.
 
     @if(stream == null) {
-        @views.html.partials.dashboards.add_to_dashboard.render("search_result_count", null)
+        @views.html.partials.dashboards.add_to_dashboard.render("search_result_count", "Add to dashboard",  null)
     } else {
-        @views.html.partials.dashboards.add_to_dashboard.render("stream_search_result_count", Array("data-stream-id='" + streamId + "'"))
+        @views.html.partials.dashboards.add_to_dashboard.render("stream_search_result_count", "Add to dashboard", Array("data-stream-id='" + streamId + "'"))
     }
 </h4>
 
@@ -160,9 +160,9 @@
     </h3>
 
     @if(stream == null) {
-        @views.html.partials.dashboards.add_to_dashboard.render("search_result_chart", Array("data-interval='" + histogram.getInterval() + "'"))
+        @views.html.partials.dashboards.add_to_dashboard.render("search_result_chart", "Add to dashboard", Array("data-interval='" + histogram.getInterval() + "'"))
     } else {
-        @views.html.partials.dashboards.add_to_dashboard.render("search_result_chart", Array("data-stream-id='" + streamId + "'", "data-interval='" + histogram.getInterval() + "'"))
+        @views.html.partials.dashboards.add_to_dashboard.render("search_result_chart", "Add to dashboard", Array("data-stream-id='" + streamId + "'", "data-interval='" + histogram.getInterval() + "'"))
     }
 </div>
 

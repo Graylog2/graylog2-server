@@ -104,11 +104,6 @@ $(document).ready(function() {
         $(".result-highlight").toggleClass("result-highlight-colored", $(this).is(":checked"));
     });
 
-    if ($(".messages").find(".result-highlight").length > 0) {
-        $(".messages .result-highlight").toggleClass("result-highlight-colored");
-        $(".result-highlight-control").show();
-    }
-
     // Save a search: Open save dialog.
     $(".save-search").on("click", function(e) {
         e.preventDefault();

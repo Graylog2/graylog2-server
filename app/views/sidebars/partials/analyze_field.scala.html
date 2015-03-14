@@ -1,14 +1,14 @@
 @(f: org.graylog2.restclient.lib.Field, streamId: String)
 @addToDashboardButton(statsFunction: String) = {
-    @views.html.partials.dashboards.add_to_dashboard.render("stats_count", Array("data-field='" + f.getName + "'", "data-statistical-function='"+ statsFunction + "'", if (streamId == null || streamId.isEmpty()) "" else "data-stream-id='" + streamId + "'"))
+    @views.html.partials.dashboards.add_to_dashboard.render("stats_count", "Add to dashboard", Array("data-field='" + f.getName + "'", "data-statistical-function='"+ statsFunction + "'", if (streamId == null || streamId.isEmpty()) "" else "data-stream-id='" + streamId + "'"))
 }
 
 <div class="analyze-field" @if(streamId != null) { data-stream-id="@streamId" } style="display: none;">
-    <a href="#" class="btn btn-info btn-mini generate-statistics" data-field="@f.getName">Statistics</a>
+    <a href="#" class="btn btn-info btn-sm generate-statistics" data-field="@f.getName">Statistics</a>
 
-    <a href="#" class="btn btn-info btn-mini show-quickvalues" data-field="@f.getName">Quick values</a>
+    <a href="#" class="btn btn-info btn-sm show-quickvalues" data-field="@f.getName">Quick values</a>
 
-    <a href="#" class="btn btn-info btn-mini line-chart" data-field="@f.getName">Generate chart</a>
+    <a href="#" class="btn btn-info btn-sm line-chart" data-field="@f.getName">Generate chart</a>
 
     <div class="quickvalues alpha80" data-field="@f.getName" data-autorefresh="true" style="display: none;">
         <i class="icon icon-play arrow"></i>
@@ -18,9 +18,9 @@
                 <i class="icon icon-refresh quickvalues-refresh" data-field="@f.getName" title="Refresh"></i>
 
                 @if(streamId == null || streamId.isEmpty()) {
-                    @views.html.partials.dashboards.add_to_dashboard.render("quickvalues", null)
+                    @views.html.partials.dashboards.add_to_dashboard.render("quickvalues", "Add to dashboard", null)
                 } else {
-                    @views.html.partials.dashboards.add_to_dashboard.render("quickvalues", Array("data-stream-id='" + streamId + "'"))
+                    @views.html.partials.dashboards.add_to_dashboard.render("quickvalues", "Add to dashboard", Array("data-stream-id='" + streamId + "'"))
                 }
 
                 <i class="icon icon-play-circle active quickvalues-autorefresh" data-field="@f.getName" title="Automatic refresh"></i>
@@ -62,7 +62,7 @@
         </div>
 
         <div class='wrong-type' style="display: none;">
-            <i class="icon icon-info"></i>
+            <i class="fa fa-info"></i>
             Statistical analysis is only available for numeric field types.
         </div>
 
