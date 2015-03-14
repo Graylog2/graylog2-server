@@ -9,12 +9,8 @@
 </h3>
 
 <p style="margin-top: 3px;">
-    Search job took <span class="number-format" data-format="0,0">@searchResult.getTookMs()</span>ms,
-    searched in
-    <a href="#used-indices" role="button" data-toggle="modal" data-backdrop="true">
-            @searchResult.getUsedIndices().size()
-            @if(searchResult.getUsedIndices().size() == 1) {index} else {indices}
-    </a>
+    Search job took <span class="number-format" data-format="0,0">@searchResult.getTookMs()</span>ms, searched in
+    <a href="#used-indices" role="button" data-toggle="modal" data-backdrop="true">@searchResult.getUsedIndices().size() @if(searchResult.getUsedIndices().size() == 1) {index} else {indices}</a>.
 </p>
 
 <p style="margin-top: 10px;">

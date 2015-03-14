@@ -1,0 +1,20 @@
+@(widgetType: String, params: Array[String])
+
+@import lib.security.RestPermissions
+@import views.helpers.Permissions
+
+@****** the actual dashboards are loaded in here using JS ****@
+
+<ul class="dropdown-menu dashboard-selector" data-widget-type="@widgetType"
+    @if(params != null) {
+        @for(param <- params) {
+            @Html(param)
+        }
+    }
+>
+@if(Permissions.isPermitted(RestPermissions.DASHBOARDS_CREATE)) {
+    <li>
+        <a href="@routes.DashboardsController.newDashboard()">No dashboards. Create one?</a>
+    </li>
+}
+</ul>
