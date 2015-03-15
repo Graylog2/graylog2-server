@@ -17,18 +17,17 @@
 package org.graylog2.rules;
 
 import com.google.common.collect.Sets;
-import org.graylog2.Graylog2BaseTest;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
-import org.testng.annotations.Test;
+import org.junit.Test;
 
 import java.net.URL;
 
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
-public class DroolsEngineTest extends Graylog2BaseTest {
+public class DroolsEngineTest {
 
     @Test
     public void runWithoutRules() {
@@ -36,7 +35,7 @@ public class DroolsEngineTest extends Graylog2BaseTest {
 
         final int rulesFired = engine.evaluateInSharedSession(new Message("test message", "test", Tools.iso8601()));
 
-        assertEquals(rulesFired, 0, "No rules should have fired");
+        assertEquals("No rules should have fired", rulesFired, 0);
 
         engine.stop();
     }
@@ -70,16 +69,16 @@ public class DroolsEngineTest extends Graylog2BaseTest {
                 "end\n";
 
         final boolean valid1 = engine.addRule(rule1);
-        assertTrue(valid1, "Rule should compile without errors");
+        assertTrue("Rule should compile without errors", valid1);
 
         final boolean valid2 = engine.addRule(rule2);
-        assertTrue(valid2, "Rule should compile without errors");
+        assertTrue("Rule should compile without errors", valid2);
 
         final Message msg = new Message("test message", "test source", Tools.iso8601());
         final int fired = engine.evaluateInSharedSession(msg);
 
-        assertTrue(msg.getFilterOut(), "msg is filtered out");
-        assertEquals(fired, 2, "both rules should have fired");
+        assertTrue("msg is filtered out", msg.getFilterOut());
+        assertEquals("both rules should have fired", fired, 2);
 
         engine.stop();
     }
@@ -101,10 +100,10 @@ public class DroolsEngineTest extends Graylog2BaseTest {
                 "end";
 
         boolean deployed = engine.addRule(invalidRule);
-        assertFalse(deployed, "Should not deploy invalid rule");
+        assertFalse("Should not deploy invalid rule", deployed);
 
         deployed = engine.addRule(validRule);
-        assertTrue(deployed, "Subsequent deployment of valid rule works");
+        assertTrue("Subsequent deployment of valid rule works", deployed);
 
         engine.evaluateInSharedSession(new Message("foo", "source", Tools.iso8601()));
 

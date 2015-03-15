@@ -18,33 +18,34 @@ package org.graylog2.alarmcallbacks;
 
 import org.graylog2.plugin.alarms.callbacks.AlarmCallback;
 import org.graylog2.shared.bindings.InstantiationService;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 import java.util.HashSet;
 import java.util.Set;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNotNull;
-import static org.testng.Assert.assertTrue;
 
-/**
- * @author Dennis Oelkers <dennis@torch.sh>
- */
+@RunWith(MockitoJUnitRunner.class)
 public class AlarmCallbackFactoryTest {
     private AlarmCallbackFactory alarmCallbackFactory;
+    @Mock
     private InstantiationService instantiationService;
+    @Mock
     private DummyAlarmCallback dummyAlarmCallback;
 
     public interface DummyAlarmCallback extends AlarmCallback {
     }
 
-    @BeforeMethod
+    @Before
     public void setUp() throws Exception {
-        this.instantiationService = mock(InstantiationService.class);
-        this.dummyAlarmCallback = mock(DummyAlarmCallback.class);
         when(instantiationService.getInstance(DummyAlarmCallback.class)).thenReturn(dummyAlarmCallback);
         Set<Class<? extends AlarmCallback>> availableAlarmCallbacks = new HashSet<Class<? extends AlarmCallback>>();
         availableAlarmCallbacks.add(DummyAlarmCallback.class);

@@ -17,11 +17,13 @@
 package org.graylog2.inputs.converters;
 
 import org.graylog2.plugin.inputs.Converter;
-import org.testng.annotations.Test;
+import org.junit.Test;
 
 import java.util.HashMap;
 
-import static org.testng.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>

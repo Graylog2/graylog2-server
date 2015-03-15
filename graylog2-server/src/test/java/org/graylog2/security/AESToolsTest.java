@@ -17,8 +17,8 @@
 package org.graylog2.security;
 
 import org.apache.commons.codec.binary.Hex;
-import org.testng.Assert;
-import org.testng.annotations.Test;
+import org.junit.Assert;
+import org.junit.Test;
 
 import java.security.SecureRandom;
 

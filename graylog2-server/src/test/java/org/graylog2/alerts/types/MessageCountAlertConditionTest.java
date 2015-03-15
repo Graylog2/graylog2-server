@@ -22,20 +22,29 @@ import org.graylog2.indexer.results.CountResult;
 import org.graylog2.indexer.searches.timeranges.TimeRange;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.alarms.AlertCondition;
-import org.testng.annotations.Test;
+import org.junit.Ignore;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.runners.MockitoJUnitRunner;
 
 import java.util.Map;
 
-import static org.mockito.Mockito.*;
-import static org.testng.AssertJUnit.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
-/**
- * @author Dennis Oelkers <dennis@torch.sh>
- */
-@Test(enabled=false)
+@Ignore
 public class MessageCountAlertConditionTest extends AlertConditionTest {
     protected final int threshold = 100;
 
+    @Test
     public void testConstructor() throws Exception {
         final Map<String, Object> parameters = getParametersMap(0, 0, MessageCountAlertCondition.ThresholdType.MORE, 0);
 
@@ -45,12 +54,13 @@ public class MessageCountAlertConditionTest extends AlertConditionTest {
         assertNotNull(messageCountAlertCondition.getDescription());
     }
 
+    @Test
     public void testRunCheckMorePositive() throws Exception {
         final MessageCountAlertCondition.ThresholdType type = MessageCountAlertCondition.ThresholdType.MORE;
 
         final MessageCountAlertCondition messageCountAlertCondition = getConditionWithParameters(type, threshold);
 
-        searchCountShouldReturn(threshold+1);
+        searchCountShouldReturn(threshold + 1);
         // AlertCondition was never triggered before
         alertLastTriggered(-1);
         final AlertCondition.CheckResult result = alertService.triggered(messageCountAlertCondition);
@@ -59,6 +69,7 @@ public class MessageCountAlertConditionTest extends AlertConditionTest {
         assertTriggered(messageCountAlertCondition, result);
     }
 
+    @Test
     public void testRunCheckLessPositive() throws Exception {
         final MessageCountAlertCondition.ThresholdType type = MessageCountAlertCondition.ThresholdType.LESS;
 
@@ -72,6 +83,7 @@ public class MessageCountAlertConditionTest extends AlertConditionTest {
         assertTriggered(messageCountAlertCondition, result);
     }
 
+    @Test
     public void testRunCheckMoreNegative() throws Exception {
         final MessageCountAlertCondition.ThresholdType type = MessageCountAlertCondition.ThresholdType.MORE;
 
@@ -85,6 +97,7 @@ public class MessageCountAlertConditionTest extends AlertConditionTest {
         assertNotTriggered(result);
     }
 
+    @Test
     public void testRunCheckLessNegative() throws Exception {
         final MessageCountAlertCondition.ThresholdType type = MessageCountAlertCondition.ThresholdType.LESS;
 
@@ -98,6 +111,7 @@ public class MessageCountAlertConditionTest extends AlertConditionTest {
         assertNotTriggered(result);
     }
 
+    @Test
     public void testNoRecheckDuringGracePeriod() throws Exception {
         final MessageCountAlertCondition.ThresholdType type = MessageCountAlertCondition.ThresholdType.LESS;
         final int grace = 10;
@@ -120,7 +134,7 @@ public class MessageCountAlertConditionTest extends AlertConditionTest {
         final AlertCondition.CheckResult resultJustTriggered = alertService.triggered(messageCountAlertCondition);
         assertNotTriggered(resultJustTriggered);
 
-        alertLastTriggered(grace*60-1);
+        alertLastTriggered(grace * 60 - 1);
         assertTrue("Alert condition should be in grace period because grace is greater than zero and alert has been triggered during grace period!",
                 alertService.inGracePeriod(messageCountAlertCondition));
         final AlertCondition.CheckResult resultTriggeredAgo = alertService.triggered(messageCountAlertCondition);

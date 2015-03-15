@@ -27,8 +27,10 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.graylog2.plugin.streams.Stream;
 import org.joda.time.DateTime;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.runners.MockitoJUnitRunner;
 
 import java.util.Collections;
 import java.util.List;
@@ -36,15 +38,21 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.testng.AssertJUnit.*;
 
+@RunWith(MockitoJUnitRunner.class)
 public class MessageTest {
     private Message message;
     private DateTime originalTimestamp;
 
-    @BeforeMethod
+    @Before
     public void setUp() {
         originalTimestamp = Tools.iso8601();
         message = new Message("foo", "bar", originalTimestamp);
@@ -167,7 +175,7 @@ public class MessageTest {
         assertEquals(Lists.newArrayList("hello"), message.getFieldAs(List.class, "fields"));
     }
 
-    @Test(expectedExceptions = ClassCastException.class)
+    @Test(expected = ClassCastException.class)
     public void testGetFieldAsWithIncompatibleCast() throws Exception {
         message.addField("fields", Lists.newArrayList("hello"));
         message.getFieldAs(Map.class, "fields");
@@ -325,7 +333,7 @@ public class MessageTest {
         assertEquals(message.getField("timestamp"), fields.get("timestamp"));
     }
 
-    @Test(expectedExceptions = UnsupportedOperationException.class)
+    @Test(expected = UnsupportedOperationException.class)
     public void testGetFieldsReturnsImmutableMap() throws Exception {
         final Map<String, Object> fields = message.getFields();
 
@@ -341,7 +349,7 @@ public class MessageTest {
         assertTrue("Missing fields in set!", Sets.symmetricDifference(message.getFieldNames(), Sets.newHashSet("_id", "timestamp", "source", "message", "testfield")).isEmpty());
     }
 
-    @Test(expectedExceptions = UnsupportedOperationException.class)
+    @Test(expected = UnsupportedOperationException.class)
     public void testGetFieldNamesReturnsUnmodifiableSet() throws Exception {
         final Set<String> fieldNames = message.getFieldNames();
 

@@ -25,23 +25,33 @@ import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.filters.MessageFilter;
 import org.graylog2.shared.journal.Journal;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static org.mockito.Mockito.*;
-import static org.testng.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.same;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
+@RunWith(MockitoJUnitRunner.class)
 public class ServerProcessBufferProcessorTest {
-
+    @Mock
     private ServerStatus serverStatus;
 
-    @BeforeClass
+    @Before
     public void setUp() throws Exception {
-        serverStatus = mock(ServerStatus.class);
         when(serverStatus.getDetailedMessageRecordingStrategy()).thenReturn(ServerStatus.MessageDetailRecordingStrategy.NEVER);
     }
 
@@ -73,15 +83,16 @@ public class ServerProcessBufferProcessorTest {
 
         final ServerProcessBufferProcessor emptyFilters =
                 new ServerProcessBufferProcessor(metricRegistry,
-                                                 Sets.<MessageFilter>newHashSet(),
-                                                 configuration,
-                                                 mock(ServerStatus.class),
-                                                 outputBuffer,
-                                                 mock(Journal.class));
+                        Sets.<MessageFilter>newHashSet(),
+                        configuration,
+                        mock(ServerStatus.class),
+                        outputBuffer,
+                        mock(Journal.class));
         try {
             emptyFilters.handleMessage(new Message("test", "source", Tools.iso8601()));
             fail("A processor with empty filter set should throw an exception");
-        } catch (RuntimeException ignored) {}
+        } catch (RuntimeException ignored) {
+        }
     }
 
     @Test
@@ -118,28 +129,24 @@ public class ServerProcessBufferProcessorTest {
         final Journal journal = mock(Journal.class);
         final ServerProcessBufferProcessor filterTest =
                 new ServerProcessBufferProcessor(metricRegistry,
-                                                 Sets.newHashSet(filterOnlyFirst),
-                                                 configuration,
-                                                 serverStatus,
-                                                 outputBuffer,
-                                                 journal);
-        try {
-            Message filteredoutMessage = new Message("filtered out", "source", Tools.iso8601());
-            filteredoutMessage.setJournalOffset(1);
-            Message unfilteredMessage = new Message("filtered out", "source", Tools.iso8601());
+                        Sets.newHashSet(filterOnlyFirst),
+                        configuration,
+                        serverStatus,
+                        outputBuffer,
+                        journal);
 
-            filterTest.handleMessage(filteredoutMessage);
-            filterTest.handleMessage(unfilteredMessage);
+        Message filteredoutMessage = new Message("filtered out", "source", Tools.iso8601());
+        filteredoutMessage.setJournalOffset(1);
+        Message unfilteredMessage = new Message("filtered out", "source", Tools.iso8601());
 
-            verify(outputBuffer, times(0)).insertBlocking(same(filteredoutMessage));
-            verify(outputBuffer, times(1)).insertBlocking(same(unfilteredMessage));
-            verify(journal, times(1)).markJournalOffsetCommitted(1);
-            assertTrue(filteredoutMessage.getFilterOut());
-            assertFalse(unfilteredMessage.getFilterOut());
+        filterTest.handleMessage(filteredoutMessage);
+        filterTest.handleMessage(unfilteredMessage);
 
-        } catch (RuntimeException e) {
-            fail("This test should not throw exceptions", e);
-        }
+        verify(outputBuffer, times(0)).insertBlocking(same(filteredoutMessage));
+        verify(outputBuffer, times(1)).insertBlocking(same(unfilteredMessage));
+        verify(journal, times(1)).markJournalOffsetCommitted(1);
+        assertTrue(filteredoutMessage.getFilterOut());
+        assertFalse(unfilteredMessage.getFilterOut());
     }
 
     private class DummyFilter implements MessageFilter {

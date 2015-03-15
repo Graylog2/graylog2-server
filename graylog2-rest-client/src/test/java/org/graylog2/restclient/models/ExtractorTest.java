@@ -1,38 +1,48 @@
 package org.graylog2.restclient.models;
 
 import com.google.common.collect.ImmutableMap;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import org.mockito.runners.MockitoJUnitRunner;
 
 import java.util.Collections;
 import java.util.Map;
 
-import static org.mockito.MockitoAnnotations.initMocks;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
+@RunWith(MockitoJUnitRunner.class)
 public class ExtractorTest {
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
+
     private Extractor extractor;
     @Mock
     private User mockUser;
 
-    @BeforeMethod
+    @Before
     public void setUp() {
-        initMocks(this);
         extractor = new Extractor(Extractor.CursorStrategy.COPY, "title", "source", "target",
                 Extractor.Type.COPY_INPUT, mockUser, Extractor.ConditionType.NONE, "");
     }
 
-    @Test(expectedExceptions = NullPointerException.class,
-            expectedExceptionsMessageRegExp = "Extractor type must not be null\\.$")
+    @Test
     public void loadConfigFromImportThrowsNPEIfTypeIsNull() throws Exception {
+        expectedException.expect(NullPointerException.class);
+        expectedException.expectMessage("Extractor type must not be null");
+
         extractor.loadConfigFromImport(null, Collections.<String, Object>emptyMap());
     }
 
-    @Test(expectedExceptions = NullPointerException.class,
-            expectedExceptionsMessageRegExp = "^Extractor configuration must not be null\\.$")
+    @Test
     public void loadConfigFromImportThrowsNPEIfConfigIsNull() throws Exception {
+        expectedException.expect(NullPointerException.class);
+        expectedException.expectMessage("Extractor configuration must not be null");
+
         extractor.loadConfigFromImport(Extractor.Type.COPY_INPUT, null);
     }
 
@@ -78,27 +88,35 @@ public class ExtractorTest {
         assertEquals(extractor.getExtractorConfig().get("end_index"), 1);
     }
 
-    @Test(expectedExceptions = RuntimeException.class,
-            expectedExceptionsMessageRegExp = "^Missing extractor config:.*")
+    @Test
     public void loadConfigFromImportFailsWithEmptyConfigForGrokExtractor() throws Exception {
+        expectedException.expect(RuntimeException.class);
+        expectedException.expectMessage("Missing extractor config:");
+
         extractor.loadConfigFromImport(Extractor.Type.GROK, Collections.<String, Object>emptyMap());
     }
 
-    @Test(expectedExceptions = RuntimeException.class,
-            expectedExceptionsMessageRegExp = "^Missing extractor config:.*")
+    @Test
     public void loadConfigFromImportFailsWithEmptyConfigForRegexExtractor() throws Exception {
+        expectedException.expect(RuntimeException.class);
+        expectedException.expectMessage("Missing extractor config:");
+
         extractor.loadConfigFromImport(Extractor.Type.REGEX, Collections.<String, Object>emptyMap());
     }
 
-    @Test(expectedExceptions = RuntimeException.class,
-            expectedExceptionsMessageRegExp = "^Missing extractor config:.*")
+    @Test
     public void loadConfigFromImportFailsWithEmptyConfigForSplitAndIndexExtractor() throws Exception {
+        expectedException.expect(RuntimeException.class);
+        expectedException.expectMessage("Missing extractor config:");
+
         extractor.loadConfigFromImport(Extractor.Type.SPLIT_AND_INDEX, Collections.<String, Object>emptyMap());
     }
 
-    @Test(expectedExceptions = RuntimeException.class,
-            expectedExceptionsMessageRegExp = "^Missing extractor config:.*")
+    @Test
     public void loadConfigFromImportFailsWithEmptyConfigForSubstringExtractor() throws Exception {
+        expectedException.expect(RuntimeException.class);
+        expectedException.expectMessage("Missing extractor config:");
+
         extractor.loadConfigFromImport(Extractor.Type.SUBSTRING, Collections.<String, Object>emptyMap());
     }
 

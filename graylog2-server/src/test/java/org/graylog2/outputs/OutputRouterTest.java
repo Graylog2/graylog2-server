@@ -20,31 +20,33 @@ import org.graylog2.plugin.Message;
 import org.graylog2.plugin.outputs.MessageOutput;
 import org.graylog2.plugin.streams.Output;
 import org.graylog2.plugin.streams.Stream;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import org.mockito.runners.MockitoJUnitRunner;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
-import static org.testng.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
-/**
- * @author Dennis Oelkers <dennis@torch.sh>
- */
-@Test
+@RunWith(MockitoJUnitRunner.class)
 public class OutputRouterTest {
-    @Mock private MessageOutput defaultMessageOutput;
-    @Mock private OutputRegistry outputRegistry;
+    @Mock
+    private MessageOutput defaultMessageOutput;
+    @Mock
+    private OutputRegistry outputRegistry;
 
-    @BeforeMethod
-    public void setUp() throws Exception {
-        MockitoAnnotations.initMocks(this);
-    }
-
+    @Test
     public void testAlwaysIncludeDefaultOutput() throws Exception {
         final Message message = mock(Message.class);
         final OutputRouter outputRouter = new OutputRouter(defaultMessageOutput, outputRegistry);
@@ -55,6 +57,7 @@ public class OutputRouterTest {
         assertTrue(messageOutputs.contains(defaultMessageOutput));
     }
 
+    @Test
     public void testGetMessageOutputsForEmptyStream() throws Exception {
         final Stream stream = mock(Stream.class);
         final OutputRouter outputRouter = new OutputRouter(defaultMessageOutput, outputRegistry);
@@ -64,12 +67,15 @@ public class OutputRouterTest {
         assertEquals(messageOutputs.size(), 0);
     }
 
+    @Test
     public void testGetMessageOutputsForSingleStream() throws Exception {
         final Stream stream = mock(Stream.class);
         final Output output = mock(Output.class);
         final String outputId = "foobar";
         final MessageOutput messageOutput = mock(MessageOutput.class);
-        final Set<Output> outputSet = new HashSet<Output>() {{ add(output); }};
+        final Set<Output> outputSet = new HashSet<Output>() {{
+            add(output);
+        }};
         when(stream.getOutputs()).thenReturn(outputSet);
         when(output.getId()).thenReturn(outputId);
         when(outputRegistry.getOutputForIdAndStream(eq(outputId), eq(stream))).thenReturn(messageOutput);
@@ -81,6 +87,7 @@ public class OutputRouterTest {
         assertTrue(messageOutputs.contains(messageOutput));
     }
 
+    @Test
     public void testGetMessageOutputsForStreamWithTwoOutputs() throws Exception {
         final Stream stream = mock(Stream.class);
         final Output output1 = mock(Output.class);
@@ -89,7 +96,10 @@ public class OutputRouterTest {
         final String output2Id = "bar";
         final MessageOutput messageOutput1 = mock(MessageOutput.class);
         final MessageOutput messageOutput2 = mock(MessageOutput.class);
-        final Set<Output> outputSet = new HashSet<Output>() {{ add(output1); add(output2); }};
+        final Set<Output> outputSet = new HashSet<Output>() {{
+            add(output1);
+            add(output2);
+        }};
         when(stream.getOutputs()).thenReturn(outputSet);
         when(output1.getId()).thenReturn(output1Id);
         when(output2.getId()).thenReturn(output2Id);
@@ -104,6 +114,7 @@ public class OutputRouterTest {
         assertTrue(messageOutputs.contains(messageOutput2));
     }
 
+    @Test
     public void testGetOutputFromSingleStreams() throws Exception {
         final Stream stream = mock(Stream.class);
         List<Stream> streamList = new ArrayList<Stream>() {{
@@ -113,7 +124,9 @@ public class OutputRouterTest {
         when(message.getStreams()).thenReturn(streamList);
 
         final MessageOutput messageOutput = mock(MessageOutput.class);
-        final Set<MessageOutput> messageOutputList = new HashSet<MessageOutput>() {{ add(messageOutput); }};
+        final Set<MessageOutput> messageOutputList = new HashSet<MessageOutput>() {{
+            add(messageOutput);
+        }};
 
         final OutputRouter outputRouter = Mockito.spy(new OutputRouter(defaultMessageOutput, outputRegistry));
         doReturn(messageOutputList).when(outputRouter).getMessageOutputsForStream(eq(stream));
@@ -127,15 +140,23 @@ public class OutputRouterTest {
         assertTrue(messageOutputs.contains(messageOutput));
     }
 
+    @Test
     public void testGetOutputsFromTwoStreams() throws Exception {
         final Stream stream1 = mock(Stream.class);
         final Stream stream2 = mock(Stream.class);
         final MessageOutput messageOutput1 = mock(MessageOutput.class);
-        final Set<MessageOutput> messageOutputSet1 = new HashSet<MessageOutput>() {{ add(messageOutput1); }};
+        final Set<MessageOutput> messageOutputSet1 = new HashSet<MessageOutput>() {{
+            add(messageOutput1);
+        }};
         final MessageOutput messageOutput2 = mock(MessageOutput.class);
-        final Set<MessageOutput> messageOutputSet2 = new HashSet<MessageOutput>() {{ add(messageOutput2); }};
+        final Set<MessageOutput> messageOutputSet2 = new HashSet<MessageOutput>() {{
+            add(messageOutput2);
+        }};
         final Message message = mock(Message.class);
-        final List<Stream> streamList = new ArrayList<Stream>() {{ add(stream1); add(stream2); }};
+        final List<Stream> streamList = new ArrayList<Stream>() {{
+            add(stream1);
+            add(stream2);
+        }};
         when(message.getStreams()).thenReturn(streamList);
 
         OutputRouter outputRouter = Mockito.spy(new OutputRouter(defaultMessageOutput, outputRegistry));
@@ -155,9 +176,14 @@ public class OutputRouterTest {
         final Stream stream1 = mock(Stream.class);
         final Stream stream2 = mock(Stream.class);
         final MessageOutput messageOutput = mock(MessageOutput.class);
-        final Set<MessageOutput> messageOutputSet = new HashSet<MessageOutput>() {{ add(messageOutput); }};
+        final Set<MessageOutput> messageOutputSet = new HashSet<MessageOutput>() {{
+            add(messageOutput);
+        }};
         final Message message = mock(Message.class);
-        final List<Stream> streamList = new ArrayList<Stream>() {{ add(stream1); add(stream2); }};
+        final List<Stream> streamList = new ArrayList<Stream>() {{
+            add(stream1);
+            add(stream2);
+        }};
         when(message.getStreams()).thenReturn(streamList);
 
         OutputRouter outputRouter = Mockito.spy(new OutputRouter(defaultMessageOutput, outputRegistry));

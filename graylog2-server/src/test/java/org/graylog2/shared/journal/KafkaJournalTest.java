@@ -22,73 +22,65 @@ import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 import kafka.log.LogSegment;
 import kafka.utils.FileLock;
-import org.graylog2.Graylog2BaseTest;
 import org.graylog2.plugin.InstantMillisProvider;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeUtils;
 import org.joda.time.Duration;
 import org.joda.time.Period;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.util.List;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
-import static com.google.common.base.Charsets.UTF_8;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.apache.commons.io.filefilter.FileFilterUtils.and;
 import static org.apache.commons.io.filefilter.FileFilterUtils.directoryFileFilter;
 import static org.apache.commons.io.filefilter.FileFilterUtils.fileFileFilter;
 import static org.apache.commons.io.filefilter.FileFilterUtils.nameFileFilter;
 import static org.apache.commons.io.filefilter.FileFilterUtils.suffixFileFilter;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNotNull;
-import static org.testng.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
-public class KafkaJournalTest extends Graylog2BaseTest {
+public class KafkaJournalTest {
     private static final int BULK_SIZE = 200;
+
+    @Rule
+    public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
     private ScheduledThreadPoolExecutor scheduler;
     private File journalDirectory;
 
-    @BeforeClass
-    public void before() {
+    @Before
+    public void setUp() throws IOException {
         scheduler = new ScheduledThreadPoolExecutor(1);
         scheduler.prestartCoreThread();
+        journalDirectory = temporaryFolder.newFolder();
     }
 
-    @AfterClass
-    public void after() {
-        scheduler.shutdown();
-    }
-
-    @BeforeMethod
-    public void setUp() throws IOException {
-        journalDirectory = Files.createTempDirectory("journal").toFile();
-    }
-
-    @AfterMethod
+    @After
     public void tearDown() {
-        deleteDirectory(journalDirectory);
+        scheduler.shutdown();
     }
 
     @Test
     public void writeAndRead() throws IOException {
         final Journal journal = new KafkaJournal(journalDirectory,
-                                                 scheduler,
-                                                 Size.megabytes(100l),
-                                                 Duration.standardHours(1),
-                                                 Size.megabytes(5l),
-                                                 Duration.standardHours(1),
-                                                 1_000_000,
-                                                 Duration.standardMinutes(1),
-                                                 new MetricRegistry());
+                scheduler,
+                Size.megabytes(100l),
+                Duration.standardHours(1),
+                Size.megabytes(5l),
+                Duration.standardHours(1),
+                1_000_000,
+                Duration.standardMinutes(1),
+                new MetricRegistry());
 
         final byte[] idBytes = "id".getBytes(UTF_8);
         final byte[] messageBytes = "message".getBytes(UTF_8);
@@ -104,14 +96,14 @@ public class KafkaJournalTest extends Graylog2BaseTest {
     @Test
     public void readAtLeastOne() throws Exception {
         final Journal journal = new KafkaJournal(journalDirectory,
-                                                 scheduler,
-                                                 Size.megabytes(100l),
-                                                 Duration.standardHours(1),
-                                                 Size.megabytes(5l),
-                                                 Duration.standardHours(1),
-                                                 1_000_000,
-                                                 Duration.standardMinutes(1),
-                                                 new MetricRegistry());
+                scheduler,
+                Size.megabytes(100l),
+                Duration.standardHours(1),
+                Size.megabytes(5l),
+                Duration.standardHours(1),
+                1_000_000,
+                Duration.standardMinutes(1),
+                new MetricRegistry());
 
         final byte[] idBytes = "id".getBytes(UTF_8);
         final byte[] messageBytes = "message1".getBytes(UTF_8);
@@ -150,40 +142,40 @@ public class KafkaJournalTest extends Graylog2BaseTest {
     @Test
     public void segmentRotation() throws Exception {
         final KafkaJournal journal = new KafkaJournal(journalDirectory,
-                                                      scheduler,
-                                                      Size.kilobytes(1l),
-                                                      Duration.standardHours(1),
-                                                      Size.kilobytes(10l),
-                                                      Duration.standardDays(1),
-                                                      1_000_000,
-                                                      Duration.standardMinutes(1),
-                                                      new MetricRegistry());
+                scheduler,
+                Size.kilobytes(1l),
+                Duration.standardHours(1),
+                Size.kilobytes(10l),
+                Duration.standardDays(1),
+                1_000_000,
+                Duration.standardMinutes(1),
+                new MetricRegistry());
 
         createBulkChunks(journal, 3);
 
         final File[] files = journalDirectory.listFiles();
         assertNotNull(files);
-        assertTrue(files.length > 0, "there should be files in the journal directory");
+        assertTrue("there should be files in the journal directory", files.length > 0);
 
         final File[] messageJournalDir = journalDirectory.listFiles((FileFilter) and(directoryFileFilter(),
                 nameFileFilter("messagejournal-0")));
         assertTrue(messageJournalDir.length == 1);
         final File[] logFiles = messageJournalDir[0].listFiles((FileFilter) and(fileFileFilter(),
                 suffixFileFilter(".log")));
-        assertEquals(logFiles.length, 3, "should have two journal segments");
+        assertEquals("should have two journal segments", 3, logFiles.length);
     }
 
     @Test
     public void segmentSizeCleanup() throws Exception {
         final KafkaJournal journal = new KafkaJournal(journalDirectory,
-                                                      scheduler,
-                                                      Size.kilobytes(1l),
-                                                      Duration.standardHours(1),
-                                                      Size.kilobytes(10l),
-                                                      Duration.standardDays(1),
-                                                      1_000_000,
-                                                      Duration.standardMinutes(1),
-                                                      new MetricRegistry());
+                scheduler,
+                Size.kilobytes(1l),
+                Duration.standardHours(1),
+                Size.kilobytes(10l),
+                Duration.standardDays(1),
+                1_000_000,
+                Duration.standardMinutes(1),
+                new MetricRegistry());
         final File messageJournalDir = new File(journalDirectory, "messagejournal-0");
         assertTrue(messageJournalDir.exists());
 
@@ -210,14 +202,14 @@ public class KafkaJournalTest extends Graylog2BaseTest {
         try {
 
             final KafkaJournal journal = new KafkaJournal(journalDirectory,
-                                                          scheduler,
-                                                          Size.kilobytes(1l),
-                                                          Duration.standardHours(1),
-                                                          Size.kilobytes(10l),
-                                                          Duration.standardMinutes(1),
-                                                          1_000_000,
-                                                          Duration.standardMinutes(1),
-                                                          new MetricRegistry());
+                    scheduler,
+                    Size.kilobytes(1l),
+                    Duration.standardHours(1),
+                    Size.kilobytes(10l),
+                    Duration.standardMinutes(1),
+                    1_000_000,
+                    Duration.standardMinutes(1),
+                    new MetricRegistry());
             final File messageJournalDir = new File(journalDirectory, "messagejournal-0");
             assertTrue(messageJournalDir.exists());
 
@@ -243,15 +235,15 @@ public class KafkaJournalTest extends Graylog2BaseTest {
             }
 
             int cleanedLogs = journal.cleanupLogs();
-            assertEquals(cleanedLogs, 0, "no segments should've been cleaned");
-            assertEquals(countSegmentsInDir(messageJournalDir), 2, "two segments segment should remain");
+            assertEquals("no segments should've been cleaned", cleanedLogs, 0);
+            assertEquals("two segments segment should remain", countSegmentsInDir(messageJournalDir), 2);
 
             // move clock beyond the retention period and clean again
             clock.tick(Period.seconds(120));
 
             cleanedLogs = journal.cleanupLogs();
-            assertEquals(cleanedLogs, 2, "two segments should've been cleaned (only one will actually be removed...)");
-            assertEquals(countSegmentsInDir(messageJournalDir), 1, "one segment should remain");
+            assertEquals("two segments should've been cleaned (only one will actually be removed...)", cleanedLogs, 2);
+            assertEquals("one segment should remain", countSegmentsInDir(messageJournalDir), 1);
 
         } finally {
             DateTimeUtils.setCurrentMillisSystem();
@@ -261,14 +253,14 @@ public class KafkaJournalTest extends Graylog2BaseTest {
     @Test
     public void segmentCommittedCleanup() throws Exception {
         final KafkaJournal journal = new KafkaJournal(journalDirectory,
-                                                      scheduler,
-                                                      Size.kilobytes(1l),
-                                                      Duration.standardHours(1),
-                                                      Size.petabytes(1l), // never clean by size in this test
-                                                      Duration.standardDays(1),
-                                                      1_000_000,
-                                                      Duration.standardMinutes(1),
-                                                      new MetricRegistry());
+                scheduler,
+                Size.kilobytes(1l),
+                Duration.standardHours(1),
+                Size.petabytes(1l), // never clean by size in this test
+                Duration.standardDays(1),
+                1_000_000,
+                Duration.standardMinutes(1),
+                new MetricRegistry());
         final File messageJournalDir = new File(journalDirectory, "messagejournal-0");
         assertTrue(messageJournalDir.exists());
 
@@ -288,19 +280,19 @@ public class KafkaJournalTest extends Graylog2BaseTest {
 
         // mark first half of first segment committed, should not clean anything
         journal.markJournalOffsetCommitted(BULK_SIZE / 2);
-        assertEquals(journal.cleanupLogs(), 0, "should not touch segments");
+        assertEquals("should not touch segments", journal.cleanupLogs(), 0);
         assertEquals(countSegmentsInDir(messageJournalDir), 3);
 
         journal.markJournalOffsetCommitted(BULK_SIZE + 1);
-        assertEquals(journal.cleanupLogs(), 1, "first segment should've been purged");
+        assertEquals("first segment should've been purged", journal.cleanupLogs(), 1);
         assertEquals(countSegmentsInDir(messageJournalDir), 2);
 
         journal.markJournalOffsetCommitted(BULK_SIZE * 4);
-        assertEquals(journal.cleanupLogs(), 1, "only purge one segment, not the active one");
+        assertEquals("only purge one segment, not the active one", journal.cleanupLogs(), 1);
         assertEquals(countSegmentsInDir(messageJournalDir), 1);
     }
 
-    @Test(expectedExceptions = RuntimeException.class)
+    @Test(expected = RuntimeException.class)
     public void lockedJournalDir() throws Exception {
         // Grab the lock before starting the KafkaJournal.
         final File file = new File(journalDirectory, ".lock");
@@ -317,5 +309,19 @@ public class KafkaJournalTest extends Graylog2BaseTest {
                 1_000_000,
                 Duration.standardMinutes(1),
                 new MetricRegistry());
+    }
+
+    public static void deleteDirectory(File folder) {
+        File[] files = folder.listFiles();
+        if (files != null) { //some JVMs return null for empty dirs
+            for (File f : files) {
+                if (f.isDirectory()) {
+                    deleteDirectory(f);
+                } else {
+                    f.delete();
+                }
+            }
+        }
+        folder.delete();
     }
 }

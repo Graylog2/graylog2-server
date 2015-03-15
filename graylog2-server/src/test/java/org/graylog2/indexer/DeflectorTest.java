@@ -27,20 +27,24 @@ import org.graylog2.indexer.ranges.CreateNewSingleIndexRangeJob;
 import org.graylog2.indexer.ranges.RebuildIndexRangesJob;
 import org.graylog2.system.activities.SystemMessageActivityWriter;
 import org.graylog2.system.jobs.SystemJobManager;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.runners.MockitoJUnitRunner;
 
 import java.util.Map;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
-import static org.testng.Assert.*;
-import static org.testng.AssertJUnit.assertEquals;
 
+@RunWith(MockitoJUnitRunner.class)
 public class DeflectorTest {
-
     private Deflector deflector;
 
-    @BeforeMethod
+    @Before
     public void setUp() {
         deflector = new Deflector(
                 mock(SystemJobManager.class),
@@ -66,7 +70,7 @@ public class DeflectorTest {
         assertEquals(52, Deflector.extractIndexNumber("foo_0_bar_52"));
     }
 
-    @Test(expectedExceptions = NumberFormatException.class)
+    @Test(expected = NumberFormatException.class)
     public void testExtractIndexNumberWithMalformedFormatThrowsException() {
         Deflector.extractIndexNumber("graylog2_hunderttausend");
     }
@@ -82,9 +86,9 @@ public class DeflectorTest {
                 mock(CreateNewSingleIndexRangeJob.Factory.class),
                 mock(Indices.class));
 
-        assertEquals("graylog2_0", d.buildIndexName("graylog2", 0));
-        assertEquals("graylog2_1", d.buildIndexName("graylog2", 1));
-        assertEquals("graylog2_9001", d.buildIndexName("graylog2", 9001));
+        assertEquals("graylog2_0", Deflector.buildIndexName("graylog2", 0));
+        assertEquals("graylog2_1", Deflector.buildIndexName("graylog2", 1));
+        assertEquals("graylog2_9001", Deflector.buildIndexName("graylog2", 9001));
     }
 
     @Test
@@ -95,37 +99,30 @@ public class DeflectorTest {
     @Test
     public void nullIndexerDoesNotThrow() {
         Deflector d = new Deflector(mock(SystemJobManager.class),
-                                    mock(ElasticsearchConfiguration.class),
-                                    mock(SystemMessageActivityWriter.class),
-                                    mock(RebuildIndexRangesJob.Factory.class),
-                                    mock(SetIndexReadOnlyJob.Factory.class),
-                                    mock(CreateNewSingleIndexRangeJob.Factory.class),
-                                    mock(Indices.class));
-        try {
-            final Map<String, IndexStats> deflectorIndices = d.getAllDeflectorIndices();
-            assertNotNull(deflectorIndices);
-            assertEquals(0, deflectorIndices.size());
-        } catch (Exception e) {
-            fail("Should not throw an exception", e);
-        }
+                mock(ElasticsearchConfiguration.class),
+                mock(SystemMessageActivityWriter.class),
+                mock(RebuildIndexRangesJob.Factory.class),
+                mock(SetIndexReadOnlyJob.Factory.class),
+                mock(CreateNewSingleIndexRangeJob.Factory.class),
+                mock(Indices.class));
+
+        final Map<String, IndexStats> deflectorIndices = d.getAllDeflectorIndices();
+        assertNotNull(deflectorIndices);
+        assertEquals(0, deflectorIndices.size());
     }
 
     @Test
     public void nullIndexerDoesNotThrowOnIndexName() {
         Deflector d = new Deflector(mock(SystemJobManager.class),
-                                    mock(ElasticsearchConfiguration.class),
-                                    mock(SystemMessageActivityWriter.class),
-                                    mock(RebuildIndexRangesJob.Factory.class),
-                                    mock(SetIndexReadOnlyJob.Factory.class),
-                                    mock(CreateNewSingleIndexRangeJob.Factory.class),
-                                    mock(Indices.class));
-        try {
-            final String[] deflectorIndices = d.getAllDeflectorIndexNames();
-            assertNotNull(deflectorIndices);
-            assertEquals(0, deflectorIndices.length);
-        } catch (Exception e) {
-            fail("Should not throw an exception", e);
-        }
+                mock(ElasticsearchConfiguration.class),
+                mock(SystemMessageActivityWriter.class),
+                mock(RebuildIndexRangesJob.Factory.class),
+                mock(SetIndexReadOnlyJob.Factory.class),
+                mock(CreateNewSingleIndexRangeJob.Factory.class),
+                mock(Indices.class));
+        final String[] deflectorIndices = d.getAllDeflectorIndexNames();
+        assertNotNull(deflectorIndices);
+        assertEquals(0, deflectorIndices.length);
     }
 
     @Test

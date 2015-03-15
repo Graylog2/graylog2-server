@@ -16,13 +16,12 @@
  */
 package org.graylog2.utilities.date;
 
-import org.testng.annotations.Test;
+import org.junit.Ignore;
+import org.junit.Test;
 
-import static org.testng.AssertJUnit.*;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public class NaturalDateParserTest {
 
     @Test
@@ -38,17 +37,18 @@ public class NaturalDateParserTest {
         p.parse("last week to today");
     }
 
-    @Test(expectedExceptions = NaturalDateParser.DateNotParsableException.class)
+    @Test(expected = NaturalDateParser.DateNotParsableException.class)
     public void testParseFailsOnUnparsableDate() throws Exception, NaturalDateParser.DateNotParsableException {
         new NaturalDateParser().parse("LOLWUT");
     }
 
-    @Test(expectedExceptions = NaturalDateParser.DateNotParsableException.class)
+    @Test(expected = NaturalDateParser.DateNotParsableException.class)
     public void testParseFailsOnEmptyDate() throws Exception, NaturalDateParser.DateNotParsableException {
         new NaturalDateParser().parse("");
     }
 
-    @Test(enabled = false)
+    @Test
+    @Ignore
     public void testTemporalOrder() throws Exception, NaturalDateParser.DateNotParsableException {
         NaturalDateParser p = new NaturalDateParser();
 

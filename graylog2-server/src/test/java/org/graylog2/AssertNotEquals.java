@@ -15,7 +15,8 @@
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
 package org.graylog2;
-import static org.testng.AssertJUnit.*;
+
+import static org.junit.Assert.assertFalse;
 
 /**
  * @author Dennis Oelkers <dennis@torch.sh>

@@ -308,6 +308,10 @@
             <groupId>com.lordofthejars</groupId>
             <artifactId>nosqlunit-elasticsearch</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.lordofthejars</groupId>
+            <artifactId>nosqlunit-mongodb</artifactId>
+        </dependency>
     </dependencies>
 
     <dependencyManagement>

@@ -26,10 +26,11 @@ import com.google.common.collect.Sets;
 import com.google.common.eventbus.EventBus;
 import org.graylog2.plugin.lifecycles.Lifecycle;
 import org.joda.time.DateTimeZone;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import org.mockito.runners.MockitoJUnitRunner;
 
 import java.io.File;
 import java.nio.file.Files;
@@ -37,9 +38,17 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static org.mockito.Mockito.*;
-import static org.testng.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
+@RunWith(MockitoJUnitRunner.class)
 public class ServerStatusTest {
     @Mock private BaseConfiguration config;
     @Mock private EventBus eventBus;
@@ -47,12 +56,10 @@ public class ServerStatusTest {
     private ServerStatus status;
     private File tempFile;
 
-    @BeforeMethod
+    @Before
     public void setUp() throws Exception {
         tempFile = File.createTempFile("server-status-test", "node-id");
         tempFile.deleteOnExit();
-
-        MockitoAnnotations.initMocks(this);
 
         when(config.getNodeIdFile()).thenReturn(tempFile.getPath());
 
@@ -214,7 +221,7 @@ public class ServerStatusTest {
         assertEquals(status.getLifecycle(), Lifecycle.RUNNING);
     }
 
-    @Test(expectedExceptions = ProcessingPauseLockedException.class)
+    @Test(expected = ProcessingPauseLockedException.class)
     public void testResumeMessageProcessingWithLock() throws Exception {
         status.pauseMessageProcessing(true);
         status.resumeMessageProcessing();

@@ -23,20 +23,27 @@ import org.graylog2.indexer.IndexNotFoundException;
 import org.graylog2.indexer.indices.IndexStatistics;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.plugin.indexer.rotation.RotationStrategy;
-import org.testng.annotations.Test;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
-import static org.mockito.Mockito.*;
-import static org.testng.Assert.assertNull;
-import static org.testng.AssertJUnit.assertEquals;
-import static org.testng.AssertJUnit.assertNotNull;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
+@RunWith(MockitoJUnitRunner.class)
 public class SizeBasedRotationStrategyTest {
+    @Mock
+    private ElasticsearchConfiguration configuration;
+    @Mock
+    private Indices indices;
 
     @Test
     public void testRotate() throws IndexNotFoundException {
-        final ElasticsearchConfiguration configuration = mock(ElasticsearchConfiguration.class);
-        final Indices indices = mock(Indices.class);
-
         final IndexStatistics stats = new IndexStatistics();
         final CommonStats commonStats = new CommonStats();
         commonStats.store = new StoreStats(1000, 0);
@@ -45,8 +52,7 @@ public class SizeBasedRotationStrategyTest {
         when(indices.getIndexStats("name")).thenReturn(stats);
         when(configuration.getMaxSizePerIndex()).thenReturn(100L);
 
-        final SizeBasedRotationStrategy strategy = new SizeBasedRotationStrategy(configuration,
-                                                                                       indices);
+        final SizeBasedRotationStrategy strategy = new SizeBasedRotationStrategy(configuration, indices);
         final RotationStrategy.Result rotate = strategy.shouldRotate("name");
 
         verify(configuration, atLeastOnce()).getMaxSizePerIndex();
@@ -57,9 +63,6 @@ public class SizeBasedRotationStrategyTest {
 
     @Test
     public void testDontRotate() throws IndexNotFoundException {
-        final ElasticsearchConfiguration configuration = mock(ElasticsearchConfiguration.class);
-        final Indices indices = mock(Indices.class);
-
         final IndexStatistics stats = new IndexStatistics();
         final CommonStats commonStats = new CommonStats();
         commonStats.store = new StoreStats(1000, 0);
@@ -68,8 +71,7 @@ public class SizeBasedRotationStrategyTest {
         when(indices.getIndexStats("name")).thenReturn(stats);
         when(configuration.getMaxSizePerIndex()).thenReturn(100000L);
 
-        final SizeBasedRotationStrategy strategy = new SizeBasedRotationStrategy(configuration,
-                                                                                 indices);
+        final SizeBasedRotationStrategy strategy = new SizeBasedRotationStrategy(configuration, indices);
         final RotationStrategy.Result rotate = strategy.shouldRotate("name");
 
         verify(configuration, atLeastOnce()).getMaxSizePerIndex();
@@ -80,18 +82,13 @@ public class SizeBasedRotationStrategyTest {
 
     @Test
     public void testRotateFailed() throws IndexNotFoundException {
-        final ElasticsearchConfiguration configuration = mock(ElasticsearchConfiguration.class);
-        final Indices indices = mock(Indices.class);
-
         when(indices.getIndexStats("name")).thenReturn(null);
         when(configuration.getMaxSizePerIndex()).thenReturn(100L);
 
-        final SizeBasedRotationStrategy strategy = new SizeBasedRotationStrategy(configuration,
-                                                                                 indices);
+        final SizeBasedRotationStrategy strategy = new SizeBasedRotationStrategy(configuration, indices);
         final RotationStrategy.Result rotate = strategy.shouldRotate("name");
 
         verify(configuration, atLeastOnce()).getMaxSizePerIndex();
         assertNull(rotate);
     }
-
 }

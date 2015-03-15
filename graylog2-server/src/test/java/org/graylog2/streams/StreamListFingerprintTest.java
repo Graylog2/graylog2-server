@@ -25,31 +25,39 @@ import org.graylog2.plugin.streams.Output;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.streams.StreamRule;
 import org.joda.time.DateTime;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import org.mockito.runners.MockitoJUnitRunner;
 
 import java.util.HashMap;
 
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNotEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 
+@RunWith(MockitoJUnitRunner.class)
 public class StreamListFingerprintTest {
-    @Mock Stream stream1;
-    @Mock Stream stream2;
-    @Mock StreamRule streamRule1;
-    @Mock StreamRule streamRule2;
-    @Mock StreamRule streamRule3;
-    @Mock Output output1;
-    @Mock Output output2;
+    @Mock
+    Stream stream1;
+    @Mock
+    Stream stream2;
+    @Mock
+    StreamRule streamRule1;
+    @Mock
+    StreamRule streamRule2;
+    @Mock
+    StreamRule streamRule3;
+    @Mock
+    Output output1;
+    @Mock
+    Output output2;
 
     private final String expectedFingerprint = "944fc39a2e1db9d13ef7c7323a670ebd426e37c1";
     private final String expectedEmptyFingerprint = "da39a3ee5e6b4b0d3255bfef95601890afd80709";
 
-    @BeforeMethod
+    @Before
     public void setUp() throws Exception {
-        MockitoAnnotations.initMocks(this);
         output1 = makeOutput(1, "output1");
         output2 = makeOutput(2, "output2");
 
@@ -57,8 +65,8 @@ public class StreamListFingerprintTest {
         streamRule2 = makeStreamRule(2, "field2");
         streamRule3 = makeStreamRule(3, "field3");
 
-        stream1 = makeStream(1, "title1", new StreamRule[] {streamRule1, streamRule2}, new Output[] {output1, output2});
-        stream2 = makeStream(2, "title2", new StreamRule[] {streamRule3}, new Output[] {output2, output1});
+        stream1 = makeStream(1, "title1", new StreamRule[]{streamRule1, streamRule2}, new Output[]{output1, output2});
+        stream2 = makeStream(2, "title2", new StreamRule[]{streamRule3}, new Output[]{output2, output1});
     }
 
     private static Stream makeStream(int id, String title, StreamRule[] rules, Output[] outputs) {

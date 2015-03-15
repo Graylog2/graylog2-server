@@ -18,10 +18,10 @@ package org.graylog2.database.validators;
 
 import org.graylog2.plugin.database.validators.Validator;
 import org.joda.time.DateTimeZone;
-import org.testng.annotations.Test;
+import org.junit.Test;
 
-import static org.testng.AssertJUnit.assertFalse;
-import static org.testng.AssertJUnit.assertTrue;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>

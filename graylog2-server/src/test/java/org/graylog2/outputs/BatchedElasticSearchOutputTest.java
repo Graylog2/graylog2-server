@@ -25,32 +25,39 @@ import org.graylog2.indexer.messages.Messages;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
 import org.graylog2.shared.journal.NoopJournal;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static org.mockito.Matchers.anyListOf;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.*;
-import static org.testng.Assert.fail;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
+@RunWith(MockitoJUnitRunner.class)
 public class BatchedElasticSearchOutputTest {
 
     private MetricRegistry metricRegistry;
-    private Cluster cluster;
+    @Mock
     private Messages messages;
+    @Mock
+    private Cluster cluster;
 
-    @BeforeMethod
+    @Before
     public void setUp() {
         metricRegistry = new MetricRegistry();
-        cluster = mock(Cluster.class);
-        messages = mock(Messages.class);
     }
 
     @Test
-    public void flushingBatchWritesBulk() {
+    public void flushingBatchWritesBulk() throws Exception {
         final Configuration config = new Configuration() {
             @Override
             public int getOutputBatchSize() {
@@ -64,14 +71,10 @@ public class BatchedElasticSearchOutputTest {
         MetricRegistry metricRegistry = new MetricRegistry();
 
         final BatchedElasticSearchOutput output = new BatchedElasticSearchOutput(metricRegistry, messages,
-                                                                                 cluster, config, new NoopJournal());
+                cluster, config, new NoopJournal());
 
-        try {
-            for (Message message : messageList) {
-                output.write(message);
-            }
-        } catch (Exception e) {
-            fail("Output should not throw", e);
+        for (Message message : messageList) {
+            output.write(message);
         }
 
         output.flush(false);
@@ -80,7 +83,7 @@ public class BatchedElasticSearchOutputTest {
     }
 
     @Test
-    public void dontFlushWritesIfElasticsearchIsUnhealthy() {
+    public void dontFlushWritesIfElasticsearchIsUnhealthy() throws Exception {
         final Configuration config = new Configuration() {
             @Override
             public int getOutputBatchSize() {
@@ -92,12 +95,8 @@ public class BatchedElasticSearchOutputTest {
         final List<Message> messageList = buildMessages(3);
         BatchedElasticSearchOutput output = new BatchedElasticSearchOutput(metricRegistry, messages, cluster, config, new NoopJournal());
 
-        try {
-            for (Message message : messageList) {
-                output.write(message);
-            }
-        } catch (Exception e) {
-            fail("Output should not throw", e);
+        for (Message message : messageList) {
+            output.write(message);
         }
 
         output.flush(false);
@@ -106,7 +105,7 @@ public class BatchedElasticSearchOutputTest {
     }
 
     @Test
-    public void flushIfBatchSizeIsExceeded() {
+    public void flushIfBatchSizeIsExceeded() throws Exception {
         final int batchSize = 5;
         final Configuration config = new Configuration() {
             @Override
@@ -119,12 +118,8 @@ public class BatchedElasticSearchOutputTest {
         final List<Message> messageList = buildMessages(batchSize + 1);
         final BatchedElasticSearchOutput output = new BatchedElasticSearchOutput(metricRegistry, messages, cluster, config, new NoopJournal());
 
-        try {
-            for (Message message : messageList) {
-                output.write(message);
-            }
-        } catch (Exception e) {
-            fail("Output should not throw", e);
+        for (Message message : messageList) {
+            output.write(message);
         }
 
         // Give the asynchronous flush a chance to finish

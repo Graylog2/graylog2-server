@@ -17,12 +17,12 @@
 package org.graylog2.inputs.converters;
 
 import org.graylog2.ConfigurationException;
-import org.testng.annotations.Test;
+import org.junit.Test;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.testng.Assert.assertEquals;
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
@@ -38,12 +38,12 @@ public class SplitAndCountConverterTest {
         assertEquals(3, new SplitAndCountConverter(config(".")).convert("foo.bar.baz")); // Regex. Must be escaped.
     }
 
-    @Test(expectedExceptions = ConfigurationException.class)
+    @Test(expected = ConfigurationException.class)
     public void testWithEmptyConfig() throws Exception {
         assertEquals(null, new SplitAndCountConverter(config("")).convert("foo"));
     }
 
-    @Test(expectedExceptions = ConfigurationException.class)
+    @Test(expected = ConfigurationException.class)
     public void testWithNullConfig() throws Exception {
         assertEquals(null, new SplitAndCountConverter(config(null)).convert("foo"));
     }

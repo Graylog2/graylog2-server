@@ -20,18 +20,14 @@ import com.google.common.collect.Maps;
 import org.bson.types.ObjectId;
 import org.graylog2.plugin.database.Persisted;
 import org.graylog2.plugin.database.validators.Validator;
-import org.testng.annotations.Test;
+import org.junit.Test;
 
 import java.util.Map;
 
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertNotNull;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 
-/**
- * @author Dennis Oelkers <dennis@torch.sh>
- */
-@Test
 public class PersistedImplTest {
     class PersistedImplSUT extends PersistedImpl {
         PersistedImplSUT(Map<String, Object> fields) {
@@ -71,21 +67,6 @@ public class PersistedImplTest {
         assertNotNull(persisted.getId());
         assertFalse(persisted.getId().isEmpty());
         assertEquals(id.toString(), persisted.getId());
-    }
-
-    @Test
-    public void testGetObjectId() throws Exception {
-
-    }
-
-    @Test
-    public void testGetId() throws Exception {
-
-    }
-
-    @Test
-    public void testGetFields() throws Exception {
-
     }
 
     @Test

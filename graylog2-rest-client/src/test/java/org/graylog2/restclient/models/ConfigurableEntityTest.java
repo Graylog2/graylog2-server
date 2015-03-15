@@ -4,29 +4,29 @@ import autovalue.shaded.com.google.common.common.collect.Lists;
 import autovalue.shaded.com.google.common.common.collect.Maps;
 import org.graylog2.restclient.lib.plugin.configuration.RequestedConfigurationField;
 import org.graylog2.restclient.lib.plugin.configuration.TextField;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Spy;
+import org.mockito.runners.MockitoJUnitRunner;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.mockito.Matchers.any;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
-import static org.testng.Assert.*;
 
+@RunWith(MockitoJUnitRunner.class)
 public class ConfigurableEntityTest {
-    @Mock private ConfigurableEntity configurableEntity;
+    @Spy
+    private ConfigurableEntity configurableEntity;
     private final Map<String, Object> configuration = Maps.newHashMap();
     private final List<RequestedConfigurationField> requestedConfigurationFields = Lists.newArrayList();
 
-    @BeforeMethod
+    @Before
     public void setUp() throws Exception {
-        MockitoAnnotations.initMocks(this);
-        when(configurableEntity.getConfiguration(any(List.class))).thenCallRealMethod();
         when(configurableEntity.getConfiguration()).thenReturn(configuration);
     }
 
@@ -38,7 +38,7 @@ public class ConfigurableEntityTest {
 
         final Map<String, Object> result = configurableEntity.getConfiguration(requestedConfigurationFields);
 
-        assertEquals(result.get(passwordField), "*******", "Password should be masked in result!");
+        assertEquals("Password should be masked in result!", result.get(passwordField), "*******");
     }
 
     @Test
@@ -50,7 +50,7 @@ public class ConfigurableEntityTest {
 
         final Map<String, Object> result = configurableEntity.getConfiguration(requestedConfigurationFields);
 
-        assertEquals(result.get(userField), username, "Non-password field should not be masked in result!");
+        assertEquals("Non-password field should not be masked in result!", result.get(userField), username);
     }
 
     @Test
@@ -66,8 +66,8 @@ public class ConfigurableEntityTest {
 
         final Map<String, Object> result = configurableEntity.getConfiguration(requestedConfigurationFields);
 
-        assertEquals(result.get(userField), username, "Non-password field should not be masked in result!");
-        assertEquals(result.get(passwordField), "*******", "Password should be masked in result!");
+        assertEquals("Non-password field should not be masked in result!", result.get(userField), username);
+        assertEquals("Password should be masked in result!", result.get(passwordField), "*******");
     }
 
     private void addNonPasswordField(String userField) {
@@ -86,24 +86,24 @@ public class ConfigurableEntityTest {
 
     private Map.Entry<String, Map<String, Object>> stubConfigurationFieldConfig(final String type, final String title, final List<String> attributes, final Boolean isOptional) {
         return new Map.Entry<String, Map<String, Object>>() {
-                @Override
-                public String getKey() {
-                    return title;
-                }
+            @Override
+            public String getKey() {
+                return title;
+            }
 
-                @Override
-                public Map<String, Object> getValue() {
-                    return new HashMap<String, Object>() {{
-                        put("type", type);
-                        put("attributes", attributes);
-                        put("is_optional", isOptional);
-                    }};
-                }
+            @Override
+            public Map<String, Object> getValue() {
+                return new HashMap<String, Object>() {{
+                    put("type", type);
+                    put("attributes", attributes);
+                    put("is_optional", isOptional);
+                }};
+            }
 
-                @Override
-                public Map<String, Object> setValue(Map<String, Object> value) {
-                    return null;
-                }
-            };
+            @Override
+            public Map<String, Object> setValue(Map<String, Object> value) {
+                return null;
+            }
+        };
     }
 }

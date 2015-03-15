@@ -23,12 +23,12 @@
 package org.graylog2.plugin;
 
 import com.google.common.collect.Maps;
+import org.junit.Test;
 import org.msgpack.MessagePack;
-import org.testng.annotations.Test;
 
 import java.util.Map;
 
-import static org.testng.Assert.assertTrue;
+import static org.junit.Assert.assertTrue;
 
 public class RadioMessageTest {
 

@@ -18,29 +18,46 @@ package org.graylog2.periodical;
 
 import com.google.common.collect.Lists;
 import org.graylog2.plugin.periodical.Periodical;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.slf4j.Logger;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
 
 import java.util.List;
-import java.util.concurrent.*;
+import java.util.concurrent.Delayed;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
-import static org.mockito.Mockito.*;
-import static org.testng.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
+@RunWith(MockitoJUnitRunner.class)
 public class PeriodicalsTest {
+    @Mock
     private ScheduledExecutorService scheduler;
+    @Mock
     private ScheduledExecutorService daemonScheduler;
-    private Periodicals periodicals;
-    private ScheduledFuture<Object> future;
+    @Mock
     private Periodical periodical;
+    private ScheduledFuture<Object> future;
+    private Periodicals periodicals;
 
-    @BeforeMethod
+    @Before
     public void setUp() throws Exception {
-        scheduler = mock(ScheduledExecutorService.class);
-        daemonScheduler = mock(ScheduledExecutorService.class);
         periodicals = new Periodicals(scheduler, daemonScheduler);
-        periodical = mock(Periodical.class);
         future = createScheduledFuture();
 
         when(scheduler.scheduleAtFixedRate(
@@ -76,7 +93,7 @@ public class PeriodicalsTest {
         //      Fixable by using an injectable ThreadFactoryBuilder so we can properly mock?
         //verify(periodical).run();
 
-        assertFalse(periodicals.getFutures().containsKey(periodical), "Periodical should not be in the futures Map");
+        assertFalse("Periodical should not be in the futures Map", periodicals.getFutures().containsKey(periodical));
     }
 
     @Test
@@ -96,7 +113,7 @@ public class PeriodicalsTest {
 
         verify(periodical, never()).run();
 
-        assertTrue(periodicals.getFutures().containsKey(periodical), "Periodical was not added to the futures Map");
+        assertTrue("Periodical was not added to the futures Map", periodicals.getFutures().containsKey(periodical));
     }
 
     @Test
@@ -116,14 +133,14 @@ public class PeriodicalsTest {
 
         verify(periodical, never()).run();
 
-        assertEquals(periodicals.getFutures().get(periodical), future, "Future for the periodical was not added to the futures Map");
+        assertEquals("Future for the periodical was not added to the futures Map", periodicals.getFutures().get(periodical), future);
     }
 
     @Test
     public void testGetAll() throws Exception {
         periodicals.registerAndStart(periodical);
 
-        assertEquals(periodicals.getAll(), Lists.newArrayList(periodical), "getAll() did not return all periodicals");
+        assertEquals("getAll() did not return all periodicals", periodicals.getAll(), Lists.newArrayList(periodical));
     }
 
     @Test
@@ -132,7 +149,7 @@ public class PeriodicalsTest {
 
         periodicals.getAll().add(periodical);
 
-        assertEquals(periodicals.getAll().size(), 1, "getAll() did not return a copy of the periodicals List");
+        assertEquals("getAll() did not return a copy of the periodicals List", periodicals.getAll().size(), 1);
     }
 
     @Test
@@ -145,16 +162,16 @@ public class PeriodicalsTest {
 
         List<Periodical> allStoppedOnGracefulShutdown = periodicals.getAllStoppedOnGracefulShutdown();
 
-        assertFalse(allStoppedOnGracefulShutdown.contains(periodical), "periodical without graceful shutdown is in the list");
-        assertTrue(allStoppedOnGracefulShutdown.contains(periodical2), "graceful shutdown periodical is not in the list");
-        assertEquals(allStoppedOnGracefulShutdown.size(), 1, "more graceful shutdown periodicals in the list");
+        assertFalse("periodical without graceful shutdown is in the list", allStoppedOnGracefulShutdown.contains(periodical));
+        assertTrue("graceful shutdown periodical is not in the list", allStoppedOnGracefulShutdown.contains(periodical2));
+        assertEquals("more graceful shutdown periodicals in the list", allStoppedOnGracefulShutdown.size(), 1);
     }
 
     @Test
     public void testGetFutures() throws Exception {
         periodicals.registerAndStart(periodical);
 
-        assertTrue(periodicals.getFutures().containsKey(periodical), "missing periodical in future Map");
+        assertTrue("missing periodical in future Map", periodicals.getFutures().containsKey(periodical));
         assertEquals(periodicals.getFutures().size(), 1);
     }
 
@@ -166,7 +183,7 @@ public class PeriodicalsTest {
 
         periodicals.getFutures().put(periodical2, null);
 
-        assertFalse(periodicals.getFutures().containsKey(periodical2), "getFutures() did not return a copy of the Map");
+        assertFalse("getFutures() did not return a copy of the Map", periodicals.getFutures().containsKey(periodical2));
         assertEquals(periodicals.getFutures().size(), 1);
     }
 
@@ -221,13 +238,9 @@ public class PeriodicalsTest {
             }
         };
 
-        try {
-            periodical1.run();
-            // the uncaught exception from doRun should have been logged
-            verify(logger, atLeastOnce()).error(anyString(), any(Throwable.class));
-        } catch (Exception e) {
-            fail("run() should never propagate an unchecked exception!", e);
-        }
+        periodical1.run();
+        // the uncaught exception from doRun should have been logged
+        verify(logger, atLeastOnce()).error(anyString(), any(Throwable.class));
     }
 
     private ScheduledFuture<Object> createScheduledFuture() {

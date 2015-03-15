@@ -24,19 +24,22 @@ import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mockito;
-import org.testng.annotations.Test;
+import org.mockito.runners.MockitoJUnitRunner;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNotNull;
 
-@Test
+@RunWith(MockitoJUnitRunner.class)
 public class GelfOutputTest {
+    @Test
     public void testWrite() throws Exception {
         final GelfTransport transport = mock(GelfTransport.class);
         final Message message = mock(Message.class);
@@ -55,6 +58,7 @@ public class GelfOutputTest {
         verify(transport).send(eq(gelfMessage));
     }
 
+    @Test
     public void testGetRequestedConfiguration() throws Exception {
         final GelfOutput.Config gelfOutputConfig = new GelfOutput.Config();
 
@@ -77,6 +81,6 @@ public class GelfOutputTest {
 
         final GelfMessage gelfMessage = gelfOutput.toGELFMessage(message);
 
-        assertEquals(gelfMessage.getTimestamp(), now.getMillis() / 1000.0d);
+        assertEquals(gelfMessage.getTimestamp(), now.getMillis() / 1000.0d, 0.0d);
     }
 }

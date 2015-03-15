@@ -23,18 +23,18 @@ import org.graylog2.plugin.outputs.MessageOutputConfigurationException;
 import org.graylog2.plugin.streams.Output;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.shared.bindings.InstantiationService;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import org.mockito.runners.MockitoJUnitRunner;
 
 import java.util.Map;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.testng.Assert.*;
 
-@Test
+@RunWith(MockitoJUnitRunner.class)
 public class MessageOutputFactoryTest {
     @Mock
     private InstantiationService instantiationService;
@@ -46,14 +46,12 @@ public class MessageOutputFactoryTest {
         this.availableOutputs = Maps.newHashMap();
     }
 
-    @BeforeMethod
+    @Before
     public void setUp() throws Exception {
-        MockitoAnnotations.initMocks(this);
-
         this.messageOutputFactory = new MessageOutputFactory(instantiationService, availableOutputs);
     }
 
-    @Test(expectedExceptions = IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void testNonExistentOutputType() throws MessageOutputConfigurationException {
         final String outputType = "non.existent";
         final Output output = mock(Output.class);

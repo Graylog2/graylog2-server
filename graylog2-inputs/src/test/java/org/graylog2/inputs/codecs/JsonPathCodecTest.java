@@ -18,12 +18,12 @@ package org.graylog2.inputs.codecs;
 
 import com.google.common.collect.Maps;
 import org.graylog2.plugin.configuration.Configuration;
-import org.testng.annotations.Test;
+import org.junit.Test;
 
 import java.util.Map;
 
 import static org.graylog2.inputs.codecs.JsonPathCodec.CK_PATH;
-import static org.testng.AssertJUnit.assertEquals;
+import static org.junit.Assert.assertEquals;
 
 // TODO migrate test to use codec instead
 public class JsonPathCodecTest {

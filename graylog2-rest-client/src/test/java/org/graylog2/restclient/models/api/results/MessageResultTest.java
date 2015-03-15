@@ -21,12 +21,12 @@ import org.graylog2.restclient.lib.DateTools;
 import org.graylog2.restclient.models.FieldMapper;
 import org.graylog2.restclient.models.api.responses.HighlightRange;
 import org.joda.time.DateTime;
-import org.testng.annotations.Test;
+import org.junit.Test;
 
 import java.util.Collections;
 import java.util.List;
 
-import static org.testng.Assert.assertEquals;
+import static org.junit.Assert.assertEquals;
 
 public class MessageResultTest {
 

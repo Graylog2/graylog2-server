@@ -25,30 +25,33 @@ import org.jboss.netty.channel.ChannelUpstreamHandler;
 import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.handler.codec.frame.DelimiterBasedFrameDecoder;
 import org.jboss.netty.handler.codec.frame.Delimiters;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import org.mockito.runners.MockitoJUnitRunner;
 
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.testng.Assert.assertEquals;
 
+@RunWith(MockitoJUnitRunner.class)
 public class SyslogTCPFramingRouterHandlerTest {
     private ChannelUpstreamHandler handler;
 
-    @Mock private ChannelHandlerContext context;
-    @Mock private MessageEvent event;
-    @Mock private ChannelPipeline pipeline;
+    @Mock
+    private ChannelHandlerContext context;
+    @Mock
+    private MessageEvent event;
+    @Mock
+    private ChannelPipeline pipeline;
 
-    @BeforeMethod
+    @Before
     public void setUp() throws Exception {
-        MockitoAnnotations.initMocks(this);
-
         handler = new SyslogTCPFramingRouterHandler(2048, Delimiters.lineDelimiter());
 
         when(context.getPipeline()).thenReturn(pipeline);

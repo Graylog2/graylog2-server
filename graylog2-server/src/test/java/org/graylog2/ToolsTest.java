@@ -20,10 +20,10 @@
 
 package org.graylog2;
 
-import org.graylog2.plugin.Tools;
 import com.google.common.collect.Lists;
+import org.graylog2.plugin.Tools;
 import org.joda.time.DateTime;
-import org.testng.annotations.Test;
+import org.junit.Test;
 
 import java.io.ByteArrayOutputStream;
 import java.io.EOFException;
@@ -34,8 +34,10 @@ import java.util.List;
 import java.util.zip.Deflater;
 import java.util.zip.GZIPOutputStream;
 
-import static org.testng.AssertJUnit.*;
-import static org.testng.AssertJUnit.assertEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author lennart
@@ -121,7 +123,7 @@ public class ToolsTest {
         assertEquals(testString, Tools.decompressGzip(buffer));
     }
 
-    @Test(expectedExceptions = EOFException.class)
+    @Test(expected = EOFException.class)
     public void testDecompressGzipEmptyInput() throws IOException {
 
         Tools.decompressGzip(new byte[0]);

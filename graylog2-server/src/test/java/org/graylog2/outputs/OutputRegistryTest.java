@@ -24,24 +24,24 @@ import org.graylog2.plugin.outputs.MessageOutputConfigurationException;
 import org.graylog2.plugin.streams.Output;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.streams.OutputService;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import org.mockito.runners.MockitoJUnitRunner;
 
 import java.util.Set;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNotNull;
-import static org.testng.Assert.assertNull;
-import static org.testng.Assert.assertSame;
 
-@Test
+@RunWith(MockitoJUnitRunner.class)
 public class OutputRegistryTest {
     private static final long FAULT_COUNT_THRESHOLD = 5;
     private static final long FAULT_PENALTY_SECONDS = 30;
@@ -57,21 +57,21 @@ public class OutputRegistryTest {
     @Mock
     private org.graylog2.Configuration configuration;
 
-    @BeforeMethod
+    @Before
     public void setUp() throws Exception {
-        MockitoAnnotations.initMocks(this);
         when(configuration.getOutputFaultCountThreshold()).thenReturn(FAULT_COUNT_THRESHOLD);
         when(configuration.getOutputFaultPenaltySeconds()).thenReturn(FAULT_PENALTY_SECONDS);
     }
 
+    @Test
     public void testMessageOutputsIncludesDefault() {
         OutputRegistry registry = new OutputRegistry(messageOutput, null, null, null, null, FAULT_COUNT_THRESHOLD, FAULT_PENALTY_SECONDS);
 
         Set<MessageOutput> outputs = registry.getMessageOutputs();
-        assertSame(Iterables.getOnlyElement(outputs, null), messageOutput, "we should only have the default MessageOutput");
+        assertSame("we should only have the default MessageOutput", Iterables.getOnlyElement(outputs, null), messageOutput);
     }
 
-    @Test(expectedExceptions = IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void testThrowExceptionForUnknownOutputType() throws MessageOutputConfigurationException {
         when(messageOutputFactory.fromStreamOutput(eq(output), any(Stream.class), any(Configuration.class))).thenReturn(null);
         OutputRegistry registry = new OutputRegistry(null, null, messageOutputFactory, null, null, FAULT_COUNT_THRESHOLD, FAULT_PENALTY_SECONDS);
@@ -81,6 +81,7 @@ public class OutputRegistryTest {
         assertEquals(registry.getRunningMessageOutputs().size(), 0);
     }
 
+    @Test
     public void testLaunchNewOutput() throws Exception {
         final String outputId = "foobar";
         final Stream stream = mock(Stream.class);
@@ -97,6 +98,7 @@ public class OutputRegistryTest {
         assertEquals(outputRegistry.getRunningMessageOutputs().size(), 1);
     }
 
+    @Test
     public void testNonExistingInput() throws Exception {
         final String outputId = "foobar";
         final Stream stream = mock(Stream.class);
@@ -110,6 +112,7 @@ public class OutputRegistryTest {
         assertEquals(outputRegistry.getRunningMessageOutputs().size(), 0);
     }
 
+    @Test
     public void testInvalidOutputConfiguration() throws Exception {
         final String outputId = "foobar";
         final Stream stream = mock(Stream.class);

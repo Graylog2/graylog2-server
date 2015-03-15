@@ -20,23 +20,27 @@ import org.graylog2.restclient.models.User;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeUtils;
 import org.joda.time.DateTimeZone;
-import org.testng.annotations.AfterTest;
-import org.testng.annotations.BeforeTest;
-import org.testng.annotations.Test;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
-import static org.mockito.Mockito.mock;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
-import static org.testng.AssertJUnit.assertEquals;
 
+@RunWith(MockitoJUnitRunner.class)
 public class DateToolsTest {
+    @Mock
     private User user;
-    @BeforeTest
+
+    @Before
     public void beforeTest() {
-        this.user = mock(User.class);
         when(user.getTimeZone()).thenReturn(DateTimeZone.forID("Europe/Berlin"));
     }
 
-    @AfterTest
+    @After
     public void afterTest() {
         DateTimeUtils.setCurrentMillisSystem();
     }

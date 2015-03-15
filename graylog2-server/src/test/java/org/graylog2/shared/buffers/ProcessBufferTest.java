@@ -25,8 +25,10 @@ import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.journal.RawMessage;
 import org.graylog2.shared.buffers.processors.DecodingProcessor;
 import org.graylog2.shared.buffers.processors.ProcessBufferProcessor;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.runners.MockitoJUnitRunner;
 
 import javax.inject.Provider;
 
@@ -34,10 +36,7 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-/**
- * @author Dennis Oelkers <dennis@torch.sh>
- */
-@Test
+@RunWith(MockitoJUnitRunner.class)
 public class ProcessBufferTest {
     private MetricRegistry metricRegistry;
     private ServerStatus serverStatus;
@@ -54,13 +53,14 @@ public class ProcessBufferTest {
         return mockMetricRegistry;
     }
 
-    @BeforeMethod
+    @Before
     public void setUp() throws Exception {
         metricRegistry = getMockMetricRegistry();
         serverStatus = mock(ServerStatus.class);
         when(serverStatus.isProcessing()).thenReturn(true);
     }
 
+    @Test
     public void testBasicInsert() throws Exception {
         final Provider provider = mock(Provider.class);
         when(provider.get()).thenReturn(mock(ProcessBufferProcessor.class));

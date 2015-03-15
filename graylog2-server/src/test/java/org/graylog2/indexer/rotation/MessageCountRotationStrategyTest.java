@@ -20,25 +20,32 @@ import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.indexer.IndexNotFoundException;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.plugin.indexer.rotation.RotationStrategy;
-import org.testng.annotations.Test;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
-import static org.mockito.Mockito.*;
-import static org.testng.Assert.assertNull;
-import static org.testng.AssertJUnit.assertEquals;
-import static org.testng.AssertJUnit.assertNotNull;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
+@RunWith(MockitoJUnitRunner.class)
 public class MessageCountRotationStrategyTest {
+    @Mock
+    private ElasticsearchConfiguration configuration = mock(ElasticsearchConfiguration.class);
+    @Mock
+    private Indices indices = mock(Indices.class);
 
     @Test
     public void testRotate() throws IndexNotFoundException {
-        final ElasticsearchConfiguration configuration = mock(ElasticsearchConfiguration.class);
-        final Indices indices = mock(Indices.class);
-
         when(indices.numberOfMessages("name")).thenReturn(10L);
         when(configuration.getMaxDocsPerIndex()).thenReturn(5);
 
         final MessageCountRotationStrategy strategy = new MessageCountRotationStrategy(configuration,
-                                                                                       indices);
+                indices);
         final RotationStrategy.Result rotate = strategy.shouldRotate("name");
 
         assertNotNull(rotate);
@@ -47,14 +54,11 @@ public class MessageCountRotationStrategyTest {
 
     @Test
     public void testDontRotate() throws IndexNotFoundException {
-        final ElasticsearchConfiguration configuration = mock(ElasticsearchConfiguration.class);
-        final Indices indices = mock(Indices.class);
-
         when(indices.numberOfMessages("name")).thenReturn(1L);
         when(configuration.getMaxDocsPerIndex()).thenReturn(5);
 
         final MessageCountRotationStrategy strategy = new MessageCountRotationStrategy(configuration,
-                                                                                       indices);
+                indices);
 
         final RotationStrategy.Result rotate = strategy.shouldRotate("name");
 
@@ -65,18 +69,13 @@ public class MessageCountRotationStrategyTest {
 
     @Test
     public void testIndexUnavailable() throws IndexNotFoundException {
-        final ElasticsearchConfiguration configuration = mock(ElasticsearchConfiguration.class);
-        final Indices indices = mock(Indices.class);
-
         doThrow(IndexNotFoundException.class).when(indices).numberOfMessages("name");
         when(configuration.getMaxDocsPerIndex()).thenReturn(5);
 
         final MessageCountRotationStrategy strategy = new MessageCountRotationStrategy(configuration,
-                                                                                       indices);
+                indices);
         final RotationStrategy.Result rotate = strategy.shouldRotate("name");
 
         assertNull(rotate);
     }
-
-
 }
