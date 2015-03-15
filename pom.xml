@@ -103,7 +103,7 @@
         <guice.version>3.0</guice.version>
         <drools.version>6.1.0.Final</drools.version>
         <slf4j.version>1.7.10</slf4j.version>
-        <mongojack.version>2.1.0</mongojack.version>
+        <mongojack.version>2.3.0</mongojack.version>
         <findbugs.version>3.0.0</findbugs.version>
         <swagger.version>1.3.11</swagger.version>
         <sigar.version>1.6.4</sigar.version>
