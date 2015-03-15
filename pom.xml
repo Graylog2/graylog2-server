@@ -94,7 +94,7 @@
         <build.timestamp>${maven.build.timestamp}</build.timestamp>
 
         <metrics.version>3.1.0</metrics.version>
-        <jackson.version>2.5.0</jackson.version>
+        <jackson.version>2.5.1</jackson.version>
         <jersey.version>2.17</jersey.version>
         <!-- The HK2 version should match the version being used by Jersey -->
         <glassfish-hk2.version>2.4.0-b10</glassfish-hk2.version>
