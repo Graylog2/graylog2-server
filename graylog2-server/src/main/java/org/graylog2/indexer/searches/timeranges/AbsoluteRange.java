@@ -23,6 +23,9 @@ import org.joda.time.DateTime;
 import org.joda.time.format.ISODateTimeFormat;
 
 import java.util.Map;
+import java.util.Objects;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 public class AbsoluteRange implements TimeRange {
 
@@ -30,8 +33,8 @@ public class AbsoluteRange implements TimeRange {
     private final DateTime to;
 
     public AbsoluteRange(DateTime from, DateTime to) {
-        this.from = from;
-        this.to = to;
+        this.from = checkNotNull(from);
+        this.to = checkNotNull(to);
     }
 
     public AbsoluteRange(String from, String to) throws InvalidRangeParametersException {
@@ -88,5 +91,20 @@ public class AbsoluteRange implements TimeRange {
                 .add("from", getFrom())
                 .add("to", getTo())
                 .toString();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        AbsoluteRange that = (AbsoluteRange) o;
+        return from.equals(that.from) && to.equals(that.to);
+
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(from, to);
     }
 }

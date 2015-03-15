@@ -74,4 +74,18 @@ public class RelativeRange implements TimeRange {
                 .add("to", getTo())
                 .toString();
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        RelativeRange that = (RelativeRange) o;
+        return range == that.range;
+    }
+
+    @Override
+    public int hashCode() {
+        return range;
+    }
 }

@@ -220,12 +220,7 @@
             <dependency>
                 <groupId>org.elasticsearch</groupId>
                 <artifactId>elasticsearch</artifactId>
-                <version>1.3.7</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.lucene</groupId>
-                <artifactId>lucene-queryparser</artifactId>
-                <version>4.9.1</version>
+                <version>1.4.4</version>
             </dependency>
 
             <dependency>
@@ -672,6 +667,26 @@
                 <version>2.4.0</version>
                 <scope>test</scope>
             </dependency>
+
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>4.12</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.assertj</groupId>
+                <artifactId>assertj-core</artifactId>
+                <version>1.7.1</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.lordofthejars</groupId>
+                <artifactId>nosqlunit-elasticsearch</artifactId>
+                <version>0.8.1</version>
+                <scope>test</scope>
+            </dependency>
+
             <dependency>
                 <groupId>org.graylog.telemetry</groupId>
                 <artifactId>graylog-telemetry-plugin</artifactId>

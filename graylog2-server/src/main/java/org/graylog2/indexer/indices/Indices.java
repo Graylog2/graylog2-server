@@ -16,6 +16,7 @@
  */
 package org.graylog2.indexer.indices;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -84,7 +85,12 @@ public class Indices implements IndexManagement {
 
     @Inject
     public Indices(Node node, ElasticsearchConfiguration configuration) {
-        this.c = node.client();
+        this(node.client(), configuration);
+    }
+
+    @VisibleForTesting
+    public Indices(Client client, ElasticsearchConfiguration configuration) {
+        this.c = client;
         this.configuration = configuration;
     }
 

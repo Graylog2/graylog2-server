@@ -22,6 +22,7 @@ import org.graylog2.utilities.date.NaturalDateParser;
 import org.joda.time.DateTime;
 
 import java.util.Map;
+import java.util.Objects;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 
@@ -101,6 +102,21 @@ public class KeywordRange implements TimeRange {
                 .add("from", getFrom())
                 .add("to", getTo())
                 .toString();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        KeywordRange that = (KeywordRange) o;
+        return dynamic == that.dynamic && keyword.equals(that.keyword);
+
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(keyword, dynamic);
     }
 }
 

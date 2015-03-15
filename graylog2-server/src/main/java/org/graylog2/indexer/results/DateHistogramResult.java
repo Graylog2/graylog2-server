@@ -19,40 +19,35 @@ package org.graylog2.indexer.results;
 import com.google.common.collect.Maps;
 import org.elasticsearch.common.bytes.BytesReference;
 import org.elasticsearch.common.unit.TimeValue;
-import org.elasticsearch.search.facet.datehistogram.DateHistogramFacet;
+import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogram;
 import org.graylog2.indexer.searches.Searches;
 
 import java.util.Map;
 
-/**
- * @author Lennart Koopmann <lennart@socketfeed.com>
- */
 public class DateHistogramResult extends HistogramResult {
-	
-	private final DateHistogramFacet result;
-	private final Searches.DateHistogramInterval interval;
+    private final DateHistogram result;
+    private final Searches.DateHistogramInterval interval;
 
-	public DateHistogramResult(DateHistogramFacet result, String originalQuery, BytesReference builtQuery, Searches.DateHistogramInterval interval, TimeValue took) {
+    public DateHistogramResult(DateHistogram result, String originalQuery, BytesReference builtQuery, Searches.DateHistogramInterval interval, TimeValue took) {
         super(originalQuery, builtQuery, took);
 
-		this.result = result;
-		this.interval = interval;
-	}
+        this.result = result;
+        this.interval = interval;
+    }
 
     @Override
-	public Searches.DateHistogramInterval getInterval() {
-		return interval;
-	}
+    public Searches.DateHistogramInterval getInterval() {
+        return interval;
+    }
 
     @Override
-	public Map<Long, Long> getResults() {
-		Map<Long, Long> results = Maps.newTreeMap();
-		
-		for (DateHistogramFacet.Entry e : result) {
-			results.put(e.getTime()/1000, e.getCount());
-		}
-		
-		return results;
-	}
-	
+    public Map<Long, Long> getResults() {
+        Map<Long, Long> results = Maps.newTreeMap();
+
+        for (DateHistogram.Bucket bucket : result.getBuckets()) {
+            results.put(bucket.getKeyAsDate().getMillis() / 1000L, bucket.getDocCount());
+        }
+
+        return results;
+    }
 }
