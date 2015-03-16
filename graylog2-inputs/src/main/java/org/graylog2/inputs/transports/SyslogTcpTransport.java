@@ -62,7 +62,7 @@ public class SyslogTcpTransport extends TcpTransport {
         return new InstrumentedExecutorService(
                 Executors.newCachedThreadPool(threadFactory),
                 metricRegistry,
-                name(HttpTransport.class, executorName, "executor-service"));
+                name(SyslogTcpTransport.class, executorName, "executor-service"));
     }
 
 
