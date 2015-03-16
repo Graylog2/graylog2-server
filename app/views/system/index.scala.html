@@ -12,7 +12,7 @@
 @import views.helpers.Permissions._
 @import views.helpers.DateHelper
 
-@main("System", views.html.system.sidebar(), "", currentUser, false) {
+@main("System", null, "", currentUser, false) {
 
     @if(isPermitted(NOTIFICATIONS_READ)) {
         <div class="row content">

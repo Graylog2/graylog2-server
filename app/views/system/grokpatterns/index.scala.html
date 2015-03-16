@@ -2,7 +2,7 @@
         breadcrumbs: lib.BreadcrumbList,
         patterns: java.util.TreeSet[org.graylog2.restclient.models.GrokPattern])
 
-@main("Grok patterns", views.html.system.sidebar(), "", currentUser) {
+@main("Grok patterns", null, "", currentUser) {
         @views.html.partials.breadcrumbs(breadcrumbs)
 
         <div class="row-fluid">

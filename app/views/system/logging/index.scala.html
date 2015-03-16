@@ -1,6 +1,6 @@
 @(currentUser: org.graylog2.restclient.models.User, breadcrumbs: lib.BreadcrumbList, loggers: Map[org.graylog2.restclient.models.Node, List[org.graylog2.restclient.models.InternalLogger]], subsystems: Map[org.graylog2.restclient.models.Node, Map[String, org.graylog2.restclient.models.InternalLoggerSubsystem]])
 @import org.graylog2.restclient.models._
-@main("Logging", views.html.system.sidebar(), "", currentUser) {
+@main("Logging", null, "", currentUser) {
 
     @views.html.partials.breadcrumbs(breadcrumbs)
 
