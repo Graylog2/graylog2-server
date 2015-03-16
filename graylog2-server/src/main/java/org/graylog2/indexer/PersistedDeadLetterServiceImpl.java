@@ -44,9 +44,9 @@ public class PersistedDeadLetterServiceImpl extends PersistedServiceImpl impleme
     @Override
     public PersistedDeadLetter create(String id, String letterId, DateTime timestamp, Map<String, Object> message) {
         Map<String, Object> doc = Maps.newHashMap();
-        doc.put("letter_id", letterId);
-        doc.put("timestamp", timestamp);
-        doc.put("message", message);
+        doc.put(PersistedDeadLetterImpl.LETTERID, letterId);
+        doc.put(PersistedDeadLetterImpl.TIMESTAMP, timestamp);
+        doc.put(PersistedDeadLetterImpl.MESSAGE, message);
 
         return new PersistedDeadLetterImpl(new ObjectId(id), doc);
     }
