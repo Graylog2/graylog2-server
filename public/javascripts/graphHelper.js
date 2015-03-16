@@ -13,14 +13,16 @@
     ];
 
     var intervalResolutions = [
-        { interval: 'year',  unit: 'year',  step: 1,  condition: function(duration) { return duration.years() > 1 }},
-        { interval: 'month', unit: 'month', step: 1,  condition: function(duration) { return duration.years() === 1 || duration.months() > 1 }},
-        { interval: 'day',   unit: 'date',  step: 2,  condition: function(duration) { return duration.months() === 1 || duration.days() > 10 }},
-        { interval: 'day',   unit: 'date',  step: 1,  condition: function(duration) { return duration.days() > 3 }},
-        { interval: 'hour',  unit: 'hour',  step: 12, condition: function(duration) { return duration.days() > 1 }},
-        { interval: 'hour',  unit: 'hour',  step: 3,  condition: function(duration) { return duration.days() == 1 }},
-        { interval: 'hour',  unit: 'hour',  step: 1,  condition: function(duration) { return duration.hours() > 1 }},
-        { interval: 'minute',  unit: 'minute',  step: 10,  condition: function() { return true }}
+        { interval: 'year',    unit: 'year',    step: 1,  condition: function(duration) { return duration.years() > 1 }},
+        { interval: 'month',   unit: 'month',   step: 1,  condition: function(duration) { return duration.years() === 1 || duration.months() > 1 }},
+        { interval: 'day',     unit: 'date',    step: 2,  condition: function(duration) { return duration.months() === 1 || duration.days() > 10 }},
+        { interval: 'day',     unit: 'date',    step: 1,  condition: function(duration) { return duration.days() > 3 }},
+        { interval: 'hour',    unit: 'hour',    step: 12, condition: function(duration) { return duration.days() > 1 }},
+        { interval: 'hour',    unit: 'hour',    step: 3,  condition: function(duration) { return duration.days() === 1 }},
+        { interval: 'hour',    unit: 'hour',    step: 1,  condition: function(duration) { return duration.hours() > 1 }},
+        { interval: 'minute',  unit: 'minute',  step: 10, condition: function(duration) { return duration.hours() === 1 || duration.minutes() > 30 }},
+        { interval: 'minute',  unit: 'minute',  step: 5,  condition: function(duration) { return duration.minutes() > 15 }},
+        { interval: 'minute',  unit: 'minute',  step: 1,  condition: function() { return true }}
     ];
 
     var exports = {
