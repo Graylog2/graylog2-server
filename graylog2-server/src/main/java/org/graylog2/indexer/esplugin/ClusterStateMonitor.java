@@ -29,10 +29,14 @@ import org.graylog2.indexer.cluster.Cluster;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.EnumSet;
 import java.util.HashMap;
 
 public class ClusterStateMonitor extends org.elasticsearch.common.component.AbstractLifecycleComponent<ClusterStateMonitor> implements ClusterStateListener {
     private static final Logger log = LoggerFactory.getLogger(ClusterStateMonitor.class);
+    private static final EnumSet<ClusterState.ClusterStateStatus> VALID_CLUSTER_STATES =
+            EnumSet.of(ClusterState.ClusterStateStatus.BEING_APPLIED, ClusterState.ClusterStateStatus.APPLIED);
+
     private final ClusterService clusterService;
 
     // Yes, this sucks, but ES and Graylog use different injectors and it's not obvious how to bridge them, so I'm using a static. Shoot me.
@@ -51,7 +55,7 @@ public class ClusterStateMonitor extends org.elasticsearch.common.component.Abst
 
     @Override
     public void clusterChanged(ClusterChangedEvent event) {
-        if(event.previousState().status() != ClusterState.ClusterStateStatus.APPLIED) {
+        if (!VALID_CLUSTER_STATES.contains(event.state().status())) {
             // Only process fully applied cluster states
             return;
         }
@@ -63,7 +67,7 @@ public class ClusterStateMonitor extends org.elasticsearch.common.component.Abst
             // ignore events that don't contain node changes, we don't need to track this now
             return;
         }
-        if (cluster != null){
+        if (cluster != null) {
             final HashMap<String, DiscoveryNode> nodes = Maps.newHashMap();
             for (ObjectObjectCursor<String, DiscoveryNode> cursor : event.state().getNodes().dataNodes()) {
                 nodes.put(cursor.key, cursor.value);
