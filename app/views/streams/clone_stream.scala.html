@@ -1,15 +1,23 @@
-@(currentUser: org.graylog2.restclient.models.User, streamId: String)
+@(currentUser: org.graylog2.restclient.models.User, streamId: String, breadcrumbs: lib.BreadcrumbList)
 
-@main("Clone stream", views.html.sidebars.standard(currentUser), "", currentUser) {
-    <h1>
-        <i class="icon-pushpin"></i>
-        Clone stream
-    </h1>
+@main("Clone stream", views.html.sidebars.standard(currentUser), "", currentUser, false) {
 
-    <p>
-        Streams allow you to tag your data when it arrives. Create a stream called <em>SSH logins</em> and add rules that
-        match every message notifying about a SSH login. You will get quick access to all login messages, charts and
-        analysis of logins and can even define actions to trigger when a login was performed.
-    </p>
-    @views.html.partials.streams.stream_form.render(routes.StreamsController.cloneStream(streamId), null, "Clone stream and continue")
+    @views.html.partials.breadcrumbs(breadcrumbs)
+
+    <div class="row content content-head">
+        <div class="col-md-10">
+            <h1>Clone stream</h1>
+
+            <p class="description">
+                Copy a stream and all it's settings into a new stream.
+            </p>
+        </div>
+    </div>
+
+    <div class="row content">
+        <div class="col-md-12">
+            @views.html.partials.streams.stream_form.render(routes.StreamsController.cloneStream(streamId), null, "Clone stream and continue")
+        </div>
+    </div>
+
 }

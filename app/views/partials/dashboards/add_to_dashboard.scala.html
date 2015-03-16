@@ -1,25 +1,9 @@
-@(widgetType: String, params: Array[String])
-@import lib.security.RestPermissions
-@import views.helpers.Permissions
+@(widgetType: String, text: String, params: Array[String])
 
 <div class="btn-group">
-    <a data-toggle="dropdown" href="#" class="add-to-dashboard" data-widget-type="@widgetType">
-        <i class="icon icon-dashboard" title="Add to dashboard"></i>
+    <a data-toggle="dropdown" href="#" class="btn btn-sm btn-info add-to-dashboard" data-widget-type="@widgetType">
+        @text
     </a>
 
-    @****** the actual dashboards are loaded in here using JS ****@
-
-    <ul class="dropdown-menu dashboard-selector" data-widget-type="@widgetType"
-        @if(params != null) {
-            @for(param <- params) {
-                @Html(param)
-            }
-        }
-    >
-        @if(Permissions.isPermitted(RestPermissions.DASHBOARDS_CREATE)) {
-            <li>
-                <a href="@routes.DashboardsController.newDashboard()">No dashboards. Create one?</a>
-            </li>
-        }
-    </ul>
+    @views.html.partials.dashboards.add_to_dashboard_base_selector.render(widgetType, params)
 </div>

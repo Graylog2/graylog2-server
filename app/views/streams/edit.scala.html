@@ -1,15 +1,22 @@
-@(currentUser: org.graylog2.restclient.models.User, stream: org.graylog2.restclient.models.Stream)
+@(currentUser: org.graylog2.restclient.models.User, stream: org.graylog2.restclient.models.Stream, breadcrumbs: lib.BreadcrumbList)
 
-@main("Edit stream", views.html.sidebars.standard(currentUser), "", currentUser) {
-    <h1>
-        <i class="icon-pushpin"></i>
-        Edit stream &raquo;@stream.getTitle&laquo;
-    </h1>
+@main("Edit stream", views.html.sidebars.standard(currentUser), "", currentUser, false) {
+    @views.html.partials.breadcrumbs(breadcrumbs)
 
-    <div class="row-fluid">
-        Use this page to change basic settings of the stream. The stream rules are configured in an
-        <a href="@routes.StreamRulesController.index(stream.getId)">own interface</a>.
+    <div class="row content content-head">
+        <div class="col-md-10">
+            <h1>Edit stream &raquo;@stream.getTitle&laquo;</h1>
+
+            <p class="description">
+                Use this page to change basic settings of the stream. The stream rules are configured
+                <a href="@routes.StreamRulesController.index(stream.getId)">here</a>.
+            </p>
+        </div>
     </div>
 
-    @views.html.partials.streams.stream_form.render(routes.StreamsController.update(stream.getId), stream, "Update stream")
+    <div class="row content">
+        <div class="col-md-12">
+            @views.html.partials.streams.stream_form.render(routes.StreamsController.update(stream.getId), stream, "Update stream")
+        </div>
+    </div>
 }

@@ -87,7 +87,7 @@ $(document).ready(function() {
         dashboardSelectors.each(function() {
             var dashboardSelector = $(this);
             if (dashboardSelector.children().length === 0) {
-                var link = "<li><a href='#'>You cannot add widgets to any dashboard</a></li>";
+                var link = "<li><a href='#'>No dashboard with enough permissions to add widgets.</a></li>";
                 dashboardSelector.append(link);
             }
         });

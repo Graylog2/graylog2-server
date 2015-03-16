@@ -24,7 +24,7 @@ public class InputFailedToStartNotification implements NotificationType {
                 "This means that you are unable to receive any messages from this input. This is mostly " +
                 "an indication for a misconfiguration or an error. " + "" +
                 "You can click <a href='" + routes.InputsController.index() + "'>here</a> to solve this";
-        TITLE = "An input has failed to start.";
+        TITLE = "An input has failed to start";
     }
 
     @Override

@@ -2,26 +2,26 @@
 
 @if(clusterHealth == null) {
     <div class="es-cluster-status alert alert-error">
-        <i class="icon icon-ambulance"></i> <strong>Cluster information currently unavailable</strong>
+        <i class="fa fa-ambulance"></i> <strong>Cluster information currently unavailable</strong>
     </div>
 } else {
     @if(clusterHealth.isGreen) {
         <div class="es-cluster-status alert alert-success">
-            <i class="icon icon-ok-sign"></i> &nbsp;Elasticsearch cluster is green.
+            <i class="fa fa-check-circle"></i> &nbsp;Elasticsearch cluster is green.
             }
 
     @if(clusterHealth.isYellow) {
         <div class="es-cluster-status alert alert-warning">
-            <i class="icon icon-warning-sign"></i> &nbsp;<strong>Elasticsearch cluster is yellow.</strong>
+            <i class="fa fa-warning"></i> &nbsp;<strong>Elasticsearch cluster is yellow.</strong>
             }
 
     @if(clusterHealth.isRed) {
         <div class="es-cluster-status alert alert-error">
-            <i class="icon icon-ambulance"></i> &nbsp;<strong>Elasticsearch cluster is red.</strong>
+            <i class="fa fa-ambulance"></i> &nbsp;<strong>Elasticsearch cluster is red.</strong>
             }
 
     <div class="pull-right">
-        Shards:
+        <strong>Shards:</strong>
         @clusterHealth.getActiveShards active,
         @clusterHealth.getInitializingShards initializing,
         @clusterHealth.getRelocatingShards relocating,

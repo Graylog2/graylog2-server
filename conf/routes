@@ -29,7 +29,7 @@ GET         /streams                                                            
 GET         /streams/new                                                             @controllers.StreamsController.newStream()
 POST        /streams/new                                                             @controllers.StreamsController.create()
 GET         /streams/:stream_id/messages                                             @controllers.StreamSearchController.index(stream_id: String, q ?= "", rangetype ?= "", relative:Integer ?= -1, from ?= "", to ?= "", keyword ?= "", interval ?= "", page:Integer ?= 1, saved:String ?= "", sortField:String ?= "", sortOrder:String ?= "", fields: String ?= "", width:Integer ?= -1)
-POST        /streams/:stream_id/delete                                               @controllers.StreamsController.delete(stream_id: String)
+GET         /streams/:stream_id/delete                                               @controllers.StreamsController.delete(stream_id: String)
 POST        /streams/:stream_id/rules/:streamrule_id/delete                          @controllers.StreamRulesController.delete(stream_id: String, streamrule_id: String)
 GET         /streams/:stream_id/rules                                                @controllers.StreamRulesController.index(stream_id: String)
 POST        /streams/:stream_id/rules                                                @controllers.StreamRulesController.create(stream_id: String)

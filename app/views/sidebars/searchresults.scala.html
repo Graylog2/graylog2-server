@@ -1,97 +1,82 @@
 @(searchResult: org.graylog2.restclient.models.api.results.SearchResult, streamId: String, selectedFields: Set[String])
 
-<h2>
-	<i class="icon-search"></i>
-	Search results
-</h2>
+<h1>Search results</h1>
 
-
-	Found
+<h3 style="margin-top: 10px;">
+    Found
     <span class="number-format" data-format="0,0">@searchResult.getTotalResultCount()</span>
-    messages in
-    <span class="number-format" data-format="0,0">@searchResult.getTookMs()</span>ms,
-    searched in
-
-    <a href="#used-indices" role="button" data-toggle="modal" data-backdrop="true">
-        @searchResult.getUsedIndices().size()
-        @if(searchResult.getUsedIndices().size() == 1) {index} else {indices}</a>.
-
-
-@if(searchResult.getTotalResultCount() > 0) {
-<h3>
-    Message fields
-    <span class="message-result-fields-range">
-        <a href="#" class="page" style="font-weight: bold;">of current page</a>
-        /
-        <a href="#" class="all">all</a>
-    </span>
+    messages
 </h3>
 
-<div>
-    <h4>Quick select fields</h4>
-    <div class="message-result-fields-set pull-left">
-        <div class="btn-group">
-            <button class="btn btn-mini fields-set-chooser" data-fields-set="default">Default</button>
-            <button class="btn btn-mini fields-set-chooser" data-fields-set="none">None</button>
-            <button class="btn btn-mini fields-set-chooser" data-fields-set="all">All</button>
-        </div>
-    </div>
-    <div class="message-result-fields-search input-prepend">
-        <span class="add-on"><i class="icon icon-search"></i></span>
-        <input type="text" />
-    </div>
-</div>
-<div class="nano">
-    <div class="content">
-        <div class="inner-content">
-            <ul class="search-result-fields" data-selected="page">
-                @for(f <- searchResult.getPageFields().sortBy(_.getName)) {
-                    <li class="search-result-field-type page">
-                        @views.html.sidebars.partials.search_result_field.render(f, streamId, selectedFields)
-                    </li>
+<p style="margin-top: 3px;">
+    Search job took <span class="number-format" data-format="0,0">@searchResult.getTookMs()</span>ms, searched in
+    <a href="#used-indices" role="button" data-toggle="modal" data-backdrop="true">@searchResult.getUsedIndices().size() @if(searchResult.getUsedIndices().size() == 1) {index} else {indices}</a>.
+</p>
+
+<p style="margin-top: 10px;">
+    @if(streamId == null || streamId.isEmpty) {
+        @views.html.partials.dashboards.add_to_dashboard.render("search_result_count", "Add count to dashboard", null)
+    } else {
+        @views.html.partials.dashboards.add_to_dashboard.render("stream_search_result_count", "Add count to dashboard", Array("data-stream-id='" + streamId + "'"))
+    }
+
+    <a href="#" class="btn btn-success btn-sm">Save search criteria</a>
+</p>
+
+<hr />
+
+<h1 style="display: inline-block">Filter</h1>
+
+<a href="#" class="fields-set-chooser" data-fields-set="default">Default</a>
+|
+<a href="#" class="fields-set-chooser" data-fields-set="none">None</a>
+|
+<a href="#" class="fields-set-chooser" data-fields-set="all">All</a>
+
+<ul class="search-result-fields" data-selected="page">
+    @for(f <- searchResult.getPageFields().sortBy(_.getName)) {
+        <li class="search-result-field-type page">
+        @views.html.sidebars.partials.search_result_field.render(f, streamId, selectedFields)
+        </li>
+    }
+
+    @for(f <- searchResult.getAllFields().sortBy(_.getName)) {
+        <li class="search-result-field-type all" style="display : none ;">
+        @views.html.sidebars.partials.search_result_field.render(f, streamId, selectedFields)
+        </li>
+    }
+</ul>
+
+<p style="margin-top: 13px; margin-bottom: 0px;">
+    List
+    <span class="message-result-fields-range">
+        <a href="#" class="page" style="font-weight: bold;">fields of current page</a>
+        or
+        <a href="#" class="all">all fields</a>.
+    </span>
+</p>
+
+<div id="used-indices" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h2 class="modal-title">Used indices</h2>
+                Graylog is intelligently selecting the indices it needs to search upon based on the time frame you selected.
+                This list of indices is mainly useful for debugging purposes.
+            </div>
+            <div class="modal-body">
+                <h3>Indices used for this search:</h3>
+
+                <ul class="index-list">
+                @for(index <- searchResult.getUsedIndices()) {
+                    <li>@index.index</li>
                 }
-
-                @for(f <- searchResult.getAllFields().sortBy(_.getName)) {
-                    <li class="search-result-field-type all" style="display: none;">
-                        @views.html.sidebars.partials.search_result_field.render(f, streamId, selectedFields)
-                    </li>
-                }
-            </ul>
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
         </div>
-    </div>
-</div>
-
-<div class="result-highlight-control" style="display: none">
-    <input type="checkbox" class="toggle-result-highlight" id="toggle-highlighting" checked /> <label for="toggle-highlighting">Highlight matches</label>
-</div>
-
-<div class="explain-result-highlight-control" style="display: none">
-    <i class="icon icon-lightbulb"></i>
-    Learn about search result highlighting
-    <a href="https://www.graylog.org/documentation/setup/searchresulthighlighting/" target="_blank">here</a>.
-</div>
-
-}
-
-<div id="used-indices" class="modal hide fade" tabindex="-1" role="dialog">
-    <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal">x</button>
-        <h2>Used indices</h2>
-        Graylog is intelligently selecting the indices it needs to search upon based on the timeframe you selected.
-        This list of indices is mainly useful for debugging purposes.
-    </div>
-
-    <div class="modal-body">
-        <h4>Indices used for this search:</h4>
-
-        <ul class="index-list">
-        @for(index <- searchResult.getUsedIndices()) {
-            <li>@index.index</li>
-        }
-        </ul>
-    </div>
-
-    <div class="modal-footer">
-        <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
     </div>
 </div>

@@ -26,9 +26,9 @@
         0 messages found.
 
         @if(stream == null) {
-            @views.html.partials.dashboards.add_to_dashboard.render("search_result_count", null)
+            @views.html.partials.dashboards.add_to_dashboard.render("search_result_count", "Add to dashboard", null)
         } else {
-            @views.html.partials.dashboards.add_to_dashboard.render("stream_search_result_count", Array("data-stream-id='" + stream.getId + "'"))
+            @views.html.partials.dashboards.add_to_dashboard.render("stream_search_result_count", "Add to dashboard", Array("data-stream-id='" + stream.getId + "'"))
         }
     </h4>
     </p>

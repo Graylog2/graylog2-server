@@ -7,22 +7,25 @@
 
 <li data-streamrule-id="@streamRule.getId">
     <i class="match-status" style="display: none:"></i> <!-- placeholder for rule checks -->
-    @streamRule
 
     @if(isPermitted(STREAMS_EDIT, streamRule.getStreamId)) {
-    <a class="edit-streamrule" href="#"
-        data-streamrule-id="@streamRule.getId">
-        <i class="icon-edit"></i>
-    </a>
-
-    <a class="remove-streamrule" href="#"
+        <a class="remove-streamrule" href="#"
         data-stream-id="@streamRule.getStreamId"
         data-removeUrl="@routes.StreamRulesController.delete(streamRule.getStreamId, streamRule.getId)">
-        <i class="icon-remove"></i>
-    </a>
-    <div style="position:absolute;color:#000000">
-        @views.html.partials.streamrules.stream_rule_form.render(streamRule.getStreamId, streamRule)
-    </div>
+            <i class="fa fa-trash-o"></i>
+        </a>
+
+
+        <a class="edit-streamrule" href="#"
+            data-streamrule-id="@streamRule.getId">
+            <i class="fa fa-edit"></i>
+        </a>
+
+        &nbsp;Field @streamRule
+
+        <div style="position:absolute;color:#000000">
+            @views.html.partials.streamrules.stream_rule_form.render(streamRule.getStreamId, streamRule)
+        </div>
     }
 
 </li>

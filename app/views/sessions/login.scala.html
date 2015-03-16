@@ -4,32 +4,35 @@
 
 <div class="container" id="login-box">
 	<div class="row">
-		<div class="span4 offset4 well" id="login-box-content">
+		<div class="col-md-4 col-md-offset-4 well" id="login-box-content">
 			<legend><i class="icon-group"></i> Welcome to Graylog</legend>
 
             @if(flash.get("error") != null && !flash.get("error").isEmpty()) {
-                <div class="alert alert-error">
+                <div class="alert alert-danger">
                     <a class="close" data-dismiss="alert" href="#">×</a>@flash.get("error")
                 </div>
             }
 
             @helper.form(action = controllers.routes.SessionsController.create()) {
                 <input type="hidden" name="destination" value="@destination">
-                <input type="text" id="username" class="span4" name="username" placeholder="Username" value="@loginForm.field("username").value()" autofocus @if(disconnected) {disabled}>
-                <input type="password" id="password" class="span4" name="password" placeholder="Password" @if(disconnected) {disabled}>
+
+                <div class="form-group">
+                    <input type="text" class="form-control" id="username" name="username" placeholder="Username" value="@loginForm.field("username").value()" autofocus @if(disconnected) {disabled}>
+                </div>
+
+                <div class="form-group">
+                    <input type="password" class="form-control" id="password" name="password" placeholder="Password" @if(disconnected) {disabled}>
+                </div>
+
                 <a id="checkconnection" class="btn btn-warning btn-block @if(!disconnected){hidden}" href="@routes.LonesomeInterfaceController.index()">Check server connections</a>
                 <button type="submit" id="signin" name="submit" class="btn btn-info btn-block @if(disconnected){hidden}">Sign in</button>
 
                 <div class="login-advanced">
-                    <div class="footer hidden pull-right">
+                    <div class="footer pull-right">
                         <span id="total-count-zero" class="hidden">No configured node was ever reached.</span>
                         <span id="total-count-nonzero"><span id="connected-count"></span> of <span id="total-count"></span> nodes connected.</span>
                     </div>
-
-                    <label>
-                        <input type="checkbox" name="noStartpage" value="true" />
-                        Skip custom startpage
-                    </label>
+                    <br style="clear: both;" />
                 </div>
             }
 		</div>

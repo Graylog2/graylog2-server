@@ -94,11 +94,11 @@ $(document).ready(function() {
 
     // Node heap usage.
     (function updateNodeHeapUsage() {
-        if ($(".node-heap-usage").length > 0) {
+        if ($(".graylog-node-heap").length > 0) {
             var interval = 1000;
             if (!assertUpdateEnabled(updateNodeHeapUsage)) return;
 
-            $(".node-heap-usage").each(function(i) {
+            $(".graylog-node-heap").each(function(i) {
                 var nodeType = $(this).attr("data-node-type");
                 var url;
                 if (!!nodeType && $(this).attr("data-node-type") == "radio") {
@@ -122,7 +122,7 @@ $(document).ready(function() {
                     },
                     complete: function() {
                         // Trigger next call of the whole function when we updated the last element.
-                        if (i == $(".node-heap-usage").length-1) {
+                        if (i == $(".graylog-node-heap").length-1) {
                             setTimeout(updateNodeHeapUsage, interval);
                         }
                     }
@@ -359,23 +359,6 @@ $(document).ready(function() {
                 var count = data.length;
                 if (count > 0) {
                     notificationBadgeElement.text(count);
-                    var urgent = data.filter(function(x) { return x.severity == "URGENT"});
-                    if (urgent.length > 0) {
-                        if (!notificationBadgeElement.data("bouncing")) {
-                            var bouncer = setInterval(function() {
-                                if (notificationBadgeElement.data("bouncing")) {
-                                    notificationBadgeElement.effect("fade", "fast");
-                                }
-                            }, 750);
-
-                            $("#notification-badge").data("bouncing", bouncer);
-                        }
-                    } else {
-                        if (notificationBadgeElement.data("bouncing")) {
-                            clearInterval(notificationBadgeElement.data("bouncing"));
-                            notificationBadgeElement.data("bouncing", undefined);
-                        }
-                    }
                     notificationBadgeElement.show();
                 } else {
                     // Badges are collapsing when empty so we make a 0 collapse.

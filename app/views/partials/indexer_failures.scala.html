@@ -7,7 +7,11 @@
     </div>
 } else {
     <div class="alert alert-success">
-        <i class="icon icon-ok-sign"></i> &nbsp;No failed indexing attempts in the last 24 hours.
-        &nbsp; <a href="@routes.IndicesController.failures()"><i class="icon icon-caret-right"></i> Show all errors</a>
+        <i class="fa fa-check-circle"></i> &nbsp;No failed indexing attempts in the last 24 hours.
+
+
+        <a href="@routes.IndicesController.failures()" class="btn btn-xs pull-right btn-info">
+            <i class="fa fa-caret-right"></i> Show all errors
+        </a>
     </div>
 }

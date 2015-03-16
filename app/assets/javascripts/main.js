@@ -45,7 +45,6 @@ $(document).ready(function() {
 
         messageId = nextRow.attr("data-message-id");
         index = nextRow.attr("data-source-index");
-        displayMessageInSidebar(nextRow, messageId, index);
     });
 
     Mousetrap.bind('<', function() {
@@ -66,99 +65,8 @@ $(document).ready(function() {
 
         messageId = prevRow.attr("data-message-id");
         index = prevRow.attr("data-source-index");
-        displayMessageInSidebar(prevRow, messageId, index);
     });
 
-    function displayMessageInSidebar(row, messageId, index) {
-        // Highlight message.
-        $(".messages tbody > tr").removeClass("message-highlighted");
-        $(row).addClass("message-highlighted");
-
-        // Hide original sidebar and show ours again if it was already hidden before.
-        $("#sidebar-original").hide();
-        $("#sidebar-replacement").show();
-
-        // Show loading spinner. Will be replaced onSuccess.
-        spinner = "<h2><i class='icon-refresh icon-spin'></i> &nbsp;Loading message</h2>";
-        $("#sidebar-replacement").html(spinner);
-
-        $.get(appPrefixed("/messages/" + index + "/" + messageId + "/partial"), function(data) {
-            $("#sidebar-replacement").html(data);
-        })
-
-            .fail(function() { displayFailureInSidebar("Sorry, could not load message."); })
-
-            .complete(function() {
-
-                sizeSidebar();
-
-                // Inject terms of a message when modal is requested.
-                $('.terms-msg-modal').on('show', function() {
-                    messageId = $(this).attr("data-msg-id");
-                    spinner = $("#terms-msg-" + messageId + " .modal-body .spinner");
-                    list = $("#terms-msg-" + messageId + " .modal-body ul");
-                    list_link = $("#terms-msg-" + messageId + "-as-list");
-
-                    if ($(this).attr("data-loaded") != "true") {
-                        $.get(appPrefixed("/a/analyze/" + index + "/" + messageId + "/message"), function(data) {
-                            if (data.length > 0) {
-                                for(var i = 0; i < data.length; i++) {
-                                    list.append("<li>" + data[i] + "</li>");
-                                }
-                            } else {
-                                list.append("<li>No terms extracted</li>")
-                            }
-
-                            // Hide spinner, show list link.
-                            spinner.hide();
-                            list_link.show();
-                        });
-
-                        // Mark as already loaded so we don't add the terms again on next open.
-                        $(this).attr("data-loaded", "true");
-                    }
-
-                    // Show as list link.
-                    list_link.bind("click", function() {
-                        list.addClass("as-list");
-                        $(this).hide();
-                        return false;
-                    });
-                });
-            })
-    }
-
-    // Opening messages in sidebar with click in message result table.
-	$(".messages tbody > tr").bind("click", function() {
-		messageId = $(this).attr("data-message-id");
-		index = $(this).attr("data-source-index");
-
-        displayMessageInSidebar(this, messageId, index);
-	});
-
-	// Go back in sidebar history / Show original sidebar.
-	$(document).on("click", ".sidebar-back", function() {
-		$("#sidebar-replacement").hide();
-		$("#sidebar-original").show();
-
-		// Remove highlighting.
-		$(".messages tbody > tr").removeClass("message-highlighted");
-
-        // Set old sidebar to the correct height again.
-        sizeSidebar();
-	});
-
-    // Hide sidebar completely.
-    $(document).on("click", ".sidebar-hide", function() {
-        hideSidebar();
-    });
-
-    $(document).on("click", ".sidebar-show", function() {
-        showSidebar();
-    });
-
-    // Always do this on first load.
-    sizeSidebar();
 
 	// Adding more fields to the message result table.
 	$(".field-selector").bind("change", function() {
@@ -334,9 +242,11 @@ $(document).ready(function() {
 
                         if (!included) {
                             $(this).removeClass("systemjob-progress");
-                            $(".progress .bar", $(this)).css("width", "100%");
-                            $(".progress", $(this)).removeClass("active");
-                            $(".progress", $(this)).addClass("progress-success");
+                            $(".progress-bar", $(this)).css("width", "100%");
+                            $(".progress-bar", $(this)).text("100% complete (success)");
+                            $(".progress-bar", $(this)).removeClass("active");
+                            $(".progress-bar", $(this)).removeClass("progress-bar-info");
+                            $(".progress-bar", $(this)).addClass("progress-bar-success");
                             $(".finished", $(this)).show();
                         }
                     });
@@ -346,7 +256,8 @@ $(document).ready(function() {
 
                         // Only update those jobs that provide progress.
                         if (el.hasClass("systemjob-progress")) {
-                            $(".progress .bar", el).css("width", job.percent_complete + "%");
+                            $(".progress .progress-bar", el).css("width", job.percent_complete + "%");
+                            $(".progress .progress-bar", el).text(job.percent_complete + "% complete");
                         }
                     });
                 },
@@ -562,21 +473,21 @@ $(document).ready(function() {
     });
 
     // Show configured stream rules in streams list.
-    $(".stream-row .trigger-stream-rules").on("click", function(e) {
+    $("ul.streams li.stream .trigger-stream-rules").on("click", function(e) {
         e.preventDefault();
 
-        var rules = $('.streamrules-list-container[data-stream-id="' + $(this).closest(".stream-row").attr("data-stream-id") + '"]').find("div.streamrules-details");
+        var rules = $('.streamrules-list-container[data-stream-id="' + $(this).closest("ul.streams li.stream").attr("data-stream-id") + '"]').find("div.streamrules-details");
 
         if (rules.is(":visible")) {
             rules.hide();
-            $(".icon", this).removeClass("icon-caret-up");
-            $(".icon", this).addClass("icon-caret-down");
-            $("span", this).text("Show rules");
+            $(".fa", this).removeClass("fa-caret-up");
+            $(".fa", this).addClass("fa-caret-down");
+            $("span", this).text("show rules");
         } else {
             rules.show();
-            $(".icon", this).removeClass("icon-caret-down");
-            $(".icon", this).addClass("icon-caret-up");
-            $("span", this).text("Hide rules");
+            $(".fa", this).removeClass("fa-caret-down");
+            $(".fa", this).addClass("fa-caret-up");
+            $("span", this).text("hide rules");
         }
     });
 
@@ -873,11 +784,6 @@ $(document).ready(function() {
         }
     }
 
-	function displayFailureInSidebar(message) {
-		x = "<span class='alert alert-error sidebar-alert'><i class='icon-warning-sign'></i> " + message + "</span>"
-		$("#sidebar-inner").html(x);
-	}
-
 	function addParameterToCurrentUrl(key, value) {
 	    key = escape(key);
 	    value = escape(value);
@@ -902,24 +808,6 @@ $(document).ready(function() {
 
 	    return kvp.join('&');
 	}
-
-    function sizeSidebar() {
-        if ($("#sidebar .inner-content").filter(':visible').height() > $(window).height()-265-15) {
-            // We need a scrollbar.
-            $("#sidebar .nano").not(".quickvalues .nano").filter(':visible').css("height", $(window).height()-265-15);
-            $("#sidebar .nano").not(".quickvalues .nano").filter(':visible').nanoScroller();
-        } else {
-            // No scrollbar required.
-            $("#sidebar .nano").not(".quickvalues .nano").filter(':visible').css("height", $("#sidebar .inner-content").filter(':visible').height()+15);
-        }
-    }
-
-    // Resize the sidebar regularly if window size changes.
-    (function fixSidebarForWindow() {
-        sizeSidebar();
-
-        setTimeout(fixSidebarForWindow, 250);
-    })();
 
     function onResizedWindow(){
         redrawGraphs();
@@ -1065,24 +953,6 @@ function delayedAjaxCallOnKeyup(el, callback, delay) {
         callback();
     };
     el = null;
-}
-
-function hideSidebar() {
-    $("#sidebar").hide();
-    $("#sidebar-activator").show();
-    var mainContentElement = $("#main-content");
-    mainContentElement.removeClass("span8");
-    mainContentElement.addClass("span12");
-    redrawGraphs();
-}
-
-function showSidebar() {
-    $("#sidebar-activator").hide();
-    $("#sidebar").show();
-    var mainContentElement = $("#main-content");
-    mainContentElement.removeClass("span12");
-    mainContentElement.addClass("span8");
-    redrawGraphs();
 }
 
 function redrawGraphs() {

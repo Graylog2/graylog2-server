@@ -3,6 +3,8 @@
 @import org.graylog2.restclient.models.StreamRule
 @import org.graylog2.restclient.lib.Version
 
+
+
 <form id="streamrule-form"
     @if(streamRule != null) {
         data-parent-stream-id="@streamId"
@@ -10,101 +12,126 @@
     }
     @if(streamRule == null && streamId != null) {
         data-stream-id="@streamId"
-    }
-    >
-    <div class="modal hide fade" id="streamrule-form-modal">
-        <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-            <h2>
-                <i class="icon-signin"></i>
-                @if(streamRule != null) {
-                    Edit Stream rule
-                } else {
-                    Add stream rule
-                }
-            </h2>
-        </div>
-        <div class="modal-body">
-            <div class="span8" id="sr">
-                <label id="sr-label-field">Field</label>
-                <input type="text"
-                id="sr-field"
-                class="sr-input typeahead-fields validatable"
-                data-reflect="#sr-result-field"
-                data-validate="defined"
-                @if(streamRule != null) {
-                    value="@streamRule.getField"
-                }
-                placeholder="user_id"
-                autocomplete="off"
-                required />
+        }
+>
 
-                <label id="sr-label-type">Type</label>
-                <select name="category"
-                id="sr-type"
-                class="sr-input validatable"
-                data-reflect="#sr-result-category"
-                data-validate="defined"
-                required>
-                    @for((rule) <- StreamRule.Type.values()) {
-                        <option value="@rule.getId()"
-                            @if(streamRule != null && streamRule.getType == rule) {
-                                selected="true"
-                            }
-                                data-reflect-string="@rule.getLongDesc()">@rule.getShortDesc()</option>
-                    }
-                </select>
+    <div class="modal fade" id="streamrule-form-modal">
+        <div class="modal-dialog">
+            <div class="modal-content">
 
-                <label id="sr-label-value">Value</label>
-                <input type="text"
-                id="sr-value"
-                class="sr-input validatable"
-                data-validate="defined"
-                data-reflect="#sr-result-value"
-                @if(streamRule != null) {
-                    value="@streamRule.getValue"
-                }
-                placeholder="19983"
-                required />
-
-                <label id="sr-label-inverted" class="checkbox">
-                    <input type="checkbox"
-                        @if(streamRule != null && streamRule.getInverted) {
-                           checked="true"
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">
+                        <i class="fa fa-sign-in"></i>
+                        @if(streamRule != null) {
+                            Edit Stream rule
+                        } else {
+                            Add stream rule
                         }
-                           id="sr-inverted" /> Inverted
-                </label>
-
-                <p>
-                    <strong>Result:</strong>
-                    <span id="sr-result">
-                        Field <em id="sr-result-field">user_id</em> must
-                        <em id="sr-result-category">@StreamRule.Type.fromInt(1).getLongDesc()</em>
-                        <em id="sr-result-value">19983</em>
-                    </span>
-                </p>
-            </div>
-
-            <div class="span4">
-                <div class="well well-small matcher-github">
-                    The server will try to convert to Strings / Numbers based on the matcher type as good as it can.
-
-                    <br /><br />
-                    <i class="icon-github"></i>
-                    <a href="https://github.com/Graylog2/graylog2-server/tree/@Version.VERSION.getBranchName/graylog2-server/src/main/java/org/graylog2/streams/matchers"
-                    target="_blank">
-                        Take a look at the matcher code on GitHub
-                    </a>
-                    <br /><br />
-                    Regular expressions use Java syntax. @views.html.partials.support.bubble.render("general/streams")
+                    </h4>
                 </div>
+
+                <div class="modal-body">
+                    <div class="row">
+
+                        <div class="col-md-8" id="sr">
+
+                            <div class="form-group">
+                                <label for="sr-field" id="sr-label-field">Field</label><br />
+                                <input type="text"
+                                    id="sr-field"
+                                    style="width: 300px; !important;"
+                                    class="sr-input typeahead-fields validatable form-control"
+                                    data-reflect="#sr-result-field"
+                                    data-validate="defined"
+                                        @if(streamRule != null) {
+                                            value="@streamRule.getField"
+                                        }
+                                    placeholder="user_id"
+                                    autocomplete="off"
+                                    required />
+                            </div>
+
+                            <div class="form-group">
+                                <label id="sr-label-type">Type</label><br />
+                                <select name="category"
+                                    id="sr-type"
+                                    style="width: 300px; !important;"
+                                    class="sr-input validatable form-control"
+                                    data-reflect="#sr-result-category"
+                                    data-validate="defined"
+                                    required>
+                                        @for((rule) <- StreamRule.Type.values()) {
+                                            <option value="@rule.getId()"
+                                                @if(streamRule != null && streamRule.getType == rule) {
+                                                    selected="true"
+                                                }
+                                            data-reflect-string="@rule.getLongDesc()">@rule.getShortDesc()</option>
+                                        }
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label id="sr-label-value">Value</label><br />
+                                <input type="text"
+                                    id="sr-value"
+                                    style="width: 300px; !important;"
+                                    class="sr-input validatable form-control"
+                                    data-validate="defined"
+                                    data-reflect="#sr-result-value"
+                                        @if(streamRule != null) {
+                                            value="@streamRule.getValue"
+                                        }
+                                    placeholder="19983"
+                                    required />
+                            </div>
+
+                            <div class="checkbox">
+                                <label id="sr-label-inverted">
+                                    <input type="checkbox"
+                                        @if(streamRule != null && streamRule.getInverted) {
+                                            checked="true"
+                                        }
+                                    id="sr-inverted" /> Inverted
+                                </label>
+                            </div>
+
+                            <p>
+                                <strong>Result:</strong>
+                                <span id="sr-result">
+                                    Field <em id="sr-result-field">user_id</em> must
+                                    <em id="sr-result-category">@StreamRule.Type.fromInt(1).getLongDesc()</em>
+                                    <em id="sr-result-value">19983</em>
+                                </span>
+                            </p>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="well well-small matcher-github">
+                                The server will try to convert to strings or numbers based on the matcher type as good as it can.
+
+                                <br /><br />
+                                <i class="fa fa-github"></i>
+                                <a href="https://github.com/Graylog2/graylog2-server/tree/@Version.VERSION.getBranchName/graylog2-server/src/main/java/org/graylog2/streams/matchers" target="_blank">
+                                    Take a look at the matcher code on GitHub
+                                </a>
+                                <br /><br />
+                                Regular expressions use Java syntax. @views.html.partials.support.bubble.render("general/streams")
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+                    <button type="submit" class="btn btn-success validate streamrule-form-submit">
+                        Save
+                    </button>
+                </div>
+
             </div>
-        </div>
-        <div class="modal-footer">
-            <button type="button" class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
-            <button type="submit" class="btn btn-success validate streamrule-form-submit">
-                Save
-            </button>
         </div>
     </div>
+
 </form>

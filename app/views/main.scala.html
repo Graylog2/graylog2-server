@@ -6,7 +6,7 @@
 @import org.graylog2.restclient.lib.Version
 
 
-    <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
     <head>
         <title>Graylog - @title</title>
@@ -45,33 +45,21 @@
             </div>
 
 	    	<div class="row-fluid">
-                @if(sidebarContent == null) {
-                    <div class="span12" id="main-content">
-                } else {
-                    <div class="span8" id="main-content">
-                }
-		       		@content
-		       	</div>
-	       	
-		   		@if(sidebarContent != null) {
-                    <div class="span4" id="sidebar">
-                        <div id="sidebar-inner" data-spy="affix" data-offset-top="85">
-                            <div id="sidebar-original">
-                                <div class="pull-right sidebar-hide" title="Hide sidebar">
-                                    <i class="icon-chevron-right"></i>
-                                </div>
-
-                                @sidebarContent
-                            </div>
-
-                            <div id="sidebar-replacement"></div>
+                @if(sidebarContent != null) {
+                    <div class="col-md-3" id="sidebar">
+                        <div class="content-col" id="sidebar-inner">
+                            @sidebarContent
                         </div>
                     </div>
+                }
 
-                    <div id="sidebar-activator" style="display: none;">
-                        <div class="sidebar-show" title="Show sidebar">
-                            <i class="icon-chevron-left"></i>
-                        </div>
+                @if(sidebarContent != null) {
+                    <div class="col-md-9 content-col" id="main-content">
+                        @content
+                    </div>
+                } else {
+                    <div class="col-md=12" id="main-content">
+                        @content
                     </div>
                 }
 			</div>

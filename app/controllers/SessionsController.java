@@ -107,11 +107,7 @@ public class SessionsController extends BaseController {
                 return redirect(r.destination);
             }
             // upon redirect, the auth layer will load the user with the given session and log the user in.
-            if(r.noStartpage) {
-                return redirect(routes.SystemController.index(0));
-            } else {
-                return redirect(routes.StartpageController.redirect());
-            }
+            return redirect(routes.StartpageController.redirect());
         } catch (APIException e) {
             log.warn("Unable to authenticate user {}. Redirecting back to '/'", r.username, e);
             if (e.getCause() instanceof Graylog2ServerUnavailableException) {
