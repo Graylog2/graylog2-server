@@ -76,16 +76,13 @@ var HistogramVisualization = React.createClass({
     },
     processData(data) {
         var formattedData = [];
-        // TODO: add also points where the number of messages is 0
         for(var key in data) {
-            if (data.hasOwnProperty(key)) {
-                formattedData.push({x: Number(key), y: data[key]});
-            }
+            formattedData.push({x: Number(key), y: data[key]});
         }
         this.setState({processedData: formattedData}, this.drawData);
     },
     drawData() {
-        this.histogram.xUnits(() => this.state.processedData.length);
+        this.histogram.xUnits(() => this.state.processedData.length - 1);
         this.histogramData.remove();
         this.histogramData.add(this.state.processedData);
         this.histogram.redraw();
