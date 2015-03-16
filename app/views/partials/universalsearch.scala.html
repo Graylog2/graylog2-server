@@ -48,7 +48,7 @@
                     </ul>
                 </div>
 
-                <div class="timerange-selector relative"  style="width: 270px; display: @if(request.getQueryString("rangetype") == null) { block } @if(request.getQueryString("rangetype") != null && request.getQueryString("rangetype").equals("relative")) { block } else { none };">
+                <div class="timerange-selector relative"  style="width: 270px; display: @if(request.getQueryString("rangetype") == null) { block } else {@if(request.getQueryString("rangetype") != null && request.getQueryString("rangetype").equals("relative")) { block } else { none };}">
                     @partials.timerangeselectors.relative(request)
                 </div>
 
