@@ -109,10 +109,10 @@ function updateWidget_search_result_count(widget, data) {
     var nowCount = null, previousCount = null;
     var result = data.result;
     if (typeof result === 'object') {
-        nowCount = result.now;
+        nowCount = normalizeNumber(result.now);
         previousCount = normalizeNumber(result.previous);
     } else {
-        nowCount = result;
+        nowCount = normalizeNumber(result);
     }
     var valueElement = $(".value", widget);
     valueElement.text(numeral(nowCount).format());
