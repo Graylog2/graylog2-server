@@ -358,6 +358,7 @@
 			<td @if(!(selectedFields.contains("message") || search.getOrder.getField.equals("message"))) { style="display: none;" }
                 class="messages-message result-td-78e731027d8fd50ed642340b7c9a63b3">
                 @renderMessageResultField("message", r.getFields, r)
+                <a href="@routes.MessagesController.show(r.getIndex.asInstanceOf[String], r.getFields.get("_id").asInstanceOf[String])" target="_blank">[open msg]</a>
             </td>
 			
 			@for(f <- searchResult.getPageFields()) {

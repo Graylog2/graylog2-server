@@ -15,17 +15,17 @@
 
         <div class="inner">
             <span class="pull-right icons">
-                <i class="icon icon-refresh quickvalues-refresh" data-field="@f.getName" title="Refresh"></i>
+                <i class="fa fa-refresh quickvalues-refresh" data-field="@f.getName" title="Refresh"></i>
 
-                @if(streamId == null || streamId.isEmpty()) {
+                <!--@if(streamId == null || streamId.isEmpty()) {
                     @views.html.partials.dashboards.add_to_dashboard.render("quickvalues", "Add to dashboard", null)
                 } else {
                     @views.html.partials.dashboards.add_to_dashboard.render("quickvalues", "Add to dashboard", Array("data-stream-id='" + streamId + "'"))
-                }
+                }-->
 
-                <i class="icon icon-play-circle active quickvalues-autorefresh" data-field="@f.getName" title="Automatic refresh"></i>
+                <i class="fa fa-play-circle active quickvalues-autorefresh" data-field="@f.getName" title="Automatic refresh"></i>
                 <!--<i class="icon icon-download-alt quickvalues-export" title="Download"></i>-->
-                <i class="icon icon-remove quickvalues-close" data-field="@f.getName" title="Close"></i>
+                <i class="fa fa-remove quickvalues-close" data-field="@f.getName" title="Close"></i>
             </span>
 
             <h2>Quick value breakdown of <em>@f.getName</em></h2>

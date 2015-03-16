@@ -154,9 +154,9 @@ $(document).ready(function() {
                 sortedKeys = Object.keys(data.terms).sort(function(a,b){return data.terms[b] - data.terms[a]});
 
                 for(var i = 0; i < sortedKeys.length; i++){
+
                     var key = sortedKeys[i];
                     var val = data.terms[key];
-
                     var percent = (val/data.total*100);
 
                     var searchLink = "<a href='#' title='Search for this value. (Press alt to search immediately, shift to negate)' class='search-link' data-field='" + htmlEscape(field) + "' data-value='" + htmlEscape(key) + "'><i class='icon icon-search'></i></a>";
@@ -170,8 +170,6 @@ $(document).ready(function() {
                 showError("Could not load quick values.");
             },
             complete: function() {
-                $(".nano", quickvalues).nanoScroller();
-
                 if (reload) {
                     // Loading complete. Set autoreload button to old color again.
                     $(".quickvalues-autorefresh", quickvalues).removeClass("loading");
@@ -223,23 +221,7 @@ $(document).ready(function() {
     })();
 
     function updatePosition(button, quickvalues, direction) {
-        var left = button.offset().left-$(window).scrollLeft()-622;
 
-        switch(direction)  {
-            case "up":
-                var top = button.offset().top-$(window).scrollTop()-355;
-                quickvalues.removeClass("quickvalues-down");
-                quickvalues.addClass("quickvalues-up");
-                break;
-            case "down":
-                var top = button.offset().top-$(window).scrollTop()-20;
-                quickvalues.removeClass("quickvalues-up");
-                quickvalues.addClass("quickvalues-down");
-                break;
-        }
-
-        quickvalues.css("top", top);
-        quickvalues.css("left", left);
     }
 
 });
