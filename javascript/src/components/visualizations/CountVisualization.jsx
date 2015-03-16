@@ -127,9 +127,6 @@ var CountVisualization = React.createClass({
         return this._getIndicatorClass(index, TrendIndicatorType.LOWER);
     },
     render() {
-        if (this.state.percentage !== undefined) {
-            console.log("previous: " + this.state.previousCount + " now: " + this.state.nowCount + " percentage: " + this.state.percentage);
-        }
         var trendIndicators;
 
         if (Boolean(this.props.config.trend)) {
