@@ -47,11 +47,7 @@ var HistogramVisualization = React.createClass({
             .renderTitle(false)
             .colors(D3Utils.glColourPalette())
             .on('renderlet', (_) => {
-                d3.selectAll('.bar').attr('title', (d) => {
-                    return numeral(d.y).format("0,0") + " messages<br>" + d.x.format(momentHelper.DATE_FORMAT_TZ);
-                });
-
-                $('svg .bar').tooltip({
+                $('svg .chart-body rect.bar', histogramDomNode).tooltip({
                     'trigger': 'hover',
                     'container': 'body',
                     'placement': 'top',
@@ -59,6 +55,12 @@ var HistogramVisualization = React.createClass({
                     'html': true
                 });
 
+                var formatTitle = (d) => {
+                    return numeral(d.y).format("0,0") + " messages<br>" + d.x.format(momentHelper.DATE_FORMAT_TZ);
+                };
+
+                d3.select(histogramDomNode).selectAll('.chart-body rect.bar')
+                    .attr('data-original-title', formatTitle);
             });
 
         this.histogram.xAxis()
