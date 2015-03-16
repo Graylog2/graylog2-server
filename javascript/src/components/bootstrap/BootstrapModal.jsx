@@ -17,7 +17,7 @@ var BootstrapModal = React.createClass({
     open() {
         var modal = this._modalNode();
         modal.modal('show');
-        modal.on("shown", () => {
+        modal.on("shown.bs.modal", () => {
             var element = $("input", this.refs.body.getDOMNode()).first();
 
             if (element.length === 0) {
@@ -49,7 +49,7 @@ var BootstrapModal = React.createClass({
                 );
         }
         var formContent = (
-            <div>
+            <div className="modal-content">
                 <div className="modal-header">
                     <button
                         type="button"
@@ -81,8 +81,10 @@ var BootstrapModal = React.createClass({
         );
         
         return (
-            <div ref="modal" className="modal hide fade">
-                {form}
+            <div ref="modal" className="modal fade" aria-hidden="true" role="dialog" tabIndex="-1">
+                <div className="modal-dialog">
+                    {form}
+                </div>
             </div>
             );
     }
