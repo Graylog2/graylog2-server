@@ -66,7 +66,9 @@ var HistogramVisualization = React.createClass({
             .tickFormat(graphHelper.customDateTimeFormat());
         this.histogram.yAxis()
             .ticks(3)
-            .tickFormat(d3.format("s"));
+            .tickFormat((value) => {
+                return value % 1 === 0 ? d3.format("s")(value) : null;
+            });
         dc.renderAll();
     },
     _formatInterval() {
