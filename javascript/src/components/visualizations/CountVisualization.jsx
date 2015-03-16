@@ -134,24 +134,24 @@ var CountVisualization = React.createClass({
                 <div className="trend-indicators">
                     <div className="trend-icons-higher">
                         <div className={this._getHigherIndicatorClass(0)}>
-                            <span className="trend-higher"><i className="icon icon-angle-up"></i></span>
+                            <span className="trend-higher"><i className="fa fa-angle-up"></i></span>
                         </div>
                         <div className={this._getHigherIndicatorClass(1)}>
-                            <span className="trend-higher"><i className="icon icon-angle-up"></i></span>
+                            <span className="trend-higher"><i className="fa fa-angle-up"></i></span>
                         </div>
                         <div className={this._getHigherIndicatorClass(2)}>
-                            <span className="trend-higher"><i className="icon icon-angle-up"></i></span>
+                            <span className="trend-higher"><i className="fa fa-angle-up"></i></span>
                         </div>
                     </div>
                     <div className="trend-icons-lower">
                         <div className={this._getLowerIndicatorClass(0)}>
-                            <span className="trend-lower"><i className="icon icon-angle-down"></i></span>
+                            <span className="trend-lower"><i className="fa fa-angle-down"></i></span>
                         </div>
                         <div className={this._getLowerIndicatorClass(1)}>
-                            <span className="trend-lower"><i className="icon icon-angle-down"></i></span>
+                            <span className="trend-lower"><i className="fa fa-angle-down"></i></span>
                         </div>
                         <div className={this._getLowerIndicatorClass(2)}>
-                            <span className="trend-lower"><i className="icon icon-angle-down"></i></span>
+                            <span className="trend-lower"><i className="fa fa-angle-down"></i></span>
                         </div>
                     </div>
                 </div>

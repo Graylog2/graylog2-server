@@ -8,7 +8,7 @@ var WidgetHeader = React.createClass({
 
         if (this.props.error) {
             loadErrorElement = (
-                <span className="load-error" title={this.props.errorMessage}><i className="icon icon-warning-sign"></i></span>
+                <span className="load-error" title={this.props.errorMessage}><i className="fa fa-exclamation-triangle"></i></span>
             );
         }
 

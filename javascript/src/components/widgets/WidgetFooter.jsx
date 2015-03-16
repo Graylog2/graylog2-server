@@ -17,14 +17,14 @@ var WidgetFooter = React.createClass({
                         <button className="btn btn-mini btn-link btn-text"
                                 title="Replay search"
                                 onClick={this._replaySearch}>
-                            <i className="icon icon-play"></i>
+                            <i className="fa fa-play"></i>
                         </button>
                     </div>
                     <div className="widget-info">
                         <button className="btn btn-mini btn-link btn-text"
                                 title="Show widget configuration"
                                 onClick={this._showConfig}>
-                            <i className="icon icon-cog"></i>
+                            <i className="fa fa-info-circle"></i>
                         </button>
                     </div>
                 </div>

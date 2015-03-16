@@ -1,4 +1,7 @@
 $(document).ready(function() {
+    var toggleDashboardLock = $("#toggle-dashboard-lock");
+    var unlockDashboardLink = $("#unlock-dashboard");
+    var toggleUpdateUnfocussed = $("#update-unfocussed");
 
     // Load all writable dashboards in the global registry first.
     $.ajax({
@@ -16,7 +19,7 @@ $(document).ready(function() {
 
         dashboardGrid = $(".gridster ul").gridster({
             widget_margins: [10, 10],
-            widget_base_dimensions: [400, 160],
+            widget_base_dimensions: [410, 170],
             draggable: {
                 stop: function() {
                     var positions = this.serialize();
@@ -64,8 +67,7 @@ $(document).ready(function() {
             dashboardGrid.add_widget(item, columns, rows, col, row);
         });
     } else {
-        $(".unlock-dashboard-widgets").hide();
-        $(".lock-dashboard-widgets").hide()
+        toggleDashboardLock.hide();
     }
 
     function applyDashboardsToAllSelectors() {
@@ -226,47 +228,75 @@ $(document).ready(function() {
     }
     displayUpdateUnfocussed(userPreferences && userPreferences.updateUnfocussed);
 
-    $(".update-onfocussed-on").on("click", function() {
-        displayUpdateUnfocussed(true);
+    var updateInBackground = function() {
         setUpdateUnfocussedMode(true);
-        alert("Window will be updated even when unfocussed");
-    });
+        alert("Graphs will be updated when browser is in the background");
+    };
 
-    $(".update-onfocussed-off").on("click", function() {
-        displayUpdateUnfocussed(false);
+    var updateInFocus = function() {
         setUpdateUnfocussedMode(false);
-        alert("Window will no longer be updated when unfocussed");
+        alert("Graphs will be updated when browser is in the foreground");
+    };
+
+    toggleUpdateUnfocussed.on('click', function() {
+        var updateUnfocussed = Boolean(toggleUpdateUnfocussed.data('update-unfocussed'));
+        if(updateUnfocussed) {
+            updateInFocus();
+            toggleUpdateUnfocussed.text("Update in background");
+        } else {
+            updateInBackground();
+            toggleUpdateUnfocussed.text("Update in foreground");
+        }
+
+        toggleUpdateUnfocussed.data('update-unfocussed', !updateUnfocussed);
     });
 
-    $(".unlock-dashboard-widgets").on("click", function() {
+    var unlockDashboard = function() {
         dashboardGrid.enable();
         $(".dashboard .gridster .gs-w").css("cursor", "move");
         $(this).hide();
         $(".only-unlocked").show();
         $(".hidden-unlocked").hide();
-        $(".lock-dashboard-widgets").show();
 
         // Replay links fix. We don't want the links to be clickable when dragging.
         $(".dashboard .widget a.replay-link").each(function() {
             $(this).css("cursor", "move")
                 .attr("data-original-href", $(this).attr("href"))
                 .attr("href", "javascript: void(0)");
-        })
-    });
+        });
+    };
 
-    $(".lock-dashboard-widgets").on("click", function() {
+    var lockDashboard = function() {
         dashboardGrid.disable();
         $(".dashboard .gridster .gs-w").css("cursor", "default");
         $(this).hide();
         $(".hidden-unlocked").show();
         $(".only-unlocked").hide();
-        $(".unlock-dashboard-widgets").show();
 
         // Replay links fix. Make the links clickable again.
         $(".dashboard .widget a.replay-link").each(function() {
             $(this).css("cursor", "pointer")
                 .attr("href", $(this).attr("data-original-href"));
-        })
+        });
+    };
+
+    toggleDashboardLock.on('click', function() {
+        var locked = Boolean(toggleDashboardLock.data('locked'));
+        if (locked) {
+            unlockDashboard();
+            toggleDashboardLock.text("Lock");
+        } else {
+            lockDashboard();
+            toggleDashboardLock.text("Unlock / Edit");
+        }
+
+        toggleDashboardLock.data('locked', !locked);
+    });
+
+    unlockDashboardLink.on('click', function() {
+        unlockDashboard();
+        toggleDashboardLock.data('locked', false);
+        toggleDashboardLock.text("Lock");
     });
 
     $(".dashboard .widget .edit-description").on("click", function(e) {
