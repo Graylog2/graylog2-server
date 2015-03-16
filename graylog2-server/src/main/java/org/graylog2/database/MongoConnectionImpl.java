@@ -18,6 +18,7 @@ package org.graylog2.database;
 
 import com.mongodb.CommandFailureException;
 import com.mongodb.DB;
+import com.mongodb.Mongo;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
 import com.mongodb.MongoException;
@@ -53,7 +54,7 @@ public class MongoConnectionImpl implements MongoConnection {
      * Connect the instance.
      */
     @Override
-    public synchronized MongoClient connect() {
+    public synchronized Mongo connect() {
         if (m == null) {
             try {
                 m = new MongoClient(mongoClientURI);

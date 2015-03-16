@@ -1,10 +1,11 @@
 package org.graylog2.database;
 
 import com.mongodb.DB;
+import com.mongodb.Mongo;
 import com.mongodb.MongoClient;
 
 public interface MongoConnection {
-    MongoClient connect();
+    Mongo connect();
 
     DB getDatabase();
 }
