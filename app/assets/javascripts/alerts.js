@@ -81,7 +81,7 @@ function fillAlertAnnotator(chart, annotator) {
 
 function buildAlertAnnotationText(alert) {
     // lol solli
-    return "<i class='icon icon-warning-sign'></i> Stream \"" + alert.stream_name + "\" triggered an alert: "
+    return "<i class='fa fa-warning'></i> Stream \"" + alert.stream_name + "\" triggered an alert: "
         + alert.description;
 
 }

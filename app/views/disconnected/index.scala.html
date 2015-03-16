@@ -5,7 +5,7 @@
             <div class="row">
                 <div class="span8 offset2 well" id="disconnected-box-content">
                     <legend>
-                        <i class="icon-group"></i> Graylog Web Interface is disconnected.
+                        <i class="fa fa-group"></i> Graylog Web Interface is disconnected.
                     </legend>
 
                     <div class="row-fluid">
@@ -24,12 +24,12 @@
                                 @for(node <- configuredNodes.sortBy(_.getTransportAddress)) {
                                     <div class="well well-small config-node" data-config-node-address="@node.getTransportAddress">
                                         <a class="btn btn-mini btn-info pull-right" target="_blank" href="@node.getTransportAddress/api-browser">API Browser</a>
-                                        <h5><i class="icon-sitemap"></i> @node.getTransportAddress</h5>
+                                        <h5><i class="fa fa-sitemap"></i> @node.getTransportAddress</h5>
                                         <h6>
                                             @if(serverNodes.getDiscoveredNodeVia(node).getNodeId == null) {
-                                                <span class="muted never-seen-warning"><i class="icon-warning-sign"></i> Never connected!</span>
+                                                <span class="muted never-seen-warning"><i class="fa fa-warning-sign"></i> Never connected!</span>
                                             } else {
-                                                <span class="muted discovered-node-link" data-discovered-node="@serverNodes.getDiscoveredNodeVia(node).getNodeId"><i class="icon-sitemap"></i> @serverNodes.getDiscoveredNodeVia(node).getTransportAddress</span>
+                                                <span class="muted discovered-node-link" data-discovered-node="@serverNodes.getDiscoveredNodeVia(node).getNodeId"><i class="fa fa-sitemap"></i> @serverNodes.getDiscoveredNodeVia(node).getTransportAddress</span>
                                             }
                                         </h6>
                                     </div>
@@ -43,11 +43,11 @@
                                     @for(node <- nodesEverConnectedTo.sortBy(_.getTransportAddress)) {
                                         <div class="well well-small discovered-node" data-node-id="@node.getNodeId">
                                             <a class="btn btn-mini btn-info pull-right" target="_blank" href="@node.getTransportAddress/api-browser">API Browser</a>
-                                            <h5><i class="icon-sitemap"></i> @node.getTransportAddress
+                                            <h5><i class="fa fa-sitemap"></i> @node.getTransportAddress
                                             @if(serverNodes.getConfigNodeOf(node) != null && !serverNodes.getConfigNodeOf(node).getTransportAddress.equals(node.getTransportAddress)) {
                                                 <h6>
                                                     <span class="muted via-node-headline" data-discovered-via="@serverNodes.getConfigNodeOf(node).getTransportAddress">
-                                                    via <i class="icon-sitemap"></i> @serverNodes.getConfigNodeOf(node).getTransportAddress
+                                                    via <i class="fa fa-sitemap"></i> @serverNodes.getConfigNodeOf(node).getTransportAddress
                                                     </span>
                                                 </h6>
                                             }

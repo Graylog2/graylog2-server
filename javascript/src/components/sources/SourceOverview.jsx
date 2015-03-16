@@ -312,7 +312,7 @@ var SourceOverview = React.createClass({
                             <option value={daysToSeconds(365)}>Last Year</option>
                             <option value="0">All</option>
                         </select>
-                        <h1><i className="icon icon-download-alt"></i> Sources</h1>
+                        <h1><i className="fa fa-download"></i> Sources</h1>
                     </div>
                     <p style={{"marginTop": "15px"}}>
                         This is a list of all sources that sent in messages to Graylog. Use the table and charts to interact

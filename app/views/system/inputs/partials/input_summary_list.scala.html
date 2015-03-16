@@ -11,7 +11,7 @@
 }
 
 <div class="row-fluid input-list">
-    <h2><i class="icon icon-cogs"></i> Running global inputs</h2>
+    <h2><i class="fa fa-cogs"></i> Running global inputs</h2>
     @if(globalInputs.size > 0) {
         @for((input, nodeStates) <- orderedGlobalInputs) {
             @views.html.system.inputs.partials.global_input_summary(input, nodeStates, inputTypes, node)
@@ -21,7 +21,7 @@
     }
 </div>
 <div class="row-fluid input-list">
-    <h2><i class="icon icon-cogs"></i> Running local inputs</h2>
+    <h2><i class="fa fa-cogs"></i> Running local inputs</h2>
 
     @if(localInputs.size > 0) {
         @for(inputState <- orderedLocalInputs) {

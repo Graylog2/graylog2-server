@@ -25,7 +25,7 @@
                 <button class="btn btn-danger btn-mini"
                 type="submit"
                 data-confirm="Do you really want to terminate this global input, stopping it permanently on all active nodes in the cluster?">
-                    <i class="icon icon-remove"></i> Delete
+                    <i class="fa fa-remove"></i> Delete
                 </button>
             </form>
         }
@@ -41,25 +41,25 @@
         <div class="global-input-io focuslimit" data-input-id="@input.getId">
             Network IO:
                 <span class="global-persec">
-                    <i class="icon icon-caret-down channel-direction channel-direction-down"></i>
+                    <i class="fa fa-caret-down channel-direction channel-direction-down"></i>
                     <span class="rx value">@Tools.byteToHuman(0)</span>
 
-                    <i class="icon icon-caret-up channel-direction channel-direction-up"></i>
+                    <i class="fa fa-caret-up channel-direction channel-direction-up"></i>
                     <span class="tx value">@Tools.byteToHuman(0)</span>
                 </span>
 
                 <span class="global-total">
                     (total:
-                    <i class="icon icon-caret-down channel-direction channel-direction-down"></i>
+                    <i class="fa fa-caret-down channel-direction channel-direction-down"></i>
                     <span class="rx value">@Tools.byteToHuman(0)</span>
 
-                    <i class="icon icon-caret-up channel-direction channel-direction-up"></i>
+                    <i class="fa fa-caret-up channel-direction channel-direction-up"></i>
                     <span class="tx value">@Tools.byteToHuman(0)</span>
                     )
                 </span>
 
                 <a href="#" class="trigger-input-io-details" data-input-id="@input.getId">
-                    <i class="icon icon-caret-down"></i>
+                    <i class="fa fa-caret-down"></i>
                     <span>Show details</span>
                 </a>
         </div>
@@ -69,19 +69,19 @@
                 <div class="input-io focuslimit" data-node-id="@nodeState.getNode.getNodeId" data-input-id="@input.getId">
                         @node.getShortNodeId / @node.getHostname:
                     <span class="persec">
-                        <i class="icon icon-caret-down channel-direction channel-direction-down"></i>
+                        <i class="fa fa-caret-down channel-direction channel-direction-down"></i>
                         <span class="rx value">@Tools.byteToHuman(nodeState.getInput.getReadBytes)</span>
 
-                        <i class="icon icon-caret-up channel-direction channel-direction-up"></i>
+                        <i class="fa fa-caret-up channel-direction channel-direction-up"></i>
                         <span class="tx value">@Tools.byteToHuman(nodeState.getInput.getWrittenBytes)</span>
                     </span>
 
                     <span class="total">
                                     (total:
-                        <i class="icon icon-caret-down channel-direction channel-direction-down"></i>
+                        <i class="fa fa-caret-down channel-direction channel-direction-down"></i>
                         <span class="rx value">@Tools.byteToHuman(nodeState.getInput.getTotalReadBytes)</span>
 
-                        <i class="icon icon-caret-up channel-direction channel-direction-up"></i>
+                        <i class="fa fa-caret-up channel-direction channel-direction-up"></i>
                         <span class="tx value">@Tools.byteToHuman(nodeState.getInput.getTotalWrittenBytes)</span>
                         )
                     </span>
@@ -97,7 +97,7 @@
                 (<span class="global-active">0</span> active)
 
                 <a href="#" class="trigger-input-connection-details" data-input-id="@input.getId">
-                    <i class="icon icon-caret-down"></i>
+                    <i class="fa fa-caret-down"></i>
                     <span>Show details</span>
                 </a>
         </div>
@@ -124,7 +124,7 @@
     @if(!input.getStaticFields.isEmpty) {
         <div class="static-fields">
             <h4 style="display: inline;">
-                <i class="icon icon-tag"></i> Static fields
+                <i class="fa fa-tag"></i> Static fields
             </h4><br />
             <ul>
             @for((k,v) <- input.getStaticFields) {
@@ -135,7 +135,7 @@
                 class="remove-static-field"
                 style="display: none;"
                 data-confirm="Really delete static field?">
-                    <i class="icon icon-remove"></i>
+                    <i class="fa fa-remove"></i>
                 </a>
                 }
                 </li>

@@ -86,11 +86,11 @@
 <span id="original-search-timerange" style="display: none;">@searchResult.getTimeRange</span>
 
 <div class="pull-right">
-    <a href="#built-query" class="btn btn-small" role="button" data-toggle="modal" data-backdrop="true"><i class="icon-bug"></i></a>
+    <a href="#built-query" class="btn btn-small" role="button" data-toggle="modal" data-backdrop="true"><i class="fa fa-bug"></i></a>
 
     <div class="btn-group">
         <a class="btn btn-small dropdown-toggle" data-toggle="dropdown" href="#">
-            <i class="icon-cloud-download"></i> Export
+            <i class="fa fa-cloud-download"></i> Export
             <span class="caret"></span>
         </a>
         <ul class="dropdown-menu">
@@ -121,7 +121,7 @@
         <form>
             <input type="text" placeholder="Give the search a title" id="save-search-title" />
             <button type="submit" class="btn btn-small btn-success do-save" disabled="true">
-                <i class="icon icon-save"></i>&nbsp;
+                <i class="fa fa-save"></i>&nbsp;
                 Save
             </button>
         </form>
@@ -131,9 +131,9 @@
 
 <h1>
     @if(stream == null) {
-        <i class="icon-search"></i> Search results
+        <i class="fa fa-search"></i> Search results
     } else {
-        <i class="icon-barcode"></i> Stream &laquo;@stream.getTitle&raquo;
+        <i class="fa fa-barcode"></i> Stream &laquo;@stream.getTitle&raquo;
     }
 </h1>
 
@@ -155,7 +155,7 @@
 
 <div class="result-distribution">
     <h3>
-        <i class="icon icon-ellipsis-vertical"></i>
+        <i class="fa fa-ellipsis-vertical"></i>
         Total result histogram
     </h3>
 
@@ -179,7 +179,7 @@
 </script>
 
 <div class="graph-resolution-selector">
-    <i class="icon-time"></i>
+    <i class="fa fa-time"></i>
     <strong>Resolution:</strong> @Html(DateHistogramResolutionSelector.getOptions(histogram.getInterval(), request()))
 </div>
 
@@ -188,15 +188,15 @@
 <div id="field-graphs">
     @****** field graph template. this is copied, filled and appended for every new field graph. ****@
     <div id="field-graph-template" class="field-graph-container" style="display: none;">
-        <i class="icon icon-reorder pull-right reposition-handle"></i>
+        <i class="fa fa-reorder pull-right reposition-handle"></i>
 
         <h3>
-            <i class="icon icon-ellipsis-vertical"></i>
+            <i class="fa fa-ellipsis-vertical"></i>
             <span class="title">Field: <span></span></span>
 
             <div class="btn-group graph-settings">
                 <a data-toggle="dropdown" href="#">
-                    <i class="icon icon-cog" title="Customize"></i>
+                    <i class="fa fa-cog" title="Customize"></i>
                 </a>
 
                 <ul class="dropdown-menu">
@@ -272,8 +272,8 @@
                 </ul>
             </div>
 
-            <a href="#" class="pin hide-combined-chart"><i class="icon icon-pushpin" title="Pin"></i></a>
-            <a href="#" class="unpin hide-combined-chart" style="display: none;"><i class="icon-pushpin"></i></a>
+            <a href="#" class="pin hide-combined-chart"><i class="fa fa-pushpin" title="Pin"></i></a>
+            <a href="#" class="unpin hide-combined-chart" style="display: none;"><i class="fa fa-pushpin"></i></a>
         </h3>
 
         <ul class="field-graph-query-container">
@@ -303,7 +303,7 @@
     <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal">x</button>
         <h2>
-            <i class="icon-copy copy-clipboard" data-clipboard-target="query-text" data-toggle="tooltip" data-initial-title="Copy Query" data-trigger="manual"></i>
+            <i class="fa fa-copy copy-clipboard" data-clipboard-target="query-text" data-toggle="tooltip" data-initial-title="Copy Query" data-trigger="manual"></i>
             Elasticsearch Query
         </h2>
     </div>

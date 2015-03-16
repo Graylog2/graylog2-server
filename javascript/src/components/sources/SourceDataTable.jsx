@@ -29,7 +29,7 @@ var SourceDataTable = React.createClass({
             .group((d) => d.percentage > othersThreshold ? "Top Sources" : othersName)
             .size(this.state.numberOfSources)
             .columns([
-                (d) => "<button class='btn btn-mini btn-link dc-search-button' title='Search for this source'><i class='icon icon-search'></i></button>",
+                (d) => "<button class='btn btn-mini btn-link dc-search-button' title='Search for this source'><i class='fa fa-search'></i></button>",
                 (d) => "<a href='javascript:undefined' class='dc-filter-link' title='Filter this source'>" + d.name +"</a>",
                 (d) => d.percentage.toFixed(2) + "%",
                 (d) => numeral(d.message_count).format("0,0")
@@ -102,8 +102,8 @@ var SourceDataTable = React.createClass({
 
         return (
           <div>
-              <h3><i className="icon icon-th-list"></i> Selected sources&nbsp;
-                  <small><a href="javascript:undefined" id="dc-sources-result-reset" className="reset" onClick={this.props.resetFilters} title="Reset filter" style={{"display": "none"}}><i className="icon icon-retweet"></i></a></small>
+              <h3><i className="fa fa-th-list"></i> Selected sources&nbsp;
+                  <small><a href="javascript:undefined" id="dc-sources-result-reset" className="reset" onClick={this.props.resetFilters} title="Reset filter" style={{"display": "none"}}><i className="fa fa-retweet"></i></a></small>
               </h3>
               <div className="row-fluid sources-filtering">
                   <div className="span6">

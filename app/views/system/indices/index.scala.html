@@ -30,7 +30,7 @@
     @views.html.partials.breadcrumbs(breadcrumbs)
 
     <div class="row-fluid">
-        <h1><i class="icon icon-reorder"></i> Indices</h1>
+        <h1><i class="fa fa-reorder"></i> Indices</h1>
         This is an overview of all indices (message stores) Graylog is currently taking in account
         for searches and analysis. You can learn more about the index model in the
         <a href="https://www.graylog.org/documentation/general/indexmodel/" target="_blank">
@@ -54,7 +54,7 @@
     <div class="row-fluid">
         @if(!closedIndices.isEmpty) {
             <div class="alert alert-info closed-indices">
-                <i class="icon icon-ban-circle"></i>&nbsp;
+                <i class="fa fa-ban-circle"></i>&nbsp;
 
                 @if(closedIndices.size() == 1) {
                     There is a closed index you can reopen.
@@ -62,14 +62,14 @@
                     There are @closedIndices.size() closed indices you can reopen.
                 }
 
-                <a href="#" class="pull-right show-indices"><i class="icon icon-caret-down"></i> Show</a>
+                <a href="#" class="pull-right show-indices"><i class="fa fa-caret-down"></i> Show</a>
 
                 <ul style="display: none;">
                     @for(index <- closedIndices.sorted) {
                         <li>
                             @index
                             <a href="@routes.IndicesController.reopenIndex(index)" data-confirm="Really reopen index @index? It might take a few seconds until it appears in the list." title="Reopen">
-                                <i class="icon icon-retweet"></i>
+                                <i class="fa fa-retweet"></i>
                             </a>
                         </li>
                     }
@@ -78,7 +78,7 @@
         }
 
         <div class="alert alert-success" style="margin-top: 10px;">
-            <i class="icon icon-th"></i> &nbsp;@indices.length indices with a total of <span class="total-events focuslimit">?</span> messages under management.
+            <i class="fa fa-th"></i> &nbsp;@indices.length indices with a total of <span class="total-events focuslimit">?</span> messages under management.
             <span class="pull-right">Current write-active index is <i>@deflectorTarget</i>.</span>
         </div>
 
@@ -89,12 +89,12 @@
     @if(indices.find(_.getName == deflectorTarget) == None) {
         <div class="row-fluid index-description">
             <h3>
-                <i class="icon icon-ellipsis-vertical"></i>
+                <i class="fa fa-ellipsis-vertical"></i>
 
-                <i class="icon icon-bolt" title="Write-active index"></i> @deflectorTarget
+                <i class="fa fa-bolt" title="Write-active index"></i> @deflectorTarget
             </h3>
             <div class="index-info">
-                <div class="alert alert-info"><i class="icon icon-info-sign"></i> Deflector information is not available at the moment. Please try again once the index range calculation finishes.</div>
+                <div class="alert alert-info"><i class="fa fa-info-sign"></i> Deflector information is not available at the moment. Please try again once the index range calculation finishes.</div>
             </div>
 
             <hr style="margin-bottom: 5px; margin-top: 10px;">
@@ -105,16 +105,16 @@
     @for(index <- indices.sortWith(_.getNumber > _.getNumber)) {
         <div class="row-fluid index-description">
             <h3>
-                <i class="icon icon-ellipsis-vertical"></i>
+                <i class="fa fa-ellipsis-vertical"></i>
 
                 @if(index.getName.equals(deflectorTarget)) {
-                    <i class="icon icon-bolt" title="Write-active index"></i>
+                    <i class="fa fa-bolt" title="Write-active index"></i>
                 }
 
                 @index.getName
 
                 @if(reopenedSet.contains(index.getName)) {
-                    <i class="icon icon-retweet" title="Reopened index"></i>
+                    <i class="fa fa-retweet" title="Reopened index"></i>
                 }
 
                 <span class="starts">
@@ -132,7 +132,7 @@
                     }
 
                     @if(!index.getName.equals(deflectorTarget)) {
-                        <a href="#" class="index-details" data-index-name="@index.getName"><i class="icon icon-caret-right"></i>  Load Details / Actions</a>
+                        <a href="#" class="index-details" data-index-name="@index.getName"><i class="fa fa-caret-right"></i>  Load Details / Actions</a>
                     }
                 </span>
             </h3>

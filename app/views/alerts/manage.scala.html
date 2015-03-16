@@ -12,7 +12,7 @@
 
 @main("Alerts", views.html.sidebars.standard(currentUser), "", currentUser) {
     <h1>
-        <i class="icon icon-fire"></i>
+        <i class="fa fa-fire"></i>
         Alerts of stream &raquo;@stream.getTitle&laquo;
     </h1>
 
@@ -34,14 +34,14 @@
 
     <hr />
 
-    <h2 style="margin-bottom: 5px;"><i class="icon icon-tasks"></i> Configured alert conditions</h2>
+    <h2 style="margin-bottom: 5px;"><i class="fa fa-tasks"></i> Configured alert conditions</h2>
 
 
     @views.html.partials.alerts.list_alert_conditions.render(alertConditions, stream)
 
     <hr />
 
-    <h2><i class="icon icon-mail-forward"></i> Alert callbacks</h2>
+    <h2><i class="fa fa-mail-forward"></i> Alert callbacks</h2>
 
     <div class="row-fluid" style="margin-bottom: 5px;">
         The following callbacks will be performed when this stream triggers an alert. You can find alert callback plugins
@@ -75,7 +75,7 @@
         </div>
     }
 
-    <h2><i class="icon icon-group"></i> Alert receivers</h2>
+    <h2><i class="fa fa-group"></i> Alert receivers</h2>
 
     <div class="row-fluid" style="margin-bottom: 5px;">
         The following Graylog users will be notified about alerts via email if they have configured
@@ -90,12 +90,12 @@
         <ul>
             @for(user <- stream.getUserAlertReceivers) {
                 <li>
-                    <i class="icon icon-user"></i>&nbsp;
+                    <i class="fa fa-user"></i>&nbsp;
                     <a href="@routes.UsersController.show(user)">@user</a>
 
                     @if(isPermitted(STREAMS_EDIT, stream.getId)) {
                         <a href="@routes.AlertsController.removeReceiverUser(stream.getId, user)" data-confirm="Really remove receiver?">
-                            <i class="icon icon-remove"></i>
+                            <i class="fa fa-remove"></i>
                         </a>
                     }
                 </li>
@@ -103,12 +103,12 @@
 
             @for(email <- stream.getEmailAlertReceivers) {
                 <li>
-                    <i class="icon icon-envelope"></i>&nbsp;
+                    <i class="fa fa-envelope"></i>&nbsp;
                     @email
 
                     @if(isPermitted(STREAMS_EDIT, stream.getId)) {
                         <a href="@routes.AlertsController.removeReceiverEmail(stream.getId, email)" data-confirm="Really remove receiver?">
-                            <i class="icon icon-remove"></i>
+                            <i class="fa fa-remove"></i>
                         </a>
                     }
                 </li>

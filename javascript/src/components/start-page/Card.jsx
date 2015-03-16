@@ -10,9 +10,9 @@ var Card = React.createClass({
 
         if (this.props.type === "info") {
             classes = classes + " info";
-            icon = <i className="icon icon-lightbulb pull-left"></i>;
+            icon = <i className="fa fa-lightbulb-o pull-left"></i>;
         } else if (this.props.icon) {
-            icon = <i className={"icon pull-left " + this.props.icon}></i>;
+            icon = <i className={"fa pull-left " + this.props.icon}></i>;
         }
 
         if (this.props.title) {

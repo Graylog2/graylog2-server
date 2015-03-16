@@ -83,7 +83,7 @@ var SourceLineChart = React.createClass({
         };
         var loadingSpinner = (
             <div className="sources overlay" style={loadingSpinnerStyle}>
-                <i className="icon-spin icon-refresh spinner"></i>
+                <i className="fa fa-spin fa-refresh spinner"></i>
             </div>
         );
 
@@ -97,10 +97,10 @@ var SourceLineChart = React.createClass({
         return (
             <div id="dc-sources-line-chart" className="span12">
                 <h3>
-                    <i className="icon icon-calendar"></i> Messages per {this.props.resolution}&nbsp;
+                    <i className="fa fa-calendar"></i> Messages per {this.props.resolution}&nbsp;
                     <small>
                         <a href="javascript:undefined" className="reset" onClick={this.props.resetFilters} title="Reset filter" style={{"display": "none"}}>
-                            <i className="icon icon-retweet"></i>
+                            <i className="fa fa-retweet"></i>
                         </a>
                     </small>
                 </h3>

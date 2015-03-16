@@ -19,7 +19,7 @@
 
     <div class="row-fluid">
         <h1>
-            <i class="icon icon-beaker"></i>
+            <i class="fa fa-beaker"></i>
             Extractors of <em>@input.getTitle</em>
         </h1>
 
@@ -32,7 +32,7 @@
     @*Add extractor wizard *@
     <div class="row-fluid xtrc-select-message">
         <h2>
-            <i class="icon icon-signin"></i>
+            <i class="fa fa-signin"></i>
             Add extractor
         </h2>
 
@@ -72,7 +72,7 @@
             </form>
         </div>
 
-        <div class="spinner" style="display: none;"><h2><i class='icon-refresh icon-spin'></i> &nbsp;Loading message</h2></div>
+        <div class="spinner" style="display: none;"><h2><i class='fa-refresh fa-spin'></i> &nbsp;Loading message</h2></div>
 
         <div class="xtrc-message" style="display: none;">
             We found this message.
@@ -91,7 +91,7 @@
 
     <div class="row-fluid xtrc-wizard" style="display: none;">
         <h2>
-            <i class="icon icon-signin"></i>
+            <i class="fa fa-signin"></i>
             Add extractor on field
             <span class="xtrc-wizard-field"></span>
         </h2>
@@ -119,12 +119,12 @@
     @*Extractor list*@
     <div class="row-fluid xtrc-list-container">
         <span class="pull-right">
-            <i class="icon icon-lightbulb"></i>
+            <i class="fa fa-lightbulb"></i>
             Change execution order by dragging on the icons.
         </span>
 
         <h2>
-            <i class="icon icon-cogs"></i>
+            <i class="fa fa-cogs"></i>
             Configured extractors
         </h2>
 
@@ -134,7 +134,7 @@
                 <li id="@extractor.getId">
                 <div class="row-fluid node-row">
                     <h3>
-                        <i class="icon icon-reorder xtrc-order-handle"></i>
+                        <i class="fa fa-reorder xtrc-order-handle"></i>
                         <strong>@extractor.getTitle</strong> (@extractor.getType().toHumanReadable)
 
                         @if(extractor.getTotalExceptions > 0) {
@@ -171,7 +171,7 @@
 
                         @if(extractor.getTotalExceptions > 0) {
                             <div class="alert alert-danger">
-                                <i class="icon icon-warning-sign"></i>
+                                <i class="fa fa-warning-sign"></i>
                                 This extractor has thrown <em>@extractor.getExceptions</em> exception@if(extractor.getExceptions != 1) {s}
                                 during extraction and <em>@extractor.getConverterExceptions</em>
                                 exception@if(extractor.getConverterExceptions != 1) {s}

@@ -23,13 +23,13 @@
     @views.html.partials.breadcrumbs(breadcrumbs)
 
     <div class="row-fluid">
-        <h1><i class="icon icon-sitemap"></i> Radio @radio.getHostname / @radio.getShortNodeId</h1>
+        <h1><i class="fa fa-sitemap"></i> Radio @radio.getHostname / @radio.getShortNodeId</h1>
         This page shows details of a Graylog radio that is active and has registered itself in your cluster.
     </div>
 
     <div class="row-fluid">
         <div class="alert alert-info">
-            <i class="icon icon-retweet"></i> &nbsp; Lifecycle state:
+            <i class="fa fa-retweet"></i> &nbsp; Lifecycle state:
             <strong>@radio.getLifecycle</strong>
         </div>
     </div>
@@ -38,26 +38,26 @@
     @if(radio.lbAlive()) {
         <div class="row-fluid">
             <div class="alert alert-success">
-                <i class="icon icon-heart"></i> &nbsp; Marked as <strong>ALIVE</strong> for load balancers.
+                <i class="fa fa-heart"></i> &nbsp; Marked as <strong>ALIVE</strong> for load balancers.
             </div>
         </div>
     } else {
         <div class="row-fluid">
             <div class="alert alert-error">
-                <i class="icon icon-heart"></i> &nbsp; Marked as <strong>DEAD</strong> for load balancers.
+                <i class="fa fa-heart"></i> &nbsp; Marked as <strong>DEAD</strong> for load balancers.
             </div>
         </div>
     }
 
     <div class="row-fluid">
         <div class="alert alert-success">
-            <i class="icon icon-ok-sign"></i> &nbsp; Radio is producing <strong class="node-throughput focuslimit" data-node-type="radio" data-radio-id="@radio.getId">?</strong>
+            <i class="fa fa-ok-sign"></i> &nbsp; Radio is producing <strong class="node-throughput focuslimit" data-node-type="radio" data-radio-id="@radio.getId">?</strong>
             messages per second.
         </div>
     </div>
 
     <div class="row-fluid node-heap-usage" data-node-type="radio" data-radio-id="@radio.getId">
-        <h2><i class="icon icon-tasks"></i> Memory/Heap usage</h2>
+        <h2><i class="fa fa-tasks"></i> Memory/Heap usage</h2>
 
         <div class="progress">
             <div class="bar bar-warning heap-used-percent" style="width: @radio.jvm.usedMemoryPercentage()%;"></div>
@@ -71,7 +71,7 @@
     <hr />
 
     <div class="row-fluid">
-        <h2><i class="icon icon-shield"></i> Buffers</h2>
+        <h2><i class="fa fa-shield"></i> Buffers</h2>
         <div class="row-fluid">
             <div class="span6">
                 <a href="@routes.MetricsController.ofRadio(radio.getId, "org.graylog2.shared.buffers.InputBuffer")" class="btn btn-info btn-mini pull-right">Metrics</a>
@@ -102,7 +102,7 @@
 
     <div class="row-fluid">
         <div class="span6">
-            <h2><i class="icon icon-cogs"></i> System</h2>
+            <h2><i class="fa fa-cogs"></i> System</h2>
 
             <dl class="system-system">
                 <dt>Hostname:</dt>
@@ -120,7 +120,7 @@
         </div>
 
         <div class="span6">
-            <h2><i class="icon icon-signin"></i> REST API</h2>
+            <h2><i class="fa fa-signin"></i> REST API</h2>
 
             <dl class="system-rest">
                 <dt>Transport address:</dt>
@@ -136,7 +136,7 @@
             <a href="@routes.InputsController.manageRadio(radio.getId)" class="btn btn-small btn-success pull-right">
                 Manage inputs</a>
         }
-        <h2><i class="icon icon-cloud-download"></i> Installed/available input types <span style="font-size: 12px;">@radio.getInputs.size() @pluralize("input", radio.getInputs.size()) running.</span></h2>
+        <h2><i class="fa fa-cloud-download"></i> Installed/available input types <span style="font-size: 12px;">@radio.getInputs.size() @pluralize("input", radio.getInputs.size()) running.</span></h2>
 
         <table class="table table-striped table-hover table-condensed">
             <thead>
@@ -154,7 +154,7 @@
                     <td>
                     @if(info.linkToDocs != null && !info.linkToDocs.isEmpty) {
                         <a href="@info.linkToDocs" target="_blank">
-                            <i class="icon icon-external-link"></i> Documentation
+                            <i class="fa fa-external-link"></i> Documentation
                         </a>
                     } else {
                             &nbsp;

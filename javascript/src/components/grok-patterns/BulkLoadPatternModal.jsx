@@ -22,7 +22,7 @@ var BulkLoadPatternModal = React.createClass({
         );
         return (
             <span>
-                <button className="btn btn-small btn-success" style={{marginRight: 5}} onClick={this.openModal}><i className="icon icon-file"></i> Import pattern file</button>
+                <button className="btn btn-small btn-success" style={{marginRight: 5}} onClick={this.openModal}><i className="fa fa-file"></i> Import pattern file</button>
 
                 <BootstrapModal 
                     ref="modal" 

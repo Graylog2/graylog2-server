@@ -32,7 +32,7 @@ $(document).ready(function() {
     $(".xtrc-try-regex").on("click", function() {
         var button = $(this);
 
-        button.html("<i class='icon-refresh icon-spin'></i> Trying...");
+        button.html("<i class='fa fa-refresh fa-spin'></i> Trying...");
         $.ajax({
             url: appPrefixed('/a/tools/regex_test'),
             data: {
@@ -72,7 +72,7 @@ $(document).ready(function() {
             return;
         }
 
-        button.html("<i class='icon-refresh icon-spin'></i> Trying...");
+        button.html("<i class='fa fa-refresh fa-spin'></i> Trying...");
         $.ajax({
             url: appPrefixed('/a/tools/substring_test'),
             data: {
@@ -123,7 +123,7 @@ $(document).ready(function() {
 
         var warningText = "We were not able to run the split&index extraction. Please check your parameters.";
 
-        button.html("<i class='icon-refresh icon-spin'></i> Trying...");
+        button.html("<i class='fa fa-refresh fa-spin'></i> Trying...");
         $.ajax({
             url: appPrefixed('/a/tools/split_and_index_test'),
             data: {
@@ -175,7 +175,7 @@ $(document).ready(function() {
 
         var warningText = "We were not able to run the grok extraction. Please check your parameters.";
 
-        button.html("<i class='icon-refresh icon-spin'></i> Trying...");
+        button.html("<i class='fa fa-refresh fa-spin'></i> Trying...");
         $.ajax({
             url: appPrefixed('/a/tools/grok_test'),
             data: {
@@ -292,7 +292,7 @@ $(document).ready(function() {
     $(".try-xtrc-condition").on("click", function() {
         var button = $(this);
 
-        button.html("<i class='icon-refresh icon-spin'></i> Trying...");
+        button.html("<i class='fa fa-refresh fa-spin'></i> Trying...");
         $.ajax({
             url: appPrefixed('/a/tools/regex_test'),
             data: {

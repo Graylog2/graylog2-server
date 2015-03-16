@@ -182,19 +182,19 @@ $(document).ready(function() {
                     var login_auth_classes = "";
                     var entry_exists_classes = "";
                     if (loginResult.login_authenticated) {
-                        login_auth_classes = "icon-ok ldap-success";
+                        login_auth_classes = "fa fa-check ldap-success";
                     } else {
                         if ($("ldap-test-password").val() === "") {
                             // we didn't even try to log in, just reading the entry.
-                            login_auth_classes = "icon-meh";
+                            login_auth_classes = "fa fa-meh-o";
                         } else {
-                            login_auth_classes = "icon-meh ldap-failure";
+                            login_auth_classes = "fa fa-meh-o ldap-failure";
                         }
                     }
                     if (isEmptyEntry) {
-                        entry_exists_classes = "icon-meh ldap-failure";
+                        entry_exists_classes = "fa fa-meh-o ldap-failure";
                     } else {
-                        entry_exists_classes = "icon-ok ldap-success";
+                        entry_exists_classes = "fa fa-check ldap-success";
                     }
 
                     $("#login-authenticated").attr('class', login_auth_classes);

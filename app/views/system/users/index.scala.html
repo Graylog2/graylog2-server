@@ -13,7 +13,7 @@
     @views.html.partials.breadcrumbs(breadcrumbs)
 
     <div class="row-fluid">
-        <h1><i class="icon icon-group"></i> User accounts</h1>
+        <h1><i class="fa fa-group"></i> User accounts</h1>
         Create as many users as you want next to the default administrator user here. You can also configure
         LDAP and make changes to already existing users.
     </div>
@@ -38,10 +38,10 @@
                 }">
                     <td class="centered">
                     @if(user.isReadonly) {
-                        <i title="System User" class="icon-lock"></i>
+                        <i title="System User" class="fa-lock"></i>
                     }
                     @if(user.isExternal) {
-                        <i title="LDAP User" class="icon-cloud"></i>
+                        <i title="LDAP User" class="fa-cloud"></i>
                     }
                     </td>
                     <td class="limited">@user.getFullName</td>
@@ -58,10 +58,10 @@
                             @if(!user.isReadonly) {
                                 @if(isPermitted(USERS_EDIT)) {
                                     <form class="edit-user-form" data-username="@user.getName" method="POST" action="@routes.UsersController.delete(user.getName)">
-                                        <button id="delete-user" type="submit" class="btn btn-mini" title="Delete" data-confirm="Really delete user @user.getName?"><i class="icon-remove icon-large"></i></button>
+                                        <button id="delete-user" type="submit" class="btn btn-mini" title="Delete" data-confirm="Really delete user @user.getName?"><i class="fa fa-remove fa-large"></i></button>
                                     </form>
                                 }
-                                <a id="edit-user" href="@routes.UsersController.editUserForm(user.getName)" class="btn btn-mini" title="Edit"><i class="icon-edit icon-large"></i></a>
+                                <a id="edit-user" href="@routes.UsersController.editUserForm(user.getName)" class="btn btn-mini" title="Edit"><i class="fa fa-edit fa-large"></i></a>
                             }
                         </div>
                     </td>

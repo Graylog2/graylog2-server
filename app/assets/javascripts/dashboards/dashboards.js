@@ -378,7 +378,7 @@ $(document).ready(function() {
 
         $(".value, .dashboard-chart, .widget-error-active", widget)
             .show()
-            .html("<i class='icon icon-warning-sign loading-failed'></i>");
+            .html("<i class='fa fa-warning loading-failed'></i>");
     }
 
 });

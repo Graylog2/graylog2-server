@@ -5,11 +5,11 @@
 
 <div class="detail-message">
     <div class="pull-right sidebar-back">
-        <i class="icon-mail-reply" title="Go back"></i>
+        <i class="fa fa-mail-reply" title="Go back"></i>
     </div>
 
     <h2>
-        <i class="icon icon-envelope copy-clipboard" data-clipboard-text="@message.getId" data-toggle="tooltip" data-initial-title="Copy Id" data-trigger="manual"></i>
+        <i class="fa fa-envelope copy-clipboard" data-clipboard-text="@message.getId" data-toggle="tooltip" data-initial-title="Copy Id" data-trigger="manual"></i>
         <a href="@routes.MessagesController.show(message.getIndex, message.getId)">
             @message.getId
         </a>
@@ -23,7 +23,7 @@
 
     Received by
     @if(sourceInput != null) {
-        <i class="icon icon-cloud-download"></i>
+        <i class="fa fa-cloud-download"></i>
         <em>@sourceInput.getTitle</em>
     } else {
         <em>deleted input</em>
@@ -41,7 +41,7 @@
         via
 
         @if(sourceRadioInput != null) {
-            <i class="icon icon-cloud-download"></i>
+            <i class="fa fa-cloud-download"></i>
             <em>@sourceRadioInput.getTitle</em>
         } else {
             <em>deleted input</em>

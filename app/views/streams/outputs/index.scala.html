@@ -12,7 +12,7 @@
 
     <div class="row-fluid">
         <h1>
-            <i class="icon icon-download-alt"></i>
+            <i class="fa fa-download-alt"></i>
             Outputs for Stream &raquo;@stream.getTitle&laquo;
         </h1>
         Graylog nodes can forward messages of streams via outputs. Launch or terminate as many outputs as you want here.
@@ -60,7 +60,7 @@
     }
 
     <div class="outputs-list">
-        <h2><i class="icon icon-cogs"></i> Configured outputs</h2>
+        <h2><i class="fa fa-cogs"></i> Configured outputs</h2>
 
         @if(outputs.size > 0) {
             @for(output <- outputs.toSeq.sortBy(_.getTitle.toLowerCase)) {

@@ -633,12 +633,12 @@ $(document).ready(function() {
             
             var icon = linkElem.children().first();
 
-            if(icon.hasClass("icon-caret-right")) {
-                icon.removeClass("icon-caret-right");
-                icon.addClass("icon-caret-down");
+            if(icon.hasClass("fa-caret-right")) {
+                icon.removeClass("fa-caret-right");
+                icon.addClass("fa-caret-down");
             } else {
-                icon.removeClass("icon-caret-down");
-                icon.addClass("icon-caret-right");
+                icon.removeClass("fa-caret-down");
+                icon.addClass("fa-caret-right");
             }
         });
 

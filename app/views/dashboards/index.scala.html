@@ -11,7 +11,7 @@
         <a href="@routes.DashboardsController.newDashboard()" class="btn btn-success pull-right">Create dashboard</a>
         }
 
-        <h1><i class="icon icon-dashboard"></i> Dashboards</h1>
+        <h1><i class="fa fa-dashboard"></i> Dashboards</h1>
         Use dashboards to create specific views on your messages. Create a new dashboard here and add any graph or chart
         you create in other parts of Graylog with one click.
 
@@ -20,7 +20,7 @@
 
     @if(dashboards.filter(d => isPermitted(DASHBOARDS_READ, d.getId)).isEmpty) {
         <div class="alert alert-warn">
-            <i class="icon icon-info-sign"></i>
+            <i class="fa fa-info-sign"></i>
             No dashboards configured. @if(isPermitted(DASHBOARDS_CREATE)) { <a href="@routes.DashboardsController.newDashboard()">Create one now</a>. }
         </div>
     }
@@ -34,7 +34,7 @@
                 <div class="list-actions">
                     @if(!currentUser.isReadonly) {
                         <a href="@routes.StartpageController.set("dashboard", dashboard.getId)"
-                        class="btn btn-mini"><i class="icon-home"></i> Set as start page</a>
+                        class="btn btn-mini"><i class="fa fa-home"></i> Set as start page</a>
                     }
 
                     @if(isPermitted(DASHBOARDS_EDIT, dashboard.getId)) {
@@ -47,7 +47,7 @@
 
                         @helper.form(action = routes.DashboardsController.delete(dashboard.getId)) {
                             <button type="submit" class="btn btn-danger btn-mini" data-confirm="Really delete dashboard @dashboard.getTitle?">
-                                <i class="icon-remove"></i> Delete
+                                <i class="fa fa-remove"></i> Delete
                             </button>
                         }
                     }
@@ -55,11 +55,11 @@
             </div>
 
             <h3>
-                <i class="icon icon-ellipsis-vertical"></i>
+                <i class="fa fa-ellipsis-vertical"></i>
                 <a href="@routes.DashboardsController.show(dashboard.getId)">
                 <span data-dashboard-id="@dashboard.getId" class="dashboard-title">@dashboard.getTitle</span>
                 @if(dashboard.getContentPack != null) {
-                    <span title="Created from content pack"><i class="icon-gift"></i></span>
+                    <span title="Created from content pack"><i class="fa fa-gift"></i></span>
                 }
                 </a>
             </h3>

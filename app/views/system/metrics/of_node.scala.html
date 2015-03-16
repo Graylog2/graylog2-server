@@ -6,7 +6,7 @@
 
     <div class="row-fluid">
         <h1>
-            <i class="icon icon-bar-chart"></i>
+            <i class="fa fa-bar-chart"></i>
             Metrics of @node.getShortNodeId
             / @node.getHostname
         </h1>
@@ -25,23 +25,23 @@
             <li data-metricname="@name" @if(!name.matches("^" + preFilter + ".*")){ style="display: none;" }>
                 <div class="name">
                     @if(metric.getType.equals(Metric.MetricType.TIMER)) {
-                        <i class="icon icon-time"></i>
+                        <i class="fa fa-time"></i>
                     }
 
                     @if(metric.getType.equals(Metric.MetricType.HISTOGRAM)) {
-                        <i class="icon icon-signal"></i>
+                        <i class="fa fa-signal"></i>
                     }
 
                     @if(metric.getType.equals(Metric.MetricType.METER)) {
-                        <i class="icon icon-play-circle"></i>
+                        <i class="fa fa-play-circle"></i>
                     }
 
                     @if(metric.getType.equals(Metric.MetricType.GAUGE)) {
-                        <i class="icon icon-dashboard"></i>
+                        <i class="fa fa-dashboard"></i>
                     }
 
                     @if(metric.getType.equals(Metric.MetricType.COUNTER)) {
-                        <i class="icon icon-circle"></i>
+                        <i class="fa fa-circle"></i>
                     }
 
                     <a href="#" class="open" data-metricname="@name">

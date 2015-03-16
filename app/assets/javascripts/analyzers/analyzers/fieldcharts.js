@@ -33,7 +33,7 @@ $(document).ready(function() {
 
     function insertSpinner(position) {
         var defaultElement = $("#field-graph-template");
-        var spinnerElement = $('<div class="spinner" style="height: 200px;"><i class="icon-spin icon-refresh icon-3x spinner"></i></div>');
+        var spinnerElement = $('<div class="spinner" style="height: 200px;"><i class="fa fa-spin fa-refresh fa-3x spinner"></i></div>');
         spinnerElement.attr("data-position", position);
         var previousElement = findPreviousGraph(position, "data-position");
         if (previousElement === null) {

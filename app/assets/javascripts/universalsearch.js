@@ -126,7 +126,7 @@ $(document).ready(function() {
         button.prop("disabled", true);
         input.prop("disabled", true);
 
-        button.html("<i class='icon icon-spin icon-spinner'></i>&nbsp; Saving");
+        button.html("<i class='fa fa-spin fa-spinner'></i>&nbsp; Saving");
 
         var params = {};
         params.query = originalUniversalSearchSettings(searchViewState);
@@ -139,10 +139,10 @@ $(document).ready(function() {
                 "params": JSON.stringify(params)
             },
             success: function(data) {
-                button.html("<i class='icon icon-ok'></i>&nbsp; Saved");
+                button.html("<i class='fa fa-check'></i>&nbsp; Saved");
             },
             error: function(data) {
-                button.html("<i class='icon icon-warning-sign'></i>&nbsp; Failed");
+                button.html("<i class='fa fa-warning'></i>&nbsp; Failed");
                 button.switchClass("btn-success", "btn-danger");
                 showError("Could not save search.")
             }

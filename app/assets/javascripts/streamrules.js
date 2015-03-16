@@ -193,7 +193,7 @@ $(document).ready(function() {
                 $("li", container).addClass("alert-success");
                 var matchStatus = $("i.match-status");
                 matchStatus.show();
-                matchStatus.addClass("icon icon-ok");
+                matchStatus.addClass("fa fa-check");
             },
             function (result) {
                 // Not all matched.
@@ -238,10 +238,10 @@ $(document).ready(function() {
                 var match = rules[streamruleId];
                 if (match != undefined) {
                     if (match) {
-                        matchStatus.switchClass("icon-warning-sign", "icon-ok");
+                        matchStatus.switchClass("fa-warning", "fa-check");
                         rule.switchClass("alert-danger alert-info", "alert-success");
                     } else {
-                        matchStatus.switchClass("icon-ok", "icon-warning-sign");
+                        matchStatus.switchClass("fa-check", "fa-warning");
                         rule.switchClass("alert-success alert-info", "alert-danger");
                     }
                 }

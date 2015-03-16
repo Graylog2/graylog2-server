@@ -9,15 +9,15 @@
 @main(dashboard.getTitle, null, "", currentUser, false) {
 
     <div class="pull-right dashboard-controls">
-        <i class="icon icon-refresh update-onfocussed-on" title="Update unfocussed" style="color: #B0B0B0;"></i>
-        <i class="icon icon-refresh update-onfocussed-off" title="Do not update when unfocussed" style="display: none; color: #000000"></i>
+        <i class="fa fa-refresh update-onfocussed-on" title="Update unfocussed" style="color: #B0B0B0;"></i>
+        <i class="fa fa-refresh update-onfocussed-off" title="Do not update when unfocussed" style="display: none; color: #000000"></i>
             &nbsp;
         @if(isPermitted(DASHBOARDS_EDIT, dashboard.getId)) {
-        <i class="icon icon-lock unlock-dashboard-widgets" title="Unlock widget positions"></i>
-        <i class="icon icon-unlock lock-dashboard-widgets" title="Lock widget positions" style="display: none;"></i>
+        <i class="fa fa-lock unlock-dashboard-widgets" title="Unlock widget positions"></i>
+        <i class="fa fa-unlock lock-dashboard-widgets" title="Lock widget positions" style="display: none;"></i>
         &nbsp;
         }
-        <i class="icon icon-fullscreen toggle-fullscreen" title="Fullscreen"></i>
+        <i class="fa fa-fullscreen toggle-fullscreen" title="Fullscreen"></i>
     </div>
 
     @views.html.partials.breadcrumbs(breadcrumbs)
@@ -26,7 +26,7 @@
         @dashboard.getTitle
 
         <a href="#" class="edit-dashboard only-unlocked" style="display: none; line-height: 12px;">
-            <i class="icon icon-pencil" title="Edit"></i>
+            <i class="fa fa-pencil" title="Edit"></i>
         </a>
     </h1>
 
@@ -72,12 +72,12 @@
                                                 data-fixed-time-axis="@widget.hasFixedTimeAxis">
 
                                 <div class="pull-left widget-top controls only-unlocked">
-                                    <a href="#" class="remove-widget"><i class="icon icon-remove"></i></a>
+                                    <a href="#" class="remove-widget"><i class="fa fa-remove"></i></a>
                                 </div>
 
                                 <div class="pull-left widget-top controls hidden-unlocked widget-top" style="display : block ;">
                                     <a href="#" class="show-config">
-                                        <i class="icon icon-calendar-empty" title="Show widget config"></i>
+                                        <i class="fa fa-calendar-o" title="Show widget config"></i>
                                     </a>
                                 </div>
 
@@ -91,7 +91,7 @@
                                         </span>
 
                                         <a href="#" class="edit-cache-time">
-                                            <i class="icon icon-edit"></i>
+                                            <i class="fa fa-edit"></i>
                                         </a>
                                     </span>
                                 </div>

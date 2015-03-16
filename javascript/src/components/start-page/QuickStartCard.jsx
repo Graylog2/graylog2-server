@@ -9,7 +9,7 @@ var QuickStartCard = React.createClass({
         var quickStartDescription = <p>New to Graylog&#63; Select a configuration bundle to get you started:</p>;
 
         return (
-            <Card title="Quick Start" icon="icon-plane">
+            <Card title="Quick Start" icon="fa-plane">
                 {quickStartDescription}
                 <ConfigurationBundles />
             </Card>

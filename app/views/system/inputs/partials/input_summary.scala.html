@@ -25,7 +25,7 @@
                     <button class="btn btn-danger btn-mini"
                     type="submit"
                     data-confirm="Really delete input @input.getTitle?">
-                        <i class="icon icon-remove"></i> Delete
+                        <i class="fa fa-remove"></i> Delete
                     </button>
                 </form>
             }
@@ -55,19 +55,19 @@
                 Network IO:
 
                 <span class="persec">
-                    <i class="icon icon-caret-down channel-direction channel-direction-down"></i>
+                    <i class="fa fa-caret-down channel-direction channel-direction-down"></i>
                     <span class="rx value">@Tools.byteToHuman(input.getReadBytes)</span>
 
-                    <i class="icon icon-caret-up channel-direction channel-direction-up"></i>
+                    <i class="fa fa-caret-up channel-direction channel-direction-up"></i>
                     <span class="tx value">@Tools.byteToHuman(input.getWrittenBytes)</span>
                 </span>
 
                 <span class="total">
                     (total:
-                    <i class="icon icon-caret-down channel-direction channel-direction-down"></i>
+                    <i class="fa fa-caret-down channel-direction channel-direction-down"></i>
                     <span class="rx value">@Tools.byteToHuman(input.getTotalReadBytes)</span>
 
-                    <i class="icon icon-caret-up channel-direction channel-direction-up"></i>
+                    <i class="fa fa-caret-up channel-direction channel-direction-up"></i>
                     <span class="tx value">@Tools.byteToHuman(input.getTotalWrittenBytes)</span>
                     )
                 </span>
@@ -94,7 +94,7 @@
         @if(!input.getStaticFields.isEmpty) {
             <div class="static-fields">
                 <h4 style="display: inline;">
-                    <i class="icon icon-tag"></i> Static fields
+                    <i class="fa fa-tag"></i> Static fields
                 </h4><br />
                 <ul>
                 @for((k,v) <- input.getStaticFields) {
@@ -105,7 +105,7 @@
                     class="remove-static-field"
                     style="display: none;"
                     data-confirm="Really delete static field?">
-                        <i class="icon icon-remove"></i>
+                        <i class="fa fa-remove"></i>
                     </a>
                     }
                     </li>
