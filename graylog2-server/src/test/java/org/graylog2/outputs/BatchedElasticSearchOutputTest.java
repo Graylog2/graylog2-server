@@ -128,7 +128,7 @@ public class BatchedElasticSearchOutputTest {
         }
 
         // Give the asynchronous flush a chance to finish
-        Uninterruptibles.sleepUninterruptibly(100, TimeUnit.MILLISECONDS);
+        Uninterruptibles.sleepUninterruptibly(250, TimeUnit.MILLISECONDS);
 
         verify(messages, times(1)).bulkIndex(eq(messageList.subList(0, batchSize)));
     }
