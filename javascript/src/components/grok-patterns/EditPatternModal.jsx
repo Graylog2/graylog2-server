@@ -30,7 +30,7 @@ var EditDashboardModal = React.createClass({
         return this.state.name !== undefined ? prefixIdName + this.state.name : prefixIdName;
     },
     render() {
-        var header = <h2>{this.props.create ? "Create" : "Edit"} Grok Pattern {this.state.name}</h2>;
+        var header = <h2 class="modal-title">{this.props.create ? "Create" : "Edit"} Grok Pattern {this.state.name}</h2>;
         var body = (
             <fieldset>
                 <div className={this.state.error ? "form-group has-error" : "form-group"}>

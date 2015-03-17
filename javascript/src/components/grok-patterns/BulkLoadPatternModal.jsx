@@ -10,7 +10,7 @@ var BulkLoadPatternModal = React.createClass({
         return {};
     },
     render() {
-        var header = <h2>Import Grok patterns from file</h2>;
+        var header = <h2 class="modal-title">Import Grok patterns from file</h2>;
         var body = (
             <div>
                 <div className="form-group">

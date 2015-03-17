@@ -21,7 +21,7 @@ var EditDashboardModal = React.createClass({
         this.setState({title: event.target.value});
     },
     render() {
-        var header = <h2>Edit Dashboard {this.props.title}</h2>;
+        var header = <h2 class="modal-title">Edit Dashboard {this.props.title}</h2>;
         var body = (
             <fieldset>
                 <div className="form-group">
