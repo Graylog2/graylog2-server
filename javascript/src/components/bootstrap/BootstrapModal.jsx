@@ -49,19 +49,22 @@ var BootstrapModal = React.createClass({
                 );
         }
         var formContent = (
-            <div className="modal-content">
+            <div>
                 <div className="modal-header">
                     <button
                         type="button"
                         className="close"
                         data-dismiss="modal"
+                        aria-label="Close"
                         onClick={this.props.onCancel}
                         dangerouslySetInnerHTML={{__html: '&times'}}
                     />
                             {Array.isArray(this.props.children) ? this.props.children[0] : this.props.children}
                 </div>
                 <div ref="body" className="modal-body">
-                    {this.props.children[1]}
+                    <div className="container-fluid">
+                        {this.props.children[1]}
+                    </div>
                 </div>
                 <div ref="footer" className="modal-footer">
                           {cancelButton}
@@ -83,7 +86,9 @@ var BootstrapModal = React.createClass({
         return (
             <div ref="modal" className="modal fade" aria-hidden="true" role="dialog" tabIndex="-1">
                 <div className="modal-dialog">
-                    {form}
+                    <div className="modal-content">
+                        {form}
+                    </div>
                 </div>
             </div>
             );
