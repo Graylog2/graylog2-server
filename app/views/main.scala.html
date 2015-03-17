@@ -29,7 +29,7 @@
 			    @partials.universalsearch(searchQuery)
             }
 
-            <div class="row-fluid error-bar">
+            <div class="row error-bar">
             @if(flash.get("error") != null && !flash.get("error").isEmpty()) {
                 <div class="alert alert-error main-error">
                     <strong>Error!</strong>
@@ -44,7 +44,7 @@
             }
             </div>
 
-	    	<div class="row-fluid">
+	    	<div class="row">
                 @if(sidebarContent != null) {
                     <div class="col-md-3" id="sidebar">
                         <div class="content-col" id="sidebar-inner">
@@ -58,7 +58,7 @@
                         @content
                     </div>
                 } else {
-                    <div class="col-md=12" id="main-content">
+                    <div class="col-md-12" id="main-content">
                         @content
                     </div>
                 }
