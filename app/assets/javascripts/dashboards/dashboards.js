@@ -337,7 +337,7 @@ $(document).ready(function() {
         modalWindow.modal();
     });
 
-    $("#dashboardwidget-cache-time").on("shown", focusFirstFormInput);
+    $("#dashboardwidget-cache-time").on("shown.bs.modal", focusFirstFormInput);
 
     $("#dashboardwidget-cache-time input.cachetime-value").on("keyup", function() {
         if ($(this).val().length > 0 && isNumber($(this).val()) && parseInt($(this).val()) >= 1) {

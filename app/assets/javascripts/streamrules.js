@@ -78,7 +78,7 @@ $(document).ready(function() {
         e.preventDefault();
     });
 
-    $(document.body).on("shown", "div#streamrule-form-modal.modal", focusFirstFormInput);
+    $(document.body).on("shown.bs.modal", "div#streamrule-form-modal.modal", focusFirstFormInput);
 
     // Stream rules inverter.
     $("form#streamrule-form").on("click", "#sr-inverted", function() {

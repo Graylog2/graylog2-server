@@ -327,9 +327,9 @@ $(document).ready(function() {
     });
 
     // Set the focus on the first element of modals
-    $(".input-configuration.modal").on("shown", focusFirstFormInput);
-    $(".input-add-static-field.modal").on("shown", focusFirstFormInput);
-    $(".edit-input-configuration.modal").on("shown", focusFirstFormInput);
+    $(".input-configuration.modal").on("shown.bs.modal", focusFirstFormInput);
+    $(".input-add-static-field.modal").on("shown.bs.modal", focusFirstFormInput);
+    $(".edit-input-configuration.modal").on("shown.bs.modal", focusFirstFormInput);
 
 
     // Remove static field.
