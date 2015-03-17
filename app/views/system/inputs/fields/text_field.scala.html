@@ -24,18 +24,18 @@
     }
 }
 
-<label>
+<label for="@field.getTitle">
     @field.getHumanName
     @if(field.isOptional) {
         <span class="configuration-field-optional">(optional)</span>
     }
 </label>
-<span class="help-block">@field.getDescription</span>
 @if(field.hasAttribute("textarea")) {
-    <textarea class="textarea-xlarge"
+    <textarea id="@field.getTitle" class="textarea-xlarge form-control"
         @htmlAttributes(field)>@fieldValue(value, field.getDefaultValue, field.hasAttribute("is_password"), true)</textarea>
 } else {
-    <input class="input-xlarge"
+    <input id="@field.getTitle" class="input-xlarge form-control"
         @htmlAttributes(field)
         value="@fieldValue(value, field.getDefaultValue, field.hasAttribute("is_password"), false)">
 }
+<p class="help-block">@field.getDescription</p>

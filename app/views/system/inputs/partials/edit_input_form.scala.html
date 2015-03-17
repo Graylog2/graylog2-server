@@ -5,62 +5,72 @@
 
 @import org.graylog2.restclient.lib.plugin.configuration.DropdownField
 
-<div id="edit-input-@input.getId" class="edit-input-configuration modal hide fade">
-    <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-        <h2>
-            <i class="fa fa-signin"></i> Edit input: <em>@input.getTitle</em> (@inputInfo.name)
-        </h2>
+<form action="@routes.InputsController.update(input.getId)" method="POST">
+    <div id="edit-input-@input.getId" class="edit-input-configuration modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h2 class="modal-title">
+                        <i class="fa fa-signin"></i> Edit input: <em>@input.getTitle</em> (@inputInfo.name)
+                    </h2>
+                </div>
+
+                <div class="modal-body">
+                    <input type="hidden" name="type" value="@inputType" />
+
+                    @if(input.getGlobal) {
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" class="input-global-checkbox" name="global" disabled="disabled" checked="checked">
+                                <span class="help-block">Global input (started on all nodes)</span>
+                            </label>
+                        </div>
+                        <input type="hidden" name="global" value="true">
+                    } else {
+                        <label for="node-@input.getId">Started on node:</label>
+                        <select name="node-@input.getId" disabled="disabled" class="input-node-selector form-control">
+                                <option value="@inputNode.getNodeId">@inputNode.getShortNodeId / @inputNode.getHostname</option>
+                        </select>
+                        <input type="hidden" name="node" value="@inputNode.getNodeId">
+                    }
+
+                    <label for="title-@input.getId">Title</label>
+                    <input id="title-@input.getId"
+                           name="title"
+                           type="text"
+                           value="@input.getTitle"
+                           class="input-xlarge form-control"
+                           required>
+                    <p class="help-block">Name describing the input.</p>
+
+                    @for(field <- inputInfo.getRequestedConfiguration) {
+
+                        @if(field.getType.equals("text")) {
+                            @views.html.system.inputs.fields.text_field(field, input.getAttributes.get(field.getTitle).asInstanceOf[String])
+                        }
+
+                        @if(field.getType.equals("number")) {
+                            @views.html.system.inputs.fields.number_field(field, input.getAttributes.get(field.getTitle).asInstanceOf[Number])
+                        }
+
+                        @if(field.getType.equals("boolean")) {
+                            @views.html.system.inputs.fields.boolean_field(field, input.getAttributes.get(field.getTitle) == true)
+                        }
+
+                        @if(field.getType.equals("dropdown")) {
+                            @views.html.system.inputs.fields.dropdown_field(field.asInstanceOf[DropdownField], input.getAttributes.get(field.getTitle).asInstanceOf[String])
+                        }
+                    }
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary update-input" data-input-id="@input.getId">Update input</button>
+                </div>
+            </div>
+        </div>
     </div>
-
-    <form action="@routes.InputsController.update(input.getId)" method="POST">
-        <input type="hidden" name="type" value="@inputType" />
-
-        <fieldset>
-            <div class="modal-body">
-
-                @if(input.getGlobal) {
-                    <label class="checkbox">
-                        <input type="checkbox" class="input-global-checkbox" name="global" disabled="disabled" checked="checked">
-                        <span class="help-block">Global input (started on all nodes)</span>
-                    </label>
-                    <input type="hidden" name="global" value="true">
-                } else {
-                    <label for="node">Started on node:</label>
-                    <select name="node" disabled="disabled" class="input-node-selector">
-                            <option value="@inputNode.getNodeId">@inputNode.getShortNodeId / @inputNode.getHostname</option>
-                    </select>
-                    <input type="hidden" name="node" value="@inputNode.getNodeId">
-                }
-
-                <label>Title</label>
-                <span class="help-block">Name describing the input.</span>
-                <input name="title" required="true" type="text" value="@input.getTitle" class="input-xlarge">
-
-                @for(field <- inputInfo.getRequestedConfiguration) {
-
-                    @if(field.getType.equals("text")) {
-                        @views.html.system.inputs.fields.text_field(field, input.getAttributes.get(field.getTitle).asInstanceOf[String])
-                    }
-
-                    @if(field.getType.equals("number")) {
-                        @views.html.system.inputs.fields.number_field(field, input.getAttributes.get(field.getTitle).asInstanceOf[Number])
-                    }
-
-                    @if(field.getType.equals("boolean")) {
-                        @views.html.system.inputs.fields.boolean_field(field, input.getAttributes.get(field.getTitle) == true)
-                    }
-
-                    @if(field.getType.equals("dropdown")) {
-                        @views.html.system.inputs.fields.dropdown_field(field.asInstanceOf[DropdownField], input.getAttributes.get(field.getTitle).asInstanceOf[String])
-                    }
-                }
-
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
-                <button type="submit" class="btn btn-primary update-input" data-input-id="@input.getId">Update input</button>
-            </div>
-        </fieldset>
-    </form>
-</div>
+</form>

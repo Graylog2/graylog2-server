@@ -1,30 +1,42 @@
 @(messageId: String)
 
 <div id="terms-msg-@messageId"
-	class="modal hide fade terms-msg-modal"
+	class="modal fade terms-msg-modal"
 	data-msg-id="@messageId"
 	tabindex="-1"
-	role="dialog">
-  <div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal">x</button>
-    <h2>Terms of message @messageId</h2>
-    You see all terms of this message. If you have a message that says <em>"Hello, this is a test."</em> you will
-    be able to find it searching for <em>hello</em> or <em>test</em> but the other words and character signs are stripped
-    out because they are not relevant. Note that only <em>message</em> and <em>full_message</em> are broken down to terms
-    and all other fields must fully match your search query.
-  </div>
-  
-  <div class="modal-body">
- 	<a href="#" id="terms-msg-@messageId-as-list" class="pull-right" style="display: none;">
- 		<i class="fa fa-list"></i> Show as list
- 	</a>
+	role="dialog"
+    aria-hidden="true"
+    tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h2 class="modal-title">Terms of message @messageId</h2>
+            </div>
 
-	<h2 class="spinner"><i class='fa-refresh fa-spin'></i> &nbsp;Loading terms</h2>
+            <div class="modal-body">
+                <p>
+                    You see all terms of this message. If you have a message that says <em>"Hello, this is a test."</em>
+                    you will be able to find it searching for <em>hello</em> or <em>test</em> but the other words
+                    and character signs are stripped out because they are not relevant. Note that only
+                    <em>message</em> and <em>full_message</em> are broken down to terms and all other fields must
+                    fully match your search query.
+                </p>
 
-  	<ul><!-- terms are injected using JS on show --></ul>
-  </div>
-  
-  <div class="modal-footer">
-    <button type="button" class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
-  </div>
+                <a href="#" id="terms-msg-@messageId-as-list" class="pull-right" style="display : none ;">
+                    <i class="fa fa-list"></i> Show as list
+                </a>
+
+                <h2 class="spinner"><i class='fa-refresh fa-spin'></i> &nbsp;Loading terms</h2>
+
+                <ul><!-- terms are injected using JS on show --></ul>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
 </div>

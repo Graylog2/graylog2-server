@@ -13,16 +13,18 @@
     }
 }
 
-<label class="checkbox">
-    <input type="checkbox"
-        @checked
-        value="true"
-        name="configuration[@field.getTitle]">
+<div class="checkbox">
+    <label>
+        <input type="checkbox"
+            @checked
+            value="true"
+            name="configuration[@field.getTitle]">
 
-    @field.getHumanName
+        @field.getHumanName
 
-    @if(field.isOptional) {
-        <span class="configuration-field-optional">(optional)</span>
-    }
-</label>
-<span class="help-block">@field.getDescription</span>
+        @if(field.isOptional) {
+            <span class="configuration-field-optional">(optional)</span>
+        }
+    </label>
+</div>
+<p class="help-block">@field.getDescription</p>

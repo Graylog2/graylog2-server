@@ -17,19 +17,19 @@
     }
 }
 
-    <label>
-        @field.getHumanName
+<label for="@field.getTitle">
+    @field.getHumanName
 
-        @if(field.isOptional) {
-            <span class="configuration-field-optional">(optional)</span>
-        }
-    </label>
-    <span class="help-block">@field.getDescription</span>
+    @if(field.isOptional) {
+        <span class="configuration-field-optional">(optional)</span>
+    }
+</label>
 
-    <select @htmlAttributes(field) class="input-xlarge">
+<select @htmlAttributes(field) class="input-xlarge form-control">
     @for((k, v) <- field.getValues.toSeq.sortBy(_._2)) {
         <option value="@k" @if(isSelected(k, selected, field.getDefaultValue)) { selected="selected" }>
             @v
         </option>
     }
-    </select>
+</select>
+<p class="help-block">@field.getDescription</p>
