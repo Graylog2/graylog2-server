@@ -29,7 +29,7 @@
 
     @views.html.partials.breadcrumbs(breadcrumbs)
 
-    <div class="row-fluid">
+    <div class="row">
         <h1><i class="fa fa-reorder"></i> Indices</h1>
         This is an overview of all indices (message stores) Graylog is currently taking in account
         for searches and analysis. You can learn more about the index model in the
@@ -51,7 +51,7 @@
         }
     </div>
 
-    <div class="row-fluid">
+    <div class="row">
         @if(!closedIndices.isEmpty) {
             <div class="alert alert-info closed-indices">
                 <i class="fa fa-ban-circle"></i>&nbsp;
@@ -87,7 +87,7 @@
 
     @* We may not have deflector index information if the deflector is cycled and the index ranges are being rebuilt. *@
     @if(indices.find(_.getName == deflectorTarget) == None) {
-        <div class="row-fluid index-description">
+        <div class="row index-description">
             <h3>
                 <i class="fa fa-ellipsis-vertical"></i>
 
@@ -103,7 +103,7 @@
     }
 
     @for(index <- indices.sortWith(_.getNumber > _.getNumber)) {
-        <div class="row-fluid index-description">
+        <div class="row index-description">
             <h3>
                 <i class="fa fa-ellipsis-vertical"></i>
 

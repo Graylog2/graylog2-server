@@ -88,7 +88,7 @@ var GrokPatterns = React.createClass({
 
         return (
             <div style={{paddingTop: 15}}>
-                <div className="row-fluid">
+                <div className="row">
                     <form className="form-inline grok-filter-form">
                         <label htmlFor="grokfilter">Filter pattern names:</label>
                         <input type="text" name="filter" id="grokfilter" value={this.state.filter} onChange={(event) => {this.setState({filter: event.target.value});}} />
@@ -98,7 +98,7 @@ var GrokPatterns = React.createClass({
                         <EditPatternModal id={""} name={""} pattern={""} create={true} reload={this.loadData} savePattern={this.savePattern} validPatternName={this.validPatternName}/>
                     </div>
                 </div>
-                <div className="grok-patterns row-fluid">
+                <div className="grok-patterns row">
                     {patterns}
                 </div>
             </div>

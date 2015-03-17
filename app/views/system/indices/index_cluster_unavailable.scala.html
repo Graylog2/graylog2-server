@@ -6,7 +6,7 @@
 
   @views.html.partials.breadcrumbs(breadcrumbs)
 
-  <div class="row-fluid">
+  <div class="row">
     <h1><i class="fa fa-reorder"></i> Indices</h1>
     This is an overview of all indices (message stores) Graylog is currently taking in account
     for searches and analysis. You can learn more about the index model in the
@@ -16,7 +16,7 @@
     <br />
   </div>
 
-  <div class="row-fluid">
+  <div class="row">
     @views.html.partials.es_cluster_health.render(clusterHealth)
 
     <div class="index-info">

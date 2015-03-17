@@ -71,8 +71,8 @@ var ConfigurationBundles = React.createClass({
     },
     render() {
         return (
-            <div className="configuration-bundles row-fluid">
-                <div className="span6">
+            <div className="configuration-bundles row">
+                <div className="col-md-6">
                     <BootstrapAccordion>
                             {this._getCategoriesHtml()}
                         <BootstrapAccordionGroup name="Import content pack">
@@ -84,7 +84,7 @@ var ConfigurationBundles = React.createClass({
                         </BootstrapAccordionGroup>
                     </BootstrapAccordion>
                 </div>
-                <div className="span6">
+                <div className="col-md-6">
                     <ConfigurationBundlePreview sourceTypeId={this.state.sourceTypeId} sourceTypeDescription={this.state.sourceTypeDescription}/>
                 </div>
             </div>

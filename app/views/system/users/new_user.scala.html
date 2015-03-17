@@ -13,13 +13,13 @@
 
     @views.html.partials.breadcrumbs(breadcrumbs)
 
-    <div class="row-fluid">
+    <div class="row">
         <h1><i class="fa fa-user"></i> Create new user</h1>
         Use this page to create new Graylog users. The users and their permissions created here are not limited to
         the web interface but valid and required for the REST APIs of your Graylog server nodes, too.
     </div>
 
-    <div class="row-fluid">
+    <div class="row">
         <form id="create-user-form" class="user-form" action="@routes.UsersController.create()" method="POST">
             <label for="username">Username</label>
             <span class="help-block">Select a unique user name used to log in with.</span>
@@ -65,8 +65,8 @@
 
             <label for="timeout">Explicit timeout</label>
             <span class="help-block">Session automatically end after this amount of time, unless they are actively used.</span>
-            <input type="text" data-validate="positive_number" name="timeout" id="timeout" value="@form("timeout").value" class="span1 session-timeout-fields validatable" />
-            <select name="timeout_unit" id="timeout_unit" class="span2 session-timeout-fields">
+            <input type="text" data-validate="positive_number" name="timeout" id="timeout" value="@form("timeout").value" class="col-md-1 session-timeout-fields validatable" />
+            <select name="timeout_unit" id="timeout_unit" class="col-md-2 session-timeout-fields">
                 <option value="seconds" @if("seconds".equals(form("timeout_unit").value)) {selected}>Seconds</option>
                 <option value="minutes" @if("minutes".equals(form("timeout_unit").value)) {selected}>Minutes</option>
                 <option value="hours" @if("hours".equals(form("timeout_unit").value)) {selected}>Hours</option>

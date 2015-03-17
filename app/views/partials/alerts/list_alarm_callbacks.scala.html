@@ -11,7 +11,7 @@
     </div>
 } else {
     @for(callback <- alarmCallbacks) {
-        <div class="row-fluid node-row alert-condition alert-callback" data-destination-id="@callback">
+        <div class="row node-row alert-condition alert-callback" data-destination-id="@callback">
             <span class="pull-right node-row-info">
                 Created by @views.html.partials.links.to_user.render(callback.getCreatorUser)
                 @DateHelper.readablePeriodFromNow(callback.getCreatedAt())

@@ -9,7 +9,7 @@
 @main("Outputs in cluster", null, "", currentUser) {
     @views.html.partials.breadcrumbs(breadcrumbs)
 
-    <div class="row-fluid">
+    <div class="row">
         <h1>
             <i class="fa fa-download-alt"></i>
             Outputs in Cluster
@@ -22,7 +22,7 @@
     </div>
 
     @if(isPermitted(OUTPUTS_CREATE)) {
-        <div class="row-fluid input-new">
+        <div class="row input-new">
 
             <select id="input-type">
             @for((inputType,info) <- availableOutputs.toSeq.sortBy(_._2.name.toLowerCase)) {

@@ -105,15 +105,15 @@ var SourceDataTable = React.createClass({
               <h3><i className="fa fa-th-list"></i> Selected sources&nbsp;
                   <small><a href="javascript:undefined" id="dc-sources-result-reset" className="reset" onClick={this.props.resetFilters} title="Reset filter" style={{"display": "none"}}><i className="fa fa-retweet"></i></a></small>
               </h3>
-              <div className="row-fluid sources-filtering">
-                  <div className="span6">
+              <div className="row sources-filtering">
+                  <div className="col-md-6">
                       <div className="form-horizontal pull-left">
                           <div className="control-group">
                               <input type="search" className="input-medium" onChange={this._onFilterChanged} placeholder="Search"/>
                           </div>
                       </div>
                   </div>
-                  <div className="span6">
+                  <div className="col-md-6">
                       <div className="form-horizontal pull-right">
                           <div className="control-group">
                               <label className="control-label">Results:</label>

@@ -15,7 +15,7 @@
         @index.getInfo.getOpenSearchContexts open search contexts,
         @index.getInfo.getDocuments.deleted deleted messages
 
-        <div class="row-fluid" style="margin-bottom: 10px;">
+        <div class="row" style="margin-bottom: 10px;">
             @views.html.system.indices.partials.shard_meters.render("Primary shard operations", index.getInfo.getPrimaryShards)
             @views.html.system.indices.partials.shard_meters.render("Total shard operations", index.getInfo.getAllShards)
         </div>
@@ -39,7 +39,7 @@
             </ul>
 
             <br style="clear: both;" />
-            <div class="description span10">
+            <div class="description col-md-10">
                 Bold shards are primaries, others are replicas. Replicas are elected to primaries automatically
                 when primaries leave the cluster. Size and document counts only reflect primary shards and no
                 possible replica duplication.

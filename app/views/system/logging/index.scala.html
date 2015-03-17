@@ -4,7 +4,7 @@
 
     @views.html.partials.breadcrumbs(breadcrumbs)
 
-    <div class="row-fluid">
+    <div class="row">
         <h1><i class="fa fa-inbox"></i> Logging</h1>
         This section controls logging of the Graylog architecture and allows you to change log
         levels on the fly. Note that log levels are reset to their defaults after you restart
@@ -12,7 +12,7 @@
     </div>
 
     @for((node, nodeLoggers) <- loggers) {
-        <div class="row-fluid log-writing-node node-row">
+        <div class="row log-writing-node node-row">
             <div class="pull-right">
                 <a href="#" class="btn btn-mini trigger-log-level-metrics" data-node-id="@node.getNodeId">
                     <i class="fa fa-dashboard"></i>
@@ -48,34 +48,34 @@
 
             <div class="loglevel-metrics" data-node-id="@node.getNodeId" style="display: none;">
                 <div class="loglevel-metrics-row">
-                    <div class="span4">
+                    <div class="col-md-4">
                         <h3 class="u-light">Level: Fatal</h3>
                         @views.html.system.logging.partials.loglevel_metrics("fatal")
                     </div>
 
-                    <div class="span4">
+                    <div class="col-md-4">
                         <h3 class="u-light">Level: Error</h3>
                         @views.html.system.logging.partials.loglevel_metrics("error")
                     </div>
 
-                    <div class="span4">
+                    <div class="col-md-4">
                         <h3 class="u-light">Level: Warn</h3>
                         @views.html.system.logging.partials.loglevel_metrics("warn")
                     </div>
                 </div>
 
                 <div class="loglevel-metrics-row">
-                    <div class="span4">
+                    <div class="col-md-4">
                         <h3 class="u-light">Level: Info</h3>
                         @views.html.system.logging.partials.loglevel_metrics("info")
                     </div>
 
-                    <div class="span4">
+                    <div class="col-md-4">
                         <h3 class="u-light">Level: Debug</h3>
                         @views.html.system.logging.partials.loglevel_metrics("debug")
                     </div>
 
-                    <div class="span4">
+                    <div class="col-md-4">
                         <h3 class="u-light">Level: Trace</h3>
                         @views.html.system.logging.partials.loglevel_metrics("trace")
                     </div>

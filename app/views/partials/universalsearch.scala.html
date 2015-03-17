@@ -3,7 +3,7 @@
 @import views.helpers.Permissions.isPermitted
 @import lib.security.RestPermissions.SAVEDSEARCHES_READ
 
-<div class="row-fluid no-bm">
+<div class="row no-bm">
     <div class="col-md-12" id="universalsearch">
 
         <form class="universalsearch-form" action="@if(stream == null) { @controllers.routes.SearchController.index() } else { @controllers.routes.StreamSearchController.index(stream.getId) }" method="GET">

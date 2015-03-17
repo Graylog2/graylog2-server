@@ -4,18 +4,18 @@
 @loggedout("Disconnected") {
     <div class="container" id="disconnected-box">
         <div class="row">
-            <div class="span8 offset2 well" id="disconnected-box-content">
+            <div class="col-md-8 offset2 well" id="disconnected-box-content">
                 <legend>
                     <i class="fa fa-group"></i> No Graylog Master available.
                 </legend>
 
-                <div class="row-fluid">
+                <div class="row">
                     <div class="alert alert-danger">
                         <p>The web interface could not connect to any Graylog master node.</p>
                         <p>Please check the server configuration and make sure that one master node is running.</p>
                     </div>
-                    <div class="row-fluid" id="nodes-box">
-                        <div class="span6">
+                    <div class="row" id="nodes-box">
+                        <div class="col-md-6">
                             <h3>Configured nodes</h3>
                             @for(node <- configuredNodes.sortBy(_.getTransportAddress)) {
                                 <div class="well well-small config-node" data-config-node-address="@node.getTransportAddress">
@@ -31,7 +31,7 @@
                                 </div>
                             }
                         </div>
-                        <div class="span6">
+                        <div class="col-md-6">
                             <h3>Discovered nodes</h3>
                             @if(nodesEverConnectedTo.isEmpty) {
                                 <p>None of the configured nodes could be reached recently.</p>

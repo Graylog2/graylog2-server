@@ -282,18 +282,18 @@ var SourceOverview = React.createClass({
         var resultsStyle = this.state.renderResultTable ? null : {display: 'none'};
         var results = (
             <div style={resultsStyle}>
-                <div className="row-fluid">
+                <div className="row">
                     <SourceLineChart ref="sourceLineChart"
                         reloadingHistogram={this.state.reloadingHistogram}
                         histogramDataAvailable={this.state.histogramDataAvailable}
                         resolution={this.state.resolution}
                         resetFilters={this.resetHistogramFilters}/>
                 </div>
-                <div className="row-fluid">
-                    <div className="span9">
+                <div className="row">
+                    <div className="col-md-9">
                         <SourceDataTable ref="sourceDataTable" resetFilters={this.resetSourcesFilters} setSearchFilter={this.setSearchFilter}/>
                     </div>
-                    <div className="span3">
+                    <div className="col-md-3">
                         <SourcePieChart ref="sourcePieChart" resetFilters={this.resetSourcesFilters}/>
                     </div>
                 </div>
@@ -302,7 +302,7 @@ var SourceOverview = React.createClass({
 
         return (
             <div>
-                <div className="row-fluid">
+                <div className="row">
                     <div>
                         <select ref="rangeSelector" className="sources-range pull-right" value={this.state.range} onChange={this._onRangeChanged}>
                             <option value={hoursToSeconds(1)}>Last Hour</option>

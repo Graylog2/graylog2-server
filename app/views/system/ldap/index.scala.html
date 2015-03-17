@@ -4,13 +4,13 @@
 
     @views.html.partials.breadcrumbs(breadcrumbs)
 
-    <div class="row-fluid" xmlns="http://www.w3.org/1999/html">
+    <div class="row" xmlns="http://www.w3.org/1999/html">
         <h1><i class="fa fa-wrench"></i> LDAP Settings</h1>
         This page is the only resource you need to set up the Graylog LDAP integration. You can test the
         connection to your LDAP server and even try to log in with an LDAP account of your choice right away.
     </div>
 
-    <div class="row-fluid">
+    <div class="row">
         @helper.form(action = routes.LdapController.saveLdapSettings(), 'class -> "form-horizontal", 'id -> "ldap-settings") {
             <div class="control-group">
                 <label class="control-label" for="ldap-enabled">Use LDAP</label>

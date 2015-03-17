@@ -6,7 +6,7 @@
 
 @main("Dashboards", sidebars.standard(currentUser), "", currentUser) {
 
-    <div class="row-fluid">
+    <div class="row">
         @if(isPermitted(DASHBOARDS_CREATE)) {
         <a href="@routes.DashboardsController.newDashboard()" class="btn btn-success pull-right">Create dashboard</a>
         }
@@ -26,7 +26,7 @@
     }
 
     @for(dashboard <- dashboards.filter(d => isPermitted(DASHBOARDS_READ, d.getId)).toSeq.sortBy(_.getTitle.toLowerCase)) {
-        <div class="row-fluid node-row dashboard-row">
+        <div class="row node-row dashboard-row">
             <div class="pull-right">
                 Created by @views.html.partials.links.to_user.render(dashboard.getCreatorUser)
                 @DateHelper.readablePeriodFromNow(dashboard.getCreatedAt)

@@ -7,7 +7,7 @@
 
     @views.html.partials.breadcrumbs(breadcrumbs)
 
-    <div class="row-fluid">
+    <div class="row">
         <h1>
             <i class="fa fa-cloud-download"></i>
             Import extractors to input <em>@input.getTitle</em>
@@ -19,7 +19,7 @@
     </div>
 
     <form action="@routes.ExtractorsController.importExtractors(node.getNodeId, input.getId)" method="POST">
-        <div class="row-fluid">
+        <div class="row">
             <textarea class="extractor-json" name="extractors"></textarea>
         </div>
 

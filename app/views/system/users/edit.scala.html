@@ -18,13 +18,13 @@
 @main("Users", views.html.system.sidebar(), "", currentUser) {
     @views.html.partials.breadcrumbs(breadcrumbs)
 
-    <div class="row-fluid">
+    <div class="row">
         <h1 class="username"><i class="fa fa-edit"></i> Edit user &raquo;@username&laquo;</h1>
         You can either change the details of a user here or set a new password.
     </div>
 
-    <div class="row-fluid" style="margin-top: 30px;">
-        <div class="span6">
+    <div class="row" style="margin-top: 30px;">
+        <div class="col-md-6">
             <form class="form-horizontal user-form" id="edit-user-form" action="@routes.UsersController.saveChanges(username)" method="POST">
                 <div class="control-group">
                     <label class="control-label" for="fullname">Full Name</label>
@@ -112,8 +112,8 @@
                 <div class="control-group">
                     <label class="control-label" for="timeout"></label>
                     <div class="controls">
-                        <input type="text" data-validate="positive_number" name="timeout" id="timeout" value="@form("timeout").value" class="span4 session-timeout-fields validatable" required />
-                        <select name="timeout_unit" id="timeout_unit" class="span4 session-timeout-fields">
+                        <input type="text" data-validate="positive_number" name="timeout" id="timeout" value="@form("timeout").value" class="col-md-4 session-timeout-fields validatable" required />
+                        <select name="timeout_unit" id="timeout_unit" class="col-md-4 session-timeout-fields">
                             <option value="seconds" @if("seconds".equals(form("timeout_unit").value)) {selected}>Seconds</option>
                             <option value="minutes" @if("minutes".equals(form("timeout_unit").value)) {selected}>Minutes</option>
                             <option value="hours" @if("hours".equals(form("timeout_unit").value)) {selected}>Hours</option>
@@ -131,7 +131,7 @@
                 </div>
             </form>
         </div>
-        <div class="span6">
+        <div class="col-md-6">
             @if(!user.isExternal) {
                 <form class="form-horizontal" action="@routes.UsersController.changePassword(username)" method="POST">
                     @if(requiresOldPassword) {
@@ -167,7 +167,7 @@
     </div>
 
     @if(isPermitted(USERS_PERMISSIONSEDIT)) {
-    <div class="row-fluid">
+    <div class="row">
         <h2><h2><i class="fa fa-bolt"></i> Change Permissions</h2>
 
         <form class="form form-horizontal" action="@routes.UsersController.resetPermissions(user.getName)" method="POST">
@@ -194,7 +194,7 @@
     </div>
     }
 
-    <div class="row-fluid">
+    <div class="row">
         <h2><i class="fa fa-arrow-circle-right"></i> Custom startpage</h2>
 
         <p>
@@ -219,7 +219,7 @@
         </form>
     </div>
 
-    <div class="row-fluid">
+    <div class="row">
         <h2><i class="fa fa-table"></i> User preferences</h2>
         <p>User might have to reload the application to make sure changes take effect.</p>
         <span id="react-user-preferences-button" data-user-name="@username">

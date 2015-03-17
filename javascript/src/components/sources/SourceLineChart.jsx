@@ -95,7 +95,7 @@ var SourceLineChart = React.createClass({
             <div className="sources overlay" style={noDataOverlayStyle}>Not enough data</div>
         );
         return (
-            <div id="dc-sources-line-chart" className="span12">
+            <div id="dc-sources-line-chart" className="col-md-12">
                 <h3>
                     <i className="fa fa-calendar"></i> Messages per {this.props.resolution}&nbsp;
                     <small>

@@ -5,7 +5,7 @@
 
 @main("Message " + message.getId, sidebars.standard(currentUser), "", currentUser) {
 
-    <div class="row-fluid" style="margin-bottom: 0px;">
+    <div class="row" style="margin-bottom: 0px;">
         <h1><i class="fa fa-envelope copy-clipboard" data-clipboard-text="@message.getId" data-toggle="tooltip" data-initial-title="Copy Id" data-trigger="manual"></i> Message @message.getId()</h1>
         <script>
             // this html is loaded via ajax, so we need to activate the clipboard plugin

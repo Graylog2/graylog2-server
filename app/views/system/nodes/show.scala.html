@@ -41,12 +41,12 @@
 
     @views.html.partials.breadcrumbs(breadcrumbs)
 
-    <div class="row-fluid">
+    <div class="row">
         <h1><i class="fa fa-sitemap"></i> Node @node.getHostname / @node.getShortNodeId</h1>
         This page shows details of a Graylog server node that is active and reachable in your cluster.
     </div>
 
-    <div class="row-fluid">
+    <div class="row">
         <div class="alert alert-info">
             <i class="fa fa-retweet"></i> &nbsp; Lifecycle state:
             <strong>@node.getLifecycle</strong>
@@ -56,14 +56,14 @@
 
 
     @if(node.lbAlive()) {
-        <div class="row-fluid">
+        <div class="row">
             <div class="alert alert-success">
                 <i class="fa fa-heart"></i> &nbsp; Marked as <strong>ALIVE</strong> for load balancers.
                 <span class="pull-right">@partials.support.head_bubble("setup/loadbalancer", 0, 19)</span>
             </div>
         </div>
     } else {
-        <div class="row-fluid">
+        <div class="row">
             <div class="alert alert-error">
                 <i class="fa fa-heart"></i> &nbsp; Marked as <strong>DEAD</strong> for load balancers.
                 <span class="pull-right">@partials.support.head_bubble("setup/loadbalancer", 0, 19)</span>
@@ -72,14 +72,14 @@
     }
 
     @if(node.isMaster) {
-        <div class="row-fluid">
+        <div class="row">
             <div class="alert alert-success">
                 <i class="fa fa-star"></i> &nbsp;This is the master node.
             </div>
         </div>
     }
 
-    <div class="row-fluid">
+    <div class="row">
         @if(node.isProcessing) {
             <div class="alert alert-success">
                 @if(isPermitted(PROCESSING_CHANGESTATE)) {
@@ -102,7 +102,7 @@
         }
     </div>
 
-    <div class="row-fluid">
+    <div class="row">
         <h2><i class="fa fa-tasks"></i> Memory/Heap usage</h2>
 
         <div class="node-heap-usage" data-node-id="@node.getNodeId">
@@ -118,10 +118,10 @@
 
     <hr />
 
-    <div class="row-fluid">
+    <div class="row">
         <h2><i class="fa fa-shield"></i> Buffers</h2>
-        <div class="row-fluid">
-            <div class="span4">
+        <div class="row">
+            <div class="col-md-4">
                 <a href="@routes.MetricsController.ofNode(node.getNodeId, node.getBufferClasses.inputBufferClass)" class="btn btn-info btn-mini pull-right">Metrics</a>
                 <h3>Input buffer</h3>
 
@@ -134,7 +134,7 @@
                 }
             </div>
 
-            <div class="span4">
+            <div class="col-md-4">
                 <a href="@routes.MetricsController.ofNode(node.getNodeId, node.getBufferClasses.processBufferClass)" class="btn btn-info btn-mini pull-right">Metrics</a>
                 <h3>Process buffer</h3>
 
@@ -147,7 +147,7 @@
                 }
             </div>
 
-            <div class="span4">
+            <div class="col-md-4">
                 <a href="@routes.MetricsController.ofNode(node.getNodeId, node.getBufferClasses.outputBufferClass)" class="btn btn-info btn-mini pull-right">Metrics</a>
                 <h3>Output buffer</h3>
 
@@ -165,14 +165,14 @@
 
     <hr />
 
-    <div class="row-fluid">
+    <div class="row">
         <h2><i class="fa fa-hdd"></i> Disk Journal</h2>
         @if(node.getJournalInfo.enabled) {
             <p>Incoming messages are written to the disk journal to ensure they are kept safe in case of a server failure. The journal also helps keeping Graylog working if any of the outputs is too slow to keep up with the message rate
             or whenever there is a peak in incoming messages. It makes sure that Graylog does not buffer all of those messages in main memory and avoids overly long garbage collection pauses that way.
             </p>
-            <div class="row-fluid">
-                <div class="span6">
+            <div class="row">
+                <div class="col-md-6">
                     <h3>Configuration</h3>
                     <dl class="system-journal">
                         <dt>Path:</dt>
@@ -193,7 +193,7 @@
                         </dd>
                     </dl>
                 </div>
-                <div class="span6">
+                <div class="col-md-6">
                     <h3>Utilization</h3>
                     @defining(NumberHelper.asPercent(node.getJournalInfo.journalSize, node.getJournalInfo.journalSizeLimit, 1, false)) { utilizationPercent =>
                         <div class="progress progress-percentage node-journal-usage">
@@ -225,8 +225,8 @@
 
     <hr />
 
-    <div class="row-fluid">
-        <div class="span6">
+    <div class="row">
+        <div class="col-md-6">
             <h2><i class="fa fa-cogs"></i> System</h2>
 
             <dl class="system-system">
@@ -247,7 +247,7 @@
             </dl>
         </div>
 
-        <div class="span6">
+        <div class="col-md-6">
             <h2><i class="fa fa-signin"></i> REST API</h2>
 
             <dl class="system-rest">
@@ -267,7 +267,7 @@
     </div>
 
     <hr />
-    <div class="row-fluid">
+    <div class="row">
         <h2><i class="fa fa-cloud-download"></i> Installed Plugins <span style="font-size: 12px;">@installedPlugins.size() @pluralize("plugin", installedPlugins.size) installed.</span></h2>
 
         @if(installedPlugins.size() > 0) {
@@ -305,7 +305,7 @@
 
     <hr />
 
-    <div class="row-fluid">
+    <div class="row">
         @if(isPermitted(INPUTS_EDIT)) {
         <a href="@routes.InputsController.manage(node.getNodeId)" class="btn btn-small btn-success pull-right">Manage inputs</a>
         }

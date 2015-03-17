@@ -17,7 +17,7 @@
     </h1>
 
     @if(isPermitted(STREAMS_EDIT, stream.getId)) {
-        <div class="row-fluid">
+        <div class="row">
             You can define thresholds on any message field or message count of a stream and be alerted based on this definition.
         </div>
 
@@ -43,7 +43,7 @@
 
     <h2><i class="fa fa-mail-forward"></i> Alert callbacks</h2>
 
-    <div class="row-fluid" style="margin-bottom: 5px;">
+    <div class="row" style="margin-bottom: 5px;">
         The following callbacks will be performed when this stream triggers an alert. You can find alert callback plugins
         on <a href="https://www.graylog.org/resources/integrations/" target="_blank">the Graylog website</a>.
     </div>
@@ -77,7 +77,7 @@
 
     <h2><i class="fa fa-group"></i> Alert receivers</h2>
 
-    <div class="row-fluid" style="margin-bottom: 5px;">
+    <div class="row" style="margin-bottom: 5px;">
         The following Graylog users will be notified about alerts via email if they have configured
         an email address in their profile.
     </div>
@@ -117,8 +117,8 @@
     }
 
     @if(isPermitted(STREAMS_EDIT, stream.getId)) {
-        <div id="add-alert-receivers" class="row-fluid">
-            <div class="span6">
+        <div id="add-alert-receivers" class="row">
+            <div class="col-md-6">
                 <form action="@routes.AlertsController.addReceiverUser(stream.getId)" method="POST">
                     <label for="user">Username:</label>
                     <input name="username"
@@ -132,7 +132,7 @@
                 </form>
             </div>
 
-            <div class="span6">
+            <div class="col-md-6">
                 <form action="@routes.AlertsController.addReceiverEmail(stream.getId)" method="POST">
                     <label for="email">Email address:</label>
                     <input name="email" type="text" id="email" class="input-large" />
