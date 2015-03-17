@@ -143,27 +143,33 @@
 
             @**************** change cache time modal ****************@
             <form>
-                <div id="dashboardwidget-cache-time" class="modal hide fade" tabindex="-1" role="dialog">
-                    <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-                        <h2>Change widget cache time</h2>
-                        Every widget has a configured cache time. Increasing this cache time leads to less
-                        search load in the cluster. (minimum is 1 second)
-                    </div>
+                <div id="dashboardwidget-cache-time" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                                <h2 class="modal-title">Change widget cache time</h2>
+                            </div>
 
-                    <div class="modal-body">
-                        <div class="control-group">
-                            <label class="control-label" for="cachetime">Seconds</label>
-                            <div class="controls">
-                                <span class="help-block">Number of seconds the widget value will be cached</span>
-                                <input type="text" name="cachetime" class="input-mini cachetime-value" />
+                            <div class="modal-body">
+                                <p>Every widget has a configured cache time. Increasing this cache time leads to less
+                                    search load in the cluster. (minimum is 1 second)</p>
+                                <div class="control-group">
+                                    <label class="control-label" for="cachetime">Seconds</label>
+                                    <div class="controls">
+                                        <span class="help-block">Number of seconds the widget value will be cached</span>
+                                        <input type="text" name="cachetime" class="input-mini cachetime-value" />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="modal-footer">
+                                <button type="button" class="btn" data-dismiss="modal">Close</button>
+                                <button type="submit" class="btn btn-success update-cachetime">Update</button>
                             </div>
                         </div>
-                    </div>
-
-                    <div class="modal-footer">
-                        <button type="button" class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
-                        <button type="submit" class="btn btn-success update-cachetime">Update</button>
                     </div>
                 </div>
             </form>
@@ -171,46 +177,52 @@
             @**************** widget config modals ****************@
 
             @for(widget <- dashboard.getWidgets.values()) {
-                <div class="modal hide fade widget-config" data-widget-id="@widget.getId" tabindex="-1" role="dialog">
-                    <div class="modal-header" style="padding-bottom: 3px;">
-                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-                        <h2>Widget config</h2>
-                        Type: @widget.getType.toString.toLowerCase, cached for @widget.getCacheTime seconds.
+                <div class="modal fade widget-config" data-widget-id="@widget.getId" tabindex="-1" role="dialog" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header" style="padding-bottom: 3px;">
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                                <h2 class="modal-title">Widget config</h2>
+                                Type: @widget.getType.toString.toLowerCase, cached for @widget.getCacheTime seconds.
 
-                        <p style="margin-bottom: 0px; margin-top: 5px;">
-                        @if(widget.getConfig.containsKey("stream_id") && widget.getConfig.get("stream_id") != null) {
-                            Bound to stream
-                            <a href="@routes.StreamSearchController.index(widget.getConfig.get("stream_id").asInstanceOf[String], "*", "relative", 300)">@widget.getConfig.get("stream_id")</a>.
-                        } else {
-                            <strong>Not</strong> bound to a stream.
-                        }
-                        </p>
-                    </div>
+                                <p style="margin-bottom: 0px; margin-top: 5px;">
+                                @if(widget.getConfig.containsKey("stream_id") && widget.getConfig.get("stream_id") != null) {
+                                    Bound to stream
+                                    <a href="@routes.StreamSearchController.index(widget.getConfig.get("stream_id").asInstanceOf[String], "*", "relative", 300)">@widget.getConfig.get("stream_id")</a>.
+                                } else {
+                                    <strong>Not</strong> bound to a stream.
+                                }
+                                </p>
+                            </div>
 
-                    <div class="modal-body">
-                        <div class="well well-small" style="margin-bottom: 0px;">
-                            <ul style="margin-bottom: 15px;">
-                                <li>Widget ID: @widget.getId</li>
-                                <li>Dashboard ID: @widget.getDashboard.getId</li>
-                                <li>Created by: @widget.getCreatorUserId</li>
-                            </ul>
+                            <div class="modal-body">
+                                <div class="well well-small" style="margin-bottom: 0px;">
+                                    <ul style="margin-bottom: 15px;">
+                                        <li>Widget ID: @widget.getId</li>
+                                        <li>Dashboard ID: @widget.getDashboard.getId</li>
+                                        <li>Created by: @widget.getCreatorUserId</li>
+                                    </ul>
 
-                            <ul>
-                            @for((k,v) <- widget.getConfig) {
-                                <li>@k: @v</li>
-                            }
-                            </ul>
+                                    <ul>
+                                    @for((k,v) <- widget.getConfig) {
+                                        <li>@k: @v</li>
+                                    }
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div class="modal-footer">
+                                <a class="btn" href="@routes.MetricsController.ofMasterNode("org.graylog2.dashboards.widgets.*." + widget.getId)">
+                                    Show widget metrics
+                                </a>
+                                <a class="btn btn-success added-width-search-link" href="@DashboardWidgetRouteHelper.replayRoute(widget)">
+                                    Replay search
+                                </a>
+                                <button class="btn btn-primary" data-dismiss="modal">Close</button>
+                            </div>
                         </div>
-                    </div>
-
-                    <div class="modal-footer">
-                        <a class="btn" href="@routes.MetricsController.ofMasterNode("org.graylog2.dashboards.widgets.*." + widget.getId)">
-                            Show widget metrics
-                        </a>
-                        <a class="btn btn-success added-width-search-link" href="@DashboardWidgetRouteHelper.replayRoute(widget)">
-                            Replay search
-                        </a>
-                        <button class="btn btn-primary" data-dismiss="modal" aria-hidden="true">Close</button>
                     </div>
                 </div>
             }
