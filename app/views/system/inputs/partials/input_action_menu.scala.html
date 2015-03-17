@@ -6,11 +6,11 @@
 @import org.graylog2.restclient.models.Radio
 @import views.helpers.InputHelper.sourceFieldForNode
 
-<div class="btn-group">
-    <a class="btn btn-mini dropdown-toggle" data-toggle="dropdown" href="#">
+<div class="btn-group pull-right">
+    <button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
         Action <span class="caret"></span>
-    </a>
-    <ul class="dropdown-menu">
+    </button>
+    <ul class="dropdown-menu" role="menu">
         @if(isPermitted(INPUTS_EDIT, input.getId)) {
             <li><a href="#edit-input-@input.getId" data-toggle="modal">Edit input</a></li>
         }

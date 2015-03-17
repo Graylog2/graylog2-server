@@ -10,110 +10,112 @@
 @import org.graylog2.restclient.lib.Tools
 
 @for(input <- Seq(inputState.getInput)) {
-    <div class="row-fluid node-row">
-        <span class="pull-right node-row-info">
-            <span class="text">Started by @views.html.partials.links.to_user(inputState.getInput.getCreatorUser)</span>
-            @if(input.getGlobal == false) {
-                <span class="text" title="@inputState.getNode.getNodeId">on @views.helpers.ClusterEntityHelper.linkToEntity(inputState.getNode)</span>
-            }
-            @DateHelper.readablePeriodFromNow(input.getCreatedAt, "text")
-                &nbsp;
+    <div class="row node-row">
+        <div class="col-md-12">
+            <span class="pull-right node-row-info">
+                <span class="text">Started by @views.html.partials.links.to_user(inputState.getInput.getCreatorUser)</span>
+                @if(input.getGlobal == false) {
+                    <span class="text" title="@inputState.getNode.getNodeId">on @views.helpers.ClusterEntityHelper.linkToEntity(inputState.getNode)</span>
+                }
+                @DateHelper.readablePeriodFromNow(input.getCreatedAt, "text")
+                    &nbsp;
 
-            @views.html.system.inputs.partials.input_state_controls.render(inputState.getState, input)
-            @if(isPermitted(INPUTS_TERMINATE)) {
-                <form action="@routes.InputsController.terminate(inputState.getNode.getNodeId, input.getId)" method="POST">
-                    <button class="btn btn-danger btn-mini"
-                    type="submit"
-                    data-confirm="Really delete input @input.getTitle?">
-                        <i class="fa fa-remove"></i> Delete
-                    </button>
-                </form>
-            }
-            @views.html.system.inputs.partials.input_action_menu.render(inputState.getNode, input)
-        </span>
-
-        <h3>
-            @views.html.system.inputs.partials.input_list_title.render(input, inputTypes)
-
-            <span class="label label-@InputStateHelper.labelClassForState(inputState.getState)">
-                @inputState.getState
+                @views.html.system.inputs.partials.input_state_controls.render(inputState.getState, input)
+                @if(isPermitted(INPUTS_TERMINATE)) {
+                    <form action="@routes.InputsController.terminate(inputState.getNode.getNodeId, input.getId)" method="POST">
+                        <button class="btn btn-danger btn-xs"
+                        type="submit"
+                        data-confirm="Really delete input @input.getTitle?">
+                            <i class="fa fa-remove"></i> Delete
+                        </button>
+                    </form>
+                }
+                @views.html.system.inputs.partials.input_action_menu.render(inputState.getNode, input)
             </span>
 
-            @if(input.getGlobal) {
-                <span class="label label-info">global</span>
-            }
-        </h3>
+            <h4>
+                @views.html.system.inputs.partials.input_list_title.render(input, inputTypes)
 
-        @if((inputState.getState == InputState.InputStateType.FAILED) && (inputState.getDetailedMessage != null) && (!inputState.getDetailedMessage.isEmpty)) {
-            <div class="alert alert-error">
-                <strong>Error starting input:</strong> @inputState.getDetailedMessage
-            </div>
-        }
-
-        @if(input.getReadBytes >= 0 && input.getWrittenBytes >= 0) {
-            <div class="input-io focuslimit" data-node-id="@inputState.getNode.getNodeId" data-input-id="@input.getId">
-                Network IO:
-
-                <span class="persec">
-                    <i class="fa fa-caret-down channel-direction channel-direction-down"></i>
-                    <span class="rx value">@Tools.byteToHuman(input.getReadBytes)</span>
-
-                    <i class="fa fa-caret-up channel-direction channel-direction-up"></i>
-                    <span class="tx value">@Tools.byteToHuman(input.getWrittenBytes)</span>
+                <span class="label label-@InputStateHelper.labelClassForState(inputState.getState)">
+                    @inputState.getState
                 </span>
 
-                <span class="total">
-                    (total:
-                    <i class="fa fa-caret-down channel-direction channel-direction-down"></i>
-                    <span class="rx value">@Tools.byteToHuman(input.getTotalReadBytes)</span>
+                @if(input.getGlobal) {
+                    <span class="label label-info">global</span>
+                }
+            </h4>
 
-                    <i class="fa fa-caret-up channel-direction channel-direction-up"></i>
-                    <span class="tx value">@Tools.byteToHuman(input.getTotalWrittenBytes)</span>
-                    )
-                </span>
-
-            </div>
-        }
-
-        @if(input.getConnections >= 0 && input.getTotalConnections >= 0) {
-            <div class="input-connections focuslimit" data-node-id="@inputState.getNode.getNodeId" data-input-id="@input.getId">
-                Total connections:
-                <span class="total">@input.getTotalConnections</span>
-                (<span class="active">@input.getConnections</span> active)
-            </div>
-        }
-
-        <div class="well well-small">
-            <ul>
-            @for((k,v) <- input.getAttributes(inputTypes.get(input.getType))) {
-                <li>@k: @v</li>
+            @if((inputState.getState == InputState.InputStateType.FAILED) && (inputState.getDetailedMessage != null) && (!inputState.getDetailedMessage.isEmpty)) {
+                <div class="alert alert-error">
+                    <strong>Error starting input:</strong> @inputState.getDetailedMessage
+                </div>
             }
-            </ul>
-        </div>
 
-        @if(!input.getStaticFields.isEmpty) {
-            <div class="static-fields">
-                <h4 style="display: inline;">
-                    <i class="fa fa-tag"></i> Static fields
-                </h4><br />
+            @if(input.getReadBytes >= 0 && input.getWrittenBytes >= 0) {
+                <div class="input-io focuslimit" data-node-id="@inputState.getNode.getNodeId" data-input-id="@input.getId">
+                    Network IO:
+
+                    <span class="persec">
+                        <i class="fa fa-caret-down channel-direction channel-direction-down"></i>
+                        <span class="rx value">@Tools.byteToHuman(input.getReadBytes)</span>
+
+                        <i class="fa fa-caret-up channel-direction channel-direction-up"></i>
+                        <span class="tx value">@Tools.byteToHuman(input.getWrittenBytes)</span>
+                    </span>
+
+                    <span class="total">
+                        (total:
+                        <i class="fa fa-caret-down channel-direction channel-direction-down"></i>
+                        <span class="rx value">@Tools.byteToHuman(input.getTotalReadBytes)</span>
+
+                        <i class="fa fa-caret-up channel-direction channel-direction-up"></i>
+                        <span class="tx value">@Tools.byteToHuman(input.getTotalWrittenBytes)</span>
+                        )
+                    </span>
+
+                </div>
+            }
+
+            @if(input.getConnections >= 0 && input.getTotalConnections >= 0) {
+                <div class="input-connections focuslimit" data-node-id="@inputState.getNode.getNodeId" data-input-id="@input.getId">
+                    Total connections:
+                    <span class="total">@input.getTotalConnections</span>
+                    (<span class="active">@input.getConnections</span> active)
+                </div>
+            }
+
+            <div class="well well-sm">
                 <ul>
-                @for((k,v) <- input.getStaticFields) {
-                    <li>
-                        @k: @v
-                    @if(isPermitted(INPUTS_EDIT, input.getId)) {
-                    <a href="@routes.InputsController.removeStaticField(inputState.getNode.getNodeId, input.getId, k)"
-                    class="remove-static-field"
-                    style="display: none;"
-                    data-confirm="Really delete static field?">
-                        <i class="fa fa-remove"></i>
-                    </a>
-                    }
-                    </li>
+                @for((k,v) <- input.getAttributes(inputTypes.get(input.getType))) {
+                    <li>@k: @v</li>
                 }
                 </ul>
             </div>
-        }
 
-        @views.html.system.inputs.partials.edit_input_form(input, inputState.getNode, input.getType, inputTypes.get(input.getType))
+            @if(!input.getStaticFields.isEmpty) {
+                <div class="static-fields">
+                    <h4 style="display: inline;">
+                        <i class="fa fa-tag"></i> Static fields
+                    </h4><br />
+                    <ul>
+                    @for((k,v) <- input.getStaticFields) {
+                        <li>
+                            @k: @v
+                        @if(isPermitted(INPUTS_EDIT, input.getId)) {
+                        <a href="@routes.InputsController.removeStaticField(inputState.getNode.getNodeId, input.getId, k)"
+                        class="remove-static-field"
+                        style="display: none;"
+                        data-confirm="Really delete static field?">
+                            <i class="fa fa-remove"></i>
+                        </a>
+                        }
+                        </li>
+                    }
+                    </ul>
+                </div>
+            }
+
+            @views.html.system.inputs.partials.edit_input_form(input, inputState.getNode, input.getType, inputTypes.get(input.getType))
+    </div>
     </div>
 }

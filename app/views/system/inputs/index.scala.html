@@ -14,25 +14,28 @@
     inputTypes.toSeq.sortBy(_._2.name)
 }
 
-@main("Inputs in Cluster", null, "", currentUser) {
+@main("Inputs in Cluster", null, "", currentUser, false) {
     @views.html.partials.breadcrumbs(breadcrumbs)
 
-    <div class="row-fluid">
-        <h1>
-            <i class="fa fa-cloud-download"></i> Inputs in Cluster
-        </h1>
-        Graylog nodes accept data via inputs. Launch or terminate as many inputs as you want here.
+    <div class="row content content-head">
+        <div class="col-md-12">
+            <h1><i class="fa fa-cloud-download"></i> Inputs in Cluster</h1>
+            <p class="description">
+                Graylog nodes accept data via inputs. Launch or terminate as many inputs as you want here.
+            </p>
+        </div>
     </div>
     @if(isPermitted(INPUTS_CREATE)) {
-        <div class="row-fluid input-new">
+        <div class="row content input-new">
+            <div class="col-md-12">
+                <select id="input-type">
+                @for((inputType, info) <- orderedInputTypes) {
+                    <option value="@inputType">@info.name</option>
+                }
+                </select>
 
-            <select id="input-type">
-            @for((inputType, info) <- orderedInputTypes) {
-                <option value="@inputType">@info.name</option>
-            }
-            </select>
-
-            <button id="configure-input" class="btn btn-success">Launch new input</button>
+                <button id="configure-input" class="btn btn-success">Launch new input</button>
+            </div>
         </div>
     }
     @if(isPermitted(INPUTS_READ)) {
