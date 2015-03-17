@@ -22,9 +22,11 @@
 
     @if(dashboards.filter(d => isPermitted(DASHBOARDS_READ, d.getId)).isEmpty) {
         <div class="row">
-            <div class="alert alert-warn">
-                <i class="fa fa-info-sign"></i>
-                No dashboards configured. @if(isPermitted(DASHBOARDS_CREATE)) { <a href="@routes.DashboardsController.newDashboard()">Create one now</a>. }
+            <div class="col-md-12">
+                <div class="alert alert-warning" role="alert">
+                    <i class="fa fa-info-sign"></i>
+                    No dashboards configured. @if(isPermitted(DASHBOARDS_CREATE)) { <a href="@routes.DashboardsController.newDashboard()">Create one now</a>. }
+                </div>
             </div>
         </div>
     }
