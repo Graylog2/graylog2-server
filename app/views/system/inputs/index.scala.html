@@ -28,13 +28,17 @@
     @if(isPermitted(INPUTS_CREATE)) {
         <div class="row content input-new">
             <div class="col-md-12">
-                <select id="input-type">
-                @for((inputType, info) <- orderedInputTypes) {
-                    <option value="@inputType">@info.name</option>
-                }
-                </select>
+                <form class="form-inline">
+                    <div class="form-group">
+                        <select id="input-type" class="form-control">
+                        @for((inputType, info) <- orderedInputTypes) {
+                            <option value="@inputType">@info.name</option>
+                        }
+                        </select>
 
-                <button id="configure-input" class="btn btn-success">Launch new input</button>
+                        <button id="configure-input" class="btn btn-success form-control">Launch new input</button>
+                    </div>
+                </form>
             </div>
         </div>
     }
