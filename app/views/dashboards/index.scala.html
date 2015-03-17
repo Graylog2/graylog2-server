@@ -7,6 +7,7 @@
 @main("Dashboards", sidebars.standard(currentUser), "", currentUser) {
 
     <div class="row">
+        <div class="col-md-12">
         @if(isPermitted(DASHBOARDS_CREATE)) {
         <a href="@routes.DashboardsController.newDashboard()" class="btn btn-success pull-right">Create dashboard</a>
         }
@@ -16,56 +17,61 @@
         you create in other parts of Graylog with one click.
 
         &nbsp;@views.html.partials.support.bubble.render("general/dashboards")
+        </div>
     </div>
 
     @if(dashboards.filter(d => isPermitted(DASHBOARDS_READ, d.getId)).isEmpty) {
-        <div class="alert alert-warn">
-            <i class="fa fa-info-sign"></i>
-            No dashboards configured. @if(isPermitted(DASHBOARDS_CREATE)) { <a href="@routes.DashboardsController.newDashboard()">Create one now</a>. }
+        <div class="row">
+            <div class="alert alert-warn">
+                <i class="fa fa-info-sign"></i>
+                No dashboards configured. @if(isPermitted(DASHBOARDS_CREATE)) { <a href="@routes.DashboardsController.newDashboard()">Create one now</a>. }
+            </div>
         </div>
     }
 
     @for(dashboard <- dashboards.filter(d => isPermitted(DASHBOARDS_READ, d.getId)).toSeq.sortBy(_.getTitle.toLowerCase)) {
         <div class="row node-row dashboard-row">
-            <div class="pull-right">
-                Created by @views.html.partials.links.to_user.render(dashboard.getCreatorUser)
-                @DateHelper.readablePeriodFromNow(dashboard.getCreatedAt)
+            <div class="col-md-12">
+                <div class="pull-right">
+                    Created by @views.html.partials.links.to_user.render(dashboard.getCreatorUser)
+                    @DateHelper.readablePeriodFromNow(dashboard.getCreatedAt)
 
-                <div class="list-actions">
-                    @if(!currentUser.isReadonly) {
-                        <a href="@routes.StartpageController.set("dashboard", dashboard.getId)"
-                        class="btn btn-mini"><i class="fa fa-home"></i> Set as start page</a>
-                    }
-
-                    @if(isPermitted(DASHBOARDS_EDIT, dashboard.getId)) {
-                        <span
-                            class="react-edit-dashboard"
-                            data-dashboard-id="@dashboard.getId"
-                            data-dashboard-title="@dashboard.getTitle"
-                            data-dashboard-description="@dashboard.getDescription">
-                        </span>
-
-                        @helper.form(action = routes.DashboardsController.delete(dashboard.getId)) {
-                            <button type="submit" class="btn btn-danger btn-mini" data-confirm="Really delete dashboard @dashboard.getTitle?">
-                                <i class="fa fa-remove"></i> Delete
-                            </button>
+                    <div class="list-actions">
+                        @if(!currentUser.isReadonly) {
+                            <a href="@routes.StartpageController.set("dashboard", dashboard.getId)"
+                            class="btn btn-mini"><i class="fa fa-home"></i> Set as start page</a>
                         }
-                    }
+
+                        @if(isPermitted(DASHBOARDS_EDIT, dashboard.getId)) {
+                            <span
+                                class="react-edit-dashboard"
+                                data-dashboard-id="@dashboard.getId"
+                                data-dashboard-title="@dashboard.getTitle"
+                                data-dashboard-description="@dashboard.getDescription">
+                            </span>
+
+                            @helper.form(action = routes.DashboardsController.delete(dashboard.getId)) {
+                                <button type="submit" class="btn btn-danger btn-mini" data-confirm="Really delete dashboard @dashboard.getTitle?">
+                                    <i class="fa fa-remove"></i> Delete
+                                </button>
+                            }
+                        }
+                    </div>
                 </div>
+
+                <h3>
+                    <i class="fa fa-ellipsis-vertical"></i>
+                    <a href="@routes.DashboardsController.show(dashboard.getId)">
+                    <span data-dashboard-id="@dashboard.getId" class="dashboard-title">@dashboard.getTitle</span>
+                    @if(dashboard.getContentPack != null) {
+                        <span title="Created from content pack"><i class="fa fa-gift"></i></span>
+                    }
+                    </a>
+                </h3>
+
+                @dashboard.getWidgets.size() widgets.
+                <span data-dashboard-id="@dashboard.getId" class="dashboard-description">@dashboard.getDescription</span>
             </div>
-
-            <h3>
-                <i class="fa fa-ellipsis-vertical"></i>
-                <a href="@routes.DashboardsController.show(dashboard.getId)">
-                <span data-dashboard-id="@dashboard.getId" class="dashboard-title">@dashboard.getTitle</span>
-                @if(dashboard.getContentPack != null) {
-                    <span title="Created from content pack"><i class="fa fa-gift"></i></span>
-                }
-                </a>
-            </h3>
-
-            @dashboard.getWidgets.size() widgets.
-            <span data-dashboard-id="@dashboard.getId" class="dashboard-description">@dashboard.getDescription</span>
         </div>
     }
 
