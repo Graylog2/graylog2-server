@@ -1,5 +1,6 @@
 @(currentUser: org.graylog2.restclient.models.User, breadcrumbs: lib.BreadcrumbList, dashboard: org.graylog2.restclient.models.dashboards.Dashboard)
 
+@import scala.util.Try
 @import views.helpers.Permissions._
 @import lib.security.RestPermissions._
 @import views.helpers.DashboardWidgetRouteHelper
@@ -29,7 +30,7 @@
 
         <div class="col-md-4 actions">
             @if(!dashboard.getWidgets.isEmpty) {
-                @if(currentUser.getPreferences.get("updateUnfocussed").asInstanceOf[Boolean]) {
+                @if(Try(currentUser.getPreferences.get("updateUnfocussed").toString.toBoolean).getOrElse(false)) {
                     <button id="update-unfocussed" class="btn btn-info" data-update-unfocussed="true">
                         Update in foreground</button>
                 } else {
@@ -67,7 +68,7 @@
                     <div class="gridster" data-dashboard-id="@dashboard.getId">
                         <ul>
                         @for(widget <- dashboard.getWidgets.values()) {
-                            @if(currentUser.getPreferences.get("enableNewWidgets").asInstanceOf[Boolean]) {
+                            @if(Try(currentUser.getPreferences.get("enableNewWidgets").toString.toBoolean).getOrElse(false)) {
                                 <li data-row="@widget.getRow" data-col="@widget.getCol" data-sizex="@widget.getWidth" data-sizey="@widget.getHeight">
                                     <div class="react-widget" data-dashboard-id="@widget.getDashboard.getId"
                                                               data-widget-id="@widget.getId"></div>
