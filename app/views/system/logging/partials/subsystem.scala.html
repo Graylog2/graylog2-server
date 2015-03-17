@@ -3,10 +3,10 @@
     <h3 class="u-light">
         Subsystem: @name
         <div class="btn-group pull-right">
-            <a class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown" href="#">
+            <button class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown">
                 <span class="loglevel-title">@info.getLevel.capitalize</span>
                 <span class="caret"></span>
-            </a>
+            </button>
             <ul class="dropdown-menu">
                 <li @if(info.getLevel.equals("fatal")) { class="active" }>
                     <a href="#" data-level="fatal">Fatal</a>
