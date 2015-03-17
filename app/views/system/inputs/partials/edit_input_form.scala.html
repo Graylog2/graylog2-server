@@ -49,19 +49,35 @@
                     @for(field <- inputInfo.getRequestedConfiguration) {
 
                         @if(field.getType.equals("text")) {
-                            @views.html.system.inputs.fields.text_field(field, input.getAttributes.get(field.getTitle).asInstanceOf[String])
+                            @views.html.system.inputs.fields.text_field(
+                                inputType,
+                                field,
+                                input.getAttributes.get(field.getTitle).asInstanceOf[String]
+                            )
                         }
 
                         @if(field.getType.equals("number")) {
-                            @views.html.system.inputs.fields.number_field(field, input.getAttributes.get(field.getTitle).asInstanceOf[Number])
+                            @views.html.system.inputs.fields.number_field(
+                                inputType,
+                                field,
+                                input.getAttributes.get(field.getTitle).asInstanceOf[Number]
+                            )
                         }
 
                         @if(field.getType.equals("boolean")) {
-                            @views.html.system.inputs.fields.boolean_field(field, input.getAttributes.get(field.getTitle) == true)
+                            @views.html.system.inputs.fields.boolean_field(
+                                inputType,
+                                field,
+                                input.getAttributes.get(field.getTitle) == true
+                            )
                         }
 
                         @if(field.getType.equals("dropdown")) {
-                            @views.html.system.inputs.fields.dropdown_field(field.asInstanceOf[DropdownField], input.getAttributes.get(field.getTitle).asInstanceOf[String])
+                            @views.html.system.inputs.fields.dropdown_field(
+                                inputType,
+                                field.asInstanceOf[DropdownField],
+                                input.getAttributes.get(field.getTitle).asInstanceOf[String]
+                            )
                         }
                     }
 

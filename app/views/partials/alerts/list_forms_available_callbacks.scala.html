@@ -16,19 +16,19 @@
             @for(field <- details.getRequestedConfiguration()) {
 
                 @if(field.getType().equals("text")) {
-                    @views.html.system.inputs.fields.text_field(field)
+                    @views.html.system.inputs.fields.text_field(callbackType, field)
                 }
 
                 @if(field.getType().equals("number")) {
-                    @views.html.system.inputs.fields.number_field(field)
+                    @views.html.system.inputs.fields.number_field(callbackType, field)
                 }
 
                 @if(field.getType().equals("boolean")) {
-                    @views.html.system.inputs.fields.boolean_field(field)
+                    @views.html.system.inputs.fields.boolean_field(callbackType, field)
                 }
 
                 @if(field.getType().equals("dropdown")) {
-                    @views.html.system.inputs.fields.dropdown_field(field.asInstanceOf[DropdownField])
+                    @views.html.system.inputs.fields.dropdown_field(callbackType, field.asInstanceOf[DropdownField])
                 }
             }
 

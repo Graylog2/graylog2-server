@@ -1,4 +1,5 @@
-@(field: org.graylog2.restclient.lib.plugin.configuration.DropdownField,
+@(idPrefix: String,
+        field: org.graylog2.restclient.lib.plugin.configuration.DropdownField,
         selected: String = null)
 @import org.graylog2.restclient.lib.plugin.configuration.DropdownField
 
@@ -17,7 +18,7 @@
     }
 }
 
-<label for="@field.getTitle">
+<label for="@(idPrefix + "-" + field.getTitle)">
     @field.getHumanName
 
     @if(field.isOptional) {
@@ -25,7 +26,7 @@
     }
 </label>
 
-<select @htmlAttributes(field) class="input-xlarge form-control">
+<select id="@(idPrefix + "-" + field.getTitle)" @htmlAttributes(field) class="input-xlarge form-control">
     @for((k, v) <- field.getValues.toSeq.sortBy(_._2)) {
         <option value="@k" @if(isSelected(k, selected, field.getDefaultValue)) { selected="selected" }>
             @v

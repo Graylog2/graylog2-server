@@ -1,4 +1,5 @@
-@(field: org.graylog2.restclient.lib.plugin.configuration.RequestedConfigurationField,
+@(idPrefix: String,
+        field: org.graylog2.restclient.lib.plugin.configuration.RequestedConfigurationField,
         value: Number = null)
 @import org.graylog2.restclient.lib.plugin.configuration.RequestedConfigurationField
 
@@ -23,14 +24,14 @@
     }
 }
 
-<label for="@field.getTitle">
+<label for="@(idPrefix + "-" + field.getTitle)">
     @field.getHumanName
 
     @if(field.isOptional) {
         <span class="configuration-field-optional">(optional)</span>
     }
 </label>
-<input type="number" min="@Integer.MIN_VALUE" max="@Integer.MAX_VALUE"
+<input id="@(idPrefix + "-" + field.getTitle)" type="number" min="@Integer.MIN_VALUE" max="@Integer.MAX_VALUE"
     @htmlAttributes(field)
     @fieldValue(value, field.getDefaultValue)
     class="input-xlarge validatable form-control">

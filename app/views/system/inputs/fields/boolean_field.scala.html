@@ -1,4 +1,5 @@
-@(field: org.graylog2.restclient.lib.plugin.configuration.RequestedConfigurationField,
+@(idPrefix: String,
+        field: org.graylog2.restclient.lib.plugin.configuration.RequestedConfigurationField,
         value: Boolean = null)
 
 @checked = {
@@ -15,7 +16,8 @@
 
 <div class="checkbox">
     <label>
-        <input type="checkbox"
+        <input id="@(idPrefix + "-" + field.getTitle)"
+            type="checkbox"
             @checked
             value="true"
             name="configuration[@field.getTitle]">
