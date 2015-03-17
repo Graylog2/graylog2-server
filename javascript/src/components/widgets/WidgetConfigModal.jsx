@@ -56,7 +56,7 @@ var WidgetConfigModal = React.createClass({
         return configListElements;
     },
     render() {
-        var configModalHeader = <h2 class="modal-title">Widget "{this.props.title}" configuration</h2>;
+        var configModalHeader = <h2 className="modal-title">Widget "{this.props.title}" configuration</h2>;
         var configModalBody = (
             <div className="configuration">
                 {this._getBasicConfiguration()}

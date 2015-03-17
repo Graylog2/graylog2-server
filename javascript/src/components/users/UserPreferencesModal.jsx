@@ -17,7 +17,7 @@ var UserPreferencesModal = React.createClass({
         }
     },
     render() {
-        var header = <h2 class="modal-title">Preferences for user {this.props.userName}</h2>;
+        var header = <h2 className="modal-title">Preferences for user {this.props.userName}</h2>;
         // TODO: Add additional row where you can add a new preference
         // TODO: Add delete button
         var body = (

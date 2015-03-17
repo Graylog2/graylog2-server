@@ -17,7 +17,7 @@ var TrendConfigurationModal = React.createClass({
         this.setState({lowerIsBetter: event.target.checked});
     },
     render() {
-        var header = <h2 class="modal-title">Configure Dashboard Widget</h2>;
+        var header = <h2 className="modal-title">Configure Dashboard Widget</h2>;
         var trendOptions = (
             <div>
                 <div className="checkbox">
