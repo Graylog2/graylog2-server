@@ -4,80 +4,86 @@
 
     @views.html.partials.breadcrumbs(breadcrumbs)
 
-    <div class="row">
-        <h1><i class="fa fa-inbox"></i> Logging</h1>
-        This section controls logging of the Graylog architecture and allows you to change log
-        levels on the fly. Note that log levels are reset to their defaults after you restart
-        the affected service.
+    <div class="row content">
+        <div class="col-md-12">
+            <h1><i class="fa fa-inbox"></i> Logging</h1>
+            <p class="description">
+                This section controls logging of the Graylog architecture and allows you to change log
+                levels on the fly. Note that log levels are reset to their defaults after you restart
+                the affected service.
+            </p>
+        </div>
     </div>
 
     @for((node, nodeLoggers) <- loggers) {
-        <div class="row log-writing-node node-row">
-            <div class="pull-right">
-                <a href="#" class="btn btn-mini trigger-log-level-metrics" data-node-id="@node.getNodeId">
-                    <i class="fa fa-dashboard"></i>
-                    Metrics
-                </a>
-            </div>
-
-            <h2>
-                @views.html.partials.node_title_link(node)
-
-                <span style="font-size: 12px;">
-                    Has written a total of
-                    <strong>
-                        <span class="total-logs focuslimit" data-node-id="@node.getNodeId">?</span>
-                        internal log messages.
-                    </strong>
-                </span>
-            </h2>
-
-            <div class="subsystems">
-                <div class="subsystems-row">
-                    @views.html.system.logging.partials.subsystem(node.getNodeId, "Graylog", "graylog2", "All messages from graylog2-owned systems.", subsystems.get(node).get("graylog2"))
-                    @views.html.system.logging.partials.subsystem(node.getNodeId, "Indexer", "indexer", "All messages related to indexing and searching.", subsystems.get(node).get("indexer"))
-                    <br style="clear: both;" />
+        <div class="row log-writing-node node-row content">
+            <div class="col-md-12">
+                <div class="pull-right">
+                    <a href="#" class="btn btn-mini trigger-log-level-metrics" data-node-id="@node.getNodeId">
+                        <i class="fa fa-dashboard"></i>
+                        Metrics
+                    </a>
                 </div>
 
-                <div class="subsystems-row">
-                    @views.html.system.logging.partials.subsystem(node.getNodeId, "Authentication", "authentication", "All user authentication messages.", subsystems.get(node).get("authentication"))
-                    @views.html.system.logging.partials.subsystem(node.getNodeId, "Sockets", "sockets", "All messages related to socket communication.", subsystems.get(node).get("sockets"))
-                    <br style="clear: both;" />
-                </div>
-            </div>
+                <h2>
+                    @views.html.partials.node_title_link(node)
 
-            <div class="loglevel-metrics" data-node-id="@node.getNodeId" style="display: none;">
-                <div class="loglevel-metrics-row">
-                    <div class="col-md-4">
-                        <h3 class="u-light">Level: Fatal</h3>
-                        @views.html.system.logging.partials.loglevel_metrics("fatal")
+                    <span style="font-size: 12px;">
+                        Has written a total of
+                        <strong>
+                            <span class="total-logs focuslimit" data-node-id="@node.getNodeId">?</span>
+                            internal log messages.
+                        </strong>
+                    </span>
+                </h2>
+
+                <div class="subsystems">
+                    <div class="subsystems-row">
+                        @views.html.system.logging.partials.subsystem(node.getNodeId, "Graylog", "graylog2", "All messages from graylog2-owned systems.", subsystems.get(node).get("graylog2"))
+                        @views.html.system.logging.partials.subsystem(node.getNodeId, "Indexer", "indexer", "All messages related to indexing and searching.", subsystems.get(node).get("indexer"))
+                        <br style="clear: both;" />
                     </div>
 
-                    <div class="col-md-4">
-                        <h3 class="u-light">Level: Error</h3>
-                        @views.html.system.logging.partials.loglevel_metrics("error")
-                    </div>
-
-                    <div class="col-md-4">
-                        <h3 class="u-light">Level: Warn</h3>
-                        @views.html.system.logging.partials.loglevel_metrics("warn")
+                    <div class="subsystems-row">
+                        @views.html.system.logging.partials.subsystem(node.getNodeId, "Authentication", "authentication", "All user authentication messages.", subsystems.get(node).get("authentication"))
+                        @views.html.system.logging.partials.subsystem(node.getNodeId, "Sockets", "sockets", "All messages related to socket communication.", subsystems.get(node).get("sockets"))
+                        <br style="clear: both;" />
                     </div>
                 </div>
 
-                <div class="loglevel-metrics-row">
-                    <div class="col-md-4">
-                        <h3 class="u-light">Level: Info</h3>
-                        @views.html.system.logging.partials.loglevel_metrics("info")
+                <div class="loglevel-metrics" data-node-id="@node.getNodeId" style="display: none;">
+                    <div class="loglevel-metrics-row">
+                        <div class="col-md-4">
+                            <h3 class="u-light">Level: Fatal</h3>
+                            @views.html.system.logging.partials.loglevel_metrics("fatal")
+                        </div>
+
+                        <div class="col-md-4">
+                            <h3 class="u-light">Level: Error</h3>
+                            @views.html.system.logging.partials.loglevel_metrics("error")
+                        </div>
+
+                        <div class="col-md-4">
+                            <h3 class="u-light">Level: Warn</h3>
+                            @views.html.system.logging.partials.loglevel_metrics("warn")
+                        </div>
                     </div>
 
-                    <div class="col-md-4">
-                        <h3 class="u-light">Level: Debug</h3>
-                        @views.html.system.logging.partials.loglevel_metrics("debug")
-                    </div>
+                    <div class="loglevel-metrics-row">
+                        <div class="col-md-4">
+                            <h3 class="u-light">Level: Info</h3>
+                            @views.html.system.logging.partials.loglevel_metrics("info")
+                        </div>
 
-                    <div class="col-md-4">
-                        <h3 class="u-light">Level: Trace</h3>
-                        @views.html.system.logging.partials.loglevel_metrics("trace")
+                        <div class="col-md-4">
+                            <h3 class="u-light">Level: Debug</h3>
+                            @views.html.system.logging.partials.loglevel_metrics("debug")
+                        </div>
+
+                        <div class="col-md-4">
+                            <h3 class="u-light">Level: Trace</h3>
+                            @views.html.system.logging.partials.loglevel_metrics("trace")
+                        </div>
                     </div>
                 </div>
             </div>
