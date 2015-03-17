@@ -232,6 +232,12 @@
                 <groupId>org.drools</groupId>
                 <artifactId>drools-compiler</artifactId>
                 <version>${drools.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <artifactId>xpp3_min</artifactId>
+                        <groupId>xpp3</groupId>
+                    </exclusion>
+                </exclusions>
             </dependency>
 
             <dependency>
