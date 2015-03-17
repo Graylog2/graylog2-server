@@ -24,17 +24,24 @@ var UserPreferencesModal = React.createClass({
             <div>
             {this.state.preferences.map((preference, index) => {
                 return (
-                    <div className="control-group" key={index}>
-                        <label htmlFor={preference.name+"-"+index} className="control-label">{preference.name}</label>
-                        <div className="controls">
-                            <input id={preference.name+"-"+index} onChange={this._onPreferenceChanged.bind(this, preference.name)} className="form-control" required value={preference.value} type="text"/>
-                        </div>
+                    <div className="form-group" key={index}>
+                        <label htmlFor={preference.name+"-"+index}>{preference.name}</label>
+                        <input id={preference.name+"-"+index}
+                               onChange={this._onPreferenceChanged.bind(this, preference.name)}
+                               className="form-control"
+                               value={preference.value}
+                               type="text"
+                               required />
                     </div>
                 );
             }, this)}
             </div>);
         return (
-            <BootstrapModal ref="modal" onCancel={this._closeModal} onConfirm={this._save} cancel="Cancel" confirm="Save" formClass="form-horizontal">
+            <BootstrapModal ref="modal"
+                            onCancel={this._closeModal}
+                            onConfirm={this._save}
+                            cancel="Cancel"
+                            confirm="Save">
                {header}
                {body}
             </BootstrapModal>

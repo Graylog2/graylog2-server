@@ -13,24 +13,29 @@ var BulkLoadPatternModal = React.createClass({
         var header = <h2>Import Grok patterns from file</h2>;
         var body = (
             <div>
-                <span className="help-block">A file containing Grok patterns, one per line. Name and patterns should be separated by whitespace.</span>
-                <input type="file" name="patterns" required/>
-                <label className="checkbox">
-                    <input type="checkbox" name="replace"/> Replace all existing patterns?
-                </label>
+                <div className="form-group">
+                    <label htmlFor="pattern-file">Pattern file</label>
+                    <input id="pattern-file" type="file" required/>
+                    <span className="help-block">A file containing Grok patterns, one per line. Name and patterns should be separated by whitespace.</span>
+                </div>
+                <div className="checkbox">
+                    <label>
+                        <input type="checkbox" name="replace"/> Replace all existing patterns?
+                    </label>
+                </div>
             </div>
         );
         return (
             <span>
                 <button className="btn btn-small btn-success" style={{marginRight: 5}} onClick={this.openModal}><i className="fa fa-file"></i> Import pattern file</button>
 
-                <BootstrapModal 
-                    ref="modal" 
-                    onConfirm={this.uploadPatterns} 
+                <BootstrapModal
+                    ref="modal"
+                    onConfirm={this.uploadPatterns}
                     confirm="Upload"
                     onCancel={this._closeModal}
                     cancel="Cancel"
-                    method="POST" 
+                    method="POST"
                     encType="multipart/form-data"
                     action={URLUtils.appPrefixed('/system/grokpatterns/import')}>
                    {header}

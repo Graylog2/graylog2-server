@@ -20,19 +20,25 @@ var TrendConfigurationModal = React.createClass({
         var header = <h2>Configure Dashboard Widget</h2>;
         var trendOptions = (
             <div>
-                <label className="checkbox">
-                    <input type="checkbox" onChange={this._onTrendChange} checked={this.state.trend}/> Display trend
-                </label>
-                <label className="checkbox">
-                    <input type="checkbox" onChange={this._onLowerIsBetterChange} disabled={!this.state.trend} checked={this.state.lowerIsBetter}/> Lower value is better
-                    <span className="help-inline"> (use green colour when trend goes down)</span>
-                </label>
+                <div className="checkbox">
+                    <label>
+                        <input type="checkbox" onChange={this._onTrendChange} checked={this.state.trend}/> Display trend
+                    </label>
+                </div>
+                <div className="checkbox">
+                    <label>
+                        <input type="checkbox" onChange={this._onLowerIsBetterChange} disabled={!this.state.trend} checked={this.state.lowerIsBetter}/> Lower value is better
+                        <span className="help-inline"> (use green colour when trend goes down)</span>
+                    </label>
+                </div>
             </div>
         );
         var body = (
             <fieldset>
-                <label>Description:</label>
-                <input type="text" onChange={this._onDescriptionChange} value={this.state.description} required/>
+                <div className="form-group">
+                    <label>Description:</label>
+                    <input type="text" className="form-control" onChange={this._onDescriptionChange} value={this.state.description} required/>
+                </div>
                 {this.state.supportsTrending ? trendOptions : null}
             </fieldset>
         );

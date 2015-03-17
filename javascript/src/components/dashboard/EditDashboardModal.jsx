@@ -24,10 +24,14 @@ var EditDashboardModal = React.createClass({
         var header = <h2>Edit Dashboard {this.props.title}</h2>;
         var body = (
             <fieldset>
-                <label>Title:</label>
-                <input type="text" onChange={this._onTitleChange} value={this.state.title} required/>
-                <label>Description:</label>
-                <input type="text" onChange={this._onDescriptionChange} value={this.state.description}  required/>
+                <div className="form-group">
+                    <label>Title:</label>
+                    <input type="text" className="form-control" onChange={this._onTitleChange} value={this.state.title} required/>
+                </div>
+                <div className="form-group">
+                    <label>Description:</label>
+                    <input type="text" className="form-control" onChange={this._onDescriptionChange} value={this.state.description}  required/>
+                </div>
             </fieldset>
         );
         return (

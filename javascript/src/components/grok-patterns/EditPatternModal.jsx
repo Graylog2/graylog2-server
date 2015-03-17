@@ -26,19 +26,29 @@ var EditDashboardModal = React.createClass({
             this.setState({name: name, error: false, error_message: ""});
         }
     },
+    _getId(prefixIdName) {
+        return this.state.name !== undefined ? prefixIdName + this.state.name : prefixIdName;
+    },
     render() {
         var header = <h2>{this.props.create ? "Create" : "Edit"} Grok Pattern {this.state.name}</h2>;
         var body = (
             <fieldset>
-                <div className={this.state.error ? "control-group error" : "control-group"}>
-                    <label>Name:</label>
-                    <div className="controls">
-                        <input type="text" onChange={this._onNameChange} value={this.state.name} required/>
-                        <span className="help-inline">{this.state.error_message}</span>
-                    </div>
+                <div className={this.state.error ? "form-group has-error" : "form-group"}>
+                    <label htmlFor={this._getId("pattern-name")}>Name:</label>
+                    <input type="text"
+                        className="form-control"
+                        onChange={this._onNameChange}
+                        value={this.state.name}
+                        id={this._getId("pattern-name")}
+                        required/>
+                    <span className="help-block">{this.state.error_message}</span>
                 </div>
-                <label>Pattern:</label>
-                <textarea onChange={this._onPatternChange} value={this.state.pattern} required></textarea>
+                <label htmlFor={this._getId("pattern")}>Pattern:</label>
+                <textarea id={this._getId("pattern")}
+                          className="form-control"
+                          onChange={this._onPatternChange}
+                          value={this.state.pattern}
+                          required></textarea>
             </fieldset>
         );
         return (
