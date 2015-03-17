@@ -4,8 +4,9 @@
 @import lib.security.RestPermissions.SAVEDSEARCHES_READ
 
 <div class="row no-bm">
-    <div class="col-md-12" id="universalsearch">
-
+    <div class="col-md-12" id="universalsearch-container">
+    <div class="row no-bm">
+        <div class="col-md-12" id="universalsearch">
         <form class="universalsearch-form" action="@if(stream == null) { @controllers.routes.SearchController.index() } else { @controllers.routes.StreamSearchController.index(stream.getId) }" method="GET">
             <input type="hidden" name="rangetype"
                     value="@if(request.getQueryString("rangetype") == null) {relative} else {@request.getQueryString("rangetype")}"
@@ -81,6 +82,7 @@
             </div>
 
         </form>
-
+    </div>
+    </div>
     </div>
  </div>
