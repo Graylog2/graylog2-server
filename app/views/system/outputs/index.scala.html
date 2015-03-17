@@ -9,28 +9,35 @@
 @main("Outputs in cluster", null, "", currentUser) {
     @views.html.partials.breadcrumbs(breadcrumbs)
 
-    <div class="row">
-        <h1>
-            <i class="fa fa-download-alt"></i>
-            Outputs in Cluster
-        </h1>
-        Graylog nodes can forward messages via outputs. Launch or terminate as many outputs as you want here
-        <strong>and then assign them to streams to forward all messages of a stream in real-time.</strong>
+    <div class="row content">
+        <div class="col-md-12">
+            <h1>
+                <i class="fa fa-download-alt"></i>
+                Outputs in Cluster
+            </h1>
+            Graylog nodes can forward messages via outputs. Launch or terminate as many outputs as you want here
+            <strong>and then assign them to streams to forward all messages of a stream in real-time.</strong>
 
-        <br />
-        You can find output plugins on <a href="https://www.graylog.org/resources/integrations/" target="_blank">the Graylog website</a>.
+            <br />
+            You can find output plugins on <a href="https://www.graylog.org/resources/integrations/" target="_blank">the Graylog website</a>.
+        </div>
     </div>
 
     @if(isPermitted(OUTPUTS_CREATE)) {
-        <div class="row input-new">
+        <div class="row input-new content">
+            <div class="col-md-12">
+                <form class="form-inline">
+                    <div class="form-group">
+                        <select id="input-type" class="form-control">
+                        @for((inputType,info) <- availableOutputs.toSeq.sortBy(_._2.name.toLowerCase)) {
+                            <option value="@inputType">@info.name</option>
+                        }
+                        </select>
 
-            <select id="input-type">
-            @for((inputType,info) <- availableOutputs.toSeq.sortBy(_._2.name.toLowerCase)) {
-                <option value="@inputType">@info.name</option>
-            }
-            </select>
-
-            <button id="configure-input" class="btn btn-success">Launch new output</button>
+                        <button id="configure-input" class="btn btn-success btn-sm form-control">Launch new output</button>
+                    </div>
+                </form>
+            </div>
         </div>
 
         @views.html.system.outputs.partials.output_creation_forms.render(availableOutputs, routes.OutputsController.index())
@@ -41,6 +48,10 @@
             @views.html.system.outputs.partials.output_summary.render(output, null, availableOutputs.get(output.getType))
         }
     } else {
-        <div class="alert alert-info">There are no outputs.</div>
+        <div class="row content">
+            <div class="col-md-12">
+                <div class="alert alert-info">There are no outputs.</div>
+            </div>
+        </div>
     }
 }
