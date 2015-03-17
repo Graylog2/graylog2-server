@@ -275,21 +275,26 @@ var SourceOverview = React.createClass({
         });
     },
     render() {
-        var emptySources = <div className="alert alert-info">
-            No message sources found for this time range. Did you try using a different one?
-        </div>;
+        var emptySources =
+            <div className="row content">
+                <div className="col-md-12">
+                    <div className="alert alert-info">
+                        No message sources found for this time range. Did you try using a different one?
+                    </div>
+                </div>
+            </div>;
 
         var resultsStyle = this.state.renderResultTable ? null : {display: 'none'};
         var results = (
             <div style={resultsStyle}>
-                <div className="row">
+                <div className="row content">
                     <SourceLineChart ref="sourceLineChart"
                         reloadingHistogram={this.state.reloadingHistogram}
                         histogramDataAvailable={this.state.histogramDataAvailable}
                         resolution={this.state.resolution}
                         resetFilters={this.resetHistogramFilters}/>
                 </div>
-                <div className="row">
+                <div className="row content">
                     <div className="col-md-9">
                         <SourceDataTable ref="sourceDataTable" resetFilters={this.resetSourcesFilters} setSearchFilter={this.setSearchFilter}/>
                     </div>
@@ -302,24 +307,26 @@ var SourceOverview = React.createClass({
 
         return (
             <div>
-                <div className="row">
-                    <div>
-                        <select ref="rangeSelector" className="sources-range pull-right" value={this.state.range} onChange={this._onRangeChanged}>
-                            <option value={hoursToSeconds(1)}>Last Hour</option>
-                            <option value={daysToSeconds(1)}>Last Day</option>
-                            <option value={daysToSeconds(7)}>Last Week</option>
-                            <option value={daysToSeconds(31)}>Last Month</option>
-                            <option value={daysToSeconds(365)}>Last Year</option>
-                            <option value="0">All</option>
-                        </select>
-                        <h1><i className="fa fa-download"></i> Sources</h1>
+                <div className="row content">
+                    <div className="col-md-12">
+                        <div>
+                            <select ref="rangeSelector" className="sources-range pull-right" value={this.state.range} onChange={this._onRangeChanged}>
+                                <option value={hoursToSeconds(1)}>Last Hour</option>
+                                <option value={daysToSeconds(1)}>Last Day</option>
+                                <option value={daysToSeconds(7)}>Last Week</option>
+                                <option value={daysToSeconds(31)}>Last Month</option>
+                                <option value={daysToSeconds(365)}>Last Year</option>
+                                <option value="0">All</option>
+                            </select>
+                            <h1><i className="fa fa-download"></i> Sources</h1>
+                        </div>
+                        <p style={{"marginTop": "15px"}}>
+                            This is a list of all sources that sent in messages to Graylog. Use the table and charts to interact
+                            with the different sources and get a better understanding of them.
+                            &nbsp;Note that the list is cached for a few seconds so you might have to wait a bit until a new source
+                            appears.
+                        </p>
                     </div>
-                    <p style={{"marginTop": "15px"}}>
-                        This is a list of all sources that sent in messages to Graylog. Use the table and charts to interact
-                        with the different sources and get a better understanding of them.
-                        &nbsp;Note that the list is cached for a few seconds so you might have to wait a bit until a new source
-                        appears.
-                    </p>
                 </div>
 
                 {this.state.renderResultTable ? null : emptySources}
