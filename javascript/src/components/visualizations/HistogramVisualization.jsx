@@ -47,21 +47,23 @@ var HistogramVisualization = React.createClass({
             .renderTitle(false)
             .colors(D3Utils.glColourPalette())
             .on('renderlet', (_) => {
-                $('svg .chart-body rect.bar', histogramDomNode).tooltip({
-                    'trigger': 'hover',
-                    'container': 'body',
-                    'placement': 'top',
-                    'delay': { show: 300, hide: 100 },
-                    'html': true
-                });
-
                 var formatTitle = (d) => {
                     return numeral(d.y).format("0,0") + " messages<br>" + d.x.format(momentHelper.DATE_FORMAT_TZ);
                 };
 
                 d3.select(histogramDomNode).selectAll('.chart-body rect.bar')
+                    .attr('rel', 'tooltip')
                     .attr('data-original-title', formatTitle);
             });
+
+        $(histogramDomNode).tooltip({
+            'selector': '[rel="tooltip"]',
+            'trigger': 'hover',
+            'container': 'body',
+            'placement': 'auto',
+            'delay': { show: 300, hide: 100 },
+            'html': true
+        });
 
         this.histogram.xAxis()
             .ticks(graphHelper.customTickInterval())
