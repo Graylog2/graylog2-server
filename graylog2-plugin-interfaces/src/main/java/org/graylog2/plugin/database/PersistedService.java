@@ -38,8 +38,6 @@
  */
 package org.graylog2.plugin.database;
 
-import org.graylog2.plugin.database.Persisted;
-import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.database.validators.ValidationResult;
 import org.graylog2.plugin.database.validators.Validator;
 
