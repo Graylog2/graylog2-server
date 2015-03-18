@@ -26,7 +26,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.io.Resources;
 import org.graylog2.configuration.ElasticsearchConfiguration;
-import org.testng.annotations.Test;
+import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
@@ -34,7 +34,9 @@ import java.net.URISyntaxException;
 import java.util.Map;
 
 import static org.graylog2.AssertNotEquals.assertNotEquals;
-import static org.testng.AssertJUnit.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class EsNodeProviderTest {
     private ElasticsearchConfiguration setupConfig(Map<String, String> settings) {

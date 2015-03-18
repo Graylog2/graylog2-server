@@ -22,15 +22,15 @@ import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.inputs.Converter;
 import org.graylog2.plugin.inputs.Extractor;
-import org.testng.annotations.Test;
+import org.junit.Test;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.testng.Assert.assertNull;
-import static org.testng.AssertJUnit.assertEquals;
-import static org.testng.AssertJUnit.assertNotNull;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
@@ -145,17 +145,17 @@ public class RegexExtractorTest extends AbstractExtractorTest {
         assertEquals("fullyCutByExtractor", msg.getField("somefield"));
     }
 
-    @Test(expectedExceptions = ConfigurationException.class)
+    @Test(expected = ConfigurationException.class)
     public void testDoesNotInitializeOnNullConfigMap() throws Exception {
         new RegexExtractor(metricRegistry, "foo", "foo", 0, Extractor.CursorStrategy.CUT, "somefield", "somefield", null, "foo", noConverters(), Extractor.ConditionType.NONE, null);
     }
 
-    @Test(expectedExceptions = ConfigurationException.class)
+    @Test(expected = ConfigurationException.class)
     public void testDoesNotInitializeOnNullRegexValue() throws Exception {
         new RegexExtractor(metricRegistry, "foo", "foo", 0, Extractor.CursorStrategy.CUT, "somefield", "somefield", config(null), "foo", noConverters(), Extractor.ConditionType.NONE, null);
     }
 
-    @Test(expectedExceptions = ConfigurationException.class)
+    @Test(expected = ConfigurationException.class)
     public void testDoesNotInitializeOnEmptyRegexValue() throws Exception {
         new RegexExtractor(metricRegistry, "foo", "foo", 0, Extractor.CursorStrategy.CUT, "somefield", "somefield", config(""), "foo", noConverters(), Extractor.ConditionType.NONE, null);
     }

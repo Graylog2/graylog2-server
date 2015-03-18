@@ -16,9 +16,9 @@
  */
 package org.graylog2.restclient.models.api.requests;
 
-import org.testng.annotations.Test;
+import org.junit.Test;
 
-import static org.testng.AssertJUnit.assertNotNull;
+import static org.junit.Assert.assertNotNull;
 
 public class MultiMetricRequestTest {
     @Test

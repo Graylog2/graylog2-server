@@ -19,31 +19,30 @@ package org.graylog2.alerts;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.alarms.AlertCondition;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
 
 import java.util.List;
 import java.util.Map;
 
-import static org.testng.AssertJUnit.assertFalse;
-import static org.testng.AssertJUnit.assertTrue;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
-/**
- * @author Dennis Oelkers <dennis@torch.sh>
- */
 public class AbstractAlertConditionTest extends AlertConditionTest {
     protected AlertCondition alertCondition;
     final protected int grace = 10;
     final protected int time = 10;
 
     @Override
-    @BeforeClass
+    @Before
     public void setUp() throws Exception {
         super.setUp();
         alertCondition = getDummyAlertCondition(getParametersMap(grace, time, 0));
     }
 
-    @Test(enabled=false)
+    @Test
+    @Ignore
     public void testInGracePeriod() throws Exception {
         alertLastTriggered(-1);
         assertFalse("Should not be in grace period because alert was never fired", alertService.inGracePeriod(alertCondition));

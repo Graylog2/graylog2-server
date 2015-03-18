@@ -16,13 +16,13 @@
  */
 package org.graylog2.inputs.transports;
 
-import org.testng.annotations.Test;
+import org.junit.Test;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.graylog2.inputs.transports.HttpPollTransport.*;
-import static org.testng.AssertJUnit.assertEquals;
+import static org.graylog2.inputs.transports.HttpPollTransport.parseHeaders;
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>

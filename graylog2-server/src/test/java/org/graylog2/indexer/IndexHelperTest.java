@@ -17,9 +17,11 @@
 package org.graylog2.indexer;
 
 import com.google.common.collect.Sets;
+import org.junit.Test;
+
 import java.util.Set;
-import org.testng.annotations.Test;
-import static org.testng.AssertJUnit.*;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author lennart.koopmann

@@ -21,37 +21,55 @@ import com.codahale.metrics.MetricRegistry;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.buffer.ChannelBuffers;
-import org.jboss.netty.channel.*;
-import org.jboss.netty.handler.codec.http.*;
+import org.jboss.netty.channel.Channel;
+import org.jboss.netty.channel.ChannelEvent;
+import org.jboss.netty.channel.ChannelFuture;
+import org.jboss.netty.channel.ChannelHandlerContext;
+import org.jboss.netty.channel.MessageEvent;
+import org.jboss.netty.handler.codec.http.HttpHeaders;
+import org.jboss.netty.handler.codec.http.HttpMethod;
+import org.jboss.netty.handler.codec.http.HttpRequest;
+import org.jboss.netty.handler.codec.http.HttpResponse;
+import org.jboss.netty.handler.codec.http.HttpResponseStatus;
+import org.jboss.netty.handler.codec.http.HttpVersion;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import org.mockito.runners.MockitoJUnitRunner;
 
 import java.nio.charset.Charset;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.*;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNull;
+import static org.mockito.Mockito.atMost;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
-/**
- * @author Dennis Oelkers <dennis@torch.sh>
- */
+@RunWith(MockitoJUnitRunner.class)
 public class GELFHttpHandlerTest {
-    @Mock private MessageInput messageInput;
-    @Mock private MetricRegistry metricRegistry;
-    @Mock private ChannelHandlerContext ctx;
-    @Mock private MessageEvent evt;
-    @Mock private Channel channel;
-    @Mock private HttpRequest request;
-    @Mock private HttpHeaders headers;
+    @Mock
+    private MessageInput messageInput;
+    @Mock
+    private MetricRegistry metricRegistry;
+    @Mock
+    private ChannelHandlerContext ctx;
+    @Mock
+    private MessageEvent evt;
+    @Mock
+    private Channel channel;
+    @Mock
+    private HttpRequest request;
+    @Mock
+    private HttpHeaders headers;
 
-    @BeforeMethod
+    @Before
     public void setUp() throws Exception {
-        MockitoAnnotations.initMocks(this);
         Meter meter = mock(Meter.class);
         when(metricRegistry.meter(anyString())).thenReturn(meter);
 

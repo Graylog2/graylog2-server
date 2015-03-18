@@ -1,0 +1,5 @@
+{
+  "dead_letters" : [
+    {"_id" : {"$oid": "54e3deadbeefdeadbeefaffe"}, "message" : {}, "timestamp" : { "$date" : "2015-03-14T15:09:26.540Z" }, "letter_id" : "54f9deadbeefdeadbeefaffe"}
+  ]
+}

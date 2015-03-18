@@ -29,4 +29,5 @@ public interface AlarmCallbackConfigurationService extends PersistedService {
     public List<AlarmCallbackConfiguration> getForStream(Stream stream);
     public AlarmCallbackConfiguration load(String alarmCallbackId);
     public AlarmCallbackConfiguration create(String streamId, CreateAlarmCallbackRequest request, String userId);
+    public long count();
 }

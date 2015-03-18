@@ -24,48 +24,48 @@ package org.graylog2.plugin.inputs;
 
 import com.google.common.eventbus.EventBus;
 import org.graylog2.plugin.IOState;
-import org.testng.annotations.Test;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.runners.MockitoJUnitRunner;
 
-import java.util.Map;
-import java.util.UUID;
-
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
-import static org.testng.Assert.*;
 
-/**
- * @author Dennis Oelkers <dennis@torch.sh>
- */
-@Test
+@RunWith(MockitoJUnitRunner.class)
 public class IOStateTest {
+    @Test
     public void testNotEqualIfDifferentInput() throws Exception {
         EventBus eventBus = mock(EventBus.class);
         MessageInput messageInput1 = mock(MessageInput.class);
         MessageInput messageInput2 = mock(MessageInput.class);
 
-        IOState inputState1 = new IOState<MessageInput>(eventBus, messageInput1);
-        IOState inputState2 = new IOState<MessageInput>(eventBus, messageInput2);
+        IOState<MessageInput> inputState1 = new IOState<>(eventBus, messageInput1);
+        IOState<MessageInput> inputState2 = new IOState<>(eventBus, messageInput2);
 
         assertFalse(inputState1.equals(inputState2));
         assertFalse(inputState2.equals(inputState1));
     }
 
+    @Test
     public void testEqualsSameState() throws Exception {
         EventBus eventBus = mock(EventBus.class);
         MessageInput messageInput = mock(MessageInput.class);
 
-        IOState inputState1 = new IOState<MessageInput>(eventBus, messageInput, IOState.Type.RUNNING);
-        IOState inputState2 = new IOState<MessageInput>(eventBus, messageInput, IOState.Type.RUNNING);
+        IOState<MessageInput> inputState1 = new IOState<>(eventBus, messageInput, IOState.Type.RUNNING);
+        IOState<MessageInput> inputState2 = new IOState<>(eventBus, messageInput, IOState.Type.RUNNING);
 
         assertTrue(inputState1.equals(inputState2));
         assertTrue(inputState2.equals(inputState1));
     }
 
+    @Test
     public void testNotEqualIfDifferentState() throws Exception {
         EventBus eventBus = mock(EventBus.class);
         MessageInput messageInput = mock(MessageInput.class);
 
-        IOState inputState1 = new IOState<MessageInput>(eventBus, messageInput, IOState.Type.RUNNING);
-        IOState inputState2 = new IOState<MessageInput>(eventBus, messageInput, IOState.Type.STOPPED);
+        IOState<MessageInput> inputState1 = new IOState<>(eventBus, messageInput, IOState.Type.RUNNING);
+        IOState<MessageInput> inputState2 = new IOState<>(eventBus, messageInput, IOState.Type.STOPPED);
 
         assertTrue(inputState1.equals(inputState2));
         assertTrue(inputState2.equals(inputState1));

@@ -16,8 +16,9 @@
  */
 package org.graylog2;
 
-import org.testng.annotations.Test;
-import static org.testng.AssertJUnit.*;
+import org.junit.Test;
+
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author lennart

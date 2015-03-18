@@ -14,17 +14,27 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.alerts.types;
+package org.graylog2.database;
 
-import org.graylog2.alerts.AlertConditionTest;
-import org.testng.annotations.Test;
+import com.mongodb.DB;
+import com.mongodb.Mongo;
 
-/**
- * @author Dennis Oelkers <dennis@torch.sh>
- */
-@Test
-public class DummyAlertConditionTest extends AlertConditionTest {
-    public void testRunCheck() throws Exception {
+public class MongoConnectionForTests implements MongoConnection {
+    private final Mongo mongoClient;
+    private final DB db;
 
+    public MongoConnectionForTests(Mongo mongoClient, String dbName) {
+        this.mongoClient = mongoClient;
+        this.db = mongoClient.getDB(dbName);
+    }
+
+    @Override
+    public Mongo connect() {
+        return mongoClient;
+    }
+
+    @Override
+    public DB getDatabase() {
+        return db;
     }
 }

@@ -18,21 +18,25 @@ package org.graylog2.system.jobs;
 
 import com.codahale.metrics.MetricRegistry;
 import com.google.common.util.concurrent.Uninterruptibles;
-import org.graylog2.plugin.ServerStatus;
 import org.graylog2.system.activities.SystemMessageActivityWriter;
-import org.testng.annotations.Test;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 import java.util.concurrent.TimeUnit;
 
-import static org.mockito.Mockito.mock;
-import static org.testng.AssertJUnit.assertEquals;
-import static org.testng.AssertJUnit.assertTrue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
+@RunWith(MockitoJUnitRunner.class)
 public class SystemJobManagerTest {
+    @Mock
+    private SystemMessageActivityWriter systemMessageActivityWriter;
 
     @Test
     public void testGetRunningJobs() throws Exception {
-        SystemJobManager manager = new SystemJobManager(mock(SystemMessageActivityWriter.class), new MetricRegistry());
+        SystemJobManager manager = new SystemJobManager(systemMessageActivityWriter, new MetricRegistry());
 
         LongRunningJob job1 = new LongRunningJob(1);
         LongRunningJob job2 = new LongRunningJob(1);
@@ -50,7 +54,7 @@ public class SystemJobManagerTest {
 
     @Test
     public void testConcurrentJobs() throws Exception {
-        SystemJobManager manager = new SystemJobManager(mock(SystemMessageActivityWriter.class), new MetricRegistry());
+        SystemJobManager manager = new SystemJobManager(systemMessageActivityWriter, new MetricRegistry());
 
         SystemJob job1 = new LongRunningJob(3);
         SystemJob job2 = new LongRunningJob(3);
@@ -66,7 +70,7 @@ public class SystemJobManagerTest {
 
     @Test
     public void testSubmitThrowsExceptionIfMaxConcurrencyLevelReached() throws Exception {
-        SystemJobManager manager = new SystemJobManager(mock(SystemMessageActivityWriter.class), new MetricRegistry());
+        SystemJobManager manager = new SystemJobManager(systemMessageActivityWriter, new MetricRegistry());
 
         LongRunningJob job1 = new LongRunningJob(3);
         LongRunningJob job2 = new LongRunningJob(3);

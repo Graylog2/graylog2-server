@@ -17,10 +17,10 @@
 package org.graylog2.inputs.codecs.gelf;
 
 import org.graylog2.inputs.TestHelper;
-import org.graylog2.inputs.codecs.gelf.GELFMessage;
-import org.graylog2.inputs.codecs.gelf.GELFMessageChunk;
-import org.testng.annotations.Test;
-import static org.testng.AssertJUnit.*;
+import org.junit.Test;
+
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author lennart.koopmann

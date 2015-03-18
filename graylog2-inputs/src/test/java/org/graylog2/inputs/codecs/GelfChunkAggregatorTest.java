@@ -17,7 +17,6 @@
 package org.graylog2.inputs.codecs;
 
 import org.graylog2.plugin.InstantMillisProvider;
-import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.codecs.CodecAggregator;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.buffer.ChannelBuffers;
@@ -25,34 +24,32 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeUtils;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Period;
-import org.testng.annotations.AfterTest;
-import org.testng.annotations.BeforeTest;
-import org.testng.annotations.Test;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.runners.MockitoJUnitRunner;
 
-import java.net.InetSocketAddress;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static org.testng.Assert.*;
 
+@RunWith(MockitoJUnitRunner.class)
 public class GelfChunkAggregatorTest {
     private static final byte[] CHUNK_MAGIC_BYTES = new byte[]{0x1e, 0x0f};
-    private MessageInput input;
     private ScheduledThreadPoolExecutor poolExecutor;
     private GelfChunkAggregator aggregator;
-    private InetSocketAddress remoteAddress;
 
-    @BeforeTest
+    @Before
     public void before() {
-        input = mock(MessageInput.class);
-        when(input.getUniqueReadableId()).thenReturn("input-id");
         poolExecutor = new ScheduledThreadPoolExecutor(1);
         aggregator = new GelfChunkAggregator(poolExecutor);
-        remoteAddress = InetSocketAddress.createUnresolved("127.0.0.1", 4444);
     }
 
-    @AfterTest
+    @After
     public void after() {
         poolExecutor.shutdown();
         DateTimeUtils.setCurrentMillisSystem();
@@ -64,7 +61,7 @@ public class GelfChunkAggregatorTest {
 
         final CodecAggregator.Result result = aggregator.addChunk(singleChunk[0]);
 
-        assertNotNull(result.getMessage(), "message should be complete");
+        assertNotNull("message should be complete", result.getMessage());
 
     }
 
@@ -78,9 +75,9 @@ public class GelfChunkAggregatorTest {
             final CodecAggregator.Result result = aggregator.addChunk(chunk);
             assertTrue(result.isValid());
             if (i == 5) {
-                assertNotNull(result.getMessage(), "message should've been assembled from chunks");
+                assertNotNull("message should've been assembled from chunks", result.getMessage());
             } else {
-                assertNull(result.getMessage(), "chunks not complete");
+                assertNull("chunks not complete", result.getMessage());
             }
         }
     }
@@ -107,7 +104,7 @@ public class GelfChunkAggregatorTest {
             }
             result = aggregator.addChunk(chunk);
             assertTrue(result.isValid());
-            assertNull(result.getMessage(), "chunks not complete");
+            assertNull("chunks not complete", result.getMessage());
         }
         // move clock forward enough to evict all of the chunks
         clock.tick(Period.seconds(10));
@@ -116,7 +113,7 @@ public class GelfChunkAggregatorTest {
 
         final CodecAggregator.Result result = aggregator.addChunk(chunks[0]);
 
-        assertNull(result.getMessage(), "message should not be complete because chunks were evicted already");
+        assertNull("message should not be complete because chunks were evicted already", result.getMessage());
         assertTrue(result.isValid());
 
         // reset clock for other tests
@@ -127,14 +124,14 @@ public class GelfChunkAggregatorTest {
     public void outOfOrderChunks() {
         final ChannelBuffer[] chunks = createChunkedMessage(4096 + 512, 1024); // creates 5 chunks
         CodecAggregator.Result result = null;
-        for (int i = chunks.length - 1 ; i >= 0; i--) {
+        for (int i = chunks.length - 1; i >= 0; i--) {
             result = aggregator.addChunk(chunks[i]);
             if (i != 0) {
-                assertNull(result.getMessage(), "message still incomplete");
+                assertNull("message still incomplete", result.getMessage());
             }
         }
         assertNotNull(result);
-        assertNotNull(result.getMessage(), "first chunk should've completed the message");
+        assertNotNull("first chunk should've completed the message", result.getMessage());
     }
 
     @Test
@@ -152,8 +149,8 @@ public class GelfChunkAggregatorTest {
         }
         assertNotNull(result1);
         assertNotNull(result2);
-        assertNotNull(result1.getMessage(), "message 1 should be complete");
-        assertNull(result2.getMessage(), "message 2 should not be complete");
+        assertNotNull("message 1 should be complete", result1.getMessage());
+        assertNull("message 2 should not be complete", result2.getMessage());
     }
 
     private ChannelBuffer[] createChunkedMessage(int messageSize, int maxChunkSize) {

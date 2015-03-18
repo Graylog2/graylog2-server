@@ -22,15 +22,15 @@ import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.inputs.Converter;
 import org.graylog2.plugin.inputs.Extractor;
-import org.testng.annotations.Test;
+import org.junit.Test;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.testng.Assert.assertNull;
-import static org.testng.AssertJUnit.assertEquals;
-import static org.testng.AssertJUnit.assertNotNull;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
@@ -131,27 +131,27 @@ public class SubstringExtractorTest extends AbstractExtractorTest {
         assertEquals("fullyCutByExtractor", msg.getField("somefield"));
     }
 
-    @Test(expectedExceptions = ConfigurationException.class)
+    @Test(expected = ConfigurationException.class)
     public void testDoesNotInitializeOnNullConfigMap() throws Exception {
         new SubstringExtractor(metricRegistry, "foo", "foo", 0, Extractor.CursorStrategy.CUT, "somefield", "somefield", null, "foo", noConverters(), Extractor.ConditionType.NONE, null);
     }
 
-    @Test(expectedExceptions = ConfigurationException.class)
+    @Test(expected = ConfigurationException.class)
     public void testDoesNotInitializeOnNullStartValue() throws Exception {
         new SubstringExtractor(metricRegistry, "foo", "foo", 0, Extractor.CursorStrategy.CUT, "somefield", "somefield", config(null, 2), "foo", noConverters(), Extractor.ConditionType.NONE, null);
     }
 
-    @Test(expectedExceptions = ConfigurationException.class)
+    @Test(expected = ConfigurationException.class)
     public void testDoesNotInitializeOnNullEndValue() throws Exception {
         new SubstringExtractor(metricRegistry, "foo", "foo", 0, Extractor.CursorStrategy.CUT, "somefield", "somefield", config(1, null), "foo", noConverters(), Extractor.ConditionType.NONE, null);
     }
 
-    @Test(expectedExceptions = ConfigurationException.class)
+    @Test(expected = ConfigurationException.class)
     public void testDoesNotInitializeOnStringStartValue() throws Exception {
         new SubstringExtractor(metricRegistry, "foo", "foo", 0, Extractor.CursorStrategy.CUT, "somefield", "somefield", config("1", 2), "foo", noConverters(), Extractor.ConditionType.NONE, null);
     }
 
-    @Test(expectedExceptions = ConfigurationException.class)
+    @Test(expected = ConfigurationException.class)
     public void testDoesNotInitializeOnStringEndValue() throws Exception {
         new SubstringExtractor(metricRegistry, "foo", "foo", 0, Extractor.CursorStrategy.CUT, "somefield", "somefield", config(1, "2"), "foo", noConverters(), Extractor.ConditionType.NONE, null);
     }

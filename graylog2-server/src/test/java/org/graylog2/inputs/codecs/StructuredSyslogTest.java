@@ -21,10 +21,11 @@ import com.codahale.metrics.Timer;
 import com.google.common.collect.ImmutableMap;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.syslog4j.server.impl.event.structured.StructuredSyslogServerEvent;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.testng.annotations.BeforeTest;
-import org.testng.annotations.Test;
+import org.mockito.runners.MockitoJUnitRunner;
 
 import java.net.InetSocketAddress;
 import java.util.Collections;
@@ -32,12 +33,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
 
+@RunWith(MockitoJUnitRunner.class)
 public class StructuredSyslogTest {
     // http://tools.ietf.org/rfc/rfc5424.txt
     private static final String ValidStructuredMessage = "<165>1 2012-12-25T22:14:15.003Z mymachine.example.com evntslog - ID47 [exampleSDID@32473 iut=\"3\" eventSource=\"Application\" eventID=\"1011\"] BOMAn application event log entry";
@@ -54,13 +56,13 @@ public class StructuredSyslogTest {
             SyslogCodec.CK_STORE_FULL_MESSAGE, true
     ));
     private SyslogCodec syslogCodec;
-    @Mock private MetricRegistry metricRegistry;
-    @Mock private Timer mockedTimer;
+    @Mock
+    private MetricRegistry metricRegistry;
+    @Mock
+    private Timer mockedTimer;
 
-    @BeforeTest
+    @Before
     public void setUp() {
-        MockitoAnnotations.initMocks(this);
-
         when(metricRegistry.timer(any(String.class))).thenReturn(mockedTimer);
         when(mockedTimer.time()).thenReturn(mock(Timer.Context.class));
 
@@ -98,7 +100,7 @@ public class StructuredSyslogTest {
     public void testExtractFieldsWithoutExpansion() {
         // Order is not guaranteed in the current syslog4j implementation!
         Map<String, Object> result = syslogCodec.extractFields(newEvent(ValidStructuredMultiMessageSameKey), false);
-        assertTrue(Pattern.compile("3|10").matcher((String) result.get("iut")).matches(), "iut value is not 3 or 10!");
+        assertTrue("iut value is not 3 or 10!", Pattern.compile("3|10").matcher((String) result.get("iut")).matches());
     }
 
     @Test
@@ -111,7 +113,7 @@ public class StructuredSyslogTest {
     @Test
     public void testExtractNoFields() {
         Map<String, Object> result = syslogCodec.extractFields(newEvent(ValidStructuredNoStructValues), false);
-        assertEquals(result, Collections.emptyMap());
+        assertEquals(Collections.<String, Object>emptyMap(), result);
     }
 
     @Test

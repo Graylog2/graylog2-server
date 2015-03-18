@@ -28,17 +28,16 @@ import com.github.joschi.jadconfig.RepositoryException;
 import com.github.joschi.jadconfig.ValidationException;
 import com.github.joschi.jadconfig.repositories.InMemoryRepository;
 import com.google.common.collect.Maps;
-import org.testng.Assert;
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.URI;
 import java.util.Map;
 
-import static org.testng.AssertJUnit.assertEquals;
+import static org.junit.Assert.assertEquals;
 
 public class BaseConfigurationTest {
     private class Configuration extends BaseConfiguration {
@@ -62,7 +61,7 @@ public class BaseConfigurationTest {
     private Map<String, String> validProperties;
     private File tempFile;
 
-    @BeforeMethod
+    @Before
     public void setUp() throws Exception {
         validProperties = Maps.newHashMap();
         tempFile = File.createTempFile("graylog", null);
@@ -81,7 +80,7 @@ public class BaseConfigurationTest {
         validProperties.put("root_password_sha2", "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918"); // sha2 of admin
     }
 
-    @AfterMethod
+    @After
     public void tearDown() {
         if(tempFile != null) {
             tempFile.delete();

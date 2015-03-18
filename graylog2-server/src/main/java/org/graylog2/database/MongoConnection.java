@@ -16,73 +16,12 @@
  */
 package org.graylog2.database;
 
-import com.mongodb.CommandFailureException;
-import com.mongodb.CommandResult;
 import com.mongodb.DB;
+import com.mongodb.Mongo;
 import com.mongodb.MongoClient;
-import com.mongodb.MongoClientURI;
-import com.mongodb.MongoException;
-import com.mongodb.WriteConcern;
-import org.graylog2.configuration.MongoDbConfiguration;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import java.net.UnknownHostException;
+public interface MongoConnection {
+    Mongo connect();
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
-/**
- * MongoDB connection singleton
- */
-@Singleton
-public class MongoConnection {
-    private final MongoClientURI mongoClientURI;
-
-    private MongoClient m = null;
-    private DB db = null;
-
-    @Inject
-    public MongoConnection(final MongoDbConfiguration configuration) {
-        this(configuration.getMongoClientURI());
-    }
-
-    MongoConnection(MongoClientURI mongoClientURI) {
-        this.mongoClientURI = checkNotNull(mongoClientURI);
-    }
-
-    /**
-     * Connect the instance.
-     */
-    public synchronized MongoClient connect() {
-        if (m == null) {
-            try {
-                m = new MongoClient(mongoClientURI);
-                db = m.getDB(mongoClientURI.getDatabase());
-                db.setWriteConcern(WriteConcern.SAFE);
-            } catch (UnknownHostException e) {
-                throw new RuntimeException("Cannot resolve host name for MongoDB", e);
-            }
-        }
-
-        try {
-            db.command("{ ping: 1 }");
-        } catch (CommandFailureException e) {
-            if(e.getCode() == 18) {
-                throw new MongoException("Couldn't connect to MongoDB. Please check the authentication credentials.", e);
-            } else {
-                throw new MongoException("Couldn't connect to MongoDB: " + e.getMessage(), e);
-            }
-        }
-
-        return m;
-    }
-
-    /**
-     * Returns the raw database object.
-     *
-     * @return database
-     */
-    public DB getDatabase() {
-        return db;
-    }
+    DB getDatabase();
 }

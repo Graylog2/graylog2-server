@@ -16,28 +16,26 @@
  */
 package org.graylog2.shared.buffers;
 
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.slf4j.Logger;
-import org.testng.annotations.Test;
 
 import static org.mockito.Mockito.mock;
-import static org.testng.Assert.fail;
 
+@RunWith(MockitoJUnitRunner.class)
 public class LoggingExceptionHandlerTest {
 
     @Test
     public void testHandleEventException() throws Exception {
         final Logger logger = mock(Logger.class);
-        try {
-            final LoggingExceptionHandler handler = new LoggingExceptionHandler(logger);
-            handler.handleEventException(new RuntimeException(), -1, null);
-            handler.handleEventException(new RuntimeException(), -1, new Object() {
-                @Override
-                public String toString() {
-                    throw new NullPointerException();
-                }
-            });
-        } catch (Exception e) {
-            fail("handleEventException should never throw", e);
-        }
+        final LoggingExceptionHandler handler = new LoggingExceptionHandler(logger);
+        handler.handleEventException(new RuntimeException(), -1, null);
+        handler.handleEventException(new RuntimeException(), -1, new Object() {
+            @Override
+            public String toString() {
+                throw new NullPointerException();
+            }
+        });
     }
 }

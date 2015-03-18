@@ -17,8 +17,15 @@
 package org.graylog2.indexer;
 
 import javax.inject.Inject;
+
+import com.google.common.collect.Maps;
+import com.mongodb.BasicDBObject;
+import org.bson.types.ObjectId;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PersistedServiceImpl;
+import org.joda.time.DateTime;
+
+import java.util.Map;
 
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
@@ -27,5 +34,25 @@ public class PersistedDeadLetterServiceImpl extends PersistedServiceImpl impleme
     @Inject
     public PersistedDeadLetterServiceImpl(MongoConnection mongoConnection) {
         super(mongoConnection);
+    }
+
+    @Override
+    public PersistedDeadLetter create(String letterId, DateTime timestamp, Map<String, Object> message) {
+        return create(new ObjectId().toHexString(), letterId, timestamp, message);
+    }
+
+    @Override
+    public PersistedDeadLetter create(String id, String letterId, DateTime timestamp, Map<String, Object> message) {
+        Map<String, Object> doc = Maps.newHashMap();
+        doc.put(PersistedDeadLetterImpl.LETTERID, letterId);
+        doc.put(PersistedDeadLetterImpl.TIMESTAMP, timestamp);
+        doc.put(PersistedDeadLetterImpl.MESSAGE, message);
+
+        return new PersistedDeadLetterImpl(new ObjectId(id), doc);
+    }
+
+    @Override
+    public long count() {
+        return count(PersistedDeadLetterImpl.class, new BasicDBObject());
     }
 }

@@ -18,20 +18,22 @@ package org.graylog2.rules;
 
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.rule.FactHandle;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import org.mockito.runners.MockitoJUnitRunner;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
 
+@RunWith(MockitoJUnitRunner.class)
 public class DroolsRulesSessionTest {
     @Mock
     private KieSession kieSession;
@@ -42,10 +44,8 @@ public class DroolsRulesSessionTest {
     private DroolsRulesSession session;
     private int rulesFired = 3;
 
-    @BeforeMethod
+    @Before
     public void setUp() throws Exception {
-        MockitoAnnotations.initMocks(this);
-
         message = new Message("hello", "localhost", Tools.iso8601());
 
         when(kieSession.insert(message)).thenReturn(factHandle);
@@ -83,14 +83,14 @@ public class DroolsRulesSessionTest {
         assertEquals(i, rulesFired);
     }
 
-    @Test(expectedExceptions = IllegalStateException.class)
+    @Test(expected = IllegalStateException.class)
     public void testEvaluateWithNullSession() throws Exception {
         DroolsRulesSession session = new DroolsRulesSession(null);
 
         session.evaluate(message, false);
     }
 
-    @Test(expectedExceptions = IllegalStateException.class)
+    @Test(expected = IllegalStateException.class)
     public void testEvaluateWithClosedSession() throws Exception {
         session.close();
         session.evaluate(message, false);

@@ -21,7 +21,7 @@ import com.google.common.net.HostAndPort;
 import com.mongodb.BasicDBObject;
 import com.mongodb.CommandResult;
 import com.mongodb.DB;
-import com.mongodb.MongoClient;
+import com.mongodb.Mongo;
 import com.mongodb.ServerAddress;
 import org.graylog2.database.MongoConnection;
 import org.joda.time.DateTime;
@@ -33,7 +33,7 @@ import java.util.List;
 @Singleton
 public class MongoProbe {
     private final MongoConnection mongoConnection;
-    private final MongoClient mongoClient;
+    private final Mongo mongoClient;
     private final DB db;
     private final DB adminDb;
     private final BuildInfo buildInfo;

@@ -30,17 +30,17 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Sets;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import org.junit.Before;
+import org.junit.Test;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertNull;
-import static org.testng.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 public class MessageSummaryTest {
     public static final List<String> STREAM_IDS = ImmutableList.of("stream1", "stream2");
@@ -49,7 +49,7 @@ public class MessageSummaryTest {
     private Message message;
     private MessageSummary messageSummary;
 
-    @BeforeMethod
+    @Before
     public void setUp() throws Exception {
         message = new Message("message", "source", DateTime.now(DateTimeZone.UTC));
         message.addField("streams", STREAM_IDS);

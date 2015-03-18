@@ -30,6 +30,10 @@ import java.util.Map;
 @CollectionName("dead_letters")
 public class PersistedDeadLetterImpl extends PersistedImpl implements PersistedDeadLetter {
 
+    public static final String TIMESTAMP = "timestamp";
+    public static final String LETTERID = "letter_id";
+    public static final String MESSAGE = "message";
+
     public PersistedDeadLetterImpl(Map<String, Object> fields) {
         super(fields);
     }

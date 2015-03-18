@@ -16,7 +16,6 @@
  */
 package org.graylog2.periodical;
 
-import javax.inject.Provider;
 import org.graylog2.indexer.Deflector;
 import org.graylog2.indexer.NoTargetIndexException;
 import org.graylog2.indexer.indices.Indices;
@@ -24,13 +23,24 @@ import org.graylog2.initializers.IndexerSetupService;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.indexer.rotation.RotationStrategy;
 import org.graylog2.system.activities.SystemMessageActivityWriter;
-import org.testng.annotations.Test;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 import javax.annotation.Nullable;
+import javax.inject.Provider;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
+@RunWith(MockitoJUnitRunner.class)
 public class IndexRotationThreadTest {
+    @Mock
+    private Deflector deflector;
 
     @Test
     public void testFailedRotation() {
@@ -47,7 +57,6 @@ public class IndexRotationThreadTest {
             }
         };
 
-        final Deflector deflector = mock(Deflector.class);
         final IndexRotationThread rotationThread = new IndexRotationThread(
                 mock(NotificationService.class),
                 mock(Indices.class),
@@ -55,7 +64,7 @@ public class IndexRotationThreadTest {
                 mock(SystemMessageActivityWriter.class),
                 mock(IndexerSetupService.class),
                 provider
-            );
+        );
 
         rotationThread.checkForRotation();
 
@@ -87,7 +96,6 @@ public class IndexRotationThreadTest {
             }
         };
 
-        final Deflector deflector = mock(Deflector.class);
         final IndexRotationThread rotationThread = new IndexRotationThread(
                 mock(NotificationService.class),
                 mock(Indices.class),
@@ -95,7 +103,7 @@ public class IndexRotationThreadTest {
                 mock(SystemMessageActivityWriter.class),
                 mock(IndexerSetupService.class),
                 provider
-            );
+        );
 
         when(deflector.getNewestTargetName()).thenReturn("some_index");
 
@@ -130,7 +138,6 @@ public class IndexRotationThreadTest {
             }
         };
 
-        final Deflector deflector = mock(Deflector.class);
         final IndexRotationThread rotationThread = new IndexRotationThread(
                 mock(NotificationService.class),
                 mock(Indices.class),

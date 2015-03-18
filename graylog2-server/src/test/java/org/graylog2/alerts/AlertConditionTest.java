@@ -26,54 +26,55 @@ import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.alarms.AlertCondition;
 import org.graylog2.plugin.streams.Stream;
 import org.joda.time.DateTime;
-import org.testng.annotations.BeforeClass;
+import org.junit.Before;
 
 import java.util.Map;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.testng.AssertJUnit.*;
 
-/**
- * @author Dennis Oelkers <dennis@torch.sh>
- */
-public class AlertConditionTest {
+public abstract class AlertConditionTest {
     protected Stream stream;
     protected Searches searches;
-    protected AlertService alertService;
     protected MongoConnection mongoConnection;
+    protected AlertService alertService;
 
     protected final String STREAM_ID = "STREAMMOCKID";
     protected final String STREAM_CREATOR = "MOCKUSER";
     protected final String CONDITION_ID = "CONDITIONMOCKID";
 
-    @BeforeClass
+    @Before
     public void setUp() throws Exception {
         stream = mock(Stream.class);
         searches = mock(Searches.class);
         mongoConnection = mock(MongoConnection.class);
         // TODO use injection please. this sucks so bad
         alertService = new AlertServiceImpl(mongoConnection,
-                                            new FieldValueAlertCondition.Factory() {
-                                                @Override
-                                                public FieldValueAlertCondition createAlertCondition(Stream stream,
-                                                                                                     String id,
-                                                                                                     DateTime createdAt,
-                                                                                                     @Assisted("userid") String creatorUserId,
-                                                                                                     Map<String, Object> parameters) {
-                                                    return new FieldValueAlertCondition(searches, stream, id, createdAt, creatorUserId, parameters);
-                                                }
-                                            },
-                                            new MessageCountAlertCondition.Factory() {
-                                                @Override
-                                                public MessageCountAlertCondition createAlertCondition(Stream stream,
-                                                                                                       String id,
-                                                                                                       DateTime createdAt,
-                                                                                                       @Assisted("userid") String creatorUserId,
-                                                                                                       Map<String, Object> parameters) {
-                                                    return new MessageCountAlertCondition(searches, stream, id, createdAt, creatorUserId, parameters);
-                                                }
-                                            });
+                new FieldValueAlertCondition.Factory() {
+                    @Override
+                    public FieldValueAlertCondition createAlertCondition(Stream stream,
+                                                                         String id,
+                                                                         DateTime createdAt,
+                                                                         @Assisted("userid") String creatorUserId,
+                                                                         Map<String, Object> parameters) {
+                        return new FieldValueAlertCondition(searches, stream, id, createdAt, creatorUserId, parameters);
+                    }
+                },
+                new MessageCountAlertCondition.Factory() {
+                    @Override
+                    public MessageCountAlertCondition createAlertCondition(Stream stream,
+                                                                           String id,
+                                                                           DateTime createdAt,
+                                                                           @Assisted("userid") String creatorUserId,
+                                                                           Map<String, Object> parameters) {
+                        return new MessageCountAlertCondition(searches, stream, id, createdAt, creatorUserId, parameters);
+                    }
+                });
 
         when(stream.getId()).thenReturn(STREAM_ID);
     }

@@ -21,18 +21,18 @@ import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.buffer.ChannelBuffers;
 import org.jboss.netty.handler.codec.embedder.CodecEmbedderException;
 import org.jboss.netty.handler.codec.embedder.DecoderEmbedder;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import org.junit.Before;
+import org.junit.Test;
 
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertNull;
-import static org.testng.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 public class SyslogOctetCountFrameDecoderTest {
     private DecoderEmbedder<ChannelBuffer> embedder;
 
-    @BeforeMethod
+    @Before
     public void setUp() throws Exception {
         embedder = new DecoderEmbedder<ChannelBuffer>(new SyslogOctetCountFrameDecoder());
     }
@@ -81,7 +81,7 @@ public class SyslogOctetCountFrameDecoderTest {
         assertEquals(embedder.poll().toString(Charsets.UTF_8), "<45>1 2014-10-21T10:21:09+00:00 c4dc57ba1ebb syslog-ng 7120 - [meta sequenceId=\"1\"] syslog-ng starting up; version='3.5.3'\n");
     }
 
-    @Test(expectedExceptions = CodecEmbedderException.class)
+    @Test(expected = CodecEmbedderException.class)
     public void testBrokenFrames() throws Exception {
         final ChannelBuffer buf1 = ChannelBuffers.copiedBuffer("1 2014-10-21T10:21:09+00:00 c4dc57ba1ebb syslog-ng 7120 - ", Charsets.UTF_8);
 

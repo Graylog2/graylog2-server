@@ -18,11 +18,14 @@ package org.graylog2.inputs.converters;
 
 import com.google.common.collect.Maps;
 import org.graylog2.ConfigurationException;
-import org.testng.annotations.Test;
+import org.junit.Test;
 
 import java.util.Map;
 
-import static org.testng.AssertJUnit.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
 
 @SuppressWarnings("unchecked")
 public class CsvConverterTest {

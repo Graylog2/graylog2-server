@@ -305,8 +305,16 @@
             <artifactId>assertj-core</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-joda-time</artifactId>
+        </dependency>
+        <dependency>
             <groupId>com.lordofthejars</groupId>
             <artifactId>nosqlunit-elasticsearch</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.lordofthejars</groupId>
+            <artifactId>nosqlunit-mongodb</artifactId>
         </dependency>
     </dependencies>
 

@@ -16,23 +16,24 @@
  */
 package org.graylog2.indexer.rotation;
 
-import org.graylog2.Graylog2BaseTest;
 import org.graylog2.plugin.InstantMillisProvider;
 import org.graylog2.plugin.indexer.rotation.RotationStrategy;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeUtils;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Period;
-import org.testng.annotations.AfterTest;
-import org.testng.annotations.Test;
+import org.junit.After;
+import org.junit.Test;
 
 import static org.joda.time.Period.minutes;
 import static org.joda.time.Period.seconds;
-import static org.testng.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
-public class TimeBasedRotationStrategyTest extends Graylog2BaseTest {
+public class TimeBasedRotationStrategyTest {
 
-    @AfterTest
+    @After
     public void resetTimeProvider() {
         DateTimeUtils.setCurrentMillisSystem();
     }
@@ -68,7 +69,7 @@ public class TimeBasedRotationStrategyTest extends Graylog2BaseTest {
         assertEquals(dayAnd6Hours.getHourOfDay(), 0);
         assertEquals(dayAnd6Hours.getMinuteOfHour(), 0);
         assertEquals(dayAnd6Hours.getSecondOfMinute(), 0);
-        
+
         period = Period.days(30);
         final DateTime thirtyDays = TimeBasedRotationStrategy.determineRotationPeriodAnchor(period);
         assertEquals(thirtyDays.getYear(), 2014);
@@ -93,17 +94,17 @@ public class TimeBasedRotationStrategyTest extends Graylog2BaseTest {
         RotationStrategy.Result result;
 
         result = hourlyRotation.shouldRotate("ignored");
-        assertTrue(result.shouldRotate(), "Should rotate the first index");
+        assertTrue("Should rotate the first index", result.shouldRotate());
 
         clock.tick(seconds(2));
 
         result = hourlyRotation.shouldRotate("ignored");
-        assertTrue(result.shouldRotate(), "Crossed rotation period");
+        assertTrue("Crossed rotation period", result.shouldRotate());
 
         clock.tick(seconds(2));
 
         result = hourlyRotation.shouldRotate("ignored");
-        assertFalse(result.shouldRotate(), "Did not cross rotation period");
+        assertFalse("Did not cross rotation period", result.shouldRotate());
     }
 
     @Test
@@ -119,32 +120,32 @@ public class TimeBasedRotationStrategyTest extends Graylog2BaseTest {
         RotationStrategy.Result result;
 
         result = tenMinRotation.shouldRotate("ignored");
-        assertTrue(result.shouldRotate(), "Should rotate the first index");
+        assertTrue("Should rotate the first index", result.shouldRotate());
 
         // advance time to 01:55:01
         clock.tick(seconds(1));
 
         result = tenMinRotation.shouldRotate("ignored");
-        assertFalse(result.shouldRotate(), "Did not cross rotation period");
+        assertFalse("Did not cross rotation period", result.shouldRotate());
 
         // advance time to 02:00:00
         clock.tick(minutes(4).withSeconds(59));
 
         result = tenMinRotation.shouldRotate("ignored");
-        assertTrue(result.shouldRotate(), "Crossed rotation period");
+        assertTrue("Crossed rotation period", result.shouldRotate());
 
         // advance time multiple rotation periods into the future
         // to time 02:51:00
         clock.tick(minutes(51));
 
         result = tenMinRotation.shouldRotate("ignored");
-        assertTrue(result.shouldRotate(), "Crossed multiple rotation periods");
+        assertTrue("Crossed multiple rotation periods", result.shouldRotate());
 
         // move time to 2:52:00
         // this should not cycle again, because next valid rotation time is 3:00:00
         clock.tick(minutes(1));
         result = tenMinRotation.shouldRotate("ignored");
-        assertFalse(result.shouldRotate(), "Should not cycle when we missed multiple periods");
+        assertFalse("Should not cycle when we missed multiple periods", result.shouldRotate());
     }
 
 }

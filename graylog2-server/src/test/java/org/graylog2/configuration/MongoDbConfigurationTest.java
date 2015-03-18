@@ -21,12 +21,12 @@ import com.github.joschi.jadconfig.JadConfig;
 import com.github.joschi.jadconfig.RepositoryException;
 import com.github.joschi.jadconfig.ValidationException;
 import com.github.joschi.jadconfig.repositories.InMemoryRepository;
-import org.testng.Assert;
-import org.testng.annotations.Test;
+import org.junit.Assert;
+import org.junit.Test;
 
 import static java.util.Collections.singletonMap;
-import static org.testng.AssertJUnit.assertEquals;
-import static org.testng.AssertJUnit.assertNull;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 public class MongoDbConfigurationTest {
     @Test
@@ -117,13 +117,13 @@ public class MongoDbConfigurationTest {
         assertEquals(3, configuration.getReplicaSet().size());
     }
 
-    @Test(expectedExceptions = ValidationException.class)
+    @Test(expected = ValidationException.class)
     public void testValidateMongoDbAuth() throws RepositoryException, ValidationException {
         MongoDbConfiguration configuration = new MongoDbConfiguration();
         new JadConfig(new InMemoryRepository(singletonMap("mongodb_useauth", "true")), configuration).process();
     }
 
-    @Test(expectedExceptions = ValidationException.class)
+    @Test(expected = ValidationException.class)
     public void validateFailsIfUriAndHostAreMissing() throws RepositoryException, ValidationException {
         MongoDbConfiguration configuration = new MongoDbConfiguration();
         final ImmutableMap<String, String> config = ImmutableMap.of(
@@ -133,7 +133,7 @@ public class MongoDbConfigurationTest {
         new JadConfig(new InMemoryRepository(config), configuration).process();
     }
 
-    @Test(expectedExceptions = ValidationException.class)
+    @Test(expected = ValidationException.class)
     public void validateFailsIfUriAndDatabaseAreMissing() throws RepositoryException, ValidationException {
         MongoDbConfiguration configuration = new MongoDbConfiguration();
         final ImmutableMap<String, String> properties = ImmutableMap.of(

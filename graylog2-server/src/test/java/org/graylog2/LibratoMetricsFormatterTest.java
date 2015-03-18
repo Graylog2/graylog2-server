@@ -19,17 +19,10 @@ package org.graylog2;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
-import org.bson.types.ObjectId;
-import org.graylog2.metrics.LibratoMetricsFormatter;
-import org.testng.annotations.Test;
+import org.junit.Test;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-
-import static org.testng.AssertJUnit.assertEquals;
 
 public class LibratoMetricsFormatterTest {
     private ObjectMapper objectMapper = new ObjectMapper();

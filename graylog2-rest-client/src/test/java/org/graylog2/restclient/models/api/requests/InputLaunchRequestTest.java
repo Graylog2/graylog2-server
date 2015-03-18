@@ -19,11 +19,11 @@ package org.graylog2.restclient.models.api.requests;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.graylog2.rest.models.system.inputs.requests.InputLaunchRequest;
-import org.testng.annotations.Test;
+import org.junit.Test;
 
 import java.util.HashMap;
 
-import static org.testng.AssertJUnit.assertNotNull;
+import static org.junit.Assert.assertNotNull;
 
 public class InputLaunchRequestTest {
     @Test

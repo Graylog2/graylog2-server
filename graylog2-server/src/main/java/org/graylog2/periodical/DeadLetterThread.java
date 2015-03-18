@@ -84,13 +84,7 @@ public class DeadLetterThread extends Periodical {
                 if (configuration.isDeadLettersEnabled()) {
                     try {
                         Message message = item.getMessage();
-
-                        Map<String, Object> doc = Maps.newHashMap();
-                        doc.put("letter_id", item.getId());
-                        doc.put("timestamp", Tools.iso8601());
-                        doc.put("message", message.toElasticSearchObject());
-
-                        PersistedDeadLetter persistedDeadLetter = new PersistedDeadLetterImpl(doc);
+                        PersistedDeadLetter persistedDeadLetter = persistedDeadLetterService.create(item.getId(), Tools.iso8601(), message.toElasticSearchObject());
                         persistedDeadLetterService.saveWithoutValidation(persistedDeadLetter);
                         written = true;
                     } catch(Exception e) {

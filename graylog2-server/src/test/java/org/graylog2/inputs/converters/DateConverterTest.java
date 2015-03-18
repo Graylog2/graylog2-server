@@ -19,12 +19,12 @@ package org.graylog2.inputs.converters;
 import org.graylog2.ConfigurationException;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.testng.annotations.Test;
+import org.junit.Test;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.testng.Assert.assertEquals;
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
@@ -43,12 +43,12 @@ public class DateConverterTest {
         assertEquals("2014-05-19T00:30:43.116Z", date.toDateTime(DateTimeZone.UTC).toString());
     }
 
-    @Test(expectedExceptions = ConfigurationException.class)
+    @Test(expected = ConfigurationException.class)
     public void testWithEmptyConfig() throws Exception {
         assertEquals(null, new DateConverter(config("")).convert("foo"));
     }
 
-    @Test(expectedExceptions = ConfigurationException.class)
+    @Test(expected = ConfigurationException.class)
     public void testWithNullConfig() throws Exception {
         assertEquals(null, new DateConverter(config(null)).convert("foo"));
     }

@@ -17,9 +17,15 @@
 package org.graylog2.indexer;
 
 import org.graylog2.plugin.database.PersistedService;
+import org.joda.time.DateTime;
+
+import java.util.Map;
 
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
  */
 public interface PersistedDeadLetterService extends PersistedService {
+    PersistedDeadLetter create(String letterId, DateTime timestamp, Map<String, Object> message);
+    PersistedDeadLetter create(String id, String letterId, DateTime timestamp, Map<String, Object> message);
+    long count();
 }

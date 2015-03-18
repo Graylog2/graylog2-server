@@ -45,9 +45,10 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.Before;
 import org.junit.ClassRule;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.runners.MockitoJUnitRunner;
 
 import javax.inject.Inject;
 import java.io.InputStream;
@@ -62,8 +63,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mockito.MockitoAnnotations.initMocks;
 
+@RunWith(MockitoJUnitRunner.class)
 public class SearchesTest {
     @ClassRule
     public static final EmbeddedElasticsearch EMBEDDED_ELASTICSEARCH = newEmbeddedElasticsearchRule().build();
@@ -134,7 +135,6 @@ public class SearchesTest {
 
     @Before
     public void setUp() throws Exception {
-        initMocks(this);
         when(indexRangeService.getFrom(anyInt())).thenReturn(INDEX_RANGES);
         searches = new Searches(new Configuration(), deflector, indexRangeService, client);
     }

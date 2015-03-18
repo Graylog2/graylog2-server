@@ -1,32 +1,48 @@
+/**
+ * This file is part of Graylog.
+ *
+ * Graylog is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Graylog is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package org.graylog2.restclient.models;
 
 import autovalue.shaded.com.google.common.common.collect.Lists;
 import autovalue.shaded.com.google.common.common.collect.Maps;
 import org.graylog2.restclient.lib.plugin.configuration.RequestedConfigurationField;
 import org.graylog2.restclient.lib.plugin.configuration.TextField;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Spy;
+import org.mockito.runners.MockitoJUnitRunner;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.mockito.Matchers.any;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
-import static org.testng.Assert.*;
 
+@RunWith(MockitoJUnitRunner.class)
 public class ConfigurableEntityTest {
-    @Mock private ConfigurableEntity configurableEntity;
+    @Spy
+    private ConfigurableEntity configurableEntity;
     private final Map<String, Object> configuration = Maps.newHashMap();
     private final List<RequestedConfigurationField> requestedConfigurationFields = Lists.newArrayList();
 
-    @BeforeMethod
+    @Before
     public void setUp() throws Exception {
-        MockitoAnnotations.initMocks(this);
-        when(configurableEntity.getConfiguration(any(List.class))).thenCallRealMethod();
         when(configurableEntity.getConfiguration()).thenReturn(configuration);
     }
 
@@ -38,7 +54,7 @@ public class ConfigurableEntityTest {
 
         final Map<String, Object> result = configurableEntity.getConfiguration(requestedConfigurationFields);
 
-        assertEquals(result.get(passwordField), "*******", "Password should be masked in result!");
+        assertEquals("Password should be masked in result!", result.get(passwordField), "*******");
     }
 
     @Test
@@ -50,7 +66,7 @@ public class ConfigurableEntityTest {
 
         final Map<String, Object> result = configurableEntity.getConfiguration(requestedConfigurationFields);
 
-        assertEquals(result.get(userField), username, "Non-password field should not be masked in result!");
+        assertEquals("Non-password field should not be masked in result!", result.get(userField), username);
     }
 
     @Test
@@ -66,8 +82,8 @@ public class ConfigurableEntityTest {
 
         final Map<String, Object> result = configurableEntity.getConfiguration(requestedConfigurationFields);
 
-        assertEquals(result.get(userField), username, "Non-password field should not be masked in result!");
-        assertEquals(result.get(passwordField), "*******", "Password should be masked in result!");
+        assertEquals("Non-password field should not be masked in result!", result.get(userField), username);
+        assertEquals("Password should be masked in result!", result.get(passwordField), "*******");
     }
 
     private void addNonPasswordField(String userField) {
@@ -86,24 +102,24 @@ public class ConfigurableEntityTest {
 
     private Map.Entry<String, Map<String, Object>> stubConfigurationFieldConfig(final String type, final String title, final List<String> attributes, final Boolean isOptional) {
         return new Map.Entry<String, Map<String, Object>>() {
-                @Override
-                public String getKey() {
-                    return title;
-                }
+            @Override
+            public String getKey() {
+                return title;
+            }
 
-                @Override
-                public Map<String, Object> getValue() {
-                    return new HashMap<String, Object>() {{
-                        put("type", type);
-                        put("attributes", attributes);
-                        put("is_optional", isOptional);
-                    }};
-                }
+            @Override
+            public Map<String, Object> getValue() {
+                return new HashMap<String, Object>() {{
+                    put("type", type);
+                    put("attributes", attributes);
+                    put("is_optional", isOptional);
+                }};
+            }
 
-                @Override
-                public Map<String, Object> setValue(Map<String, Object> value) {
-                    return null;
-                }
-            };
+            @Override
+            public Map<String, Object> setValue(Map<String, Object> value) {
+                return null;
+            }
+        };
     }
 }
