@@ -40,6 +40,7 @@ var HistogramVisualization = React.createClass({
             .x(d3.time.scale())
             .elasticX(true)
             .elasticY(true)
+            .centerBar(true)
             .renderHorizontalGridLines(true)
             .brushOn(false)
             .xAxisLabel(this._formatInterval())
