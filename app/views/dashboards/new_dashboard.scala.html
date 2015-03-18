@@ -1,19 +1,41 @@
 @(currentUser: org.graylog2.restclient.models.User, breadcrumbs: lib.BreadcrumbList, form: Form[org.graylog2.restclient.models.api.requests.dashboards.CreateDashboardRequest])
 @import helper.twitterBootstrap._
 
-@main("Create dashboard", sidebars.standard(currentUser), "", currentUser) {
+@main("Create dashboard", null, "", currentUser, false) {
 
     @views.html.partials.breadcrumbs(breadcrumbs)
 
-    <div class="row">
-        <h1><i class="fa fa-dashboard"></i> Create dashboard</h1>
+    <div class="row content content-head">
+        <div class="col-md-10">
+            <h1>Create dashboard</h1>
+            <p class="description">Add widgets to the dashboard from the search or stream pages.</p>
+        </div>
     </div>
 
-    @helper.form(action = routes.DashboardsController.create()) {
-        @helper.inputText(form("title"), '_label -> "Title", 'required -> "required")
-        @helper.inputText(form("description"), '_label -> "Description", 'required -> "required")
+    <div class="row content">
+        <div class="col-md-12">
+            <form action="@routes.DashboardsController.create()" method="POST">
+                <div class="form-group">
+                   <label for="title">Title</label>
+                   <input id="title"
+                          type="text"
+                          name="title"
+                          placeholder="A descriptive name of the new dashboard"
+                          class="input-xlarge form-control"
+                          required>
+                </div>
+                <div class="form-group">
+                    <label for="description">Description</label>
+                    <input id="description"
+                           type="text"
+                           name="description"
+                           placeholder="Describe the contents this dashboard will contain"
+                           class="input-xlarge form-control"
+                           required>
+                </div>
 
-        <input type="submit" class="btn btn-success" value="Create" />
-    }
-
+                <button type="submit" class="btn btn-success">Create</button>
+            </form>
+        </div>
+    </div>
 }

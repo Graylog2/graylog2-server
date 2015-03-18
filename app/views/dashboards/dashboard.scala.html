@@ -22,7 +22,7 @@
                 </span>
 
                 @helper.form(action = routes.DashboardsController.delete(dashboard.getId), args = 'class -> "action-form") {
-                    <button type="submit" class="btn btn-danger btn-delete last" data-confirm="Really delete dashboard @dashboard.getTitle?">
+                    <button type="submit" class="btn btn-danger btn-delete last" data-confirm="Do you really want to delete the dashboard @dashboard.getTitle?">
                         <i class="fa fa-trash"></i>
                     </button>
                 }
