@@ -72,4 +72,9 @@ public class AlarmCallbackConfigurationServiceImpl extends PersistedServiceImpl 
 
         return new AlarmCallbackConfigurationImpl(fields);
     }
+
+    @Override
+    public long count() {
+        return count(AlarmCallbackConfigurationImpl.class, new BasicDBObject());
+    }
 }

@@ -54,7 +54,7 @@ public class AccessTokenServiceImplTest {
     }
 
     @Test
-    @UsingDataSet(locations = "singleToken.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @UsingDataSet(locations = "accessTokensSingleToken.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void testLoadSingleToken() throws Exception {
         final AccessToken accessToken = accessTokenService.load("foobar");
         assertNotNull("Matching token should have been returned", accessToken);
@@ -65,7 +65,7 @@ public class AccessTokenServiceImplTest {
     }
 
     @Test
-    @UsingDataSet(locations = "multipleTokens.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @UsingDataSet(locations = "accessTokensMultipleTokens.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void testLoadAll() throws Exception {
         final List<AccessToken> tokens = accessTokenService.loadAll("admin");
 
@@ -90,7 +90,7 @@ public class AccessTokenServiceImplTest {
     }
 
     @Test
-    @UsingDataSet(locations = "singleToken.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @UsingDataSet(locations = "accessTokensSingleToken.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void testTouch() throws Exception {
         final AccessToken token = accessTokenService.load("foobar");
         final DateTime initialLastAccess = token.getLastAccess();
@@ -125,7 +125,7 @@ public class AccessTokenServiceImplTest {
     }
 
     @Test(expected = IllegalStateException.class)
-    @UsingDataSet(locations = "multipleIdenticalTokens.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @UsingDataSet(locations = "accessTokensMultipleIdenticalTokens.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void testExceptionForMultipleTokens() throws Exception {
         accessTokenService.load("foobar");
     }

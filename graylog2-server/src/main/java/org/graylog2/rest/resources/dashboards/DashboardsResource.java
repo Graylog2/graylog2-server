@@ -109,13 +109,7 @@ public class DashboardsResource extends RestResource {
         restrictToMaster();
 
         // Create dashboard.
-        Map<String, Object> dashboardData = Maps.newHashMap();
-        dashboardData.put("title", cr.title());
-        dashboardData.put("description", cr.description());
-        dashboardData.put("creator_user_id", getCurrentUser().getName());
-        dashboardData.put("created_at", Tools.iso8601());
-
-        final Dashboard dashboard = new DashboardImpl(dashboardData);
+        final Dashboard dashboard = dashboardService.create(cr.title(), cr.description(), getCurrentUser().getName(), Tools.iso8601());
         final String id = dashboardService.save(dashboard);
 
         dashboardRegistry.add(dashboard);

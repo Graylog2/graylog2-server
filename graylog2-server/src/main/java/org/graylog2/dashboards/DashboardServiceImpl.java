@@ -28,10 +28,12 @@ import org.graylog2.dashboards.widgets.InvalidWidgetConfigurationException;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.database.PersistedServiceImpl;
+import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.indexer.searches.Searches;
 import org.graylog2.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.rest.resources.dashboards.requests.WidgetPositions;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,6 +52,17 @@ public class DashboardServiceImpl extends PersistedServiceImpl implements Dashbo
         super(mongoConnection);
         this.metricRegistry = metricRegistry;
         this.searches = searches;
+    }
+
+    @Override
+    public Dashboard create(String title, String description, String creatorUserId, DateTime createdAt) {
+        Map<String, Object> dashboardData = Maps.newHashMap();
+        dashboardData.put("title", title);
+        dashboardData.put("description", description);
+        dashboardData.put("creator_user_id", creatorUserId);
+        dashboardData.put("created_at", createdAt);
+
+        return new DashboardImpl(dashboardData);
     }
 
     @Override

@@ -47,13 +47,13 @@ public class PersistedDeadLetterServiceImplTest {
     }
 
     @Test
-    @UsingDataSet(locations = "emptyCollection.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @UsingDataSet(locations = "deadLettersEmptyCollection.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void emptyCollection() throws Exception {
         assertEquals("Collection should be empty", 0, persistedDeadLetterService.count());
     }
 
     @Test
-    @UsingDataSet(locations = "singleDocument.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @UsingDataSet(locations = "deadLettersSingleDocument.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void singleDocument() throws Exception {
         final long documentCount = persistedDeadLetterService.count();
         assertEquals("Collection should contain exactly one document", 1, documentCount);
@@ -61,7 +61,7 @@ public class PersistedDeadLetterServiceImplTest {
 
     @Test
     @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
-    @ShouldMatchDataSet(location = "singleDocument.json")
+    @ShouldMatchDataSet(location = "deadLettersSingleDocument.json")
     public void saveSingleDocument() throws Exception {
         final PersistedDeadLetter deadLetter = persistedDeadLetterService.create("54e3deadbeefdeadbeefaffe", "54f9deadbeefdeadbeefaffe", DateTime.parse("2015-03-14T15:09:26.540Z"), new HashMap<String, Object>());
         persistedDeadLetterService.save(deadLetter);
