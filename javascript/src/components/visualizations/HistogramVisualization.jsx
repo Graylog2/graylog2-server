@@ -13,6 +13,7 @@ var D3Utils = require('../../util/D3Utils');
 
 var HistogramVisualization = React.createClass({
     getInitialState() {
+        this.firstRender = true;
         this.histogramData = crossfilter();
         this.dimension = this.histogramData.dimension((d) => momentHelper.toUserTimeZone(d.x * 1000));
         this.group = this.dimension.group().reduceSum((d) => d.y);
@@ -74,7 +75,7 @@ var HistogramVisualization = React.createClass({
             .tickFormat((value) => {
                 return value % 1 === 0 ? d3.format("s")(value) : null;
             });
-        dc.renderAll();
+        this.histogram.render();
     },
     _formatInterval() {
         return this.props.interval.charAt(0).toUpperCase() + this.props.interval.slice(1) + "s";
@@ -91,6 +92,13 @@ var HistogramVisualization = React.createClass({
         this.histogramData.remove();
         this.histogramData.add(this.state.processedData);
         this.histogram.redraw();
+
+        // Fix to make Firefox render tooltips in the right place
+        // TODO: Find the cause of this
+        if (this.firstRender) {
+            this.histogram.render();
+            this.firstRender = false;
+        }
     },
     render() {
         return (
