@@ -2689,12 +2689,33 @@ ul.streams {
 }
 
 ul.streams li.stream {
-  padding: 15px 5px;
+  display: block;
+  padding: 15px 0px;
   border-bottom: 1px solid #6dcff6;
 }
 
 ul.streams li.stream .stream-data {
   margin-top: 8px;
+}
+
+ul.streams li.stream .stream-data .stream-actions {
+  position: relative;
+  float: right;
+  right: 0px;
+  bottom: 20px;
+}
+
+ul.streams li.stream .stream-data .stream-actions form.action-form {
+  display: inline-block;
+}
+
+ul.streams li.stream .stream-data .stream-actions .btn-delete {
+  margin-left: 15px;
+  margin-right: 15px;
+}
+
+ul.streams li.stream .stream-data .stream-actions .btn-delete.last {
+  margin-right: 0;
 }
 
 ul.streams li.stream .stream-description {

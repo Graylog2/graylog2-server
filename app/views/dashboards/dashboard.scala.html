@@ -1,0 +1,41 @@
+@(currentUser: org.graylog2.restclient.models.User, dashboard: org.graylog2.restclient.models.dashboards.Dashboard)
+
+@import views.helpers.DateHelper
+@import views.helpers.Permissions._
+@import lib.security.RestPermissions._
+
+<li class="stream" data-dashboard-id="@dashboard.getId">
+    <h2>
+        <a href="@routes.DashboardsController.show(dashboard.getId)">
+            <span data-dashboard-id="@dashboard.getId" class="dashboard-title">@dashboard.getTitle</span>
+        </a>
+    </h2>
+
+    <div class="stream-data">
+        <div class="stream-actions">
+            @if(isPermitted(DASHBOARDS_EDIT, dashboard.getId)) {
+                <span
+                class="react-edit-dashboard"
+                data-dashboard-id="@dashboard.getId"
+                data-dashboard-title="@dashboard.getTitle"
+                data-dashboard-description="@dashboard.getDescription">
+                </span>
+
+                @helper.form(action = routes.DashboardsController.delete(dashboard.getId), args = 'class -> "action-form") {
+                    <button type="submit" class="btn btn-danger btn-delete last" data-confirm="Really delete dashboard @dashboard.getTitle?">
+                        <i class="fa fa-trash"></i>
+                    </button>
+                }
+            }
+        </div>
+
+        <div class="stream-description">
+            @if(dashboard.getContentPack != null) {
+                <i class="fa fa-cube" title="Created from content pack"></i>
+            }
+
+            @dashboard.getWidgets.size() widgets.
+            <span data-dashboard-id="@dashboard.getId" class="dashboard-description">@dashboard.getDescription</span>
+        </div>
+    </div>
+</li>

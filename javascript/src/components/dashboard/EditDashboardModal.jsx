@@ -25,8 +25,13 @@ var EditDashboardModal = React.createClass({
         var body = (
             <fieldset>
                 <div className="form-group">
-                    <label>Title:</label>
-                    <input type="text" className="form-control" onChange={this._onTitleChange} value={this.state.title} required/>
+                    <label htmlFor={this.props.id + "-title"}>Title:</label>
+                    <input id={this.props.id + "-title"}
+                           type="text"
+                           className="form-control"
+                           onChange={this._onTitleChange}
+                           value={this.state.title}
+                           required/>
                 </div>
                 <div className="form-group">
                     <label>Description:</label>
@@ -36,9 +41,7 @@ var EditDashboardModal = React.createClass({
         );
         return (
             <span>
-                <button onClick={this.openModal} className="btn btn-mini">
-                    <i className="fa fa-edit"></i> Edit
-                </button>
+                <button onClick={this.openModal} className="btn btn-info">Edit dashboard</button>
                 <BootstrapModal ref="modal" onCancel={this._closeModal} onConfirm={this._save} cancel="Cancel" confirm="Save">
                    {header}
                    {body}
