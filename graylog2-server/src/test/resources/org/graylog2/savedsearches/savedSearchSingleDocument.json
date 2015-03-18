@@ -1,0 +1,5 @@
+{
+  "saved_searches" : [
+    {"_id" : {"$oid": "54e3deadbeefdeadbeefaffe"}, "title" : "Example Saved Search", "query" : {}, "creator_user_id" : "someuser", "created_at" : { "$date" : "2015-03-14T15:09:26.540Z" }}
+  ]
+}

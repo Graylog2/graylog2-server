@@ -18,8 +18,10 @@ package org.graylog2.savedsearches;
 
 import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.database.PersistedService;
+import org.joda.time.DateTime;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
@@ -29,5 +31,7 @@ public interface SavedSearchService extends PersistedService {
     List<SavedSearch> all();
 
     @SuppressWarnings("unchecked")
-    SavedSearchImpl load(String id) throws NotFoundException;
+    SavedSearch load(String id) throws NotFoundException;
+
+    SavedSearch create(String title, Map<String, Object> query, String creatorUserId, DateTime createdAt);
 }

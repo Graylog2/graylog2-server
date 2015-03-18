@@ -16,6 +16,7 @@
  */
 package org.graylog2.savedsearches;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
@@ -23,9 +24,12 @@ import org.bson.types.ObjectId;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.database.PersistedServiceImpl;
+import org.graylog2.plugin.Tools;
+import org.joda.time.DateTime;
 
 import javax.inject.Inject;
 import java.util.List;
+import java.util.Map;
 
 public class SavedSearchServiceImpl extends PersistedServiceImpl implements SavedSearchService {
     @Inject
@@ -49,7 +53,7 @@ public class SavedSearchServiceImpl extends PersistedServiceImpl implements Save
 
     @Override
     @SuppressWarnings("unchecked")
-    public SavedSearchImpl load(String id) throws NotFoundException {
+    public SavedSearch load(String id) throws NotFoundException {
         BasicDBObject o = (BasicDBObject) get(SavedSearchImpl.class, id);
 
         if (o == null) {
@@ -57,5 +61,17 @@ public class SavedSearchServiceImpl extends PersistedServiceImpl implements Save
         }
 
         return new SavedSearchImpl((ObjectId) o.get("_id"), o.toMap());
+    }
+
+    @Override
+    public SavedSearch create(String title, Map<String, Object> query, String creatorUserId, DateTime createdAt) {
+        // Create saved search
+        final Map<String, Object> searchData = ImmutableMap.of(
+                "title", title,
+                "query", query,
+                "creator_user_id", creatorUserId,
+                "created_at", createdAt);
+
+        return new SavedSearchImpl(searchData);
     }
 }

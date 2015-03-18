@@ -32,7 +32,6 @@ import org.graylog2.indexer.searches.Searches;
 import org.graylog2.plugin.Tools;
 import org.graylog2.rest.resources.search.requests.CreateSavedSearchRequest;
 import org.graylog2.savedsearches.SavedSearch;
-import org.graylog2.savedsearches.SavedSearchImpl;
 import org.graylog2.savedsearches.SavedSearchService;
 import org.graylog2.shared.security.RestPermissions;
 
@@ -72,14 +71,7 @@ public class SavedSearchesResource extends SearchResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response create(@ApiParam(name = "JSON body", required = true)
                            @Valid CreateSavedSearchRequest cr) throws ValidationException {
-        // Create saved search
-        final Map<String, Object> searchData = ImmutableMap.of(
-                "title", cr.title(),
-                "query", cr.query(),
-                "creator_user_id", getCurrentUser().getName(),
-                "created_at", Tools.iso8601());
-
-        final SavedSearch search = new SavedSearchImpl(searchData);
+        final SavedSearch search = savedSearchService.create(cr.title(), cr.query(), getCurrentUser().getName(), Tools.iso8601());
         final String id = savedSearchService.save(search);
 
         final URI searchUri = getUriBuilderToSelf().path(SavedSearchesResource.class)
