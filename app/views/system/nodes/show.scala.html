@@ -128,7 +128,7 @@
             <h2><i class="fa fa-shield"></i> Buffers</h2>
             <div class="row">
                 <div class="col-md-4">
-                    <a href="@routes.MetricsController.ofNode(node.getNodeId, node.getBufferClasses.inputBufferClass)" class="btn btn-info btn-mini pull-right">Metrics</a>
+                    <a href="@routes.MetricsController.ofNode(node.getNodeId, node.getBufferClasses.inputBufferClass)" class="btn btn-default btn-xs pull-right">Metrics</a>
                     <h3>Input buffer</h3>
 
                     @defining(node.getBufferInfo.getInputBuffer.utilizationPercent) { utilizationPercent =>
@@ -141,7 +141,7 @@
                 </div>
 
                 <div class="col-md-4">
-                    <a href="@routes.MetricsController.ofNode(node.getNodeId, node.getBufferClasses.processBufferClass)" class="btn btn-info btn-mini pull-right">Metrics</a>
+                    <a href="@routes.MetricsController.ofNode(node.getNodeId, node.getBufferClasses.processBufferClass)" class="btn btn-default btn-xs pull-right">Metrics</a>
                     <h3>Process buffer</h3>
 
                     @defining(node.getBufferInfo.getProcessBuffer.utilizationPercent) { utilizationPercent =>
@@ -154,7 +154,7 @@
                 </div>
 
                 <div class="col-md-4">
-                    <a href="@routes.MetricsController.ofNode(node.getNodeId, node.getBufferClasses.outputBufferClass)" class="btn btn-info btn-mini pull-right">Metrics</a>
+                    <a href="@routes.MetricsController.ofNode(node.getNodeId, node.getBufferClasses.outputBufferClass)" class="btn btn-default btn-xs pull-right">Metrics</a>
                     <h3>Output buffer</h3>
 
                     @defining(node.getBufferInfo.getOutputBuffer.utilizationPercent) { utilizationPercent =>
