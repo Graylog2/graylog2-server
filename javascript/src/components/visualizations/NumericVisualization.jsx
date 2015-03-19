@@ -16,37 +16,37 @@ var NumericVisualization = React.createClass({
     PERCENTAGE_PER_INDICATOR: 30,
     getInitialState() {
         return {
-            nowCount: undefined,
-            previousCount: undefined
+            currentNumber: undefined,
+            previousNumber: undefined
         };
     },
     componentWillReceiveProps(newProps) {
         var result = newProps.data;
         if (typeof result === 'object') {
-            var normalizedNowCount = NumberUtils.normalizeNumber(result.now);
-            var normalizedPreviousCount = NumberUtils.normalizeNumber(result.previous);
+            var normalizedNowNumber = NumberUtils.normalizeNumber(result.now);
+            var normalizedPreviousNumber = NumberUtils.normalizeNumber(result.previous);
             this.setState({
-                nowCount: normalizedNowCount,
-                previousCount: normalizedPreviousCount,
-                percentage: this._calculatePercentage(normalizedNowCount, normalizedPreviousCount)
+                currentNumber: normalizedNowNumber,
+                previousNumber: normalizedPreviousNumber,
+                percentage: this._calculatePercentage(normalizedNowNumber, normalizedPreviousNumber)
             }, this._calculatePercentage);
         } else {
-            this.setState({nowCount: result});
+            this.setState({currentNumber: result});
         }
     },
-    _calculatePercentage(nowCount, previousCount) {
+    _calculatePercentage(nowNumber, previousNumber) {
         var percentage;
-        if (previousCount === 0 || isNaN(previousCount)) {
+        if (previousNumber === 0 || isNaN(previousNumber)) {
             var factor = 0;
-            if (nowCount > previousCount) {
+            if (nowNumber > previousNumber) {
                 factor = 1;
-            } else if (nowCount < previousCount) {
+            } else if (nowNumber < previousNumber) {
                 factor = -1;
             }
 
             percentage = 100 * factor;
         } else {
-            percentage = ((nowCount - previousCount) / previousCount) * 100;
+            percentage = ((nowNumber - previousNumber) / previousNumber) * 100;
         }
 
         return percentage;
@@ -86,15 +86,15 @@ var NumericVisualization = React.createClass({
     },
     _formatData() {
         try {
-            return numeral(this.state.nowCount).format("0,0.[00]");
+            return numeral(this.state.currentNumber).format("0,0.[00]");
         } catch(e) {
-            return String(this.state.nowCount);
+            return String(this.state.currentNumber);
         }
     },
     _isIndicatorActive(index, trendIndicatorType) {
         if ((this.state.percentage === 0) ||
-            (this.state.nowCount >= this.state.previousCount && trendIndicatorType !== TrendIndicatorType.HIGHER) ||
-            (this.state.nowCount <= this.state.previousCount && trendIndicatorType !== TrendIndicatorType.LOWER)) {
+            (this.state.currentNumber >= this.state.previousNumber && trendIndicatorType !== TrendIndicatorType.HIGHER) ||
+            (this.state.currentNumber <= this.state.previousNumber && trendIndicatorType !== TrendIndicatorType.LOWER)) {
             return false;
         }
 
@@ -159,7 +159,7 @@ var NumericVisualization = React.createClass({
         }
 
         return (
-            <div className="count">
+            <div className="number">
                 <div className="text-center">
                     <span className="value" style={{fontSize: this._calculateFontSize()}}>
                         {this._formatData()}
