@@ -111,8 +111,8 @@
 
             <div class="node-heap-usage" data-node-id="@node.getNodeId">
                 <div class="progress">
-                    <div class="bar bar-warning heap-used-percent" style="width: @node.jvm.usedMemoryPercentage()%;"></div>
-                    <div class="bar heap-total-percent" style="width: @(node.jvm.totalMemoryPercentage()-node.jvm.usedMemoryPercentage)%"></div>
+                    <div class="progress-bar heap-used-percent" style="width: @node.jvm.usedMemoryPercentage()%;"></div>
+                    <div class="progress-bar progress-bar-warning heap-total-percent" style="width: @(node.jvm.totalMemoryPercentage()-node.jvm.usedMemoryPercentage)%"></div>
                 </div>
 
                 The JVM is using <strong><span class="heap-used">@node.jvm.getUsedMemory.getMegabytes()</span> of <span class="heap-total">@node.jvm.getTotalMemory.getMegabytes()</span> MB</strong>
@@ -133,7 +133,7 @@
 
                     @defining(node.getBufferInfo.getInputBuffer.utilizationPercent) { utilizationPercent =>
                         <div class="progress progress-percentage node-buffer-usage">
-                            <div class="bar bar-warning" data-percentage="@utilizationPercent" style="width : @utilizationPercent% ;"><span class="number-format" data-format="0.0%">@utilizationPercent%</span></div>
+                            <div class="progress-bar progress-bar-warning" data-percentage="@utilizationPercent" style="width : @utilizationPercent% ;"><span class="number-format" data-format="0.0%">@utilizationPercent%</span></div>
                         </div>
                         <strong><span class="number-format" data-format="0,0">@node.getBufferInfo.getInputBuffer.utilization</span> messages</strong> in input buffer.
                         (<span class="number-format" data-format="0.0%">@utilizationPercent%</span> utilized)
@@ -146,7 +146,7 @@
 
                     @defining(node.getBufferInfo.getProcessBuffer.utilizationPercent) { utilizationPercent =>
                         <div class="progress progress-percentage node-buffer-usage">
-                            <div class="bar bar-warning" data-percentage="@utilizationPercent" style="width : @utilizationPercent% ;"><span class="number-format" data-format="0.0%">@utilizationPercent%</span></div>
+                            <div class="progress-bar progress-bar-warning" data-percentage="@utilizationPercent" style="width : @utilizationPercent% ;"><span class="number-format" data-format="0.0%">@utilizationPercent%</span></div>
                         </div>
                         <strong><span class="number-format" data-format="0,0">@node.getBufferInfo.getProcessBuffer.utilization</span> messages</strong> in process buffer.
                         (<span class="number-format" data-format="0.0%">@utilizationPercent%</span> utilized)
@@ -159,7 +159,7 @@
 
                     @defining(node.getBufferInfo.getOutputBuffer.utilizationPercent) { utilizationPercent =>
                         <div class="progress progress-percentage node-buffer-usage">
-                            <div class="bar bar-warning" data-percentage="@utilizationPercent" style="width : @utilizationPercent% ;"><span class="number-format" data-format="0.0%">@utilizationPercent%</span></div>
+                            <div class="progress-bar progress-bar-warning" data-percentage="@utilizationPercent" style="width : @utilizationPercent% ;"><span class="number-format" data-format="0.0%">@utilizationPercent%</span></div>
                         </div>
                         <strong><span class="number-format" data-format="0,0">@node.getBufferInfo.getOutputBuffer.utilization</span> messages</strong> in output buffer.
                         (<span class="number-format" data-format="0.0%">@utilizationPercent%</span> utilized)
@@ -206,9 +206,9 @@
                         @defining(NumberHelper.asPercent(node.getJournalInfo.journalSize, node.getJournalInfo.journalSizeLimit, 1, false)) { utilizationPercent =>
                             <div class="progress progress-percentage node-journal-usage">
                                 @if(journalIsOvercommitted(node.getJournalInfo)) {
-                                    <div class="bar bar-warning" data-percentage="100" style="width : 100%;">
+                                    <div class="progress-bar progress-bar-warning" data-percentage="100" style="width : 100%;">
                                 } else {
-                                    <div class="bar bar-warning" data-percentage="@utilizationPercent" style="width : @utilizationPercent%;">
+                                    <div class="progress-bar progress-bar-warning" data-percentage="@utilizationPercent" style="width : @utilizationPercent%;">
                                 }
                                     <span class="number-format" data-format="0.0%">@utilizationPercent%</span>
                                 </div>
