@@ -174,7 +174,7 @@
 
     <div class="row content">
         <div class="col-md-12">
-            <h2><i class="fa fa-hdd"></i> Disk Journal</h2>
+            <h2><i class="fa fa-hdd-o"></i> Disk Journal</h2>
             @if(node.getJournalInfo.enabled) {
                 <p>Incoming messages are written to the disk journal to ensure they are kept safe in case of a server failure. The journal also helps keeping Graylog working if any of the outputs is too slow to keep up with the message rate
                 or whenever there is a peak in incoming messages. It makes sure that Graylog does not buffer all of those messages in main memory and avoids overly long garbage collection pauses that way.
@@ -257,7 +257,7 @@
         </div>
 
         <div class="col-md-6">
-            <h2><i class="fa fa-signin"></i> REST API</h2>
+            <h2><i class="fa fa-sign-in"></i> REST API</h2>
 
             <dl class="system-rest">
                 <dt>Transport address:</dt>
