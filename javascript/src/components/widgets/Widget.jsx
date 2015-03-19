@@ -10,7 +10,7 @@ var WidgetHeader = require('./WidgetHeader');
 var WidgetFooter = require('./WidgetFooter');
 var WidgetConfigModal = require('./WidgetConfigModal');
 
-var CountVisualization = require('../visualizations/CountVisualization');
+var NumericVisualization = require('../visualizations/NumericVisualization');
 var HistogramVisualization = require('../visualizations/HistogramVisualization');
 
 var WidgetsStore = require('../../stores/widgets/WidgetsStore');
@@ -94,7 +94,7 @@ var Widget = React.createClass({
             case 'SEARCH_RESULT_COUNT':
             case 'STREAM_SEARCH_RESULT_COUNT':
             case 'STATS_COUNT':
-                visualization = <CountVisualization data={this.state.result} config={this.state.config}/>;
+                visualization = <NumericVisualization data={this.state.result} config={this.state.config}/>;
                 break;
             case 'SEARCH_RESULT_CHART':
                 visualization = <HistogramVisualization id={this.props.widgetId}

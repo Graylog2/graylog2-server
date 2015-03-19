@@ -10,7 +10,7 @@ var TrendIndicatorType = {
     LOWER: "lower"
 };
 
-var CountVisualization = React.createClass({
+var NumericVisualization = React.createClass({
     DEFAULT_VALUE_FONT_SIZE: "70px",
     NUMBER_OF_INDICATORS: 3,
     PERCENTAGE_PER_INDICATOR: 30,
@@ -171,4 +171,4 @@ var CountVisualization = React.createClass({
     }
 });
 
-module.exports = CountVisualization;
+module.exports = NumericVisualization;
