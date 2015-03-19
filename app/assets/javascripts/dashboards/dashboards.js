@@ -1,4 +1,5 @@
 $(document).ready(function() {
+    var dashboard = $(".dashboard");
     var toggleDashboardLock = $("#toggle-dashboard-lock");
     var unlockDashboardLink = $("#unlock-dashboard");
     var toggleUpdateUnfocussed = $("#update-unfocussed");
@@ -12,7 +13,7 @@ $(document).ready(function() {
         }
     });
 
-    if ($(".gridster").size() > 0){
+    if ($(".gridster").length > 0){
         /* ducksboard/gridster.js#147 Hotfix - Part 1 */
         var items = $(".gridster ul li");
         items.detach();
@@ -122,6 +123,26 @@ $(document).ready(function() {
             );
         }
     });
+
+    if (dashboard.length > 0) {
+        dashboard[0].addEventListener("delete.widget", function (e) {
+            var dashboardId = $(".dashboard .gridster").data("dashboard-id");
+            var widgetId = e.detail.widgetId;
+            var widget = $("[data-widget-id=" + widgetId + "]");
+            var gridsterWidget = widget.parent("li");
+            $.ajax({
+                url: appPrefixed('/a/dashboards/' + dashboardId + '/widgets/' + widgetId + '/delete'),
+                type: 'POST',
+                success: function() {
+                    showSuccess("Widget has been removed from dashboard!");
+                    dashboardGrid.remove_widget(gridsterWidget);
+                },
+                error: function(data) {
+                    showError("Could not remove widget from dashboard.");
+                }
+            });
+        });
+    }
 
     $(document).on("click", ".dashboard .widget .remove-widget", function(e) {
         e.preventDefault();
@@ -264,6 +285,11 @@ $(document).ready(function() {
                 .attr("data-original-href", $(this).attr("href"))
                 .attr("href", "javascript: void(0)");
         });
+
+        var unlockedEvent = new CustomEvent("unlocked.dashboard");
+        $(".dashboard .widget").each(function() {
+            this.dispatchEvent(unlockedEvent);
+        });
     };
 
     var lockDashboard = function() {
@@ -277,6 +303,12 @@ $(document).ready(function() {
         $(".dashboard .widget a.replay-link").each(function() {
             $(this).css("cursor", "pointer")
                 .attr("href", $(this).attr("data-original-href"));
+        });
+
+        var lockedEvent = new CustomEvent("locked.dashboard");
+
+        $(".dashboard .widget").each(function() {
+            this.dispatchEvent(lockedEvent);
         });
     };
 

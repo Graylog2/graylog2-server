@@ -20,6 +20,8 @@ var Widget = React.createClass({
 
     getInitialState() {
         return {
+            deleted: false,
+            locked: true,
             type: "",
             title: "",
             cacheTime: 10,
@@ -45,12 +47,22 @@ var Widget = React.createClass({
             config: this.state.config
         };
     },
+    _getWidgetNode() {
+        return this.refs.widget.getDOMNode();
+    },
     componentDidMount() {
         this.loadData();
         this.loadValue();
+
+        this._getWidgetNode().addEventListener("unlocked.dashboard", this._dashboardUnlocked);
+        this._getWidgetNode().addEventListener("locked.dashboard", this._dashboardLocked);
+    },
+    componentWillUnmount() {
+        this._getWidgetNode().removeEventListener("unlocked.dashboard", this._dashboardUnlocked);
+        this._getWidgetNode().removeEventListener("locked.dashboard", this._dashboardLocked);
     },
     loadData() {
-        if (!assertUpdateEnabled(this.loadData)) { return; }
+        if (!assertUpdateEnabled(this.loadData) || this.state.deleted) { return; }
 
         var widgetPromise = WidgetsStore.loadWidget(this.props.dashboardId, this.props.widgetId);
         widgetPromise.done((widget) => {
@@ -65,7 +77,7 @@ var Widget = React.createClass({
         setTimeout(this.loadData, this.LOAD_WIDGET_DATA_INTERVAL);
     },
     loadValue() {
-        if (!assertUpdateEnabled(this.loadValue)) { return; }
+        if (!assertUpdateEnabled(this.loadValue) || this.state.deleted) { return; }
 
         var dataPromise = WidgetsStore.loadValue(this.props.dashboardId, this.props.widgetId);
         dataPromise.fail((jqXHR, textStatus, errorThrown) => {
@@ -84,6 +96,12 @@ var Widget = React.createClass({
         });
 
         setTimeout(this.loadValue, this.state.cacheTime * 1000);
+    },
+    _dashboardLocked() {
+        this.setState({locked: true});
+    },
+    _dashboardUnlocked() {
+        this.setState({locked: false});
     },
     getVisualization() {
         if (this.state.type === "") { return; }
@@ -152,9 +170,23 @@ var Widget = React.createClass({
     _showConfig() {
         this.refs.configModal.open();
     },
+    deleteWidget() {
+        if (confirm("Do you really want to delete '" + this.state.title + "'?")) {
+            this.setState({deleted: true});
+            var deleteEvent = new CustomEvent("delete.widget", {"detail": {widgetId: this.props.widgetId}});
+            document.getElementsByClassName("dashboard")[0].dispatchEvent(deleteEvent);
+        }
+    },
     render() {
+        var showConfigModal = (
+            <WidgetConfigModal ref="configModal"
+                    {...this._getWidgetData()}
+                boundToStream={this._isBoundToStream()}
+                metricsAction={this._goToWidgetMetrics}/>
+        );
+
         return (
-            <div className="widget" data-widget-id={this.props.widgetId}>
+            <div ref="widget" className="widget" data-widget-id={this.props.widgetId}>
                 <WidgetHeader title={this.state.title}
                               calculatedAt={this.state.calculatedAt}
                               error={this.state.error}
@@ -162,11 +194,11 @@ var Widget = React.createClass({
 
                 {this.getVisualization()}
 
-                <WidgetFooter onReplaySearch={this._replaySearch} onShowConfig={this._showConfig}/>
-                <WidgetConfigModal ref="configModal"
-                    {...this._getWidgetData()}
-                    boundToStream={this._isBoundToStream()}
-                    metricsAction={this._goToWidgetMetrics}/>
+                <WidgetFooter locked={this.state.locked}
+                              onReplaySearch={this._replaySearch}
+                              onShowConfig={this._showConfig}
+                              onDelete={this.deleteWidget}/>
+                {this.state.locked ? showConfigModal : null}
             </div>
         );
     }
