@@ -228,17 +228,6 @@ $(document).ready(function() {
         });
     })();
 
-    function displayUpdateUnfocussed(updateUnfocussed) {
-        if (updateUnfocussed) {
-            $(".update-onfocussed-on").hide();
-            $(".update-onfocussed-off").show();
-        } else {
-            $(".update-onfocussed-on").show();
-            $(".update-onfocussed-off").hide();
-        }
-    }
-    displayUpdateUnfocussed(userPreferences && userPreferences.updateUnfocussed);
-
     var updateInBackground = function() {
         setUpdateUnfocussedMode(true);
         alert("Graphs will be updated when browser is in the background");
