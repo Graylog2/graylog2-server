@@ -12,6 +12,7 @@ var WidgetConfigModal = require('./WidgetConfigModal');
 
 var NumericVisualization = require('../visualizations/NumericVisualization');
 var HistogramVisualization = require('../visualizations/HistogramVisualization');
+var QuickValuesVisualization = require('../visualizations/QuickValuesVisualization');
 
 var WidgetsStore = require('../../stores/widgets/WidgetsStore');
 
@@ -118,6 +119,9 @@ var Widget = React.createClass({
                 visualization = <HistogramVisualization id={this.props.widgetId}
                                                         data={this.state.result}
                                                         interval={this.state.config.interval}/>;
+                break;
+            case 'QUICKVALUES':
+                visualization = <QuickValuesVisualization data={this.state.result}/>;
                 break;
             default:
                 throw("Error: Widget type '" + this.state.type + "' not supported");
