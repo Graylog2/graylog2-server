@@ -20,7 +20,7 @@
 
             <div class="pull-right">
                 <div class="btn-group">
-                    <a class="btn btn-info btn-small dropdown-toggle" data-toggle="dropdown" href="#">
+                    <a class="btn btn-info btn-sm dropdown-toggle" data-toggle="dropdown" href="#">
                         Maintenance
                         <span class="caret"></span>
                     </a>
@@ -32,10 +32,11 @@
             </div>
 
             <h1><i class="fa fa-reorder"></i> Indices</h1>
-            This is an overview of all indices (message stores) Graylog is currently taking in account
+            <p class="description">This is an overview of all indices (message stores) Graylog is currently taking in account
             for searches and analysis. You can learn more about the index model in the
             <a href="https://www.graylog.org/documentation/general/indexmodel/" target="_blank">
             documentation</a>. Closed indices can be re-opened at any time.
+            </p>
 
             <br />
             @if("size".equals(deflectorConfig.`type`)) {
