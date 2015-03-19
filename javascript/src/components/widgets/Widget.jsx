@@ -171,7 +171,7 @@ var Widget = React.createClass({
         this.refs.configModal.open();
     },
     deleteWidget() {
-        if (confirm("Do you really want to delete '" + this.state.title + "'?")) {
+        if (window.confirm("Do you really want to delete '" + this.state.title + "'?")) {
             this.setState({deleted: true});
             var deleteEvent = new CustomEvent("delete.widget", {"detail": {widgetId: this.props.widgetId}});
             document.getElementsByClassName("dashboard")[0].dispatchEvent(deleteEvent);
