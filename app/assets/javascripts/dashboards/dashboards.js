@@ -228,16 +228,6 @@ $(document).ready(function() {
         });
     })();
 
-    // Change dashboard title.
-    $(".edit-dashboard").on("click", function(e) {
-        e.preventDefault();
-        $(this).closest("h1").hide();
-        $(".dashboard-description").hide();
-        var editDashboardForm = $("form.edit-dashboard-form");
-        editDashboardForm.show();
-        focusFirstFormInput(editDashboardForm);
-    });
-
     function displayUpdateUnfocussed(updateUnfocussed) {
         if (updateUnfocussed) {
             $(".update-onfocussed-on").hide();
@@ -443,6 +433,9 @@ $(document).ready(function() {
             .html("<i class='fa fa-warning loading-failed'></i>");
     }
 
+    if (dashboard.length > 0) {
+        lockDashboard();
+    }
 });
 
 function addWidget(dashboardId, description, params) {

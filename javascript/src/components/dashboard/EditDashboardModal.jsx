@@ -39,9 +39,20 @@ var EditDashboardModal = React.createClass({
                 </div>
             </fieldset>
         );
+        var triggerButtonContent;
+
+        if (this.props.children === undefined || this.props.children.trim() === "") {
+            triggerButtonContent = {__html: "Edit dashboard"};
+        } else {
+            triggerButtonContent = {__html: this.props.children};
+        }
+
         return (
             <span>
-                <button onClick={this.openModal} className="btn btn-info">Edit dashboard</button>
+                <button onClick={this.openModal}
+                    className={"btn btn-info " + this.props.buttonClass}
+                    dangerouslySetInnerHTML={triggerButtonContent}>
+                </button>
                 <BootstrapModal ref="modal" onCancel={this._closeModal} onConfirm={this._save} cancel="Cancel" confirm="Save">
                    {header}
                    {body}

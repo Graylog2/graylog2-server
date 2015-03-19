@@ -11,13 +11,19 @@
     @views.html.partials.breadcrumbs(breadcrumbs)
     <div class="row content content-head">
         <div class="col-md-8">
-            <h1>@dashboard.getTitle</h1>
-            <a href="#" class="edit-dashboard only-unlocked" style="display: none; line-height: 12px;">
-                <i class="fa fa-pencil" title="Edit"></i>
-            </a>
+            <h1>
+                <span data-dashboard-id="@dashboard.getId" class="dashboard-title">@dashboard.getTitle</span>
+                <span class="react-edit-dashboard only-unlocked"
+                      data-dashboard-id="@dashboard.getId"
+                      data-dashboard-title="@dashboard.getTitle"
+                      data-dashboard-description="@dashboard.getDescription"
+                      data-button-class="btn-xs">
+                    <i class="fa fa-pencil"></i>
+                </span>
+            </h1>
 
             <p class="description">
-                @dashboard.getDescription
+                <span data-dashboard-id="@dashboard.getId" class="dashboard-description">@dashboard.getDescription</span>
             </p>
 
             @if(!dashboard.getWidgets.isEmpty) {
@@ -45,17 +51,6 @@
             }
         </div>
     </div>
-
-    <form action="@routes.DashboardsController.update(dashboard.getId)" method="POST" class="edit-dashboard-form">
-        <label for="title">Title:</label>
-        <input type="text" name="title" class="input-xxlarge" id="title" value="@dashboard.getTitle" />
-
-        <label for="description">Description:</label>
-        <input type="text" name="description" class="input-xxlarge" id="description" value="@dashboard.getDescription" />
-
-        <br />
-        <button type="submit" class="btn btn-success">Update dashboard</button>
-    </form>
 
     <div class="row">
         @if(dashboard.getWidgets.isEmpty) {
