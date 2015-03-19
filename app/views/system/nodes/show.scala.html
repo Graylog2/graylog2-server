@@ -13,219 +13,228 @@
     journalInfo.journalSizeLimit == 0 || ((journalInfo.journalSize * 100.0) / journalInfo.journalSizeLimit >= 100.0)
 }
 
-@main("Node " + node.getNodeId, views.html.system.sidebar(), "", currentUser) {
+@main("Node " + node.getNodeId, null, "", currentUser, false) {
 
-    <div class="pull-right">
-        <div class="btn-group">
-            <a class="btn btn-info btn-small dropdown-toggle" data-toggle="dropdown" href="#">
-                Actions
-                <span class="caret"></span>
-            </a>
-            <ul class="dropdown-menu">
-                @if(isPermitted(THREADS_DUMP)) {
-                    <li><a href="@routes.NodesController.threadDump(node.getNodeId)">Get thread dump</a></li>
-                }
-                <li><a href="@routes.MetricsController.ofNode(node.getNodeId)">Metrics</a></li>
-                @if(isPermitted(LOGGERS_READ)) {
-                    <li><a href="@routes.LoggingController.index()">Internal logging</a></li>
-                }
-                <li>
-                    <a href="@node.getTransportAddress/api-browser" target="_blank">
-                        API Browser
-                        <i class="fa fa-external-link" style="font-size: 11px;"></i>
-                    </a>
-                </li>
-            </ul>
-        </div>
-    </div>
 
     @views.html.partials.breadcrumbs(breadcrumbs)
 
-    <div class="row">
-        <h1><i class="fa fa-sitemap"></i> Node @node.getHostname / @node.getShortNodeId</h1>
-        This page shows details of a Graylog server node that is active and reachable in your cluster.
-    </div>
+    <div class="row content">
 
-    <div class="row">
-        <div class="alert alert-info">
-            <i class="fa fa-retweet"></i> &nbsp; Lifecycle state:
-            <strong>@node.getLifecycle</strong>
-            <span class="pull-right">@partials.support.head_bubble("setup/loadbalancer", 0, 19)</span>
-        </div>
-    </div>
+        <div class="col-md-12">
 
-
-    @if(node.lbAlive()) {
-        <div class="row">
-            <div class="alert alert-success">
-                <i class="fa fa-heart"></i> &nbsp; Marked as <strong>ALIVE</strong> for load balancers.
-                <span class="pull-right">@partials.support.head_bubble("setup/loadbalancer", 0, 19)</span>
-            </div>
-        </div>
-    } else {
-        <div class="row">
-            <div class="alert alert-error">
-                <i class="fa fa-heart"></i> &nbsp; Marked as <strong>DEAD</strong> for load balancers.
-                <span class="pull-right">@partials.support.head_bubble("setup/loadbalancer", 0, 19)</span>
-            </div>
-        </div>
-    }
-
-    @if(node.isMaster) {
-        <div class="row">
-            <div class="alert alert-success">
-                <i class="fa fa-star"></i> &nbsp;This is the master node.
-            </div>
-        </div>
-    }
-
-    <div class="row">
-        @if(node.isProcessing) {
-            <div class="alert alert-success">
-                @if(isPermitted(PROCESSING_CHANGESTATE)) {
-                <form action="@routes.NodesController.pauseMessageProcessing(node.getNodeId)" method="POST" class="node-processing-change">
-                    <input type="submit" class="btn btn-mini btn-danger pull-right" value="Pause processing" data-confirm="Really pause message processing?">
-                </form>
-                }
-                <i class="fa fa-ok-sign"></i> &nbsp; Node is processing <strong class="node-throughput focuslimit" data-node-id="@node.getNodeId">?</strong>
-                messages per second.
-            </div>
-        } else {
-            <div class="alert alert-danger">
-                @if(isPermitted(PROCESSING_CHANGESTATE)) {
-                <form action="@routes.NodesController.resumeMessageProcessing(node.getNodeId)" method="POST" class="node-processing-change">
-                    <input type="submit" class="btn btn-mini btn-success pull-right" value="Resume processing" data-confirm="Really resume message processing?">
-                </form>
-                }
-                <i class="fa fa-warning-sign"></i> &nbsp; Node is <strong>not</strong> processing messages.
-            </div>
-        }
-    </div>
-
-    <div class="row">
-        <h2><i class="fa fa-tasks"></i> Memory/Heap usage</h2>
-
-        <div class="node-heap-usage" data-node-id="@node.getNodeId">
-            <div class="progress">
-                <div class="bar bar-warning heap-used-percent" style="width: @node.jvm.usedMemoryPercentage()%;"></div>
-                <div class="bar heap-total-percent" style="width: @(node.jvm.totalMemoryPercentage()-node.jvm.usedMemoryPercentage)%"></div>
-            </div>
-
-            The JVM is using <strong><span class="heap-used">@node.jvm.getUsedMemory.getMegabytes()</span> of <span class="heap-total">@node.jvm.getTotalMemory.getMegabytes()</span> MB</strong>
-            heap space and will not attempt to use more than <strong><span class="heap-max">@node.jvm.getMaxMemory.getMegabytes()</span> MB</strong>.
-        </div>
-    </div>
-
-    <hr />
-
-    <div class="row">
-        <h2><i class="fa fa-shield"></i> Buffers</h2>
-        <div class="row">
-            <div class="col-md-4">
-                <a href="@routes.MetricsController.ofNode(node.getNodeId, node.getBufferClasses.inputBufferClass)" class="btn btn-info btn-mini pull-right">Metrics</a>
-                <h3>Input buffer</h3>
-
-                @defining(node.getBufferInfo.getInputBuffer.utilizationPercent) { utilizationPercent =>
-                    <div class="progress progress-percentage node-buffer-usage">
-                        <div class="bar bar-warning" data-percentage="@utilizationPercent" style="width : @utilizationPercent% ;"><span class="number-format" data-format="0.0%">@utilizationPercent%</span></div>
-                    </div>
-                    <strong><span class="number-format" data-format="0,0">@node.getBufferInfo.getInputBuffer.utilization</span> messages</strong> in input buffer.
-                    (<span class="number-format" data-format="0.0%">@utilizationPercent%</span> utilized)
-                }
-            </div>
-
-            <div class="col-md-4">
-                <a href="@routes.MetricsController.ofNode(node.getNodeId, node.getBufferClasses.processBufferClass)" class="btn btn-info btn-mini pull-right">Metrics</a>
-                <h3>Process buffer</h3>
-
-                @defining(node.getBufferInfo.getProcessBuffer.utilizationPercent) { utilizationPercent =>
-                    <div class="progress progress-percentage node-buffer-usage">
-                        <div class="bar bar-warning" data-percentage="@utilizationPercent" style="width : @utilizationPercent% ;"><span class="number-format" data-format="0.0%">@utilizationPercent%</span></div>
-                    </div>
-                    <strong><span class="number-format" data-format="0,0">@node.getBufferInfo.getProcessBuffer.utilization</span> messages</strong> in process buffer.
-                    (<span class="number-format" data-format="0.0%">@utilizationPercent%</span> utilized)
-                }
-            </div>
-
-            <div class="col-md-4">
-                <a href="@routes.MetricsController.ofNode(node.getNodeId, node.getBufferClasses.outputBufferClass)" class="btn btn-info btn-mini pull-right">Metrics</a>
-                <h3>Output buffer</h3>
-
-                @defining(node.getBufferInfo.getOutputBuffer.utilizationPercent) { utilizationPercent =>
-                    <div class="progress progress-percentage node-buffer-usage">
-                        <div class="bar bar-warning" data-percentage="@utilizationPercent" style="width : @utilizationPercent% ;"><span class="number-format" data-format="0.0%">@utilizationPercent%</span></div>
-                    </div>
-                    <strong><span class="number-format" data-format="0,0">@node.getBufferInfo.getOutputBuffer.utilization</span> messages</strong> in output buffer.
-                    (<span class="number-format" data-format="0.0%">@utilizationPercent%</span> utilized)
-                }
-            </div>
-        </div>
-        The buffers are built to cache small amounts of messages on their way through the different processors.
-    </div>
-
-    <hr />
-
-    <div class="row">
-        <h2><i class="fa fa-hdd"></i> Disk Journal</h2>
-        @if(node.getJournalInfo.enabled) {
-            <p>Incoming messages are written to the disk journal to ensure they are kept safe in case of a server failure. The journal also helps keeping Graylog working if any of the outputs is too slow to keep up with the message rate
-            or whenever there is a peak in incoming messages. It makes sure that Graylog does not buffer all of those messages in main memory and avoids overly long garbage collection pauses that way.
-            </p>
-            <div class="row">
-                <div class="col-md-6">
-                    <h3>Configuration</h3>
-                    <dl class="system-journal">
-                        <dt>Path:</dt>
-                        <dd>@node.getJournalInfo.journalConfig.directory</dd>
-                        <dt>Earliest entry: </dt>
-                        <dd>@DateHelper.readablePeriodFromNow(node.getJournalInfo.oldestSegment)</dd>
-                        <dt>Maximum size:</dt>
-                        <dd>
-                            <span class="number-format" data-format="0,0">@node.getJournalInfo.journalConfig.maxSize</span>
-                            bytes
-                        </dd>
-                        <dt>Maximum age:</dt>
-                        <dd>@DateHelper.readableDuration(node.getJournalInfo.journalConfig.maxAge)</dd>
-                        <dt>Flush policy:</dt>
-                        <dd>
-                            Every <span class="number-format" data-format="0,0">@node.getJournalInfo.journalConfig.flushInterval</span>
-                            messages or @DateHelper.readableDuration(node.getJournalInfo.journalConfig.flushAge)
-                        </dd>
-                    </dl>
-                </div>
-                <div class="col-md-6">
-                    <h3>Utilization</h3>
-                    @defining(NumberHelper.asPercent(node.getJournalInfo.journalSize, node.getJournalInfo.journalSizeLimit, 1, false)) { utilizationPercent =>
-                        <div class="progress progress-percentage node-journal-usage">
-                            @if(journalIsOvercommitted(node.getJournalInfo)) {
-                                <div class="bar bar-warning" data-percentage="100" style="width : 100%;">
-                            } else {
-                                <div class="bar bar-warning" data-percentage="@utilizationPercent" style="width : @utilizationPercent%;">
-                            }
-                                <span class="number-format" data-format="0.0%">@utilizationPercent%</span>
-                            </div>
-                        </div>
-                        @if(journalIsOvercommitted(node.getJournalInfo)) {
-                            <strong>Warning!</strong> The journal utilization is exceeding the maximum size
-                            defined. <a href="@routes.SystemController.index()">Click here</a> for more information.<br/>
+            <div class="pull-right">
+                <div class="btn-group">
+                    <a class="btn btn-info btn-small dropdown-toggle" data-toggle="dropdown" href="#">
+                        Actions
+                        <span class="caret"></span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-right">
+                        @if(isPermitted(THREADS_DUMP)) {
+                            <li><a href="@routes.NodesController.threadDump(node.getNodeId)">Get thread dump</a></li>
                         }
-                        <strong><span class="number-format" data-format="0,0">@node.getJournalInfo.uncommittedJournalEntries</span> unprocessed messages</strong>
-                        are currently in the journal, in @node.getJournalInfo.numberOfSegments segments.<br/>
-                        <strong><span class="number-format" data-format="0,0">@node.getJournalInfo.appendEventsPerSecond</span> messages</strong>
-                        have been appended in the last second,
-                        <strong><span class="number-format" data-format="0,0">@node.getJournalInfo.readEventsPerSecond</span> messages</strong>
-                        have been read in the last second.
+                        <li><a href="@routes.MetricsController.ofNode(node.getNodeId)">Metrics</a></li>
+                        @if(isPermitted(LOGGERS_READ)) {
+                            <li><a href="@routes.LoggingController.index()">Internal logging</a></li>
+                        }
+                        <li>
+                            <a href="@node.getTransportAddress/api-browser" target="_blank">
+                                API Browser
+                                <i class="fa fa-external-link" style="font-size: 11px;"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <h1><i class="fa fa-sitemap"></i> Node @node.getHostname / @node.getShortNodeId</h1>
+
+            <p class="description">This page shows details of a Graylog server node that is active and reachable in your cluster.</p>
+
+            @if(node.isMaster) {
+                <div class="alert alert-success">
+                    <i class="fa fa-star"></i> &nbsp;This is the master node.
+                </div>
+            }
+        </div>
+    </div>
+
+    <div class="row content">
+        <div class="col-md-4">
+            <div class="alert alert-info">
+                <i class="fa fa-retweet"></i> &nbsp; Lifecycle state:
+                <strong>@node.getLifecycle</strong>
+                <span class="pull-right">@partials.support.head_bubble("setup/loadbalancer", 0, 5)</span>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            @if(node.lbAlive()) {
+                <div class="alert alert-success">
+                    <i class="fa fa-heart"></i> &nbsp; Marked as <strong>ALIVE</strong> for load balancers.
+                    <span class="pull-right">@partials.support.head_bubble("setup/loadbalancer", 0, 5)</span>
+                </div>
+            } else {
+                <div class="alert alert-error">
+                    <i class="fa fa-heart"></i> &nbsp; Marked as <strong>DEAD</strong> for load balancers.
+                    <span class="pull-right">@partials.support.head_bubble("setup/loadbalancer", 0, 5)</span>
+                </div>
+            }
+        </div>
+
+        <div class="col-md-4">
+            @if(node.isProcessing) {
+                <div class="alert alert-success">
+                    @if(isPermitted(PROCESSING_CHANGESTATE)) {
+                    <form action="@routes.NodesController.pauseMessageProcessing(node.getNodeId)" method="POST">
+                        <input type="submit" class="btn btn-xs btn-danger pull-right" value="Pause processing" data-confirm="Really pause message processing?">
+                    </form>
+                    }
+                    <i class="fa fa-ok-sign"></i> &nbsp; Node is processing <strong class="node-throughput focuslimit" data-node-id="@node.getNodeId">?</strong>
+                    messages per second.
+                </div>
+            } else {
+                <div class="alert alert-danger">
+                    @if(isPermitted(PROCESSING_CHANGESTATE)) {
+                    <form action="@routes.NodesController.resumeMessageProcessing(node.getNodeId)" method="POST">
+                        <input type="submit" class="btn btn-xs btn-success pull-right" value="Resume processing" data-confirm="Really resume message processing?">
+                    </form>
+                    }
+                    <i class="fa fa-warning-sign"></i> &nbsp; Node is <strong>not</strong> processing messages.
+                </div>
+            }
+        </div>
+    </div>
+
+    <div class="row content">
+        <div class="col-md-12">
+            <h2><i class="fa fa-tasks"></i> Memory/Heap usage</h2>
+
+            <div class="node-heap-usage" data-node-id="@node.getNodeId">
+                <div class="progress">
+                    <div class="bar bar-warning heap-used-percent" style="width: @node.jvm.usedMemoryPercentage()%;"></div>
+                    <div class="bar heap-total-percent" style="width: @(node.jvm.totalMemoryPercentage()-node.jvm.usedMemoryPercentage)%"></div>
+                </div>
+
+                The JVM is using <strong><span class="heap-used">@node.jvm.getUsedMemory.getMegabytes()</span> of <span class="heap-total">@node.jvm.getTotalMemory.getMegabytes()</span> MB</strong>
+                heap space and will not attempt to use more than <strong><span class="heap-max">@node.jvm.getMaxMemory.getMegabytes()</span> MB</strong>.
+            </div>
+        </div>
+    </div>
+
+    
+
+    <div class="row content">
+        <div class="col-md-12">
+            <h2><i class="fa fa-shield"></i> Buffers</h2>
+            <div class="row">
+                <div class="col-md-4">
+                    <a href="@routes.MetricsController.ofNode(node.getNodeId, node.getBufferClasses.inputBufferClass)" class="btn btn-info btn-mini pull-right">Metrics</a>
+                    <h3>Input buffer</h3>
+
+                    @defining(node.getBufferInfo.getInputBuffer.utilizationPercent) { utilizationPercent =>
+                        <div class="progress progress-percentage node-buffer-usage">
+                            <div class="bar bar-warning" data-percentage="@utilizationPercent" style="width : @utilizationPercent% ;"><span class="number-format" data-format="0.0%">@utilizationPercent%</span></div>
+                        </div>
+                        <strong><span class="number-format" data-format="0,0">@node.getBufferInfo.getInputBuffer.utilization</span> messages</strong> in input buffer.
+                        (<span class="number-format" data-format="0.0%">@utilizationPercent%</span> utilized)
+                    }
+                </div>
+
+                <div class="col-md-4">
+                    <a href="@routes.MetricsController.ofNode(node.getNodeId, node.getBufferClasses.processBufferClass)" class="btn btn-info btn-mini pull-right">Metrics</a>
+                    <h3>Process buffer</h3>
+
+                    @defining(node.getBufferInfo.getProcessBuffer.utilizationPercent) { utilizationPercent =>
+                        <div class="progress progress-percentage node-buffer-usage">
+                            <div class="bar bar-warning" data-percentage="@utilizationPercent" style="width : @utilizationPercent% ;"><span class="number-format" data-format="0.0%">@utilizationPercent%</span></div>
+                        </div>
+                        <strong><span class="number-format" data-format="0,0">@node.getBufferInfo.getProcessBuffer.utilization</span> messages</strong> in process buffer.
+                        (<span class="number-format" data-format="0.0%">@utilizationPercent%</span> utilized)
+                    }
+                </div>
+
+                <div class="col-md-4">
+                    <a href="@routes.MetricsController.ofNode(node.getNodeId, node.getBufferClasses.outputBufferClass)" class="btn btn-info btn-mini pull-right">Metrics</a>
+                    <h3>Output buffer</h3>
+
+                    @defining(node.getBufferInfo.getOutputBuffer.utilizationPercent) { utilizationPercent =>
+                        <div class="progress progress-percentage node-buffer-usage">
+                            <div class="bar bar-warning" data-percentage="@utilizationPercent" style="width : @utilizationPercent% ;"><span class="number-format" data-format="0.0%">@utilizationPercent%</span></div>
+                        </div>
+                        <strong><span class="number-format" data-format="0,0">@node.getBufferInfo.getOutputBuffer.utilization</span> messages</strong> in output buffer.
+                        (<span class="number-format" data-format="0.0%">@utilizationPercent%</span> utilized)
                     }
                 </div>
             </div>
-       } else {
-            The disk journal is disabled for this node.
-        }
+            The buffers are built to cache small amounts of messages on their way through the different processors.
+        </div>
     </div>
 
-    <hr />
+    
 
-    <div class="row">
+    <div class="row content">
+        <div class="col-md-12">
+            <h2><i class="fa fa-hdd"></i> Disk Journal</h2>
+            @if(node.getJournalInfo.enabled) {
+                <p>Incoming messages are written to the disk journal to ensure they are kept safe in case of a server failure. The journal also helps keeping Graylog working if any of the outputs is too slow to keep up with the message rate
+                or whenever there is a peak in incoming messages. It makes sure that Graylog does not buffer all of those messages in main memory and avoids overly long garbage collection pauses that way.
+                </p>
+                <div class="row">
+                    <div class="col-md-6">
+                        <h3>Configuration</h3>
+                        <dl class="system-journal">
+                            <dt>Path:</dt>
+                            <dd>@node.getJournalInfo.journalConfig.directory</dd>
+                            <dt>Earliest entry: </dt>
+                            <dd>@DateHelper.readablePeriodFromNow(node.getJournalInfo.oldestSegment)</dd>
+                            <dt>Maximum size:</dt>
+                            <dd>
+                                <span class="number-format" data-format="0,0">@node.getJournalInfo.journalConfig.maxSize</span>
+                                bytes
+                            </dd>
+                            <dt>Maximum age:</dt>
+                            <dd>@DateHelper.readableDuration(node.getJournalInfo.journalConfig.maxAge)</dd>
+                            <dt>Flush policy:</dt>
+                            <dd>
+                                Every <span class="number-format" data-format="0,0">@node.getJournalInfo.journalConfig.flushInterval</span>
+                                messages or @DateHelper.readableDuration(node.getJournalInfo.journalConfig.flushAge)
+                            </dd>
+                        </dl>
+                    </div>
+                    <div class="col-md-6">
+                        <h3>Utilization</h3>
+                        @defining(NumberHelper.asPercent(node.getJournalInfo.journalSize, node.getJournalInfo.journalSizeLimit, 1, false)) { utilizationPercent =>
+                            <div class="progress progress-percentage node-journal-usage">
+                                @if(journalIsOvercommitted(node.getJournalInfo)) {
+                                    <div class="bar bar-warning" data-percentage="100" style="width : 100%;">
+                                } else {
+                                    <div class="bar bar-warning" data-percentage="@utilizationPercent" style="width : @utilizationPercent%;">
+                                }
+                                    <span class="number-format" data-format="0.0%">@utilizationPercent%</span>
+                                </div>
+                            </div>
+                            @if(journalIsOvercommitted(node.getJournalInfo)) {
+                                <strong>Warning!</strong> The journal utilization is exceeding the maximum size
+                                defined. <a href="@routes.SystemController.index()">Click here</a> for more information.<br/>
+                            }
+                            <strong><span class="number-format" data-format="0,0">@node.getJournalInfo.uncommittedJournalEntries</span> unprocessed messages</strong>
+                            are currently in the journal, in @node.getJournalInfo.numberOfSegments segments.<br/>
+                            <strong><span class="number-format" data-format="0,0">@node.getJournalInfo.appendEventsPerSecond</span> messages</strong>
+                            have been appended in the last second,
+                            <strong><span class="number-format" data-format="0,0">@node.getJournalInfo.readEventsPerSecond</span> messages</strong>
+                            have been read in the last second.
+                        }
+                    </div>
+                </div>
+           } else {
+                The disk journal is disabled for this node.
+            }
+        </div>
+    </div>
+
+    
+
+    <div class="row content">
         <div class="col-md-6">
             <h2><i class="fa fa-cogs"></i> System</h2>
 
@@ -266,77 +275,81 @@
         </div>
     </div>
 
-    <hr />
-    <div class="row">
-        <h2><i class="fa fa-cloud-download"></i> Installed Plugins <span style="font-size: 12px;">@installedPlugins.size() @pluralize("plugin", installedPlugins.size) installed.</span></h2>
+    
+    <div class="row content">
+        <div class="col-md-12">
+            <h2><i class="fa fa-cloud-download"></i> Installed Plugins <span style="font-size: 12px;">@installedPlugins.size() @pluralize("plugin", installedPlugins.size) installed.</span></h2>
 
-        @if(installedPlugins.size() > 0) {
+            @if(installedPlugins.size() > 0) {
+                <table class="table table-striped table-hover table-condensed">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Author</th>
+                            <th>Version</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                    @for(plugin <- installedPlugins.sortBy(_.name)) {
+                        <tr>
+                            <td>@plugin.name</td>
+                            <td>@plugin.author</td>
+                            <td>@plugin.version</td>
+                            <td>@plugin.description
+                                @if(plugin.url != null) {
+                                    <a href="@plugin.url" target="_blank">
+                                        <i class="fa fa-external-link"></i> Homepage
+                                    </a>
+                                } else {
+                                        &nbsp;
+                                }
+                            </td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            }
+        </div>
+    </div>
+
+    
+
+    <div class="row content">
+        <div class="col-md-12">
+            @if(isPermitted(INPUTS_EDIT)) {
+            <a href="@routes.InputsController.manage(node.getNodeId)" class="btn btn-small btn-success pull-right">Manage inputs</a>
+            }
+            <h2><i class="fa fa-cloud-download"></i> Installed/available input types <span style="font-size: 12px;">@node.getInputs.size() @pluralize("input", node.getInputs.size) running.</span></h2>
+
             <table class="table table-striped table-hover table-condensed">
                 <thead>
                     <tr>
                         <th>Name</th>
-                        <th>Author</th>
-                        <th>Version</th>
-                        <th>Description</th>
+                        <th colspan="2">Type</th>
                     </tr>
                 </thead>
 
                 <tbody>
-                @for(plugin <- installedPlugins.sortBy(_.name)) {
+                @for((inputType, info) <- node.getAllInputTypeInformation.toSeq.sortBy(_._2.name)) {
                     <tr>
-                        <td>@plugin.name</td>
-                        <td>@plugin.author</td>
-                        <td>@plugin.version</td>
-                        <td>@plugin.description
-                            @if(plugin.url != null) {
-                                <a href="@plugin.url" target="_blank">
-                                    <i class="fa fa-external-link"></i> Homepage
+                        <td>@info.name</td>
+                        <td>@inputType</td>
+                        <td>
+                            @if(info.linkToDocs != null && !info.linkToDocs.isEmpty) {
+                                <a href="@info.linkToDocs" target="_blank">
+                                    <i class="fa fa-external-link"></i> Documentation
                                 </a>
                             } else {
-                                    &nbsp;
+                                &nbsp;
                             }
                         </td>
                     </tr>
                 }
                 </tbody>
             </table>
-        }
-    </div>
-
-    <hr />
-
-    <div class="row">
-        @if(isPermitted(INPUTS_EDIT)) {
-        <a href="@routes.InputsController.manage(node.getNodeId)" class="btn btn-small btn-success pull-right">Manage inputs</a>
-        }
-        <h2><i class="fa fa-cloud-download"></i> Installed/available input types <span style="font-size: 12px;">@node.getInputs.size() @pluralize("input", node.getInputs.size) running.</span></h2>
-
-        <table class="table table-striped table-hover table-condensed">
-            <thead>
-                <tr>
-                    <th>Name</th>
-                    <th colspan="2">Type</th>
-                </tr>
-            </thead>
-
-            <tbody>
-            @for((inputType, info) <- node.getAllInputTypeInformation.toSeq.sortBy(_._2.name)) {
-                <tr>
-                    <td>@info.name</td>
-                    <td>@inputType</td>
-                    <td>
-                        @if(info.linkToDocs != null && !info.linkToDocs.isEmpty) {
-                            <a href="@info.linkToDocs" target="_blank">
-                                <i class="fa fa-external-link"></i> Documentation
-                            </a>
-                        } else {
-                            &nbsp;
-                        }
-                    </td>
-                </tr>
-            }
-            </tbody>
-        </table>
+        </div>
     </div>
 
 }
