@@ -24,7 +24,6 @@ import com.mongodb.MongoException;
 import io.airlift.airline.Command;
 import io.airlift.airline.Option;
 import org.graylog2.Configuration;
-import org.graylog2.shared.ServerVersion;
 import org.graylog2.UI;
 import org.graylog2.bindings.AlarmCallbackBindings;
 import org.graylog2.bindings.InitializerBindings;
@@ -82,9 +81,6 @@ public class Server extends ServerBootstrap implements Runnable {
     @Option(name = {"-l", "--local"}, description = "Run Graylog in local mode. Only interesting for Graylog developers.")
     private boolean local = false;
 
-    @Option(name = {"-s", "--statistics"}, description = "Print utilization statistics to STDOUT")
-    private boolean stats = false;
-
     @Option(name = {"-r", "--no-retention"}, description = "Do not automatically remove messages from index that are older than the retention time")
     private boolean noRetention = false;
 
@@ -94,10 +90,6 @@ public class Server extends ServerBootstrap implements Runnable {
 
     public boolean isLocal() {
         return local;
-    }
-
-    public boolean isStats() {
-        return stats;
     }
 
     public boolean performRetention() {
