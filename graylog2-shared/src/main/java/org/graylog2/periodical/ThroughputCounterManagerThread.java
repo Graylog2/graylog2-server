@@ -16,15 +16,17 @@
  */
 package org.graylog2.periodical;
 
-import javax.inject.Inject;
 import org.graylog2.plugin.periodical.Periodical;
 import org.graylog2.shared.stats.ThroughputStats;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
+
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
+@Deprecated
 public class ThroughputCounterManagerThread extends Periodical {
     private static final Logger LOG = LoggerFactory.getLogger(ThroughputCounterManagerThread.class);
     private final ThroughputStats throughputStats;
