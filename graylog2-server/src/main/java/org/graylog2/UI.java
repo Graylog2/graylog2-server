@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory;
 
 public class UI {
 
-    private static final String HELP_DOCS = "https://www.graylog.org/documentation/intro/";
+    private static final String HELP_DOCS = "http://docs.graylog.org/";
     private static final String HELP_COMMUNITY = "https://www.graylog.org/community-support/";
     private static final String HELP_COMMERCIAL = "https://www.graylog.com/support/";
 
