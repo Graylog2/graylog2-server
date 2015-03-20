@@ -33,6 +33,8 @@ import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.alarms.callbacks.AlarmCallback;
 import org.graylog2.plugin.streams.Stream;
+import org.graylog2.rest.models.alarmcallbacks.AlarmCallbackListSummary;
+import org.graylog2.rest.models.alarmcallbacks.AlarmCallbackSummary;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.streams.StreamService;
@@ -81,18 +83,23 @@ public class AlarmCallbackResource extends RestResource {
     @Timed
     @ApiOperation(value = "Get a list of all alarm callbacks for this stream")
     @Produces(MediaType.APPLICATION_JSON)
-    public Map<String, Object> get(@ApiParam(name = "streamid", value = "The id of the stream whose alarm callbacks we want.", required = true)
+    public AlarmCallbackListSummary get(@ApiParam(name = "streamid", value = "The id of the stream whose alarm callbacks we want.", required = true)
                                    @PathParam("streamid") String streamid) throws NotFoundException {
         final Stream stream = streamService.load(streamid);
 
-        final List<Map<String, Object>> alarmCallbacks = Lists.newArrayList();
+        final List<AlarmCallbackSummary> alarmCallbacks = Lists.newArrayList();
         for (AlarmCallbackConfiguration callback : alarmCallbackConfigurationService.getForStream(stream)) {
-            alarmCallbacks.add(callback.getFields());
+            alarmCallbacks.add(AlarmCallbackSummary.create(
+                    callback.getId(),
+                    callback.getStreamId(),
+                    callback.getType(),
+                    callback.getConfiguration().getSource(),
+                    callback.getCreatedAt(),
+                    callback.getCreatorUserId()
+            ));
         }
 
-        return ImmutableMap.of(
-                "alarmcallbacks", alarmCallbacks,
-                "total", alarmCallbacks.size());
+        return AlarmCallbackListSummary.create(alarmCallbacks);
     }
 
     @GET
@@ -100,7 +107,7 @@ public class AlarmCallbackResource extends RestResource {
     @Timed
     @ApiOperation(value = "Get a single specified alarm callback for this stream")
     @Produces(MediaType.APPLICATION_JSON)
-    public Map<String, Object> get(@ApiParam(name = "streamid", value = "The id of the stream whose alarm callbacks we want.", required = true)
+    public AlarmCallbackSummary get(@ApiParam(name = "streamid", value = "The id of the stream whose alarm callbacks we want.", required = true)
                                    @PathParam("streamid") String streamid,
                                    @ApiParam(name = "alarmCallbackId", value = "The alarm callback id we are getting", required = true)
                                    @PathParam("alarmCallbackId") String alarmCallbackId) throws NotFoundException {
@@ -111,7 +118,7 @@ public class AlarmCallbackResource extends RestResource {
             throw new javax.ws.rs.NotFoundException();
         }
 
-        return result.getFields();
+        return AlarmCallbackSummary.create(result.getId(), result.getStreamId(), result.getType(), result.getConfiguration().getSource(), result.getCreatedAt(), result.getCreatorUserId());
     }
 
     @POST

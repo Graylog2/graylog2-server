@@ -19,6 +19,7 @@ package org.graylog2.alarmcallbacks;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.database.Persisted;
 import org.graylog2.plugin.streams.Stream;
+import org.joda.time.DateTime;
 
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
@@ -28,4 +29,6 @@ public interface AlarmCallbackConfiguration extends Persisted {
     public String getStreamId();
     public String getType();
     public Configuration getConfiguration();
+    public DateTime getCreatedAt();
+    public String getCreatorUserId();
 }
