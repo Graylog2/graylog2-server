@@ -18,7 +18,7 @@ package org.graylog2.shared.initializers;
 
 import com.google.common.collect.Maps;
 import com.google.common.util.concurrent.AbstractIdleService;
-import com.iterative.groovy.service.GroovyShellService;
+import me.bazhenov.groovysh.GroovyShellService;
 import org.graylog2.plugin.BaseConfiguration;
 import org.graylog2.shared.bindings.InstantiationService;
 
@@ -26,9 +26,6 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.util.Map;
 
-/**
- * @author Dennis Oelkers <dennis@torch.sh>
- */
 @Singleton
 public class GroovyShellSetupService extends AbstractIdleService {
     private final GroovyShellService groovyShellService = new GroovyShellService();
@@ -47,14 +44,15 @@ public class GroovyShellSetupService extends AbstractIdleService {
 
     @Override
     protected void startUp() throws Exception {
-        if (!configuration.isGroovyShellEnable())
-            return;
-
-        groovyShellService.start();
+        if (configuration.isGroovyShellEnable()) {
+            groovyShellService.start();
+        }
     }
 
     @Override
     protected void shutDown() throws Exception {
-        groovyShellService.destroy();
+        if(configuration.isGroovyShellEnable()) {
+            groovyShellService.destroy();
+        }
     }
 }
