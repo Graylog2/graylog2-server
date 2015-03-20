@@ -151,7 +151,7 @@ public abstract class BaseConfiguration {
                     LOG.debug("Using loopback address {}", guessedAddress);
                 }
             } catch (Exception e) {
-                LOG.error("Could not guess primary network address for rest_transport_uri. Please configure it in your graylog2.conf.", e);
+                LOG.error("Could not guess primary network address for \"rest_transport_uri\". Please configure it in your Graylog configuration.", e);
                 throw new RuntimeException("No rest_transport_uri.", e);
             }
 

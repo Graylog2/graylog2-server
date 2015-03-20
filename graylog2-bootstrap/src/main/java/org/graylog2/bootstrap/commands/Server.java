@@ -167,7 +167,7 @@ public class Server extends ServerBootstrap implements Runnable {
     @Override
     protected boolean validateConfiguration() {
         if (configuration.getPasswordSecret().isEmpty()) {
-            LOG.error("No password secret set. Please define password_secret in your graylog2.conf.");
+            LOG.error("No password secret set. Please define \"password_secret\" in your Graylog configuration.");
             return false;
         }
 
