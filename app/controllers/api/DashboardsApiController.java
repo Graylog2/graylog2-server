@@ -145,6 +145,9 @@ public class DashboardsApiController extends AuthenticatedController {
         try {
             Dashboard dashboard = dashboardService.get(dashboardId);
             DashboardWidget widget = dashboard.getWidget(widgetId);
+            if (widget == null) {
+                return notFound();
+            }
 
             Map<String, Object> result = Maps.newHashMap();
             result.put("type", widget.getType());
@@ -168,6 +171,9 @@ public class DashboardsApiController extends AuthenticatedController {
         try {
             Dashboard dashboard = dashboardService.get(dashboardId);
             DashboardWidget widget = dashboard.getWidget(widgetId);
+            if (widget == null) {
+                return notFound();
+            }
             DashboardWidgetValueResponse widgetValue = widget.getValue(api());
 
             Object resultValue;

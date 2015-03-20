@@ -6,6 +6,8 @@ var React = require('react');
 var Qs = require('qs');
 var URLUtils = require("../../util/URLUtils");
 
+var UserNotification = require("../../util/UserNotification");
+
 var WidgetHeader = require('./WidgetHeader');
 var WidgetFooter = require('./WidgetFooter');
 var WidgetConfigModal = require('./WidgetConfigModal');
@@ -67,6 +69,14 @@ var Widget = React.createClass({
         if (!assertUpdateEnabled(this.loadData) || this.state.deleted) { return; }
 
         var widgetPromise = WidgetsStore.loadWidget(this.props.dashboardId, this.props.widgetId);
+        widgetPromise.fail((jqXHR, textStatus, errorThrown) => {
+            if(jqXHR.status === 404) {
+                UserNotification.warning("It looks like widget '" + this.state.title + "' does not exist anymore. " +
+                    "Please refresh the page to remove it from the dashboard.",
+                    "Could not load widget information");
+                this.setState({deleted: true});
+            }
+        });
         widgetPromise.done((widget) => {
             this.setState({
                 type: widget.type,

@@ -10,8 +10,10 @@ var WidgetsStore = {
         var url = URLUtils.appPrefixed('/a/dashboards/' + dashboardId + '/widgets/' + widgetId);
         var promise = $.getJSON(url);
         promise.fail((jqXHR, textStatus, errorThrown) => {
-            UserNotification.error("Loading widget information failed with status: " + errorThrown,
-                "Could not load widget information");
+            if (jqXHR.status !== 404) {
+                UserNotification.error("Loading widget information failed with status: " + errorThrown,
+                    "Could not load widget information");
+            }
         });
         return promise;
     },
