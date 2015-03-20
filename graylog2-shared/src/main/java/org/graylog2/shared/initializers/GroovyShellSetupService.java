@@ -44,14 +44,15 @@ public class GroovyShellSetupService extends AbstractIdleService {
 
     @Override
     protected void startUp() throws Exception {
-        if (!configuration.isGroovyShellEnable())
-            return;
-
-        groovyShellService.start();
+        if (configuration.isGroovyShellEnable()) {
+            groovyShellService.start();
+        }
     }
 
     @Override
     protected void shutDown() throws Exception {
-        groovyShellService.destroy();
+        if(configuration.isGroovyShellEnable()) {
+            groovyShellService.destroy();
+        }
     }
 }
