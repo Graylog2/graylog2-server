@@ -55,6 +55,8 @@ var QuickValuesVisualization = React.createClass({
             return [];
         }
 
+        values.sort((a, b) => Number(this.state.terms[b]) - Number(this.state.terms[a]));
+
         values.forEach((term) => {
             var count = this.state.terms[term];
             var percentage = count / this.state.total;
