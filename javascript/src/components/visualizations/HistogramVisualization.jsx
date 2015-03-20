@@ -29,7 +29,7 @@ var HistogramVisualization = React.createClass({
         this.processData(nextProps.data);
     },
     renderHistogram() {
-        var histogramDomNode = $("#visualization-" + this.props.id)[0];
+        var histogramDomNode = this.getDOMNode();
 
         this.histogram = dc.barChart(histogramDomNode);
         this.histogram
