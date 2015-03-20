@@ -17,7 +17,8 @@ var QuickValuesVisualization = require('../visualizations/QuickValuesVisualizati
 var WidgetsStore = require('../../stores/widgets/WidgetsStore');
 
 var Widget = React.createClass({
-    LOAD_WIDGET_DATA_INTERVAL: 30 * 1000,
+    WIDGET_DATA_REFRESH: 30 * 1000,
+    DEFAULT_WIDGET_VALUE_REFRESH: 10 * 1000,
 
     getInitialState() {
         return {
@@ -75,7 +76,7 @@ var Widget = React.createClass({
                 config: widget.config
             });
         });
-        setTimeout(this.loadData, this.LOAD_WIDGET_DATA_INTERVAL);
+        setTimeout(this.loadData, this.WIDGET_DATA_REFRESH);
     },
     loadValue() {
         if (!assertUpdateEnabled(this.loadValue) || this.state.deleted) { return; }
@@ -96,7 +97,7 @@ var Widget = React.createClass({
             });
         });
 
-        setTimeout(this.loadValue, this.state.cacheTime * 1000);
+        setTimeout(this.loadValue, Math.min(this.state.cacheTime * 1000, this.DEFAULT_WIDGET_VALUE_REFRESH));
     },
     _dashboardLocked() {
         this.setState({locked: true});
