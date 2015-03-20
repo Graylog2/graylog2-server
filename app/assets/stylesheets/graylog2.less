@@ -1568,6 +1568,18 @@ table#users-list td.limited {
 }
 
 /* New widgets */
+
+.dashboard .react-widget {
+  height: 100%;
+  overflow: hidden;
+}
+
+.dashboard .react-widget .widget {
+  height: inherit;
+  margin: 0;
+  padding: 15px;
+}
+
 .dashboard .widget .widget-title {
   display: inline-block;
   font-size: 18px;
@@ -1631,6 +1643,12 @@ table#users-list td.limited {
 
 .dashboard .widget .number .trend-indicators .trend-icons-higher {
   margin-bottom: 5px;
+}
+
+.dashboard .widget .quickvalues-visualization {
+  height: 85%;
+  margin-top: 5px;
+  overflow: auto;
 }
 
 .dashboard .widget .actions {

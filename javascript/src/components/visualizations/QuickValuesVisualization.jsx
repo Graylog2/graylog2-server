@@ -75,8 +75,8 @@ var QuickValuesVisualization = React.createClass({
                 <table className="table table-condensed table-hover table-striped">
                     <thead>
                         <tr>
-                            <th style={{width: "225px;"}}>Value</th>
-                            <th style={{width: "50px;"}}>%</th>
+                            <th style={{width: "225px"}}>Value</th>
+                            <th style={{width: "50px"}}>%</th>
                             <th>Count</th>
                         </tr>
                     </thead>
