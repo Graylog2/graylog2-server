@@ -21,6 +21,7 @@ var GraphFactory = {
             case 'bar':
                 graph = dc.barChart(domNode);
                 graph.centerBar(true);
+                break;
             default:
                 console.log("Unsupported renderer '" + renderer +"'");
         }
