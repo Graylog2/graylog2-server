@@ -1,6 +1,6 @@
 @(currentUser: org.graylog2.restclient.models.User, stream: org.graylog2.restclient.models.Stream, streamrules: List[org.graylog2.restclient.models.StreamRule], breadcrumbs: lib.BreadcrumbList)
 
-@main("Rules of stream \"" + stream.getTitle + "\"" , views.html.sidebars.standard(currentUser), "", currentUser, false) {
+@main("Rules of stream \"" + stream.getTitle + "\"" , null, "", currentUser, false) {
 
     @views.html.partials.breadcrumbs(breadcrumbs)
 
