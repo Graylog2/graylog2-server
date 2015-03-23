@@ -15,6 +15,7 @@ var WidgetConfigModal = require('./WidgetConfigModal');
 var NumericVisualization = require('../visualizations/NumericVisualization');
 var HistogramVisualization = require('../visualizations/HistogramVisualization');
 var QuickValuesVisualization = require('../visualizations/QuickValuesVisualization');
+var GraphVisualization = require('../visualizations/GraphVisualization');
 
 var WidgetsStore = require('../../stores/widgets/WidgetsStore');
 
@@ -133,6 +134,11 @@ var Widget = React.createClass({
                 break;
             case 'QUICKVALUES':
                 visualization = <QuickValuesVisualization data={this.state.result}/>;
+                break;
+            case 'FIELD_CHART':
+                visualization = <GraphVisualization id={this.props.widgetId}
+                                                    data={this.state.result}
+                                                    config={this.state.config}/>;
                 break;
             default:
                 throw("Error: Widget type '" + this.state.type + "' not supported");
