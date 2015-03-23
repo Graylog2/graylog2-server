@@ -20,7 +20,7 @@ var BulkLoadPatternModal = React.createClass({
                 </div>
                 <div className="checkbox">
                     <label>
-                        <input type="checkbox" name="replace"/> Replace all existing patterns?
+                        <input type="checkbox" name="replace"/> Replace all existing patterns&#63;
                     </label>
                 </div>
             </div>

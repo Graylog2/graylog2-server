@@ -279,7 +279,7 @@ var SourceOverview = React.createClass({
             <div className="row content">
                 <div className="col-md-12">
                     <div className="alert alert-info">
-                        No message sources found for this time range. Did you try using a different one?
+                        No message sources found for this time range. Did you try using a different one&#63;
                     </div>
                 </div>
             </div>;
