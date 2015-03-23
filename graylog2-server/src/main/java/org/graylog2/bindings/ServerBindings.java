@@ -75,6 +75,7 @@ import org.graylog2.shared.journal.JournalReaderModule;
 import org.graylog2.shared.journal.KafkaJournalModule;
 import org.graylog2.shared.journal.NoopJournalModule;
 import org.graylog2.shared.metrics.jersey2.MetricsDynamicBinding;
+import org.graylog2.shared.security.RestrictToMasterFeature;
 import org.graylog2.shared.security.ShiroSecurityBinding;
 import org.graylog2.shared.system.activities.ActivityWriter;
 import org.graylog2.streams.StreamRouter;
@@ -186,6 +187,7 @@ public class ServerBindings extends AbstractModule {
         Multibinder<Class<? extends DynamicFeature>> setBinder = Multibinder.newSetBinder(binder(), type);
         setBinder.addBinding().toInstance(ShiroSecurityBinding.class);
         setBinder.addBinding().toInstance(MetricsDynamicBinding.class);
+        setBinder.addBinding().toInstance(RestrictToMasterFeature.class);
     }
 
     private void bindContainerResponseFilters() {
