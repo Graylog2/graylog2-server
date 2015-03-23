@@ -83,7 +83,9 @@ var HistogramVisualization = React.createClass({
     processData(data) {
         var formattedData = [];
         for(var key in data) {
-            formattedData.push({x: Number(key), y: data[key]});
+            if (data.hasOwnProperty(key)) {
+                formattedData.push({x: Number(key), y: data[key]});
+            }
         }
         this.setState({processedData: formattedData}, this.drawData);
     },
