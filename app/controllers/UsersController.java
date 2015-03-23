@@ -202,7 +202,7 @@ public class UsersController extends AuthenticatedController {
         effectivePreferences.put("updateUnfocussed", false);
         effectivePreferences.put("disableExpensiveUpdates", false);
         effectivePreferences.put("enableSmartSearch", false);
-        effectivePreferences.put("enableNewWidgets", false);
+        effectivePreferences.put("enableNewWidgets", true);
         if (preferences != null) {
             effectivePreferences.putAll(preferences);
         }

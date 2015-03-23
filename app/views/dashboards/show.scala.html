@@ -63,7 +63,7 @@
                 <div class="gridster" data-dashboard-id="@dashboard.getId">
                     <ul>
                     @for(widget <- dashboard.getWidgets.values()) {
-                        @if(Try(currentUser.getPreferences.get("enableNewWidgets").toString.toBoolean).getOrElse(false)) {
+                        @if(Try(currentUser.getPreferences.get("enableNewWidgets").toString.toBoolean).getOrElse(true)) {
                             <li data-row="@widget.getRow" data-col="@widget.getCol" data-sizex="@widget.getWidth" data-sizey="@widget.getHeight">
                                 <div class="react-widget" data-dashboard-id="@widget.getDashboard.getId"
                                                           data-widget-id="@widget.getId"></div>
@@ -136,7 +136,7 @@
             </div>
         }
 
-        @if(!Try(currentUser.getPreferences.get("enableNewWidgets").toString.toBoolean).getOrElse(false)) {
+        @if(!Try(currentUser.getPreferences.get("enableNewWidgets").toString.toBoolean).getOrElse(true)) {
             @**************** change cache time modal ****************@
             <form>
                 <div id="dashboardwidget-cache-time" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
