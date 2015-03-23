@@ -10,7 +10,7 @@
             &nbsp;
         @if(stream != null && isPermitted(STREAM_OUTPUTS_DELETE)) {
             <form action="@routes.StreamOutputsController.remove(stream.getId, output.getId)" method="POST">
-                <button class="btn btn-warning btn-mini"
+                <button class="btn btn-warning btn-xs"
                 type="submit" data-confirm="Really delete output @output.getTitle from stream @stream.getTitle?">
                     <i class="fa fa-remove"></i> Delete from stream
                 </button>
@@ -22,7 +22,7 @@
             } else {
                 <form action="@routes.OutputsController.terminate(output.getId, stream.getId)" method="POST">
             }
-                <button class="btn btn-danger btn-mini" type="submit"
+                <button class="btn btn-danger btn-xs" type="submit"
                 data-confirm="Really delete output @output.getTitle globally? It will be removed from all streams in the system.">
                     <i class="fa fa-remove"></i> Delete globally
                 </button>

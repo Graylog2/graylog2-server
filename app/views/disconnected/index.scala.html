@@ -23,7 +23,7 @@
                                 <h3>Configured nodes</h3>
                                 @for(node <- configuredNodes.sortBy(_.getTransportAddress)) {
                                     <div class="well well-small config-node" data-config-node-address="@node.getTransportAddress">
-                                        <a class="btn btn-mini btn-info pull-right" target="_blank" href="@node.getTransportAddress/api-browser">API Browser</a>
+                                        <a class="btn btn-xs btn-info pull-right" target="_blank" href="@node.getTransportAddress/api-browser">API Browser</a>
                                         <h5><i class="fa fa-sitemap"></i> @node.getTransportAddress</h5>
                                         <h6>
                                             @if(serverNodes.getDiscoveredNodeVia(node).getNodeId == null) {
@@ -42,7 +42,7 @@
                                 } else {
                                     @for(node <- nodesEverConnectedTo.sortBy(_.getTransportAddress)) {
                                         <div class="well well-small discovered-node" data-node-id="@node.getNodeId">
-                                            <a class="btn btn-mini btn-info pull-right" target="_blank" href="@node.getTransportAddress/api-browser">API Browser</a>
+                                            <a class="btn btn-xs btn-info pull-right" target="_blank" href="@node.getTransportAddress/api-browser">API Browser</a>
                                             <h5><i class="fa fa-sitemap"></i> @node.getTransportAddress
                                             @if(serverNodes.getConfigNodeOf(node) != null && !serverNodes.getConfigNodeOf(node).getTransportAddress.equals(node.getTransportAddress)) {
                                                 <h6>

@@ -86,10 +86,10 @@
 <span id="original-search-timerange" style="display: none;">@searchResult.getTimeRange</span>
 
 <div class="pull-right">
-    <a href="#built-query" class="btn btn-small" role="button" data-toggle="modal" data-backdrop="true"><i class="fa fa-bug"></i></a>
+    <a href="#built-query" class="btn btn-sm" role="button" data-toggle="modal" data-backdrop="true"><i class="fa fa-bug"></i></a>
 
     <div class="btn-group">
-        <a class="btn btn-small dropdown-toggle" data-toggle="dropdown" href="#">
+        <a class="btn btn-sm dropdown-toggle" data-toggle="dropdown" href="#">
             <i class="fa fa-cloud-download"></i> Export
             <span class="caret"></span>
         </a>
@@ -100,27 +100,27 @@
 
     @if(stream != null) {
     <div class="btn-group">
-        @views.html.partials.streams.action_menu.render(stream, nodes, currentUser, "btn-small")
+        @views.html.partials.streams.action_menu.render(stream, nodes, currentUser, "btn-sm")
     </div>
     }
 
-    <a href="#" class="btn btn-small clear-pinned-charts" title="Reset/clear all pinned charts." style="display: none;">
+    <a href="#" class="btn btn-sm clear-pinned-charts" title="Reset/clear all pinned charts." style="display: none;">
         Clear pinned charts
     </a>
 
     @if(savedSearch != null && Permissions.isPermitted(RestPermissions.SAVEDSEARCHES_EDIT)) {
-        <a href="@routes.SavedSearchesController.delete(savedSearch.getId)" class="btn btn-small btn-danger" data-confirm='Really delete saved search "@savedSearch.getTitle"?'>Delete saved search</a>
+        <a href="@routes.SavedSearchesController.delete(savedSearch.getId)" class="btn btn-sm btn-danger" data-confirm='Really delete saved search "@savedSearch.getTitle"?'>Delete saved search</a>
     }
 
     @if(Permissions.isPermitted(RestPermissions.SAVEDSEARCHES_CREATE)) {
-    <a href="#" class="btn btn-small btn-success save-search" title="Save this search so you can execute it at any time with just a click.">
+    <a href="#" class="btn btn-sm btn-success save-search" title="Save this search so you can execute it at any time with just a click.">
         Save search
     </a>
 
     <div class="save-search-form input-append" style="display: none;">
         <form>
             <input type="text" placeholder="Give the search a title" id="save-search-title" />
-            <button type="submit" class="btn btn-small btn-success do-save" disabled="true">
+            <button type="submit" class="btn btn-sm btn-success do-save" disabled="true">
                 <i class="fa fa-save"></i>&nbsp;
                 Save
             </button>

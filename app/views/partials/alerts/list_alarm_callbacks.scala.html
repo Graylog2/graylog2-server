@@ -18,9 +18,9 @@
 
                 @if(isPermitted(STREAMS_EDIT, stream.getId)) {
                         &nbsp;
-                        <!-- <button type="submit" id="edit-alarm-destination" data-alarm-destination-id="@callback.getId" class="btn btn-success btn-mini">Edit</button> -->
+                        <!-- <button type="submit" id="edit-alarm-destination" data-alarm-destination-id="@callback.getId" class="btn btn-success btn-xs">Edit</button> -->
                     <form action="@routes.AlarmCallbacksController.delete(stream.getId, callback.getId)" method="POST" style="position: relative; top: -1px;">
-                        <button type="submit" class="btn btn-danger btn-mini" data-confirm="Really delete alarm destination?">Delete</button>
+                        <button type="submit" class="btn btn-danger btn-xs" data-confirm="Really delete alarm destination?">Delete</button>
                     </form>
                 }
                 </span>

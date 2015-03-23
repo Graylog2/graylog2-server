@@ -7,7 +7,7 @@
 
     <div class="pull-right">
         <div class="btn-group">
-            <a class="btn btn-info btn-small dropdown-toggle" data-toggle="dropdown" href="#">
+            <a class="btn btn-info btn-sm dropdown-toggle" data-toggle="dropdown" href="#">
                 Actions
                 <span class="caret"></span>
             </a>
@@ -74,7 +74,7 @@
         <h2><i class="fa fa-shield"></i> Buffers</h2>
         <div class="row">
             <div class="col-md-6">
-                <a href="@routes.MetricsController.ofRadio(radio.getId, "org.graylog2.shared.buffers.InputBuffer")" class="btn btn-info btn-mini pull-right">Metrics</a>
+                <a href="@routes.MetricsController.ofRadio(radio.getId, "org.graylog2.shared.buffers.InputBuffer")" class="btn btn-info btn-xs pull-right">Metrics</a>
                 <h3>Input buffer</h3>
 
                 <div class="progress progress-percentage node-buffer-usage">
@@ -84,7 +84,7 @@
                 (<span class="number-format" data-format="0.0%">@radio.getBuffers.getInputBuffer.utilizationPercent%</span> utilized)
             </div>
             <div class="col-md-6">
-                <a href="@routes.MetricsController.ofRadio(radio.getId, "org.graylog2.shared.buffers.ProcessBuffer")" class="btn btn-info btn-mini pull-right">Metrics</a>
+                <a href="@routes.MetricsController.ofRadio(radio.getId, "org.graylog2.shared.buffers.ProcessBuffer")" class="btn btn-info btn-xs pull-right">Metrics</a>
                 <h3>Process buffer</h3>
 
                 <div class="progress progress-percentage node-buffer-usage">
@@ -133,7 +133,7 @@
 
     <div class="row">
         @if(isPermitted(INPUTS_EDIT)) {
-            <a href="@routes.InputsController.manageRadio(radio.getId)" class="btn btn-small btn-success pull-right">
+            <a href="@routes.InputsController.manageRadio(radio.getId)" class="btn btn-sm btn-success pull-right">
                 Manage inputs</a>
         }
         <h2><i class="fa fa-cloud-download"></i> Installed/available input types <span style="font-size: 12px;">@radio.getInputs.size() @pluralize("input", radio.getInputs.size()) running.</span></h2>

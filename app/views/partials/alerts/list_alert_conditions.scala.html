@@ -19,10 +19,10 @@
                 @if(isPermitted(STREAMS_EDIT, stream.getId)) {
                         &nbsp;
                     <form action="@routes.AlertsController.removeCondition(stream.getId, condition.getId)" method="POST">
-                        <button type="submit" class="btn btn-danger btn-mini" data-confirm="Really delete alarm condition?">Delete</button>
+                        <button type="submit" class="btn btn-danger btn-xs" data-confirm="Really delete alarm condition?">Delete</button>
                     </form>
 
-                    <a href="#" class="btn btn-mini edit-alert-condition">Edit</a>
+                    <a href="#" class="btn btn-xs edit-alert-condition">Edit</a>
                 }
                 </span>
 

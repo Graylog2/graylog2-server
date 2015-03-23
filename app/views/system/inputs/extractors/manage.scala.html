@@ -4,7 +4,7 @@
 
     <div class="pull-right">
         <div class="btn-group">
-            <a class="btn btn-info btn-small dropdown-toggle" data-toggle="dropdown" href="#">
+            <a class="btn btn-info btn-sm dropdown-toggle" data-toggle="dropdown" href="#">
                 Actions
                 <span class="caret"></span>
             </a>
@@ -41,11 +41,11 @@
 
             @if(!input.getGlobal) {
             <div class="buttons">
-                <button class="btn btn-success btn-small xtrc-load-recent" data-node-id="@node.getNodeId" data-input-id="@input.getId">
+                <button class="btn btn-success btn-sm xtrc-load-recent" data-node-id="@node.getNodeId" data-input-id="@input.getId">
                     Load a message recently received by this input
                 </button>
 
-                <button class="btn btn-small xtrc-load-manual" data-node-id="@node.getNodeId" data-input-id="@input.getId">
+                <button class="btn btn-sm xtrc-load-manual" data-node-id="@node.getNodeId" data-input-id="@input.getId">
                     Manually load a message
                 </button>
             </div>
@@ -148,16 +148,16 @@
                         <span class="text">Added by @views.html.partials.links.to_user(extractor.getCreatorUser)</span>
                             &nbsp;
 
-                        <button class="btn btn-mini extractor-show-details" type="button" data-extractor-id="@extractor.getId">
+                        <button class="btn btn-xs extractor-show-details" type="button" data-extractor-id="@extractor.getId">
                                 Details
                         </button>
 
                         <form action="@routes.ExtractorsController.editExtractor(node.getNodeId, input.getId, extractor.getId)" method="GET">
-                            <button class="btn btn-mini" type="submit">Edit</button>
+                            <button class="btn btn-xs" type="submit">Edit</button>
                         </form>
 
                         <form action="@routes.ExtractorsController.delete(node.getNodeId, input.getId, extractor.getId)" method="POST">
-                            <button class="btn btn-danger btn-mini" type="submit" data-confirm="Really remove extractor?">
+                            <button class="btn btn-danger btn-xs" type="submit" data-confirm="Really remove extractor?">
                                 Remove
                             </button>
                         </form>

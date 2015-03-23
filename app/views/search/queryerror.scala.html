@@ -5,7 +5,7 @@
 @main("Query error", sidebars.standard(currentUser), query, currentUser) {
 
     @if(savedSearch != null) {
-        <a href="@routes.SavedSearchesController.delete(savedSearch.getId)" class="btn btn-small btn-danger pull-right" data-confirm='Really delete saved search "@savedSearch.getTitle"?'>Delete saved search</a>
+        <a href="@routes.SavedSearchesController.delete(savedSearch.getId)" class="btn btn-sm btn-danger pull-right" data-confirm='Really delete saved search "@savedSearch.getTitle"?'>Delete saved search</a>
     }
 
     <h1>

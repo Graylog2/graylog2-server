@@ -22,7 +22,7 @@
         }
         @if(isPermitted(PROCESSING_CHANGESTATE)) {
             <form action="@routes.InputsController.terminateGlobal(input.getId)" method="POST">
-                <button class="btn btn-danger btn-mini"
+                <button class="btn btn-danger btn-xs"
                 type="submit"
                 data-confirm="Do you really want to terminate this global input, stopping it permanently on all active nodes in the cluster?">
                     <i class="fa fa-remove"></i> Delete

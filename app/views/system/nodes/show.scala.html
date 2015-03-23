@@ -24,7 +24,7 @@
 
             <div class="pull-right">
                 <div class="btn-group">
-                    <a class="btn btn-info btn-small dropdown-toggle" data-toggle="dropdown" href="#">
+                    <a class="btn btn-info btn-sm dropdown-toggle" data-toggle="dropdown" href="#">
                         Actions
                         <span class="caret"></span>
                     </a>
@@ -319,7 +319,7 @@
     <div class="row content">
         <div class="col-md-12">
             @if(isPermitted(INPUTS_EDIT)) {
-            <a href="@routes.InputsController.manage(node.getNodeId)" class="btn btn-small btn-success pull-right">Manage inputs</a>
+            <a href="@routes.InputsController.manage(node.getNodeId)" class="btn btn-sm btn-success pull-right">Manage inputs</a>
             }
             <h2><i class="fa fa-cloud-download"></i> Installed/available input types <span style="font-size: 12px;">@node.getInputs.size() @pluralize("input", node.getInputs.size) running.</span></h2>
 

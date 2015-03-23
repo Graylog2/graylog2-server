@@ -182,7 +182,7 @@
                 Set to reader permissions
             </label>
 
-            <button class="btn btn-warning btn-small" type="submit" data-confirm="Really reset permissions for @user.getName?" style="margin-top: 10px; margin-bottom: 10px;">
+            <button class="btn btn-warning btn-sm" type="submit" data-confirm="Really reset permissions for @user.getName?" style="margin-top: 10px; margin-bottom: 10px;">
                 Set default permissions
             </button>
 
@@ -213,7 +213,7 @@
         </p>
 
         <form action="@routes.StartpageController.reset(user.getName)" method="POST">
-            <button type="submit" class="btn btn-primary btn-small" data-confirm="Really reset startpage?">
+            <button type="submit" class="btn btn-primary btn-sm" data-confirm="Really reset startpage?">
                 Reset custom startpage
             </button>
         </form>
@@ -223,7 +223,7 @@
         <h2><i class="fa fa-table"></i> User preferences</h2>
         <p>User might have to reload the application to make sure changes take effect.</p>
         <span id="react-user-preferences-button" data-user-name="@username">
-            <button class="btn btn-primary btn-small">Edit user preferences</button>
+            <button class="btn btn-primary btn-sm">Edit user preferences</button>
         </span>
     </div>
     <div id="react-user-preferences-modal"></div>
