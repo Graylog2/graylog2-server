@@ -26,131 +26,135 @@
     details
 }
 
-@main("Create a content pack", views.html.system.sidebar(), "", currentUser) {
+@main("Create a content pack", null, "", currentUser) {
     @views.html.partials.breadcrumbs(breadcrumbs)
 
-    <div class="row">
-        <h1><i class="fa fa-sitemap"></i> Create a content pack</h1>
-        Export your inputs, outputs, streams and dashboards as a content pack and share it with the community or other setups.
+    <div class="row content content-header">
+        <div class="col-md-12">
+            <h1><i class="fa fa-sitemap"></i> Create a content pack</h1>
+            <p class="description">Export your inputs, outputs, streams and dashboards as a content pack and share it with the community or other setups.</p>
+        </div>
     </div>
 
-    @helper.form(action = routes.BundlesController.export(), 'class -> "form-horizontal build-content-pack") {
-        <div class="control-group @if(form("name").hasErrors) {error}">
-            <label class="control-label" for="name">Name</label>
-            <div class="controls">
-                <input type="text" id="name" class="input-xlarge" name="name" value="@form("name").value()" required/>
-                <span class="help-block">The name of your configuration bundle.</span>
-            </div>
-        </div>
+    <div class="row content">
+        <div class="col-md-5">
+            <form class="form-horizontal build-content-pack" action="@routes.BundlesController.export()" method="POST">
+                <div class="form-group @if(form("name").hasErrors) {error}">
+                    <label class="col-sm-2 control-label" for="name">Name</label>
+                    <div class="col-sm-10">
+                        <input type="text" id="name" class="input-xlarge form-control" name="name" value="@form("name").value()" required/>
+                        <span class="help-block">The name of your configuration bundle.</span>
+                    </div>
+                </div>
 
-        <div class="control-group @if(form("description").hasErrors) {error}">
-            <label class="control-label" for="description">Description</label>
-            <div class="controls">
-                <textarea rows="6" id="description" name="description" class="input-xlarge" required>@form("description").value()</textarea>
-                <span class="help-block">
-                    A description of what your bundle does and possible special instructions for the user.
-                    You can use <a href="http://daringfireball.net/projects/markdown/syntax" target="_blank">Markdown</a> syntax.
-                </span>
-            </div>
-        </div>
+                <div class="form-group @if(form("description").hasErrors) {error}">
+                    <label class="col-sm-2 control-label" for="description">Description</label>
+                    <div class="col-sm-10">
+                        <textarea rows="6" id="description" name="description" class="input-xlarge form-control" required>@form("description").value()</textarea>
+                        <span class="help-block">
+                            A description of what your bundle does and possible special instructions for the user.
+                            You can use <a href="http://daringfireball.net/projects/markdown/syntax" target="_blank">Markdown</a> syntax.
+                        </span>
+                    </div>
+                </div>
 
-        <div class="control-group @if(form("category").hasErrors) {error}">
-            <label class="control-label" for="category">Category</label>
-            <div class="controls">
-                <input type="text" id="category" name="category" class="input-xlarge" value="@form("category").value()" required/>
-                <span class="help-block">A category for your bundle, e.g. Operating Systems, Firewalls or Switches.</span>
-            </div>
-        </div>
+                <div class="form-group @if(form("category").hasErrors) {error}">
+                    <label class="col-sm-2 control-label" for="category">Category</label>
+                    <div class="col-sm-10">
+                        <input type="text" id="category" name="category" class="input-xlarge form-control" value="@form("category").value()" required/>
+                        <span class="help-block">A category for your bundle, e.g. Operating Systems, Firewalls or Switches.</span>
+                    </div>
+                </div>
 
-        @defining(values(form("inputs"))) { listValues =>
-            <div class="control-group">
-                <label class="control-label" for="inputs">Inputs</label>
-                <div class="controls">
-                    @if(inputs.isEmpty) {
-                        <span class="help-block help-standalone">There are no inputs to export.</span>
-                    } else {
-                        <button type="button" class="btn btn-sm btn-link select-all" data-target="inputs">Select all</button>
-                        @for(i <- inputs.sortBy(_.getTitle)) {
-                            <div class="checkbox-control">
-                                <label class="checkbox"><input type="checkbox" name="inputs" id="input_@i.getId" value="@i.getId" @if(listValues.contains(Some(i.getId))) {checked=""}>@i.getTitle</label>
-                                <span class="help-inline">(@inputDetails(i))</span>
-                            </div>
+                @defining(values(form("inputs"))) { listValues =>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label" for="inputs">Inputs</label>
+                        <div class="col-sm-10">
+                            @if(inputs.isEmpty) {
+                                <span class="help-block help-standalone">There are no inputs to export.</span>
+                            } else {
+                                <button type="button" class="btn btn-sm btn-link select-all" data-target="inputs">Select all</button>
+                                @for(i <- inputs.sortBy(_.getTitle)) {
+                                    <div class="checkbox">
+                                        <label class="checkbox"><input type="checkbox" name="inputs" id="input_@i.getId" value="@i.getId" @if(listValues.contains(Some(i.getId))) {checked=""}>@i.getTitle</label>
+                                        <span class="help-inline">(@inputDetails(i))</span>
+                                    </div>
+                                }
+                            }
+                        </div>
+                    </div>
+                }
+
+                @defining(values(form("outputs"))) { listValues =>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label" for="outputs">Outputs</label>
+                        <div class="col-sm-10">
+                        @if(outputs.isEmpty) {
+                            <span class="help-block help-standalone">There are no outputs to export.</span>
+                        } else {
+                            <button type="button" class="btn btn-sm btn-link select-all" data-target="outputs">Select all</button>
+                            @for(o <- outputs.sortBy(_.getTitle)) {
+                                <div class="checkbox">
+                                    <label class="checkbox"><input type="checkbox" name="outputs" id="output_@o.getId" value="@o.getId" @if(listValues.contains(Some(o.getId))) {checked=""}>@o.getTitle</label>
+                                </div>
+                            }
                         }
-                    }
-                </div>
-            </div>
-        }
-
-        @defining(values(form("outputs"))) { listValues =>
-            <div class="control-group">
-                <label class="control-label" for="outputs">Outputs</label>
-                <div class="controls">
-                @if(outputs.isEmpty) {
-                    <span class="help-block help-standalone">There are no outputs to export.</span>
-                } else {
-                    <button type="button" class="btn btn-sm btn-link select-all" data-target="outputs">Select all</button>
-                    @for(o <- outputs.sortBy(_.getTitle)) {
-                        <div class="checkbox-control">
-                            <label class="checkbox"><input type="checkbox" name="outputs" id="output_@o.getId" value="@o.getId" @if(listValues.contains(Some(o.getId))) {checked=""}>@o.getTitle</label>
                         </div>
-                    }
+                    </div>
                 }
-                </div>
-            </div>
-        }
 
-        @defining(values(form("streams"))) { listValues =>
-            <div class="control-group">
-                <label class="control-label" for="streams">Streams</label>
-                <div class="controls">
-                @if(streams.isEmpty) {
-                    <span class="help-block help-standalone">There are no streams to export.</span>
-                } else {
-                    <button type="button" class="btn btn-sm btn-link select-all" data-target="streams">Select all</button>
-                    @for(s <- streams.sortBy(_.getTitle)) {
-                        <div class="checkbox-control">
-                            <label class="checkbox"><input type="checkbox" name="streams" id="stream_@s.getId" value="@s.getId" @if(listValues.contains(Some(s.getId))) {checked=""}>@s.getTitle</label>
+                @defining(values(form("streams"))) { listValues =>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label" for="streams">Streams</label>
+                        <div class="col-sm-10">
+                        @if(streams.isEmpty) {
+                            <span class="help-block help-standalone">There are no streams to export.</span>
+                        } else {
+                            <button type="button" class="btn btn-sm btn-link select-all" data-target="streams">Select all</button>
+                            @for(s <- streams.sortBy(_.getTitle)) {
+                                <div class="checkbox">
+                                    <label class="checkbox"><input type="checkbox" name="streams" id="stream_@s.getId" value="@s.getId" @if(listValues.contains(Some(s.getId))) {checked=""}>@s.getTitle</label>
+                                </div>
+                            }
+                        }
                         </div>
-                    }
+                    </div>
                 }
-                </div>
-            </div>
-        }
 
-        @defining(values(form("dashboards"))) { listValues =>
-            <div class="control-group">
-                <label class="control-label" for="dashboards">Dashboards</label>
-                <div class="controls">
-                @if(dashboards.isEmpty) {
-                    <span class="help-block help-standalone">There are no dashboards to export.</span>
-                } else {
-                    <button type="button" class="btn btn-sm btn-link select-all" data-target="dashboards">Select all</button>
-                    @for(d <- dashboards.sortBy(_.getTitle)) {
-                        <div class="checkbox-control">
-                            <label class="checkbox"><input type="checkbox" name="dashboards" id="dashboard_@d.getId" value="@d.getId" @if(listValues.contains(Some(d.getId))) {checked=""}>@d.getTitle</label>
+                @defining(values(form("dashboards"))) { listValues =>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label" for="dashboards">Dashboards</label>
+                        <div class="col-sm-10">
+                        @if(dashboards.isEmpty) {
+                            <span class="help-block help-standalone">There are no dashboards to export.</span>
+                        } else {
+                            <button type="button" class="btn btn-sm btn-link select-all" data-target="dashboards">Select all</button>
+                            @for(d <- dashboards.sortBy(_.getTitle)) {
+                                <div class="checkbox">
+                                    <label class="checkbox"><input type="checkbox" name="dashboards" id="dashboard_@d.getId" value="@d.getId" @if(listValues.contains(Some(d.getId))) {checked=""}>@d.getTitle</label>
+                                </div>
+                            }
+                        }
                         </div>
-                    }
+                    </div>
                 }
+
+                <div class="form-group">
+                    <div class="col-sm-10">
+                        <button type="submit" class="btn btn-success">
+                            <i class="fa fa-cloud-download"></i>
+                            Download my content pack
+                        </button>
+
+                        <br /><br />
+                        <p>
+                            <i class="fa fa-lightbulb"></i>&nbsp;
+                            Share your content pack with the community on <a href="https://www.graylog.org/resources/data-sources/" target="_blank">graylog.org</a>
+                            after you have downloaded it.
+                        </p>
+                    </div>
                 </div>
-            </div>
-        }
-
-        <div class="control-group">
-            <div class="controls">
-                <button type="submit" class="btn btn-success">
-                    <i class="fa fa-cloud-download"></i>
-                    Download my content pack
-                </button>
-
-                <br /><br />
-                <p>
-                    <i class="fa fa-lightbulb"></i>&nbsp;
-                    Share your content pack with the community on <a href="https://www.graylog.org/resources/data-sources/" target="_blank">graylog.org</a>
-                    after you have downloaded it.
-                </p>
-            </div>
+            </form>
         </div>
-
-
-    }
+    </div>
 }
