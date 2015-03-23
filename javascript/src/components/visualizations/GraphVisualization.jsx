@@ -9,6 +9,7 @@ var dc = require('dc');
 var d3 = require('d3');
 var $ = require('jquery');
 
+var NumberUtils = require("../../util/NumberUtils");
 var D3Utils = require('../../util/D3Utils');
 
 var GraphFactory = {
@@ -17,16 +18,52 @@ var GraphFactory = {
         switch(renderer) {
             case 'line':
                 graph = dc.lineChart(domNode);
+                this.tooltipRenderlet(graph, '.chart-body circle.dot');
+                break;
+            case 'area':
+                graph = dc.lineChart(domNode);
+                graph.renderArea(true);
+                this.tooltipRenderlet(graph, '.chart-body circle.dot');
                 break;
             case 'bar':
                 graph = dc.barChart(domNode);
                 graph.centerBar(true);
+                this.tooltipRenderlet(graph, '.chart-body rect.bar');
+                break;
+            case 'scatterplot':
+                graph = dc.scatterPlot(domNode);
+                graph
+                    .symbolSize(5)
+                    .highlightedSize(10)
+                    // We need accessors to workaround this: https://github.com/dc-js/dc.js/issues/870
+                    .keyAccessor((d) => d.key)
+                    .valueAccessor((d) => d.value);
+                this.tooltipRenderlet(graph, '.chart-body path.symbol');
                 break;
             default:
-                console.log("Unsupported renderer '" + renderer +"'");
+                throw "Unsupported renderer '" + renderer + "'";
         }
 
         return graph;
+    },
+    // Add a data element to the given D3 selection to show a bootstrap tooltip
+    tooltipRenderlet(graph, selector) {
+        graph.on('renderlet', (chart) => {
+            var formatTitle = (d) => {
+                var formattedValue;
+                try {
+                    formattedValue = numeral(d.y).format("0,0.[00]");
+                } catch (e) {
+                    formattedValue = d3.format(".2r")(d.y);
+                }
+
+                return formattedValue + " messages<br>" + d.x.format(momentHelper.DATE_FORMAT_TZ);
+            };
+
+            d3.select(chart.root()[0][0]).selectAll(selector)
+                .attr('rel', 'tooltip')
+                .attr('data-original-title', formatTitle);
+        })
     }
 };
 
@@ -67,16 +104,7 @@ var GraphVisualization = React.createClass({
             .xAxisLabel(this._formatInterval())
             .yAxisLabel(this.props.config.field)
             .renderTitle(false)
-            .colors(D3Utils.glColourPalette())
-            .on('renderlet', (_) => {
-                var formatTitle = (d) => {
-                    return numeral(d.y).format("0,0.[00]") + " messages<br>" + d.x.format(momentHelper.DATE_FORMAT_TZ);
-                };
-
-                d3.select(graphDomNode).selectAll('.chart-body circle.dot')
-                    .attr('rel', 'tooltip')
-                    .attr('data-original-title', formatTitle);
-            });
+            .colors(D3Utils.glColourPalette());
 
         $(graphDomNode).tooltip({
             'selector': '[rel="tooltip"]',
@@ -101,7 +129,13 @@ var GraphVisualization = React.createClass({
     processData(data) {
         var formattedData = [];
         for(var key in data) {
-            formattedData.push({x: Number(key), y: data[key][this.props.config.valuetype]});
+            if (data.hasOwnProperty(key)) {
+                var normalizedValue = NumberUtils.normalizeNumber(data[key][this.props.config.valuetype]);
+                formattedData.push({
+                    x: Number(key),
+                    y: isNaN(normalizedValue) ? 0 : normalizedValue
+                });
+            }
         }
         this.setState({processedData: formattedData}, this.drawData);
     },
