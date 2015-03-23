@@ -83,10 +83,6 @@ public abstract class RestResource {
         }
     }
 
-    protected int page(int page) {
-        return Math.max(0, page - 1);
-    }
-
     protected Subject getSubject() {
         if (securityContext == null) {
             LOG.error("Cannot retrieve current subject, SecurityContext isn't set.");
@@ -121,40 +117,6 @@ public abstract class RestResource {
         if (!isPermitted(permission, instanceId)) {
             throw new ForbiddenException("Not authorized to access resource id " + instanceId);
         }
-    }
-
-    protected Map<String, Long> bytesToValueMap(long bytes) {
-        final Size size = Size.bytes(bytes);
-        return ImmutableMap.of(
-                "bytes", size.toBytes(),
-                "kilobytes", size.toKilobytes(),
-                "megabytes", size.toMegabytes());
-    }
-
-    protected String guessContentType(final String filename) {
-        // A really dumb but for us good enough approach. We only need this for a very few static files we control.
-
-        if (filename.endsWith(".png")) {
-            return "image/png";
-        }
-
-        if (filename.endsWith(".gif")) {
-            return "image/gif";
-        }
-
-        if (filename.endsWith(".css")) {
-            return "text/css";
-        }
-
-        if (filename.endsWith(".js")) {
-            return "application/javascript";
-        }
-
-        if (filename.endsWith(".html")) {
-            return MediaType.TEXT_HTML;
-        }
-
-        return MediaType.TEXT_PLAIN;
     }
 
     protected void restrictToMaster() {

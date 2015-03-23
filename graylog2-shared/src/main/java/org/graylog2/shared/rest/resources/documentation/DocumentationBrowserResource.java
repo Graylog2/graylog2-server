@@ -24,6 +24,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.net.URL;
@@ -64,5 +65,31 @@ public class DocumentationBrowserResource extends RestResource {
         } else {
             throw new NotFoundException();
         }
+    }
+
+    private String guessContentType(final String filename) {
+        // A really dumb but for us good enough approach. We only need this for a very few static files we control.
+
+        if (filename.endsWith(".png")) {
+            return "image/png";
+        }
+
+        if (filename.endsWith(".gif")) {
+            return "image/gif";
+        }
+
+        if (filename.endsWith(".css")) {
+            return "text/css";
+        }
+
+        if (filename.endsWith(".js")) {
+            return "application/javascript";
+        }
+
+        if (filename.endsWith(".html")) {
+            return MediaType.TEXT_HTML;
+        }
+
+        return MediaType.TEXT_PLAIN;
     }
 }
