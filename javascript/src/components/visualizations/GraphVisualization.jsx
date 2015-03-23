@@ -93,7 +93,7 @@ var GraphVisualization = React.createClass({
         this.graph
             .width(810)
             .height(120)
-            .margins({left: 35, right: 15, top: 10, bottom: 30})
+            .margins({left: 50, right: 15, top: 10, bottom: 35})
             .dimension(this.dimension)
             .group(this.group)
             .x(d3.time.scale())
@@ -120,7 +120,9 @@ var GraphVisualization = React.createClass({
             .tickFormat(graphHelper.customDateTimeFormat());
         this.graph.yAxis()
             .ticks(3)
-            .tickFormat(d3.format("s"));
+            .tickFormat((value) => {
+                return Math.abs(value) > 1e+30 ? value.toPrecision(1) : d3.format(".2s")(value);
+            });
         this.graph.render();
     },
     _formatInterval() {
