@@ -127,7 +127,6 @@ public class DashboardsResource extends RestResource {
     @ApiResponses(value = {
             @ApiResponse(code = 403, message = "Request must be performed against master node.")
     })
-    @RestrictToMaster
     public DashboardList list() {
         final List<Map<String, Object>> dashboards = Lists.newArrayList();
         for (Dashboard dashboard : dashboardService.all()) {
