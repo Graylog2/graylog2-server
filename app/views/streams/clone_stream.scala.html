@@ -1,6 +1,6 @@
 @(currentUser: org.graylog2.restclient.models.User, streamId: String, breadcrumbs: lib.BreadcrumbList)
 
-@main("Clone stream", views.html.sidebars.standard(currentUser), "", currentUser, false) {
+@main("Clone stream", null, "", currentUser, false) {
 
     @views.html.partials.breadcrumbs(breadcrumbs)
 

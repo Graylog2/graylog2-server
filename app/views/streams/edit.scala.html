@@ -1,6 +1,6 @@
 @(currentUser: org.graylog2.restclient.models.User, stream: org.graylog2.restclient.models.Stream, breadcrumbs: lib.BreadcrumbList)
 
-@main("Edit stream", views.html.sidebars.standard(currentUser), "", currentUser, false) {
+@main("Edit stream", null, "", currentUser, false) {
     @views.html.partials.breadcrumbs(breadcrumbs)
 
     <div class="row content content-head">
