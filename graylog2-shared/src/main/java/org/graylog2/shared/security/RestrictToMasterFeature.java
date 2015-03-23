@@ -26,10 +26,12 @@ import java.lang.reflect.Method;
 
 public class RestrictToMasterFeature implements DynamicFeature {
     private final ServerStatus serverStatus;
+    private final RestrictToMasterFilter restrictToMasterFilter;
 
     @Inject
     public RestrictToMasterFeature(ServerStatus serverStatus) {
         this.serverStatus = serverStatus;
+        this.restrictToMasterFilter = new RestrictToMasterFilter();
     }
 
     @Override
@@ -41,7 +43,7 @@ public class RestrictToMasterFeature implements DynamicFeature {
             return;
 
         if (resourceMethod.isAnnotationPresent(RestrictToMaster.class) || resourceClass.isAnnotationPresent(RestrictToMaster.class)) {
-            context.register(new RestrictToMasterFilter());
+            context.register(restrictToMasterFilter);
         }
     }
 }
