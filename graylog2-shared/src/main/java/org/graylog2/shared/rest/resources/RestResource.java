@@ -59,9 +59,6 @@ public abstract class RestResource {
     protected UserService userService;
 
     @Inject
-    protected ServerStatus serverStatus;
-
-    @Inject
     private BaseConfiguration configuration;
 
     @Context
@@ -116,13 +113,6 @@ public abstract class RestResource {
     protected void checkPermission(String permission, String instanceId) {
         if (!isPermitted(permission, instanceId)) {
             throw new ForbiddenException("Not authorized to access resource id " + instanceId);
-        }
-    }
-
-    protected void restrictToMaster() {
-        if (!serverStatus.hasCapability(ServerStatus.Capability.MASTER)) {
-            LOG.warn("Rejected request that is only allowed against master nodes. Returning HTTP 403.");
-            throw new ForbiddenException("Request is only allowed against master nodes.");
         }
     }
 

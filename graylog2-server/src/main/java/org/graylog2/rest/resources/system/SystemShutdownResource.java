@@ -20,6 +20,7 @@ import com.codahale.metrics.annotation.Timed;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.graylog2.plugin.ServerStatus;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.system.shutdown.GracefulShutdown;
@@ -36,10 +37,13 @@ import static javax.ws.rs.core.Response.accepted;
 @Path("/system/shutdown")
 public class SystemShutdownResource extends RestResource {
     private final GracefulShutdown gracefulShutdown;
+    private final ServerStatus serverStatus;
 
     @Inject
-    public SystemShutdownResource(GracefulShutdown gracefulShutdown) {
+    public SystemShutdownResource(GracefulShutdown gracefulShutdown,
+                                  ServerStatus serverStatus) {
         this.gracefulShutdown = gracefulShutdown;
+        this.serverStatus = serverStatus;
     }
 
     @POST
