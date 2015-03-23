@@ -233,7 +233,7 @@ $(document).ready(function() {
             if (streamruleId != undefined) {
                 var matchStatus = $("i.match-status", rule);
                 matchStatus.show();
-                matchStatus.addClass("icon");
+                matchStatus.addClass("fa");
 
                 var match = rules[streamruleId];
                 if (match != undefined) {
