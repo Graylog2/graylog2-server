@@ -418,7 +418,7 @@
             <dependency>
                 <groupId>org.graylog2</groupId>
                 <artifactId>jersey-netty</artifactId>
-                <version>1.5</version>
+                <version>1.5.1</version>
             </dependency>
 
             <dependency>
