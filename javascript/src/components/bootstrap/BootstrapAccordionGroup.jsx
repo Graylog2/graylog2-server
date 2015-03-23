@@ -13,12 +13,14 @@ var BootstrapAccordionGroup = React.createClass({
         }
 
         return (
-            <div className="accordion-group">
-                <div className="accordion-heading">
-                    <a href={"#" + id} data-parent="#bundles" data-toggle="collapse" className="accordion-toggle">{name}</a>
+            <div className="panel panel-default">
+                <div className="panel-heading">
+                    <h4 className="panel-title">
+                        <a href={"#" + id} data-parent="#bundles" data-toggle="collapse" className="collapsed">{name}</a>
+                    </h4>
                 </div>
-                <div className="accordion-body collapse" id={id}>
-                    <div className="accordion-inner">
+                <div className="panel-collapse collapse" id={id}>
+                    <div className="panel-body">
                         {this.props.children}
                     </div>
                 </div>

@@ -5,7 +5,7 @@ var React = require('react');
 var BootstrapAccordion = React.createClass({
     render() {
         return (
-            <div id="bundles" className="accordion">
+            <div id="bundles" className="panel-group">
                 {this.props.children}
             </div>
         );
