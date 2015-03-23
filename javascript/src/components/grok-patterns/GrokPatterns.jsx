@@ -38,7 +38,7 @@ var GrokPatterns = React.createClass({
                     <td>{pattern.name}</td>
                     <td>{pattern.pattern}</td>
                     <td>
-                        <button style={{marginRight: 5}} className="btn btn-danger btn-small" onClick={this.confirmedRemove.bind(this, pattern)}>
+                        <button style={{marginRight: 5}} className="btn btn-danger btn-xs" onClick={this.confirmedRemove.bind(this, pattern)}>
                             <i className="fa fa-remove"></i> Delete
                         </button>
                         <EditPatternModal id={pattern.id} name={pattern.name} pattern={pattern.pattern} create={false} reload={this.loadData} savePattern={this.savePattern} validPatternName={this.validPatternName}/>
@@ -87,19 +87,25 @@ var GrokPatterns = React.createClass({
         }
 
         return (
-            <div style={{paddingTop: 15}}>
+            <div>
                 <div className="row">
-                    <form className="form-inline grok-filter-form">
-                        <label htmlFor="grokfilter">Filter pattern names:</label>
-                        <input type="text" name="filter" id="grokfilter" value={this.state.filter} onChange={(event) => {this.setState({filter: event.target.value});}} />
-                    </form>
-                    <div className="pull-right">
-                        <BulkLoadPatternModal />
-                        <EditPatternModal id={""} name={""} pattern={""} create={true} reload={this.loadData} savePattern={this.savePattern} validPatternName={this.validPatternName}/>
+                    <div className="col-md-12">
+                        <form className="form-inline grok-filter-form">
+                            <label htmlFor="grokfilter">Filter pattern names:</label>
+                            <input type="text" name="filter" id="grokfilter" value={this.state.filter} onChange={(event) => {this.setState({filter: event.target.value});}} />
+                        </form>
+                        <div className="pull-right">
+                            <BulkLoadPatternModal />
+                            <EditPatternModal id={""} name={""} pattern={""} create={true} reload={this.loadData} savePattern={this.savePattern} validPatternName={this.validPatternName}/>
+                        </div>
+                        <div className="row">
+                            <div className="col-md-12">
+                                <div className="grok-patterns">
+                                {patterns}
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                </div>
-                <div className="grok-patterns row">
-                    {patterns}
                 </div>
             </div>
         );
