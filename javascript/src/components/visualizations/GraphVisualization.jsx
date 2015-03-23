@@ -50,6 +50,8 @@ var GraphFactory = {
     tooltipRenderlet(graph, selector) {
         graph.on('renderlet', (chart) => {
             var formatTitle = (d) => {
+                var formattedKey = d.x === undefined ? d.x : d.x.format(momentHelper.DATE_FORMAT_TZ);
+
                 var formattedValue;
                 try {
                     formattedValue = numeral(d.y).format("0,0.[00]");
@@ -57,13 +59,13 @@ var GraphFactory = {
                     formattedValue = d3.format(".2r")(d.y);
                 }
 
-                return formattedValue + " messages<br>" + d.x.format(momentHelper.DATE_FORMAT_TZ);
+                return formattedValue + " messages<br>" + formattedKey;
             };
 
             d3.select(chart.root()[0][0]).selectAll(selector)
                 .attr('rel', 'tooltip')
                 .attr('data-original-title', formatTitle);
-        })
+        });
     }
 };
 
