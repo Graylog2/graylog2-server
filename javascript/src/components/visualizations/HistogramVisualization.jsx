@@ -35,7 +35,7 @@ var HistogramVisualization = React.createClass({
         this.histogram
             .width(810)
             .height(120)
-            .margins({left: 35, right: 15, top: 10, bottom: 30})
+            .margins({left: 50, right: 15, top: 10, bottom: 30})
             .dimension(this.dimension)
             .group(this.group)
             .x(d3.time.scale())

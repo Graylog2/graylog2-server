@@ -44,6 +44,11 @@ var GraphFactory = {
                 throw "Unsupported renderer '" + renderer + "'";
         }
 
+        // Bar charts with clip padding overflow the x axis
+        if(renderer !== 'bar') {
+            graph.clipPadding(5);
+        }
+
         return graph;
     },
     // Add a data element to the given D3 selection to show a bootstrap tooltip
@@ -144,7 +149,7 @@ var GraphVisualization = React.createClass({
         this.setState({processedData: formattedData}, this.drawData);
     },
     drawData() {
-        this.graph.xUnits(() => this.state.processedData.length - 1);
+        this.graph.xUnits(() => Math.max(this.state.processedData.length - 1, 1));
         this.graphData.remove();
         this.graphData.add(this.state.processedData);
         this.graph.redraw();
