@@ -18,6 +18,7 @@ package org.graylog2.shared.bindings;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.multibindings.Multibinder;
+import org.graylog2.periodical.ThroughputCalculator;
 import org.graylog2.periodical.ThroughputCounterManagerThread;
 import org.graylog2.plugin.periodical.Periodical;
 
@@ -29,5 +30,7 @@ public class SharedPeriodicalBindings extends AbstractModule {
     protected void configure() {
         Multibinder<Periodical> periodicalBinder = Multibinder.newSetBinder(binder(), Periodical.class);
         periodicalBinder.addBinding().to(ThroughputCounterManagerThread.class);
+        periodicalBinder.addBinding().to(ThroughputCalculator.class);
+
     }
 }

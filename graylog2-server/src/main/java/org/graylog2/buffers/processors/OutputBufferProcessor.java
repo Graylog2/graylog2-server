@@ -16,7 +16,7 @@
  */
 package org.graylog2.buffers.processors;
 
-import com.codahale.metrics.Histogram;
+import com.codahale.metrics.Counter;
 import com.codahale.metrics.InstrumentedExecutorService;
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
@@ -24,7 +24,6 @@ import com.codahale.metrics.Timer;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.common.util.concurrent.Uninterruptibles;
-import javax.inject.Inject;
 import com.lmax.disruptor.WorkHandler;
 import org.graylog2.Configuration;
 import org.graylog2.outputs.DefaultMessageOutput;
@@ -33,10 +32,12 @@ import org.graylog2.plugin.Message;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.buffers.MessageEvent;
 import org.graylog2.plugin.outputs.MessageOutput;
+import org.graylog2.plugin.GlobalMetricNames;
 import org.graylog2.shared.stats.ThroughputStats;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
@@ -52,6 +53,9 @@ public class OutputBufferProcessor implements WorkHandler<MessageEvent> {
 
     private static final Logger LOG = LoggerFactory.getLogger(OutputBufferProcessor.class);
 
+    public static final String INCOMING_MESSAGES_METRICNAME = name(OutputBufferProcessor.class, "incomingMessages");
+    public static final String PROCESS_TIME_METRICNAME = name(OutputBufferProcessor.class, "processTime");
+
     private final ExecutorService executor;
 
     private final Configuration configuration;
@@ -61,7 +65,7 @@ public class OutputBufferProcessor implements WorkHandler<MessageEvent> {
     //private List<Message> buffer = Lists.newArrayList();
 
     private final Meter incomingMessages;
-    private final Histogram batchSize;
+    private final Counter outputThroughput;
     private final Timer processTime;
 
     private final OutputRouter outputRouter;
@@ -86,9 +90,9 @@ public class OutputBufferProcessor implements WorkHandler<MessageEvent> {
         final int keepAliveTime = configuration.getOutputBufferProcessorKeepAliveTime();
         this.executor = executorService(metricRegistry, nameFormat, corePoolSize, maxPoolSize, keepAliveTime);
 
-        this.incomingMessages = metricRegistry.meter(name(OutputBufferProcessor.class, "incomingMessages"));
-        this.batchSize = metricRegistry.histogram(name(OutputBufferProcessor.class, "batchSize"));
-        this.processTime = metricRegistry.timer(name(OutputBufferProcessor.class, "processTime"));
+        this.incomingMessages = metricRegistry.meter(INCOMING_MESSAGES_METRICNAME);
+        this.outputThroughput = metricRegistry.counter(GlobalMetricNames.OUTPUT_THROUGHPUT);
+        this.processTime = metricRegistry.timer(PROCESS_TIME_METRICNAME);
     }
 
     private ExecutorService executorService(final MetricRegistry metricRegistry, final String nameFormat,
@@ -158,11 +162,9 @@ public class OutputBufferProcessor implements WorkHandler<MessageEvent> {
         if (msg.hasRecordings()) {
             LOG.debug("Message event trace: {}", msg.recordingsAsString());
         }
-        if (serverStatus.hasCapability(ServerStatus.Capability.STATSMODE)) {
-            throughputStats.getBenchmarkCounter().increment();
-        }
 
         throughputStats.getThroughputCounter().increment();
+        outputThroughput.inc();
 
         LOG.debug("Wrote message <{}> to all outputs. Finished handling.", msg.getId());
     }

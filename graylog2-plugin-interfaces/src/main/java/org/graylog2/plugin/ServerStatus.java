@@ -25,7 +25,6 @@ package org.graylog2.plugin;
 import com.google.common.collect.Sets;
 import com.google.common.eventbus.EventBus;
 import com.google.common.util.concurrent.Uninterruptibles;
-import javax.inject.Inject;
 import org.graylog2.plugin.lifecycles.Lifecycle;
 import org.graylog2.plugin.system.NodeId;
 import org.joda.time.DateTime;
@@ -33,6 +32,7 @@ import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.util.Arrays;
 import java.util.Set;
@@ -51,7 +51,6 @@ public class ServerStatus {
         SERVER,
         RADIO,
         MASTER,
-        STATSMODE,
         LOCALMODE
     }
 
@@ -201,14 +200,6 @@ public class ServerStatus {
 
     public void unlockProcessingPause() {
         processingPauseLocked.set(false);
-    }
-
-    public void setStatsMode(boolean statsMode) {
-        if (statsMode) {
-            addCapability(Capability.STATSMODE);
-        } else {
-            removeCapability(Capability.STATSMODE);
-        }
     }
 
     private ServerStatus removeCapability(Capability capability) {

@@ -177,8 +177,8 @@ public class ServerStatusTest {
 
     @Test
     public void testAddCapabilities() throws Exception {
-        assertEquals(status.addCapabilities(ServerStatus.Capability.LOCALMODE, ServerStatus.Capability.STATSMODE), status);
-        assertTrue(status.hasCapabilities(ServerStatus.Capability.MASTER, ServerStatus.Capability.LOCALMODE, ServerStatus.Capability.STATSMODE));
+        assertEquals(status.addCapabilities(ServerStatus.Capability.LOCALMODE), status);
+        assertTrue(status.hasCapabilities(ServerStatus.Capability.MASTER, ServerStatus.Capability.LOCALMODE));
     }
 
     @Test
@@ -234,15 +234,6 @@ public class ServerStatusTest {
 
         status.unlockProcessingPause();
         assertFalse(status.processingPauseLocked());
-    }
-
-    @Test
-    public void testSetStatsMode() throws Exception {
-        status.setStatsMode(false);
-        assertFalse(status.hasCapability(ServerStatus.Capability.STATSMODE));
-
-        status.setStatsMode(true);
-        assertTrue(status.hasCapability(ServerStatus.Capability.STATSMODE));
     }
 
     @Test
