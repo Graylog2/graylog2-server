@@ -77,4 +77,8 @@ public class MessagesResource extends RestResource {
                 "messages", messages,
                 "total", systemMessageService.totalCount());
     }
+
+    private int page(int page) {
+        return Math.max(0, page - 1);
+    }
 }

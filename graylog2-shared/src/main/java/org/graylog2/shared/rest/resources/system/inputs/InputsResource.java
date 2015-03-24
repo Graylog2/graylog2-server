@@ -41,6 +41,7 @@ import org.graylog2.shared.inputs.InputRegistry;
 import org.graylog2.shared.inputs.MessageInputFactory;
 import org.graylog2.shared.inputs.NoSuchInputTypeException;
 import org.graylog2.rest.models.system.inputs.requests.InputLaunchRequest;
+import org.graylog2.shared.security.RestrictToMaster;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -74,16 +75,19 @@ public class InputsResource extends RestResource {
     private final MessageInputFactory messageInputFactory;
     private final InputLauncher inputLauncher;
     private final PersistedInputs persistedInputs;
+    private final ServerStatus serverStatus;
 
     @Inject
     public InputsResource(InputRegistry inputRegistry,
                           MessageInputFactory messageInputFactory,
                           InputLauncher inputLauncher,
-                          PersistedInputs persistedInputs) {
+                          PersistedInputs persistedInputs,
+                          ServerStatus serverStatus) {
         this.inputRegistry = inputRegistry;
         this.messageInputFactory = messageInputFactory;
         this.inputLauncher = inputLauncher;
         this.persistedInputs = persistedInputs;
+        this.serverStatus = serverStatus;
     }
 
     @GET
@@ -165,9 +169,9 @@ public class InputsResource extends RestResource {
             @ApiResponse(code = 400, message = "Missing or invalid configuration"),
             @ApiResponse(code = 400, message = "Type is exclusive and already has input running")
     })
+    @RestrictToMaster
     public Response create(@ApiParam(name = "JSON body", required = true)
                            @Valid @NotNull InputLaunchRequest lr) throws ValidationException {
-        restrictToMaster();
         checkPermission(RestPermissions.INPUTS_CREATE);
 
         // Build input.

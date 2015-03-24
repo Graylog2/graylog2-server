@@ -22,10 +22,12 @@ import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.lifecycles.LoadBalancerStatus;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 
+import javax.inject.Inject;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
@@ -44,6 +46,13 @@ public class LoadBalancerStatusResource extends RestResource {
      *             acccess for load balancers. think about this
      *             when adding more stuff.
      */
+
+    private final ServerStatus serverStatus;
+
+    @Inject
+    public LoadBalancerStatusResource(ServerStatus serverStatus) {
+        this.serverStatus = serverStatus;
+    }
 
     @GET
     @Timed

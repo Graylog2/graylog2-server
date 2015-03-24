@@ -18,6 +18,8 @@ package org.graylog2.shared.rest.resources.system;
 
 import com.codahale.metrics.annotation.Timed;
 import com.codahale.metrics.jvm.ThreadDump;
+import com.github.joschi.jadconfig.util.Size;
+import com.google.common.collect.ImmutableMap;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
@@ -36,6 +38,7 @@ import javax.ws.rs.Produces;
 import java.io.ByteArrayOutputStream;
 import java.lang.management.ManagementFactory;
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static javax.ws.rs.core.MediaType.TEXT_PLAIN;
@@ -109,5 +112,13 @@ public class SystemResource extends RestResource {
 
         threadDump.dump(output);
         return new String(output.toByteArray(), StandardCharsets.UTF_8);
+    }
+
+    private Map<String, Long> bytesToValueMap(long bytes) {
+        final Size size = Size.bytes(bytes);
+        return ImmutableMap.of(
+                "bytes", size.toBytes(),
+                "kilobytes", size.toKilobytes(),
+                "megabytes", size.toMegabytes());
     }
 }

@@ -33,6 +33,7 @@ import org.graylog2.plugin.indexer.rotation.RotationStrategy;
 import org.graylog2.rest.resources.system.responses.DeflectorConfigResponse;
 import org.graylog2.rest.resources.system.responses.MessageCountRotationStrategyResponse;
 import org.graylog2.rest.resources.system.responses.SizeBasedRotationStrategyResponse;
+import org.graylog2.shared.security.RestrictToMaster;
 import org.graylog2.shared.system.activities.Activity;
 import org.graylog2.shared.system.activities.ActivityWriter;
 import org.slf4j.Logger;
@@ -88,9 +89,8 @@ public class DeflectorResource extends RestResource {
     @RequiresPermissions(RestPermissions.DEFLECTOR_READ)
     @Path("/config")
     @Produces(MediaType.APPLICATION_JSON)
+    @RestrictToMaster
     public DeflectorConfigResponse config() {
-        restrictToMaster();
-
         final RotationStrategy strategy = rotationStrategyProvider.get();
         DeflectorConfigResponse response = null;
 
@@ -114,9 +114,8 @@ public class DeflectorResource extends RestResource {
     @ApiOperation(value = "Cycle deflector to new/next index")
     @RequiresPermissions(RestPermissions.DEFLECTOR_CYCLE)
     @Path("/cycle")
+    @RestrictToMaster
     public void cycle() {
-        restrictToMaster();
-
         final String msg = "Cycling deflector. Reason: REST request.";
         LOG.info(msg);
         activityWriter.write(new Activity(msg, DeflectorResource.class));

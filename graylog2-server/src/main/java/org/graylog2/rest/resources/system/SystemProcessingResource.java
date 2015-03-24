@@ -21,11 +21,13 @@ import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.plugin.ProcessingPauseLockedException;
+import org.graylog2.plugin.ServerStatus;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
 import javax.ws.rs.ForbiddenException;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
@@ -35,6 +37,13 @@ import javax.ws.rs.Path;
 @Path("/system/processing")
 public class SystemProcessingResource extends RestResource {
     private static final Logger LOG = LoggerFactory.getLogger(SystemProcessingResource.class);
+
+    private final ServerStatus serverStatus;
+
+    @Inject
+    public SystemProcessingResource(ServerStatus serverStatus) {
+        this.serverStatus = serverStatus;
+    }
 
     // TODO Change to @POST
     @PUT
