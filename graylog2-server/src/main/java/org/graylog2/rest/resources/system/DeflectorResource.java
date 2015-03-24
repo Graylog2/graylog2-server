@@ -24,6 +24,8 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.indexer.Deflector;
+import org.graylog2.rest.models.system.deflector.responses.DeflectorSummary;
+import org.graylog2.rest.models.system.responses.TimeBasedRotationStrategyResponse;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.indexer.rotation.MessageCountRotationStrategy;
@@ -77,10 +79,8 @@ public class DeflectorResource extends RestResource {
     @ApiOperation(value = "Get current deflector status")
     @RequiresPermissions(RestPermissions.DEFLECTOR_READ)
     @Produces(MediaType.APPLICATION_JSON)
-    public Map<String, Object> deflector() {
-        return ImmutableMap.<String, Object>of(
-                "is_up", deflector.isUp(),
-                "current_target", deflector.getCurrentActualTargetIndex());
+    public DeflectorSummary deflector() {
+        return DeflectorSummary.create(deflector.isUp(), deflector.getCurrentActualTargetIndex());
     }
 
     @GET
