@@ -48,7 +48,7 @@ function updateWidget_field_chart(widget, data) {
     for (var key in data.result) {
         var point = {
             x: parseInt(key),
-            y: data.result[key][graphElem.attr("data-config-valuetype")]
+            y: data.result[key]
         };
 
         series.push(point);

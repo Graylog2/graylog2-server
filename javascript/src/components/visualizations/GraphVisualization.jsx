@@ -139,7 +139,7 @@ var GraphVisualization = React.createClass({
         var formattedData = [];
         for(var key in data) {
             if (data.hasOwnProperty(key)) {
-                var normalizedValue = NumberUtils.normalizeNumber(data[key][this.props.config.valuetype]);
+                var normalizedValue = NumberUtils.normalizeNumber(data[key]);
                 formattedData.push({
                     x: Number(key),
                     y: isNaN(normalizedValue) ? 0 : normalizedValue

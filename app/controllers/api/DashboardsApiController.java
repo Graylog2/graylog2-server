@@ -177,7 +177,7 @@ public class DashboardsApiController extends AuthenticatedController {
             DashboardWidgetValueResponse widgetValue = widget.getValue(api());
 
             Object resultValue;
-            if (widget instanceof SearchResultChartWidget) {
+            if (widget instanceof SearchResultChartWidget || widget instanceof FieldChartWidget) {
                 resultValue = formatWidgetValueResults(resolution, widget, widgetValue);
             } else {
                 resultValue = widgetValue.result;
@@ -198,7 +198,7 @@ public class DashboardsApiController extends AuthenticatedController {
         }
     }
 
-    protected Map<String, Long> formatWidgetValueResults(final int maxDataPoints,
+    protected Map<String, Object> formatWidgetValueResults(final int maxDataPoints,
                                                                final DashboardWidget widget,
                                                                final DashboardWidgetValueResponse widgetValue) {
         final Map<String, Object> widgetConfig = widget.getConfig();
@@ -207,18 +207,20 @@ public class DashboardsApiController extends AuthenticatedController {
 
         return formatWidgetValueResults(maxDataPoints,
                 widgetValue.result,
+                (String)widgetConfig.get("valuetype"),
                 interval,
                 widgetValue.computationTimeRange,
                 allQuery);
     }
 
     // TODO: Extract common parts of this and the similar method on SearchApiController
-    protected Map<String, Long> formatWidgetValueResults(final int maxDataPoints,
+    protected Map<String, Object> formatWidgetValueResults(final int maxDataPoints,
                                                          final Object resultValue,
+                                                         final String functionType,
                                                          final String interval,
                                                          final Map<String, Object> timeRange,
                                                          final boolean allQuery) {
-        final Map<String, Long> points = Maps.newHashMap();
+        final Map<String, Object> points = Maps.newHashMap();
 
         if (resultValue instanceof Map) {
             final Map<?, ?> resultMap = (Map) resultValue;
@@ -245,7 +247,10 @@ public class DashboardsApiController extends AuthenticatedController {
                 if (index % factor == 0) {
                     String timestamp = Long.toString(currentTime.getMillis() / 1000);
                     Object value = resultMap.get(timestamp);
-                    Long result = value == null ? 0L : Long.parseLong(String.valueOf(value));
+                    if (functionType != null && value != null) {
+                        value = ((Map)value).get(functionType);
+                    }
+                    Object result = value == null ? 0 : value;
                     points.put(timestamp, result);
                 }
                 index++;
