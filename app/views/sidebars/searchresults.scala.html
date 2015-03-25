@@ -13,7 +13,7 @@
     <a href="#used-indices" role="button" data-toggle="modal" data-backdrop="true">@searchResult.getUsedIndices().size() @if(searchResult.getUsedIndices().size() == 1) {index} else {indices}</a>.
 </p>
 
-<p style="margin-top: 10px;">
+<div style="margin-top: 10px;">
     @if(streamId == null || streamId.isEmpty) {
         @views.html.partials.dashboards.add_to_dashboard.render("search_result_count", "Add count to dashboard", null)
     } else {
@@ -21,7 +21,7 @@
     }
 
     <a href="#" class="btn btn-success btn-sm">Save search criteria</a>
-</p>
+</div>
 
 <hr />
 

@@ -50,8 +50,6 @@ public class DateHistogramResolutionSelector {
 			sb.append(WordUtils.capitalize(interval));
 			sb.append("</a>");
 			
-			if (interval.equals(selected)) { sb.append("</strong>"); }
-			
 			if (i != SearchTools.ALLOWED_DATE_HISTOGRAM_INTERVALS.size()-1) {
 				sb.append(", ");
 			}
