@@ -14,9 +14,10 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.rest.resources.users.responses;
+package org.graylog2.rest.models.users.responses;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 
@@ -27,9 +28,10 @@ import java.util.List;
 @AutoValue
 public abstract class UserList {
     @JsonProperty
-    public abstract List<User> users();
+    public abstract List<UserSummary> users();
 
-    public static UserList create(List<User> users) {
+    @JsonCreator
+    public static UserList create(@JsonProperty("users") List<UserSummary> users) {
         return new AutoValue_UserList(users);
     }
 }
