@@ -13,27 +13,27 @@ var NumberUtils = require("../../util/NumberUtils");
 var D3Utils = require('../../util/D3Utils');
 
 var GraphFactory = {
-    create(renderer, domNode) {
+    create(renderer, domNode, tooltipTitleFormatter) {
         var graph;
         switch(renderer) {
             case 'line':
                 graph = dc.lineChart(domNode);
-                this.tooltipRenderlet(graph, '.chart-body circle.dot');
+                this.tooltipRenderlet(graph, '.chart-body circle.dot', tooltipTitleFormatter);
                 break;
             case 'area':
                 graph = dc.lineChart(domNode);
                 graph.renderArea(true);
-                this.tooltipRenderlet(graph, '.chart-body circle.dot');
+                this.tooltipRenderlet(graph, '.chart-body circle.dot', tooltipTitleFormatter);
                 break;
             case 'bar':
                 graph = dc.barChart(domNode);
                 graph.centerBar(true);
-                this.tooltipRenderlet(graph, '.chart-body rect.bar');
+                this.tooltipRenderlet(graph, '.chart-body rect.bar', tooltipTitleFormatter);
                 break;
             case 'scatterplot':
                 graph = dc.lineChart(domNode);
                 graph.renderDataPoints({radius: 2, fillOpacity: 1, strokeOpacity: 1});
-                this.tooltipRenderlet(graph, '.chart-body circle.dot');
+                this.tooltipRenderlet(graph, '.chart-body circle.dot', tooltipTitleFormatter);
                 break;
             default:
                 throw "Unsupported renderer '" + renderer + "'";
@@ -47,24 +47,11 @@ var GraphFactory = {
         return graph;
     },
     // Add a data element to the given D3 selection to show a bootstrap tooltip
-    tooltipRenderlet(graph, selector) {
+    tooltipRenderlet(graph, selector, callback) {
         graph.on('renderlet', (chart) => {
-            var formatTitle = (d) => {
-                var formattedKey = d.x === undefined ? d.x : d.x.format(momentHelper.DATE_FORMAT_TZ);
-
-                var formattedValue;
-                try {
-                    formattedValue = numeral(d.y).format("0,0.[00]");
-                } catch (e) {
-                    formattedValue = d3.format(".2r")(d.y);
-                }
-
-                return formattedValue + " messages<br>" + formattedKey;
-            };
-
             d3.select(chart.root()[0][0]).selectAll(selector)
                 .attr('rel', 'tooltip')
-                .attr('data-original-title', formatTitle);
+                .attr('data-original-title', callback);
         });
     }
 };
@@ -91,7 +78,7 @@ var GraphVisualization = React.createClass({
     renderGraph() {
         var graphDomNode = this.getDOMNode();
 
-        this.graph = GraphFactory.create(this.props.config.renderer, graphDomNode);
+        this.graph = GraphFactory.create(this.props.config.renderer, graphDomNode, this._formatTooltipTitle);
         this.graph
             .width(810)
             .height(120)
@@ -110,7 +97,6 @@ var GraphVisualization = React.createClass({
 
         $(graphDomNode).tooltip({
             'selector': '[rel="tooltip"]',
-            'trigger': 'hover',
             'container': 'body',
             'placement': 'auto',
             'delay': { show: 300, hide: 100 },
@@ -126,6 +112,21 @@ var GraphVisualization = React.createClass({
                 return Math.abs(value) > 1e+30 ? value.toPrecision(1) : d3.format(".2s")(value);
             });
         this.graph.render();
+    },
+    _formatTooltipTitle(d) {
+        var formattedKey = d.x === undefined ? d.x : d.x.format(momentHelper.HUMAN_TZ);
+
+        var formattedValue;
+        try {
+            formattedValue = numeral(d.y).format("0,0.[00]");
+        } catch (e) {
+            formattedValue = d3.format(".2r")(d.y);
+        }
+
+        var valueText = this.props.config.valuetype + " " + this.props.config.field + ": " + formattedValue + "<br>";
+        var keyText = "<span class=\"date\">" + formattedKey + "</span>";
+
+        return "<div class=\"datapoint-info\">" + valueText + keyText + "</div>";
     },
     _formatInterval() {
         return this.props.config.interval.charAt(0).toUpperCase() + this.props.config.interval.slice(1) + "s";

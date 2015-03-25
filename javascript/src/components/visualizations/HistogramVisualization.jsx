@@ -50,7 +50,10 @@ var HistogramVisualization = React.createClass({
             .colors(D3Utils.glColourPalette())
             .on('renderlet', (_) => {
                 var formatTitle = (d) => {
-                    return numeral(d.y).format("0,0") + " messages<br>" + d.x.format(momentHelper.DATE_FORMAT_TZ);
+                    var valueText = numeral(d.y).format("0,0") + " messages<br>";
+                    var keyText = "<span class=\"date\">" + d.x.format(momentHelper.HUMAN_TZ) + "</span>";
+
+                    return "<div class=\"datapoint-info\">" + valueText + keyText + "</div>";
                 };
 
                 d3.select(histogramDomNode).selectAll('.chart-body rect.bar')
@@ -60,7 +63,6 @@ var HistogramVisualization = React.createClass({
 
         $(histogramDomNode).tooltip({
             'selector': '[rel="tooltip"]',
-            'trigger': 'hover',
             'container': 'body',
             'placement': 'auto',
             'delay': { show: 300, hide: 100 },

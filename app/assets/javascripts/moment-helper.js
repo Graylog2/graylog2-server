@@ -4,6 +4,7 @@ momentHelper = {
     DATE_FORMAT_TZ_NO_MS: "YYYY-MM-DD HH:mm:ss Z",
     DATE_FORMAT_TZ: "YYYY-MM-DD HH:mm:ss.SSS Z",
     DATE_FORMAT_ISO: "YYYY-MM-DDTHH:mm:ss.SSSZ",
+    HUMAN_TZ: "ddd D MMM YYYY, HH:mm ZZ",
 
     /*
      * Returns a new moment object in the users' timezone. If the argument is not a moment object, it will
