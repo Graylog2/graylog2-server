@@ -6,13 +6,15 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.joda.time.DateTime;
 
+import javax.annotation.Nullable;
+
 @AutoValue
 @JsonAutoDetect
 public abstract class IndexRangeSummary {
     @JsonProperty("index_name")
     public abstract String indexName();
 
-    @JsonProperty("calculated_at")
+    @Nullable @JsonProperty("calculated_at")
     public abstract DateTime calculatedAt();
 
     @JsonProperty("start")
@@ -23,9 +25,9 @@ public abstract class IndexRangeSummary {
 
     @JsonCreator
     public static IndexRangeSummary create(@JsonProperty("index_name") String indexName,
-                                           @JsonProperty("calculated_at") DateTime calculatedAt,
+                                           @Nullable @JsonProperty("calculated_at") DateTime calculatedAt,
                                            @JsonProperty("start") DateTime start,
-                                           @JsonProperty("calculation_took_ms") int calculationTookMs) {
+                                           @Nullable @JsonProperty("calculation_took_ms") int calculationTookMs) {
         return new AutoValue_IndexRangeSummary(indexName, calculatedAt, start, calculationTookMs);
     }
 }
