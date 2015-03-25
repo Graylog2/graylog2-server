@@ -16,11 +16,11 @@
  */
 package org.graylog2.configuration;
 
-import autovalue.shaded.com.google.common.common.collect.ImmutableMap;
 import com.github.joschi.jadconfig.JadConfig;
 import com.github.joschi.jadconfig.RepositoryException;
 import com.github.joschi.jadconfig.ValidationException;
 import com.github.joschi.jadconfig.repositories.InMemoryRepository;
+import com.google.common.collect.ImmutableMap;
 import org.junit.Assert;
 import org.junit.Test;
 

@@ -16,8 +16,8 @@
  */
 package org.graylog2.restclient.models;
 
-import autovalue.shaded.com.google.common.common.collect.Lists;
-import autovalue.shaded.com.google.common.common.collect.Maps;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import org.graylog2.restclient.lib.plugin.configuration.RequestedConfigurationField;
 import org.graylog2.restclient.lib.plugin.configuration.TextField;
 import org.junit.Before;
