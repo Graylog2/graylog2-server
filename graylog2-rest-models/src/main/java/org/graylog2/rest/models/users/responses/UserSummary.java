@@ -14,9 +14,10 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.rest.resources.users.responses;
+package org.graylog2.rest.models.users.responses;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 
@@ -26,7 +27,7 @@ import java.util.Map;
 
 @JsonAutoDetect
 @AutoValue
-public abstract class User {
+public abstract class UserSummary {
 
     @JsonProperty
     @Nullable
@@ -66,17 +67,18 @@ public abstract class User {
     @Nullable
     public abstract Map<String, String> startpage();
 
-    public static User create(@Nullable String id,
-                              String username,
-                              String email,
-                              @Nullable String fullName,
-                              @Nullable List<String> permissions,
-                              @Nullable Map<String, Object> preferences,
-                              @Nullable String timezone,
-                              @Nullable Long sessionTimeoutMs,
-                              boolean readOnly,
-                              boolean external,
-                              @Nullable Map<String, String> startpage) {
-        return new AutoValue_User(id, username, email, fullName, permissions, preferences, timezone, sessionTimeoutMs, readOnly, external, startpage);
+    @JsonCreator
+    public static UserSummary create(@JsonProperty("id") @Nullable String id,
+                              @JsonProperty("username") String username,
+                              @JsonProperty("email") String email,
+                              @JsonProperty("full_name") @Nullable String fullName,
+                              @JsonProperty("permissions") @Nullable List<String> permissions,
+                              @JsonProperty("preferences") @Nullable Map<String, Object> preferences,
+                              @JsonProperty("timezone") @Nullable String timezone,
+                              @JsonProperty("session_timeout_ms") @Nullable Long sessionTimeoutMs,
+                              @JsonProperty("readonly") boolean readOnly,
+                              @JsonProperty("external") boolean external,
+                              @JsonProperty("startpage") @Nullable Map<String, String> startpage) {
+        return new AutoValue_UserSummary(id, username, email, fullName, permissions, preferences, timezone, sessionTimeoutMs, readOnly, external, startpage);
     }
 }
