@@ -47,6 +47,6 @@ public class CreateExtractorRequest extends ApiRequest {
     @JsonProperty("condition_value")
     public String conditionValue;
 
-    public int order;
+    public long order;
 
 }

@@ -124,7 +124,7 @@ public abstract class Extractor implements EmbeddedPersistable {
     public Extractor(MetricRegistry metricRegistry,
                      String id,
                      String title,
-                     int order,
+                     long order,
                      Type type,
                      CursorStrategy cursorStrategy,
                      String sourceField,

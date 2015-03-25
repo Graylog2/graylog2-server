@@ -18,9 +18,7 @@ package org.graylog2.rest.resources.system.inputs;
 
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.annotation.Timed;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.wordnik.swagger.annotations.*;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.ConfigurationException;
@@ -29,6 +27,7 @@ import org.graylog2.inputs.Input;
 import org.graylog2.inputs.InputService;
 import org.graylog2.inputs.converters.ConverterFactory;
 import org.graylog2.inputs.extractors.ExtractorFactory;
+import org.graylog2.rest.models.system.inputs.extractors.responses.ExtractorCreated;
 import org.graylog2.rest.models.system.inputs.extractors.responses.ExtractorMetrics;
 import org.graylog2.rest.models.system.inputs.extractors.responses.ExtractorSummary;
 import org.graylog2.rest.models.system.inputs.extractors.responses.ExtractorSummaryList;
@@ -38,8 +37,8 @@ import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.inputs.Converter;
 import org.graylog2.plugin.inputs.Extractor;
 import org.graylog2.plugin.inputs.MessageInput;
-import org.graylog2.rest.resources.system.inputs.requests.CreateExtractorRequest;
-import org.graylog2.rest.resources.system.inputs.requests.OrderExtractorsRequest;
+import org.graylog2.rest.models.system.inputs.requests.CreateExtractorRequest;
+import org.graylog2.rest.models.system.inputs.requests.OrderExtractorsRequest;
 import org.graylog2.shared.rest.resources.system.inputs.InputsResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.shared.inputs.InputRegistry;
@@ -92,7 +91,8 @@ public class ExtractorsResource extends RestResource {
     @Timed
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    @ApiOperation(value = "Add an extractor to an input")
+    @ApiOperation(value = "Add an extractor to an input",
+            response = ExtractorCreated.class)
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "No such input on this node."),
             @ApiResponse(code = 400, message = "No such extractor type."),
@@ -126,7 +126,7 @@ public class ExtractorsResource extends RestResource {
         LOG.info(msg);
         activityWriter.write(new Activity(msg, ExtractorsResource.class));
 
-        final Map<String, String> result = ImmutableMap.of("extractor_id", id);
+        final ExtractorCreated result = ExtractorCreated.create(id);
         final URI extractorUri = getUriBuilderToSelf().path(ExtractorsResource.class)
                 .path("{inputId}")
                 .build(input.getId());

@@ -42,7 +42,7 @@ public class GrokExtractor extends Extractor {
                          Set<GrokPattern> grokPatterns,
                          String id,
                          String title,
-                         int order,
+                         long order,
                          CursorStrategy cursorStrategy,
                          String sourceField,
                          String targetField,

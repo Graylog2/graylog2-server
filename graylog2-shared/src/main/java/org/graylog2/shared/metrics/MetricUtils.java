@@ -21,6 +21,9 @@ import com.codahale.metrics.Meter;
 import com.codahale.metrics.Metric;
 import com.codahale.metrics.Timer;
 import com.google.common.collect.Maps;
+import org.graylog2.rest.models.metrics.responses.RateMetricsResponse;
+import org.graylog2.rest.models.metrics.responses.TimerMetricsResponse;
+import org.graylog2.rest.models.metrics.responses.TimerRateMetricsResponse;
 
 import java.util.Map;
 import java.util.Set;
@@ -87,37 +90,35 @@ public class MetricUtils {
         return metricMap;
     }
 
-    public static Map<String, Object> buildTimerMap(Timer t) {
-        Map<String, Object> metrics = Maps.newHashMap();
+    public static TimerRateMetricsResponse buildTimerMap(Timer t) {
+        final TimerRateMetricsResponse result = new TimerRateMetricsResponse();
+        final TimerMetricsResponse time = new TimerMetricsResponse();
+        final RateMetricsResponse rate = new RateMetricsResponse();
 
         if (t == null) {
-            return metrics;
+            return result;
         }
 
-        TimeUnit timeUnit = TimeUnit.MICROSECONDS;
+        time.max = TimeUnit.MICROSECONDS.convert(t.getSnapshot().getMax(), TimeUnit.NANOSECONDS);
+        time.min = TimeUnit.MICROSECONDS.convert(t.getSnapshot().getMin(), TimeUnit.NANOSECONDS);
+        time.mean = TimeUnit.MICROSECONDS.convert((long) t.getSnapshot().getMean(), TimeUnit.NANOSECONDS);
+        time.percentile95th = TimeUnit.MICROSECONDS.convert((long) t.getSnapshot().get95thPercentile(), TimeUnit.NANOSECONDS);
+        time.percentile98th = TimeUnit.MICROSECONDS.convert((long) t.getSnapshot().get98thPercentile(), TimeUnit.NANOSECONDS);
+        time.percentile99th = TimeUnit.MICROSECONDS.convert((long) t.getSnapshot().get99thPercentile(), TimeUnit.NANOSECONDS);
+        time.stdDev = TimeUnit.MICROSECONDS.convert((long) t.getSnapshot().getStdDev(), TimeUnit.NANOSECONDS);
 
-        Map<String, Object> time = Maps.newHashMap();
-        time.put("max", TimeUnit.MICROSECONDS.convert(t.getSnapshot().getMax(), TimeUnit.NANOSECONDS));
-        time.put("min", TimeUnit.MICROSECONDS.convert(t.getSnapshot().getMin(), TimeUnit.NANOSECONDS));
-        time.put("mean", TimeUnit.MICROSECONDS.convert((long) t.getSnapshot().getMean(), TimeUnit.NANOSECONDS));
-        time.put("95th_percentile", TimeUnit.MICROSECONDS.convert((long) t.getSnapshot().get95thPercentile(), TimeUnit.NANOSECONDS));
-        time.put("98th_percentile", TimeUnit.MICROSECONDS.convert((long) t.getSnapshot().get98thPercentile(), TimeUnit.NANOSECONDS));
-        time.put("99th_percentile", TimeUnit.MICROSECONDS.convert((long) t.getSnapshot().get99thPercentile(), TimeUnit.NANOSECONDS));
-        time.put("std_dev", TimeUnit.MICROSECONDS.convert((long) t.getSnapshot().getStdDev(), TimeUnit.NANOSECONDS));
+        rate.oneMinute = t.getOneMinuteRate();
+        rate.fiveMinute = t.getFiveMinuteRate();
+        rate.fifteenMinute = t.getFifteenMinuteRate();
+        rate.total = t.getCount();
+        rate.mean = t.getMeanRate();
 
-        Map<String, Object> rate = Maps.newHashMap();
-        rate.put("one_minute", t.getOneMinuteRate());
-        rate.put("five_minute", t.getFiveMinuteRate());
-        rate.put("fifteen_minute", t.getFifteenMinuteRate());
-        rate.put("total", t.getCount());
-        rate.put("mean", t.getMeanRate());
+        result.time = time;
+        result.rate = rate;
+        result.rateUnit = "events/second";
+        result.durationUnit = TimeUnit.MICROSECONDS.toString().toLowerCase();
 
-        metrics.put("rate_unit", "events/second");
-        metrics.put("duration_unit", timeUnit.toString().toLowerCase());
-        metrics.put("time", time);
-        metrics.put("rate", rate);
-
-        return metrics;
+        return result;
     }
 
     public static Map<String, Object> buildHistogramMap(Histogram h) {

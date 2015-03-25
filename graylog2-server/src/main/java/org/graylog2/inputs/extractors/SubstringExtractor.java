@@ -36,7 +36,7 @@ public class SubstringExtractor extends Extractor {
     public SubstringExtractor(MetricRegistry metricRegistry,
                               String id,
                               String title,
-                              int order,
+                              long order,
                               CursorStrategy cursorStrategy,
                               String sourceField,
                               String targetField,

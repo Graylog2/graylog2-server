@@ -7,12 +7,14 @@ import com.google.auto.value.AutoValue;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Range;
 
+import javax.annotation.Nullable;
 import java.util.Map;
 
 @AutoValue
 @JsonAutoDetect
 public abstract class ResultMessageSummary {
     @JsonProperty("highlight_ranges")
+    @Nullable
     public abstract Multimap<String, Range<Integer>> highlightRanges();
 
     @JsonProperty
@@ -22,7 +24,7 @@ public abstract class ResultMessageSummary {
     public abstract String index();
 
     @JsonCreator
-    public static ResultMessageSummary create(@JsonProperty("highlight_ranges") Multimap<String, Range<Integer>> highlightRanges,
+    public static ResultMessageSummary create(@Nullable @JsonProperty("highlight_ranges") Multimap<String, Range<Integer>> highlightRanges,
                                               @JsonProperty("message") Map<String, Object> message,
                                               @JsonProperty("index") String index) {
         return new AutoValue_ResultMessageSummary(highlightRanges, message, index);

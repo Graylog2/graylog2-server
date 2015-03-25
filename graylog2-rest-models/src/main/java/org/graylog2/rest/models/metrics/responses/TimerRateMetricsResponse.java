@@ -14,23 +14,22 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.rest.resources.system.inputs.requests;
+package org.graylog2.rest.models.metrics.responses;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.auto.value.AutoValue;
 
-import java.util.Map;
+/**
+ * @author Lennart Koopmann <lennart@torch.sh>
+ */
+public class TimerRateMetricsResponse {
 
-@JsonAutoDetect
-@AutoValue
-public abstract class OrderExtractorsRequest {
-    @JsonProperty
-    public abstract Map<Integer, String> order();
+    public TimerMetricsResponse time;
+    public RateMetricsResponse rate;
 
-    @JsonCreator
-    public static OrderExtractorsRequest create(@JsonProperty("order") Map<Integer, String> order) {
-        return new AutoValue_OrderExtractorsRequest(order);
-    }
+    @JsonProperty("duration_unit")
+    public String durationUnit;
+
+    @JsonProperty("rate_unit")
+    public String rateUnit;
+
 }

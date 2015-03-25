@@ -14,13 +14,29 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.restclient.models;
+package org.graylog2.rest.models.metrics.responses;
 
-public class GrokPattern {
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-    public String id;
+/**
+ * @author Lennart Koopmann <lennart@torch.sh>
+ */
+public class TimerMetricsResponse {
 
-    public String name;
+    public double min;
+    public double max;
+    public double mean;
 
-    public String pattern;
+    @JsonProperty("std_dev")
+    public double stdDev;
+
+    @JsonProperty("95th_percentile")
+    public double percentile95th;
+
+    @JsonProperty("98th_percentile")
+    public double percentile98th;
+
+    @JsonProperty("99th_percentile")
+    public double percentile99th;
+
 }

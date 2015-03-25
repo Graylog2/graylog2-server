@@ -34,7 +34,7 @@ public class RegexExtractor extends Extractor {
     public RegexExtractor(final MetricRegistry metricRegistry,
                           final String id,
                           final String title,
-                          final int order,
+                          final long order,
                           final CursorStrategy cursorStrategy,
                           final String sourceField,
                           final String targetField,

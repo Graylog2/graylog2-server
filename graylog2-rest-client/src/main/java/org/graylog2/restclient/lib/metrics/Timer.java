@@ -17,7 +17,7 @@
 package org.graylog2.restclient.lib.metrics;
 
 import com.google.common.collect.ImmutableMap;
-import org.graylog2.restclient.models.api.responses.metrics.TimerMetricsResponse;
+import org.graylog2.rest.models.metrics.responses.TimerMetricsResponse;
 
 import java.util.Map;
 

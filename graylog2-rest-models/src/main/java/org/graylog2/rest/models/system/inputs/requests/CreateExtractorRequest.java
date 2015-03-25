@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.rest.resources.system.inputs.requests;
+package org.graylog2.rest.models.system.inputs.requests;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -55,7 +55,7 @@ public abstract class CreateExtractorRequest {
     public abstract String conditionValue();
 
     @JsonProperty
-    public abstract int order();
+    public abstract long order();
 
     @JsonCreator
     public static CreateExtractorRequest create(@JsonProperty("title") @NotEmpty String title,
@@ -67,7 +67,7 @@ public abstract class CreateExtractorRequest {
                                                 @JsonProperty("converters") Map<String, Map<String, Object>> converters,
                                                 @JsonProperty("condition_type") String conditionType,
                                                 @JsonProperty("condition_value") String conditionValue,
-                                                @JsonProperty("order") int order) {
+                                                @JsonProperty("order") long order) {
         return new AutoValue_CreateExtractorRequest(title, cutOrCopy, sourceField, targetField, extractorType, extractorConfig, converters, conditionType, conditionValue, order);
     }
 }

@@ -21,6 +21,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
+import org.graylog2.rest.models.system.inputs.extractors.responses.ExtractorSummary;
 import org.graylog2.restclient.models.api.requests.CreateExtractorRequest;
 import org.graylog2.restclient.models.api.responses.system.ExtractorSummaryResponse;
 import org.slf4j.Logger;
@@ -37,6 +38,7 @@ public class Extractor {
 
     public interface Factory {
         Extractor fromResponse(ExtractorSummaryResponse esr);
+        Extractor fromResponse(ExtractorSummary es);
 
         Extractor forCreate(CursorStrategy cursorStrategy,
                             @Assisted("title") String title,
@@ -104,7 +106,7 @@ public class Extractor {
     private final long exceptions;
     private final long converterExceptions;
 
-    private int order;
+    private long order;
 
     @AssistedInject
     private Extractor(UserService userService, @Assisted ExtractorSummaryResponse esr) {
@@ -123,6 +125,25 @@ public class Extractor {
         this.exceptions = esr.exceptions;
         this.converterExceptions = esr.converterExceptions;
         this.order = esr.order;
+    }
+
+    @AssistedInject
+    private Extractor(UserService userService, @Assisted ExtractorSummary es) {
+        this.id = es.id();
+        this.title = es.title();
+        this.cursorStrategy = CursorStrategy.fromString(es.cursorStrategy());
+        this.sourceField = es.sourceField();
+        this.targetField = es.targetField();
+        this.extractorType = Type.fromString(es.type());
+        this.creatorUser = userService.load(es.creatorUserId());
+        this.extractorConfig = es.extractorConfig();
+        this.converters = buildConverterList(es.converters());
+        this.conditionType = ConditionType.fromString(es.conditionType());
+        this.conditionValue = es.conditionValue();
+        this.metrics = new ExtractorMetrics(es.metrics().total(), es.metrics().converters());
+        this.exceptions = es.exceptions();
+        this.converterExceptions = es.converterExceptions();
+        this.order = es.order();
     }
 
     @VisibleForTesting
@@ -427,11 +448,11 @@ public class Extractor {
         return exceptions + converterExceptions;
     }
 
-    public int getOrder() {
+    public long getOrder() {
         return order;
     }
 
-    public void setOrder(int order) {
+    public void setOrder(long order) {
         this.order = order;
     }
 

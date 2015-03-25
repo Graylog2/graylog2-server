@@ -17,15 +17,19 @@
 package org.graylog2.rest.resources.system;
 
 import com.codahale.metrics.annotation.Timed;
+import com.google.common.base.Strings;
+import com.google.common.collect.Sets;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.bson.types.ObjectId;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.grok.GrokPattern;
 import org.graylog2.grok.GrokPatternService;
 import org.graylog2.plugin.database.ValidationException;
-import org.graylog2.rest.resources.system.responses.GrokPatternList;
+import org.graylog2.rest.models.system.responses.GrokPatternList;
+import org.graylog2.rest.models.system.responses.GrokPatternSummary;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 
@@ -44,6 +48,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 import java.net.URI;
+import java.util.Collection;
+import java.util.Set;
 
 
 @RequiresAuthentication
@@ -66,7 +72,7 @@ public class GrokResource extends RestResource {
     public GrokPatternList listGrokPatterns() {
         checkPermission(RestPermissions.INPUTS_READ);
 
-        return GrokPatternList.create(grokPatternService.loadAll());
+        return GrokPatternList.create(toSummarySet(grokPatternService.loadAll()));
     }
     
     @GET
@@ -82,12 +88,12 @@ public class GrokResource extends RestResource {
     
     @POST
     @Timed
-    @ApiOperation("Add a new named pattern")
+    @ApiOperation(value = "Add a new named pattern", response = GrokPatternSummary.class)
     public Response createPattern(@ApiParam(name = "pattern", required = true)
-                                      @Valid @NotNull GrokPattern pattern) throws ValidationException {
+                                      @Valid @NotNull GrokPatternSummary pattern) throws ValidationException {
         checkPermission(RestPermissions.INPUTS_CREATE);
 
-        final GrokPattern newPattern = grokPatternService.save(pattern);
+        final GrokPattern newPattern = grokPatternService.save(fromSummary(pattern));
 
         final URI patternUri = getUriBuilderToSelf().path(GrokResource.class, "listPattern").build(newPattern.id);
         
@@ -102,13 +108,13 @@ public class GrokResource extends RestResource {
                                        @QueryParam("replace") @DefaultValue("false") boolean replace) throws ValidationException {
         checkPermission(RestPermissions.INPUTS_CREATE);
 
-        for (final GrokPattern pattern : patternList.patterns()) {
-            if (!grokPatternService.validate(pattern)) {
+        for (final GrokPatternSummary pattern : patternList.patterns()) {
+            if (!grokPatternService.validate(fromSummary(pattern))) {
                 throw new ValidationException("Invalid pattern " + pattern + ". Did not save any patterns.");
             }
         }
 
-        grokPatternService.saveAll(patternList.patterns(), replace);
+        grokPatternService.saveAll(fromSummarySet(patternList.patterns()), replace);
 
         return Response.accepted().build();
     }
@@ -120,7 +126,7 @@ public class GrokResource extends RestResource {
     public GrokPattern updatePattern(@ApiParam(name = "patternId", required = true)
                                      @PathParam("patternId") String patternId,
                                      @ApiParam(name = "pattern", required = true)
-                                     GrokPattern pattern) throws NotFoundException, ValidationException {
+                                     GrokPatternSummary pattern) throws NotFoundException, ValidationException {
         checkPermission(RestPermissions.INPUTS_EDIT);
         
         final GrokPattern oldPattern = grokPatternService.load(patternId);
@@ -141,5 +147,44 @@ public class GrokResource extends RestResource {
         if (grokPatternService.delete(patternId) == 0) {
             throw new javax.ws.rs.NotFoundException();
         }
+    }
+
+    private GrokPatternSummary toSummary(GrokPattern grokPattern) {
+        final GrokPatternSummary summary = new GrokPatternSummary();
+
+        summary.id = grokPattern.id.toHexString();
+        summary.name = grokPattern.name;
+        summary.pattern = grokPattern.pattern;
+
+        return summary;
+    }
+
+    private Set<GrokPatternSummary> toSummarySet(Set<GrokPattern> patternSet) {
+        final Set<GrokPatternSummary> result = Sets.newHashSetWithExpectedSize(patternSet.size());
+
+        for (GrokPattern grokPattern : patternSet) {
+            result.add(toSummary(grokPattern));
+        }
+
+        return result;
+    }
+
+    private GrokPattern fromSummary(GrokPatternSummary grokPatternSummary) {
+        final GrokPattern result = new GrokPattern();
+        if (!Strings.isNullOrEmpty(grokPatternSummary.id))
+            result.id = new ObjectId(grokPatternSummary.id);
+        result.name = grokPatternSummary.name;
+        result.pattern = grokPatternSummary.pattern;
+
+        return result;
+    }
+
+    private Set<GrokPattern> fromSummarySet(Collection<GrokPatternSummary> grokPatternSummaries) {
+        final Set<GrokPattern> result = Sets.newHashSetWithExpectedSize(grokPatternSummaries.size());
+        for (GrokPatternSummary summary : grokPatternSummaries) {
+            result.add(fromSummary(summary));
+        }
+
+        return result;
     }
 }

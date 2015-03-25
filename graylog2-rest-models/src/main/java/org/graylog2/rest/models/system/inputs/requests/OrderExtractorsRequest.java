@@ -14,24 +14,24 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.rest.resources.system.responses;
+package org.graylog2.rest.models.system.inputs.requests;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.graylog2.grok.GrokPattern;
 
-import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
-@AutoValue
 @JsonAutoDetect
-public abstract class GrokPatternList {
-    
+@AutoValue
+public abstract class OrderExtractorsRequest {
     @JsonProperty
-    public abstract Collection<GrokPattern> patterns();
+    public abstract Map<Integer, String> order();
 
     @JsonCreator
-    public static GrokPatternList create(@JsonProperty("patterns") Collection<GrokPattern> patternList) {return new AutoValue_GrokPatternList(patternList);}
-    
+    public static OrderExtractorsRequest create(@JsonProperty("order") Map<Integer, String> order) {
+        return new AutoValue_OrderExtractorsRequest(order);
+    }
 }

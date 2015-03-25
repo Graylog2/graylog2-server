@@ -17,7 +17,7 @@
 package org.graylog2.restclient.models.api.responses.system;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.graylog2.restclient.models.api.responses.metrics.TimerRateMetricsResponse;
+import org.graylog2.rest.models.metrics.responses.TimerRateMetricsResponse;
 
 import java.util.List;
 import java.util.Map;
