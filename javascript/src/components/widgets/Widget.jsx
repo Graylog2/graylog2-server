@@ -184,11 +184,11 @@ var Widget = React.createClass({
 
         return URLUtils.appPrefixed(url + "?" + Qs.stringify(query));
     },
-    _replaySearch() {
-        window.location = this.replayUrl();
+    _replaySearch(e) {
+        URLUtils.openLink(this.replayUrl(), e.metaKey || e.ctrlKey);
     },
     _goToWidgetMetrics() {
-        window.location = this.metricsUrl();
+        URLUtils.openLink(this.metricsUrl(), false);
     },
     _showConfig() {
         this.refs.configModal.open();
