@@ -13,7 +13,7 @@ $(document).ready(function() {
         }
     });
 
-    if ($(".gridster").length > 0){
+    var initializeDashboard = function() {
         /* ducksboard/gridster.js#147 Hotfix - Part 1 */
         var items = $(".gridster ul li");
         items.detach();
@@ -67,9 +67,30 @@ $(document).ready(function() {
             var row = parseInt(item.attr("data-row"));
             dashboardGrid.add_widget(item, columns, rows, col, row);
         });
+    };
+
+    var reloadDashboard = function() {
+        lockDashboard();
+        dashboardGrid.destroy();
+        initializeDashboard();
+    };
+
+    if ($(".gridster").length > 0){
+        initializeDashboard();
     } else {
         toggleDashboardLock.hide();
     }
+
+    var resizeTimeout;
+    $(window).on("resize", function(e) {
+        // ignore resize events as long as a reloadDashboard execution is in the queue
+        if (!resizeTimeout) {
+            resizeTimeout = setTimeout(function() {
+                resizeTimeout = null;
+                reloadDashboard();
+            }, 200);
+        }
+    });
 
     function applyDashboardsToAllSelectors() {
         var dashboardSelectors = $(".dashboard-selector[data-widget-type]");
@@ -230,12 +251,12 @@ $(document).ready(function() {
 
     var updateInBackground = function() {
         setUpdateUnfocussedMode(true);
-        alert("Graphs will be updated when browser is in the background");
+        alert("Graphs will be updated even when the browser is in the background");
     };
 
     var updateInFocus = function() {
         setUpdateUnfocussedMode(false);
-        alert("Graphs will be updated when browser is in the foreground");
+        alert("Graphs will be updated only when the browser is in the foreground");
     };
 
     toggleUpdateUnfocussed.on('click', function() {
@@ -268,6 +289,9 @@ $(document).ready(function() {
         $(".dashboard .widget").each(function() {
             $(this).trigger("unlocked.dashboard");
         });
+
+        toggleDashboardLock.text("Lock");
+        toggleDashboardLock.data('locked', false);
     };
 
     var lockDashboard = function() {
@@ -286,25 +310,22 @@ $(document).ready(function() {
         $(".dashboard .widget").each(function() {
             $(this).trigger("locked.dashboard");
         });
+
+        toggleDashboardLock.text("Unlock / Edit");
+        toggleDashboardLock.data('locked', true);
     };
 
     toggleDashboardLock.on('click', function() {
         var locked = Boolean(toggleDashboardLock.data('locked'));
         if (locked) {
             unlockDashboard();
-            toggleDashboardLock.text("Lock");
         } else {
             lockDashboard();
-            toggleDashboardLock.text("Unlock / Edit");
         }
-
-        toggleDashboardLock.data('locked', !locked);
     });
 
     unlockDashboardLink.on('click', function() {
         unlockDashboard();
-        toggleDashboardLock.data('locked', false);
-        toggleDashboardLock.text("Lock");
     });
 
     $(".dashboard .widget .edit-description").on("click", function(e) {
