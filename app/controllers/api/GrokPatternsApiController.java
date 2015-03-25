@@ -22,7 +22,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import controllers.AuthenticatedController;
 import org.graylog2.restclient.lib.APIException;
 import org.graylog2.restclient.models.ExtractorService;
-import org.graylog2.restclient.models.GrokPattern;
+import org.graylog2.rest.models.system.responses.GrokPatternSummary;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import play.libs.Json;
@@ -53,7 +53,7 @@ public class GrokPatternsApiController extends AuthenticatedController {
     
     public Result create() {
         final JsonNode json = request().body().asJson();
-        final GrokPattern grokPattern = Json.fromJson(json, GrokPattern.class);
+        final GrokPatternSummary grokPattern = Json.fromJson(json, GrokPatternSummary.class);
         // remove an empty string to force creation of a new object
         grokPattern.id = null;
         try {
@@ -68,7 +68,7 @@ public class GrokPatternsApiController extends AuthenticatedController {
     public Result update() {
 
         final JsonNode json = request().body().asJson();
-        final GrokPattern grokPattern = Json.fromJson(json, GrokPattern.class);
+        final GrokPatternSummary grokPattern = Json.fromJson(json, GrokPatternSummary.class);
         try {
             extractorService.updateGrokPattern(grokPattern);
         } catch (APIException | IOException e) {
@@ -79,7 +79,7 @@ public class GrokPatternsApiController extends AuthenticatedController {
     }
     
     public Result delete(String patternId) {
-        final GrokPattern grokPattern = new GrokPattern();
+        final GrokPatternSummary grokPattern = new GrokPatternSummary();
         grokPattern.id = patternId;
         try {
             extractorService.deleteGrokPattern(grokPattern);
