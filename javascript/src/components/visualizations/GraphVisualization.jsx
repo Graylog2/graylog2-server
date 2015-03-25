@@ -31,14 +31,9 @@ var GraphFactory = {
                 this.tooltipRenderlet(graph, '.chart-body rect.bar');
                 break;
             case 'scatterplot':
-                graph = dc.scatterPlot(domNode);
-                graph
-                    .symbolSize(5)
-                    .highlightedSize(10)
-                    // We need accessors to workaround this: https://github.com/dc-js/dc.js/issues/870
-                    .keyAccessor((d) => d.key)
-                    .valueAccessor((d) => d.value);
-                this.tooltipRenderlet(graph, '.chart-body path.symbol');
+                graph = dc.lineChart(domNode);
+                graph.renderDataPoints({radius: 2, fillOpacity: 1, strokeOpacity: 1});
+                this.tooltipRenderlet(graph, '.chart-body circle.dot');
                 break;
             default:
                 throw "Unsupported renderer '" + renderer + "'";
@@ -163,7 +158,7 @@ var GraphVisualization = React.createClass({
     },
     render() {
         return (
-            <div id={"visualization-" + this.props.id} className="graph"/>
+            <div id={"visualization-" + this.props.id} className={"graph " + this.props.config.renderer}/>
         );
     }
 });
