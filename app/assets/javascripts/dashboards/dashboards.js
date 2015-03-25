@@ -125,9 +125,9 @@ $(document).ready(function() {
     });
 
     if (dashboard.length > 0) {
-        dashboard[0].addEventListener("delete.widget", function (e) {
+        dashboard.on("delete.widget", function (event, details) {
             var dashboardId = $(".dashboard .gridster").data("dashboard-id");
-            var widgetId = e.detail.widgetId;
+            var widgetId = details.widgetId;
             var widget = $("[data-widget-id=" + widgetId + "]");
             var gridsterWidget = widget.parent("li");
             $.ajax({
@@ -265,9 +265,8 @@ $(document).ready(function() {
                 .attr("href", "javascript: void(0)");
         });
 
-        var unlockedEvent = new CustomEvent("unlocked.dashboard");
         $(".dashboard .widget").each(function() {
-            this.dispatchEvent(unlockedEvent);
+            $(this).trigger("unlocked.dashboard");
         });
     };
 
@@ -284,10 +283,8 @@ $(document).ready(function() {
                 .attr("href", $(this).attr("data-original-href"));
         });
 
-        var lockedEvent = new CustomEvent("locked.dashboard");
-
         $(".dashboard .widget").each(function() {
-            this.dispatchEvent(lockedEvent);
+            $(this).trigger("locked.dashboard");
         });
     };
 

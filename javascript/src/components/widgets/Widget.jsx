@@ -3,6 +3,8 @@
 
 var React = require('react');
 
+var $ = require("jquery");
+
 var Qs = require('qs');
 var URLUtils = require("../../util/URLUtils");
 
@@ -59,12 +61,12 @@ var Widget = React.createClass({
         this.loadData();
         this.loadValue();
 
-        this._getWidgetNode().addEventListener("unlocked.dashboard", this._dashboardUnlocked);
-        this._getWidgetNode().addEventListener("locked.dashboard", this._dashboardLocked);
+        $(this._getWidgetNode()).on("unlocked.dashboard", this._dashboardUnlocked);
+        $(this._getWidgetNode()).on("locked.dashboard", this._dashboardLocked);
     },
     componentWillUnmount() {
-        this._getWidgetNode().removeEventListener("unlocked.dashboard", this._dashboardUnlocked);
-        this._getWidgetNode().removeEventListener("locked.dashboard", this._dashboardLocked);
+        $(this._getWidgetNode()).off("unlocked.dashboard", this._dashboardUnlocked);
+        $(this._getWidgetNode()).off("locked.dashboard", this._dashboardLocked);
     },
     loadData() {
         if (!assertUpdateEnabled(this.loadData) || this.state.deleted) { return; }
@@ -194,8 +196,7 @@ var Widget = React.createClass({
     deleteWidget() {
         if (window.confirm("Do you really want to delete '" + this.state.title + "'?")) {
             this.setState({deleted: true});
-            var deleteEvent = new CustomEvent("delete.widget", {"detail": {widgetId: this.props.widgetId}});
-            document.getElementsByClassName("dashboard")[0].dispatchEvent(deleteEvent);
+            $(".dashboard").trigger("delete.widget", {widgetId: this.props.widgetId});
         }
     },
     render() {
