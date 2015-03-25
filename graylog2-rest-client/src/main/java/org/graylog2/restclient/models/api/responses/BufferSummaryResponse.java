@@ -17,6 +17,7 @@
 package org.graylog2.restclient.models.api.responses;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.graylog2.rest.models.system.buffers.responses.SingleRingUtilization;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
@@ -29,4 +30,11 @@ public class BufferSummaryResponse {
     @JsonProperty("utilization_percent")
     public float utilizationPercent;
 
+    public static BufferSummaryResponse fromSingleRingUtilization(SingleRingUtilization sru) {
+        final BufferSummaryResponse bur = new BufferSummaryResponse();
+        bur.utilization = sru.utilization();
+        bur.utilizationPercent = sru.utilizationPercent();
+
+        return bur;
+    }
 }

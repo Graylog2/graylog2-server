@@ -83,7 +83,7 @@ public class LoggersResource extends RestResource {
     @Path("/subsystems")
     @ApiOperation(value = "List all logger subsystems and their current levels")
     @Produces(MediaType.APPLICATION_JSON)
-    public SubsystemSummary subsytems() {
+    public SubsystemSummary subsystems() {
         final Map<String, SingleSubsystemSummary> subsystems = Maps.newHashMap();
         for (Map.Entry<String, Subsystem> subsystem : SUBSYSTEMS.entrySet()) {
             if (!isPermitted(RestPermissions.LOGGERS_READSUBSYSTEM, subsystem.getKey())) {

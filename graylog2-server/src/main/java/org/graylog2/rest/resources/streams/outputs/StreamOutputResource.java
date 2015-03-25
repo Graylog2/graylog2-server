@@ -29,6 +29,8 @@ import org.graylog2.outputs.OutputRegistry;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.streams.Output;
 import org.graylog2.plugin.streams.Stream;
+import org.graylog2.rest.models.streams.outputs.OutputListResponse;
+import org.graylog2.rest.models.streams.outputs.requests.AddOutputRequest;
 import org.graylog2.rest.models.system.outputs.responses.OutputSummary;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;

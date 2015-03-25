@@ -21,6 +21,7 @@ import com.google.common.collect.Maps;
 import com.google.common.net.MediaType;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
+import org.graylog2.rest.models.system.buffers.responses.BufferClasses;
 import org.graylog2.rest.models.system.inputs.requests.InputLaunchRequest;
 import org.graylog2.restclient.lib.APIException;
 import org.graylog2.restclient.lib.ApiClient;
@@ -91,13 +92,13 @@ public class Node extends ClusterEntity {
     private AtomicInteger failureCount = new AtomicInteger(0);
 
     private BufferInfo bufferInfo;
-    private BufferClassesResponse bufferClasses;
+    private BufferClasses bufferClasses;
     private JournalInfo journalInfo;
 
     /* for initial set up in test */
-    public Node(NodeSummaryResponse r) {
+    /*public Node(NodeSummaryResponse r) {
         this(null, null, null, r);
-    }
+    }*/
 
     @AssistedInject
     public Node(ApiClient api,
@@ -152,9 +153,10 @@ public class Node extends ClusterEntity {
         return BufferInfo.buildEmpty();
     }
 
-    public synchronized BufferClassesResponse getBufferClasses() {
+    public synchronized BufferClasses getBufferClasses() {
         if (this.bufferClasses == null) {
-            this.bufferClasses = loadBufferClasses();
+            final BufferClassesResponse response = loadBufferClasses();
+            this.bufferClasses = BufferClasses.create(response.processBufferClass, response.outputBufferClass);
         }
         return this.bufferClasses;
     }
@@ -187,7 +189,7 @@ public class Node extends ClusterEntity {
     public Map<String, InternalLoggerSubsystem> allLoggerSubsystems() {
         Map<String, InternalLoggerSubsystem> subsystems = Maps.newHashMap();
         try {
-            LoggerSubsystemsResponse response = api.path(routes.LoggersResource().subsytems(), LoggerSubsystemsResponse.class)
+            LoggerSubsystemsResponse response = api.path(routes.LoggersResource().subsystems(), LoggerSubsystemsResponse.class)
                     .node(this)
                     .execute();
 

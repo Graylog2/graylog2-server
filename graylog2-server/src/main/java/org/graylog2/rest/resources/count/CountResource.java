@@ -23,7 +23,7 @@ import org.graylog2.indexer.counts.Counts;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import org.graylog2.shared.rest.resources.RestResource;
-import org.graylog2.rest.resources.count.responses.MessageCountResponse;
+import org.graylog2.rest.models.count.responses.MessageCountResponse;
 import org.graylog2.shared.security.RestPermissions;
 
 import javax.inject.Inject;

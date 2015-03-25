@@ -28,7 +28,7 @@ import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.streams.Output;
 import org.graylog2.plugin.streams.Stream;
-import org.graylog2.streams.outputs.CreateOutputRequest;
+import org.graylog2.rest.models.streams.outputs.requests.CreateOutputRequest;
 
 import javax.inject.Inject;
 import java.util.HashMap;

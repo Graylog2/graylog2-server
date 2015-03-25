@@ -54,7 +54,7 @@ public class GrokTesterResource extends RestResource {
 
     @GET
     @Timed
-    public Object grokTest(@QueryParam("pattern") @NotEmpty String pattern,
+    public GrokTesterResponse grokTest(@QueryParam("pattern") @NotEmpty String pattern,
                            @QueryParam("string") @NotNull String string) throws GrokException {
 
         final Set<GrokPattern> grokPatterns = grokPatternService.loadAll();

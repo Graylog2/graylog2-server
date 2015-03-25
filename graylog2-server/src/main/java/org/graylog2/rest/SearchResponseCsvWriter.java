@@ -21,6 +21,7 @@ import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import org.graylog2.indexer.results.ResultMessage;
+import org.graylog2.rest.models.messages.responses.ResultMessageSummary;
 import org.graylog2.rest.resources.search.responses.SearchResponse;
 import org.graylog2.shared.rest.AdditionalMediaType;
 import org.slf4j.Logger;
@@ -68,11 +69,11 @@ public class SearchResponseCsvWriter implements MessageBodyWriter<SearchResponse
 
         // write result set in same order as the header row
         final String[] fieldValues = new String[sortedFields.size()];
-        for (ResultMessage message : searchResponse.messages()) {
+        for (ResultMessageSummary message : searchResponse.messages()) {
             int idx = 0;
             // first collect all values from the current message
             for (String fieldName : sortedFields) {
-                final Object val = message.getMessage().get(fieldName);
+                final Object val = message.message().get(fieldName);
                 fieldValues[idx++] = ((val == null) ? null : val.toString().replaceAll("\n", "\\\\n"));
                 fieldValues[idx++] = ((val == null) ? null : val.toString().replaceAll("\r", "\\\\r"));
             }

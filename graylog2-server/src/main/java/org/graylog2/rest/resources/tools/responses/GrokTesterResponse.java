@@ -17,6 +17,7 @@
 package org.graylog2.rest.resources.tools.responses;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
@@ -41,7 +42,11 @@ public abstract class GrokTesterResponse {
     @JsonProperty
     public abstract String string();
 
-    public static GrokTesterResponse create(boolean matched, @Nullable List<Match> matches, String pattern, String string) {
+    @JsonCreator
+    public static GrokTesterResponse create(@JsonProperty("matched") boolean matched,
+                                            @JsonProperty("matches") @Nullable List<Match> matches,
+                                            @JsonProperty("oattern") String pattern,
+                                            @JsonProperty("string") String string) {
         return new AutoValue_GrokTesterResponse(matched, matches, pattern, string);
     }
 
@@ -54,7 +59,9 @@ public abstract class GrokTesterResponse {
         @JsonProperty
         public abstract String match();
 
-        public static Match create(String name, String match) {
+        @JsonCreator
+        public static Match create(@JsonProperty("name") String name,
+                                   @JsonProperty("match") String match) {
             return new AutoValue_GrokTesterResponse_Match(name, match);
         }
     }

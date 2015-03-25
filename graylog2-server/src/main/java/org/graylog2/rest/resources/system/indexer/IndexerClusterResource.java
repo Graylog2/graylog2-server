@@ -24,8 +24,8 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.elasticsearch.action.admin.cluster.health.ClusterHealthResponse;
 import org.graylog2.indexer.cluster.Cluster;
 import org.graylog2.shared.rest.resources.RestResource;
-import org.graylog2.rest.resources.system.indexer.responses.ClusterHealth;
-import org.graylog2.rest.resources.system.indexer.responses.ClusterName;
+import org.graylog2.rest.models.system.indexer.responses.ClusterHealth;
+import org.graylog2.rest.models.system.indexer.responses.ClusterName;
 import org.graylog2.shared.security.RestPermissions;
 
 import javax.inject.Inject;

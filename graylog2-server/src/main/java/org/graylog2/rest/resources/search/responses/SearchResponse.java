@@ -19,8 +19,8 @@ package org.graylog2.rest.resources.search.responses;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.graylog2.indexer.ranges.IndexRange;
-import org.graylog2.indexer.results.ResultMessage;
+import org.graylog2.rest.models.messages.responses.ResultMessageSummary;
+import org.graylog2.rest.models.system.indexer.responses.IndexRangeSummary;
 import org.joda.time.DateTime;
 
 import java.util.List;
@@ -36,10 +36,10 @@ public abstract class SearchResponse {
     public abstract String builtQuery();
 
     @JsonProperty
-    public abstract Set<IndexRange> usedIndices();
+    public abstract Set<IndexRangeSummary> usedIndices();
 
     @JsonProperty
-    public abstract List<ResultMessage> messages();
+    public abstract List<ResultMessageSummary> messages();
 
     @JsonProperty
     public abstract Set<String> fields();
@@ -58,8 +58,8 @@ public abstract class SearchResponse {
 
     public static SearchResponse create(String query,
                                         String builtQuery,
-                                        Set<IndexRange> usedIndices,
-                                        List<ResultMessage> messages,
+                                        Set<IndexRangeSummary> usedIndices,
+                                        List<ResultMessageSummary> messages,
                                         Set<String> fields,
                                         long time,
                                         long totalResults,
