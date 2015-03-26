@@ -41,8 +41,8 @@ public abstract class IndexInfo {
     @JsonCreator
     public static IndexInfo create(@JsonProperty("primary_shards") IndexStats primaryShards,
                                    @JsonProperty("all_shards") IndexStats allShards,
-                                   List<ShardRouting> routing,
-                                   boolean isReopened) {
+                                   @JsonProperty("routing") List<ShardRouting> routing,
+                                   @JsonProperty("is_reopened") boolean isReopened) {
         return new AutoValue_IndexInfo(primaryShards, allShards, routing, isReopened);
     }
 }
