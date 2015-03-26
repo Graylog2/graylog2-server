@@ -45,6 +45,7 @@ public class OkHttpClientProvider implements Provider<OkHttpClient> {
     protected final Duration writeTimeout;
     protected final URI httpProxyUri;
 
+    @Inject
     public OkHttpClientProvider(@Named("http_connect_timeout") Duration connectTimeout,
                                 @Named("http_read_timeout") Duration readTimeout,
                                 @Named("http_write_timeout") Duration writeTimeout,
@@ -54,9 +55,6 @@ public class OkHttpClientProvider implements Provider<OkHttpClient> {
         this.writeTimeout = checkNotNull(writeTimeout);
         this.httpProxyUri = httpProxyUri;
     }
-
-    @Inject
-
 
     @Override
     public OkHttpClient get() {
