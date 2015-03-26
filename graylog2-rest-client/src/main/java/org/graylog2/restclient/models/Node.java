@@ -95,11 +95,6 @@ public class Node extends ClusterEntity {
     private BufferClasses bufferClasses;
     private JournalInfo journalInfo;
 
-    /* for initial set up in test */
-    /*public Node(NodeSummaryResponse r) {
-        this(null, null, null, r);
-    }*/
-
     @AssistedInject
     public Node(ApiClient api,
                 Input.Factory inputFactory,
