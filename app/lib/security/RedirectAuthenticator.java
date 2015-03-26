@@ -103,13 +103,12 @@ public class RedirectAuthenticator extends Authenticator {
             log.info("Accessing the current user failed, there's no sessionid in the cookie.");
             return null;
         }
-        final String userAndSessionId = Crypto.decryptAES(encryptedSessionId);
-        final StringTokenizer tokenizer = new StringTokenizer(userAndSessionId, "\t");
-        if (tokenizer.countTokens() != 2) {
+        final String[] userAndSession = decodeSession(encryptedSessionId);
+        if (userAndSession == null) {
             return null;
         }
-        final String userName = tokenizer.nextToken();
-        final String sessionId = tokenizer.nextToken();
+        String userName = userAndSession[0];
+        String sessionId = userAndSession[1];
         Http.Context.current().args.put("sessionId", sessionId);
         // special case for the local admin user for the web interface
 //        if (userName != null) {
@@ -120,6 +119,22 @@ public class RedirectAuthenticator extends Authenticator {
 //            }
 //        }
         return userService.retrieveUserWithSessionId(userName, sessionId);
+    }
+
+    /**
+     * Decrypt the session id into username + sessionid.
+     * @param encryptedSessionId AES encrypted
+     * @return null or String[2] containing username + sessionid
+     */
+    public static String[] decodeSession(String encryptedSessionId) {
+        final String userAndSessionId = Crypto.decryptAES(encryptedSessionId);
+        final StringTokenizer tokenizer = new StringTokenizer(userAndSessionId, "\t");
+        if (tokenizer.countTokens() != 2) {
+            return null;
+        }
+        final String userName = tokenizer.nextToken();
+        final String sessionId = tokenizer.nextToken();
+        return new String[] {userName, sessionId};
     }
 
     protected User authenticateBasicAuthUser() {

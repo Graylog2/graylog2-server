@@ -40,7 +40,7 @@ interface Callback {
 }
 
 class MetricsStore {
-    private METRICS_SOCKJS_URL: string = "/a/metrics"; // URLUtils.appPrefixed('/a/metrics');
+    private METRICS_SOCKJS_URL: string = URLUtils.appPrefixed('/a/metrics');
 
     private sock: SockJS;
 

@@ -7,13 +7,12 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
-import com.google.common.collect.Sets;
 import controllers.AuthenticatedController;
+import lib.security.RedirectAuthenticator;
 import models.sockjs.CreateSessionCommand;
 import models.sockjs.MetricValuesUpdate;
 import models.sockjs.SockJsCommand;
 import models.sockjs.SubscribeMetricsUpdates;
-import models.sockjs.UnsubscribeMetricsUpdates;
 import org.graylog2.restclient.lib.APIException;
 import org.graylog2.restclient.lib.ApiClient;
 import org.graylog2.restclient.lib.ApiRequestBuilder;
@@ -24,7 +23,6 @@ import org.graylog2.restclient.models.api.requests.MultiMetricRequest;
 import org.graylog2.restclient.models.api.responses.metrics.MetricsListResponse;
 import play.Logger;
 import play.Play;
-import play.libs.Crypto;
 import play.libs.F;
 import play.libs.Json;
 import play.sockjs.SockJS;
@@ -32,10 +30,10 @@ import play.sockjs.SockJSRouter;
 
 import javax.inject.Inject;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.StringTokenizer;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -71,7 +69,6 @@ public class MetricsController extends AuthenticatedController {
 
             return new SockJS() {
 
-                private Set<String> subscribedMetrics = Sets.newHashSet();
                 private Multimap<String, String> metricsPerNode =
                         Multimaps.synchronizedMultimap(HashMultimap.<String, String>create());
 
@@ -89,16 +86,12 @@ public class MetricsController extends AuthenticatedController {
 
                                     final String sessionId = ((CreateSessionCommand) command).sessionId;
 
-                                    final String userAndSessionId = Crypto.decryptAES(sessionId);
-                                    final StringTokenizer tokenizer = new StringTokenizer(userAndSessionId, "\t");
-                                    if (tokenizer.countTokens() != 2) {
-                                        Logger.warn("Invalid credentials '{}' for sockjs connection, closing socket.",
-                                                    userAndSessionId);
-                                        out.close();
+                                    final String[] userAndSessionId = RedirectAuthenticator.decodeSession(sessionId);
+                                    if (userAndSessionId == null) {
+                                        Logger.warn("No valid session id, cannot load metrics.");
+                                        return;
                                     }
-                                    //noinspection unused
-                                    String ignored = tokenizer.nextToken();
-                                    clearSessionId = tokenizer.nextToken();
+                                    clearSessionId = userAndSessionId[1];
                                 } else if (command instanceof SubscribeMetricsUpdates) {
                                     final SubscribeMetricsUpdates metricsUpdates = (SubscribeMetricsUpdates) command;
                                     Logger.info("Subscribed to metrics {} on node {}",
@@ -106,10 +99,6 @@ public class MetricsController extends AuthenticatedController {
                                                 MoreObjects.firstNonNull(metricsUpdates.nodeId, "ALL"));
 
                                     metricsPerNode.putAll(metricsUpdates.nodeId, metricsUpdates.metrics);
-                                } else if (command instanceof UnsubscribeMetricsUpdates) {
-                                    for (String metric : ((UnsubscribeMetricsUpdates) command).metrics) {
-                                        subscribedMetrics.remove(metric);
-                                    }
                                 }
                             } catch (Exception e) {
                                 Logger.error("Unhandled exception", e);
@@ -132,42 +121,29 @@ public class MetricsController extends AuthenticatedController {
                                     for (String nodeId : metricsPerNode.keySet()) {
                                         try {
                                             final MultiMetricRequest request = new MultiMetricRequest();
-                                            request.metrics = metricsPerNode.get(nodeId).toArray(new String[]{});
+                                            Collection<String> metricNames = metricsPerNode.get(nodeId);
+                                            request.metrics = metricNames.toArray(new String[metricNames.size()]);
 
+                                            // base request builder, in the next step we decide which node to ask
                                             ApiRequestBuilder<MetricsListResponse> requestBuilder = api.path(MetricsResource().multipleMetrics(), MetricsListResponse.class)
                                                     .body(request)
                                                     .session(clearSessionId)
                                                     .extendSession(false)
                                                     .expect(200);
 
-
+                                            // either query every known node in the cluster, or just one
                                             if (nodeId == null) {
                                                 final Map<Node, MetricsListResponse> responseMap = requestBuilder.fromAllNodes().executeOnAll();
 
                                                 for (Map.Entry<Node, MetricsListResponse> perNodeEntry : responseMap.entrySet()) {
-                                                    final MetricValuesUpdate valuesUpdate = new MetricValuesUpdate();
-                                                    valuesUpdate.nodeId = perNodeEntry.getKey().getNodeId();
-                                                    valuesUpdate.values = Lists.newArrayList();
-                                                    for (Map.Entry<String, Metric> entry : perNodeEntry.getValue().getMetrics().entrySet()) {
-                                                        valuesUpdate.values.add(new MetricValuesUpdate.NamedMetric(entry.getKey(), entry.getValue()));
-                                                    }
-                                                    valuesPerNode.add(valuesUpdate);
+                                                    valuesPerNode.add(createMetricUpdate(perNodeEntry.getKey().getNodeId(), perNodeEntry.getValue().getMetrics().entrySet()));
                                                 }
-
-
                                             } else {
                                                 try {
                                                     final Node node = controllerInstance.nodeService.loadNode(nodeId);
                                                     final MetricsListResponse response = requestBuilder.node(node).execute();
 
-                                                    final MetricValuesUpdate valuesUpdate = new MetricValuesUpdate();
-                                                    valuesUpdate.nodeId = node.getNodeId();
-                                                    valuesUpdate.values = Lists.newArrayList();
-                                                    for (Map.Entry<String, Metric> entry : response.getMetrics().entrySet()) {
-                                                        valuesUpdate.values.add(new MetricValuesUpdate.NamedMetric(entry.getKey(), entry.getValue()));
-                                                    }
-                                                    valuesPerNode.add(valuesUpdate);
-
+                                                    valuesPerNode.add(createMetricUpdate(node.getNodeId(), response.getMetrics().entrySet()));
                                                 } catch (NodeService.NodeNotFoundException e) {
                                                     Logger.warn("Unknown node {}, skipping it.", nodeId);
                                                 }
@@ -177,9 +153,17 @@ public class MetricsController extends AuthenticatedController {
                                             Logger.warn("Unable to load metrics", e);
                                         }
                                     }
-                                    Logger.info(Json.toJson(valuesPerNode).toString());
                                     out.write(Json.toJson(valuesPerNode).toString());
+                                }
 
+                                private MetricValuesUpdate createMetricUpdate(String nodeId, Set<Map.Entry<String, Metric>> metrics) {
+                                    final MetricValuesUpdate valuesUpdate = new MetricValuesUpdate();
+                                    valuesUpdate.nodeId = nodeId;
+                                    valuesUpdate.values = Lists.newArrayList();
+                                    for (Map.Entry<String, Metric> entry : metrics) {
+                                        valuesUpdate.values.add(new MetricValuesUpdate.NamedMetric(entry.getKey(), entry.getValue()));
+                                    }
+                                    return valuesUpdate;
                                 }
                             }, 1, 1, TimeUnit.SECONDS);
 

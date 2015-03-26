@@ -8,8 +8,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "command")
 @JsonSubTypes({
         @JsonSubTypes.Type(value = CreateSessionCommand.class, name = "create_session"),
-        @JsonSubTypes.Type(value = SubscribeMetricsUpdates.class, name = "metrics_subscribe"),
-        @JsonSubTypes.Type(value = UnsubscribeMetricsUpdates.class, name = "metrics_unsubscribe")
+        @JsonSubTypes.Type(value = SubscribeMetricsUpdates.class, name = "metrics_subscribe")
 })
 public abstract class SockJsCommand {
     public String command;
