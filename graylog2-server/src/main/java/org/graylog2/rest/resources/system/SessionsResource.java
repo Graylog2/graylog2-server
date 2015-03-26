@@ -16,8 +16,6 @@
  */
 package org.graylog2.rest.resources.system;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
@@ -29,6 +27,8 @@ import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.apache.shiro.session.UnknownSessionException;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.ThreadContext;
+import org.graylog2.rest.models.system.sessions.requests.SessionCreateRequest;
+import org.graylog2.rest.models.system.sessions.responses.SessionResponse;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.ShiroSecurityContext;
 import org.graylog2.plugin.database.users.User;
@@ -52,7 +52,6 @@ import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.SecurityContext;
 import java.io.Serializable;
-import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 @Path("/system/sessions")
@@ -72,10 +71,9 @@ public class SessionsResource extends RestResource {
 
     @POST
     @ApiOperation(value = "Create a new session", notes = "This request creates a new session for a user or reactivates an existing session: the equivalent of logging in.")
-    public Session newSession(@Context ContainerRequestContext requestContext,
+    public SessionResponse newSession(@Context ContainerRequestContext requestContext,
                               @ApiParam(name = "Login request", value = "Username and credentials", required = true)
                               @Valid @NotNull SessionCreateRequest createRequest) {
-        final Session result = new Session();
         final SecurityContext securityContext = requestContext.getSecurityContext();
         if (!(securityContext instanceof ShiroSecurityContext)) {
             throw new InternalServerErrorException("Unsupported SecurityContext class, this is a bug!");
@@ -92,8 +90,8 @@ public class SessionsResource extends RestResource {
         ThreadContext.bind(subject);
 
         try {
-            subject.login(new UsernamePasswordToken(createRequest.username, createRequest.password));
-            final User user = userService.load(createRequest.username);
+            subject.login(new UsernamePasswordToken(createRequest.username(), createRequest.password()));
+            final User user = userService.load(createRequest.username());
             if (user != null) {
                 long timeoutInMillis = user.getSessionTimeoutMs();
                 subject.getSession().setTimeout(timeoutInMillis);
@@ -107,17 +105,16 @@ public class SessionsResource extends RestResource {
             ((DefaultSecurityManager) SecurityUtils.getSecurityManager()).getSubjectDAO().save(subject);
 
         } catch (AuthenticationException e) {
-            LOG.warn("Unable to log in user " + createRequest.username, e);
+            LOG.warn("Unable to log in user " + createRequest.username(), e);
         } catch (UnknownSessionException e) {
             subject.logout();
         }
         if (subject.isAuthenticated()) {
             final org.apache.shiro.session.Session session = subject.getSession();
             id = session.getId();
-            result.sessionId = id.toString();
-            // TODO is this even used by anyone yet?
-            result.validUntil = new DateTime(session.getLastAccessTime(), DateTimeZone.UTC).plus(session.getTimeout()).toDate();
-            return result;
+            // TODO is the validUntil attribute even used by anyone yet?
+            return SessionResponse.create(new DateTime(session.getLastAccessTime(), DateTimeZone.UTC).plus(session.getTimeout()).toDate(),
+                    id.toString());
         }
         throw new NotAuthorizedException("Invalid username or password", "Basic realm=\"Graylog Server session\"");
     }
@@ -134,28 +131,5 @@ public class SessionsResource extends RestResource {
         if (session == null || !session.getId().equals(sessionId)) {
             throw new NotFoundException();
         }
-    }
-
-    @JsonAutoDetect
-    public static class SessionCreateRequest {
-        public SessionCreateRequest() {
-        }
-
-        @JsonProperty(required = true)
-        public String username;
-
-        @JsonProperty(required = true)
-        public String password;
-
-        public String host;
-    }
-
-    @JsonAutoDetect
-    public static class Session {
-        @JsonProperty(required = true)
-        public Date validUntil;
-
-        @JsonProperty(required = true)
-        public String sessionId;
     }
 }
