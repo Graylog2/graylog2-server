@@ -141,8 +141,8 @@
             <artifactId>javax.ws.rs-api</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.ning</groupId>
-            <artifactId>async-http-client</artifactId>
+            <groupId>com.squareup.okhttp</groupId>
+            <artifactId>okhttp</artifactId>
         </dependency>
 
         <dependency>

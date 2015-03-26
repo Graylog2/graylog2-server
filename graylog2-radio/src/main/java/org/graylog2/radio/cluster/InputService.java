@@ -17,122 +17,117 @@
 package org.graylog2.radio.cluster;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ning.http.client.AsyncHttpClient;
-import com.ning.http.client.Request;
-import com.ning.http.client.Response;
-import org.graylog2.plugin.ServerStatus;
+import com.google.common.net.HttpHeaders;
+import com.squareup.okhttp.MediaType;
+import com.squareup.okhttp.OkHttpClient;
+import com.squareup.okhttp.Request;
+import com.squareup.okhttp.RequestBody;
+import com.squareup.okhttp.Response;
 import org.graylog2.plugin.inputs.MessageInput;
-import org.graylog2.rest.models.radio.responses.RegisterInputResponse;
+import org.graylog2.plugin.system.NodeId;
 import org.graylog2.rest.models.radio.responses.PersistedInputsResponse;
 import org.graylog2.rest.models.radio.responses.PersistedInputsSummaryResponse;
+import org.graylog2.rest.models.radio.responses.RegisterInputResponse;
 import org.graylog2.rest.models.system.inputs.requests.RegisterInputRequest;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.ws.rs.core.UriBuilder;
 import java.io.IOException;
 import java.net.URI;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
 public class InputService {
-    private static final Logger LOG = LoggerFactory.getLogger(InputService.class);
-
-    protected final ObjectMapper mapper = new ObjectMapper();
-    protected final AsyncHttpClient httpclient;
-    protected final URI serverUrl;
-    private final ServerStatus serverStatus;
+    private final ObjectMapper mapper = new ObjectMapper();
+    private final OkHttpClient httpclient;
+    private final URI serverUrl;
+    private final NodeId nodeId;
 
     @Inject
-    public InputService(AsyncHttpClient httpclient, @Named("graylog2_server_uri") URI serverUrl, ServerStatus serverStatus) {
-        this.httpclient = httpclient;
-        this.serverUrl = serverUrl;
-        this.serverStatus = serverStatus;
+    public InputService(@Named("systemHttpClient") OkHttpClient httpclient,
+                        @Named("graylog2_server_uri") URI serverUrl,
+                        NodeId nodeId) {
+        this.httpclient = checkNotNull(httpclient);
+        this.serverUrl = checkNotNull(serverUrl);
+        this.nodeId = checkNotNull(nodeId);
     }
 
     public List<PersistedInputsResponse> getPersistedInputs() throws IOException {
-        final UriBuilder uriBuilder = UriBuilder.fromUri(serverUrl);
-        uriBuilder.path("/system/radios/" + serverStatus.getNodeId().toString() + "/inputs");
+        final URI uri = UriBuilder.fromUri(serverUrl)
+                .path("/system/radios/{radioId}/inputs")
+                .build(nodeId.toString());
 
-        final Request request = httpclient.prepareGet(uriBuilder.build().toString())
-                .setHeader("Content-Type", "application/json")
+        final Request request = new Request.Builder()
+                .header(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON)
+                .get()
+                .url(uri.toString())
                 .build();
-        LOG.debug("API Request {} {}", request.getMethod(), request.getUrl());
-        final Future<Response> f = httpclient.executeRequest(request);
 
-        final Response r;
-        try {
-            r = f.get();
-        } catch (InterruptedException | ExecutionException e) {
-            LOG.error("Unable to fetch inputs from master: ", e);
-            return Collections.emptyList();
+        final Response r = httpclient.newCall(request).execute();
+        if (!r.isSuccessful()) {
+            throw new RuntimeException("Expected successful HTTP response [2xx] for list of persisted input but got [" + r.code() + "].");
         }
 
-        if (r.getStatusCode() != 200) {
-            throw new RuntimeException("Expected HTTP response [200] for list of persisted input but got [" + r.getStatusCode() + "].");
-        }
-        final String responseBody = r.getResponseBody();
-        PersistedInputsSummaryResponse persistedInputsResponse = mapper.readValue(responseBody,
-                PersistedInputsSummaryResponse.class);
+        final PersistedInputsSummaryResponse persistedInputsResponse = mapper.readValue(r.body().byteStream(), PersistedInputsSummaryResponse.class);
+
         return persistedInputsResponse.inputs();
     }
 
     public PersistedInputsResponse getPersistedInput(String inputId) throws IOException {
-        for (PersistedInputsResponse inputSummaryResponse : getPersistedInputs())
-            if (inputSummaryResponse.id().equals(inputId))
+        for (PersistedInputsResponse inputSummaryResponse : getPersistedInputs()) {
+            if (inputSummaryResponse.id().equals(inputId)) {
                 return inputSummaryResponse;
+            }
+        }
 
         return null;
     }
 
-    // TODO make this use a generic ApiClient class that knows the graylog2-server node address(es) or something.
+    // TODO make this use a generic ApiClient class that knows the graylog-server node address(es) or something.
     public RegisterInputResponse registerInCluster(MessageInput input) throws ExecutionException, InterruptedException, IOException {
-        final UriBuilder uriBuilder = UriBuilder.fromUri(serverUrl);
-        uriBuilder.path("/system/radios/" + serverStatus.getNodeId().toString() + "/inputs");
+        final URI uri = UriBuilder.fromUri(serverUrl)
+                .path("/system/radios/{radioId}/inputs")
+                .build(nodeId.toString());
 
-        RegisterInputRequest rir = RegisterInputRequest.create(input.getId(), input.getTitle(), input.getType(), input.getConfiguration().getSource(),
-                serverStatus.getNodeId().toString(), input.getCreatorUserId());
+        final RegisterInputRequest rir = RegisterInputRequest.create(input.getId(), input.getTitle(), input.getType(), input.getConfiguration().getSource(),
+                nodeId.toString(), input.getCreatorUserId());
 
-        String json;
-        try {
-            json = mapper.writeValueAsString(rir);
-        } catch (IOException e) {
-            throw new RuntimeException("Could not create JSON for register input request.", e);
-        }
+        final Request request = new Request.Builder()
+                .post(RequestBody.create(MediaType.parse(APPLICATION_JSON), mapper.writeValueAsBytes(rir)))
+                .url(uri.toString())
+                .build();
 
-        Future<Response> f = httpclient.preparePost(uriBuilder.build().toString())
-                .setHeader("Content-Type", "application/json")
-                .setBody(json)
-                .execute();
-
-        Response r = f.get();
-
-        RegisterInputResponse response = mapper.readValue(r.getResponseBody(), RegisterInputResponse.class);
+        final Response r = httpclient.newCall(request).execute();
+        final RegisterInputResponse registerInputResponse = mapper.readValue(r.body().byteStream(), RegisterInputResponse.class);
 
         // Set the ID that was generated in the server as persist ID of this input.
-        input.setPersistId(response.persistId());
+        input.setPersistId(registerInputResponse.persistId());
 
-        if (r.getStatusCode() != 201) {
-            throw new RuntimeException("Expected HTTP response [201] for input registration but got [" + r.getStatusCode() + "].");
+        if (!r.isSuccessful()) {
+            throw new RuntimeException("Expected HTTP response [2xx] for input registration but got [" + r.code() + "].");
         }
 
-        return response;
+        return registerInputResponse;
     }
 
     public void unregisterInCluster(MessageInput input) throws ExecutionException, InterruptedException, IOException {
-        final UriBuilder uriBuilder = UriBuilder.fromUri(serverUrl);
-        uriBuilder.path("/system/radios/" + serverStatus.getNodeId().toString() + "/inputs/" + input.getPersistId());
+        final URI uri = UriBuilder.fromUri(serverUrl)
+                .path("/system/radios/{radioId}/inputs/{inputId}")
+                .build(nodeId.toString(), input.getPersistId());
 
-        Future<Response> f = httpclient.prepareDelete(uriBuilder.build().toString())
-                .setHeader("Content-Type", "application/json")
-                .execute();
-        Response r = f.get();
-        if (r.getStatusCode() != 204) {
-            throw new RuntimeException("Expected HTTP response [204] for input unregistration but got [" + r.getStatusCode() + "].");
+        final Request request = new Request.Builder()
+                .header(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON)
+                .delete()
+                .url(uri.toString())
+                .build();
+
+        final Response r = httpclient.newCall(request).execute();
+        if (!r.isSuccessful()) {
+            throw new RuntimeException("Expected HTTP response [2xx] for input unregistration but got [" + r.code() + "].");
         }
     }
 }
