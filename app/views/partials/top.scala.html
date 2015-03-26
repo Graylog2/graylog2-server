@@ -6,12 +6,14 @@
 @import org.graylog2.restclient.lib.DateTools
 @import views.helpers.Permissions
 @import lib.security.RestPermissions
+@import play.mvc.Http
 
 <script type="text/javascript">
 // needs to be global!
 gl2AppPathPrefix = "@Configuration.getApplicationContext";
 gl2UserTimeZone = "@DateTools.getUserTimeZone(UserService.current())";
 gl2UserTimeZoneOffset = @DateTools.getUserTimeZoneOffset(UserService.current());
+gl2UserSessionId = "@Http.Context.current().session().get("sessionid")";
 </script>
 
 <div id="top">

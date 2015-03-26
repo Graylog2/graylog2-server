@@ -15,7 +15,8 @@
     "markdown": "^0.5.0",
     "numeral": "1.5.x",
     "qs": "2.3.x",
-    "react": "0.12.x"
+    "react": "0.12.x",
+    "sockjs-client": "1.0.0-beta.12"
   },
   "devDependencies": {
     "browserify": "*",
