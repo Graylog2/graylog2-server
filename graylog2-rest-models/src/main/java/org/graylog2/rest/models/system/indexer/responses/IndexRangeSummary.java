@@ -43,7 +43,7 @@ public abstract class IndexRangeSummary {
     public static IndexRangeSummary create(@JsonProperty("index_name") String indexName,
                                            @Nullable @JsonProperty("calculated_at") DateTime calculatedAt,
                                            @JsonProperty("start") DateTime start,
-                                           @Nullable @JsonProperty("calculation_took_ms") int calculationTookMs) {
+                                           @JsonProperty("calculation_took_ms") int calculationTookMs) {
         return new AutoValue_IndexRangeSummary(indexName, calculatedAt, start, calculationTookMs);
     }
 }
