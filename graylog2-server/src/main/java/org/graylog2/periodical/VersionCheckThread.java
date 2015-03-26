@@ -17,147 +17,139 @@
 package org.graylog2.periodical;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.commons.io.IOUtils;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpHost;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.utils.URIBuilder;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.util.EntityUtils;
-import org.graylog2.shared.ServerVersion;
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.net.HttpHeaders;
+import com.squareup.okhttp.OkHttpClient;
+import com.squareup.okhttp.Request;
+import com.squareup.okhttp.Response;
 import org.graylog2.configuration.VersionCheckConfiguration;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.Version;
 import org.graylog2.plugin.periodical.Periodical;
+import org.graylog2.plugin.system.NodeId;
+import org.graylog2.shared.ServerVersion;
 import org.graylog2.versioncheck.VersionCheckResponse;
+import org.graylog2.versioncheck.VersionResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nullable;
 import javax.inject.Inject;
-import javax.inject.Named;
 import java.io.IOException;
-import java.io.StringWriter;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.nio.charset.Charset;
 
+import static com.google.common.base.Strings.isNullOrEmpty;
+import static java.lang.String.format;
 import static java.util.concurrent.TimeUnit.MINUTES;
 
 public class VersionCheckThread extends Periodical {
     private static final Logger LOG = LoggerFactory.getLogger(VersionCheckThread.class);
+    private static final String USER_AGENT = format("graylog2-server (%s, %s, %s, %s)",
+            System.getProperty("java.vendor"), System.getProperty("java.version"),
+            System.getProperty("os.name"), System.getProperty("os.version"));
 
     private final NotificationService notificationService;
     private final ServerStatus serverStatus;
-    private final VersionCheckConfiguration versionCheckConfiguration;
-    private final URI httpProxyUri;
+    private final VersionCheckConfiguration config;
+    private final ObjectMapper objectMapper;
+    private final OkHttpClient httpClient;
+    private final URI versionCheckUri;
 
     @Inject
     public VersionCheckThread(NotificationService notificationService,
                               ServerStatus serverStatus,
-                              VersionCheckConfiguration versionCheckConfiguration,
-                              @Named("http_proxy_uri") @Nullable URI httpProxyUri) {
+                              VersionCheckConfiguration config,
+                              ObjectMapper objectMapper,
+                              OkHttpClient httpClient) throws URISyntaxException {
+        this(
+                notificationService,
+                serverStatus,
+                config,
+                objectMapper,
+                httpClient,
+                buildURI(serverStatus.getNodeId(), config.getUri())
+        );
+    }
+
+    private static URI buildURI(NodeId nodeId, URI baseUri) throws URISyntaxException {
+        final String queryParams = "anonid=" + nodeId.anonymize() + "&version=" + ServerVersion.VERSION.toString();
+        return new URI(
+                baseUri.getScheme(),
+                baseUri.getUserInfo(),
+                baseUri.getHost(),
+                baseUri.getPort(),
+                baseUri.getPath(),
+                isNullOrEmpty(baseUri.getQuery()) ? queryParams : baseUri.getQuery() + "&" + queryParams,
+                baseUri.getFragment()
+        );
+    }
+
+    @VisibleForTesting
+    VersionCheckThread(NotificationService notificationService,
+                       ServerStatus serverStatus,
+                       VersionCheckConfiguration config,
+                       ObjectMapper objectMapper,
+                       OkHttpClient httpClient,
+                       URI versionCheckUri) {
         this.notificationService = notificationService;
         this.serverStatus = serverStatus;
-        this.versionCheckConfiguration = versionCheckConfiguration;
-        this.httpProxyUri = httpProxyUri;
+        this.config = config;
+        this.objectMapper = objectMapper;
+        this.httpClient = httpClient;
+        this.versionCheckUri = versionCheckUri;
     }
 
     @Override
     public void doRun() {
-        final URIBuilder uri;
-        final HttpGet get;
-        try {
-            uri = new URIBuilder(versionCheckConfiguration.getUri());
-            uri.addParameter("anonid", serverStatus.getNodeId().anonymize());
-            uri.addParameter("version", ServerVersion.VERSION.toString());
+        final Request request = new Request.Builder()
+                .addHeader(HttpHeaders.USER_AGENT, USER_AGENT)
+                .get()
+                .url(versionCheckUri.toString())
+                .build();
 
-            get = new HttpGet(uri.build());
-            get.setHeader("User-Agent",
-                    "graylog2-server ("
-                            + System.getProperty("java.vendor") + ", "
-                            + System.getProperty("java.version") + ", "
-                            + System.getProperty("os.name") + ", "
-                            + System.getProperty("os.version") + ")");
-            final RequestConfig.Builder configBuilder = RequestConfig.custom()
-                    .setConnectTimeout(versionCheckConfiguration.getConnectTimeOut())
-                    .setSocketTimeout(versionCheckConfiguration.getSocketTimeOut())
-                    .setConnectionRequestTimeout(versionCheckConfiguration.getConnectionRequestTimeOut());
-            if (httpProxyUri != null) {
-                try {
-                    configBuilder.setProxy(new HttpHost(httpProxyUri.getHost(), httpProxyUri.getPort(), httpProxyUri.getScheme()));
-                } catch (Exception e) {
-                    LOG.error("Invalid version check proxy URI: " + httpProxyUri, e);
-                    return;
-                }
-            }
-            get.setConfig(configBuilder.build());
-        } catch (URISyntaxException e) {
-            LOG.error("Invalid version check URI.", e);
+        final Response response;
+        try {
+            response = httpClient.newCall(request).execute();
+        } catch (IOException e) {
+            LOG.error("Couldn't perform version check", e);
             return;
         }
 
-        CloseableHttpClient http = HttpClients.createDefault();
-        CloseableHttpResponse response = null;
-        try {
-            response = http.execute(get);
-
-            if (response.getStatusLine().getStatusCode() != 200) {
-                LOG.error("Expected version check HTTP status code [200] but got [{}]", response.getStatusLine().getStatusCode());
+        if (response.isSuccessful()) {
+            final VersionCheckResponse versionCheckResponse;
+            try {
+                versionCheckResponse = objectMapper.readValue(response.body().byteStream(), VersionCheckResponse.class);
+            } catch (IOException e) {
+                LOG.error("Couldn't parse version check response", e);
                 return;
             }
 
-            HttpEntity entity = response.getEntity();
+            final VersionResponse version = versionCheckResponse.version;
+            Version reportedVersion = new Version(version.major, version.minor, version.patch);
 
-            StringWriter writer = new StringWriter();
-            IOUtils.copy(entity.getContent(), writer, Charset.forName("UTF-8"));
-            String body = writer.toString();
-
-            VersionCheckResponse parsedResponse = parse(body);
-            Version reportedVersion = new Version(parsedResponse.version.major, parsedResponse.version.minor, parsedResponse.version.patch);
-
-            LOG.debug("Version check reports current version: " + parsedResponse);
-
+            LOG.debug("Version check reports current version: " + versionCheckResponse);
             if (reportedVersion.greaterMinor(ServerVersion.VERSION)) {
                 LOG.debug("Reported version is higher than ours ({}). Writing notification.", ServerVersion.VERSION);
 
                 Notification notification = notificationService.buildNow()
                         .addSeverity(Notification.Severity.NORMAL)
                         .addType(Notification.Type.OUTDATED_VERSION)
-                        .addDetail("current_version", parsedResponse.toString());
+                        .addDetail("current_version", versionCheckResponse.toString());
                 notificationService.publishIfFirst(notification);
             } else {
                 LOG.debug("Reported version is not higher than ours ({}).", ServerVersion.VERSION);
                 notificationService.fixed(Notification.Type.OUTDATED_VERSION);
             }
-
-            EntityUtils.consume(entity);
-        } catch (IOException e) {
-            LOG.warn("Could not perform version check.", e);
-        } finally {
-            try {
-                if (response != null) {
-                    response.close();
-                }
-            } catch (IOException e) {
-                LOG.warn("Could not close HTTP connection to version check API.", e);
-            }
+        } else {
+            LOG.error("Version check unsuccessful (response code {}).", response.code());
         }
     }
 
     @Override
     protected Logger getLogger() {
         return LOG;
-    }
-
-    private VersionCheckResponse parse(String httpBody) throws IOException {
-        ObjectMapper mapper = new ObjectMapper();
-        return mapper.readValue(httpBody, VersionCheckResponse.class);
     }
 
     @Override
@@ -177,7 +169,7 @@ public class VersionCheckThread extends Periodical {
 
     @Override
     public boolean startOnThisNode() {
-        return versionCheckConfiguration.isEnabled() && !serverStatus.hasCapability(ServerStatus.Capability.LOCALMODE);
+        return config.isEnabled() && !serverStatus.hasCapability(ServerStatus.Capability.LOCALMODE);
     }
 
     @Override

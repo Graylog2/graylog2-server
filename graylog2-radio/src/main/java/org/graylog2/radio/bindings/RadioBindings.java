@@ -22,12 +22,10 @@ import com.google.inject.TypeLiteral;
 import com.google.inject.multibindings.Multibinder;
 import com.google.inject.name.Names;
 import com.google.inject.util.Providers;
-import com.ning.http.client.AsyncHttpClient;
 import org.graylog2.jersey.container.netty.SecurityContextFactory;
 import org.graylog2.plugin.BaseConfiguration;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.radio.Configuration;
-import org.graylog2.radio.bindings.providers.AsyncHttpClientProvider;
 import org.graylog2.radio.bindings.providers.RadioTransportProvider;
 import org.graylog2.radio.buffers.processors.RadioProcessBufferProcessor;
 import org.graylog2.shared.inputs.InputStateListener;
@@ -99,7 +97,6 @@ public class RadioBindings extends AbstractModule {
     }
 
     private void bindProviders() {
-        bind(AsyncHttpClient.class).toProvider(AsyncHttpClientProvider.class);
     }
 
     private void bindTransport() {

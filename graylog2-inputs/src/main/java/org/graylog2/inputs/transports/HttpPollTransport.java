@@ -23,10 +23,10 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
-import com.ning.http.client.AsyncHttpClient;
-import com.ning.http.client.Response;
-import org.graylog2.plugin.inputs.annotations.ConfigClass;
-import org.graylog2.plugin.inputs.annotations.FactoryClass;
+import com.squareup.okhttp.Headers;
+import com.squareup.okhttp.OkHttpClient;
+import com.squareup.okhttp.Request;
+import com.squareup.okhttp.Response;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
@@ -36,6 +36,8 @@ import org.graylog2.plugin.configuration.fields.NumberField;
 import org.graylog2.plugin.configuration.fields.TextField;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.MisfireException;
+import org.graylog2.plugin.inputs.annotations.ConfigClass;
+import org.graylog2.plugin.inputs.annotations.FactoryClass;
 import org.graylog2.plugin.inputs.codecs.CodecAggregator;
 import org.graylog2.plugin.inputs.transports.ThrottleableTransport;
 import org.graylog2.plugin.inputs.transports.Transport;
@@ -49,12 +51,13 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
+import java.util.Collections;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+
+import static com.google.common.base.Strings.isNullOrEmpty;
 
 public class HttpPollTransport extends ThrottleableTransport {
     private static final Logger LOG = LoggerFactory.getLogger(HttpPollTransport.class);
@@ -68,6 +71,7 @@ public class HttpPollTransport extends ThrottleableTransport {
     private final EventBus serverEventBus;
     private final ServerStatus serverStatus;
     private final ScheduledExecutorService scheduler;
+    private final OkHttpClient httpClient;
 
     private volatile boolean paused = true;
     private ScheduledFuture<?> scheduledFuture;
@@ -76,33 +80,28 @@ public class HttpPollTransport extends ThrottleableTransport {
     public HttpPollTransport(@Assisted Configuration configuration,
                              EventBus serverEventBus,
                              ServerStatus serverStatus,
-                             @Named("daemonScheduler") ScheduledExecutorService scheduler) {
+                             @Named("daemonScheduler") ScheduledExecutorService scheduler,
+                             OkHttpClient httpClient) {
         super(serverEventBus, configuration);
         this.configuration = configuration;
         this.serverEventBus = serverEventBus;
         this.serverStatus = serverStatus;
         this.scheduler = scheduler;
+        this.httpClient = httpClient;
     }
 
     @VisibleForTesting
     static Map<String, String> parseHeaders(String headerString) {
-        final Map<String, String> headers = Maps.newHashMap();
-
-        if (headerString == null || headerString.isEmpty()) {
-            return headers;
+        if (isNullOrEmpty(headerString)) {
+            return Collections.emptyMap();
         }
 
-        headerString = headerString.trim();
-
-        for (String headerPart : headerString.split(",")) {
-            headerPart = headerPart.trim();
-
-            final String[] parts = headerPart.split(":");
-            if (parts.length != 2) {
-                continue;
+        final Map<String, String> headers = Maps.newHashMap();
+        for (String headerPart : headerString.trim().split(",")) {
+            final String[] parts = headerPart.trim().split(":");
+            if (parts.length == 2) {
+                headers.put(parts[0].trim(), parts[1].trim());
             }
-
-            headers.put(parts[0].trim(), parts[1].trim());
         }
 
         return headers;
@@ -164,34 +163,28 @@ public class HttpPollTransport extends ThrottleableTransport {
                     // this transport won't block, but we can simply skip this iteration
                     LOG.debug("Not polling HTTP resource {} because we are throttled.", url);
                 }
-                try (AsyncHttpClient client = new AsyncHttpClient()) {
-                    final AsyncHttpClient.BoundRequestBuilder requestBuilder = client.prepareGet(url);
 
-                    // Add custom headers if there are some.
-                    if (headers != null) {
-                        for (final Map.Entry<String, String> header : headers.entrySet()) {
-                            requestBuilder.addHeader(header.getKey(), header.getValue());
-                        }
+                final Request.Builder requestBuilder = new Request.Builder().get()
+                        .url(url)
+                        .headers(Headers.of(headers));
+
+                try {
+                    final Response r = httpClient.newCall(requestBuilder.build()).execute();
+
+                    if (!r.isSuccessful()) {
+                        throw new RuntimeException("Expected successful HTTP status code [2xx], got " + r.code());
                     }
 
-                    final Response r = requestBuilder.execute().get();
-
-                    if (r.getStatusCode() != 200) {
-                        throw new RuntimeException("Expected HTTP status code 200, got " + r.getStatusCode());
-                    }
-
-                    input.processRawMessage(new RawMessage(r.getResponseBody().getBytes(StandardCharsets.UTF_8),
-                                                           remoteAddress
-                    ));
-                } catch (InterruptedException | ExecutionException | IOException e) {
+                    input.processRawMessage(new RawMessage(r.body().bytes(), remoteAddress));
+                } catch (IOException e) {
                     LOG.error("Could not fetch HTTP resource at " + url, e);
                 }
             }
         };
-        scheduledFuture = scheduler.scheduleAtFixedRate(task,
-                                                        0,
-                                                        configuration.getInt(CK_INTERVAL),
-                                                        TimeUnit.valueOf(configuration.getString(CK_TIMEUNIT)));
+
+        scheduledFuture = scheduler.scheduleAtFixedRate(task, 0,
+                configuration.getInt(CK_INTERVAL),
+                TimeUnit.valueOf(configuration.getString(CK_TIMEUNIT)));
     }
 
     @Override

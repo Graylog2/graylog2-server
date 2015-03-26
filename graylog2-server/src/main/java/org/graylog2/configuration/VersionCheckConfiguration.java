@@ -17,41 +17,21 @@
 package org.graylog2.configuration;
 
 import com.github.joschi.jadconfig.Parameter;
-import com.github.joschi.jadconfig.validators.PositiveIntegerValidator;
+
+import java.net.URI;
 
 public class VersionCheckConfiguration {
     @Parameter(value = "versionchecks")
     private boolean enabled = true;
 
     @Parameter(value = "versionchecks_uri")
-    private String uri = "https://versioncheck.graylog.com/check";
-
-    @Parameter(value = "versionchecks_connect_timeout", validator = PositiveIntegerValidator.class)
-    private int connectTimeOut = 10000;
-
-    @Parameter(value = "versionchecks_socket_timeout", validator = PositiveIntegerValidator.class)
-    private int socketTimeOut = 10000;
-
-    @Parameter(value = "versionchecks_connection_request_timeout", validator = PositiveIntegerValidator.class)
-    private int connectionRequestTimeOut = 10000;
+    private URI uri = URI.create("https://versioncheck.graylog.com/check");
 
     public boolean isEnabled() {
         return enabled;
     }
 
-    public String getUri() {
+    public URI getUri() {
         return uri;
-    }
-
-    public int getConnectTimeOut() {
-        return connectTimeOut;
-    }
-
-    public int getSocketTimeOut() {
-        return socketTimeOut;
-    }
-
-    public int getConnectionRequestTimeOut() {
-        return connectionRequestTimeOut;
     }
 }

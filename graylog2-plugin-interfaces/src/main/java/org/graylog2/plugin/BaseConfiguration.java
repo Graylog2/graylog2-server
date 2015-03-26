@@ -23,7 +23,9 @@
 package org.graylog2.plugin;
 
 import com.github.joschi.jadconfig.Parameter;
+import com.github.joschi.jadconfig.util.Duration;
 import com.github.joschi.jadconfig.validators.InetPortValidator;
+import com.github.joschi.jadconfig.validators.PositiveDurationValidator;
 import com.github.joschi.jadconfig.validators.PositiveIntegerValidator;
 import com.lmax.disruptor.BlockingWaitStrategy;
 import com.lmax.disruptor.BusySpinWaitStrategy;
@@ -125,6 +127,15 @@ public abstract class BaseConfiguration {
 
     @Parameter(value = "http_proxy_uri")
     private URI httpProxyUri;
+
+    @Parameter(value = "http_connect_timeout", validator = PositiveDurationValidator.class)
+    private Duration httpConnectTimeout = Duration.seconds(5l);
+
+    @Parameter(value = "http_write_timeout", validator = PositiveDurationValidator.class)
+    private Duration httpWriteTimeout = Duration.seconds(10l);
+
+    @Parameter(value = "http_read_timeout", validator = PositiveDurationValidator.class)
+    private Duration httpReadTimeout = Duration.seconds(10l);
 
     public String getRestUriScheme() {
         return isRestEnableTls() ? "https" : "http";
@@ -295,5 +306,17 @@ public abstract class BaseConfiguration {
 
     public URI getHttpProxyUri() {
         return httpProxyUri;
+    }
+
+    public Duration getHttpConnectTimeout() {
+        return httpConnectTimeout;
+    }
+
+    public Duration getHttpWriteTimeout() {
+        return httpWriteTimeout;
+    }
+
+    public Duration getHttpReadTimeout() {
+        return httpReadTimeout;
     }
 }

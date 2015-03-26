@@ -16,25 +16,20 @@
  */
 package org.graylog2.shared.bindings.providers;
 
-import com.ning.http.client.AsyncHttpClient;
+import com.github.joschi.jadconfig.util.Duration;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
+import javax.inject.Singleton;
 
 /**
- * @author Dennis Oelkers <dennis@torch.sh>
+ * Provider for a configured {@link com.squareup.okhttp.OkHttpClient} used for system-level tasks.
  */
-public class AsyncHttpClientProvider implements Provider<AsyncHttpClient> {
-    private static AsyncHttpClient asyncHttpClient = null;
-
-    @Inject
-    public AsyncHttpClientProvider() {
-        if (asyncHttpClient == null)
-            asyncHttpClient = new AsyncHttpClient();
-    }
-
-    @Override
-    public AsyncHttpClient get() {
-        return asyncHttpClient;
+@Singleton
+public class SystemOkHttpClientProvider extends OkHttpClientProvider {
+    public SystemOkHttpClientProvider() {
+        super(
+                Duration.seconds(2l),
+                Duration.seconds(5l),
+                Duration.seconds(5l),
+                null);
     }
 }

@@ -23,9 +23,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 
-/**
- * @author Dennis Oelkers <dennis@torch.sh>
- */
 public class MasterPingPeriodical extends Periodical {
     private static final Logger LOG = LoggerFactory.getLogger(MasterPingPeriodical.class);
 
