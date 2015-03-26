@@ -48,10 +48,6 @@ public class ExtractorMetrics {
         }
     }
 
-    public ExtractorMetrics(Map<String, Object> total, Map<String, Object> converters) {
-
-    }
-
     public Timer getTotalTiming() {
         return totalTiming;
     }
