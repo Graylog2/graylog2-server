@@ -77,20 +77,20 @@ $(document).ready(function() {
 
     if ($(".gridster").length > 0){
         initializeDashboard();
+
+        var resizeTimeout;
+        $(window).on("resize", function(e) {
+            // ignore resize events as long as a reloadDashboard execution is in the queue
+            if (!resizeTimeout) {
+                resizeTimeout = setTimeout(function() {
+                    resizeTimeout = null;
+                    reloadDashboard();
+                }, 200);
+            }
+        });
     } else {
         toggleDashboardLock.hide();
     }
-
-    var resizeTimeout;
-    $(window).on("resize", function(e) {
-        // ignore resize events as long as a reloadDashboard execution is in the queue
-        if (!resizeTimeout) {
-            resizeTimeout = setTimeout(function() {
-                resizeTimeout = null;
-                reloadDashboard();
-            }, 200);
-        }
-    });
 
     function applyDashboardsToAllSelectors() {
         var dashboardSelectors = $(".dashboard-selector[data-widget-type]");
