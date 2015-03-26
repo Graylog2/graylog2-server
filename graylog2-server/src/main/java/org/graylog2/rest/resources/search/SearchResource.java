@@ -161,7 +161,7 @@ public abstract class SearchResource extends RestResource {
     }
 
     protected List<ResultMessageSummary> resultMessageListtoValueList(List<ResultMessage> resultMessages) {
-        final List<ResultMessageSummary> result = Lists.newArrayListWithExpectedSize(resultMessages.size());
+        final List<ResultMessageSummary> result = Lists.newArrayListWithCapacity(resultMessages.size());
 
         for (ResultMessage resultMessage : resultMessages) {
             result.add(ResultMessageSummary.create(resultMessage.highlightRanges, resultMessage.getMessage(), resultMessage.getIndex()));
