@@ -1,5 +1,8 @@
 package models.sockjs;
 
+import java.util.List;
+
 public class SubscribeMetricsUpdates extends SockJsCommand {
-    public String metrics[];
+    public String nodeId;
+    public List<String> metrics;
 }

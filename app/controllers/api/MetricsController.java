@@ -2,7 +2,11 @@ package controllers.api;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.MoreObjects;
+import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.Multimaps;
 import com.google.common.collect.Sets;
 import controllers.AuthenticatedController;
 import models.sockjs.CreateSessionCommand;
@@ -12,6 +16,7 @@ import models.sockjs.SubscribeMetricsUpdates;
 import models.sockjs.UnsubscribeMetricsUpdates;
 import org.graylog2.restclient.lib.APIException;
 import org.graylog2.restclient.lib.ApiClient;
+import org.graylog2.restclient.lib.ApiRequestBuilder;
 import org.graylog2.restclient.lib.metrics.Metric;
 import org.graylog2.restclient.models.Node;
 import org.graylog2.restclient.models.NodeService;
@@ -22,13 +27,12 @@ import play.Play;
 import play.libs.Crypto;
 import play.libs.F;
 import play.libs.Json;
-import play.mvc.Http;
-import play.sockjs.CookieCalculator;
 import play.sockjs.SockJS;
 import play.sockjs.SockJSRouter;
 
 import javax.inject.Inject;
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
@@ -44,7 +48,8 @@ public class MetricsController extends AuthenticatedController {
     private final NodeService nodeService;
     private final ScheduledExecutorService executor;
 
-    private static ObjectMapper objectMapper = new ObjectMapper().enable(DeserializationFeature.FAIL_ON_INVALID_SUBTYPE);
+    private static ObjectMapper objectMapper = new ObjectMapper()
+            .enable(DeserializationFeature.FAIL_ON_INVALID_SUBTYPE);
 
     @Inject
     public MetricsController(NodeService nodeService) {
@@ -67,6 +72,8 @@ public class MetricsController extends AuthenticatedController {
             return new SockJS() {
 
                 private Set<String> subscribedMetrics = Sets.newHashSet();
+                private Multimap<String, String> metricsPerNode =
+                        Multimaps.synchronizedMultimap(HashMultimap.<String, String>create());
 
                 private String clearSessionId;
 
@@ -92,14 +99,13 @@ public class MetricsController extends AuthenticatedController {
                                     //noinspection unused
                                     String ignored = tokenizer.nextToken();
                                     clearSessionId = tokenizer.nextToken();
-
-                                    Logger.warn("session is {}", clearSessionId);
-
                                 } else if (command instanceof SubscribeMetricsUpdates) {
-                                    for (String metric : ((SubscribeMetricsUpdates) command).metrics) {
-                                        Logger.warn("Subscribed to metric {}", metric);
-                                        subscribedMetrics.add(metric);
-                                    }
+                                    final SubscribeMetricsUpdates metricsUpdates = (SubscribeMetricsUpdates) command;
+                                    Logger.info("Subscribed to metrics {} on node {}",
+                                                metricsUpdates.metrics,
+                                                MoreObjects.firstNonNull(metricsUpdates.nodeId, "ALL"));
+
+                                    metricsPerNode.putAll(metricsUpdates.nodeId, metricsUpdates.metrics);
                                 } else if (command instanceof UnsubscribeMetricsUpdates) {
                                     for (String metric : ((UnsubscribeMetricsUpdates) command).metrics) {
                                         subscribedMetrics.remove(metric);
@@ -116,36 +122,64 @@ public class MetricsController extends AuthenticatedController {
                                 @Override
                                 public void run() {
                                     // don't send anything if not authenticated or nothing is requested
-                                    if (clearSessionId == null || subscribedMetrics.isEmpty()) {
+                                    if (clearSessionId == null || metricsPerNode.isEmpty()) {
                                         return;
                                     }
-                                    try {
-                                        final ApiClient api = controllerInstance.api();
+                                    final ApiClient api = controllerInstance.api();
 
-                                        final Node node = controllerInstance.nodeService.loadMasterNode();
+                                    final List<MetricValuesUpdate> valuesPerNode = Lists.newArrayList();
 
-                                        final MultiMetricRequest request = new MultiMetricRequest();
-                                        request.metrics = subscribedMetrics.toArray(new String[subscribedMetrics.size()]);
+                                    for (String nodeId : metricsPerNode.keySet()) {
+                                        try {
+                                            final MultiMetricRequest request = new MultiMetricRequest();
+                                            request.metrics = metricsPerNode.get(nodeId).toArray(new String[]{});
 
-                                        MetricsListResponse response = api.path(MetricsResource().multipleMetrics(), MetricsListResponse.class)
-                                                .node(node)
-                                                .body(request)
-                                                .session(clearSessionId)
-                                                .extendSession(false)
-                                                .expect(200)
-                                                .execute();
+                                            ApiRequestBuilder<MetricsListResponse> requestBuilder = api.path(MetricsResource().multipleMetrics(), MetricsListResponse.class)
+                                                    .body(request)
+                                                    .session(clearSessionId)
+                                                    .extendSession(false)
+                                                    .expect(200);
 
-                                        final MetricValuesUpdate valuesUpdate = new MetricValuesUpdate();
-                                        valuesUpdate.nodeId = node.getNodeId();
-                                        valuesUpdate.values = Lists.newArrayList();
-                                        for (Map.Entry<String, Metric> entry : response.getMetrics().entrySet()) {
-                                            valuesUpdate.values.add(new MetricValuesUpdate.NamedMetric(entry.getKey(), entry.getValue()));
+
+                                            if (nodeId == null) {
+                                                final Map<Node, MetricsListResponse> responseMap = requestBuilder.fromAllNodes().executeOnAll();
+
+                                                for (Map.Entry<Node, MetricsListResponse> perNodeEntry : responseMap.entrySet()) {
+                                                    final MetricValuesUpdate valuesUpdate = new MetricValuesUpdate();
+                                                    valuesUpdate.nodeId = perNodeEntry.getKey().getNodeId();
+                                                    valuesUpdate.values = Lists.newArrayList();
+                                                    for (Map.Entry<String, Metric> entry : perNodeEntry.getValue().getMetrics().entrySet()) {
+                                                        valuesUpdate.values.add(new MetricValuesUpdate.NamedMetric(entry.getKey(), entry.getValue()));
+                                                    }
+                                                    valuesPerNode.add(valuesUpdate);
+                                                }
+
+
+                                            } else {
+                                                try {
+                                                    final Node node = controllerInstance.nodeService.loadNode(nodeId);
+                                                    final MetricsListResponse response = requestBuilder.node(node).execute();
+
+                                                    final MetricValuesUpdate valuesUpdate = new MetricValuesUpdate();
+                                                    valuesUpdate.nodeId = node.getNodeId();
+                                                    valuesUpdate.values = Lists.newArrayList();
+                                                    for (Map.Entry<String, Metric> entry : response.getMetrics().entrySet()) {
+                                                        valuesUpdate.values.add(new MetricValuesUpdate.NamedMetric(entry.getKey(), entry.getValue()));
+                                                    }
+                                                    valuesPerNode.add(valuesUpdate);
+
+                                                } catch (NodeService.NodeNotFoundException e) {
+                                                    Logger.warn("Unknown node {}, skipping it.", nodeId);
+                                                }
+                                            }
+
+                                        } catch (APIException | IOException e) {
+                                            Logger.warn("Unable to load metrics", e);
                                         }
-
-                                        out.write(Json.toJson(valuesUpdate).toString());
-                                    } catch (APIException | IOException e) {
-                                        Logger.warn("Unable to load metrics", e);
                                     }
+                                    Logger.info(Json.toJson(valuesPerNode).toString());
+                                    out.write(Json.toJson(valuesPerNode).toString());
+
                                 }
                             }, 1, 1, TimeUnit.SECONDS);
 
@@ -153,7 +187,6 @@ public class MetricsController extends AuthenticatedController {
                         @Override
                         public void invoke() throws Throwable {
                             scheduledFuture.cancel(true);
-                            Logger.info("Good bye.");
                         }
                     });
 
@@ -162,10 +195,4 @@ public class MetricsController extends AuthenticatedController {
         }
     };
 
-    public static class Graylog2Cookie implements CookieCalculator {
-        @Override
-        public Http.Cookie cookie(Http.RequestHeader request) {
-            return null;
-        }
-    }
 }

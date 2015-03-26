@@ -23,7 +23,7 @@ interface MetricUpdate {
 }
 
 interface MetricUpdateCallback {
-    (update: MetricUpdate):void;
+    (update: Array<MetricUpdate>):void;
 }
 
 interface ListenRequest {
@@ -35,11 +35,12 @@ interface ListenRequest {
 
 interface Callback {
     callback: MetricUpdateCallback;
-    names: {}
+    nodeId: String;
+    names: {};
 }
 
 class MetricsStore {
-    private METRICS_SOCKJS_URL: string = URLUtils.appPrefixed('/a/metrics');
+    private METRICS_SOCKJS_URL: string = "/a/metrics"; // URLUtils.appPrefixed('/a/metrics');
 
     private sock: SockJS;
 
@@ -61,20 +62,34 @@ class MetricsStore {
             // process those first before we continue.
             this.queuedRequests.forEach((request) => this.registerRequest(request));
             this.queuedRequests = [];
-
-//            this.sock.send(JSON.stringify({command:"metrics_subscribe", metrics:["org.graylog2.throughput"]}));
         };
 
         this.sock.onmessage = (e) => {
-            var update: MetricUpdate = JSON.parse(e.data);
+            var update: Array<MetricUpdate> = JSON.parse(e.data);
 
             this.callbacks.forEach((cb) => {
-                // only pass the metrics this caller has asked for, not the entire set
-                var interestingMetrics = update.values.filter((metric) => cb.names.hasOwnProperty(metric.name));
+                var updates: Array<MetricUpdate> = [];
 
-                cb.callback({node_id: update.node_id, values: interestingMetrics});
+                if (cb.nodeId === null) {
+                    // caller wanted all nodes
+                    update.forEach((nodeMetrics) => {
+                        var interestingMetrics = nodeMetrics.values.filter((metric) => cb.names.hasOwnProperty(metric.name));
+                        updates.push({node_id: nodeMetrics.node_id, values: interestingMetrics});
+                    });
+                } else {
+                    // caller specified a single node, so we only pass that specific one
+                    // only pass the metrics this caller has asked for, not the entire set
+                    var nodeMetrics = update.filter((node) => node.node_id === cb.nodeId);
+                    if (nodeMetrics.length === 1) {
+                        var interestingMetrics = nodeMetrics[0].values.filter((metric) => cb.names.hasOwnProperty(metric.name));
+                        updates.push({node_id: nodeMetrics[0].node_id, values: interestingMetrics});
+                    }
+                }
+
+                if (updates.length > 0) {
+                    cb.callback(updates);
+                }
             });
-            //console.log('message', e.data);
         };
 
         this.sock.onclose = () => {
@@ -95,9 +110,9 @@ class MetricsStore {
         var nameMap = {};
         request.metricNames.forEach((name) => nameMap[name] = 1);
 
-        this.callbacks.push({callback: request.callback, names: nameMap});
+        this.callbacks.push({callback: request.callback, names: nameMap, nodeId: request.nodeId});
 
-        this.sock.send(JSON.stringify({"command":"metrics_subscribe", metrics:request.metricNames }));
+        this.sock.send(JSON.stringify({"command":"metrics_subscribe", metrics:request.metricNames, nodeId: request.nodeId }));
     }
 
 }
