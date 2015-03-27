@@ -22,8 +22,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.graylog2.rest.models.metrics.responses.TimerRateMetricsResponse;
 
-import java.util.Map;
-
 @AutoValue
 @JsonAutoDetect
 public abstract class ExtractorMetrics {
