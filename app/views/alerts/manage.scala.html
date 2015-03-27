@@ -3,7 +3,7 @@
         totalAlerts: Long,
         alerts: List[org.graylog2.restclient.models.alerts.Alert],
         users: String,
-        availableAlarmCallbacks: Map[String, org.graylog2.restclient.models.api.responses.alarmcallbacks.GetSingleAvailableAlarmCallbackResponse],
+        availableAlarmCallbacks: Map[String, org.graylog2.rest.models.alarmcallbacks.responses.AvailableAlarmCallbackSummaryResponse],
         alarmCallbacks: List[org.graylog2.restclient.models.AlarmCallback],
         node: org.graylog2.restclient.models.Node)
 
