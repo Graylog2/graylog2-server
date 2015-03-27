@@ -3,7 +3,7 @@
         inputType: String,
         inputInfo: org.graylog2.restclient.models.api.responses.system.InputTypeSummaryResponse)
 
-@import org.graylog2.restclient.lib.plugin.configuration.DropdownField
+@import org.graylog2.rest.models.configuration.responses.DropdownField
 
 <form action="@routes.InputsController.update(input.getId)" method="POST">
     <div id="edit-input-@input.getId" class="edit-input-configuration modal fade" tabindex="-1" role="dialog" aria-hidden="true">

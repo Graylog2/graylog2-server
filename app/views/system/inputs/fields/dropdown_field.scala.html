@@ -1,7 +1,8 @@
 @(idPrefix: String,
-        field: org.graylog2.restclient.lib.plugin.configuration.DropdownField,
+        field: org.graylog2.rest.models.configuration.responses.DropdownField,
         selected: String = null)
-@import org.graylog2.restclient.lib.plugin.configuration.DropdownField
+
+@import org.graylog2.rest.models.configuration.responses.DropdownField
 
 @htmlAttributes(field: DropdownField) = {
     name="configuration[@field.getTitle]"

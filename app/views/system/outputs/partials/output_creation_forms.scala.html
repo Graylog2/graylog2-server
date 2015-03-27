@@ -1,7 +1,7 @@
 @(outputTypes: Map[String, org.graylog2.restclient.models.api.responses.AvailableOutputSummary],
     formTarget: Call)
 
-@import org.graylog2.restclient.lib.plugin.configuration.DropdownField
+@import org.graylog2.rest.models.configuration.responses.DropdownField
 
 @for((outputType,info) <- outputTypes) {
     <form action="@formTarget" method="POST">
