@@ -27,16 +27,16 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.Configuration;
 import org.graylog2.plugin.database.ValidationException;
-import org.graylog2.rest.resources.users.requests.ChangePasswordRequest;
-import org.graylog2.rest.resources.users.requests.ChangeUserRequest;
-import org.graylog2.rest.resources.users.requests.CreateUserRequest;
-import org.graylog2.rest.resources.users.requests.PermissionEditRequest;
-import org.graylog2.rest.resources.users.requests.Startpage;
-import org.graylog2.rest.resources.users.requests.UpdateUserPreferences;
-import org.graylog2.rest.resources.users.responses.Token;
-import org.graylog2.rest.resources.users.responses.TokenList;
-import org.graylog2.rest.resources.users.responses.User;
-import org.graylog2.rest.resources.users.responses.UserList;
+import org.graylog2.rest.models.users.requests.ChangePasswordRequest;
+import org.graylog2.rest.models.users.requests.ChangeUserRequest;
+import org.graylog2.rest.models.users.requests.CreateUserRequest;
+import org.graylog2.rest.models.users.requests.PermissionEditRequest;
+import org.graylog2.rest.models.users.requests.Startpage;
+import org.graylog2.rest.models.users.requests.UpdateUserPreferences;
+import org.graylog2.rest.models.users.responses.Token;
+import org.graylog2.rest.models.users.responses.TokenList;
+import org.graylog2.rest.models.users.responses.UserSummary;
+import org.graylog2.rest.models.users.responses.UserList;
 import org.graylog2.security.AccessToken;
 import org.graylog2.security.AccessTokenService;
 import org.graylog2.shared.security.RestPermissions;
@@ -98,7 +98,7 @@ public class UsersResource extends RestResource {
     @ApiResponses({
             @ApiResponse(code = 404, message = "The user could not be found.")
     })
-    public User get(@ApiParam(name = "username", value = "The username to return information for.", required = true)
+    public UserSummary get(@ApiParam(name = "username", value = "The username to return information for.", required = true)
                     @PathParam("username") String username) {
         final org.graylog2.plugin.database.users.User user = userService.load(username);
         if (user == null) {
@@ -116,7 +116,7 @@ public class UsersResource extends RestResource {
     @ApiOperation(value = "List all users", notes = "The permissions assigned to the users are always included.")
     public UserList listUsers() {
         final List<org.graylog2.plugin.database.users.User> users = userService.loadAll();
-        final List<User> resultUsers = Lists.newArrayListWithCapacity(users.size() + 1);
+        final List<UserSummary> resultUsers = Lists.newArrayListWithCapacity(users.size() + 1);
         resultUsers.add(toUserResponse(userService.getAdminUser()));
 
         for (org.graylog2.plugin.database.users.User user : users) {
@@ -429,12 +429,12 @@ public class UsersResource extends RestResource {
         return user;
     }
 
-    private User toUserResponse(org.graylog2.plugin.database.users.User user) {
+    private UserSummary toUserResponse(org.graylog2.plugin.database.users.User user) {
         return toUserResponse(user, true);
     }
 
-    private User toUserResponse(org.graylog2.plugin.database.users.User user, boolean includePermissions) {
-        return User.create(
+    private UserSummary toUserResponse(org.graylog2.plugin.database.users.User user, boolean includePermissions) {
+        return UserSummary.create(
                 user.getId(),
                 user.getName(),
                 user.getEmail(),

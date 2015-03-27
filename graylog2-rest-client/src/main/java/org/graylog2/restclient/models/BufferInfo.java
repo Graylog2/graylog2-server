@@ -18,6 +18,7 @@ package org.graylog2.restclient.models;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.Maps;
+import org.graylog2.rest.models.system.buffers.responses.BuffersUtilizationSummary;
 import org.graylog2.restclient.models.api.responses.BufferSummaryResponse;
 import org.graylog2.restclient.models.api.responses.BuffersResponse;
 
@@ -33,6 +34,12 @@ public class BufferInfo {
         inputBuffer = br.buffers.get("input");
         processBuffer = br.buffers.get("process");
         outputBuffer = br.buffers.get("output");
+    }
+
+    public BufferInfo(BuffersUtilizationSummary bus) {
+        inputBuffer = BufferSummaryResponse.fromSingleRingUtilization(bus.buffers().input());
+        processBuffer = BufferSummaryResponse.EMPTY;
+        outputBuffer = BufferSummaryResponse.fromSingleRingUtilization(bus.buffers().output());
     }
 
     public BufferSummaryResponse getInputBuffer() {

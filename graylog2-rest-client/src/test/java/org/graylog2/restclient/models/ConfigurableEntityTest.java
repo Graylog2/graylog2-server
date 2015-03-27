@@ -16,10 +16,10 @@
  */
 package org.graylog2.restclient.models;
 
-import autovalue.shaded.com.google.common.common.collect.Lists;
-import autovalue.shaded.com.google.common.common.collect.Maps;
-import org.graylog2.restclient.lib.plugin.configuration.RequestedConfigurationField;
-import org.graylog2.restclient.lib.plugin.configuration.TextField;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import org.graylog2.rest.models.configuration.responses.RequestedConfigurationField;
+import org.graylog2.rest.models.configuration.responses.TextField;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

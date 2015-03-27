@@ -41,7 +41,7 @@ public class ExtractorFactory {
 
     public Extractor factory(String id,
                                     String title,
-                                    int order,
+                                    long order,
                                     Extractor.CursorStrategy cursorStrategy,
                                     Extractor.Type type,
                                     String sourceField,

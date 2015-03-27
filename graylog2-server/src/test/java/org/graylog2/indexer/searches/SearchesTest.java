@@ -16,7 +16,7 @@
  */
 package org.graylog2.indexer.searches;
 
-import autovalue.shaded.com.google.common.common.collect.ImmutableSet;
+import com.google.common.collect.ImmutableSet;
 import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
 import com.lordofthejars.nosqlunit.core.DatabaseOperation;
 import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;

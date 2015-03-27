@@ -37,9 +37,9 @@ import org.graylog2.rest.models.radio.requests.PingRequest;
 import org.graylog2.rest.models.radio.responses.PersistedInputsResponse;
 import org.graylog2.rest.models.radio.responses.PersistedInputsSummaryResponse;
 import org.graylog2.rest.models.radio.responses.RegisterInputResponse;
-import org.graylog2.rest.models.system.inputs.requests.RegisterInputRequest;
-import org.graylog2.rest.resources.system.radio.responses.RadioSummary;
 import org.graylog2.shared.rest.resources.RestResource;
+import org.graylog2.rest.models.system.radio.responses.RadioSummary;
+import org.graylog2.rest.models.system.inputs.requests.RegisterInputRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

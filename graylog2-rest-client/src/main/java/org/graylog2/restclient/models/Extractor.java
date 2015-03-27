@@ -21,8 +21,8 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
-import org.graylog2.restclient.models.api.requests.CreateExtractorRequest;
-import org.graylog2.restclient.models.api.responses.system.ExtractorSummaryResponse;
+import org.graylog2.rest.models.system.inputs.extractors.requests.CreateExtractorRequest;
+import org.graylog2.rest.models.system.inputs.extractors.responses.ExtractorSummary;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,7 +36,7 @@ public class Extractor {
     private static final Logger LOG = LoggerFactory.getLogger(Extractor.class);
 
     public interface Factory {
-        Extractor fromResponse(ExtractorSummaryResponse esr);
+        Extractor fromResponse(ExtractorSummary es);
 
         Extractor forCreate(CursorStrategy cursorStrategy,
                             @Assisted("title") String title,
@@ -104,25 +104,25 @@ public class Extractor {
     private final long exceptions;
     private final long converterExceptions;
 
-    private int order;
+    private long order;
 
     @AssistedInject
-    private Extractor(UserService userService, @Assisted ExtractorSummaryResponse esr) {
-        this.id = esr.id;
-        this.title = esr.title;
-        this.cursorStrategy = CursorStrategy.fromString(esr.cursorStrategy);
-        this.sourceField = esr.sourceField;
-        this.targetField = esr.targetField;
-        this.extractorType = Type.fromString(esr.type);
-        this.creatorUser = userService.load(esr.creatorUserId);
-        this.extractorConfig = esr.extractorConfig;
-        this.converters = buildConverterList(esr.converters);
-        this.conditionType = ConditionType.fromString(esr.conditionType);
-        this.conditionValue = esr.conditionValue;
-        this.metrics = new ExtractorMetrics(esr.metrics.get("total"), esr.metrics.get("converters"));
-        this.exceptions = esr.exceptions;
-        this.converterExceptions = esr.converterExceptions;
-        this.order = esr.order;
+    private Extractor(UserService userService, @Assisted ExtractorSummary es) {
+        this.id = es.id();
+        this.title = es.title();
+        this.cursorStrategy = CursorStrategy.fromString(es.cursorStrategy());
+        this.sourceField = es.sourceField();
+        this.targetField = es.targetField();
+        this.extractorType = Type.fromString(es.type());
+        this.creatorUser = userService.load(es.creatorUserId());
+        this.extractorConfig = es.extractorConfig();
+        this.converters = buildConverterList(es.converters());
+        this.conditionType = ConditionType.fromString(es.conditionType());
+        this.conditionValue = es.conditionValue();
+        this.metrics = new ExtractorMetrics(es.metrics().total(), es.metrics().converters());
+        this.exceptions = es.exceptions();
+        this.converterExceptions = es.converterExceptions();
+        this.order = es.order();
     }
 
     @VisibleForTesting
@@ -153,23 +153,13 @@ public class Extractor {
     }
 
     public CreateExtractorRequest toCreateExtractorRequest() {
-        CreateExtractorRequest request = new CreateExtractorRequest();
-
-        Map<String, Map<String, Object>> converterList = Maps.newHashMap();
+        final Map<String, Map<String, Object>> converterList = Maps.newHashMap();
         for (Converter converter : converters) {
             converterList.put(converter.getType(), converter.getConfig());
         }
 
-        request.title = title;
-        request.cutOrCopy = cursorStrategy.toString().toLowerCase();
-        request.extractorType = extractorType.toString().toLowerCase();
-        request.sourceField = sourceField;
-        request.targetField = targetField;
-        request.extractorConfig = extractorConfig;
-        request.converters = converterList;
-        request.conditionType = conditionType.toString().toLowerCase();
-        request.conditionValue = conditionValue;
-        request.order = order;
+        final CreateExtractorRequest request = CreateExtractorRequest.create(title, cursorStrategy.toString().toLowerCase(), sourceField, targetField,
+                extractorType.toString().toLowerCase(), extractorConfig, converterList, conditionType.toString().toLowerCase(), conditionValue, order);
 
         return request;
     }
@@ -427,11 +417,11 @@ public class Extractor {
         return exceptions + converterExceptions;
     }
 
-    public int getOrder() {
+    public long getOrder() {
         return order;
     }
 
-    public void setOrder(int order) {
+    public void setOrder(long order) {
         this.order = order;
     }
 

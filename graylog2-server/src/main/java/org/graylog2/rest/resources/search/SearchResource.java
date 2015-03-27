@@ -18,6 +18,7 @@ package org.graylog2.rest.resources.search;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.queryparser.classic.QueryParser;
@@ -25,18 +26,22 @@ import org.apache.lucene.queryparser.classic.Token;
 import org.elasticsearch.action.search.SearchPhaseExecutionException;
 import org.glassfish.jersey.server.ChunkedOutput;
 import org.graylog2.indexer.InvalidRangeFormatException;
+import org.graylog2.indexer.ranges.IndexRange;
+import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.indexer.results.ScrollResult;
 import org.graylog2.indexer.results.SearchResult;
 import org.graylog2.indexer.searches.Searches;
 import org.graylog2.indexer.searches.Sorting;
 import org.graylog2.indexer.searches.timeranges.AbsoluteRange;
-import org.graylog2.rest.resources.search.responses.FieldStatsResult;
-import org.graylog2.rest.resources.search.responses.HistogramResult;
+import org.graylog2.rest.models.messages.responses.ResultMessageSummary;
+import org.graylog2.rest.models.search.responses.FieldStatsResult;
+import org.graylog2.rest.models.search.responses.HistogramResult;
+import org.graylog2.rest.models.system.indexer.responses.IndexRangeSummary;
 import org.graylog2.rest.resources.search.responses.QueryParseError;
 import org.graylog2.rest.resources.search.responses.SearchResponse;
-import org.graylog2.rest.resources.search.responses.TermsResult;
-import org.graylog2.rest.resources.search.responses.TermsStatsResult;
-import org.graylog2.rest.resources.search.responses.TimeRange;
+import org.graylog2.rest.models.search.responses.TermsResult;
+import org.graylog2.rest.models.search.responses.TermsStatsResult;
+import org.graylog2.rest.models.search.responses.TimeRange;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.slf4j.Logger;
@@ -49,6 +54,7 @@ import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 
@@ -135,13 +141,33 @@ public abstract class SearchResource extends RestResource {
     protected SearchResponse buildSearchResponse(SearchResult sr, org.graylog2.indexer.searches.timeranges.TimeRange timeRange) {
         return SearchResponse.create(sr.getOriginalQuery(),
                 sr.getBuiltQuery(),
-                sr.getUsedIndices(),
-                sr.getResults(),
+                indexRangeListToValueList(sr.getUsedIndices()),
+                resultMessageListtoValueList(sr.getResults()),
                 sr.getFields(),
                 sr.took().millis(),
                 sr.getTotalResults(),
                 timeRange.getFrom(),
                 timeRange.getTo());
+    }
+
+    protected Set<IndexRangeSummary> indexRangeListToValueList(Set<IndexRange> indexRanges) {
+        final Set<IndexRangeSummary> result = Sets.newHashSetWithExpectedSize(indexRanges.size());
+
+        for (IndexRange indexRange : indexRanges) {
+            result.add(IndexRangeSummary.create(indexRange.getIndexName(), indexRange.getCalculatedAt(), indexRange.getStart(), indexRange.getCalculationTookMs()));
+        }
+
+        return result;
+    }
+
+    protected List<ResultMessageSummary> resultMessageListtoValueList(List<ResultMessage> resultMessages) {
+        final List<ResultMessageSummary> result = Lists.newArrayListWithCapacity(resultMessages.size());
+
+        for (ResultMessage resultMessage : resultMessages) {
+            result.add(ResultMessageSummary.create(resultMessage.highlightRanges, resultMessage.getMessage(), resultMessage.getIndex()));
+        }
+
+        return result;
     }
 
     protected FieldStatsResult buildFieldStatsResult(org.graylog2.indexer.results.FieldStatsResult sr) {

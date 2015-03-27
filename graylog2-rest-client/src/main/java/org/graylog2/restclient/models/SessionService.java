@@ -16,10 +16,10 @@
  */
 package org.graylog2.restclient.models;
 
+import org.graylog2.rest.models.system.sessions.requests.SessionCreateRequest;
+import org.graylog2.rest.models.system.sessions.responses.SessionResponse;
 import org.graylog2.restclient.lib.APIException;
 import org.graylog2.restclient.lib.ApiClient;
-import org.graylog2.restclient.models.api.requests.SessionCreateRequest;
-import org.graylog2.restclient.models.api.responses.SessionCreateResponse;
 import org.graylog2.restroutes.generated.routes;
 
 import javax.inject.Inject;
@@ -40,10 +40,10 @@ public class SessionService {
         this.apiClient = apiClient;
     }
 
-    public SessionCreateResponse create(String username, String password, String remoteAddress) throws APIException, IOException {
-        return apiClient.path(routes.SessionsResource().newSession(), SessionCreateResponse.class)
+    public SessionResponse create(String username, String password, String remoteAddress) throws APIException, IOException {
+        return apiClient.path(routes.SessionsResource().newSession(), SessionResponse.class)
                 .unauthenticated()
-                .body(new SessionCreateRequest(username, password, remoteAddress))
+                .body(SessionCreateRequest.create(username, password, remoteAddress))
                 .execute();
     }
 

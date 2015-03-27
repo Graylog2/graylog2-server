@@ -28,7 +28,7 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.rest.models.system.SystemJobSummary;
 import org.graylog2.shared.rest.resources.RestResource;
-import org.graylog2.rest.resources.system.jobs.requests.TriggerRequest;
+import org.graylog2.rest.models.system.jobs.requests.TriggerRequest;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.system.jobs.NoSuchJobException;
 import org.graylog2.system.jobs.SystemJob;

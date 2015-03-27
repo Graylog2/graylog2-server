@@ -17,13 +17,15 @@
 package org.graylog2.shared.rest.resources.system;
 
 import com.codahale.metrics.annotation.Timed;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
+import org.graylog2.plugin.Capabilities;
 import org.graylog2.plugin.PluginMetaData;
 import org.graylog2.plugin.ServerStatus;
-import org.graylog2.plugin.Version;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
+import org.graylog2.rest.models.system.plugins.responses.PluginList;
+import org.graylog2.rest.models.system.plugins.responses.PluginMetaDataValue;
 import org.graylog2.shared.rest.resources.RestResource;
 
 import javax.inject.Inject;
@@ -31,9 +33,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
-import java.net.URI;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 @Api(value = "System/Plugin", description = "Plugin information")
@@ -41,28 +41,6 @@ import java.util.Set;
 @Produces(MediaType.APPLICATION_JSON)
 public class SystemPluginResource extends RestResource {
     private final Set<PluginMetaData> pluginMetaDataSet;
-
-    static class PluginMetaDataValue {
-        public final String unique_id;
-        public final String name;
-        public final String author;
-        public final URI url;
-        public final Version version;
-        public final String description;
-        public final Version required_version;
-        public final Set<ServerStatus.Capability> required_capabilities;
-
-        PluginMetaDataValue(PluginMetaData pluginMetaData) {
-            this.unique_id = pluginMetaData.getUniqueId();
-            this.name = pluginMetaData.getName();
-            this.author = pluginMetaData.getAuthor();
-            this.url = pluginMetaData.getURL();
-            this.version = pluginMetaData.getVersion();
-            this.description = pluginMetaData.getDescription();
-            this.required_version = pluginMetaData.getRequiredVersion();
-            this.required_capabilities = pluginMetaData.getRequiredCapabilities();
-        }
-    }
 
     @Inject
     public SystemPluginResource(Set<PluginMetaData> pluginMetaDataSet) {
@@ -72,15 +50,22 @@ public class SystemPluginResource extends RestResource {
     @GET
     @Timed
     @ApiOperation(value = "List all installed plugins on this node.")
-    public Map<String, Object> list() {
+    public PluginList list() {
         final List<PluginMetaDataValue> pluginMetaDataValues = Lists.newArrayList();
 
         for (PluginMetaData pluginMetaData : pluginMetaDataSet) {
-            pluginMetaDataValues.add(new PluginMetaDataValue(pluginMetaData));
+            pluginMetaDataValues.add(PluginMetaDataValue.create(
+                    pluginMetaData.getUniqueId(),
+                    pluginMetaData.getName(),
+                    pluginMetaData.getAuthor(),
+                    pluginMetaData.getURL(),
+                    pluginMetaData.getVersion().toString(),
+                    pluginMetaData.getDescription(),
+                    pluginMetaData.getRequiredVersion().toString(),
+                    Capabilities.toStringSet(pluginMetaData.getRequiredCapabilities())
+            ));
         }
 
-        return ImmutableMap.of(
-                "plugins", pluginMetaDataValues,
-                "total", pluginMetaDataValues.size());
+        return PluginList.create(pluginMetaDataValues);
     }
 }

@@ -24,7 +24,7 @@ import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresGuest;
-import org.graylog2.rest.resources.system.responses.ReaderPermissionResponse;
+import org.graylog2.rest.models.system.responses.ReaderPermissionResponse;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 

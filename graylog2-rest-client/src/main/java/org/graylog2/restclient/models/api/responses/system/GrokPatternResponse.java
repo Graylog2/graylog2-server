@@ -16,11 +16,11 @@
  */
 package org.graylog2.restclient.models.api.responses.system;
 
-import org.graylog2.restclient.models.GrokPattern;
+import org.graylog2.rest.models.system.responses.GrokPatternSummary;
 
 import java.util.List;
 
 public class GrokPatternResponse {
     
-    public List<GrokPattern> patterns;
+    public List<GrokPatternSummary> patterns;
 }

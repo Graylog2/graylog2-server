@@ -17,6 +17,7 @@
 package org.graylog2.rest.resources.streams.responses;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.graylog2.plugin.streams.Stream;
@@ -32,7 +33,8 @@ public abstract class StreamListResponse {
     @JsonProperty
     public abstract Collection<Stream> streams();
 
-    public static StreamListResponse create(long total, Collection<Stream> streams) {
+    @JsonCreator
+    public static StreamListResponse create(@JsonProperty("total") long total, @JsonProperty("streams") Collection<Stream> streams) {
         return new AutoValue_StreamListResponse(total, streams);
     }
 }

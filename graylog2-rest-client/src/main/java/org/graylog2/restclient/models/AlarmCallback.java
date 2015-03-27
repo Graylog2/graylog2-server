@@ -18,8 +18,8 @@ package org.graylog2.restclient.models;
 
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
-import org.graylog2.restclient.models.api.responses.alarmcallbacks.AlarmCallbackSummaryResponse;
-import org.graylog2.restclient.models.api.responses.alarmcallbacks.GetSingleAvailableAlarmCallbackResponse;
+import org.graylog2.rest.models.alarmcallbacks.AlarmCallbackSummary;
+import org.graylog2.rest.models.alarmcallbacks.responses.AvailableAlarmCallbackSummaryResponse;
 import org.joda.time.DateTime;
 
 import java.util.Map;
@@ -29,7 +29,7 @@ import java.util.Map;
  */
 public class AlarmCallback extends ConfigurableEntity {
     public interface Factory {
-        public AlarmCallback fromSummaryResponse(String streamId, AlarmCallbackSummaryResponse response);
+        AlarmCallback fromSummaryResponse(String streamId, AlarmCallbackSummary response);
     }
 
     private String id;
@@ -44,14 +44,14 @@ public class AlarmCallback extends ConfigurableEntity {
     @AssistedInject
     public AlarmCallback(UserService userService,
                          @Assisted String streamId,
-                         @Assisted AlarmCallbackSummaryResponse response) {
+                         @Assisted AlarmCallbackSummary response) {
         this.userService = userService;
         this.streamId = streamId;
-        this.id = response.id;
-        this.type = response.type;
-        this.configuration = response.configuration;
-        this.createdAt = DateTime.parse(response.createdAt);
-        this.creatorUserId = response.creatorUserId;
+        this.id = response.id();
+        this.type = response.type();
+        this.configuration = response.configuration();
+        this.createdAt = response.createdAt();
+        this.creatorUserId = response.creatorUserId();
         this.creatorUser = userService.load(creatorUserId);
     }
 
@@ -72,7 +72,7 @@ public class AlarmCallback extends ConfigurableEntity {
         return configuration;
     }
 
-    public Map<String, Object> getConfiguration(GetSingleAvailableAlarmCallbackResponse availableAlarmCallbackResponse) {
+    public Map<String, Object> getConfiguration(AvailableAlarmCallbackSummaryResponse availableAlarmCallbackResponse) {
         return getConfiguration(availableAlarmCallbackResponse.getRequestedConfiguration());
     }
 

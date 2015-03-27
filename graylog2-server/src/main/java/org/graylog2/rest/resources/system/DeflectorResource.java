@@ -17,22 +17,23 @@
 package org.graylog2.rest.resources.system;
 
 import com.codahale.metrics.annotation.Timed;
-import com.google.common.collect.ImmutableMap;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.indexer.Deflector;
+import org.graylog2.rest.models.system.responses.TimeBasedRotationStrategyResponse;
+import org.graylog2.rest.models.system.deflector.responses.DeflectorSummary;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.indexer.rotation.MessageCountRotationStrategy;
 import org.graylog2.indexer.rotation.SizeBasedRotationStrategy;
 import org.graylog2.indexer.rotation.TimeBasedRotationStrategy;
 import org.graylog2.plugin.indexer.rotation.RotationStrategy;
-import org.graylog2.rest.resources.system.responses.DeflectorConfigResponse;
-import org.graylog2.rest.resources.system.responses.MessageCountRotationStrategyResponse;
-import org.graylog2.rest.resources.system.responses.SizeBasedRotationStrategyResponse;
+import org.graylog2.rest.models.system.responses.DeflectorConfigResponse;
+import org.graylog2.rest.models.system.responses.MessageCountRotationStrategyResponse;
+import org.graylog2.rest.models.system.responses.SizeBasedRotationStrategyResponse;
 import org.graylog2.shared.security.RestrictToMaster;
 import org.graylog2.shared.system.activities.Activity;
 import org.graylog2.shared.system.activities.ActivityWriter;
@@ -47,7 +48,6 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
-import java.util.Map;
 
 @RequiresAuthentication
 @Api(value = "System/Deflector", description = "Index deflector management")
@@ -77,10 +77,8 @@ public class DeflectorResource extends RestResource {
     @ApiOperation(value = "Get current deflector status")
     @RequiresPermissions(RestPermissions.DEFLECTOR_READ)
     @Produces(MediaType.APPLICATION_JSON)
-    public Map<String, Object> deflector() {
-        return ImmutableMap.<String, Object>of(
-                "is_up", deflector.isUp(),
-                "current_target", deflector.getCurrentActualTargetIndex());
+    public DeflectorSummary deflector() {
+        return DeflectorSummary.create(deflector.isUp(), deflector.getCurrentActualTargetIndex());
     }
 
     @GET

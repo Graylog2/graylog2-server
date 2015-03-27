@@ -20,7 +20,7 @@ import com.codahale.metrics.annotation.Timed;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.inputs.extractors.SplitAndIndexExtractor;
 import org.graylog2.shared.rest.resources.RestResource;
-import org.graylog2.rest.resources.tools.responses.SplitAndIndexTesterResponse;
+import org.graylog2.rest.models.tools.responses.SplitAndIndexTesterResponse;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;

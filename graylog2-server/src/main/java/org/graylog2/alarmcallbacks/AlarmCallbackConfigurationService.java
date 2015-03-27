@@ -18,6 +18,7 @@ package org.graylog2.alarmcallbacks;
 
 import org.graylog2.plugin.database.PersistedService;
 import org.graylog2.plugin.streams.Stream;
+import org.graylog2.rest.models.alarmcallbacks.requests.CreateAlarmCallbackRequest;
 
 import java.util.List;
 

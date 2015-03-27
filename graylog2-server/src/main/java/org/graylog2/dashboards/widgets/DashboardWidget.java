@@ -31,7 +31,7 @@ import org.graylog2.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.indexer.searches.timeranges.TimeRange;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.database.EmbeddedPersistable;
-import org.graylog2.rest.resources.dashboards.requests.AddWidgetRequest;
+import org.graylog2.rest.models.dashboards.requests.AddWidgetRequest;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 

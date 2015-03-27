@@ -17,15 +17,15 @@
 package org.graylog2.restclient.models.api.requests;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.graylog2.restclient.models.GrokPattern;
+import org.graylog2.rest.models.system.responses.GrokPatternSummary;
 
 import java.util.Collection;
 
 public class GrokPatternUpdateRequest {
     @JsonProperty
-    private final Collection<GrokPattern> patterns;
+    private final Collection<GrokPatternSummary> patterns;
 
-    public GrokPatternUpdateRequest(Collection<GrokPattern> patterns) {
+    public GrokPatternUpdateRequest(Collection<GrokPatternSummary> patterns) {
         this.patterns = patterns;
     }
 }

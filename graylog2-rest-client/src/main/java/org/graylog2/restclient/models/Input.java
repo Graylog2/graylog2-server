@@ -17,14 +17,13 @@
 package org.graylog2.restclient.models;
 
 import com.google.common.base.Joiner;
-import com.google.common.collect.Maps;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import org.graylog2.restclient.lib.APIException;
 import org.graylog2.restclient.lib.ApiClient;
 import org.graylog2.restclient.lib.metrics.Gauge;
 import org.graylog2.restclient.lib.metrics.Metric;
-import org.graylog2.restclient.lib.plugin.configuration.RequestedConfigurationField;
+import org.graylog2.rest.models.configuration.responses.RequestedConfigurationField;
 import org.graylog2.restclient.lib.timeranges.InvalidRangeParametersException;
 import org.graylog2.restclient.lib.timeranges.RelativeRange;
 import org.graylog2.restclient.models.api.requests.AddStaticFieldRequest;

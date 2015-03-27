@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 public class CopyInputExtractor extends Extractor {
-    public CopyInputExtractor(MetricRegistry metricRegistry, String id, String title, int order, CursorStrategy cursorStrategy, String sourceField, String targetField, Map<String, Object> extractorConfig, String creatorUserId, List<Converter> converters, ConditionType conditionType, String conditionValue) throws ReservedFieldException {
+    public CopyInputExtractor(MetricRegistry metricRegistry, String id, String title, long order, CursorStrategy cursorStrategy, String sourceField, String targetField, Map<String, Object> extractorConfig, String creatorUserId, List<Converter> converters, ConditionType conditionType, String conditionValue) throws ReservedFieldException {
         super(metricRegistry,
               id,
               title,

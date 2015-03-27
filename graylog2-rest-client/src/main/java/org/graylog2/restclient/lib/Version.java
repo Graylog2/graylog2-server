@@ -29,6 +29,8 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 import java.util.Properties;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Strings.isNullOrEmpty;
@@ -38,6 +40,8 @@ public class Version implements Comparable<Version> {
     private static final Logger LOG = LoggerFactory.getLogger(Version.class);
 
     public static final Version VERSION;
+
+    private static final Pattern versionPattern = Pattern.compile("(\\d+)\\.(\\d+)\\.(\\d+)(-(\\S+))?( \\((\\S+)\\))?");
 
     static {
         Version tmpVersion;
@@ -93,6 +97,31 @@ public class Version implements Comparable<Version> {
         patch = 0;
         additional = null;
         commitSha1 = null;
+    }
+
+    @JsonCreator
+    public static Version fromString(String version) {
+        if (isNullOrEmpty(version))
+            return null;
+
+        final Matcher matcher = versionPattern.matcher(version);
+
+        if (matcher.matches()) {
+            final int major = Integer.parseInt(matcher.group(1));
+            final int minor = Integer.parseInt(matcher.group(2));
+            final int patch = Integer.parseInt(matcher.group(3));
+            final String additional = matcher.group(5);
+            final String sha1 = matcher.group(7);
+
+            if (isNullOrEmpty(sha1)) {
+                if (isNullOrEmpty(additional))
+                    return new Version(major, minor, patch);
+                else
+                    return new Version(major, minor, patch, additional);
+            } else
+                return new Version(major, minor, patch, additional, sha1);
+        } else
+            throw new IllegalArgumentException("Unable to parse Version string " + version);
     }
 
     public Version(int major, int minor, int patch) {

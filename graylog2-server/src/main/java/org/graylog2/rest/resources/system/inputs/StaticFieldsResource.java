@@ -30,7 +30,7 @@ import org.graylog2.inputs.InputService;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.shared.rest.resources.RestResource;
-import org.graylog2.rest.resources.system.inputs.requests.CreateStaticFieldRequest;
+import org.graylog2.rest.models.system.inputs.requests.CreateStaticFieldRequest;
 import org.graylog2.shared.rest.resources.system.inputs.InputsResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.shared.inputs.InputRegistry;

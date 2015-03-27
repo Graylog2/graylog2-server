@@ -16,7 +16,7 @@
  */
 package org.graylog2.outputs;
 
-import autovalue.shaded.com.google.common.common.collect.Maps;
+import com.google.common.collect.Maps;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.outputs.MessageOutput;
 import org.graylog2.plugin.outputs.MessageOutputConfigurationException;

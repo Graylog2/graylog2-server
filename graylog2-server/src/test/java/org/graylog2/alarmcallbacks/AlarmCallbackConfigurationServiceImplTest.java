@@ -22,6 +22,7 @@ import com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb;
 import org.bson.types.ObjectId;
 import org.graylog2.database.MongoConnectionRule;
 import org.graylog2.plugin.streams.Stream;
+import org.graylog2.rest.models.alarmcallbacks.requests.CreateAlarmCallbackRequest;
 import org.graylog2.streams.StreamImpl;
 import org.junit.Before;
 import org.junit.ClassRule;
