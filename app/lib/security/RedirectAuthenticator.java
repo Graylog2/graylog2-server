@@ -20,12 +20,12 @@ package lib.security;
 
 import com.ning.http.util.Base64;
 import controllers.routes;
+import org.graylog2.rest.models.system.sessions.responses.SessionResponse;
 import org.graylog2.restclient.lib.APIException;
 import org.graylog2.restclient.lib.Graylog2ServerUnavailableException;
 import org.graylog2.restclient.models.SessionService;
 import org.graylog2.restclient.models.User;
 import org.graylog2.restclient.models.UserService;
-import org.graylog2.restclient.models.api.responses.SessionCreateResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import play.libs.Crypto;
@@ -156,8 +156,8 @@ public class RedirectAuthenticator extends Authenticator {
         final String password = credString[1];
 
         try {
-            SessionCreateResponse session = sessionService.create(userName, password, request.remoteAddress());
-            return userService.retrieveUserWithSessionId(userName, session.sessionId);
+            SessionResponse session = sessionService.create(userName, password, request.remoteAddress());
+            return userService.retrieveUserWithSessionId(userName, session.sessionId());
         } catch (IOException e) {
             log.error("Could not reach graylog2 server", e);
         } catch (APIException e) {
