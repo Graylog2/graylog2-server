@@ -21,8 +21,8 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
+import org.graylog2.rest.models.system.inputs.extractors.requests.CreateExtractorRequest;
 import org.graylog2.rest.models.system.inputs.extractors.responses.ExtractorSummary;
-import org.graylog2.restclient.models.api.requests.CreateExtractorRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -153,23 +153,13 @@ public class Extractor {
     }
 
     public CreateExtractorRequest toCreateExtractorRequest() {
-        CreateExtractorRequest request = new CreateExtractorRequest();
-
-        Map<String, Map<String, Object>> converterList = Maps.newHashMap();
+        final Map<String, Map<String, Object>> converterList = Maps.newHashMap();
         for (Converter converter : converters) {
             converterList.put(converter.getType(), converter.getConfig());
         }
 
-        request.title = title;
-        request.cutOrCopy = cursorStrategy.toString().toLowerCase();
-        request.extractorType = extractorType.toString().toLowerCase();
-        request.sourceField = sourceField;
-        request.targetField = targetField;
-        request.extractorConfig = extractorConfig;
-        request.converters = converterList;
-        request.conditionType = conditionType.toString().toLowerCase();
-        request.conditionValue = conditionValue;
-        request.order = order;
+        final CreateExtractorRequest request = CreateExtractorRequest.create(title, cursorStrategy.toString().toLowerCase(), sourceField, targetField,
+                extractorType.toString().toLowerCase(), extractorConfig, converterList, conditionType.toString().toLowerCase(), conditionValue, order);
 
         return request;
     }

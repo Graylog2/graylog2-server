@@ -17,12 +17,12 @@
 package org.graylog2.restclient.models;
 
 import com.google.common.collect.Lists;
+import org.graylog2.rest.models.system.inputs.extractors.requests.CreateExtractorRequest;
 import org.graylog2.rest.models.system.inputs.extractors.responses.ExtractorSummary;
 import org.graylog2.rest.models.system.inputs.extractors.responses.ExtractorSummaryList;
 import org.graylog2.rest.models.system.responses.GrokPatternSummary;
 import org.graylog2.restclient.lib.APIException;
 import org.graylog2.restclient.lib.ApiClient;
-import org.graylog2.restclient.models.api.requests.CreateExtractorRequest;
 import org.graylog2.restclient.models.api.requests.ExtractorOrderRequest;
 import org.graylog2.restclient.models.api.requests.GrokPatternUpdateRequest;
 import org.graylog2.restclient.models.api.responses.system.CreateExtractorResponse;
