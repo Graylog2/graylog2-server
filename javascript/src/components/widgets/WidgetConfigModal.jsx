@@ -16,14 +16,14 @@ var WidgetConfigModal = React.createClass({
         if (this.props.boundToStream) {
             basicConfigurationMessage = (
                 <p>
-                    Type: {this.props.type.toLowerCase()}, cached for {this.props.cacheTime} seconds.&nbsp;
-                    Widget is bound to stream {this.props.config.stream_id}.
+                    Type: {this.props.widget.type.toLowerCase()}, cached for {this.props.widget.cacheTime} seconds.&nbsp;
+                    Widget is bound to stream {this.props.widget.config.stream_id}.
                 </p>
             );
         } else {
             basicConfigurationMessage = (
                 <p>
-                    Type: {this.props.type.toLowerCase()}, cached for {this.props.cacheTime} seconds.&nbsp;
+                    Type: {this.props.widget.type.toLowerCase()}, cached for {this.props.widget.cacheTime} seconds.&nbsp;
                     Widget is <strong>not</strong> bound to a stream.
                 </p>
             );
@@ -38,17 +38,17 @@ var WidgetConfigModal = React.createClass({
         return key === "query" && value === "" ? "*" : String(value);
     },
     _getConfigAsDescriptionList() {
-        var configKeys = Object.keys(this.props.config);
+        var configKeys = Object.keys(this.props.widget.config);
         if (configKeys.length === 0) {
             return [];
         }
         var configListElements = [];
 
         configKeys.forEach((key) => {
-            if (this.props.config[key] !== null) {
+            if (this.props.widget.config[key] !== null) {
                 configListElements.push(<dt key={key}>{this._formatConfigurationKey(key)}:</dt>);
                 configListElements.push(
-                    <dd key={key + "-value"}>{this._formatConfigurationValue(key, this.props.config[key])}</dd>
+                    <dd key={key + "-value"}>{this._formatConfigurationValue(key, this.props.widget.config[key])}</dd>
                 );
             }
         });
@@ -56,18 +56,18 @@ var WidgetConfigModal = React.createClass({
         return configListElements;
     },
     render() {
-        var configModalHeader = <h2 className="modal-title">Widget "{this.props.title}" configuration</h2>;
+        var configModalHeader = <h2 className="modal-title">Widget "{this.props.widget.title}" configuration</h2>;
         var configModalBody = (
             <div className="configuration">
                 {this._getBasicConfiguration()}
                 <div>More details:
                     <dl className="dl-horizontal">
                         <dt>Widget ID:</dt>
-                        <dd>{this.props.widgetId}</dd>
+                        <dd>{this.props.widget.widgetId}</dd>
                         <dt>Dashboard ID:</dt>
-                        <dd>{this.props.dashboardId}</dd>
+                        <dd>{this.props.widget.dashboardId}</dd>
                         <dt>Created by:</dt>
-                        <dd>{this.props.creatorUserId}</dd>
+                        <dd>{this.props.widget.creatorUserId}</dd>
                         {this._getConfigAsDescriptionList()}
                     </dl>
                 </div>

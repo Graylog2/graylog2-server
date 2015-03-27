@@ -202,9 +202,9 @@ var Widget = React.createClass({
     render() {
         var showConfigModal = (
             <WidgetConfigModal ref="configModal"
-                    {...this._getWidgetData()}
-                boundToStream={this._isBoundToStream()}
-                metricsAction={this._goToWidgetMetrics}/>
+                               widget={this._getWidgetData()}
+                               boundToStream={this._isBoundToStream()}
+                               metricsAction={this._goToWidgetMetrics}/>
         );
 
         return (
