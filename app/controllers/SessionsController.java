@@ -18,6 +18,7 @@
  */
 package controllers;
 
+import org.graylog2.rest.models.system.sessions.responses.SessionResponse;
 import org.graylog2.restclient.lib.APIException;
 import org.graylog2.restclient.lib.ServerNodes;
 import org.graylog2.restclient.lib.Graylog2ServerUnavailableException;
@@ -27,7 +28,6 @@ import org.graylog2.restclient.models.SessionService;
 import org.graylog2.restclient.models.UserService;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
-import org.graylog2.restclient.models.api.responses.SessionCreateResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import play.data.Form;
@@ -96,9 +96,9 @@ public class SessionsController extends BaseController {
 		LoginRequest r = loginRequest.get();
 
         try {
-            final SessionCreateResponse sessionResponse = sessionService.create(r.username, r.password, request().remoteAddress());
+            final SessionResponse sessionResponse = sessionService.create(r.username, r.password, request().remoteAddress());
             // if we have successfully created a session, we can save that id for the next request
-            final String cookieContent = Crypto.encryptAES(r.username + "\t" + sessionResponse.sessionId);
+            final String cookieContent = Crypto.encryptAES(r.username + "\t" + sessionResponse.sessionId());
             Http.Context.current().session().put("sessionid", cookieContent);
 
             // if we were redirected from somewhere else because the session had expired, redirect back to that page

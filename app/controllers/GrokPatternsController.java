@@ -26,7 +26,7 @@ import com.google.common.io.LineReader;
 import lib.BreadcrumbList;
 import org.graylog2.restclient.lib.APIException;
 import org.graylog2.restclient.models.ExtractorService;
-import org.graylog2.restclient.models.GrokPattern;
+import org.graylog2.rest.models.system.responses.GrokPatternSummary;
 import play.Logger;
 import play.mvc.BodyParser;
 import play.mvc.Http;
@@ -57,7 +57,7 @@ public class GrokPatternsController extends AuthenticatedController {
         bc.addCrumb("System", routes.SystemController.index(0));
         bc.addCrumb("Grok patterns", routes.GrokPatternsController.index());
 
-        final Collection<GrokPattern> grokPatterns;
+        final Collection<GrokPatternSummary> grokPatterns;
         try {
             grokPatterns = extractorService.allGrokPatterns();
         } catch (APIException e) {
@@ -66,9 +66,9 @@ public class GrokPatternsController extends AuthenticatedController {
             return internalServerError();
         }
         
-        final TreeSet<GrokPattern> sortedPatterns = Sets.newTreeSet(new Comparator<GrokPattern>() {
+        final TreeSet<GrokPatternSummary> sortedPatterns = Sets.newTreeSet(new Comparator<GrokPatternSummary>() {
             @Override
-            public int compare(GrokPattern o1, GrokPattern o2) {
+            public int compare(GrokPatternSummary o1, GrokPatternSummary o2) {
                 return ComparisonChain.start()
                         .compare(o1.name, o2.name)
                         .result();
@@ -90,7 +90,7 @@ public class GrokPatternsController extends AuthenticatedController {
 
         if (patterns != null) {
 
-            Collection<GrokPattern> grokPatterns = Lists.newArrayList();
+            Collection<GrokPatternSummary> grokPatterns = Lists.newArrayList();
             try {
                 File file = patterns.getFile();
                 String patternsContent = Files.toString(file, StandardCharsets.UTF_8);
@@ -102,7 +102,7 @@ public class GrokPatternsController extends AuthenticatedController {
                 while ((line = lineReader.readLine()) != null) {
                     Matcher m = pattern.matcher(line);
                     if (m.matches()) {
-                        final GrokPattern grokPattern = new GrokPattern();
+                        final GrokPatternSummary grokPattern = new GrokPatternSummary();
                         grokPattern.name = m.group(1);
                         grokPattern.pattern = m.group(2);
                         grokPatterns.add(grokPattern);
