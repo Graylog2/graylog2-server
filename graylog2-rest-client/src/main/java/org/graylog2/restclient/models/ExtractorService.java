@@ -18,12 +18,12 @@ package org.graylog2.restclient.models;
 
 import com.google.common.collect.Lists;
 import org.graylog2.rest.models.system.inputs.extractors.requests.CreateExtractorRequest;
+import org.graylog2.rest.models.system.inputs.extractors.requests.OrderExtractorsRequest;
 import org.graylog2.rest.models.system.inputs.extractors.responses.ExtractorSummary;
 import org.graylog2.rest.models.system.inputs.extractors.responses.ExtractorSummaryList;
 import org.graylog2.rest.models.system.responses.GrokPatternSummary;
 import org.graylog2.restclient.lib.APIException;
 import org.graylog2.restclient.lib.ApiClient;
-import org.graylog2.restclient.models.api.requests.ExtractorOrderRequest;
 import org.graylog2.restclient.models.api.requests.GrokPatternUpdateRequest;
 import org.graylog2.restclient.models.api.responses.system.CreateExtractorResponse;
 import org.graylog2.restclient.models.api.responses.system.GrokPatternResponse;
@@ -95,8 +95,7 @@ public class ExtractorService {
     }
 
     public void order(String inputId, SortedMap<Integer, String> order) throws APIException, IOException {
-        ExtractorOrderRequest req = new ExtractorOrderRequest();
-        req.order = order;
+        final OrderExtractorsRequest req = OrderExtractorsRequest.create(order);
 
         api.path(resource.order(inputId))
                 .body(req)
