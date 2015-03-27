@@ -23,7 +23,6 @@ import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import org.graylog2.rest.models.system.inputs.extractors.responses.ExtractorSummary;
 import org.graylog2.restclient.models.api.requests.CreateExtractorRequest;
-import org.graylog2.restclient.models.api.responses.system.ExtractorSummaryResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,7 +36,6 @@ public class Extractor {
     private static final Logger LOG = LoggerFactory.getLogger(Extractor.class);
 
     public interface Factory {
-        Extractor fromResponse(ExtractorSummaryResponse esr);
         Extractor fromResponse(ExtractorSummary es);
 
         Extractor forCreate(CursorStrategy cursorStrategy,
@@ -107,25 +105,6 @@ public class Extractor {
     private final long converterExceptions;
 
     private long order;
-
-    @AssistedInject
-    private Extractor(UserService userService, @Assisted ExtractorSummaryResponse esr) {
-        this.id = esr.id;
-        this.title = esr.title;
-        this.cursorStrategy = CursorStrategy.fromString(esr.cursorStrategy);
-        this.sourceField = esr.sourceField;
-        this.targetField = esr.targetField;
-        this.extractorType = Type.fromString(esr.type);
-        this.creatorUser = userService.load(esr.creatorUserId);
-        this.extractorConfig = esr.extractorConfig;
-        this.converters = buildConverterList(esr.converters);
-        this.conditionType = ConditionType.fromString(esr.conditionType);
-        this.conditionValue = esr.conditionValue;
-        this.metrics = new ExtractorMetrics(esr.metrics.get("total"), esr.metrics.get("converters"));
-        this.exceptions = esr.exceptions;
-        this.converterExceptions = esr.converterExceptions;
-        this.order = esr.order;
-    }
 
     @AssistedInject
     private Extractor(UserService userService, @Assisted ExtractorSummary es) {

@@ -17,6 +17,8 @@
 package org.graylog2.restclient.models;
 
 import com.google.common.collect.Lists;
+import org.graylog2.rest.models.system.inputs.extractors.responses.ExtractorSummary;
+import org.graylog2.rest.models.system.inputs.extractors.responses.ExtractorSummaryList;
 import org.graylog2.rest.models.system.responses.GrokPatternSummary;
 import org.graylog2.restclient.lib.APIException;
 import org.graylog2.restclient.lib.ApiClient;
@@ -24,8 +26,6 @@ import org.graylog2.restclient.models.api.requests.CreateExtractorRequest;
 import org.graylog2.restclient.models.api.requests.ExtractorOrderRequest;
 import org.graylog2.restclient.models.api.requests.GrokPatternUpdateRequest;
 import org.graylog2.restclient.models.api.responses.system.CreateExtractorResponse;
-import org.graylog2.restclient.models.api.responses.system.ExtractorSummaryResponse;
-import org.graylog2.restclient.models.api.responses.system.ExtractorsResponse;
 import org.graylog2.restclient.models.api.responses.system.GrokPatternResponse;
 import org.graylog2.restroutes.generated.ExtractorsResource;
 import org.graylog2.restroutes.generated.routes;
@@ -74,7 +74,7 @@ public class ExtractorService {
     }
 
     public Extractor load(Node node, Input input, String extractorId) throws IOException, APIException {
-        final ExtractorSummaryResponse extractorSummaryResponse = api.path(resource.single(input.getId(), extractorId), ExtractorSummaryResponse.class)
+        final ExtractorSummary extractorSummaryResponse = api.path(resource.single(input.getId(), extractorId), ExtractorSummary.class)
                 .node(node)
                 .execute();
 
@@ -84,10 +84,10 @@ public class ExtractorService {
     public List<Extractor> all(Node node, Input input) throws IOException, APIException {
         List<Extractor> extractors = Lists.newArrayList();
 
-        final ExtractorsResponse extractorsResponse = api.path(resource.list(input.getId()), ExtractorsResponse.class)
+        final ExtractorSummaryList extractorsList = api.path(resource.list(input.getId()), ExtractorSummaryList.class)
                 .node(node)
                 .execute();
-        for (ExtractorSummaryResponse ex : extractorsResponse.extractors) {
+        for (ExtractorSummary ex : extractorsList.extractors()) {
             extractors.add(extractorFactory.fromResponse(ex));
         }
 

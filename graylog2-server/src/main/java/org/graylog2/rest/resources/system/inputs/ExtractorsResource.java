@@ -37,8 +37,8 @@ import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.inputs.Converter;
 import org.graylog2.plugin.inputs.Extractor;
 import org.graylog2.plugin.inputs.MessageInput;
-import org.graylog2.rest.models.system.inputs.requests.CreateExtractorRequest;
-import org.graylog2.rest.models.system.inputs.requests.OrderExtractorsRequest;
+import org.graylog2.rest.models.system.inputs.extractors.requests.CreateExtractorRequest;
+import org.graylog2.rest.models.system.inputs.extractors.requests.OrderExtractorsRequest;
 import org.graylog2.shared.rest.resources.system.inputs.InputsResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.shared.inputs.InputRegistry;
@@ -177,7 +177,7 @@ public class ExtractorsResource extends RestResource {
         LOG.info(msg);
         activityWriter.write(new Activity(msg, ExtractorsResource.class));
 
-        return toMap(extractor);
+        return toSummary(extractor);
     }
 
     @GET
@@ -199,7 +199,7 @@ public class ExtractorsResource extends RestResource {
 
         final List<ExtractorSummary> extractors = Lists.newArrayList();
         for (Extractor extractor : inputService.getExtractors(input)) {
-            extractors.add(toMap(extractor));
+            extractors.add(toSummary(extractor));
         }
 
         return ExtractorSummaryList.create(extractors);
@@ -230,7 +230,7 @@ public class ExtractorsResource extends RestResource {
         final Input mongoInput = inputService.find(input.getPersistId());
         final Extractor extractor = inputService.getExtractor(mongoInput, extractorId);
 
-        return toMap(extractor);
+        return toSummary(extractor);
     }
 
     @DELETE
@@ -299,7 +299,7 @@ public class ExtractorsResource extends RestResource {
         LOG.info("Updated extractor ordering of input <persist:{}>.", inputPersistId);
     }
 
-    private ExtractorSummary toMap(Extractor extractor) {
+    private ExtractorSummary toSummary(Extractor extractor) {
         final ExtractorMetrics metrics = ExtractorMetrics.create(MetricUtils.buildTimerMap(metricRegistry.getTimers().get(extractor.getTotalTimerName())),
                 MetricUtils.buildTimerMap(metricRegistry.getTimers().get(extractor.getConverterTimerName())));
 
