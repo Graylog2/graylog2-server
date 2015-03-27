@@ -25,6 +25,7 @@ import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PersistedServiceImpl;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.streams.Stream;
+import org.graylog2.rest.models.alarmcallbacks.requests.CreateAlarmCallbackRequest;
 
 import javax.inject.Inject;
 import java.util.List;

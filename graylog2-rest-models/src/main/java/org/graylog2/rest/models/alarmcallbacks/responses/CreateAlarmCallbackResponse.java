@@ -14,14 +14,24 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.restclient.models.api.responses.alarmcallbacks;
+package org.graylog2.rest.models.alarmcallbacks.responses;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.auto.value.AutoValue;
 
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
  */
-public class CreateAlarmCallbackResponse {
+@AutoValue
+@JsonAutoDetect
+public abstract class CreateAlarmCallbackResponse {
     @JsonProperty("alarmcallback_id")
-    public String alarmCallbackId;
+    public abstract String alarmCallbackId();
+
+    @JsonCreator
+    public static CreateAlarmCallbackResponse create(@JsonProperty("alarmcallback_id") String alarmCallbackId) {
+        return new AutoValue_CreateAlarmCallbackResponse(alarmCallbackId);
+    }
 }
