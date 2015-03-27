@@ -85,323 +85,351 @@
 <span id="original-search-query" style="display: none;">@searchResult.getOriginalQuery</span>
 <span id="original-search-timerange" style="display: none;">@searchResult.getTimeRange</span>
 
-<div class="pull-right">
-    <a href="#built-query" class="btn btn-sm" role="button" data-toggle="modal" data-backdrop="true"><i class="fa fa-bug"></i></a>
+<!--
+    <div class="pull-right">
+        <a href="#built-query" class="btn btn-sm" role="button" data-toggle="modal" data-backdrop="true"><i class="fa fa-bug"></i></a>
 
-    <div class="btn-group">
-        <a class="btn btn-sm dropdown-toggle" data-toggle="dropdown" href="#">
-            <i class="fa fa-cloud-download"></i> Export
-            <span class="caret"></span>
+        <div class="btn-group">
+            <a class="btn btn-sm dropdown-toggle" data-toggle="dropdown" href="#">
+                <i class="fa fa-cloud-download"></i> Export
+                <span class="caret"></span>
+            </a>
+            <ul class="dropdown-menu">
+                <li><a class="search-view-state" href="@SearchRouteHelper.getCsvRoute(request(), stream, search)">Download as CSV</a></li>
+            </ul>
+        </div>
+
+        @if(stream != null) {
+        <div class="btn-group">
+            @views.html.partials.streams.action_menu.render(stream, nodes, currentUser, "btn-sm")
+        </div>
+        }
+
+        <a href="#" class="btn btn-sm clear-pinned-charts" title="Reset/clear all pinned charts." style="display: none;">
+            Clear pinned charts
         </a>
-        <ul class="dropdown-menu">
-            <li><a class="search-view-state" href="@SearchRouteHelper.getCsvRoute(request(), stream, search)">Download as CSV</a></li>
-        </ul>
+
+        @if(savedSearch != null && Permissions.isPermitted(RestPermissions.SAVEDSEARCHES_EDIT)) {
+            <a href="@routes.SavedSearchesController.delete(savedSearch.getId)" class="btn btn-sm btn-danger" data-confirm='Really delete saved search "@savedSearch.getTitle"?'>Delete saved search</a>
+        }
+
+        @if(Permissions.isPermitted(RestPermissions.SAVEDSEARCHES_CREATE)) {
+        <a href="#" class="btn btn-sm btn-success save-search" title="Save this search so you can execute it at any time with just a click.">
+            Save search
+        </a>
+
+        <div class="save-search-form input-append" style="display: none;">
+            <form>
+                <input type="text" placeholder="Give the search a title" id="save-search-title" />
+                <button type="submit" class="btn btn-sm btn-success do-save" disabled="true">
+                    <i class="fa fa-save"></i>&nbsp;
+                    Save
+                </button>
+            </form>
+        </div>
+        }
+    </div>
+-->
+
+    <div class="content-col">
+        <div class="pull-right">
+        @if(stream == null) {
+            @views.html.partials.dashboards.add_to_dashboard.render("search_result_chart", "Add to dashboard", Array("data-interval='" + histogram.getInterval() + "'"))
+        } else {
+            @views.html.partials.dashboards.add_to_dashboard.render("search_result_chart", "Add to dashboard", Array("data-stream-id='" + streamId + "'", "data-interval='" + histogram.getInterval() + "'"))
+        }
+        </div>
+
+        <h1>Histogram</h1>
+
+        <div class="graph-resolution-selector">
+            <i class="fa fa-time"></i>
+            @Html(DateHistogramResolutionSelector.getOptions(histogram.getInterval(), request()))
+        </div>
+
+        <div id="result-graph-container">
+            <div id="y_axis"></div>
+            <div id="result-graph" @Html(dataAttributes())></div>
+            <div id="result-graph-timeline"></div>
+        </div>
+
+
+        <script>
+            // Investigate if we can use a data-* attribute to store this data, as it can become **really** big.
+            resultHistogramData = @Html(formattedHistogramResults);
+        </script>
     </div>
 
-    @if(stream != null) {
-    <div class="btn-group">
-        @views.html.partials.streams.action_menu.render(stream, nodes, currentUser, "btn-sm")
-    </div>
-    }
 
-    <a href="#" class="btn btn-sm clear-pinned-charts" title="Reset/clear all pinned charts." style="display: none;">
-        Clear pinned charts
-    </a>
+<!--
+    <div id="field-graphs">
+        @****** field graph template. this is copied, filled and appended for every new field graph. ****@
+        <div id="field-graph-template" class="field-graph-container" style="display: none;">
+            <i class="fa fa-reorder pull-right reposition-handle"></i>
 
-    @if(savedSearch != null && Permissions.isPermitted(RestPermissions.SAVEDSEARCHES_EDIT)) {
-        <a href="@routes.SavedSearchesController.delete(savedSearch.getId)" class="btn btn-sm btn-danger" data-confirm='Really delete saved search "@savedSearch.getTitle"?'>Delete saved search</a>
-    }
+            <h3>
+                <i class="fa fa-ellipsis-vertical"></i>
+                <span class="title">Field: <span></span></span>
 
-    @if(Permissions.isPermitted(RestPermissions.SAVEDSEARCHES_CREATE)) {
-    <a href="#" class="btn btn-sm btn-success save-search" title="Save this search so you can execute it at any time with just a click.">
-        Save search
-    </a>
+                <div class="btn-group graph-settings">
+                    <a data-toggle="dropdown" href="#">
+                        <i class="fa fa-cog" title="Customize"></i>
+                    </a>
 
-    <div class="save-search-form input-append" style="display: none;">
-        <form>
-            <input type="text" placeholder="Give the search a title" id="save-search-title" />
-            <button type="submit" class="btn btn-sm btn-success do-save" disabled="true">
-                <i class="fa fa-save"></i>&nbsp;
-                Save
-            </button>
-        </form>
-    </div>
-    }
-</div>
+                    <ul class="dropdown-menu">
+                        <li class="dropdown-submenu hide-combined-chart">
+                            <a href="#">Value</a>
 
-<h1>
-    @if(stream == null) {
-        <i class="fa fa-search"></i> Search results
-    } else {
-        <i class="fa fa-barcode"></i> Stream &laquo;@stream.getTitle&raquo;
-    }
-</h1>
+                            <ul class="dropdown-menu valuetype-selector">
+                                <li><a href="#" class="selected" data-type="mean">mean</a></li>
+                                <li><a href="#" data-type="max">maximum</a></li>
+                                <li><a href="#" data-type="min">minimum</a></li>
+                                <li><a href="#" data-type="total">total</a></li>
+                                <li><a href="#" data-type="count">count</a></li>
+                            </ul>
+                        </li>
 
-<h4>
-    Found <span class="number-format" data-format="0,0">@searchResult.getTotalResultCount</span> messages.
+                        <li class="dropdown-submenu">
+                            <a href="#">Type</a>
 
-    @if(stream == null) {
-        @views.html.partials.dashboards.add_to_dashboard.render("search_result_count", "Add to dashboard",  null)
-    } else {
-        @views.html.partials.dashboards.add_to_dashboard.render("stream_search_result_count", "Add to dashboard", Array("data-stream-id='" + streamId + "'"))
-    }
-</h4>
+                            <ul class="dropdown-menu type-selector">
+                                <li><a href="#" data-type="area">Area</a></li>
+                                <li><a href="#" class="selected" data-type="bar">Bar</a></li>
+                                <li><a href="#" data-type="line">Line</a></li>
+                                <li><a href="#" data-type="scatterplot">Scatterplot</a></li>
+                            </ul>
+                        </li>
 
-<style>
-.y_ticks { color: #000; }
-</style>
+                        <li class="dropdown-submenu">
+                            <a href="#">Interpolation</a>
 
-<hr class="search-result-head-separator" />
+                            <ul class="dropdown-menu interpolation-selector">
+                                <li><a href="#" class="selected"  data-type="linear">linear</a></li>
+                                <li><a href="#" data-type="step-after">step-after</a></li>
+                                <li><a href="#" data-type="basis">basis</a></li>
+                                <li><a href="#" data-type="bundle">bundle</a></li>
+                                <li><a href="#" data-type="cardinal">cardinal</a></li>
+                                <li><a href="#" data-type="monotone">monotone</a></li>
+                            </ul>
+                        </li>
 
-<div class="result-distribution">
-    <h3>
-        <i class="fa fa-ellipsis-vertical"></i>
-        Total result histogram
-    </h3>
+                        <li class="dropdown-submenu hide-combined-chart">
+                            <a href="#">Resolution</a>
 
-    @if(stream == null) {
-        @views.html.partials.dashboards.add_to_dashboard.render("search_result_chart", "Add to dashboard", Array("data-interval='" + histogram.getInterval() + "'"))
-    } else {
-        @views.html.partials.dashboards.add_to_dashboard.render("search_result_chart", "Add to dashboard", Array("data-stream-id='" + streamId + "'", "data-interval='" + histogram.getInterval() + "'"))
-    }
-</div>
+                            <ul class="dropdown-menu interval-selector">
+                                <li><a href="#" data-type="minute">Minute</a></li>
+                                <li><a href="#" data-type="hour">Hour</a></li>
+                                <li><a href="#" data-type="day">Day</a></li>
+                                <li><a href="#" data-type="week">Week</a></li>
+                                <li><a href="#" data-type="month">Month</a></li>
+                                <li><a href="#" data-type="quarter">Quarter</a></li>
+                                <li><a href="#" data-type="year">Year</a></li>
+                            </ul>
+                        </li>
 
-<div id="result-graph-container">
-    <div id="y_axis"></div>
-    <div id="result-graph" @Html(dataAttributes())></div>
-    <div id="result-graph-timeline"></div>
-</div>
+                        <li class="dropdown-submenu hide-combined-chart">
+                            <a href="#">Add to dashboard</a>
 
+                            <ul class="dropdown-menu dashboard-selector"
+                                @if(stream != null) {
+                                    data-stream-id="@stream.getId"
+                                }
 
-<script>
-    // Investigate if we can use a data-* attribute to store this data, as it can become **really** big.
-    resultHistogramData = @Html(formattedHistogramResults);
-</script>
+                                data-widget-type="field_chart"
+                            >
+                                @if(Permissions.isPermitted(RestPermissions.DASHBOARDS_CREATE)) {
+                                    <li>
+                                        <a href="@routes.DashboardsController.newDashboard()">No dashboards. Create one?</a>
+                                    </li>
+                                }
+                            </ul>
+                        </li>
 
-<div class="graph-resolution-selector">
-    <i class="fa fa-time"></i>
-    <strong>Resolution:</strong> @Html(DateHistogramResolutionSelector.getOptions(histogram.getInterval(), request()))
-</div>
+                        <li><a href="#" class="hide">Hide</a></li>
+                    </ul>
+                </div>
 
-<hr style="margin-bottom: -20px;" />
+                <a href="#" class="pin hide-combined-chart"><i class="fa fa-pushpin" title="Pin"></i></a>
+                <a href="#" class="unpin hide-combined-chart" style="display: none;"><i class="fa fa-pushpin"></i></a>
+            </h3>
 
-<div id="field-graphs">
-    @****** field graph template. this is copied, filled and appended for every new field graph. ****@
-    <div id="field-graph-template" class="field-graph-container" style="display: none;">
-        <i class="fa fa-reorder pull-right reposition-handle"></i>
+            <ul class="field-graph-query-container">
+                <li>
+                    <div class="field-graph-query-color" style="background-color: #4DBCE9"></div>
+                    <span class="type-description"></span>
+                    Query: <span class="field-graph-query"></span>
+                </li>
+            </ul>
 
-        <h3>
-            <i class="fa fa-ellipsis-vertical"></i>
-            <span class="title">Field: <span></span></span>
-
-            <div class="btn-group graph-settings">
-                <a data-toggle="dropdown" href="#">
-                    <i class="fa fa-cog" title="Customize"></i>
-                </a>
-
-                <ul class="dropdown-menu">
-                    <li class="dropdown-submenu hide-combined-chart">
-                        <a href="#">Value</a>
-
-                        <ul class="dropdown-menu valuetype-selector">
-                            <li><a href="#" class="selected" data-type="mean">mean</a></li>
-                            <li><a href="#" data-type="max">maximum</a></li>
-                            <li><a href="#" data-type="min">minimum</a></li>
-                            <li><a href="#" data-type="total">total</a></li>
-                            <li><a href="#" data-type="count">count</a></li>
-                        </ul>
-                    </li>
-
-                    <li class="dropdown-submenu">
-                        <a href="#">Type</a>
-
-                        <ul class="dropdown-menu type-selector">
-                            <li><a href="#" data-type="area">Area</a></li>
-                            <li><a href="#" class="selected" data-type="bar">Bar</a></li>
-                            <li><a href="#" data-type="line">Line</a></li>
-                            <li><a href="#" data-type="scatterplot">Scatterplot</a></li>
-                        </ul>
-                    </li>
-
-                    <li class="dropdown-submenu">
-                        <a href="#">Interpolation</a>
-
-                        <ul class="dropdown-menu interpolation-selector">
-                            <li><a href="#" class="selected"  data-type="linear">linear</a></li>
-                            <li><a href="#" data-type="step-after">step-after</a></li>
-                            <li><a href="#" data-type="basis">basis</a></li>
-                            <li><a href="#" data-type="bundle">bundle</a></li>
-                            <li><a href="#" data-type="cardinal">cardinal</a></li>
-                            <li><a href="#" data-type="monotone">monotone</a></li>
-                        </ul>
-                    </li>
-
-                    <li class="dropdown-submenu hide-combined-chart">
-                        <a href="#">Resolution</a>
-
-                        <ul class="dropdown-menu interval-selector">
-                            <li><a href="#" data-type="minute">Minute</a></li>
-                            <li><a href="#" data-type="hour">Hour</a></li>
-                            <li><a href="#" data-type="day">Day</a></li>
-                            <li><a href="#" data-type="week">Week</a></li>
-                            <li><a href="#" data-type="month">Month</a></li>
-                            <li><a href="#" data-type="quarter">Quarter</a></li>
-                            <li><a href="#" data-type="year">Year</a></li>
-                        </ul>
-                    </li>
-
-                    <li class="dropdown-submenu hide-combined-chart">
-                        <a href="#">Add to dashboard</a>
-
-                        <ul class="dropdown-menu dashboard-selector"
-                            @if(stream != null) {
-                                data-stream-id="@stream.getId"
-                            }
-
-                            data-widget-type="field_chart"
-                        >
-                            @if(Permissions.isPermitted(RestPermissions.DASHBOARDS_CREATE)) {
-                                <li>
-                                    <a href="@routes.DashboardsController.newDashboard()">No dashboards. Create one?</a>
-                                </li>
-                            }
-                        </ul>
-                    </li>
-
-                    <li><a href="#" class="hide">Hide</a></li>
-                </ul>
+            <div class="field-graph-components">
+                <div class="field-graph-y-axis"></div>
+                <div class="field-graph"></div>
             </div>
 
-            <a href="#" class="pin hide-combined-chart"><i class="fa fa-pushpin" title="Pin"></i></a>
-            <a href="#" class="unpin hide-combined-chart" style="display: none;"><i class="fa fa-pushpin"></i></a>
-        </h3>
-
-        <ul class="field-graph-query-container">
-            <li>
-                <div class="field-graph-query-color" style="background-color: #4DBCE9"></div>
-                <span class="type-description"></span>
-                Query: <span class="field-graph-query"></span>
-            </li>
-        </ul>
-
-        <div class="field-graph-components">
-            <div class="field-graph-y-axis"></div>
-            <div class="field-graph"></div>
-        </div>
-
-        <div class="merge-hint">
-            <span class="alpha70">Drop to merge charts</span>
+            <div class="merge-hint">
+                <span class="alpha70">Drop to merge charts</span>
+            </div>
         </div>
     </div>
-</div>
+-->
 
-@if(stream != null) {
-    @views.html.partials.streamrules.stream_rule_form.render(streamId, null)
-}
+    @if(stream != null) {
+        @views.html.partials.streamrules.stream_rule_form.render(streamId, null)
+    }
 
-@views.html.search.partials.show_query_modal(searchResult.getBuiltQuery)
+    @views.html.search.partials.show_query_modal(searchResult.getBuiltQuery)
 
-<table class="table table-condensed table-hover table-striped messages">
-	<thead>
-		<tr>
-			<th style="width: 135px;">
-                Timestamp
-                @views.html.search.partials.column_sorter.render("timestamp", search, page)
-            </th>
+    <nav class="content-col" style="margin-top: 10px;">
 
-			<th style="width: 180px;
-                @if(!(selectedFields.contains("source") || search.getOrder.getField.equals("source"))) { display: none;}"
-                    id="result-th-36cd38f49b9afa08222c0dc9ebfe35eb">
-                Source
-                @views.html.search.partials.column_sorter.render("source", search, page)
-            </th>
+        <h1>Messages</h1>
 
-			<th style="@if(!(selectedFields.contains("message") || search.getOrder.getField.equals("message"))) { display: none;}"
-            id="result-th-78e731027d8fd50ed642340b7c9a63b3">
-                Message
-                @views.html.search.partials.column_sorter.render("message", search, page)
-            </th>
-			
-			@for(f <- searchResult.getPageFields()) {
-                @if(!f.isStandardSelected) {
-                    <th id="result-th-@f.getHash"
-                        @if(!(selectedFields.contains(f.getName) || search.getOrder.getField.equals(f.getName))) { style="display: none;" }
-                    >
-                        @f.getName
-                        @views.html.search.partials.column_sorter.render(f.getName, search, page)
+        @****** extract this paginator to a partial! ****@
+
+        <nav class="pagination-search-result">
+            <ul class="pagination">
+                @if(page == 1){
+                    <li class="disabled"><a href="#">Previous</a></li>
+                } else {
+                    <li><a class="search-view-state" href="@route(page-1)">Previous</a></li>
+                }
+
+                @if(page < paginatorLength()) {
+                    <li class="disabled"><a href="#">&laquo;</a></li>
+                } else {
+                    @if(lowestPage()-paginatorLength() <= 0) {
+                        <li><a class="search-view-state" href="@route(1)">&laquo;</a></li>
+                    } else {
+                        <li><a class="search-view-state" href="@route(lowestPage()-paginatorLength())">&laquo;</a></li>
+                    }
+                }
+
+                @for(i <- lowestPage().max(1) until page) {
+                    <li><a class="search-view-state" href="@route(i)">@i</a></li>
+                }
+
+                <li class="active"><a class="search-view-state" href="@route(page)">@page</a></li>
+
+                @for(i <- page+1 to highestPage()) {
+                    <li><a class="search-view-state" href="@route(i)">@i</a></li>
+                }
+
+                @if(highestPage() * UniversalSearch.PER_PAGE <= searchResult.getTotalResultCount && highestPage() > page && page * UniversalSearch.PER_PAGE != searchResult.getTotalResultCount) {
+                    <li><a class="search-view-state" href="@route(highestPage())">&raquo;</a></li>
+                } else {
+                    <li class="disabled"><a href="#">&raquo;</a></li>
+                }
+
+                @if(page < highestPage()) {
+                    <li><a class="search-view-state" href="@route(page+1)">Next</a></li>
+                } else {
+                    <li class="disabled"><a href="#">Next</a></li>
+
+                }
+            </ul>
+        </nav>
+
+        <table class="table table-condensed table-hover table-striped messages">
+            <thead>
+                <tr>
+                    <th style="width: 135px;">
+                        Timestamp
+                        @views.html.search.partials.column_sorter.render("timestamp", search, page)
                     </th>
-				}
-			}
-		</tr>
-	</thead>
-	<tbody>
-		@for(r <- searchResult.getMessages()) {
-		<tr data-message-id='@r.getFields.get("_id")' data-source-index="@r.getIndex">
-			<td>@DateHelper.timestampShort(r.getTimestamp)</td>
-			<td @if(!(selectedFields.contains("source") || search.getOrder.getField.equals("source"))) { style="display: none;" }
-                class="result-td-36cd38f49b9afa08222c0dc9ebfe35eb">@r.getFields.get("source")</td>
-			<td @if(!(selectedFields.contains("message") || search.getOrder.getField.equals("message"))) { style="display: none;" }
-                class="messages-message result-td-78e731027d8fd50ed642340b7c9a63b3">
-                @renderMessageResultField("message", r.getFields, r)
-                <a href="@routes.MessagesController.show(r.getIndex.asInstanceOf[String], r.getFields.get("_id").asInstanceOf[String])" target="_blank">[open msg]</a>
-            </td>
-			
-			@for(f <- searchResult.getPageFields()) {
-                @if(!f.isStandardSelected) {
-					<td class="result-td-@f.getHash()"
-                        @if(!(selectedFields.contains(f.getName) || search.getOrder.getField.equals(f.getName))) { style="display: none;" }
-                    >@renderMessageResultField(f.getName, r.getFormattedFields, r)</td>
-				}
-			}
-		</tr>
-		}
-	</tbody>
-</table>
 
-@****** extract this paginator to a partial! ****@
+                    <th style="width: 180px;
+                        @if(!(selectedFields.contains("source") || search.getOrder.getField.equals("source"))) { display: none;}"
+                            id="result-th-36cd38f49b9afa08222c0dc9ebfe35eb">
+                        Source
+                        @views.html.search.partials.column_sorter.render("source", search, page)
+                    </th>
 
-<div class="pagination pagination-centered">
-    <ul>
-        @if(page == 1){
-            <li class="disabled"><a href="#">Previous</a></li>
-        } else {
-            <li><a class="search-view-state" href="@route(page-1)">Previous</a></li>
-        }
+                    <th style="@if(!(selectedFields.contains("message") || search.getOrder.getField.equals("message"))) { display: none;}"
+                    id="result-th-78e731027d8fd50ed642340b7c9a63b3">
+                        Message
+                        @views.html.search.partials.column_sorter.render("message", search, page)
+                    </th>
 
-        @if(page < paginatorLength()) {
-            <li class="disabled"><a href="#">&laquo;</a></li>
-        } else {
-            @if(lowestPage()-paginatorLength() <= 0) {
-                <li><a class="search-view-state" href="@route(1)">&laquo;</a></li>
-            } else {
-                <li><a class="search-view-state" href="@route(lowestPage()-paginatorLength())">&laquo;</a></li>
-            }
-        }
+                    @for(f <- searchResult.getPageFields()) {
+                        @if(!f.isStandardSelected) {
+                            <th id="result-th-@f.getHash"
+                                @if(!(selectedFields.contains(f.getName) || search.getOrder.getField.equals(f.getName))) { style="display: none;" }
+                            >
+                                @f.getName
+                                @views.html.search.partials.column_sorter.render(f.getName, search, page)
+                            </th>
+                        }
+                    }
+                </tr>
+            </thead>
+            <tbody>
+                @for(r <- searchResult.getMessages()) {
+                <tr data-message-id='@r.getFields.get("_id")' data-source-index="@r.getIndex">
+                    <td>@DateHelper.timestampShort(r.getTimestamp)</td>
+                    <td @if(!(selectedFields.contains("source") || search.getOrder.getField.equals("source"))) { style="display: none;" }
+                        class="result-td-36cd38f49b9afa08222c0dc9ebfe35eb">@r.getFields.get("source")</td>
+                    <td @if(!(selectedFields.contains("message") || search.getOrder.getField.equals("message"))) { style="display: none;" }
+                        class="messages-message result-td-78e731027d8fd50ed642340b7c9a63b3">
+                        @renderMessageResultField("message", r.getFields, r)
+                        <a href="@routes.MessagesController.show(r.getIndex.asInstanceOf[String], r.getFields.get("_id").asInstanceOf[String])" target="_blank">[open msg]</a>
+                    </td>
 
-        @for(i <- lowestPage().max(1) until page) {
-            <li><a class="search-view-state" href="@route(i)">@i</a></li>
-        }
+                    @for(f <- searchResult.getPageFields()) {
+                        @if(!f.isStandardSelected) {
+                            <td class="result-td-@f.getHash()"
+                                @if(!(selectedFields.contains(f.getName) || search.getOrder.getField.equals(f.getName))) { style="display: none;" }
+                            >@renderMessageResultField(f.getName, r.getFormattedFields, r)</td>
+                        }
+                    }
+                </tr>
+                }
+            </tbody>
+        </table>
 
-        <li class="active"><a class="search-view-state" href="@route(page)">@page</a></li>
+        @****** extract this paginator to a partial! ****@
 
-        @for(i <- page+1 to highestPage()) {
-            <li><a class="search-view-state" href="@route(i)">@i</a></li>
-        }
+        <nav style="text-align: center;">
+            <ul class="pagination">
+                @if(page == 1){
+                    <li class="disabled"><a href="#">Previous</a></li>
+                } else {
+                    <li><a class="search-view-state" href="@route(page-1)">Previous</a></li>
+                }
 
-        @if(highestPage() * UniversalSearch.PER_PAGE <= searchResult.getTotalResultCount && highestPage() > page && page * UniversalSearch.PER_PAGE != searchResult.getTotalResultCount) {
-            <li><a class="search-view-state" href="@route(highestPage())">&raquo;</a></li>
-        } else {
-            <li class="disabled"><a href="#">&raquo;</a></li>
-        }
+                @if(page < paginatorLength()) {
+                    <li class="disabled"><a href="#">&laquo;</a></li>
+                } else {
+                    @if(lowestPage()-paginatorLength() <= 0) {
+                        <li><a class="search-view-state" href="@route(1)">&laquo;</a></li>
+                    } else {
+                        <li><a class="search-view-state" href="@route(lowestPage()-paginatorLength())">&laquo;</a></li>
+                    }
+                }
 
-        @if(page < highestPage()) {
-            <li><a class="search-view-state" href="@route(page+1)">Next</a></li>
-        } else {
-            <li class="disabled"><a href="#">Next</a></li>
+                @for(i <- lowestPage().max(1) until page) {
+                    <li><a class="search-view-state" href="@route(i)">@i</a></li>
+                }
 
-        }
-    </ul>
-</div>
+                <li class="active"><a class="search-view-state" href="@route(page)">@page</a></li>
+
+                @for(i <- page+1 to highestPage()) {
+                    <li><a class="search-view-state" href="@route(i)">@i</a></li>
+                }
+
+                @if(highestPage() * UniversalSearch.PER_PAGE <= searchResult.getTotalResultCount && highestPage() > page && page * UniversalSearch.PER_PAGE != searchResult.getTotalResultCount) {
+                    <li><a class="search-view-state" href="@route(highestPage())">&raquo;</a></li>
+                } else {
+                    <li class="disabled"><a href="#">&raquo;</a></li>
+                }
+
+                @if(page < highestPage()) {
+                    <li><a class="search-view-state" href="@route(page+1)">Next</a></li>
+                } else {
+                    <li class="disabled"><a href="#">Next</a></li>
+
+                }
+            </ul>
+        </nav>
+    </div>
 
 <script src="@routes.Assets.at("javascripts/result-histogram.js")" type="text/javascript"></script>
 
