@@ -121,7 +121,7 @@ public class Version implements Comparable<Version> {
             } else
                 return new Version(major, minor, patch, additional, sha1);
         } else
-            return null;
+            throw new IllegalArgumentException("Unable to parse Version string " + version);
     }
 
     public Version(int major, int minor, int patch) {
