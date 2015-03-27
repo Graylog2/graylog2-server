@@ -31,6 +31,8 @@ object ApplicationBuild extends Build {
     "com.sun.jersey" % "jersey-grizzly2" % "1.18.1",
     "com.sun.jersey" % "jersey-bundle" % "1.18.1",
 
+    "com.github.fdimuccio" %% "play2-sockjs" % "0.3.1",
+
     "org.mockito" % "mockito-all" % "1.9.5" % "test"
   )
   val repositories = Seq(

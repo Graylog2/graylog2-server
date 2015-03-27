@@ -16,4 +16,5 @@ $(document).ready(() => {
     if (userPreferences.enableSmartSearch) {
         require('./components/search/mount');
     }
+    require('./stores/metrics/mount');
 });

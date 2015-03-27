@@ -181,6 +181,9 @@ GET         /a/messagecounts/total                                              
 # API: Message analyzing
 GET         /a/analyze/:index/:id/:field                                             @controllers.MessagesController.analyze(index: String, id: String, field: String)
 
+# Metrics via SockJS, set up new router
+->         /a/metrics                                                                controllers.api.MetricsController.metrics
+
 # API: System
 GET         /a/system/fields                                                         @controllers.api.SystemApiController.fields()
 GET         /a/system/jobs                                                           @controllers.api.SystemApiController.jobs()
