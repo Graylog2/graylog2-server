@@ -13,6 +13,7 @@ var UserNotification = require("../../util/UserNotification");
 var WidgetHeader = require('./WidgetHeader');
 var WidgetFooter = require('./WidgetFooter');
 var WidgetConfigModal = require('./WidgetConfigModal');
+var WidgetEditConfigModal = require('./WidgetEditConfigModal');
 
 var NumericVisualization = require('../visualizations/NumericVisualization');
 var HistogramVisualization = require('../visualizations/HistogramVisualization');
@@ -69,11 +70,13 @@ var Widget = React.createClass({
         $(this._getWidgetNode()).off("locked.dashboard", this._dashboardLocked);
     },
     loadData() {
-        if (!assertUpdateEnabled(this.loadData) || this.state.deleted) { return; }
+        if (!assertUpdateEnabled(this.loadData) || this.state.deleted) {
+            return;
+        }
 
         var widgetPromise = WidgetsStore.loadWidget(this.props.dashboardId, this.props.widgetId);
         widgetPromise.fail((jqXHR, textStatus, errorThrown) => {
-            if(jqXHR.status === 404) {
+            if (jqXHR.status === 404) {
                 UserNotification.warning("It looks like widget '" + this.state.title + "' does not exist anymore. " +
                     "Please refresh the page to remove it from the dashboard.",
                     "Could not load widget information");
@@ -92,7 +95,9 @@ var Widget = React.createClass({
         setTimeout(this.loadData, this.WIDGET_DATA_REFRESH);
     },
     loadValue() {
-        if (!assertUpdateEnabled(this.loadValue) || this.state.deleted) { return; }
+        if (!assertUpdateEnabled(this.loadValue) || this.state.deleted) {
+            return;
+        }
 
         var dataPromise = WidgetsStore.loadValue(this.props.dashboardId, this.props.widgetId);
         dataPromise.fail((jqXHR, textStatus, errorThrown) => {
@@ -119,11 +124,13 @@ var Widget = React.createClass({
         this.setState({locked: false});
     },
     getVisualization() {
-        if (this.state.type === "") { return; }
+        if (this.state.type === "") {
+            return;
+        }
 
         var visualization;
 
-        switch(this.state.type) {
+        switch (this.state.type) {
             case 'SEARCH_RESULT_COUNT':
             case 'STREAM_SEARCH_RESULT_COUNT':
             case 'STATS_COUNT':
@@ -193,6 +200,16 @@ var Widget = React.createClass({
     _showConfig() {
         this.refs.configModal.open();
     },
+    _showEditConfig() {
+        this.refs.editModal.open();
+    },
+    updateWidget(newWidgetData) {
+        this.setState({
+            title: newWidgetData.title,
+            cacheTime: newWidgetData.cache_time,
+            config: newWidgetData.config
+        });
+    },
     deleteWidget() {
         if (window.confirm("Do you really want to delete '" + this.state.title + "'?")) {
             this.setState({deleted: true});
@@ -207,6 +224,12 @@ var Widget = React.createClass({
                                metricsAction={this._goToWidgetMetrics}/>
         );
 
+        var editConfigModal = (
+            <WidgetEditConfigModal ref="editModal"
+                                   widget={this._getWidgetData()}
+                                   onUpdate={this.updateWidget}/>
+        );
+
         return (
             <div ref="widget" className="widget" data-widget-id={this.props.widgetId}>
                 <WidgetHeader title={this.state.title}
@@ -219,8 +242,9 @@ var Widget = React.createClass({
                 <WidgetFooter locked={this.state.locked}
                               onReplaySearch={this._replaySearch}
                               onShowConfig={this._showConfig}
+                              onEditConfig={this._showEditConfig}
                               onDelete={this.deleteWidget}/>
-                {this.state.locked ? showConfigModal : null}
+                {this.state.locked ? showConfigModal : editConfigModal}
             </div>
         );
     }

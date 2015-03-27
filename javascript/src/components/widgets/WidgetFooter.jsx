@@ -10,7 +10,7 @@ var WidgetFooter = React.createClass({
         this.props.onShowConfig();
     },
     _editConfig() {
-        alert("edit");
+        this.props.onEditConfig();
     },
     _delete() {
         this.props.onDelete();

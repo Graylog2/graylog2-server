@@ -16,6 +16,7 @@
     "numeral": "1.5.x",
     "qs": "2.3.x",
     "react": "0.12.x",
+    "react-bootstrap": "0.17.x",
     "sockjs-client": "1.0.0-beta.12"
   },
   "devDependencies": {

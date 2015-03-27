@@ -57,19 +57,7 @@ momentHelper = {
 
     /* Parse the given string against the list of accepted formats and return a moment in the users' local timezone. */
     parseUserLocalFromString: function(dateString) {
-        var parsedDate = this.parseUTCFromString(dateString);
-        var userDate = this.toUserTimeZone(null);
-
-        // I really don't want to use moment-timezone.js just for this
-        userDate.year(parsedDate.year());
-        userDate.month(parsedDate.month());
-        userDate.date(parsedDate.date());
-        userDate.hour(parsedDate.hour());
-        userDate.minute(parsedDate.minute());
-        userDate.second(parsedDate.second());
-        userDate.millisecond(parsedDate.millisecond());
-
-        return userDate;
+        return moment.tz(this._cleanDateString(dateString), this._getAcceptedFormats(), true, gl2UserTimeZone);
     },
 
     getFormattedResolution: function(resolution) {
