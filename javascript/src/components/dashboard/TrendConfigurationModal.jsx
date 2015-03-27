@@ -24,12 +24,13 @@ var TrendConfigurationModal = React.createClass({
                     <label>
                         <input type="checkbox" onChange={this._onTrendChange} checked={this.state.trend}/> Display trend
                     </label>
+                    <p className="help-block">Show trend information for this number.</p>
                 </div>
                 <div className="checkbox">
                     <label>
                         <input type="checkbox" onChange={this._onLowerIsBetterChange} disabled={!this.state.trend} checked={this.state.lowerIsBetter}/> Lower value is better
-                        <span className="help-inline"> (use green colour when trend goes down)</span>
                     </label>
+                    <p className="help-block">Use green colour when trend goes down.</p>
                 </div>
             </div>
         );
