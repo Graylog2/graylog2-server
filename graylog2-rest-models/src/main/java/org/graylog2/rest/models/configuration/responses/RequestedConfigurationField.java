@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.restclient.lib.plugin.configuration;
+package org.graylog2.rest.models.configuration.responses;
 
 import java.util.List;
 import java.util.Map;

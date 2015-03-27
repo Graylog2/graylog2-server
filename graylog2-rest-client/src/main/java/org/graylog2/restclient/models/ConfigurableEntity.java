@@ -17,7 +17,7 @@
 package org.graylog2.restclient.models;
 
 import com.google.common.collect.Maps;
-import org.graylog2.restclient.lib.plugin.configuration.RequestedConfigurationField;
+import org.graylog2.rest.models.configuration.responses.RequestedConfigurationField;
 
 import java.util.List;
 import java.util.Map;

@@ -14,22 +14,26 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.restclient.lib.plugin.configuration;
+package org.graylog2.rest.models.configuration.responses;
+
+import org.graylog2.rest.models.configuration.responses.RequestedConfigurationField;
 
 import java.util.Map;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
  */
-public class TextField extends RequestedConfigurationField {
+public class NumberField extends RequestedConfigurationField {
 
-    private final static String TYPE = "text";
+    private final static String TYPE = "number";
 
     public enum Attribute {
-        IS_PASSWORD
+        ONLY_POSITIVE,
+        ONLY_NEGATIVE,
+        IS_PORT_NUMBER
     }
 
-    public TextField(Map.Entry<String, Map<String, Object>> c) {
+    public NumberField(Map.Entry<String, Map<String, Object>> c) {
         super(TYPE, c);
     }
 
@@ -40,7 +44,16 @@ public class TextField extends RequestedConfigurationField {
 
     @Override
     public String attributeToJSValidation(String attribute) {
-        throw new RuntimeException("This type does not have any validatable attributes.");
+        switch (Attribute.valueOf(attribute.toUpperCase())) {
+            case ONLY_NEGATIVE:
+                return "negative_number";
+            case ONLY_POSITIVE:
+                return "positive_number";
+            case IS_PORT_NUMBER:
+                return "port_number";
+            default:
+                throw new RuntimeException("No JS validation for type [" + attribute + "].");
+        }
     }
 
 }

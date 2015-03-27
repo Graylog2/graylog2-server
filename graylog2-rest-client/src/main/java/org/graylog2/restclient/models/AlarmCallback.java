@@ -19,8 +19,7 @@ package org.graylog2.restclient.models;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import org.graylog2.rest.models.alarmcallbacks.AlarmCallbackSummary;
-import org.graylog2.restclient.models.api.responses.alarmcallbacks.AlarmCallbackSummaryResponse;
-import org.graylog2.restclient.models.api.responses.alarmcallbacks.GetSingleAvailableAlarmCallbackResponse;
+import org.graylog2.rest.models.alarmcallbacks.responses.AvailableAlarmCallbackSummaryResponse;
 import org.joda.time.DateTime;
 
 import java.util.Map;
@@ -30,7 +29,6 @@ import java.util.Map;
  */
 public class AlarmCallback extends ConfigurableEntity {
     public interface Factory {
-        AlarmCallback fromSummaryResponse(String streamId, AlarmCallbackSummaryResponse response);
         AlarmCallback fromSummaryResponse(String streamId, AlarmCallbackSummary response);
     }
 
@@ -42,20 +40,6 @@ public class AlarmCallback extends ConfigurableEntity {
     private DateTime createdAt;
     private String creatorUserId;
     private User creatorUser;
-
-    @AssistedInject
-    public AlarmCallback(UserService userService,
-                         @Assisted String streamId,
-                         @Assisted AlarmCallbackSummaryResponse response) {
-        this.userService = userService;
-        this.streamId = streamId;
-        this.id = response.id;
-        this.type = response.type;
-        this.configuration = response.configuration;
-        this.createdAt = DateTime.parse(response.createdAt);
-        this.creatorUserId = response.creatorUserId;
-        this.creatorUser = userService.load(creatorUserId);
-    }
 
     @AssistedInject
     public AlarmCallback(UserService userService,
@@ -88,7 +72,7 @@ public class AlarmCallback extends ConfigurableEntity {
         return configuration;
     }
 
-    public Map<String, Object> getConfiguration(GetSingleAvailableAlarmCallbackResponse availableAlarmCallbackResponse) {
+    public Map<String, Object> getConfiguration(AvailableAlarmCallbackSummaryResponse availableAlarmCallbackResponse) {
         return getConfiguration(availableAlarmCallbackResponse.getRequestedConfiguration());
     }
 

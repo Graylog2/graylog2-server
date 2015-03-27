@@ -14,22 +14,22 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.restclient.models.api.responses.alarmcallbacks;
+package org.graylog2.rest.models.alarmcallbacks.responses;
 
 import com.google.common.collect.Lists;
-import org.graylog2.restclient.lib.plugin.configuration.BooleanField;
-import org.graylog2.restclient.lib.plugin.configuration.DropdownField;
-import org.graylog2.restclient.lib.plugin.configuration.NumberField;
-import org.graylog2.restclient.lib.plugin.configuration.RequestedConfigurationField;
-import org.graylog2.restclient.lib.plugin.configuration.TextField;
+import org.graylog2.rest.models.configuration.responses.BooleanField;
+import org.graylog2.rest.models.configuration.responses.DropdownField;
+import org.graylog2.rest.models.configuration.responses.NumberField;
+import org.graylog2.rest.models.configuration.responses.RequestedConfigurationField;
+import org.graylog2.rest.models.configuration.responses.TextField;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Map;
 
-public class GetSingleAvailableAlarmCallbackResponse {
-    private static final Logger LOG = LoggerFactory.getLogger(GetSingleAvailableAlarmCallbackResponse.class);
+public class AvailableAlarmCallbackSummaryResponse {
+    private static final Logger LOG = LoggerFactory.getLogger(AvailableAlarmCallbackSummaryResponse.class);
 
     public String name;
     public Map<String, Map<String, Object>> requested_configuration;

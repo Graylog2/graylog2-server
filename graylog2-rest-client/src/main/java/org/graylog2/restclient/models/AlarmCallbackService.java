@@ -20,10 +20,11 @@ import com.google.common.collect.Lists;
 import org.graylog2.rest.models.alarmcallbacks.AlarmCallbackListSummary;
 import org.graylog2.rest.models.alarmcallbacks.AlarmCallbackSummary;
 import org.graylog2.rest.models.alarmcallbacks.responses.CreateAlarmCallbackResponse;
+import org.graylog2.rest.models.alarmcallbacks.responses.AvailableAlarmCallbacksResponse;
+import org.graylog2.rest.models.alarmcallbacks.responses.AvailableAlarmCallbackSummaryResponse;
 import org.graylog2.restclient.lib.APIException;
 import org.graylog2.restclient.lib.ApiClient;
 import org.graylog2.restclient.models.api.requests.alarmcallbacks.CreateAlarmCallbackRequest;
-import org.graylog2.restclient.models.api.responses.alarmcallbacks.*;
 import org.graylog2.restroutes.generated.AlarmCallbackResource;
 import org.graylog2.restroutes.generated.routes;
 import play.mvc.Http;
@@ -71,8 +72,8 @@ public class AlarmCallbackService {
         return apiClient.path(resource.create(streamId), CreateAlarmCallbackResponse.class).body(request).expect(Http.Status.CREATED).execute();
     }
 
-    public Map<String, GetSingleAvailableAlarmCallbackResponse> available(String streamId) throws IOException, APIException {
-        GetAvailableAlarmCallbacksResponse response = apiClient.path(resource.available(streamId), GetAvailableAlarmCallbacksResponse.class)
+    public Map<String, AvailableAlarmCallbackSummaryResponse> available(String streamId) throws IOException, APIException {
+        final AvailableAlarmCallbacksResponse response = apiClient.path(resource.available(streamId), AvailableAlarmCallbacksResponse.class)
                 .expect(Http.Status.OK).execute();
 
         return response.types;

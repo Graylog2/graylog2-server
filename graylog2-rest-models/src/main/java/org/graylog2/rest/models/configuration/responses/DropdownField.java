@@ -14,19 +14,23 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.restclient.lib.plugin.configuration;
+package org.graylog2.rest.models.configuration.responses;
+
+import org.graylog2.rest.models.configuration.responses.RequestedConfigurationField;
 
 import java.util.Map;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
-public class BooleanField extends RequestedConfigurationField {
+public class DropdownField extends RequestedConfigurationField {
 
-    private final static String TYPE = "boolean";
+    private final static String TYPE = "dropdown";
 
-    public BooleanField(Map.Entry<String, Map<String, Object>> c) {
+    private final Map<String, String> values;
+
+    public DropdownField(Map.Entry<String, Map<String, Object>> c) {
         super(TYPE, c);
+
+        // lolwut
+        this.values = (Map<String, String>) ((Map<String, Object>) c.getValue().get("additional_info")).get("values");
     }
 
     @Override
@@ -39,4 +43,7 @@ public class BooleanField extends RequestedConfigurationField {
         throw new RuntimeException("This type does not have any validatable attributes.");
     }
 
+    public Map<String, String> getValues() {
+        return values;
+    }
 }

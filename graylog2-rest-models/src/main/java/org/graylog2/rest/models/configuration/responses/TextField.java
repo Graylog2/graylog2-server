@@ -14,23 +14,35 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.restclient.models.api.responses.alarmcallbacks;
+package org.graylog2.rest.models.configuration.responses;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import org.graylog2.rest.models.configuration.responses.RequestedConfigurationField;
 
 import java.util.Map;
 
 /**
- * @author Dennis Oelkers <dennis@torch.sh>
+ * @author Lennart Koopmann <lennart@torch.sh>
  */
-public class AlarmCallbackSummaryResponse {
-    public String id;
-    @JsonProperty("stream_id")
-    public String streamId;
-    public String type;
-    public Map<String, Object> configuration;
-    @JsonProperty("created_at")
-    public String createdAt;
-    @JsonProperty("creator_user_id")
-    public String creatorUserId;
+public class TextField extends RequestedConfigurationField {
+
+    private final static String TYPE = "text";
+
+    public enum Attribute {
+        IS_PASSWORD
+    }
+
+    public TextField(Map.Entry<String, Map<String, Object>> c) {
+        super(TYPE, c);
+    }
+
+    @Override
+    public String getType() {
+        return TYPE;
+    }
+
+    @Override
+    public String attributeToJSValidation(String attribute) {
+        throw new RuntimeException("This type does not have any validatable attributes.");
+    }
+
 }

@@ -17,7 +17,6 @@
 package org.graylog2.rest.resources.alarmcallbacks;
 
 import com.codahale.metrics.annotation.Timed;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.wordnik.swagger.annotations.Api;
@@ -36,6 +35,8 @@ import org.graylog2.plugin.streams.Stream;
 import org.graylog2.rest.models.alarmcallbacks.AlarmCallbackListSummary;
 import org.graylog2.rest.models.alarmcallbacks.AlarmCallbackSummary;
 import org.graylog2.rest.models.alarmcallbacks.responses.CreateAlarmCallbackResponse;
+import org.graylog2.rest.models.alarmcallbacks.responses.AvailableAlarmCallbacksResponse;
+import org.graylog2.rest.models.alarmcallbacks.responses.AvailableAlarmCallbackSummaryResponse;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.streams.StreamService;
@@ -158,17 +159,20 @@ public class AlarmCallbackResource extends RestResource {
     @Timed
     @ApiOperation(value = "Get a list of all alarm callback types")
     @Produces(MediaType.APPLICATION_JSON)
-    public Map<String, Map<String, Object>> available(@ApiParam(name = "streamid", value = "The id of the stream whose alarm callbacks we want.", required = true)
+    public AvailableAlarmCallbacksResponse available(@ApiParam(name = "streamid", value = "The id of the stream whose alarm callbacks we want.", required = true)
                                                       @PathParam("streamid") String streamid) {
-        final Map<String, Object> types = Maps.newHashMapWithExpectedSize(availableAlarmCallbacks.size());
+        final Map<String, AvailableAlarmCallbackSummaryResponse> types = Maps.newHashMapWithExpectedSize(availableAlarmCallbacks.size());
         for (AlarmCallback availableAlarmCallback : availableAlarmCallbacks) {
-            Map<String, Object> type = Maps.newHashMap();
-            type.put("requested_configuration", availableAlarmCallback.getRequestedConfiguration().asList());
-            type.put("name", availableAlarmCallback.getName());
+            final AvailableAlarmCallbackSummaryResponse type = new AvailableAlarmCallbackSummaryResponse();
+            type.name = availableAlarmCallback.getName();
+            type.requested_configuration = availableAlarmCallback.getRequestedConfiguration().asList();
             types.put(availableAlarmCallback.getClass().getCanonicalName(), type);
         }
 
-        return ImmutableMap.of("types", types);
+        final AvailableAlarmCallbacksResponse response = new AvailableAlarmCallbacksResponse();
+        response.types = types;
+
+        return response;
     }
 
     @DELETE
