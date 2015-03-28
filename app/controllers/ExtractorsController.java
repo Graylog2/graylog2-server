@@ -33,7 +33,7 @@ import org.graylog2.restclient.models.Input;
 import org.graylog2.restclient.models.MessagesService;
 import org.graylog2.restclient.models.Node;
 import org.graylog2.restclient.models.NodeService;
-import org.graylog2.restclient.models.api.requests.CreateExtractorRequest;
+import org.graylog2.rest.models.system.inputs.extractors.requests.CreateExtractorRequest;
 import org.graylog2.restclient.models.api.requests.ExtractorImportRequest;
 import org.graylog2.restclient.models.api.requests.ExtractorListImportRequest;
 import org.graylog2.restclient.models.api.results.MessageResult;

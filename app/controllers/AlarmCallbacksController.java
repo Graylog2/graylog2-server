@@ -4,7 +4,7 @@ import com.google.common.collect.Maps;
 import org.graylog2.restclient.lib.APIException;
 import org.graylog2.restclient.models.AlarmCallbackService;
 import org.graylog2.restclient.models.api.requests.alarmcallbacks.CreateAlarmCallbackRequest;
-import org.graylog2.restclient.models.api.responses.alarmcallbacks.GetSingleAvailableAlarmCallbackResponse;
+import org.graylog2.rest.models.alarmcallbacks.responses.AvailableAlarmCallbackSummaryResponse;
 import play.data.Form;
 import play.mvc.Result;
 
@@ -28,7 +28,7 @@ public class AlarmCallbacksController extends AuthenticatedController {
         Form<CreateAlarmCallbackRequest> boundForm = alarmCallbackForm.bindFromRequest();
         CreateAlarmCallbackRequest request = boundForm.get();
 
-        Map<String, GetSingleAvailableAlarmCallbackResponse> availableAlarmCallbacks = alarmCallbackService.available(streamId);
+        Map<String, AvailableAlarmCallbackSummaryResponse> availableAlarmCallbacks = alarmCallbackService.available(streamId);
 
         request.configuration = extractConfiguration(request.configuration, availableAlarmCallbacks.get(request.type));
 
@@ -43,7 +43,7 @@ public class AlarmCallbacksController extends AuthenticatedController {
         return redirect(routes.AlertsController.index(streamId));
     }
 
-    protected Map<String, Object> extractConfiguration(Map<String, Object> form, GetSingleAvailableAlarmCallbackResponse alarmCallbackInfo) {
+    protected Map<String, Object> extractConfiguration(Map<String, Object> form, AvailableAlarmCallbackSummaryResponse alarmCallbackInfo) {
         Map<String, Object> configuration = Maps.newHashMap();
         for (Map.Entry<String, Object> entry : form.entrySet()) {
             Object value;
