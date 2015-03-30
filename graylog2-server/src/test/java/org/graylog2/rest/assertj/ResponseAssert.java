@@ -24,4 +24,23 @@ public class ResponseAssert extends AbstractAssert<ResponseAssert, Response> {
 
         return this;
     }
+
+    public ResponseAssert isError() {
+        isNotNull();
+
+        final Response.Status.Family statusFamily = actual.getStatusInfo().getFamily();
+
+        if (statusFamily == Response.Status.Family.CLIENT_ERROR || statusFamily == Response.Status.Family.SERVER_ERROR) {
+            failWithMessage("Response was expected to be an error, but is <%s>", statusFamily);
+        }
+    }
+
+    public ResponseAssert isStatus(Response.Status expected) {
+        isNotNull();
+
+        final Response.StatusType status = actual.getStatusInfo();
+
+        if (status != expected)
+            failWithMessage("Response status was expected to be <%s>, but is <%s>", expected, status);
+    }
 }
