@@ -8,8 +8,10 @@ var BootstrapModal = React.createClass({
     componentDidMount() {
         this._modalNode()
             .modal({backdrop: 'static', keyboard: true, show: false});
+        $(this._modalNode()).on("hidden.bs.modal", this.props.onHidden);
     },
     componentWillUnmount() {
+        $(this._modalNode()).off("hidden.bs.modal");
     },
     close() {
         this._modalNode().modal('hide');

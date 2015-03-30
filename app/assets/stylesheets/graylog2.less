@@ -1480,7 +1480,7 @@ dl.metric-histogram dd {
 .dashboard .gridster .gs-w {
   background-color: #FFF;
   border: 1px solid #D1D1D1;
-  z-index: initial;
+  z-index: auto;
 }
 
 .dashboard .gridster .player {
@@ -1590,6 +1590,14 @@ dl.metric-histogram dd {
 .dashboard .gridster ul {
   margin: 0;
   transition: none;
+}
+
+.dashboard.unlocked .gridster .gs-w {
+  cursor: move;
+}
+
+.dashboard.unlocked .modal {
+  cursor: default;
 }
 
 .dashboard .react-widget {

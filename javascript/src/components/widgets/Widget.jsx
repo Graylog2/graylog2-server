@@ -1,4 +1,4 @@
-/* global assertUpdateEnabled */
+/* global assertUpdateEnabled, dashboardGrid */
 'use strict';
 
 var React = require('react');
@@ -202,6 +202,15 @@ var Widget = React.createClass({
     },
     _showEditConfig() {
         this.refs.editModal.open();
+
+        // Ugly workaround to avoid being able to move a widget when the modal is shown :(
+        this._disableGridster();
+    },
+    _disableGridster() {
+        dashboardGrid.disable();
+    },
+    _enableGridster() {
+        dashboardGrid.enable();
     },
     updateWidget(newWidgetData) {
         this.setState({
@@ -227,7 +236,8 @@ var Widget = React.createClass({
         var editConfigModal = (
             <WidgetEditConfigModal ref="editModal"
                                    widget={this._getWidgetData()}
-                                   onUpdate={this.updateWidget}/>
+                                   onUpdate={this.updateWidget}
+                                   onModalHidden={this._enableGridster}/>
         );
 
         return (

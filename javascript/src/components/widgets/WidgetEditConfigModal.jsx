@@ -208,6 +208,7 @@ var WidgetEditConfigModal = React.createClass({
             <BootstrapModal ref="editModal"
                             onCancel={this.hide}
                             onConfirm={this.save}
+                            onHidden={this.props.onModalHidden}
                             cancel="Cancel"
                             confirm="Update">
                 {configModalHeader}

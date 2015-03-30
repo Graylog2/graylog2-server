@@ -260,7 +260,7 @@ $(document).ready(function() {
 
     var unlockDashboard = function() {
         dashboardGrid.enable();
-        $(".dashboard .gridster .gs-w").css("cursor", "move");
+        $(".dashboard").addClass("unlocked");
         $(this).hide();
         $(".only-unlocked").show();
         $(".hidden-unlocked").hide();
@@ -282,7 +282,7 @@ $(document).ready(function() {
 
     var lockDashboard = function() {
         dashboardGrid.disable();
-        $(".dashboard .gridster .gs-w").css("cursor", "default");
+        $(".dashboard").removeClass("unlocked");
         $(this).hide();
         $(".hidden-unlocked").show();
         $(".only-unlocked").hide();
