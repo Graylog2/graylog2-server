@@ -53,6 +53,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -136,7 +137,7 @@ public class DashboardsResource extends RestResource {
             }
         }
 
-        return DashboardList.create(dashboards.size(),dashboards);
+        return DashboardList.create(dashboards.size(), dashboards);
     }
 
     @GET
@@ -356,6 +357,59 @@ public class DashboardsResource extends RestResource {
 
     @PUT
     @Timed
+    @ApiOperation(value = "Update a widget")
+    @Path("/{dashboardId}/widgets/{widgetId}")
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "Dashboard not found."),
+            @ApiResponse(code = 404, message = "Widget not found."),
+            @ApiResponse(code = 403, message = "Request must be performed against master node.")
+    })
+    @Produces(MediaType.APPLICATION_JSON)
+    @RestrictToMaster
+    public void updateWidget(@ApiParam(name = "dashboardId", required = true)
+                             @PathParam("dashboardId") String dashboardId,
+                             @ApiParam(name = "widgetId", required = true)
+                             @PathParam("widgetId") String widgetId,
+                             @ApiParam(name = "JSON body", required = true)
+                             @Valid @NotNull AddWidgetRequest awr) throws ValidationException {
+        checkPermission(RestPermissions.DASHBOARDS_EDIT, dashboardId);
+
+        final Dashboard dashboard = dashboardRegistry.get(dashboardId);
+        if (dashboard == null) {
+            LOG.error("Dashboard not found.");
+            throw new javax.ws.rs.NotFoundException();
+        }
+
+        final DashboardWidget widget = dashboard.getWidget(widgetId);
+        if (widget == null) {
+            LOG.error("Widget not found.");
+            throw new javax.ws.rs.NotFoundException();
+        }
+
+        try {
+            final DashboardWidget updatedWidget = DashboardWidget.fromRequest(metricRegistry,
+                    searches, widgetId, awr, widget.getCreatorUserId());
+            updatedWidget.setCacheTime(awr.cacheTime());
+
+            dashboardService.removeWidget(dashboard, widget);
+            dashboardService.addWidget(dashboard, updatedWidget);
+        } catch (DashboardWidget.NoSuchWidgetTypeException e2) {
+            LOG.error("No such widget type.", e2);
+            throw new BadRequestException(e2);
+        } catch (InvalidRangeParametersException e3) {
+            LOG.error("Invalid timerange parameters provided.", e3);
+            throw new BadRequestException(e3);
+        } catch (InvalidWidgetConfigurationException e4) {
+            LOG.error("Invalid widget configuration.", e4);
+            throw new BadRequestException(e4);
+        }
+
+        LOG.info("Updated widget <" + widgetId + "> on dashboard <" + dashboardId + ">. Reason: REST request.");
+    }
+
+    @Deprecated
+    @PUT
+    @Timed
     @ApiOperation(value = "Update description of a widget")
     @Path("/{dashboardId}/widgets/{widgetId}/description")
     @ApiResponses(value = {
@@ -390,6 +444,7 @@ public class DashboardsResource extends RestResource {
         LOG.info("Updated description of widget <" + widgetId + "> on dashboard <" + dashboardId + ">. Reason: REST request.");
     }
 
+    @Deprecated
     @PUT
     @Timed
     @ApiOperation(value = "Update cache time of a widget")

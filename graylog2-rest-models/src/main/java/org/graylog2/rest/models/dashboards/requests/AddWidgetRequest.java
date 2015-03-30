@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 
+import javax.validation.constraints.Min;
 import java.util.Map;
 
 @JsonAutoDetect
@@ -32,13 +33,17 @@ public abstract class AddWidgetRequest {
     @JsonProperty
     public abstract String type();
 
+    @JsonProperty("cache_time")
+    public abstract int cacheTime();
+
     @JsonProperty
     public abstract Map<String, Object> config();
 
     @JsonCreator
     public static AddWidgetRequest create(@JsonProperty("description") String description,
                                           @JsonProperty("type") String type,
+                                          @JsonProperty("cache_time") @Min(0) int cacheTime,
                                           @JsonProperty("config") Map<String, Object> config) {
-        return new AutoValue_AddWidgetRequest(description, type, config);
+        return new AutoValue_AddWidgetRequest(description, type, cacheTime, config);
     }
 }

@@ -19,7 +19,6 @@ package org.graylog2.dashboards;
 import com.codahale.metrics.MetricRegistry;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import javax.inject.Inject;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import org.bson.types.ObjectId;
@@ -28,15 +27,16 @@ import org.graylog2.dashboards.widgets.InvalidWidgetConfigurationException;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.database.PersistedServiceImpl;
-import org.graylog2.plugin.Tools;
-import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.indexer.searches.Searches;
 import org.graylog2.indexer.searches.timeranges.InvalidRangeParametersException;
+import org.graylog2.plugin.database.ValidationException;
+import org.graylog2.rest.models.dashboards.requests.UpdateWidgetRequest;
 import org.graylog2.rest.resources.dashboards.requests.WidgetPositions;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
 import java.util.List;
 import java.util.Map;
 
@@ -141,6 +141,7 @@ public class DashboardServiceImpl extends PersistedServiceImpl implements Dashbo
         dashboard.removeWidget(widget);
     }
 
+    @Deprecated
     @Override
     public void updateWidgetDescription(Dashboard dashboard, DashboardWidget widget, String newDescription) throws ValidationException {
         // Updating objects in arrays is a bit flaky in MongoDB. Let'S go the simple and stupid way until weh ave a proper DBA layer.
@@ -149,6 +150,7 @@ public class DashboardServiceImpl extends PersistedServiceImpl implements Dashbo
         addWidget(dashboard, widget);
     }
 
+    @Deprecated
     @Override
     public void updateWidgetCacheTime(Dashboard dashboard, DashboardWidget widget, int cacheTime) throws ValidationException {
         // Updating objects in arrays is a bit flaky in MongoDB. Let'S go the simple and stupid way until weh ave a proper DBA layer.
