@@ -86,9 +86,9 @@ var Widget = React.createClass({
         widgetPromise.done((widget) => {
             this.setState({
                 type: widget.type,
-                title: widget.description,
-                cacheTime: widget.cache_time,
-                creatorUserId: widget.creator_user_id,
+                title: widget.title,
+                cacheTime: widget.cacheTime,
+                creatorUserId: widget.creatorUserId,
                 config: widget.config
             });
         });
@@ -204,9 +204,12 @@ var Widget = React.createClass({
         this.refs.editModal.open();
     },
     updateWidget(newWidgetData) {
+        newWidgetData.id = this.props.widgetId;
+
+        WidgetsStore.updateWidget(this.props.dashboardId, newWidgetData);
         this.setState({
             title: newWidgetData.title,
-            cacheTime: newWidgetData.cache_time,
+            cacheTime: newWidgetData.cacheTime,
             config: newWidgetData.config
         });
     },
