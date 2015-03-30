@@ -26,7 +26,7 @@ var PreferencesStore = {
                 value: preferencesAsMap[name]
             };
         });
-        preferences = preferences.sort((t1, t2) => t1.name.localeCompare(t2.name));
+        preferences = preferences.sort((t1: Preference, t2: Preference) => t1.name.localeCompare(t2.name));
         return preferences;
     },
     convertPreferenceArrayToMap: function (preferences: Array<Preference>): PreferencesMap {
