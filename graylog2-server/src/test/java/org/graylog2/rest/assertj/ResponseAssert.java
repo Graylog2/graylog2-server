@@ -33,6 +33,8 @@ public class ResponseAssert extends AbstractAssert<ResponseAssert, Response> {
         if (statusFamily == Response.Status.Family.CLIENT_ERROR || statusFamily == Response.Status.Family.SERVER_ERROR) {
             failWithMessage("Response was expected to be an error, but is <%s>", statusFamily);
         }
+
+        return this;
     }
 
     public ResponseAssert isStatus(Response.Status expected) {
@@ -42,5 +44,7 @@ public class ResponseAssert extends AbstractAssert<ResponseAssert, Response> {
 
         if (status != expected)
             failWithMessage("Response status was expected to be <%s>, but is <%s>", expected, status);
+
+        return this;
     }
 }
