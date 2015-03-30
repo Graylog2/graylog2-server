@@ -36,12 +36,10 @@ object ApplicationBuild extends Build {
     "org.mockito" % "mockito-all" % "1.9.5" % "test"
   )
   val repositories = Seq(
-    "Local Maven Repository" at "file:///" + Path.userHome.absolutePath + "/.m2/repository",
-    Resolver.url("Graylog Play Repository", url("http://graylog2.github.io/play2-graylog2/releases/"))(Resolver.ivyStylePatterns),
-    Resolver.url("Graylog Play Snapshot Repository", url("http://graylog2.github.io/play2-graylog2/snapshots/"))(Resolver.ivyStylePatterns),
+    Resolver.mavenLocal,
     Resolver.sonatypeRepo("releases"),
-    ("Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots"),
-    ("Typesafe Releases" at "http://repo.typesafe.com/typesafe/releases/")
+    Resolver.sonatypeRepo("snapshots"),
+    Resolver.typesafeRepo("releases")
   )
 
   // Helper
