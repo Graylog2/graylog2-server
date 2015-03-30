@@ -6,7 +6,7 @@ import javax.ws.rs.core.Response;
 
 public class ResponseAssert extends AbstractAssert<ResponseAssert, Response> {
     public ResponseAssert(Response actual) {
-        super(actual, Response.class);
+        super(actual, ResponseAssert.class);
     }
 
     public static ResponseAssert assertThat(Response response) {
