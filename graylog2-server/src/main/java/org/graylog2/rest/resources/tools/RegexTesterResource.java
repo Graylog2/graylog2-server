@@ -14,16 +14,21 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package org.graylog2.rest.resources.tools;
 
 import com.codahale.metrics.annotation.Timed;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.rest.models.tools.responses.RegexTesterResponse;
+import org.graylog2.rest.resources.tools.requests.RegexTestRequest;
 import org.hibernate.validator.constraints.NotEmpty;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
@@ -39,7 +44,19 @@ public class RegexTesterResource extends RestResource {
     @Produces(MediaType.APPLICATION_JSON)
     public RegexTesterResponse regexTester(@QueryParam("regex") @NotEmpty String regex,
                                            @QueryParam("string") @NotNull String string) {
-        final Matcher matcher = Pattern.compile(regex, Pattern.DOTALL).matcher(string);
+        return doTestRegex(string, regex);
+    }
+
+    @POST
+    @Timed
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public RegexTesterResponse testRegex(@Valid @NotNull RegexTestRequest regexTestRequest) {
+        return doTestRegex(regexTestRequest.string(), regexTestRequest.regex());
+    }
+
+    private RegexTesterResponse doTestRegex(String example, String regex) {
+        final Matcher matcher = Pattern.compile(regex, Pattern.DOTALL).matcher(example);
         boolean matched = matcher.find();
 
         // Get the first matched group.
@@ -50,6 +67,6 @@ public class RegexTesterResource extends RestResource {
             match = null;
         }
 
-        return RegexTesterResponse.create(matched, match, regex, string);
+        return RegexTesterResponse.create(matched, match, regex, example);
     }
 }

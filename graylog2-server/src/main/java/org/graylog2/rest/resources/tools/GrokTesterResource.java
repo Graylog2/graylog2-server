@@ -24,13 +24,17 @@ import oi.thekraken.grok.api.exception.GrokException;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.grok.GrokPattern;
 import org.graylog2.grok.GrokPatternService;
+import org.graylog2.rest.resources.tools.requests.GrokTestRequest;
 import org.graylog2.rest.resources.tools.responses.GrokTesterResponse;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.inject.Inject;
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
@@ -55,8 +59,20 @@ public class GrokTesterResource extends RestResource {
     @GET
     @Timed
     public GrokTesterResponse grokTest(@QueryParam("pattern") @NotEmpty String pattern,
-                           @QueryParam("string") @NotNull String string) throws GrokException {
+                                       @QueryParam("string") @NotNull String string) throws GrokException {
 
+        return doTestGrok(string, pattern);
+    }
+
+    @POST
+    @Timed
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public GrokTesterResponse testGrok(@Valid @NotNull GrokTestRequest grokTestRequest) throws GrokException {
+        return doTestGrok(grokTestRequest.string(), grokTestRequest.pattern());
+    }
+
+    private GrokTesterResponse doTestGrok(String string, String pattern) throws GrokException {
         final Set<GrokPattern> grokPatterns = grokPatternService.loadAll();
 
         final Grok grok = new Grok();
