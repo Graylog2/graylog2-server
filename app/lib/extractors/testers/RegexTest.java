@@ -1,6 +1,4 @@
-/*
- * Copyright 2012-2015 TORCH GmbH, 2015 Graylog, Inc.
- *
+/**
  * This file is part of Graylog.
  *
  * Graylog is free software: you can redistribute it and/or modify
@@ -16,20 +14,19 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package lib.extractors.testers;
 
 import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 import org.graylog2.restclient.lib.APIException;
 import org.graylog2.restclient.lib.ApiClient;
+import org.graylog2.restclient.models.api.requests.tools.RegexTestRequest;
 import org.graylog2.restclient.models.api.responses.RegexTestResponse;
 
 import java.io.IOException;
 import java.util.Map;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public class RegexTest {
 
     private final ApiClient api;
@@ -39,11 +36,10 @@ public class RegexTest {
         this.api = api;
     }
 
-    public Map<String, Object> test(String regex, String string) throws IOException, APIException {
-        RegexTestResponse r = api.get(RegexTestResponse.class)
+    public Map<String, Object> test(RegexTestRequest request) throws IOException, APIException {
+        RegexTestResponse r = api.post(RegexTestResponse.class)
                 .path("/tools/regex_tester")
-                .queryParam("regex", regex)
-                .queryParam("string", string)
+                .body(request)
                 .execute();
 
         Map<String, Object> result = Maps.newHashMap();
@@ -62,5 +58,4 @@ public class RegexTest {
 
         return result;
     }
-
 }
