@@ -15,7 +15,7 @@
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.graylog2.rest.resources.tools.requests;
+package org.graylog2.rest.models.tools.requests;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -24,16 +24,20 @@ import com.google.auto.value.AutoValue;
 
 @JsonAutoDetect
 @AutoValue
-public abstract class GrokTestRequest {
+public abstract class SplitAndIndexTestRequest {
     @JsonProperty
     public abstract String string();
 
+    @JsonProperty("split_by")
+    public abstract String splitBy();
+
     @JsonProperty
-    public abstract String pattern();
+    public abstract int index();
 
     @JsonCreator
-    public static GrokTestRequest create(@JsonProperty("string") String string,
-                                         @JsonProperty("pattern") String pattern) {
-        return new AutoValue_GrokTestRequest(string, pattern);
+    public static SplitAndIndexTestRequest create(@JsonProperty("string") String string,
+                                                  @JsonProperty("split_by") String splitBy,
+                                                  @JsonProperty("index") int index) {
+        return new AutoValue_SplitAndIndexTestRequest(string, splitBy, index);
     }
 }

@@ -21,7 +21,7 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.inputs.extractors.SplitAndIndexExtractor;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.rest.models.tools.responses.SplitAndIndexTesterResponse;
-import org.graylog2.rest.resources.tools.requests.SplitAndIndexTestRequest;
+import org.graylog2.rest.models.tools.requests.SplitAndIndexTestRequest;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Min;

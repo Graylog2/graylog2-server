@@ -21,7 +21,7 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.plugin.Tools;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.rest.models.tools.responses.SubstringTesterResponse;
-import org.graylog2.rest.resources.tools.requests.SubstringTestRequest;
+import org.graylog2.rest.models.tools.requests.SubstringTestRequest;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
