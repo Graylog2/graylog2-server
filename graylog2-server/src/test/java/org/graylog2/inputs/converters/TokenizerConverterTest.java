@@ -22,6 +22,7 @@ import org.junit.Test;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
@@ -157,5 +158,43 @@ public class TokenizerConverterTest {
 
         assertEquals(1, result.size());
         assertEquals("123", result.get("_id"));
+    }
+
+    @Test
+    public void testFilterWithMixedQuotedAndPlainValues() {
+        TokenizerConverter f = new TokenizerConverter(new HashMap<String, Object>());
+        @SuppressWarnings("unchecked")
+        Map<String, String> result = (Map<String, String>) f.convert("otters in k1=\"v1\" k2=v2 more otters");
+
+        assertThat(result)
+                .hasSize(2)
+                .containsEntry("k1", "v1")
+                .containsEntry("k2", "v2");
+    }
+
+    @Test
+    public void testFilterWithKeysIncludingDashOrUnderscore() {
+        TokenizerConverter f = new TokenizerConverter(new HashMap<String, Object>());
+        @SuppressWarnings("unchecked")
+        Map<String, String> result = (Map<String, String>) f.convert("otters in k-1=v1 k_2=v2 _k3=v3 more otters");
+
+        assertThat(result)
+                .hasSize(3)
+                .containsEntry("k-1", "v1")
+                .containsEntry("k_2", "v2")
+                .containsEntry("_k3", "v3");
+    }
+
+    @Test
+    public void testFilterRetainsWhitespaceInQuotedValues() {
+        TokenizerConverter f = new TokenizerConverter(new HashMap<String, Object>());
+        @SuppressWarnings("unchecked")
+        Map<String, String> result = (Map<String, String>) f.convert("otters in k1= v1  k2=\" v2\" k3=\" v3 \" more otters");
+
+        assertThat(result)
+                .hasSize(3)
+                .containsEntry("k1", "v1")
+                .containsEntry("k2", " v2")
+                .containsEntry("k3", " v3 ");
     }
 }
