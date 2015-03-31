@@ -89,7 +89,7 @@ $(document).ready(function() {
             $(this).addClass("up-submenu");
 
             if (elementOverflowParentHeight(container, menu, "top")) {
-                $(this).removeClass("up-submenu")
+                $(this).removeClass("up-submenu");
                 $(this).addClass("down-submenu");
             }
         }
