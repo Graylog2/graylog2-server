@@ -45,7 +45,7 @@ public abstract class GrokTesterResponse {
     @JsonCreator
     public static GrokTesterResponse create(@JsonProperty("matched") boolean matched,
                                             @JsonProperty("matches") @Nullable List<Match> matches,
-                                            @JsonProperty("oattern") String pattern,
+                                            @JsonProperty("pattern") String pattern,
                                             @JsonProperty("string") String string) {
         return new AutoValue_GrokTesterResponse(matched, matches, pattern, string);
     }
