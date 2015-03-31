@@ -53,8 +53,8 @@ public class OutputBufferProcessor implements WorkHandler<MessageEvent> {
 
     private static final Logger LOG = LoggerFactory.getLogger(OutputBufferProcessor.class);
 
-    public static final String INCOMING_MESSAGES_METRICNAME = name(OutputBufferProcessor.class, "incomingMessages");
-    public static final String PROCESS_TIME_METRICNAME = name(OutputBufferProcessor.class, "processTime");
+    private static final String INCOMING_MESSAGES_METRICNAME = name(OutputBufferProcessor.class, "incomingMessages");
+    private static final String PROCESS_TIME_METRICNAME = name(OutputBufferProcessor.class, "processTime");
 
     private final ExecutorService executor;
 

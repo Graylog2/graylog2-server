@@ -24,7 +24,9 @@ package org.graylog2.plugin;
 
 import static com.codahale.metrics.MetricRegistry.name;
 
-public class GlobalMetricNames {
+public final class GlobalMetricNames {
+
+    private GlobalMetricNames() {}
 
     public static final String INPUT_THROUGHPUT = "org.graylog2.throughput.input";
     public static final String INPUT_THROUGHPUT_RATE = name(INPUT_THROUGHPUT, "1-sec-rate");

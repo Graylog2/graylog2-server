@@ -42,8 +42,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import static com.codahale.metrics.MetricRegistry.name;
 
 public class ElasticSearchOutput implements MessageOutput {
-    public static final String WRITES_METRICNAME = name(ElasticSearchOutput.class, "writes");
-    public static final String PROCESS_TIME_METRICNAME = name(ElasticSearchOutput.class, "processTime");
+    private static final String WRITES_METRICNAME = name(ElasticSearchOutput.class, "writes");
+    private static final String PROCESS_TIME_METRICNAME = name(ElasticSearchOutput.class, "processTime");
 
     private static final String NAME = "ElasticSearch Output";
     private static final Logger LOG = LoggerFactory.getLogger(ElasticSearchOutput.class);
