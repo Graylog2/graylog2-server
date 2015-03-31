@@ -158,4 +158,39 @@ public class TokenizerConverterTest {
         assertEquals(1, result.size());
         assertEquals("123", result.get("_id"));
     }
+
+    @Test
+    public void testFilterWithMixedQuotedAndPlainValues() {
+        TokenizerConverter f = new TokenizerConverter(new HashMap<String, Object>());
+        @SuppressWarnings("unchecked")
+        Map<String, String> result = (Map<String, String>) f.convert("otters in k1=\"v1\" k2=v2 more otters");
+
+        assertEquals(2, result.size());
+        assertEquals("v1", result.get("k1"));
+        assertEquals("v2", result.get("k2"));
+    }
+
+    @Test
+    public void testFilterWithKeysIncludingDashOrUnderscore() {
+        TokenizerConverter f = new TokenizerConverter(new HashMap<String, Object>());
+        @SuppressWarnings("unchecked")
+        Map<String, String> result = (Map<String, String>) f.convert("otters in k-1=v1 k_2=v2 _k3=v3 more otters");
+
+        assertEquals(3, result.size());
+        assertEquals("v1", result.get("k-1"));
+        assertEquals("v2", result.get("k_2"));
+        assertEquals("v3", result.get("_k3"));
+    }
+
+    @Test
+    public void testFilterRetainsWhitespaceInQuotedValues() {
+        TokenizerConverter f = new TokenizerConverter(new HashMap<String, Object>());
+        @SuppressWarnings("unchecked")
+        Map<String, String> result = (Map<String, String>) f.convert("otters in k1= v1  k2=\" v2\" k3=\" v3 \" more otters");
+
+        assertEquals(3, result.size());
+        assertEquals("v1", result.get("k1"));
+        assertEquals(" v2", result.get("k2"));
+        assertEquals(" v3 ", result.get("k3"));
+    }
 }
