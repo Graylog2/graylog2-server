@@ -25,35 +25,6 @@ $(document).ready(function() {
         }
     })();
 
-    // Total throughput.
-    (function updateTotalThroughput() {
-        if ($(".total-throughput").length > 0) {
-            var interval = 1000;
-            if (!assertUpdateEnabled(updateTotalThroughput)) return;
-
-            $.ajax({
-                url: appPrefixed('/a/system/throughput'),
-                headers: { "X-Graylog2-No-Session-Extension" : "true"},
-                success: function(data) {
-                    $(".total-throughput").text(numeral(data.throughput).format("0,0"));
-
-                    if (data.nodecount > 1) {
-                        $(".total-nodes").html(" across <strong>" + data.nodecount + "</strong> nodes");
-                    } else {
-                        $(".total-nodes").html(" on 1 node");
-                    }
-                },
-                error: function() {
-                    $(".total-throughput").html("?");
-                    $(".total-nodes").html("");
-                },
-                complete: function() {
-                    setTimeout(updateTotalThroughput, interval);
-                }
-            });
-        }
-    })();
-
     // Individual node throughput.
     (function updateNodeThroughput() {
         if ($(".node-throughput").length > 0) {
