@@ -89,12 +89,18 @@ public class EmailAlarmCallback implements AlarmCallback {
                 notificationService.publishIfFirst(notification);
             } catch (Exception e) {
                 LOG.error("Stream [" + stream + "] has alert receivers and is triggered, but sending emails failed", e);
+
+                String exceptionDetail = e.toString();
+                if (e.getCause() != null) {
+                    exceptionDetail += " (" + e.getCause() + ")";
+                }
+
                 Notification notification = notificationService.buildNow()
                         .addNode(nodeId.toString())
                         .addType(Notification.Type.EMAIL_TRANSPORT_FAILED)
                         .addSeverity(Notification.Severity.NORMAL)
                         .addDetail("stream_id", stream.getId())
-                        .addDetail("exception", e.toString() + " (" + e.getCause().toString() + "");
+                        .addDetail("exception", exceptionDetail);
                 notificationService.publishIfFirst(notification);
             }
         }
