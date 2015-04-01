@@ -23,6 +23,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import controllers.AuthenticatedController;
 import lib.security.RestPermissions;
+import org.graylog2.rest.models.dashboards.requests.AddWidgetRequest;
 import org.graylog2.restclient.lib.APIException;
 import org.graylog2.restclient.lib.ApiClient;
 import org.graylog2.restclient.lib.timeranges.InvalidRangeParametersException;
@@ -484,6 +485,29 @@ public class DashboardsApiController extends AuthenticatedController {
             return noContent();
         } catch (APIException e) {
             String message = "Could not get dashboard. We expected HTTP 200, but got a HTTP " + e.getHttpCode() + ".";
+            return status(504, views.html.errors.error.render(message, e, request()));
+        } catch (IOException e) {
+            return status(504, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));
+        }
+    }
+
+    @BodyParser.Of(BodyParser.Json.class)
+    public Result updateWidget(String dashboardId, String widgetId) {
+        if (!Permissions.isPermitted(RestPermissions.DASHBOARDS_EDIT, dashboardId)) {
+            return redirect(controllers.routes.StartpageController.redirect());
+        }
+
+        final AddWidgetRequest addWidgetRequest = Json.fromJson(request().body().asJson(), AddWidgetRequest.class);
+
+        try {
+            Dashboard dashboard = dashboardService.get(dashboardId);
+            DashboardWidget widget = dashboard.getWidget(widgetId);
+
+            widget.updateWidget(api(), addWidgetRequest);
+
+            return ok().as(Http.MimeTypes.JSON);
+        } catch (APIException e) {
+            String message = "Could not get widget. We expected HTTP 200, but got a HTTP " + e.getHttpCode() + ".";
             return status(504, views.html.errors.error.render(message, e, request()));
         } catch (IOException e) {
             return status(504, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));

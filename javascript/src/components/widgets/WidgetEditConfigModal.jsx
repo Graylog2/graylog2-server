@@ -11,6 +11,7 @@ var WidgetEditConfigModal = React.createClass({
     getInitialState() {
         return {
             title: this.props.widget.title,
+            type: this.props.widget.type,
             cacheTime: this.props.widget.cacheTime,
             config: this.props.widget.config,
             errors: {}
