@@ -2,12 +2,17 @@ package org.graylog2.rest.resources.system.agent;
 
 import com.google.common.collect.Lists;
 import org.graylog2.agents.Agent;
+import org.graylog2.agents.AgentNodeDetails;
+import org.graylog2.agents.AgentService;
 import org.graylog2.rest.models.agent.responses.AgentList;
 import org.graylog2.rest.models.agent.responses.AgentSummary;
 import org.graylog2.rest.resources.RestResourceBaseTest;
 import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 import java.util.List;
 
@@ -15,14 +20,19 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@RunWith(value = MockitoJUnitRunner.class)
 public class AgentResourceTest extends RestResourceBaseTest {
     private AgentResource resource;
     private List<Agent> agents;
 
+    @Mock
+    private AgentService agentService;
+
     @Before
     public void setUp() throws Exception {
         this.agents = getDummyAgentList();
-        this.resource = new AgentResource();
+        this.resource = new AgentResource(agentService);
+        when(agentService.all()).thenReturn(agents);
     }
 
     @Test
@@ -55,10 +65,14 @@ public class AgentResourceTest extends RestResourceBaseTest {
     }
 
     private Agent getDummyAgent(String id, String nodeId, DateTime lastSeen, String operatingSystem) {
+        final AgentNodeDetails agentNodeDetails = mock(AgentNodeDetails.class);
+        when(agentNodeDetails.operatingSystem()).thenReturn(operatingSystem);
+
         final Agent agent = mock(Agent.class);
         when(agent.getId()).thenReturn(id);
         when(agent.getNodeId()).thenReturn(nodeId);
         when(agent.getLastSeen()).thenReturn(lastSeen);
+        when(agent.nodeDetails()).thenReturn(agentNodeDetails);
         when(agent.getOperatingSystem()).thenReturn(operatingSystem);
 
         return agent;

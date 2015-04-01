@@ -1,6 +1,6 @@
 package org.graylog2.rest.resources.system.agent;
 
-import org.graylog2.rest.models.agent.AgentNodeDetails;
+import org.graylog2.rest.models.agent.AgentNodeDetailsSummary;
 import org.graylog2.rest.models.agent.requests.AgentRegistrationRequest;
 import org.graylog2.rest.resources.RestResourceBaseTest;
 import org.junit.Before;
@@ -20,7 +20,7 @@ public class AgentRegistrationResourceTest extends RestResourceBaseTest {
 
     @Test
     public void testRegister() throws Exception {
-        final AgentRegistrationRequest input = AgentRegistrationRequest.create("agentId", "nodeId", AgentNodeDetails.create("DummyOS 1.0"));
+        final AgentRegistrationRequest input = AgentRegistrationRequest.create("agentId", "nodeId", AgentNodeDetailsSummary.create("DummyOS 1.0"));
 
         final Response response = this.resource.register(input);
 
@@ -29,7 +29,7 @@ public class AgentRegistrationResourceTest extends RestResourceBaseTest {
 
     @Test
     public void testRegisterInvalidAgentId() throws Exception {
-        final AgentRegistrationRequest invalid = AgentRegistrationRequest.create("", "nodeId", AgentNodeDetails.create("DummyOS 1.0"));
+        final AgentRegistrationRequest invalid = AgentRegistrationRequest.create("", "nodeId", AgentNodeDetailsSummary.create("DummyOS 1.0"));
 
         final Response response = this.resource.register(invalid);
 
@@ -39,7 +39,7 @@ public class AgentRegistrationResourceTest extends RestResourceBaseTest {
 
     @Test
     public void testRegisterInvalidNodeId() throws Exception {
-        final AgentRegistrationRequest invalid = AgentRegistrationRequest.create("agentId", "", AgentNodeDetails.create("DummyOS 1.0"));
+        final AgentRegistrationRequest invalid = AgentRegistrationRequest.create("agentId", "", AgentNodeDetailsSummary.create("DummyOS 1.0"));
 
         final Response response = this.resource.register(invalid);
 
@@ -59,7 +59,7 @@ public class AgentRegistrationResourceTest extends RestResourceBaseTest {
 
     @Test
     public void testRegisterMissingOperatingSystem() throws Exception {
-        final AgentRegistrationRequest invalid = AgentRegistrationRequest.create("agentId", "nodeId", AgentNodeDetails.create(""));
+        final AgentRegistrationRequest invalid = AgentRegistrationRequest.create("agentId", "nodeId", AgentNodeDetailsSummary.create(""));
 
         final Response response = this.resource.register(invalid);
 
