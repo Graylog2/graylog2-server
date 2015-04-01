@@ -128,6 +128,19 @@
             <h2><i class="fa fa-shield"></i> Buffers</h2>
             <div class="row">
                 <div class="col-md-4">
+                    <a href="@routes.MetricsController.ofNode(node.getNodeId, node.getBufferClasses.inputBuffer)" class="btn btn-default btn-xs pull-right">Metrics</a>
+                    <h3>Input buffer</h3>
+
+                    @defining(node.getBufferInfo.getInputBuffer.utilizationPercent) { utilizationPercent =>
+                        <div class="progress progress-percentage node-buffer-usage">
+                            <div class="progress-bar progress-bar-warning" data-percentage="@utilizationPercent" style="width : @utilizationPercent% ;"><span class="number-format" data-format="0.0%">@utilizationPercent%</span></div>
+                        </div>
+                        <strong><span class="number-format" data-format="0,0">@node.getBufferInfo.getInputBuffer.utilization</span> messages</strong> in input buffer.
+                        (<span class="number-format" data-format="0.0%">@utilizationPercent%</span> utilized)
+                    }
+                </div>
+
+                <div class="col-md-4">
                     <a href="@routes.MetricsController.ofNode(node.getNodeId, node.getBufferClasses.processBuffer)" class="btn btn-default btn-xs pull-right">Metrics</a>
                     <h3>Process buffer</h3>
 
