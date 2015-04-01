@@ -708,6 +708,12 @@
                 <version>0.8.1</version>
                 <scope>test</scope>
             </dependency>
+            <dependency>
+                <groupId>org.jukito</groupId>
+                <artifactId>jukito</artifactId>
+                <version>1.4</version>
+                <scope>test</scope>
+            </dependency>
 
             <dependency>
                 <groupId>org.graylog.telemetry</groupId>
