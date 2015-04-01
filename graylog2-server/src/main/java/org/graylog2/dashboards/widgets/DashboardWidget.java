@@ -41,6 +41,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
+import static com.google.common.base.Strings.isNullOrEmpty;
 
 public abstract class DashboardWidget implements EmbeddedPersistable {
     private static final String FIELD_ID = "id";
@@ -82,6 +83,10 @@ public abstract class DashboardWidget implements EmbeddedPersistable {
     }
 
     public static DashboardWidget fromRequest(MetricRegistry metricRegistry, Searches searches, AddWidgetRequest awr, String userId) throws NoSuchWidgetTypeException, InvalidRangeParametersException, InvalidWidgetConfigurationException {
+        return DashboardWidget.fromRequest(metricRegistry, searches, null, awr, userId);
+    }
+
+    public static DashboardWidget fromRequest(MetricRegistry metricRegistry, Searches searches, String widgetId, AddWidgetRequest awr, String userId) throws NoSuchWidgetTypeException, InvalidRangeParametersException, InvalidWidgetConfigurationException {
         Type type;
         try {
             type = Type.valueOf(awr.type().toUpperCase());
@@ -89,7 +94,7 @@ public abstract class DashboardWidget implements EmbeddedPersistable {
             throw new NoSuchWidgetTypeException("No such widget type <" + awr.type() + ">");
         }
 
-        String id = UUID.randomUUID().toString();
+        String id = isNullOrEmpty(widgetId) ? UUID.randomUUID().toString() : widgetId;
 
         // Build timerange.
         final String rangeType = (String) awr.config().get("range_type");
