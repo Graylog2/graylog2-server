@@ -56,7 +56,7 @@ public class AgentResource extends RestResource {
         final Agent agent = agentService.findById(agentId);
 
         if (agent != null)
-            return Agents.toSummary(agent);
+            return agent.toSummary();
         else
             throw new NotFoundException("Agent <" + agentId + "> not found!");
     }
