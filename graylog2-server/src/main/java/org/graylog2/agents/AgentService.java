@@ -3,7 +3,7 @@ package org.graylog2.agents;
 import java.util.List;
 
 public interface AgentService {
-    int count();
+    long count();
     Agent save(Agent agent);
     List<Agent> all();
     Agent findById(String id);
