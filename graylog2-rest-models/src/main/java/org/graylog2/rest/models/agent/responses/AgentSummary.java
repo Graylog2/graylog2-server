@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.graylog2.rest.models.agent.AgentNodeDetails;
+import org.graylog2.rest.models.agent.AgentNodeDetailsSummary;
 import org.joda.time.DateTime;
 
 @AutoValue
@@ -18,7 +18,7 @@ public abstract class AgentSummary {
     public abstract String nodeId();
 
     @JsonProperty("node_details")
-    public abstract AgentNodeDetails nodeDetails();
+    public abstract AgentNodeDetailsSummary nodeDetails();
 
     @JsonProperty("last_seen")
     public abstract DateTime lastSeen();
@@ -26,7 +26,7 @@ public abstract class AgentSummary {
     @JsonCreator
     public static AgentSummary create(@JsonProperty("id") String id,
                                       @JsonProperty("node_id") String nodeId,
-                                      @JsonProperty("node_details") AgentNodeDetails nodeDetails,
+                                      @JsonProperty("node_details") AgentNodeDetailsSummary nodeDetails,
                                       @JsonProperty("last_seen") DateTime lastSeen) {
         return new AutoValue_AgentSummary(id, nodeId, nodeDetails, lastSeen);
     }
