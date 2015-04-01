@@ -145,8 +145,18 @@ public class ThroughputCalculator extends Periodical {
         private long previousCount = 0L;
         private double currentAverage = 0d;
 
+        /**
+         * Updates the "average" of the corresponding counter metric.
+         * <p/>
+         * Implementation note: <br/>
+         * We assume that this is done once per second and live with any inaccuracies if that schedule isn't hit exactly.
+         * Thus the average becomes the delta, because the denominator is always 1. The field and return value is a double
+         * to keep the option to sample at different intervals in the future.
+         *
+         * @param currentCount the currently observed count
+         */
         public void updateAverage(long currentCount) {
-            currentAverage = (double) currentCount - (double) previousCount;
+            currentAverage = currentCount - previousCount;
             previousCount = currentCount;
         }
 
