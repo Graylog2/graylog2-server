@@ -124,7 +124,7 @@ public class ThroughputCalculator extends Periodical {
             final String rateName = name(metricName, GlobalMetricNames.RATE_SUFFIX);
             if (!metricRegistry.getMetrics().containsKey(rateName)) {
                 try {
-                    log.info("Registering metric {}", rateName);
+                    log.debug("Registering derived, per-second metric {}", rateName);
                     metricRegistry.register(rateName, new Gauge<Double>() {
                         @Override
                         public Double getValue() {
