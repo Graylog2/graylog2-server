@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import org.graylog2.agents.Agent;
 import org.graylog2.agents.AgentNodeDetails;
 import org.graylog2.agents.AgentService;
+import org.graylog2.database.NotFoundException;
 import org.graylog2.rest.models.agent.responses.AgentList;
 import org.graylog2.rest.models.agent.responses.AgentSummary;
 import org.graylog2.rest.resources.RestResourceBaseTest;
@@ -44,7 +45,7 @@ public class AgentResourceTest extends RestResourceBaseTest {
         assertEquals("Agent list should be of same size as dummy list", agents.size(), response.agents().size());
     }
 
-    @Test
+    @Test(expected = NotFoundException.class)
     public void testGetNotExisting() throws Exception {
         final AgentSummary response = this.resource.get("Nonexisting");
 
@@ -54,14 +55,14 @@ public class AgentResourceTest extends RestResourceBaseTest {
     @Test
     public void testGet() throws Exception {
         final Agent agent = agents.get(agents.size() - 1);
+        when(agentService.findById(agent.getId())).thenReturn(agent);
+        final AgentSummary agentSummary = mock(AgentSummary.class);
+        when(agent.toSummary()).thenReturn(agentSummary);
+
         final AgentSummary response = this.resource.get(agent.getId());
 
         assertNotNull(response);
-        assertEquals(agent.getId(), response.id());
-        assertEquals(agent.getNodeId(), response.nodeId());
-        assertNotNull(response.nodeDetails());
-        assertEquals(agent.getOperatingSystem(), response.nodeDetails().operatingSystem());
-        assertEquals(agent.getLastSeen(), response.lastSeen());
+        assertEquals(agentSummary, response);
     }
 
     private Agent getDummyAgent(String id, String nodeId, DateTime lastSeen, String operatingSystem) {
