@@ -17,6 +17,7 @@ $(document).ready(() => {
     require('./components/grok-patterns/mount');
     require('./components/widgets/mount');
     require('./components/throughput/mount');
+    require('./components/streams/mount');
     if (userPreferences.enableSmartSearch) {
         require('./components/search/mount');
     }
