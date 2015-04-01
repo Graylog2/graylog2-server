@@ -39,13 +39,16 @@ import com.google.auto.value.AutoValue;
 @AutoValue
 public abstract class BufferClasses {
     @JsonProperty
+    public abstract String inputBuffer();
+    @JsonProperty
     public abstract String processBuffer();
     @JsonProperty
     public abstract String outputBuffer();
 
     @JsonCreator
-    public static BufferClasses create(@JsonProperty("process_buffer") String processBuffer,
+    public static BufferClasses create(@JsonProperty("input_buffer") String inputBuffer,
+                                       @JsonProperty("process_buffer") String processBuffer,
                                        @JsonProperty("output_buffer") String outputBuffer) {
-        return new AutoValue_BufferClasses(processBuffer, outputBuffer);
+        return new AutoValue_BufferClasses(inputBuffer, processBuffer, outputBuffer);
     }
 }

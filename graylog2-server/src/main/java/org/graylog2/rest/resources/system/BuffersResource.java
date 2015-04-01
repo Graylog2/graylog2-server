@@ -23,6 +23,7 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.Configuration;
 import org.graylog2.buffers.OutputBuffer;
+import org.graylog2.plugin.buffers.InputBuffer;
 import org.graylog2.rest.models.system.buffers.responses.BufferClasses;
 import org.graylog2.rest.models.system.buffers.responses.BuffersUtilizationSummary;
 import org.graylog2.rest.models.system.buffers.responses.RingSummary;
@@ -44,14 +45,17 @@ import javax.ws.rs.core.MediaType;
 public class BuffersResource extends RestResource {
 
     private final Configuration configuration;
+    private final InputBuffer inputBuffer;
     private final ProcessBuffer processBuffer;
     private final OutputBuffer outputBuffer;
 
     @Inject
     public BuffersResource(Configuration configuration,
+                           InputBuffer inputBuffer,
                            ProcessBuffer processBuffer,
                            OutputBuffer outputBuffer) {
         this.configuration = configuration;
+        this.inputBuffer = inputBuffer;
         this.processBuffer = processBuffer;
         this.outputBuffer = outputBuffer;
     }
@@ -83,7 +87,9 @@ public class BuffersResource extends RestResource {
     @ApiOperation(value = "Get classnames of current buffer implementations.")
     @RequiresPermissions(RestPermissions.BUFFERS_READ)
     public BufferClasses getBufferClasses() {
-        return BufferClasses.create(processBuffer.getClass().getCanonicalName(),
+        return BufferClasses.create(
+                inputBuffer.getClass().getCanonicalName(),
+                processBuffer.getClass().getCanonicalName(),
                 outputBuffer.getClass().getCanonicalName());
     }
 }

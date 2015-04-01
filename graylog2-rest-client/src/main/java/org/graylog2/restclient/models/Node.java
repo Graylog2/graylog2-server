@@ -151,7 +151,7 @@ public class Node extends ClusterEntity {
     public synchronized BufferClasses getBufferClasses() {
         if (this.bufferClasses == null) {
             final BufferClassesResponse response = loadBufferClasses();
-            this.bufferClasses = BufferClasses.create(response.processBufferClass, response.outputBufferClass);
+            this.bufferClasses = BufferClasses.create(response.inputBufferClass, response.processBufferClass, response.outputBufferClass);
         }
         return this.bufferClasses;
     }
