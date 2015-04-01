@@ -16,7 +16,6 @@
  */
 package org.graylog2.database;
 
-import com.lordofthejars.nosqlunit.core.NoSqlAssertionError;
 import com.lordofthejars.nosqlunit.mongodb.MongoDbRule;
 import org.junit.rules.MethodRule;
 import org.junit.runners.model.FrameworkMethod;
