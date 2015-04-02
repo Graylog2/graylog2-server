@@ -52,6 +52,10 @@ gl2UserSessionId = "@Http.Context.current().session().get("sessionid")";
                                 <li role="presentation"><a role="menuitem" href="@routes.OutputsController.index()">Outputs</a></li>
                             }
 
+                            @if(Permissions.isPermitted(RestPermissions.AGENTS_READ)) {
+                                <li role="presentation"><a role="menuitem" href="@routes.AgentsController.index()">Agents</a></li>
+                            }
+
                             @if(Permissions.isPermitted(RestPermissions.INDICES_READ)) {
                                 <li role="presentation"><a role="menuitem" href="@routes.IndicesController.index()">Indices</a></li>
                             }
