@@ -65,9 +65,9 @@ class MetricsStore {
             this.sock.send(JSON.stringify({command:"create_session", sessionId:gl2UserSessionId}));
 
             // callers where potentially queued when they ran before the sockjs connection had been established.
-            // process those first before we continue.
+            // process those first before we continue
+            // in case we have to reconnect (because the web interface process went away, we want to re-register, too.
             this.queuedRequests.forEach((request) => this.registerRequest(request));
-            this.queuedRequests = [];
         };
 
         this.sock.onmessage = (e) => {
@@ -102,18 +102,23 @@ class MetricsStore {
 
         this.sock.onclose = () => {
             this.isOpen = false;
-            // TODO support reconnecting when web interface goes away
-            console.log('sockjs connection closed');
+            // notify all callbacks about the error
+                this.callbacks.forEach((cb) => {
+                    try {
+                        cb.callback([], true);
+                    } catch (ignore) {}
+                });
+            // reconnect after two seconds
+            setTimeout(() => this.connect(), 2000);
         };
 
         MetricsStore.instance = this;
     }
 
     listen(request: ListenRequest) {
+        this.queuedRequests.push(request);
         if (this.isOpen) {
             this.registerRequest(request);
-        } else {
-            this.queuedRequests.push(request);
         }
     }
 

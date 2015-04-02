@@ -29,6 +29,9 @@ var JvmHeapUsage = React.createClass({
             nodeId: this.props.nodeId,
             metricNames: metricNames,
             callback: (update, hasError) => {
+                if (hasError) {
+                    this.setState({hasError: hasError});
+                }
                 // update is [{nodeId, values: [{name, value: {metric}}]} ...]
                 // metric can be various different things, depending on metric {type: "GAUGE"|"COUNTER"|"METER"|"TIMER"}
 
@@ -62,20 +65,23 @@ var JvmHeapUsage = React.createClass({
         });
     },
     render() {
+        var detail;
         if (this.state.hasError) {
-            return (<span>Heap information unavailable</span>);
-        }
-        var detail = (<p><i className="fa fa-spin fa-spinner"></i> Loading heap usage information...</p>);
-        if (this.state.initialized) {
-            detail = (<p>
-                The JVM is using <span className="blob" style={{backgroundColor: "#9e1f63"}}></span>
-                <strong>
-                    <span className="heap-used"> {numeral(this.state.usedMemory).format('0.0 b')}</span> of <span
-                    className="blob" style={{backgroundColor: "#f7941e"}}></span> <span
-                    className="heap-total"> {numeral(this.state.committedMemory).format('0.0 b')}</span></strong> heap space and will
-                not attempt to use more than <span className="blob" style={{backgroundColor: "#f5f5f5"}}></span>
-                <strong><span className="heap-max"> {numeral(this.state.maxMemory).format('0.0 b')}</span></strong>
-            </p>)
+            detail = (<p>Heap information unavailable.</p>);
+        } else {
+            if (this.state.initialized) {
+                detail = (<p>
+                    The JVM is using <span className="blob" style={{backgroundColor: "#9e1f63"}}></span>
+                    <strong>
+                        <span className="heap-used"> {numeral(this.state.usedMemory).format('0.0 b')}</span> of <span
+                        className="blob" style={{backgroundColor: "#f7941e"}}></span> <span
+                        className="heap-total"> {numeral(this.state.committedMemory).format('0.0 b')}</span></strong> heap space and will
+                    not attempt to use more than <span className="blob" style={{backgroundColor: "#f5f5f5"}}></span>
+                    <strong><span className="heap-max"> {numeral(this.state.maxMemory).format('0.0 b')}</span></strong>
+                </p>);
+            } else {
+                detail = (<p><i className="fa fa-spin fa-spinner"></i> Loading heap usage information...</p>);
+            }
         }
 
         return (
