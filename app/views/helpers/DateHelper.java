@@ -25,21 +25,26 @@ import org.joda.time.Duration;
 import org.joda.time.format.PeriodFormat;
 import org.joda.time.format.PeriodFormatter;
 import play.twirl.api.Html;
+import play.twirl.api.HtmlFormat;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public class DateHelper {
-
     public static Html current() {
         return timestamp(DateTime.now());
     }
 
     public static Html timestamp(DateTime instant) {
+        if (instant == null) {
+            return HtmlFormat.empty();
+        }
+
         return views.html.partials.dates.instant.render(DateTools.inUserTimeZone(instant), DateTools.DEFAULT_DATE_FORMAT);
     }
 
     public static Html timestampShort(DateTime instant) {
+        if (instant == null) {
+            return HtmlFormat.empty();
+        }
+
         return views.html.partials.dates.instant.render(DateTools.inUserTimeZone(instant), DateTools.SHORT_DATE_FORMAT);
     }
 
@@ -48,12 +53,11 @@ public class DateHelper {
     }
 
     public static Html timestampShortTZ(DateTime instant, boolean inUserTZ) {
-        DateTime date = instant;
-
-        if (inUserTZ) {
-            date = DateTools.inUserTimeZone(instant);
+        if (instant == null) {
+            return HtmlFormat.empty();
         }
-        return views.html.partials.dates.instant.render(date, DateTools.SHORT_DATE_FORMAT_TZ);
+
+        return views.html.partials.dates.instant.render(inUserTZ ? DateTools.inUserTimeZone(instant) : instant, DateTools.SHORT_DATE_FORMAT_TZ);
     }
 
     public static Html readablePeriodFromNow(DateTime instant) {
@@ -61,13 +65,18 @@ public class DateHelper {
     }
 
     public static Html readablePeriodFromNow(DateTime instant, String classes) {
+        if (instant == null) {
+            return HtmlFormat.empty();
+        }
+
         return views.html.partials.dates.readable_period.render(DateTools.inUserTimeZone(instant), classes);
     }
 
     public static Html readableDuration(Duration duration) {
-        PeriodFormatter formatter = PeriodFormat.getDefault();
+        if (duration == null) {
+            return HtmlFormat.empty();
+        }
 
-        return views.html.partials.dates.duration.render(duration, formatter);
-        
+        return views.html.partials.dates.duration.render(duration, PeriodFormat.getDefault());
     }
 }
