@@ -1,0 +1,52 @@
+@(currentUser: org.graylog2.restclient.models.User,
+        breadcrumbs: lib.BreadcrumbList,
+        globalInputs: Map[org.graylog2.restclient.models.Input, Map[org.graylog2.restclient.models.ClusterEntity, org.graylog2.restclient.models.InputState]],
+        localInputs: List[org.graylog2.restclient.models.InputState],
+        nodes: List[org.graylog2.restclient.models.Node],
+        radios: List[org.graylog2.restclient.models.Radio],
+        inputTypes: Map[String, org.graylog2.restclient.models.api.responses.system.InputTypeSummaryResponse],
+        masterNode: org.graylog2.restclient.models.Node)
+
+@import lib.security.RestPermissions._;
+@import views.helpers.Permissions._;
+
+@orderedInputTypes = @{
+    inputTypes.toSeq.sortBy(_._2.name)
+}
+
+@main("Inputs in Cluster", null, "", currentUser, false) {
+    @views.html.partials.breadcrumbs(breadcrumbs)
+
+    <div class="row content content-head">
+        <div class="col-md-12">
+            <h1><i class="fa fa-cloud-download"></i> Inputs in Cluster</h1>
+            <p class="description">
+                Graylog nodes accept data via inputs. Launch or terminate as many inputs as you want here.
+            </p>
+        </div>
+    </div>
+    @if(isPermitted(INPUTS_CREATE)) {
+        <div class="row content input-new">
+            <div class="col-md-12">
+                <form class="form-inline">
+                    <div class="form-group">
+                        <select id="input-type" class="form-control">
+                        @for((inputType, info) <- orderedInputTypes) {
+                            <option value="@inputType">@info.name</option>
+                        }
+                        </select>
+
+                        <button id="configure-input" type="button" class="btn btn-success form-control">Launch new input</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    }
+    @if(isPermitted(INPUTS_READ)) {
+        @views.html.system.inputs.partials.input_summary_list(globalInputs, localInputs, inputTypes, masterNode)
+    }
+    @for((inputType, info) <- inputTypes) {
+        @views.html.system.inputs.partials.create_input_form(inputType, info, nodes, radios)
+    }
+    @views.html.system.inputs.partials.add_static_field_form()
+}
