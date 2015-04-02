@@ -1,52 +1,52 @@
 @(currentUser: org.graylog2.restclient.models.User,
         breadcrumbs: lib.BreadcrumbList,
-        globalInputs: Map[org.graylog2.restclient.models.Input, Map[org.graylog2.restclient.models.ClusterEntity, org.graylog2.restclient.models.InputState]],
-        localInputs: List[org.graylog2.restclient.models.InputState],
-        nodes: List[org.graylog2.restclient.models.Node],
-        radios: List[org.graylog2.restclient.models.Radio],
-        inputTypes: Map[String, org.graylog2.restclient.models.api.responses.system.InputTypeSummaryResponse],
-        masterNode: org.graylog2.restclient.models.Node)
+        agents: List[org.graylog2.rest.models.agent.responses.AgentSummary])
+@import views.helpers.DateHelper
 
-@import lib.security.RestPermissions._;
-@import views.helpers.Permissions._;
-
-@orderedInputTypes = @{
-    inputTypes.toSeq.sortBy(_._2.name)
-}
-
-@main("Inputs in Cluster", null, "", currentUser, false) {
+@main("Agents in Cluster", null, "", currentUser, false) {
     @views.html.partials.breadcrumbs(breadcrumbs)
 
     <div class="row content content-head">
         <div class="col-md-12">
-            <h1><i class="fa fa-cloud-download"></i> Inputs in Cluster</h1>
+            <h1><i class="fa fa-cloud"></i> Agents in Cluster</h1>
             <p class="description">
-                Graylog nodes accept data via inputs. Launch or terminate as many inputs as you want here.
+                Agents deliver local resources to a remote Graylog cluster.
             </p>
         </div>
     </div>
-    @if(isPermitted(INPUTS_CREATE)) {
-        <div class="row content input-new">
-            <div class="col-md-12">
-                <form class="form-inline">
-                    <div class="form-group">
-                        <select id="input-type" class="form-control">
-                        @for((inputType, info) <- orderedInputTypes) {
-                            <option value="@inputType">@info.name</option>
-                        }
-                        </select>
-
-                        <button id="configure-input" type="button" class="btn btn-success form-control">Launch new input</button>
-                    </div>
-                </form>
-            </div>
+    <div class="row content">
+        <div class="col-md-12">
+            <table class="table table-striped users-list">
+                <thead>
+                    <tr>
+                        <th class="name">Agent ID</th>
+                        <th>Node Id</th>
+                        <th>Operating System</th>
+                        <th>Last Seen</th>
+                        <th class="actions">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for(agent <- agents) {
+                        <tr>
+                            <td class="limited">
+                                @agent.id()
+                            </td>
+                            <td class="limited">
+                                @agent.nodeId()
+                            </td>
+                            <td class="limited">
+                                @agent.nodeDetails().operatingSystem()
+                            </td>
+                            <td class="limited">
+                                @DateHelper.readablePeriodFromNow(agent.lastSeen(), "text")
+                            </td>
+                            <td class="limited">
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
         </div>
-    }
-    @if(isPermitted(INPUTS_READ)) {
-        @views.html.system.inputs.partials.input_summary_list(globalInputs, localInputs, inputTypes, masterNode)
-    }
-    @for((inputType, info) <- inputTypes) {
-        @views.html.system.inputs.partials.create_input_form(inputType, info, nodes, radios)
-    }
-    @views.html.system.inputs.partials.add_static_field_form()
+    </div>
 }
