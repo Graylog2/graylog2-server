@@ -1,6 +1,4 @@
-/*
- * Copyright 2012-2015 TORCH GmbH, 2015 Graylog, Inc.
- *
+/**
  * This file is part of Graylog.
  *
  * Graylog is free software: you can redistribute it and/or modify
@@ -16,8 +14,10 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package controllers.api;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.google.inject.Inject;
 import controllers.AuthenticatedController;
 import lib.NaturalDateTest;
@@ -26,6 +26,10 @@ import lib.extractors.testers.RegexTest;
 import lib.extractors.testers.SplitAndIndexTest;
 import lib.extractors.testers.SubstringTest;
 import org.graylog2.restclient.lib.APIException;
+import org.graylog2.restclient.models.api.requests.tools.RegexTestRequest;
+import org.graylog2.restclient.models.api.requests.tools.GrokTestRequest;
+import org.graylog2.restclient.models.api.requests.tools.SplitAndIndexTestRequest;
+import org.graylog2.restclient.models.api.requests.tools.SubstringTestRequest;
 import play.libs.Json;
 import play.mvc.Result;
 
@@ -52,13 +56,16 @@ public class ToolsApiController extends AuthenticatedController {
         this.grokTest = grokTest;
     }
 
-    public Result regexTest(String regex, String string) {
+    public Result regexTest() {
+        final JsonNode json = request().body().asJson();
+        final RegexTestRequest request = Json.fromJson(json, RegexTestRequest.class);
+
         try {
-            if (regex.isEmpty() || string.isEmpty()) {
+            if (request.regex.isEmpty() || request.string.isEmpty()) {
                 return badRequest();
             }
 
-            return ok(Json.toJson(regexTest.test(regex, string)));
+            return ok(Json.toJson(regexTest.test(request)));
         } catch (IOException e) {
             return internalServerError("io exception");
         } catch (APIException e) {
@@ -66,13 +73,15 @@ public class ToolsApiController extends AuthenticatedController {
         }
     }
 
-    public Result substringTest(int start, int end, String string) {
+    public Result substringTest() {
+        final JsonNode json = request().body().asJson();
+        final SubstringTestRequest request = Json.fromJson(json, SubstringTestRequest.class);
         try {
-            if (start < 0 || end <= 0 || string.isEmpty()) {
+            if (request.start < 0 || request.end <= 0 || request.string.isEmpty()) {
                 return badRequest();
             }
 
-            return ok(Json.toJson(substringTest.test(start, end, string)));
+            return ok(Json.toJson(substringTest.test(request)));
         } catch (IOException e) {
             return internalServerError("io exception");
         } catch (APIException e) {
@@ -80,13 +89,16 @@ public class ToolsApiController extends AuthenticatedController {
         }
     }
 
-    public Result splitAndIndexTest(String splitBy, int index, String string) {
+    public Result splitAndIndexTest() {
+        final JsonNode json = request().body().asJson();
+        final SplitAndIndexTestRequest request = Json.fromJson(json, SplitAndIndexTestRequest.class);
+
         try {
-            if (splitBy.isEmpty() || index < 0 || string.isEmpty()) {
+            if (request.splitBy.isEmpty() || request.index < 0 || request.string.isEmpty()) {
                 return badRequest();
             }
 
-            return ok(Json.toJson(splitAndIndexTest.test(splitBy, index, string)));
+            return ok(Json.toJson(splitAndIndexTest.test(request)));
         } catch (IOException e) {
             return internalServerError("io exception");
         } catch (APIException e) {
@@ -111,13 +123,16 @@ public class ToolsApiController extends AuthenticatedController {
         }
     }
 
-    public Result grokTest(String pattern, String string) {
-        if (pattern.isEmpty() || string.isEmpty()) {
+    public Result grokTest() {
+        final JsonNode json = request().body().asJson();
+        final GrokTestRequest request = Json.fromJson(json, GrokTestRequest.class);
+
+        if (request.pattern.isEmpty() || request.string.isEmpty()) {
             return badRequest();
         }
 
         try {
-            return ok(Json.toJson(grokTest.test(pattern, string)));
+            return ok(Json.toJson(grokTest.test(request)));
         } catch (IOException e) {
             return internalServerError("io exception");
         } catch (APIException e) {

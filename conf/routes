@@ -213,11 +213,11 @@ GET         /a/messages/:index/:id                                              
 GET         /a/messages/:index/:id/filtered                                          @controllers.MessagesController.single(index: String, id: String, filtered: Boolean ?= true)
 
 # API: Tools
-GET         /a/tools/regex_test                                                      @controllers.api.ToolsApiController.regexTest(regex ?= "", string ?= "")
-GET         /a/tools/substring_test                                                  @controllers.api.ToolsApiController.substringTest(start:Integer ?= 0, end:Integer ?= 0, string ?= "")
-GET         /a/tools/split_and_index_test                                            @controllers.api.ToolsApiController.splitAndIndexTest(split_by:String ?= "", index:Integer ?= 0, string ?= "")
+POST        /a/tools/regex_test                                                      @controllers.api.ToolsApiController.regexTest()
+POST        /a/tools/substring_test                                                  @controllers.api.ToolsApiController.substringTest()
+POST        /a/tools/split_and_index_test                                            @controllers.api.ToolsApiController.splitAndIndexTest()
+POST        /a/tools/grok_test                                                       @controllers.api.ToolsApiController.grokTest()
 GET         /a/tools/natural_date_test                                               @controllers.api.ToolsApiController.naturalDateTest(string ?= "")
-GET         /a/tools/grok_test                                                       @controllers.api.ToolsApiController.grokTest(pattern ?= "", string ?= "")
 
 # API: Server Connection
 GET         /a/connection/available                                                  @controllers.LonesomeInterfaceController.checkServerAvailability()

@@ -1,6 +1,4 @@
-/*
- * Copyright 2012-2015 TORCH GmbH, 2015 Graylog, Inc.
- *
+/**
  * This file is part of Graylog.
  *
  * Graylog is free software: you can redistribute it and/or modify
@@ -16,6 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package lib.extractors.testers;
 
 import com.google.common.collect.FluentIterable;
@@ -25,6 +24,7 @@ import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 import org.graylog2.restclient.lib.APIException;
 import org.graylog2.restclient.lib.ApiClient;
+import org.graylog2.restclient.models.api.requests.tools.GrokTestRequest;
 import org.graylog2.restclient.models.api.responses.GrokTestResponse;
 
 import java.io.IOException;
@@ -33,9 +33,6 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public class GrokTest {
 
     private final ApiClient api;
@@ -45,11 +42,10 @@ public class GrokTest {
         this.api = api;
     }
 
-    public Map<String, Object> test(String pattern, String string) throws IOException, APIException {
-        GrokTestResponse r = api.get(GrokTestResponse.class)
+    public Map<String, Object> test(GrokTestRequest request) throws IOException, APIException {
+        GrokTestResponse r = api.post(GrokTestResponse.class)
                 .path("/tools/grok_tester")
-                .queryParam("pattern", pattern)
-                .queryParam("string", string)
+                .body(request)
                 .execute();
 
         ArrayList<Object> matches = Lists.newArrayList();
