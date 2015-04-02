@@ -134,10 +134,14 @@ public abstract class MessageInput implements Stoppable {
     public void initialize() {
         this.transportMetrics = transport.getMetricSet();
 
-        if (transportMetrics != null) {
-            metricRegistry.register(getUniqueReadableId(), transportMetrics);
+        try {
+            if (transportMetrics != null) {
+                metricRegistry.register(getUniqueReadableId(), transportMetrics);
+            }
+            metricRegistry.register(getUniqueReadableId(), localRegistry);
+        } catch (IllegalArgumentException ignored) {
+            // This happens for certain types of inputs, see https://github.com/Graylog2/graylog2-server/issues/1049#issuecomment-88857134
         }
-        metricRegistry.register(getUniqueReadableId(), localRegistry);
     }
 
     public void checkConfiguration() throws ConfigurationException {
