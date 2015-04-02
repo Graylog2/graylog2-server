@@ -109,15 +109,8 @@
         <div class="col-md-12">
             <h2><i class="fa fa-tasks"></i> Memory/Heap usage</h2>
 
-            <div class="node-heap-usage" data-node-id="@node.getNodeId">
-                <div class="progress">
-                    <div class="progress-bar heap-used-percent" style="width: @node.jvm.usedMemoryPercentage()%;"></div>
-                    <div class="progress-bar progress-bar-warning heap-total-percent" style="width: @(node.jvm.totalMemoryPercentage()-node.jvm.usedMemoryPercentage)%"></div>
-                </div>
+            <div class="react-jvm-heap" data-node-id="@node.getNodeId"></div>
 
-                The JVM is using <strong><span class="heap-used">@node.jvm.getUsedMemory.getMegabytes()</span> of <span class="heap-total">@node.jvm.getTotalMemory.getMegabytes()</span> MB</strong>
-                heap space and will not attempt to use more than <strong><span class="heap-max">@node.jvm.getMaxMemory.getMegabytes()</span> MB</strong>.
-            </div>
         </div>
     </div>
 

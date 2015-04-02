@@ -148,6 +148,8 @@ public class MetricsController extends AuthenticatedController {
         @Override
         public void run() {
             final PushResponse pushResponse = new PushResponse();
+            // collects all metrics per node, so we don't send duplicate updates for any given node id
+            final HashMultimap<String, Map.Entry<String, Metric>> entries = HashMultimap.create();
 
             try {
                 // don't send anything if not authenticated or nothing is requested
@@ -155,7 +157,6 @@ public class MetricsController extends AuthenticatedController {
                     return;
                 }
                 final ApiClient api = controllerInstance.api();
-
 
                 for (String nodeId : metricsPerNode.keySet()) {
                     try {
@@ -177,16 +178,13 @@ public class MetricsController extends AuthenticatedController {
                             final Map<Node, MetricsListResponse> responseMap = requestBuilder.fromAllNodes().executeOnAll();
 
                             for (Map.Entry<Node, MetricsListResponse> perNodeEntry : responseMap.entrySet()) {
-                                pushResponse.metrics.add(createMetricUpdate(perNodeEntry.getKey().getNodeId(),
-                                                                                  perNodeEntry.getValue().getMetrics().entrySet()));
+                                entries.putAll(perNodeEntry.getKey().getNodeId(), perNodeEntry.getValue().getMetrics().entrySet());
                             }
                         } else {
                             try {
                                 final Node node = controllerInstance.nodeService.loadNode(nodeId);
                                 final MetricsListResponse response = requestBuilder.node(node).execute();
-
-                                pushResponse.metrics.add(createMetricUpdate(node.getNodeId(),
-                                                                                  response.getMetrics().entrySet()));
+                                entries.putAll(node.getNodeId(), response.getMetrics().entrySet());
                             } catch (NodeService.NodeNotFoundException e) {
                                 Logger.warn("Unknown node {}, skipping it.", nodeId);
                             }
@@ -201,8 +199,11 @@ public class MetricsController extends AuthenticatedController {
                 pushResponse.hasError = true;
             } catch (Exception e) {
                 pushResponse.hasError = true;
-                Logger.warn("Unhandled exception, catching to prevent scheduled task from ending.",
-                        e);
+                Logger.warn("Unhandled exception, catching to prevent scheduled task from ending.", e);
+            }
+
+            for (String nodeId : entries.keySet()) {
+                pushResponse.metrics.add(createMetricUpdate(nodeId, entries.get(nodeId)));
             }
 
             out.write(Json.toJson(pushResponse).toString());

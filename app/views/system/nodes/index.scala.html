@@ -118,21 +118,7 @@
                             </dl>
                         </div>
 
-                        <div class="col-md-9 graylog-node-heap" data-node-id="@jvm.getNodeId">
-                            <div class="progress">
-                                <div class="progress-bar heap-used-percent" style="width: @jvm.usedMemoryPercentage()%;"></div>
-                                <div class="progress-bar progress-bar-warning heap-total-percent" style="width: @(jvm.totalMemoryPercentage()-jvm.usedMemoryPercentage)%"></div>
-                            </div>
-
-                            <p>
-                                The JVM is using <span class="blob" style="background-color: #9e1f63;"></span>
-                                <strong><span class="heap-used">@jvm.getUsedMemory.getMegabytes()</span>
-                                of <span class="blob" style="background-color: #f7941e;"></span>
-                                <span class="heap-total">@jvm.getTotalMemory.getMegabytes()</span> MB</strong>
-                                heap space and will not attempt to use more than <span class="blob" style="background-color: #f5f5f5;"></span>
-                                <strong><span class="heap-max">@jvm.getMaxMemory.getMegabytes()</span> MB</strong>
-                            </p>
-                        </div>
+                        <div class="react-jvm-heap col-md-9" data-node-id="@jvm.getNodeId"></div>
                     </div>
 
                     <div class="row">
