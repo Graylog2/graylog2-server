@@ -4,7 +4,7 @@
 
 This is Graylog, an open source log management solution.
 
-Please follow the release announcements and documentation links on https//graylog.org/ for details.
+Please follow the release announcements and documentation links on http://graylog.org/ for details.
 
 ![YourKit](https://s3.amazonaws.com/graylog2public/images/yourkit.png)
 
