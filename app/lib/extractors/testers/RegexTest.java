@@ -19,9 +19,9 @@ package lib.extractors.testers;
 
 import com.google.common.collect.Maps;
 import com.google.inject.Inject;
+import org.graylog2.rest.models.tools.requests.RegexTestRequest;
 import org.graylog2.restclient.lib.APIException;
 import org.graylog2.restclient.lib.ApiClient;
-import org.graylog2.restclient.models.api.requests.tools.RegexTestRequest;
 import org.graylog2.restclient.models.api.responses.RegexTestResponse;
 
 import java.io.IOException;

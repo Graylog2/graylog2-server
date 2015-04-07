@@ -22,9 +22,9 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.inject.Inject;
+import org.graylog2.rest.models.tools.requests.GrokTestRequest;
 import org.graylog2.restclient.lib.APIException;
 import org.graylog2.restclient.lib.ApiClient;
-import org.graylog2.restclient.models.api.requests.tools.GrokTestRequest;
 import org.graylog2.restclient.models.api.responses.GrokTestResponse;
 
 import java.io.IOException;

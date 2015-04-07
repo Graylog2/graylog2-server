@@ -26,10 +26,10 @@ import lib.extractors.testers.RegexTest;
 import lib.extractors.testers.SplitAndIndexTest;
 import lib.extractors.testers.SubstringTest;
 import org.graylog2.restclient.lib.APIException;
-import org.graylog2.restclient.models.api.requests.tools.RegexTestRequest;
-import org.graylog2.restclient.models.api.requests.tools.GrokTestRequest;
-import org.graylog2.restclient.models.api.requests.tools.SplitAndIndexTestRequest;
-import org.graylog2.restclient.models.api.requests.tools.SubstringTestRequest;
+import org.graylog2.rest.models.tools.requests.RegexTestRequest;
+import org.graylog2.rest.models.tools.requests.GrokTestRequest;
+import org.graylog2.rest.models.tools.requests.SplitAndIndexTestRequest;
+import org.graylog2.rest.models.tools.requests.SubstringTestRequest;
 import play.libs.Json;
 import play.mvc.Result;
 
@@ -61,7 +61,7 @@ public class ToolsApiController extends AuthenticatedController {
         final RegexTestRequest request = Json.fromJson(json, RegexTestRequest.class);
 
         try {
-            if (request.regex.isEmpty() || request.string.isEmpty()) {
+            if (request.regex().isEmpty() || request.string().isEmpty()) {
                 return badRequest();
             }
 
@@ -77,7 +77,7 @@ public class ToolsApiController extends AuthenticatedController {
         final JsonNode json = request().body().asJson();
         final SubstringTestRequest request = Json.fromJson(json, SubstringTestRequest.class);
         try {
-            if (request.start < 0 || request.end <= 0 || request.string.isEmpty()) {
+            if (request.start() < 0 || request.end() <= 0 || request.string().isEmpty()) {
                 return badRequest();
             }
 
@@ -94,7 +94,7 @@ public class ToolsApiController extends AuthenticatedController {
         final SplitAndIndexTestRequest request = Json.fromJson(json, SplitAndIndexTestRequest.class);
 
         try {
-            if (request.splitBy.isEmpty() || request.index < 0 || request.string.isEmpty()) {
+            if (request.splitBy().isEmpty() || request.index() < 0 || request.string().isEmpty()) {
                 return badRequest();
             }
 
@@ -127,7 +127,7 @@ public class ToolsApiController extends AuthenticatedController {
         final JsonNode json = request().body().asJson();
         final GrokTestRequest request = Json.fromJson(json, GrokTestRequest.class);
 
-        if (request.pattern.isEmpty() || request.string.isEmpty()) {
+        if (request.pattern().isEmpty() || request.string().isEmpty()) {
             return badRequest();
         }
 
