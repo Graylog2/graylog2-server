@@ -36,7 +36,7 @@ var GraphFactory = {
                 this.tooltipRenderlet(graph, '.chart-body circle.dot', tooltipTitleFormatter);
                 break;
             default:
-                throw "Unsupported renderer '" + renderer + "'";
+                throw "Unsupported renderer '" + config.renderer + "'";
         }
 
         if (config.renderer === 'line' || config.renderer === 'area') {
