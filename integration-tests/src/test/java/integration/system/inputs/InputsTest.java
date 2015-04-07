@@ -32,7 +32,7 @@ public class InputsTest extends BaseRestTest {
         given().when()
                 .body(jsonResourceForMethod()).post("/system/inputs")
                 .then()
-                    .statusCode(404).statusLine(notNullValue());
+                    .statusCode(400).statusLine(notNullValue());
     }
 
     @Test(dependsOnMethods = "createInputTest")
