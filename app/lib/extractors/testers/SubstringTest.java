@@ -1,6 +1,4 @@
-/*
- * Copyright 2012-2015 TORCH GmbH, 2015 Graylog, Inc.
- *
+/**
  * This file is part of Graylog.
  *
  * Graylog is free software: you can redistribute it and/or modify
@@ -16,20 +14,19 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package lib.extractors.testers;
 
 import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 import org.graylog2.restclient.lib.APIException;
 import org.graylog2.restclient.lib.ApiClient;
+import org.graylog2.restclient.models.api.requests.tools.SubstringTestRequest;
 import org.graylog2.restclient.models.api.responses.SubstringTestResponse;
 
 import java.io.IOException;
 import java.util.Map;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public class SubstringTest {
 
 
@@ -40,12 +37,10 @@ public class SubstringTest {
         this.api = api;
     }
 
-    public Map<String, Object> test(int start, int end, String string) throws IOException, APIException {
-        SubstringTestResponse r = api.get(SubstringTestResponse.class)
+    public Map<String, Object> test(SubstringTestRequest request) throws IOException, APIException {
+        SubstringTestResponse r = api.post(SubstringTestResponse.class)
                 .path("/tools/substring_tester")
-                .queryParam("begin_index", start)
-                .queryParam("end_index", end)
-                .queryParam("string", string)
+                .body(request)
                 .execute();
 
         Map<String, Object> match = Maps.newHashMap();
