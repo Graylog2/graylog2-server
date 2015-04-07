@@ -18,12 +18,13 @@ import static org.assertj.jodatime.api.Assertions.assertThat;
 @RequiresVersion(">=1.1.0")
 public class AgentsTest extends BaseRestTest {
     private final String resourcePrefix = "/system/agents";
+    private final String resourceEndpoint = resourcePrefix + "/register";
 
     @Test
     public void testRegisterAgent() throws Exception {
         given().when()
                     .body(jsonResourceForMethod())
-                    .post(resourcePrefix + "/register")
+                    .post(resourceEndpoint)
                 .then()
                     .statusCode(202);
     }
@@ -32,7 +33,7 @@ public class AgentsTest extends BaseRestTest {
     public void testRegisterInvalidAgent() throws Exception {
         given().when()
                     .body(jsonResourceForMethod())
-                    .post(resourcePrefix + "/register")
+                    .post(resourceEndpoint)
                 .then()
                     .statusCode(400);
     }
@@ -50,7 +51,7 @@ public class AgentsTest extends BaseRestTest {
     public void testGetAgent() throws Exception {
         given().when()
                     .body(jsonResourceForMethod())
-                    .post(resourcePrefix + "/register")
+                    .post(resourceEndpoint)
                 .then()
                     .statusCode(202);
 
@@ -60,13 +61,13 @@ public class AgentsTest extends BaseRestTest {
                     .statusCode(200)
                     .assertThat()
                         .body("id", is("getAgentTest"))
-                        .body(".", containsAllKeys("id", "node_id", "node_details", "last_seen"));
+                        .body(".", containsAllKeys("id", "node_id", "node_details", "last_seen", "active"))
+                        .body("active", is(true));
     }
 
     @Test
     public void testTouchAgent() throws Exception {
         final String agentId = "testTouchAgentId";
-        final String resourceEndpoint = resourcePrefix + "/register";
 
         given().when()
                 .body(jsonResourceForMethod())
