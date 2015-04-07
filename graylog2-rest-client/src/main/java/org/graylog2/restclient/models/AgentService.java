@@ -14,34 +14,28 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.agents;
+package org.graylog2.restclient.models;
 
+import org.graylog2.rest.models.agent.responses.AgentList;
 import org.graylog2.rest.models.agent.responses.AgentSummary;
-import org.joda.time.DateTime;
+import org.graylog2.restclient.lib.APIException;
+import org.graylog2.restclient.lib.ApiClient;
+import org.graylog2.restroutes.generated.routes;
 
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Past;
-import javax.validation.constraints.Size;
-import java.util.function.Function;
+import javax.inject.Inject;
+import java.io.IOException;
+import java.util.List;
 
-public interface Agent {
-    @NotNull
-    @Size(min = 1)
-    String getId();
+public class AgentService {
+    private final ApiClient apiClient;
 
-    @NotNull
-    @Size(min = 1)
-    String getNodeId();
-    String getOperatingSystem();
+    @Inject
+    public AgentService(ApiClient apiClient) {
+        this.apiClient = apiClient;
+    }
 
-    @NotNull
-    @Past
-    DateTime getLastSeen();
-
-    @NotNull
-    @Valid
-    AgentNodeDetails getNodeDetails();
-
-    AgentSummary toSummary(Function<Agent, Boolean> isActiveFunction);
+    public List<AgentSummary> all() throws APIException, IOException {
+        final AgentList response = apiClient.path(routes.AgentResource().list(), AgentList.class).execute();
+        return response.agents();
+    }
 }
