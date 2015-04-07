@@ -22,6 +22,7 @@ import com.google.common.eventbus.AsyncEventBus;
 import com.google.common.eventbus.EventBus;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.graylog2.plugin.BaseConfiguration;
+import org.graylog2.shared.events.DeadEventLoggingListener;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -43,7 +44,10 @@ public class EventBusProvider implements Provider<EventBus> {
 
     @Override
     public EventBus get() {
-        return new AsyncEventBus("graylog2-eventbus", executorService(configuration.getAsyncEventbusProcessors()));
+        final EventBus eventBus = new AsyncEventBus("graylog-eventbus", executorService(configuration.getAsyncEventbusProcessors()));
+        eventBus.register(new DeadEventLoggingListener());
+
+        return eventBus;
     }
 
     private ExecutorService executorService(int nThreads) {
