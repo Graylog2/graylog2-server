@@ -2907,3 +2907,9 @@ table.messages tr.message-detail-row dl.message-details dd div.message-field-act
   position: relative;
   top: -10px;
 }
+.greyedOut {
+  filter:alpha(opacity=50); /* IE */
+  opacity: 0.5; /* Safari, Opera */
+  -moz-opacity:0.50; /* FireFox */
+  z-index: 20;
+}

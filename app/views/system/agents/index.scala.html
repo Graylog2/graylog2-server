@@ -1,52 +1,22 @@
 @(currentUser: org.graylog2.restclient.models.User,
-        breadcrumbs: lib.BreadcrumbList,
-        agents: List[org.graylog2.rest.models.agent.responses.AgentSummary])
-@import views.helpers.DateHelper
+        breadcrumbs: lib.BreadcrumbList)
 
 @main("Agents in Cluster", null, "", currentUser, false) {
     @views.html.partials.breadcrumbs(breadcrumbs)
+
+    <script src="@routes.Assets.at("javascripts/agents.js")" type="text/javascript"></script>
 
     <div class="row content content-head">
         <div class="col-md-12">
             <h1><i class="fa fa-cloud"></i> Agents in Cluster</h1>
             <p class="description">
                 Agents deliver local resources to a remote Graylog cluster.
+                    <a href="#" class="toggleInactive">Show Inactive</a>
             </p>
         </div>
     </div>
     <div class="row content">
-        <div class="col-md-12">
-            <table class="table table-striped users-list">
-                <thead>
-                    <tr>
-                        <th class="name">Agent ID</th>
-                        <th>Node Id</th>
-                        <th>Operating System</th>
-                        <th>Last Seen</th>
-                        <th class="actions">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @for(agent <- agents) {
-                        <tr>
-                            <td class="limited">
-                                @agent.id()
-                            </td>
-                            <td class="limited">
-                                @agent.nodeId()
-                            </td>
-                            <td class="limited">
-                                @agent.nodeDetails().operatingSystem()
-                            </td>
-                            <td class="limited">
-                                @DateHelper.readablePeriodFromNow(agent.lastSeen(), "text")
-                            </td>
-                            <td class="limited">
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
+        <div class="col-md-12" id="react-agent-list">
         </div>
     </div>
 }
