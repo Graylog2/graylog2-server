@@ -13,9 +13,9 @@ var NumberUtils = require("../../util/NumberUtils");
 var D3Utils = require('../../util/D3Utils');
 
 var GraphFactory = {
-    create(renderer, domNode, tooltipTitleFormatter) {
+    create(config, domNode, tooltipTitleFormatter) {
         var graph;
-        switch(renderer) {
+        switch (config.renderer) {
             case 'line':
                 graph = dc.lineChart(domNode);
                 this.tooltipRenderlet(graph, '.chart-body circle.dot', tooltipTitleFormatter);
@@ -39,8 +39,12 @@ var GraphFactory = {
                 throw "Unsupported renderer '" + renderer + "'";
         }
 
+        if (config.renderer === 'line' || config.renderer === 'area') {
+            graph.interpolate(config.interpolation);
+        }
+
         // Bar charts with clip padding overflow the x axis
-        if(renderer !== 'bar') {
+        if (config.renderer !== 'bar') {
             graph.clipPadding(5);
         }
 
@@ -78,7 +82,7 @@ var GraphVisualization = React.createClass({
     renderGraph() {
         var graphDomNode = this.getDOMNode();
 
-        this.graph = GraphFactory.create(this.props.config.renderer, graphDomNode, this._formatTooltipTitle);
+        this.graph = GraphFactory.create(this.props.config, graphDomNode, this._formatTooltipTitle);
         this.graph
             .width(810)
             .height(120)
@@ -99,7 +103,7 @@ var GraphVisualization = React.createClass({
             'selector': '[rel="tooltip"]',
             'container': 'body',
             'placement': 'auto',
-            'delay': { show: 300, hide: 100 },
+            'delay': {show: 300, hide: 100},
             'html': true
         });
 
@@ -133,7 +137,7 @@ var GraphVisualization = React.createClass({
     },
     processData(data) {
         var formattedData = [];
-        for(var key in data) {
+        for (var key in data) {
             if (data.hasOwnProperty(key)) {
                 var normalizedValue = NumberUtils.normalizeNumber(data[key]);
                 formattedData.push({
