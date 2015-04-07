@@ -386,7 +386,7 @@
                                 <a href="@routes.MessagesController.show(r.getIndex, r.getFields.get("_id").asInstanceOf[String])" class="btn btn-sm btn-info">Permalink</a>
                                 <a href="#" class="btn btn-sm btn-info">Copy ID</a>
                                 <a href="#" class="btn btn-sm btn-info">Test against stream</a>
-                                <a href="#" href="#terms-msg-@r.getFields.get("_id")" data-toggle="modal" class="btn btn-sm btn-info">Show terms</a>
+                                <a href="#" href="#terms-msg-@r.getFields.get("_id")" data-toggle="modal" class="btn btn-sm btn-info" style="margin-right: 15px;">Show terms</a>
                             </div>
 
                             <h3><i class="fa fa-envelope"></i>&nbsp;
@@ -436,7 +436,7 @@
                                 </dl>
                             </div>
 
-                            @views.html.partials.messages.message_terms(r.getFields.get("_id").asInstanceOf[String]))
+                            @views.html.partials.messages.message_terms(r.getFields.get("_id").asInstanceOf[String])
                         </td>
                     </tr>
                 </tbody>
