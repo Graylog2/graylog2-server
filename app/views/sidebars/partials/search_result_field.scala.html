@@ -9,6 +9,7 @@ class="field-selector"
 data-field-hash="@field.getHash"
 data-field-name="@field.getName"
 @if(selectedFields.contains(field.getName)) { checked="checked" }
+@if(field.getName.equals("message")) { disabled="disabled" }
 />
 
 <label for="field-selector-@field.getHash" class="field-name">@field.getName()</label>

@@ -20,6 +20,8 @@
 @import org.graylog2.restclient.models.api.results.MessageResult
 @import org.graylog2.restclient.lib.timeranges.TimeRange
 @import org.graylog2.restclient.lib.timeranges.RelativeRange
+@import org.graylog2.restclient.lib.Tools
+
 
 @paginatorLength() = @{10}
 
@@ -328,10 +330,10 @@
             </ul>
         </nav>
 
-        <table class="table table-condensed table-hover table-striped messages">
+        <table class="table table-condensed messages">
             <thead>
                 <tr>
-                    <th style="width: 135px;">
+                    <th style="width: 150px;">
                         Timestamp
                         @views.html.search.partials.column_sorter.render("timestamp", search, page)
                     </th>
@@ -341,12 +343,6 @@
                             id="result-th-36cd38f49b9afa08222c0dc9ebfe35eb">
                         Source
                         @views.html.search.partials.column_sorter.render("source", search, page)
-                    </th>
-
-                    <th style="@if(!(selectedFields.contains("message") || search.getOrder.getField.equals("message"))) { display: none;}"
-                    id="result-th-78e731027d8fd50ed642340b7c9a63b3">
-                        Message
-                        @views.html.search.partials.column_sorter.render("message", search, page)
                     </th>
 
                     @for(f <- searchResult.getPageFields()) {
@@ -361,28 +357,90 @@
                     }
                 </tr>
             </thead>
-            <tbody>
-                @for(r <- searchResult.getMessages()) {
-                <tr data-message-id='@r.getFields.get("_id")' data-source-index="@r.getIndex">
-                    <td>@DateHelper.timestampShort(r.getTimestamp)</td>
-                    <td @if(!(selectedFields.contains("source") || search.getOrder.getField.equals("source"))) { style="display: none;" }
-                        class="result-td-36cd38f49b9afa08222c0dc9ebfe35eb">@r.getFields.get("source")</td>
-                    <td @if(!(selectedFields.contains("message") || search.getOrder.getField.equals("message"))) { style="display: none;" }
-                        class="messages-message result-td-78e731027d8fd50ed642340b7c9a63b3">
-                        @renderMessageResultField("message", r.getFields, r)
-                        <a href="@routes.MessagesController.show(r.getIndex.asInstanceOf[String], r.getFields.get("_id").asInstanceOf[String])" target="_blank">[open msg]</a>
-                    </td>
+            @for(r <- searchResult.getMessages()) {
+                <tbody class="message-group" data-message-id='@r.getFields.get("_id")'>
+                    <tr class="fields-row" data-message-id='@r.getFields.get("_id")' data-source-index="@r.getIndex">
+                            <td><strong>@DateHelper.timestampShort(r.getTimestamp)</strong></td>
+                            <td @if(!(selectedFields.contains("source") || search.getOrder.getField.equals("source"))) { style="display: none;" }
+                            class="result-td-36cd38f49b9afa08222c0dc9ebfe35eb">@r.getFields.get("source")</td>
 
-                    @for(f <- searchResult.getPageFields()) {
-                        @if(!f.isStandardSelected) {
-                            <td class="result-td-@f.getHash()"
-                                @if(!(selectedFields.contains(f.getName) || search.getOrder.getField.equals(f.getName))) { style="display: none;" }
-                            >@renderMessageResultField(f.getName, r.getFormattedFields, r)</td>
-                        }
-                    }
-                </tr>
-                }
-            </tbody>
+                            @for(f <- searchResult.getPageFields()) {
+                                @if(!f.isStandardSelected) {
+                                    <td class="result-td-@f.getHash()"
+                                        @if(!(selectedFields.contains(f.getName) || search.getOrder.getField.equals(f.getName))) { style="display: none;" }
+                                    >@renderMessageResultField(f.getName, r.getFormattedFields, r)</td>
+                                }
+                            }
+                    </tr>
+
+                    <tr class="message-row" data-message-id='@r.getFields.get("_id")'>
+                        <td colspan="2">
+                            @renderMessageResultField("message", r.getFields, r)
+                        </td>
+                    </tr>
+
+                    <tr class="message-detail-row" data-message-id='@r.getFields.get("_id")'>
+                        <td colspan="2">
+
+                            <div class="message-actions pull-right">
+                                <a href="@routes.MessagesController.show(r.getIndex, r.getFields.get("_id").asInstanceOf[String])" class="btn btn-sm btn-info">Permalink</a>
+                                <a href="#" class="btn btn-sm btn-info">Copy ID</a>
+                                <a href="#" class="btn btn-sm btn-info">Test against stream</a>
+                                <a href="#" href="#terms-msg-@r.getFields.get("_id")" data-toggle="modal" class="btn btn-sm btn-info">Show terms</a>
+                            </div>
+
+                            <h3><i class="fa fa-envelope"></i>&nbsp;
+                                <a href="@routes.MessagesController.show(r.getIndex, r.getFields.get("_id").asInstanceOf[String])" style="color: #000;">@r.getFields.get("_id")</a>
+                            </h3>
+
+                            <div class="col-md-3" style="padding-left: 0px;">
+                                <dl class="message-details">
+                                    <dt>Received by</dt>
+                                    <dd>
+                                        <em>Example Input</em>
+                                        on
+
+                                        <a href="#">
+                                            <i class="fa fa-code-fork"></i>
+                                            127.0.0.1
+                                        </a>
+                                    </dd>
+
+                                    <dt>Stored in index</dt>
+                                    <dd>@r.getIndex</dd>
+
+                                    <dt>Routed in streams</dt>
+                                    <dd>
+                                        <ul>
+                                            <li><a href="#">Some stream</a></li>
+                                            <li><a href="#">Example stream</a></li>
+                                            <li><a href="#">Another example stream</a></li>
+                                        </ul>
+                                    </dd>
+                                </dl>
+                            </div>
+
+                            <div class="col-md-9">
+                                <dl class="message-details message-details-fields">
+                                @for(f <- searchResult.getPageFields()) {
+                                    <dt>@f.getName</dt>
+                                    <dd>
+                                        <div class="message-field-actions pull-right">
+                                            <a href="#" class="btn btn-xs btn-default search-link" data-field="@f.getName" data-value="@Tools.removeTrailingNewline(r.getFormattedFields.get(f.getName))" title="Append to search query"><i class="fa fa-search-plus"></i></a>
+                                            <a href="#" class="btn btn-xs btn-default" title="Split into fields / Create extractor"><i class="fa fa-magic"></i></a>
+                                        </div>
+
+                                        @renderMessageResultField(f.getName, r.getFormattedFields, r)
+                                    </dd>
+                                }
+                                </dl>
+                            </div>
+
+                            @views.html.partials.messages.message_terms(r.getFields.get("_id").asInstanceOf[String]))
+                        </td>
+                    </tr>
+                </tbody>
+            }
         </table>
 
         @****** extract this paginator to a partial! ****@

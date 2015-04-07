@@ -347,8 +347,14 @@ a.fields-set-chooser {
   word-wrap: break-word;
 }
 
-.messages th {
-  font-size: 13px;
+.messages thead > tr {
+  color: #fff;
+}
+
+.messages thead th {
+  font-size: 11px;
+  font-weight: normal;
+  background-color: #000;
 }
 
 #result-graph-container {
@@ -369,10 +375,6 @@ a.fields-set-chooser {
   float: left;
   height: 200px;
   width: 40px;
-}
-
-.messages tbody > tr {
-  cursor: pointer;
 }
 
 .search-result-fields {
@@ -2160,11 +2162,11 @@ form.edit-dashboard-form {
 .messages th .sort-order {
   margin-left: 2px;
   font-size: 11px;
-  color: #000;
+  color: #fff;
 }
 
 .messages th .sort-order:hover {
-  color: #000;
+  color: #4DBCE9;
   text-decoration: none;
 }
 
@@ -2178,7 +2180,7 @@ form.edit-dashboard-form {
 }
 
 .messages th .choose-sort-order {
-  color: #8c8e86;
+  color: #fff;
 }
 
 .add-alert-type {
@@ -2815,4 +2817,93 @@ span.blob {
 .pagination-search-result ul {
   margin: 0px;
   margin-left: 100px;
+}
+
+table.messages tbody.messages-main-body td {
+  border-top: 0;
+}
+
+table.messages tbody.message-group {
+  border-top: 0;
+}
+
+table.messages tbody.message-group-toggled {
+  border-left: 5px solid #16ace3;
+}
+
+table.messages tr.fields-row {
+  cursor: pointer;
+}
+
+table.messages tr.fields-row td {
+  padding-top: 10px;
+}
+
+table.messages tr.message-row td {
+  border-top: 0;
+  padding-top: 0px;
+  padding-bottom: 5px;
+  font-family: monospace;
+  color: #16ace3;
+}
+
+table.messages tr.message-row {
+  margin-bottom: 5px;
+  cursor: pointer;
+}
+
+table.messages tr.message-detail-row {
+  display: none;
+}
+
+table.messages tr.message-detail-row td {
+  padding-top: 5px;
+  border-top: 0;
+}
+
+table.messages tr.message-detail-row dl.message-details {
+  margin-top: 10px;
+  margin-bottom: 0px;
+}
+
+table.messages tr.message-detail-row dl.message-details dt {
+  font-weight: bold;
+}
+
+table.messages tr.message-detail-row dl.message-details dd {
+  margin-bottom: 5px;
+  padding-bottom: 5px;
+}
+
+table.messages tr.message-detail-row dl.message-details-fields dd {
+  border-bottom: 1px solid #ececec;
+}
+
+table.messages tr.message-detail-row dl.message-details dd ul {
+  list-style-type: disc;
+  padding-left: 25px;
+}
+
+table.messages tr.message-detail-row dl.message-details dd ul li {
+  margin-top: 3px;
+}
+
+table.messages {
+  position: relative;
+  left: -13px;
+}
+
+table.messages td, table.messages th {
+  position: relative;
+  left: 13px;
+}
+
+table.messages tr {
+  border: 0 !important;
+}
+
+table.messages tr.message-detail-row dl.message-details dd div.message-field-actions {
+  padding-left: 10px;
+  position: relative;
+  top: -10px;
 }

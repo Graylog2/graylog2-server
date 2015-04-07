@@ -74,15 +74,28 @@ $(document).ready(function() {
 		td = $(".result-td-" + hash);
 		th = $("#result-th-" + hash);
         var fieldname = $(this).data("field-name");
+
+        var details = $("table.messages tr.message-detail-row td");
+        var message = $("table.messages tr.message-row td");
+        var colspan = parseInt(details.attr("colspan"));
+
         if ($(this).is(':checked')) {
+            // show field
             searchViewState.addField(fieldname);
 			th.show();
 			td.show();
+
+            details.attr("colspan", colspan+1);
+            message.attr("colspan", colspan+1);
 		} else {
+            // hide field
             searchViewState.removeField(fieldname);
             th.hide();
 			td.hide();
-		}
+
+            details.attr("colspan", colspan-1);
+            message.attr("colspan", colspan-1);
+        }
 	});
 
 
@@ -93,13 +106,20 @@ $(document).ready(function() {
         if (fragment["fields"] !== undefined) {
             if (fragment["fields"].length > 0) {
                 var fields = fragment["fields"].split(",");
+
+                var activeFields = 0;
                 for (var i = 0; i < fields.length; i++) {
                     $(".field-selector[data-field-name="+fields[i]+"]").each(function(){
                         if (!$(this).is(":checked")) {
                             $(this).trigger("click"); // tick the checkbox if it wasn't checked before
+                            activeFields+=1;
                         }
                     });
                 }
+
+                // Update colspan of full-width rows.
+                $("table.messages tr.message-detail-row td").attr("colspan", activeFields);
+                $("table.messages tr.message-row td").attr("colspan", activeFields);
             }
         }
     })();
@@ -888,6 +908,14 @@ $(document).ready(function() {
             $(element).prop("checked", true);
         });
     });
+
+    $("table.messages tr.fields-row, table.messages tr.message-row").on("click", function() {
+        var messageId = $(this).attr("data-message-id");
+        $("table.messages tr.message-detail-row[data-message-id=" + messageId + "]").toggle();
+
+        $("table.messages tbody[data-message-id=" + messageId + "]").toggleClass("message-group-toggled");
+    });
+
 });
 
 function showError(message) {
