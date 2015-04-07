@@ -14,19 +14,16 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.agents;
+package org.graylog2.shared.bindings;
 
-import org.graylog2.rest.models.agent.requests.AgentRegistrationRequest;
+import com.google.inject.AbstractModule;
+import org.graylog2.shared.bindings.providers.ValidatorProvider;
 
-import java.util.List;
+import javax.validation.Validator;
 
-public interface AgentService {
-    long count();
-    Agent save(Agent agent);
-    List<Agent> all();
-    Agent findById(String id);
-    List<Agent> findByNodeId(String nodeId);
-    int destroy(Agent agent);
-
-    Agent fromRequest(AgentRegistrationRequest request);
+public class ValidatorModule extends AbstractModule {
+    @Override
+    protected void configure() {
+        bind(Validator.class).toProvider(ValidatorProvider.class);
+    }
 }

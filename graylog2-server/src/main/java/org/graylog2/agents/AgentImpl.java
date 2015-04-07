@@ -1,3 +1,19 @@
+/**
+ * This file is part of Graylog.
+ *
+ * Graylog is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Graylog is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package org.graylog2.agents;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
@@ -8,6 +24,8 @@ import com.google.auto.value.AutoValue;
 import org.graylog2.database.CollectionName;
 import org.graylog2.rest.models.agent.responses.AgentSummary;
 import org.joda.time.DateTime;
+
+import java.util.function.Function;
 
 @AutoValue
 @JsonAutoDetect
@@ -23,17 +41,17 @@ public abstract class AgentImpl implements Agent {
     public abstract String getNodeId();
 
     @JsonProperty("node_details")
-    public abstract AgentNodeDetails nodeDetails();
+    public abstract AgentNodeDetails getNodeDetails();
 
     @Override
-    public AgentSummary toSummary() {
-        return AgentSummary.create(getId(), getNodeId(), nodeDetails().toSummary(), getLastSeen());
+    public AgentSummary toSummary(Function<Agent, Boolean> isActiveFunction) {
+        return AgentSummary.create(getId(), getNodeId(), getNodeDetails().toSummary(), getLastSeen(), isActiveFunction.apply(this));
     }
 
     @Override
     @JsonIgnore
     public String getOperatingSystem() {
-        return nodeDetails().operatingSystem();
+        return getNodeDetails().operatingSystem();
     }
 
     @JsonProperty("last_seen")
