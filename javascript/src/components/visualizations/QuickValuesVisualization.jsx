@@ -63,10 +63,11 @@ var QuickValuesVisualization = React.createClass({
             .size(50)
             .columns([
                 (d) => {
-                    var colourBadge;
+                    var colourBadge = "";
 
-                    if (typeof this.pieChart !== 'undefined') {
-                        colourBadge = "<span class=\"datatable-badge\" style=\"background-color: " + this.pieChart.colors()(d.term) + "\"> </span>";
+                    if (typeof this.pieChart !== 'undefined' && this.dataTable.group()(d) !== 'Others') {
+                        var colour = this.pieChart.colors()(d.term);
+                        colourBadge = "<span class=\"datatable-badge\" style=\"background-color: " + colour + "\"></span>";
                     }
 
                     return colourBadge + " " + d.term;
