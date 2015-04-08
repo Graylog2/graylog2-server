@@ -7,11 +7,15 @@ var crossfilter = require('crossfilter');
 var dc = require('dc');
 var d3 = require('d3');
 
+var D3Utils = require('../../util/D3Utils');
+
 var QuickValuesVisualization = React.createClass({
     NUMBER_OF_TOP_VALUES: 5,
     getInitialState() {
+        this.dcGroupName = "quickvalue-" + this.props.id;
         this.quickValuesData = crossfilter();
-        this.dimension = this.quickValuesData.dimension((d) => d.count);
+        this.dimension = this.quickValuesData.dimension((d) => d.term);
+        this.group = this.dimension.group().reduceSum((d) => d.count);
 
         return {
             total: undefined,
@@ -21,46 +25,8 @@ var QuickValuesVisualization = React.createClass({
         };
     },
     componentDidMount() {
-        var tableDomNode = this.getDOMNode().getElementsByTagName("table")[0];
-
-        this.dataTable = dc.dataTable(tableDomNode);
-        this.dataTable
-            .dimension(this.dimension)
-            .group((d) => {
-                var topValues = this.dimension.top(this.NUMBER_OF_TOP_VALUES);
-                var dInTopValues = topValues.some((value) => d.term.localeCompare(value.term) === 0);
-                return dInTopValues ? "Top values" : "Others";
-            })
-            .size(50)
-            .columns([
-                (d) => d.term,
-                (d) => {
-                    var total = this.state.total - this.state.missing;
-                    return this._formatPercentage(d.count / total);
-                },
-                (d) => this._formatCount(d.count)
-            ])
-            .sortBy((d) => d.count)
-            .order(d3.descending)
-            .on('renderlet', (table) => {
-                table.selectAll(".dc-table-group").classed("info", true);
-            });
-
-        this.dataTable.render();
-    },
-    _formatPercentage(percentage) {
-        try {
-            return numeral(percentage).format("0.00%");
-        } catch (e) {
-            return percentage;
-        }
-    },
-    _formatCount(count) {
-        try {
-            return numeral(count).format("0,0");
-        } catch (e) {
-            return count;
-        }
+        this._renderDataTable();
+        this._renderGraph();
     },
     componentWillReceiveProps(newProps) {
         var quickValues = newProps.data;
@@ -82,23 +48,107 @@ var QuickValuesVisualization = React.createClass({
             terms: formattedTerms
         }, this.drawData);
     },
+    _renderDataTable() {
+        var tableDomNode = this.refs.table.getDOMNode();
+
+        this.dataTable = dc.dataTable(tableDomNode, this.dcGroupName);
+        this.dataTable
+            .dimension(this.dimension)
+            .group((d) => {
+                var topValues = this.group.top(this.NUMBER_OF_TOP_VALUES);
+                var dInTopValues = topValues.some((value) => d.term.localeCompare(value.key) === 0);
+                return dInTopValues ? "Top values" : "Others";
+            })
+            .size(50)
+            .columns([
+                (d) => {
+                    var colourBadge;
+
+                    if (typeof this.pieChart !== 'undefined') {
+                        colourBadge = "<span class=\"datatable-badge\" style=\"background-color: " + this.pieChart.colors()(d.term) + "\"> </span>";
+                    }
+
+                    return colourBadge + " " + d.term;
+                },
+                (d) => {
+                    var total = this.state.total - this.state.missing;
+                    return this._formatPercentage(d.count / total);
+                },
+                (d) => this._formatCount(d.count)
+            ])
+            .sortBy((d) => d.count)
+            .order(d3.descending)
+            .on('renderlet', (table) => {
+                table.selectAll(".dc-table-group").classed("info", true);
+            });
+
+        this.dataTable.render();
+    },
+    _renderGraph() {
+        var graphDomNode = this.refs.graph.getDOMNode();
+
+        this.pieChart = dc.pieChart(graphDomNode, this.dcGroupName);
+        this.pieChart
+            .dimension(this.dimension)
+            .group(this.group)
+            .renderLabel(false)
+            .renderTitle(false)
+            .slicesCap(this.NUMBER_OF_TOP_VALUES)
+            .ordering((d) => d.value)
+            .colors(D3Utils.glColourPalette());
+
+        D3Utils.tooltipRenderlet(this.pieChart, 'g.pie-slice', this._formatGraphTooltip);
+
+        $(graphDomNode).tooltip({
+            'selector': '[rel="tooltip"]',
+            'container': 'body',
+            'placement': 'auto',
+            'delay': {show: 300, hide: 100},
+            'html': true
+        });
+
+        this.pieChart.render();
+    },
+    _formatGraphTooltip(d) {
+        var valueText = d.data.key + ": " + this._formatCount(d.value) + "<br>";
+
+        return "<div class=\"datapoint-info\">" + valueText + "</div>";
+    },
+    _formatPercentage(percentage) {
+        try {
+            return numeral(percentage).format("0.00%");
+        } catch (e) {
+            return percentage;
+        }
+    },
+    _formatCount(count) {
+        try {
+            return numeral(count).format("0,0");
+        } catch (e) {
+            return count;
+        }
+    },
     drawData() {
         this.quickValuesData.remove();
         this.quickValuesData.add(this.state.terms);
         this.dataTable.redraw();
+        this.pieChart.redraw();
     },
     render() {
         return (
             <div id={"visualization-" + this.props.id} className="quickvalues-visualization">
-                <table className="table table-condensed table-striped table-hover">
-                    <thead>
-                    <tr>
-                        <th style={{width: "225px"}}>Value</th>
-                        <th style={{width: "50px"}}>%</th>
-                        <th>Count</th>
-                    </tr>
-                    </thead>
-                </table>
+                <div className="quickvalues-table">
+                    <table ref="table" className="table table-condensed table-striped table-hover">
+                        <thead>
+                        <tr>
+                            <th style={{width: "225px"}}>Value</th>
+                            <th style={{width: "50px"}}>%</th>
+                            <th>Count</th>
+                        </tr>
+                        </thead>
+                    </table>
+                </div>
+                <div ref="graph" className="quickvalues-graph"/>
             </div>
         );
     }
