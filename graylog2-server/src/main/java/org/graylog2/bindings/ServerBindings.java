@@ -16,12 +16,12 @@
  */
 package org.graylog2.bindings;
 
+import com.google.common.eventbus.EventBus;
 import com.google.inject.AbstractModule;
 import com.google.inject.Scopes;
 import com.google.inject.TypeLiteral;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.multibindings.Multibinder;
-import com.google.inject.name.Names;
 import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.elasticsearch.node.Node;
 import org.graylog2.Configuration;
@@ -31,6 +31,7 @@ import org.graylog2.alerts.types.FieldValueAlertCondition;
 import org.graylog2.alerts.types.MessageCountAlertCondition;
 import org.graylog2.bindings.providers.BundleExporterProvider;
 import org.graylog2.bindings.providers.BundleImporterProvider;
+import org.graylog2.bindings.providers.ClusterEventBusProvider;
 import org.graylog2.bindings.providers.DefaultSecurityManagerProvider;
 import org.graylog2.bindings.providers.EsNodeProvider;
 import org.graylog2.bindings.providers.LdapConnectorProvider;
@@ -89,6 +90,8 @@ import javax.ws.rs.container.DynamicFeature;
 import javax.ws.rs.ext.ExceptionMapper;
 import java.util.Set;
 
+import static com.google.inject.name.Names.named;
+
 public class ServerBindings extends AbstractModule {
     private final Configuration configuration;
     private final Set<ServerStatus.Capability> capabilities;
@@ -114,6 +117,7 @@ public class ServerBindings extends AbstractModule {
 
     private void bindProviders() {
         bind(RotationStrategy.class).toProvider(RotationStrategyProvider.class);
+        bind(EventBus.class).annotatedWith(named("cluster_event_bus")).toProvider(ClusterEventBusProvider.class).asEagerSingleton();
     }
 
     private void bindFactoryModules() {
@@ -160,7 +164,7 @@ public class ServerBindings extends AbstractModule {
         bind(BundleExporterProvider.class).in(Scopes.SINGLETON);
         bind(ClusterStatsModule.class).asEagerSingleton();
 
-        bind(String[].class).annotatedWith(Names.named("RestControllerPackages")).toInstance(new String[]{
+        bind(String[].class).annotatedWith(named("RestControllerPackages")).toInstance(new String[]{
                 "org.graylog2.rest.resources",
                 "org.graylog2.shared.rest.resources"
         });
@@ -203,7 +207,7 @@ public class ServerBindings extends AbstractModule {
     }
 
     private void bindAdditionalJerseyComponents() {
-        Multibinder<Class> componentBinder = Multibinder.newSetBinder(binder(), Class.class, Names.named("additionalJerseyComponents"));
+        Multibinder<Class> componentBinder = Multibinder.newSetBinder(binder(), Class.class, named("additionalJerseyComponents"));
         componentBinder.addBinding().toInstance(ScrollChunkWriter.class);
     }
 
