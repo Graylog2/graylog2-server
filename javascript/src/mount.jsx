@@ -19,6 +19,7 @@ $(document).ready(() => {
     require('./components/throughput/mount');
     require('./components/streams/mount');
     require('./components/node/mount');
+    require('./components/navigation/mount');
     if (userPreferences.enableSmartSearch) {
         require('./components/search/mount');
     }

@@ -1,0 +1,44 @@
+@(currentUser: org.graylog2.restclient.models.User)
+
+@import lib.security.RestPermissions._
+@import views.helpers.Permissions._
+@import org.graylog2.restclient.lib.Configuration
+@import org.graylog2.restclient.lib.DateTools
+@import views.helpers.Permissions
+@import lib.security.RestPermissions
+@import play.mvc.Http
+
+<script type="text/javascript">
+// needs to be global!
+gl2AppPathPrefix = "@Configuration.getApplicationContext";
+gl2UserTimeZone = "@DateTools.getUserTimeZone(currentUser)";
+gl2UserTimeZoneOffset = @DateTools.getUserTimeZoneOffset(currentUser);
+gl2UserSessionId = "@Http.Context.current().session().get("sessionid")";
+</script>
+
+@helper.javascriptRouter("jsRoutes")(
+    routes.javascript.Assets.at,
+    routes.javascript.SearchController.globalSearch,
+    routes.javascript.StreamsController.index,
+    routes.javascript.DashboardsController.index,
+    routes.javascript.SourcesController.list,
+    routes.javascript.SystemController.index,
+    routes.javascript.NodesController.nodes,
+    routes.javascript.InputsController.index,
+    routes.javascript.OutputsController.index,
+    routes.javascript.SearchController.globalSearch,
+    routes.javascript.IndicesController.index,
+    routes.javascript.LoggingController.index,
+    routes.javascript.UsersController.index,
+    routes.javascript.UsersController.show,
+    routes.javascript.BundlesController.index,
+    routes.javascript.GrokPatternsController.index,
+    routes.javascript.SessionsController.destroy
+)
+
+<div id="navigation-bar"
+    data-permissions='@Permissions.asJson(SEARCHES_ABSOLUTE, SEARCHES_RELATIVE, SEARCHES_KEYWORD, SOURCES_READ, INPUTS_READ, INPUTS_CREATE, INPUTS_EDIT, OUTPUTS_READ, INDICES_READ, LOGGERS_READ, DASHBOARDS_CREATE, STREAMS_CREATE)'
+    data-request-path="@request.path"
+    data-login-name="@currentUser.getName"
+    data-full-name="@currentUser.getFullName">
+</div>

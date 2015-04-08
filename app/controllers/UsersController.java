@@ -358,8 +358,8 @@ public class UsersController extends AuthenticatedController {
             @Override
             public boolean apply(@Nullable String input) {
                 return (input != null) &&
-                        !(input.startsWith(STREAMS_READ) || input.startsWith(STREAMS_EDIT) ||
-                                input.startsWith(DASHBOARDS_READ) || input.startsWith(DASHBOARDS_EDIT));
+                        !(input.startsWith(STREAMS_READ.getPermission()) || input.startsWith(STREAMS_EDIT.getPermission()) ||
+                                input.startsWith(DASHBOARDS_READ.getPermission()) || input.startsWith(DASHBOARDS_EDIT.getPermission()));
             }
         }));
         for (String streampermission : formData.streampermissions) {
