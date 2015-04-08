@@ -40,7 +40,7 @@ var AgentList = React.createClass({
         var sort = this.state.sort || ((agent) => {return agent.id});
         var field1 = sort(agent1);
         var field2 = sort(agent2);
-        if (typeof(field1) == "number") {
+        if (typeof(field1) === "number") {
             return field1 - field2;
         } else {
             return field1.localeCompare(field2);
