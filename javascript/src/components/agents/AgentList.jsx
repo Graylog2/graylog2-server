@@ -12,6 +12,7 @@ var AgentList = React.createClass({
         return {
             agents: [],
             filter: "",
+            sort: undefined,
             showInactive: false
         };
     },
@@ -35,36 +36,50 @@ var AgentList = React.createClass({
             || agent.node_id.toLowerCase().indexOf(filter) !== -1
             || agent.node_details.operating_system.toLowerCase().indexOf(filter) !== -1; })
     },
+    _bySortField(agent1, agent2) {
+        var sort = this.state.sort || ((agent) => {return agent.id});
+        var field1 = sort(agent1);
+        var field2 = sort(agent2);
+        if (typeof(field1) == "number") {
+            return field1 - field2;
+        } else {
+            return field1.localeCompare(field2);
+        }
+    },
     render() {
         var agentList;
 
         if (this.state.agents.length === 0) {
             agentList = <div><div className="alert alert-info">There are no agents.</div></div>;
         } else {
-            var agents = this._getFilteredAgents().filter((agent) => {return (this.state.showInactive || agent.active)}).map((agent) => {
-                var agentClass = agent.active ? "" : "greyedOut inactive";
-                var style = {}; //agent.active ? {} : {display: 'none'};
-                var annotation = agent.active ? "" : "(inactive)";
-                return (
-                    <tr className={agentClass} style={style}>
-                        <td className="limited">
-                            {agent.id}
-                            {annotation}
-                        </td>
-                        <td className="limited">
-                            {agent.node_id}
-                        </td>
-                        <td className="limited">
-                            {agent.node_details.operating_system}
-                        </td>
-                        <td className="limited">
-                            {agent.last_seen}
-                        </td>
-                        <td className="limited">
-                        </td>
-                    </tr>
-                );
-            });
+            var agents = this._getFilteredAgents()
+                .filter((agent) => {return (this.state.showInactive || agent.active)})
+                .sort(this._bySortField)
+                .map((agent) => {
+                    var agentClass = agent.active ? "" : "greyedOut inactive";
+                    var style = {}; //agent.active ? {} : {display: 'none'};
+                    var annotation = agent.active ? "" : "(inactive)";
+                    return (
+                        <tr className={agentClass} style={style}>
+                            <td className="limited">
+                                {agent.id}
+                                {annotation}
+                            </td>
+                            <td className="limited">
+                                {agent.node_id}
+                            </td>
+                            <td className="limited">
+                                {agent.node_details.operating_system}
+                            </td>
+                            <td className="limited">
+                                {agent.last_seen}
+                            </td>
+                            <td className="limited">
+                            </td>
+                        </tr>
+                    );
+                }
+            );
 
             agentList = (
                 <div>
@@ -80,12 +95,12 @@ var AgentList = React.createClass({
                             <table className="table table-striped users-list">
                                 <thead>
                                 <tr>
-                                    <th className="name">
+                                    <th className="name" onClick={this.sortById}>
                                         Agent ID
                                     </th>
-                                    <th>Node Id</th>
-                                    <th>Operating System</th>
-                                    <th>Last Seen</th>
+                                    <th onClick={this.sortByNodeId}>Node Id</th>
+                                    <th onClick={this.sortByOperatingSystem}>Operating System</th>
+                                    <th onClick={this.sortByLastSeen}>Last Seen</th>
                                     <th className="actions">Actions</th>
                                 </tr>
                                 </thead>
@@ -103,7 +118,19 @@ var AgentList = React.createClass({
     },
     toggleShowInactive() {
         this.setState({showInactive: !this.state.showInactive});
-    }
+    },
+    sortById() {
+        this.setState({sort: (agent) => {return agent.id}});
+    },
+    sortByNodeId() {
+        this.setState({sort: (agent) => {return agent.node_id}});
+    },
+    sortByOperatingSystem() {
+        this.setState({sort: (agent) => {return agent.node_details.operating_system}});
+    },
+    sortByLastSeen() {
+        this.setState({sort: (agent) => {return agent.last_seen}});
+    },
 });
 
 module.exports = AgentList;
