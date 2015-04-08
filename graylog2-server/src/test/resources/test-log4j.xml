@@ -11,6 +11,9 @@
     </appender>
 
     <!-- Application Loggers -->
+    <logger name="org.drools.compiler.kie.builder.impl.KieRepositoryImpl">
+        <level value="warn"/>
+    </logger>
     <root>
         <priority value="info"/>
         <appender-ref ref="console"/>
