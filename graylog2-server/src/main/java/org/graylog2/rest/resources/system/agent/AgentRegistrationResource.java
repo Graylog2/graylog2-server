@@ -17,21 +17,18 @@
 package org.graylog2.rest.resources.system.agent;
 
 import com.codahale.metrics.annotation.Timed;
-import com.google.common.base.Strings;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
 import com.wordnik.swagger.annotations.ApiResponse;
 import com.wordnik.swagger.annotations.ApiResponses;
 import org.graylog2.agents.Agent;
-import org.graylog2.agents.AgentImpl;
 import org.graylog2.agents.AgentService;
 import org.graylog2.rest.models.agent.requests.AgentRegistrationRequest;
 import org.graylog2.shared.rest.resources.RestResource;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
-import javax.validation.Validator;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
@@ -39,8 +36,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-
-import static com.google.common.base.Strings.isNullOrEmpty;
 
 @Api(value = "System/Agents/Registration", description = "Registration resource for graylog agent nodes.")
 @Path("/system/agents/register")
