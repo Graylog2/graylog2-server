@@ -19,6 +19,7 @@ package org.graylog2.agents;
 import org.graylog2.rest.models.agent.requests.AgentRegistrationRequest;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public interface AgentService {
     long count();
@@ -27,6 +28,7 @@ public interface AgentService {
     Agent findById(String id);
     List<Agent> findByNodeId(String nodeId);
     int destroy(Agent agent);
+    int destroyExpired(int time, TimeUnit unit);
 
     Agent fromRequest(AgentRegistrationRequest request);
 }

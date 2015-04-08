@@ -17,6 +17,7 @@
 package org.graylog2.agents;
 
 import com.google.common.collect.Lists;
+import com.google.common.primitives.Ints;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
@@ -34,6 +35,7 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 public class AgentServiceImpl implements AgentService {
 
@@ -87,6 +89,17 @@ public class AgentServiceImpl implements AgentService {
     @Override
     public int destroy(Agent agent) {
         return coll.remove(DBQuery.is("id", agent.getId())).getN();
+    }
+
+    @Override
+    public int destroyExpired(int time, TimeUnit unit) {
+        int count = 0;
+        final DateTime threshold = DateTime.now().minusSeconds(Ints.checkedCast(unit.toSeconds(time)));
+        for (Agent agent : all())
+            if (agent.getLastSeen().isBefore(threshold))
+                count += destroy(agent);
+
+        return count;
     }
 
     @Override
