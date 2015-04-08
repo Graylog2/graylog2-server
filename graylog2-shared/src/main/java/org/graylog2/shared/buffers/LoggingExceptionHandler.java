@@ -19,7 +19,7 @@ package org.graylog2.shared.buffers;
 import com.lmax.disruptor.ExceptionHandler;
 import org.slf4j.Logger;
 
-public class LoggingExceptionHandler implements ExceptionHandler {
+public class LoggingExceptionHandler implements ExceptionHandler<Object> {
     private final Logger logger;
 
     public LoggingExceptionHandler(Logger logger) {
