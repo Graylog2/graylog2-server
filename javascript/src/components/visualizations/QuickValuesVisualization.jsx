@@ -6,6 +6,7 @@ var numeral = require('numeral');
 var crossfilter = require('crossfilter');
 var dc = require('dc');
 var d3 = require('d3');
+var $ = require('jquery');
 
 var D3Utils = require('../../util/D3Utils');
 
