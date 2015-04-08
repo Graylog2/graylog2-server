@@ -333,13 +333,12 @@
         <table class="table table-condensed messages">
             <thead>
                 <tr>
-                    <th style="width: 150px;">
+                    <th style="width: 180px;">
                         Timestamp
                         @views.html.search.partials.column_sorter.render("timestamp", search, page)
                     </th>
 
-                    <th style="width: 180px;
-                        @if(!(selectedFields.contains("source") || search.getOrder.getField.equals("source"))) { display: none;}"
+                    <th style="width: 180px;@if(!(selectedFields.contains("source") || search.getOrder.getField.equals("source"))) { display: none;}"
                             id="result-th-36cd38f49b9afa08222c0dc9ebfe35eb">
                         Source
                         @views.html.search.partials.column_sorter.render("source", search, page)
@@ -360,7 +359,7 @@
             @for(r <- searchResult.getMessages()) {
                 <tbody class="message-group" data-message-id='@r.getFields.get("_id")'>
                     <tr class="fields-row" data-message-id='@r.getFields.get("_id")' data-source-index="@r.getIndex">
-                            <td><strong>@DateHelper.timestampShort(r.getTimestamp)</strong></td>
+                            <td style="width: 180px;"><strong>@DateHelper.timestampShort(r.getTimestamp)</strong></td>
                             <td @if(!(selectedFields.contains("source") || search.getOrder.getField.equals("source"))) { style="display: none;" }
                             class="result-td-36cd38f49b9afa08222c0dc9ebfe35eb">@r.getFields.get("source")</td>
 
