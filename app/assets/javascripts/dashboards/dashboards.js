@@ -17,6 +17,9 @@ $(document).ready(function() {
         dashboardGrid = $(".gridster ul").gridster({
             widget_margins: [10, 10],
             widget_base_dimensions: [410, 170],
+            resize: {
+                enabled: true
+            },
             draggable: {
                 stop: function() {
                     var positions = this.serialize();
@@ -52,7 +55,9 @@ $(document).ready(function() {
                     size_y: pos.size_y
                 }
             }
-        }).data('gridster').disable();
+        }).data('gridster');
+        dashboardGrid.disable();
+        dashboardGrid.disable_resize();
     };
 
     var reloadDashboard = function() {
@@ -260,6 +265,7 @@ $(document).ready(function() {
 
     var unlockDashboard = function() {
         dashboardGrid.enable();
+        dashboardGrid.enable_resize();
         $(".dashboard").addClass("unlocked");
         $(this).hide();
         $(".only-unlocked").show();
@@ -282,6 +288,7 @@ $(document).ready(function() {
 
     var lockDashboard = function() {
         dashboardGrid.disable();
+        dashboardGrid.disable_resize();
         $(".dashboard").removeClass("unlocked");
         $(this).hide();
         $(".hidden-unlocked").show();
