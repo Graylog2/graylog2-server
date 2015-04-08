@@ -93,6 +93,8 @@ var QuickValuesVisualization = React.createClass({
         this.pieChart
             .dimension(this.dimension)
             .group(this.group)
+            .height(200)
+            .width(200)
             .renderLabel(false)
             .renderTitle(false)
             .slicesCap(this.NUMBER_OF_TOP_VALUES)
@@ -139,18 +141,28 @@ var QuickValuesVisualization = React.createClass({
     render() {
         return (
             <div id={"visualization-" + this.props.id} className="quickvalues-visualization">
-                <div className="quickvalues-table">
-                    <table ref="table" className="table table-condensed table-striped table-hover">
-                        <thead>
-                        <tr>
-                            <th style={{width: "225px"}}>Value</th>
-                            <th style={{width: "50px"}}>%</th>
-                            <th>Count</th>
-                        </tr>
-                        </thead>
-                    </table>
+                <div className="container-fluid">
+                    <div className="row">
+                        <div className="col-md-12">
+                            <div ref="graph" className="quickvalues-graph"/>
+                        </div>
+                    </div>
+                    <div className="row">
+                        <div className="col-md-12">
+                            <div className="quickvalues-table">
+                                <table ref="table" className="table table-condensed table-striped table-hover">
+                                    <thead>
+                                    <tr>
+                                        <th style={{width: "225px"}}>Value</th>
+                                        <th style={{width: "50px"}}>%</th>
+                                        <th>Count</th>
+                                    </tr>
+                                    </thead>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div ref="graph" className="quickvalues-graph"/>
             </div>
         );
     }
