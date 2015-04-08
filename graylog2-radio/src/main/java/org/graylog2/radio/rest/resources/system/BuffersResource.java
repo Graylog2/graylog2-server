@@ -50,7 +50,7 @@ public class BuffersResource extends RestResource {
     @Produces(MediaType.APPLICATION_JSON)
     public BuffersUtilizationSummary utilization() {
         final int ringSize = configuration.getRingSize();
-        final long inputSize = processBuffer.size();
+        final long inputSize = processBuffer.getUsage();
         final long inputUtil = inputSize / ringSize * 100;
 
         return BuffersUtilizationSummary.create(RingSummary.create(SingleRingUtilization.create(inputSize, inputUtil)));

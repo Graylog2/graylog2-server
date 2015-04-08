@@ -58,7 +58,7 @@ public abstract class Buffer {
         if (ringBuffer == null) {
             return 0;
         }
-        return (long) ringBuffer.getBufferSize() -ringBuffer.remainingCapacity();
+        return (long) ringBuffer.getBufferSize() - ringBuffer.remainingCapacity();
     }
 
     protected void insert(Message message) {
@@ -100,9 +100,5 @@ public abstract class Buffer {
         }
         ringBuffer.publish(lo, hi);
         afterInsert(length);
-    }
-
-    public long size() {
-        return ringBuffer.getBufferSize() - ringBuffer.remainingCapacity();
     }
 }
