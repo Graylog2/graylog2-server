@@ -76,7 +76,7 @@ var Navigation = React.createClass({
     },
 
     _isActive(prefix) {
-        return this.props.requestPath.startsWith(prefix);
+        return this.props.requestPath.indexOf(prefix) === 0;
     },
 
     _systemTitle() {
