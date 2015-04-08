@@ -50,12 +50,6 @@ var Throughput = React.createClass({
             );
         }
 
-        //var nodeMarkup;
-        //if (this.state.nodeCount > 1) {
-        //    nodeMarkup = <span className="total-nodes">across {this.state.nodeCount} nodes</span>;
-        //} else {
-        //    nodeMarkup = <span className="total-nodes">on 1 node</span>;
-        //}
         if (this.state.nodeCount === 0) {
             return (
                 <span>
@@ -63,7 +57,6 @@ var Throughput = React.createClass({
                 </span>
             );
         }
-        // TODO use numeral for formatting large numbers
         return (
             <span>
                 In <strong className="total-throughput">{numeral(this.state.totalIn).format('0,0')}</strong> / Out <strong className="total-throughput">{numeral(this.state.totalOut).format('0,0')}</strong> msg/s
