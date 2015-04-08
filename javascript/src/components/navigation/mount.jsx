@@ -10,6 +10,5 @@ React.render(
         requestPath={elem.getAttribute("data-request-path")}
         permissions={elem.getAttribute("data-permissions")}
         loginName={elem.getAttribute("data-login-name")}
-        fullName={elem.getAttribute("data-full-name")}/>
-    , elem);
+        fullName={elem.getAttribute("data-full-name")}/>, elem);
 

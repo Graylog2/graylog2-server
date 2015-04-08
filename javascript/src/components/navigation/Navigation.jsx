@@ -1,3 +1,5 @@
+/* global jsRoutes */
+
 'use strict';
 
 var React = require('react');
@@ -64,7 +66,7 @@ var Navigation = React.createClass({
                 </Nav>
 
                 <Nav right>
-                    <NavItem href={jsRoutes.controllers.SystemController.index(0).url}>
+                    <NavItem href={jsRoutes.controllers.NodesController.nodes().url}>
                         <Throughput />
                     </NavItem>
                     <UserMenu fullName={this.props.fullName} loginName={this.props.loginName}/>
