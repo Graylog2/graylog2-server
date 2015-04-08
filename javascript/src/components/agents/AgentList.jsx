@@ -41,7 +41,7 @@ var AgentList = React.createClass({
         var field1 = sort(agent1);
         var field2 = sort(agent2);
         if (typeof(field1) === "number") {
-            return field1 - field2;
+            return field2 - field1;
         } else {
             return field1.localeCompare(field2);
         }
@@ -59,6 +59,7 @@ var AgentList = React.createClass({
                     var agentClass = agent.active ? "" : "greyedOut inactive";
                     var style = {}; //agent.active ? {} : {display: 'none'};
                     var annotation = agent.active ? "" : "(inactive)";
+                    var osGlyph = this._getOsGlyph(agent.node_details.operating_system);
                     return (
                         <tr className={agentClass} style={style}>
                             <td className="limited">
@@ -69,10 +70,11 @@ var AgentList = React.createClass({
                                 {agent.node_id}
                             </td>
                             <td className="limited">
+                                {osGlyph}
                                 {agent.node_details.operating_system}
                             </td>
                             <td className="limited">
-                                {agent.last_seen}
+                                {moment(agent.last_seen).fromNow()}
                             </td>
                             <td className="limited">
                             </td>
@@ -131,6 +133,21 @@ var AgentList = React.createClass({
     sortByLastSeen() {
         this.setState({sort: (agent) => {return agent.last_seen}});
     },
+    _getOsGlyph(operatingSystem) {
+        var glyphClass = "fa-question-circle";
+        var os = operatingSystem.trim().toLowerCase();
+        if (os.indexOf("mac os") > -1) {
+            glyphClass = "fa-apple";
+        }
+        if (os.indexOf("linux") > -1) {
+            glyphClass = "fa-linux";
+        }
+        if (os.indexOf("win") > -1) {
+            glyphClass = "fa-windows";
+        }
+
+        return (<i className={"fa " + glyphClass}></i>);
+    }
 });
 
 module.exports = AgentList;
