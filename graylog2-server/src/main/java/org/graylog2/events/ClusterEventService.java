@@ -197,7 +197,12 @@ public class ClusterEventService extends AbstractExecutionThreadService {
 
         final String className = event.getClass().getCanonicalName();
         final ClusterEvent clusterEvent = ClusterEvent.create(nodeId.toString(), className, event);
-        final String id = dbCollection.save(clusterEvent).getSavedId();
-        LOG.debug("Published cluster event with ID <{}> and type <{}>", id, className);
+
+        try {
+            final String id = dbCollection.save(clusterEvent).getSavedId();
+            LOG.debug("Published cluster event with ID <{}> and type <{}>", id, className);
+        } catch (MongoException e) {
+            LOG.error("Couldn't publish cluster event of type <" + className + ">", e);
+        }
     }
 }
