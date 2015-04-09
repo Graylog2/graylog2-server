@@ -16,7 +16,6 @@
  */
 package org.graylog2.events;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.eventbus.DeadEvent;
@@ -31,6 +30,7 @@ import com.mongodb.Bytes;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
+import com.mongodb.MongoException;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.plugin.system.NodeId;
@@ -45,7 +45,6 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -92,14 +91,23 @@ public class ClusterEventService extends AbstractExecutionThreadService {
     static DBCollection prepareCollection(final MongoConnection mongoConnection) {
         final DB db = mongoConnection.getDatabase();
 
-        final DBCollection coll;
+        DBCollection coll;
         if (!db.collectionExists(COLLECTION_NAME)) {
             final DBObject options = BasicDBObjectBuilder.start()
                     .add("capped", true)
                     .add("size", 32768)
                     .get();
 
-            coll = db.createCollection(COLLECTION_NAME, options);
+            try {
+                coll = db.createCollection(COLLECTION_NAME, options);
+            } catch (MongoException e) {
+                // Error code 48 == "collection already exists"
+                if(e.getCode() == 48) {
+                    coll = db.getCollection(COLLECTION_NAME);
+                } else {
+                    throw e;
+                }
+            }
         } else {
             coll = db.getCollection(COLLECTION_NAME);
         }
