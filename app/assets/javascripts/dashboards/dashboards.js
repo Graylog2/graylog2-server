@@ -13,35 +13,42 @@ $(document).ready(function() {
         }
     });
 
+    function updateWidgetPositions() {
+        var positions = dashboardGrid.serialize();
+        var dashboardId = $(".gridster").attr("data-dashboard-id");
+
+        var payload = {
+            positions: positions
+        };
+
+        $.ajax({
+            url: appPrefixed('/a/dashboards/' + dashboardId + '/positions'),
+            type: 'POST',
+            data: JSON.stringify(payload),
+            processData: false,
+            contentType: 'application/json',
+            success: function (data) {
+                // not doing anything here for now. no need to notify user about success IMO
+            },
+            error: function (data) {
+                showError("Could not save widget positions.");
+            }
+        });
+    }
+
     var initializeDashboard = function() {
         dashboardGrid = $(".gridster ul").gridster({
             widget_margins: [10, 10],
             widget_base_dimensions: [410, 170],
             resize: {
-                enabled: true
+                enabled: true,
+                stop: function() {
+                    updateWidgetPositions();
+                }
             },
             draggable: {
                 stop: function() {
-                    var positions = this.serialize();
-                    var dashboardId = $(".gridster").attr("data-dashboard-id");
-
-                    var payload = {
-                        positions: positions
-                    };
-
-                    $.ajax({
-                        url: appPrefixed('/a/dashboards/' + dashboardId + '/positions'),
-                        type: 'POST',
-                        data: JSON.stringify(payload),
-                        processData: false,
-                        contentType: 'application/json',
-                        success: function(data) {
-                            // not doing anything here for now. no need to notify user about success IMO
-                        },
-                        error: function(data) {
-                            showError("Could not save widget positions.");
-                        }
-                    });
+                    updateWidgetPositions();
                 }
             },
             serialize_params: function(widgetListItem, pos) {
@@ -169,7 +176,7 @@ $(document).ready(function() {
             url: appPrefixed('/a/dashboards/' + widget.attr("data-dashboard-id") + '/widgets/' + widget.attr("data-widget-id") + '/delete'),
             type: 'POST',
             success: function() {
-                showSuccess("Widget has been removed from dashboard!")
+                showSuccess("Widget has been removed from dashboard!");
                 widget.parent().remove();
                 location.reload();
             },
