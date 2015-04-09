@@ -43,9 +43,13 @@ public abstract class AgentImpl implements Agent {
     @JsonProperty("node_details")
     public abstract AgentNodeDetails getNodeDetails();
 
+    @JsonProperty("agent_version")
+    public abstract String getAgentVersion();
+
     @Override
     public AgentSummary toSummary(Function<Agent, Boolean> isActiveFunction) {
-        return AgentSummary.create(getId(), getNodeId(), getNodeDetails().toSummary(), getLastSeen(), isActiveFunction.apply(this));
+        return AgentSummary.create(getId(), getNodeId(), getNodeDetails().toSummary(),
+                getLastSeen(), getAgentVersion(), isActiveFunction.apply(this));
     }
 
     @Override
@@ -63,11 +67,12 @@ public abstract class AgentImpl implements Agent {
                                    @JsonProperty("id") String id,
                                    @JsonProperty("node_id") String nodeId,
                                    @JsonProperty("node_details") AgentNodeDetails agentNodeDetails,
+                                   @JsonProperty("agent_version") String agentVersion,
                                    @JsonProperty("last_seen") DateTime lastSeen) {
-        return new AutoValue_AgentImpl(id, nodeId, agentNodeDetails, lastSeen);
+        return new AutoValue_AgentImpl(id, nodeId, agentNodeDetails, agentVersion, lastSeen);
     }
 
-    public static AgentImpl create(String agentId, String nodeId, AgentNodeDetails agentNodeDetails, DateTime lastSeen) {
-        return new AutoValue_AgentImpl(agentId, nodeId, agentNodeDetails, lastSeen);
+    public static AgentImpl create(String agentId, String nodeId, String agentVersion, AgentNodeDetails agentNodeDetails, DateTime lastSeen) {
+        return new AutoValue_AgentImpl(agentId, nodeId, agentNodeDetails, agentVersion, lastSeen);
     }
 }

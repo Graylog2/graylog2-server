@@ -36,6 +36,9 @@ public interface Agent {
     String getOperatingSystem();
 
     @NotNull
+    String getAgentVersion();
+
+    @NotNull
     @Past
     DateTime getLastSeen();
 

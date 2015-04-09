@@ -30,5 +30,5 @@ public interface AgentService {
     int destroy(Agent agent);
     int destroyExpired(int time, TimeUnit unit);
 
-    Agent fromRequest(AgentRegistrationRequest request);
+    Agent fromRequest(AgentRegistrationRequest request, String agentVersion);
 }

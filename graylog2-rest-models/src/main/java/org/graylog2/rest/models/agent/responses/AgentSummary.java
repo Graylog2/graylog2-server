@@ -39,6 +39,9 @@ public abstract class AgentSummary {
     @JsonProperty("last_seen")
     public abstract DateTime lastSeen();
 
+    @JsonProperty("agent_version")
+    public abstract String agentVersion();
+
     @JsonProperty
     public abstract boolean active();
 
@@ -47,7 +50,8 @@ public abstract class AgentSummary {
                                       @JsonProperty("node_id") String nodeId,
                                       @JsonProperty("node_details") AgentNodeDetailsSummary nodeDetails,
                                       @JsonProperty("last_seen") DateTime lastSeen,
+                                      @JsonProperty("agent_version") String agentVersion,
                                       @JsonProperty("active") boolean active) {
-        return new AutoValue_AgentSummary(id, nodeId, nodeDetails, lastSeen, active);
+        return new AutoValue_AgentSummary(id, nodeId, nodeDetails, lastSeen, agentVersion, active);
     }
 }

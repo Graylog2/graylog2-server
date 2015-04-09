@@ -31,6 +31,7 @@ import javax.inject.Inject;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -58,8 +59,9 @@ public class AgentRegistrationResource extends RestResource {
             @ApiResponse(code = 400, message = "The supplied request is not valid.")
     })
     public Response register(@ApiParam(name = "JSON body", required = true)
-                             @Valid @NotNull AgentRegistrationRequest request) {
-        final Agent agent = agentService.fromRequest(request);
+                             @Valid @NotNull AgentRegistrationRequest request,
+                             @HeaderParam(value = "X-Graylog-Agent-Version") String agentVersion) {
+        final Agent agent = agentService.fromRequest(request, agentVersion);
 
         agentService.save(agent);
 

@@ -103,8 +103,8 @@ public class AgentServiceImpl implements AgentService {
     }
 
     @Override
-    public Agent fromRequest(AgentRegistrationRequest request) {
-        return AgentImpl.create(request.id(), request.nodeId(), AgentNodeDetails.create(request.nodeDetails().operatingSystem()), DateTime.now());
+    public Agent fromRequest(AgentRegistrationRequest request, String agentVersion) {
+        return AgentImpl.create(request.id(), request.nodeId(), agentVersion, AgentNodeDetails.create(request.nodeDetails().operatingSystem()), DateTime.now());
     }
 
     private List<Agent> toAbstractListType(DBCursor<AgentImpl> agents) {

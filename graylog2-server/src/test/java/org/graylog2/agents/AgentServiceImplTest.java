@@ -83,7 +83,7 @@ public class AgentServiceImplTest {
     @ShouldMatchDataSet(location = "agentsSingleDataset.json")
     @IgnorePropertyValue(properties = {"_id", "last_seen"})
     public void testSaveFirstRecord() throws Exception {
-        final Agent agent = AgentImpl.create("agentId", "nodeId", AgentNodeDetails.create("DummyOS 1.0"), DateTime.now());
+        final Agent agent = AgentImpl.create("agentId", "nodeId", "0.0.1", AgentNodeDetails.create("DummyOS 1.0"), DateTime.now());
 
         final Agent result = this.agentService.save(agent);
 

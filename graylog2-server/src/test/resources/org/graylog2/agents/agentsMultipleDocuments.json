@@ -1,7 +1,7 @@
 {
 "agents" : [
-{"id" : "agent1id", "node_id" : "uniqueid1", "node_details" : { "operating_system" : "DummyOS 1.0"}, "last_seen" : "2015-04-01T11:50:20.195Z"},
-{"id" : "agent2id", "node_id" : "uniqueid2", "node_details" : { "operating_system" : "DummyOS 1.0"}, "last_seen" : "2015-04-01T11:50:20.195Z"},
-{"id" : "agent3id", "node_id" : "uniqueid3", "node_details" : { "operating_system" : "DummyOS 1.0"}, "last_seen" : "2015-04-01T11:50:20.195Z"}
+{"id" : "agent1id", "node_id" : "uniqueid1", "agent_version" : "0.0.1", "node_details" : { "operating_system" : "DummyOS 1.0"}, "last_seen" : "2015-04-01T11:50:20.195Z"},
+{"id" : "agent2id", "node_id" : "uniqueid2", "agent_version" : "0.0.1", "node_details" : { "operating_system" : "DummyOS 1.0"}, "last_seen" : "2015-04-01T11:50:20.195Z"},
+{"id" : "agent3id", "node_id" : "uniqueid3", "agent_version" : "0.0.1", "node_details" : { "operating_system" : "DummyOS 1.0"}, "last_seen" : "2015-04-01T11:50:20.195Z"}
 ]
 }
