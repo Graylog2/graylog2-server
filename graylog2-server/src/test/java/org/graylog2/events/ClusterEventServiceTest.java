@@ -37,6 +37,7 @@ import com.mongodb.BasicDBObjectBuilder;
 import com.mongodb.Bytes;
 import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
+import com.mongodb.WriteConcern;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.MongoConnectionRule;
@@ -289,12 +290,12 @@ public class ClusterEventServiceTest {
         assertThat(original.getName()).isEqualTo(ClusterEventService.COLLECTION_NAME);
         assertThat(original.getIndexInfo()).hasSize(1);
 
-
         DBCollection collection = ClusterEventService.prepareCollection(mongoConnection);
         assertThat(collection.getName()).isEqualTo(ClusterEventService.COLLECTION_NAME);
         assertThat(collection.getIndexInfo()).hasSize(3);
         assertThat(collection.getOptions() & Bytes.QUERYOPTION_AWAITDATA).isEqualTo(Bytes.QUERYOPTION_AWAITDATA);
         assertThat(collection.getOptions() & Bytes.QUERYOPTION_TAILABLE).isEqualTo(Bytes.QUERYOPTION_TAILABLE);
+        assertThat(collection.getWriteConcern()).isEqualTo(WriteConcern.MAJORITY);
     }
 
     @Test
@@ -307,6 +308,7 @@ public class ClusterEventServiceTest {
         assertThat(collection.getIndexInfo()).hasSize(3);
         assertThat(collection.getOptions() & Bytes.QUERYOPTION_AWAITDATA).isEqualTo(Bytes.QUERYOPTION_AWAITDATA);
         assertThat(collection.getOptions() & Bytes.QUERYOPTION_TAILABLE).isEqualTo(Bytes.QUERYOPTION_TAILABLE);
+        assertThat(collection.getWriteConcern()).isEqualTo(WriteConcern.MAJORITY);
     }
 
     public static class SimpleEventHandler {

@@ -31,6 +31,7 @@ import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
 import com.mongodb.MongoException;
+import com.mongodb.WriteConcern;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.plugin.system.NodeId;
@@ -121,6 +122,8 @@ public class ClusterEventService extends AbstractExecutionThreadService {
         coll.createIndex(DBSort.asc("consumers"));
         coll.addOption(Bytes.QUERYOPTION_TAILABLE | Bytes.QUERYOPTION_AWAITDATA);
 
+        coll.setWriteConcern(WriteConcern.MAJORITY);
+
         return coll;
     }
 
@@ -142,6 +145,7 @@ public class ClusterEventService extends AbstractExecutionThreadService {
     }
 
     private void updateConsumers(final String eventId, final NodeId nodeId) {
+
         final WriteResult<ClusterEvent, String> writeResult = dbCollection.updateById(eventId, DBUpdate.addToSet("consumers", nodeId.toString()));
     }
 
