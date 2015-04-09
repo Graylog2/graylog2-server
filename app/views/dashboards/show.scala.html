@@ -7,6 +7,16 @@
 @import org.graylog2.restclient.models.dashboards.Dashboard
 @import org.graylog2.restclient.models.dashboards.widgets._
 
+@sortedDashboards = @{
+    dashboard.getWidgets.values().toSeq.sortWith((d1, d2) => {
+        if (d1.getCol == d2.getCol) {
+            d1.getRow < d2.getRow
+        } else {
+            d1.getCol < d2.getCol
+        }
+    })
+}
+
 @main(dashboard.getTitle, null, "", currentUser, false) {
     @views.html.partials.breadcrumbs(breadcrumbs)
     <div class="row content content-head">
@@ -62,7 +72,7 @@
             <div class="dashboard">
                 <div class="gridster" data-dashboard-id="@dashboard.getId">
                     <ul>
-                    @for(widget <- dashboard.getWidgets.values()) {
+                    @for(widget <- sortedDashboards) {
                         @if(Try(currentUser.getPreferences.get("enableNewWidgets").toString.toBoolean).getOrElse(true)) {
                             <li data-row="@widget.getRow" data-col="@widget.getCol" data-sizex="@widget.getWidth" data-sizey="@widget.getHeight">
                                 <div class="react-widget" data-dashboard-id="@widget.getDashboard.getId"
