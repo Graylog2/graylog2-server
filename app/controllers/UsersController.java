@@ -172,7 +172,7 @@ public class UsersController extends AuthenticatedController {
         User user = userService.load(username);
         if (user != null) {
             Map<String, Object> result = Maps.newHashMap();
-            result.put("preferences", initDefaultPreferences(user.getPreferences()));
+            result.put("preferences", user.getPreferences());
             // TODO: there is more than preferences
             return ok(Json.toJson(result));
         } else {
@@ -194,19 +194,6 @@ public class UsersController extends AuthenticatedController {
             // TODO: Really?
             return notFound();
         }
-    }
-
-    private Map<String, Object> initDefaultPreferences(Map<String, Object> preferences) {
-        Map<String, Object> effectivePreferences = Maps.newHashMap();
-        // TODO: Move defaults into a static map once we have more preferences
-        effectivePreferences.put("updateUnfocussed", false);
-        effectivePreferences.put("disableExpensiveUpdates", false);
-        effectivePreferences.put("enableSmartSearch", false);
-        effectivePreferences.put("enableNewWidgets", true);
-        if (preferences != null) {
-            effectivePreferences.putAll(preferences);
-        }
-        return effectivePreferences;
     }
 
     private Map<String, Object> normalizePreferences(Map<String, Object> preferences) {
