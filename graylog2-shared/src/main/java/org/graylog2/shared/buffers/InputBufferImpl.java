@@ -16,6 +16,7 @@
  */
 package org.graylog2.shared.buffers;
 
+import com.codahale.metrics.Gauge;
 import com.codahale.metrics.InstrumentedExecutorService;
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
@@ -24,6 +25,7 @@ import com.lmax.disruptor.RingBuffer;
 import com.lmax.disruptor.dsl.Disruptor;
 import com.lmax.disruptor.dsl.ProducerType;
 import org.graylog2.plugin.BaseConfiguration;
+import org.graylog2.plugin.GlobalMetricNames;
 import org.graylog2.plugin.buffers.InputBuffer;
 import org.graylog2.plugin.journal.RawMessage;
 import org.slf4j.Logger;
@@ -37,6 +39,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 
 import static com.codahale.metrics.MetricRegistry.name;
+import static org.graylog2.shared.metrics.MetricUtils.constantGauge;
+import static org.graylog2.shared.metrics.MetricUtils.safelyRegister;
 
 
 @Singleton
@@ -82,12 +86,19 @@ public class InputBufferImpl implements InputBuffer {
         ringBuffer = disruptor.start();
 
         incomingMessages = metricRegistry.meter(name(InputBufferImpl.class, "incomingMessages"));
+        safelyRegister(metricRegistry, GlobalMetricNames.INPUT_BUFFER_USAGE, new Gauge<Long>() {
+            @Override
+            public Long getValue() {
+                return InputBufferImpl.this.getUsage();
+            }
+        });
+        safelyRegister(metricRegistry, GlobalMetricNames.INPUT_BUFFER_SIZE, constantGauge(ringBuffer.getBufferSize()));
 
         LOG.info("Initialized {} with ring size <{}> and wait strategy <{}>, running {} parallel message handlers.",
-                this.getClass().getSimpleName(),
-                configuration.getInputBufferRingSize(),
-                configuration.getInputBufferWaitStrategy().getClass().getSimpleName(),
-                numberOfHandlers);
+                 this.getClass().getSimpleName(),
+                 configuration.getInputBufferRingSize(),
+                 configuration.getInputBufferWaitStrategy().getClass().getSimpleName(),
+                 numberOfHandlers);
     }
 
     public void insert(RawMessage message) {
@@ -96,7 +107,7 @@ public class InputBufferImpl implements InputBuffer {
     }
 
     @Override
-    public long size() {
+    public long getUsage() {
         return ringBuffer.getBufferSize() - ringBuffer.remainingCapacity();
     }
 

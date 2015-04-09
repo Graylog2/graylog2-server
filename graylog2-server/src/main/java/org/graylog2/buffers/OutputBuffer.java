@@ -16,16 +16,16 @@
  */
 package org.graylog2.buffers;
 
+import com.codahale.metrics.Gauge;
 import com.codahale.metrics.InstrumentedExecutorService;
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import javax.inject.Provider;
-import javax.inject.Named;
 import com.lmax.disruptor.WaitStrategy;
 import com.lmax.disruptor.dsl.Disruptor;
 import com.lmax.disruptor.dsl.ProducerType;
 import org.graylog2.buffers.processors.OutputBufferProcessor;
+import org.graylog2.plugin.GlobalMetricNames;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.buffers.Buffer;
 import org.graylog2.plugin.buffers.MessageEvent;
@@ -34,12 +34,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 
 import static com.codahale.metrics.MetricRegistry.name;
+import static org.graylog2.shared.metrics.MetricUtils.constantGauge;
+import static org.graylog2.shared.metrics.MetricUtils.safelyRegister;
 
 @Singleton
 public class OutputBuffer extends Buffer {
@@ -57,6 +61,14 @@ public class OutputBuffer extends Buffer {
         this.ringBufferSize = ringSize;
 
         incomingMessages = metricRegistry.meter(name(OutputBuffer.class, "incomingMessages"));
+
+        safelyRegister(metricRegistry, GlobalMetricNames.OUTPUT_BUFFER_USAGE, new Gauge<Long>() {
+            @Override
+            public Long getValue() {
+                return OutputBuffer.this.getUsage();
+            }
+        });
+        safelyRegister(metricRegistry,GlobalMetricNames.OUTPUT_BUFFER_SIZE, constantGauge(ringBufferSize));
 
         final WaitStrategy waitStrategy = getWaitStrategy(waitStrategyName, "processor_wait_strategy");
         final Disruptor<MessageEvent> disruptor = new Disruptor<>(

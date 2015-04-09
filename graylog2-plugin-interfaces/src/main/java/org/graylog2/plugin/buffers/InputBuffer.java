@@ -27,5 +27,5 @@ import org.graylog2.plugin.journal.RawMessage;
 public interface InputBuffer {
     public abstract void insert(RawMessage message);
 
-    public long size();
+    public long getUsage();
 }

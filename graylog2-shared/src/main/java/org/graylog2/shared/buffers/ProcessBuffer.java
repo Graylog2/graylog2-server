@@ -16,6 +16,7 @@
  */
 package org.graylog2.shared.buffers;
 
+import com.codahale.metrics.Gauge;
 import com.codahale.metrics.InstrumentedExecutorService;
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
@@ -24,12 +25,14 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.lmax.disruptor.WaitStrategy;
 import com.lmax.disruptor.dsl.Disruptor;
 import com.lmax.disruptor.dsl.ProducerType;
+import org.graylog2.plugin.GlobalMetricNames;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.buffers.Buffer;
 import org.graylog2.plugin.buffers.MessageEvent;
 import org.graylog2.plugin.journal.RawMessage;
 import org.graylog2.shared.buffers.processors.DecodingProcessor;
 import org.graylog2.shared.buffers.processors.ProcessBufferProcessor;
+import org.graylog2.shared.metrics.MetricUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,6 +45,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 
 import static com.codahale.metrics.MetricRegistry.name;
+import static org.graylog2.shared.metrics.MetricUtils.constantGauge;
+import static org.graylog2.shared.metrics.MetricUtils.safelyRegister;
 
 public class ProcessBuffer extends Buffer {
     private final Timer parseTime;
@@ -71,6 +76,14 @@ public class ProcessBuffer extends Buffer {
 
         this.parseTime = metricRegistry.timer(name(ProcessBuffer.class, "parseTime"));
         this.decodeTime = metricRegistry.timer(name(ProcessBuffer.class, "decodeTime"));
+
+        MetricUtils.safelyRegister(metricRegistry, GlobalMetricNames.PROCESS_BUFFER_USAGE, new Gauge<Long>() {
+            @Override
+            public Long getValue() {
+                return ProcessBuffer.this.getUsage();
+            }
+        });
+        safelyRegister(metricRegistry, GlobalMetricNames.PROCESS_BUFFER_SIZE, constantGauge(ringBufferSize));
 
         if (serverStatus.hasCapability(ServerStatus.Capability.RADIO)) {
             SOURCE_INPUT_ATTR_NAME = "gl2_source_radio_input";
