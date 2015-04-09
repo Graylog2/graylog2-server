@@ -105,6 +105,8 @@ public class Dashboard {
             position.id = userPosition.id;
             position.col = userPosition.col;
             position.row = userPosition.row;
+            position.height = userPosition.size_y;
+            position.width = userPosition.size_x;
 
             req.positions.add(position);
         }

@@ -16,13 +16,12 @@
  */
 package org.graylog2.restclient.models.api.requests.dashboards;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public class WidgetPositionRequest {
 
     public String id;
     public int col;
     public int row;
+    public int height;
+    public int width;
 
 }

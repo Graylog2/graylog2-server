@@ -48,11 +48,19 @@ public abstract class WidgetPositions {
         @JsonProperty
         public abstract int row();
 
+        @JsonProperty
+        public abstract int height();
+
+        @JsonProperty
+        public abstract int width();
+
         @JsonCreator
         public static WidgetPosition create(@JsonProperty("id") @NotEmpty String id,
                                             @JsonProperty("col") @Min(0) int col,
-                                            @JsonProperty("row") @Min(0) int row) {
-            return new AutoValue_WidgetPositions_WidgetPosition(id, col, row);
+                                            @JsonProperty("row") @Min(0) int row,
+                                            @JsonProperty("height") @Min(0) int height,
+                                            @JsonProperty("width") @Min(0) int width) {
+            return new AutoValue_WidgetPositions_WidgetPosition(id, col, row, height, width);
         }
     }
 }

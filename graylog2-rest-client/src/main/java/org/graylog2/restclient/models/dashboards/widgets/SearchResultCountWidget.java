@@ -24,8 +24,8 @@ import java.util.Map;
 
 public class SearchResultCountWidget extends DashboardWidget {
 
-    private static final int WIDTH = 1;
-    private static final int HEIGHT = 1;
+    private static final int DEFAULT_WIDTH = 1;
+    private static final int DEFAULT_HEIGHT = 1;
 
     private final Boolean trend;
     private final Boolean lowerIsBetter;
@@ -62,12 +62,14 @@ public class SearchResultCountWidget extends DashboardWidget {
 
     @Override
     public int getWidth() {
-        return WIDTH;
+        int storedWidth = super.getWidth();
+        return storedWidth == 0 ? DEFAULT_WIDTH : storedWidth;
     }
 
     @Override
     public int getHeight() {
-        return HEIGHT;
+        int storedHeight = super.getHeight();
+        return storedHeight == 0 ? DEFAULT_HEIGHT : storedHeight;
     }
 
     @Override
