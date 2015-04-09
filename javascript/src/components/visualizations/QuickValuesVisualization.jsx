@@ -146,8 +146,6 @@ var QuickValuesVisualization = React.createClass({
                         <div className="col-md-12">
                             <div ref="graph" className="quickvalues-graph"/>
                         </div>
-                    </div>
-                    <div className="row">
                         <div className="col-md-12">
                             <div className="quickvalues-table">
                                 <table ref="table" className="table table-condensed table-striped table-hover">
