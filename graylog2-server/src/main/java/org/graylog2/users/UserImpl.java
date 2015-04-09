@@ -45,6 +45,13 @@ import static com.google.common.base.Strings.nullToEmpty;
 public class UserImpl extends PersistedImpl implements User {
     private static final Logger LOG = LoggerFactory.getLogger(UserImpl.class);
 
+    private static final Map<String, Object> DEFAULT_PREFERENCES = new ImmutableMap.Builder<String, Object>()
+            .put("updateUnfocussed", false)
+            .put("disableExpensiveUpdates", false)
+            .put("enableSmartSearch", true)
+            .put("enableNewWidgets", true)
+            .build();
+
     public static final String USERNAME = "username";
     public static final String PASSWORD = "password";
     public static final String EMAIL = "email";
@@ -133,7 +140,9 @@ public class UserImpl extends PersistedImpl implements User {
     @Override
     @SuppressWarnings("unchecked")
     public Map<String, Object> getPreferences() {
-        return (Map<String, Object>) fields.get(PREFERENCES);
+        final Map<String, Object> preferences = (Map<String, Object>) fields.get(PREFERENCES);
+
+        return (preferences == null || preferences.isEmpty()) ? DEFAULT_PREFERENCES : preferences;
     }
 
     @Override
@@ -297,7 +306,7 @@ public class UserImpl extends PersistedImpl implements User {
 
         @Override
         public Map<String, Object> getPreferences() {
-            return Collections.emptyMap();
+            return DEFAULT_PREFERENCES;
         }
 
         @Override

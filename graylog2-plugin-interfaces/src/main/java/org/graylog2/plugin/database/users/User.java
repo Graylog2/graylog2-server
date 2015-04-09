@@ -44,9 +44,6 @@ import org.joda.time.DateTimeZone;
 import java.util.List;
 import java.util.Map;
 
-/**
- * @author Dennis Oelkers <dennis@torch.sh>
- */
 public interface User extends Persisted {
     boolean isReadOnly();
 
