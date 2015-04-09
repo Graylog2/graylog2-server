@@ -16,15 +16,20 @@
  */
 package org.graylog2.restclient.models.dashboards;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
+import org.graylog2.rest.models.dashboards.requests.WidgetPositionsRequest;
 import org.graylog2.restclient.lib.APIException;
 import org.graylog2.restclient.lib.ApiClient;
 import org.graylog2.restclient.lib.timeranges.InvalidRangeParametersException;
 import org.graylog2.restclient.models.User;
 import org.graylog2.restclient.models.UserService;
-import org.graylog2.restclient.models.api.requests.dashboards.*;
+import org.graylog2.restclient.models.api.requests.dashboards.AddWidgetRequest;
+import org.graylog2.restclient.models.api.requests.dashboards.UpdateDashboardRequest;
+import org.graylog2.restclient.models.api.requests.dashboards.UserSetWidgetPositionsRequest;
+import org.graylog2.restclient.models.api.requests.dashboards.UserWidgetPositionRequest;
 import org.graylog2.restclient.models.api.responses.dashboards.DashboardSummaryResponse;
 import org.graylog2.restclient.models.api.responses.dashboards.DashboardWidgetResponse;
 import org.graylog2.restclient.models.api.responses.dashboards.WidgetPositionResponse;
@@ -39,6 +44,9 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static org.graylog2.rest.models.dashboards.requests.WidgetPositionsRequest.WidgetPosition;
+import static org.graylog2.rest.models.dashboards.requests.WidgetPositionsRequest.create;
 
 public class Dashboard {
 
@@ -97,22 +105,25 @@ public class Dashboard {
                 .execute();
     }
 
-    public void setWidgetPositions(List<UserWidgetPositionRequest> positions) throws APIException, IOException {
-        SetWidgetPositionsRequest req = new SetWidgetPositionsRequest();
+    public void setWidgetPositions(UserSetWidgetPositionsRequest request) throws APIException, IOException {
+        final List<WidgetPosition> positions = Lists.newArrayList();
 
-        for (UserWidgetPositionRequest userPosition : positions) {
-            WidgetPositionRequest position = new WidgetPositionRequest();
-            position.id = userPosition.id;
-            position.col = userPosition.col;
-            position.row = userPosition.row;
-            position.height = userPosition.size_y;
-            position.width = userPosition.size_x;
+        for (UserWidgetPositionRequest userPosition : request.positions) {
+            final WidgetPosition position = WidgetPosition.create(
+                    userPosition.id,
+                    userPosition.col,
+                    userPosition.row,
+                    userPosition.size_y,
+                    userPosition.size_x
+            );
 
-            req.positions.add(position);
+            positions.add(position);
         }
 
+        final WidgetPositionsRequest updatePositionsRequest = create(positions);
+
         api.path(routes.DashboardsResource().setPositions(id))
-                .body(req)
+                .body(updatePositionsRequest)
                 .expect(Http.Status.OK)
                 .execute();
     }

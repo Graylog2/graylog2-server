@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.rest.resources.dashboards.requests;
+package org.graylog2.rest.models.dashboards.requests;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -27,13 +27,13 @@ import java.util.List;
 
 @JsonAutoDetect
 @AutoValue
-public abstract class WidgetPositions {
+public abstract class WidgetPositionsRequest {
     @JsonProperty
     public abstract List<WidgetPosition> positions();
 
     @JsonCreator
-    public static WidgetPositions create(@JsonProperty("positions") @NotEmpty List<WidgetPosition> positions) {
-        return new AutoValue_WidgetPositions(positions);
+    public static WidgetPositionsRequest create(@JsonProperty("positions") @NotEmpty List<WidgetPosition> positions) {
+        return new AutoValue_WidgetPositionsRequest(positions);
     }
 
     @JsonAutoDetect
@@ -60,7 +60,7 @@ public abstract class WidgetPositions {
                                             @JsonProperty("row") @Min(0) int row,
                                             @JsonProperty("height") @Min(0) int height,
                                             @JsonProperty("width") @Min(0) int width) {
-            return new AutoValue_WidgetPositions_WidgetPosition(id, col, row, height, width);
+            return new AutoValue_WidgetPositionsRequest_WidgetPosition(id, col, row, height, width);
         }
     }
 }
