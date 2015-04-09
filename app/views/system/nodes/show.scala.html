@@ -121,44 +121,16 @@
             <h2><i class="fa fa-shield"></i> Buffers</h2>
             <div class="row">
                 <div class="col-md-4">
-                    <a href="@routes.MetricsController.ofNode(node.getNodeId, node.getBufferClasses.inputBuffer)" class="btn btn-default btn-xs pull-right">Metrics</a>
-                    <h3>Input buffer</h3>
-
-                    @defining(node.getBufferInfo.getInputBuffer.utilizationPercent) { utilizationPercent =>
-                        <div class="progress progress-percentage node-buffer-usage">
-                            <div class="progress-bar progress-bar-warning" data-percentage="@utilizationPercent" style="width : @utilizationPercent% ;"><span class="number-format" data-format="0.0%">@utilizationPercent%</span></div>
-                        </div>
-                        <strong><span class="number-format" data-format="0,0">@node.getBufferInfo.getInputBuffer.utilization</span> messages</strong> in input buffer.
-                        (<span class="number-format" data-format="0.0%">@utilizationPercent%</span> utilized)
-                    }
+                    <div class="react-buffer-usage" data-node-id="@node.getNodeId" data-title="Input buffer" data-buffer-type="input"></div>
                 </div>
-
                 <div class="col-md-4">
-                    <a href="@routes.MetricsController.ofNode(node.getNodeId, node.getBufferClasses.processBuffer)" class="btn btn-default btn-xs pull-right">Metrics</a>
-                    <h3>Process buffer</h3>
-
-                    @defining(node.getBufferInfo.getProcessBuffer.utilizationPercent) { utilizationPercent =>
-                        <div class="progress progress-percentage node-buffer-usage">
-                            <div class="progress-bar progress-bar-warning" data-percentage="@utilizationPercent" style="width : @utilizationPercent% ;"><span class="number-format" data-format="0.0%">@utilizationPercent%</span></div>
-                        </div>
-                        <strong><span class="number-format" data-format="0,0">@node.getBufferInfo.getProcessBuffer.utilization</span> messages</strong> in process buffer.
-                        (<span class="number-format" data-format="0.0%">@utilizationPercent%</span> utilized)
-                    }
+                    <div class="react-buffer-usage" data-node-id="@node.getNodeId" data-title="Process buffer" data-buffer-type="process"></div>
                 </div>
-
                 <div class="col-md-4">
-                    <a href="@routes.MetricsController.ofNode(node.getNodeId, node.getBufferClasses.outputBuffer)" class="btn btn-default btn-xs pull-right">Metrics</a>
-                    <h3>Output buffer</h3>
-
-                    @defining(node.getBufferInfo.getOutputBuffer.utilizationPercent) { utilizationPercent =>
-                        <div class="progress progress-percentage node-buffer-usage">
-                            <div class="progress-bar progress-bar-warning" data-percentage="@utilizationPercent" style="width : @utilizationPercent% ;"><span class="number-format" data-format="0.0%">@utilizationPercent%</span></div>
-                        </div>
-                        <strong><span class="number-format" data-format="0,0">@node.getBufferInfo.getOutputBuffer.utilization</span> messages</strong> in output buffer.
-                        (<span class="number-format" data-format="0.0%">@utilizationPercent%</span> utilized)
-                    }
+                    <div class="react-buffer-usage" data-node-id="@node.getNodeId" data-title="Output buffer" data-buffer-type="output"></div>
                 </div>
             </div>
+
             The buffers are built to cache small amounts of messages on their way through the different processors.
         </div>
     </div>
