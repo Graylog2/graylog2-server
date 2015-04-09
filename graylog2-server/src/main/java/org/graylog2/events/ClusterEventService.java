@@ -19,6 +19,7 @@ package org.graylog2.events;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.eventbus.DeadEvent;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.common.util.concurrent.AbstractExecutionThreadService;
@@ -181,6 +182,11 @@ public class ClusterEventService extends AbstractExecutionThreadService {
 
     @Subscribe
     public void publishClusterEvent(Object event) {
+        if(event instanceof DeadEvent) {
+            LOG.debug("Skipping DeadEvent on cluster event bus");
+            return;
+        }
+
         final String className = event.getClass().getCanonicalName();
         final ClusterEvent clusterEvent = ClusterEvent.create(nodeId.toString(), className, event);
         final String id = dbCollection.save(clusterEvent).getSavedId();

@@ -24,6 +24,7 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.datatype.guava.GuavaModule;
 import com.fasterxml.jackson.datatype.joda.JodaModule;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.eventbus.DeadEvent;
 import com.google.common.eventbus.EventBus;
 import com.google.common.util.concurrent.Service;
 import com.google.common.util.concurrent.ServiceManager;
@@ -218,6 +219,20 @@ public class ClusterEventServiceTest {
         @SuppressWarnings("unchecked")
         Map<String, Object> payload = (Map<String, Object>) dbObject.get("payload");
         assertThat(payload).containsEntry("payload", "test");
+    }
+
+    @Test
+    @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
+    public void publishClusterEventSkipsDeadEvent() throws Exception {
+        DBCollection collection = mongoConnection.getDatabase().getCollection(ClusterEventService.COLLECTION_NAME);
+        DeadEvent event = new DeadEvent(clusterEventBus, new SimpleEvent("test"));
+
+        assertThat(collection.count()).isEqualTo(0L);
+
+        clusterEventService.publishClusterEvent(event);
+
+        verify(clusterEventBus, never()).post(any());
+        assertThat(collection.count()).isEqualTo(0L);
     }
 
     @Test
