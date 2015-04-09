@@ -13,6 +13,7 @@ interface Agent {
     node_id: string;
     node_details: NodeDetails;
     last_seen: number;
+    agent_version: String;
 }
 
 var AgentsStore = {
