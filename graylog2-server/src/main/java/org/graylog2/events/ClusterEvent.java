@@ -59,7 +59,7 @@ public abstract class ClusterEvent {
 
     @JsonProperty
     @Nullable
-    public abstract Map<String, Object> payload();
+    public abstract Object payload();
 
 
     @JsonCreator
@@ -68,13 +68,13 @@ public abstract class ClusterEvent {
                                       @JsonProperty("producer") @Nullable String producer,
                                       @JsonProperty("consumers") @Nullable Set<String> consumers,
                                       @JsonProperty("event_class") @Nullable String eventClass,
-                                      @JsonProperty("payload") @Nullable Map<String, Object> payload) {
+                                      @JsonProperty("payload") @Nullable Object payload) {
         return new AutoValue_ClusterEvent(id, date, producer, consumers, eventClass, payload);
     }
 
     public static ClusterEvent create(@NotEmpty String producer,
                                       @NotEmpty String eventClass,
-                                      @NotEmpty Map<String, Object> payload) {
+                                      @NotEmpty Object payload) {
         return new AutoValue_ClusterEvent(null,
                 DateTime.now(DateTimeZone.UTC),
                 producer,
