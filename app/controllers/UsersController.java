@@ -206,8 +206,6 @@ public class UsersController extends AuthenticatedController {
                 normalizedPreferences.put(preference.getKey(), asBoolean(preference.getValue()));
             } else if (preference.getKey().equals("enableSmartSearch")) {
                 normalizedPreferences.put(preference.getKey(), asBoolean(preference.getValue()));
-            } else if (preference.getKey().equals("enableNewWidgets")) {
-                normalizedPreferences.put(preference.getKey(), asBoolean(preference.getValue()));
             }
         }
         return normalizedPreferences;
