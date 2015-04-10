@@ -30,8 +30,7 @@ import org.graylog2.database.PersistedServiceImpl;
 import org.graylog2.indexer.searches.Searches;
 import org.graylog2.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.plugin.database.ValidationException;
-import org.graylog2.rest.models.dashboards.requests.UpdateWidgetRequest;
-import org.graylog2.rest.resources.dashboards.requests.WidgetPositions;
+import org.graylog2.rest.models.dashboards.requests.WidgetPositionsRequest;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -113,13 +112,15 @@ public class DashboardServiceImpl extends PersistedServiceImpl implements Dashbo
     }
 
     @Override
-    public void updateWidgetPositions(Dashboard dashboard, WidgetPositions positions) throws ValidationException {
+    public void updateWidgetPositions(Dashboard dashboard, WidgetPositionsRequest positions) throws ValidationException {
         Map<String, Map<String, Object>> map = Maps.newHashMap();
 
-        for (WidgetPositions.WidgetPosition position : positions.positions()) {
+        for (WidgetPositionsRequest.WidgetPosition position : positions.positions()) {
             Map<String, Object> x = Maps.newHashMap();
             x.put("col", position.col());
             x.put("row", position.row());
+            x.put("height", position.height());
+            x.put("width", position.width());
 
             map.put(position.id(), x);
         }
