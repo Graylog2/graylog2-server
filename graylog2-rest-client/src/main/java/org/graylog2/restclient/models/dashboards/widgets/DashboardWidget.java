@@ -202,6 +202,7 @@ public abstract class DashboardWidget {
                         (String) w.config.get("query"),
                         TimeRange.factory((Map<String, Object>) w.config.get("timerange")),
                         (String) w.config.get("field"),
+                        w.config.get("show_pie_chart") != null && Boolean.parseBoolean(String.valueOf(w.config.get("show_pie_chart"))),
                         w.creatorUserId
                 );
                 break;

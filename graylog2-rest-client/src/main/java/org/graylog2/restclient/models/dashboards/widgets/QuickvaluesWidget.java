@@ -30,14 +30,17 @@ public class QuickvaluesWidget extends DashboardWidget {
     private final String field;
     private final String streamId;
 
+    private final Boolean showPieChart;
+
     public QuickvaluesWidget(Dashboard dashboard, String query, TimeRange timerange, String field, String description, String streamId) {
-        this(dashboard, null, description, streamId, 0, query, timerange, field, null);
+        this(dashboard, null, description, streamId, 0, query, timerange, field, false, null);
     }
 
-    public QuickvaluesWidget(Dashboard dashboard, String id, String description, String streamId, int cacheTime, String query, TimeRange timerange, String field, String creatorUserId) {
+    public QuickvaluesWidget(Dashboard dashboard, String id, String description, String streamId, int cacheTime, String query, TimeRange timerange, String field, boolean showPieChart, String creatorUserId) {
         super(Type.QUICKVALUES, id, description, cacheTime, dashboard, creatorUserId, query, timerange);
 
         this.field = field;
+        this.showPieChart = showPieChart;
 
         if (streamId != null && !streamId.isEmpty()) {
             this.streamId = streamId;
@@ -53,6 +56,7 @@ public class QuickvaluesWidget extends DashboardWidget {
         config.put("query", getQuery());
         config.put("stream_id", streamId);
         config.put("field", field);
+        config.put("show_pie_chart", showPieChart);
 
         return config;
     }
