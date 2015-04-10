@@ -275,7 +275,6 @@ public class Indices implements IndexManagement {
     public void flush(String index) {
         FlushRequest flush = new FlushRequest(index);
         flush.force(true); // Just flushes. Even if it is not necessary.
-        flush.full(false);
 
         c.admin().indices().flush(new FlushRequest(index).force(true)).actionGet();
     }
@@ -398,7 +397,6 @@ public class Indices implements IndexManagement {
         or.maxNumSegments(configuration.getIndexOptimizationMaxNumSegments());
         or.onlyExpungeDeletes(false);
         or.flush(true);
-        or.waitForMerge(true); // This makes us block until the operation finished.
 
         c.admin().indices().optimize(or).actionGet();
     }

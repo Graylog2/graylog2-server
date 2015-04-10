@@ -42,7 +42,7 @@ import org.graylog2.rest.models.dashboards.requests.AddWidgetRequest;
 import org.graylog2.rest.models.dashboards.requests.CreateDashboardRequest;
 import org.graylog2.rest.models.dashboards.requests.UpdateDashboardRequest;
 import org.graylog2.rest.models.dashboards.requests.UpdateWidgetRequest;
-import org.graylog2.rest.resources.dashboards.requests.WidgetPositions;
+import org.graylog2.rest.models.dashboards.requests.WidgetPositionsRequest;
 import org.graylog2.rest.models.dashboards.responses.DashboardList;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.shared.security.RestrictToMaster;
@@ -218,7 +218,7 @@ public class DashboardsResource extends RestResource {
             @ApiParam(name = "dashboardId", required = true)
             @PathParam("dashboardId") String dashboardId,
             @ApiParam(name = "JSON body", required = true)
-            @Valid WidgetPositions uwpr) throws NotFoundException, ValidationException {
+            @Valid WidgetPositionsRequest uwpr) throws NotFoundException, ValidationException {
         checkPermission(RestPermissions.DASHBOARDS_EDIT, dashboardId);
 
         final Dashboard dashboard = dashboardService.load(dashboardId);

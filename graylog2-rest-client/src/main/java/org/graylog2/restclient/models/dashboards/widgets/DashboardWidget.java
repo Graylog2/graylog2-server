@@ -54,6 +54,9 @@ public abstract class DashboardWidget {
     private int col = 1;
     private int row = 1;
 
+    private int height = 0;
+    private int width = 0;
+
     protected DashboardWidget(Type type, String id, String description, int cacheTime, Dashboard dashboard, String query, TimeRange timeRange) {
         this(type, id, description, cacheTime, dashboard, null, query, timeRange);
     }
@@ -95,6 +98,14 @@ public abstract class DashboardWidget {
 
     public void setRow(int row) {
         this.row = row;
+    }
+
+    public void setHeight(int height) {
+        this.height = height;
+    }
+
+    public void setWidth(int width) {
+        this.width = width;
     }
 
     public DashboardWidgetValueResponse getValue(ApiClient api) throws APIException, IOException {
@@ -191,6 +202,7 @@ public abstract class DashboardWidget {
                         (String) w.config.get("query"),
                         TimeRange.factory((Map<String, Object>) w.config.get("timerange")),
                         (String) w.config.get("field"),
+                        w.config.get("show_pie_chart") != null && Boolean.parseBoolean(String.valueOf(w.config.get("show_pie_chart"))),
                         w.creatorUserId
                 );
                 break;
@@ -226,18 +238,24 @@ public abstract class DashboardWidget {
             default:
                 throw new NoSuchWidgetTypeException();
         }
-        // Read and set positions. Defaults to 1, which is then rescued by the JS dashboard library.
+        // Read and set positions. Defaults to 0, which is then rescued by the JS dashboard library.
         if (dashboard.getPositions().containsKey(w.id)) {
             widget.setCol(dashboard.getPositions().get(w.id).col);
             widget.setRow(dashboard.getPositions().get(w.id).row);
+            widget.setHeight(dashboard.getPositions().get(w.id).height);
+            widget.setWidth(dashboard.getPositions().get(w.id).width);
         }
 
         return widget;
     }
 
     public abstract Map<String, Object> getConfig();
-    public abstract int getWidth();
-    public abstract int getHeight();
+    public int getWidth() {
+        return width;
+    };
+    public int getHeight() {
+        return height;
+    };
     public abstract String getStreamId();
 
     /* Indicate if the representation should contain the whole searched time range */

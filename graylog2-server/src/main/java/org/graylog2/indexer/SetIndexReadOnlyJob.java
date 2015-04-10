@@ -69,7 +69,7 @@ public class SetIndexReadOnlyJob extends SystemJob {
         log.info("Setting old index <{}> to read-only.", index);
         indices.setReadOnly(index);
 
-        activityWriter.write(new Activity("Flushed and make <" + index + "> read only.", SetIndexReadOnlyJob.class));
+        activityWriter.write(new Activity("Flushed and set <" + index + "> to read-only.", SetIndexReadOnlyJob.class));
 
         if (!disableIndexOptimization) {
             try {

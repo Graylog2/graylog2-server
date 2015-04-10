@@ -44,6 +44,12 @@ public class DashboardWidget {
     @JsonProperty
     @Min(0)
     private int row = -1;
+    @JsonProperty
+    @Min(0)
+    private int height = 0;
+    @JsonProperty
+    @Min(0)
+    private int width = 0;
 
     public String getDescription() {
         return description;
@@ -91,5 +97,21 @@ public class DashboardWidget {
 
     public void setRow(int row) {
         this.row = row;
+    }
+
+    public int getHeight() {
+        return height;
+    }
+
+    public void setHeight(int height) {
+        this.height = height;
+    }
+
+    public int getWidth() {
+        return width;
+    }
+
+    public void setWidth(int width) {
+        this.width = width;
     }
 }

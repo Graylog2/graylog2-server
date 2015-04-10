@@ -318,13 +318,19 @@ public class BundleExporter {
                 if (widgetPosition != null) {
                     final Integer row = widgetPosition.get("row");
                     final Integer col = widgetPosition.get("col");
+                    final Integer height = widgetPosition.get("height");
+                    final Integer width = widgetPosition.get("width");
                     dashboardWidgetDescription.setRow(row == null ? 0 : row);
                     dashboardWidgetDescription.setCol(col == null ? 0 : col);
+                    dashboardWidgetDescription.setHeight(height == null ? 0 : height);
+                    dashboardWidgetDescription.setWidth(width == null ? 0 : width);
                 } else {
-                    LOG.debug("Couldn't find position for widget {} on dashboard {}, using defaults (0, 0).",
+                    LOG.debug("Couldn't find position for widget {} on dashboard {}, using defaults (0, 0, 0, 0).",
                             widget.getId(), dashboard.getTitle());
                     dashboardWidgetDescription.setRow(0);
                     dashboardWidgetDescription.setCol(0);
+                    dashboardWidgetDescription.setHeight(0);
+                    dashboardWidgetDescription.setWidth(0);
                 }
 
                 dashboardWidgetBuilder.add(dashboardWidgetDescription);

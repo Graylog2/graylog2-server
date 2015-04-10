@@ -35,4 +35,13 @@ public final class GlobalMetricNames {
     public static final String OUTPUT_THROUGHPUT = "org.graylog2.throughput.output";
     public static final String OUTPUT_THROUGHPUT_RATE = name(OUTPUT_THROUGHPUT, RATE_SUFFIX);
 
+    public static final String INPUT_BUFFER_USAGE = "org.graylog2.buffers.input.usage";
+    public static final String INPUT_BUFFER_SIZE = "org.graylog2.buffers.input.size";
+
+    public static final String PROCESS_BUFFER_USAGE = "org.graylog2.buffers.process.usage";
+    public static final String PROCESS_BUFFER_SIZE = "org.graylog2.buffers.process.size";
+
+    public static final String OUTPUT_BUFFER_USAGE = "org.graylog2.buffers.output.usage";
+    public static final String OUTPUT_BUFFER_SIZE = "org.graylog2.buffers.output.size";
+
 }

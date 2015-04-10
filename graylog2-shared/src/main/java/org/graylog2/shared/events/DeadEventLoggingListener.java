@@ -14,22 +14,19 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.restclient.models.api.requests.dashboards;
+package org.graylog2.shared.events;
 
-import com.google.common.collect.Lists;
-import org.graylog2.restclient.models.api.requests.ApiRequest;
+import com.google.common.eventbus.DeadEvent;
+import com.google.common.eventbus.Subscribe;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.util.List;
+public class DeadEventLoggingListener {
+    private static final Logger LOGGER = LoggerFactory.getLogger(DeadEventLoggingListener.class);
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
-public class SetWidgetPositionsRequest extends ApiRequest {
-
-    public List<WidgetPositionRequest> positions;
-
-    public SetWidgetPositionsRequest() {
-        this.positions = Lists.newArrayList();
+    @Subscribe
+    public void handleDeadEvent(DeadEvent event) {
+        LOGGER.debug("Received unhandled event of type <{}>", event.getEvent().getClass().getCanonicalName());
+        LOGGER.trace("Dead event contents: {}", event.getEvent());
     }
-
 }

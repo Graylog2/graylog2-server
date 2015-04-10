@@ -67,10 +67,10 @@ public class BuffersResource extends RestResource {
     public BuffersUtilizationSummary utilization() {
         int ringSize = configuration.getRingSize();
 
-        final long inputSize = processBuffer.size();
+        final long inputSize = processBuffer.getUsage();
         final long inputUtil = inputSize / ringSize * 100;
 
-        final long outputSize = outputBuffer.size();
+        final long outputSize = outputBuffer.getUsage();
         final long outputUtil = outputSize / ringSize * 100;
 
         return BuffersUtilizationSummary.create(

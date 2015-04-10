@@ -16,9 +16,6 @@
  */
 package org.graylog2.restclient.models.api.requests.dashboards;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public class UserWidgetPositionRequest {
 
     public String id;

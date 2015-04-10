@@ -39,15 +39,15 @@ import java.util.List;
 import java.util.Map;
 
 public class User {
-	private static final Logger log = LoggerFactory.getLogger(User.class);
+    private static final Logger log = LoggerFactory.getLogger(User.class);
 
     private final ApiClient api;
     @Deprecated
     private final String id;
     private final String name;
-	private final String email;
-	private final String fullName;
-	private final List<String> permissions;
+    private final String email;
+    private final String fullName;
+    private final List<String> permissions;
     private final String sessionId;
     private final DateTimeZone timezone;
     private final boolean readonly;
@@ -63,7 +63,7 @@ public class User {
         this(api, ur.id, ur.username, ur.email, ur.fullName, ur.permissions, sessionId, ur.timezone, ur.readonly, ur.external, ur.getStartpage(), ur.sessionTimeoutMs, ur.preferences);
     }
 
-	public User(ApiClient api,
+    public User(ApiClient api,
                 String id,
                 String name,
                 String email,
@@ -81,9 +81,9 @@ public class User {
         this.api = api;
         this.id = id;
         this.name = name;
-		this.email = email;
-		this.fullName = fullName;
-		this.permissions = permissions;
+        this.email = email;
+        this.fullName = fullName;
+        this.permissions = permissions;
         this.sessionId = sessionId;
         try {
             if (timezone != null) {
@@ -116,29 +116,30 @@ public class User {
             return false;
         }
     }
+
     @Deprecated
     public String getId() {
         return getName();
     }
 
-	public String getName() {
-		return name;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public String getEmail() {
-		return email;
-	}
+    public String getEmail() {
+        return email;
+    }
 
-	public String getFullName() {
-		return fullName;
-	}
+    public String getFullName() {
+        return fullName;
+    }
 
-	public List<String> getPermissions() {
+    public List<String> getPermissions() {
         if (permissions == null) {
             return Collections.emptyList();
         }
-		return permissions;
-	}
+        return permissions;
+    }
 
     public String getSessionId() {
         return sessionId;
@@ -151,9 +152,9 @@ public class User {
     public boolean updatePassword(ChangePasswordRequest request) {
         try {
             api.path(routes.UsersResource().changePassword(getName()))
-                .body(request)
-                .expect(Http.Status.NO_CONTENT)
-                .execute();
+                    .body(request)
+                    .expect(Http.Status.NO_CONTENT)
+                    .execute();
         } catch (APIException e) {
             log.error("Unable to update password", e);
             return false;

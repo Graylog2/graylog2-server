@@ -18,9 +18,6 @@ package org.graylog2.restclient.models.api.requests.dashboards;
 
 import java.util.List;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public class UserSetWidgetPositionsRequest {
 
     public List<UserWidgetPositionRequest> positions;
