@@ -103,7 +103,7 @@ var WidgetEditConfigModal = React.createClass({
 
         var rangeValueInput;
 
-        switch(this.state.config.range_type) {
+        switch (this.state.config.range_type) {
             case 'relative':
                 rangeValueInput = (
                     <Input type="number"
@@ -155,24 +155,37 @@ var WidgetEditConfigModal = React.createClass({
         );
     },
     _getSpecificConfigurationControls() {
-        var controls;
+        var controls = [];
 
         if (this.state.config.hasOwnProperty("trend")) {
-            controls = (
-                <div>
-                    <Input type="checkbox"
-                           label="Display trend"
-                           defaultChecked={this.state.config.trend}
-                           onChange={this._onConfigurationCheckboxChange("trend")}
-                           help="Show trend information for this number."/>
+            controls.push(
+                <Input key="trend"
+                       type="checkbox"
+                       label="Display trend"
+                       defaultChecked={this.state.config.trend}
+                       onChange={this._onConfigurationCheckboxChange("trend")}
+                       help="Show trend information for this number."/>
+            );
 
-                    <Input type="checkbox"
-                           label="Lower is better"
-                           disabled={this.state.config.trend === false}
-                           defaultChecked={this.state.config.lower_is_better}
-                           onChange={this._onConfigurationCheckboxChange("lower_is_better")}
-                           help="Use green colour when trend goes down."/>
-                </div>
+            controls.push(
+                <Input key="lowerIsBetter"
+                       type="checkbox"
+                       label="Lower is better"
+                       disabled={this.state.config.trend === false}
+                       defaultChecked={this.state.config.lower_is_better}
+                       onChange={this._onConfigurationCheckboxChange("lower_is_better")}
+                       help="Use green colour when trend goes down."/>
+            );
+        }
+
+        if (this.state.config.hasOwnProperty("show_pie_chart")) {
+            controls.push(
+                <Input key="showPieChart"
+                       type="checkbox"
+                       label="Show pie chart"
+                       defaultChecked={this.state.config.show_pie_chart}
+                       onChange={this._onConfigurationCheckboxChange("show_pie_chart")}
+                       help="Represent data in a pie chart"/>
             );
         }
 
