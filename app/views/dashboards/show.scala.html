@@ -7,6 +7,16 @@
 @import org.graylog2.restclient.models.dashboards.Dashboard
 @import org.graylog2.restclient.models.dashboards.widgets._
 
+@sortedDashboards = @{
+    dashboard.getWidgets.values().toSeq.sortWith((d1, d2) => {
+        if(d1.getCol == d2.getCol) {
+            d1.getRow < d2.getRow
+        } else {
+            d1.getCol < d2.getCol
+        }
+    })
+}
+
 @main(dashboard.getTitle, null, "", currentUser, false) {
     @views.html.partials.breadcrumbs(breadcrumbs)
     <div class="row content content-head">
@@ -14,10 +24,10 @@
             <h1>
                 <span data-dashboard-id="@dashboard.getId" class="dashboard-title">@dashboard.getTitle</span>
                 <span class="react-edit-dashboard only-unlocked"
-                      data-dashboard-id="@dashboard.getId"
-                      data-dashboard-title="@dashboard.getTitle"
-                      data-dashboard-description="@dashboard.getDescription"
-                      data-button-class="btn-xs">
+                data-dashboard-id="@dashboard.getId"
+                data-dashboard-title="@dashboard.getTitle"
+                data-dashboard-description="@dashboard.getDescription"
+                data-button-class="btn-xs">
                     <i class="fa fa-pencil"></i>
                 </span>
             </h1>
@@ -28,27 +38,28 @@
 
             @if(!dashboard.getWidgets.isEmpty) {
                 @views.html.partials.support.list() {
-                    Drag widgets to any position you like in <a id="unlock-dashboard" role="button">unlock / edit</a>
+                    Drag widgets to any position you like in <a id="unlock-dashboard" href="#" role="button">
+                        unlock / edit</a>
                     mode.
                 }
             }
         </div>
 
         <div class="col-md-4 actions">
-            @if(!dashboard.getWidgets.isEmpty) {
-                @if(Try(currentUser.getPreferences.get("updateUnfocussed").toString.toBoolean).getOrElse(false)) {
-                    <button id="update-unfocussed" class="btn btn-info" data-update-unfocussed="true">
-                        Update in foreground</button>
-                } else {
-                    <button id="update-unfocussed" class="btn btn-info" data-update-unfocussed="false">
-                        Update in background</button>
-                }
-                <button class="btn btn-info toggle-fullscreen">Fullscreen</button>
-                @if(isPermitted(DASHBOARDS_EDIT, dashboard.getId)) {
-                    <button id="toggle-dashboard-lock" class="btn btn-success" data-locked="true">Unlock / Edit</button>
-                        &nbsp;
-                }
+        @if(!dashboard.getWidgets.isEmpty) {
+            @if(Try(currentUser.getPreferences.get("updateUnfocussed").toString.toBoolean).getOrElse(false)) {
+                <button id="update-unfocussed" class="btn btn-info" data-update-unfocussed="true">
+                    Update in foreground</button>
+            } else {
+                <button id="update-unfocussed" class="btn btn-info" data-update-unfocussed="false">
+                    Update in background</button>
             }
+            <button class="btn btn-info toggle-fullscreen">Fullscreen</button>
+            @if(isPermitted(DASHBOARDS_EDIT, dashboard.getId)) {
+                <button id="toggle-dashboard-lock" class="btn btn-success" data-locked="true">Unlock / Edit</button>
+                    &nbsp;
+            }
+        }
         </div>
     </div>
 
@@ -62,165 +73,17 @@
             <div class="dashboard">
                 <div class="gridster" data-dashboard-id="@dashboard.getId">
                     <ul>
-                    @for(widget <- dashboard.getWidgets.values()) {
-                        @if(Try(currentUser.getPreferences.get("enableNewWidgets").toString.toBoolean).getOrElse(true)) {
-                            <li data-row="@widget.getRow" data-col="@widget.getCol" data-sizex="@widget.getWidth" data-sizey="@widget.getHeight">
-                                <div class="react-widget" data-dashboard-id="@widget.getDashboard.getId"
-                                                          data-widget-id="@widget.getId"></div>
-                            </li>
-                        } else {
-                            <li data-row="@widget.getRow" data-col="@widget.getCol" data-sizex="@widget.getWidth" data-sizey="@widget.getHeight">
-                                <div class="widget" data-cache-time="@widget.getCacheTime"
-                                                    data-widget-type="@widget.getType.toString.toLowerCase"
-                                                    data-dashboard-id="@widget.getDashboard.getId"
-                                                    data-widget-id="@widget.getId"
-                                                    data-fixed-time-axis="@widget.hasFixedTimeAxis">
-
-                                    <div class="pull-left widget-top controls only-unlocked">
-                                        <a href="#" class="remove-widget"><i class="fa fa-remove"></i></a>
-                                    </div>
-
-                                    <div class="pull-left widget-top controls hidden-unlocked widget-top" style="display : block ;">
-                                        <a href="#" class="show-config">
-                                            <i class="fa fa-calendar-o" title="Show widget config"></i>
-                                        </a>
-                                    </div>
-
-                                    <div class="pull-right widget-top info">
-                                        <span class="reloading">&middot;</span>
-                                        <span class="calculated-at hidden-unlocked"></span>
-                                        <span class="cache-info only-unlocked">
-                                            <span class="cache-time">
-                                                <span class="cache-time-value">@widget.getCacheTime</span>
-                                                seconds cached
-                                            </span>
-
-                                            <a href="#" class="edit-cache-time">
-                                                <i class="fa fa-edit"></i>
-                                            </a>
-                                        </span>
-                                    </div>
-
-                                    @if(widget.getType.equals(DashboardWidget.Type.SEARCH_RESULT_COUNT)) {
-                                        @views.html.dashboards.widgets.search_result_count(widget.asInstanceOf[SearchResultCountWidget])
-                                    }
-
-                                    @if(widget.getType.equals(DashboardWidget.Type.STREAM_SEARCH_RESULT_COUNT)) {
-                                        @views.html.dashboards.widgets.search_result_count(widget.asInstanceOf[SearchResultCountWidget])
-                                    }
-
-                                    @if(widget.getType.equals(DashboardWidget.Type.FIELD_CHART)) {
-                                        @views.html.dashboards.widgets.field_chart(widget.asInstanceOf[FieldChartWidget])
-                                    }
-
-                                    @if(widget.getType.equals(DashboardWidget.Type.QUICKVALUES)) {
-                                        @views.html.dashboards.widgets.quickvalues(widget.asInstanceOf[QuickvaluesWidget])
-                                    }
-
-                                    @if(widget.getType.equals(DashboardWidget.Type.SEARCH_RESULT_CHART)) {
-                                        @views.html.dashboards.widgets.search_result_chart(widget.asInstanceOf[SearchResultChartWidget])
-                                    }
-
-                                    @if(widget.getType.equals(DashboardWidget.Type.STATS_COUNT)) {
-                                        @views.html.dashboards.widgets.search_result_count(widget.asInstanceOf[SearchResultCountWidget])
-                                    }
-
-                                </div>
-                            </li>
-                        }
+                    @for(widget <- sortedDashboards) {
+                        <li data-row="@widget.getRow" data-col="@widget.getCol" data-sizex="@widget.getWidth" data-sizey="@widget.getHeight">
+                            <div class="react-widget" data-dashboard-id="@widget.getDashboard.getId"
+                            data-widget-id="@widget.getId"></div>
+                        </li>
                     }
                     </ul>
                 </div>
 
-                <br style="clear: both;" />
+                <br style="clear : both ;" />
             </div>
-        }
-
-        @if(!Try(currentUser.getPreferences.get("enableNewWidgets").toString.toBoolean).getOrElse(true)) {
-            @**************** change cache time modal ****************@
-            <form>
-                <div id="dashboardwidget-cache-time" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
-                                <h2 class="modal-title">Change widget cache time</h2>
-                            </div>
-
-                            <div class="modal-body">
-                                <p>Every widget has a configured cache time. Increasing this cache time leads to less
-                                    search load in the cluster. (minimum is 1 second)</p>
-                                <div class="control-group">
-                                    <label class="control-label" for="cachetime">Seconds</label>
-                                    <div class="controls">
-                                        <span class="help-block">Number of seconds the widget value will be cached</span>
-                                        <input type="text" name="cachetime" class="input-mini cachetime-value" />
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="modal-footer">
-                                <button type="button" class="btn" data-dismiss="modal">Close</button>
-                                <button type="submit" class="btn btn-success update-cachetime">Update</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </form>
-            @**************** widget config modals ****************@
-            @for(widget <- dashboard.getWidgets.values()) {
-                <div class="modal fade widget-config" data-widget-id="@widget.getId" tabindex="-1" role="dialog" aria-hidden="true">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header" style="padding-bottom : 3 px ;">
-                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
-                                <h2 class="modal-title">Widget config</h2>
-                                Type: @widget.getType.toString.toLowerCase, cached for @widget.getCacheTime seconds.
-
-                                <p style="margin-bottom : 0 px ; margin-top : 5 px ;">
-                                @if(widget.getConfig.containsKey("stream_id") && widget.getConfig.get("stream_id") != null) {
-                                    Bound to stream
-                                    <a href="@routes.StreamSearchController.index(widget.getConfig.get("stream_id").asInstanceOf[String], "*", "relative", 300)">@widget.getConfig.get("stream_id")</a>
-                                    .
-                                } else {
-                                    <strong>Not</strong> bound to a stream.
-                                }
-                                </p>
-                            </div>
-
-                            <div class="modal-body">
-                                <div class="well well-small" style="margin-bottom : 0 px ;">
-                                    <ul style="margin-bottom : 15 px ;">
-                                        <li>Widget ID: @widget.getId</li>
-                                        <li>Dashboard ID: @widget.getDashboard.getId</li>
-                                        <li>Created by: @widget.getCreatorUserId</li>
-                                    </ul>
-
-                                    <ul>
-                                    @for((k, v) <- widget.getConfig) {
-                                        <li>@k: @v</li>
-                                    }
-                                    </ul>
-                                </div>
-                            </div>
-
-                            <div class="modal-footer">
-                                <a class="btn" href="@routes.MetricsController.ofMasterNode("org.graylog2.dashboards.widgets.*." + widget.getId)">
-                                    Show widget metrics
-                                </a>
-                                <a class="btn btn-success added-width-search-link" href="@DashboardWidgetRouteHelper.replayRoute(widget)">
-                                    Replay search
-                                </a>
-                                <button class="btn btn-primary" data-dismiss="modal">Close</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            }
         }
     </div>
 

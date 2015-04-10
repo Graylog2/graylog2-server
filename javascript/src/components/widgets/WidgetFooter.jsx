@@ -37,18 +37,18 @@ var WidgetFooter = React.createClass({
 
         var unlockedActions = (
             <div className="actions">
-                <div className="widget-edit">
-                    <button className="btn btn-mini btn-link btn-text"
-                            title="Edit widget"
-                            onClick={this._editConfig}>
-                        <i className="fa fa-pencil"></i>
-                    </button>
-                </div>
                 <div className="widget-delete">
                     <button className="btn btn-mini btn-link btn-text"
                             title="Delete widget"
                             onClick={this._delete}>
                         <i className="fa fa-trash"></i>
+                    </button>
+                </div>
+                <div className="widget-edit">
+                    <button className="btn btn-mini btn-link btn-text"
+                            title="Edit widget"
+                            onClick={this._editConfig}>
+                        <i className="fa fa-pencil"></i>
                     </button>
                 </div>
             </div>

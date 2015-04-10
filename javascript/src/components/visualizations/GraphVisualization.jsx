@@ -18,22 +18,22 @@ var GraphFactory = {
         switch (config.renderer) {
             case 'line':
                 graph = dc.lineChart(domNode);
-                this.tooltipRenderlet(graph, '.chart-body circle.dot', tooltipTitleFormatter);
+                D3Utils.tooltipRenderlet(graph, '.chart-body circle.dot', tooltipTitleFormatter);
                 break;
             case 'area':
                 graph = dc.lineChart(domNode);
                 graph.renderArea(true);
-                this.tooltipRenderlet(graph, '.chart-body circle.dot', tooltipTitleFormatter);
+                D3Utils.tooltipRenderlet(graph, '.chart-body circle.dot', tooltipTitleFormatter);
                 break;
             case 'bar':
                 graph = dc.barChart(domNode);
                 graph.centerBar(true);
-                this.tooltipRenderlet(graph, '.chart-body rect.bar', tooltipTitleFormatter);
+                D3Utils.tooltipRenderlet(graph, '.chart-body rect.bar', tooltipTitleFormatter);
                 break;
             case 'scatterplot':
                 graph = dc.lineChart(domNode);
                 graph.renderDataPoints({radius: 2, fillOpacity: 1, strokeOpacity: 1});
-                this.tooltipRenderlet(graph, '.chart-body circle.dot', tooltipTitleFormatter);
+                D3Utils.tooltipRenderlet(graph, '.chart-body circle.dot', tooltipTitleFormatter);
                 break;
             default:
                 throw "Unsupported renderer '" + config.renderer + "'";
@@ -49,14 +49,6 @@ var GraphFactory = {
         }
 
         return graph;
-    },
-    // Add a data element to the given D3 selection to show a bootstrap tooltip
-    tooltipRenderlet(graph, selector, callback) {
-        graph.on('renderlet', (chart) => {
-            d3.select(chart.root()[0][0]).selectAll(selector)
-                .attr('rel', 'tooltip')
-                .attr('data-original-title', callback);
-        });
     }
 };
 

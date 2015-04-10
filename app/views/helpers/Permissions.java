@@ -18,21 +18,39 @@
  */
 package views.helpers;
 
+import com.google.common.collect.Maps;
+import lib.security.RestPermissions;
 import org.graylog2.restclient.models.User;
 import org.graylog2.restclient.models.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Map;
+
+import static play.libs.Json.toJson;
+
 public class Permissions {
 
     private static final Logger log = LoggerFactory.getLogger(Permissions.class);
+
+    public static Boolean isPermitted(RestPermissions restPermission) {
+        return isPermitted(restPermission.getPermission());
+    }
 
     public static Boolean isPermitted(String permission) {
         return isPermitted(UserService.current(), permission);
     }
 
+    public static Boolean isPermitted(RestPermissions permission, String instanceId) {
+        return isPermitted(permission.getPermission(), instanceId);
+    }
+
     public static Boolean isPermitted(String permission, String instanceId) {
         return isPermitted(UserService.current(), permission, instanceId);
+    }
+
+    public static Boolean isPermitted(User user, RestPermissions permission, String instanceId) {
+        return isPermitted(user, permission.getPermission(), instanceId);
     }
 
     public static Boolean isPermitted(User user, String permission, String instanceId) {
@@ -47,12 +65,26 @@ public class Permissions {
         return permitted;
     }
 
+    public static Boolean isPermitted(User user, RestPermissions permission) {
+        return isPermitted(user, permission.getPermission());
+    }
+
     public static Boolean isPermitted(User user, String permission) {
         final boolean permitted = user.getSubject().isPermitted(permission);
         if (log.isDebugEnabled()) {
             log.debug("{} has permission {}: {}", user.getName(), permission, permitted);
         }
         return permitted;
+    }
+
+    public static String asJson(RestPermissions... permissions) {
+        final Map<String, Boolean> permissionMap = Maps.newHashMap();
+
+        for (RestPermissions permission : permissions) {
+            permissionMap.put(permission.name(), isPermitted(permission));
+        }
+
+        return toJson(permissionMap).toString();
     }
 
 }

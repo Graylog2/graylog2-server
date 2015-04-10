@@ -116,10 +116,6 @@ $(document).ready(function() {
                         }
                     });
                 }
-
-                // Update colspan of full-width rows.
-                $("table.messages tr.message-detail-row td").attr("colspan", activeFields);
-                $("table.messages tr.message-row td").attr("colspan", activeFields);
             }
         }
     })();

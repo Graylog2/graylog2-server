@@ -18,82 +18,90 @@
  */
 package lib.security;
 
-public class RestPermissions {
+public enum RestPermissions {
     // this is the complete list from the graylog2-server corresponding to this interface version.
     // THESE MUST BE KEPT IN SYNC.
     // Yes, we should share the code in some other way, but currently we don't.
 
-    public static final String USERS_CREATE = "users:create";
-    public static final String USERS_EDIT = "users:edit";
-    public static final String USERS_LIST = "users:list";
-    public static final String USERS_PERMISSIONSEDIT = "users:permissionsedit";
-    public static final String USERS_PASSWORDCHANGE = "users:passwordchange";
-    public static final String USERS_TOKENCREATE = "users:tokencreate";
-    public static final String USERS_TOKENLIST = "users:tokenlist";
-    public static final String USERS_TOKENREMOVE = "users:tokenremove";
-    public static final String THROUGHPUT_READ = "throughput:read";
-    public static final String MESSAGECOUNT_READ = "messagecount:read";
-    public static final String DASHBOARDS_CREATE = "dashboards:create";
-    public static final String DASHBOARDS_LIST = "dashboards:list";
-    public static final String DASHBOARDS_READ = "dashboards:read";
-    public static final String DASHBOARDS_EDIT = "dashboards:edit";
-    public static final String MESSAGES_READ = "messages:read";
-    public static final String MESSAGES_ANALYZE = "messages:analyze";
-    public static final String SEARCHES_ABSOLUTE = "searches:absolute";
-    public static final String SEARCHES_KEYWORD = "searches:keyword";
-    public static final String SEARCHES_RELATIVE = "searches:relative";
-    public static final String SAVEDSEARCHES_CREATE = "savedsearches:create";
-    public static final String SAVEDSEARCHES_READ = "savedsearches:read";
-    public static final String SAVEDSEARCHES_EDIT = "savedsearches:edit";
-    public static final String SOURCES_READ = "sources:read";
-    public static final String STREAMS_CREATE = "streams:create";
-    public static final String STREAMS_READ = "streams:read";
-    public static final String STREAMS_EDIT = "streams:edit";
-    public static final String STREAMS_CHANGESTATE = "streams:changestate";
-    public static final String STREAM_OUTPUTS_CREATE = "stream_outputs:create";
-    public static final String STREAM_OUTPUTS_READ = "stream_outputs:read";
-    public static final String STREAM_OUTPUTS_DELETE = "stream_outputs:delete";
-    public static final String INDEXERCLUSTER_READ = "indexercluster:read";
-    public static final String INDICES_READ = "indices:read";
-    public static final String INDICES_CHANGESTATE = "indices:changestate";
-    public static final String INDICES_DELETE = "indices:delete";
-    public static final String INDICES_FAILURES = "indices:failures";
-    public static final String INPUTS_READ = "inputs:read";
-    public static final String INPUTS_CREATE = "inputs:create";
-    public static final String INPUTS_TERMINATE = "inputs:terminate";
-    public static final String INPUTS_EDIT = "inputs:edit";
-    public static final String INPUTS_STOP = "inputs:stop";
-    public static final String INPUTS_START = "inputs:start";
-    public static final String OUTPUTS_READ = "outputs:read";
-    public static final String OUTPUTS_CREATE = "outputs:create";
-    public static final String OUTPUTS_TERMINATE = "outputs:terminate";
-    public static final String OUTPUTS_EDIT = "outputs:edit";
-    public static final String AGENTS_READ = "agents:read";
-    public static final String SYSTEMJOBS_READ = "systemjobs:read";
-    public static final String SYSTEMJOBS_CREATE = "systemjobs:create";
-    public static final String LDAP_EDIT = "ldap:edit";
-    public static final String LOGGERS_READ = "loggers:read";
-    public static final String LOGGERS_EDIT = "loggers:edit";
-    public static final String LOGGERS_READSUBSYSTEM = "loggers:readsubsystem";
-    public static final String LOGGERS_EDITSUBSYSTEM = "loggers:editsubsystem";
-    public static final String BUFFERS_READ = "buffers:read";
-    public static final String DEFLECTOR_READ = "deflector:read";
-    public static final String DEFLECTOR_CYCLE = "deflector:cycle";
-    public static final String INDEXRANGES_READ = "indexranges:read";
-    public static final String INDEXRANGES_REBUILD = "indexranges:rebuild";
-    public static final String SYSTEMMESSAGES_READ = "systemmessages:read";
-    public static final String METRICS_READALL = "metrics:readall";
-    public static final String METRICS_ALLKEYS = "metrics:allkeys";
-    public static final String METRICS_READ = "metrics:read";
-    public static final String METRICS_READHISTORY = "metrics:readhistory";
-    public static final String NOTIFICATIONS_READ = "notifications:read";
-    public static final String NOTIFICATIONS_DELETE = "notifications:delete";
-    public static final String SYSTEM_READ = "system:read";
-    public static final String FIELDNAMES_READ = "fieldnames:read";
-    public static final String PROCESSING_CHANGESTATE = "processing:changestate";
-    public static final String JVMSTATS_READ = "jvmstats:read";
-    public static final String THREADS_DUMP = "threads:dump";
-    public static final String LBSTATUS_CHANGE = "lbstatus:change";
-    public static final String NODE_SHUTDOWN = "node:shutdown";
+    USERS_CREATE("users:create"),
+    USERS_EDIT("users:edit"),
+    USERS_LIST("users:list"),
+    USERS_PERMISSIONSEDIT("users:permissionsedit"),
+    USERS_PASSWORDCHANGE("users:passwordchange"),
+    USERS_TOKENCREATE("users:tokencreate"),
+    USERS_TOKENLIST("users:tokenlist"),
+    USERS_TOKENREMOVE("users:tokenremove"),
+    THROUGHPUT_READ("throughput:read"),
+    MESSAGECOUNT_READ("messagecount:read"),
+    DASHBOARDS_CREATE("dashboards:create"),
+    DASHBOARDS_LIST("dashboards:list"),
+    DASHBOARDS_READ("dashboards:read"),
+    DASHBOARDS_EDIT("dashboards:edit"),
+    MESSAGES_READ("messages:read"),
+    MESSAGES_ANALYZE("messages:analyze"),
+    SEARCHES_ABSOLUTE("searches:absolute"),
+    SEARCHES_KEYWORD("searches:keyword"),
+    SEARCHES_RELATIVE("searches:relative"),
+    SAVEDSEARCHES_CREATE("savedsearches:create"),
+    SAVEDSEARCHES_READ("savedsearches:read"),
+    SAVEDSEARCHES_EDIT("savedsearches:edit"),
+    SOURCES_READ("sources:read"),
+    STREAMS_CREATE("streams:create"),
+    STREAMS_READ("streams:read"),
+    STREAMS_EDIT("streams:edit"),
+    STREAMS_CHANGESTATE("streams:changestate"),
+    STREAM_OUTPUTS_CREATE("stream_outputs:create"),
+    STREAM_OUTPUTS_READ("stream_outputs:read"),
+    STREAM_OUTPUTS_DELETE("stream_outputs:delete"),
+    INDEXERCLUSTER_READ("indexercluster:read"),
+    INDICES_READ("indices:read"),
+    INDICES_CHANGESTATE("indices:changestate"),
+    INDICES_DELETE("indices:delete"),
+    INDICES_FAILURES("indices:failures"),
+    INPUTS_READ("inputs:read"),
+    INPUTS_CREATE("inputs:create"),
+    INPUTS_TERMINATE("inputs:terminate"),
+    INPUTS_EDIT("inputs:edit"),
+    INPUTS_STOP("inputs:stop"),
+    INPUTS_START("inputs:start"),
+    OUTPUTS_READ("outputs:read"),
+    OUTPUTS_CREATE("outputs:create"),
+    OUTPUTS_TERMINATE("outputs:terminate"),
+    OUTPUTS_EDIT("outputs:edit"),
+    SYSTEMJOBS_READ("systemjobs:read"),
+    SYSTEMJOBS_CREATE("systemjobs:create"),
+    LDAP_EDIT("ldap:edit"),
+    LOGGERS_READ("loggers:read"),
+    LOGGERS_EDIT("loggers:edit"),
+    LOGGERS_READSUBSYSTEM("loggers:readsubsystem"),
+    LOGGERS_EDITSUBSYSTEM("loggers:editsubsystem"),
+    BUFFERS_READ("buffers:read"),
+    DEFLECTOR_READ("deflector:read"),
+    DEFLECTOR_CYCLE("deflector:cycle"),
+    INDEXRANGES_READ("indexranges:read"),
+    INDEXRANGES_REBUILD("indexranges:rebuild"),
+    SYSTEMMESSAGES_READ("systemmessages:read"),
+    METRICS_READALL("metrics:readall"),
+    METRICS_ALLKEYS("metrics:allkeys"),
+    METRICS_READ("metrics:read"),
+    METRICS_READHISTORY("metrics:readhistory"),
+    NOTIFICATIONS_READ("notifications:read"),
+    NOTIFICATIONS_DELETE("notifications:delete"),
+    SYSTEM_READ("system:read"),
+    FIELDNAMES_READ("fieldnames:read"),
+    PROCESSING_CHANGESTATE("processing:changestate"),
+    JVMSTATS_READ("jvmstats:read"),
+    THREADS_DUMP("threads:dump"),
+    LBSTATUS_CHANGE("lbstatus:change"),
+    NODE_SHUTDOWN("node:shutdown");
 
+    private final String permission;
+
+    RestPermissions(String objectActionWildcard) {
+        this.permission = objectActionWildcard;
+    }
+
+    public String getPermission() {
+        return permission;
+    }
 }

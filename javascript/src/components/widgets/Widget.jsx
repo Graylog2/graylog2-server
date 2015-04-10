@@ -142,7 +142,7 @@ var Widget = React.createClass({
                                                         interval={this.state.config.interval}/>;
                 break;
             case 'QUICKVALUES':
-                visualization = <QuickValuesVisualization data={this.state.result}/>;
+                visualization = <QuickValuesVisualization id={this.props.widgetId} data={this.state.result}/>;
                 break;
             case 'FIELD_CHART':
                 visualization = <GraphVisualization id={this.props.widgetId}

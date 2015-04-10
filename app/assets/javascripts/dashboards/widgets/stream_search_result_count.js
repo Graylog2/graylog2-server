@@ -10,7 +10,3 @@ function addWidget_stream_search_result_count(dashboardId, config, eventElem) {
     copyInto(config, params);
     addWidget(dashboardId, undefined, params);
 }
-
-function updateWidget_stream_search_result_count(widget, data) {
-    updateWidget_search_result_count(widget, data);
-}

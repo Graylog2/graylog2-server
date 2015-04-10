@@ -337,7 +337,6 @@ a.fields-set-chooser {
 .messages {
   font-size: 11px;
   margin-top: 15px;
-  table-layout: fixed;
   border-collapse: collapse;
   width: 100%;
   word-break: break-all;
@@ -354,7 +353,7 @@ a.fields-set-chooser {
 .messages thead th {
   font-size: 11px;
   font-weight: normal;
-  background-color: #000;
+  background-color: #222;
 }
 
 #result-graph-container {
@@ -1495,6 +1494,10 @@ dl.metric-histogram dd {
   background: #16ACE3 !important;
 }
 
+.dashboard .gridster .resize-preview-holder {
+  z-index: -1;
+}
+
 .dashboard .widget {
   margin: 15px;
 }
@@ -1577,6 +1580,13 @@ dl.metric-histogram dd {
 
 /* New widgets */
 
+.datatable-badge {
+  border-radius: 2px;
+  display: inline-block;
+  padding: 5px;
+  vertical-align: baseline;
+}
+
 .tooltip .tooltip-inner {
   max-width: 300px;
 }
@@ -1611,6 +1621,10 @@ dl.metric-histogram dd {
   height: inherit;
   margin: 0;
   padding: 15px;
+}
+
+.dashboard .widget .dc-chart {
+  float: none;
 }
 
 .dashboard .widget .widget-title {
@@ -1682,6 +1696,10 @@ dl.metric-histogram dd {
   height: 85%;
   margin-top: 5px;
   overflow: auto;
+}
+
+.dashboard .widget .quickvalues-graph {
+  text-align: center;
 }
 
 .dashboard .widget .graph.scatterplot path.line {

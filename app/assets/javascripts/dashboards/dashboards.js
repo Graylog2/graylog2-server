@@ -13,32 +13,46 @@ $(document).ready(function() {
         }
     });
 
+    function updateWidgetPositions() {
+        var positions = dashboardGrid.serialize();
+        var dashboardId = $(".gridster").attr("data-dashboard-id");
+
+        var payload = {
+            positions: positions
+        };
+
+        $.ajax({
+            url: appPrefixed('/a/dashboards/' + dashboardId + '/positions'),
+            type: 'POST',
+            data: JSON.stringify(payload),
+            processData: false,
+            contentType: 'application/json',
+            success: function (data) {
+                // not doing anything here for now. no need to notify user about success IMO
+            },
+            error: function (data) {
+                showError("Could not save widget positions.");
+            }
+        });
+    }
+
     var initializeDashboard = function() {
+        /* ducksboard/gridster.js#147 Hotfix - Part 1 */
+        var items = $(".gridster ul li");
+        items.detach();
+
         dashboardGrid = $(".gridster ul").gridster({
             widget_margins: [10, 10],
             widget_base_dimensions: [410, 170],
+            resize: {
+                enabled: true,
+                stop: function() {
+                    updateWidgetPositions();
+                }
+            },
             draggable: {
                 stop: function() {
-                    var positions = this.serialize();
-                    var dashboardId = $(".gridster").attr("data-dashboard-id");
-
-                    var payload = {
-                        positions: positions
-                    };
-
-                    $.ajax({
-                        url: appPrefixed('/a/dashboards/' + dashboardId + '/positions'),
-                        type: 'POST',
-                        data: JSON.stringify(payload),
-                        processData: false,
-                        contentType: 'application/json',
-                        success: function(data) {
-                            // not doing anything here for now. no need to notify user about success IMO
-                        },
-                        error: function(data) {
-                            showError("Could not save widget positions.");
-                        }
-                    });
+                    updateWidgetPositions();
                 }
             },
             serialize_params: function(widgetListItem, pos) {
@@ -52,7 +66,20 @@ $(document).ready(function() {
                     size_y: pos.size_y
                 }
             }
-        }).data('gridster').disable();
+        }).data('gridster');
+        dashboardGrid.disable();
+        dashboardGrid.disable_resize();
+
+
+        /* ducksboard/gridster.js#147 Hotfix - Part 2 */
+        $.each(items , function (i, e) {
+            var item = $(this);
+            var columns = parseInt(item.attr("data-sizex"));
+            var rows = parseInt(item.attr("data-sizey"));
+            var col = parseInt(item.attr("data-col"));
+            var row = parseInt(item.attr("data-row"));
+            dashboardGrid.add_widget(item, columns, rows, col, row);
+        });
     };
 
     var reloadDashboard = function() {
@@ -151,89 +178,10 @@ $(document).ready(function() {
         });
     }
 
-    $(document).on("click", ".dashboard .widget .remove-widget", function(e) {
-        e.preventDefault();
-
-        if(!confirm("Really remove widget? The page will reload after removing it.")) {
-            return;
-        }
-
-        var widget = $(this).closest(".widget");
-
-        $.ajax({
-            url: appPrefixed('/a/dashboards/' + widget.attr("data-dashboard-id") + '/widgets/' + widget.attr("data-widget-id") + '/delete'),
-            type: 'POST',
-            success: function() {
-                showSuccess("Widget has been removed from dashboard!")
-                widget.parent().remove();
-                location.reload();
-            },
-            error: function(data) {
-                showError("Could not remove widget from dashboard.");
-            }
-        });
-    });
-
-    $(document).on("click", ".dashboard .widget .show-config", function(e) {
-        var widget = $(this).closest(".widget");
-
-        $(".widget-config[data-widget-id=" + widget.attr("data-widget-id") + "]").modal();
-    });
-
     function delegateAddToDashboard(widgetType, dashboardId, description, elem) {
         var funcName = "addWidget_" + widgetType;
         window[funcName](dashboardId, description, elem);
     }
-
-    // Periodically poll every widget.
-    (function updateDashboardWidgets() {
-
-        if (!assertUpdateEnabled(updateDashboardWidgets)) return;
-
-        $(".dashboard .widget[data-widget-type]").each(function() {
-            var widget = $(this);
-            var dashboardId = widget.attr("data-dashboard-id");
-            var widgetId = widget.attr("data-widget-id");
-            var cacheTimeInSecs = parseInt(widget.attr("data-cache-time") || 0);
-
-            function reloadWidget() {
-                if (!assertUpdateEnabled(reloadWidget)) return;
-
-                $(".reloading", widget).show();
-
-                // XXX: This is just the fixed resolution of the Rickshaw graph as defined in "search_result_chart.js"
-                var resolution = 800;
-
-                var url;
-                if (resolution) {
-                    url = appPrefixed('/a/dashboards/' + dashboardId + '/widgets/' + widgetId  + '/resolution/' + resolution + '/value');
-                } else {
-                    url = appPrefixed('/a/dashboards/' + dashboardId + '/widgets/' + widgetId + '/value');
-                }
-
-                $.ajax({
-                    url: url,
-                    type: 'GET',
-                    success: function(data) {
-                        // Pass to widget specific function to display actual value(s).
-                        var funcName = "updateWidget_" + widget.attr("data-widget-type");
-                        window[funcName](widget, data);
-
-                        $(".calculated-at", widget).attr("title", data.calculated_at);
-                        $(".calculated-at", widget).text(moment(data.calculated_at).fromNow());
-                    },
-                    error: function(data) {
-                        showErrorInWidget(widget);
-                    },
-                    complete: function(data) {
-                        $(".reloading", widget).hide();
-                        setTimeout(reloadWidget, cacheTimeInSecs * 1000);
-                    }
-                });
-            }
-            reloadWidget();
-        });
-    })();
 
     var updateInBackground = function() {
         setUpdateUnfocussedMode(true);
@@ -260,6 +208,7 @@ $(document).ready(function() {
 
     var unlockDashboard = function() {
         dashboardGrid.enable();
+        dashboardGrid.enable_resize();
         $(".dashboard").addClass("unlocked");
         $(this).hide();
         $(".only-unlocked").show();
@@ -282,6 +231,7 @@ $(document).ready(function() {
 
     var lockDashboard = function() {
         dashboardGrid.disable();
+        dashboardGrid.disable_resize();
         $(".dashboard").removeClass("unlocked");
         $(this).hide();
         $(".hidden-unlocked").show();
@@ -313,118 +263,6 @@ $(document).ready(function() {
     unlockDashboardLink.on('click', function() {
         unlockDashboard();
     });
-
-    $(".dashboard .widget .edit-description").on("click", function(e) {
-        e.preventDefault();
-        var widget = $(this).closest(".widget");
-
-        $(".description", widget).hide();
-
-        var descriptionForm = $(".description-form", widget);
-        descriptionForm.show();
-        focusFirstFormInput(descriptionForm);
-    });
-
-    $(".dashboard .widget .description-form input").on("keyup", function() {
-        var widget = $(this).closest(".widget");
-
-        if ($(this).val().length > 0) {
-            $("button.update-description", widget).prop("disabled", false);
-        } else {
-            $("button.update-description", widget).prop("disabled", true);
-        }
-    });
-
-    $(".dashboard .widget .edit-cache-time").on("click", function(e) {
-        e.preventDefault();
-        var widget = $(this).closest(".widget");
-
-        var dashboardId = widget.attr("data-dashboard-id");
-        var widgetId = widget.attr("data-widget-id");
-
-        var modalWindow = $("#dashboardwidget-cache-time");
-        var button = $("button.update-cachetime", modalWindow);
-
-        $("input.cachetime-value", modalWindow).val($(".cache-time-value", widget).text());
-        button.attr("data-dashboard-id", dashboardId);
-        button.attr("data-widget-id", widgetId);
-
-        modalWindow.modal();
-    });
-
-    $("#dashboardwidget-cache-time").on("shown.bs.modal", focusFirstFormInput);
-
-    $("#dashboardwidget-cache-time input.cachetime-value").on("keyup", function() {
-        if ($(this).val().length > 0 && isNumber($(this).val()) && parseInt($(this).val()) >= 1) {
-            $("#dashboardwidget-cache-time button.update-cachetime").prop("disabled", false);
-        } else {
-            $("#dashboardwidget-cache-time button.update-cachetime").prop("disabled", true);
-        }
-    });
-
-    $("#dashboardwidget-cache-time button.update-cachetime").on("click", function(e) {
-        e.preventDefault();
-        var widget = $('.dashboard .widget[data-widget-id="' + $(this).attr("data-widget-id") + '"]')
-        var newVal = $("#dashboardwidget-cache-time input.cachetime-value").val();
-
-        var dashboardId = widget.attr("data-dashboard-id");
-        var widgetId = widget.attr("data-widget-id");
-
-        $.ajax({
-            url: appPrefixed('/a/dashboards/' + dashboardId + '/widgets/' + widgetId + '/cachetime'),
-            data: {
-                cacheTime: newVal
-            },
-            type: 'POST',
-            success: function(data) {
-                $(".info .cache-info .cache-time .cache-time-value", widget).text(newVal);
-
-                showSuccess("Widget cache time updated!")
-            },
-            error: function(data) {
-                showError("Could not update widget cache time.")
-            },
-            complete: function(data) {
-                $("#dashboardwidget-cache-time").modal('hide');
-            }
-        });
-    });
-
-    $("button.update-description").on("click", function(e) {
-        e.preventDefault();
-        var widget = $(this).closest(".widget");
-        var dashboardId = widget.attr("data-dashboard-id");
-        var widgetId = widget.attr("data-widget-id");
-
-        var newVal = $(".description-value", widget).val().trim();
-
-        $.ajax({
-            url: appPrefixed('/a/dashboards/' + dashboardId + '/widgets/' + widgetId + '/description'),
-            data: {
-                description: newVal
-            },
-            type: 'POST',
-            success: function(data) {
-                $(".description .widget-title", widget).text(newVal);
-                $(".description", widget).show();
-                $(".description-form", widget).hide();
-                $(".description", widget).show();
-
-                showSuccess("Widget description updated!")
-            },
-            error: function(data) {
-                showError("Could not update widget description.")
-            }
-        });
-    });
-
-    function showErrorInWidget(widget) {
-        $(".widget-error-hidden", widget).hide();
-
-        $(".value, .dashboard-chart, .widget-error-active", widget)
-            .show()
-            .html("<i class='fa fa-warning loading-failed'></i>");
-    }
 
     if (dashboard.length > 0) {
         lockDashboard();
