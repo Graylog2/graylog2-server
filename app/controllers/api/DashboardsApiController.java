@@ -1,6 +1,4 @@
 /**
- * Copyright 2012-2015 TORCH GmbH, 2015 Graylog, Inc.
- *
  * This file is part of Graylog.
  *
  * Graylog is free software: you can redistribute it and/or modify
@@ -15,8 +13,8 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
+
 package controllers.api;
 
 import com.google.common.collect.Lists;
@@ -131,7 +129,7 @@ public class DashboardsApiController extends AuthenticatedController {
         try {
             Dashboard dashboard = dashboardService.get(dashboardId);
             UserSetWidgetPositionsRequest positions = Json.fromJson(request().body().asJson(), UserSetWidgetPositionsRequest.class);
-            dashboard.setWidgetPositions(positions.positions);
+            dashboard.setWidgetPositions(positions);
         } catch (APIException e) {
             String message = "Could not update positions. We expected HTTP 200, but got a HTTP " + e.getHttpCode() + ".";
             return status(504, views.html.errors.error.render(message, e, request()));
