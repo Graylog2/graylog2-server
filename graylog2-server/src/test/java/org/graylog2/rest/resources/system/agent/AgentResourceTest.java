@@ -16,7 +16,9 @@
  */
 package org.graylog2.rest.resources.system.agent;
 
+import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.collect.Lists;
+import org.graylog2.Configuration;
 import org.graylog2.agents.Agent;
 import org.graylog2.agents.AgentNodeDetails;
 import org.graylog2.agents.AgentService;
@@ -50,7 +52,9 @@ public class AgentResourceTest extends RestResourceBaseTest {
     @Before
     public void setUp() throws Exception {
         this.agents = getDummyAgentList();
-        this.resource = new AgentResource(agentService);
+        final Configuration config = mock(Configuration.class);
+        when(config.getAgentInactiveThreshold()).thenReturn(Duration.minutes(1));
+        this.resource = new AgentResource(agentService, config);
         when(agentService.all()).thenReturn(agents);
     }
 

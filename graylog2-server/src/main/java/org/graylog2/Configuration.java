@@ -127,6 +127,9 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "agent_expiration_threshold", validator = PositiveIntegerValidator.class)
     private Duration agentExpirationThreshold = Duration.days(14);
 
+    @Parameter(value = "agent_inactive_threshold", validator = PositiveIntegerValidator.class)
+    private Duration agentInactiveThreshold = Duration.minutes(1);
+
     public boolean isMaster() {
         return isMaster;
     }
@@ -254,5 +257,9 @@ public class Configuration extends BaseConfiguration {
 
     public Duration getAgentExpirationThreshold() {
         return agentExpirationThreshold;
+    }
+
+    public Duration getAgentInactiveThreshold() {
+        return agentInactiveThreshold;
     }
 }

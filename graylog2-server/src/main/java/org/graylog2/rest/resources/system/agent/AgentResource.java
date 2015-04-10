@@ -17,11 +17,13 @@
 package org.graylog2.rest.resources.system.agent;
 
 import com.codahale.metrics.annotation.Timed;
+import com.google.common.primitives.Ints;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
 import com.wordnik.swagger.annotations.ApiResponse;
 import com.wordnik.swagger.annotations.ApiResponses;
+import org.graylog2.Configuration;
 import org.graylog2.agents.Agent;
 import org.graylog2.agents.AgentService;
 import org.graylog2.agents.Agents;
@@ -30,7 +32,6 @@ import org.graylog2.rest.models.agent.responses.AgentList;
 import org.graylog2.rest.models.agent.responses.AgentSummary;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.joda.time.DateTime;
-import org.joda.time.Minutes;
 
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
@@ -48,17 +49,27 @@ import java.util.function.Function;
 @Produces(MediaType.APPLICATION_JSON)
 public class AgentResource extends RestResource {
     private final AgentService agentService;
+    private final LostAgentFunction lostAgentFunction;
 
     public class LostAgentFunction implements Function<Agent, Boolean> {
+        private final long timeOutInSeconds;
+
+        @Inject
+        public LostAgentFunction(long timeOutInSeconds) {
+            this.timeOutInSeconds = timeOutInSeconds;
+        }
+
         @Override
         public Boolean apply(Agent agent) {
-            return (Minutes.minutesBetween(agent.getLastSeen(), DateTime.now()).getMinutes() < 5);
+            final DateTime threshold = DateTime.now().minusSeconds(Ints.checkedCast(timeOutInSeconds));
+            return agent.getLastSeen().isBefore(threshold);
         }
     }
 
     @Inject
-    public AgentResource(AgentService agentService) {
+    public AgentResource(AgentService agentService, Configuration config) {
         this.agentService = agentService;
+        this.lostAgentFunction = new LostAgentFunction(config.getAgentInactiveThreshold().toSeconds());
     }
 
     @GET
@@ -66,7 +77,7 @@ public class AgentResource extends RestResource {
     @ApiOperation(value = "lists all existing agent registrations")
     public AgentList list() {
         final List<Agent> agents = agentService.all();
-        final List<AgentSummary> agentSummaries = Agents.toSummaryList(agents, new LostAgentFunction());
+        final List<AgentSummary> agentSummaries = Agents.toSummaryList(agents, lostAgentFunction);
         return AgentList.create(agentSummaries);
     }
 
@@ -82,7 +93,7 @@ public class AgentResource extends RestResource {
         final Agent agent = agentService.findById(agentId);
 
         if (agent != null)
-            return agent.toSummary(new LostAgentFunction());
+            return agent.toSummary(lostAgentFunction);
         else
             throw new NotFoundException("Agent <" + agentId + "> not found!");
     }
