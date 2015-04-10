@@ -42,9 +42,9 @@ public class AgentRegistrationResourceTest extends RestResourceBaseTest {
 
     @Test
     public void testRegister() throws Exception {
-        final AgentRegistrationRequest input = AgentRegistrationRequest.create("agentId", "nodeId", AgentNodeDetailsSummary.create("DummyOS 1.0"));
+        final AgentRegistrationRequest input = AgentRegistrationRequest.create("nodeId", AgentNodeDetailsSummary.create("DummyOS 1.0"));
 
-        final Response response = this.resource.register(input, "0.0.1");
+        final Response response = this.resource.register("agentId", input, "0.0.1");
 
         assertThat(response).isSuccess();
     }
@@ -52,9 +52,9 @@ public class AgentRegistrationResourceTest extends RestResourceBaseTest {
     @Test
     @Ignore
     public void testRegisterInvalidAgentId() throws Exception {
-        final AgentRegistrationRequest invalid = AgentRegistrationRequest.create("", "nodeId", AgentNodeDetailsSummary.create("DummyOS 1.0"));
+        final AgentRegistrationRequest invalid = AgentRegistrationRequest.create("nodeId", AgentNodeDetailsSummary.create("DummyOS 1.0"));
 
-        final Response response = this.resource.register(invalid, "0.0.1");
+        final Response response = this.resource.register("", invalid, "0.0.1");
 
         assertThat(response).isError();
         assertThat(response).isStatus(Response.Status.BAD_REQUEST);
@@ -63,9 +63,9 @@ public class AgentRegistrationResourceTest extends RestResourceBaseTest {
     @Test
     @Ignore
     public void testRegisterInvalidNodeId() throws Exception {
-        final AgentRegistrationRequest invalid = AgentRegistrationRequest.create("agentId", "", AgentNodeDetailsSummary.create("DummyOS 1.0"));
+        final AgentRegistrationRequest invalid = AgentRegistrationRequest.create("", AgentNodeDetailsSummary.create("DummyOS 1.0"));
 
-        final Response response = this.resource.register(invalid, "0.0.1");
+        final Response response = this.resource.register("agentId", invalid, "0.0.1");
 
         assertThat(response).isError();
         assertThat(response).isStatus(Response.Status.BAD_REQUEST);
@@ -74,9 +74,9 @@ public class AgentRegistrationResourceTest extends RestResourceBaseTest {
     @Test
     @Ignore
     public void testRegisterMissingNodeDetails() throws Exception {
-        final AgentRegistrationRequest invalid = AgentRegistrationRequest.create("agentId", "nodeId", null);
+        final AgentRegistrationRequest invalid = AgentRegistrationRequest.create("nodeId", null);
 
-        final Response response = this.resource.register(invalid, "0.0.1");
+        final Response response = this.resource.register("agentId", invalid, "0.0.1");
 
         assertThat(response).isError();
         assertThat(response).isStatus(Response.Status.BAD_REQUEST);
@@ -85,9 +85,9 @@ public class AgentRegistrationResourceTest extends RestResourceBaseTest {
     @Test
     @Ignore
     public void testRegisterMissingOperatingSystem() throws Exception {
-        final AgentRegistrationRequest invalid = AgentRegistrationRequest.create("agentId", "nodeId", AgentNodeDetailsSummary.create(""));
+        final AgentRegistrationRequest invalid = AgentRegistrationRequest.create("nodeId", AgentNodeDetailsSummary.create(""));
 
-        final Response response = this.resource.register(invalid, "0.0.1");
+        final Response response = this.resource.register("agentId", invalid, "0.0.1");
 
         assertThat(response).isError();
         assertThat(response).isStatus(Response.Status.BAD_REQUEST);

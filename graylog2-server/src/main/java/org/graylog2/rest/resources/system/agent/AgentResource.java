@@ -23,6 +23,7 @@ import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
 import com.wordnik.swagger.annotations.ApiResponse;
 import com.wordnik.swagger.annotations.ApiResponses;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.Configuration;
 import org.graylog2.agents.Agent;
 import org.graylog2.agents.AgentService;
@@ -43,10 +44,11 @@ import javax.ws.rs.core.MediaType;
 import java.util.List;
 import java.util.function.Function;
 
-@Api(value = "System/Agents", description = "Management of graylog agents.")
+@Api(value = "System/Agents", description = "Management of Graylog agents.")
 @Path("/system/agents")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
+@RequiresAuthentication
 public class AgentResource extends RestResource {
     private final AgentService agentService;
     private final LostAgentFunction lostAgentFunction;
@@ -62,7 +64,7 @@ public class AgentResource extends RestResource {
         @Override
         public Boolean apply(Agent agent) {
             final DateTime threshold = DateTime.now().minusSeconds(Ints.checkedCast(timeOutInSeconds));
-            return agent.getLastSeen().isBefore(threshold);
+            return agent.getLastSeen().isAfter(threshold);
         }
     }
 
@@ -74,7 +76,7 @@ public class AgentResource extends RestResource {
 
     @GET
     @Timed
-    @ApiOperation(value = "lists all existing agent registrations")
+    @ApiOperation(value = "Lists all existing agent registrations")
     public AgentList list() {
         final List<Agent> agents = agentService.all();
         final List<AgentSummary> agentSummaries = Agents.toSummaryList(agents, lostAgentFunction);
