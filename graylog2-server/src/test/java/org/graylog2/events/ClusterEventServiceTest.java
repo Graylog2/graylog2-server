@@ -206,6 +206,7 @@ public class ClusterEventServiceTest {
     }
 
     @Test
+    @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
     public void testRun() throws Exception {
         DBObject event = new BasicDBObjectBuilder()
                 .add("date", "2015-04-01T00:00:00.000Z")
