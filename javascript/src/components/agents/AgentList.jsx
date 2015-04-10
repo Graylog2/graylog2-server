@@ -82,6 +82,8 @@ var AgentList = React.createClass({
                 }
             );
 
+            var showOrHideInactive = (this.state.showInactive ? "Hide" : "Show");
+
             agentList = (
                 <div>
                     <div className="row">
@@ -91,7 +93,7 @@ var AgentList = React.createClass({
                                 <input type="text" name="filter" id="agentsfilter" value={this.state.filter} onChange={(event) => {this.setState({filter: event.target.value});}} />
                             </form>
 
-                            <a onClick={this.toggleShowInactive}>Toggle</a> displaying inactive agents
+                            <a onClick={this.toggleShowInactive}>{showOrHideInactive}</a> inactive agents
 
                             <table className="table table-striped users-list">
                                 <thead>
