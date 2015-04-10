@@ -113,6 +113,25 @@ public class Searches {
         public Period getPeriod() {
             return period;
         }
+
+        public DateHistogram.Interval toESInterval() {
+            switch (this.name()) {
+                case "MINUTE":
+                    return DateHistogram.Interval.MINUTE;
+                case "HOUR":
+                    return DateHistogram.Interval.HOUR;
+                case "DAY":
+                    return DateHistogram.Interval.DAY;
+                case "WEEK":
+                    return DateHistogram.Interval.WEEK;
+                case "MONTH":
+                    return DateHistogram.Interval.MONTH;
+                case "QUARTER":
+                    return DateHistogram.Interval.QUARTER;
+                default:
+                    return DateHistogram.Interval.YEAR;
+            }
+        }
     }
 
 
@@ -392,7 +411,7 @@ public class Searches {
                 .subAggregation(
                         AggregationBuilders.dateHistogram(AGG_HISTOGRAM)
                                 .field("timestamp")
-                                .interval(interval.getPeriod().toStandardDuration().getMillis()))
+                                .interval(interval.toESInterval()))
                 .filter(standardFilters(range, filter));
 
         QueryStringQueryBuilder qs = queryString(query);
@@ -422,7 +441,7 @@ public class Searches {
                         AggregationBuilders.dateHistogram(AGG_HISTOGRAM)
                                 .field("timestamp")
                                 .subAggregation(AggregationBuilders.stats(AGG_STATS).field(field))
-                                .interval(interval.getPeriod().toStandardDuration().getMillis())
+                                .interval(interval.toESInterval())
                 )
                 .filter(standardFilters(range, filter));
 
