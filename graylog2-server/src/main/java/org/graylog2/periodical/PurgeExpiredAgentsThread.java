@@ -81,6 +81,7 @@ public class PurgeExpiredAgentsThread extends Periodical {
     @Override
     public void doRun() {
         final Duration threshold = configuration.getAgentExpirationThreshold();
-        agentService.destroyExpired(Ints.checkedCast(threshold.getQuantity()), threshold.getUnit());
+        final int purgedAgents = agentService.destroyExpired(Ints.checkedCast(threshold.getQuantity()), threshold.getUnit());
+        LOG.debug("Purged {} inactive agents.", purgedAgents);
     }
 }
