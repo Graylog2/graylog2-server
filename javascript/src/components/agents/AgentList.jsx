@@ -75,8 +75,6 @@ var AgentList = React.createClass({
                             <td className="limited">
                                 {moment(agent.last_seen).fromNow()}
                             </td>
-                            <td className="limited">
-                            </td>
                         </tr>
                     );
                 }
@@ -105,7 +103,6 @@ var AgentList = React.createClass({
                                     <th onClick={this.sortByAgentVersion}>Agent Version</th>
                                     <th onClick={this.sortByOperatingSystem}>Operating System</th>
                                     <th onClick={this.sortByLastSeen}>Last Seen</th>
-                                    <th className="actions">Actions</th>
                                 </tr>
                                 </thead>
                                 <tbody>
