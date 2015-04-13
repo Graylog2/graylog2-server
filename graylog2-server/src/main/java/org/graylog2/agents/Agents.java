@@ -16,11 +16,11 @@
  */
 package org.graylog2.agents;
 
+import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import org.graylog2.rest.models.agent.responses.AgentSummary;
 
 import java.util.List;
-import java.util.function.Function;
 
 public class Agents {
     public static List<AgentSummary> toSummaryList(List<Agent> agents, Function<Agent, Boolean> isActiveFunction) {

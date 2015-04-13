@@ -17,6 +17,7 @@
 package org.graylog2.rest.resources.system.agent;
 
 import com.github.joschi.jadconfig.util.Duration;
+import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import org.graylog2.Configuration;
 import org.graylog2.agents.Agent;
@@ -34,7 +35,6 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import java.util.List;
-import java.util.function.Function;
 
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;

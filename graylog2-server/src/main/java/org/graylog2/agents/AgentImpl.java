@@ -21,11 +21,10 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import com.google.common.base.Function;
 import org.graylog2.database.CollectionName;
 import org.graylog2.rest.models.agent.responses.AgentSummary;
 import org.joda.time.DateTime;
-
-import java.util.function.Function;
 
 @AutoValue
 @JsonAutoDetect
@@ -48,8 +47,9 @@ public abstract class AgentImpl implements Agent {
 
     @Override
     public AgentSummary toSummary(Function<Agent, Boolean> isActiveFunction) {
+        final Boolean isActive = isActiveFunction.apply(this);
         return AgentSummary.create(getId(), getNodeId(), getNodeDetails().toSummary(),
-                getLastSeen(), getAgentVersion(), isActiveFunction.apply(this));
+                getLastSeen(), getAgentVersion(), isActive != null && isActive);
     }
 
     @Override

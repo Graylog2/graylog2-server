@@ -16,6 +16,7 @@
  */
 package org.graylog2.agents;
 
+import com.google.common.base.Function;
 import org.graylog2.rest.models.agent.responses.AgentSummary;
 import org.joda.time.DateTime;
 
@@ -23,7 +24,6 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Past;
 import javax.validation.constraints.Size;
-import java.util.function.Function;
 
 public interface Agent {
     @NotNull

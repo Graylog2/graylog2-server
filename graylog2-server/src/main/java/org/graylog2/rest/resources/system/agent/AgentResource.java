@@ -17,6 +17,7 @@
 package org.graylog2.rest.resources.system.agent;
 
 import com.codahale.metrics.annotation.Timed;
+import com.google.common.base.Function;
 import com.google.common.primitives.Ints;
 import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
@@ -42,7 +43,6 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import java.util.List;
-import java.util.function.Function;
 
 @Api(value = "System/Agents", description = "Management of Graylog agents.")
 @Path("/system/agents")
