@@ -18,8 +18,8 @@ package org.graylog2.restclient.models;
 
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
+import org.graylog2.rest.models.system.indexer.responses.IndexRangeSummary;
 import org.graylog2.restclient.lib.ApiClient;
-import org.graylog2.restclient.models.api.responses.system.indices.IndexRangeSummary;
 import org.graylog2.restclient.models.api.responses.system.indices.IndexShardsResponse;
 import org.graylog2.restclient.models.api.responses.system.indices.IndexSummaryResponse;
 import org.graylog2.restclient.models.api.responses.system.indices.ShardDocumentsResponse;
@@ -51,7 +51,7 @@ public class Index {
         this.api = api;
 
         this.range = new Range(ir);
-        this.name = ir.index;
+        this.name = ir.indexName();
     }
 
     public Range getRange() {
@@ -207,12 +207,12 @@ public class Index {
         private DateTime calculatedAt = null;
 
         public Range(IndexRangeSummary ir) {
-            this.starts = new DateTime(ir.starts, DateTimeZone.UTC);
+            this.starts = new DateTime(ir.start(), DateTimeZone.UTC);
 
-            if (ir.calculatedAt != null && !ir.calculatedAt.isEmpty() && ir.calculationTookMs >= 0) {
+            if (ir.calculatedAt() != null && ir.calculationTookMs() >= 0) {
                 this.providesCalculationInfo = true;
-                this.calculationTookMs = ir.calculationTookMs;
-                this.calculatedAt = new DateTime(ir.calculatedAt, DateTimeZone.UTC);
+                this.calculationTookMs = ir.calculationTookMs();
+                this.calculatedAt = new DateTime(ir.calculatedAt(), DateTimeZone.UTC);
             } else {
                 this.providesCalculationInfo = false;
             }
