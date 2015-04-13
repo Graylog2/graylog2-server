@@ -50,6 +50,7 @@ public class AgentServiceImpl implements AgentService {
         final String collectionName = AgentImpl.class.getAnnotation(CollectionName.class).value();
         final DBCollection dbCollection = mongoConnection.getDatabase().getCollection(collectionName);
         this.coll = JacksonDBCollection.wrap(dbCollection, AgentImpl.class, String.class, mapperProvider.get());
+        this.coll.createIndex(new BasicDBObject("id", 1), new BasicDBObject("unique", true));
     }
 
     @Override
