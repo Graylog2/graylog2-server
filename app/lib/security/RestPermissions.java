@@ -93,7 +93,8 @@ public enum RestPermissions {
     JVMSTATS_READ("jvmstats:read"),
     THREADS_DUMP("threads:dump"),
     LBSTATUS_CHANGE("lbstatus:change"),
-    NODE_SHUTDOWN("node:shutdown");
+    NODE_SHUTDOWN("node:shutdown"),
+    AGENTS_READ("agents:read");
 
     private final String permission;
 
