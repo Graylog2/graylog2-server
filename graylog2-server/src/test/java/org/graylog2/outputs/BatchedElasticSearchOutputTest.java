@@ -18,7 +18,7 @@ package org.graylog2.outputs;
 
 import com.codahale.metrics.MetricRegistry;
 import com.google.common.collect.ImmutableList;
-import com.google.common.util.concurrent.Uninterruptibles;
+import com.jayway.awaitility.Duration;
 import org.graylog2.Configuration;
 import org.graylog2.indexer.cluster.Cluster;
 import org.graylog2.indexer.messages.Messages;
@@ -32,8 +32,8 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
+import static com.jayway.awaitility.Awaitility.await;
 import static org.mockito.Matchers.anyListOf;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
@@ -122,10 +122,12 @@ public class BatchedElasticSearchOutputTest {
             output.write(message);
         }
 
-        // Give the asynchronous flush a chance to finish
-        Uninterruptibles.sleepUninterruptibly(250, TimeUnit.MILLISECONDS);
-
-        verify(messages, times(1)).bulkIndex(eq(messageList.subList(0, batchSize)));
+        await().atMost(Duration.FIVE_SECONDS).until(new Runnable() {
+            @Override
+            public void run() {
+                verify(messages, times(1)).bulkIndex(eq(messageList.subList(0, batchSize)));
+            }
+        });
     }
 
     @Test
