@@ -110,6 +110,9 @@ var Navigation = React.createClass({
         if (this._isActive("/system/grokpatterns")) {
             suffix = " / Grok Patterns";
         }
+        if (this._isActive("/system/agents")) {
+            suffix = " / Agents";
+        }
 
         return "System" + suffix;
     },
