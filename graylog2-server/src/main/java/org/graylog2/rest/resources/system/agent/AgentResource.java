@@ -25,6 +25,7 @@ import com.wordnik.swagger.annotations.ApiParam;
 import com.wordnik.swagger.annotations.ApiResponse;
 import com.wordnik.swagger.annotations.ApiResponses;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.Configuration;
 import org.graylog2.agents.Agent;
 import org.graylog2.agents.AgentService;
@@ -33,6 +34,7 @@ import org.graylog2.database.NotFoundException;
 import org.graylog2.rest.models.agent.responses.AgentList;
 import org.graylog2.rest.models.agent.responses.AgentSummary;
 import org.graylog2.shared.rest.resources.RestResource;
+import org.graylog2.shared.security.RestPermissions;
 import org.joda.time.DateTime;
 
 import javax.inject.Inject;
@@ -49,6 +51,7 @@ import java.util.List;
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 @RequiresAuthentication
+@RequiresPermissions(RestPermissions.AGENTS_READ)
 public class AgentResource extends RestResource {
     private final AgentService agentService;
     private final LostAgentFunction lostAgentFunction;
