@@ -16,6 +16,7 @@
  */
 package org.graylog2.restclient.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import org.graylog2.restclient.lib.APIException;
@@ -121,6 +122,7 @@ public class StreamRule {
         return stream_id;
     }
 
+    @JsonIgnore
     public Stream getStream() throws IOException, APIException {
         if (this.streamService == null)
             throw new RuntimeException("foo");
