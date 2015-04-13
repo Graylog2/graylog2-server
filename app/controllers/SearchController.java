@@ -27,6 +27,7 @@ import com.google.common.collect.Sets;
 import com.google.common.net.MediaType;
 import lib.SearchTools;
 import lib.security.RestPermissions;
+import org.graylog2.rest.models.system.indexer.responses.IndexRangeSummary;
 import org.graylog2.restclient.lib.APIException;
 import org.graylog2.restclient.lib.ApiClient;
 import org.graylog2.restclient.lib.Field;
@@ -41,7 +42,6 @@ import org.graylog2.restclient.models.SearchSort;
 import org.graylog2.restclient.models.Stream;
 import org.graylog2.restclient.models.UniversalSearch;
 import org.graylog2.restclient.models.api.responses.QueryParseError;
-import org.graylog2.restclient.models.api.responses.system.indices.IndexRangeSummary;
 import org.graylog2.restclient.models.api.results.DateHistogramResult;
 import org.graylog2.restclient.models.api.results.SearchResult;
 import org.joda.time.DateTime;
@@ -52,6 +52,8 @@ import views.helpers.Permissions;
 
 import javax.inject.Inject;
 import java.io.IOException;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -169,8 +171,14 @@ public class SearchController extends AuthenticatedController {
         // We don't want to use fromDateTime coming from the search query if the user asked for all messages
         if (isEmptyRelativeRange(searchResult.getTimeRange())) {
             List<IndexRangeSummary> usedIndices = searchResult.getUsedIndices();
-            IndexRangeSummary oldestIndex = usedIndices.get(usedIndices.size() - 1);
-            queryRangeInMinutes = Minutes.minutesBetween(DateTime.parse(oldestIndex.starts), searchResult.getToDateTime()).getMinutes();
+            Collections.sort(usedIndices, new Comparator<IndexRangeSummary>() {
+                @Override
+                public int compare(IndexRangeSummary o1, IndexRangeSummary o2) {
+                    return o1.start().compareTo(o2.start());
+                }
+            });
+            IndexRangeSummary oldestIndex = usedIndices.get(0);
+            queryRangeInMinutes = Minutes.minutesBetween(oldestIndex.start(), searchResult.getToDateTime()).getMinutes();
         } else {
             queryRangeInMinutes = Minutes.minutesBetween(searchResult.getFromDateTime(), searchResult.getToDateTime()).getMinutes();
         }
