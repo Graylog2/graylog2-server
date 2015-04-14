@@ -199,7 +199,7 @@ public class ClusterEventService extends AbstractExecutionThreadService {
             return;
         }
 
-        final String className = event.getClass().getCanonicalName();
+        final String className = getCanonicalName(event.getClass());
         final ClusterEvent clusterEvent = ClusterEvent.create(nodeId.toString(), className, event);
 
         try {
@@ -208,5 +208,26 @@ public class ClusterEventService extends AbstractExecutionThreadService {
         } catch (MongoException e) {
             LOG.error("Couldn't publish cluster event of type <" + className + ">", e);
         }
+    }
+
+    /**
+     * Get the canonical class name of the provided {@link Class} with special handling of Google AutoValue classes.
+
+     * @param aClass a class
+     * @return the canonical class name of {@code aClass} or its super class in case of an auto-generated class by
+     * Google AutoValue
+     *
+     * @see Class#getCanonicalName()
+     * @see com.google.auto.value.AutoValue
+     */
+    private String getCanonicalName(final Class<?> aClass) {
+        final Class<?> cls;
+        if(aClass.getSimpleName().startsWith("AutoValue_")) {
+            cls = aClass.getSuperclass();
+        } else {
+            cls = aClass;
+        }
+
+        return cls.getCanonicalName();
     }
 }
