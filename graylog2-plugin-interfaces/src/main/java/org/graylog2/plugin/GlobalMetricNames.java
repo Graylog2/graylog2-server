@@ -44,4 +44,13 @@ public final class GlobalMetricNames {
     public static final String OUTPUT_BUFFER_USAGE = "org.graylog2.buffers.output.usage";
     public static final String OUTPUT_BUFFER_SIZE = "org.graylog2.buffers.output.size";
 
+    public static final String JOURNAL_APPEND_RATE = name("org.graylog2.journal.append", RATE_SUFFIX);
+    public static final String JOURNAL_READ_RATE = name("org.graylog2.journal.read", RATE_SUFFIX);
+    public static final String JOURNAL_SEGMENTS = "org.graylog2.journal.segments";
+    public static final String JOURNAL_UNCOMMITTED_ENTRIES = "org.graylog2.journal.entries-uncommitted";
+    public static final String JOURNAL_SIZE = "org.graylog2.journal.size";
+    public static final String JOURNAL_SIZE_LIMIT = "org.graylog2.journal.size-limit";
+    public static final String JOURNAL_UTILIZATION_RATIO = "org.graylog2.journal.utilization-ratio";
+    public static final String JOURNAL_OLDEST_SEGMENT = "org.graylog2.journal.oldest-segment";
+
 }

@@ -47,9 +47,12 @@ import kafka.message.MessageSet;
 import kafka.utils.KafkaScheduler;
 import kafka.utils.Time;
 import kafka.utils.Utils;
+import org.graylog2.plugin.GlobalMetricNames;
 import org.graylog2.plugin.ThrottleState;
 import org.graylog2.shared.metrics.HdrTimer;
+import org.joda.time.DateTime;
 import org.joda.time.DateTimeUtils;
+import org.joda.time.DateTimeZone;
 import org.joda.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -333,6 +336,16 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
             @Override
             public Long getValue() {
                 return kafkaLog.lastFlushTime();
+            }
+        });
+        metricRegistry.register(GlobalMetricNames.JOURNAL_OLDEST_SEGMENT, new Gauge<DateTime>() {
+            @Override
+            public DateTime getValue() {
+                long oldestSegment = Long.MAX_VALUE;
+                for (final LogSegment segment : getSegments()) {
+                    oldestSegment = Math.min(oldestSegment, segment.created());
+                }
+                return new DateTime(oldestSegment, DateTimeZone.UTC);
             }
         });
     }

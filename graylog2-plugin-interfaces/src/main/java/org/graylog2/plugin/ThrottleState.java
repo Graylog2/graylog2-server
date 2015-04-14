@@ -32,6 +32,18 @@ public class ThrottleState {
     public long readEventsPerSec;
     public long processBufferCapacity;
 
+    public ThrottleState() {
+    }
+
+    public ThrottleState(ThrottleState o) {
+        this.uncommittedJournalEntries = o.uncommittedJournalEntries;
+        this.appendEventsPerSec = o.appendEventsPerSec;
+        this.journalSize = o.journalSize;
+        this.journalSizeLimit = o.journalSizeLimit;
+        this.readEventsPerSec = o.readEventsPerSec;
+        this.processBufferCapacity = o.processBufferCapacity;
+    }
+
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
