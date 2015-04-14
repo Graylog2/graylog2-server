@@ -5,7 +5,7 @@ jdk:
   - oraclejdk7
   - oraclejdk8
 node_js:
-  - "0.10"
+  - "0.10.36"
 env:
   global:
   - secure: |-
