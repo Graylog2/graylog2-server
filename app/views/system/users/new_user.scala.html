@@ -9,90 +9,180 @@
 @import com.google.common.collect.ImmutableList
 @import controllers.routes
 
-@main("Create new users", views.html.system.sidebar(), "", currentUser) {
+@main("Create new users", null, "", currentUser, false) {
 
     @views.html.partials.breadcrumbs(breadcrumbs)
 
-    <div class="row">
-        <h1><i class="fa fa-user"></i> Create new user</h1>
-        Use this page to create new Graylog users. The users and their permissions created here are not limited to
-        the web interface but valid and required for the REST APIs of your Graylog server nodes, too.
+    <div class="row content content-head">
+        <div class="col-md-10">
+            <h1>Create new user</h1>
+            <p class="description">
+                Use this page to create new Graylog users. The users and their permissions created here are not limited
+                to the web interface but valid and required for the REST APIs of your Graylog server nodes, too.
+            </p>
+        </div>
     </div>
 
-    <div class="row">
-        <form id="create-user-form" class="user-form" action="@routes.UsersController.create()" method="POST">
-            <label for="username">Username</label>
-            <span class="help-block">Select a unique user name used to log in with.</span>
-            <input name="username" id="username" type="text" value="@form("username").value()" required maxlength="100" />
+    <div class="row content">
+        <div class="col-md-6">
+            <form id="create-user-form" class="form-horizontal" action="@routes.UsersController.create()" method="POST">
+                <div class="form-group">
+                    <label for="username" class="col-sm-2 control-label">Username</label>
+                    <div class="col-sm-10">
+                        <input name="username"
+                        id="username"
+                        class="form-control"
+                        type="text"
+                        value="@form("username").value()"
+                        maxlength="100"
+                        required />
+                        <span class="help-block">Select a unique user name used to log in with.</span>
+                    </div>
+                </div>
 
-            <label class="checkbox">
-                <input name="admin" id="admin" type="checkbox"/>
-                Is Admin account
-            </label>
-            <span class="help-block">Admin accounts have access to all functionality, including adding users.</span>
+                <div class="form-group">
+                    <label for="fullname" class="col-sm-2 control-label">Full Name</label>
+                    <div class="col-sm-10">
+                        <input name="fullname"
+                        id="fullname"
+                        class="form-control"
+                        type="text"
+                        value="@form("fullname").value()"
+                        maxlength="200"
+                        required />
+                        <span class="help-block">Give a descriptive name for this account, e.g. the full name.</span>
+                    </div>
+                </div>
 
+                <div class="form-group">
+                    <label for="email" class="col-sm-2 control-label">Email Address</label>
+                    <div class="col-sm-10">
+                        <input name="email"
+                        id="email"
+                        class="form-control"
+                        type="email"
+                        value="@form("email").value()"
+                        maxlength="254"
+                        required />
+                        <span class="help-block">Give the contact email address.</span>
+                    </div>
+                </div>
 
-            <label for="fullname">Full Name</label>
-            <span class="help-block">Give a descriptive name for this account, e.g. the full name.</span>
-            <input name="fullname" id="fullname" type="text" value="@form("fullname").value()" required maxlength="200" />
+                <div class="form-group">
+                    <label for="password" class="col-sm-2 control-label">Password</label>
+                    <div class="col-sm-10">
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <input name="password"
+                                id="password"
+                                class="form-control"
+                                type="password"
+                                placeholder="Password"
+                                required />
+                            </div>
+                            <div class="col-sm-6">
+                                <input id="password-repeat"
+                                class="form-control"
+                                type="password"
+                                placeholder="Repeat password"
+                                required />
+                            </div>
+                        </div>
+                        <span class="help-block">
+                            Passwords must be at least 6 characters long. We recommend using a strong password.
+                        </span>
+                    </div>
+                </div>
 
-            <label for="email">Email Address</label>
-            <span class="help-block">Give the contact email address.</span>
-            <input name="email" id="email" type="email" value="@form("email").value()" required maxlength="254" />
+                <div class="form-group">
+                    <div class="col-sm-offset-2 col-sm-10">
+                        <div class="checkbox">
+                            <label>
+                                <input name="admin" id="admin" type="checkbox"/>
+                                Is Admin account
+                            </label>
+                        </div>
+                        <span class="help-block">
+                            Admin accounts have access to all functionality, including adding new users.
+                        </span>
+                    </div>
+                </div>
 
-            <label for="password">Password</label>
-            <span class="help-block"></span>
-            <input name="password" id="password" type="password" required />
+                <div class="form-group">
+                    <div class="col-sm-offset-2 col-sm-10">
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox"
+                                id="session-timeout-never"
+                                name="session_timeout_never"
+                                @if("true".equals(form("session_timeout_never").value())) {checked} />
+                                Sessions do not time out
+                            </label>
+                        </div>
+                        <span class="help-block">When checked sessions never time out due to inactivity.</span>
+                    </div>
+                </div>
 
-            <label for="password-repeat">Repeat Password</label>
-            <span class="help-block">Repeat the password.</span>
-            <input id="password-repeat" type="password" required />
-            <!--
-            <label for="permissions">Permissions</label>
-            <span class="help-block">Choose the permissions granted to the account.</span>
-            <select name="permissions" id="permissions" data-placeholder="Choose permissions..." multiple required class="permission-select">
-            @for(permission <- permissions) {
-                <option @{if(selectedPermissions.contains(permission)) "selected"}>@permission</option>
-            }
-            </select>
-            -->
+                <div class="form-group">
+                    <label for="timeout" class="col-sm-2 control-label">Timeout</label>
+                    <div class="col-sm-10">
+                        <div class="row">
+                            <div class="col-sm-2">
+                                <input type="number"
+                                id="timeout"
+                                class="session-timeout-fields validatable form-control"
+                                name="timeout"
+                                min="1"
+                                data-validate="positive_number" value="@form("timeout").value" />
+                            </div>
+                            <div class="col-sm-3">
+                                <select name="timeout_unit" id="timeout_unit" class="session-timeout-fields form-control">
+                                    <option value="seconds" @if("seconds".equals(form("timeout_unit").value)) {selected}>Seconds</option>
+                                    <option value="minutes" @if("minutes".equals(form("timeout_unit").value)) {selected}>Minutes</option>
+                                    <option value="hours" @if("hours".equals(form("timeout_unit").value)) {selected}>Hours</option>
+                                    <option value="days" @if("days".equals(form("timeout_unit").value)) {selected}>Days</option>
+                                </select>
+                            </div>
+                        </div>
+                        <span class="help-block">
+                            Session automatically end after this amount of time, unless they are actively used.
+                        </span>
+                    </div>
+                </div>
 
-            <label class="checkbox">
-                <input type="checkbox" id="session-timeout-never" name="session_timeout_never" @if("true".equals(form("session_timeout_never").value())) {checked} />
-                Sessions do not time out
-            </label>
-            <span class="help-block">When checked sessions never time out due to inactivity.</span>
+                <div class="form-group">
+                    <label for="timezone" class="col-sm-2 control-label">Time Zone</label>
+                    <div class="col-sm-10">
+                        <div class="row">
+                            <div class="col-sm-5">
+                                <select name="timezone" id="timezone" data-placeholder="Pick your time zone" class="timezone-select">
+                                @for(group <- ImmutableList.copyOf(timezones.keys).sorted) {
+                                    <option></option>
+                                    <optgroup label="@group">
+                                    @for(zone <- ImmutableList.copyOf(timezones.get(group).iterator()).sorted) {
+                                        <option value="@group/@zone" @if(applicationTimeZone.getID.equals(group + "/" + zone)) {selected}>@zone </option>
+                                    }
+                                    </optgroup>
+                                }
+                                </select>
+                            </div>
+                        </div>
+                        <span class="help-block">
+                            Choose your local time zone or leave it as it is to use the system's default.
+                        </span>
+                    </div>
+                </div>
 
-            <label for="timeout">Explicit timeout</label>
-            <span class="help-block">Session automatically end after this amount of time, unless they are actively used.</span>
-            <input type="text" data-validate="positive_number" name="timeout" id="timeout" value="@form("timeout").value" class="col-md-1 session-timeout-fields validatable" />
-            <select name="timeout_unit" id="timeout_unit" class="col-md-2 session-timeout-fields">
-                <option value="seconds" @if("seconds".equals(form("timeout_unit").value)) {selected}>Seconds</option>
-                <option value="minutes" @if("minutes".equals(form("timeout_unit").value)) {selected}>Minutes</option>
-                <option value="hours" @if("hours".equals(form("timeout_unit").value)) {selected}>Hours</option>
-                <option value="days" @if("days".equals(form("timeout_unit").value)) {selected}>Days</option>
-            </select>
-
-            <label for="timezone">Time Zone</label>
-            <span class="help-block">Choose your local time zone or leave it as it is to use the system's default.</span>
-            <select name="timezone" id="timezone" data-placeholder="Pick your time zone" class="timezone-select">
-            @for(group <- ImmutableList.copyOf(timezones.keys).sorted) {
-                <option></option>
-                <optgroup label="@group">
-                @for(zone <- ImmutableList.copyOf(timezones.get(group).iterator()).sorted) {
-                    <option value="@group/@zone" @if(applicationTimeZone.getID.equals(group+"/"+zone)) {selected}>@zone</option>
-                }
-                </optgroup>
-            }
-            </select>
-
-            <div class="pull-right">
-                <button type="submit" class="btn btn-primary create-user">
-                    <i class="fa fa-rocket"></i>
-                    Create User
-                </button>
-            </div>
-        </form>
+                <div class="form-group">
+                    <div class="col-sm-offset-2 col-sm-10">
+                        <button type="submit" class="btn btn-success create-user">
+                            <i class="fa fa-rocket"></i>
+                            Create User
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
     </div>
 
 }
