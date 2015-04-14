@@ -29,7 +29,7 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.common.util.concurrent.Service;
 import com.google.common.util.concurrent.ServiceManager;
-import com.google.common.util.concurrent.Uninterruptibles;
+import com.jayway.awaitility.Duration;
 import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
 import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
 import com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb;
@@ -59,6 +59,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import static com.jayway.awaitility.Awaitility.await;
 import static com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb.InMemoryMongoRuleBuilder.newInMemoryMongoDbRule;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
@@ -141,15 +142,23 @@ public class ClusterEventServiceTest {
         assertThat(serviceManager.servicesByState().get(Service.State.RUNNING)).contains(clusterEventService);
         assertThat(clusterEventService.isRunning()).isTrue();
 
-        Uninterruptibles.sleepUninterruptibly(1L, TimeUnit.SECONDS);
+        await().atMost(Duration.FIVE_SECONDS).until(new Runnable() {
+            @Override
+            public void run() {
+                assertThat(collection.count()).isEqualTo(1L);
+            }
+        });
 
-        assertThat(collection.count()).isEqualTo(1L);
+        await().atMost(Duration.FIVE_SECONDS).until(new Runnable() {
+            @Override
+            public void run() {
+                DBObject dbObject = collection.findOne();
 
-        DBObject dbObject = collection.findOne();
-
-        @SuppressWarnings("unchecked")
-        final List<String> consumers = (List<String>) dbObject.get("consumers");
-        assertThat(consumers).containsExactly(nodeId.toString());
+                @SuppressWarnings("unchecked")
+                final List<String> consumers = (List<String>) dbObject.get("consumers");
+                assertThat(consumers).containsExactly(nodeId.toString());
+            }
+        });
 
         serviceManager
                 .stopAsync()
@@ -162,7 +171,7 @@ public class ClusterEventServiceTest {
     @Test
     @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
     public void serverEventBusDispatchesTypedEvents() throws Exception {
-        SimpleEventHandler handler = new SimpleEventHandler();
+        final SimpleEventHandler handler = new SimpleEventHandler();
         serverEventBus.register(handler);
 
         DBObject event = new BasicDBObjectBuilder()
@@ -186,16 +195,24 @@ public class ClusterEventServiceTest {
         assertThat(serviceManager.servicesByState().get(Service.State.RUNNING)).contains(clusterEventService);
         assertThat(clusterEventService.isRunning()).isTrue();
 
-        Uninterruptibles.sleepUninterruptibly(1L, TimeUnit.SECONDS);
+        await().atMost(Duration.FIVE_SECONDS).until(new Runnable() {
+            @Override
+            public void run() {
+                assertThat(handler.invocations).isEqualTo(1);
+                assertThat(collection.count()).isEqualTo(1L);
+            }
+        });
 
-        assertThat(handler.invocations).isEqualTo(1);
-        assertThat(collection.count()).isEqualTo(1L);
+        await().atMost(Duration.FIVE_SECONDS).until(new Runnable() {
+            @Override
+            public void run() {
+                DBObject dbObject = collection.findOne();
 
-        DBObject dbObject = collection.findOne();
-
-        @SuppressWarnings("unchecked")
-        final List<String> consumers = (List<String>) dbObject.get("consumers");
-        assertThat(consumers).containsExactly(nodeId.toString());
+                @SuppressWarnings("unchecked")
+                final List<String> consumers = (List<String>) dbObject.get("consumers");
+                assertThat(consumers).containsExactly(nodeId.toString());
+            }
+        });
 
         serviceManager
                 .stopAsync()
@@ -229,15 +246,23 @@ public class ClusterEventServiceTest {
         assertThat(serviceManager.servicesByState().get(Service.State.RUNNING)).contains(clusterEventService);
         assertThat(clusterEventService.isRunning()).isTrue();
 
-        Uninterruptibles.sleepUninterruptibly(1L, TimeUnit.SECONDS);
+        await().atMost(Duration.FIVE_SECONDS).until(new Runnable() {
+            @Override
+            public void run() {
+                assertThat(collection.count()).isEqualTo(1L);
+            }
+        });
 
-        assertThat(collection.count()).isEqualTo(1L);
+        await().atMost(Duration.FIVE_SECONDS).until(new Runnable() {
+            @Override
+            public void run() {
+                DBObject dbObject = collection.findOne();
 
-        DBObject dbObject = collection.findOne();
-
-        @SuppressWarnings("unchecked")
-        final List<String> consumers = (List<String>) dbObject.get("consumers");
-        assertThat(consumers).containsExactly(nodeId.toString());
+                @SuppressWarnings("unchecked")
+                final List<String> consumers = (List<String>) dbObject.get("consumers");
+                assertThat(consumers).containsExactly(nodeId.toString());
+            }
+        });
 
         serviceManager
                 .stopAsync()
@@ -314,6 +339,7 @@ public class ClusterEventServiceTest {
 
     public static class SimpleEventHandler {
         public volatile int invocations = 0;
+
         @Subscribe
         public void handleSimpleEvent(SimpleEvent event) {
             invocations++;

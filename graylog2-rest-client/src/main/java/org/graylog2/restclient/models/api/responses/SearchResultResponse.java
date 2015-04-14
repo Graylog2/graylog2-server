@@ -17,10 +17,9 @@
 package org.graylog2.restclient.models.api.responses;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.graylog2.restclient.models.api.responses.system.indices.IndexRangeSummary;
+import org.graylog2.rest.models.system.indexer.responses.IndexRangeSummary;
 import org.joda.time.DateTime;
 
-import javax.annotation.Nullable;
 import java.util.List;
 
 public class SearchResultResponse {

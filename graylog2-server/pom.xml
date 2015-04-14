@@ -320,6 +320,10 @@
             <groupId>org.jukito</groupId>
             <artifactId>jukito</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.jayway.awaitility</groupId>
+            <artifactId>awaitility</artifactId>
+        </dependency>
     </dependencies>
 
     <dependencyManagement>

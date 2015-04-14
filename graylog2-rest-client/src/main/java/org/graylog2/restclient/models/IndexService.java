@@ -17,13 +17,13 @@
 package org.graylog2.restclient.models;
 
 import com.google.common.collect.Lists;
+import org.graylog2.rest.models.system.indexer.responses.IndexRangeSummary;
+import org.graylog2.rest.models.system.indexer.responses.IndexRangesResponse;
 import org.graylog2.restclient.lib.APIException;
 import org.graylog2.restclient.lib.ApiClient;
 import org.graylog2.restclient.models.api.responses.system.indices.ClosedIndicesResponse;
 import org.graylog2.restclient.models.api.responses.system.indices.DeflectorConfigResponse;
 import org.graylog2.restclient.models.api.responses.system.indices.DeflectorInformationResponse;
-import org.graylog2.restclient.models.api.responses.system.indices.IndexRangeSummary;
-import org.graylog2.restclient.models.api.responses.system.indices.IndexRangesResponse;
 import org.graylog2.restroutes.generated.routes;
 
 import javax.inject.Inject;

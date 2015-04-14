@@ -38,6 +38,9 @@ public class Gauge extends Metric {
     }
 
     public String getFormattedValue() {
-        return df.format(value);
+        if (value instanceof Number) {
+            return df.format(value);
+        }
+        return "";
     }
 }

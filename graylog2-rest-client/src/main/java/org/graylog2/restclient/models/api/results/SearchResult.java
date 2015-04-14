@@ -33,12 +33,11 @@
 package org.graylog2.restclient.models.api.results;
 
 import com.google.common.collect.Lists;
+import org.graylog2.rest.models.system.indexer.responses.IndexRangeSummary;
 import org.graylog2.restclient.lib.Field;
 import org.graylog2.restclient.lib.timeranges.TimeRange;
 import org.graylog2.restclient.models.FieldMapper;
 import org.graylog2.restclient.models.api.responses.MessageSummaryResponse;
-import org.graylog2.restclient.models.api.responses.SearchResultResponse;
-import org.graylog2.restclient.models.api.responses.system.indices.IndexRangeSummary;
 import org.joda.time.DateTime;
 
 import java.util.List;
