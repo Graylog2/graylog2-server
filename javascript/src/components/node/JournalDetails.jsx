@@ -114,8 +114,8 @@ var JournalDetails = React.createClass({
                             {overcommittedWarning}
 
                             <strong>{numeral(this.state.entriesUncommitted).format('0,0')} unprocessed messages</strong> are currently in the journal, in {this.state.segments} segments.<br/>
-                            <strong>{numeral(this.state.append).format('0,0')} messages</strong> have been appended in the last second,
-                            <strong>{numeral(this.state.read).format('0,0')} messages</strong> have been read in the last second.
+                            <strong>{numeral(this.state.append).format('0,0')} messages</strong> have been appended in the last second, <strong>
+                            {numeral(this.state.read).format('0,0')} messages</strong> have been read in the last second.
                         </Col>
                     </Row>
                 </div>
