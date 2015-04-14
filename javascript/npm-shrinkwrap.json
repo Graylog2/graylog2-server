@@ -4726,17 +4726,10 @@
       "from": "moment@*",
       "resolved": "https://registry.npmjs.org/moment/-/moment-2.10.2.tgz"
     },
-    "moment-interval": {
-      "version": "0.2.1",
-      "from": "moment-interval@*",
-      "resolved": "https://registry.npmjs.org/moment-interval/-/moment-interval-0.2.1.tgz",
-      "dependencies": {
-        "moment": {
-          "version": "2.5.1",
-          "from": "moment@>=2.5.0 <2.6.0",
-          "resolved": "https://registry.npmjs.org/moment/-/moment-2.5.1.tgz"
-        }
-      }
+    "moment-duration-format": {
+      "version": "1.3.0",
+      "from": "moment-duration-format@*",
+      "resolved": "https://registry.npmjs.org/moment-duration-format/-/moment-duration-format-1.3.0.tgz"
     },
     "numeral": {
       "version": "1.5.3",
