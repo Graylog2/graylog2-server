@@ -323,8 +323,7 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
         DBObject modify = new BasicDBObject("$pull", new BasicDBObject(StreamImpl.FIELD_OUTPUTS, outputId));
 
         collection(StreamImpl.class).update(
-                match,
-                modify
+                match, modify, false, true
         );
     }
 }
