@@ -55,9 +55,9 @@ var JvmHeapUsage = React.createClass({
                 this.setState({
                     initialized: true,
                     usedMemory: used,
-                    usedPercentage: Math.floor(usedPercentage),
+                    usedPercentage: usedPercentage,
                     committedMemory: committed,
-                    committedPercentage: Math.floor(committedPercentage),
+                    committedPercentage: committedPercentage,
                     maxMemory: max,
                     hasError: hasError
                 });
