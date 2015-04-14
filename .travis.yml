@@ -1,11 +1,8 @@
 language:
   - java
-  - node_js
 jdk:
   - oraclejdk7
   - oraclejdk8
-node_js:
-  - "0.10"
 env:
   global:
   - secure: |-
@@ -18,6 +15,8 @@ env:
       0Y0YksLljdKHv8mn02KX2tZxLVYjgzq09Dvn0+bGOzQU+TLbkPY=
 before_script:
   - sbt update
+  - nvm install 0.10
+  - nvm use 0.10
   - node --version
   - npm --version
   - npm install -g npm@latest
