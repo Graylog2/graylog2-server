@@ -40,7 +40,7 @@ public abstract class IndexRangeSummary {
     public abstract int calculationTookMs();
 
     @JsonCreator
-    public static IndexRangeSummary create(@JsonProperty("index_name") String indexName,
+    public static IndexRangeSummary create(@JsonProperty("index") String indexName,
                                            @Nullable @JsonProperty("calculated_at") DateTime calculatedAt,
                                            @JsonProperty("start") DateTime start,
                                            @JsonProperty("calculation_took_ms") int calculationTookMs) {
