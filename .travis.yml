@@ -15,7 +15,7 @@ env:
       0Y0YksLljdKHv8mn02KX2tZxLVYjgzq09Dvn0+bGOzQU+TLbkPY=
 before_script:
   - sbt update
-  - nvm use 0.10
+  - nvm use v0.10.36
   - node --version
   - npm --version
   - npm install -g npm@2.1.18
