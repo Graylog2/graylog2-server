@@ -19,7 +19,6 @@ package org.graylog2.bindings;
 import com.google.common.util.concurrent.Service;
 import com.google.inject.AbstractModule;
 import com.google.inject.multibindings.Multibinder;
-import org.graylog2.events.ClusterEventPeriodical;
 import org.graylog2.initializers.BufferSynchronizerService;
 import org.graylog2.initializers.DashboardRegistryService;
 import org.graylog2.initializers.IndexerSetupService;
