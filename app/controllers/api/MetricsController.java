@@ -201,13 +201,14 @@ public class MetricsController extends AuthenticatedController {
                 pushResponse.hasError = true;
                 Logger.warn("Unhandled exception, catching to prevent scheduled task from ending.", e);
             }
-
-            for (String nodeId : entries.keySet()) {
-                pushResponse.metrics.add(createMetricUpdate(nodeId, entries.get(nodeId)));
+            try {
+                for (String nodeId : entries.keySet()) {
+                    pushResponse.metrics.add(createMetricUpdate(nodeId, entries.get(nodeId)));
+                }
+                out.write(Json.toJson(pushResponse).toString());
+            } catch (Exception e){
+                Logger.error("Unhandled exception, catching to prevent scheduled task from ending, this is a bug.", e);
             }
-
-            out.write(Json.toJson(pushResponse).toString());
-
         }
 
         private MetricValuesUpdate createMetricUpdate(String nodeId, Set<Map.Entry<String, Metric>> metrics) {

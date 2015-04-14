@@ -9,10 +9,6 @@
 @import org.joda.time.DateTime
 @import org.joda.time.DateTimeZone
 
-@journalIsOvercommitted(journalInfo: JournalInfo) = @{
-    journalInfo.journalSizeLimit == 0 || ((journalInfo.journalSize * 100.0) / journalInfo.journalSizeLimit >= 100.0)
-}
-
 @main("Node " + node.getNodeId, null, "", currentUser, false) {
 
 
@@ -135,69 +131,21 @@
         </div>
     </div>
 
-    
+
 
     <div class="row content">
         <div class="col-md-12">
-            <h2><i class="fa fa-hdd-o"></i> Disk Journal</h2>
-            @if(node.getJournalInfo.enabled) {
-                <p>Incoming messages are written to the disk journal to ensure they are kept safe in case of a server failure. The journal also helps keeping Graylog working if any of the outputs is too slow to keep up with the message rate
-                or whenever there is a peak in incoming messages. It makes sure that Graylog does not buffer all of those messages in main memory and avoids overly long garbage collection pauses that way.
-                </p>
-                <div class="row">
-                    <div class="col-md-6">
-                        <h3>Configuration</h3>
-                        <dl class="system-journal">
-                            <dt>Path:</dt>
-                            <dd>@node.getJournalInfo.journalConfig.directory</dd>
-                            <dt>Earliest entry: </dt>
-                            <dd>@DateHelper.readablePeriodFromNow(node.getJournalInfo.oldestSegment)</dd>
-                            <dt>Maximum size:</dt>
-                            <dd>
-                                <span class="number-format" data-format="0,0">@node.getJournalInfo.journalConfig.maxSize</span>
-                                bytes
-                            </dd>
-                            <dt>Maximum age:</dt>
-                            <dd>@DateHelper.readableDuration(node.getJournalInfo.journalConfig.maxAge)</dd>
-                            <dt>Flush policy:</dt>
-                            <dd>
-                                Every <span class="number-format" data-format="0,0">@node.getJournalInfo.journalConfig.flushInterval</span>
-                                messages or @DateHelper.readableDuration(node.getJournalInfo.journalConfig.flushAge)
-                            </dd>
-                        </dl>
-                    </div>
-                    <div class="col-md-6">
-                        <h3>Utilization</h3>
-                        @defining(NumberHelper.asPercent(node.getJournalInfo.journalSize, node.getJournalInfo.journalSizeLimit, 1, false)) { utilizationPercent =>
-                            <div class="progress progress-percentage node-journal-usage">
-                                @if(journalIsOvercommitted(node.getJournalInfo)) {
-                                    <div class="progress-bar progress-bar-warning" data-percentage="100" style="width : 100%;">
-                                } else {
-                                    <div class="progress-bar progress-bar-warning" data-percentage="@utilizationPercent" style="width : @utilizationPercent%;">
-                                }
-                                    <span class="number-format" data-format="0.0%">@utilizationPercent%</span>
-                                </div>
-                            </div>
-                            @if(journalIsOvercommitted(node.getJournalInfo)) {
-                                <strong>Warning!</strong> The journal utilization is exceeding the maximum size
-                                defined. <a href="@routes.SystemController.index()">Click here</a> for more information.<br/>
-                            }
-                            <strong><span class="number-format" data-format="0,0">@node.getJournalInfo.uncommittedJournalEntries</span> unprocessed messages</strong>
-                            are currently in the journal, in @node.getJournalInfo.numberOfSegments segments.<br/>
-                            <strong><span class="number-format" data-format="0,0">@node.getJournalInfo.appendEventsPerSecond</span> messages</strong>
-                            have been appended in the last second,
-                            <strong><span class="number-format" data-format="0,0">@node.getJournalInfo.readEventsPerSecond</span> messages</strong>
-                            have been read in the last second.
-                        }
-                    </div>
-                </div>
-           } else {
-                The disk journal is disabled for this node.
-            }
+            <div id="react-journal-info"
+                data-node-id="@node.getNodeId"
+                data-journal-enabled="@node.getJournalInfo.enabled"
+                data-journal-dir="@node.getJournalInfo.journalConfig.directory"
+                data-journal-max-size="@node.getJournalInfo.journalConfig.maxSize"
+                data-journal-maxage="@node.getJournalInfo.journalConfig.maxAge"
+                data-journal-flush-interval="@node.getJournalInfo.journalConfig.flushInterval"
+                data-journal-flush-age="@node.getJournalInfo.journalConfig.flushAge">
+            </div>
         </div>
     </div>
-
-    
 
     <div class="row content">
         <div class="col-md-6">

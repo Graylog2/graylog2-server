@@ -3,6 +3,7 @@
 var React = require('react/addons');
 var JvmHeapUsage = require('./JvmHeapUsage');
 var BufferUsage = require('./BufferUsage');
+var JournalDetails = require('./JournalDetails');
 
 var heapUsage = document.getElementsByClassName('react-jvm-heap');
 if (heapUsage) {
@@ -22,4 +23,18 @@ if (buffers) {
         var bufferType = elem.getAttribute('data-buffer-type');
         React.render(<BufferUsage nodeId={id} title={title} bufferType={bufferType}/>, elem);
     }
+}
+
+var journal = document.getElementById('react-journal-info');
+if (journal) {
+    var id = elem.getAttribute('data-node-id');
+    var dir = journal.getAttribute('data-journal-dir');
+    var enabled = journal.getAttribute('data-journal-enabled');
+    var maxSize = journal.getAttribute('data-journal-max-size');
+    var maxAge = journal.getAttribute('data-journal-maxage');
+    var flushInterval = journal.getAttribute('data-journal-flush-interval');
+    var flushAge = journal.getAttribute('data-journal-flush-age');
+
+    React.render(<JournalDetails nodeId={id} directory={dir} enabled={enabled} maxSize={maxSize} maxAge={maxAge}
+                                 flushInterval={flushInterval} flushAge={flushAge}/>, journal);
 }

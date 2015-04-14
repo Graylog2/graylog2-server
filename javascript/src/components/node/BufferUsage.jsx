@@ -65,7 +65,7 @@ var BufferUsage = React.createClass({
                 <Button href={jsRoutes.controllers.MetricsController.ofNode(this.props.nodeId, this._metricPrefix()).url} bsSize="xsmall" className="pull-right">Metrics</Button>
                 <h3>{this.props.title}</h3>
                 <div className="node-buffer-usage">
-                    <ProgressBar now={numeral(this.state.usagePercentage).format('0.0')}
+                    <ProgressBar now={this.state.usagePercentage}
                                  bsStyle='warning'
                                  label={percentLabel} />
                 </div>
