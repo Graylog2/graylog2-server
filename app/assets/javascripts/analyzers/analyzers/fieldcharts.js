@@ -61,12 +61,14 @@ $(document).ready(function() {
             opts.streamid = container.attr("data-stream-id");
         }
 
-        renderFieldChart(opts);
+        renderFieldChart(opts, container);
         askBeforeUnload();
     });
 
-    function renderFieldChart(opts) {
+    function renderFieldChart(opts, menuContainer) {
         var field = opts.field;
+        var fieldCharts = $(".field-charts", menuContainer);
+        fieldCharts.hide();
 
         // Options.
         if (opts.chartid == undefined) {
@@ -327,7 +329,7 @@ $(document).ready(function() {
                 }
             },
             statusCode: { 400: function() {
-                showError("Line charts are only available for numeric field types.");
+                fieldCharts.show();
             }},
             complete: function() {
                 deleteSpinner(opts.position);
