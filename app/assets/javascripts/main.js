@@ -125,7 +125,7 @@ $(document).ready(function() {
                         return false;
                     });
                 });
-            })
+            });
     }
 
     // Opening messages in sidebar with click in message result table.
@@ -999,6 +999,26 @@ $(document).ready(function() {
         checkboxes.each(function(index, element) {
             $(element).prop("checked", true);
         });
+    });
+
+    /*
+     * Awful workaround to avoid bootstrap modal-backdrop to appear on top of modal.
+     *
+     * The cause of this is that we modify the position and overflow values of some elements
+     * in the sidebar, breaking the modal. We would usually fix that by rendering the modal
+     * somewhere else, but here is easier to move it.
+     */
+    $("#sidebar-original").on("show", function (e) {
+        "use strict";
+        var modal = $(e.target);
+        modal.appendTo("body");
+    });
+    $("#sidebar-replacement").on("show", function (e) {
+        "use strict";
+        var modal = $(e.target);
+        modal.addClass("removable-modal");
+        $("body > .removable-modal").remove();
+        modal.appendTo("body");
     });
 });
 
