@@ -27,14 +27,10 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.eventbus.DeadEvent;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
-import com.google.common.util.concurrent.Service;
-import com.google.common.util.concurrent.ServiceManager;
-import com.jayway.awaitility.Duration;
 import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
 import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
 import com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb;
 import com.mongodb.BasicDBObjectBuilder;
-import com.mongodb.Bytes;
 import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
 import com.mongodb.WriteConcern;
@@ -64,7 +60,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import static com.jayway.awaitility.Awaitility.await;
 import static com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb.InMemoryMongoRuleBuilder.newInMemoryMongoDbRule;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
@@ -74,7 +69,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
-public class ClusterEventServiceTest {
+public class ClusterEventPeriodicalTest {
     @ClassRule
     public static final InMemoryMongoDb IN_MEMORY_MONGO_DB = newInMemoryMongoDbRule().build();
     private static final DateTime TIME = new DateTime(2015, 4, 1, 0, 0, DateTimeZone.UTC);
@@ -82,15 +77,24 @@ public class ClusterEventServiceTest {
     @Rule
     public MongoConnectionRule mongoRule = MongoConnectionRule.build("test");
 
-    private ClusterEventService clusterEventService;
-    private MongoConnection mongoConnection;
+    private final ObjectMapper objectMapper = new ObjectMapper()
+            .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+            .setPropertyNamingStrategy(new PropertyNamingStrategy.LowerCaseWithUnderscoresStrategy())
+            .registerModule(new JodaModule())
+            .registerModule(new GuavaModule())
+            .registerModule(new MetricsModule(TimeUnit.SECONDS, TimeUnit.SECONDS, false))
+            .registerModule(new SimpleModule()
+                    .addSerializer(new ObjectIdSerializer())
+                    .addSerializer(new RangeJsonSerializer())
+                    .addSerializer(new SizeSerializer()));
     @Mock
     private NodeId nodeId;
     @Spy
     private EventBus serverEventBus;
     @Spy
     private EventBus clusterEventBus;
-    private ObjectMapper objectMapper;
+    private MongoConnection mongoConnection;
+    private ClusterEventPeriodical clusterEventPeriodical;
 
     @Before
     public void setUpService() throws Exception {
@@ -98,21 +102,10 @@ public class ClusterEventServiceTest {
 
         this.mongoConnection = mongoRule.getMongoConnection();
 
-        objectMapper = new ObjectMapper()
-                .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
-                .setPropertyNamingStrategy(new PropertyNamingStrategy.LowerCaseWithUnderscoresStrategy())
-                .registerModule(new JodaModule())
-                .registerModule(new GuavaModule())
-                .registerModule(new MetricsModule(TimeUnit.SECONDS, TimeUnit.SECONDS, false))
-                .registerModule(new SimpleModule()
-                        .addSerializer(new ObjectIdSerializer())
-                        .addSerializer(new RangeJsonSerializer())
-                        .addSerializer(new SizeSerializer()));
-
         MongoJackObjectMapperProvider provider = new MongoJackObjectMapperProvider(objectMapper);
         when(nodeId.toString()).thenReturn("ID");
 
-        this.clusterEventService = new ClusterEventService(
+        this.clusterEventPeriodical = new ClusterEventPeriodical(
                 provider,
                 mongoRule.getMongoConnection(),
                 nodeId,
@@ -129,7 +122,7 @@ public class ClusterEventServiceTest {
 
     @Test
     public void clusterEventServiceRegistersItselfWithClusterEventBus() throws Exception {
-        verify(clusterEventBus, times(1)).register(clusterEventService);
+        verify(clusterEventBus, times(1)).register(clusterEventPeriodical);
     }
 
     @Test
@@ -142,41 +135,18 @@ public class ClusterEventServiceTest {
                 .add("event_class", SimpleEvent.class.getCanonicalName())
                 .add("payload", ImmutableMap.of("HAHA", "test"))
                 .get();
-        final DBCollection collection = mongoConnection.getDatabase().getCollection(ClusterEventService.COLLECTION_NAME);
+        final DBCollection collection = mongoConnection.getDatabase().getCollection(ClusterEventPeriodical.COLLECTION_NAME);
         collection.save(event);
 
         assertThat(collection.count()).isEqualTo(1L);
 
-        ServiceManager serviceManager = new ServiceManager(Collections.singleton(clusterEventService));
+        clusterEventPeriodical.run();
 
-        serviceManager
-                .startAsync()
-                .awaitHealthy(1L, TimeUnit.SECONDS);
+        assertThat(collection.count()).isEqualTo(1L);
 
-        assertThat(serviceManager.servicesByState().get(Service.State.RUNNING)).contains(clusterEventService);
-        assertThat(clusterEventService.isRunning()).isTrue();
-
-        await().atMost(Duration.FIVE_SECONDS).until(new Runnable() {
-            @Override
-            public void run() {
-                assertThat(collection.count()).isEqualTo(1L);
-            }
-        });
-
-        await().atMost(Duration.FIVE_SECONDS).until(new Runnable() {
-            @Override
-            public void run() {
-                DBObject dbObject = collection.findOne();
-
-                @SuppressWarnings("unchecked")
-                final List<String> consumers = (List<String>) dbObject.get("consumers");
-                assertThat(consumers).containsExactly(nodeId.toString());
-            }
-        });
-
-        serviceManager
-                .stopAsync()
-                .awaitStopped(5L, TimeUnit.SECONDS);
+        @SuppressWarnings("unchecked")
+        final List<String> consumers = (List<String>) collection.findOne().get("consumers");
+        assertThat(consumers).containsExactly(nodeId.toString());
 
         verify(serverEventBus, never()).post(any());
         verify(clusterEventBus, never()).post(any());
@@ -195,42 +165,19 @@ public class ClusterEventServiceTest {
                 .add("event_class", SimpleEvent.class.getCanonicalName())
                 .add("payload", ImmutableMap.of("payload", "test"))
                 .get();
-        final DBCollection collection = mongoConnection.getDatabase().getCollection(ClusterEventService.COLLECTION_NAME);
+        final DBCollection collection = mongoConnection.getDatabase().getCollection(ClusterEventPeriodical.COLLECTION_NAME);
         assertThat(collection.save(event).getN()).isEqualTo(1);
         assertThat(collection.count()).isEqualTo(1L);
         assertThat(handler.invocations).isEqualTo(0);
 
-        ServiceManager serviceManager = new ServiceManager(Collections.singleton(clusterEventService));
+        clusterEventPeriodical.run();
 
-        serviceManager
-                .startAsync()
-                .awaitHealthy(1L, TimeUnit.SECONDS);
+        assertThat(handler.invocations).isEqualTo(1);
+        assertThat(collection.count()).isEqualTo(1L);
 
-        assertThat(serviceManager.servicesByState().get(Service.State.RUNNING)).contains(clusterEventService);
-        assertThat(clusterEventService.isRunning()).isTrue();
-
-        await().atMost(Duration.FIVE_SECONDS).until(new Runnable() {
-            @Override
-            public void run() {
-                assertThat(handler.invocations).isEqualTo(1);
-                assertThat(collection.count()).isEqualTo(1L);
-            }
-        });
-
-        await().atMost(Duration.FIVE_SECONDS).until(new Runnable() {
-            @Override
-            public void run() {
-                DBObject dbObject = collection.findOne();
-
-                @SuppressWarnings("unchecked")
-                final List<String> consumers = (List<String>) dbObject.get("consumers");
-                assertThat(consumers).containsExactly(nodeId.toString());
-            }
-        });
-
-        serviceManager
-                .stopAsync()
-                .awaitStopped(5L, TimeUnit.SECONDS);
+        @SuppressWarnings("unchecked")
+        final List<String> consumers = (List<String>) collection.findOne().get("consumers");
+        assertThat(consumers).containsExactly(nodeId.toString());
 
         verify(serverEventBus, times(1)).post(any(SimpleEvent.class));
         verify(clusterEventBus, never()).post(any());
@@ -247,41 +194,18 @@ public class ClusterEventServiceTest {
                 .add("event_class", DebugEvent.class.getCanonicalName())
                 .add("payload", objectMapper.convertValue(event, Map.class))
                 .get();
-        final DBCollection collection = mongoConnection.getDatabase().getCollection(ClusterEventService.COLLECTION_NAME);
+        final DBCollection collection = mongoConnection.getDatabase().getCollection(ClusterEventPeriodical.COLLECTION_NAME);
         collection.save(dbObject);
 
         assertThat(collection.count()).isEqualTo(1L);
 
-        ServiceManager serviceManager = new ServiceManager(Collections.singleton(clusterEventService));
+        clusterEventPeriodical.run();
 
-        serviceManager
-                .startAsync()
-                .awaitHealthy(1L, TimeUnit.SECONDS);
+        assertThat(collection.count()).isEqualTo(1L);
 
-        assertThat(serviceManager.servicesByState().get(Service.State.RUNNING)).contains(clusterEventService);
-        assertThat(clusterEventService.isRunning()).isTrue();
-
-        await().atMost(Duration.FIVE_SECONDS).until(new Runnable() {
-            @Override
-            public void run() {
-                assertThat(collection.count()).isEqualTo(1L);
-            }
-        });
-
-        await().atMost(Duration.FIVE_SECONDS).until(new Runnable() {
-            @Override
-            public void run() {
-                DBObject dbObject = collection.findOne();
-
-                @SuppressWarnings("unchecked")
-                final List<String> consumers = (List<String>) dbObject.get("consumers");
-                assertThat(consumers).containsExactly(nodeId.toString());
-            }
-        });
-
-        serviceManager
-                .stopAsync()
-                .awaitStopped(5L, TimeUnit.SECONDS);
+        @SuppressWarnings("unchecked")
+        final List<String> consumers = (List<String>) collection.findOne().get("consumers");
+        assertThat(consumers).containsExactly(nodeId.toString());
 
         verify(serverEventBus, times(1)).post(event);
         verify(clusterEventBus, never()).post(event);
@@ -297,41 +221,18 @@ public class ClusterEventServiceTest {
                 .add("event_class", SimpleEvent.class.getCanonicalName())
                 .add("payload", ImmutableMap.of("payload", "test"))
                 .get();
-        final DBCollection collection = mongoConnection.getDatabase().getCollection(ClusterEventService.COLLECTION_NAME);
+        final DBCollection collection = mongoConnection.getDatabase().getCollection(ClusterEventPeriodical.COLLECTION_NAME);
         collection.save(event);
 
         assertThat(collection.count()).isEqualTo(1L);
 
-        ServiceManager serviceManager = new ServiceManager(Collections.singleton(clusterEventService));
+        clusterEventPeriodical.run();
 
-        serviceManager
-                .startAsync()
-                .awaitHealthy(1L, TimeUnit.SECONDS);
+        assertThat(collection.count()).isEqualTo(1L);
 
-        assertThat(serviceManager.servicesByState().get(Service.State.RUNNING)).contains(clusterEventService);
-        assertThat(clusterEventService.isRunning()).isTrue();
-
-        await().atMost(Duration.FIVE_SECONDS).until(new Runnable() {
-            @Override
-            public void run() {
-                assertThat(collection.count()).isEqualTo(1L);
-            }
-        });
-
-        await().atMost(Duration.FIVE_SECONDS).until(new Runnable() {
-            @Override
-            public void run() {
-                DBObject dbObject = collection.findOne();
-
-                @SuppressWarnings("unchecked")
-                final List<String> consumers = (List<String>) dbObject.get("consumers");
-                assertThat(consumers).containsExactly(nodeId.toString());
-            }
-        });
-
-        serviceManager
-                .stopAsync()
-                .awaitStopped(5L, TimeUnit.SECONDS);
+        @SuppressWarnings("unchecked")
+        final List<String> consumers = (List<String>) collection.findOne().get("consumers");
+        assertThat(consumers).containsExactly(nodeId.toString());
 
         verify(serverEventBus, times(1)).post(new SimpleEvent("test"));
         verify(clusterEventBus, never()).post(event);
@@ -340,12 +241,12 @@ public class ClusterEventServiceTest {
     @Test
     @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
     public void testPublishClusterEvent() throws Exception {
-        DBCollection collection = mongoConnection.getDatabase().getCollection(ClusterEventService.COLLECTION_NAME);
+        DBCollection collection = mongoConnection.getDatabase().getCollection(ClusterEventPeriodical.COLLECTION_NAME);
         SimpleEvent event = new SimpleEvent("test");
 
         assertThat(collection.count()).isEqualTo(0L);
 
-        clusterEventService.publishClusterEvent(event);
+        clusterEventPeriodical.publishClusterEvent(event);
 
         verify(clusterEventBus, never()).post(any());
         assertThat(collection.count()).isEqualTo(1L);
@@ -363,12 +264,12 @@ public class ClusterEventServiceTest {
     @Test
     @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
     public void publishClusterEventHandlesAutoValueCorrectly() throws Exception {
-        DBCollection collection = mongoConnection.getDatabase().getCollection(ClusterEventService.COLLECTION_NAME);
+        DBCollection collection = mongoConnection.getDatabase().getCollection(ClusterEventPeriodical.COLLECTION_NAME);
         DebugEvent event = DebugEvent.create("Node ID", "Test");
 
         assertThat(collection.count()).isEqualTo(0L);
 
-        clusterEventService.publishClusterEvent(event);
+        clusterEventPeriodical.publishClusterEvent(event);
 
         verify(clusterEventBus, never()).post(any());
         assertThat(collection.count()).isEqualTo(1L);
@@ -382,12 +283,12 @@ public class ClusterEventServiceTest {
     @Test
     @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
     public void publishClusterEventSkipsDeadEvent() throws Exception {
-        DBCollection collection = mongoConnection.getDatabase().getCollection(ClusterEventService.COLLECTION_NAME);
+        DBCollection collection = mongoConnection.getDatabase().getCollection(ClusterEventPeriodical.COLLECTION_NAME);
         DeadEvent event = new DeadEvent(clusterEventBus, new SimpleEvent("test"));
 
         assertThat(collection.count()).isEqualTo(0L);
 
-        clusterEventService.publishClusterEvent(event);
+        clusterEventPeriodical.publishClusterEvent(event);
 
         verify(clusterEventBus, never()).post(any());
         assertThat(collection.count()).isEqualTo(0L);
@@ -395,29 +296,25 @@ public class ClusterEventServiceTest {
 
     @Test
     public void prepareCollectionCreatesIndexesOnExistingCollection() throws Exception {
-        DBCollection original = mongoConnection.getDatabase().createCollection(ClusterEventService.COLLECTION_NAME, null);
+        DBCollection original = mongoConnection.getDatabase().createCollection(ClusterEventPeriodical.COLLECTION_NAME, null);
         original.dropIndexes();
-        assertThat(original.getName()).isEqualTo(ClusterEventService.COLLECTION_NAME);
+        assertThat(original.getName()).isEqualTo(ClusterEventPeriodical.COLLECTION_NAME);
         assertThat(original.getIndexInfo()).hasSize(1);
 
-        DBCollection collection = ClusterEventService.prepareCollection(mongoConnection);
-        assertThat(collection.getName()).isEqualTo(ClusterEventService.COLLECTION_NAME);
-        assertThat(collection.getIndexInfo()).hasSize(3);
-        assertThat(collection.getOptions() & Bytes.QUERYOPTION_AWAITDATA).isEqualTo(Bytes.QUERYOPTION_AWAITDATA);
-        assertThat(collection.getOptions() & Bytes.QUERYOPTION_TAILABLE).isEqualTo(Bytes.QUERYOPTION_TAILABLE);
+        DBCollection collection = ClusterEventPeriodical.prepareCollection(mongoConnection);
+        assertThat(collection.getName()).isEqualTo(ClusterEventPeriodical.COLLECTION_NAME);
+        assertThat(collection.getIndexInfo()).hasSize(4);
         assertThat(collection.getWriteConcern()).isEqualTo(WriteConcern.MAJORITY);
     }
 
     @Test
+    @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
     public void prepareCollectionCreatesCollectionIfItDoesNotExist() throws Exception {
-        DBCollection collection = ClusterEventService.prepareCollection(mongoConnection);
+        assertThat(mongoConnection.getDatabase().collectionExists(ClusterEventPeriodical.COLLECTION_NAME)).isFalse();
+        DBCollection collection = ClusterEventPeriodical.prepareCollection(mongoConnection);
 
-        assertThat(collection.getName()).isEqualTo(ClusterEventService.COLLECTION_NAME);
-        // Not supported by Fongo at the moment.
-        // assertThat(collection.isCapped()).isTrue();
-        assertThat(collection.getIndexInfo()).hasSize(3);
-        assertThat(collection.getOptions() & Bytes.QUERYOPTION_AWAITDATA).isEqualTo(Bytes.QUERYOPTION_AWAITDATA);
-        assertThat(collection.getOptions() & Bytes.QUERYOPTION_TAILABLE).isEqualTo(Bytes.QUERYOPTION_TAILABLE);
+        assertThat(collection.getName()).isEqualTo(ClusterEventPeriodical.COLLECTION_NAME);
+        assertThat(collection.getIndexInfo()).hasSize(4);
         assertThat(collection.getWriteConcern()).isEqualTo(WriteConcern.MAJORITY);
     }
 

@@ -18,6 +18,7 @@ package org.graylog2.bindings;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.multibindings.Multibinder;
+import org.graylog2.events.ClusterEventPeriodical;
 import org.graylog2.periodical.AlertScannerThread;
 import org.graylog2.periodical.BatchedElasticSearchOutputFlushThread;
 import org.graylog2.periodical.ClusterHealthCheckThread;
@@ -50,5 +51,6 @@ public class PeriodicalBindings extends AbstractModule {
         periodicalBinder.addBinding().to(StreamThroughputCounterManagerThread.class);
         periodicalBinder.addBinding().to(VersionCheckThread.class);
         periodicalBinder.addBinding().to(ThrottleStateUpdaterThread.class);
+        periodicalBinder.addBinding().to(ClusterEventPeriodical.class);
     }
 }
