@@ -1,4 +1,5 @@
 /* global jsRoutes */
+/* jshint -W079 */
 
 'use strict';
 
@@ -6,7 +7,6 @@ var React = require('react');
 var ProgressBar = require('react-bootstrap').ProgressBar;
 var Row = require('react-bootstrap').Row;
 var Col = require('react-bootstrap').Col;
-var Button = require('react-bootstrap').Button;
 //noinspection JSUnusedGlobalSymbols
 var MetricsStore = require('../../stores/metrics/MetricsStore');
 var numeral = require('numeral');
