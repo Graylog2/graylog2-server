@@ -47,7 +47,9 @@ import org.graylog2.shared.jackson.SizeSerializer;
 import org.graylog2.shared.rest.RangeJsonSerializer;
 import org.graylog2.system.debug.DebugEvent;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeUtils;
 import org.joda.time.DateTimeZone;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
@@ -75,6 +77,7 @@ import static org.mockito.Mockito.when;
 public class ClusterEventServiceTest {
     @ClassRule
     public static final InMemoryMongoDb IN_MEMORY_MONGO_DB = newInMemoryMongoDbRule().build();
+    private static final DateTime TIME = new DateTime(2015, 4, 1, 0, 0, DateTimeZone.UTC);
 
     @Rule
     public MongoConnectionRule mongoRule = MongoConnectionRule.build("test");
@@ -91,6 +94,8 @@ public class ClusterEventServiceTest {
 
     @Before
     public void setUpService() throws Exception {
+        DateTimeUtils.setCurrentMillisFixed(TIME.getMillis());
+
         this.mongoConnection = mongoRule.getMongoConnection();
 
         objectMapper = new ObjectMapper()
@@ -117,6 +122,11 @@ public class ClusterEventServiceTest {
         );
     }
 
+    @After
+    public void tearDown() {
+        DateTimeUtils.setCurrentMillisSystem();
+    }
+
     @Test
     public void clusterEventServiceRegistersItselfWithClusterEventBus() throws Exception {
         verify(clusterEventBus, times(1)).register(clusterEventService);
@@ -126,7 +136,7 @@ public class ClusterEventServiceTest {
     @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
     public void runHandlesInvalidPayloadsGracefully() throws Exception {
         DBObject event = new BasicDBObjectBuilder()
-                .add("date", "2015-04-01T00:00:00.000Z")
+                .add("timestamp", TIME.getMillis())
                 .add("producer", "TEST-PRODUCER")
                 .add("consumers", Collections.emptyList())
                 .add("event_class", SimpleEvent.class.getCanonicalName())
@@ -179,7 +189,7 @@ public class ClusterEventServiceTest {
         serverEventBus.register(handler);
 
         DBObject event = new BasicDBObjectBuilder()
-                .add("date", "2015-04-01T00:00:00.000Z")
+                .add("timestamp", TIME.getMillis())
                 .add("producer", "TEST-PRODUCER")
                 .add("consumers", Collections.emptyList())
                 .add("event_class", SimpleEvent.class.getCanonicalName())
@@ -229,9 +239,9 @@ public class ClusterEventServiceTest {
     @Test
     @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
     public void runHandlesAutoValueCorrectly() throws Exception {
-        final DebugEvent event = DebugEvent.create("Node ID", new DateTime(2015, 4, 1, 0, 0, DateTimeZone.UTC), "test");
+        final DebugEvent event = DebugEvent.create("Node ID", TIME, "test");
         DBObject dbObject = new BasicDBObjectBuilder()
-                .add("date", "2015-04-01T00:00:00.000Z")
+                .add("timestamp", TIME.getMillis())
                 .add("producer", "TEST-PRODUCER")
                 .add("consumers", Collections.emptyList())
                 .add("event_class", DebugEvent.class.getCanonicalName())
@@ -281,7 +291,7 @@ public class ClusterEventServiceTest {
     @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
     public void testRun() throws Exception {
         DBObject event = new BasicDBObjectBuilder()
-                .add("date", "2015-04-01T00:00:00.000Z")
+                .add("timestamp", TIME.getMillis())
                 .add("producer", "TEST-PRODUCER")
                 .add("consumers", Collections.emptyList())
                 .add("event_class", SimpleEvent.class.getCanonicalName())
