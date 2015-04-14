@@ -23,13 +23,15 @@
         <div class="col-md-8">
             <h1>
                 <span data-dashboard-id="@dashboard.getId" class="dashboard-title">@dashboard.getTitle</span>
-                <span class="react-edit-dashboard only-unlocked"
-                data-dashboard-id="@dashboard.getId"
-                data-dashboard-title="@dashboard.getTitle"
-                data-dashboard-description="@dashboard.getDescription"
-                data-button-class="btn-xs">
-                    <i class="fa fa-pencil"></i>
-                </span>
+                @if(!dashboard.getWidgets.isEmpty) {
+                    <span class="react-edit-dashboard only-unlocked"
+                    data-dashboard-id="@dashboard.getId"
+                    data-dashboard-title="@dashboard.getTitle"
+                    data-dashboard-description="@dashboard.getDescription"
+                    data-button-class="btn-xs">
+                        <i class="fa fa-pencil"></i>
+                    </span>
+                }
             </h1>
 
             <p class="description">

@@ -88,7 +88,7 @@ $(document).ready(function() {
         initializeDashboard();
     };
 
-    if ($(".gridster").length > 0){
+    if (dashboard.length > 0){
         initializeDashboard();
 
         var resizeTimeout;
@@ -209,17 +209,10 @@ $(document).ready(function() {
     var unlockDashboard = function() {
         dashboardGrid.enable();
         dashboardGrid.enable_resize();
-        $(".dashboard").addClass("unlocked");
+        dashboard.addClass("unlocked");
         $(this).hide();
         $(".only-unlocked").show();
         $(".hidden-unlocked").hide();
-
-        // Replay links fix. We don't want the links to be clickable when dragging.
-        $(".dashboard .widget a.replay-link").each(function() {
-            $(this).css("cursor", "move")
-                .attr("data-original-href", $(this).attr("href"))
-                .attr("href", "javascript: void(0)");
-        });
 
         $(".dashboard .widget").each(function() {
             $(this).trigger("unlocked.dashboard");
@@ -232,16 +225,10 @@ $(document).ready(function() {
     var lockDashboard = function() {
         dashboardGrid.disable();
         dashboardGrid.disable_resize();
-        $(".dashboard").removeClass("unlocked");
+        dashboard.removeClass("unlocked");
         $(this).hide();
         $(".hidden-unlocked").show();
         $(".only-unlocked").hide();
-
-        // Replay links fix. Make the links clickable again.
-        $(".dashboard .widget a.replay-link").each(function() {
-            $(this).css("cursor", "pointer")
-                .attr("href", $(this).attr("data-original-href"));
-        });
 
         $(".dashboard .widget").each(function() {
             $(this).trigger("locked.dashboard");

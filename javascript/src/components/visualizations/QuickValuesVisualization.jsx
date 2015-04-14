@@ -27,7 +27,7 @@ var QuickValuesVisualization = React.createClass({
     },
     componentDidMount() {
         this._renderDataTable();
-        this._renderGraph();
+        this._renderPieChart();
     },
     componentWillReceiveProps(newProps) {
         var quickValues = newProps.data;
@@ -86,7 +86,7 @@ var QuickValuesVisualization = React.createClass({
 
         this.dataTable.render();
     },
-    _renderGraph() {
+    _renderPieChart() {
         var graphDomNode = this.refs.graph.getDOMNode();
 
         this.pieChart = dc.pieChart(graphDomNode, this.dcGroupName);
@@ -136,14 +136,17 @@ var QuickValuesVisualization = React.createClass({
         this.quickValuesData.remove();
         this.quickValuesData.add(this.state.terms);
         this.dataTable.redraw();
-        this.pieChart.redraw();
+
+        if (this.props.config.show_pie_chart) {
+            this.pieChart.redraw();
+        }
     },
     render() {
         return (
             <div id={"visualization-" + this.props.id} className="quickvalues-visualization">
                 <div className="container-fluid">
                     <div className="row">
-                        <div className="col-md-12">
+                        <div className={this.props.config.show_pie_chart ? "col-md-12" : "hidden"}>
                             <div ref="graph" className="quickvalues-graph"/>
                         </div>
                         <div className="col-md-12">

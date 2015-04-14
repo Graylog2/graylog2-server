@@ -70,7 +70,7 @@
 
                 <ul class="index-list">
                 @for(index <- searchResult.getUsedIndices()) {
-                    <li>@index.index</li>
+                    <li>@index.indexName()</li>
                 }
                 </ul>
             </div>

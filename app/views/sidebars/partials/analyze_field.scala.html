@@ -17,11 +17,11 @@
             <span class="pull-right icons">
                 <i class="fa fa-refresh quickvalues-refresh" data-field="@f.getName" title="Refresh"></i>
 
-                <!--@if(streamId == null || streamId.isEmpty()) {
-                    @views.html.partials.dashboards.add_to_dashboard.render("quickvalues", "Add to dashboard", null)
+                @if(streamId == null || streamId.isEmpty()) {
+                    @views.html.partials.dashboards.add_to_dashboard.render("quickvalues", "<i class=\"fa fa-tachometer\"></i>", null)
                 } else {
-                    @views.html.partials.dashboards.add_to_dashboard.render("quickvalues", "Add to dashboard", Array("data-stream-id='" + streamId + "'"))
-                }-->
+                    @views.html.partials.dashboards.add_to_dashboard.render("quickvalues", "<i class=\"fa fa-tachometer\"></i>", Array("data-stream-id='" + streamId + "'"))
+                }
 
                 <i class="fa fa-play-circle active quickvalues-autorefresh" data-field="@f.getName" title="Automatic refresh"></i>
                 <!--<i class="fa fa-download-alt quickvalues-export" title="Download"></i>-->
