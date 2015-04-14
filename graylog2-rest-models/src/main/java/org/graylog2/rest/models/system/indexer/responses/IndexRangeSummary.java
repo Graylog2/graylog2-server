@@ -27,7 +27,7 @@ import javax.annotation.Nullable;
 @AutoValue
 @JsonAutoDetect
 public abstract class IndexRangeSummary {
-    @JsonProperty("index_name")
+    @JsonProperty("index")
     public abstract String indexName();
 
     @Nullable @JsonProperty("calculated_at")
