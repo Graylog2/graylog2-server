@@ -303,7 +303,7 @@ public class ClusterEventPeriodicalTest {
 
         DBCollection collection = ClusterEventPeriodical.prepareCollection(mongoConnection);
         assertThat(collection.getName()).isEqualTo(ClusterEventPeriodical.COLLECTION_NAME);
-        assertThat(collection.getIndexInfo()).hasSize(3);
+        assertThat(collection.getIndexInfo()).hasSize(2);
         assertThat(collection.getWriteConcern()).isEqualTo(WriteConcern.MAJORITY);
     }
 
@@ -314,7 +314,7 @@ public class ClusterEventPeriodicalTest {
         DBCollection collection = ClusterEventPeriodical.prepareCollection(mongoConnection);
 
         assertThat(collection.getName()).isEqualTo(ClusterEventPeriodical.COLLECTION_NAME);
-        assertThat(collection.getIndexInfo()).hasSize(3);
+        assertThat(collection.getIndexInfo()).hasSize(2);
         assertThat(collection.getWriteConcern()).isEqualTo(WriteConcern.MAJORITY);
     }
 
