@@ -84,17 +84,10 @@ public class OutputServiceImpl extends PersistedServiceImpl implements OutputSer
     }
 
     @Override
-    public Set<Output> loadForStream(Stream stream) {
-        return stream.getOutputs();
-    }
-
-    @Override
     public Output create(Output request) throws ValidationException {
-        final String id = save(request);
-        if (request instanceof OutputImpl) {
-            OutputImpl impl = OutputImpl.class.cast(request);
-            impl.setId(id);
-        }
+        OutputImpl impl = getImplOrFail(request);
+        final String id = save(impl);
+        impl.setId(id);
         return request;
     }
 
@@ -106,9 +99,10 @@ public class OutputServiceImpl extends PersistedServiceImpl implements OutputSer
 
     @Override
     public void destroy(Output output) throws NotFoundException {
+        final OutputImpl impl = getImplOrFail(output);
         streamService.removeOutputFromAllStreams(output);
         outputRegistry.removeOutput(output);
-        super.destroy(output);
+        super.destroy(impl);
     }
 
     @Override
@@ -131,5 +125,14 @@ public class OutputServiceImpl extends PersistedServiceImpl implements OutputSer
         }
 
         return outputsCountByType;
+    }
+
+    OutputImpl getImplOrFail(Output output) {
+        if (output instanceof OutputImpl) {
+            final OutputImpl impl = (OutputImpl) output;
+            return impl;
+        } else {
+            throw new IllegalArgumentException("Passed object must be of OutputImpl class, not " + output.getClass());
+        }
     }
 }
