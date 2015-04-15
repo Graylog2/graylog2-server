@@ -5,6 +5,7 @@
     stream: org.graylog2.restclient.models.Stream,
     availableOutputs: Map[String, org.graylog2.restclient.models.api.responses.AvailableOutputSummary])
 
+@import views.helpers.Permissions
 @import lib.security.RestPermissions._;
 @import views.helpers.Permissions._;
 
@@ -70,19 +71,8 @@
     </div>
     <div class="row content">
         <div class="col-md-12">
-            <div class="outputs-list">
-                <h2><i class="fa fa-cogs"></i> Configured outputs</h2>
-
-                @if(outputs.size > 0) {
-                    @for(output <- outputs.toSeq.sortBy(_.getTitle.toLowerCase)) {
-                        @views.html.system.outputs.partials.output_summary.render(output, stream, availableOutputs.get(output.getType))
-                    }
-                } else {
-                    <div class="alert alert-info">
-                        There are no configured outputs for this stream but all messages are written to the Graylog search
-                        indices by default.
-                    </div>
-                }
+            <h2><i class="fa fa-cogs"></i> Configured outputs</h2>
+            <div class="outputs-list" id="react-output-list" data-permissions="@Permissions.asJson(STREAM_OUTPUTS_DELETE, OUTPUTS_TERMINATE, OUTPUTS_EDIT)" data-stream-id="@stream.getId">
             </div>
         </div>
     </div>

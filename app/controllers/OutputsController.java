@@ -35,7 +35,6 @@ public class OutputsController extends AuthenticatedController {
             if (!Permissions.isPermitted(RestPermissions.OUTPUTS_READ)) {
                 return redirect(routes.StartpageController.redirect());
             }
-            List<Output> outputs = outputService.list();
 
             BreadcrumbList bc = new BreadcrumbList();
             bc.addCrumb("System", routes.SystemController.index(0));
@@ -44,7 +43,6 @@ public class OutputsController extends AuthenticatedController {
             return ok(views.html.system.outputs.index.render(
                     currentUser(),
                     bc,
-                    outputs,
                     outputService.available().types
             ));
         } catch (IOException e) {

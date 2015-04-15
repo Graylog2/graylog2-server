@@ -20,6 +20,7 @@ $(document).ready(() => {
     require('./components/streams/mount');
     require('./components/node/mount');
     require('./components/navigation/mount');
+    require('./components/outputs/mount');
     if (userPreferences.enableSmartSearch) {
         require('./components/search/mount');
     }

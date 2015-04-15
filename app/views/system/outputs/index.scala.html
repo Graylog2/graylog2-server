@@ -1,10 +1,10 @@
 @(currentUser: org.graylog2.restclient.models.User,
         breadcrumbs: lib.BreadcrumbList,
-        outputs: List[org.graylog2.restclient.models.Output],
         availableOutputs: Map[String, org.graylog2.restclient.models.api.responses.AvailableOutputSummary])
 
 @import lib.security.RestPermissions._;
 @import views.helpers.Permissions._;
+@import views.helpers.Permissions
 
 @main("Outputs in cluster", null, "", currentUser) {
     @views.html.partials.breadcrumbs(breadcrumbs)
@@ -45,15 +45,6 @@
         @views.html.system.outputs.partials.output_creation_forms.render(availableOutputs, routes.OutputsController.index())
     }
 
-    @if(outputs.size > 0) {
-        @for(output <- outputs.toSeq.sortBy(_.getTitle)) {
-            @views.html.system.outputs.partials.output_summary.render(output, null, availableOutputs.get(output.getType))
-        }
-    } else {
-        <div class="row content">
-            <div class="col-md-12">
-                <div class="alert alert-info">There are no outputs.</div>
-            </div>
-        </div>
-    }
+    <div id="react-output-list" data-permissions='@Permissions.asJson(STREAM_OUTPUTS_DELETE, OUTPUTS_TERMINATE, OUTPUTS_EDIT)'>
+    </div>
 }

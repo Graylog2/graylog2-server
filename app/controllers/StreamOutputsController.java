@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Set;
 
 import static play.data.Form.form;
+import static views.helpers.Permissions.isPermitted;
 
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
@@ -36,6 +37,9 @@ public class StreamOutputsController extends AuthenticatedController {
     }
 
     public Result index(String streamId) throws IOException, APIException {
+        if (!isPermitted(RestPermissions.STREAMS_READ, streamId) || !isPermitted(RestPermissions.OUTPUTS_READ))
+            return forbidden();
+
         final Stream stream = streamService.get(streamId);
 
         if (stream == null) {
@@ -61,7 +65,7 @@ public class StreamOutputsController extends AuthenticatedController {
     }
 
     public Result create(String streamId) throws APIException, IOException {
-        if (!Permissions.isPermitted(RestPermissions.OUTPUTS_EDIT)) {
+        if (!isPermitted(RestPermissions.OUTPUTS_EDIT)) {
             return redirect(routes.StartpageController.redirect());
         }
 
