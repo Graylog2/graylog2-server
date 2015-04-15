@@ -13,149 +13,227 @@
 @import views.helpers.Permissions._
 @import lib.security.RestPermissions._
 @import controllers.routes
-@import views.helpers.StartpageRouteHelper
 
-@main("Users", views.html.system.sidebar(), "", currentUser) {
+@main("Users", null, "", currentUser, false) {
     @views.html.partials.breadcrumbs(breadcrumbs)
 
-    <div class="row">
-        <h1 class="username"><i class="fa fa-edit"></i> Edit user &raquo;@username&laquo;</h1>
-        You can either change the details of a user here or set a new password.
+
+    <div class="row content content-head">
+        <div class="col-md-12">
+            <div class="pull-right actions">
+                @if(user.getStartpage != null) {
+                    <form action="@routes.StartpageController.reset(user.getName)" method="POST">
+                        <button type="submit" class="btn btn-info" data-confirm="Really reset startpage?">
+                            Reset custom startpage
+                        </button>
+                    </form>
+                }
+                <span id="react-user-preferences-button" data-user-name="@username">
+                    <button class="btn btn-success">User preferences</button>
+                </span>
+            </div>
+
+            <h1>Edit user &raquo;@username&laquo;</h1>
+            <p class="description">You can either change the details of a user here or set a new password.</p>
+        </div>
+
+        <div id="react-user-preferences-modal"></div>
     </div>
 
-    <div class="row" style="margin-top: 30px;">
+    <div class="row content">
         <div class="col-md-6">
+            <h2>User information</h2>
             <form class="form-horizontal user-form" id="edit-user-form" action="@routes.UsersController.saveChanges(username)" method="POST">
-                <div class="control-group">
-                    <label class="control-label" for="fullname">Full Name</label>
-                    <div class="controls">
-                        <input name="fullname" id="fullname" type="text" value="@form("fullname").value()" required maxlength="200"/>
-                        <span class="help-inline">A descriptive name for this account.</span>
+                <div class="form-group">
+                    <label for="fullname" class="col-sm-3 control-label">Full Name</label>
+                    <div class="col-sm-9">
+                        <input name="fullname"
+                        id="fullname"
+                        class="form-control"
+                        type="text"
+                        value="@form("fullname").value()"
+                        maxlength="200"
+                        required />
+                        <span class="help-block">Give a descriptive name for this account, e.g. the full name.</span>
                     </div>
                 </div>
-                <div class="control-group">
-                    <label class="control-label" for="email">Email Address</label>
-                    <div class="controls">
-                        <input name="email" id="email" type="email" value="@form("email").value()" required maxlength="254"/>
+
+                <div class="form-group">
+                    <label for="email" class="col-sm-3 control-label">Email Address</label>
+                    <div class="col-sm-9">
+                        <input name="email"
+                        id="email"
+                        class="form-control"
+                        type="email"
+                        value="@form("email").value()"
+                        maxlength="254"
+                        required />
+                        <span class="help-block">Give the contact email address.</span>
                     </div>
                 </div>
+
                 @if(isPermitted(USERS_EDIT)) {
-                    <div class="control-group">
-                        <label class="control-label" for="streampermissions">Streams Permissions</label>
-                        <div class="controls">
-                            <select id="streampermissions" name="streampermissions[]" data-placeholder="Choose read permissions..." multiple>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label" for="streampermissions">Streams Permissions</label>
+                        <div class="col-sm-9">
+                            <select id="streampermissions" name="streampermissions[]" class="chosen-select" data-placeholder="Choose read permissions..." multiple>
                             @for(stream <- streams.sortBy(_.getTitle)) {
-                                <option @if(isPermitted(user, STREAMS_READ, stream.getId)) {selected} value="@stream.getId">@stream.getTitle</option>
+                                <option @if(isPermitted(user, STREAMS_READ, stream.getId)) {selected} value="@stream.getId">@stream.getTitle </option>
                             }
                             </select>
-                            <span class="help-inline">Choose streams the user can <strong>view</strong>. Removing read access will remove edit access, too.</span>
+                            <span class="help-block">Choose streams the user can <strong>view</strong>
+                                . Removing read access will remove edit access, too.</span>
 
 
                             <select class="streameditpermissions" name="streameditpermissions[]" id="streameditpermissions" data-placeholder="Choose edit permissions..." multiple>
                             @for(stream <- streams.sortBy(_.getTitle)) {
-                                <option @if(isPermitted(user, STREAMS_EDIT, stream.getId)) {selected} value="@stream.getId">@stream.getTitle</option>
+                                <option @if(isPermitted(user, STREAMS_EDIT, stream.getId)) {selected} value="@stream.getId">@stream.getTitle </option>
                             }
                             </select>
-                            <span class="help-inline">Choose the streams the user can <strong>edit</strong>. Values chosen here will enable read access, too.</span>
+                            <span class="help-block">Choose the streams the user can <strong>edit</strong>
+                                . Values chosen here will enable read access, too.</span>
 
                         </div>
                     </div>
-                    <div class="control-group">
-                        <label class="control-label" for="dashboardpermissions">Dashboard Permissions</label>
-                        <div class="controls">
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label" for="dashboardpermissions">Dashboard Permissions</label>
+                        <div class="col-sm-9">
                             <select id="dashboardpermissions" name="dashboardpermissions[]" data-placeholder="Choose read permissions..." multiple>
                             @for(dashboard <- dashboards.sortBy(_.getTitle)) {
-                                <option @if(isPermitted(user, DASHBOARDS_READ, dashboard.getId)) {selected} value="@dashboard.getId">@dashboard.getTitle</option>
+                                <option @if(isPermitted(user, DASHBOARDS_READ, dashboard.getId)) {selected} value="@dashboard.getId">@dashboard.getTitle </option>
                             }
                             </select>
-                            <span class="help-inline">Choose dashboards the user can <strong>view</strong>. Removing read access will remove edit access, too.</span>
+                            <span class="help-block">Choose dashboards the user can <strong>view</strong>
+                                . Removing read access will remove edit access, too.</span>
 
                             <select class="dashboardeditpermissions" id="dashboardeditpermissions" name="dashboardeditpermissions[]" data-placeholder="Choose edit permissions..." multiple>
                             @for(dashboard <- dashboards.sortBy(_.getTitle)) {
-                                <option @if(isPermitted(user, DASHBOARDS_EDIT, dashboard.getId)) {selected} value="@dashboard.getId">@dashboard.getTitle</option>
+                                <option @if(isPermitted(user, DASHBOARDS_EDIT, dashboard.getId)) {selected} value="@dashboard.getId">@dashboard.getTitle </option>
                             }
                             </select>
-                            <span class="help-inline">Choose dashboards the user can <strong>edit</strong>. Values chosen here will enable read access, too.</span>
+                            <span class="help-block">Choose dashboards the user can <strong>edit</strong>
+                                . Values chosen here will enable read access, too.</span>
                         </div>
                     </div>
                 }
-                <div class="control-group">
-                    <label class="control-label" for="timezone">Time Zone</label>
-                    <div class="controls">
-                        <select name="timezone" id="timezone" data-placeholder="Pick your time zone" class="timezone-select">
-                            @for(group <- ImmutableList.copyOf(timezones.keys).sorted) {
-                                <option></option>
-                                <optgroup label="@group">
-                                @for(zone <- ImmutableList.copyOf(timezones.get(group).iterator()).sorted) {
-                                    @if(form("timezone").valueOr("").equals(group+"/"+zone)) {
-                                    <option value="@group/@zone" selected>@zone</option>
-                                    } else {
-                                    <option value="@group/@zone">@zone</option>
-                                    }
-                                }
-                                </optgroup>
-                            }
-                        </select>
 
-                    </div>
-                </div>
                 @if(isPermitted("*")) {
-                <div class="control-group">
-                    <label class="control-label" for="session-timeout-never">Session timeout</label>
-                    <div class="controls">
-                        <label class="checkbox">
-                            <input type="checkbox" id="session-timeout-never" name="session_timeout_never" @if("true".equals(form("session_timeout_never").value())) {checked} />
-                            Sessions do not time out
-                        </label>
+                    <div class="form-group">
+                        <div class="col-sm-offset-3 col-sm-9">
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox"
+                                    id="session-timeout-never"
+                                    name="session_timeout_never"
+                                    @if("true".equals(form("session_timeout_never").value())) {checked} />
+                                    Sessions do not time out
+                                </label>
+                            </div>
+                            <span class="help-block">When checked sessions never time out due to inactivity.</span>
+                        </div>
                     </div>
-                </div>
-                <div class="control-group">
-                    <label class="control-label" for="timeout"></label>
-                    <div class="controls">
-                        <input type="text" data-validate="positive_number" name="timeout" id="timeout" value="@form("timeout").value" class="col-md-4 session-timeout-fields validatable" required />
-                        <select name="timeout_unit" id="timeout_unit" class="col-md-4 session-timeout-fields">
-                            <option value="seconds" @if("seconds".equals(form("timeout_unit").value)) {selected}>Seconds</option>
-                            <option value="minutes" @if("minutes".equals(form("timeout_unit").value)) {selected}>Minutes</option>
-                            <option value="hours" @if("hours".equals(form("timeout_unit").value)) {selected}>Hours</option>
-                            <option value="days" @if("days".equals(form("timeout_unit").value)) {selected}>Days</option>
-                        </select>
+
+                    <div class="form-group">
+                        <label for="timeout" class="col-sm-3 control-label">Timeout</label>
+                        <div class="col-sm-9">
+                            <div class="row">
+                                <div class="col-sm-3">
+                                    <input type="number"
+                                    id="timeout"
+                                    class="session-timeout-fields validatable form-control"
+                                    name="timeout"
+                                    min="1"
+                                    data-validate="positive_number" value="@form("timeout").value" />
+                                </div>
+                                <div class="col-sm-3">
+                                    <select name="timeout_unit" id="timeout_unit" class="session-timeout-fields form-control">
+                                        <option value="seconds" @if("seconds".equals(form("timeout_unit").value)) {selected}>Seconds</option>
+                                        <option value="minutes" @if("minutes".equals(form("timeout_unit").value)) {selected}>Minutes</option>
+                                        <option value="hours" @if("hours".equals(form("timeout_unit").value)) {selected}>Hours</option>
+                                        <option value="days" @if("days".equals(form("timeout_unit").value)) {selected}>Days</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <span class="help-block">
+                                Session automatically end after this amount of time, unless they are actively used.
+                            </span>
+                        </div>
                     </div>
-                </div>
                 }
-                <div class="control-group">
-                    <div class="controls">
-                    <button type="submit" class="btn btn-success create-user">
-                        Save changes
-                    </button>
+
+                <div class="form-group">
+                    <label for="timezone" class="col-sm-3 control-label">Time Zone</label>
+                    <div class="col-sm-9">
+                        <div class="row">
+                            <div class="col-sm-5">
+                                <select name="timezone" id="timezone" data-placeholder="Pick your time zone" class="timezone-select">
+                                @for(group <- ImmutableList.copyOf(timezones.keys).sorted) {
+                                    <option></option>
+                                    <optgroup label="@group">
+                                    @for(zone <- ImmutableList.copyOf(timezones.get(group).iterator()).sorted) {
+                                        @if(form("timezone").valueOr("").equals(group + "/" + zone)) {
+                                            <option value="@group/@zone" selected>@zone</option>
+                                        } else {
+                                            <option value="@group/@zone">@zone</option>
+                                        }
+                                    }
+                                    </optgroup>
+                                }
+                                </select>
+                            </div>
+                        </div>
+                        <span class="help-block">
+                            Choose your local time zone or leave it as it is to use the system's default.
+                        </span>
+                    </div>
                 </div>
+
+                <div class="form-group">
+                    <div class="col-sm-offset-3 col-sm-9">
+                        <button type="submit" class="btn btn-success create-user">
+                            Update User
+                        </button>
+                    </div>
                 </div>
             </form>
         </div>
+    </div>
+
+    <div class="row content">
         <div class="col-md-6">
-            @if(!user.isExternal) {
+            <h2>Change password</h2>
+            @if(user.isExternal) {
+                <p>
+                    This user was created from an external system and you can't change the password here.
+                    Please contact an administrator for more information.
+                </p>
+            } else {
                 <form class="form-horizontal" action="@routes.UsersController.changePassword(username)" method="POST">
                     @if(requiresOldPassword) {
-                    <div class="control-group">
-                        <label class="control-label" for="old-password">Old Password</label>
-                        <div class="controls">
-                            <input type="password" id="old-password" name="old_password" required />
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label" for="old-password">Old Password</label>
+                            <div class="col-sm-9">
+                                <input type="password" id="old-password" name="old_password" class="form-control" required />
+                            </div>
                         </div>
-                    </div>
                     }
-                    <div class="control-group">
-                        <label class="control-label" for="password">New Password</label>
-                        <div class="controls">
-                            <input type="password" id="password" name="password" required />
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label" for="password">New Password</label>
+                        <div class="col-sm-9">
+                            <input type="password" id="password" name="password" class="form-control" required />
+                            <span class="help-block">
+                                Passwords must be at least 6 characters long. We recommend using a strong password.
+                            </span>
                         </div>
                     </div>
-                    <div class="control-group">
-                        <label class="control-label" for="password-repeat">Confirm Password</label>
-                        <div class="controls">
-                            <input type="password" id="password-repeat" required/>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label" for="password-repeat">Repeat Password</label>
+                        <div class="col-sm-9">
+                            <input type="password" id="password-repeat" class="form-control" required/>
                         </div>
                     </div>
-                    <div class="control-group">
-                        <div class="controls">
+                    <div class="form-group">
+                        <div class="col-sm-offset-3 col-sm-9">
                             <button class="btn btn-success" type="submit">
                                 Update Password
                             </button>
@@ -167,65 +245,63 @@
     </div>
 
     @if(isPermitted(USERS_PERMISSIONSEDIT)) {
-    <div class="row">
-        <h2><h2><i class="fa fa-bolt"></i> Change Permissions</h2>
+        <div class="row content">
+            <div class="col-sm-6">
+                <h2>Change user role</h2>
+                <form class="form-horizontal" action="@routes.UsersController.resetPermissions(user.getName)" method="POST">
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">User Role</label>
 
-        <form class="form form-horizontal" action="@routes.UsersController.resetPermissions(user.getName)" method="POST">
+                        <div class="col-sm-9">
+                            <div class="radio">
+                                <label>
+                                    <input type="radio" name="permissiontype" value="reader" @if(!isPermitted(user, "*")) {
+                                        checked="checked" } />
+                                    Reader
+                                </label>
+                            </div>
+                            <span class="help-block">
+                                Reader users <strong>can't use the global search</strong>. An administrator has to
+                                explicitly grant them permissions to read or edit any stream or dashboard. They <strong>
+                                can't modify Graylog's configuration or add new users</strong>.
+                            </span>
 
-            <label class="radio" style="margin-top: 5px;">
-                <input type="radio" name="permissiontype" value="admin" @if(isPermitted(user, "*")) { checked="checked" } />
-                Set to administrator permissions
-            </label>
+                            <div class="radio">
+                                <label>
+                                    <input type="radio" name="permissiontype" value="admin" @if(isPermitted(user, "*")) {
+                                        checked="checked" } />
+                                    Administrator
+                                </label>
+                            </div>
+                            <span class="help-block">
+                                Administrators <strong>have full control over Graylog</strong>, being able to access the
+                                global search, and any streams or dashboards. They can also <strong>modify Graylog's
+                                configuration and add new users</strong>.
+                            </span>
+                        </div>
+                    </div>
 
-            <label class="radio">
-                <input type="radio" name="permissiontype" value="reader" @if(!isPermitted(user, "*")) { checked="checked" } />
-                Set to reader permissions
-            </label>
+                    <div class="form-group">
+                        <div class="col-sm-offset-3 col-sm-9">
+                            <div class="panel panel-info">
+                                <div class="panel-body">
+                                    <strong>Note:</strong>
+                                    Changing the user role will reset previously assigned stream and dashboard permissions.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
-            <button class="btn btn-warning btn-sm" type="submit" data-confirm="Really reset permissions for @user.getName?" style="margin-top: 10px; margin-bottom: 10px;">
-                Set default permissions
-            </button>
-
-            <p>
-                Previously assigned stream and dashboard permissions will be lost!
-            </p>
-        </form>
-
-    </div>
+                    <div class="form-group">
+                        <div class="col-sm-offset-3 col-sm-9">
+                            <button class="btn btn-warning" type="submit" data-confirm="Really update role for @user.getName?">
+                                Update role
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
     }
-
-    <div class="row">
-        <h2><i class="fa fa-arrow-circle-right"></i> Custom startpage</h2>
-
-        <p>
-            @if(user.getStartpage == null) {
-                No custom startpage configured yet.
-            } else {
-                The startpage is currently set to
-                <em>@user.getStartpage.getType.toString.toLowerCase</em> with ID
-                <em>@user.getStartpage.getId</em>.
-
-                <a href="@StartpageRouteHelper.getCall(user.getStartpage)">
-                    &nbsp;<i class="fa fa-angle-right"></i> Open
-                </a>
-
-            }
-        </p>
-
-        <form action="@routes.StartpageController.reset(user.getName)" method="POST">
-            <button type="submit" class="btn btn-primary btn-sm" data-confirm="Really reset startpage?">
-                Reset custom startpage
-            </button>
-        </form>
-    </div>
-
-    <div class="row">
-        <h2><i class="fa fa-table"></i> User preferences</h2>
-        <p>User might have to reload the application to make sure changes take effect.</p>
-        <span id="react-user-preferences-button" data-user-name="@username">
-            <button class="btn btn-primary btn-sm">Edit user preferences</button>
-        </span>
-    </div>
-    <div id="react-user-preferences-modal"></div>
 
 }
