@@ -50,6 +50,7 @@ var JournalDetails = React.createClass({
                 callback: (update, hasError) => {
                     if (hasError) {
                         this.setState({hasError: hasError});
+                        return;
                     }
                     // update is [{nodeId, values: [{name, value: {metric}}]} ...]
                     // metric can be various different things, depending on metric {type: "GAUGE"|"COUNTER"|"METER"|"TIMER"}

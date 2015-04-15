@@ -21,6 +21,10 @@ var NodeThroughput = React.createClass({
             nodeId: this.props.nodeId,
             metricNames: ["org.graylog2.throughput.input.1-sec-rate", "org.graylog2.throughput.output.1-sec-rate"],
             callback: (update, hasError) => {
+                if (hasError) {
+                    this.setState({hasError: hasError});
+                    return;
+                }
                 // update is [{nodeId, values: [{name, value: {metric}}]} ...]
                 // metric can be various different things, depending on metric {type: "GAUGE"|"COUNTER"|"METER"|"TIMER"}
                 var throughIn = 0;

@@ -21,6 +21,10 @@ var StreamThroughput = React.createClass({
             callback: (update, hasError) => {
                 // update is [{nodeId, values: [{name, value: {metric}}]} ...]
                 // metric can be various different things, depending on metric {type: "GAUGE"|"COUNTER"|"METER"|"TIMER"}
+                if (hasError) {
+                    this.setState({hasError: hasError});
+                    return;
+                }
 
                 var throughput = 0;
                 // not using filter.map.reduce because that's even worse to read than this code...
