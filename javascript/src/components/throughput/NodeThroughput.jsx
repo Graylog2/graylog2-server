@@ -1,32 +1,31 @@
 'use strict';
 
 var React = require('react');
-//noinspection JSUnusedGlobalSymbols
-var MetricsStore = require('../../stores/metrics/MetricsStore');
 var numeral = require('numeral');
+var MetricsStore = require('../../stores/metrics/MetricsStore');
+
 var metricsStore = MetricsStore.instance;
 
-var Throughput = React.createClass({
+// TODO this is a copy of GlobalTroughput, it just renders differently and only targets a single node.
+var NodeThroughput = React.createClass({
     getInitialState() {
         return {
-            nodeCount: 0,
+            initialized: false,
             totalIn: 0,
             totalOut: 0,
             hasError: false
         };
     },
-    componentDidMount() {
+    componentWillMount() {
         metricsStore.listen({
-            nodeId: null, // across all nodes
+            nodeId: this.props.nodeId,
             metricNames: ["org.graylog2.throughput.input.1-sec-rate", "org.graylog2.throughput.output.1-sec-rate"],
             callback: (update, hasError) => {
                 // update is [{nodeId, values: [{name, value: {metric}}]} ...]
                 // metric can be various different things, depending on metric {type: "GAUGE"|"COUNTER"|"METER"|"TIMER"}
-                var nodeCount = update.length;
-
                 var throughIn = 0;
                 var throughOut = 0;
-                // not using filter.map.reduce because that's even worse to read than this code...
+                // we will only get 0 or 1 node here.
                 update.forEach((perNode) => {
                     perNode.values.forEach((namedMetric) => {
                         if (namedMetric.name === "org.graylog2.throughput.input.1-sec-rate") {
@@ -36,34 +35,22 @@ var Throughput = React.createClass({
                         }
                     });
                 });
-                this.setState({nodeCount: nodeCount, totalIn: throughIn, totalOut: throughOut, hasError: hasError});
+                this.setState({initialized: true, totalIn: throughIn, totalOut: throughOut, hasError: hasError});
             }
         });
     },
-
     render() {
         if (this.state.hasError) {
-            return (
-                <span>
-                    <strong className="total-throughput">Throughput unavailable</strong>
-                </span>
-            );
+            return (<span>Unable to load throughput.</span>);
         }
-
-        if (this.state.nodeCount === 0) {
-            return (
-                <span>
-                    <strong className="total-throughput">Loading throughput...</strong>
-                </span>
-            );
+        if (!this.state.initialized) {
+            return (<span><i className="fa fa-spin fa-spinner"></i> Loading throughput...</span>);
         }
-        return (
-            <span>
-                In <strong className="total-throughput">{numeral(this.state.totalIn).format('0,0')}</strong> / Out <strong className="total-throughput">{numeral(this.state.totalOut).format('0,0')}</strong> msg/s
-            </span>
-
-        );
+        return (<span>
+            Processing <strong>{numeral(this.state.totalIn).format("0,0")}</strong> incoming and <strong>
+            {numeral(this.state.totalOut).format("0,0")}</strong> outgoing msg/s.
+        </span>);
     }
 });
 
-module.exports = Throughput;
+module.exports = NodeThroughput;

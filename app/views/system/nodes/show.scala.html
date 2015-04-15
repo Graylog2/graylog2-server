@@ -85,8 +85,7 @@
                         <input type="submit" class="btn btn-xs btn-danger pull-right" value="Pause processing" data-confirm="Really pause message processing?">
                     </form>
                     }
-                    <i class="fa fa-ok-sign"></i> &nbsp; Node is processing <strong class="node-throughput focuslimit" data-node-id="@node.getNodeId">?</strong>
-                    messages per second.
+                    <span class="react-node-throughput" data-node-id="@node.getNodeId"></span>
                 </div>
             } else {
                 <div class="alert alert-danger">
