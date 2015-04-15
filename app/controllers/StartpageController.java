@@ -76,7 +76,7 @@ public class StartpageController extends AuthenticatedController {
     public Result reset(String username) {
         User user = userService.load(username);
         if (user.setStartpage(null)) {
-            flash("success", "Startpage of user was reset.");
+            flash("success", "User's startpage was reset.");
         } else {
             flash("error", "Could not reset startpage.");
         }
