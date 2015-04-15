@@ -86,7 +86,7 @@ public class ClusterEventPeriodical extends Periodical {
 
         DBCollection coll = db.getCollection(COLLECTION_NAME);
 
-        coll.createIndex(DBSort.desc("timestamp"));
+        coll.createIndex(DBSort.asc("timestamp"));
         coll.createIndex(DBSort.asc("producer"));
         coll.createIndex(DBSort.asc("consumers"));
 
@@ -188,7 +188,7 @@ public class ClusterEventPeriodical extends Periodical {
         and.add(consumersClause);
         final DBObject query = new BasicDBObject("$and", and);
 
-        return dbCollection.find(query).sort(DBSort.desc("timestamp"));
+        return dbCollection.find(query).sort(DBSort.asc("timestamp"));
     }
 
     private void updateConsumers(final String eventId, final NodeId nodeId) {
