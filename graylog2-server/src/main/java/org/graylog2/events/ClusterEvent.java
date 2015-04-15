@@ -18,10 +18,8 @@ package org.graylog2.events;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.graylog2.plugin.system.NodeId;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -30,7 +28,6 @@ import org.mongojack.ObjectId;
 
 import javax.annotation.Nullable;
 import java.util.Collections;
-import java.util.Map;
 import java.util.Set;
 
 @JsonAutoDetect
@@ -42,8 +39,7 @@ public abstract class ClusterEvent {
     public abstract String id();
 
     @JsonProperty
-    @Nullable
-    public abstract DateTime date();
+    public abstract long timestamp();
 
     @JsonProperty
     @Nullable
@@ -64,19 +60,19 @@ public abstract class ClusterEvent {
 
     @JsonCreator
     public static ClusterEvent create(@Id @ObjectId @JsonProperty("_id") @Nullable String id,
-                                      @JsonProperty("date") @Nullable DateTime date,
+                                      @JsonProperty("timestamp") long timestamp,
                                       @JsonProperty("producer") @Nullable String producer,
                                       @JsonProperty("consumers") @Nullable Set<String> consumers,
                                       @JsonProperty("event_class") @Nullable String eventClass,
                                       @JsonProperty("payload") @Nullable Object payload) {
-        return new AutoValue_ClusterEvent(id, date, producer, consumers, eventClass, payload);
+        return new AutoValue_ClusterEvent(id, timestamp, producer, consumers, eventClass, payload);
     }
 
     public static ClusterEvent create(@NotEmpty String producer,
                                       @NotEmpty String eventClass,
                                       @NotEmpty Object payload) {
-        return new AutoValue_ClusterEvent(null,
-                DateTime.now(DateTimeZone.UTC),
+        return create(null,
+                DateTime.now(DateTimeZone.UTC).getMillis(),
                 producer,
                 Collections.<String>emptySet(),
                 eventClass,
