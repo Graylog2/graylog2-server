@@ -3,6 +3,7 @@
 var React = require('react/addons');
 var OutputsStore = require('../../stores/outputs/OutputsStore');
 var StreamsStore = require('../../stores/streams/StreamsStore');
+var UserNotification = require("../../util/UserNotification");
 
 var OutputList = React.createClass({
     OUTPUT_DATA_REFRESH: 5*1000,
@@ -104,6 +105,7 @@ var OutputList = React.createClass({
         if (confirm("Do you really want to terminate this output?")) {
             OutputsStore.remove(outputId, (jqXHR, textStatus, errorThrown) => {
                 this.loadData();
+                UserNotification.success("Output was terminated.", "Success!");
             });
         }
     },
@@ -111,6 +113,7 @@ var OutputList = React.createClass({
         if (confirm("Do you really want to remove this output from the stream?")) {
             StreamsStore.removeOutput(streamId, outputId, (jqXHR, textStatus, errorThrown) => {
                 this.loadData();
+                UserNotification.success("Removed output from stream!", "Success!");
             });
         }
     },
