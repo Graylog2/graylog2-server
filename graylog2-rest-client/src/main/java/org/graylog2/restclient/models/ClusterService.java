@@ -154,7 +154,13 @@ public class ClusterService {
 
     public List<NodeJVMStats> getClusterJvmStats() {
         List<NodeJVMStats> result = Lists.newArrayList();
-        Map<Node, ClusterEntityJVMStatsResponse> rs = api.path(routes.SystemResource().jvm(), ClusterEntityJVMStatsResponse.class).fromAllNodes().executeOnAll();
+        Map<Node, ClusterEntityJVMStatsResponse> rs = null;
+        try {
+            rs = api.path(routes.SystemResource().jvm(), ClusterEntityJVMStatsResponse.class).fromAllNodes().executeOnAll();
+        } catch (APIException e) {
+            LOG.error("Unable to load JVM stats", e);
+            return result;
+        }
 
         for (Map.Entry<Node, ClusterEntityJVMStatsResponse> entry : rs.entrySet()) {
             if (entry.getValue() == null) {
@@ -168,10 +174,15 @@ public class ClusterService {
     }
 
     public F.Tuple<Integer, Integer> getClusterThroughput() {
-        final Map<Node, NodeThroughputResponse> responses =
-                api.path(routes.ThroughputResource().total(), NodeThroughputResponse.class)
-                        .fromAllNodes()
-                        .executeOnAll();
+        final Map<Node, NodeThroughputResponse> responses;
+        try {
+            responses = api.path(routes.ThroughputResource().total(), NodeThroughputResponse.class)
+                    .fromAllNodes()
+                    .executeOnAll();
+        } catch (APIException e) {
+            LOG.error("Unable to load cluster throughput", e);
+            return F.Tuple(0, 0);
+        }
         int t = 0;
         for (Map.Entry<Node, NodeThroughputResponse> entry : responses.entrySet()) {
             if (entry.getValue() == null) {
