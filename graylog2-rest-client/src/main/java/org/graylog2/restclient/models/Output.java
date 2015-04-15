@@ -16,6 +16,7 @@
  */
 package org.graylog2.restclient.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import org.graylog2.restclient.lib.ApiClient;
@@ -59,6 +60,7 @@ public class Output extends ConfigurableEntity {
         this.contentPack = outputSummaryResponse.contentPack;
     }
 
+    @JsonIgnore
     public ApiClient getApi() {
         return api;
     }
@@ -75,6 +77,7 @@ public class Output extends ConfigurableEntity {
         return creatorUserId;
     }
 
+    @JsonIgnore
     public User getCreatorUser() {
         return userService.load(getCreatorUserId());
     }
