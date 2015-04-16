@@ -348,21 +348,22 @@ public class UsersController extends AuthenticatedController {
             }
         }));
         for (String streampermission : formData.streampermissions) {
-            permissions.add(RestPermissions.STREAMS_READ + ":" + streampermission);
+            permissions.add(RestPermissions.STREAMS_READ.getPermission() + ":" + streampermission);
         }
         for (String streameditpermission : formData.streameditpermissions) {
-            permissions.add(RestPermissions.STREAMS_EDIT + ":" + streameditpermission);
+            permissions.add(RestPermissions.STREAMS_EDIT.getPermission() + ":" + streameditpermission);
         }
         for (String dashboardpermission : formData.dashboardpermissions) {
-            permissions.add(RestPermissions.DASHBOARDS_READ + ":" + dashboardpermission);
+            permissions.add(RestPermissions.DASHBOARDS_READ.getPermission() + ":" + dashboardpermission);
         }
         for (String dashboardeditpermissions : formData.dashboardeditpermissions) {
-            permissions.add(RestPermissions.DASHBOARDS_EDIT + ":" + dashboardeditpermissions);
+            permissions.add(RestPermissions.DASHBOARDS_EDIT.getPermission() + ":" + dashboardeditpermissions);
         }
         final ChangeUserRequest changeRequest = formData.toApiRequest();
         changeRequest.permissions = Lists.newArrayList(permissions);
         user.update(changeRequest);
 
+        flash("success", "User '" + user.getFullName() + "' was updated successfully");
         return redirect(routes.UsersController.index());
     }
 
@@ -396,8 +397,8 @@ public class UsersController extends AuthenticatedController {
             return redirect(routes.UsersController.editUserForm(username));
         }
 
-        flash("success", "Successfully changed the password for user " + user.getFullName());
-        return redirect(routes.UsersController.index());
+        flash("success", "Successfully changed the password for user '" + user.getFullName() + "'");
+        return redirect(routes.UsersController.editUserForm(username));
     }
 
     public Result resetPermissions(String username) {
@@ -415,7 +416,7 @@ public class UsersController extends AuthenticatedController {
         final User user = userService.load(username);
 
         if (!Permissions.isPermitted(USERS_PERMISSIONSEDIT) || user.isReadonly()) {
-            flash("error", "Unable to reset permissions!");
+            flash("error", "Unable to change user role");
             return redirect(routes.UsersController.editUserForm(username));
         }
 
@@ -427,9 +428,9 @@ public class UsersController extends AuthenticatedController {
         }
         final boolean success = user.update(changeRequest);
         if (success) {
-            flash("success", "Successfully reset permission for " + user.getFullName() + " to " + (isAdmin ? "administrator" : "reader") + " permissions.");
+            flash("success", "Successfully changed user role for " + user.getFullName() + " to " + (isAdmin ? "administrator" : "reader") + " permissions.");
         } else {
-            flash("error", "Unable to reset permissions for user " + user.getFullName());
+            flash("error", "Unable to change user role for " + user.getFullName());
         }
         return redirect(routes.UsersController.editUserForm(username));
     }

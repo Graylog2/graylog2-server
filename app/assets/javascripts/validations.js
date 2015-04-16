@@ -11,7 +11,7 @@ function validate(formcontainer) {
     });
 
     return !errors;
-};
+}
 
 function dispatchRuleValidation(ref, validatorType) {
     switch(validatorType) {
@@ -19,37 +19,37 @@ function dispatchRuleValidation(ref, validatorType) {
             if (!validateDefined(ref)) {
                 validationFailure(ref, "must be set");
                 errors = true;
-            };
+            }
             break;
         case "port_number":
             if (!validatePortNumber(ref)) {
                 validationFailure(ref, "must be a valid port number");
                 errors = true;
-            };
+            }
             break;
         case "number":
             if (!validateNumber(ref)) {
                 validationFailure(ref, "must be a number");
                 errors = true;
-            };
+            }
             break;
         case "positive_number":
             if (!validatePositiveNumber(ref)) {
                 validationFailure(ref, "must be a positive number");
                 errors = true;
-            };
+            }
             break;
         case "negative_number":
             if (!validateNegativeNumber(ref)) {
                 validationFailure(ref, "must be a negative number");
                 errors = true;
-            };
+            }
             break;
         case "not_negative_number":
             if (!validateNotNegativeNumber(ref)) {
                 validationFailure(ref, "must be a not negative number");
                 errors = true;
-            };
+            }
             break;
         case "alphanum_underscore":
             if (!validateAlphanumericUnderscores(ref)) {
@@ -74,7 +74,9 @@ function dispatchRuleValidation(ref, validatorType) {
 
 function validationFailure(el, msg) {
     el.popover({
-        content: msg
+        container: 'body',
+        content: msg,
+        placement: 'auto'
     }).popover("show");
 }
 

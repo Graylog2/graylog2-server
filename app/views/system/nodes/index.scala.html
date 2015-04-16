@@ -28,10 +28,6 @@
                 persisted to disk, even when processing is disabled. If it is disabled, you might lose messages sent to inputs
                 that do not support buffering, such as TCP and UDP-based inputs.
             </p>
-
-            @views.html.partials.support.list() {
-                Processing <strong class="total-throughput focuslimit"></strong> messages per second.
-            }
         </div>
     </div>
 
@@ -123,32 +119,19 @@
 
                     <div class="row">
                         <div class="col-md-12">
+
                             @if(nodes.get(jvm.getNodeId).isProcessing) {
-                                <span class="sentence">
-                                    Processing
-                                    <strong class="node-throughput focuslimit" data-node-id="@jvm.getNodeId">?</strong>
-                                    messages per second.
-                                </span>
+                                <span class="react-node-throughput" data-node-id="@jvm.getNodeId"></span>
                             } else {
-                                <span class="sentence">
+                                <span>
                                     Processing is <strong>paused</strong>.
                                 </span>
                             }
 
                             @if(nodes.get(jvm.getNodeId).getJournalInfo.enabled) {
-                                <strong>
-                                    <span class="number-format" data-format="0,0">@nodes.get(jvm.getNodeId).getJournalInfo.uncommittedJournalEntries</span>
-                                    unprocessed
-
-                                    @if(nodes.get(jvm.getNodeId).getJournalInfo.uncommittedJournalEntries == 1) {
-                                        message
-                                    } else {
-                                        messages
-                                    }
-                                </strong>
-                                are currently in the journal.
+                                <span class="react-journal-state" data-node-id="@jvm.getNodeId"></span>
                             } else {
-                                Message journal is not enabled.
+                                <span>Message journal is not enabled.</span>
                             }
                         </div>
                     </div>

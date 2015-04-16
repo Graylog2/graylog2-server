@@ -73,7 +73,7 @@ public class BundlesController extends AuthenticatedController {
         BreadcrumbList bc = new BreadcrumbList();
         bc.addCrumb("System", routes.SystemController.index(0));
         bc.addCrumb("Content packs", routes.BundlesController.index());
-        bc.addCrumb("Export", routes.BundlesController.exportForm());
+        bc.addCrumb("Create", routes.BundlesController.exportForm());
 
         final Map<String, List> data = getListData();
 
@@ -95,7 +95,7 @@ public class BundlesController extends AuthenticatedController {
             BreadcrumbList bc = new BreadcrumbList();
             bc.addCrumb("System", routes.SystemController.index(0));
             bc.addCrumb("Content packs", routes.BundlesController.index());
-            bc.addCrumb("Export", routes.BundlesController.exportForm());
+            bc.addCrumb("Create", routes.BundlesController.exportForm());
 
             Map<String, List> data = getListData();
 

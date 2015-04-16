@@ -62,6 +62,11 @@ a:active, select:active, input[type="file"]:active, input[type="radio"]:active, 
   outline-offset: 0;
 }
 
+.input-group-addon.input-group-separator {
+  border-right-width: 0;
+  border-left-width: 0;
+}
+
 label {
   font-size: 14px;
 }
@@ -234,8 +239,11 @@ label {
 }
 
 .content-head div.actions {
-  margin-top: 35px;
-  text-align: right;
+  margin: 25px 0 25px 0;
+}
+
+.content-head div.actions form {
+  display: inline;
 }
 
 .content p.description-tooltips-small .fa-stack {
@@ -632,12 +640,9 @@ s
   margin-bottom: 8px;
 }
 
-.error-bar {
+.alert-bar {
+  margin-top: 10px;
   margin-bottom: 0px;
-}
-
-.main-error {
-  margin-bottom: 10px;
 }
 
 .system-messages a {
@@ -2628,8 +2633,8 @@ textarea.textarea-xlarge {
 }
 
 .build-content-pack button.select-all {
-  padding: 5px 0 0 0;
-  line-height: 20px;
+  margin-top: 7px;
+  padding: 0;
 }
 
 #react-configuration-bundles {
@@ -2639,9 +2644,8 @@ textarea.textarea-xlarge {
 }
 
 .form-horizontal .help-block.help-standalone {
-  vertical-align: middle;
-  padding-top: 5px;
   line-height: 20px;
+  margin-top: 7px;
 }
 
 .form-horizontal.pull-left label.control-label {

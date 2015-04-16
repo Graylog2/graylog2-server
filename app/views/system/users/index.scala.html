@@ -5,7 +5,7 @@
 @import controllers.routes
 
 @hasAdminPermission(user: User) = @{
-    user.getPermissions().indexOf("*") != -1;
+    user.getPermissions.indexOf("*") != -1
 }
 
 @main("Users", null, "", currentUser, false) {
@@ -14,7 +14,7 @@
 
     <div class="row content content-head">
         <div class="col-md-12">
-            <div class="pull-right">
+            <div class="pull-right actions">
                 @if(isPermitted(LDAP_EDIT)) {<a id="configure-ldap" class="btn btn-default" href="@routes.LdapController.index()">Configure LDAP</a>}
                 @if(isPermitted(USERS_CREATE)) { <a id="create-user-btn" class="btn btn-success" href="@routes.UsersController.newUserForm()">Create new user</a> }
             </div>

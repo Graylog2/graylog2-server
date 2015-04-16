@@ -1,9 +1,13 @@
 'use strict';
 
 var React = require('react/addons');
-var Throughput = require('./Throughput');
+var NodeThroughput = require('./NodeThroughput');
 
-var throughput = document.getElementById('global-throughput');
+var throughput = document.getElementsByClassName('react-node-throughput');
 if (throughput) {
-    React.render(<Throughput />, throughput);
+    for (var i = 0; i < throughput.length; i++) {
+        var elem = throughput[i];
+        var nodeId = elem.getAttribute('data-node-id');
+        React.render(<NodeThroughput nodeId={nodeId}/>, elem);
+    }
 }

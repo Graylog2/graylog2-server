@@ -29,19 +29,23 @@
 			    @partials.universalsearch(searchQuery)
             }
 
-            <div class="row error-bar">
-            @if(flash.get("error") != null && !flash.get("error").isEmpty()) {
-                <div class="alert alert-error main-error">
-                    <strong>Error!</strong>
-                    <a class="close" data-dismiss="alert" href="#">×</a>@flash.get("error")
+            <div class="row alert-bar">
+                <div class="col-sm-12">
+                @if(flash.get("error") != null && !flash.get("error").isEmpty()) {
+                    <div class="alert alert-danger">
+                        <strong>Error!</strong>
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        @flash.get("error")
+                    </div>
+                }
+                @if(flash.get("success") != null && !flash.get("success").isEmpty()) {
+                    <div class="alert alert-success">
+                        <strong>Success!</strong>
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        @flash.get("success")
+                    </div>
+                }
                 </div>
-            }
-            @if(flash.get("success") != null && !flash.get("success").isEmpty()) {
-                <div class="alert alert-success main-error">
-                    <strong>Success!</strong>
-                    <a class="close" data-dismiss="alert" href="#">×</a>@flash.get("success")
-                </div>
-            }
             </div>
             <div class="row">
             @if(sidebarContent != null) {

@@ -9,7 +9,7 @@ var NavItem = require('react-bootstrap').NavItem;
 var DropdownButton = require('react-bootstrap').DropdownButton;
 var MenuItem = require('react-bootstrap').MenuItem;
 
-var Throughput = require('../throughput/Throughput');
+var GlobalThroughput = require('../throughput/GlobalThroughput');
 var UserMenu = require('./UserMenu');
 
 var Navigation = React.createClass({
@@ -67,7 +67,7 @@ var Navigation = React.createClass({
 
                 <Nav right>
                     <NavItem href={jsRoutes.controllers.NodesController.nodes().url}>
-                        <Throughput />
+                        <GlobalThroughput />
                     </NavItem>
                     <UserMenu fullName={this.props.fullName} loginName={this.props.loginName}/>
                 </Nav>
