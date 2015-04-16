@@ -5,7 +5,7 @@
     @views.html.partials.breadcrumbs(breadcrumbs)
 
     <div class="row content content-head">
-        <div class="col-md-10">
+        <div class="col-md-12">
             <h1>LDAP Settings</h1>
             <p class="description">
                 This page is the only resource you need to set up the Graylog LDAP integration. You can test the
@@ -15,7 +15,7 @@
     </div>
 
     <div class="row content">
-        <div class="col-sm-7">
+        <div class="col-lg-8">
         @helper.form(action = routes.LdapController.saveLdapSettings(), 'class -> "form-horizontal", 'id -> "ldap-settings") {
             <div class="form-group">
                 <div class="col-sm-offset-3 col-sm-9">
@@ -52,7 +52,7 @@
                             <span class="input-group-addon" id="ldap-uri-scheme">ldap://</span>
                             <input type="text" class="form-control" id="ldap-uri-host" value="" placeholder="Hostname" required>
                             <span class="input-group-addon input-group-separator">:</span>
-                            <input type="number" class="form-control" id="ldap-uri-port" value="" min="1" placeholder="Port" required style="width: 30%;">
+                            <input type="number" class="form-control" id="ldap-uri-port" value="" min="1" placeholder="Port" required style="width: 120px;">
                         </div>
                         <label class="checkbox-inline">
                             <input type="checkbox" id="ldap-uri-ssl"> SSL
