@@ -80,6 +80,8 @@ import org.graylog2.shared.system.activities.ActivityWriter;
 import org.graylog2.streams.StreamRouter;
 import org.graylog2.streams.StreamRouterEngine;
 import org.graylog2.system.activities.SystemMessageActivityWriter;
+import org.graylog2.system.debug.ClusterDebugEventListener;
+import org.graylog2.system.debug.LocalDebugEventListener;
 import org.graylog2.system.jobs.SystemJobFactory;
 import org.graylog2.system.jobs.SystemJobManager;
 import org.graylog2.system.shutdown.GracefulShutdown;
@@ -217,5 +219,7 @@ public class ServerBindings extends AbstractModule {
 
     private void bindEventBusListeners() {
         bind(InputStateListener.class).asEagerSingleton();
+        bind(LocalDebugEventListener.class).asEagerSingleton();
+        bind(ClusterDebugEventListener.class).asEagerSingleton();
     }
 }
