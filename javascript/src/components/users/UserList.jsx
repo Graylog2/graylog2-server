@@ -47,73 +47,84 @@ var UserList = React.createClass({
             }
         };
     },
-    render() {
-        var users = this.state.users.map((user) => {
-            var rowClass = user.username === this.state.currentUsername ? "info" : null;
-            var userBadge = null;
-            if (user.read_only) {
-                userBadge = <span><i title="System User" className="fa fa-lock"></i></span>;
-            }
-            if (user.external) {
-                userBadge = <span><i title="LDAP User" className="fa fa-cloud"></i></span>;
-            }
+    _headerCellFormatting(header) {
+        var formattedHeaderCell;
 
-            var roleBadge = null;
-            if (this._hasAdminRole(user)) {
-                roleBadge = <span className="label label-info">Admin</span>;
-            } else {
-                roleBadge = <span className="label label-default">Reader</span>;
-            }
+        switch (header.toLocaleLowerCase()) {
+            case 'name':
+                formattedHeaderCell = <th className="name">{header}</th>;
+                break;
+            case 'actions':
+                formattedHeaderCell = <th className="actions">{header}</th>;
+                break;
+            default:
+                formattedHeaderCell = <th>{header}</th>;
+        }
 
-            var actions = null;
-            if (!user.read_only) {
-                var deleteAction = (
-                    <button id="delete-user" type="button" className="btn btn-xs btn-danger" title="Delete user"
-                            onClick={this._deleteUserFunction(user.username)}>
-                        <i className="fa fa-remove"></i> Delete
-                    </button>
-                );
+        return formattedHeaderCell;
+    },
+    _userInfoFormatter(user) {
+        var rowClass = user.username === this.state.currentUsername ? "info" : null;
+        var userBadge = null;
+        if (user.read_only) {
+            userBadge = <span><i title="System User" className="fa fa-lock"></i></span>;
+        }
+        if (user.external) {
+            userBadge = <span><i title="LDAP User" className="fa fa-cloud"></i></span>;
+        }
 
-                var editAction = (
-                    <a id="edit-user" href={UsersStore.editUserFormUrl(user.username)}
-                       className="btn btn-default btn-xs" title={"Edit user " + user.username}>
-                        <i className="fa fa-edit"></i> Edit</a>
-                );
+        var roleBadge = null;
+        if (this._hasAdminRole(user)) {
+            roleBadge = <span className="label label-info">Admin</span>;
+        } else {
+            roleBadge = <span className="label label-default">Reader</span>;
+        }
 
-                actions = (
-                    <div>
-                        {this.state.permissions.isPermitted(["users:edit"]) ? deleteAction : null}
-                        &nbsp;
-                        {editAction}
-                    </div>
-                );
-            }
-
-            return (
-                <tr key={user.username} className={rowClass}>
-                    <td className="centered">{userBadge}</td>
-                    <td className="limited">{user.full_name}</td>
-                    <td className="limited">{user.username}</td>
-                    <td className="limited">{user.email}</td>
-                    <td>{roleBadge}</td>
-                    <td>{actions}</td>
-                </tr>
+        var actions = null;
+        if (!user.read_only) {
+            var deleteAction = (
+                <button id="delete-user" type="button" className="btn btn-xs btn-danger" title="Delete user"
+                        onClick={this._deleteUserFunction(user.username)}>
+                    <i className="fa fa-remove"></i> Delete
+                </button>
             );
-        });
 
-        var headers = (
-            <tr>
-                <th></th>
-                <th className="name">Name</th>
-                <th>Username</th>
-                <th>Email Address</th>
-                <th>Role</th>
-                <th className="actions">Actions</th>
-            </tr>
-        );
+            var editAction = (
+                <a id="edit-user" href={UsersStore.editUserFormUrl(user.username)}
+                   className="btn btn-default btn-xs" title={"Edit user " + user.username}>
+                    <i className="fa fa-edit"></i> Edit</a>
+            );
+
+            actions = (
+                <div>
+                    {this.state.permissions.isPermitted(["users:edit"]) ? deleteAction : null}
+                    &nbsp;
+                    {editAction}
+                </div>
+            );
+        }
 
         return (
-            <DataTable id="user-list" headers={headers} rows={users}/>
+            <tr key={user.username} className={rowClass}>
+                <td className="centered">{userBadge}</td>
+                <td className="limited">{user.full_name}</td>
+                <td className="limited">{user.username}</td>
+                <td className="limited">{user.email}</td>
+                <td>{roleBadge}</td>
+                <td>{actions}</td>
+            </tr>
+        );
+    },
+    render() {
+        var headers = ["", "Name", "Username", "Email Address", "Role", "Actions"];
+
+        return (
+            <DataTable id="user-list"
+                       headers={headers}
+                       headerCellFormatter={this._headerCellFormatting}
+                       sortByKey={"full_name"}
+                       rows={this.state.users}
+                       dataRowFormatter={this._userInfoFormatter}/>
         );
     }
 });
