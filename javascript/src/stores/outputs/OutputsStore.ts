@@ -25,8 +25,13 @@ var OutputsStore = {
             callback(outputs);
         }).fail(this._failCallback);
     },
-    loadAvailable(callback: (available: any) => void) {
-        $.getJSON(jsRoutes.controllers.api.OutputsApiController.available(), (available: any) => {
+    loadAvailable(typeName: string, callback: (available: any) => void) {
+        $.getJSON(jsRoutes.controllers.api.OutputsApiController.available(typeName).url, (available: any) => {
+            callback(available);
+        }).fail(this._failCallback);
+    },
+    loadAvailableTypes(callback: (available: any) => void) {
+        $.getJSON(jsRoutes.controllers.api.OutputsApiController.availableTypes().url, (available: any) => {
             callback(available);
         }).fail(this._failCallback);
     },

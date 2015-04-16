@@ -2,6 +2,7 @@
 
 var React = require('react/addons');
 var OutputList = require('./OutputList');
+var CreateOutputDropdown = require('./CreateOutputDropdown');
 
 var outputList = document.getElementById('react-output-list');
 if (outputList) {
@@ -10,3 +11,7 @@ if (outputList) {
 
     React.render(<OutputList streamId={streamId} permissions={permissions}/>, outputList);
 }
+
+$("#react-create-output-dropdown").each(function() {
+    React.render(<CreateOutputDropdown />, this);
+});

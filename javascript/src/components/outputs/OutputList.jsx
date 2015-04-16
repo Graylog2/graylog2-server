@@ -39,17 +39,9 @@ var OutputList = React.createClass({
     _sortByTitle(output1, output2) {
         return output1.title.localeCompare(output2.title);
     },
-    _formatConfiguration(configuration) {
-        var items = [];
-
-        for (var key in configuration) {
-            if (configuration.hasOwnProperty(key)) {
-                items.push({key: key, value: configuration[key]});
-            }
-        }
-
-        var formattedItems = items.map((i) => {
-            return (<li>{i.key}: {i.value}</li>);
+    _formatConfiguration(output) {
+        var formattedItems = $.map(output.configuration, (value, key) => {
+            return (<li key={output.id + "-" + key}>{key}: {value}</li>);
         });
 
         return (
@@ -58,29 +50,34 @@ var OutputList = React.createClass({
             </ul>
         );
     },
-    _formatOutput(output) {
-        var deletionForm = (this.state.streamId && this._isPermitted(["STREAM_OUTPUTS_DELETE"]) ? (
+    _deleteFromStreamButton(output) {
+        return (
             <button className="btn btn-warning btn-xs"
                     onClick={this.removeOutputFromStream.bind(null, output.id, this.state.streamId)} data-confirm="Really delete output {output.title} from stream {this.state.stream.title}?">
                 <i className="fa fa-remove"></i> Delete from stream
             </button>
-        ) : (<form></form>));
-
-        var terminationUrl = (this.state.streamId ? jsRoutes.controllers.OutputsController.terminate(output.id, this.state.streamId).url : jsRoutes.controllers.OutputsController.terminate(output.id).url);
-        var terminationForm = (this._isPermitted(["OUTPUTS_TERMINATE"]) ? (
+        );
+    },
+    _deleteGloballyButton(output) {
+        return (
             <button className="btn btn-danger btn-xs" onClick={this.removeOutputGlobally.bind(null, output.id)}
                     data-confirm={"Really delete output " + output.title + " globally? It will be removed from all streams in the system."}>
                 <i className="fa fa-remove"></i> Delete globally
             </button>
-        ) : (<div></div>));
+        );
+    },
+    _formatOutput(output) {
+        var deletionForm = (this.state.streamId && this._isPermitted(["STREAM_OUTPUTS_DELETE"]) ? this._deleteFromStreamButton(output) : (<div></div>));
+
+        var terminationForm = (this._isPermitted(["OUTPUTS_TERMINATE"]) ? this._deleteGloballyButton(output) : (<div></div>));
 
         var contentPack = (output.content_pack ? (<span title="Created from content pack"><i className="fa fa-gift"></i></span>) : (<div></div>));
-        var configuration = (output.configuration.length == 0 ? (<ul><li>-- no configuration --</li></ul>) : this._formatConfiguration(output.configuration));
+        var configuration = (output.configuration.length == 0 ? (<ul><li>-- no configuration --</li></ul>) : this._formatConfiguration(output));
 
         var creatorUserLink = (<a href={jsRoutes.controllers.UsersController.show(output.creator_user_id).url}><i className="fa fa-user"></i> {output.creator_user_id}</a>);
 
         return (
-            <div className="row content node-row">
+            <div key={output.id} className="row content node-row">
                 <div className="col-md-12">
                     <span className="pull-right node-row-info">
                         <span className="text">Started by {creatorUserLink}</span>

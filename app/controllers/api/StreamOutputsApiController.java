@@ -35,4 +35,12 @@ public class StreamOutputsApiController extends AuthenticatedController {
         streamService.removeOutput(streamId, outputId);
         return ok();
     }
+
+    public Result add(String streamId, String outputId) throws APIException, IOException {
+        if (!isPermitted(RestPermissions.STREAM_OUTPUTS_CREATE, streamId))
+            return forbidden();
+
+        streamService.addOutput(streamId, outputId);
+        return ok();
+    }
 }

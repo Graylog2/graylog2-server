@@ -1,5 +1,6 @@
 package controllers.api;
 
+import com.google.common.collect.Maps;
 import controllers.AuthenticatedController;
 import lib.security.RestPermissions;
 import org.graylog2.restclient.lib.APIException;
@@ -33,8 +34,19 @@ public class OutputsApiController extends AuthenticatedController {
         return ok(Json.toJson(outputs));
     }
 
-    public Result available() throws APIException, IOException {
-        final Map<String, AvailableOutputSummary> result = outputService.available().types;
+    public Result available(String outputType) throws APIException, IOException {
+        final AvailableOutputSummary result = outputService.available().types.get(outputType);
+        return ok(Json.toJson(result));
+    }
+
+    public Result availableTypes() throws APIException, IOException {
+        final Map<String, AvailableOutputSummary> types = outputService.available().types;
+
+        final Map<String, String> result = Maps.newHashMap();
+
+        for (Map.Entry<String, AvailableOutputSummary> entry : types.entrySet()) {
+            result.put(entry.getKey(), entry.getValue().name);
+        }
         return ok(Json.toJson(result));
     }
 
