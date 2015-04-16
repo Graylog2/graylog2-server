@@ -200,7 +200,7 @@
     </div>
 
     <div class="row content">
-        <div class="col-md-6">
+        <div class="col-lg-8">
             <h2>Change password</h2>
             @if(user.isExternal) {
                 <p>
@@ -246,7 +246,7 @@
 
     @if(isPermitted(USERS_PERMISSIONSEDIT)) {
         <div class="row content">
-            <div class="col-sm-6">
+            <div class="col-lg-8">
                 <h2>Change user role</h2>
                 <form class="form-horizontal" action="@routes.UsersController.resetPermissions(user.getName)" method="POST">
                     <div class="form-group">
