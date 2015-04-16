@@ -113,6 +113,9 @@ $(document).ready(function() {
 
     connectTestButton.on("click", function() {
         $(this).text("Testing connection...").removeClass().addClass("btn").prop("disabled", true);
+
+        var errorContainer = $("#ldap-connectionfailure-reason");
+
         $.ajax({
             type: "POST",
             url: appPrefixed("/a/system/ldap/testconnect"),
@@ -128,10 +131,12 @@ $(document).ready(function() {
             success: function(connectResult) {
                 if (connectResult.connected) {
                     connectTestButton.removeClass().addClass("btn btn-success").text("Connection ok!");
-                    $("#ldap-connectionfailure-reason").addClass("hidden").text("");
+                    errorContainer.hide();
                 } else {
                     connectTestButton.removeClass().addClass("btn btn-danger").text("Connection failed!");
-                    $("#ldap-connectionfailure-reason").removeClass("hidden").text(connectResult.exception);
+                    if (connectResult.exception !== "") {
+                        errorContainer.show().text("Connection failed: " + connectResult.exception);
+                    }
                 }
             },
             complete: function() {
@@ -139,7 +144,7 @@ $(document).ready(function() {
             },
             error: function() {
                 connectTestButton.removeClass().addClass("btn btn-danger").text("Test Server connection");
-                $("#ldap-connectionfailure-reason").removeClass("hidden").text("Unable to check connection, please try again.");
+                errorContainer.show().text("Unable to check connection, please try again.");
             }
         });
     });
@@ -172,7 +177,8 @@ $(document).ready(function() {
                 var isEmptyEntry = $.isEmptyObject(loginResult.entry);
 
                 if (loginResult.connected && (loginResult.login_authenticated || !isEmptyEntry) ) {
-                    ldapTestLoginButton.removeClass().addClass("btn btn-success").text("Check ok!");
+                    var buttonMessage = loginResult.login_authenticated ? "Login ok!" : "User found!";
+                    ldapTestLoginButton.removeClass().addClass("btn btn-success").text(buttonMessage);
 
                     Object.keys(loginResult.entry).forEach(function(element) {
                         $("#ldap-entry-attributes")

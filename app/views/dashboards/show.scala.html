@@ -3,9 +3,6 @@
 @import scala.util.Try
 @import views.helpers.Permissions._
 @import lib.security.RestPermissions._
-@import views.helpers.DashboardWidgetRouteHelper
-@import org.graylog2.restclient.models.dashboards.Dashboard
-@import org.graylog2.restclient.models.dashboards.widgets._
 
 @sortedDashboards = @{
     dashboard.getWidgets.values().toSeq.sortWith((d1, d2) => {
@@ -20,7 +17,24 @@
 @main(dashboard.getTitle, null, "", currentUser, false) {
     @views.html.partials.breadcrumbs(breadcrumbs)
     <div class="row content content-head">
-        <div class="col-md-8">
+        <div class="col-md-12">
+            <div class="pull-right actions">
+            @if(!dashboard.getWidgets.isEmpty) {
+                @if(Try(currentUser.getPreferences.get("updateUnfocussed").toString.toBoolean).getOrElse(false)) {
+                    <button id="update-unfocussed" class="btn btn-info" data-update-unfocussed="true">
+                        Update in foreground</button>
+                } else {
+                    <button id="update-unfocussed" class="btn btn-info" data-update-unfocussed="false">
+                        Update in background</button>
+                }
+                <button class="btn btn-info toggle-fullscreen">Fullscreen</button>
+                @if(isPermitted(DASHBOARDS_EDIT, dashboard.getId)) {
+                    <button id="toggle-dashboard-lock" class="btn btn-success" data-locked="true">Unlock / Edit</button>
+                        &nbsp;
+                }
+            }
+            </div>
+
             <h1>
                 <span data-dashboard-id="@dashboard.getId" class="dashboard-title">@dashboard.getTitle</span>
                 @if(!dashboard.getWidgets.isEmpty) {
@@ -45,23 +59,6 @@
                     mode.
                 }
             }
-        </div>
-
-        <div class="col-md-4 actions">
-        @if(!dashboard.getWidgets.isEmpty) {
-            @if(Try(currentUser.getPreferences.get("updateUnfocussed").toString.toBoolean).getOrElse(false)) {
-                <button id="update-unfocussed" class="btn btn-info" data-update-unfocussed="true">
-                    Update in foreground</button>
-            } else {
-                <button id="update-unfocussed" class="btn btn-info" data-update-unfocussed="false">
-                    Update in background</button>
-            }
-            <button class="btn btn-info toggle-fullscreen">Fullscreen</button>
-            @if(isPermitted(DASHBOARDS_EDIT, dashboard.getId)) {
-                <button id="toggle-dashboard-lock" class="btn btn-success" data-locked="true">Unlock / Edit</button>
-                    &nbsp;
-            }
-        }
         </div>
     </div>
 
