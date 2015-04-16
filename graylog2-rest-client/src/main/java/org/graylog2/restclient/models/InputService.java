@@ -18,7 +18,6 @@ package org.graylog2.restclient.models;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import javax.inject.Inject;
 import org.graylog2.restclient.lib.APIException;
 import org.graylog2.restclient.lib.ApiClient;
 import org.graylog2.restclient.lib.ExclusiveInputException;
@@ -33,6 +32,7 @@ import org.graylog2.restroutes.generated.routes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
 import java.io.IOException;
 import java.util.AbstractMap;
 import java.util.List;
@@ -67,7 +67,12 @@ public class InputService {
 
     protected Map<ClusterEntity, InputsResponse> getInputsFromAllEntities() {
         Map<ClusterEntity, InputsResponse> result = Maps.newHashMap();
-        result.putAll(api.path(resource.list(), InputsResponse.class).fromAllNodes().executeOnAll());
+        try {
+            result.putAll(api.path(resource.list(), InputsResponse.class).fromAllNodes().executeOnAll());
+        } catch (APIException e) {
+            log.error("Unable to fetch server input list", e);
+            return result;
+        }
         try {
             for(Radio radio : nodeService.radios().values()) {
                 result.put(radio,
@@ -95,7 +100,13 @@ public class InputService {
     }
 
     protected Map<Node, InputsResponse> getInputsFromAllNodes() {
-        return api.path(resource.list(), InputsResponse.class).fromAllNodes().executeOnAll();
+        Map<Node, InputsResponse> responseMap = Maps.newHashMap();
+        try {
+            responseMap.putAll(api.path(resource.list(), InputsResponse.class).fromAllNodes().executeOnAll());
+        } catch (APIException e) {
+            log.error("Unable to fetch input list: ", e);
+        }
+        return responseMap;
     }
 
     public List<InputState> loadAllInputStates(ClusterEntity node) {
