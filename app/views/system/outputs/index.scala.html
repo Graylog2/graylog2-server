@@ -25,13 +25,6 @@
         </div>
     </div>
 
-    @if(isPermitted(OUTPUTS_CREATE)) {
-        <div class="row input-new content">
-            <div class="col-md-12" id="react-create-output-dropdown">
-            </div>
-        </div>
-    }
-
-    <div id="react-output-list" data-permissions='@Permissions.asJson(STREAM_OUTPUTS_DELETE, OUTPUTS_TERMINATE, OUTPUTS_EDIT)'>
+    <div class="react-output-component" data-permissions='@Permissions.asJson(STREAM_OUTPUTS_DELETE, OUTPUTS_CREATE, OUTPUTS_TERMINATE, OUTPUTS_EDIT)'>
     </div>
 }

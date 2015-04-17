@@ -47,7 +47,10 @@ var CreateOutputDropdown = React.createClass({
         });
     },
     handleSubmit(data) {
-        console.log(data);
+        OutputsStore.save(data, () => {
+            console.log("saved");
+            this.props.onUpdate();
+        });
     },
     formatConfigurationForm(typeName, configuration) {
         var title = "Create new output";

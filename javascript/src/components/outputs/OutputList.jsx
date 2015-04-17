@@ -14,7 +14,7 @@ var OutputList = React.createClass({
         return {
             outputs: [],
             streamId: this.props.streamId,
-            permissions: JSON.parse(this.props.permissions)
+            permissions: this.props.permissions
         };
     },
     componentDidMount() {

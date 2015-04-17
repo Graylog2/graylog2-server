@@ -268,6 +268,7 @@ DELETE      /a/system/grokpatterns/:pattern_id                                  
 
 # API: Outputs
 GET         /a/system/outputs                                                        @controllers.api.OutputsApiController.index()
+POST        /a/system/outputs                                                        @controllers.api.OutputsApiController.create()
 GET         /a/system/outputs/available/:output_type                                 @controllers.api.OutputsApiController.available(output_type: String)
 GET         /a/system/outputs/availableTypes                                         @controllers.api.OutputsApiController.availableTypes()
 DELETE      /a/system/outputs/:output_id                                             @controllers.api.OutputsApiController.delete(output_id: String)

@@ -1,11 +1,13 @@
 package controllers.api;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Maps;
 import controllers.AuthenticatedController;
 import lib.security.RestPermissions;
 import org.graylog2.restclient.lib.APIException;
 import org.graylog2.restclient.models.Output;
 import org.graylog2.restclient.models.OutputService;
+import org.graylog2.restclient.models.api.requests.outputs.OutputLaunchRequest;
 import org.graylog2.restclient.models.api.responses.AvailableOutputSummary;
 import play.libs.Json;
 import play.mvc.Result;
@@ -56,5 +58,16 @@ public class OutputsApiController extends AuthenticatedController {
 
         outputService.delete(outputId);
         return ok();
+    }
+
+    public Result create() throws APIException, IOException {
+        final JsonNode json = request().body().asJson();
+        final OutputLaunchRequest request = Json.fromJson(json, OutputLaunchRequest.class);
+        if (!isPermitted(RestPermissions.OUTPUTS_CREATE))
+            return forbidden();
+
+        final Output output = outputService.create(request);
+
+        return ok(Json.toJson(output));
     }
 }

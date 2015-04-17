@@ -1,18 +1,12 @@
 'use strict';
 
 var React = require('react/addons');
-var OutputList = require('./OutputList');
-var CreateOutputDropdown = require('./CreateOutputDropdown');
+var OutputsComponent = require('./OutputsComponent');
 var $ = require('jquery'); // excluded and shimed
 
-var outputList = document.getElementById('react-output-list');
-if (outputList) {
-    var streamId = outputList.getAttribute('data-stream-id');
-    var permissions = outputList.getAttribute('data-permissions');
+$(".react-output-component").each(function() {
+    var streamId = this.getAttribute('data-stream-id');
+    var permissions = this.getAttribute('data-permissions');
 
-    React.render(<OutputList streamId={streamId} permissions={permissions}/>, outputList);
-}
-
-$("#react-create-output-dropdown").each(function() {
-    React.render(<CreateOutputDropdown />, this);
+    React.render(<OutputsComponent streamId={streamId} permissions={permissions}/>, this);
 });

@@ -68,10 +68,12 @@ var ConfigurationForm = React.createClass({
     },
     handleSubmit(evt) {
         evt.preventDefault();
-        var data = {};
         var values = this.state.values;
+        var data = {title: values.title,
+            type: this.state.typeName,
+            configuration: {}};
         $.map(this.state.configFields, function(field, name) {
-            data[name] = (values[name] || field.default_value);
+            data.configuration[name] = (values[name] || field.default_value);
         });
         this.props.submitAction(data);
     },

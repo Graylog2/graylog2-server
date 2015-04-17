@@ -46,6 +46,21 @@ var OutputsStore = {
             success: callback
         });
     },
+    save(output: any, callback: () => void) {
+        var failCallback = (jqXHR, textStatus, errorThrown) => {
+            UserNotification.error("Saving Output \"" + output.title + "\" failed with status: " + errorThrown,
+                "Could not save Output");
+        };
+
+        var url = jsRoutes.controllers.api.OutputsApiController.create().url;
+
+        $.ajax({
+            type: "POST",
+            contentType: "application/json",
+            url: url,
+            data: JSON.stringify(output)
+        }).done(callback).fail(failCallback);
+    },
     _failCallback(jqXHR: any, textStatus: string, errorThrown: string) {
         UserNotification.error("Loading otuputs failed with status: " + errorThrown,
             "Could not load outputs");
