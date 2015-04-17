@@ -46,13 +46,17 @@ var CreateOutputDropdown = React.createClass({
             this.setState({configurationForm: this.formatConfigurationForm(outputType, definition.requested_configuration)});
         });
     },
+    handleSubmit(data) {
+        console.log(data);
+    },
     formatConfigurationForm(typeName, configuration) {
         var title = "Create new output";
-        var elementName = "output";
-        var formTarget = "http://google.de";
         var formId = this.state.formId;
+        var helpBlock = (<p className="help-block">{"Select a name of your new output that describes it."}</p>);
+        var submitAction = this.handleSubmit;
         return (
-            <ConfigurationForm configFields={configuration} title={title} typeName={typeName} elementName={elementName} formTarget={formTarget} formId={formId}/>
+            <ConfigurationForm key="configuration-form-output" configFields={configuration} title={title} typeName={typeName}
+                               formId={formId} helpBlock={helpBlock} submitAction={submitAction}/>
         );
     }
 });

@@ -14,6 +14,9 @@ var BooleanField = React.createClass({
     componentWillReceiveProps(props) {
         this.setState(props);
     },
+    handleChange(evt) {
+        this.props.onChange(this.state.title, evt.target.value);
+    },
     render() {
         var field = this.state.field;
         var typeName = this.state.typeName;
@@ -21,10 +24,11 @@ var BooleanField = React.createClass({
             <div className="form-group">
                 <div className="checkbox">
                     <label>
-                        <input id={typeName + "-" + field.title}
+                        <input id={field.title}
                             type="checkbox"
                             checked={field.default_value}
-                            name={"configuration[" + field.title + "]"} />
+                            name={"configuration[" + field.title + "]"}
+                            onChange={this.handleChange} />
 
                             {field.human_name}
 

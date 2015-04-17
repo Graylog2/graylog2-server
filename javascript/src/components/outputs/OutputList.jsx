@@ -34,10 +34,6 @@ var OutputList = React.createClass({
             OutputsStore.load(callback);
         }
     },
-    _isPermitted(permissions) {
-        var result = permissions.every((p) => this.state.permissions[p]);
-        return result;
-    },
     _sortByTitle(output1, output2) {
         return output1.title.localeCompare(output2.title);
     },

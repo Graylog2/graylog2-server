@@ -18,8 +18,11 @@ var DropdownField = React.createClass({
     },
     _formatOption(value, key) {
         return (
-            <option value={key} id={key}>{value}</option>
+            <option key={this.state.typeName + "-" + this.state.field + "-" + key}value={key} id={key}>{value}</option>
         );
+    },
+    handleChange(evt) {
+        this.props.onChange(this.state.title, evt.target.value);
     },
     render() {
         var field = this.state.field;
@@ -33,7 +36,8 @@ var DropdownField = React.createClass({
                     {FieldHelpers.optionalMarker(field)}
                 </label>
 
-                <select id={typeName + "-" + field.title} defaultValue={field.default_value} className="input-xlarge form-control">
+                <select id={field.title} defaultValue={field.default_value}
+                        className="input-xlarge form-control" onChange={this.handleChange}>
                     {options}
                 </select>
                 <p className="help-block">{field.description}</p>
