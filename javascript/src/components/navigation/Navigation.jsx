@@ -55,7 +55,7 @@ var Navigation = React.createClass({
                             { this._isPermitted(['OUTPUTS_READ']) && <MenuItem href={jsRoutes.controllers.OutputsController.index().url}>Outputs</MenuItem> }
                             { this._isPermitted(['INDICES_READ']) && <MenuItem href={jsRoutes.controllers.IndicesController.index().url}>Indices</MenuItem> }
                             { this._isPermitted(['LOGGERS_READ']) && <MenuItem href={jsRoutes.controllers.LoggingController.index().url}>Logging</MenuItem> }
-                            <MenuItem href={jsRoutes.controllers.UsersController.index().url}>Users</MenuItem>
+                            { this._isPermitted(['USERS_EDIT']) && <MenuItem href={jsRoutes.controllers.UsersController.index().url}>Users</MenuItem> }
                             { this._isPermitted(['DASHBOARDS_CREATE', 'INPUTS_CREATE', 'STREAMS_CREATE']) && <MenuItem href={jsRoutes.controllers.BundlesController.index().url}>Content Packs</MenuItem> }
                             { this._isPermitted(['INPUTS_EDIT']) && <MenuItem href={jsRoutes.controllers.GrokPatternsController.index().url}>Grok Patterns</MenuItem> }
                         </DropdownButton>
