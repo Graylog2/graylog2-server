@@ -10,7 +10,7 @@ var DataFilter = React.createClass({
             data: this.props.data,
             filterKeys: this.props.filterKeys,
             filter: ""
-        }
+        };
     },
     componentWillReceiveProps(newProps) {
         this.setState({
@@ -24,7 +24,7 @@ var DataFilter = React.createClass({
     filterData() {
         var filteredData = this.state.data.filter((datum) => {
             return this.state.filterKeys.some((filterKey) => {
-                return datum[filterKey].indexOf(this.state.filter) != -1
+                return datum[filterKey].indexOf(this.state.filter) !== -1;
             });
         });
 
