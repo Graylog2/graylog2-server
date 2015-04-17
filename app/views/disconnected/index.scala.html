@@ -3,73 +3,75 @@
     @loggedout("Disconnected") {
         <div class="container" id="disconnected-box">
             <div class="row">
-                <div class="col-md-8 offset2 well" id="disconnected-box-content">
+                <div class="col-md-8 col-md-offset-2 well" id="disconnected-box-content">
                     <legend>
                         <i class="fa fa-group"></i> Graylog Web Interface is disconnected.
                     </legend>
 
                     <div class="row">
-                        <div class="alert alert-danger">
-                        @if(nodesEverConnectedTo.isEmpty) {
-                            <p>The web interface was unable to connect to any Graylog node in the cluster so far.</p>
-                            <p>Please check that the configured nodes shown on the left hand side are correct and that the servers are reachable.</p>
-                        } else {
-                            <p>The web interface could not connect to any of the Graylog nodes it has been connected to before.</p>
-                            <p>Please check that the servers shown to the right are running and reachable.</p>
-                        }
+                        <div class="col-md-12">
+                            <div class="alert alert-danger">
+                            @if(nodesEverConnectedTo.isEmpty) {
+                                <p>The web interface was unable to connect to any Graylog node in the cluster so far.</p>
+                                <p>Please check that the configured nodes shown on the left hand side are correct and that the servers are reachable.</p>
+                            } else {
+                                <p>The web interface could not connect to any of the Graylog nodes it has been connected to before.</p>
+                                <p>Please check that the servers shown to the right are running and reachable.</p>
+                            }
+                            </div>
                         </div>
-                        <div class="row" id="nodes-box">
-                            <div class="col-md-6">
-                                <h3>Configured nodes</h3>
-                                @for(node <- configuredNodes.sortBy(_.getTransportAddress)) {
-                                    <div class="well well-small config-node" data-config-node-address="@node.getTransportAddress">
+                    </div>
+                    <div class="row" id="nodes-box">
+                        <div class="col-md-6">
+                            <h3>Configured nodes</h3>
+                            @for(node <- configuredNodes.sortBy(_.getTransportAddress)) {
+                                <div class="alert alert-info config-node" data-config-node-address="@node.getTransportAddress">
+                                    <a class="btn btn-xs btn-info pull-right" target="_blank" href="@node.getTransportAddress/api-browser">API Browser</a>
+                                    <h5><i class="fa fa-sitemap"></i> @node.getTransportAddress</h5>
+                                    <h6>
+                                        @if(serverNodes.getDiscoveredNodeVia(node).getNodeId == null) {
+                                            <span class="muted never-seen-warning"><i class="fa fa-warning-sign"></i> Never connected!</span>
+                                        } else {
+                                            <span class="muted discovered-node-link" data-discovered-node="@serverNodes.getDiscoveredNodeVia(node).getNodeId"><i class="fa fa-sitemap"></i> @serverNodes.getDiscoveredNodeVia(node).getTransportAddress</span>
+                                        }
+                                    </h6>
+                                </div>
+                            }
+                        </div>
+                        <div class="col-md-6">
+                            <h3>Discovered nodes</h3>
+                            @if(nodesEverConnectedTo.isEmpty) {
+                                <div class="alert alert-warning">None of the configured nodes could be reached recently.</div>
+                            } else {
+                                @for(node <- nodesEverConnectedTo.sortBy(_.getTransportAddress)) {
+                                    <div class="alert alert-info discovered-node" data-node-id="@node.getNodeId">
                                         <a class="btn btn-xs btn-info pull-right" target="_blank" href="@node.getTransportAddress/api-browser">API Browser</a>
-                                        <h5><i class="fa fa-sitemap"></i> @node.getTransportAddress</h5>
-                                        <h6>
-                                            @if(serverNodes.getDiscoveredNodeVia(node).getNodeId == null) {
-                                                <span class="muted never-seen-warning"><i class="fa fa-warning-sign"></i> Never connected!</span>
+                                        <h5><i class="fa fa-sitemap"></i> @node.getTransportAddress
+                                        @if(serverNodes.getConfigNodeOf(node) != null && !serverNodes.getConfigNodeOf(node).getTransportAddress.equals(node.getTransportAddress)) {
+                                            <h6>
+                                                <span class="muted via-node-headline" data-discovered-via="@serverNodes.getConfigNodeOf(node).getTransportAddress">
+                                                via <i class="fa fa-sitemap"></i> @serverNodes.getConfigNodeOf(node).getTransportAddress
+                                                </span>
+                                            </h6>
+                                        }
+                                        </h5>
+                                        <dl class="dl-horizontal">
+                                            <dt>Short Node ID</dt>
+                                            <dd>@node.getShortNodeId</dd>
+                                            <dt>Last reported</dt>
+                                            <dd>@views.helpers.DateHelper.timestampShort(node.getLastSeen)</dd>
+                                            <dt>Last connection</dt>
+                                            @if(node.getLastContact == null) {
+                                                <dd>Never contacted.</dd>
                                             } else {
-                                                <span class="muted discovered-node-link" data-discovered-node="@serverNodes.getDiscoveredNodeVia(node).getNodeId"><i class="fa fa-sitemap"></i> @serverNodes.getDiscoveredNodeVia(node).getTransportAddress</span>
+                                                <dd>@views.helpers.DateHelper.timestampShort(node.getLastContact)</dd>
                                             }
-                                        </h6>
+                                            <dt>Failure Count</dt>
+                                            <dd>@node.getFailureCount</dd>
+                                        </dl>
                                     </div>
                                 }
-                            </div>
-                            <div class="col-md-6">
-                                <h3>Discovered nodes</h3>
-                                @if(nodesEverConnectedTo.isEmpty) {
-                                    <p>None of the configured nodes could be reached recently.</p>
-                                } else {
-                                    @for(node <- nodesEverConnectedTo.sortBy(_.getTransportAddress)) {
-                                        <div class="well well-small discovered-node" data-node-id="@node.getNodeId">
-                                            <a class="btn btn-xs btn-info pull-right" target="_blank" href="@node.getTransportAddress/api-browser">API Browser</a>
-                                            <h5><i class="fa fa-sitemap"></i> @node.getTransportAddress
-                                            @if(serverNodes.getConfigNodeOf(node) != null && !serverNodes.getConfigNodeOf(node).getTransportAddress.equals(node.getTransportAddress)) {
-                                                <h6>
-                                                    <span class="muted via-node-headline" data-discovered-via="@serverNodes.getConfigNodeOf(node).getTransportAddress">
-                                                    via <i class="fa fa-sitemap"></i> @serverNodes.getConfigNodeOf(node).getTransportAddress
-                                                    </span>
-                                                </h6>
-                                            }
-                                            </h5>
-                                            <dl class="dl-horizontal">
-                                                <dt>Short Node ID</dt>
-                                                <dd>@node.getShortNodeId</dd>
-                                                <dt>Last reported</dt>
-                                                <dd>@views.helpers.DateHelper.timestampShort(node.getLastSeen)</dd>
-                                                <dt>Last connection</dt>
-                                                @if(node.getLastContact == null) {
-                                                    <dd>Never contacted.</dd>
-                                                } else {
-                                                    <dd>@views.helpers.DateHelper.timestampShort(node.getLastContact)</dd>
-                                                }
-                                                <dt>Failure Count</dt>
-                                                <dd>@node.getFailureCount</dd>
-                                            </dl>
-                                        </div>
-                                    }
-                                }
-                            </div>
+                            }
                         </div>
                     </div>
                 </div>
