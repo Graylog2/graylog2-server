@@ -48,7 +48,6 @@ var CreateOutputDropdown = React.createClass({
     },
     handleSubmit(data) {
         OutputsStore.save(data, () => {
-            console.log("saved");
             this.props.onUpdate();
         });
     },
