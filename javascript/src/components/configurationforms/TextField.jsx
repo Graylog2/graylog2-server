@@ -1,7 +1,5 @@
 'use strict';
 
-var $ = require('jquery'); // excluded and shimed
-
 var React = require('react/addons');
 var FieldHelpers = require('./FieldHelpers');
 

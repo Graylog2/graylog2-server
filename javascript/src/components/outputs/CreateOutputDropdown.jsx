@@ -3,6 +3,7 @@
 var React = require('react/addons');
 var OutputsStore = require('../../stores/outputs/OutputsStore');
 var ConfigurationForm = require('../configurationforms/ConfigurationForm');
+var $ = require('jquery'); // excluded and shimed
 
 var CreateOutputDropdown = React.createClass({
     getInitialState() {

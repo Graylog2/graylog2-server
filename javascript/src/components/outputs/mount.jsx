@@ -3,6 +3,7 @@
 var React = require('react/addons');
 var OutputList = require('./OutputList');
 var CreateOutputDropdown = require('./CreateOutputDropdown');
+var $ = require('jquery'); // excluded and shimed
 
 var outputList = document.getElementById('react-output-list');
 if (outputList) {

@@ -1,7 +1,5 @@
 'use strict';
 
-var $ = require('jquery'); // excluded and shimed
-
 var React = require('react/addons');
 var FieldHelpers = require('./FieldHelpers');
 
@@ -39,7 +37,7 @@ var NumberField = React.createClass({
                     {field.human_name}
                     {FieldHelpers.optionalMarker(field)}
                 </label>
-                <input id={typeName + "-" + field.title} type="number" required={isRequired} min={Number.MIN_VALUE} max={Number.MAX_VALUE}
+                <input id={typeName + "-" + field.title} type="number" required={isRequired} min={Number.MIN_VALUE.toFixed()} max={Number.MAX_VALUE.toFixed()}
                     className="input-xlarge validatable form-control" data-validate={validationSpecs} />
                 <p className="help-block">{field.description}</p>
             </div>

@@ -4,6 +4,7 @@ var React = require('react/addons');
 var OutputsStore = require('../../stores/outputs/OutputsStore');
 var StreamsStore = require('../../stores/streams/StreamsStore');
 var UserNotification = require("../../util/UserNotification");
+var $ = require('jquery'); // excluded and shimed
 
 var OutputList = React.createClass({
     OUTPUT_DATA_REFRESH: 5*1000,
@@ -72,7 +73,7 @@ var OutputList = React.createClass({
         var terminationForm = (this._isPermitted(["OUTPUTS_TERMINATE"]) ? this._deleteGloballyButton(output) : (<div></div>));
 
         var contentPack = (output.content_pack ? (<span title="Created from content pack"><i className="fa fa-gift"></i></span>) : (<div></div>));
-        var configuration = (output.configuration.length == 0 ? (<ul><li>-- no configuration --</li></ul>) : this._formatConfiguration(output));
+        var configuration = (output.configuration.length === 0 ? (<ul><li>-- no configuration --</li></ul>) : this._formatConfiguration(output));
 
         var creatorUserLink = (<a href={jsRoutes.controllers.UsersController.show(output.creator_user_id).url}><i className="fa fa-user"></i> {output.creator_user_id}</a>);
 
@@ -116,13 +117,13 @@ var OutputList = React.createClass({
     },
     render() {
         var outputList;
-        if (this.state.outputs.length == 0) {
+        if (this.state.outputs.length === 0) {
             outputList = (<div className="row content node-row"><div className="col-md-12"><div className="alert alert-info">There are no outputs.</div></div></div>);
         } else {
             var outputs = this.state.outputs.sort(this._sortByTitle).map(this._formatOutput);
             outputList = (
                 <div>{outputs}</div>
-            )
+            );
         }
 
         return outputList;
