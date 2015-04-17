@@ -23,7 +23,7 @@ var DropdownField = React.createClass({
     },
     render() {
         var field = this.state.field;
-        var options = $.map(field.values, this._formatOption);
+        var options = $.map(field.additional_info.values, this._formatOption);
         var typeName = this.state.typeName;
         return (
             <div className="form-group">

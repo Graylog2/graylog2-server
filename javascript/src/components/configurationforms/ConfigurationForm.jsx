@@ -6,6 +6,8 @@ var React = require('react/addons');
 var BootstrapModal = require('../bootstrap/BootstrapModal');
 var TextField = require('./TextField');
 var NumberField = require('./NumberField');
+var BooleanField = require('./BooleanField');
+var DropdownField = require('./DropdownField');
 
 var ConfigurationForm = React.createClass({
     getInitialState() {
@@ -69,9 +71,9 @@ var ConfigurationForm = React.createClass({
             case "number":
                 return (<NumberField key={this.state.typeName + "-" + key} typeName={this.state.typeName} title={key} field={configField} />);
             case "boolean":
-                return "";
+                return (<BooleanField key={this.state.typeName + "-" + key} typeName={this.state.typeName} title={key} field={configField} />);
             case "dropdown":
-                return "";
+                return (<DropdownField key={this.state.typeName + "-" + key} typeName={this.state.typeName} title={key} field={configField} />);
         }
     }
 });
