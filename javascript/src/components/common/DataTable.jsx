@@ -2,6 +2,8 @@
 
 var React = require('react');
 
+var DataFilter = require('./DataFilter');
+
 var DataTableElement = React.createClass({
     render() {
         return this.props.formatter(this.props.element);
@@ -12,13 +14,15 @@ var DataTable = React.createClass({
     getInitialState() {
         return {
             headers: this.props.headers,
-            rows: this.props.rows
+            rows: this.props.rows,
+            filteredRows: this.props.rows
         };
     },
     componentWillReceiveProps(newProps) {
         this.setState({
             headers: newProps.headers,
-            rows: newProps.rows
+            rows: newProps.rows,
+            filteredRows: newProps.rows
         });
     },
     getFormattedHeaders() {
@@ -32,7 +36,7 @@ var DataTable = React.createClass({
     },
     getFormattedDataRows() {
         var i = 0;
-        var sortedDataRows = this.state.rows.sort((a, b) => {
+        var sortedDataRows = this.state.filteredRows.sort((a, b) => {
             return a[this.props.sortByKey].localeCompare(b[this.props.sortByKey]);
         });
         var formattedDataRows = sortedDataRows.map((row) => {
@@ -42,19 +46,38 @@ var DataTable = React.createClass({
 
         return formattedDataRows;
     },
+    filterDataRows(filteredRows) {
+        this.setState({filteredRows: filteredRows});
+    },
     render() {
+        var filter;
+        if (this.props.filterKeys.length !== 0) {
+            filter = (
+                <div className="row">
+                    <div className="col-md-4">
+                        <DataFilter label={this.props.filterLabel}
+                                    data={this.state.rows}
+                                    filterKeys={this.props.filterKeys}
+                                    onFilterUpdate={this.filterDataRows} />
+                    </div>
+                </div>
+            );
+        }
         return (
-            <div className="row">
-                <div className="col-md-12">
-                    <div id={this.props.id} className="data-table">
-                        <table className="table table-striped">
-                            <thead>
-                            {this.getFormattedHeaders()}
-                            </thead>
-                            <tbody>
-                            {this.getFormattedDataRows()}
-                            </tbody>
-                        </table>
+            <div>
+                {filter}
+                <div className="row">
+                    <div className="col-md-12">
+                        <div id={this.props.id} className="data-table table-responsive">
+                            <table className="table table-striped table-hover">
+                                <thead>
+                                {this.getFormattedHeaders()}
+                                </thead>
+                                <tbody>
+                                {this.getFormattedDataRows()}
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>

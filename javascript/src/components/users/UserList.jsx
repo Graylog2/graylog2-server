@@ -116,15 +116,20 @@ var UserList = React.createClass({
         );
     },
     render() {
+        var filterKeys = ["username", "full_name", "email"];
         var headers = ["", "Name", "Username", "Email Address", "Role", "Actions"];
 
         return (
-            <DataTable id="user-list"
-                       headers={headers}
-                       headerCellFormatter={this._headerCellFormatting}
-                       sortByKey={"full_name"}
-                       rows={this.state.users}
-                       dataRowFormatter={this._userInfoFormatter}/>
+            <div>
+                <DataTable id="user-list"
+                           headers={headers}
+                           headerCellFormatter={this._headerCellFormatting}
+                           sortByKey={"full_name"}
+                           rows={this.state.users}
+                           dataRowFormatter={this._userInfoFormatter}
+                           filterLabel="Filter Users"
+                           filterKeys={filterKeys}/>
+            </div>
         );
     }
 });
