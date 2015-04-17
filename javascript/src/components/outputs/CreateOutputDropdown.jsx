@@ -9,8 +9,8 @@ var CreateOutputDropdown = React.createClass({
     getInitialState() {
         return {
             types: [],
-            configurationForm: "",
-            formId: "create-output-form"
+            typeDefinition: [],
+            typeName: ""
         };
     },
     componentDidMount() {
@@ -23,43 +23,42 @@ var CreateOutputDropdown = React.createClass({
     },
     render() {
         var outputTypes = $.map(this.state.types, this._formatOutputType);
+        var helpBlock = (<p className="help-block">{"Select a name of your new output that describes it."}</p>);
         return (
             <div className="form-inline">
                 <div className="form-group">
-                    <select id="input-type" defaultValue="placeholder" onChange={this.showConfigurationForm} className="form-control">
+                    <select id="input-type" defaultValue="placeholder" onChange={this.onTypeChange} className="form-control">
                         <option value="placeholder" disabled>--- Select Output Type ---</option>
                         {outputTypes}
                     </select>
 
-                    <button className="btn btn-success btn-sm" data-toggle="modal" data-target={"#" + this.state.formId}>Launch new output</button>
-                    {this.state.configurationForm}
+                    <button className="btn btn-success btn-sm" onClick={this._openModal}>Launch new output</button>
+
+                    <ConfigurationForm ref="configurationForm" key="configuration-form-output" configFields={this.state.typeDefinition} title="Create new Output"
+                                       typeName={this.state.typeName}
+                                       helpBlock={helpBlock} submitAction={this.handleSubmit}/>
                 </div>
             </div>
         );
     },
+    _openModal() {
+        this.refs.configurationForm.open();
+    },
     _formatOutputType(title, typeName) {
         return (<option key={typeName} value={typeName}>{title}</option>);
     },
-    showConfigurationForm(evt) {
+    onTypeChange(evt) {
         var outputType = evt.target.value;
+        this.setState({typeName: evt.target.value});
         OutputsStore.loadAvailable(outputType, (definition) => {
-            this.setState({configurationForm: this.formatConfigurationForm(outputType, definition.requested_configuration)});
+            this.setState({typeDefinition: definition.requested_configuration});
         });
     },
     handleSubmit(data) {
         OutputsStore.save(data, () => {
             this.props.onUpdate();
+            this.refs.configurationForm.close();
         });
-    },
-    formatConfigurationForm(typeName, configuration) {
-        var title = "Create new output";
-        var formId = this.state.formId;
-        var helpBlock = (<p className="help-block">{"Select a name of your new output that describes it."}</p>);
-        var submitAction = this.handleSubmit;
-        return (
-            <ConfigurationForm key="configuration-form-output" configFields={configuration} title={title} typeName={typeName}
-                               formId={formId} helpBlock={helpBlock} submitAction={submitAction}/>
-        );
     }
 });
 

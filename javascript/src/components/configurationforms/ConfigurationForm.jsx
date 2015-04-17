@@ -30,43 +30,30 @@ var ConfigurationForm = React.createClass({
         var configFields = $.map(this.state.configFields, this._renderConfigField);
         var title = this.state.title;
         var helpBlock = this.state.helpBlock;
+        var header = (
+            <h2 className="modal-title">
+                <i className="fa fa-signin"></i>
+                {title}
+            </h2>
+        );
+        var body = (
+            <fieldset>
+                <input type="hidden" name="type" value={typeName} />
+
+                <label htmlFor={"title-" + typeName}>Title</label>
+                <input id={"title-" + typeName} name="title" onChange={this.handleTitleChange} required="true" type="text" className="input-xlarge form-control" />
+                {helpBlock}
+                {configFields}
+            </fieldset>
+        );
         return (
-            <form onSubmit={this.handleSubmit} validate>
-                <div id={this.state.formId} className="configuration-form modal fade" data-inputtype={typeName} tabIndex="-1" role="dialog" aria-hidden="false">
-                    <div className="modal-dialog">
-                        <div className="modal-content">
-                            <div className="modal-header">
-                                <button type="button" className="close" data-dismiss="modal" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
-                                <h2 className="modal-title">
-                                    <i className="fa fa-signin"></i>
-                                    {title}
-                                </h2>
-                            </div>
-
-                            <div className="modal-body">
-                                <input type="hidden" name="type" value={typeName} />
-
-                                <label htmlFor={"title-" + typeName}>Title</label>
-                                <input id={"title-" + typeName} name="title" onChange={this.handleTitleChange} required="true" type="text" className="input-xlarge form-control" />
-                                    {helpBlock}
-                                    {configFields}
-                            </div>
-                            <div className="modal-footer">
-                                <button type="button" className="btn" data-dismiss="modal">Close</button>
-                                <button type="submit" onClick={this.handleSubmit} className="btn btn-primary" data-type={typeName}>
-                                    <i className="fa fa-rocket"></i>
-                                    Save
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </form>
+            <BootstrapModal ref="modal" onCancel={this._closeModal} onConfirm={this._save} cancel="Cancel" confirm="Save">
+                {header}
+                {body}
+            </BootstrapModal>
         );
     },
-    handleSubmit(evt) {
+    _save(evt) {
         evt.preventDefault();
         var values = this.state.values;
         var data = {title: values.title,
@@ -76,6 +63,13 @@ var ConfigurationForm = React.createClass({
             data.configuration[name] = (values[name] || field.default_value);
         });
         this.props.submitAction(data);
+        this.refs.modal.close();
+    },
+    open() {
+        this.refs.modal.open();
+    },
+    _closeModal() {
+        this.refs.modal.close();
     },
     handleTitleChange(evt) {
         this.handleChange('title', evt.target.value);
