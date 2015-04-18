@@ -34,6 +34,7 @@ var DataFilter = React.createClass({
         return (
             <form className="form-inline">
                 <Input type="text"
+                       groupClassName="form-group-sm"
                        label={this.props.label}
                        name="filter"
                        value={this.state.filter}
