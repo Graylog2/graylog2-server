@@ -24,7 +24,7 @@ var DataFilter = React.createClass({
     filterData() {
         var filteredData = this.state.data.filter((datum) => {
             return this.state.filterKeys.some((filterKey) => {
-                return datum[filterKey].indexOf(this.state.filter) !== -1;
+                return datum[filterKey].toLocaleLowerCase().indexOf(this.state.filter.toLocaleLowerCase()) !== -1;
             });
         });
 
