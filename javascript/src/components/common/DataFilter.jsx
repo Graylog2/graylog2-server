@@ -13,10 +13,14 @@ var DataFilter = React.createClass({
         };
     },
     componentWillReceiveProps(newProps) {
+        if (this.state.data === newProps.data) {
+            return;
+        }
+
         this.setState({
             data: newProps.data,
             filterKeys: newProps.filterKeys
-        });
+        }, this.filterData);
     },
     onFilterUpdate(event) {
         this.setState({filter: event.target.value}, this.filterData);
