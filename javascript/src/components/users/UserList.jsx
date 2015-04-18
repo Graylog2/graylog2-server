@@ -17,6 +17,9 @@ var UserList = React.createClass({
         };
     },
     componentDidMount() {
+        this.loadUsers();
+    },
+    loadUsers: function () {
         var promise = UsersStore.loadUsers();
         promise.done((users) => {
             var currentUser = users.filter((user) => user.username === this.state.currentUsername)[0];
@@ -34,10 +37,8 @@ var UserList = React.createClass({
         var promise = UsersStore.deleteUser(username);
 
         promise.done(() => {
-            var users = this.state.users.filter((user) => user.username !== username);
-            this.setState({
-                users: users
-            });
+            this.loadUsers();
+
         });
     },
     _deleteUserFunction(username) {
@@ -47,7 +48,7 @@ var UserList = React.createClass({
             }
         };
     },
-    _headerCellFormatting(header) {
+    _headerCellFormatter(header) {
         var formattedHeaderCell;
 
         switch (header.toLocaleLowerCase()) {
@@ -123,7 +124,7 @@ var UserList = React.createClass({
             <div>
                 <DataTable id="user-list"
                            headers={headers}
-                           headerCellFormatter={this._headerCellFormatting}
+                           headerCellFormatter={this._headerCellFormatter}
                            sortByKey={"full_name"}
                            rows={this.state.users}
                            dataRowFormatter={this._userInfoFormatter}
