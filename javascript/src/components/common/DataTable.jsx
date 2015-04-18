@@ -58,25 +58,37 @@ var DataTable = React.createClass({
                         <DataFilter label={this.props.filterLabel}
                                     data={this.state.rows}
                                     filterKeys={this.props.filterKeys}
-                                    onFilterUpdate={this.filterDataRows} />
+                                    onFilterUpdate={this.filterDataRows}/>
                     </div>
                 </div>
             );
         }
+
+        var data;
+        if (this.state.rows.length === 0) {
+            data = <p>No data available.</p>;
+        } else if (this.state.filteredRows.length === 0) {
+            data = <p>Filter does not match any data.</p>;
+        } else {
+            data = (
+                <table className="table table-striped table-hover">
+                    <thead>
+                        {this.getFormattedHeaders()}
+                    </thead>
+                    <tbody>
+                        {this.getFormattedDataRows()}
+                    </tbody>
+                </table>
+            );
+        }
+
         return (
             <div>
                 {filter}
                 <div className="row">
                     <div className="col-md-12">
                         <div id={this.props.id} className="data-table table-responsive">
-                            <table className="table table-striped table-hover">
-                                <thead>
-                                {this.getFormattedHeaders()}
-                                </thead>
-                                <tbody>
-                                {this.getFormattedDataRows()}
-                                </tbody>
-                            </table>
+                            {data}
                         </div>
                     </div>
                 </div>
