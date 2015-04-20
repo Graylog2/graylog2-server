@@ -16,6 +16,7 @@
  */
 package org.graylog2.rest.models.alarmcallbacks.responses;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.common.collect.Lists;
 import org.graylog2.rest.models.configuration.responses.BooleanField;
 import org.graylog2.rest.models.configuration.responses.DropdownField;
@@ -34,6 +35,7 @@ public class AvailableAlarmCallbackSummaryResponse {
     public String name;
     public Map<String, Map<String, Object>> requested_configuration;
 
+    @JsonIgnore
     public List<RequestedConfigurationField> getRequestedConfiguration() {
         return extractRequestedConfiguration(requested_configuration);
     }
