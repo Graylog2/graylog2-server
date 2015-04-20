@@ -13,18 +13,14 @@
 
 @main("Search V2", null, "", currentUser, false, true) {
 
-    <div class="row content">
-        <div class="col-md-12">
-            <div id="react-search-result"
-                data-query="@query"
-                data-current-page="@page"
-                data-selected-fields="@Json.toJson(selectedFields)"
-                data-timerange="@search.getTimeRange"
-                data-search-result="@Json.toJson(searchResult)"
-                data-histogram="@Json.toJson(histogram)"
-                data-formatted-histogram="@Json.toJson(formattedHistogramResults)"
-            >
-            </div>
-        </div>
+    <div id="react-search-result"
+            data-query="@query"
+            data-current-page="@page"
+            data-selected-fields="@Json.toJson(selectedFields)"
+            data-timerange="@search.getTimeRange"
+            data-search-result="@Json.toJson(searchResult)"
+            data-histogram="@Json.toJson(histogram)"
+            data-formatted-histogram="@Json.toJson(formattedHistogramResults)"
+        >
     </div>
 }
