@@ -2,24 +2,14 @@ package controllers;
 
 import lib.BreadcrumbList;
 import lib.security.RestPermissions;
-import models.forms.AddOutputToStreamForm;
 import org.graylog2.restclient.lib.APIException;
-import org.graylog2.restclient.models.Output;
-import org.graylog2.restclient.models.OutputService;
 import org.graylog2.restclient.models.Stream;
 import org.graylog2.restclient.models.StreamService;
-import org.graylog2.restclient.models.api.requests.outputs.OutputLaunchRequest;
-import play.data.Form;
 import play.mvc.Result;
-import views.helpers.Permissions;
 
 import javax.inject.Inject;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
 
-import static play.data.Form.form;
 import static views.helpers.Permissions.isPermitted;
 
 /**
