@@ -1,0 +1,30 @@
+@(currentUser: org.graylog2.restclient.models.User,
+        query: String,
+        search: org.graylog2.restclient.models.UniversalSearch,
+        page: Integer,
+        savedSearch: org.graylog2.restclient.models.SavedSearch,
+        selectedFields: java.util.Set[String],
+        searchResult: org.graylog2.restclient.models.api.results.SearchResult,
+        histogram: org.graylog2.restclient.models.api.results.DateHistogramResult,
+        formattedHistogramResults: String,
+        nodes: Map[String, org.graylog2.restclient.models.Node])(implicit stream: org.graylog2.restclient.models.Stream)
+
+@import play.libs.Json;
+
+@main("Search V2", null, "", currentUser, false, true) {
+
+    <div class="row content">
+        <div class="col-md-12">
+            <div id="react-search-result"
+                data-query="@query"
+                data-current-page="@page"
+                data-selected-fields="@Json.toJson(selectedFields)"
+                data-timerange="@search.getTimeRange"
+                data-search-result="@Json.toJson(searchResult)"
+                data-histogram="@Json.toJson(histogram)"
+                data-formatted-histogram="@Json.toJson(formattedHistogramResults)"
+            >
+            </div>
+        </div>
+    </div>
+}

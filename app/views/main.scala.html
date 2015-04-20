@@ -1,4 +1,4 @@
-@(title: String, sidebarContent: Html, searchQuery: String = "", currentUser: org.graylog2.restclient.models.User, hasSearch: Boolean = true)(content: Html)(implicit stream: org.graylog2.restclient.models.Stream = null)
+@(title: String, sidebarContent: Html, searchQuery: String = "", currentUser: org.graylog2.restclient.models.User, hasSearch: Boolean = true, reactSearch: Boolean = false)(content: Html)(implicit stream: org.graylog2.restclient.models.Stream = null)
 @import play.libs.Json
 @import views.helpers.Permissions._
 @import lib.security.RestPermissions._
@@ -27,6 +27,9 @@
 
             @if(hasSearch && (stream != null || (isPermitted(SEARCHES_ABSOLUTE) || isPermitted(SEARCHES_RELATIVE) || isPermitted(SEARCHES_KEYWORD)))) {
 			    @partials.universalsearch(searchQuery)
+            }
+            @if(reactSearch) {
+                <div id="react-search-bar"></div>
             }
 
             <div class="row alert-bar">
