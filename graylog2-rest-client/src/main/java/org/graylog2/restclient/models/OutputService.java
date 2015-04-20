@@ -71,4 +71,13 @@ public class OutputService {
     public OutputTypesResponse available() throws APIException, IOException {
         return api.path(routes.OutputResource().available(), OutputTypesResponse.class).execute();
     }
+
+    public Output update(String outputId, OutputLaunchRequest request) throws APIException, IOException {
+        OutputSummaryResponse response = api.path(routes.OutputResource().update(outputId), OutputSummaryResponse.class)
+                .body(request)
+                .expect(Http.Status.OK)
+                .execute();
+
+        return outputFactory.fromSummaryResponse(response);
+    }
 }

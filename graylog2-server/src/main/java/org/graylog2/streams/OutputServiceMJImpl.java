@@ -34,6 +34,7 @@ import org.graylog2.rest.models.streams.outputs.requests.CreateOutputRequest;
 import org.mongojack.Aggregation;
 import org.mongojack.AggregationResult;
 import org.mongojack.DBQuery;
+import org.mongojack.DBUpdate;
 import org.mongojack.JacksonDBCollection;
 import org.mongojack.WriteResult;
 
@@ -75,15 +76,10 @@ public class OutputServiceMJImpl implements OutputService {
 
     @Override
     public Output create(Output request) throws ValidationException {
-        final OutputAVImpl outputImpl;
-        if (request instanceof OutputAVImpl) {
-            outputImpl = (OutputAVImpl) request;
-            final WriteResult<OutputAVImpl, String> writeResult = coll.save(outputImpl);
+        final OutputAVImpl outputImpl = implOrFail(request);
+        final WriteResult<OutputAVImpl, String> writeResult = coll.save(outputImpl);
 
-            return writeResult.getSavedObject();
-        } else {
-            throw new IllegalArgumentException("Supplied output must be of implementation type OutputImpl, not " + request.getClass());
-        }
+        return writeResult.getSavedObject();
     }
 
     @Override
@@ -96,6 +92,15 @@ public class OutputServiceMJImpl implements OutputService {
     public void destroy(Output model) throws NotFoundException {
         coll.removeById(model.getId());
         streamService.removeOutputFromAllStreams(model);
+    }
+
+    @Override
+    public Output update(String id, Map<String, Object> deltas) {
+        DBUpdate.Builder update = new DBUpdate.Builder();
+        for (Map.Entry<String, Object> fields : deltas.entrySet())
+            update = update.set(fields.getKey(), fields.getValue());
+
+        return coll.findAndModify(DBQuery.is("_id", id), update);
     }
 
     @Override
@@ -122,5 +127,15 @@ public class OutputServiceMJImpl implements OutputService {
     class TypeCountResult {
         String type;
         Long count;
+    }
+
+    private OutputAVImpl implOrFail(Output output) {
+        final OutputAVImpl outputImpl;
+        if (output instanceof OutputAVImpl) {
+            outputImpl = (OutputAVImpl) output;
+            return outputImpl;
+        } else {
+            throw new IllegalArgumentException("Supplied output must be of implementation type OutputImpl, not " + output.getClass());
+        }
     }
 }

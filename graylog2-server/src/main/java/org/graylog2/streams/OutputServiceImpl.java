@@ -106,6 +106,11 @@ public class OutputServiceImpl extends PersistedServiceImpl implements OutputSer
     }
 
     @Override
+    public Output update(String id, Map<String, Object> deltas) {
+        return null;
+    }
+
+    @Override
     public long count() {
         return totalCount(OutputImpl.class);
     }
