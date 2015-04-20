@@ -8,7 +8,8 @@ var NumberField = React.createClass({
         return {
             typeName: this.props.typeName,
             field: this.props.field,
-            title: this.props.title
+            title: this.props.title,
+            value: this.props.value
         };
     },
     componentWillReceiveProps(props) {
@@ -27,6 +28,7 @@ var NumberField = React.createClass({
     },
     handleChange(evt) {
         this.props.onChange(this.state.title, evt.target.value);
+        this.setState({value: evt.target.value});
     },
     render() {
         var typeName = this.state.typeName;
@@ -40,7 +42,7 @@ var NumberField = React.createClass({
                     {field.human_name}
                     {FieldHelpers.optionalMarker(field)}
                 </label>
-                <input id={field.title} type="number" required={isRequired} onChange={this.handleChange}
+                <input id={field.title} type="number" required={isRequired} onChange={this.handleChange} value={this.state.value}
                        min={Number.MIN_VALUE.toFixed()} max={Number.MAX_VALUE.toFixed()}
                     className="input-xlarge validatable form-control" data-validate={validationSpecs} />
                 <p className="help-block">{field.description}</p>

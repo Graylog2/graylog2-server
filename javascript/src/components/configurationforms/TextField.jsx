@@ -11,7 +11,8 @@ var TextField = React.createClass({
         return {
             typeName: this.props.typeName,
             field: this.props.field,
-            title: this.props.title
+            title: this.props.title,
+            value: this.props.value
         };
     },
     componentWillReceiveProps(props) {
@@ -19,6 +20,7 @@ var TextField = React.createClass({
     },
     handleChange(evt) {
         this.props.onChange(this.state.title, evt.target.value);
+        this.setState({value: evt.target.value});
     },
     render() {
         var field = this.state.field;
@@ -33,14 +35,14 @@ var TextField = React.createClass({
         if (FieldHelpers.hasAttribute(field.attributes, "textarea")) {
             inputField = (
                     <textarea id={title} className="textarea-xlarge form-control"
-                              name={"configuration["+title+"]"} required={isRequired}
+                              name={"configuration["+title+"]"} required={isRequired} value={this.state.value}
                               onChange={this.handleChange}>
                         {value}
                     </textarea>
             );
         } else {
             inputField = (
-                <input id={title} type={fieldType} className="input-xlarge form-control" name={"configuration["+title+"]"}
+                <input id={title} type={fieldType} className="input-xlarge form-control" name={"configuration["+title+"]"} value={this.state.value}
                        onChange={this.handleChange} required={isRequired} defaultValue={this._fieldValue(field)}/>
             );
         }

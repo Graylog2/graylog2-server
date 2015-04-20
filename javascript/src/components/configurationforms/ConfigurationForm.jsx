@@ -18,7 +18,8 @@ var ConfigurationForm = React.createClass({
             formId: this.props.formId,
             submitAction: this.props.submitAction,
             helpBlock: this.props.helpBlock,
-            values: {}
+            values: this.props.values || {},
+            titleValue: this.props.titleValue
         };
     },
     componentDidMount() {},
@@ -41,7 +42,8 @@ var ConfigurationForm = React.createClass({
                 <input type="hidden" name="type" value={typeName} />
 
                 <label htmlFor={"title-" + typeName}>Title</label>
-                <input id={"title-" + typeName} name="title" onChange={this.handleTitleChange} required="true" type="text" className="input-xlarge form-control" />
+                <input id={"title-" + typeName} name="title" value={this.state.titleValue} onChange={this.handleTitleChange}
+                       required="true" type="text" className="input-xlarge form-control" />
                 {helpBlock}
                 {configFields}
             </fieldset>
@@ -73,6 +75,7 @@ var ConfigurationForm = React.createClass({
     },
     handleTitleChange(evt) {
         this.handleChange('title', evt.target.value);
+        this.setState({titleValue: evt.target.value});
     },
     handleChange(field, value) {
         var values = this.state.values;
@@ -80,15 +83,16 @@ var ConfigurationForm = React.createClass({
         this.setState({values: values});
     },
     _renderConfigField(configField, key) {
+        var value = this.state.values[key];
         switch(configField.type) {
             case "text":
-                return (<TextField key={this.state.typeName + "-" + key} typeName={this.state.typeName} title={key} field={configField} onChange={this.handleChange}/>);
+                return (<TextField key={this.state.typeName + "-" + key} typeName={this.state.typeName} title={key} field={configField} value={value} onChange={this.handleChange}/>);
             case "number":
-                return (<NumberField key={this.state.typeName + "-" + key} typeName={this.state.typeName} title={key} field={configField} onChange={this.handleChange}/>);
+                return (<NumberField key={this.state.typeName + "-" + key} typeName={this.state.typeName} title={key} field={configField} value={value} onChange={this.handleChange}/>);
             case "boolean":
-                return (<BooleanField key={this.state.typeName + "-" + key} typeName={this.state.typeName} title={key} field={configField} onChange={this.handleChange}/>);
+                return (<BooleanField key={this.state.typeName + "-" + key} typeName={this.state.typeName} title={key} field={configField} value={value} onChange={this.handleChange}/>);
             case "dropdown":
-                return (<DropdownField key={this.state.typeName + "-" + key} typeName={this.state.typeName} title={key} field={configField} onChange={this.handleChange}/>);
+                return (<DropdownField key={this.state.typeName + "-" + key} typeName={this.state.typeName} title={key} field={configField} value={value} onChange={this.handleChange}/>);
         }
     }
 });

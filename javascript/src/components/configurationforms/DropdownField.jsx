@@ -10,7 +10,8 @@ var DropdownField = React.createClass({
         return {
             typeName: this.props.typeName,
             field: this.props.field,
-            title: this.props.title
+            title: this.props.title,
+            value: this.props.value
         };
     },
     componentWillReceiveProps(props) {
@@ -23,6 +24,7 @@ var DropdownField = React.createClass({
     },
     handleChange(evt) {
         this.props.onChange(this.state.title, evt.target.value);
+        this.setState({value: evt.target.value});
     },
     render() {
         var field = this.state.field;
@@ -36,7 +38,7 @@ var DropdownField = React.createClass({
                     {FieldHelpers.optionalMarker(field)}
                 </label>
 
-                <select id={field.title} defaultValue={field.default_value}
+                <select id={field.title} defaultValue={field.default_value} value={this.state.value}
                         className="input-xlarge form-control" onChange={this.handleChange}>
                     {options}
                 </select>

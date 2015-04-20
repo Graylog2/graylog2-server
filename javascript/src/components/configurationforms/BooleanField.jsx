@@ -8,7 +8,8 @@ var BooleanField = React.createClass({
         return {
             typeName: this.props.typeName,
             field: this.props.field,
-            title: this.props.title
+            title: this.props.title,
+            value: this.props.value
         };
     },
     componentWillReceiveProps(props) {

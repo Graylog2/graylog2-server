@@ -1,6 +1,7 @@
 'use strict';
 
 var React = require('react/addons');
+var EditOutputButton = require('./EditOutputButton');
 
 var Output = React.createClass({
     getInitialState() {
@@ -48,9 +49,10 @@ var Output = React.createClass({
     },
     render() {
         var output = this.state.output;
-        var deletionForm = (this.state.streamId && this._isPermitted(["STREAM_OUTPUTS_DELETE"]) ? this._deleteFromStreamButton(output) : (<div></div>));
+        var deletionForm = (this.state.streamId && this._isPermitted(["STREAM_OUTPUTS_DELETE"]) ? this._deleteFromStreamButton(output) : "");
 
-        var terminationForm = (this._isPermitted(["OUTPUTS_TERMINATE"]) ? this._deleteGloballyButton(output) : (<div></div>));
+        var editButton = (this._isPermitted(["OUTPUTS_EDIT"]) ? <EditOutputButton output={output} /> : "");
+        var terminationForm = (this._isPermitted(["OUTPUTS_TERMINATE"]) ? this._deleteGloballyButton(output) : "");
 
         var contentPack = (output.content_pack ? (<span title="Created from content pack"><i className="fa fa-gift"></i></span>) : (<div></div>));
         var configuration = (output.configuration.length === 0 ? (<ul><li>-- no configuration --</li></ul>) : this._formatConfiguration(output));
@@ -65,6 +67,7 @@ var Output = React.createClass({
 
                         <span className="text" title={moment(output.created_at).format()}>{moment(output.created_at).fromNow()}</span>
                         &nbsp;
+                        {editButton}
                         {deletionForm}
                         {terminationForm}
                     </span>
