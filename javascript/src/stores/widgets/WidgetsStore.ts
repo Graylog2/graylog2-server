@@ -78,8 +78,8 @@ var WidgetsStore = {
         return promise;
     },
 
-    loadValue(dashboardId: string, widgetId: string): JQueryPromise<string[]> {
-        var url = URLUtils.appPrefixed('/a/dashboards/' + dashboardId + '/widgets/' + widgetId + '/value');
+    loadValue(dashboardId: string, widgetId: string, resolution: number): JQueryPromise<string[]> {
+        var url = URLUtils.appPrefixed('/a/dashboards/' + dashboardId + '/widgets/' + widgetId + '/resolution/' + resolution + '/value');
         return $.getJSON(url);
     }
 };
