@@ -42,6 +42,8 @@ var OutputList = React.createClass({
             OutputsStore.remove(outputId, (jqXHR, textStatus, errorThrown) => {
                 this.loadData();
                 UserNotification.success("Output was terminated.", "Success!");
+                if (this.props.onUpdate)
+                    this.props.onUpdate();
             });
         }
     },
@@ -50,6 +52,8 @@ var OutputList = React.createClass({
             StreamsStore.removeOutput(streamId, outputId, (jqXHR, textStatus, errorThrown) => {
                 this.loadData();
                 UserNotification.success("Removed output from stream!", "Success!");
+                if (this.props.onUpdate)
+                    this.props.onUpdate();
             });
         }
     },

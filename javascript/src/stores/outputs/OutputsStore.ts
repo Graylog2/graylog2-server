@@ -46,7 +46,7 @@ var OutputsStore = {
             success: callback
         });
     },
-    save(output: any, callback: () => void) {
+    save(output: any, callback: (output: Output) => void) {
         var failCallback = (jqXHR, textStatus, errorThrown) => {
             UserNotification.error("Saving Output \"" + output.title + "\" failed with status: " + errorThrown,
                 "Could not save Output");

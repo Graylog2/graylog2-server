@@ -2,6 +2,7 @@
 
 var React = require('react/addons');
 var OutputsStore = require('../../stores/outputs/OutputsStore');
+var StreamsStore = require('../../stores/streams/StreamsStore');
 var ConfigurationForm = require('../configurationforms/ConfigurationForm');
 var $ = require('jquery'); // excluded and shimed
 
@@ -10,7 +11,8 @@ var CreateOutputDropdown = React.createClass({
         return {
             types: [],
             typeDefinition: [],
-            typeName: ""
+            typeName: "",
+            streamId: this.props.streamId
         };
     },
     componentDidMount() {
@@ -55,9 +57,14 @@ var CreateOutputDropdown = React.createClass({
         });
     },
     handleSubmit(data) {
-        OutputsStore.save(data, () => {
-            this.props.onUpdate();
-            this.refs.configurationForm.close();
+        OutputsStore.save(data, (result) => {
+            if (this.state.streamId) {
+                StreamsStore.addOutput(this.state.streamId, result.id, () => {
+                    this.props.onUpdate();
+                });
+            } else {
+                this.props.onUpdate();
+            }
         });
     }
 });

@@ -32,49 +32,6 @@
         </div>
     </div>
 
-    <div class="row content">
-        <div class="col-md-12">
-            @if(isPermitted(OUTPUTS_CREATE)) {
-                <div class="output-new">
-                    <form class="form-inline">
-                        <select id="input-type" class="form-control">
-                            <option selected disabled>Select type of new output</option>
-                        @for((inputType,info) <- availableOutputs.toSeq.sortBy(_._2.name)) {
-                            <option value="@inputType">@info.name</option>
-                        }
-                        </select>
-                        <button id="configure-input" type="button" class="btn btn-success form-control">Launch new Output</button>
-                    </form>
-                </div>
-
-                @views.html.system.outputs.partials.output_creation_forms.render(availableOutputs, routes.StreamOutputsController.create(stream.getId))
-            }
-            @if(isPermitted(STREAM_OUTPUTS_CREATE) && otherOutputs.size > 0) {
-                <div class="output-add" style="margin-top: 10px">
-                    <form class="form-inline" action="@routes.StreamOutputsController.add(stream.getId)" method="POST">
-                        <select name="outputId" class="form-control">
-                            @if(otherOutputs.size > 0) {
-                                <option selected disabled>Select existing output</option>
-                                @for(output <- otherOutputs.toSeq.sortBy(_.getTitle)) {
-                                    <option value="@output.getId">@output.getTitle</option>
-                                }
-                            } else {
-                                <option disabled>No outputs available</option>
-                            }
-                        </select>
-
-                        <button type="submit" id="add-existing-output" class="btn btn-success form-control">Assign existing Output</button>
-                    </form>
-                </div>
-            }
-
-        </div>
-    </div>
-    <div class="row content">
-        <div class="col-md-12">
-            <h2><i class="fa fa-cogs"></i> Configured outputs</h2>
-            <div class="outputs-list" id="react-output-list" data-permissions="@Permissions.asJson(STREAM_OUTPUTS_DELETE, OUTPUTS_TERMINATE, OUTPUTS_EDIT)" data-stream-id="@stream.getId">
-            </div>
-        </div>
+    <div class="react-output-component" data-stream-id="@stream.getId" data-permissions='@Permissions.asJson(STREAM_OUTPUTS_DELETE, OUTPUTS_CREATE, OUTPUTS_TERMINATE, OUTPUTS_EDIT)'>
     </div>
 }
