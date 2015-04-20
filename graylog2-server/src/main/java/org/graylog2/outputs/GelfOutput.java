@@ -185,11 +185,11 @@ public class GelfOutput implements MessageOutput {
         public ConfigurationRequest getRequestedConfiguration() {
             final ConfigurationRequest configurationRequest = new ConfigurationRequest();
             configurationRequest.addField(new TextField(CK_HOSTNAME, "Destination host", "", "This is the hostname of the destination", ConfigurationField.Optional.NOT_OPTIONAL));
-            configurationRequest.addField(new NumberField(CK_PORT, "Destination port", 12201, "This is the port of the destination", ConfigurationField.Optional.NOT_OPTIONAL));
+            configurationRequest.addField(new NumberField(CK_PORT, "Destination port", 12201, "This is the port of the destination", ConfigurationField.Optional.NOT_OPTIONAL, NumberField.Attribute.IS_PORT_NUMBER));
             final Map<String, String> protocols = ImmutableMap.of(
                     "TCP", "TCP",
                     "UDP", "UDP");
-            configurationRequest.addField(new DropdownField(CK_PROTOCOL, "Protocol", "TCP", protocols, "The protocol used to connect", ConfigurationField.Optional.OPTIONAL));
+            configurationRequest.addField(new DropdownField(CK_PROTOCOL, "Protocol", "TCP", protocols, "The protocol used to connect", ConfigurationField.Optional.NOT_OPTIONAL));
             return configurationRequest;
         }
     }
