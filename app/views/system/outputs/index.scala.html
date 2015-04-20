@@ -1,9 +1,7 @@
 @(currentUser: org.graylog2.restclient.models.User,
-        breadcrumbs: lib.BreadcrumbList,
-        availableOutputs: Map[String, org.graylog2.restclient.models.api.responses.AvailableOutputSummary])
+        breadcrumbs: lib.BreadcrumbList)
 
 @import lib.security.RestPermissions._;
-@import views.helpers.Permissions._;
 @import views.helpers.Permissions
 
 @main("Outputs in cluster", null, "", currentUser) {

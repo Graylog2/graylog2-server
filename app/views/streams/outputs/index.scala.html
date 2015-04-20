@@ -1,13 +1,9 @@
 @(currentUser: org.graylog2.restclient.models.User,
     breadcrumbs: lib.BreadcrumbList,
-    outputs: List[org.graylog2.restclient.models.Output],
-    otherOutputs: List[org.graylog2.restclient.models.Output],
-    stream: org.graylog2.restclient.models.Stream,
-    availableOutputs: Map[String, org.graylog2.restclient.models.api.responses.AvailableOutputSummary])
+    stream: org.graylog2.restclient.models.Stream)
 
 @import views.helpers.Permissions
 @import lib.security.RestPermissions._;
-@import views.helpers.Permissions._;
 
 @main("Outputs of stream \"" + stream.getTitle + "\"", null, "", currentUser, false) {
 
