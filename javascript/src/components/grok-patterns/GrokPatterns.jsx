@@ -1,16 +1,16 @@
 'use strict';
 
 var React = require('react');
-//noinspection JSUnusedGlobalSymbols
+
 var EditPatternModal = require('./EditPatternModal');
 var BulkLoadPatternModal = require('./BulkLoadPatternModal');
+var DataTable = require('../common/DataTable');
 var GrokPatternsStore = require('../../stores/grok-patterns/GrokPatternsStore');
 
 var GrokPatterns = React.createClass({
     getInitialState() {
         return {
-            patterns: [],
-            filter: ""
+            patterns: []
         };
     },
     componentDidMount() {
@@ -24,42 +24,6 @@ var GrokPatterns = React.createClass({
                 });
             }
         });
-    },
-    _getFilteredPatterns() {
-        var filter = this.state.filter.toLowerCase().trim();
-        return this.state.patterns.filter((pattern) => { return pattern.name.toLowerCase().indexOf(filter) !== -1; });
-    },
-    
-    _filteredPatternsHtml() {
-        var patterns = this._getFilteredPatterns();
-        var jsx = patterns.map((pattern) => {
-            return (
-                <tr key={pattern.id}>
-                    <td>{pattern.name}</td>
-                    <td>{pattern.pattern}</td>
-                    <td>
-                        <button style={{marginRight: 5}} className="btn btn-danger btn-xs" onClick={this.confirmedRemove.bind(this, pattern)}>
-                            <i className="fa fa-remove"></i> Delete
-                        </button>
-                        <EditPatternModal id={pattern.id} name={pattern.name} pattern={pattern.pattern} create={false} reload={this.loadData} savePattern={this.savePattern} validPatternName={this.validPatternName}/>
-                    </td>
-                </tr>
-            );
-        }, this);
-
-        return (
-            <table className="table table-striped grok-patterns-table">
-                <thead>
-                    <tr>
-                        <th className="name">Name</th>
-                        <th>Pattern</th>
-                        <th className="actions">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {jsx}
-                </tbody>
-            </table>);
     },
     validPatternName(name) {
         // Check if patterns already contain a pattern with the given name.
@@ -76,35 +40,74 @@ var GrokPatterns = React.createClass({
             GrokPatternsStore.deletePattern(pattern, this.loadData);
         }
     },
+    _headerCellFormatter(header) {
+        var formattedHeaderCell;
 
-    render() {
-        var patterns;
-
-        if (this.state.patterns.length === 0) {
-            patterns = <div><div className="alert alert-info">There are no grok patterns.</div></div>;
-        } else {
-            patterns = this._filteredPatternsHtml();
+        switch (header.toLocaleLowerCase()) {
+            case 'name':
+                formattedHeaderCell = <th className="name">{header}</th>;
+                break;
+            case 'actions':
+                formattedHeaderCell = <th className="actions">{header}</th>;
+                break;
+            default:
+                formattedHeaderCell = <th>{header}</th>;
         }
+
+        return formattedHeaderCell;
+    },
+    _patternFormatter(pattern) {
+        return (
+            <tr key={pattern.id}>
+                <td>{pattern.name}</td>
+                <td>{pattern.pattern}</td>
+                <td>
+                    <button style={{marginRight: 5}} className="btn btn-danger btn-xs"
+                            onClick={this.confirmedRemove.bind(this, pattern)}>
+                        <i className="fa fa-remove"></i> Delete
+                    </button>
+                    <EditPatternModal id={pattern.id} name={pattern.name} pattern={pattern.pattern} create={false}
+                                      reload={this.loadData} savePattern={this.savePattern}
+                                      validPatternName={this.validPatternName}/>
+                </td>
+            </tr>
+        );
+    },
+    render() {
+        var headers = ["Name", "Pattern", "Actions"];
+        var filterKeys = ["name"];
 
         return (
             <div>
-                <div className="row">
+                <div className="row content content-head">
                     <div className="col-md-12">
-                        <form className="form-inline grok-filter-form">
-                            <label htmlFor="grokfilter">Filter pattern names:</label>
-                            <input type="text" name="filter" id="grokfilter" value={this.state.filter} onChange={(event) => {this.setState({filter: event.target.value});}} />
-                        </form>
-                        <div className="pull-right">
+                        <div className="pull-right actions">
                             <BulkLoadPatternModal />
-                            <EditPatternModal id={""} name={""} pattern={""} create={true} reload={this.loadData} savePattern={this.savePattern} validPatternName={this.validPatternName}/>
+                            <EditPatternModal id={""} name={""} pattern={""} create={true}
+                                              reload={this.loadData}
+                                              savePattern={this.savePattern}
+                                              validPatternName={this.validPatternName}/>
                         </div>
-                        <div className="row">
-                            <div className="col-md-12">
-                                <div className="grok-patterns">
-                                {patterns}
-                                </div>
-                            </div>
-                        </div>
+
+                        <h1>Grok patterns</h1>
+
+                        <p className="description">
+                            This is a list of grok patterns you can use in your Graylog grok extractors. You can add
+                            your own manually or import a whole list of patterns from a so called pattern file.
+                        </p>
+                    </div>
+                </div>
+
+                <div className="row content">
+                    <div className="col-md-12">
+                        <DataTable id="grok-pattern-list"
+                                   headers={headers}
+                                   headerCellFormatter={this._headerCellFormatter}
+                                   sortByKey={"name"}
+                                   rows={this.state.patterns}
+                                   dataRowFormatter={this._patternFormatter}
+                                   filterLabel="Filter patterns"
+                                   filterKeys={filterKeys}/>
                     </div>
                 </div>
             </div>

@@ -14,7 +14,7 @@
     @views.html.partials.breadcrumbs(breadcrumbs)
 
     <div class="row content content-head">
-        <div class="col-md-10">
+        <div class="col-md-12">
             <h1>Create new user</h1>
             <p class="description">
                 Use this page to create new Graylog users. The users and their permissions created here are not limited
@@ -24,7 +24,7 @@
     </div>
 
     <div class="row content">
-        <div class="col-md-6">
+        <div class="col-lg-8">
             <form id="create-user-form" class="form-horizontal" action="@routes.UsersController.create()" method="POST">
                 <div class="form-group">
                     <label for="username" class="col-sm-2 control-label">Username</label>

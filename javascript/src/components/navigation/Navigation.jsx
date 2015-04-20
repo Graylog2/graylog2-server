@@ -4,6 +4,7 @@
 
 var React = require('react');
 var Navbar = require('react-bootstrap').Navbar;
+var CollapsableNav = require('react-bootstrap').CollapsableNav;
 var Nav = require('react-bootstrap').Nav;
 var NavItem = require('react-bootstrap').NavItem;
 var DropdownButton = require('react-bootstrap').DropdownButton;
@@ -31,46 +32,48 @@ var Navigation = React.createClass({
         </a>);
         return (
             <Navbar brand={brand} inverse fluid fixedTop toggleNavKey={0}>
-                <Nav>
-                    {this._isPermitted(['SEARCHES_ABSOLUTE', 'SEARCHES_RELATIVE', 'SEARCHES_KEYWORD']) &&
-                        <NavItem href={jsRoutes.controllers.SearchController.globalSearch().url}
-                                 active={this.props.requestPath === '/' || this._isActive("/search")}>Search</NavItem>
-                    }
-                    <NavItem href={jsRoutes.controllers.StreamsController.index().url}
-                             active={this._isActive("/streams")}>Streams</NavItem>
+                <CollapsableNav eventKey={0}>
+                    <Nav navbar>
+                        {this._isPermitted(['SEARCHES_ABSOLUTE', 'SEARCHES_RELATIVE', 'SEARCHES_KEYWORD']) &&
+                            <NavItem href={jsRoutes.controllers.SearchController.globalSearch().url}
+                                     active={this.props.requestPath === '/' || this._isActive("/search")}>Search</NavItem>
+                        }
+                        <NavItem href={jsRoutes.controllers.StreamsController.index().url}
+                                 active={this._isActive("/streams")}>Streams</NavItem>
 
-                    <NavItem href={jsRoutes.controllers.DashboardsController.index().url}
-                             active={this._isActive("/dashboards")}>Dashboards</NavItem>
+                        <NavItem href={jsRoutes.controllers.DashboardsController.index().url}
+                                 active={this._isActive("/dashboards")}>Dashboards</NavItem>
 
-                    {this.state.permissions['SOURCES_READ'] &&
-                        <NavItem href={jsRoutes.controllers.SourcesController.list().url}
-                                   active={this._isActive("/sources")}>Sources</NavItem>
-                    }
-                    <DropdownButton title={this._systemTitle()} active={this._isActive("/system")}>
-                        <MenuItem href={jsRoutes.controllers.SystemController.index(0).url}>Overview</MenuItem>
-                        <MenuItem href={jsRoutes.controllers.NodesController.nodes().url}>Nodes</MenuItem>
-                        { this._isPermitted(['INPUTS_READ']) && <MenuItem href={jsRoutes.controllers.InputsController.index().url}>Inputs</MenuItem> }
-                        { this._isPermitted(['OUTPUTS_READ']) && <MenuItem href={jsRoutes.controllers.OutputsController.index().url}>Outputs</MenuItem> }
-                        { this._isPermitted(['INDICES_READ']) && <MenuItem href={jsRoutes.controllers.IndicesController.index().url}>Indices</MenuItem> }
-                        { this._isPermitted(['LOGGERS_READ']) && <MenuItem href={jsRoutes.controllers.LoggingController.index().url}>Logging</MenuItem> }
-                        <MenuItem href={jsRoutes.controllers.UsersController.index().url}>Users</MenuItem>
-                        { this._isPermitted(['DASHBOARDS_CREATE', 'INPUTS_CREATE', 'STREAMS_CREATE']) && <MenuItem href={jsRoutes.controllers.BundlesController.index().url}>Content Packs</MenuItem> }
-                        { this._isPermitted(['INPUTS_EDIT']) && <MenuItem href={jsRoutes.controllers.GrokPatternsController.index().url}>Grok Patterns</MenuItem> }
-                    </DropdownButton>
-                </Nav>
+                        {this.state.permissions['SOURCES_READ'] &&
+                            <NavItem href={jsRoutes.controllers.SourcesController.list().url}
+                                       active={this._isActive("/sources")}>Sources</NavItem>
+                        }
+                        <DropdownButton title={this._systemTitle()} active={this._isActive("/system")}>
+                            <MenuItem href={jsRoutes.controllers.SystemController.index(0).url}>Overview</MenuItem>
+                            <MenuItem href={jsRoutes.controllers.NodesController.nodes().url}>Nodes</MenuItem>
+                            { this._isPermitted(['INPUTS_READ']) && <MenuItem href={jsRoutes.controllers.InputsController.index().url}>Inputs</MenuItem> }
+                            { this._isPermitted(['OUTPUTS_READ']) && <MenuItem href={jsRoutes.controllers.OutputsController.index().url}>Outputs</MenuItem> }
+                            { this._isPermitted(['INDICES_READ']) && <MenuItem href={jsRoutes.controllers.IndicesController.index().url}>Indices</MenuItem> }
+                            { this._isPermitted(['LOGGERS_READ']) && <MenuItem href={jsRoutes.controllers.LoggingController.index().url}>Logging</MenuItem> }
+                            { this._isPermitted(['USERS_EDIT']) && <MenuItem href={jsRoutes.controllers.UsersController.index().url}>Users</MenuItem> }
+                            { this._isPermitted(['DASHBOARDS_CREATE', 'INPUTS_CREATE', 'STREAMS_CREATE']) && <MenuItem href={jsRoutes.controllers.BundlesController.index().url}>Content Packs</MenuItem> }
+                            { this._isPermitted(['INPUTS_EDIT']) && <MenuItem href={jsRoutes.controllers.GrokPatternsController.index().url}>Grok Patterns</MenuItem> }
+                        </DropdownButton>
+                    </Nav>
 
-                <Nav>
-                    <NavItem href={jsRoutes.controllers.SystemController.index(0).url} className="notification-badge-link">
-                        <span className="badge" style={{backgroundColor: '#ff3b00'}} id="notification-badge"></span>
-                    </NavItem>
-                </Nav>
+                    <Nav navbar>
+                        <NavItem href={jsRoutes.controllers.SystemController.index(0).url} className="notification-badge-link">
+                            <span className="badge" style={{backgroundColor: '#ff3b00'}} id="notification-badge"></span>
+                        </NavItem>
+                    </Nav>
 
-                <Nav right>
-                    <NavItem href={jsRoutes.controllers.NodesController.nodes().url}>
-                        <GlobalThroughput />
-                    </NavItem>
-                    <UserMenu fullName={this.props.fullName} loginName={this.props.loginName}/>
-                </Nav>
+                    <Nav navbar right>
+                        <NavItem href={jsRoutes.controllers.NodesController.nodes().url}>
+                            <GlobalThroughput />
+                        </NavItem>
+                        <UserMenu fullName={this.props.fullName} loginName={this.props.loginName}/>
+                    </Nav>
+                </CollapsableNav>
             </Navbar>
         );
     },

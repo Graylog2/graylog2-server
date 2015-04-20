@@ -17,10 +17,10 @@
 @main("Users", null, "", currentUser, false) {
     @views.html.partials.breadcrumbs(breadcrumbs)
 
-
     <div class="row content content-head">
         <div class="col-md-12">
             <div class="pull-right actions">
+            @if(!user.isReadonly) {
                 @if(user.getStartpage != null) {
                     <form action="@routes.StartpageController.reset(user.getName)" method="POST">
                         <button type="submit" class="btn btn-info" data-confirm="Really reset startpage?">
@@ -31,6 +31,7 @@
                 <span id="react-user-preferences-button" data-user-name="@username">
                     <button class="btn btn-success">User preferences</button>
                 </span>
+            }
             </div>
 
             <h1>Edit user &raquo;@username&laquo;</h1>
@@ -41,9 +42,19 @@
     </div>
 
     <div class="row content">
-        <div class="col-md-6">
+        <div class="col-lg-8">
             <h2>User information</h2>
             <form class="form-horizontal user-form" id="edit-user-form" action="@routes.UsersController.saveChanges(username)" method="POST">
+                @if(user.isReadonly) {
+                    <div class="col-sm-offset-3 col-sm-9">
+                        <div class="alert alert-warning" role="alert">
+                            The admin user can only be modified in your Graylog server configuration file.
+                        </div>
+                    </div>
+                    <div class="clearfix"></div>
+                    <br>
+                }
+                <fieldset @if(user.isReadonly) {disabled}>
                 <div class="form-group">
                     <label for="fullname" class="col-sm-3 control-label">Full Name</label>
                     <div class="col-sm-9">
@@ -195,111 +206,131 @@
                         </button>
                     </div>
                 </div>
+                </fieldset>
             </form>
         </div>
     </div>
 
     <div class="row content">
-        <div class="col-md-6">
+        <div class="col-lg-8">
             <h2>Change password</h2>
-            @if(user.isExternal) {
-                <p>
-                    This user was created from an external system and you can't change the password here.
-                    Please contact an administrator for more information.
-                </p>
+            @if(user.isReadonly) {
+                <div class="col-sm-offset-3 col-sm-9">
+                    <div class="alert alert-warning" role="alert">
+                        Please edit your Graylog server configuration file to change the admin password.
+                    </div>
+                </div>
             } else {
-                <form class="form-horizontal" action="@routes.UsersController.changePassword(username)" method="POST">
-                    @if(requiresOldPassword) {
+                @if(user.isExternal) {
+                    <div class="col-sm-offset-3 col-sm-9">
+                        <div class="alert alert-warning" role="alert">
+                            This user was created from an external system and you can't change the password here.
+                            Please contact an administrator for more information.
+                        </div>
+                    </div>
+                } else {
+                    <form class="form-horizontal" action="@routes.UsersController.changePassword(username)" method="POST">
+                        @if(requiresOldPassword) {
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label" for="old-password">Old Password</label>
+                                <div class="col-sm-9">
+                                    <input type="password" id="old-password" name="old_password" class="form-control" required />
+                                </div>
+                            </div>
+                        }
                         <div class="form-group">
-                            <label class="col-sm-3 control-label" for="old-password">Old Password</label>
+                            <label class="col-sm-3 control-label" for="password">New Password</label>
                             <div class="col-sm-9">
-                                <input type="password" id="old-password" name="old_password" class="form-control" required />
+                                <input type="password" id="password" name="password" class="form-control" required />
+                                <span class="help-block">
+                                    Passwords must be at least 6 characters long. We recommend using a strong password.
+                                </span>
                             </div>
                         </div>
-                    }
-                    <div class="form-group">
-                        <label class="col-sm-3 control-label" for="password">New Password</label>
-                        <div class="col-sm-9">
-                            <input type="password" id="password" name="password" class="form-control" required />
-                            <span class="help-block">
-                                Passwords must be at least 6 characters long. We recommend using a strong password.
-                            </span>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label" for="password-repeat">Repeat Password</label>
+                            <div class="col-sm-9">
+                                <input type="password" id="password-repeat" class="form-control" required/>
+                            </div>
                         </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="col-sm-3 control-label" for="password-repeat">Repeat Password</label>
-                        <div class="col-sm-9">
-                            <input type="password" id="password-repeat" class="form-control" required/>
+                        <div class="form-group">
+                            <div class="col-sm-offset-3 col-sm-9">
+                                <button class="btn btn-success" type="submit">
+                                    Update Password
+                                </button>
+                            </div>
                         </div>
-                    </div>
-                    <div class="form-group">
-                        <div class="col-sm-offset-3 col-sm-9">
-                            <button class="btn btn-success" type="submit">
-                                Update Password
-                            </button>
-                        </div>
-                    </div>
-                </form>
+                    </form>
+                }
             }
         </div>
     </div>
 
     @if(isPermitted(USERS_PERMISSIONSEDIT)) {
         <div class="row content">
-            <div class="col-sm-6">
+            <div class="col-lg-8">
                 <h2>Change user role</h2>
-                <form class="form-horizontal" action="@routes.UsersController.resetPermissions(user.getName)" method="POST">
-                    <div class="form-group">
-                        <label class="col-sm-3 control-label">User Role</label>
-
-                        <div class="col-sm-9">
-                            <div class="radio">
-                                <label>
-                                    <input type="radio" name="permissiontype" value="reader" @if(!isPermitted(user, "*")) {
-                                        checked="checked" } />
-                                    Reader
-                                </label>
-                            </div>
-                            <span class="help-block">
-                                Reader users <strong>can't use the global search</strong>. An administrator has to
-                                explicitly grant them permissions to read or edit any stream or dashboard. They <strong>
-                                can't modify Graylog's configuration or add new users</strong>.
-                            </span>
-
-                            <div class="radio">
-                                <label>
-                                    <input type="radio" name="permissiontype" value="admin" @if(isPermitted(user, "*")) {
-                                        checked="checked" } />
-                                    Administrator
-                                </label>
-                            </div>
-                            <span class="help-block">
-                                Administrators <strong>have full control over Graylog</strong>, being able to access the
-                                global search, and any streams or dashboards. They can also <strong>modify Graylog's
-                                configuration and add new users</strong>.
-                            </span>
+                @if(user.isReadonly) {
+                    <div class="col-sm-offset-3 col-sm-9">
+                        <div class="alert alert-warning" role="alert">
+                            You cannot edit the admin's user role.
                         </div>
                     </div>
+                } else {
+                    <form class="form-horizontal" action="@routes.UsersController.resetPermissions(user.getName)" method="POST">
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">User Role</label>
 
-                    <div class="form-group">
-                        <div class="col-sm-offset-3 col-sm-9">
-                            <div class="panel panel-info">
-                                <div class="panel-body">
-                                    <strong>Note:</strong>
-                                    Changing the user role will reset previously assigned stream and dashboard permissions.
+                            <div class="col-sm-9">
+                                <div class="radio">
+                                    <label>
+                                        <input type="radio" name="permissiontype" value="reader" @if(!isPermitted(user, "*")) {
+                                            checked="checked" } />
+                                        Reader
+                                    </label>
+                                </div>
+                                <span class="help-block">
+                                    Reader users <strong>can't use the global search</strong>. An administrator has to
+                                    explicitly grant them permissions to read or edit any stream or dashboard. They <strong>
+                                    can't modify Graylog's configuration or add new users</strong>.
+                                </span>
+
+                                <div class="radio">
+                                    <label>
+                                        <input type="radio" name="permissiontype" value="admin" @if(isPermitted(user, "*")) {
+                                            checked="checked" } />
+                                        Administrator
+                                    </label>
+                                </div>
+                                <span class="help-block">
+                                    Administrators <strong>have full control over Graylog</strong>
+                                    , being able to access the
+                                    global search, and any streams or dashboards. They can also <strong>modify Graylog's
+                                    configuration and add new users</strong>.
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="col-sm-offset-3 col-sm-9">
+                                <div class="panel panel-info">
+                                    <div class="panel-body">
+                                        <strong>Note:</strong>
+                                        Changing the user role will reset previously assigned stream and dashboard permissions.
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
 
-                    <div class="form-group">
-                        <div class="col-sm-offset-3 col-sm-9">
-                            <button class="btn btn-warning" type="submit" data-confirm="Really update role for @user.getName?">
-                                Update role
-                            </button>
+                        <div class="form-group">
+                            <div class="col-sm-offset-3 col-sm-9">
+                                <button class="btn btn-warning" type="submit" data-confirm="Really update role for @user.getName?">
+                                    Update role
+                                </button>
+                            </div>
                         </div>
-                    </div>
-                </form>
+                    </form>
+                }
             </div>
         </div>
     }
