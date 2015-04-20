@@ -14,6 +14,9 @@ var ConfigurationWell = React.createClass({
             return (<li key={id + "-" + key}>{key}: {value}</li>);
         });
 
+        if (formattedItems.length < 1)
+            formattedItems.push(<li key="placeholder">-- no configuration --</li>);
+
         return (
             <ul>
                 {formattedItems}

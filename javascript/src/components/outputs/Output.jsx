@@ -45,8 +45,6 @@ var Output = React.createClass({
         var terminationForm = (this._isPermitted(["OUTPUTS_TERMINATE"]) ? this._deleteGloballyButton(output) : "");
 
         var contentPack = (output.content_pack ? (<span title="Created from content pack"><i className="fa fa-gift"></i></span>) : (<div></div>));
-        var configuration = (output.configuration.length === 0 ? (<div className="well well-small"><ul><li>-- no configuration --</li></ul></div>)
-            : <ConfigurationWell key={"configuration-well-output-" + output.id} id={output.id} configuration={output.configuration} />);
 
         var creatorUserLink = (<a href={jsRoutes.controllers.UsersController.show(output.creator_user_id).url}><i className="fa fa-user"></i> {output.creator_user_id}</a>);
 
@@ -66,7 +64,7 @@ var Output = React.createClass({
                         <i className="fa fa-ellipsis-vertical"></i> {output.title} ({output.type})
                         {contentPack}
                     </h3>
-                    {configuration}
+                    <ConfigurationWell key={"configuration-well-output-" + output.id} id={output.id} configuration={output.configuration} />
                 </div>
             </div>
         );
