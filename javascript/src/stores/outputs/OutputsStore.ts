@@ -61,6 +61,21 @@ var OutputsStore = {
             data: JSON.stringify(output)
         }).done(callback).fail(failCallback);
     },
+    update(output: Output, deltas: any, callback: (output: Output) => void) {
+        var failCallback = (jqXHR, textStatus, errorThrown) => {
+            UserNotification.error("Updating Output \"" + output.title + "\" failed with status: " + errorThrown,
+                "Could not update Output");
+        };
+
+        var url = jsRoutes.controllers.api.OutputsApiController.update(output.id).url;
+
+        $.ajax({
+            type: "PUT",
+            contentType: "application/json",
+            url: url,
+            data: JSON.stringify(deltas)
+        }).done(callback).fail(failCallback);
+    },
     _failCallback(jqXHR: any, textStatus: string, errorThrown: string) {
         UserNotification.error("Loading otuputs failed with status: " + errorThrown,
             "Could not load outputs");

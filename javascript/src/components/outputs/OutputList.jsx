@@ -59,7 +59,8 @@ var OutputList = React.createClass({
     },
     _formatOutput(output) {
         return (<Output key={output.id} output={output} streamId={this.state.streamId} permissions={this.state.permissions}
-                        removeOutputFromStream={this.removeOutputFromStream} removeOutputGlobally={this.removeOutputGlobally} />);
+                        removeOutputFromStream={this.removeOutputFromStream} removeOutputGlobally={this.removeOutputGlobally}
+                        onUpdate={this.props.onUpdate} />);
     },
     render() {
         var outputList;

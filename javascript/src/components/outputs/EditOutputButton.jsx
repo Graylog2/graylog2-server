@@ -20,7 +20,9 @@ var EditOutputButton = React.createClass({
         });
     },
     handleSubmit(data) {
-        console.log(data);
+        OutputsStore.update(this.state.output, data, () => {
+            this.props.onUpdate();
+        });
     },
     render() {
         var typeDefinition = this.state.typeDefinition;

@@ -58,7 +58,7 @@ var ConfigurationForm = React.createClass({
     _save(evt) {
         evt.preventDefault();
         var values = this.state.values;
-        var data = {title: values.title,
+        var data = {title: this.state.titleValue,
             type: this.state.typeName,
             configuration: {}};
         $.map(this.state.configFields, function(field, name) {

@@ -14,7 +14,7 @@ var AssignOutputDropdown = React.createClass({
             selectedOutput: "placeholder"
         };
     },
-    willReceiveProps(props) {
+    componentWillReceiveProps(props) {
         this.setState(props);
     },
     loadData() {

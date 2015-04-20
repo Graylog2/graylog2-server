@@ -269,6 +269,7 @@ POST        /a/system/outputs                                                   
 GET         /a/system/outputs/available/:output_type                                 @controllers.api.OutputsApiController.available(output_type: String)
 GET         /a/system/outputs/availableTypes                                         @controllers.api.OutputsApiController.availableTypes()
 DELETE      /a/system/outputs/:output_id                                             @controllers.api.OutputsApiController.delete(output_id: String)
+PUT         /a/system/outputs/:output_id                                             @controllers.api.OutputsApiController.update(output_id: String)
 GET         /a/streams/:stream_id/outputs                                            @controllers.api.StreamOutputsApiController.index(stream_id: String)
 DELETE      /a/streams/:stream_id/outputs/:output_id                                 @controllers.api.StreamOutputsApiController.delete(stream_id: String, output_id: String)
 PUT         /a/streams/:stream_id/outputs/:output_id                                 @controllers.api.StreamOutputsApiController.add(stream_id: String, output_id: String)

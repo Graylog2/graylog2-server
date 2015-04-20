@@ -16,7 +16,7 @@ var OutputComponent = React.createClass({
           streamId: this.props.streamId
       };
     },
-    willReceiveProps(props) {
+    componentWillReceiveProps(props) {
         this.setState(props);
     },
     handleUpdate() {

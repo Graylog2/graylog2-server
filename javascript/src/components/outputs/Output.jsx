@@ -44,14 +44,14 @@ var Output = React.createClass({
             </button>
         );
     },
-    willReceiveProps(props) {
+    componentWillReceiveProps(props) {
         this.setState(props);
     },
     render() {
         var output = this.state.output;
         var deletionForm = (this.state.streamId && this._isPermitted(["STREAM_OUTPUTS_DELETE"]) ? this._deleteFromStreamButton(output) : "");
 
-        var editButton = (this._isPermitted(["OUTPUTS_EDIT"]) ? <EditOutputButton output={output} /> : "");
+        var editButton = (this._isPermitted(["OUTPUTS_EDIT"]) ? <EditOutputButton output={output} onUpdate={this.props.onUpdate}/> : "");
         var terminationForm = (this._isPermitted(["OUTPUTS_TERMINATE"]) ? this._deleteGloballyButton(output) : "");
 
         var contentPack = (output.content_pack ? (<span title="Created from content pack"><i className="fa fa-gift"></i></span>) : (<div></div>));

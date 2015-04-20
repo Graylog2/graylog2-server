@@ -61,12 +61,25 @@ public class OutputsApiController extends AuthenticatedController {
     }
 
     public Result create() throws APIException, IOException {
-        final JsonNode json = request().body().asJson();
-        final OutputLaunchRequest request = Json.fromJson(json, OutputLaunchRequest.class);
         if (!isPermitted(RestPermissions.OUTPUTS_CREATE))
             return forbidden();
 
+        final JsonNode json = request().body().asJson();
+        final OutputLaunchRequest request = Json.fromJson(json, OutputLaunchRequest.class);
+
         final Output output = outputService.create(request);
+
+        return ok(Json.toJson(output));
+    }
+
+    public Result update(String outputId) throws APIException, IOException {
+        if (!isPermitted(RestPermissions.OUTPUTS_EDIT, outputId))
+            return forbidden();
+
+        final JsonNode json = request().body().asJson();
+        final OutputLaunchRequest request = Json.fromJson(json, OutputLaunchRequest.class);
+
+        final Output output = outputService.update(outputId, request);
 
         return ok(Json.toJson(output));
     }
