@@ -31,5 +31,7 @@ if (searchResultElem) {
   if (formattedHistogram) {
     formattedHistogram = JSON.parse(formattedHistogram);
   }
-  React.render(<SearchResult query={query} result={searchResult} histogram={histogram} formattedHistogram={formattedHistogram}/>, searchResultElem);
+  var currentPage = searchResultElem.getAttribute('data-current-page');
+
+  React.render(<SearchResult query={query} result={searchResult} histogram={histogram} formattedHistogram={formattedHistogram} currentPage={currentPage}/>, searchResultElem);
 }
