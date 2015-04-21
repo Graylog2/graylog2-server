@@ -9,6 +9,7 @@
 
 @import lib.security.RestPermissions._
 @import views.helpers.Permissions._
+@import views.helpers.Permissions
 
 @main("Alerts", views.html.sidebars.standard(currentUser), "", currentUser) {
     <h1>
@@ -61,8 +62,7 @@
         @views.html.partials.alerts.list_forms_available_callbacks.render(availableAlarmCallbacks, stream)
     }
 
-    <div class="alert-callbacks">
-        @views.html.partials.alerts.list_alarm_callbacks.render(alarmCallbacks, availableAlarmCallbacks, stream)
+    <div class="react-alarmcallback-component" data-permissions='@Permissions.asJson(STREAMS_EDIT)' data-stream-id='@stream.getId'>
     </div>
 
     <hr />

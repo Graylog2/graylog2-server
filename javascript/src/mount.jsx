@@ -22,6 +22,7 @@ $(document).ready(() => {
     require('./components/navigation/mount');
     require('./components/inputs/mount');
     require('./components/outputs/mount');
+    require('./components/alarmcallbacks/mount');
     if (userPreferences.enableSmartSearch) {
         require('./components/search/mount');
     }

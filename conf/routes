@@ -274,6 +274,10 @@ GET         /a/streams/:stream_id/outputs                                       
 DELETE      /a/streams/:stream_id/outputs/:output_id                                 @controllers.api.StreamOutputsApiController.delete(stream_id: String, output_id: String)
 PUT         /a/streams/:stream_id/outputs/:output_id                                 @controllers.api.StreamOutputsApiController.add(stream_id: String, output_id: String)
 
+# API: AlarmCallbacks
+GET         /a/streams/:stream_id/alarmcallbacks                                     @controllers.api.AlarmCallbacksApiController.list(stream_id: String)
+GET         /a/streams/:stream_id/alarmcallbacks/available                           @controllers.api.AlarmCallbacksApiController.available(stream_id: String)
+
 GET         /robots.txt                                                              controllers.Assets.at(path="/public", file="robots.txt")
 
 # Map static resources from the /public folder to the /assets URL path
