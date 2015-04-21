@@ -26,10 +26,10 @@ import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.alarms.AlertCondition;
 import org.graylog2.plugin.alarms.transports.TransportConfigurationException;
-import org.graylog2.plugin.streams.Stream;
-import org.graylog2.streams.StreamRuleService;
 import org.graylog2.plugin.database.users.User;
+import org.graylog2.plugin.streams.Stream;
 import org.graylog2.shared.users.UserService;
+import org.graylog2.streams.StreamRuleService;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -119,10 +119,8 @@ public class StaticEmailAlertSender implements AlertSender {
         sb.append("Date: ").append(Tools.iso8601().toString()).append("\n");
         sb.append("Stream ID: ").append(stream.getId()).append("\n");
         sb.append("Stream title: ").append(stream.getTitle()).append("\n");
-        if (configuration.getWebInterfaceUri() != null)
-            sb.append("Stream URL: ").append(
-                    buildStreamDetailsURL(configuration.getWebInterfaceUri(),
-                            checkResult, stream));
+        sb.append("Stream URL: ").append(buildStreamDetailsURL(configuration.getWebInterfaceUri(), checkResult, stream)).append("\n");
+
         try {
             sb.append("Stream rules: ").append(streamRuleService.loadForStream(stream)).append("\n");
         } catch (NotFoundException e) {
@@ -140,27 +138,22 @@ public class StaticEmailAlertSender implements AlertSender {
     }
 
     protected String buildStreamDetailsURL(URI baseUri, AlertCondition.CheckResult checkResult, Stream stream) {
-        // Return an empty string if the transport_email_web_interface_url setting has not been set in the config.
-        if (baseUri == null) {
-            return "";
+        // Return an informational message if the web interface URL hasn't been set
+        if (baseUri == null || isNullOrEmpty(baseUri.getHost())) {
+            return "Please configure 'transport_email_web_interface_url' in your Graylog configuration file.";
         }
 
-        StringBuilder sb = new StringBuilder();
-
         int time = 5;
-        if (checkResult.getTriggeredCondition().getParameters().get("time") != null)
-            time = (int)checkResult.getTriggeredCondition().getParameters().get("time");
+        if (checkResult.getTriggeredCondition().getParameters().get("time") != null) {
+            time = (int) checkResult.getTriggeredCondition().getParameters().get("time");
+        }
 
         DateTime dateAlertEnd = checkResult.getTriggeredAt();
         DateTime dateAlertStart = dateAlertEnd.minusMinutes(time);
         String alertStart = Tools.getISO8601String(dateAlertStart);
         String alertEnd = Tools.getISO8601String(dateAlertEnd);
 
-        sb.append(baseUri).append("/streams/").append(stream.getId()).append("/messages");
-        sb.append("?rangetype=absolute&from=").append(alertStart)
-                .append("&to=").append(alertEnd).append("&q=*\n");
-
-        return sb.toString();
+        return baseUri + "/streams/" + stream.getId() + "/messages?rangetype=absolute&from=" + alertStart + "&to=" + alertEnd + "&q=*";
     }
 
     protected String buildBacklogSummary(List<Message> backlog) {
