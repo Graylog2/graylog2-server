@@ -22,6 +22,7 @@ import com.wordnik.swagger.annotations.Api;
 import com.wordnik.swagger.annotations.ApiOperation;
 import com.wordnik.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.system.debug.DebugEvent;
@@ -29,7 +30,6 @@ import org.graylog2.system.debug.DebugEventHolder;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
-import javax.inject.Named;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -52,7 +52,7 @@ public class DebugEventsResource extends RestResource {
     @Inject
     public DebugEventsResource(NodeId nodeId,
                                EventBus serverEventBus,
-                               @Named("cluster_event_bus") EventBus clusterEventBus) {
+                               @ClusterEventBus EventBus clusterEventBus) {
         this.nodeId = checkNotNull(nodeId);
         this.serverEventBus = checkNotNull(serverEventBus);
         this.clusterEventBus = checkNotNull(clusterEventBus);

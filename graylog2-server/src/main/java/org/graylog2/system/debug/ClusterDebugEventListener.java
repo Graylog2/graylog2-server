@@ -18,11 +18,11 @@ package org.graylog2.system.debug;
 
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
+import org.graylog2.events.ClusterEventBus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -30,7 +30,7 @@ public class ClusterDebugEventListener {
     private static final Logger LOG = LoggerFactory.getLogger(ClusterDebugEventListener.class);
 
     @Inject
-    public ClusterDebugEventListener(@Named("cluster_event_bus") EventBus clusterEventBus) {
+    public ClusterDebugEventListener(@ClusterEventBus EventBus clusterEventBus) {
         checkNotNull(clusterEventBus).register(this);
     }
 
