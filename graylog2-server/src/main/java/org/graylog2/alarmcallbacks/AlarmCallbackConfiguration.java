@@ -25,10 +25,10 @@ import org.joda.time.DateTime;
  * @author Dennis Oelkers <dennis@torch.sh>
  */
 public interface AlarmCallbackConfiguration extends Persisted {
-    public void setStream(Stream stream);
-    public String getStreamId();
-    public String getType();
-    public Configuration getConfiguration();
-    public DateTime getCreatedAt();
-    public String getCreatorUserId();
+    void setStream(Stream stream);
+    String getStreamId();
+    String getType();
+    Configuration getConfiguration();
+    DateTime getCreatedAt();
+    String getCreatorUserId();
 }
