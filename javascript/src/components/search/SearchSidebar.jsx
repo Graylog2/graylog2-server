@@ -5,7 +5,6 @@ var Modal = require('react-bootstrap').Modal;
 var ModalTrigger = require('react-bootstrap').ModalTrigger;
 
 var numeral = require('numeral');
-var Immutable = require('immutable');
 
 var MessageField = React.createClass({
     render() {
@@ -25,6 +24,14 @@ var MessageField = React.createClass({
 });
 
 var SearchSidebar = React.createClass({
+    _updateFieldSelection(event, setName) {
+        this.props.predefinedFieldSelection(setName);
+        event.preventDefault();
+    },
+    _togglePageFields(event) {
+        this.props.togglePageFields();
+        event.preventDefault();
+    },
     render() {
         var indicesModal =
             <Modal title='Used Indices' onRequestHide={() => {}}>
@@ -57,13 +64,24 @@ var SearchSidebar = React.createClass({
                 <hr />
 
                 <h1 style={{display: 'inline-block'}}>Fields</h1>
+                <a href="#" className="fields-set-chooser" onClick={(event) => this._updateFieldSelection(event, 'default')}>Default</a>
+                |
+                <a href="#" className="fields-set-chooser" onClick={(event) => this._updateFieldSelection(event, 'all')}>All</a>
+                |
+                <a href="#" className="fields-set-chooser" onClick={(event) => this._updateFieldSelection(event, 'none')}>None</a>
 
                 <ul className="search-result-fields">
-                    {this.props.result['page_fields']
+                    {this.props.fields
                         .sort((a,b) => a.name.localeCompare(b.name))
                         .map((field) => <MessageField key={field.name} field={field} onToggled={this.props.onFieldToggled} selected={this.props.selectedFields.contains(field.name)}/>)}
                 </ul>
 
+                <p style={{marginTop: 13, marginBottom: 0}}>
+                    List <span className="message-result-fields-range">
+                        <a href="#" style={{fontWeight: this.props.showAllFields ? 'normal' : 'bold'}}
+                           onClick={this._togglePageFields}>fields of current page</a> or <a href="#" style={{fontWeight: this.props.showAllFields ? 'bold' : 'normal'}} onClick={this._togglePageFields}>all fields</a>.
+                    </span>
+                </p>
             </div>
         );
     }
