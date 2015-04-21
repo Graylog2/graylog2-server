@@ -13,12 +13,17 @@ var AlarmCallback = React.createClass({
             alarmCallback: this.props.alarmCallback,
             streamId: this.props.streamId,
             permissions: this.props.permissions,
-            humanReadableType: this.props.humanReadableType
+            humanReadableType: this.props.humanReadableType,
+            deleteAlarmCallback: this.props.deleteAlarmCallback
         };
+    },
+    componentWillReceiveProps(props) {
+        this.setState(props);
     },
     render() {
         var alarmCallback = this.state.alarmCallback;
-        var deleteAlarmCallbackButton = (this.isPermitted(this.state.permissions, ["STREAMS_EDIT"]) ? <DeleteAlarmCallbackButton alarmCallback={alarmCallback} /> : "");
+        var deleteAlarmCallbackButton = (this.isPermitted(this.state.permissions, ["STREAMS_EDIT"]) ?
+            <DeleteAlarmCallbackButton alarmCallback={alarmCallback} onClick={this.state.deleteAlarmCallback} /> : "");
         return (
             <div className="row node-row alert-condition alert-callback" data-destination-id={alarmCallback.id}>
                 <span className="pull-right node-row-info">

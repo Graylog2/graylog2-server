@@ -4,17 +4,23 @@ var React = require('react/addons');
 
 var DeleteAlarmCallbackButton = React.createClass({
     getInitialState() {
-        return {};
+        return {
+            alarmCallback: this.props.alarmCallback
+        };
+    },
+    componentWillReceiveProps(props) {
+        this.setState(props);
+    },
+    handleClick(evt) {
+        if(confirm("Really delete alarm destination?")) {
+            this.state.onClick(this.state.alarmCallback);
+        }
     },
     render() {
-        var style = {
-            position: 'relative',
-            top: '-1px'
-        };
         return (
-            <form action="@routes.AlarmCallbacksController.delete(stream.getId, callback.getId)" method="POST" style={style}>
-                <button type="submit" className="btn btn-danger btn-xs" data-confirm="Really delete alarm destination?">Delete</button>
-            </form>
+            <button className="btn btn-danger btn-xs" onClick={this.handleClick}>
+                <i className="fa fa-remove"></i>  Delete
+            </button>
         );
     }
 });

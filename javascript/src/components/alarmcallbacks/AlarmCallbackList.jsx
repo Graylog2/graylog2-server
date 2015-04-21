@@ -1,7 +1,7 @@
 'use strict';
 
 var React = require('react/addons');
-var AlarmCallbacksStore = require('../../stores/alarmcallbacks/AlarmCallbackStore');
+var AlarmCallbacksStore = require('../../stores/alarmcallbacks/AlarmCallbacksStore');
 var AlarmCallback = require('./AlarmCallback');
 
 var AlarmCallbackList = React.createClass({
@@ -21,6 +21,9 @@ var AlarmCallbackList = React.createClass({
            this.setState({availableAlarmCallbacks: available});
         });
     },
+    componentWillReceiveProps(props) {
+        this.setState(props);
+    },
     componentDidMount() {
         this.loadData();
     },
@@ -36,17 +39,32 @@ var AlarmCallbackList = React.createClass({
         }
         return <span><i className="fa fa-spin fa-spinner"></i> Loading</span>;
     },
+    _deleteAlarmCallback(alarmCallback) {
+        AlarmCallbacksStore.remove(this.state.streamId, alarmCallback.id, () => {
+            this.loadData();
+            this.props.onUpdate();
+        });
+    },
     render() {
         var alarmCallbacks = this.state.alarmCallbacks.map((alarmCallback) => {
             return <AlarmCallback key={"alarmCallback-" + alarmCallback.id} alarmCallback={alarmCallback}
-                                  humanReadableType={this._humanReadableType(alarmCallback)} permissions={this.state.permissions}/>;
+                                  humanReadableType={this._humanReadableType(alarmCallback)} deleteAlarmCallback={this._deleteAlarmCallback}
+                                  permissions={this.state.permissions}/>;
         });
 
-        return (
-            <div className="alert-callbacks">
-                {alarmCallbacks}
-            </div>
-        );
+        if (alarmCallbacks.length > 0) {
+            return (
+                <div className="alert-callbacks">
+                    {alarmCallbacks}
+                </div>
+            );
+        } else {
+            return (
+                <div className="alert alert-info">
+                    No configured alarm callbacks.
+                </div>
+            );
+        }
     }
 });
 

@@ -49,19 +49,6 @@
         on <a href="https://www.graylog.org/resources/integrations/" target="_blank">the Graylog website</a>.
     </div>
 
-    @if(isPermitted(STREAMS_EDIT, stream.getId)) {
-        <select class="add-alert-destination-type">
-            <option disabled selected>New callback type</option>
-            @for((callbackType, details) <- availableAlarmCallbacks.toArray.sortBy(_._2.name)) {
-                <option value="@callbackType">@details.name</option>
-            }
-        </select>
-
-        <button class="btn btn-success add-alert-destination">Configure new alert destination</button>
-
-        @views.html.partials.alerts.list_forms_available_callbacks.render(availableAlarmCallbacks, stream)
-    }
-
     <div class="react-alarmcallback-component" data-permissions='@Permissions.asJson(STREAMS_EDIT)' data-stream-id='@stream.getId'>
     </div>
 
