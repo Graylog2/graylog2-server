@@ -16,6 +16,7 @@
  */
 package org.graylog2.restclient.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import org.graylog2.rest.models.alarmcallbacks.AlarmCallbackSummary;
@@ -84,6 +85,7 @@ public class AlarmCallback extends ConfigurableEntity {
         return creatorUserId;
     }
 
+    @JsonIgnore
     public User getCreatorUser() {
         return creatorUser;
     }
