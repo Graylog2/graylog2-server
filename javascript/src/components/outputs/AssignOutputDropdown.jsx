@@ -3,7 +3,6 @@
 var React = require('react/addons');
 var OutputsStore = require('../../stores/outputs/OutputsStore');
 var StreamsStore = require('../../stores/streams/StreamsStore');
-var $ = require('jquery'); // excluded and shimed
 
 var AssignOutputDropdown = React.createClass({
     getInitialState() {
@@ -23,7 +22,7 @@ var AssignOutputDropdown = React.createClass({
         });
         OutputsStore.loadForStreamId(this.state.streamId, (outputs) => {
             this.setState({streamOutputs: outputs});
-        })
+        });
     },
     componentDidMount() {
         this.loadData();
@@ -45,8 +44,9 @@ var AssignOutputDropdown = React.createClass({
         var streamOutputIds = this.state.streamOutputs.map((output) => {return output.id;});
         var outputs = this.state.allOutputs.filter((output) => {
             for (var i in streamOutputIds) {
-                if (output.id === streamOutputIds[i])
+                if (output.id === streamOutputIds[i]) {
                     return false;
+                }
             }
             return true;
         }).sort((output1, output2) => { return output1.title.localeCompare(output2.title);});
