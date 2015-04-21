@@ -5,7 +5,6 @@ var OutputsStore = require('../../stores/outputs/OutputsStore');
 var StreamsStore = require('../../stores/streams/StreamsStore');
 var UserNotification = require("../../util/UserNotification");
 var Output = require('./Output');
-var $ = require('jquery'); // excluded and shimed
 
 var OutputList = React.createClass({
     OUTPUT_DATA_REFRESH: 5*1000,
@@ -42,8 +41,9 @@ var OutputList = React.createClass({
             OutputsStore.remove(outputId, (jqXHR, textStatus, errorThrown) => {
                 this.loadData();
                 UserNotification.success("Output was terminated.", "Success!");
-                if (this.props.onUpdate)
+                if (this.props.onUpdate) {
                     this.props.onUpdate();
+                }
             });
         }
     },
@@ -52,8 +52,9 @@ var OutputList = React.createClass({
             StreamsStore.removeOutput(streamId, outputId, (jqXHR, textStatus, errorThrown) => {
                 this.loadData();
                 UserNotification.success("Removed output from stream!", "Success!");
-                if (this.props.onUpdate)
+                if (this.props.onUpdate) {
                     this.props.onUpdate();
+                }
             });
         }
     },

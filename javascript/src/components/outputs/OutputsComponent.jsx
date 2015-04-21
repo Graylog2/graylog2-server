@@ -20,10 +20,12 @@ var OutputComponent = React.createClass({
         this.setState(props);
     },
     handleUpdate() {
-        if (this.refs.outputList)
+        if (this.refs.outputList) {
             this.refs.outputList.loadData();
-        if (this.refs.assignOutputDropdown)
+        }
+        if (this.refs.assignOutputDropdown) {
             this.refs.assignOutputDropdown.loadData();
+        }
     },
     render() {
         var permissions = this.state.permissions;
