@@ -3,6 +3,7 @@
 var React = require('react/addons');
 var EditOutputButton = require('./EditOutputButton');
 var ConfigurationWell = require('../configurationforms/ConfigurationWell');
+var UserLink = require('../users/UserLink');
 
 var Output = React.createClass({
     getInitialState() {
@@ -46,7 +47,7 @@ var Output = React.createClass({
 
         var contentPack = (output.content_pack ? (<span title="Created from content pack"><i className="fa fa-gift"></i></span>) : (<div></div>));
 
-        var creatorUserLink = (<a href={jsRoutes.controllers.UsersController.show(output.creator_user_id).url}><i className="fa fa-user"></i> {output.creator_user_id}</a>);
+        var creatorUserLink = (<UserLink username={output.creator_user_id} />);
 
         return (
             <div key={output.id} className="row content node-row">
