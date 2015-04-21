@@ -1,6 +1,7 @@
 /// <reference path="../../../declarations/jquery/jquery.d.ts" />
 
 declare var $: any;
+declare var jsRoutes: any;
 
 import UserNotification = require("../../util/UserNotification");
 import URLUtils = require("../../util/URLUtils");
@@ -18,6 +19,15 @@ var UsersStore = {
                     "Could not load user list");
             }
         });
+        return promise;
+    },
+    load(username: string): JQueryPromise<string[]> {
+        var promise = $.getJSON(jsRoutes.controllers.api.UsersApiController.loadUser(username).url);
+        promise.fail((jqXHR, textStatus, errorThrown) => {
+            UserNotification.error("Loading user failed with status: " + errorThrown,
+                "Could not load user " + username);
+        });
+
         return promise;
     },
     deleteUser(username: string): JQueryPromise<string[]> {
