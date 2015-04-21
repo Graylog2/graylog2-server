@@ -1,3 +1,5 @@
+/* global resultHistogram */
+
 'use strict';
 
 var React = require('react');
@@ -17,15 +19,33 @@ var SearchResult = React.createClass({
         this.state.expandedMessages[id] = !this.state.expandedMessages[id];
         this.setState(this.state);
     },
-
+    componentDidMount() {
+        resultHistogram.resetContainerElements(React.findDOMNode(this));
+        resultHistogram.setData(this.props.formattedHistogram);
+        resultHistogram.drawResultGraph();
+    },
     render() {
-
         return (
             <div >
                 <div className="col-md-3" id="sidebar">
-                    <SearchSidebar result={this.props.result} />
+                    <SearchSidebar result={this.props.result}/>
                 </div>
                 <div className="col-md-9" id="main-content-sidebar">
+                    <div className="content-col">
+                        <div className="pull-right">TODO dashboards</div>
+                        <h1>Histogram</h1>
+
+                        <div className="graph-resolution-selector">
+                            <i className="fa fa-time"></i>
+                            TODO selector
+                        </div>
+                        <div id="result-graph-container">
+                            <div id="y_axis"></div>
+                            <div id="result-graph" data-from={this.props.histogram['histogram_boundaries'].from} data-to={this.props.histogram['histogram_boundaries'].to}></div>
+                            <div id="result-graph-timeline"></div>
+                        </div>
+
+                    </div>
                     <div className="content-col">
                         <ul className="pagination">
                             <PageItem href="#">Previous</PageItem>

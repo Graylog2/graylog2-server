@@ -23,5 +23,13 @@ if (searchResultElem) {
   if (searchResult) {
     searchResult = JSON.parse(searchResult);
   }
-  React.render(<SearchResult query={query} result={searchResult}/>, searchResultElem);
+  var histogram = searchResultElem.getAttribute('data-histogram');
+  if (histogram) {
+    histogram = JSON.parse(histogram);
+  }
+  var formattedHistogram = searchResultElem.getAttribute('data-formatted-histogram');
+  if (formattedHistogram) {
+    formattedHistogram = JSON.parse(formattedHistogram);
+  }
+  React.render(<SearchResult query={query} result={searchResult} histogram={histogram} formattedHistogram={formattedHistogram}/>, searchResultElem);
 }
