@@ -16,6 +16,7 @@
  */
 package org.graylog2.restclient.models.api.responses;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.common.collect.Lists;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.graylog2.rest.models.configuration.responses.BooleanField;
@@ -36,6 +37,7 @@ public class AvailableOutputSummary {
     @JsonProperty("requested_configuration")
     public Map<String, Map<String, Object>> requestedConfiguration;
 
+    @JsonIgnore
     public List<RequestedConfigurationField> getRequestedConfiguration() {
         List<RequestedConfigurationField> fields = Lists.newArrayList();
         List<RequestedConfigurationField> tmpBools = Lists.newArrayList();

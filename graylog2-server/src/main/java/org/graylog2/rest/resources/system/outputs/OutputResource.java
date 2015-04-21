@@ -46,6 +46,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -165,7 +166,7 @@ public class OutputResource extends RestResource {
     public void delete(@ApiParam(name = "outputId", value = "The id of the output that should be deleted", required = true)
                        @PathParam("outputId") String outputId) throws org.graylog2.database.NotFoundException {
         checkPermission(RestPermissions.OUTPUTS_TERMINATE);
-        Output output = outputService.load(outputId);
+        final Output output = outputService.load(outputId);
         outputService.destroy(output);
     }
 
@@ -179,4 +180,21 @@ public class OutputResource extends RestResource {
         return ImmutableMap.of("types", messageOutputFactory.getAvailableOutputs());
     }
 
+    @PUT
+    @Path("/{outputId}")
+    @Timed
+    @ApiOperation(value = "Update output")
+    @RequiresPermissions(RestPermissions.OUTPUTS_EDIT)
+    @Produces(MediaType.APPLICATION_JSON)
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "No such output on this node.")
+    })
+    public Output update(@ApiParam(name = "outputId", value = "The id of the output that should be deleted", required = true)
+                           @PathParam("outputId") String outputId,
+                           @ApiParam(name = "JSON body", required = true) Map<String, Object> deltas) throws ValidationException {
+        checkPermission(RestPermissions.OUTPUTS_EDIT, outputId);
+        deltas.remove("streams");
+        final Output output = this.outputService.update(outputId, deltas);
+        return output;
+    }
 }
