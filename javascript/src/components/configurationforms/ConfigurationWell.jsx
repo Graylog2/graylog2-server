@@ -1,6 +1,7 @@
 'use strict';
 
 var React = require('react/addons');
+var $ = require('jquery'); // excluded and shimed
 
 var ConfigurationWell = React.createClass({
     getInitialState() {
@@ -10,12 +11,16 @@ var ConfigurationWell = React.createClass({
         };
     },
     _formatConfiguration(id, config) {
+        if (!config) {
+            return ("");
+        }
         var formattedItems = $.map(config, (value, key) => {
             return (<li key={id + "-" + key}>{key}: {value}</li>);
         });
 
-        if (formattedItems.length < 1)
+        if (formattedItems.length < 1) {
             formattedItems.push(<li key="placeholder">-- no configuration --</li>);
+        }
 
         return (
             <ul>
