@@ -12,8 +12,8 @@ var SearchBar = React.createClass({
     },
 
     render() {
-        this.props.streamId = null;
-        this.props.searchQuery = "";
+        //this.props.streamId = null;
+        //this.props.searchQuery = "";
 
         var relative = (
             <select id="relative-timerange-selector" name="relative">

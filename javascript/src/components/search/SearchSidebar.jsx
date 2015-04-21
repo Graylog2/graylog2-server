@@ -9,7 +9,7 @@ var numeral = require('numeral');
 var SearchSidebar = React.createClass({
     render() {
         var indicesModal =
-            <Modal title='Used Indices' backdrop={false}>
+            <Modal title='Used Indices' onRequestHide={() => {}}>
                 <div className="modal-body">
                     <p>Graylog is intelligently selecting the indices it needs to search upon based on the time frame
                         you selected.
