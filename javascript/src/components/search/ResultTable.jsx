@@ -16,7 +16,18 @@ var ResultTable = React.createClass({
         this.setState(this.state);
     },
 
+    _fieldColumns() {
+        return this.props.selectedFields.delete('message');
+    },
+    _columnStyle(fieldName) {
+        if (fieldName.toLowerCase() === 'source') {
+            return {width: 180};
+        }
+        return {};
+    },
+
     render() {
+        var selectedColumns = this._fieldColumns();
         return (<div className="content-col">
             <ul className="pagination">
                 <PageItem href="#">Previous</PageItem>
@@ -26,18 +37,23 @@ var ResultTable = React.createClass({
 
             <h1>Messages</h1>
 
-            <table className="table table-condensed messages">
-                <thead>
-                <tr>
-                    <th style={{style: 180}}>Timestamp</th>
-                    <th style={{style: 180}} id="result-th-36cd38f49b9afa08222c0dc9ebfe35eb">Source</th>
-                </tr>
-                </thead>
-                { this.props.messages.map((message) => <MessageTableEntry key={message.id}
-                                                                          message={message}
-                                                                          expanded={this.state.expandedMessages[message.id]}
-                                                                          toggleDetail={this._toggleMessageDetail}/>) }
-            </table>
+            <div className="table-responsive">
+                <table className="table table-condensed messages">
+                    <thead>
+                    <tr>
+                        <th style={{width: 180}}>Timestamp</th>
+                        { selectedColumns.map(selectedFieldName => <th key={selectedFieldName}
+                                                                       style={this._columnStyle(selectedFieldName)}>{selectedFieldName}</th>) }
+                    </tr>
+                    </thead>
+                    { this.props.messages.map((message) => <MessageTableEntry key={message.id}
+                                                                              message={message}
+                                                                              showMessageRow={this.props.selectedFields.contains('message')}
+                                                                              selectedFields={selectedColumns}
+                                                                              expanded={this.state.expandedMessages[message.id]}
+                                                                              toggleDetail={this._toggleMessageDetail}/>) }
+                </table>
+            </div>
 
         </div>);
     }

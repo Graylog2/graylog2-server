@@ -5,6 +5,24 @@ var Modal = require('react-bootstrap').Modal;
 var ModalTrigger = require('react-bootstrap').ModalTrigger;
 
 var numeral = require('numeral');
+var Immutable = require('immutable');
+
+var MessageField = React.createClass({
+    render() {
+        return (
+            <li className="search-result-field-type">
+                <i className="fa fa-fw open-analyze-field fa-caret-right"></i>
+                <input type="checkbox"
+                       id={"field-selector-" + this.props.field.hash}
+                       className="field-selector"
+                       checked={this.props.selected}
+                       onChange={(event) => this.props.onToggled(this.props.field.name)}
+                    />
+                <label htmlFor={"field-selector-" + this.props.field.hash} className="field-name">{this.props.field.name}</label>
+            </li>
+        );
+    }
+});
 
 var SearchSidebar = React.createClass({
     render() {
@@ -40,10 +58,10 @@ var SearchSidebar = React.createClass({
 
                 <h1 style={{display: 'inline-block'}}>Fields</h1>
 
-                <ul className="search-result-field">
+                <ul className="search-result-fields">
                     {this.props.result['page_fields']
                         .sort((a,b) => a.name.localeCompare(b.name))
-                        .map((field) => <li key={field.name} className="search-result-field-type">{field.name}</li>)}
+                        .map((field) => <MessageField key={field.name} field={field} onToggled={this.props.onFieldToggled} selected={this.props.selectedFields.contains(field.name)}/>)}
                 </ul>
 
             </div>
