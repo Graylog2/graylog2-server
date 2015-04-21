@@ -1,10 +1,9 @@
-/* global resultHistogram */
-
 'use strict';
 
 var React = require('react');
 var MessageTableEntry = require('./MessageTableEntry');
 var SearchSidebar = require('./SearchSidebar');
+var LegacyHistogram= require('./LegacyHistogram');
 var PageItem = require('react-bootstrap').PageItem;
 
 var SearchResult = React.createClass({
@@ -19,11 +18,6 @@ var SearchResult = React.createClass({
         this.state.expandedMessages[id] = !this.state.expandedMessages[id];
         this.setState(this.state);
     },
-    componentDidMount() {
-        resultHistogram.resetContainerElements(React.findDOMNode(this));
-        resultHistogram.setData(this.props.formattedHistogram);
-        resultHistogram.drawResultGraph();
-    },
     render() {
         return (
             <div >
@@ -31,21 +25,8 @@ var SearchResult = React.createClass({
                     <SearchSidebar result={this.props.result}/>
                 </div>
                 <div className="col-md-9" id="main-content-sidebar">
-                    <div className="content-col">
-                        <div className="pull-right">TODO dashboards</div>
-                        <h1>Histogram</h1>
+                    <LegacyHistogram formattedHistogram={this.props.formattedHistogram} histogram={this.props.histogram} />
 
-                        <div className="graph-resolution-selector">
-                            <i className="fa fa-time"></i>
-                            TODO selector
-                        </div>
-                        <div id="result-graph-container">
-                            <div id="y_axis"></div>
-                            <div id="result-graph" data-from={this.props.histogram['histogram_boundaries'].from} data-to={this.props.histogram['histogram_boundaries'].to}></div>
-                            <div id="result-graph-timeline"></div>
-                        </div>
-
-                    </div>
                     <div className="content-col">
                         <ul className="pagination">
                             <PageItem href="#">Previous</PageItem>
@@ -68,7 +49,6 @@ var SearchResult = React.createClass({
                                                                                              toggleDetail={this._toggleMessageDetail}/>) }
                         </table>
 
-                        <p>some search result for query {this.props.result['original_query']}</p>
                     </div>
                 </div>
             </div>);
