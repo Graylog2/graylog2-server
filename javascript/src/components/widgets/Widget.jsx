@@ -99,7 +99,9 @@ var Widget = React.createClass({
             return;
         }
 
-        var dataPromise = WidgetsStore.loadValue(this.props.dashboardId, this.props.widgetId);
+        var width = this.refs.widget.getDOMNode().clientWidth;
+
+        var dataPromise = WidgetsStore.loadValue(this.props.dashboardId, this.props.widgetId, width);
         dataPromise.fail((jqXHR, textStatus, errorThrown) => {
             this.setState({
                 error: true,
