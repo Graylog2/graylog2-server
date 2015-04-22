@@ -30,6 +30,7 @@ var BootstrapModal = React.createClass({
         });
     },
     _submit(event) {
+        event.target.checkValidity();
         this.props.onConfirm(event);
         event.preventDefault();
     },

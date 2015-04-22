@@ -38,6 +38,10 @@ var Navigation = React.createClass({
                             <NavItem href={jsRoutes.controllers.SearchController.globalSearch().url}
                                      active={this.props.requestPath === '/' || this._isActive("/search")}>Search</NavItem>
                         }
+                        {this._isPermitted(['SEARCHES_ABSOLUTE', 'SEARCHES_RELATIVE', 'SEARCHES_KEYWORD']) &&
+                        <NavItem href={jsRoutes.controllers.SearchControllerV2.index().url}
+                                 active={this._isActive("/searchv2")}>Search V2</NavItem>
+                        }
                         <NavItem href={jsRoutes.controllers.StreamsController.index().url}
                                  active={this._isActive("/streams")}>Streams</NavItem>
 

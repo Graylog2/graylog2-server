@@ -189,6 +189,10 @@ label {
   margin-top: 55px !important;
 }
 
+.modal-backdrop {
+  height: 100000%;  // yes, really. this fixes the backdrop being cut off when the page is scrolled.
+}
+
 #search {
   padding-top: 1px;
   padding-bottom: 1px;
@@ -266,6 +270,10 @@ label {
 #sidebar {
   padding-left: 10px;
   padding-right: 10px;
+}
+
+#sidebar .affix {
+  top: 45px;
 }
 
 #main-content-sidebar {
@@ -581,6 +589,14 @@ form #stream-rules {
 .graph-resolution-selector {
   margin-top: 5px;
   margin-bottom: 20px;
+}
+
+.graph-resolution-selector li {
+  padding-right: 0;
+}
+
+.graph-resolution-selector a {
+  text-transform: capitalize;
 }
 
 .selected-resolution {

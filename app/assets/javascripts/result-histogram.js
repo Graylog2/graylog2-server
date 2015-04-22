@@ -16,6 +16,12 @@ resultHistogram = {
         return this._histogramContainer.width();
     },
 
+    resetContainerElements: function(elem) {
+        this._histogramContainer = $("#result-graph", elem);
+        this._yAxis = $("#y_axis", elem);
+        this._graphTimeline = $("#result-graph-timeline", elem);
+    },
+
     setData: function(data) {
         this._histogram = this._correctDataBoundaries(data);
     },

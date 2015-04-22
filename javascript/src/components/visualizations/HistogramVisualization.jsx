@@ -19,14 +19,14 @@ var HistogramVisualization = React.createClass({
         this.group = this.dimension.group().reduceSum((d) => d.y);
 
         return {
-            processedData: []
+            dataPoints: []
         };
     },
     componentDidMount() {
         this.renderHistogram();
     },
     componentWillReceiveProps(nextProps) {
-        this.processData(nextProps.data);
+        this.setState({dataPoints: nextProps.data}, this.drawData);
     },
     renderHistogram() {
         var histogramDomNode = this.getDOMNode();
@@ -82,26 +82,18 @@ var HistogramVisualization = React.createClass({
     _formatInterval() {
         return this.props.interval.charAt(0).toUpperCase() + this.props.interval.slice(1) + "s";
     },
-    processData(data) {
-        var formattedData = [];
-        for(var key in data) {
-            if (data.hasOwnProperty(key)) {
-                formattedData.push({x: Number(key), y: data[key]});
-            }
-        }
-        this.setState({processedData: formattedData}, this.drawData);
-    },
     drawData() {
-        this.histogram.xUnits(() => this.state.processedData.length - 1);
+        this.histogram.xUnits(() => this.state.dataPoints.length - 1);
         this.histogramData.remove();
-        this.histogramData.add(this.state.processedData);
-        this.histogram.redraw();
+        this.histogramData.add(this.state.dataPoints);
 
         // Fix to make Firefox render tooltips in the right place
         // TODO: Find the cause of this
         if (this.firstRender) {
             this.histogram.render();
             this.firstRender = false;
+        } else {
+            this.histogram.redraw();
         }
     },
     render() {

@@ -17,6 +17,8 @@
 
 package controllers.api;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import controllers.AuthenticatedController;
@@ -197,7 +199,7 @@ public class DashboardsApiController extends AuthenticatedController {
         }
     }
 
-    protected Map<String, Object> formatWidgetValueResults(final int maxDataPoints,
+    protected List<Map<String, Object>> formatWidgetValueResults(final int maxDataPoints,
                                                                final DashboardWidget widget,
                                                                final DashboardWidgetValueResponse widgetValue) {
         final Map<String, Object> widgetConfig = widget.getConfig();
@@ -213,13 +215,13 @@ public class DashboardsApiController extends AuthenticatedController {
     }
 
     // TODO: Extract common parts of this and the similar method on SearchApiController
-    protected Map<String, Object> formatWidgetValueResults(final int maxDataPoints,
+    protected List<Map<String, Object>> formatWidgetValueResults(final int maxDataPoints,
                                                          final Object resultValue,
                                                          final String functionType,
                                                          final String interval,
                                                          final Map<String, Object> timeRange,
                                                          final boolean allQuery) {
-        final Map<String, Object> points = Maps.newHashMap();
+        final ImmutableList.Builder<Map<String, Object>> pointListBuilder = ImmutableList.builder();
 
         if (resultValue instanceof Map) {
             final Map<?, ?> resultMap = (Map) resultValue;
@@ -250,13 +252,14 @@ public class DashboardsApiController extends AuthenticatedController {
                         value = ((Map)value).get(functionType);
                     }
                     Object result = value == null ? 0 : value;
-                    points.put(timestamp, result);
+                    final Map<String, Object> point = ImmutableMap.of("x", Long.parseLong(timestamp), "y", result);
+                    pointListBuilder.add(point);
                 }
                 index++;
                 nextStep(interval, currentTime);
             }
         }
-        return points;
+        return pointListBuilder.build();
     }
 
     private void nextStep(String interval, MutableDateTime currentTime) {
