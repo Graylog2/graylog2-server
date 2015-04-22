@@ -10,15 +10,6 @@ var BooleanField = require('./BooleanField');
 var DropdownField = require('./DropdownField');
 
 var ConfigurationForm = React.createClass({
-    statics: {
-        titleField: function(typeName, value, description) {
-            var titleField = {is_optional: false, attributes: [], human_name: "Title", description: description};
-            var titleElement = <TextField key={typeName + "-title"} typeName={typeName} title="title"
-                           field={titleField} value={value} onChange={this.handleTitleChange}/>;
-
-            return titleElement;
-        }
-    },
     getDefaultProps() {
         return {
             values: {},
