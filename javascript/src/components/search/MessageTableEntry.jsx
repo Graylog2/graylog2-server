@@ -13,8 +13,12 @@ var MessageTableEntry = React.createClass({
         var colSpanFixup = this.props.selectedFields.size + 1;
         var formattedTime = momentHelper.toUserTimeZone(moment(this.props.message.fields['timestamp'])).format();
 
+        var classes = "message-group";
+        if (this.props.expanded) {
+            classes += " message-group-toggled";
+        }
         return (
-            <tbody className="message-group" >
+            <tbody className={classes} >
                 <tr className="fields-row" onClick={() => this.props.toggleDetail(this.props.message.id)}>
                     <td><strong><time dateTime={this.props.message.fields['timestamp']}>{formattedTime}</time></strong></td>
                     { this.props.selectedFields.map(selectedFieldName => <td key={selectedFieldName}>{this.props.message.fields[selectedFieldName]}</td>) }

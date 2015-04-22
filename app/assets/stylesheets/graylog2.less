@@ -2967,3 +2967,12 @@ table.messages tr.message-detail-row dl.message-details dd div.message-field-act
   position: relative;
   top: -10px;
 }
+
+// this overrides the .table-responsive overflow-x to be able to show the blue message-group-toggled bar
+// if there's enough space. For lower widths we don't care about showing the bar (it's outside of the table's container,
+// so it triggers the overflox-x scroll behavior).
+@media(min-width: 600px) {
+  .table-responsive {
+    overflow-x: visible;
+  }
+}
