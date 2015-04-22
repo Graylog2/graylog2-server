@@ -9,7 +9,6 @@ var dc = require('dc');
 var d3 = require('d3');
 var $ = require('jquery');
 
-var NumberUtils = require("../../util/NumberUtils");
 var D3Utils = require('../../util/D3Utils');
 
 var GraphFactory = {
