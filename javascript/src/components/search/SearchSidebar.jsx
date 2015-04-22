@@ -53,7 +53,7 @@ var SearchSidebar = React.createClass({
 
                 <p style={{marginTop: 3}}>
                     Search took {numeral(this.props.result['took_ms']).format("0,0")} ms, searched in <ModalTrigger
-                    modal={indicesModal}><a href="#">{this.props.result['used_indices'].length}&nbsp;{this.props.result['used_indices'].length === 1 ? "index" : "indices"}</a></ModalTrigger>.
+                    modal={indicesModal}><a href="#" onClick={event => event.preventDefault()}>{this.props.result['used_indices'].length}&nbsp;{this.props.result['used_indices'].length === 1 ? "index" : "indices"}</a></ModalTrigger>.
                 </p>
 
                 <div style={{marginTop: 10}}>
