@@ -2,7 +2,7 @@
 
 var React = require('react');
 var MessageTableEntry = require('./MessageTableEntry');
-var PageItem = require('react-bootstrap').PageItem;
+var MessageTablePaginator = require('./MessageTablePaginator');
 
 var ResultTable = React.createClass({
     getInitialState() {
@@ -10,7 +10,6 @@ var ResultTable = React.createClass({
             expandedMessages: {}
         };
     },
-
     _toggleMessageDetail(id) {
         this.state.expandedMessages[id] = !this.state.expandedMessages[id];
         this.setState(this.state);
@@ -29,13 +28,9 @@ var ResultTable = React.createClass({
     render() {
         var selectedColumns = this._fieldColumns();
         return (<div className="content-col">
-            <ul className="pagination">
-                <PageItem href="#">Previous</PageItem>
-                <PageItem href="#">1</PageItem>
-                <PageItem href="#">Next</PageItem>
-            </ul>
+            <h1 className="pull-left">Messages</h1>
 
-            <h1>Messages</h1>
+            <MessageTablePaginator position="top"/>
 
             <div className="table-responsive">
                 <table className="table table-condensed messages">
@@ -55,6 +50,7 @@ var ResultTable = React.createClass({
                 </table>
             </div>
 
+            <MessageTablePaginator position="bottom"/>
         </div>);
     }
 });
