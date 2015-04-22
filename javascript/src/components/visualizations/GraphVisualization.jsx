@@ -62,14 +62,14 @@ var GraphVisualization = React.createClass({
         return {
             valueType: undefined,
             interpolation: undefined,
-            processedData: []
+            dataPoints: []
         };
     },
     componentDidMount() {
         this.renderGraph();
     },
     componentWillReceiveProps(nextProps) {
-        this.processData(nextProps.data);
+        this.setState({dataPoints: nextProps.data}, this.drawData);
     },
     renderGraph() {
         var graphDomNode = this.getDOMNode();
@@ -127,30 +127,18 @@ var GraphVisualization = React.createClass({
     _formatInterval() {
         return this.props.config.interval.charAt(0).toUpperCase() + this.props.config.interval.slice(1) + "s";
     },
-    processData(data) {
-        var formattedData = [];
-        for (var key in data) {
-            if (data.hasOwnProperty(key)) {
-                var normalizedValue = NumberUtils.normalizeNumber(data[key]);
-                formattedData.push({
-                    x: Number(key),
-                    y: isNaN(normalizedValue) ? 0 : normalizedValue
-                });
-            }
-        }
-        this.setState({processedData: formattedData}, this.drawData);
-    },
     drawData() {
-        this.graph.xUnits(() => Math.max(this.state.processedData.length - 1, 1));
+        this.graph.xUnits(() => Math.max(this.state.dataPoints.length - 1, 1));
         this.graphData.remove();
-        this.graphData.add(this.state.processedData);
-        this.graph.redraw();
+        this.graphData.add(this.state.dataPoints);
 
         // Fix to make Firefox render tooltips in the right place
         // TODO: Find the cause of this
         if (this.firstRender) {
             this.graph.render();
             this.firstRender = false;
+        } else {
+            this.graph.redraw();
         }
     },
     render() {
