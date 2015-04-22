@@ -25,7 +25,7 @@ var EditAlarmCallbackButton = React.createClass({
         });
     },
     handleSubmit(data) {
-        AlarmCallbacksStore.update(this.state.streamId, this.state.alarmCallback, data, () => {
+        AlarmCallbacksStore.update(this.state.streamId, this.state.alarmCallback.id, data, () => {
             this.props.onUpdate();
         });
     },
