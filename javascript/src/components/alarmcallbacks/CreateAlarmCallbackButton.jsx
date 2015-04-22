@@ -10,7 +10,7 @@ var CreateAlarmCallbackButton = React.createClass({
         return {
             types: [],
             streamId: this.props.streamId,
-            typeName: "",
+            typeName: "placeholder",
             typeDefinition: {}
         };
     },
@@ -27,12 +27,12 @@ var CreateAlarmCallbackButton = React.createClass({
     },
     render() {
         var alarmCallbackTypes = $.map(this.state.types, this._formatOutputType);
-        var humanTypeName = (this.state.typeName ? this.state.types[this.state.typeName].name : "Alarm Callback");
+        var humanTypeName = (this.state.typeName && this.state.types[this.state.typeName] ? this.state.types[this.state.typeName].name : "Alarm Callback");
 
         return (
             <div>
                 <div className="form-group form-inline">
-                    <select id="input-type" defaultValue="placeholder" onChange={this.onTypeChange} className="form-control">
+                    <select id="input-type" value={this.state.typeName} onChange={this.onTypeChange} className="form-control">
                         <option value="placeholder" disabled>--- Select Alarm Callback Type ---</option>
                         {alarmCallbackTypes}
                     </select>
@@ -64,6 +64,7 @@ var CreateAlarmCallbackButton = React.createClass({
         AlarmCallbacksStore.save(this.state.streamId, data, (result) => {
             this.props.onUpdate();
         });
+        this.setState({typeName: "placeholder"});
     }
 });
 
