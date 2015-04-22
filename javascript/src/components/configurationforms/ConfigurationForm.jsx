@@ -10,6 +10,21 @@ var BooleanField = require('./BooleanField');
 var DropdownField = require('./DropdownField');
 
 var ConfigurationForm = React.createClass({
+    statics: {
+        titleField: function(typeName, value, description) {
+            var titleField = {is_optional: false, attributes: [], human_name: "Title", description: description};
+            var titleElement = <TextField key={typeName + "-title"} typeName={typeName} title="title"
+                           field={titleField} value={value} onChange={this.handleTitleChange}/>;
+
+            return titleElement;
+        }
+    },
+    getDefaultProps() {
+        return {
+            values: {},
+            includeTitleField: true
+        };
+    },
     getInitialState() {
         return {
             configFields: this.props.configFields,
@@ -18,8 +33,9 @@ var ConfigurationForm = React.createClass({
             formId: this.props.formId,
             submitAction: this.props.submitAction,
             helpBlock: this.props.helpBlock,
-            values: this.props.values || {},
-            titleValue: this.props.titleValue
+            values: this.props.values,
+            titleValue: this.props.titleValue,
+            includeTitleField: this.props.includeTitleField
         };
     },
     componentDidMount() {},
@@ -37,14 +53,16 @@ var ConfigurationForm = React.createClass({
                 {title}
             </h2>
         );
+
+        var titleField = {is_optional: false, attributes: [], human_name: "Title", description: helpBlock};
+        var titleElement = (this.state.includeTitleField ? <TextField key={typeName + "-title"} typeName={typeName} title="title"
+                                      field={titleField} value={this.state.titleValue} onChange={this.handleTitleChange}/> : "");
+
         var body = (
             <fieldset>
                 <input type="hidden" name="type" value={typeName} />
 
-                <label htmlFor={"title-" + typeName}>Title</label>
-                <input id={"title-" + typeName} name="title" value={this.state.titleValue} onChange={this.handleTitleChange}
-                       required="true" type="text" className="input-xlarge form-control" />
-                {helpBlock}
+                {titleElement}
                 {configFields}
             </fieldset>
         );
@@ -73,9 +91,9 @@ var ConfigurationForm = React.createClass({
     _closeModal() {
         this.refs.modal.close();
     },
-    handleTitleChange(evt) {
-        this.handleChange('title', evt.target.value);
-        this.setState({titleValue: evt.target.value});
+    handleTitleChange(field, value) {
+        this.handleChange(field, value);
+        this.setState({titleValue: value});
     },
     handleChange(field, value) {
         var values = this.state.values;
