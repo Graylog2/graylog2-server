@@ -5,7 +5,8 @@ var React = require('react/addons');
 var DeleteAlarmCallbackButton = React.createClass({
     getInitialState() {
         return {
-            alarmCallback: this.props.alarmCallback
+            alarmCallback: this.props.alarmCallback,
+            onClick: this.props.onClick
         };
     },
     componentWillReceiveProps(props) {

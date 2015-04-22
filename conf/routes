@@ -279,6 +279,7 @@ GET         /a/streams/:stream_id/alarmcallbacks                                
 GET         /a/streams/:stream_id/alarmcallbacks/available                           @controllers.api.AlarmCallbacksApiController.available(stream_id: String)
 POST        /a/streams/:stream_id/alarmcallbacks                                     @controllers.api.AlarmCallbacksApiController.create(stream_id: String)
 DELETE      /a/streams/:stream_id/alarmcallbacks/:alarmcallback_id                   @controllers.api.AlarmCallbacksApiController.delete(stream_id: String, alarmcallback_id: String)
+PUT         /a/streams/:stream_id/alarmcallbacks/:alarmcallback_id                   @controllers.api.AlarmCallbacksApiController.update(stream_id: String, alarmcallback_id: String)
 
 GET         /robots.txt                                                              controllers.Assets.at(path="/public", file="robots.txt")
 

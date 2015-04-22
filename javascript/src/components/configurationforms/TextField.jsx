@@ -34,7 +34,7 @@ var TextField = React.createClass({
 
         if (FieldHelpers.hasAttribute(field.attributes, "textarea")) {
             inputField = (
-                    <textarea id={title} className="textarea-xlarge form-control"
+                    <textarea id={title} className="form-control"
                               name={"configuration["+title+"]"} required={isRequired} value={this.state.value}
                               onChange={this.handleChange}>
                         {value}
@@ -42,7 +42,7 @@ var TextField = React.createClass({
             );
         } else {
             inputField = (
-                <input id={title} type={fieldType} className="input-xlarge form-control" name={"configuration["+title+"]"} value={this.state.value}
+                <input id={title} type={fieldType} className="form-control" name={"configuration["+title+"]"} value={this.state.value}
                        onChange={this.handleChange} required={isRequired} defaultValue={this._fieldValue(field)}/>
             );
         }

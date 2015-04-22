@@ -13,7 +13,7 @@ var AlarmCallbacksStore = {
                 "Could not retrieve available AlarmCallbacks!");
         };
 
-        $.getJSON(jsRoutes.controllers.api.AlarmCallbacksApiController.available(streamId).url, callback).fail(this._failCallback);
+        $.getJSON(jsRoutes.controllers.api.AlarmCallbacksApiController.available(streamId).url, callback).fail(failCallback);
     },
     loadForStream(streamId: string, callback: ((alarmCallbacks: any) => void)) {
         var failCallback = (jqXHR, textStatus, errorThrown) => {
@@ -21,7 +21,7 @@ var AlarmCallbacksStore = {
                 "Could not retrieve AlarmCallbacks!");
         };
 
-        $.getJSON(jsRoutes.controllers.api.AlarmCallbacksApiController.list(streamId).url, callback).fail(this._failCallback);
+        $.getJSON(jsRoutes.controllers.api.AlarmCallbacksApiController.list(streamId).url, callback).fail(failCallback);
     },
     save(streamId: string, alarmCallback: any, callback: ((alarmCallback: any) => void)) {
         var failCallback = (jqXHR, textStatus, errorThrown) => {
@@ -49,6 +49,21 @@ var AlarmCallbacksStore = {
         $.ajax({
             type: "DELETE",
             url: url
+        }).done(callback).fail(failCallback);
+    },
+    update(streamId: string, alarmCallback: any, deltas: any, callback: (alarmCallback: any) => void) {
+        var failCallback = (jqXHR, textStatus, errorThrown) => {
+            UserNotification.error("Updating Alarm Callback \"" + alarmCallback.id + "\" failed with status: " + errorThrown,
+                "Could not update Alarm Callback");
+        };
+
+        var url = jsRoutes.controllers.api.AlarmCallbacksApiController.update(alarmCallback.id).url;
+
+        $.ajax({
+            type: "PUT",
+            contentType: "application/json",
+            url: url,
+            data: JSON.stringify(deltas)
         }).done(callback).fail(failCallback);
     }
 };

@@ -3,6 +3,7 @@
 var React = require('react/addons');
 var ConfigurationForm = require('../configurationforms/ConfigurationForm');
 var AlarmCallbacksStore = require('../../stores/alarmcallbacks/AlarmCallbacksStore');
+var $ = require('jquery'); // excluded and shimed
 
 var CreateAlarmCallbackButton = React.createClass({
     getInitialState() {
@@ -26,10 +27,11 @@ var CreateAlarmCallbackButton = React.createClass({
     },
     render() {
         var alarmCallbackTypes = $.map(this.state.types, this._formatOutputType);
-        var helpBlock = (<p className="help-block">{"Select a name of your new alarm callback that describes it."}</p>);
+        var humanTypeName = (this.state.typeName ? this.state.types[this.state.typeName].name : "Alarm Callback");
+
         return (
-            <div className="form-inline">
-                <div className="form-group">
+            <div>
+                <div className="form-group form-inline">
                     <select id="input-type" defaultValue="placeholder" onChange={this.onTypeChange} className="form-control">
                         <option value="placeholder" disabled>--- Select Alarm Callback Type ---</option>
                         {alarmCallbackTypes}
@@ -37,10 +39,9 @@ var CreateAlarmCallbackButton = React.createClass({
 
                     <button className="btn btn-success btn-sm" onClick={this._openModal}>Configure new alert destination</button>
 
-                    <ConfigurationForm ref="configurationForm" key="configuration-form-output" configFields={this.state.typeDefinition} title="Create new Alarm Callback"
-                                       typeName={this.state.typeName}
-                                       helpBlock={helpBlock} submitAction={this.handleSubmit}/>
                 </div>
+                <ConfigurationForm ref="configurationForm" key="configuration-form-output" configFields={this.state.typeDefinition} title={"Create new " + humanTypeName}
+                                   typeName={this.state.typeName} submitAction={this.handleSubmit} includeTitleField={false}/>
             </div>
         );
     },

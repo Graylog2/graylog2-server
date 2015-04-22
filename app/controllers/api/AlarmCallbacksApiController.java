@@ -56,4 +56,16 @@ public class AlarmCallbacksApiController extends AuthenticatedController {
 
         return ok();
     }
+
+    public Result update(String streamId, String alarmCallbackId) throws IOException, APIException {
+        if (!isPermitted(RestPermissions.STREAMS_EDIT, streamId))
+            return forbidden();
+
+        final JsonNode json = request().body().asJson();
+        final CreateAlarmCallbackRequest request = Json.fromJson(json, CreateAlarmCallbackRequest.class);
+
+        alarmCallbackService.update(streamId, alarmCallbackId, request);
+
+        return ok();
+    }
 }

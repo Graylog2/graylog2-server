@@ -77,7 +77,7 @@ var OutputsStore = {
         }).done(callback).fail(failCallback);
     },
     _failCallback(jqXHR: any, textStatus: string, errorThrown: string) {
-        UserNotification.error("Loading otuputs failed with status: " + errorThrown,
+        UserNotification.error("Loading outputs failed with status: " + errorThrown,
             "Could not load outputs");
     }
 };

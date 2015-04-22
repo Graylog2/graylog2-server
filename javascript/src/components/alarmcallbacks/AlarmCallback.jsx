@@ -5,6 +5,7 @@ var PermissionsMixin = require('../../util/PermissionsMixin');
 var DeleteAlarmCallbackButton = require('./DeleteAlarmCallbackButton');
 var ConfigurationWell = require('../configurationforms/ConfigurationWell');
 var UserLink = require('../users/UserLink');
+var EditAlarmCallbackButton = require('./EditAlarmCallbackButton');
 
 var AlarmCallback = React.createClass({
     mixins: [PermissionsMixin],
@@ -22,6 +23,8 @@ var AlarmCallback = React.createClass({
     },
     render() {
         var alarmCallback = this.state.alarmCallback;
+        var editAlarmCallbackButton = (this.isPermitted(this.state.permissions, ["STREAMS_EDIT"]) ?
+            <EditAlarmCallbackButton alarmCallback={alarmCallback} streamId={this.state.streamId} onUpdate={this.state.updateAlarmCallback} /> : "");
         var deleteAlarmCallbackButton = (this.isPermitted(this.state.permissions, ["STREAMS_EDIT"]) ?
             <DeleteAlarmCallbackButton alarmCallback={alarmCallback} onClick={this.state.deleteAlarmCallback} /> : "");
         return (
@@ -30,6 +33,7 @@ var AlarmCallback = React.createClass({
                     Created by <UserLink username={alarmCallback.creator_user_id} />
                     <span className="text" title={moment(alarmCallback.created_at).format()}>{moment(alarmCallback.created_at).fromNow()}</span>
 
+                    {editAlarmCallbackButton}
                     {deleteAlarmCallbackButton}
                     </span>
 

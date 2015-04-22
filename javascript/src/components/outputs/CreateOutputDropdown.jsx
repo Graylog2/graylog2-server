@@ -25,7 +25,6 @@ var CreateOutputDropdown = React.createClass({
     },
     render() {
         var outputTypes = $.map(this.state.types, this._formatOutputType);
-        var helpBlock = (<p className="help-block">{"Select a name of your new output that describes it."}</p>);
         return (
             <div className="form-inline">
                 <div className="form-group">
@@ -37,14 +36,17 @@ var CreateOutputDropdown = React.createClass({
                     <button className="btn btn-success btn-sm" onClick={this._openModal}>Launch new output</button>
 
                     <ConfigurationForm ref="configurationForm" key="configuration-form-output" configFields={this.state.typeDefinition} title="Create new Output"
+                                       helpBlock={<p className="help-block">{"Select a name of your new output that describes it."}</p>}
                                        typeName={this.state.typeName}
-                                       helpBlock={helpBlock} submitAction={this.handleSubmit}/>
+                                       submitAction={this.handleSubmit} />
                 </div>
             </div>
         );
     },
-    _openModal() {
-        this.refs.configurationForm.open();
+    _openModal(evt) {
+        if (this.state.typeName !== "placeholder" && this.state.typeName !== "") {
+            this.refs.configurationForm.open();
+        }
     },
     _formatOutputType(title, typeName) {
         return (<option key={typeName} value={typeName}>{title}</option>);
