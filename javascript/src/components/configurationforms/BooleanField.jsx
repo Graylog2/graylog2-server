@@ -25,7 +25,7 @@ var BooleanField = React.createClass({
             <div className="form-group">
                 <div className="checkbox">
                     <label>
-                        <input id={field.title}
+                        <input id={typeName + "-" + field.title}
                             type="checkbox"
                             checked={field.default_value}
                             name={"configuration[" + field.title + "]"}
