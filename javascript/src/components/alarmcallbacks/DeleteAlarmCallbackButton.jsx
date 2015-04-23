@@ -13,7 +13,7 @@ var DeleteAlarmCallbackButton = React.createClass({
         this.setState(props);
     },
     handleClick(evt) {
-        if(confirm("Really delete alarm destination?")) {
+        if(window.confirm("Really delete alarm destination?")) {
             this.state.onClick(this.state.alarmCallback);
         }
     },
