@@ -1,3 +1,5 @@
+/// <reference path="../../../declarations/jquery/jquery.d.ts" />
+
 'use strict';
 
 declare var $: any;
@@ -12,9 +14,19 @@ interface Dashboard {
 }
 
 var DashboardStore = {
-    URL: URLUtils.appPrefixed('/dashboards'),
+    getWritableDashboardList(): JQueryPromise<string[]> {
+        var url = URLUtils.appPrefixed('/a/dashboards/writable');
+        var promise = $.getJSON(url);
+        promise.fail((jqXHR, textStatus, errorThrown) => {
+            if (jqXHR.status !== 404) {
+                UserNotification.error("Loading your dashboard list failed with status: " + errorThrown,
+                    "Could not load your dashboard list");
+            }
+        });
+        return promise;
+    },
     saveDashboard(dashboard: Dashboard, callback: () => void) {
-        var url = this.URL + "/" + dashboard.id + "/update";
+        var url = URLUtils.appPrefixed('/dashboards') + "/" + dashboard.id + "/update";
         $.ajax({
             type: "POST",
             url: url,
