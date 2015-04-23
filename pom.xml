@@ -886,7 +886,9 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>${surefire.version}</version>
                 <configuration>
-                    <forkMode>once</forkMode>
+                    <!-- Use ALL the cores! -->
+                    <forkCount>1C</forkCount>
+                    <reuseForks>false</reuseForks>
                     <argLine>-XX:-UseSplitVerifier -Djava.library.path=${project.basedir}/../lib/sigar-${sigar.version}</argLine>
                     <excludes>
                         <exclude>**/*IntegrationTest.java</exclude>
