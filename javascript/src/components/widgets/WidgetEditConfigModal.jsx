@@ -200,7 +200,7 @@ var WidgetEditConfigModal = React.createClass({
                        required
                        defaultValue={this.state.title}
                        onChange={this._onTitleChange}
-                       help="Select a name of your new input that describes it."/>
+                       help="Type a name that describes your widget."/>
                 <Input type="number"
                        min="1"
                        required
