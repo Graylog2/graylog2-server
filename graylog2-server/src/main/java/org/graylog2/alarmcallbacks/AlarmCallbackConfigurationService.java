@@ -16,6 +16,7 @@
  */
 package org.graylog2.alarmcallbacks;
 
+import com.google.inject.ImplementedBy;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.rest.models.alarmcallbacks.requests.CreateAlarmCallbackRequest;
@@ -26,6 +27,7 @@ import java.util.Map;
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
  */
+@ImplementedBy(AlarmCallbackConfigurationServiceMJImpl.class)
 public interface AlarmCallbackConfigurationService {
     List<AlarmCallbackConfiguration> getForStreamId(String streamId);
     List<AlarmCallbackConfiguration> getForStream(Stream stream);

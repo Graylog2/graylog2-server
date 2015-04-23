@@ -18,6 +18,7 @@ package org.graylog2.alarmcallbacks;
 
 import org.graylog2.plugin.alarms.callbacks.AlarmCallback;
 import org.graylog2.plugin.alarms.callbacks.AlarmCallbackConfigurationException;
+import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.shared.bindings.InstantiationService;
 
 import javax.inject.Inject;
@@ -39,7 +40,7 @@ public class AlarmCallbackFactory {
 
     public AlarmCallback create(AlarmCallbackConfiguration configuration) throws ClassNotFoundException, AlarmCallbackConfigurationException {
         AlarmCallback alarmCallback = create(configuration.getType());
-        alarmCallback.initialize(configuration.getConfiguration());
+        alarmCallback.initialize(new Configuration(configuration.getConfiguration()));
 
         return alarmCallback;
     }

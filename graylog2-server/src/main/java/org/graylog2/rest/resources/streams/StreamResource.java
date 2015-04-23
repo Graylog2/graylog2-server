@@ -334,7 +334,7 @@ public class StreamResource extends RestResource {
         for (AlarmCallbackConfiguration alarmCallbackConfiguration : alarmCallbackConfigurationService.getForStream(sourceStream)) {
             final CreateAlarmCallbackRequest request = new CreateAlarmCallbackRequest();
             request.type = alarmCallbackConfiguration.getType();
-            request.configuration = alarmCallbackConfiguration.getConfiguration().getSource();
+            request.configuration = alarmCallbackConfiguration.getConfiguration();
             final AlarmCallbackConfiguration alarmCallback = alarmCallbackConfigurationService.create(stream.getId(), request, getCurrentUser().getName());
             alarmCallbackConfigurationService.save(alarmCallback);
         }

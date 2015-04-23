@@ -34,7 +34,7 @@ import java.util.Map;
 public class AlarmCallbackConfigurationImpl extends PersistedImpl implements AlarmCallbackConfiguration {
     private ObjectId stream_id;
     private String type;
-    private Configuration configuration;
+    private Map<String, Object> configuration;
     private DateTime createdAt;
     private String creatorUserId;
 
@@ -53,7 +53,7 @@ public class AlarmCallbackConfigurationImpl extends PersistedImpl implements Ala
         }
 
         this.type = (String)fields.get("type");
-        this.configuration = new Configuration((Map<String, Object>)fields.get("configuration"));
+        this.configuration = (Map<String, Object>)fields.get("configuration");
         this.createdAt = (DateTime)fields.get("created_at");
         this.creatorUserId = (String) fields.get("creator_user_id");
     }
@@ -66,40 +66,16 @@ public class AlarmCallbackConfigurationImpl extends PersistedImpl implements Ala
         return type;
     }
 
-    public Configuration getConfiguration() {
+    public Map<String, Object> getConfiguration() {
         return configuration;
-    }
-
-    public void setStream(Stream stream) {
-        setStreamId(stream.getId());
-    }
-
-    public void setStreamId(String stream_id) {
-        this.stream_id = new ObjectId(stream_id);
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    public void setConfiguration(Configuration configuration) {
-        this.configuration = configuration;
     }
 
     public DateTime getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(DateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
     public String getCreatorUserId() {
         return creatorUserId;
-    }
-
-    public void setCreatorUserId(String creatorUserId) {
-        this.creatorUserId = creatorUserId;
     }
 
     @Override
@@ -120,7 +96,7 @@ public class AlarmCallbackConfigurationImpl extends PersistedImpl implements Ala
         result.put("id", getId());
         result.put("stream_id", getStreamId());
         result.put("type", getType());
-        result.put("configuration", getConfiguration().getSource());
+        result.put("configuration", getConfiguration());
         result.put("created_at", getCreatedAt());
         result.put("creator_user_id", getCreatorUserId());
 
