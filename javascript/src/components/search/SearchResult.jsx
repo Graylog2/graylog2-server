@@ -102,9 +102,13 @@ var SearchResult = React.createClass({
                                      histogram={this.props.histogram}/>
 
                     <ResultTable messages={this.props.result.messages}
-                                 resultCount={this.props.result['total_result_count']}
                                  page={this.props.currentPage}
-                                 selectedFields={this.state.selectedFields}/>
+                                 selectedFields={this.state.selectedFields}
+                                 resultCount={this.props.result['total_result_count']}
+                                 inputs={this.props.inputs}
+                                 streams={this.props.streams}
+                                 nodes={this.props.nodes}
+                        />
 
                 </div>
             </div>);

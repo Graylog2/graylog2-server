@@ -32,7 +32,7 @@ var MessageTableEntry = React.createClass({
                 {this.props.expanded &&
                     <tr className="message-detail-row" style={{display: "table-row"}}>
                         <td colSpan={colSpanFixup}>
-                            <MessageDetail message={this.props.message}/>
+                            <MessageDetail message={this.props.message} inputs={this.props.inputs} streams={this.props.streams} nodes={this.props.nodes}/>
                         </td>
                     </tr>
                 }

@@ -68,7 +68,11 @@ var ResultTable = React.createClass({
                                                                               showMessageRow={this.props.selectedFields.contains('message')}
                                                                               selectedFields={selectedColumns}
                                                                               expanded={this.state.expandedMessages.contains(message.id)}
-                                                                              toggleDetail={this._toggleMessageDetail}/>) }
+                                                                              toggleDetail={this._toggleMessageDetail}
+                                                                              inputs={this.props.inputs}
+                                                                              streams={this.props.streams}
+                                                                              nodes={this.props.nodes}
+                        />) }
                 </table>
             </div>
 

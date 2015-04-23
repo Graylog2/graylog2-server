@@ -21,6 +21,14 @@ var MessageDetail = React.createClass({
             this.setState({scrollWarn: true});
         }
     },
+    _inputName(inputId) {
+        var input = this.props.inputs.get(inputId);
+        return input ? <span style={{wordBreak: 'break-word'}}>{input['title']}</span> : "deleted input";
+    },
+    _nodeName(nodeId) {
+        var node = this.props.nodes.get(nodeId);
+        return node ? <a href="#"><i className="fa fa-code-fork"></i> <span style={{wordBreak: 'break-word'}}>{node['short_node_id']}</span> / <span style={{wordBreak: 'break-word'}}>{node['hostname']}</span></a> : "stopped node";
+    },
     render() {
         var messageUrl = "/messages/" + this.props.message.index + "/" + this.props.message.id;
 
@@ -39,6 +47,17 @@ var MessageDetail = React.createClass({
             );
         });
 
+        var streamIds = Immutable.Set(this.props.message['stream_ids']);
+        var streams = streamIds
+            .map((id) => this.props.streams.get(id))
+            .map((stream) => <li key={stream.id}><a href="#">{stream.title}</a></li>);
+
+        var viaRadio = this.props.message['source_radio_id'];
+        if (viaRadio) {
+            viaRadio = <span>
+                via <em>{this._inputName(this.props.message['source_radio_input_id'])}</em> on radio {this._nodeName(this.props.message['source_radio_id'])}
+            </span>;
+        }
         return (<div>
 
             <Row>
@@ -57,20 +76,22 @@ var MessageDetail = React.createClass({
                     <dl className="message-details">
                         <dt>Received by</dt>
                         <dd>
-                            <em>Example Input</em> on <a href="#"><i className="fa fa-code-fork"></i> 127.0.0.1</a>
+                            <em>{this._inputName(this.props.message['source_input_id'])}</em> on {this._nodeName(this.props.message['source_node_id'])}
+                            { viaRadio && <br /> }
+                            {viaRadio}
                         </dd>
 
                         <dt>Stored in index</dt>
-                        <dd>@r.getIndex</dd>
+                        <dd>{this.props.message.index}</dd>
 
-                        <dt>Routed in streams</dt>
+                        { streamIds.size > 0 && <dt>Routed into streams</dt> }
+                        { streamIds.size > 0 &&
                         <dd>
                             <ul>
-                                <li><a href="#">Some stream</a></li>
-                                <li><a href="#">Example stream</a></li>
-                                <li><a href="#">Another example stream</a></li>
+                                {streams}
                             </ul>
                         </dd>
+                        }
                     </dl>
                 </Col>
                 <Col md={9}>
