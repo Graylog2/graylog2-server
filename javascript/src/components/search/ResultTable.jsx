@@ -52,7 +52,7 @@ var ResultTable = React.createClass({
                         disabled={this.state.expandedMessages.size === 0}><i className="fa fa-minus"></i></Button>
             </ButtonGroup>
 
-            <MessageTablePaginator position="top"/>
+            <MessageTablePaginator position="top" currentPage={Number(this.props.page)} resultCount={this.props.resultCount}/>
 
             <div className="table-responsive">
                 <table className="table table-condensed messages">
@@ -72,7 +72,7 @@ var ResultTable = React.createClass({
                 </table>
             </div>
 
-            <MessageTablePaginator position="bottom">
+            <MessageTablePaginator position="bottom" currentPage={Number(this.props.page)} resultCount={this.props.resultCount}>
                 <ButtonGroup bsSize='small' className="pull-right" style={{marginTop: 20}}>
                     <Button title="Expand all messages" onClick={this.expandAll}><i className="fa fa-plus"></i></Button>
                     <Button title="Collapse all messages"

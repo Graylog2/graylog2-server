@@ -101,7 +101,9 @@ var SearchResult = React.createClass({
                     <LegacyHistogram formattedHistogram={this.props.formattedHistogram}
                                      histogram={this.props.histogram}/>
 
-                    <ResultTable messages={this.props.result.messages} page={this.props.currentPage}
+                    <ResultTable messages={this.props.result.messages}
+                                 resultCount={this.props.result['total_result_count']}
+                                 page={this.props.currentPage}
                                  selectedFields={this.state.selectedFields}/>
 
                 </div>
