@@ -25,6 +25,16 @@ var WidgetsStore = require('../../stores/widgets/WidgetsStore');
 var Widget = React.createClass({
     WIDGET_DATA_REFRESH: 30 * 1000,
     DEFAULT_WIDGET_VALUE_REFRESH: 10 * 1000,
+    statics: {
+        Type: {
+            SEARCH_RESULT_COUNT: "SEARCH_RESULT_COUNT",
+            STREAM_SEARCH_RESULT_COUNT: "STREAM_SEARCH_RESULT_COUNT",
+            STATS_COUNT: "STATS_COUNT",
+            SEARCH_RESULT_CHART: "SEARCH_RESULT_CHART",
+            QUICKVALUES: "QUICKVALUES",
+            FIELD_CHART: "FIELD_CHART"
+        }
+    },
 
     getInitialState() {
         return {
@@ -133,22 +143,22 @@ var Widget = React.createClass({
         var visualization;
 
         switch (this.state.type) {
-            case 'SEARCH_RESULT_COUNT':
-            case 'STREAM_SEARCH_RESULT_COUNT':
-            case 'STATS_COUNT':
+            case this.constructor.Type.SEARCH_RESULT_COUNT:
+            case this.constructor.Type.STREAM_SEARCH_RESULT_COUNT:
+            case this.constructor.Type.STATS_COUNT:
                 visualization = <NumericVisualization data={this.state.result} config={this.state.config}/>;
                 break;
-            case 'SEARCH_RESULT_CHART':
+            case this.constructor.Type.SEARCH_RESULT_CHART:
                 visualization = <HistogramVisualization id={this.props.widgetId}
                                                         data={this.state.result}
                                                         interval={this.state.config.interval}/>;
                 break;
-            case 'QUICKVALUES':
+            case this.constructor.Type.QUICKVALUES:
                 visualization = <QuickValuesVisualization id={this.props.widgetId}
                                                           config={this.state.config}
                                                           data={this.state.result}/>;
                 break;
-            case 'FIELD_CHART':
+            case this.constructor.Type.FIELD_CHART:
                 visualization = <GraphVisualization id={this.props.widgetId}
                                                     data={this.state.result}
                                                     config={this.state.config}/>;
