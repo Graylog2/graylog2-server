@@ -61,10 +61,6 @@
             <artifactId>airline</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.graylog.telemetry</groupId>
-            <artifactId>graylog-telemetry-plugin</artifactId>
-        </dependency>
-        <dependency>
             <groupId>log4j</groupId>
             <artifactId>apache-log4j-extras</artifactId>
         </dependency>
