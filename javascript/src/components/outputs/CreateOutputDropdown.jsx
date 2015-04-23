@@ -18,6 +18,9 @@ var CreateOutputDropdown = React.createClass({
     componentDidMount() {
         this.loadData();
     },
+    componentWillReceiveProps(props) {
+        this.setState(props);
+    },
     loadData() {
         OutputsStore.loadAvailableTypes((types) => {
             this.setState({types:types});
@@ -27,9 +30,9 @@ var CreateOutputDropdown = React.createClass({
         var outputTypes = $.map(this.state.types, this._formatOutputType);
         var helpBlock = (<p className="help-block">{"Select a name of your new output that describes it."}</p>);
         return (
-            <div className="form-inline">
-                <div className="form-group">
-                    <select id="input-type" defaultValue="placeholder" onChange={this.onTypeChange} className="form-control">
+            <div>
+                <div className="form-group form-inline">
+                    <select id="input-type" defaultValue="placeholder" value={this.state.typeName} onChange={this.onTypeChange} className="form-control">
                         <option value="placeholder" disabled>--- Select Output Type ---</option>
                         {outputTypes}
                     </select>
@@ -58,6 +61,7 @@ var CreateOutputDropdown = React.createClass({
     },
     handleSubmit(data) {
         OutputsStore.save(data, (result) => {
+            this.setState({typeName: "placeholder"});
             if (this.state.streamId) {
                 StreamsStore.addOutput(this.state.streamId, result.id, () => {
                     this.props.onUpdate();
