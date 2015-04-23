@@ -27,7 +27,7 @@ var ResultTable = React.createClass({
         return this.props.selectedFields.delete('message');
     },
     _columnStyle(fieldName) {
-        if (fieldName.toLowerCase() === 'source') {
+        if (fieldName.toLowerCase() === 'source' && this._fieldColumns().size > 1) {
             return {width: 180};
         }
         return {};
