@@ -19,7 +19,7 @@ var CreateOutputDropdown = React.createClass({
         this.loadData();
     },
     componentWillReceiveProps(props) {
-        setState(props);
+        this.setState(props);
     },
     loadData() {
         OutputsStore.loadAvailableTypes((types) => {
@@ -31,7 +31,7 @@ var CreateOutputDropdown = React.createClass({
         return (
             <div>
                 <div className="form-group form-inline">
-                    <select id="input-type" defaultValue="placeholder" onChange={this.onTypeChange} className="form-control">
+                    <select id="input-type" defaultValue="placeholder" value={this.state.typeName} onChange={this.onTypeChange} className="form-control">
                         <option value="placeholder" disabled>--- Select Output Type ---</option>
                         {outputTypes}
                     </select>
@@ -63,6 +63,7 @@ var CreateOutputDropdown = React.createClass({
     },
     handleSubmit(data) {
         OutputsStore.save(data, (result) => {
+            this.setState({typeName: "placeholder"});
             if (this.state.streamId) {
                 StreamsStore.addOutput(this.state.streamId, result.id, () => {
                     this.props.onUpdate();

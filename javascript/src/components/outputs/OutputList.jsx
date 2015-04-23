@@ -37,7 +37,7 @@ var OutputList = React.createClass({
         return output1.title.localeCompare(output2.title);
     },
     removeOutputGlobally(outputId) {
-        if (confirm("Do you really want to terminate this output?")) {
+        if (window.confirm("Do you really want to terminate this output?")) {
             OutputsStore.remove(outputId, (jqXHR, textStatus, errorThrown) => {
                 this.loadData();
                 UserNotification.success("Output was terminated.", "Success!");
@@ -48,7 +48,7 @@ var OutputList = React.createClass({
         }
     },
     removeOutputFromStream(outputId, streamId) {
-        if (confirm("Do you really want to remove this output from the stream?")) {
+        if (window.confirm("Do you really want to remove this output from the stream?")) {
             StreamsStore.removeOutput(streamId, outputId, (jqXHR, textStatus, errorThrown) => {
                 this.loadData();
                 UserNotification.success("Removed output from stream!", "Success!");
