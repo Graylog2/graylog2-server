@@ -4,8 +4,6 @@ var $ = require('jquery');
 
 var React = require('react');
 var PageItem = require('react-bootstrap').PageItem;
-var ButtonGroup = require('react-bootstrap').ButtonGroup;
-var Button = require('react-bootstrap').Button;
 
 var MessageTablePaginator = React.createClass({
     getInitialState() {
