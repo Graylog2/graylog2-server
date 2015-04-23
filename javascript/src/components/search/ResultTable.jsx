@@ -1,41 +1,58 @@
 'use strict';
 
 var React = require('react');
+var ButtonGroup = require('react-bootstrap').ButtonGroup;
+var Button = require('react-bootstrap').Button;
 var MessageTableEntry = require('./MessageTableEntry');
-var PageItem = require('react-bootstrap').PageItem;
+var MessageTablePaginator = require('./MessageTablePaginator');
+var Immutable = require('immutable');
 
 var ResultTable = React.createClass({
     getInitialState() {
         return {
-            expandedMessages: {}
+            expandedMessages: Immutable.Set()
         };
     },
-
     _toggleMessageDetail(id) {
-        this.state.expandedMessages[id] = !this.state.expandedMessages[id];
-        this.setState(this.state);
+        var newSet;
+        if (this.state.expandedMessages.contains(id)) {
+            newSet = this.state.expandedMessages.delete(id);
+        } else {
+            newSet = this.state.expandedMessages.add(id);
+        }
+        this.setState({expandedMessages: newSet});
     },
 
     _fieldColumns() {
         return this.props.selectedFields.delete('message');
     },
     _columnStyle(fieldName) {
-        if (fieldName.toLowerCase() === 'source') {
+        if (fieldName.toLowerCase() === 'source' && this._fieldColumns().size > 1) {
             return {width: 180};
         }
         return {};
+    },
+    expandAll() {
+        var newSet = Immutable.Set(this.props.messages.map((message) => message.id));
+        this.setState({expandedMessages: newSet});
+    },
+    collapseAll() {
+        this.setState({expandedMessages: Immutable.Set()});
     },
 
     render() {
         var selectedColumns = this._fieldColumns();
         return (<div className="content-col">
-            <ul className="pagination">
-                <PageItem href="#">Previous</PageItem>
-                <PageItem href="#">1</PageItem>
-                <PageItem href="#">Next</PageItem>
-            </ul>
+            <h1 className="pull-left">Messages</h1>
 
-            <h1>Messages</h1>
+            <ButtonGroup bsSize='small' className="pull-right">
+                <Button title="Expand all messages" onClick={this.expandAll}><i className="fa fa-plus"></i></Button>
+                <Button title="Collapse all messages"
+                        onClick={this.collapseAll}
+                        disabled={this.state.expandedMessages.size === 0}><i className="fa fa-minus"></i></Button>
+            </ButtonGroup>
+
+            <MessageTablePaginator position="top" currentPage={Number(this.props.page)} resultCount={this.props.resultCount}/>
 
             <div className="table-responsive">
                 <table className="table table-condensed messages">
@@ -50,11 +67,23 @@ var ResultTable = React.createClass({
                                                                               message={message}
                                                                               showMessageRow={this.props.selectedFields.contains('message')}
                                                                               selectedFields={selectedColumns}
-                                                                              expanded={this.state.expandedMessages[message.id]}
-                                                                              toggleDetail={this._toggleMessageDetail}/>) }
+                                                                              expanded={this.state.expandedMessages.contains(message.id)}
+                                                                              toggleDetail={this._toggleMessageDetail}
+                                                                              inputs={this.props.inputs}
+                                                                              streams={this.props.streams}
+                                                                              nodes={this.props.nodes}
+                        />) }
                 </table>
             </div>
 
+            <MessageTablePaginator position="bottom" currentPage={Number(this.props.page)} resultCount={this.props.resultCount}>
+                <ButtonGroup bsSize='small' className="pull-right" style={{marginTop: 20}}>
+                    <Button title="Expand all messages" onClick={this.expandAll}><i className="fa fa-plus"></i></Button>
+                    <Button title="Collapse all messages"
+                            onClick={this.collapseAll}
+                            disabled={this.state.expandedMessages.size === 0}><i className="fa fa-minus"></i></Button>
+                </ButtonGroup>
+            </MessageTablePaginator>
         </div>);
     }
 });

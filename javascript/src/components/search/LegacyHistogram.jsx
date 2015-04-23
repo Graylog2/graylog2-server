@@ -4,6 +4,9 @@
 
 var React = require('react');
 
+var Widget = require('../widgets/Widget');
+var AddToDashboardMenu = require('../dashboard/AddToDashboardMenu');
+
 // Hue-manatee. We tried to be sorry, but aren't.
 var LegacyHistogram = React.createClass({
     RESOLUTIONS: ['year', 'quarter', 'month', 'week', 'day', 'hour', 'minute'],
@@ -35,7 +38,13 @@ var LegacyHistogram = React.createClass({
         );
 
         return (<div className="content-col">
-            <div className="pull-right">TODO dashboards</div>
+            <div className="pull-right">
+                <AddToDashboardMenu title="Add to dashboard"
+                                    dashboards={this.props.dashboards}
+                                    widgetType={Widget.Type.SEARCH_RESULT_CHART}
+                                    configuration={{resolution: this.props.histogram.interval}}
+                                    pullRight={true}/>
+            </div>
             <h1>Histogram</h1>
 
             {resolutionSelector}

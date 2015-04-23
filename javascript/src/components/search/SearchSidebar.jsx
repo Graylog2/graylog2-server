@@ -4,6 +4,9 @@ var React = require('react');
 var Modal = require('react-bootstrap').Modal;
 var ModalTrigger = require('react-bootstrap').ModalTrigger;
 
+var Widget = require('../widgets/Widget');
+var AddToDashboardMenu = require('../dashboard/AddToDashboardMenu');
+
 var numeral = require('numeral');
 
 var MessageField = React.createClass({
@@ -57,7 +60,11 @@ var SearchSidebar = React.createClass({
                 </p>
 
                 <div style={{marginTop: 10}}>
-                    <span>TODO Missing stream and dashboard thingies</span>
+                    <span>TODO Missing stream thingie</span><br/>
+                    <AddToDashboardMenu title="Add count to dashboard"
+                                        widgetType={Widget.Type.SEARCH_RESULT_COUNT}
+                                        dashboards={this.props.dashboards}/>
+                    &nbsp;
                     <a href="#" className="btn btn-success btn-sm">Save search criteria</a>
                 </div>
 

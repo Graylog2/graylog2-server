@@ -8,6 +8,8 @@ var ResultTable = require('./ResultTable');
 var LegacyHistogram = require('./LegacyHistogram');
 var Immutable = require('immutable');
 
+var DashboardStore = require('../../stores/dashboard/DashboardStore');
+
 var resizeMutex;
 
 var SearchResult = React.createClass({
@@ -15,7 +17,8 @@ var SearchResult = React.createClass({
         return {
             selectedFields: Immutable.Set(['message', 'source']),
             showAllFields: false,
-            currentSidebarWidth: null
+            currentSidebarWidth: null,
+            dashboards: Immutable.Map()
         };
     },
 
@@ -63,6 +66,7 @@ var SearchResult = React.createClass({
 
     componentDidMount() {
         this._updateWidth();
+        this._getWritableDashboardList();
         $(window).on('resize', this._resizeCallback);
     },
     componentWillUnmount() {
@@ -76,6 +80,10 @@ var SearchResult = React.createClass({
     _updateWidth() {
         var node = React.findDOMNode(this.refs.opa);
         this.setState({currentSidebarWidth: $(node).width()});
+    },
+    _getWritableDashboardList() {
+        var promise = DashboardStore.getWritableDashboardList();
+        promise.done(dashboards => this.setState({dashboards: Immutable.Map(dashboards)}));
     },
 
     render() {
@@ -94,15 +102,23 @@ var SearchResult = React.createClass({
                                        showAllFields={this.state.showAllFields}
                                        togglePageFields={this.togglePageFields}
                                        onFieldToggled={this.onFieldToggled}
-                                       predefinedFieldSelection={this.predefinedFieldSelection}/>
+                                       predefinedFieldSelection={this.predefinedFieldSelection}
+                                       dashboards={this.state.dashboards}/>
                     </div>
                 </div>
                 <div className="col-md-9" id="main-content-sidebar">
                     <LegacyHistogram formattedHistogram={this.props.formattedHistogram}
-                                     histogram={this.props.histogram}/>
+                                     histogram={this.props.histogram}
+                                     dashboards={this.state.dashboards}/>
 
-                    <ResultTable messages={this.props.result.messages} page={this.props.currentPage}
-                                 selectedFields={this.state.selectedFields}/>
+                    <ResultTable messages={this.props.result.messages}
+                                 page={this.props.currentPage}
+                                 selectedFields={this.state.selectedFields}
+                                 resultCount={this.props.result['total_result_count']}
+                                 inputs={this.props.inputs}
+                                 streams={this.props.streams}
+                                 nodes={this.props.nodes}
+                        />
 
                 </div>
             </div>);

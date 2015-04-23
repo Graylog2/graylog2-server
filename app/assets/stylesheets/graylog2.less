@@ -2843,6 +2843,32 @@ span.blob {
 .system-caret {
   margin-left: 3px;
 }
+
+#message-table-paginator-top {
+  width: 90%;
+}
+
+#message-table-paginator-top ul {
+  margin: 0;
+}
+
+#message-table-paginator-bottom {
+  height: 75px;
+}
+
+#message-table-paginator-bottom nav {
+  background-color: rgba(255,255,255,0.9);
+}
+
+#message-table-paginator-bottom .affix {
+  border-top: 1px #ddd solid;
+  bottom: 1px;
+}
+
+#message-table-paginator-bottom .affix-bottom {
+  position: absolute;
+}
+
 .pagination-search-result {
   text-align: center;
   margin-top: -27px;
@@ -2940,4 +2966,13 @@ table.messages tr.message-detail-row dl.message-details dd div.message-field-act
   padding-left: 10px;
   position: relative;
   top: -10px;
+}
+
+// this overrides the .table-responsive overflow-x to be able to show the blue message-group-toggled bar
+// if there's enough space. For lower widths we don't care about showing the bar (it's outside of the table's container,
+// so it triggers the overflox-x scroll behavior).
+@media(min-width: 600px) {
+  .table-responsive {
+    overflow-x: visible;
+  }
 }
