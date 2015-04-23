@@ -164,5 +164,6 @@ public class OutputRegistry {
         if (messageOutput != null)
             messageOutput.stop();
         runningMessageOutputs.invalidate(output.getId());
+        this.faultCounters.invalidate(output.getId());
     }
 }
