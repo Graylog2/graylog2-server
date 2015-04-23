@@ -4,6 +4,8 @@ var $ = require('jquery');
 
 var React = require('react');
 var PageItem = require('react-bootstrap').PageItem;
+var ButtonGroup = require('react-bootstrap').ButtonGroup;
+var Button = require('react-bootstrap').Button;
 
 var MessageTablePaginator = React.createClass({
     getInitialState() {
@@ -35,13 +37,15 @@ var MessageTablePaginator = React.createClass({
         var nav;
         if (this.props.position === 'bottom') {
             nav = (
-                <nav className="text-center"
-                     data-spy="affix"
+                <div data-spy="affix"
                      data-offset-top="450"
-                     data-offset-bottom="10"
+                     data-offset-bottom="10">
+                    {this.props.children}
+                    <nav className="text-center"
                      style={{width: this.state.paginationWidth}}>
                     {pages}
                 </nav>
+                </div>
             );
         } else {
             nav = <nav className='text-center'>{pages}</nav>;
