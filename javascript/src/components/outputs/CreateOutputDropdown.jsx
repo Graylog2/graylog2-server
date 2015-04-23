@@ -18,6 +18,9 @@ var CreateOutputDropdown = React.createClass({
     componentDidMount() {
         this.loadData();
     },
+    componentWillReceiveProps(props) {
+        setState(props);
+    },
     loadData() {
         OutputsStore.loadAvailableTypes((types) => {
             this.setState({types:types});
@@ -26,20 +29,20 @@ var CreateOutputDropdown = React.createClass({
     render() {
         var outputTypes = $.map(this.state.types, this._formatOutputType);
         return (
-            <div className="form-inline">
-                <div className="form-group">
+            <div>
+                <div className="form-group form-inline">
                     <select id="input-type" defaultValue="placeholder" onChange={this.onTypeChange} className="form-control">
                         <option value="placeholder" disabled>--- Select Output Type ---</option>
                         {outputTypes}
                     </select>
 
                     <button className="btn btn-success btn-sm" onClick={this._openModal}>Launch new output</button>
-
-                    <ConfigurationForm ref="configurationForm" key="configuration-form-output" configFields={this.state.typeDefinition} title="Create new Output"
-                                       helpBlock={<p className="help-block">{"Select a name of your new output that describes it."}</p>}
-                                       typeName={this.state.typeName}
-                                       submitAction={this.handleSubmit} />
                 </div>
+
+                <ConfigurationForm ref="configurationForm" key="configuration-form-output" configFields={this.state.typeDefinition} title="Create new Output"
+                                   helpBlock={<p className="help-block">{"Select a name of your new output that describes it."}</p>}
+                                   typeName={this.state.typeName}
+                                   submitAction={this.handleSubmit} />
             </div>
         );
     },

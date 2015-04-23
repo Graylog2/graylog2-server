@@ -15,7 +15,8 @@ var AlarmCallback = React.createClass({
             streamId: this.props.streamId,
             permissions: this.props.permissions,
             humanReadableType: this.props.humanReadableType,
-            deleteAlarmCallback: this.props.deleteAlarmCallback
+            deleteAlarmCallback: this.props.deleteAlarmCallback,
+            updateAlarmCallback: this.props.updateAlarmCallback
         };
     },
     componentWillReceiveProps(props) {

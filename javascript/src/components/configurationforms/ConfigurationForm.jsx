@@ -82,7 +82,6 @@ var ConfigurationForm = React.createClass({
         this.refs.modal.close();
     },
     handleTitleChange(field, value) {
-        this.handleChange(field, value);
         this.setState({titleValue: value});
     },
     handleChange(field, value) {

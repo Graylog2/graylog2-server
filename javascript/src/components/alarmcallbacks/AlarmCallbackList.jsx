@@ -45,10 +45,15 @@ var AlarmCallbackList = React.createClass({
             this.props.onUpdate();
         });
     },
+    _updateAlarmCallback() {
+        this.loadData();
+        this.props.onUpdate();
+    },
     render() {
         var alarmCallbacks = this.state.alarmCallbacks.map((alarmCallback) => {
-            return <AlarmCallback key={"alarmCallback-" + alarmCallback.id} alarmCallback={alarmCallback}
-                                  humanReadableType={this._humanReadableType(alarmCallback)} deleteAlarmCallback={this._deleteAlarmCallback}
+            return <AlarmCallback key={"alarmCallback-" + alarmCallback.id} alarmCallback={alarmCallback} streamId={this.state.streamId}
+                                  humanReadableType={this._humanReadableType(alarmCallback)}
+                                  deleteAlarmCallback={this._deleteAlarmCallback} updateAlarmCallback={this._updateAlarmCallback}
                                   permissions={this.state.permissions}/>;
         });
 

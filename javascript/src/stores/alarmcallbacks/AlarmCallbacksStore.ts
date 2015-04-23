@@ -51,13 +51,13 @@ var AlarmCallbacksStore = {
             url: url
         }).done(callback).fail(failCallback);
     },
-    update(streamId: string, alarmCallback: any, deltas: any, callback: (alarmCallback: any) => void) {
+    update(streamId: string, alarmCallbackId: any, deltas: any, callback: (alarmCallback: any) => void) {
         var failCallback = (jqXHR, textStatus, errorThrown) => {
-            UserNotification.error("Updating Alarm Callback \"" + alarmCallback.id + "\" failed with status: " + errorThrown,
+            UserNotification.error("Updating Alarm Callback \"" + alarmCallbackId + "\" failed with status: " + errorThrown,
                 "Could not update Alarm Callback");
         };
 
-        var url = jsRoutes.controllers.api.AlarmCallbacksApiController.update(alarmCallback.id).url;
+        var url = jsRoutes.controllers.api.AlarmCallbacksApiController.update(streamId, alarmCallbackId).url;
 
         $.ajax({
             type: "PUT",

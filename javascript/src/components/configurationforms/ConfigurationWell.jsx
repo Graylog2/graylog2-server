@@ -10,6 +10,9 @@ var ConfigurationWell = React.createClass({
             configuration: this.props.configuration
         };
     },
+    componentWillReceiveProps(props) {
+        this.setState(props);
+    },
     _formatConfiguration(id, config) {
         if (!config) {
             return ("");
