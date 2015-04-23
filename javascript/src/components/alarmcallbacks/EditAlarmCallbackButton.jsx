@@ -43,12 +43,12 @@ var EditAlarmCallbackButton = React.createClass({
             : ""
         );
         return (
-            <div>
+            <span>
                 <button className="btn btn-success btn-xs" onClick={this.handleClick}>
                     <i className="fa fa-edit"></i>  Edit
                 </button>
                 {configurationForm}
-            </div>
+            </span>
         );
     }
 });

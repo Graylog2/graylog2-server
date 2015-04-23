@@ -11,7 +11,7 @@
     </div>
 } else {
     @for(condition <- alertConditions) {
-        <div class="row node-row alert-condition" data-condition-id="@condition.getId">
+        <div class="node-row alert-condition" data-condition-id="@condition.getId">
             <span class="pull-right node-row-info">
                 Created by @views.html.partials.links.to_user.render(condition.getCreatorUser)
                 @DateHelper.readablePeriodFromNow(condition.getCreatedAt())

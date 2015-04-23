@@ -29,14 +29,13 @@ var AlarmCallback = React.createClass({
         var deleteAlarmCallbackButton = (this.isPermitted(this.state.permissions, ["STREAMS_EDIT"]) ?
             <DeleteAlarmCallbackButton alarmCallback={alarmCallback} onClick={this.state.deleteAlarmCallback} /> : "");
         return (
-            <div className="row node-row alert-condition alert-callback" data-destination-id={alarmCallback.id}>
+            <div className="node-row alert-condition alert-callback" data-destination-id={alarmCallback.id}>
                 <span className="pull-right node-row-info">
                     Created by <UserLink username={alarmCallback.creator_user_id} />
-                    <span className="text" title={moment(alarmCallback.created_at).format()}>{moment(alarmCallback.created_at).fromNow()}</span>
-
+                    <span title={moment(alarmCallback.created_at).format()}>{moment(alarmCallback.created_at).fromNow()}</span>
                     {editAlarmCallbackButton}
                     {deleteAlarmCallbackButton}
-                    </span>
+                </span>
 
                 <h3>
                     <i className="fa fa-ellipsis-vertical"></i>

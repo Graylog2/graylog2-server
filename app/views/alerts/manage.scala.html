@@ -11,127 +11,143 @@
 @import views.helpers.Permissions._
 @import views.helpers.Permissions
 
-@main("Alerts", views.html.sidebars.standard(currentUser), "", currentUser) {
-    <h1>
-        <i class="fa fa-fire"></i>
-        Alerts of stream &raquo;@stream.getTitle&laquo;
-    </h1>
-
+@main("Alerts", null, "", currentUser) {
+    <div class="row content content-head">
+        <div class="col-md-12">
+            <h1>
+                <i class="fa fa-fire"></i>
+                Alerts of stream &raquo;@stream.getTitle&laquo;
+            </h1>
+            <p class="description">
+                You can define thresholds on any message field or message count of a stream and be alerted based on this definition.
+            </p>
+        </div>
+    </div>
     @if(isPermitted(STREAMS_EDIT, stream.getId)) {
-        <div class="row">
-            You can define thresholds on any message field or message count of a stream and be alerted based on this definition.
-        </div>
+        <div class="row content input-new">
+            <div class="col-md-12">
+                <form class="form-inline">
+                    <div class="form-group">
+                        <select class="add-alert-type form-control">
+                            <option value="message-count">Message count condition</option>
+                            <option value="field-value">Field value condition</option>
+                        </select>
 
-        <select class="add-alert-type">
-            <option value="message-count">Message count condition</option>
-            <option value="field-value">Field value condition</option>
-        </select>
-
-        <button class="btn btn-success add-alert">Configure new alert condition</button>
-
-        @views.helpers.MessageCountAlertConditionDecorator.loadTemplate(stream, null)
-        @views.helpers.FieldValueAlertConditionDecorator.loadTemplate(stream, null)
-    }
-
-    <hr />
-
-    <h2 style="margin-bottom: 5px;"><i class="fa fa-tasks"></i> Configured alert conditions</h2>
-
-
-    @views.html.partials.alerts.list_alert_conditions.render(alertConditions, stream)
-
-    <hr />
-
-    <h2><i class="fa fa-mail-forward"></i> Alert callbacks</h2>
-
-    <div class="row" style="margin-bottom: 5px;">
-        The following callbacks will be performed when this stream triggers an alert. You can find alert callback plugins
-        on <a href="https://www.graylog.org/resources/integrations/" target="_blank">the Graylog website</a>.
-    </div>
-
-    <div class="react-alarmcallback-component" data-permissions='@Permissions.asJson(STREAMS_EDIT)' data-stream-id='@stream.getId'>
-    </div>
-
-    <hr />
-
-    @if((stream.getUserAlertReceivers.size() > 0 || stream.getEmailAlertReceivers.size() > 0) && isPermitted(STREAMS_EDIT, stream.getId)) {
-        <div class="sendDummyAlert">
-            <form action="@routes.AlertsController.sendDummyAlert(stream.getId)" method="POST">
-                <button type="submit" class="btn btn-info btn-xs pull-right">Send test alert</button>
-            </form>
-        </div>
-    }
-
-    <h2><i class="fa fa-group"></i> Alert receivers</h2>
-
-    <div class="row" style="margin-bottom: 5px;">
-        The following Graylog users will be notified about alerts via email if they have configured
-        an email address in their profile.
-    </div>
-
-    @if(stream.getEmailAlertReceivers.isEmpty && stream.getUserAlertReceivers.isEmpty) {
-        <div style="margin-top: 10px;" class="alert alert-info">
-            No configured alert receivers.
-        </div>
-    } else {
-        <ul>
-            @for(user <- stream.getUserAlertReceivers) {
-                <li>
-                    <i class="fa fa-user"></i>&nbsp;
-                    <a href="@routes.UsersController.show(user)">@user</a>
-
-                    @if(isPermitted(STREAMS_EDIT, stream.getId)) {
-                        <a href="@routes.AlertsController.removeReceiverUser(stream.getId, user)" data-confirm="Really remove receiver?">
-                            <i class="fa fa-remove"></i>
-                        </a>
-                    }
-                </li>
-            }
-
-            @for(email <- stream.getEmailAlertReceivers) {
-                <li>
-                    <i class="fa fa-envelope"></i>&nbsp;
-                    @email
-
-                    @if(isPermitted(STREAMS_EDIT, stream.getId)) {
-                        <a href="@routes.AlertsController.removeReceiverEmail(stream.getId, email)" data-confirm="Really remove receiver?">
-                            <i class="fa fa-remove"></i>
-                        </a>
-                    }
-                </li>
-            }
-        </ul>
-    }
-
-    @if(isPermitted(STREAMS_EDIT, stream.getId)) {
-        <div id="add-alert-receivers" class="row">
-            <div class="col-md-6">
-                <form action="@routes.AlertsController.addReceiverUser(stream.getId)" method="POST">
-                    <label for="user">Username:</label>
-                    <input name="username"
-                        type="text"
-                        id="user"
-                        class="input-large"
-                        autocomplete="off"
-                        data-source="@users" />
-
-                    <button type="submit" class="btn btn-success">Subscribe</button>
+                        <button class="btn btn-success form-control add-alert">Configure new alert condition</button>
+                    </div>
                 </form>
+
+                @views.helpers.MessageCountAlertConditionDecorator.loadTemplate(stream, null)
+                @views.helpers.FieldValueAlertConditionDecorator.loadTemplate(stream, null)
+            }
+        </div>
+    </div>
+
+    <div class="row content">
+        <div class="col-md-12">
+            <h2 style="margin-bottom: 5px;"><i class="fa fa-tasks"></i> Configured alert conditions</h2>
+
+
+            @views.html.partials.alerts.list_alert_conditions.render(alertConditions, stream)
+        </div>
+    </div>
+
+    <div class="row content">
+        <div class="col-md-12">
+            <h2><i class="fa fa-mail-forward"></i> Alert callbacks</h2>
+
+            The following callbacks will be performed when this stream triggers an alert. You can find alert callback plugins
+            on <a href="https://www.graylog.org/resources/integrations/" target="_blank">the Graylog website</a>.
+
+            <div class="react-alarmcallback-component" data-permissions='@Permissions.asJson(STREAMS_EDIT)' data-stream-id='@stream.getId'>
             </div>
 
-            <div class="col-md-6">
-                <form action="@routes.AlertsController.addReceiverEmail(stream.getId)" method="POST">
-                    <label for="email">Email address:</label>
-                    <input name="email" type="text" id="email" class="input-large" />
-
-                    <button type="submit" class="btn btn-success">Subscribe</button>
-                </form>
-            </div>
-
+            @if((stream.getUserAlertReceivers.size() > 0 || stream.getEmailAlertReceivers.size() > 0) && isPermitted(STREAMS_EDIT, stream.getId)) {
+                <div class="sendDummyAlert">
+                    <form action="@routes.AlertsController.sendDummyAlert(stream.getId)" method="POST">
+                        <button type="submit" class="btn btn-info btn-xs pull-right">Send test alert</button>
+                    </form>
+                </div>
+            }
         </div>
-    }
+    </div>
 
-    <hr />
+    <div class="row content">
+        <div class="col-md-12">
 
-    @views.html.partials.alerts.list_triggered_alerts.render(alerts, totalAlerts, stream, node)
+            <h2><i class="fa fa-group"></i> Alert receivers</h2>
+
+            The following Graylog users will be notified about alerts via email if they have configured
+            an email address in their profile.
+
+            @if(stream.getEmailAlertReceivers.isEmpty && stream.getUserAlertReceivers.isEmpty) {
+                <div style="margin-top: 10px;" class="alert alert-info">
+                    No configured alert receivers.
+                </div>
+            } else {
+                <ul>
+                    @for(user <- stream.getUserAlertReceivers) {
+                        <li>
+                            <i class="fa fa-user"></i>&nbsp;
+                            <a href="@routes.UsersController.show(user)">@user</a>
+
+                            @if(isPermitted(STREAMS_EDIT, stream.getId)) {
+                                <a href="@routes.AlertsController.removeReceiverUser(stream.getId, user)" data-confirm="Really remove receiver?">
+                                    <i class="fa fa-remove"></i>
+                                </a>
+                            }
+                        </li>
+                    }
+
+                    @for(email <- stream.getEmailAlertReceivers) {
+                        <li>
+                            <i class="fa fa-envelope"></i>&nbsp;
+                            @email
+
+                            @if(isPermitted(STREAMS_EDIT, stream.getId)) {
+                                <a href="@routes.AlertsController.removeReceiverEmail(stream.getId, email)" data-confirm="Really remove receiver?">
+                                    <i class="fa fa-remove"></i>
+                                </a>
+                            }
+                        </li>
+                    }
+                </ul>
+            }
+
+            @if(isPermitted(STREAMS_EDIT, stream.getId)) {
+                <div id="add-alert-receivers" class="row">
+                    <div class="col-md-6">
+                        <form action="@routes.AlertsController.addReceiverUser(stream.getId)" method="POST">
+                            <label for="user">Username:</label>
+                            <input name="username"
+                                type="text"
+                                id="user"
+                                class="input-large"
+                                autocomplete="off"
+                                data-source="@users" />
+
+                            <button type="submit" class="btn btn-success">Subscribe</button>
+                        </form>
+                    </div>
+
+                    <div class="col-md-6">
+                        <form action="@routes.AlertsController.addReceiverEmail(stream.getId)" method="POST">
+                            <label for="email">Email address:</label>
+                            <input name="email" type="text" id="email" class="input-large" />
+
+                            <button type="submit" class="btn btn-success">Subscribe</button>
+                        </form>
+                    </div>
+
+                </div>
+            }
+        </div>
+    </div>
+
+    <div class="row content">
+        <div class="col-md-12">
+
+            @views.html.partials.alerts.list_triggered_alerts.render(alerts, totalAlerts, stream, node)
+        </div>
+    </div>
 }
