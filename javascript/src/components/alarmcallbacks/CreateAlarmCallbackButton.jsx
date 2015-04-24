@@ -6,11 +6,12 @@ var AlarmCallbacksStore = require('../../stores/alarmcallbacks/AlarmCallbacksSto
 var $ = require('jquery'); // excluded and shimed
 
 var CreateAlarmCallbackButton = React.createClass({
+    PLACEHOLDER: "placeholder",
     getInitialState() {
         return {
             types: [],
             streamId: this.props.streamId,
-            typeName: "placeholder",
+            typeName: this.PLACEHOLDER,
             typeDefinition: {}
         };
     },
@@ -28,20 +29,23 @@ var CreateAlarmCallbackButton = React.createClass({
     render() {
         var alarmCallbackTypes = $.map(this.state.types, this._formatOutputType);
         var humanTypeName = (this.state.typeName && this.state.types[this.state.typeName] ? this.state.types[this.state.typeName].name : "Alarm Callback");
+        var configurationForm = (this.state.typeName !== this.PLACEHOLDER ? <ConfigurationForm ref="configurationForm"
+                  key="configuration-form-output" configFields={this.state.typeDefinition} title={"Create new " + humanTypeName}
+                  typeName={this.state.typeName} includeTitleField={false}
+                  submitAction={this._handleSubmit} cancelAction={this._handleCancel} /> : "");
+
 
         return (
             <div>
                 <div className="form-group form-inline">
                     <select id="input-type" value={this.state.typeName} onChange={this.onTypeChange} className="form-control">
-                        <option value="placeholder" disabled>--- Select Alarm Callback Type ---</option>
+                        <option value={this.PLACEHOLDER} disabled>--- Select Alarm Callback Type ---</option>
                         {alarmCallbackTypes}
                     </select>
 
                     <button className="btn btn-success btn-sm" onClick={this._openModal}>Configure new alert destination</button>
-
                 </div>
-                <ConfigurationForm ref="configurationForm" key="configuration-form-output" configFields={this.state.typeDefinition} title={"Create new " + humanTypeName}
-                                   typeName={this.state.typeName} submitAction={this.handleSubmit} includeTitleField={false}/>
+                {configurationForm}
             </div>
         );
     },
@@ -60,11 +64,14 @@ var CreateAlarmCallbackButton = React.createClass({
             this.setState({typeDefinition: {}});
         }
     },
-    handleSubmit(data) {
+    _handleSubmit(data) {
         AlarmCallbacksStore.save(this.state.streamId, data, (result) => {
             this.props.onUpdate();
         });
-        this.setState({typeName: "placeholder"});
+        this.setState({typeName: this.PLACEHOLDER});
+    },
+    _handleCancel() {
+        this.setState({typeName: this.PLACEHOLDER});
     }
 });
 
