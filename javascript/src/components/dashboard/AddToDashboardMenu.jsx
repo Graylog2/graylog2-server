@@ -40,7 +40,9 @@ var AddToDashboardMenu = React.createClass({
             .sortBy(dashboard => dashboard.title)
             .forEach((dashboard, id) => {
                 dashboards = dashboards.push(
-                    <MenuItem eventKey={id} key={dashboard.title}>{dashboard.title}</MenuItem>
+                    <MenuItem eventKey={id} key={dashboard.title} style={{textTransform: 'capitalize'}}>
+                        {dashboard.title}
+                    </MenuItem>
                 );
             });
 
