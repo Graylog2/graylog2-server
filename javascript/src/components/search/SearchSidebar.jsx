@@ -3,6 +3,8 @@
 var React = require('react');
 var Modal = require('react-bootstrap').Modal;
 var ModalTrigger = require('react-bootstrap').ModalTrigger;
+var ButtonGroup = require('react-bootstrap').ButtonGroup;
+var Button = require('react-bootstrap').Button;
 
 var Widget = require('../widgets/Widget');
 var AddToDashboardMenu = require('../dashboard/AddToDashboardMenu');
@@ -10,17 +12,45 @@ var AddToDashboardMenu = require('../dashboard/AddToDashboardMenu');
 var numeral = require('numeral');
 
 var MessageField = React.createClass({
+    getInitialState() {
+        return {
+            showActions: false
+        };
+    },
+    _toggleShowActions() {
+        this.setState({showActions: !this.state.showActions});
+    },
     render() {
+        var toggleClassName = "fa fa-fw open-analyze-field ";
+        toggleClassName += this.state.showActions ? "open-analyze-field-active fa-caret-down" : "fa-caret-right";
+
         return (
             <li className="search-result-field-type">
-                <i className="fa fa-fw open-analyze-field fa-caret-right"></i>
-                <input type="checkbox"
-                       id={"field-selector-" + this.props.field.hash}
-                       className="field-selector"
-                       checked={this.props.selected}
-                       onChange={(event) => this.props.onToggled(this.props.field.name)}
-                    />
-                <label htmlFor={"field-selector-" + this.props.field.hash} className="field-name">{this.props.field.name}</label>
+                <div className="row" style={{marginBottom: 0}}>
+                    <div className="col-md-1">
+                        <i className={toggleClassName}
+                           onClick={this._toggleShowActions}></i>
+                    </div>
+                    <div className="col-md-11">
+                        <input type="checkbox"
+                               id={"field-selector-" + this.props.field.hash}
+                               className="field-selector"
+                               checked={this.props.selected}
+                               onChange={(event) => this.props.onToggled(this.props.field.name)}
+                            />
+                        <label htmlFor={"field-selector-" + this.props.field.hash}
+                               className="field-name">{this.props.field.name}</label>
+
+                        {this.state.showActions &&
+                        <div className="analyze-field">
+                            <ButtonGroup bsSize='xsmall'>
+                                <Button>Statistics</Button>
+                                <Button>Quick values</Button>
+                                <Button>Generate chart</Button>
+                            </ButtonGroup>
+                        </div>}
+                    </div>
+                </div>
             </li>
         );
     }
@@ -58,13 +88,25 @@ var SearchSidebar = React.createClass({
                 </div>
             </Modal>;
 
+        var messageFields = this.props.fields
+            .sort((a, b) => a.name.localeCompare(b.name))
+            .map((field) => {
+                return (
+                    <MessageField key={field.name}
+                                  field={field}
+                                  onToggled={this.props.onFieldToggled}
+                                  selected={this.props.selectedFields.contains(field.name)}/>
+                );
+            });
+
         return (
             <div className="content-col">
                 <h3>Found {numeral(this.props.result['total_result_count']).format("0,0")} messages</h3>
 
                 <p style={{marginTop: 3}}>
                     Search took {numeral(this.props.result['took_ms']).format("0,0")} ms, searched in <ModalTrigger
-                    modal={indicesModal}><a href="#" onClick={event => event.preventDefault()}>{this.props.result['used_indices'].length}&nbsp;{this.props.result['used_indices'].length === 1 ? "index" : "indices"}</a></ModalTrigger>.
+                    modal={indicesModal}><a href="#"
+                                            onClick={event => event.preventDefault()}>{this.props.result['used_indices'].length}&nbsp;{this.props.result['used_indices'].length === 1 ? "index" : "indices"}</a></ModalTrigger>.
                 </p>
 
                 <div style={{marginTop: 10}}>
@@ -79,23 +121,27 @@ var SearchSidebar = React.createClass({
                 <hr />
 
                 <h1 style={{display: 'inline-block'}}>Fields</h1>
-                <a href="#" className="fields-set-chooser" onClick={(event) => this._updateFieldSelection(event, 'default')}>Default</a>
+                <a href="#" className="fields-set-chooser"
+                   onClick={(event) => this._updateFieldSelection(event, 'default')}>Default</a>
                 |
-                <a href="#" className="fields-set-chooser" onClick={(event) => this._updateFieldSelection(event, 'all')}>All</a>
+                <a href="#" className="fields-set-chooser"
+                   onClick={(event) => this._updateFieldSelection(event, 'all')}>All</a>
                 |
-                <a href="#" className="fields-set-chooser" onClick={(event) => this._updateFieldSelection(event, 'none')}>None</a>
+                <a href="#" className="fields-set-chooser"
+                   onClick={(event) => this._updateFieldSelection(event, 'none')}>None</a>
 
                 <ul className="search-result-fields">
-                    {this.props.fields
-                        .sort((a,b) => a.name.localeCompare(b.name))
-                        .map((field) => <MessageField key={field.name} field={field} onToggled={this.props.onFieldToggled} selected={this.props.selectedFields.contains(field.name)}/>)}
+                    {messageFields}
                 </ul>
 
                 <p style={{marginTop: 13, marginBottom: 0}}>
                     List <span className="message-result-fields-range">
-                        <a href="#" style={{fontWeight: this.props.showAllFields ? 'normal' : 'bold'}}
-                           onClick={this._showPageFields}>fields of current page</a> or <a href="#" style={{fontWeight: this.props.showAllFields ? 'bold' : 'normal'}} onClick={this._showAllFields}>all fields</a>.
-                    </span>
+                <a href="#" style={{fontWeight: this.props.showAllFields ? 'normal' : 'bold'}}
+                   onClick={this._showPageFields}>fields of current page</a> or <a href="#"
+                                                                                   style={{fontWeight: this.props.showAllFields ? 'bold' : 'normal'}}
+                                                                                   onClick={this._showAllFields}>all
+                    fields</a>.
+                </span>
                 </p>
             </div>
         );
