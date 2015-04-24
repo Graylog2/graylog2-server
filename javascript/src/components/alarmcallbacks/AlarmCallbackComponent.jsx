@@ -26,11 +26,9 @@ var AlarmCallbackComponent = React.createClass({
                 <CreateAlarmCallbackButton streamId={this.state.streamId} onUpdate={this.handleUpdate} /> : "");
         return (
             <div className="alarm-callback-component">
-                <div className="col-md-12">
-                    {createAlarmCallbackButton}
+                {createAlarmCallbackButton}
 
-                    <AlarmCallbackList ref="alarmCallbackList" streamId={this.state.streamId} permissions={this.state.permissions} onUpdate={this.handleUpdate} />
-                </div>
+                <AlarmCallbackList ref="alarmCallbackList" streamId={this.state.streamId} permissions={this.state.permissions} onUpdate={this.handleUpdate} />
             </div>
         );
     }
