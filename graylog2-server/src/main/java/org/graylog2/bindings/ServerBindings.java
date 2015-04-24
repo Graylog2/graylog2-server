@@ -44,6 +44,7 @@ import org.graylog2.bindings.providers.SystemJobManagerProvider;
 import org.graylog2.buffers.processors.ServerProcessBufferProcessor;
 import org.graylog2.bundles.BundleService;
 import org.graylog2.database.MongoConnection;
+import org.graylog2.events.ClusterEventBus;
 import org.graylog2.filters.FilterService;
 import org.graylog2.filters.FilterServiceImpl;
 import org.graylog2.indexer.SetIndexReadOnlyJob;
@@ -119,7 +120,7 @@ public class ServerBindings extends AbstractModule {
 
     private void bindProviders() {
         bind(RotationStrategy.class).toProvider(RotationStrategyProvider.class);
-        bind(EventBus.class).annotatedWith(named("cluster_event_bus")).toProvider(ClusterEventBusProvider.class).asEagerSingleton();
+        bind(EventBus.class).annotatedWith(ClusterEventBus.class).toProvider(ClusterEventBusProvider.class).asEagerSingleton();
     }
 
     private void bindFactoryModules() {

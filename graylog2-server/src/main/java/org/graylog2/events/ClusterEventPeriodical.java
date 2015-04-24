@@ -32,6 +32,7 @@ import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.plugin.periodical.Periodical;
 import org.graylog2.plugin.system.NodeId;
+import org.graylog2.shared.utilities.AutoValueUtils;
 import org.mongojack.DBCursor;
 import org.mongojack.DBSort;
 import org.mongojack.DBUpdate;
@@ -41,7 +42,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -62,7 +62,7 @@ public class ClusterEventPeriodical extends Periodical {
                                   final NodeId nodeId,
                                   final ObjectMapper objectMapper,
                                   final EventBus serverEventBus,
-                                  @Named("cluster_event_bus") final EventBus clusterEventBus) {
+                                  @ClusterEventBus final EventBus clusterEventBus) {
         this(JacksonDBCollection.wrap(prepareCollection(mongoConnection), ClusterEvent.class, String.class, mapperProvider.get()),
                 nodeId, objectMapper, serverEventBus, clusterEventBus);
     }
@@ -86,7 +86,7 @@ public class ClusterEventPeriodical extends Periodical {
 
         DBCollection coll = db.getCollection(COLLECTION_NAME);
 
-        if(coll.isCapped()) {
+        if (coll.isCapped()) {
             LOG.warn("The \"{}\" collection in MongoDB is capped which will cause problems. Please drop the collection.", COLLECTION_NAME);
         }
 
@@ -146,7 +146,7 @@ public class ClusterEventPeriodical extends Periodical {
             LOG.debug("Opening MongoDB cursor on \"{}\"", COLLECTION_NAME);
 
             final DBCursor<ClusterEvent> cursor = eventCursor(nodeId);
-            if(LOG.isTraceEnabled()) {
+            if (LOG.isTraceEnabled()) {
                 LOG.trace("MongoDB query plan: {}", cursor.explain());
             }
 
@@ -176,7 +176,7 @@ public class ClusterEventPeriodical extends Periodical {
             return;
         }
 
-        final String className = getCanonicalName(event.getClass());
+        final String className = AutoValueUtils.getCanonicalName(event.getClass());
         final ClusterEvent clusterEvent = ClusterEvent.create(nodeId.toString(), className, event);
 
         try {
@@ -217,25 +217,5 @@ public class ClusterEventPeriodical extends Periodical {
             return null;
 
         }
-    }
-
-    /**
-     * Get the canonical class name of the provided {@link Class} with special handling of Google AutoValue classes.
-     *
-     * @param aClass a class
-     * @return the canonical class name of {@code aClass} or its super class in case of an auto-generated class by
-     * Google AutoValue
-     * @see Class#getCanonicalName()
-     * @see com.google.auto.value.AutoValue
-     */
-    private String getCanonicalName(final Class<?> aClass) {
-        final Class<?> cls;
-        if (aClass.getSimpleName().startsWith("AutoValue_")) {
-            cls = aClass.getSuperclass();
-        } else {
-            cls = aClass;
-        }
-
-        return cls.getCanonicalName();
     }
 }
