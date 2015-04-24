@@ -8,6 +8,7 @@ var TextField = require('./TextField');
 var NumberField = require('./NumberField');
 var BooleanField = require('./BooleanField');
 var DropdownField = require('./DropdownField');
+var $ = require('jquery'); // excluded and shimed
 
 var ConfigurationForm = React.createClass({
     getDefaultProps() {
@@ -16,22 +17,27 @@ var ConfigurationForm = React.createClass({
             includeTitleField: true
         };
     },
-    getInitialState() {
+    _copyStateFromProps(props) {
         return {
-            configFields: this.props.configFields,
-            title: this.props.title,
-            typeName: this.props.typeName,
-            formId: this.props.formId,
-            submitAction: this.props.submitAction,
-            helpBlock: this.props.helpBlock,
-            values: this.props.values,
-            titleValue: this.props.titleValue,
-            includeTitleField: this.props.includeTitleField
+            configFields: $.extend({}, props.configFields),
+            title: props.title,
+            typeName: props.typeName,
+            formId: props.formId,
+            submitAction: props.submitAction,
+            helpBlock: props.helpBlock,
+            values: $.extend({}, props.values),
+            titleValue: props.titleValue,
+            includeTitleField: props.includeTitleField
         };
     },
-    componentDidMount() {},
+    getInitialState() {
+        return this._copyStateFromProps(this.props);
+    },
+    componentWillMount() {
+        this.setState({values: $.extend({}, this.props.values)});
+    },
 	componentWillReceiveProps(props) {
-		this.setState(props);
+		this.setState(this._copyStateFromProps(props));
 	},
     render() {
         var typeName = this.state.typeName;
@@ -47,7 +53,7 @@ var ConfigurationForm = React.createClass({
 
         var titleField = {is_optional: false, attributes: [], human_name: "Title", description: helpBlock};
         var titleElement = (this.state.includeTitleField ? <TextField key={typeName + "-title"} typeName={typeName} title="title"
-                                      field={titleField} value={this.state.titleValue} onChange={this.handleTitleChange}/> : "");
+                                      field={titleField} value={this.state.titleValue} onChange={this._handleTitleChange}/> : "");
 
         var body = (
             <fieldset>
@@ -80,11 +86,14 @@ var ConfigurationForm = React.createClass({
     },
     _closeModal() {
         this.refs.modal.close();
+        if (this.props.cancelAction) {
+            this.props.cancelAction();
+        }
     },
-    handleTitleChange(field, value) {
+    _handleTitleChange(field, value) {
         this.setState({titleValue: value});
     },
-    handleChange(field, value) {
+    _handleChange(field, value) {
         var values = this.state.values;
         values[field] = value;
         this.setState({values: values});
@@ -93,13 +102,13 @@ var ConfigurationForm = React.createClass({
         var value = this.state.values[key];
         switch(configField.type) {
             case "text":
-                return (<TextField key={this.state.typeName + "-" + key} typeName={this.state.typeName} title={key} field={configField} value={value} onChange={this.handleChange}/>);
+                return (<TextField key={this.state.typeName + "-" + key} typeName={this.state.typeName} title={key} field={configField} value={value} onChange={this._handleChange}/>);
             case "number":
-                return (<NumberField key={this.state.typeName + "-" + key} typeName={this.state.typeName} title={key} field={configField} value={value} onChange={this.handleChange}/>);
+                return (<NumberField key={this.state.typeName + "-" + key} typeName={this.state.typeName} title={key} field={configField} value={value} onChange={this._handleChange}/>);
             case "boolean":
-                return (<BooleanField key={this.state.typeName + "-" + key} typeName={this.state.typeName} title={key} field={configField} value={value} onChange={this.handleChange}/>);
+                return (<BooleanField key={this.state.typeName + "-" + key} typeName={this.state.typeName} title={key} field={configField} value={value} onChange={this._handleChange}/>);
             case "dropdown":
-                return (<DropdownField key={this.state.typeName + "-" + key} typeName={this.state.typeName} title={key} field={configField} value={value} onChange={this.handleChange}/>);
+                return (<DropdownField key={this.state.typeName + "-" + key} typeName={this.state.typeName} title={key} field={configField} value={value} onChange={this._handleChange}/>);
         }
     }
 });
