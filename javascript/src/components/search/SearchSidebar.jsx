@@ -31,8 +31,16 @@ var SearchSidebar = React.createClass({
         this.props.predefinedFieldSelection(setName);
         event.preventDefault();
     },
-    _togglePageFields(event) {
-        this.props.togglePageFields();
+    _showAllFields(event) {
+        if (!this.props.showAllFields) {
+            this.props.togglePageFields();
+        }
+        event.preventDefault();
+    },
+    _showPageFields(event) {
+        if (this.props.showAllFields) {
+            this.props.togglePageFields();
+        }
         event.preventDefault();
     },
     render() {
@@ -86,7 +94,7 @@ var SearchSidebar = React.createClass({
                 <p style={{marginTop: 13, marginBottom: 0}}>
                     List <span className="message-result-fields-range">
                         <a href="#" style={{fontWeight: this.props.showAllFields ? 'normal' : 'bold'}}
-                           onClick={this._togglePageFields}>fields of current page</a> or <a href="#" style={{fontWeight: this.props.showAllFields ? 'bold' : 'normal'}} onClick={this._togglePageFields}>all fields</a>.
+                           onClick={this._showPageFields}>fields of current page</a> or <a href="#" style={{fontWeight: this.props.showAllFields ? 'bold' : 'normal'}} onClick={this._showAllFields}>all fields</a>.
                     </span>
                 </p>
             </div>
