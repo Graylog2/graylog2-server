@@ -31,8 +31,7 @@ var MessageDetail = React.createClass({
     },
     _nodeName(nodeId) {
         var node = this.props.nodes.get(nodeId);
-        return node
-            ?
+        return node ?
             <a href={jsRoutes.controllers.NodesController.node(nodeId).url}>
                 <i className="fa fa-code-fork"></i>
                 &nbsp;
