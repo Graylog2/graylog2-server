@@ -48,8 +48,8 @@ var MessageDetail = React.createClass({
     _loadTerms(field) {
         return () => {
             var promise = MessagesStore.fieldTerms(this.props.message.index, this.props.message.id, field);
-            promise.done((terms) => this._onTermsLoaded(field, terms))
-        }
+            promise.done((terms) => this._onTermsLoaded(field, terms));
+        };
     },
     _onTermsLoaded(field, terms) {
         var map = Immutable.Map().set(field, terms);
