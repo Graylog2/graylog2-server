@@ -1,6 +1,6 @@
-/* global originalUniversalSearchSettings */
-
 'use strict';
+
+var $ = require('jquery');
 
 var React = require('react');
 var DropdownButton = require('react-bootstrap').DropdownButton;
@@ -16,7 +16,7 @@ var AddToDashboardMenu = React.createClass({
         };
     },
     componentDidMount() {
-        this._setDashboards(this.props.dashboards);
+        $(document).trigger('originalsearch.graylog.searchbar', {callback: this._setOriginalSearchParams});
     },
     componentWillReceiveProps(newProps) {
         this._setDashboards(newProps.dashboards);
@@ -24,11 +24,14 @@ var AddToDashboardMenu = React.createClass({
     _setDashboards(dashboards) {
         this.setState({dashboards: dashboards});
     },
+    _setOriginalSearchParams(originalSearchParams) {
+        this.searchParams = originalSearchParams;
+    },
     _configureWidget(dashboardId) {
         this.refs.widgetModal.open();
     },
     _saveWidget(configuration) {
-        var params = Immutable.Map(originalUniversalSearchSettings());
+        var params = Immutable.Map(this.searchParams);
         var propConfigurationMap = Immutable.Map(this.props.configuration);
         params = params.concat(propConfigurationMap).concat(configuration);
         console.log(params.toJS());
