@@ -52,7 +52,7 @@ var MessageDetail = React.createClass({
         var messageUrl = jsRoutes.controllers.MessagesController.show(this.props.message.index, this.props.message.id).url;
 
         var fields = [];
-        var formattedFields = Immutable.Map(this.props.message['formatted_fields']);
+        var formattedFields = Immutable.Map(this.props.message['formatted_fields']).sortBy((value, key) => key, (a,b) => a.localeCompare(b));
         var idx = 0;
         formattedFields.forEach((value, key) => {
             idx++;
