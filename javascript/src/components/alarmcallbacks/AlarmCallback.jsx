@@ -9,25 +9,13 @@ var EditAlarmCallbackButton = require('./EditAlarmCallbackButton');
 
 var AlarmCallback = React.createClass({
     mixins: [PermissionsMixin],
-    getInitialState() {
-        return {
-            alarmCallback: this.props.alarmCallback,
-            streamId: this.props.streamId,
-            permissions: this.props.permissions,
-            humanReadableType: this.props.humanReadableType,
-            deleteAlarmCallback: this.props.deleteAlarmCallback,
-            updateAlarmCallback: this.props.updateAlarmCallback
-        };
-    },
-    componentWillReceiveProps(props) {
-        this.setState(props);
-    },
     render() {
-        var alarmCallback = this.state.alarmCallback;
-        var editAlarmCallbackButton = (this.isPermitted(this.state.permissions, ["STREAMS_EDIT"]) ?
-            <EditAlarmCallbackButton alarmCallback={alarmCallback} streamId={this.state.streamId} onUpdate={this.state.updateAlarmCallback} /> : "");
-        var deleteAlarmCallbackButton = (this.isPermitted(this.state.permissions, ["STREAMS_EDIT"]) ?
-            <DeleteAlarmCallbackButton alarmCallback={alarmCallback} onClick={this.state.deleteAlarmCallback} /> : "");
+        var alarmCallback = this.props.alarmCallback;
+        var humanReadableType = this.props.types[alarmCallback.type].name;
+        var editAlarmCallbackButton = (this.isPermitted(this.props.permissions, ["STREAMS_EDIT"]) ?
+            <EditAlarmCallbackButton alarmCallback={alarmCallback} types={this.props.types} streamId={this.props.streamId} onUpdate={this.props.updateAlarmCallback} /> : "");
+        var deleteAlarmCallbackButton = (this.isPermitted(this.props.permissions, ["STREAMS_EDIT"]) ?
+            <DeleteAlarmCallbackButton alarmCallback={alarmCallback} onClick={this.props.deleteAlarmCallback} /> : "");
         return (
             <div className="node-row alert-condition alert-callback" data-destination-id={alarmCallback.id}>
                 <span className="pull-right node-row-info">
@@ -39,7 +27,7 @@ var AlarmCallback = React.createClass({
 
                 <h3>
                     <i className="fa fa-ellipsis-vertical"></i>
-                    <span>{this.state.humanReadableType}</span>
+                    <span>{humanReadableType}</span>
                 </h3>
 
                 <ConfigurationWell configuration={alarmCallback.configuration}/>

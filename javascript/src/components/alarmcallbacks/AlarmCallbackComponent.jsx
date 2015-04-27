@@ -4,31 +4,53 @@ var React = require('react/addons');
 var AlarmCallbackList = require('./AlarmCallbackList');
 var CreateAlarmCallbackButton = require('./CreateAlarmCallbackButton');
 var PermissionsMixin = require('../../util/PermissionsMixin');
+var AlarmCallbacksStore = require('../../stores/alarmcallbacks/AlarmCallbacksStore');
 
 var AlarmCallbackComponent = React.createClass({
     mixins: [PermissionsMixin],
     getInitialState() {
         return {
-            permissions: JSON.parse(this.props.permissions),
-            streamId: this.props.streamId
+            alarmCallbacks: [],
+            availableAlarmCallbacks: []
         };
     },
-    componentWillReceiveProps(props) {
-        this.setState(props);
+    componentDidMount() {
+        this.loadData();
     },
-    handleUpdate() {
-        if (this.refs.alarmCallbackList) {
-            this.refs.alarmCallbackList.loadData();
-        }
+    loadData() {
+        AlarmCallbacksStore.loadForStream(this.props.streamId, (alarmCallbacks) => {
+            this.setState({alarmCallbacks: alarmCallbacks});
+        });
+        AlarmCallbacksStore.available(this.props.streamId, (available) => {
+            this.setState({availableAlarmCallbacks: available});
+        });
+    },
+    _deleteAlarmCallback(alarmCallback) {
+        AlarmCallbacksStore.remove(this.props.streamId, alarmCallback.id, () => {
+            this.loadData();
+        });
+    },
+    _createAlarmCallback(data) {
+        AlarmCallbacksStore.save(this.props.streamId, data, (result) => {
+            this.loadData();
+        });
+    },
+    _updateAlarmCallback(alarmCallback, data) {
+        AlarmCallbacksStore.update(this.props.streamId, alarmCallback.id, data, () => {
+            this.loadData();
+        });
     },
     render() {
-        var createAlarmCallbackButton = (this.isPermitted(this.state.permissions, ["STREAMS_EDIT"]) ?
-                <CreateAlarmCallbackButton streamId={this.state.streamId} onUpdate={this.handleUpdate} /> : "");
+        var permissions = this.props.permissions;
+        var createAlarmCallbackButton = (this.isPermitted(permissions, ["STREAMS_EDIT"]) ?
+                <CreateAlarmCallbackButton streamId={this.props.streamId} types={this.state.availableAlarmCallbacks} onCreate={this._createAlarmCallback} /> : "");
         return (
             <div className="alarm-callback-component">
                 {createAlarmCallbackButton}
 
-                <AlarmCallbackList ref="alarmCallbackList" streamId={this.state.streamId} permissions={this.state.permissions} onUpdate={this.handleUpdate} />
+                <AlarmCallbackList alarmCallbacks={this.state.alarmCallbacks}
+                                   streamId={this.props.streamId}permissions={permissions} types={this.state.availableAlarmCallbacks}
+                                   onUpdate={this._updateAlarmCallback} onDelete={this._deleteAlarmCallback} onCreate={this._createAlarmCallback} />
             </div>
         );
     }

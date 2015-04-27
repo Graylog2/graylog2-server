@@ -6,7 +6,8 @@ var $ = require('jquery'); // excluded and shimed
 
 $(".react-alarmcallback-component").each(function() {
     var streamId = this.getAttribute('data-stream-id');
-    var permissions = this.getAttribute('data-permissions');
+    var permissions = JSON.parse(this.getAttribute('data-permissions'));
+    var component = <AlarmCallbackComponent streamId={streamId} permissions={permissions}/>;
 
-    React.render(<AlarmCallbackComponent streamId={streamId} permissions={permissions}/>, this);
+    React.render(component, this);
 });

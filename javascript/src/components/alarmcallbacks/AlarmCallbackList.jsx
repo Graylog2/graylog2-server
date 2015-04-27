@@ -1,35 +1,12 @@
 'use strict';
 
 var React = require('react/addons');
-var AlarmCallbacksStore = require('../../stores/alarmcallbacks/AlarmCallbacksStore');
 var AlarmCallback = require('./AlarmCallback');
 
 var AlarmCallbackList = React.createClass({
-    getInitialState() {
-        return {
-            permissions: this.props.permissions,
-            alarmCallbacks: [],
-            streamId: this.props.streamId,
-            availableAlarmCallbacks: undefined
-        };
-    },
-    loadData() {
-        AlarmCallbacksStore.loadForStream(this.state.streamId, (alarmCallbacks) => {
-            this.setState({alarmCallbacks: alarmCallbacks});
-        });
-        AlarmCallbacksStore.available(this.state.streamId, (available) => {
-           this.setState({availableAlarmCallbacks: available});
-        });
-    },
-    componentWillReceiveProps(props) {
-        this.setState(props);
-    },
-    componentDidMount() {
-        this.loadData();
-    },
     _humanReadableType(alarmCallback) {
-        if (this.state.availableAlarmCallbacks) {
-            var available = this.state.availableAlarmCallbacks[alarmCallback.type];
+        if (this.props.availableAlarmCallbacks) {
+            var available = this.props.availableAlarmCallbacks[alarmCallback.type];
 
             if (available) {
                 return available.name;
@@ -39,22 +16,11 @@ var AlarmCallbackList = React.createClass({
         }
         return <span><i className="fa fa-spin fa-spinner"></i> Loading</span>;
     },
-    _deleteAlarmCallback(alarmCallback) {
-        AlarmCallbacksStore.remove(this.state.streamId, alarmCallback.id, () => {
-            this.loadData();
-            this.props.onUpdate();
-        });
-    },
-    _updateAlarmCallback() {
-        this.loadData();
-        this.props.onUpdate();
-    },
     render() {
-        var alarmCallbacks = this.state.alarmCallbacks.map((alarmCallback) => {
-            return <AlarmCallback key={"alarmCallback-" + alarmCallback.id} alarmCallback={alarmCallback} streamId={this.state.streamId}
-                                  humanReadableType={this._humanReadableType(alarmCallback)}
-                                  deleteAlarmCallback={this._deleteAlarmCallback} updateAlarmCallback={this._updateAlarmCallback}
-                                  permissions={this.state.permissions}/>;
+        var alarmCallbacks = this.props.alarmCallbacks.map((alarmCallback) => {
+            return <AlarmCallback key={"alarmCallback-" + alarmCallback.id} alarmCallback={alarmCallback} streamId={this.props.streamId}
+                                  types={this.props.types} permissions={this.props.permissions}
+                                  deleteAlarmCallback={this.props.onDelete} updateAlarmCallback={this.props.onUpdate} />;
         });
 
         if (alarmCallbacks.length > 0) {

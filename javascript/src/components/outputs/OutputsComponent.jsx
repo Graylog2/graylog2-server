@@ -7,15 +7,10 @@ var AssignOutputDropdown = require('./AssignOutputDropdown');
 var OutputsStore = require('../../stores/outputs/OutputsStore');
 var StreamsStore = require('../../stores/streams/StreamsStore');
 var UserNotification = require("../../util/UserNotification");
+var PermissionsMixin = require('../../util/PermissionsMixin');
 
 var OutputComponent = React.createClass({
-    _isPermitted(permissions) {
-        var result = permissions.every((p) => this.permissions()[p]);
-        return result;
-    },
-    permissions() {
-        return JSON.parse(this.props.permissions);
-    },
+    mixins: [PermissionsMixin],
     componentDidMount() {
         this.loadData();
     },
@@ -102,9 +97,9 @@ var OutputComponent = React.createClass({
         });
     },
     render() {
-        var permissions = this.permissions();
+        var permissions = this.props.permissions;
         var streamId = this.props.streamId;
-        var createOutputDropdown = (this._isPermitted(["OUTPUTS_CREATE"]) ?
+        var createOutputDropdown = (this.isPermitted(permissions, ["OUTPUTS_CREATE"]) ?
             <CreateOutputDropdown types={this.state.types} onSubmit={this._handleCreateOutput} getTypeDefinition={OutputsStore.loadAvailable} streamId={streamId}/> : "");
         var assignOutputDropdown = (streamId ?
             <AssignOutputDropdown ref="assignOutputDropdown" streamId={streamId} outputs={this.state.assignableOutputs} onSubmit={this._handleAssignOutput}/> : "");

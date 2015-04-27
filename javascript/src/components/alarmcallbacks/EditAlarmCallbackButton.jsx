@@ -1,50 +1,39 @@
 'use strict';
 
 var React = require('react/addons');
-var AlarmCallbacksStore = require('../../stores/alarmcallbacks/AlarmCallbacksStore');
 var ConfigurationForm = require('../configurationforms/ConfigurationForm');
 
 var EditAlarmCallbackButton = React.createClass({
     getInitialState() {
         return {
-            streamId: this.props.streamId,
             typeDefinition: undefined,
-            typeName: undefined,
-            alarmCallback: this.props.alarmCallback,
-            onSubmit: this.props.onSubmit
+            typeName: undefined
         };
     },
-    handleClick() {
-        var alarmCallback = this.state.alarmCallback;
-        AlarmCallbacksStore.available(this.state.streamId, (definitions) => {
-            var definition = definitions[alarmCallback.type];
-            if (definition) {
-                this.setState({typeDefinition: definition.requested_configuration});
-                this.refs.configurationForm.open();
-            }
-        });
+    _handleClick() {
+        var alarmCallback = this.props.alarmCallback;
+        var definition = this.props.types[alarmCallback.type];
+        if (definition) {
+            this.setState({typeDefinition: definition.requested_configuration});
+            this.refs.configurationForm.open();
+        }
     },
-    handleSubmit(data) {
-        AlarmCallbacksStore.update(this.state.streamId, this.state.alarmCallback.id, data, () => {
-            this.props.onUpdate();
-        });
-    },
-    componentWillReceiveProps(props) {
-        this.setState(props);
+    _handleSubmit(data) {
+        this.props.onUpdate(this.props.alarmCallback, data);
     },
     render() {
         var typeDefinition = this.state.typeDefinition;
-        var alarmCallback = this.state.alarmCallback;
+        var alarmCallback = this.props.alarmCallback;
         var configurationForm = (typeDefinition ?
             <ConfigurationForm ref="configurationForm" key={"configuration-form-alarm-callback-"+alarmCallback.id} configFields={this.state.typeDefinition}
                                title={"Editing Alarm Callback "}
                                typeName={alarmCallback.type} includeTitleField={false}
-                               submitAction={this.handleSubmit} values={alarmCallback.configuration} />
+                               submitAction={this._handleSubmit} values={alarmCallback.configuration} />
             : ""
         );
         return (
             <span>
-                <button className="btn btn-success btn-xs" onClick={this.handleClick}>
+                <button className="btn btn-success btn-xs" onClick={this._handleClick}>
                     <i className="fa fa-edit"></i>  Edit
                 </button>
                 {configurationForm}
