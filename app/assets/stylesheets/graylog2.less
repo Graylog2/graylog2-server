@@ -335,6 +335,7 @@ label {
   border: 0px;
   background-color: #fff;
   box-shadow: none;
+  color: inherit;
   -moz-box-shadow: none;
   -webkit-box-shadow: none;
   -webkit-transition: none;
@@ -344,6 +345,10 @@ label {
   padding: 0;
   margin-left: 5px;
   margin-bottom: 5px;
+}
+
+.universalsearch-form .form-group {
+  margin-bottom: 0;
 }
 
 a.fields-set-chooser {
@@ -906,18 +911,18 @@ ul.search-result-fields input[type=checkbox] {
 }
 
 .timerange-selector-container .input-prepend, .input-append {
-  margin-bottom: 0px;
+  margin-bottom: 0;
 }
 
 .timerange-selector select {
-  margin-bottom: 0px;
+  margin-bottom: 0;
 }
 
-#relative-timerange-selector {
-  font-size: 12px;
-  line-height: 15px;
-  height: 25px;
-}
+//#relative-timerange-selector {
+//  font-size: 12px;
+//  line-height: 15px;
+//  height: 25px;
+//}
 
 .timerange-chooser {
   float: left;
@@ -925,43 +930,16 @@ ul.search-result-fields input[type=checkbox] {
 }
 
 .timerange-chooser .btn {
-  padding: 4px 7px;
+  padding: 6px 7px;
   line-height: 15px;
   font-size: 12px;
 }
 
 .timerange-chooser .btn .caret {
-  margin-top: 5px;
   margin-left: 1px;
 }
 
-.timerange-selector input {
-  height: 15px;
-  font-size: 12px;
-  margin-bottom: 0px;
-}
-
-.timerange-selector-container .absolute i {
-  font-size: 15px;
-  margin-left: 4px;
-  margin-right: 3px;
-  position: relative;
-  top: 2px;
-}
-
-.timerange-selector .set-to-now {
-  font-size: 12px;
-  line-height: 15px;
-  padding: 4px 4px;
-}
-
-.timerange-selector .set-to-now .icon {
-  font-size: 12px;
-  position: relative;
-  top: 1px;
-}
-
-.timerange-chooser .selected {
+.timerange-chooser .selected a {
   font-weight: bold;
 }
 
