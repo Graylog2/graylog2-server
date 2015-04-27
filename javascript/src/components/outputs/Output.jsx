@@ -6,43 +6,32 @@ var ConfigurationWell = require('../configurationforms/ConfigurationWell');
 var UserLink = require('../users/UserLink');
 
 var Output = React.createClass({
-    getInitialState() {
-        return {
-            output: this.props.output,
-            permissions: this.props.permissions,
-            streamId: this.props.streamId,
-            removeOutputGlobally: this.props.removeOutputGlobally,
-            removeOutputFromStream: this.props.removeOutputFromStream
-        };
-    },
     _isPermitted(permissions) {
-        var result = permissions.every((p) => this.state.permissions[p]);
+        var result = permissions.every((p) => this.props.permissions[p]);
         return result;
     },
     _deleteFromStreamButton(output) {
         return (
             <button className="btn btn-warning btn-xs"
-                    onClick={this.state.removeOutputFromStream.bind(null, output.id, this.state.streamId)} data-confirm="Really delete output {output.title} from stream {this.state.stream.title}?">
+                    onClick={this.props.removeOutputFromStream.bind(null, output.id, this.props.streamId)}>
                 <i className="fa fa-remove"></i> Delete from stream
             </button>
         );
     },
     _deleteGloballyButton(output) {
         return (
-            <button className="btn btn-danger btn-xs" onClick={this.state.removeOutputGlobally.bind(null, output.id)}
+            <button className="btn btn-danger btn-xs" onClick={this.props.removeOutputGlobally.bind(null, output.id)}
                     data-confirm={"Really delete output " + output.title + " globally? It will be removed from all streams in the system."}>
                 <i className="fa fa-remove"></i> Delete globally
             </button>
         );
     },
-    componentWillReceiveProps(props) {
-        this.setState(props);
-    },
     render() {
-        var output = this.state.output;
-        var deletionForm = (this.state.streamId && this._isPermitted(["STREAM_OUTPUTS_DELETE"]) ? this._deleteFromStreamButton(output) : "");
+        var output = this.props.output;
+        var deletionForm = (this.props.streamId && this._isPermitted(["STREAM_OUTPUTS_DELETE"]) ? this._deleteFromStreamButton(output) : "");
 
-        var editButton = (this._isPermitted(["OUTPUTS_EDIT"]) ? <EditOutputButton output={output} onUpdate={this.props.onUpdate}/> : "");
+        var editButton = (this._isPermitted(["OUTPUTS_EDIT"]) ?
+            <EditOutputButton output={output} onUpdate={this.props.onUpdate} getTypeDefinition={this.props.getTypeDefinition} /> : "");
         var terminationForm = (this._isPermitted(["OUTPUTS_TERMINATE"]) ? this._deleteGloballyButton(output) : "");
 
         var contentPack = (output.content_pack ? (<span title="Created from content pack"><i className="fa fa-gift"></i></span>) : (<div></div>));

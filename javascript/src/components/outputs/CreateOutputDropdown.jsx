@@ -1,38 +1,29 @@
 'use strict';
 
 var React = require('react/addons');
-var OutputsStore = require('../../stores/outputs/OutputsStore');
-var StreamsStore = require('../../stores/streams/StreamsStore');
 var ConfigurationForm = require('../configurationforms/ConfigurationForm');
 var $ = require('jquery'); // excluded and shimed
 
 var CreateOutputDropdown = React.createClass({
+    PLACEHOLDER: "placeholder",
     getInitialState() {
         return {
-            types: [],
             typeDefinition: [],
-            typeName: "",
-            streamId: this.props.streamId
+            typeName: ""
         };
     },
     componentDidMount() {
         this.loadData();
     },
-    componentWillReceiveProps(props) {
-        this.setState(props);
-    },
     loadData() {
-        OutputsStore.loadAvailableTypes((types) => {
-            this.setState({types:types});
-        });
     },
     render() {
-        var outputTypes = $.map(this.state.types, this._formatOutputType);
+        var outputTypes = $.map(this.props.types, this._formatOutputType);
         return (
             <div>
                 <div className="form-group form-inline">
-                    <select id="input-type" defaultValue="placeholder" value={this.state.typeName} onChange={this.onTypeChange} className="form-control">
-                        <option value="placeholder" disabled>--- Select Output Type ---</option>
+                    <select id="input-type" defaultValue={this.PLACEHOLDER} value={this.state.typeName} onChange={this._onTypeChange} className="form-control">
+                        <option value={this.PLACEHOLDER} disabled>--- Select Output Type ---</option>
                         {outputTypes}
                     </select>
 
@@ -42,37 +33,25 @@ var CreateOutputDropdown = React.createClass({
                 <ConfigurationForm ref="configurationForm" key="configuration-form-output" configFields={this.state.typeDefinition} title="Create new Output"
                                    helpBlock={<p className="help-block">{"Select a name of your new output that describes it."}</p>}
                                    typeName={this.state.typeName}
-                                   submitAction={this.handleSubmit} />
+                                   submitAction={this.props.onSubmit} />
             </div>
         );
     },
     _openModal(evt) {
-        if (this.state.typeName !== "placeholder" && this.state.typeName !== "") {
+        if (this.state.typeName !== this.PLACEHOLDER && this.state.typeName !== "") {
             this.refs.configurationForm.open();
         }
     },
     _formatOutputType(title, typeName) {
         return (<option key={typeName} value={typeName}>{title}</option>);
     },
-    onTypeChange(evt) {
+    _onTypeChange(evt) {
         var outputType = evt.target.value;
         this.setState({typeName: evt.target.value});
-        OutputsStore.loadAvailable(outputType, (definition) => {
+        this.props.getTypeDefinition(outputType, (definition) => {
             this.setState({typeDefinition: definition.requested_configuration});
         });
     },
-    handleSubmit(data) {
-        OutputsStore.save(data, (result) => {
-            this.setState({typeName: "placeholder"});
-            if (this.state.streamId) {
-                StreamsStore.addOutput(this.state.streamId, result.id, () => {
-                    this.props.onUpdate();
-                });
-            } else {
-                this.props.onUpdate();
-            }
-        });
-    }
 });
 
 module.exports = CreateOutputDropdown;
