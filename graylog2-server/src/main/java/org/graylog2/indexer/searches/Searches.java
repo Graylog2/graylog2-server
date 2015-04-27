@@ -16,6 +16,8 @@
  */
 package org.graylog2.indexer.searches;
 
+import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.Timer;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Sets;
 import org.elasticsearch.action.search.SearchRequest;
@@ -66,6 +68,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
+import static com.codahale.metrics.MetricRegistry.name;
+import static com.google.common.base.Preconditions.checkNotNull;
 import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
 import static org.elasticsearch.index.query.QueryBuilders.queryStringQuery;
 
@@ -139,24 +143,31 @@ public class Searches {
     private final Deflector deflector;
     private final IndexRangeService indexRangeService;
     private final Client c;
+    private final MetricRegistry metricRegistry;
+    private final Timer esRequestTimer;
 
     @Inject
     public Searches(Configuration configuration,
                     Deflector deflector,
                     IndexRangeService indexRangeService,
-                    Node node) {
-        this(configuration, deflector, indexRangeService, node.client());
+                    Node node,
+                    MetricRegistry metricRegistry) {
+        this(configuration, deflector, indexRangeService, node.client(), metricRegistry);
     }
 
     @VisibleForTesting
     Searches(Configuration configuration,
-                    Deflector deflector,
-                    IndexRangeService indexRangeService,
-                    Client client) {
-        this.configuration = configuration;
-        this.deflector = deflector;
-        this.indexRangeService = indexRangeService;
-        this.c = client;
+             Deflector deflector,
+             IndexRangeService indexRangeService,
+             Client client,
+             MetricRegistry metricRegistry) {
+        this.configuration = checkNotNull(configuration);
+        this.deflector = checkNotNull(deflector);
+        this.indexRangeService = checkNotNull(indexRangeService);
+        this.c = checkNotNull(client);
+        this.metricRegistry = checkNotNull(metricRegistry);
+
+        this.esRequestTimer = metricRegistry.timer(name(Searches.class, "elasticsearch", "requests"));
     }
 
     public CountResult count(String query, TimeRange range) {
@@ -175,6 +186,7 @@ public class Searches {
         request.searchType(SearchType.COUNT);
 
         SearchResponse r = c.search(request).actionGet();
+        esRequestTimer.update(r.getTookInMillis(), TimeUnit.MILLISECONDS);
         return new CountResult(r.getHits().getTotalHits(), r.getTookInMillis(), r.getHits());
     }
 
@@ -205,6 +217,7 @@ public class Searches {
             }
         }
         final SearchResponse r = c.search(request).actionGet();
+        esRequestTimer.update(r.getTookInMillis(), TimeUnit.MILLISECONDS);
 
         return new ScrollResult(c, query, request.source(), r, fields);
     }
@@ -237,6 +250,8 @@ public class Searches {
         SearchRequest request = searchRequest(config, indexNames).request();
 
         SearchResponse r = c.search(request).actionGet();
+        esRequestTimer.update(r.getTookInMillis(), TimeUnit.MILLISECONDS);
+
         return new SearchResult(r.getHits(), indices, config.query(), request.source(), r.getTook());
     }
 
@@ -266,6 +281,7 @@ public class Searches {
 
         final SearchRequest request = srb.request();
         SearchResponse r = c.search(request).actionGet();
+        esRequestTimer.update(r.getTookInMillis(), TimeUnit.MILLISECONDS);
 
         final Filter f = r.getAggregations().get(AGG_FILTER);
         return new TermsResult(
@@ -350,6 +366,7 @@ public class Searches {
 
         final SearchRequest request = srb.request();
         SearchResponse r = c.search(request).actionGet();
+        esRequestTimer.update(r.getTookInMillis(), TimeUnit.MILLISECONDS);
 
         final Filter f = r.getAggregations().get(AGG_FILTER);
         return new TermsStatsResult(
@@ -391,6 +408,7 @@ public class Searches {
         } catch (org.elasticsearch.action.search.SearchPhaseExecutionException e) {
             throw new FieldTypeException(e);
         }
+        esRequestTimer.update(r.getTookInMillis(), TimeUnit.MILLISECONDS);
 
         final Filter f = r.getAggregations().get(AGG_FILTER);
         return new FieldStatsResult(
@@ -425,6 +443,7 @@ public class Searches {
 
         final SearchRequest request = srb.request();
         SearchResponse r = c.search(request).actionGet();
+        esRequestTimer.update(r.getTookInMillis(), TimeUnit.MILLISECONDS);
 
         final Filter f = r.getAggregations().get(AGG_FILTER);
         return new DateHistogramResult(
@@ -461,6 +480,7 @@ public class Searches {
         } catch (org.elasticsearch.action.search.SearchPhaseExecutionException e) {
             throw new FieldTypeException(e);
         }
+        esRequestTimer.update(r.getTookInMillis(), TimeUnit.MILLISECONDS);
 
         final Filter f = r.getAggregations().get(AGG_FILTER);
         return new FieldHistogramResult(
@@ -588,6 +608,8 @@ public class Searches {
         srb.addSort("timestamp", sort);
 
         SearchResponse r = c.search(srb.request()).actionGet();
+        esRequestTimer.update(r.getTookInMillis(), TimeUnit.MILLISECONDS);
+
         if (r.getHits() != null && r.getHits().totalHits() > 0) {
             return r.getHits().getAt(0);
         } else {
@@ -617,7 +639,7 @@ public class Searches {
         return bfb;
     }
 
-    public class FieldTypeException extends Exception {
+    public static class FieldTypeException extends Exception {
         public FieldTypeException(Throwable e) {
             super(e);
         }
