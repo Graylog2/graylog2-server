@@ -20,6 +20,7 @@
     "qs": "2.3.x",
     "react": "0.13.x",
     "react-bootstrap": "0.20.x",
+    "react-zeroclipboard": "^1.0.0",
     "sockjs-client": "1.0.0-beta.12"
   },
   "devDependencies": {

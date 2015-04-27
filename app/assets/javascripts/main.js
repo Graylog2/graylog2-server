@@ -1,6 +1,6 @@
 $(document).ready(function() {
 
-    ZeroClipboard.config( { moviePath: appPrefixed("/assets/images/ZeroClipboard.swf") } );
+    ZeroClipboard.config( { swfPath: appPrefixed("/assets/images/ZeroClipboard.swf"), forceHandCursor: true } );
     clipBoardClient = new ZeroClipboard($(".copy-clipboard"));
 
     clipBoardClient.on( 'mouseover', function(client, args) {
