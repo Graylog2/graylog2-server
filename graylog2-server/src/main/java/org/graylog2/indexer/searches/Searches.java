@@ -67,7 +67,7 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
-import static org.elasticsearch.index.query.QueryBuilders.queryString;
+import static org.elasticsearch.index.query.QueryBuilders.queryStringQuery;
 
 @Singleton
 public class Searches {
@@ -414,7 +414,7 @@ public class Searches {
                                 .interval(interval.toESInterval()))
                 .filter(standardFilters(range, filter));
 
-        QueryStringQueryBuilder qs = queryString(query);
+        QueryStringQueryBuilder qs = queryStringQuery(query);
         qs.allowLeadingWildcard(configuration.isAllowLeadingWildcardSearches());
 
         SearchRequestBuilder srb = c.prepareSearch();
@@ -445,7 +445,7 @@ public class Searches {
                 )
                 .filter(standardFilters(range, filter));
 
-        QueryStringQueryBuilder qs = queryString(query);
+        QueryStringQueryBuilder qs = queryStringQuery(query);
         qs.allowLeadingWildcard(configuration.isAllowLeadingWildcardSearches());
 
         SearchRequestBuilder srb = c.prepareSearch();
@@ -535,7 +535,7 @@ public class Searches {
         if (query.trim().equals("*")) {
             srb.setQuery(matchAllQuery());
         } else {
-            QueryStringQueryBuilder qs = queryString(query);
+            QueryStringQueryBuilder qs = queryStringQuery(query);
             qs.allowLeadingWildcard(configuration.isAllowLeadingWildcardSearches());
             srb.setQuery(qs);
         }
@@ -606,7 +606,7 @@ public class Searches {
         }
 
         if (filter != null && !filter.isEmpty() && !filter.equals("*")) {
-            bfb.must(FilterBuilders.queryFilter(QueryBuilders.queryString(filter)));
+            bfb.must(FilterBuilders.queryFilter(QueryBuilders.queryStringQuery(filter)));
             set = true;
         }
 
