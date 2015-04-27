@@ -10,6 +10,7 @@ var Col = require('react-bootstrap').Col;
 var OverlayTrigger = require('react-bootstrap').OverlayTrigger;
 var Tooltip = require('react-bootstrap').Tooltip;
 var SplitButton = require('react-bootstrap').SplitButton;
+var DropdownMenu = require('react-bootstrap').DropdownMenu;
 var MenuItem = require('react-bootstrap').MenuItem;
 var Alert = require('react-bootstrap').Alert;
 var ReactZeroClipboard = require('react-zeroclipboard');
@@ -74,7 +75,16 @@ var MessageDetail = React.createClass({
                 <dd key={key + "dd"}>
                     <div className="message-field-actions pull-right">
                         <SplitButton dropup={shouldDropup} pullRight={true} bsSize="xsmall" title={<i className="fa fa-search-plus"></i>} key={1}>
-                            <MenuItem>Create extractor for field {key}</MenuItem>
+                            <li className="dropdown-submenu left-submenu">
+                                <a href="#">Create extractor for field {key}</a>
+                                <ul className="dropdown-menu">
+                                    <li><a href={jsRoutes.controllers.ExtractorsController.newExtractor(this.props.message['source_node_id'], this.props.message['source_input_id'], "regex", key, this.props.message.index, this.props.message.id).url}>Regular expression</a></li>
+                                    <li><a href={jsRoutes.controllers.ExtractorsController.newExtractor(this.props.message['source_node_id'], this.props.message['source_input_id'], "substring", key, this.props.message.index, this.props.message.id).url}>Substring</a></li>
+                                    <li><a href={jsRoutes.controllers.ExtractorsController.newExtractor(this.props.message['source_node_id'], this.props.message['source_input_id'], "split_and_index", key, this.props.message.index, this.props.message.id).url}>Split &amp; Index</a></li>
+                                    <li><a href={jsRoutes.controllers.ExtractorsController.newExtractor(this.props.message['source_node_id'], this.props.message['source_input_id'], "copy_input", key, this.props.message.index, this.props.message.id).url}>Copy Input</a></li>
+                                    <li><a href={jsRoutes.controllers.ExtractorsController.newExtractor(this.props.message['source_node_id'], this.props.message['source_input_id'], "grok", key, this.props.message.index, this.props.message.id).url}>Grok pattern</a></li>
+                                </ul>
+                            </li>
                             <MenuItem onClick={this._loadTerms(key)}>Show terms of {key}</MenuItem>
                         </SplitButton>
                     </div>
