@@ -9,14 +9,19 @@ var Row = require('react-bootstrap').Row;
 var Col = require('react-bootstrap').Col;
 var OverlayTrigger = require('react-bootstrap').OverlayTrigger;
 var Tooltip = require('react-bootstrap').Tooltip;
+var SplitButton = require('react-bootstrap').SplitButton;
+var MenuItem = require('react-bootstrap').MenuItem;
+var Alert = require('react-bootstrap').Alert;
 var ReactZeroClipboard = require('react-zeroclipboard');
 
 var Immutable = require('immutable');
+var MessagesStore = require('../../stores/messages/MessagesStore');
 
 var MessageDetail = React.createClass({
     getInitialState() {
         return {
-            scrollWarn: false
+            scrollWarn: false,
+            messageTerms: Immutable.Map()
         };
     },
     componentDidMount() {
@@ -40,20 +45,42 @@ var MessageDetail = React.createClass({
             :
             <span style={{wordBreak: 'break-word'}}>stopped node</span>;
     },
+    _loadTerms(field) {
+        return () => {
+            var promise = MessagesStore.fieldTerms(this.props.message.index, this.props.message.id, field);
+            promise.done((terms) => this._onTermsLoaded(field, terms))
+        }
+    },
+    _onTermsLoaded(field, terms) {
+        var map = Immutable.Map().set(field, terms);
+        this.setState({messageTerms: map});
+    },
     render() {
         var messageUrl = jsRoutes.controllers.MessagesController.show(this.props.message.index, this.props.message.id).url;
 
         var fields = [];
         var formattedFields = Immutable.Map(this.props.message['formatted_fields']);
+        var idx = 0;
         formattedFields.forEach((value, key) => {
+            idx++;
+            // this is to work around the fact that the container has an overflow-y: auto. well :grumpy:
+            var shouldDropup = !!(formattedFields.size > 4 && idx >= formattedFields.size - 1);
+            var showTerms = this.state.messageTerms.has(key);
+            var terms = showTerms ? Immutable.fromJS(this.state.messageTerms.get(key)) : Immutable.List();
+            var termsMarkup = [];
+            terms.forEach((term, idx) => termsMarkup.push(<span key={idx} className="message-terms">{term}</span>));
             fields.push(<dt key={key + "dt"}>{key}</dt>);
             fields.push(
                 <dd key={key + "dd"}>
                     <div className="message-field-actions pull-right">
-                        <a href="#" className="btn btn-xs btn-default search-link" data-field="@f.getName" data-value="@Tools.removeTrailingNewline(r.getFormattedFields.get(f.getName))" title="Append to search query"><i className="fa fa-search-plus"></i></a>
-                        <a href="#" className="btn btn-xs btn-default" title="Split into fields / Create extractor"><i className="fa fa-magic"></i></a>
+                        <SplitButton dropup={shouldDropup} pullRight={true} bsSize="xsmall" title={<i className="fa fa-search-plus"></i>} key={1}>
+                            <MenuItem>Create extractor for field {key}</MenuItem>
+                            <MenuItem onClick={this._loadTerms(key)}>Show terms of {key}</MenuItem>
+                        </SplitButton>
                     </div>
                     {value}
+                    {showTerms && <br />}
+                    {showTerms && <Alert bsStyle='info' onDismiss={() => this.setState({messageTerms: Immutable.Map()})}>Field terms: {termsMarkup}</Alert>}
                 </dd>
             );
         });
@@ -87,8 +114,6 @@ var MessageDetail = React.createClass({
                             </ReactZeroClipboard>
                         </OverlayTrigger>
 
-                        <Button href="#">Show terms</Button>
-
                         <Button href="#">Test against stream</Button>
                     </ButtonGroup>
                     <h3><i className="fa fa-envelope"></i> <a href={messageUrl} style={{color: '#000'}}>{this.props.message.id}</a></h3>
@@ -118,7 +143,7 @@ var MessageDetail = React.createClass({
                     </dl>
                 </Col>
                 <Col md={9}>
-                    <div ref="messageList" style={{maxHeight: 1000, overflowY: 'auto'}}>
+                    <div ref="messageList" style={{minHeight: 200, maxHeight: 1000, overflowY: 'auto'}}>
                         {this.state.scrollWarn ? <span><i className="fa fa-exclamation-triangle"></i> Scroll field list for more details...</span> : null}
                         <dl className="message-details message-details-fields">
                             {fields}

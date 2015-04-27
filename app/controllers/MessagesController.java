@@ -150,12 +150,12 @@ public class MessagesController extends AuthenticatedController {
         try {
             MessageResult message = messagesService.getMessage(index, id);
 
-            String analyzeField = (String) message.getFilteredFields().get(field);
-            if (analyzeField == null || analyzeField.isEmpty()) {
+            Object analyzeField = message.getFilteredFields().get(field);
+            if (analyzeField == null || (analyzeField instanceof String) && ((String)analyzeField).isEmpty()) {
                 return status(404, "Message does not have requested field " + field);
             }
-
-            MessageAnalyzeResult result = messagesService.analyze(index, analyzeField);
+            final String stringifiedValue = String.valueOf(analyzeField);
+            MessageAnalyzeResult result = messagesService.analyze(index, stringifiedValue);
             return ok(Json.toJson(result.getTokens()));
         } catch (IOException e) {
             return status(500, views.html.errors.error.render(ApiClient.ERROR_MSG_IO, e, request()));

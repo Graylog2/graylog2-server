@@ -3,6 +3,7 @@
 'use strict';
 
 declare var $: any;
+declare var jsRoutes: any;
 
 import UserNotification = require("../../util/UserNotification");
 import URLUtils = require("../../util/URLUtils");
@@ -28,6 +29,16 @@ var MessagesStore = {
         promise.fail((jqXHR, textStatus, errorThrown) => {
             UserNotification.error("Loading message information failed with status: " + errorThrown,
                 "Could not load message information");
+        });
+        return promise;
+    },
+
+    fieldTerms(index: string, messageId: string, field: string): JQueryPromise<Array<string>> {
+        var url = jsRoutes.controllers.MessagesController.analyze(index, messageId, field).url;
+        var promise = $.getJSON(url);
+        promise.fail((jqXHR, textStatus, errorThrown) => {
+            UserNotification.error("Loading field terms failed with status: " + errorThrown,
+                "Could not load field terms.");
         });
         return promise;
     }
