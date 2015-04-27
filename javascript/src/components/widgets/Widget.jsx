@@ -72,12 +72,12 @@ var Widget = React.createClass({
         this.loadData();
         this.loadValue();
 
-        $(this._getWidgetNode()).on("unlocked.dashboard", this._dashboardUnlocked);
-        $(this._getWidgetNode()).on("locked.dashboard", this._dashboardLocked);
+        $(this._getWidgetNode()).on("unlocked.graylog.dashboard", this._dashboardUnlocked);
+        $(this._getWidgetNode()).on("locked.graylog.dashboard", this._dashboardLocked);
     },
     componentWillUnmount() {
-        $(this._getWidgetNode()).off("unlocked.dashboard", this._dashboardUnlocked);
-        $(this._getWidgetNode()).off("locked.dashboard", this._dashboardLocked);
+        $(this._getWidgetNode()).off("unlocked.graylog.dashboard", this._dashboardUnlocked);
+        $(this._getWidgetNode()).off("locked.graylog.dashboard", this._dashboardLocked);
     },
     loadData() {
         if (!assertUpdateEnabled(this.loadData) || this.state.deleted) {
@@ -239,7 +239,7 @@ var Widget = React.createClass({
     deleteWidget() {
         if (window.confirm("Do you really want to delete '" + this.state.title + "'?")) {
             this.setState({deleted: true});
-            $(".dashboard").trigger("delete.widget", {widgetId: this.props.widgetId});
+            $(".dashboard").trigger("delete.graylog.widget", {widgetId: this.props.widgetId});
         }
     },
     render() {
