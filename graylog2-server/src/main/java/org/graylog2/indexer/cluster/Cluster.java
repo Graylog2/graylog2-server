@@ -26,7 +26,6 @@ import org.elasticsearch.action.admin.cluster.node.info.NodesInfoRequest;
 import org.elasticsearch.action.admin.cluster.node.info.NodesInfoResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.cluster.node.DiscoveryNode;
-import org.elasticsearch.node.Node;
 import org.graylog2.indexer.Deflector;
 import org.graylog2.indexer.esplugin.ClusterStateMonitor;
 import org.slf4j.Logger;
@@ -53,9 +52,9 @@ public class Cluster {
     private ScheduledExecutorService scheduler;
 
     @Inject
-    public Cluster(Node node, Deflector deflector, @Named("daemonScheduler") ScheduledExecutorService scheduler) {
+    public Cluster(Client client, Deflector deflector, @Named("daemonScheduler") ScheduledExecutorService scheduler) {
         this.scheduler = scheduler;
-        this.c = node.client();
+        this.c = client;
         this.deflector = deflector;
         // unfortunately we can't use guice here, because elasticsearch and graylog2 use different injectors and we can't
         // get to the instance to bridge.
@@ -120,7 +119,7 @@ public class Cluster {
     }
 
     /**
-     * Check if the Elasticsearch {@link Node} is connected and that the cluster health status
+     * Check if the Elasticsearch {@link org.elasticsearch.node.Node} is connected and that the cluster health status
      * is not {@link ClusterHealthStatus#RED} and that the {@link org.graylog2.indexer.Deflector#isUp() deflector is up}.
      *
      * @return {@code true} if the Elasticsearch client is up and the cluster is healthy and the deflector is up, {@code false} otherwise

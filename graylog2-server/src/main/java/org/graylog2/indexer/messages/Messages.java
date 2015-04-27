@@ -17,8 +17,6 @@
 package org.graylog2.indexer.messages;
 
 import com.google.common.collect.Lists;
-import javax.inject.Inject;
-import javax.inject.Singleton;
 import org.elasticsearch.action.WriteConsistencyLevel;
 import org.elasticsearch.action.admin.indices.analyze.AnalyzeRequestBuilder;
 import org.elasticsearch.action.admin.indices.analyze.AnalyzeResponse;
@@ -34,7 +32,6 @@ import org.elasticsearch.action.support.replication.ReplicationType;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.indices.IndexMissingException;
-import org.elasticsearch.node.Node;
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.indexer.DeadLetter;
 import org.graylog2.indexer.Deflector;
@@ -43,13 +40,12 @@ import org.graylog2.plugin.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.LinkedBlockingQueue;
 
-/**
- * @author Lennart Koopmann <lennart@socketfeed.com>
- */
 @Singleton
 public class Messages {
     public static final String TYPE = "message";
@@ -60,9 +56,9 @@ public class Messages {
     private LinkedBlockingQueue<List<DeadLetter>> deadLetterQueue;
 
     @Inject
-	public Messages(Node node, ElasticsearchConfiguration configuration) {
+	public Messages(Client client, ElasticsearchConfiguration configuration) {
         this.configuration = configuration;
-        this.c = node.client();
+        this.c = client;
         this.deadLetterQueue = new LinkedBlockingQueue<>(1000);
     }
 

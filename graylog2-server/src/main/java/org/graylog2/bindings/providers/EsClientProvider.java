@@ -14,28 +14,31 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.indexer.counts;
+package org.graylog2.bindings.providers;
 
-import org.elasticsearch.action.count.CountRequest;
+import com.codahale.metrics.MetricRegistry;
 import org.elasticsearch.client.Client;
-import org.graylog2.indexer.Deflector;
+import org.elasticsearch.node.Node;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
-@Singleton
-public class Counts {
-    private final Client c;
-    private final Deflector deflector;
+import static com.google.common.base.Preconditions.checkNotNull;
+
+public class EsClientProvider implements Provider<Client> {
+    private final Node node;
+    private final MetricRegistry metricRegistry;
 
     @Inject
-    public Counts(Client client, Deflector deflector) {
-        this.c = client;
-        this.deflector = deflector;
+    public EsClientProvider(Node node, MetricRegistry metricRegistry) {
+        this.node = node;
+        this.metricRegistry = checkNotNull(metricRegistry);
     }
 
-    public long total() {
-        return c.count(new CountRequest(deflector.getAllDeflectorIndexNames())).actionGet().getCount();
+    @Override
+    @Singleton
+    public Client get() {
+        return node.client();
     }
-
 }
