@@ -3,6 +3,7 @@
 @import lib.security.RestPermissions._
 @import views.helpers.Permissions._
 @import controllers.routes
+@import views.helpers.Permissions
 
 @main("Streams", null, "", currentUser, false) {
 
@@ -35,18 +36,8 @@
 
     <div class="row content">
         <div class="col-md-12">
-            <ul class="streams">
-                @for(stream <- streams.filter(stream => isPermitted(STREAMS_READ, stream.getId)).sortBy(_.getTitle)) {
-                    @views.html.streams.stream.render(stream, nodes, currentUser)
-                }
-            </ul>
-
-            @if(streams.isEmpty) {
-                <div class="alert alert-warning">
-                    <i class="fa fa-info-circle"></i>&nbsp;
-                    No streams configured. @if(isPermitted(STREAMS_CREATE)) { <a href="@routes.StreamsController.create()">Create one now</a>. }
-                </div>
-            }
+            <div class="react-stream-component" data-permissions='@Permissions.asJson(STREAMS_READ)'>
+            </div>
         </div>
     </div>
 }

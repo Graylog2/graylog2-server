@@ -20,6 +20,7 @@ gl2UserSessionId = "@Http.Context.current().session().get("sessionid")";
     routes.javascript.Assets.at,
     routes.javascript.SearchController.globalSearch,
     routes.javascript.SearchControllerV2.index,
+    routes.javascript.StreamSearchController.index,
     routes.javascript.StreamsController.index,
     routes.javascript.DashboardsController.index,
     routes.javascript.SourcesController.list,
@@ -38,7 +39,19 @@ gl2UserSessionId = "@Http.Context.current().session().get("sessionid")";
     routes.javascript.BundlesController.index,
     routes.javascript.GrokPatternsController.index,
     routes.javascript.SessionsController.destroy,
-    routes.javascript.MetricsController.ofNode
+    routes.javascript.MetricsController.ofNode,
+    api.routes.javascript.StreamsApiController.list,
+    api.routes.javascript.StreamsApiController.delete,
+    routes.javascript.StreamsController.create,
+    routes.javascript.StreamsController.edit,
+    routes.javascript.StreamsController.pause,
+    routes.javascript.StreamsController.resume,
+    routes.javascript.StreamsController.cloneStreamForm,
+    routes.javascript.StreamRulesController.index,
+    routes.javascript.StreamOutputsController.index,
+    routes.javascript.AlertsController.index,
+    routes.javascript.StreamsController.delete,
+    routes.javascript.StartpageController.set
 )
 
 <div id="navigation-bar"

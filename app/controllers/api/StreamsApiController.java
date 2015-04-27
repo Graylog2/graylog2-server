@@ -2,6 +2,7 @@ package controllers.api;
 
 import controllers.AuthenticatedController;
 import org.graylog2.restclient.lib.APIException;
+import org.graylog2.restclient.models.Stream;
 import org.graylog2.restclient.models.StreamService;
 import org.graylog2.restclient.models.api.requests.streams.TestMatchRequest;
 import org.graylog2.restclient.models.api.responses.streams.TestMatchResponse;
@@ -11,6 +12,7 @@ import play.mvc.Result;
 
 import javax.inject.Inject;
 import java.io.IOException;
+import java.util.List;
 
 public class StreamsApiController extends AuthenticatedController {
     private final StreamService streamService;
@@ -18,6 +20,17 @@ public class StreamsApiController extends AuthenticatedController {
     @Inject
     public StreamsApiController(StreamService streamService) {
         this.streamService = streamService;
+    }
+
+    public Result list() throws IOException, APIException {
+        final List<Stream> streams  = this.streamService.all();
+
+        return ok(Json.toJson(streams));
+    }
+
+    public Result delete(String streamId) throws APIException, IOException {
+        this.streamService.delete(streamId);
+        return ok();
     }
 
     @BodyParser.Of(BodyParser.Json.class)

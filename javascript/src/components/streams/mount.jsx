@@ -2,6 +2,8 @@
 
 var React = require('react/addons');
 var StreamThroughput = require('./StreamThroughput');
+var StreamComponent = require('./StreamComponent');
+var $ = require('jquery'); // excluded and shimed
 
 var streamThroughput = document.getElementsByClassName('react-stream-throughput');
 if (streamThroughput) {
@@ -11,3 +13,10 @@ if (streamThroughput) {
         React.render(<StreamThroughput streamId={id}/>, elem);
     }
 }
+
+$(".react-stream-component").each(function() {
+    var permissions = JSON.parse(this.getAttribute('data-permissions'));
+    var component = <StreamComponent permissions={permissions} />;
+
+    React.render(component, this);
+});

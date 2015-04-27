@@ -242,6 +242,8 @@ POST        /a/dashboards/:dashboard_id/widgets/:widget_id/description          
 POST        /a/dashboards/:dashboard_id/widgets/:widget_id/cachetime                 @controllers.api.DashboardsApiController.updateWidgetCacheTime(dashboard_id: String, widget_id: String)
 
 # API: Streams
+GET         /a/streams                                                               @controllers.api.StreamsApiController.list()
+DELETE      /a/streams/:stream_id                                                    @controllers.api.StreamsApiController.delete(stream_id: String)
 POST        /a/streams/:stream_id/testMatch                                          @controllers.api.StreamsApiController.testMatch(stream_id: String)
 
 # API: Alerts
