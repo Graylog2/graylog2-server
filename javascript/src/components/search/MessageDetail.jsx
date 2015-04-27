@@ -10,7 +10,6 @@ var Col = require('react-bootstrap').Col;
 var OverlayTrigger = require('react-bootstrap').OverlayTrigger;
 var Tooltip = require('react-bootstrap').Tooltip;
 var SplitButton = require('react-bootstrap').SplitButton;
-var DropdownMenu = require('react-bootstrap').DropdownMenu;
 var MenuItem = require('react-bootstrap').MenuItem;
 var Alert = require('react-bootstrap').Alert;
 var ReactZeroClipboard = require('react-zeroclipboard');
@@ -21,15 +20,8 @@ var MessagesStore = require('../../stores/messages/MessagesStore');
 var MessageDetail = React.createClass({
     getInitialState() {
         return {
-            scrollWarn: false,
             messageTerms: Immutable.Map()
         };
-    },
-    componentDidMount() {
-        var elem = React.findDOMNode(this.refs.messageList);
-        if (elem && elem.clientHeight < elem.scrollHeight) {
-            this.setState({scrollWarn: true});
-        }
     },
     _inputName(inputId) {
         var input = this.props.inputs.get(inputId);
@@ -64,8 +56,6 @@ var MessageDetail = React.createClass({
         var idx = 0;
         formattedFields.forEach((value, key) => {
             idx++;
-            // this is to work around the fact that the container has an overflow-y: auto. well :grumpy:
-            var shouldDropup = !!(formattedFields.size > 4 && idx >= formattedFields.size - 1);
             var showTerms = this.state.messageTerms.has(key);
             var terms = showTerms ? Immutable.fromJS(this.state.messageTerms.get(key)) : Immutable.List();
             var termsMarkup = [];
@@ -74,7 +64,7 @@ var MessageDetail = React.createClass({
             fields.push(
                 <dd key={key + "dd"}>
                     <div className="message-field-actions pull-right">
-                        <SplitButton dropup={shouldDropup} pullRight={true} bsSize="xsmall" title={<i className="fa fa-search-plus"></i>} key={1}>
+                        <SplitButton pullRight={true} bsSize="xsmall" title={<i className="fa fa-search-plus"></i>} key={1}>
                             <li className="dropdown-submenu left-submenu">
                                 <a href="#">Create extractor for field {key}</a>
                                 <ul className="dropdown-menu">
@@ -153,8 +143,7 @@ var MessageDetail = React.createClass({
                     </dl>
                 </Col>
                 <Col md={9}>
-                    <div ref="messageList" style={{minHeight: 200, maxHeight: 1000, overflowY: 'auto'}}>
-                        {this.state.scrollWarn ? <span><i className="fa fa-exclamation-triangle"></i> Scroll field list for more details...</span> : null}
+                    <div ref="messageList">
                         <dl className="message-details message-details-fields">
                             {fields}
                         </dl>
