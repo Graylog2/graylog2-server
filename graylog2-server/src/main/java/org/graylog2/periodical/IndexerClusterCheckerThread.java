@@ -56,21 +56,22 @@ public class IndexerClusterCheckerThread extends Periodical {
         boolean allHigher = true;
         for (NodeInfo node : cluster.getDataNodes()) {
             // Check number of maximum open files.
+            final long maxFileDescriptors = node.getProcess().getMaxFileDescriptors();
             final String osName = node.getJvm().getSystemProperties().get("os.name");
             if (null != osName && osName.startsWith("Windows")) {
                 LOG.debug("Skipping open file limit check for Indexer node <{}> on Windows", node.getNode().getName());
-            } else if (node.getProcess().getMaxFileDescriptors() < MINIMUM_OPEN_FILES_LIMIT) {
+            } else if (maxFileDescriptors != -1 && maxFileDescriptors < MINIMUM_OPEN_FILES_LIMIT) {
                 // Write notification.
                 final Notification notification = notificationService.buildNow()
                         .addType(Notification.Type.ES_OPEN_FILES)
                         .addSeverity(Notification.Severity.URGENT)
                         .addDetail("hostname", node.getHostname())
-                        .addDetail("max_file_descriptors", node.getProcess().getMaxFileDescriptors());
+                        .addDetail("max_file_descriptors", maxFileDescriptors);
 
                 if (notificationService.publishIfFirst(notification)) {
                     LOG.warn("Indexer node <{}> open file limit is too low: [{}]. Set it to at least {}.",
                             node.getNode().getName(),
-                            node.getProcess().getMaxFileDescriptors(),
+                            maxFileDescriptors,
                             MINIMUM_OPEN_FILES_LIMIT);
                 }
                 allHigher = false;
