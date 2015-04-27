@@ -191,6 +191,7 @@ label {
 
 .modal-backdrop {
   height: 100000%;  // yes, really. this fixes the backdrop being cut off when the page is scrolled.
+  z-index: 1030;
 }
 
 #search {
@@ -395,11 +396,12 @@ a.fields-set-chooser {
 .search-result-fields {
   margin-left: 5px;
   margin-top: 3px;
-  padding-left: 0px
+  padding-left: 0;
 }
 
 .search-result-fields li {
   margin-top: 1px;
+  padding: 2px 0;
 }
 
 .search-result-fields label {
@@ -859,7 +861,7 @@ s
   font-size: 16px;
   position: relative;
   top: 4px;
-  color: #0088cc;
+  color: #16ACE3;
 }
 
 ul.search-result-fields input[type=checkbox] {
@@ -869,11 +871,11 @@ ul.search-result-fields input[type=checkbox] {
 }
 
 .open-analyze-field-active {
-  color: #f00;
+  color: #1189B5;
 }
 
 .open-analyze-field:hover {
-  color: #f00;
+  color: #1189B5;
 }
 
 .analyze-field {
