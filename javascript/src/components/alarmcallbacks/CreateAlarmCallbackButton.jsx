@@ -29,7 +29,8 @@ var CreateAlarmCallbackButton = React.createClass({
                         {alarmCallbackTypes}
                     </select>
 
-                    <button className="btn btn-success btn-sm" onClick={this._openModal}>Configure new alert destination</button>
+                    <button className="btn btn-success btn-sm" disabled={this.state.typeName === this.PLACEHOLDER}
+                            onClick={this._openModal}>Configure new alert destination</button>
                 </div>
                 {configurationForm}
             </div>
