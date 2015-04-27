@@ -26,7 +26,7 @@ var MessageField = React.createClass({
 
         return (
             <li className="search-result-field-type">
-                <div className="row" style={{marginBottom: 0}}>
+                <div className="row no-bm">
                     <div className="col-md-1">
                         <i className={toggleClassName}
                            onClick={this._toggleShowActions}></i>
