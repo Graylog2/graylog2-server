@@ -9,7 +9,7 @@ var CreateOutputDropdown = React.createClass({
     getInitialState() {
         return {
             typeDefinition: [],
-            typeName: ""
+            typeName: this.PLACEHOLDER
         };
     },
     componentDidMount() {
@@ -27,7 +27,7 @@ var CreateOutputDropdown = React.createClass({
                         {outputTypes}
                     </select>
 
-                    <button className="btn btn-success btn-sm" onClick={this._openModal}>Launch new output</button>
+                    <button className="btn btn-success" disabled={this.state.typeName === this.PLACEHOLDER} onClick={this._openModal}>Launch new output</button>
                 </div>
 
                 <ConfigurationForm ref="configurationForm" key="configuration-form-output" configFields={this.state.typeDefinition} title="Create new Output"
