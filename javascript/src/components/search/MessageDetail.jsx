@@ -134,7 +134,7 @@ var MessageDetail = React.createClass({
 
                         { streamIds.size > 0 && <dt>Routed into streams</dt> }
                         { streamIds.size > 0 &&
-                        <dd>
+                        <dd className="stream-list">
                             <ul>
                                 {streams}
                             </ul>
