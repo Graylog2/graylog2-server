@@ -72,6 +72,7 @@ var ResultTable = React.createClass({
                                                                               inputs={this.props.inputs}
                                                                               streams={this.props.streams}
                                                                               nodes={this.props.nodes}
+                                                                              highlight={this.props.highlight}
                         />) }
                 </table>
             </div>

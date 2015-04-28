@@ -18,7 +18,8 @@ var SearchResult = React.createClass({
             selectedFields: Immutable.Set(['message', 'source']),
             showAllFields: false,
             currentSidebarWidth: null,
-            dashboards: Immutable.Map()
+            dashboards: Immutable.Map(),
+            shouldHighlight: true
         };
     },
 
@@ -91,6 +92,7 @@ var SearchResult = React.createClass({
         if (this.state.currentSidebarWidth) {
             style = {width: this.state.currentSidebarWidth};
         }
+        var anyHighlightRanges = Immutable.fromJS(this.props.result.messages).some(message => message.get('highlight_ranges') !== null);
 
         return (
             <div >
@@ -103,6 +105,9 @@ var SearchResult = React.createClass({
                                        togglePageFields={this.togglePageFields}
                                        onFieldToggled={this.onFieldToggled}
                                        predefinedFieldSelection={this.predefinedFieldSelection}
+                                       showHighlightToggle={anyHighlightRanges}
+                                       shouldHighlight={this.state.shouldHighlight}
+                                       toggleShouldHighlight={(event) => this.setState({shouldHighlight: !this.state.shouldHighlight})}
                                        dashboards={this.state.dashboards}/>
                     </div>
                 </div>
@@ -118,6 +123,7 @@ var SearchResult = React.createClass({
                                  inputs={this.props.inputs}
                                  streams={this.props.streams}
                                  nodes={this.props.nodes}
+                                 highlight={this.state.shouldHighlight}
                         />
 
                 </div>

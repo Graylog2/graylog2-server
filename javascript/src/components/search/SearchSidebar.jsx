@@ -5,6 +5,7 @@ var Modal = require('react-bootstrap').Modal;
 var ModalTrigger = require('react-bootstrap').ModalTrigger;
 var ButtonGroup = require('react-bootstrap').ButtonGroup;
 var Button = require('react-bootstrap').Button;
+var Input = require('react-bootstrap').Input;
 
 var Widget = require('../widgets/Widget');
 var AddToDashboardMenu = require('../dashboard/AddToDashboardMenu');
@@ -142,6 +143,12 @@ var SearchSidebar = React.createClass({
                                                                                    onClick={this._showAllFields}>all
                     fields</a>.
                 </span>
+                <br/>
+                    { this.props.showHighlightToggle &&
+                    <Input type="checkbox" bsSize="small" checked={this.props.shouldHighlight}
+                           onChange={this.props.toggleShouldHighlight} label="Highlight results"
+                           groupClassName="result-highlight-control"/>
+                    }
                 </p>
             </div>
         );

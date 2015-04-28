@@ -100,7 +100,7 @@ var MessageDetail = React.createClass({
                             <MenuItem onClick={this._loadTerms(key)}>Show terms of {key}</MenuItem>
                         </SplitButton>
                     </div>
-                    {value}
+                    {this.props.possiblyHighlight(key)}
                     {showTerms && <br />}
                     {showTerms && <Alert bsStyle='info' onDismiss={() => this.setState({messageTerms: Immutable.Map()})}>Field terms: {termsMarkup}</Alert>}
                 </dd>
