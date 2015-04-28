@@ -1,6 +1,6 @@
 /// <reference path="../../../declarations/jquery/jquery.d.ts" />
 /// <reference path="../../../declarations/node/node.d.ts" />
-/// <reference path='../../../node_modules/immutable/dist/Immutable.d.ts'/>
+/// <reference path='../../../node_modules/immutable/dist/immutable.d.ts'/>
 
 'use strict';
 
