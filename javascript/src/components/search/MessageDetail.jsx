@@ -2,6 +2,8 @@
 
 'use strict';
 
+var $ = require('jquery');
+
 var React = require('react');
 var ButtonGroup = require('react-bootstrap').ButtonGroup;
 var Button = require('react-bootstrap').Button;
@@ -84,7 +86,7 @@ var MessageDetail = React.createClass({
             fields.push(
                 <dd key={key + "dd"}>
                     <div className="message-field-actions pull-right">
-                        <SplitButton pullRight={true} bsSize="xsmall" title={<i className="fa fa-search-plus"></i>} key={1}>
+                        <SplitButton pullRight={true} bsSize="xsmall" title={<i className="fa fa-search-plus"></i>} key={1} onClick={() => $(document).trigger('add-search-term.graylog.universalsearch', {field: key, value: value})}>
                             <li className="dropdown-submenu left-submenu">
                                 <a href="#">Create extractor for field {key}</a>
                                 <ul className="dropdown-menu">

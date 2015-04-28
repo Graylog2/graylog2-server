@@ -14,24 +14,25 @@ var MenuItem = require('react-bootstrap').MenuItem;
 var Immutable = require('immutable');
 
 var URLUtils = require('../../util/URLUtils');
+var SearchStore = require('../../stores/search/SearchStore');
 
 var SearchBar = React.createClass({
     getInitialState() {
         var parsedSearch = Immutable.Map(URLUtils.getParsedSearch(window.location));
-        console.log(parsedSearch.toJS());
-
         this.originalSearch = this._initializeOriginalSearch(parsedSearch);
+        SearchStore.query = this.originalSearch.get('query');
+        SearchStore.onQueryChanged = (newQuery) => this.setState({query: newQuery});
 
         return {
             rangeType: this.originalSearch.get('rangeType'),
             rangeParams: this.originalSearch.get('rangeParams'),
-            query: this.originalSearch.get('query'),
+            query: SearchStore.query,
             streamId: null
         };
     },
     _initializeOriginalSearch(parsedSearch) {
         var originalSearch = Immutable.Map();
-        originalSearch = originalSearch.set('query', parsedSearch.get('q', "*"));
+        originalSearch = originalSearch.set('query', parsedSearch.get('q', ""));
         originalSearch = originalSearch.set('rangeType', parsedSearch.get('rangetype', 'relative'));
         var rangeParams;
 
@@ -58,7 +59,7 @@ var SearchBar = React.createClass({
     componentWillUnmount() {
         $(this.universalSearchElement).off('get-original-search.graylog.universalsearch', this._getOriginalSearchRequest);
     },
-    _onOriginalSearchRequest(event, data) {
+    _getOriginalSearchRequest(event, data) {
         data.callback(this.getSearchParams());
     },
     getSearchParams() {
@@ -70,8 +71,7 @@ var SearchBar = React.createClass({
         return filteredSearchParams;
     },
     _queryChanged() {
-        var newQuery = this.refs.searchBar.getValue();
-        this.setState({query: newQuery});
+        SearchStore.addQueryTerm(this.refs.query.getValue());
     },
     _rangeTypeChanged(newRangeType) {
         this.setState({rangeType: newRangeType, rangeParams: Immutable.Map()});
@@ -170,7 +170,7 @@ var SearchBar = React.createClass({
             <div className="row no-bm">
                 <div className="col-md-12" id="universalsearch-container">
                     <div className="row no-bm">
-                        <div className="col-md-12" id="universalsearch">
+                        <div ref="universalSearch" className="col-md-12" id="universalsearch">
                             <form className="universalsearch-form"
                                   action={this.props.streamId ?  "unimplemented" : jsRoutes.controllers.SearchControllerV2.index().url }
                                   method="GET">
@@ -215,7 +215,7 @@ var SearchBar = React.createClass({
 
                                     <div className="query">
                                         <Input type='text'
-                                               ref='searchBar'
+                                               ref='query'
                                                name='q'
                                                value={this.state.query}
                                                onChange={this._queryChanged}
