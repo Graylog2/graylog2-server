@@ -34,7 +34,7 @@ var MessageTableEntry = React.createClass({
                 });
                 return <span>{chunks}</span>;
             } else {
-                return origValue
+                return origValue;
             }
         } else {
             return origValue;

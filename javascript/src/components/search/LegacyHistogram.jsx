@@ -24,7 +24,7 @@ var LegacyHistogram = React.createClass({
         resultHistogram.drawResultGraph();
     },
     _resolutionChanged(newResolution) {
-        return () => SearchStore.resolution = newResolution;
+        return () => { SearchStore.resolution = newResolution; };
     },
     _getFirstHistogramValue() {
         if (SearchStore.rangeType === 'relative' && SearchStore.rangeParams.get('relative') === 0) {
