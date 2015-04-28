@@ -52,10 +52,11 @@ var SearchBar = React.createClass({
         return originalSearch.set('rangeParams', rangeParams);
     },
     componentDidMount() {
-        $("#universalsearch").on('originalsearch.graylog.searchbar', this._onOriginalSearchRequest);
+        this.universalSearchElement = React.findDOMNode(this.refs.universalSearch);
+        $(this.universalSearchElement).on('get-original-search.graylog.universalsearch', this._getOriginalSearchRequest);
     },
     componentWillUnmount() {
-        $("#universalsearch").off('originalsearch.graylog.searchbar', this._onOriginalSearchRequest);
+        $(this.universalSearchElement).off('get-original-search.graylog.universalsearch', this._getOriginalSearchRequest);
     },
     _onOriginalSearchRequest(event, data) {
         data.callback(this.getSearchParams());
