@@ -243,8 +243,12 @@ POST        /a/dashboards/:dashboard_id/widgets/:widget_id/cachetime            
 
 # API: Streams
 GET         /a/streams                                                               @controllers.api.StreamsApiController.list()
+POST        /a/streams                                                               @controllers.api.StreamsApiController.create()
+PUT         /a/streams/:stream_id                                                    @controllers.api.StreamsApiController.update(stream_id: String)
 DELETE      /a/streams/:stream_id                                                    @controllers.api.StreamsApiController.delete(stream_id: String)
 POST        /a/streams/:stream_id/testMatch                                          @controllers.api.StreamsApiController.testMatch(stream_id: String)
+POST        /a/streams/:stream_id/resume                                             @controllers.api.StreamsApiController.resume(stream_id: String)
+POST        /a/streams/:stream_id/cloneStream                                        @controllers.api.StreamsApiController.cloneStream(stream_id: String)
 
 # API: Alerts
 GET         /a/streams/alerts/allowed                                                @controllers.api.AlertsApiController.allAllowedSince(since:Integer ?= 0)
