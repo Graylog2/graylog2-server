@@ -101,7 +101,7 @@ public class MetricsController extends AuthenticatedController {
                                     clearSessionId.set(userAndSessionId[1]);
                                 } else if (command instanceof SubscribeMetricsUpdates) {
                                     final SubscribeMetricsUpdates metricsUpdates = (SubscribeMetricsUpdates) command;
-                                    Logger.info("Subscribed to metrics {} on node {}",
+                                    Logger.debug("Subscribed to metrics {} on node {}",
                                                 metricsUpdates.metrics,
                                                 MoreObjects.firstNonNull(metricsUpdates.nodeId, "ALL"));
 
