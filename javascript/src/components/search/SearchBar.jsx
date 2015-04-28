@@ -11,48 +11,21 @@ var ButtonToolbar = require('react-bootstrap').ButtonToolbar;
 var DropdownButton = require('react-bootstrap').DropdownButton;
 var MenuItem = require('react-bootstrap').MenuItem;
 
-var Immutable = require('immutable');
-
-var URLUtils = require('../../util/URLUtils');
 var SearchStore = require('../../stores/search/SearchStore');
 
 var SearchBar = React.createClass({
     getInitialState() {
-        var parsedSearch = Immutable.Map(URLUtils.getParsedSearch(window.location));
-        this.originalSearch = this._initializeOriginalSearch(parsedSearch);
-        SearchStore.query = this.originalSearch.get('query');
-        SearchStore.onQueryChanged = (newQuery) => this.setState({query: newQuery});
-
+        var searchParams = SearchStore.getParams();
         return {
-            rangeType: this.originalSearch.get('rangeType'),
-            rangeParams: this.originalSearch.get('rangeParams'),
-            query: SearchStore.query,
+            rangeType: searchParams.rangeType,
+            rangeParams: searchParams.rangeParams,
+            query: searchParams.query,
             streamId: null
         };
     },
-    _initializeOriginalSearch(parsedSearch) {
-        var originalSearch = Immutable.Map();
-        originalSearch = originalSearch.set('query', parsedSearch.get('q', ""));
-        originalSearch = originalSearch.set('rangeType', parsedSearch.get('rangetype', 'relative'));
-        var rangeParams;
-
-        switch (originalSearch.get('rangeType')) {
-            case 'relative':
-                rangeParams = Immutable.Map({relative: Number(parsedSearch.get('relative', 5 * 60))});
-                break;
-            case 'absolute':
-                rangeParams = Immutable.Map({from: parsedSearch.get('from', ''), to: parsedSearch.get('to', '')});
-                break;
-            case 'keyword':
-                rangeParams = Immutable.Map({keyword: parsedSearch.get('keyword', '')});
-                break;
-            default:
-                throw('Unsupported range type ' + originalSearch.get('rangeType'));
-        }
-
-        return originalSearch.set('rangeParams', rangeParams);
-    },
     componentDidMount() {
+        SearchStore.onParamsChanged = (newParams) => this.setState(newParams);
+
         this.universalSearchElement = React.findDOMNode(this.refs.universalSearch);
         $(this.universalSearchElement).on('get-original-search.graylog.universalsearch', this._getOriginalSearchRequest);
     },
@@ -60,21 +33,13 @@ var SearchBar = React.createClass({
         $(this.universalSearchElement).off('get-original-search.graylog.universalsearch', this._getOriginalSearchRequest);
     },
     _getOriginalSearchRequest(event, data) {
-        data.callback(this.getSearchParams());
-    },
-    getSearchParams() {
-        var filteredSearchParams = Immutable.Map();
-        filteredSearchParams = filteredSearchParams.set('rangetype', this.originalSearch.get('rangeType'));
-        filteredSearchParams = filteredSearchParams.merge(this.originalSearch.get('rangeParams'));
-        filteredSearchParams = filteredSearchParams.set('q', this.originalSearch.get('query'));
-
-        return filteredSearchParams;
+        data.callback(SearchStore.getSearchURLParams());
     },
     _queryChanged() {
         SearchStore.query = this.refs.query.getValue();
     },
     _rangeTypeChanged(newRangeType) {
-        this.setState({rangeType: newRangeType, rangeParams: Immutable.Map()});
+        SearchStore.rangeType = newRangeType;
     },
     _rangeParamsChanged(key) {
         return () => {
