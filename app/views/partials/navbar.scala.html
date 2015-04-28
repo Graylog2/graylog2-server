@@ -39,7 +39,9 @@ gl2UserSessionId = "@Http.Context.current().session().get("sessionid")";
     routes.javascript.GrokPatternsController.index,
     routes.javascript.SessionsController.destroy,
     routes.javascript.MetricsController.ofNode,
-    routes.javascript.ExtractorsController.newExtractor
+    routes.javascript.ExtractorsController.newExtractor,
+    api.routes.javascript.StreamsApiController.listStreams,
+    routes.javascript.StreamRulesController.index
 )
 
 <div id="navigation-bar"

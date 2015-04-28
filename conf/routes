@@ -243,6 +243,7 @@ POST        /a/dashboards/:dashboard_id/widgets/:widget_id/cachetime            
 
 # API: Streams
 POST        /a/streams/:stream_id/testMatch                                          @controllers.api.StreamsApiController.testMatch(stream_id: String)
+GET         /a/streams                                                               @controllers.api.StreamsApiController.listStreams()
 
 # API: Alerts
 GET         /a/streams/alerts/allowed                                                @controllers.api.AlertsApiController.allAllowedSince(since:Integer ?= 0)

@@ -10,18 +10,25 @@ var Col = require('react-bootstrap').Col;
 var OverlayTrigger = require('react-bootstrap').OverlayTrigger;
 var Tooltip = require('react-bootstrap').Tooltip;
 var SplitButton = require('react-bootstrap').SplitButton;
+var DropdownButton = require('react-bootstrap').DropdownButton;
 var MenuItem = require('react-bootstrap').MenuItem;
 var Alert = require('react-bootstrap').Alert;
 var ReactZeroClipboard = require('react-zeroclipboard');
 
 var Immutable = require('immutable');
 var MessagesStore = require('../../stores/messages/MessagesStore');
+var StreamsStore = require('../../stores/streams/StreamsStore');
 
 var MessageDetail = React.createClass({
     getInitialState() {
         return {
-            messageTerms: Immutable.Map()
+            messageTerms: Immutable.Map(),
+            streamsListLoaded: false,
+            streamsList: Immutable.List()
         };
+    },
+    componentDidMount() {
+        this._loadStreams();
     },
     _inputName(inputId) {
         var input = this.props.inputs.get(inputId);
@@ -38,6 +45,7 @@ var MessageDetail = React.createClass({
             :
             <span style={{wordBreak: 'break-word'}}>stopped node</span>;
     },
+
     _loadTerms(field) {
         return () => {
             var promise = MessagesStore.fieldTerms(this.props.message.index, this.props.message.id, field);
@@ -47,6 +55,18 @@ var MessageDetail = React.createClass({
     _onTermsLoaded(field, terms) {
         var map = Immutable.Map().set(field, terms);
         this.setState({messageTerms: map});
+    },
+
+    _loadStreams() {
+        // only load the streams once per message.
+        if (this.state.streamsListLoaded) {
+            return;
+        }
+        var promise = StreamsStore.listStreams();
+        promise.done((streams) => this._onStreamsLoaded(streams));
+    },
+    _onStreamsLoaded(streams) {
+        this.setState({streamsListLoaded: true, streamsList: Immutable.List(streams).sortBy(stream => stream.title)});
     },
     render() {
         var messageUrl = jsRoutes.controllers.MessagesController.show(this.props.message.index, this.props.message.id).url;
@@ -85,6 +105,16 @@ var MessageDetail = React.createClass({
             );
         });
 
+        var streamList = null;
+        this.state.streamsList.forEach((stream) => {
+            if (!streamList) {
+                streamList = [];
+            }
+            var url = jsRoutes.controllers.StreamRulesController.index(stream['id']).url + "#" + this.props.message.id + "." + this.props.message.index;
+
+            streamList.push(<MenuItem href={url}>{stream['title']}</MenuItem>);
+        });
+
         var streamIds = Immutable.Set(this.props.message['stream_ids']);
         var streams = streamIds
             .map((id) => this.props.streams.get(id))
@@ -114,7 +144,10 @@ var MessageDetail = React.createClass({
                             </ReactZeroClipboard>
                         </OverlayTrigger>
 
-                        <Button href="#">Test against stream</Button>
+                        <DropdownButton ref="streamDropdown" pullRight bsSize="small" title="Test against stream">
+                            { streamList }
+                            { ! streamList && <MenuItem header><i className="fa fa-spin fa-spinner"></i> Loading streams</MenuItem> }
+                        </DropdownButton>
                     </ButtonGroup>
                     <h3><i className="fa fa-envelope"></i> <a href={messageUrl} style={{color: '#000'}}>{this.props.message.id}</a></h3>
                 </Col>
