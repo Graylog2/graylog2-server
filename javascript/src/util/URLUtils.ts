@@ -18,7 +18,7 @@ var URLUtils = {
         }
     },
     getParsedSearch(location) {
-        var search = "";
+        var search = {};
         var query = location.search;
         if (query) {
             if (query.indexOf("?") === 0 && query.length > 1) {
