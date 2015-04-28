@@ -24,7 +24,7 @@ import com.mongodb.WriteConcern;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.events.ClusterEventBus;
-import org.graylog2.plugin.ServerStatus;
+import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.utilities.AutoValueUtils;
 import org.joda.time.DateTime;
@@ -32,7 +32,6 @@ import org.joda.time.DateTimeZone;
 import org.mongojack.DBQuery;
 import org.mongojack.DBSort;
 import org.mongojack.JacksonDBCollection;
-import org.mongojack.WriteResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,8 +39,8 @@ import javax.inject.Inject;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-public class ClusterConfigService {
-    private static final Logger LOG = LoggerFactory.getLogger(ClusterConfigService.class);
+public class ClusterConfigServiceImpl implements ClusterConfigService {
+    private static final Logger LOG = LoggerFactory.getLogger(ClusterConfigServiceImpl.class);
 
     @VisibleForTesting
     static final String COLLECTION_NAME = "cluster_config";
@@ -52,19 +51,19 @@ public class ClusterConfigService {
     private final EventBus clusterEventBus;
 
     @Inject
-    public ClusterConfigService(final MongoJackObjectMapperProvider mapperProvider,
-                                final MongoConnection mongoConnection,
-                                final NodeId nodeId,
-                                final ObjectMapper objectMapper,
-                                @ClusterEventBus final EventBus clusterEventBus) {
+    public ClusterConfigServiceImpl(final MongoJackObjectMapperProvider mapperProvider,
+                                    final MongoConnection mongoConnection,
+                                    final NodeId nodeId,
+                                    final ObjectMapper objectMapper,
+                                    @ClusterEventBus final EventBus clusterEventBus) {
         this(JacksonDBCollection.wrap(prepareCollection(mongoConnection), ClusterConfig.class, String.class, mapperProvider.get()),
                 nodeId, objectMapper, clusterEventBus);
     }
 
-    ClusterConfigService(final JacksonDBCollection<ClusterConfig, String> dbCollection,
-                         final NodeId nodeId,
-                         final ObjectMapper objectMapper,
-                         final EventBus clusterEventBus) {
+    ClusterConfigServiceImpl(final JacksonDBCollection<ClusterConfig, String> dbCollection,
+                             final NodeId nodeId,
+                             final ObjectMapper objectMapper,
+                             final EventBus clusterEventBus) {
         this.nodeId = checkNotNull(nodeId);
         this.dbCollection = checkNotNull(dbCollection);
         this.objectMapper = checkNotNull(objectMapper);
@@ -89,6 +88,7 @@ public class ClusterConfigService {
         }
     }
 
+    @Override
     public <T> T get(Class<T> type) {
         ClusterConfig config = dbCollection.findOne(DBQuery.is("type", type.getCanonicalName()));
 
@@ -105,6 +105,7 @@ public class ClusterConfigService {
         return result;
     }
 
+    @Override
     public <T> void write(T payload) {
         if(payload == null) {
             LOG.debug("Payload was null. Skipping.");

@@ -36,6 +36,7 @@ import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.MongoConnectionRule;
 import org.graylog2.database.ObjectIdSerializer;
+import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.jackson.SizeSerializer;
 import org.graylog2.shared.rest.RangeJsonSerializer;
@@ -61,11 +62,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
-public class ClusterConfigServiceTest {
+public class ClusterConfigServiceImplTest {
     @ClassRule
     public static final InMemoryMongoDb IN_MEMORY_MONGO_DB = newInMemoryMongoDbRule().build();
     private static final DateTime TIME = new DateTime(2015, 4, 1, 0, 0, DateTimeZone.UTC);
-    private static final String COLLECTION_NAME = ClusterConfigService.COLLECTION_NAME;
+    private static final String COLLECTION_NAME = ClusterConfigServiceImpl.COLLECTION_NAME;
 
     @Rule
     public MongoConnectionRule mongoRule = MongoConnectionRule.build("test");
@@ -95,7 +96,7 @@ public class ClusterConfigServiceTest {
         MongoJackObjectMapperProvider provider = new MongoJackObjectMapperProvider(objectMapper);
         when(nodeId.toString()).thenReturn("ID");
 
-        this.clusterConfigService = new ClusterConfigService(
+        this.clusterConfigService = new ClusterConfigServiceImpl(
                 provider,
                 mongoRule.getMongoConnection(),
                 nodeId,
@@ -242,7 +243,7 @@ public class ClusterConfigServiceTest {
         assertThat(original.getName()).isEqualTo(COLLECTION_NAME);
         assertThat(original.getIndexInfo()).hasSize(1);
 
-        DBCollection collection = ClusterConfigService.prepareCollection(mongoConnection);
+        DBCollection collection = ClusterConfigServiceImpl.prepareCollection(mongoConnection);
         assertThat(collection.getName()).isEqualTo(COLLECTION_NAME);
         assertThat(collection.getIndexInfo()).hasSize(2);
         assertThat(collection.getWriteConcern()).isEqualTo(WriteConcern.MAJORITY);
@@ -252,7 +253,7 @@ public class ClusterConfigServiceTest {
     @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
     public void prepareCollectionCreatesCollectionIfItDoesNotExist() throws Exception {
         assertThat(mongoConnection.getDatabase().collectionExists(COLLECTION_NAME)).isFalse();
-        DBCollection collection = ClusterConfigService.prepareCollection(mongoConnection);
+        DBCollection collection = ClusterConfigServiceImpl.prepareCollection(mongoConnection);
 
         assertThat(collection.getName()).isEqualTo(COLLECTION_NAME);
         assertThat(collection.getIndexInfo()).hasSize(2);

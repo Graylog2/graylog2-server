@@ -43,6 +43,7 @@ import org.graylog2.bindings.providers.SystemJobFactoryProvider;
 import org.graylog2.bindings.providers.SystemJobManagerProvider;
 import org.graylog2.buffers.processors.ServerProcessBufferProcessor;
 import org.graylog2.bundles.BundleService;
+import org.graylog2.cluster.ClusterConfigServiceImpl;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.filters.FilterService;
@@ -60,6 +61,7 @@ import org.graylog2.plugin.BaseConfiguration;
 import org.graylog2.plugin.PluginMetaData;
 import org.graylog2.plugin.RulesEngine;
 import org.graylog2.plugin.ServerStatus;
+import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.indexer.rotation.RotationStrategy;
 import org.graylog2.rest.NotFoundExceptionMapper;
 import org.graylog2.rest.RestAccessLogFilter;
@@ -166,6 +168,7 @@ public class ServerBindings extends AbstractModule {
         bind(BundleImporterProvider.class).in(Scopes.SINGLETON);
         bind(BundleExporterProvider.class).in(Scopes.SINGLETON);
         bind(ClusterStatsModule.class).asEagerSingleton();
+        bind(ClusterConfigService.class).to(ClusterConfigServiceImpl.class).asEagerSingleton();
 
         bind(String[].class).annotatedWith(named("RestControllerPackages")).toInstance(new String[]{
                 "org.graylog2.rest.resources",
