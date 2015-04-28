@@ -33,7 +33,7 @@ var SearchBar = React.createClass({
         $(this.universalSearchElement).off('get-original-search.graylog.universalsearch', this._getOriginalSearchRequest);
     },
     _getOriginalSearchRequest(event, data) {
-        data.callback(SearchStore.getSearchURLParams());
+        data.callback(SearchStore.getSimplifiedSearchURLParams());
     },
     _queryChanged() {
         SearchStore.query = this.refs.query.getValue();

@@ -4,7 +4,8 @@
 
 'use strict';
 
-declare var jsRoutes: any;
+declare
+var jsRoutes: any;
 
 import Immutable = require('immutable');
 var Qs = require('qs');
@@ -19,6 +20,7 @@ class SearchStore {
     private _rangeType: string;
     private _rangeParams: Immutable.Map<string, any>;
     private _page: number;
+    private _resolution: string;
     originalSearch: Immutable.Map<string, any>;
     onParamsChanged: (query: Object)=>void;
 
@@ -28,6 +30,8 @@ class SearchStore {
         this.query = this.originalSearch.get('query');
         this.rangeType = this.originalSearch.get('rangeType');
         this.rangeParams = this.originalSearch.get('rangeParams');
+        this.page = this.originalSearch.get('page');
+        this.resolution = this.originalSearch.get('resolution');
 
         $(document).on('add-search-term.graylog.universalsearch', this._addSearchTerm.bind(this));
     }
@@ -48,10 +52,11 @@ class SearchStore {
     }
 
     set page(newPage: number) {
-        this._page = newPage;
-        var searchURLParams = this.getSearchURLParams();
-        searchURLParams = searchURLParams.set('page', newPage);
-        URLUtils.openLink(jsRoutes.controllers.SearchControllerV2.index().url + "?" + Qs.stringify(searchURLParams.toJS()));
+        if (this._page === undefined) {
+            this._page = newPage;
+        } else {
+            this._reloadSearchWithNewParam('page', newPage);
+        }
     }
 
     get rangeType(): string {
@@ -77,9 +82,23 @@ class SearchStore {
         }
     }
 
+    get resolution(): string {
+        return this._resolution;
+    }
+
+    set resolution(newResolution: string) {
+        if (this._resolution === undefined) {
+            this._resolution = newResolution;
+        } else {
+            this._reloadSearchWithNewParam('interval', newResolution);
+        }
+    }
+
     static _initializeOriginalSearch(parsedSearch: Immutable.Map<string, any>): Immutable.Map<string, any> {
         var originalSearch = Immutable.Map<string, any>();
-        originalSearch = originalSearch.set('query', parsedSearch.get('q', ""));
+        originalSearch = originalSearch.set('query', parsedSearch.get('q', ''));
+        originalSearch = originalSearch.set('resolution', parsedSearch.get('interval'));
+        originalSearch = originalSearch.set('page', parsedSearch.get('page', 1));
         originalSearch = originalSearch.set('rangeType', parsedSearch.get('rangetype', 'relative'));
         var rangeParams;
 
@@ -88,7 +107,10 @@ class SearchStore {
                 rangeParams = Immutable.Map<string, any>({relative: Number(parsedSearch.get('relative', 5 * 60))});
                 break;
             case 'absolute':
-                rangeParams = Immutable.Map<string, any>({from: parsedSearch.get('from', ''), to: parsedSearch.get('to', '')});
+                rangeParams = Immutable.Map<string, any>({
+                    from: parsedSearch.get('from', ''),
+                    to: parsedSearch.get('to', '')
+                });
                 break;
             case 'keyword':
                 rangeParams = Immutable.Map<string, any>({keyword: parsedSearch.get('keyword', '')});
@@ -135,13 +157,27 @@ class SearchStore {
         };
     }
 
-    getSearchURLParams(): Immutable.Map<string, any> {
-        var filteredSearchParams = Immutable.Map<string, any>();
-        filteredSearchParams = filteredSearchParams.set('rangetype', this.originalSearch.get('rangeType'));
-        filteredSearchParams = filteredSearchParams.merge(this.originalSearch.get('rangeParams'));
-        filteredSearchParams = filteredSearchParams.set('q', this.originalSearch.get('query'));
+    getSimplifiedSearchURLParams(): Immutable.Map<string, any> {
+        var simplifiedParams = Immutable.Map<string, any>();
+        simplifiedParams = simplifiedParams.set('rangetype', this.originalSearch.get('rangeType'));
+        simplifiedParams = simplifiedParams.merge(this.originalSearch.get('rangeParams'));
+        simplifiedParams = simplifiedParams.set('q', this.originalSearch.get('query'));
 
-        return filteredSearchParams;
+        return simplifiedParams;
+    }
+
+    getSearchURLParams(): Immutable.Map<string, any> {
+        var searchParams = this.getSimplifiedSearchURLParams();
+        searchParams = searchParams.set('interval', this.originalSearch.get('resolution'));
+        searchParams = searchParams.set('page', this.originalSearch.get('page'));
+
+        return searchParams;
+    }
+
+    _reloadSearchWithNewParam(param: string, value: any) {
+        var searchURLParams = this.getSearchURLParams();
+        searchURLParams = searchURLParams.set(param, value);
+        URLUtils.openLink(jsRoutes.controllers.SearchControllerV2.index().url + "?" + Qs.stringify(searchURLParams.toJS()));
     }
 }
 
