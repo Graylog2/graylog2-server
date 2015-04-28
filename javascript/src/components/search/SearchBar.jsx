@@ -52,10 +52,10 @@ var SearchBar = React.createClass({
         return originalSearch.set('rangeParams', rangeParams);
     },
     componentDidMount() {
-        $(document).on('originalsearch.graylog.searchbar', this._onOriginalSearchRequest);
+        $("#universalsearch").on('originalsearch.graylog.searchbar', this._onOriginalSearchRequest);
     },
     componentWillUnmount() {
-        $(document).off('originalsearch.graylog.searchbar', this._onOriginalSearchRequest);
+        $("#universalsearch").off('originalsearch.graylog.searchbar', this._onOriginalSearchRequest);
     },
     _onOriginalSearchRequest(event, data) {
         data.callback(this.getSearchParams());
