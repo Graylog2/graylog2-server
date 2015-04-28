@@ -3,8 +3,12 @@
 var React = require('react/addons');
 
 var StreamStateBadge = React.createClass({
+    _onClick(evt) {
+        this.props.onClick(this.props.stream);
+    },
     render() {
-        return (this.props.stream.disabled ? <span className="badge alert-danger stream-stopped" onClick={this.props.onClick}>stopped</span> : <div></div>);
+        var stream = this.props.stream;
+        return (stream.disabled ? <span className="badge alert-danger stream-stopped" onClick={this._onClick}>stopped</span> : <div></div>);
     }
 });
 

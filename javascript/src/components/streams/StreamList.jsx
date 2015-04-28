@@ -9,7 +9,8 @@ var StreamList = React.createClass({
         return {};
     },
     _formatStream(stream) {
-        return <Stream key={"stream-" + stream.id} stream={stream} onDelete={this.props.onDelete}/>;
+        return <Stream key={"stream-" + stream.id} stream={stream}
+                       onDelete={this.props.onDelete} onResume={this.props.onResume} onUpdate={this.props.onUpdate} onClone={this.props.onClone}/>;
     },
     _sortByTitle(stream1, stream2) {
         return stream1.title.localeCompare(stream2.title);
@@ -25,7 +26,7 @@ var StreamList = React.createClass({
             );
         } else {
             // @if(isPermitted(STREAMS_CREATE))
-            var createLink = <a href={jsRoutes.controllers.StreamsController.create().url}>Create one now</a>;
+            var createLink = <a onClick={this.props.createStream}>Create one now</a>;
             return (
                 <Alert bsStyle='warning'>
                     <i className="fa fa-info-circle"></i>&nbsp;

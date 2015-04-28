@@ -31,7 +31,7 @@ var Stream = React.createClass({
                 <h2>
                     <a href={jsRoutes.controllers.StreamSearchController.index(stream.id, "*", "relative", 300).url}>{stream.title}</a>
 
-                    <StreamStateBadge stream={stream} />
+                    <StreamStateBadge stream={stream} onClick={this.props.onResume}/>
                 </h2>
                 <div className="stream-data">
                     <div className="stream-actions pull-right">
@@ -40,7 +40,8 @@ var Stream = React.createClass({
                         {manageAlertsLink}
                         {deleteStreamLink}
 
-                        <StreamControls stream={stream} />
+                        <StreamControls stream={stream}
+                                        onResume={this.props.onResume} onUpdate={this.props.onUpdate} onClone={this.props.onClone}/>
                     </div>
                     <div className="stream-description">
                         {createdFromContentPack}
