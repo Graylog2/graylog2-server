@@ -1,9 +1,11 @@
 package controllers.api;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import controllers.AuthenticatedController;
 import org.graylog2.restclient.lib.APIException;
 import org.graylog2.restclient.models.Stream;
 import org.graylog2.restclient.models.StreamService;
+import org.graylog2.restclient.models.api.requests.streams.CreateStreamRequest;
 import org.graylog2.restclient.models.api.requests.streams.TestMatchRequest;
 import org.graylog2.restclient.models.api.responses.streams.TestMatchResponse;
 import play.libs.Json;
@@ -30,6 +32,34 @@ public class StreamsApiController extends AuthenticatedController {
 
     public Result delete(String streamId) throws APIException, IOException {
         this.streamService.delete(streamId);
+        return ok();
+    }
+
+    public Result create() throws APIException, IOException {
+        final JsonNode json = request().body().asJson();
+        final CreateStreamRequest request = Json.fromJson(json, CreateStreamRequest.class);
+
+        return ok(Json.toJson(this.streamService.create(request)));
+    }
+
+    public Result resume(String streamId) throws APIException, IOException {
+        this.streamService.resume(streamId);
+        return ok();
+    }
+
+    public Result update(String streamId) throws APIException, IOException {
+        final JsonNode json = request().body().asJson();
+        final CreateStreamRequest request = Json.fromJson(json, CreateStreamRequest.class);
+
+        this.streamService.update(streamId, request);
+        return ok();
+    }
+
+    public Result cloneStream(String streamId) throws APIException, IOException {
+        final JsonNode json = request().body().asJson();
+        final CreateStreamRequest request = Json.fromJson(json, CreateStreamRequest.class);
+
+        this.streamService.cloneStream(streamId, request);
         return ok();
     }
 
