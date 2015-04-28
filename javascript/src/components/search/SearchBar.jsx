@@ -71,7 +71,7 @@ var SearchBar = React.createClass({
         return filteredSearchParams;
     },
     _queryChanged() {
-        SearchStore.addQueryTerm(this.refs.query.getValue());
+        SearchStore.query = this.refs.query.getValue();
     },
     _rangeTypeChanged(newRangeType) {
         this.setState({rangeType: newRangeType, rangeParams: Immutable.Map()});
