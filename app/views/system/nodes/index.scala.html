@@ -16,18 +16,17 @@
 
     <div class="row content content-head">
         <div class="col-md-10">
-            <h1><i class="fa fa-sitemap"></i> Nodes</h1>
+            <h1>Nodes</h1>
 
             <p class="description">
                 This page provides a real-time overview of the nodes in your Graylog cluster.
             </p>
 
-            <p class="description">
+            @views.html.partials.support.list_small() {
                 You can pause message processing at any time. The process buffers will not accept any new messages until you
                 resume it. If the message journal is enabled for a node, which it is by default, incoming messages will be
-                persisted to disk, even when processing is disabled. If it is disabled, you might lose messages sent to inputs
-                that do not support buffering, such as TCP and UDP-based inputs.
-            </p>
+                persisted to disk, even when processing is disabled.
+            }
         </div>
     </div>
 
@@ -36,12 +35,12 @@
             @if(jvms.size == 1) {
                 <h2>You are running one <span class="u-light">graylog-server</span> node</h2>
             } else {
-                <h2>You are running @jvms.size graylog-server nodes</h2>
+                <h2>You are running @jvms.size <span class="u-light">graylog-server</span> nodes</h2>
             }
 
             @for(jvm <- jvms) {
                 <div class="graylog-node">
-                    <div class="row">
+                    <div class="row row-sm">
                         <div class="col-md-5">
                             <h2 class="graylog-node-title">
                                 @views.html.partials.node_title_link(nodes.get(jvm.getNodeId))
@@ -90,7 +89,7 @@
                         </div>
                     </div>
 
-                    <div class="row">
+                    <div class="row row-sm">
                         <div class="col-md-3">
                             <dl class="graylog-node-state">
                                 <dt>Current lifecycle state:</dt>
