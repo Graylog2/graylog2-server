@@ -26,31 +26,23 @@ var MessageField = React.createClass({
         toggleClassName += this.state.showActions ? "open-analyze-field-active fa-caret-down" : "fa-caret-right";
 
         return (
-            <li className="search-result-field-type">
-                <div className="row no-bm">
-                    <div className="col-md-1">
-                        <i className={toggleClassName}
-                           onClick={this._toggleShowActions}></i>
-                    </div>
-                    <div className="col-md-11">
-                        <input type="checkbox"
-                               id={"field-selector-" + this.props.field.hash}
-                               className="field-selector"
-                               checked={this.props.selected}
-                               onChange={(event) => this.props.onToggled(this.props.field.name)}
-                            />
-                        <label htmlFor={"field-selector-" + this.props.field.hash}
-                               className="field-name">{this.props.field.name}</label>
+            <li>
+                <div className="pull-left">
+                    <i className={toggleClassName}
+                       onClick={this._toggleShowActions}></i>
+                </div>
+                <div style={{marginLeft: 25}}>
+                    <Input type="checkbox" label={this.props.field.name}
+                           onChange={() => this.props.onToggled(this.props.field.name)}/>
 
-                        {this.state.showActions &&
-                        <div className="analyze-field">
-                            <ButtonGroup bsSize='xsmall'>
-                                <Button>Statistics</Button>
-                                <Button>Quick values</Button>
-                                <Button>Generate chart</Button>
-                            </ButtonGroup>
-                        </div>}
-                    </div>
+                    {this.state.showActions &&
+                    <div className="analyze-field">
+                        <ButtonGroup bsSize='xsmall'>
+                            <Button>Statistics</Button>
+                            <Button>Quick values</Button>
+                            <Button>Generate chart</Button>
+                        </ButtonGroup>
+                    </div>}
                 </div>
             </li>
         );
@@ -143,7 +135,7 @@ var SearchSidebar = React.createClass({
                                                                                    onClick={this._showAllFields}>all
                     fields</a>.
                 </span>
-                <br/>
+                    <br/>
                     { this.props.showHighlightToggle &&
                     <Input type="checkbox" bsSize="small" checked={this.props.shouldHighlight}
                            onChange={this.props.toggleShouldHighlight} label="Highlight results"
