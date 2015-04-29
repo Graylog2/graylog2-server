@@ -16,7 +16,8 @@
  */
 package org.graylog2.indexer.searches;
 
-import com.google.common.annotations.VisibleForTesting;
+import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.Timer;
 import com.google.common.collect.Sets;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchRequestBuilder;
@@ -30,7 +31,6 @@ import org.elasticsearch.index.query.FilterBuilders;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.QueryStringQueryBuilder;
-import org.elasticsearch.node.Node;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.bucket.filter.Filter;
@@ -66,8 +66,10 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
+import static com.codahale.metrics.MetricRegistry.name;
+import static com.google.common.base.Preconditions.checkNotNull;
 import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
-import static org.elasticsearch.index.query.QueryBuilders.queryString;
+import static org.elasticsearch.index.query.QueryBuilders.queryStringQuery;
 
 @Singleton
 public class Searches {
@@ -80,7 +82,7 @@ public class Searches {
     public static final String AGG_HISTOGRAM = "gl2_histogram";
     public static final String AGG_EXTENDED_STATS = "gl2_extended_stats";
 
-    public static enum TermsStatsOrder {
+    public enum TermsStatsOrder {
         TERM,
         REVERSE_TERM,
         COUNT,
@@ -95,7 +97,7 @@ public class Searches {
         REVERSE_MEAN
     }
 
-    public static enum DateHistogramInterval {
+    public enum DateHistogramInterval {
         YEAR(Period.years(1)),
         QUARTER(Period.months(3)),
         MONTH(Period.months(1)),
@@ -139,24 +141,22 @@ public class Searches {
     private final Deflector deflector;
     private final IndexRangeService indexRangeService;
     private final Client c;
+    private final MetricRegistry metricRegistry;
+    private final Timer esRequestTimer;
 
     @Inject
     public Searches(Configuration configuration,
                     Deflector deflector,
                     IndexRangeService indexRangeService,
-                    Node node) {
-        this(configuration, deflector, indexRangeService, node.client());
-    }
+                    Client client,
+                    MetricRegistry metricRegistry) {
+        this.configuration = checkNotNull(configuration);
+        this.deflector = checkNotNull(deflector);
+        this.indexRangeService = checkNotNull(indexRangeService);
+        this.c = checkNotNull(client);
+        this.metricRegistry = checkNotNull(metricRegistry);
 
-    @VisibleForTesting
-    Searches(Configuration configuration,
-                    Deflector deflector,
-                    IndexRangeService indexRangeService,
-                    Client client) {
-        this.configuration = configuration;
-        this.deflector = deflector;
-        this.indexRangeService = indexRangeService;
-        this.c = client;
+        this.esRequestTimer = metricRegistry.timer(name(Searches.class, "elasticsearch", "requests"));
     }
 
     public CountResult count(String query, TimeRange range) {
@@ -175,6 +175,7 @@ public class Searches {
         request.searchType(SearchType.COUNT);
 
         SearchResponse r = c.search(request).actionGet();
+        esRequestTimer.update(r.getTookInMillis(), TimeUnit.MILLISECONDS);
         return new CountResult(r.getHits().getTotalHits(), r.getTookInMillis(), r.getHits());
     }
 
@@ -205,6 +206,7 @@ public class Searches {
             }
         }
         final SearchResponse r = c.search(request).actionGet();
+        esRequestTimer.update(r.getTookInMillis(), TimeUnit.MILLISECONDS);
 
         return new ScrollResult(c, query, request.source(), r, fields);
     }
@@ -237,6 +239,8 @@ public class Searches {
         SearchRequest request = searchRequest(config, indexNames).request();
 
         SearchResponse r = c.search(request).actionGet();
+        esRequestTimer.update(r.getTookInMillis(), TimeUnit.MILLISECONDS);
+
         return new SearchResult(r.getHits(), indices, config.query(), request.source(), r.getTook());
     }
 
@@ -266,6 +270,7 @@ public class Searches {
 
         final SearchRequest request = srb.request();
         SearchResponse r = c.search(request).actionGet();
+        esRequestTimer.update(r.getTookInMillis(), TimeUnit.MILLISECONDS);
 
         final Filter f = r.getAggregations().get(AGG_FILTER);
         return new TermsResult(
@@ -350,6 +355,7 @@ public class Searches {
 
         final SearchRequest request = srb.request();
         SearchResponse r = c.search(request).actionGet();
+        esRequestTimer.update(r.getTookInMillis(), TimeUnit.MILLISECONDS);
 
         final Filter f = r.getAggregations().get(AGG_FILTER);
         return new TermsStatsResult(
@@ -391,6 +397,7 @@ public class Searches {
         } catch (org.elasticsearch.action.search.SearchPhaseExecutionException e) {
             throw new FieldTypeException(e);
         }
+        esRequestTimer.update(r.getTookInMillis(), TimeUnit.MILLISECONDS);
 
         final Filter f = r.getAggregations().get(AGG_FILTER);
         return new FieldStatsResult(
@@ -414,7 +421,7 @@ public class Searches {
                                 .interval(interval.toESInterval()))
                 .filter(standardFilters(range, filter));
 
-        QueryStringQueryBuilder qs = queryString(query);
+        QueryStringQueryBuilder qs = queryStringQuery(query);
         qs.allowLeadingWildcard(configuration.isAllowLeadingWildcardSearches());
 
         SearchRequestBuilder srb = c.prepareSearch();
@@ -425,6 +432,7 @@ public class Searches {
 
         final SearchRequest request = srb.request();
         SearchResponse r = c.search(request).actionGet();
+        esRequestTimer.update(r.getTookInMillis(), TimeUnit.MILLISECONDS);
 
         final Filter f = r.getAggregations().get(AGG_FILTER);
         return new DateHistogramResult(
@@ -445,7 +453,7 @@ public class Searches {
                 )
                 .filter(standardFilters(range, filter));
 
-        QueryStringQueryBuilder qs = queryString(query);
+        QueryStringQueryBuilder qs = queryStringQuery(query);
         qs.allowLeadingWildcard(configuration.isAllowLeadingWildcardSearches());
 
         SearchRequestBuilder srb = c.prepareSearch();
@@ -461,6 +469,7 @@ public class Searches {
         } catch (org.elasticsearch.action.search.SearchPhaseExecutionException e) {
             throw new FieldTypeException(e);
         }
+        esRequestTimer.update(r.getTookInMillis(), TimeUnit.MILLISECONDS);
 
         final Filter f = r.getAggregations().get(AGG_FILTER);
         return new FieldHistogramResult(
@@ -535,7 +544,7 @@ public class Searches {
         if (query.trim().equals("*")) {
             srb.setQuery(matchAllQuery());
         } else {
-            QueryStringQueryBuilder qs = queryString(query);
+            QueryStringQueryBuilder qs = queryStringQuery(query);
             qs.allowLeadingWildcard(configuration.isAllowLeadingWildcardSearches());
             srb.setQuery(qs);
         }
@@ -588,6 +597,8 @@ public class Searches {
         srb.addSort("timestamp", sort);
 
         SearchResponse r = c.search(srb.request()).actionGet();
+        esRequestTimer.update(r.getTookInMillis(), TimeUnit.MILLISECONDS);
+
         if (r.getHits() != null && r.getHits().totalHits() > 0) {
             return r.getHits().getAt(0);
         } else {
@@ -606,7 +617,7 @@ public class Searches {
         }
 
         if (filter != null && !filter.isEmpty() && !filter.equals("*")) {
-            bfb.must(FilterBuilders.queryFilter(QueryBuilders.queryString(filter)));
+            bfb.must(FilterBuilders.queryFilter(QueryBuilders.queryStringQuery(filter)));
             set = true;
         }
 
@@ -617,7 +628,7 @@ public class Searches {
         return bfb;
     }
 
-    public class FieldTypeException extends Exception {
+    public static class FieldTypeException extends Exception {
         public FieldTypeException(Throwable e) {
             super(e);
         }

@@ -16,7 +16,6 @@
  */
 package org.graylog2.indexer.indices;
 
-import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -57,7 +56,6 @@ import org.elasticsearch.common.hppc.cursors.ObjectObjectCursor;
 import org.elasticsearch.common.settings.ImmutableSettings;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.index.query.QueryBuilder;
-import org.elasticsearch.node.Node;
 import org.elasticsearch.search.SearchHit;
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.indexer.IndexNotFoundException;
@@ -84,11 +82,6 @@ public class Indices implements IndexManagement {
     private final ElasticsearchConfiguration configuration;
 
     @Inject
-    public Indices(Node node, ElasticsearchConfiguration configuration) {
-        this(node.client(), configuration);
-    }
-
-    @VisibleForTesting
     public Indices(Client client, ElasticsearchConfiguration configuration) {
         this.c = client;
         this.configuration = configuration;

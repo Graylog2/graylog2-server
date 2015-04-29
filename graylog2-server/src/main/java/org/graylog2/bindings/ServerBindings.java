@@ -23,6 +23,7 @@ import com.google.inject.TypeLiteral;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.multibindings.Multibinder;
 import org.apache.shiro.mgt.DefaultSecurityManager;
+import org.elasticsearch.client.Client;
 import org.elasticsearch.node.Node;
 import org.graylog2.Configuration;
 import org.graylog2.alerts.AlertSender;
@@ -33,6 +34,7 @@ import org.graylog2.bindings.providers.BundleExporterProvider;
 import org.graylog2.bindings.providers.BundleImporterProvider;
 import org.graylog2.bindings.providers.ClusterEventBusProvider;
 import org.graylog2.bindings.providers.DefaultSecurityManagerProvider;
+import org.graylog2.bindings.providers.EsClientProvider;
 import org.graylog2.bindings.providers.EsNodeProvider;
 import org.graylog2.bindings.providers.LdapConnectorProvider;
 import org.graylog2.bindings.providers.LdapUserAuthenticatorProvider;
@@ -154,7 +156,8 @@ public class ServerBindings extends AbstractModule {
         } else {
             install(new NoopJournalModule());
         }
-        bind(Node.class).toProvider(EsNodeProvider.class).in(Scopes.SINGLETON);
+        bind(Node.class).toProvider(EsNodeProvider.class).asEagerSingleton();
+        bind(Client.class).toProvider(EsClientProvider.class).asEagerSingleton();
         bind(SystemJobManager.class).toProvider(SystemJobManagerProvider.class);
         bind(RulesEngine.class).toProvider(RulesEngineProvider.class);
         bind(LdapConnector.class).toProvider(LdapConnectorProvider.class);
