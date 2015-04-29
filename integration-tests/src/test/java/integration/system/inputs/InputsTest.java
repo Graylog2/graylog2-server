@@ -17,6 +17,7 @@
 package integration.system.inputs;
 
 import integration.BaseRestTest;
+import integration.MongoDbSeed;
 import integration.RequiresVersion;
 import org.testng.annotations.Test;
 
@@ -27,6 +28,7 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 public class InputsTest extends BaseRestTest {
 
     @Test
+    @MongoDbSeed(location = "graylog", database = "graylog2")
     public void createInputTest() {
 
         given().when()

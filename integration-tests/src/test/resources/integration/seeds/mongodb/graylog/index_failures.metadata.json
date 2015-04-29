@@ -1,0 +1,1 @@
+{ "options" : { "capped" : true, "size" : 52428800 }, "indexes" : [ { "v" : 1, "key" : { "_id" : 1 }, "name" : "_id_", "ns" : "graylog.index_failures" }, { "v" : 1, "key" : { "timestamp" : 1 }, "name" : "timestamp_1", "ns" : "graylog.index_failures" }, { "v" : 1, "key" : { "letter_id" : 1 }, "name" : "letter_id_1", "ns" : "graylog.index_failures" } ] }

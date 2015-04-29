@@ -25,6 +25,7 @@ import com.jayway.restassured.builder.RequestSpecBuilder;
 import com.jayway.restassured.config.MatcherConfig;
 import com.jayway.restassured.matcher.ResponseAwareMatcher;
 import com.jayway.restassured.response.Response;
+import integration.util.graylog.GraylogControl;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
@@ -47,7 +48,7 @@ import static com.jayway.restassured.RestAssured.given;
 import static com.jayway.restassured.RestAssured.preemptive;
 import static com.jayway.restassured.http.ContentType.JSON;
 
-@Listeners(BaseRestTest.class)
+@Listeners({BaseRestTest.class, SeedListener.class})
 public class BaseRestTest implements IHookable {
     private static final Logger log = LoggerFactory.getLogger(BaseRestTest.class);
     private static Version serverUnderTestVersion;
@@ -84,11 +85,12 @@ public class BaseRestTest implements IHookable {
             throw new SkipException("Not running REST API integration tests. Add -Dgl2.integration.tests to run them.");
         }
 
-        RestAssured.baseURI = System.getProperty("gl2.baseuri", "http://localhost");
-        RestAssured.port = Integer.parseInt(System.getProperty("gl2.port", "12900"));
-        RestAssured.authentication = preemptive().basic(
-                System.getProperty("gl2.admin_user", "admin"),
-                System.getProperty("gl2.admin_password", "admin"));
+        GraylogControl graylogController = new GraylogControl();
+        URL url = graylogController.getServerUrl();
+        RestAssured.baseURI = url.getProtocol() + "://" + url.getHost();
+        RestAssured.port = url.getPort();
+        String[] userInfo = url.getUserInfo().split(":");
+        RestAssured.authentication = preemptive().basic(userInfo[0], userInfo[1]);
 
         // we want all the details for failed tests
         RestAssured.enableLoggingOfRequestAndResponseIfValidationFails();
@@ -108,7 +110,7 @@ public class BaseRestTest implements IHookable {
                     @Override
                     public boolean matches(Object item) {
                         if (item instanceof String) {
-                            String str = (String)item;
+                            String str = (String) item;
                             try {
                                 // clean our slightly non-semver version number
                                 str = str.replaceAll("\\(.*?\\)", "").trim();

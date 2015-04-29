@@ -100,6 +100,26 @@
             <groupId>joda-time</groupId>
             <artifactId>joda-time</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+            <version>2.5.2</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.5.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mongodb</groupId>
+            <artifactId>mongo-java-driver</artifactId>
+            <version>3.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.4</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -135,6 +155,44 @@
                         <version>${surefire.version}</version>
                     </dependency>
                 </dependencies>
+            </plugin>
+            <plugin>
+                <groupId>org.jolokia</groupId>
+                <artifactId>docker-maven-plugin</artifactId>
+                <version>0.11.2</version>
+                <configuration>
+                    <images>
+                        <image>
+                            <name>integration-tests</name>
+                            <build>
+                                <from>graylog2/integration-environment</from>
+                                <ports>
+                                    <port>12900</port>
+                                    <port>27017</port>
+                                    <port>5000</port>
+                                </ports>
+                                <command>/opt/graylog/run.sh</command>
+                                <assembly>
+                                    <basedir>/opt/graylog</basedir>
+                                    <descriptor>assembly.xml</descriptor>
+                                </assembly>
+                            </build>
+                            <run>
+                                <ports>
+                                    <port>12900:12900</port>
+                                    <port>27017:27017</port>
+                                    <port>5000:5000</port>
+                                </ports>
+                                <wait>
+                                    <log>Server startup</log>
+                                    <url>http://127.0.0.1:12900/system/stats</url>
+                                    <time>120000</time>
+                                    <shutdown>500</shutdown>
+                                </wait>
+                            </run>
+                        </image>
+                    </images>
+                </configuration>
             </plugin>
         </plugins>
     </build>
