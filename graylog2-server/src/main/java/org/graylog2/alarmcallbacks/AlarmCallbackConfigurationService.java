@@ -16,19 +16,25 @@
  */
 package org.graylog2.alarmcallbacks;
 
-import org.graylog2.plugin.database.PersistedService;
+import com.google.inject.ImplementedBy;
+import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.rest.models.alarmcallbacks.requests.CreateAlarmCallbackRequest;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
  */
-public interface AlarmCallbackConfigurationService extends PersistedService {
-    public List<AlarmCallbackConfiguration> getForStreamId(String streamId);
-    public List<AlarmCallbackConfiguration> getForStream(Stream stream);
-    public AlarmCallbackConfiguration load(String alarmCallbackId);
-    public AlarmCallbackConfiguration create(String streamId, CreateAlarmCallbackRequest request, String userId);
-    public long count();
+@ImplementedBy(AlarmCallbackConfigurationServiceMJImpl.class)
+public interface AlarmCallbackConfigurationService {
+    List<AlarmCallbackConfiguration> getForStreamId(String streamId);
+    List<AlarmCallbackConfiguration> getForStream(Stream stream);
+    AlarmCallbackConfiguration load(String alarmCallbackId);
+    AlarmCallbackConfiguration create(String streamId, CreateAlarmCallbackRequest request, String userId);
+    long count();
+    AlarmCallbackConfiguration update(String streamId, String alarmCallbackId, Map<String, Object> deltas);
+    String save(AlarmCallbackConfiguration model) throws ValidationException;
+    int destroy(AlarmCallbackConfiguration model);
 }

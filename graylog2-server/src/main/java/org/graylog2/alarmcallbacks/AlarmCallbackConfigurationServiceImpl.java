@@ -24,6 +24,7 @@ import org.bson.types.ObjectId;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PersistedServiceImpl;
 import org.graylog2.plugin.Tools;
+import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.rest.models.alarmcallbacks.requests.CreateAlarmCallbackRequest;
 
@@ -77,5 +78,29 @@ public class AlarmCallbackConfigurationServiceImpl extends PersistedServiceImpl 
     @Override
     public long count() {
         return count(AlarmCallbackConfigurationImpl.class, new BasicDBObject());
+    }
+
+    @Override
+    public AlarmCallbackConfiguration update(String streamId, String alarmCallbackId, Map<String, Object> deltas) {
+        return null;
+    }
+
+    @Override
+    public String save(AlarmCallbackConfiguration model) throws ValidationException {
+
+        return super.save(getImplOrFail(model));
+    }
+
+    @Override
+    public int destroy(AlarmCallbackConfiguration model) {
+        return super.destroy(getImplOrFail(model));
+    }
+
+    private AlarmCallbackConfigurationImpl getImplOrFail(AlarmCallbackConfiguration alarmCallback) {
+        if (alarmCallback instanceof AlarmCallbackConfigurationImpl) {
+            return (AlarmCallbackConfigurationImpl) alarmCallback;
+        } else {
+            throw new IllegalArgumentException("Argument must be of implementation class AlarmCallbackConfigurationImpl, not " + alarmCallback.getClass());
+        }
     }
 }

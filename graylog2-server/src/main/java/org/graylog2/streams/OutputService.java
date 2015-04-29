@@ -27,19 +27,19 @@ import org.graylog2.rest.models.streams.outputs.requests.CreateOutputRequest;
 import java.util.Map;
 import java.util.Set;
 
-@ImplementedBy(OutputServiceImpl.class)
-public interface OutputService extends PersistedService {
+@ImplementedBy(OutputServiceMJImpl.class)
+public interface OutputService {
     Output load(String streamOutputId) throws NotFoundException;
 
     Set<Output> loadAll();
-
-    Set<Output> loadForStream(Stream stream);
 
     Output create(Output request) throws ValidationException;
 
     Output create(CreateOutputRequest request, String userId) throws ValidationException;
 
     void destroy(Output model) throws NotFoundException;
+
+    Output update(String id, Map<String, Object> deltas);
 
     /**
      * @return the total number of outputs

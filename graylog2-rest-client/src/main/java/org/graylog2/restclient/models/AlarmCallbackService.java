@@ -82,4 +82,8 @@ public class AlarmCallbackService {
     public void delete(String streamId, String alarmCallbackId) throws IOException, APIException {
         apiClient.path(resource.delete(streamId, alarmCallbackId)).expect(Http.Status.NO_CONTENT).execute();
     }
+
+    public void update(String streamId, String alarmCallbackId,  CreateAlarmCallbackRequest request) throws IOException, APIException {
+        apiClient.path(resource.update(streamId, alarmCallbackId), CreateAlarmCallbackRequest.class).body(request).expect(Http.Status.OK).execute();
+    }
 }
