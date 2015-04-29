@@ -1,6 +1,6 @@
 @(currentUser: org.graylog2.restclient.models.User, breadcrumbs: lib.BreadcrumbList, totalFailures: Long, page: Integer)
 
-@main("Indexer failures", views.html.system.sidebar(), "", currentUser, false) {
+@main("Indexer failures", null, "", currentUser, false) {
 
     @views.html.partials.breadcrumbs(breadcrumbs)
 
@@ -21,7 +21,7 @@
         </div>
     </div>
 
-    <div class="row content">
+    <div class="row content indexer-failures-body">
         <div class="col-md-12">
             <div class="scrollable-table">
                 <table class="indexer-failures table table-striped table-hover table-condensed">
