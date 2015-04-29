@@ -16,7 +16,7 @@ var AddToDashboardMenu = React.createClass({
         };
     },
     componentDidMount() {
-        $("#universalsearch").trigger('get-original-search.graylog.universalsearch', {callback: this._setOriginalSearchParams});
+        $(document).trigger('get-original-search.graylog.search', {callback: this._setOriginalSearchParams});
     },
     componentWillReceiveProps(newProps) {
         this._setDashboards(newProps.dashboards);

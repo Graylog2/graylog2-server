@@ -2,8 +2,6 @@
 
 'use strict';
 
-var $ = require('jquery');
-
 var React = require('react');
 var Input = require('react-bootstrap').Input;
 var Button = require('react-bootstrap').Button;
@@ -25,15 +23,6 @@ var SearchBar = React.createClass({
     },
     componentDidMount() {
         SearchStore.onParamsChanged = (newParams) => this.setState(newParams);
-
-        this.universalSearchElement = React.findDOMNode(this.refs.universalSearch);
-        $(this.universalSearchElement).on('get-original-search.graylog.universalsearch', this._getOriginalSearchRequest);
-    },
-    componentWillUnmount() {
-        $(this.universalSearchElement).off('get-original-search.graylog.universalsearch', this._getOriginalSearchRequest);
-    },
-    _getOriginalSearchRequest(event, data) {
-        data.callback(SearchStore.getSimplifiedSearchURLParams());
     },
     _queryChanged() {
         SearchStore.query = this.refs.query.getValue();

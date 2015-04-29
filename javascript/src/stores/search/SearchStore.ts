@@ -33,7 +33,8 @@ class SearchStore {
         this.page = this.originalSearch.get('page');
         this.resolution = this.originalSearch.get('resolution');
 
-        $(document).on('add-search-term.graylog.universalsearch', this._addSearchTerm.bind(this));
+        $(document).on('add-search-term.graylog.search', this._addSearchTerm.bind(this));
+        $(document).on('get-original-search.graylog.search', this._getOriginalSearchRequest.bind(this));
     }
 
     get query(): string {
@@ -128,6 +129,10 @@ class SearchStore {
         this.addQueryTerm(term, SearchStore.AND_OPERATOR);
     }
 
+    _getOriginalSearchRequest(event, data) {
+        data.callback(this.getOriginalSearchParams());
+    }
+
     static escape(source) {
         // Escape all lucene special characters from the source: && || : \ / + - ! ( ) { } [ ] ^ " ~ * ?
         return source.replace(/(&&|\|\||[\:\\\/\+\-\!\(\)\{\}\[\]\^\"\~\*\?])/g, "\\$&");
@@ -157,21 +162,25 @@ class SearchStore {
         };
     }
 
-    getSimplifiedSearchURLParams(): Immutable.Map<string, any> {
+    getOriginalSearchParams(): Immutable.Map<string,any> {
+        var orignalParams = Immutable.Map<string, any>();
+        orignalParams = orignalParams.set('range_type', this.originalSearch.get('rangeType'));
+        orignalParams = orignalParams.merge(this.originalSearch.get('rangeParams'));
+        orignalParams = orignalParams.set('query', this.originalSearch.get('query'));
+        orignalParams = orignalParams.set('interval', this.originalSearch.get('resolution'));
+
+        return orignalParams;
+    }
+
+    getSearchURLParams(): Immutable.Map<string, any> {
         var simplifiedParams = Immutable.Map<string, any>();
         simplifiedParams = simplifiedParams.set('rangetype', this.originalSearch.get('rangeType'));
         simplifiedParams = simplifiedParams.merge(this.originalSearch.get('rangeParams'));
         simplifiedParams = simplifiedParams.set('q', this.originalSearch.get('query'));
+        simplifiedParams = simplifiedParams.set('interval', this.originalSearch.get('resolution'));
+        simplifiedParams = simplifiedParams.set('page', this.originalSearch.get('page'));
 
         return simplifiedParams;
-    }
-
-    getSearchURLParams(): Immutable.Map<string, any> {
-        var searchParams = this.getSimplifiedSearchURLParams();
-        searchParams = searchParams.set('interval', this.originalSearch.get('resolution'));
-        searchParams = searchParams.set('page', this.originalSearch.get('page'));
-
-        return searchParams;
     }
 
     _reloadSearchWithNewParam(param: string, value: any) {
