@@ -22,8 +22,8 @@ import org.graylog2.plugin.Message;
 import org.graylog2.plugin.alarms.AlertCondition;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.streams.Stream;
-import org.graylog2.streams.StreamRuleService;
 import org.graylog2.shared.users.UserService;
+import org.graylog2.streams.StreamRuleService;
 
 import javax.inject.Inject;
 import java.util.Collections;
@@ -48,6 +48,7 @@ public class FormattedEmailAlertSender extends StaticEmailAlertSender implements
             "${else}<No backlog.>${end}\n" +
             "\n";
 
+    private final Engine engine = new Engine();
     private Configuration pluginConfig;
 
     @Inject
@@ -61,7 +62,7 @@ public class FormattedEmailAlertSender extends StaticEmailAlertSender implements
     }
 
     @Override
-    protected String buildSubject(Stream stream, AlertCondition.CheckResult checkResult, EmailConfiguration config, List<Message> backlog) {
+    protected String buildSubject(Stream stream, AlertCondition.CheckResult checkResult, List<Message> backlog) {
         final String template;
         if (pluginConfig == null || pluginConfig.getString("subject") == null) {
             template = "Graylog alert for stream: ${stream.title}";
@@ -84,7 +85,6 @@ public class FormattedEmailAlertSender extends StaticEmailAlertSender implements
             template = pluginConfig.getString("body");
         }
         Map<String, Object> model = getModel(stream, checkResult, backlog);
-        Engine engine = new Engine();
 
         return engine.transform(template, model);
     }
