@@ -58,7 +58,7 @@ var BootstrapModal = React.createClass({
         this.refs.modal.open();
     },
     _focusFirstInput() {
-        var element = $("input", React.findDOMNode(this.refs.body)).first();
+        var element = $("input[type!=hidden],select,textarea", React.findDOMNode(this.refs.body)).first();
 
         if (element.length === 0) {
             element = $("input, button", React.findDOMNode(this.refs.footer)).first();
