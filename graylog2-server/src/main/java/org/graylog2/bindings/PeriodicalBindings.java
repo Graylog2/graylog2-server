@@ -23,6 +23,7 @@ import org.graylog2.events.ClusterEventPeriodical;
 import org.graylog2.periodical.AlertScannerThread;
 import org.graylog2.periodical.BatchedElasticSearchOutputFlushThread;
 import org.graylog2.periodical.ClusterHealthCheckThread;
+import org.graylog2.periodical.ClusterIdGeneratorPeriodical;
 import org.graylog2.periodical.ContentPackLoaderPeriodical;
 import org.graylog2.periodical.DeadLetterThread;
 import org.graylog2.periodical.GarbageCollectionWarningThread;
@@ -54,5 +55,6 @@ public class PeriodicalBindings extends AbstractModule {
         periodicalBinder.addBinding().to(ThrottleStateUpdaterThread.class);
         periodicalBinder.addBinding().to(ClusterEventPeriodical.class);
         periodicalBinder.addBinding().to(ClusterEventCleanupPeriodical.class);
+        periodicalBinder.addBinding().to(ClusterIdGeneratorPeriodical.class);
     }
 }
