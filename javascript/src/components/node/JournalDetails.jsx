@@ -86,10 +86,10 @@ var JournalDetails = React.createClass({
 
             content = (
                 <div>
-                    <p>Incoming messages are written to the disk journal to ensure they are kept safe in case of a server failure. The journal also helps keeping Graylog working if any of the outputs is too slow to keep up with the message rate
+                    <p className="description">Incoming messages are written to the disk journal to ensure they are kept safe in case of a server failure. The journal also helps keeping Graylog working if any of the outputs is too slow to keep up with the message rate
                         or whenever there is a peak in incoming messages. It makes sure that Graylog does not buffer all of those messages in main memory and avoids overly long garbage collection pauses that way.
                     </p>
-                    <Row>
+                    <Row className="row-sm">
                         <Col md={6}>
                             <h3>Configuration</h3>
                             <dl className="system-journal">
@@ -126,7 +126,7 @@ var JournalDetails = React.createClass({
         }
 
         return (<div>
-            <h2><i className="fa fa-hdd-o"></i> Disk Journal</h2>
+            <h2>Disk Journal</h2>
             {content}
         </div>);
 

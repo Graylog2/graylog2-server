@@ -20,7 +20,7 @@
 
             <div class="pull-right">
                 <div class="btn-group">
-                    <a class="btn btn-info btn-sm dropdown-toggle" data-toggle="dropdown" href="#">
+                    <a class="btn btn-info dropdown-toggle" data-toggle="dropdown" href="#">
                         Actions
                         <span class="caret"></span>
                     </a>
@@ -30,7 +30,7 @@
                         }
                         <li><a href="@routes.MetricsController.ofNode(node.getNodeId)">Metrics</a></li>
                         @if(isPermitted(LOGGERS_READ)) {
-                            <li><a href="@routes.LoggingController.index()">Internal logging</a></li>
+                            <li><a href="@routes.LoggingController.index()">Configure internal logging</a></li>
                         }
                         <li>
                             <a href="@node.getTransportAddress/api-browser" target="_blank">
@@ -42,7 +42,7 @@
                 </div>
             </div>
 
-            <h1><i class="fa fa-sitemap"></i> Node @node.getHostname / @node.getShortNodeId</h1>
+            <h1>Node @node.getHostname / @node.getShortNodeId</h1>
 
             <p class="description">This page shows details of a Graylog server node that is active and reachable in your cluster.</p>
 
@@ -102,7 +102,11 @@
 
     <div class="row content">
         <div class="col-md-12">
-            <h2><i class="fa fa-tasks"></i> Memory/Heap usage</h2>
+            <div class="row row-sm">
+                <div class="col-md-12">
+                    <h2>Memory/Heap usage</h2>
+                </div>
+            </div>
 
             <div class="react-jvm-heap" data-node-id="@node.getNodeId"></div>
 
@@ -113,8 +117,19 @@
 
     <div class="row content">
         <div class="col-md-12">
-            <h2><i class="fa fa-shield"></i> Buffers</h2>
-            <div class="row">
+
+            <div class="row row-sm">
+                <div class="col-md-12">
+                    <h2>Buffers</h2>
+
+                    <p class="description">
+                        The buffers are built to cache small amounts of messages for a very short time
+                        (usually milliseconds) on their way through the different processors.
+                    </p>
+                </div>
+            </div>
+
+            <div class="row row-sm">
                 <div class="col-md-4">
                     <div class="react-buffer-usage" data-node-id="@node.getNodeId" data-title="Input buffer" data-buffer-type="input"></div>
                 </div>
@@ -125,8 +140,6 @@
                     <div class="react-buffer-usage" data-node-id="@node.getNodeId" data-title="Output buffer" data-buffer-type="output"></div>
                 </div>
             </div>
-
-            The buffers are built to cache small amounts of messages on their way through the different processors.
         </div>
     </div>
 
