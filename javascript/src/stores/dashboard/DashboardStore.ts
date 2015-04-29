@@ -2,10 +2,12 @@
 
 'use strict';
 
-declare var $: any;
+declare
+var $: any;
+declare
+var jsRoutes: any;
 
 import UserNotification = require("../../util/UserNotification");
-import URLUtils = require("../../util/URLUtils");
 
 interface Dashboard {
     id: string;
@@ -15,7 +17,7 @@ interface Dashboard {
 
 var DashboardStore = {
     getWritableDashboardList(): JQueryPromise<string[]> {
-        var url = URLUtils.appPrefixed('/a/dashboards/writable');
+        var url = jsRoutes.controllers.api.DashboardsApiController.listWritable().url;
         var promise = $.getJSON(url);
         promise.fail((jqXHR, textStatus, errorThrown) => {
             if (jqXHR.status !== 404) {
@@ -26,7 +28,7 @@ var DashboardStore = {
         return promise;
     },
     saveDashboard(dashboard: Dashboard, callback: () => void) {
-        var url = URLUtils.appPrefixed('/dashboards') + "/" + dashboard.id + "/update";
+        var url = jsRoutes.controllers.DashboardsController.update(dashboard.id).url;
         $.ajax({
             type: "POST",
             url: url,

@@ -8,7 +8,6 @@ var TextField = require('./TextField');
 var NumberField = require('./NumberField');
 var BooleanField = require('./BooleanField');
 var DropdownField = require('./DropdownField');
-var $ = require('jquery'); // excluded and shimed
 
 var ConfigurationForm = React.createClass({
     getDefaultProps() {

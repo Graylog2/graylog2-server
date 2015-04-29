@@ -2,8 +2,10 @@
 
 'use strict';
 
+declare
+var jsRoutes: any;
+
 import UserNotification = require("../../util/UserNotification");
-import URLUtils = require("../../util/URLUtils");
 
 interface SerializedWidget {
     id: string;
@@ -46,7 +48,7 @@ var WidgetsStore = {
     },
 
     loadWidget(dashboardId: string, widgetId: string): JQueryPromise<string[]> {
-        var url = URLUtils.appPrefixed('/a/dashboards/' + dashboardId + '/widgets/' + widgetId);
+        var url = jsRoutes.controllers.api.DashboardsApiController.widget(dashboardId, widgetId).url;
         var promise = $.getJSON(url);
         promise.fail((jqXHR, textStatus, errorThrown) => {
             if (jqXHR.status !== 404) {
@@ -58,9 +60,7 @@ var WidgetsStore = {
     },
 
     updateWidget(dashboardId: string, widget: Widget) {
-        var url = URLUtils.appPrefixed('/a/dashboards/' + dashboardId + '/widgets/' + widget.id);
-        console.log(url);
-        console.log(JSON.stringify(this._serializeWidget(widget)));
+        var url = jsRoutes.controllers.api.DashboardsApiController.updateWidget(dashboardId, widget.id).url;
         var promise = $.ajax({
             type: "PUT",
             url: url,
@@ -79,7 +79,7 @@ var WidgetsStore = {
     },
 
     loadValue(dashboardId: string, widgetId: string, resolution: number): JQueryPromise<string[]> {
-        var url = URLUtils.appPrefixed('/a/dashboards/' + dashboardId + '/widgets/' + widgetId + '/resolution/' + resolution + '/value');
+        var url = jsRoutes.controllers.api.DashboardsApiController.widgetValue(dashboardId, widgetId, resolution).url;
         return $.getJSON(url);
     }
 };
