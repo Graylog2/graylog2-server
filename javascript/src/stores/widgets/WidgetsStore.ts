@@ -47,6 +47,29 @@ var WidgetsStore = {
         };
     },
 
+    addWidget(dashboardId: string, widgetType: string, widgetTitle: string, widgetConfig: Object): JQueryPromise<string[]> {
+        var widgetData = {description: widgetTitle, type: widgetType, config: widgetConfig};
+        console.log(widgetData);
+        var url = jsRoutes.controllers.api.DashboardsApiController.addWidget(dashboardId).url;
+        var promise = $.ajax({
+            type: "POST",
+            url: url,
+            data: JSON.stringify(widgetData),
+            dataType: 'json',
+            contentType: 'application/json'
+        });
+
+        promise.done(() => UserNotification.success("Widget created successfully"));
+        promise.fail((jqXHR, textStatus, errorThrown) => {
+            if (jqXHR.status !== 404) {
+                UserNotification.error("Creating widget failed with status: " + errorThrown,
+                    "Could not create widget");
+            }
+        });
+
+        return promise;
+    },
+
     loadWidget(dashboardId: string, widgetId: string): JQueryPromise<string[]> {
         var url = jsRoutes.controllers.api.DashboardsApiController.widget(dashboardId, widgetId).url;
         var promise = $.getJSON(url);
