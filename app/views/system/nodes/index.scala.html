@@ -48,17 +48,33 @@
                         </div>
 
                         <div class="col-md-7" style="text-align: right;">
-                            <a href="#" class="btn btn-info">Details</a>
-                            <a href="#" class="btn btn-info">Metrics</a>
-                            <a href="#" class="btn btn-info">API browser</a>
+                            <a href="@routes.NodesController.node(jvm.getNodeId)" class="btn btn-info">Details</a>
+                            <a href="@routes.MetricsController.ofNode(jvm.getNodeId)" class="btn btn-info">Metrics</a>
+                            <a href="@nodes.get(jvm.getNodeId).getTransportAddress/api-browser" class="btn btn-info" target="_blank">
+                                <i class="fa fa-external-link"></i>&nbsp;
+                                API browser
+                            </a>
 
                             <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false" style="margin-left: 15px;">
                                 More actions <span class="caret"></span>
                             </button>
 
                             <ul class="dropdown-menu" role="menu">
-                                <li><a href="#">Pause message processing</a></li>
-
+                                @if(isPermitted(PROCESSING_CHANGESTATE)) {
+                                    <li>
+                                    @if(nodes.get(jvm.getNodeId).isProcessing) {
+                                        <a class="change-message-processing"
+                                        data-action="pause"
+                                        data-node-id="@jvm.getNodeId"
+                                        href="#">Pause message processing</a>
+                                    } else {
+                                        <a class="change-message-processing"
+                                        data-action="resume"
+                                        data-node-id="@jvm.getNodeId"
+                                        href="#">Resume message processing</a>
+                                    }
+                                    </li>
+                                }
                                 @if(isPermitted(LBSTATUS_CHANGE)) {
                                     <li class="dropdown-submenu">
                                         <a href="#">Override LB status</a>
@@ -81,10 +97,30 @@
                                         </ul>
                                     </li>
                                 }
-                                <li><a href="#">Shut down node</a></li>
-                                <li class="divider"></li>
-                                <li><a href="#">Local message inputs</a></li>
-                                <li><a href="#">Get thread dump</a></li>
+
+                                @if(isPermitted(NODE_SHUTDOWN)) {
+                                    <li>
+                                        <a href="@routes.NodesController.shutdown(jvm.getNodeId)"
+                                        data-super-confirm="Really shutdown node?"
+                                        data-super-confirm-word="SHUTDOWN">
+                                            Graceful shutdown
+                                        </a>
+                                    </li>
+                                }
+
+                                @if(isPermitted(INPUTS_READ) || isPermitted(THREADS_DUMP)) {
+                                    <li class="divider"></li>
+                                }
+
+                                @if(isPermitted(INPUTS_READ)) {
+                                    <li>
+                                        <a href="@routes.InputsController.manage(jvm.getNodeId)">Local message inputs</a>
+                                    </li>
+                                }
+
+                                @if(isPermitted(THREADS_DUMP)) {
+                                    <li><a href="@routes.NodesController.threadDump(jvm.getNodeId)">Get thread dump</a></li>
+                                }
                             </ul>
                         </div>
                     </div>
@@ -99,7 +135,7 @@
                                     @if(nodes.get(jvm.getNodeId).isProcessing) {
                                         Enabled
                                     } else {
-                                        Disabled
+                                        <span class="text-danger">Disabled</span>
                                     }
                                 </dd>
                                 <dt>Load balancer indication:</dt>
@@ -107,7 +143,7 @@
                                     @if(nodes.get(jvm.getNodeId).lbAlive()) {
                                         ALIVE
                                     } else {
-                                        DEAD
+                                        <span class="text-danger">DEAD</span>
                                     }
                                 </dd>
                             </dl>
@@ -122,7 +158,7 @@
                             @if(nodes.get(jvm.getNodeId).isProcessing) {
                                 <span class="react-node-throughput" data-node-id="@jvm.getNodeId"></span>
                             } else {
-                                <span>
+                                <span class="text-danger">
                                     Processing is <strong>paused</strong>.
                                 </span>
                             }
@@ -130,7 +166,7 @@
                             @if(nodes.get(jvm.getNodeId).getJournalInfo.enabled) {
                                 <span class="react-journal-state" data-node-id="@jvm.getNodeId"></span>
                             } else {
-                                <span>Message journal is not enabled.</span>
+                                <span class="text-warn">Message journal is not enabled.</span>
                             }
                         </div>
                     </div>
