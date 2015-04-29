@@ -161,7 +161,7 @@
 
     <div class="row content">
         <div class="col-md-6">
-            <h2><i class="fa fa-cogs"></i> System</h2>
+            <h2> System</h2>
 
             <dl class="system-system">
                 <dt>Hostname:</dt>
@@ -182,7 +182,7 @@
         </div>
 
         <div class="col-md-6">
-            <h2><i class="fa fa-sign-in"></i> REST API</h2>
+            <h2>REST API</h2>
 
             <dl class="system-rest">
                 <dt>Transport address:</dt>
@@ -203,10 +203,10 @@
     
     <div class="row content">
         <div class="col-md-12">
-            <h2><i class="fa fa-cloud-download"></i> Installed Plugins <span style="font-size: 12px;">@installedPlugins.size() @pluralize("plugin", installedPlugins.size) installed.</span></h2>
+            <h2>Installed Plugins <span style="font-size: 12px;">@installedPlugins.size() @pluralize("plugin", installedPlugins.size) installed.</span></h2>
 
             @if(installedPlugins.size() > 0) {
-                <table class="table table-striped table-hover table-condensed">
+                <table class="table table-striped table-hover table-condensed table-sm">
                     <thead>
                         <tr>
                             <th>Name</th>
@@ -246,9 +246,9 @@
             @if(isPermitted(INPUTS_EDIT)) {
             <a href="@routes.InputsController.manage(node.getNodeId)" class="btn btn-sm btn-success pull-right">Manage inputs</a>
             }
-            <h2><i class="fa fa-cloud-download"></i> Installed/available input types <span style="font-size: 12px;">@node.getInputs.size() @pluralize("input", node.getInputs.size) running.</span></h2>
+            <h2>Installed/available input types <span style="font-size: 12px;">@node.getInputs.size() @pluralize("input", node.getInputs.size) running.</span></h2>
 
-            <table class="table table-striped table-hover table-condensed">
+            <table class="table table-striped table-hover table-condensed table-sm">
                 <thead>
                     <tr>
                         <th>Name</th>
