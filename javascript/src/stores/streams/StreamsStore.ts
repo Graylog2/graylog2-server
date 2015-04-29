@@ -25,7 +25,28 @@ var StreamsStore = {
                 "Could not load streams.");
         });
         return promise;
+    },
+    removeOutput(streamId: string, outputId: string, callback: (jqXHR, textStatus, errorThrown) => void) {
+        $.ajax({
+            url: jsRoutes.controllers.api.StreamOutputsApiController.delete(streamId, outputId).url,
+            type: 'DELETE',
+            error: (jqXHR, textStatus, errorThrown) => {
+                UserNotification.error("Removing output from stream failed with status: " + errorThrown,
+                    "Could not remove output from stream");
+            },
+            success: callback
+        });
+    },
+    addOutput(streamId: string, outputId: string, callback: (jqXHR, textStatus, errorThrown) => void) {
+        $.ajax({
+            url: jsRoutes.controllers.api.StreamOutputsApiController.delete(streamId, outputId).url,
+            type: 'PUT',
+            error: (jqXHR, textStatus, errorThrown) => {
+                UserNotification.error("Adding output to stream failed with status: " + errorThrown,
+                    "Could not add output to stream");
+            },
+            success: callback
+        });
     }
 };
-
 export = StreamsStore;

@@ -71,10 +71,7 @@ public class UsersApiController extends AuthenticatedController {
 
         User user = userService.load(username);
         if (user != null) {
-            Map<String, Object> result = Maps.newHashMap();
-            result.put("preferences", user.getPreferences());
-            // TODO: there is more than preferences
-            return ok(Json.toJson(result));
+            return ok(Json.toJson(user));
         } else {
             return notFound();
         }
