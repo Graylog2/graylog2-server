@@ -20,13 +20,13 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
+import org.graylog2.rest.models.dashboards.requests.AddWidgetRequest;
 import org.graylog2.rest.models.dashboards.requests.WidgetPositionsRequest;
 import org.graylog2.restclient.lib.APIException;
 import org.graylog2.restclient.lib.ApiClient;
 import org.graylog2.restclient.lib.timeranges.InvalidRangeParametersException;
 import org.graylog2.restclient.models.User;
 import org.graylog2.restclient.models.UserService;
-import org.graylog2.restclient.models.api.requests.dashboards.AddWidgetRequest;
 import org.graylog2.restclient.models.api.requests.dashboards.UpdateDashboardRequest;
 import org.graylog2.restclient.models.api.requests.dashboards.UserSetWidgetPositionsRequest;
 import org.graylog2.restclient.models.api.requests.dashboards.UserWidgetPositionRequest;
@@ -82,7 +82,7 @@ public class Dashboard {
     }
 
     public void addWidget(DashboardWidget widget) throws APIException, IOException {
-        AddWidgetRequest request = new AddWidgetRequest(widget);
+        AddWidgetRequest request = AddWidgetRequest.create(widget.getDescription(), widget.getType().name(), widget.getCacheTime(), widget.getConfig());
 
         api.path(routes.DashboardsResource().addWidget(id))
                 .onlyMasterNode()
