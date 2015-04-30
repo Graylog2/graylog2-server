@@ -4,6 +4,7 @@ var React = require('react/addons');
 var StreamThroughput = require('./StreamThroughput');
 var StreamControls = require('./StreamControls');
 var StreamStateBadge = require('./StreamStateBadge');
+var CollapsableStreamList = require('./CollapsableStreamList');
 
 var Stream = React.createClass({
     _formatNumberOfStreamRules(stream) {
@@ -52,6 +53,8 @@ var Stream = React.createClass({
                         <StreamThroughput streamId={stream.id} />
 
                         , {this._formatNumberOfStreamRules(stream)}
+
+                        <CollapsableStreamList streamRules={stream.stream_rules}/>
                     </div>
                 </div>
             </li>
