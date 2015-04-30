@@ -16,6 +16,7 @@
  */
 package org.graylog2.rest.models.alarmcallbacks.responses;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.common.collect.Maps;
 import org.graylog2.rest.models.configuration.responses.RequestedConfigurationField;
 
@@ -28,6 +29,7 @@ import java.util.Map;
 public class AvailableAlarmCallbacksResponse {
     public Map<String, AvailableAlarmCallbackSummaryResponse> types;
 
+    @JsonIgnore
     public Map<String, List<RequestedConfigurationField>> getRequestedConfiguration() {
         Map<String, List<RequestedConfigurationField>> result = Maps.newHashMap();
 

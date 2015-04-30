@@ -16,6 +16,8 @@
  */
 package org.graylog2.indexer.searches;
 
+import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.Timer;
 import com.google.common.collect.ImmutableSet;
 import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
 import com.lordofthejars.nosqlunit.core.DatabaseOperation;
@@ -68,6 +70,7 @@ import static org.mockito.Mockito.when;
 public class SearchesTest {
     @ClassRule
     public static final EmbeddedElasticsearch EMBEDDED_ELASTICSEARCH = newEmbeddedElasticsearchRule().build();
+    private static final String REQUEST_TIMER_NAME = "org.graylog2.indexer.searches.Searches.elasticsearch.requests";
 
     @Rule
     public ElasticsearchRule elasticsearchRule;
@@ -123,6 +126,7 @@ public class SearchesTest {
     private final Deflector deflector = mock(Deflector.class);
     private final IndexRangeService indexRangeService = mock(IndexRangeService.class);
 
+    private MetricRegistry metricRegistry;
     private Searches searches;
 
     @Inject
@@ -136,7 +140,8 @@ public class SearchesTest {
     @Before
     public void setUp() throws Exception {
         when(indexRangeService.getFrom(anyInt())).thenReturn(INDEX_RANGES);
-        searches = new Searches(new Configuration(), deflector, indexRangeService, client);
+        metricRegistry = new MetricRegistry();
+        searches = new Searches(new Configuration(), deflector, indexRangeService, client, metricRegistry);
     }
 
     @Test
@@ -147,6 +152,19 @@ public class SearchesTest {
                 new DateTime(2015, 1, 2, 0, 0)));
 
         assertThat(result.getCount()).isEqualTo(10L);
+    }
+
+    @Test
+    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    public void countRecordsMetrics() throws Exception {
+        CountResult result = searches.count("*", new AbsoluteRange(
+                new DateTime(2015, 1, 1, 0, 0),
+                new DateTime(2015, 1, 2, 0, 0)));
+
+        assertThat(metricRegistry.getTimers()).containsKey(REQUEST_TIMER_NAME);
+
+        Timer timer = metricRegistry.timer(REQUEST_TIMER_NAME);
+        assertThat(timer.getCount()).isEqualTo(1L);
     }
 
     @Test
@@ -168,6 +186,19 @@ public class SearchesTest {
 
     @Test
     @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    public void termsRecordsMetrics() throws Exception {
+        TermsResult result = searches.terms("n", 25, "*", new AbsoluteRange(
+                new DateTime(2015, 1, 1, 0, 0),
+                new DateTime(2015, 1, 2, 0, 0)));
+
+        assertThat(metricRegistry.getTimers()).containsKey(REQUEST_TIMER_NAME);
+
+        Timer timer = metricRegistry.timer(REQUEST_TIMER_NAME);
+        assertThat(timer.getCount()).isEqualTo(1L);
+    }
+
+    @Test
+    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void testTermsStats() throws Exception {
         TermsStatsResult r = searches.termsStats("message", "n", Searches.TermsStatsOrder.COUNT, 25, "*",
                 new AbsoluteRange(
@@ -179,6 +210,21 @@ public class SearchesTest {
         assertThat((Map<String, Object>) r.getResults().get(0))
                 .hasSize(7)
                 .containsEntry("key_field", "ho");
+    }
+
+    @Test
+    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    public void termsStatsRecordsMetrics() throws Exception {
+        TermsStatsResult r = searches.termsStats("message", "n", Searches.TermsStatsOrder.COUNT, 25, "*",
+                new AbsoluteRange(
+                        new DateTime(2015, 1, 1, 0, 0),
+                        new DateTime(2015, 1, 2, 0, 0))
+        );
+
+        assertThat(metricRegistry.getTimers()).containsKey(REQUEST_TIMER_NAME);
+
+        Timer timer = metricRegistry.timer(REQUEST_TIMER_NAME);
+        assertThat(timer.getCount()).isEqualTo(1L);
     }
 
     @Test
@@ -197,6 +243,19 @@ public class SearchesTest {
         assertThat(result.getSumOfSquares()).isEqualTo(53.0);
         assertThat(result.getVariance()).isEqualTo(0.984375);
         assertThat(result.getStdDeviation()).isEqualTo(0.9921567416492215);
+    }
+
+    @Test
+    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    public void fieldStatsRecordsMetrics() throws Exception {
+        FieldStatsResult result = searches.fieldStats("n", "*", new AbsoluteRange(
+                new DateTime(2015, 1, 1, 0, 0),
+                new DateTime(2015, 1, 2, 0, 0)));
+
+        assertThat(metricRegistry.getTimers()).containsKey(REQUEST_TIMER_NAME);
+
+        Timer timer = metricRegistry.timer(REQUEST_TIMER_NAME);
+        assertThat(timer.getCount()).isEqualTo(1L);
     }
 
     @Test
@@ -220,6 +279,19 @@ public class SearchesTest {
     @Test
     @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     @SuppressWarnings("unchecked")
+    public void histogramRecordsMetrics() throws Exception {
+        final AbsoluteRange range = new AbsoluteRange(new DateTime(2015, 1, 1, 0, 0), new DateTime(2015, 1, 2, 0, 0));
+        HistogramResult h = searches.histogram("*", Searches.DateHistogramInterval.MINUTE, range);
+
+        assertThat(metricRegistry.getTimers()).containsKey(REQUEST_TIMER_NAME);
+
+        Timer timer = metricRegistry.timer(REQUEST_TIMER_NAME);
+        assertThat(timer.getCount()).isEqualTo(1L);
+    }
+
+    @Test
+    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @SuppressWarnings("unchecked")
     public void testFieldHistogram() throws Exception {
         final AbsoluteRange range = new AbsoluteRange(new DateTime(2015, 1, 1, 0, 0), new DateTime(2015, 1, 2, 0, 0));
         HistogramResult h = searches.fieldHistogram("*", "n", Searches.DateHistogramInterval.MINUTE, null, range);
@@ -234,6 +306,19 @@ public class SearchesTest {
                 .containsEntry("total_count", 2L)
                 .containsEntry("total", 4.0)
                 .containsEntry("mean", 2.0);
+    }
+
+    @Test
+    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @SuppressWarnings("unchecked")
+    public void fieldHistogramRecordsMetrics() throws Exception {
+        final AbsoluteRange range = new AbsoluteRange(new DateTime(2015, 1, 1, 0, 0), new DateTime(2015, 1, 2, 0, 0));
+        HistogramResult h = searches.fieldHistogram("*", "n", Searches.DateHistogramInterval.MINUTE, null, range);
+
+        assertThat(metricRegistry.getTimers()).containsKey(REQUEST_TIMER_NAME);
+
+        Timer timer = metricRegistry.timer(REQUEST_TIMER_NAME);
+        assertThat(timer.getCount()).isEqualTo(1L);
     }
 
     public static class IndexCreatingLoadStrategyFactory implements LoadStrategyFactory {

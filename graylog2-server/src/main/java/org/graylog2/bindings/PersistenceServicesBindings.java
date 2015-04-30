@@ -19,8 +19,6 @@ package org.graylog2.bindings;
 import com.google.inject.AbstractModule;
 import org.graylog2.agents.AgentService;
 import org.graylog2.agents.AgentServiceImpl;
-import org.graylog2.alarmcallbacks.AlarmCallbackConfigurationService;
-import org.graylog2.alarmcallbacks.AlarmCallbackConfigurationServiceImpl;
 import org.graylog2.alerts.AlertService;
 import org.graylog2.alerts.AlertServiceImpl;
 import org.graylog2.cluster.NodeService;
@@ -76,7 +74,6 @@ public class PersistenceServicesBindings extends AbstractModule {
         bind(SavedSearchService.class).to(SavedSearchServiceImpl.class);
         bind(LdapSettingsService.class).to(LdapSettingsServiceImpl.class);
         bind(MongoDBSessionService.class).to(MongoDBSessionServiceImpl.class);
-        bind(AlarmCallbackConfigurationService.class).to(AlarmCallbackConfigurationServiceImpl.class);
         bind(AgentService.class).to(AgentServiceImpl.class);
     }
 }

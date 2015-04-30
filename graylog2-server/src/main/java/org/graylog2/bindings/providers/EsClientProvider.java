@@ -14,21 +14,26 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.restclient.models.api.requests.dashboards;
+package org.graylog2.bindings.providers;
 
-import org.graylog2.restclient.models.api.requests.ApiRequest;
-import org.graylog2.restclient.models.dashboards.widgets.DashboardWidget;
+import org.elasticsearch.client.Client;
+import org.elasticsearch.node.Node;
 
-import java.util.Map;
+import javax.inject.Inject;
+import javax.inject.Provider;
+import javax.inject.Singleton;
 
-public class AddWidgetRequest extends ApiRequest {
-    public String type;
-    public String description;
-    public Map<String, Object> config;
+@Singleton
+public class EsClientProvider implements Provider<Client> {
+    private final Node node;
 
-    public AddWidgetRequest(DashboardWidget widget) {
-        this.type = widget.getType().toString().toLowerCase();
-        this.description = widget.getDescription();
-        this.config = widget.getConfig();
+    @Inject
+    public EsClientProvider(Node node) {
+        this.node = node;
+    }
+
+    @Override
+    public Client get() {
+        return node.client();
     }
 }

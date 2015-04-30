@@ -725,13 +725,6 @@
                 <version>1.6.3</version>
                 <scope>test</scope>
             </dependency>
-
-            <dependency>
-                <groupId>org.graylog.telemetry</groupId>
-                <artifactId>graylog-telemetry-plugin</artifactId>
-                <version>1.0.1</version>
-                <scope>provided</scope>
-            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -891,7 +884,9 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>${surefire.version}</version>
                 <configuration>
-                    <forkMode>once</forkMode>
+                    <!-- Use ALL the cores! -->
+                    <forkCount>1C</forkCount>
+                    <reuseForks>false</reuseForks>
                     <argLine>-XX:-UseSplitVerifier -Djava.library.path=${project.basedir}/../lib/sigar-${sigar.version}</argLine>
                     <excludes>
                         <exclude>**/*IntegrationTest.java</exclude>

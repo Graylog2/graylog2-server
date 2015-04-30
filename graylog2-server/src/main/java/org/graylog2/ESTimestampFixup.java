@@ -47,6 +47,7 @@ import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.node.Node;
 import org.elasticsearch.search.SearchHit;
+import org.graylog2.bindings.providers.EsClientProvider;
 import org.graylog2.bindings.providers.EsNodeProvider;
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.plugin.Tools;
@@ -138,6 +139,7 @@ public class ESTimestampFixup {
         protected void configure() {
             bind(Configuration.class).toInstance(configuration);
             bind(Node.class).toProvider(EsNodeProvider.class).in(Scopes.SINGLETON);
+            bind(Client.class).toProvider(EsClientProvider.class).in(Scopes.SINGLETON);
         }
     }
 

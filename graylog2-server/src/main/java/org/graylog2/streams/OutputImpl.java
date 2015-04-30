@@ -23,6 +23,7 @@ import org.bson.types.ObjectId;
 import org.graylog2.database.CollectionName;
 import org.graylog2.database.validators.FilledStringValidator;
 import org.graylog2.database.validators.OptionalStringValidator;
+import org.graylog2.plugin.database.Persisted;
 import org.graylog2.plugin.database.validators.Validator;
 import org.graylog2.plugin.streams.Output;
 
@@ -33,7 +34,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @CollectionName("outputs")
-public class OutputImpl implements Output {
+public class OutputImpl implements Output, Persisted {
     static final String FIELD_ID = "_id";
     static final String FIELD_TITLE = "title";
     static final String FIELD_TYPE = "type";
@@ -106,7 +107,6 @@ public class OutputImpl implements Output {
         return Collections.emptyMap();
     }
 
-    @Override
     public String getId() {
         return _id.toHexString();
     }
@@ -128,7 +128,6 @@ public class OutputImpl implements Output {
         return contentPack;
     }
 
-    @Override
     public Map<String, Object> getFields() {
         final HashMap<String, Object> fields = new HashMap<>();
         fields.put(FIELD_ID, new ObjectId(getId()));
@@ -173,7 +172,6 @@ public class OutputImpl implements Output {
         return result;
     }
 
-    @Override
     @JsonValue
     public Map<String, Object> asMap() {
         final Map<String, Object> fields = getFields();

@@ -50,6 +50,7 @@ import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -87,6 +88,7 @@ public class AlarmCallbackResource extends RestResource {
     @Produces(MediaType.APPLICATION_JSON)
     public AlarmCallbackListSummary get(@ApiParam(name = "streamid", value = "The id of the stream whose alarm callbacks we want.", required = true)
                                    @PathParam("streamid") String streamid) throws NotFoundException {
+        checkPermission(RestPermissions.STREAMS_READ, streamid);
         final Stream stream = streamService.load(streamid);
 
         final List<AlarmCallbackSummary> alarmCallbacks = Lists.newArrayList();
@@ -95,7 +97,7 @@ public class AlarmCallbackResource extends RestResource {
                     callback.getId(),
                     callback.getStreamId(),
                     callback.getType(),
-                    callback.getConfiguration().getSource(),
+                    callback.getConfiguration(),
                     callback.getCreatedAt(),
                     callback.getCreatorUserId()
             ));
@@ -113,6 +115,7 @@ public class AlarmCallbackResource extends RestResource {
                                    @PathParam("streamid") String streamid,
                                    @ApiParam(name = "alarmCallbackId", value = "The alarm callback id we are getting", required = true)
                                    @PathParam("alarmCallbackId") String alarmCallbackId) throws NotFoundException {
+        checkPermission(RestPermissions.STREAMS_READ, streamid);
         final Stream stream = streamService.load(streamid);
 
         final AlarmCallbackConfiguration result = alarmCallbackConfigurationService.load(alarmCallbackId);
@@ -120,7 +123,7 @@ public class AlarmCallbackResource extends RestResource {
             throw new javax.ws.rs.NotFoundException();
         }
 
-        return AlarmCallbackSummary.create(result.getId(), result.getStreamId(), result.getType(), result.getConfiguration().getSource(), result.getCreatedAt(), result.getCreatorUserId());
+        return AlarmCallbackSummary.create(result.getId(), result.getStreamId(), result.getType(), result.getConfiguration(), result.getCreatedAt(), result.getCreatorUserId());
     }
 
     @POST
@@ -137,7 +140,6 @@ public class AlarmCallbackResource extends RestResource {
         final Stream stream = streamService.load(streamid);
 
         final AlarmCallbackConfiguration alarmCallbackConfiguration = alarmCallbackConfigurationService.create(streamid, cr, getCurrentUser().getName());
-        alarmCallbackConfiguration.setStream(stream);
 
         final String id;
         try {
@@ -161,6 +163,7 @@ public class AlarmCallbackResource extends RestResource {
     @Produces(MediaType.APPLICATION_JSON)
     public AvailableAlarmCallbacksResponse available(@ApiParam(name = "streamid", value = "The id of the stream whose alarm callbacks we want.", required = true)
                                                       @PathParam("streamid") String streamid) {
+        checkPermission(RestPermissions.STREAMS_READ, streamid);
         final Map<String, AvailableAlarmCallbackSummaryResponse> types = Maps.newHashMapWithExpectedSize(availableAlarmCallbacks.size());
         for (AlarmCallback availableAlarmCallback : availableAlarmCallbacks) {
             final AvailableAlarmCallbackSummaryResponse type = new AvailableAlarmCallbackSummaryResponse();
@@ -183,10 +186,11 @@ public class AlarmCallbackResource extends RestResource {
             @ApiResponse(code = 404, message = "Alarm callback not found."),
             @ApiResponse(code = 400, message = "Invalid ObjectId.")
     })
-    public void delete(@ApiParam(name = "streamid", value = "The stream id this new rule belongs to.", required = true)
+    public void delete(@ApiParam(name = "streamid", value = "The stream id this alarm callback belongs to.", required = true)
                        @PathParam("streamid") String streamid,
                        @ApiParam(name = "alarmCallbackId", required = true)
                        @PathParam("alarmCallbackId") String alarmCallbackId) throws NotFoundException {
+        checkPermission(RestPermissions.STREAMS_EDIT, streamid);
         final Stream stream = streamService.load(streamid);
 
         final AlarmCallbackConfiguration result = alarmCallbackConfigurationService.load(alarmCallbackId);
@@ -198,5 +202,22 @@ public class AlarmCallbackResource extends RestResource {
             LOG.error("Couldn't remove alarm callback with id {}", result.getId());
             throw new InternalServerErrorException();
         }
+    }
+
+    @PUT
+    @Path("/{alarmCallbackId}")
+    @Timed
+    @ApiOperation(value = "Update an alarm callback",
+            response = CreateAlarmCallbackResponse.class)
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public void update(@ApiParam(name = "streamid", value = "The stream id this alarm callback belongs to.", required = true)
+                       @PathParam("streamid") String streamid,
+                       @ApiParam(name = "alarmCallbackId", required = true)
+                       @PathParam("alarmCallbackId") String alarmCallbackId,
+                       @ApiParam(name = "JSON body", required = true) Map<String, Object> deltas) throws NotFoundException {
+        checkPermission(RestPermissions.STREAMS_EDIT, streamid);
+
+        this.alarmCallbackConfigurationService.update(streamid, alarmCallbackId, deltas);
     }
 }
