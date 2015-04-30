@@ -6,8 +6,16 @@ declare var $: any;
 import UserNotification = require("../../util/UserNotification");
 import URLUtils = require("../../util/URLUtils");
 
+interface Stream {
+    id: string;
+    title: string;
+    description: string;
+    creatorUser: string;
+    createdAt: number;
+}
+
 var StreamsStore = {
-    load(callback: ((streams: any) => void)) {
+    load(callback: ((streams: Array<Stream>) => void)) {
         var failCallback = (jqXHR, textStatus, errorThrown) => {
             UserNotification.error("Fetching Streams failed with status: " + errorThrown,
                 "Could not retrieve Streams!");
@@ -80,6 +88,28 @@ var StreamsStore = {
             contentType: "application/json",
             data: JSON.stringify(data)
         }).done(callback).fail(failCallback);
+    },
+    removeOutput(streamId: string, outputId: string, callback: (jqXHR, textStatus, errorThrown) => void) {
+        $.ajax({
+            url: jsRoutes.controllers.api.StreamOutputsApiController.delete(streamId, outputId).url,
+            type: 'DELETE',
+            error: (jqXHR, textStatus, errorThrown) => {
+                UserNotification.error("Removing output from stream failed with status: " + errorThrown,
+                    "Could not remove output from stream");
+            },
+            success: callback
+        });
+    },
+    addOutput(streamId: string, outputId: string, callback: (jqXHR, textStatus, errorThrown) => void) {
+        $.ajax({
+            url: jsRoutes.controllers.api.StreamOutputsApiController.delete(streamId, outputId).url,
+            type: 'PUT',
+            error: (jqXHR, textStatus, errorThrown) => {
+                UserNotification.error("Adding output to stream failed with status: " + errorThrown,
+                    "Could not add output to stream");
+            },
+            success: callback
+        });
     }
 };
 

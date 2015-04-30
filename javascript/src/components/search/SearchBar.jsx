@@ -9,20 +9,31 @@ var ButtonToolbar = require('react-bootstrap').ButtonToolbar;
 var DropdownButton = require('react-bootstrap').DropdownButton;
 var MenuItem = require('react-bootstrap').MenuItem;
 
+var SearchStore = require('../../stores/search/SearchStore');
+
 var SearchBar = React.createClass({
     getInitialState() {
+        var searchParams = SearchStore.getParams();
         return {
-            rangeType: 'relative',
-            streamId: null,
-            query: ""
+            rangeType: searchParams.rangeType,
+            rangeParams: searchParams.rangeParams,
+            query: searchParams.query,
+            streamId: null
         };
     },
-    _onQueryChange() {
-        var newQuery = this.refs.searchBar.getValue();
-        this.setState({query: newQuery});
+    componentDidMount() {
+        SearchStore.onParamsChanged = (newParams) => this.setState(newParams);
     },
-    _onRangeTypeChange(newRangeType) {
-        this.setState({rangeType: newRangeType});
+    _queryChanged() {
+        SearchStore.query = this.refs.query.getValue();
+    },
+    _rangeTypeChanged(newRangeType) {
+        SearchStore.rangeType = newRangeType;
+    },
+    _rangeParamsChanged(key) {
+        return () => {
+            this.setState({rangeParams: this.state.rangeParams.set(key, this.refs[key].getValue())});
+        };
     },
     _getRangeTypeSelector() {
         var selector;
@@ -32,8 +43,13 @@ var SearchBar = React.createClass({
                 selector = (
                     <div className="timerange-selector relative"
                          style={{width: 270, marginLeft: 50}}>
-                        <Input id='relative-timerange-selector' ref='relativeTimerangeSelector' type='select'
-                               name='relative' className='input-sm'>
+                        <Input id='relative-timerange-selector'
+                               ref='relative'
+                               type='select'
+                               value={this.state.rangeParams.get('relative')}
+                               name='relative'
+                               onChange={this._rangeParamsChanged('relative')}
+                               className='input-sm'>
                             <option value="300">Search in the last 5 minutes</option>
                             <option value="900">Search in the last 15 minutes</option>
                             <option value="1800">Search in the last 30 minutes</option>
@@ -58,7 +74,10 @@ var SearchBar = React.createClass({
                         <div className='row no-bm' style={{marginLeft: 50}}>
                             <div className='col-md-5' style={{padding: 0}}>
                                 <Input type='text'
+                                       ref='from'
                                        name='from'
+                                       value={this.state.rangeParams.get('from')}
+                                       onChange={this._rangeParamsChanged('from')}
                                        placeholder={momentHelper.DATE_FORMAT}
                                        buttonAfter={setToNowButton}
                                        bsSize='small'/>
@@ -68,7 +87,10 @@ var SearchBar = React.createClass({
                             </div>
                             <div className='col-md-5' style={{padding: 0}}>
                                 <Input type='text'
+                                       ref='to'
                                        name='to'
+                                       value={this.state.rangeParams.get('to')}
+                                       onChange={this._rangeParamsChanged('to')}
                                        placeholder={momentHelper.DATE_FORMAT}
                                        buttonAfter={setToNowButton}
                                        bsSize='small'/>
@@ -80,7 +102,13 @@ var SearchBar = React.createClass({
             case 'keyword':
                 selector = (
                     <div className="timerange-selector keyword" style={{width: 353, marginLeft: 50}}>
-                        <Input type='text' name='keyword' placeholder='Last week' className='input-sm'/>
+                        <Input type='text'
+                               ref='keyword'
+                               name='keyword'
+                               value={this.state.rangeParams.get('keyword')}
+                               onChange={this._rangeParamsChanged('keyword')}
+                               placeholder='Last week'
+                               className='input-sm'/>
                     </div>
                 );
                 break;
@@ -96,7 +124,7 @@ var SearchBar = React.createClass({
             <div className="row no-bm">
                 <div className="col-md-12" id="universalsearch-container">
                     <div className="row no-bm">
-                        <div className="col-md-12" id="universalsearch">
+                        <div ref="universalSearch" className="col-md-12" id="universalsearch">
                             <form className="universalsearch-form"
                                   action={this.props.streamId ?  "unimplemented" : jsRoutes.controllers.SearchControllerV2.index().url }
                                   method="GET">
@@ -115,7 +143,7 @@ var SearchBar = React.createClass({
                                     <ButtonToolbar className='timerange-chooser pull-left'>
                                         <DropdownButton bsStyle='info'
                                                         title={<i className="fa fa-clock-o"></i>}
-                                                        onSelect={this._onRangeTypeChange}>
+                                                        onSelect={this._rangeTypeChanged}>
                                             <MenuItem eventKey='relative'
                                                       className={this.state.rangeType === 'relative' ? 'selected' : null}>
                                                 Relative
@@ -141,10 +169,10 @@ var SearchBar = React.createClass({
 
                                     <div className="query">
                                         <Input type='text'
-                                               ref='searchBar'
+                                               ref='query'
                                                name='q'
-                                               value={this.props.query}
-                                               onChange={this._onQueryChange}
+                                               value={this.state.query}
+                                               onChange={this._queryChanged}
                                                placeholder='Type your search query here and press enter. ("not found" AND http) OR http_response_code:[400 TO 404]'/>
                                     </div>
                                 </div>

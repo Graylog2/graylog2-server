@@ -5,17 +5,29 @@
         localInputs: List[org.graylog2.restclient.models.InputState],
         inputTypes: Map[String, org.graylog2.restclient.models.api.responses.system.InputTypeSummaryResponse])
 
-@main("Inputs of node", views.html.system.sidebar(), "", currentUser) {
+@main("Inputs of node", null, "", currentUser, false) {
+
     @views.html.partials.breadcrumbs(breadcrumbs)
 
-    <div class="row">
-        <h1>
-            <i class="fa fa-cloud-download"></i> Inputs of @node.getShortNodeId / @node.getHostname
-        </h1>
-        Graylog nodes accept data via inputs. On this page you can see which inputs are running on this node.
-        You can launch and terminate inputs on your cluster <a href="@routes.InputsController.index()">here</a>.
+    <div class="row content content-head">
+
+        <div class="col-md-12">
+            <h1>
+                Inputs of @node.getShortNodeId / @node.getHostname
+            </h1>
+
+            <p class="description">
+                Graylog nodes accept data via inputs. On this page you can see which inputs are running on this
+                specific node.
+            </p>
+
+            @views.html.partials.support.list_small() {
+                You can launch and terminate inputs on your cluster <a href="@routes.InputsController.index()">here</a>.
+            }
+        </div>
     </div>
 
     @views.html.system.inputs.partials.input_summary_list(globalInputs, localInputs, inputTypes, node)
     @views.html.system.inputs.partials.add_static_field_form()
+
 }

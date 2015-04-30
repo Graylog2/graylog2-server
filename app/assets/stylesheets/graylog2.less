@@ -189,6 +189,10 @@ label {
   margin-top: 55px !important;
 }
 
+.modal .modal-backdrop {
+  z-index: initial;
+}
+
 .modal-backdrop {
   height: 100000%;  // yes, really. this fixes the backdrop being cut off when the page is scrolled.
   z-index: 1030;
@@ -406,6 +410,7 @@ a.fields-set-chooser {
 
 .search-result-fields li {
   margin-top: 1px;
+  margin-bottom: 5px;
   padding: 2px 0;
 }
 
@@ -415,6 +420,19 @@ a.fields-set-chooser {
   position: relative;
   top: 3px;
   font-weight: normal !important;
+}
+
+.search-result-fields .form-group {
+  margin-bottom: 0;
+}
+
+.search-result-fields .checkbox {
+  margin: 0;
+}
+
+.search-result-fields input[type=checkbox] {
+  position: relative;
+  right: 4px;
 }
 
 .message-highlighted {
@@ -860,12 +878,6 @@ s
   color: #16ACE3;
 }
 
-ul.search-result-fields input[type=checkbox] {
-  position: relative;
-  right: 4px;
-  top: 3px;
-}
-
 .open-analyze-field-active {
   color: #1189B5;
 }
@@ -876,7 +888,7 @@ ul.search-result-fields input[type=checkbox] {
 
 .analyze-field {
   margin-top: 10px;
-  margin-left: 10px;
+  margin-left: 12px;
 }
 
 .analyzer-content dl {
@@ -1355,6 +1367,10 @@ ul.search-result-fields input[type=checkbox] {
   list-style-type: square;
 }
 
+.metric-list {
+  padding: 0;
+}
+
 .metric-list li {
   margin-bottom: 5px;
 }
@@ -1372,6 +1388,11 @@ ul.search-result-fields input[type=checkbox] {
 .metric-list li .metric {
   display: none;
   margin-left: 10px;
+  padding: 10px;
+}
+
+.metric-list li .metric h3 {
+  margin-bottom: 5px;
 }
 
 .metric-list dl {
@@ -1877,6 +1898,7 @@ h2.radios-head {
 }
 
 dl.system-journal {
+  margin-top: 5px;
   margin-bottom: 0px;
 }
 
@@ -2789,6 +2811,7 @@ ul.streams li.stream .streamrules-list li {
 
 dl.graylog-node-state {
   margin-top: 7px;
+  margin-bottom: 0;
 }
 
 dl.graylog-node-state dt {
@@ -2914,12 +2937,12 @@ table.messages tr.message-detail-row dl.message-details-fields dd {
   border-bottom: 1px solid #ececec;
 }
 
-//table.messages tr.message-detail-row dl.message-details dd ul {
-//  list-style-type: disc;
-//  padding-left: 25px;
-//}
+table.messages tr.message-detail-row dl.message-details dd.stream-list ul {
+  list-style-type: disc;
+  padding-left: 25px;
+}
 
-table.messages tr.message-detail-row dl.message-details dd ul li {
+table.messages tr.message-detail-row dl.message-details dd.stream-list ul li {
   margin-top: 3px;
 }
 
@@ -2950,4 +2973,59 @@ table.messages tr.message-detail-row dl.message-details dd div.message-field-act
   .table-responsive {
     overflow-x: visible;
   }
+}
+
+div#navigation-bar ul.dropdown-menu li a {
+  font-size: 12px;
+}
+
+div#navigation-bar ul.dropdown-menu {
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+div#navigation-bar ul.dropdown-menu li {
+  padding: 2px 2px 2px 0;
+}
+
+div#navigation-bar ul.dropdown-menu li.divider {
+  padding: 0;
+}
+
+.indexer-failures-body select.dynatable-per-page-select {
+  position: relative;
+  top: 0px;
+}
+
+table.indexer-failures {
+  margin-top: 10px;
+}
+
+div.row-sm {
+  margin-bottom: 5px;
+}
+
+.graylog-node-heap .progress, .react-buffer-usage .progress, #react-journal-info .progress {
+  margin-bottom: 5px;
+}
+
+#react-journal-info .progress {
+  margin-top: 10px;
+}
+
+#react-journal-info .progress .progress-bar {
+  min-width: 3em;
+}
+
+.graylog-node-heap p {
+  margin-bottom: 0px;
+}
+
+dl.system-system, dl.system-rest {
+  margin-top: 5px;
+  margin-bottom: 0px;
+}
+
+.table-sm {
+  margin-bottom: 0px;
 }

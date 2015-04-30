@@ -21,13 +21,16 @@ var WidgetCreationModal = React.createClass({
         this.refs.createModal.close();
     },
     getConfiguration() {
-        var configuration = Immutable.Map({title: this.state.title});
-        return configuration.concat(this.state.configuration);
+        return Immutable.Map(this.state.configuration);
     },
     save(e) {
         e.preventDefault();
         var configuration = this.getConfiguration();
-        this.props.onConfigurationSaved(configuration);
+        this.props.onConfigurationSaved(this.state.title, configuration);
+    },
+    saved() {
+        this.setState(this.getInitialState());
+        this.hide();
     },
     _getDefaultWidgetTitle() {
         var title = "";

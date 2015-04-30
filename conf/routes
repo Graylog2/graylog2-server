@@ -45,9 +45,6 @@ GET         /streams/:stream_id/csv                                             
 
 # Stream Outputs
 GET         /streams/:stream_id/outputs                                              @controllers.StreamOutputsController.index(stream_id: String)
-POST        /streams/:stream_id/outputs/add                                          @controllers.StreamOutputsController.add(stream_id: String)
-POST        /streams/:stream_id/outputs/:output_id/delete                            @controllers.StreamOutputsController.remove(stream_id: String, output_id: String)
-POST        /streams/:stream_id/outputs                                              @controllers.StreamOutputsController.create(stream_id: String)
 
 # Alerts
 GET         /streams/:stream_id/alerts                                               @controllers.AlertsController.index(stream_id: String)
@@ -90,8 +87,6 @@ POST        /system/grokpatterns/import                                         
 
 # Outputs
 GET         /system/outputs                                                          @controllers.OutputsController.index()
-POST        /system/outputs                                                          @controllers.OutputsController.create()
-POST        /system/outputs/:output_id/terminate                                     @controllers.OutputsController.terminate(output_id: String, redirectToStream ?= "")
 
 POST        /system/inputs/:input_id/start                                           @controllers.InputsController.start(input_id: String)
 POST        /system/inputs/:input_id/stop                                            @controllers.InputsController.stop(input_id: String)
@@ -277,6 +272,24 @@ GET         /a/system/grokpatterns                                              
 POST        /a/system/grokpatterns/update                                            @controllers.api.GrokPatternsApiController.update()
 POST        /a/system/grokpatterns/create                                            @controllers.api.GrokPatternsApiController.create()
 DELETE      /a/system/grokpatterns/:pattern_id                                       @controllers.api.GrokPatternsApiController.delete(pattern_id: String)
+
+# API: Outputs
+GET         /a/system/outputs                                                        @controllers.api.OutputsApiController.index()
+POST        /a/system/outputs                                                        @controllers.api.OutputsApiController.create()
+GET         /a/system/outputs/available/:output_type                                 @controllers.api.OutputsApiController.available(output_type: String)
+GET         /a/system/outputs/availableTypes                                         @controllers.api.OutputsApiController.availableTypes()
+DELETE      /a/system/outputs/:output_id                                             @controllers.api.OutputsApiController.delete(output_id: String)
+PUT         /a/system/outputs/:output_id                                             @controllers.api.OutputsApiController.update(output_id: String)
+GET         /a/streams/:stream_id/outputs                                            @controllers.api.StreamOutputsApiController.index(stream_id: String)
+DELETE      /a/streams/:stream_id/outputs/:output_id                                 @controllers.api.StreamOutputsApiController.delete(stream_id: String, output_id: String)
+PUT         /a/streams/:stream_id/outputs/:output_id                                 @controllers.api.StreamOutputsApiController.add(stream_id: String, output_id: String)
+
+# API: AlarmCallbacks
+GET         /a/streams/:stream_id/alarmcallbacks                                     @controllers.api.AlarmCallbacksApiController.list(stream_id: String)
+GET         /a/streams/:stream_id/alarmcallbacks/available                           @controllers.api.AlarmCallbacksApiController.available(stream_id: String)
+POST        /a/streams/:stream_id/alarmcallbacks                                     @controllers.api.AlarmCallbacksApiController.create(stream_id: String)
+DELETE      /a/streams/:stream_id/alarmcallbacks/:alarmcallback_id                   @controllers.api.AlarmCallbacksApiController.delete(stream_id: String, alarmcallback_id: String)
+PUT         /a/streams/:stream_id/alarmcallbacks/:alarmcallback_id                   @controllers.api.AlarmCallbacksApiController.update(stream_id: String, alarmcallback_id: String)
 
 GET         /robots.txt                                                              controllers.Assets.at(path="/public", file="robots.txt")
 

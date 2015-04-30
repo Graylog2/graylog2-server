@@ -1,7 +1,9 @@
 package controllers.api;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.google.common.collect.Lists;
 import controllers.AuthenticatedController;
+import controllers.SearchControllerV2;
 import org.graylog2.restclient.lib.APIException;
 import org.graylog2.restclient.models.Stream;
 import org.graylog2.restclient.models.StreamService;
@@ -78,5 +80,21 @@ public class StreamsApiController extends AuthenticatedController {
         }
 
         return ok(Json.toJson(response));
+    }
+
+    public Result listStreams() {
+        List<SearchControllerV2.StreamDescription> streamDescriptions = Lists.newArrayList();
+        try {
+            final List<Stream> streams = streamService.all();
+            for (Stream stream : streams) {
+                streamDescriptions.add(new SearchControllerV2.StreamDescription(stream));
+            }
+        } catch (IOException e) {
+            return status(500, "Could not load streams");
+        } catch (APIException e) {
+            return status(500, "Could not load streams, received HTTP " + e.getHttpCode() + ": " + e.getMessage());
+        }
+
+        return ok(Json.toJson(streamDescriptions));
     }
 }

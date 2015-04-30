@@ -1,26 +1,26 @@
 @(metric: org.graylog2.restclient.lib.metrics.Metric)
 @import org.graylog2.restclient.lib.metrics._
 @if(metric.getType.equals(Metric.MetricType.TIMER)) {
-    <h3 class="u-light" style="display: inline;">Timer</h3><br />
+    <h3>Timer</h3>
     @views.html.partials.metrics.timing.render(metric.asInstanceOf[Timer])
 }
 
 @if(metric.getType.equals(Metric.MetricType.METER)) {
-    <h3 class="u-light" style="display: inline;">Meter</h3><br />
+    <h3>Meter</h3>
     @views.html.partials.metrics.meter(metric.asInstanceOf[Meter])
 }
 
 @if(metric.getType.equals(Metric.MetricType.GAUGE)) {
-    <h3 class="u-light" style="display: inline;">Gauge</h3><br />
+    <h3>Gauge</h3>
     @views.html.partials.metrics.gauge(metric.asInstanceOf[Gauge])
 }
 
 @if(metric.getType.equals(Metric.MetricType.COUNTER)) {
-    <h3 class="u-light" style="display: inline;">Counter</h3><br />
+    <h3>Counter</h3>
     @views.html.partials.metrics.counter(metric.asInstanceOf[Counter])
 }
 
 @if(metric.getType.equals(Metric.MetricType.HISTOGRAM)) {
-    <h3 class="u-light" style="display: inline;">Histogram</h3><br />
+    <h3>Histogram</h3>
     @views.html.partials.metrics.histogram(metric.asInstanceOf[Histogram])
 }

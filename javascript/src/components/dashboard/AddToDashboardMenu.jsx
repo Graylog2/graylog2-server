@@ -1,22 +1,24 @@
-/* global originalUniversalSearchSettings */
-
 'use strict';
+
+var $ = require('jquery');
 
 var React = require('react');
 var DropdownButton = require('react-bootstrap').DropdownButton;
 var MenuItem = require('react-bootstrap').MenuItem;
 var Immutable = require('immutable');
 
+var WidgetStore = require('../../stores/widgets/WidgetsStore');
 var WidgetCreationModal = require('../widgets/WidgetCreationModal');
 
 var AddToDashboardMenu = React.createClass({
     getInitialState() {
         return {
-            dashboards: Immutable.Map()
+            dashboards: Immutable.Map(),
+            selectedDashboard: ""
         };
     },
     componentDidMount() {
-        this._setDashboards(this.props.dashboards);
+        $(document).trigger('get-original-search.graylog.search', {callback: this._setOriginalSearchParams});
     },
     componentWillReceiveProps(newProps) {
         this._setDashboards(newProps.dashboards);
@@ -24,14 +26,20 @@ var AddToDashboardMenu = React.createClass({
     _setDashboards(dashboards) {
         this.setState({dashboards: dashboards});
     },
-    _configureWidget(dashboardId) {
+    _setOriginalSearchParams(originalSearchParams) {
+        this.searchParams = originalSearchParams;
+    },
+    _selectDashboard(dashboardId) {
+        this.setState({selectedDashboard: dashboardId});
         this.refs.widgetModal.open();
     },
-    _saveWidget(configuration) {
-        var params = Immutable.Map(originalUniversalSearchSettings());
-        var propConfigurationMap = Immutable.Map(this.props.configuration);
-        params = params.concat(propConfigurationMap).concat(configuration);
-        console.log(params.toJS());
+    _saveWidget(title, configuration) {
+        var widgetConfig = Immutable.Map(this.props.configuration);
+        var searchParams = Immutable.Map(this.searchParams);
+        widgetConfig = widgetConfig.concat(searchParams).concat(configuration);
+
+        var promise = WidgetStore.addWidget(this.state.selectedDashboard, this.props.widgetType, title, widgetConfig.toJS());
+        promise.done(() => this.refs.widgetModal.saved());
     },
     render() {
         var dashboards = Immutable.List();
@@ -53,7 +61,7 @@ var AddToDashboardMenu = React.createClass({
                                 noCaret
                                 title={this.props.title}
                                 pullRight={this.props.pullRight}
-                                onSelect={this._configureWidget}>
+                                onSelect={this._selectDashboard}>
                     {dashboards}
                 </DropdownButton>
                 <WidgetCreationModal ref="widgetModal"

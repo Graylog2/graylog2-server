@@ -2,8 +2,10 @@
 
 'use strict';
 
+declare
+var jsRoutes: any;
+
 import UserNotification = require("../../util/UserNotification");
-import URLUtils = require("../../util/URLUtils");
 
 interface SerializedWidget {
     id: string;
@@ -45,8 +47,31 @@ var WidgetsStore = {
         };
     },
 
+    addWidget(dashboardId: string, widgetType: string, widgetTitle: string, widgetConfig: Object): JQueryPromise<string[]> {
+        var widgetData = {description: widgetTitle, type: widgetType, config: widgetConfig};
+        console.log(widgetData);
+        var url = jsRoutes.controllers.api.DashboardsApiController.addWidget(dashboardId).url;
+        var promise = $.ajax({
+            type: "POST",
+            url: url,
+            data: JSON.stringify(widgetData),
+            dataType: 'json',
+            contentType: 'application/json'
+        });
+
+        promise.done(() => UserNotification.success("Widget created successfully"));
+        promise.fail((jqXHR, textStatus, errorThrown) => {
+            if (jqXHR.status !== 404) {
+                UserNotification.error("Creating widget failed with status: " + errorThrown,
+                    "Could not create widget");
+            }
+        });
+
+        return promise;
+    },
+
     loadWidget(dashboardId: string, widgetId: string): JQueryPromise<string[]> {
-        var url = URLUtils.appPrefixed('/a/dashboards/' + dashboardId + '/widgets/' + widgetId);
+        var url = jsRoutes.controllers.api.DashboardsApiController.widget(dashboardId, widgetId).url;
         var promise = $.getJSON(url);
         promise.fail((jqXHR, textStatus, errorThrown) => {
             if (jqXHR.status !== 404) {
@@ -58,9 +83,7 @@ var WidgetsStore = {
     },
 
     updateWidget(dashboardId: string, widget: Widget) {
-        var url = URLUtils.appPrefixed('/a/dashboards/' + dashboardId + '/widgets/' + widget.id);
-        console.log(url);
-        console.log(JSON.stringify(this._serializeWidget(widget)));
+        var url = jsRoutes.controllers.api.DashboardsApiController.updateWidget(dashboardId, widget.id).url;
         var promise = $.ajax({
             type: "PUT",
             url: url,
@@ -79,7 +102,7 @@ var WidgetsStore = {
     },
 
     loadValue(dashboardId: string, widgetId: string, resolution: number): JQueryPromise<string[]> {
-        var url = URLUtils.appPrefixed('/a/dashboards/' + dashboardId + '/widgets/' + widgetId + '/resolution/' + resolution + '/value');
+        var url = jsRoutes.controllers.api.DashboardsApiController.widgetValue(dashboardId, widgetId, resolution).url;
         return $.getJSON(url);
     }
 };
