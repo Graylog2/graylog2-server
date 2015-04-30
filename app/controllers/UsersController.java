@@ -19,7 +19,6 @@ package controllers;
 import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import lib.BreadcrumbList;
 import lib.security.RestPermissions;
@@ -41,8 +40,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import play.data.DynamicForm;
 import play.data.Form;
-import play.libs.Json;
-import play.mvc.BodyParser;
 import play.mvc.Result;
 import views.helpers.Permissions;
 import views.html.system.users.edit;
@@ -53,7 +50,6 @@ import javax.annotation.Nullable;
 import javax.inject.Inject;
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -61,9 +57,7 @@ import static lib.security.RestPermissions.DASHBOARDS_EDIT;
 import static lib.security.RestPermissions.DASHBOARDS_READ;
 import static lib.security.RestPermissions.STREAMS_EDIT;
 import static lib.security.RestPermissions.STREAMS_READ;
-import static lib.security.RestPermissions.USERS_LIST;
 import static lib.security.RestPermissions.USERS_PERMISSIONSEDIT;
-import static views.helpers.Permissions.isPermitted;
 
 public class UsersController extends AuthenticatedController {
     private static final Logger log = LoggerFactory.getLogger(UsersController.class);
@@ -86,9 +80,8 @@ public class UsersController extends AuthenticatedController {
     }
 
     public Result index() {
-        final List<User> allUsers = isPermitted(USERS_LIST) ? userService.all() : Lists.newArrayList(currentUser());
         final List<String> permissions = permissionsService.all();
-        return ok(views.html.system.users.index.render(currentUser(), breadcrumbs(), allUsers, permissions));
+        return ok(views.html.system.users.index.render(currentUser(), breadcrumbs(), permissions));
     }
 
     public Result show(String username) {
@@ -164,63 +157,6 @@ public class UsersController extends AuthenticatedController {
         }
     }
 
-    public Result loadUser(String username) {
-        if (!currentUser().getName().equals(username) && !Permissions.isPermitted(RestPermissions.USERS_LIST)) {
-            return redirect(routes.StartpageController.redirect());
-        }
-
-        User user = userService.load(username);
-        if (user != null) {
-            Map<String, Object> result = Maps.newHashMap();
-            result.put("preferences", user.getPreferences());
-            // TODO: there is more than preferences
-            return ok(Json.toJson(result));
-        } else {
-            return notFound();
-        }
-    }
-
-    @BodyParser.Of(BodyParser.Json.class)
-    public Result saveUserPreferences(String username) throws IOException {
-        if (!Permissions.isPermitted(RestPermissions.USERS_EDIT, username)) {
-            return redirect(routes.StartpageController.redirect());
-        }
-
-        Map<String, Object> preferences = Json.fromJson(request().body().asJson(), Map.class);
-        Map<String, Object> normalizedPreferences = normalizePreferences(preferences);
-        if (userService.savePreferences(username, normalizedPreferences)) {
-            return ok();
-        } else {
-            // TODO: Really?
-            return notFound();
-        }
-    }
-
-    private Map<String, Object> normalizePreferences(Map<String, Object> preferences) {
-        Map<String, Object> normalizedPreferences = Maps.newHashMap();
-        // TODO: Move types into a static map once we have more preferences
-        for (Map.Entry<String, Object> preference : preferences.entrySet()) {
-            if (preference.getKey().equals("updateUnfocussed")) {
-                normalizedPreferences.put(preference.getKey(), asBoolean(preference.getValue()));
-            } else if (preference.getKey().equals("disableExpensiveUpdates")) {
-                normalizedPreferences.put(preference.getKey(), asBoolean(preference.getValue()));
-            } else if (preference.getKey().equals("enableSmartSearch")) {
-                normalizedPreferences.put(preference.getKey(), asBoolean(preference.getValue()));
-            }
-        }
-        return normalizedPreferences;
-    }
-
-    private static Boolean asBoolean(Object value) {
-        final Boolean normalizedValue;
-        if (value instanceof Boolean) {
-            normalizedValue = (Boolean) value;
-        } else {
-            normalizedValue = Boolean.valueOf(value.toString());
-        }
-        return normalizedValue;
-    }
-
     public Result create() {
         if (!Permissions.isPermitted(RestPermissions.USERS_CREATE)) {
             return redirect(routes.StartpageController.redirect());
@@ -269,17 +205,6 @@ public class UsersController extends AuthenticatedController {
 
         userService.delete(username);
         return redirect(routes.UsersController.index());
-    }
-
-    public Result isUniqueUsername(String username) {
-//        if (LocalAdminUser.getInstance().getName().equals(username)) {
-//            return noContent();
-//        }
-        if (userService.load(username) == null) {
-            return notFound();
-        } else {
-            return noContent();
-        }
     }
 
     public Result saveChanges(String username) {
@@ -348,21 +273,22 @@ public class UsersController extends AuthenticatedController {
             }
         }));
         for (String streampermission : formData.streampermissions) {
-            permissions.add(RestPermissions.STREAMS_READ + ":" + streampermission);
+            permissions.add(RestPermissions.STREAMS_READ.getPermission() + ":" + streampermission);
         }
         for (String streameditpermission : formData.streameditpermissions) {
-            permissions.add(RestPermissions.STREAMS_EDIT + ":" + streameditpermission);
+            permissions.add(RestPermissions.STREAMS_EDIT.getPermission() + ":" + streameditpermission);
         }
         for (String dashboardpermission : formData.dashboardpermissions) {
-            permissions.add(RestPermissions.DASHBOARDS_READ + ":" + dashboardpermission);
+            permissions.add(RestPermissions.DASHBOARDS_READ.getPermission() + ":" + dashboardpermission);
         }
         for (String dashboardeditpermissions : formData.dashboardeditpermissions) {
-            permissions.add(RestPermissions.DASHBOARDS_EDIT + ":" + dashboardeditpermissions);
+            permissions.add(RestPermissions.DASHBOARDS_EDIT.getPermission() + ":" + dashboardeditpermissions);
         }
         final ChangeUserRequest changeRequest = formData.toApiRequest();
         changeRequest.permissions = Lists.newArrayList(permissions);
         user.update(changeRequest);
 
+        flash("success", "User '" + user.getFullName() + "' was updated successfully");
         return redirect(routes.UsersController.index());
     }
 
@@ -396,8 +322,8 @@ public class UsersController extends AuthenticatedController {
             return redirect(routes.UsersController.editUserForm(username));
         }
 
-        flash("success", "Successfully changed the password for user " + user.getFullName());
-        return redirect(routes.UsersController.index());
+        flash("success", "Successfully changed the password for user '" + user.getFullName() + "'");
+        return redirect(routes.UsersController.editUserForm(username));
     }
 
     public Result resetPermissions(String username) {
@@ -415,7 +341,7 @@ public class UsersController extends AuthenticatedController {
         final User user = userService.load(username);
 
         if (!Permissions.isPermitted(USERS_PERMISSIONSEDIT) || user.isReadonly()) {
-            flash("error", "Unable to reset permissions!");
+            flash("error", "Unable to change user role");
             return redirect(routes.UsersController.editUserForm(username));
         }
 
@@ -427,9 +353,9 @@ public class UsersController extends AuthenticatedController {
         }
         final boolean success = user.update(changeRequest);
         if (success) {
-            flash("success", "Successfully reset permission for " + user.getFullName() + " to " + (isAdmin ? "administrator" : "reader") + " permissions.");
+            flash("success", "Successfully changed user role for " + user.getFullName() + " to " + (isAdmin ? "administrator" : "reader") + " permissions.");
         } else {
-            flash("error", "Unable to reset permissions for user " + user.getFullName());
+            flash("error", "Unable to change user role for " + user.getFullName());
         }
         return redirect(routes.UsersController.editUserForm(username));
     }

@@ -9,6 +9,7 @@ var metricsStore = MetricsStore.instance;
 var StreamThroughput = React.createClass({
     getInitialState() {
         return ({
+            initialized: false,
             throughput: 0,
             hasError: false
         });
@@ -21,6 +22,10 @@ var StreamThroughput = React.createClass({
             callback: (update, hasError) => {
                 // update is [{nodeId, values: [{name, value: {metric}}]} ...]
                 // metric can be various different things, depending on metric {type: "GAUGE"|"COUNTER"|"METER"|"TIMER"}
+                if (hasError) {
+                    this.setState({hasError: hasError});
+                    return;
+                }
 
                 var throughput = 0;
                 // not using filter.map.reduce because that's even worse to read than this code...
@@ -31,7 +36,7 @@ var StreamThroughput = React.createClass({
                         }
                     });
                 });
-                this.setState({throughput: throughput, hasError: hasError});
+                this.setState({initialized: true, throughput: throughput, hasError: hasError});
             }
         });
     },
@@ -39,7 +44,9 @@ var StreamThroughput = React.createClass({
         if (this.state.hasError) {
             return (<span>Throughput unavailable</span>);
         }
-
+        if (!this.state.initialized) {
+            return (<span><i className="fa fa-spin fa-spinner"></i> Loading</span>);
+        }
         return (
             <span>{this.state.throughput} messages/second</span>
         );

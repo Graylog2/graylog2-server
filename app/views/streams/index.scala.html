@@ -41,10 +41,10 @@
                 }
             </ul>
 
-            @if(streams.isEmpty && isPermitted(STREAMS_CREATE)) {
+            @if(streams.isEmpty) {
                 <div class="alert alert-warning">
                     <i class="fa fa-info-circle"></i>&nbsp;
-                    No streams configured. <a href="@routes.StreamsController.create()">Create one now</a>.
+                    No streams configured. @if(isPermitted(STREAMS_CREATE)) { <a href="@routes.StreamsController.create()">Create one now</a>. }
                 </div>
             }
         </div>

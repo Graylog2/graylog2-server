@@ -1,5 +1,5 @@
 /* global activateTimerangeChooser, momentHelper */
-/* jshint -W107 */
+/* jshint -W107, -W079 */
 
 'use strict';
 
@@ -19,6 +19,7 @@ var SourcePieChart = require('./SourcePieChart');
 var SourceLineChart = require('./SourceLineChart');
 
 var UniversalSearch = require('../../logic/search/UniversalSearch');
+var moment = require('moment');
 
 var daysToSeconds = (days) => moment.duration(days, 'days').as('seconds');
 var hoursToSeconds = (hours) => moment.duration(hours, 'hours').as('seconds');

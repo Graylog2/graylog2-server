@@ -51,38 +51,7 @@
                 </div>
             }
 
-            @if(input.getReadBytes >= 0 && input.getWrittenBytes >= 0) {
-                <div class="input-io focuslimit" data-node-id="@inputState.getNode.getNodeId" data-input-id="@input.getId">
-                    Network IO:
-
-                    <span class="persec">
-                        <i class="fa fa-caret-down channel-direction channel-direction-down"></i>
-                        <span class="rx value">@Tools.byteToHuman(input.getReadBytes)</span>
-
-                        <i class="fa fa-caret-up channel-direction channel-direction-up"></i>
-                        <span class="tx value">@Tools.byteToHuman(input.getWrittenBytes)</span>
-                    </span>
-
-                    <span class="total">
-                        (total:
-                        <i class="fa fa-caret-down channel-direction channel-direction-down"></i>
-                        <span class="rx value">@Tools.byteToHuman(input.getTotalReadBytes)</span>
-
-                        <i class="fa fa-caret-up channel-direction channel-direction-up"></i>
-                        <span class="tx value">@Tools.byteToHuman(input.getTotalWrittenBytes)</span>
-                        )
-                    </span>
-
-                </div>
-            }
-
-            @if(input.getConnections >= 0 && input.getTotalConnections >= 0) {
-                <div class="input-connections focuslimit" data-node-id="@inputState.getNode.getNodeId" data-input-id="@input.getId">
-                    Total connections:
-                    <span class="total">@input.getTotalConnections</span>
-                    (<span class="active">@input.getConnections</span> active)
-                </div>
-            }
+            <div class="react-input-metrics" data-input-id="@input.getId" data-input-classname="@input.getType" data-node-id="@inputState.getNode.getNodeId"></div>
 
             <div class="well well-sm">
                 <ul>

@@ -1,59 +1,69 @@
 @(currentUser: org.graylog2.restclient.models.User, breadcrumbs: lib.BreadcrumbList, node: org.graylog2.restclient.models.ClusterEntity, metrics: Map[String, org.graylog2.restclient.lib.metrics.Metric], preFilter: String)
 @import org.graylog2.restclient.lib.metrics.Metric
-@main("Metrics", views.html.system.sidebar(), "", currentUser) {
+
+@main("Metrics", null, "", currentUser, false) {
 
     @views.html.partials.breadcrumbs(breadcrumbs)
 
-    <div class="row">
-        <h1>
-            <i class="fa fa-bar-chart"></i>
-            Metrics of @node.getShortNodeId
-            / @node.getHostname
-        </h1>
-        All Graylog nodes provide a set of internal metrics for diagnosis, debugging and monitoring. Note that you can access
-        all metrics via JMX, too.
+    <div class="row content content-head">
+        <div class="col-md-10">
+            <h1>
+                Metrics of @node.getShortNodeId
+                / @node.getHostname
+            </h1>
 
-        <br />
-        This node is reporting a total of @metrics.size() metrics.
+            <p class="description">
+                All Graylog nodes provide a set of internal metrics for diagnosis, debugging and monitoring. Note that you can access
+                all metrics via JMX, too.
+            </p>
+
+            @views.html.partials.support.list_small() {
+                This node is reporting a total of @metrics.size() metrics.
+            }
+        </div>
     </div>
 
-    <input type="text" class="metrics-filter col-md-11" value="@preFilter" placeholder="Type a metric name to filter..." />
+    <div class="row content">
+        <div class="col-md-12">
+            <input type="text" class="metrics-filter input-lg" style="width: 100%;" value="@preFilter" placeholder="Type a metric name to filter..." />
 
-    <ul class="metric-list">
-    @for((name, metric) <- metrics) {
-        @if(metric != null) {
-            <li data-metricname="@name" @if(!name.matches("^" + preFilter + ".*")){ style="display: none;" }>
-                <div class="name">
-                    @if(metric.getType.equals(Metric.MetricType.TIMER)) {
-                        <i class="fa fa-time"></i>
-                    }
+            <ul class="metric-list">
+            @for((name, metric) <- metrics) {
+                @if(metric != null) {
+                    <li data-metricname="@name" @if(!name.matches("^" + preFilter + ".*")){ style="display: none;" }>
+                        <div class="name">
+                            @if(metric.getType.equals(Metric.MetricType.TIMER)) {
+                                <i class="fa fa-clock-o"></i>
+                            }
 
-                    @if(metric.getType.equals(Metric.MetricType.HISTOGRAM)) {
-                        <i class="fa fa-signal"></i>
-                    }
+                            @if(metric.getType.equals(Metric.MetricType.HISTOGRAM)) {
+                                <i class="fa fa-signal"></i>
+                            }
 
-                    @if(metric.getType.equals(Metric.MetricType.METER)) {
-                        <i class="fa fa-play-circle"></i>
-                    }
+                            @if(metric.getType.equals(Metric.MetricType.METER)) {
+                                <i class="fa fa-play-circle"></i>
+                            }
 
-                    @if(metric.getType.equals(Metric.MetricType.GAUGE)) {
-                        <i class="fa fa-dashboard"></i>
-                    }
+                            @if(metric.getType.equals(Metric.MetricType.GAUGE)) {
+                                <i class="fa fa-dashboard"></i>
+                            }
 
-                    @if(metric.getType.equals(Metric.MetricType.COUNTER)) {
-                        <i class="fa fa-circle"></i>
-                    }
+                            @if(metric.getType.equals(Metric.MetricType.COUNTER)) {
+                                <i class="fa fa-circle"></i>
+                            }
 
-                    <a href="#" class="open" data-metricname="@name">
-                        <span class="prefix">@name.substring(0,"org.graylog2.".length)</span>@name.substring("org.graylog2.".length)
-                    </a>
-                </div>
+                            <a href="#" class="open" data-metricname="@name">
+                                <span class="prefix">@name.substring(0,"org.graylog2.".length)</span>@name.substring("org.graylog2.".length)
+                            </a>
+                        </div>
 
-                <div class="metric" data-metricname="@name">
-                    @views.html.system.metrics.partials.metric.render(metric)
-                </div>
-            </li>
-        }
-    }
-    </ul>
+                        <div class="metric" data-metricname="@name">
+                            @views.html.system.metrics.partials.metric.render(metric)
+                        </div>
+                    </li>
+                }
+            }
+            </ul>
+        </div>
+    </div>
 }

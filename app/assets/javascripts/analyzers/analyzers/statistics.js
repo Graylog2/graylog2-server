@@ -4,7 +4,6 @@ $(document).ready(function() {
         e.preventDefault();
 
         var container = $(this).parent();
-        $(this).attr("disabled", "disabled");
 
         showStatistics($(this).attr("data-field"), container);
     });
@@ -18,6 +17,7 @@ $(document).ready(function() {
 
     function showStatistics(field, container) {
         var statistics = $(".statistics", container);
+        statistics.hide();
 
         // TODO: deduplicate
         var rangeType = $("#universalsearch-rangetype-permanent").text().trim();

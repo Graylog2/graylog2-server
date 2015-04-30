@@ -1,148 +1,214 @@
 @(currentUser: org.graylog2.restclient.models.User, breadcrumbs: lib.BreadcrumbList, ldapForm: Form[org.graylog2.restclient.models.api.requests.accounts.LdapSettingsRequest])
-@import org.graylog2.restclient.models._
-@main("LDAP Settings", views.html.system.sidebar(), "", currentUser) {
+
+@main("LDAP Settings", null, "", currentUser, false) {
 
     @views.html.partials.breadcrumbs(breadcrumbs)
 
-    <div class="row" xmlns="http://www.w3.org/1999/html">
-        <h1><i class="fa fa-wrench"></i> LDAP Settings</h1>
-        This page is the only resource you need to set up the Graylog LDAP integration. You can test the
-        connection to your LDAP server and even try to log in with an LDAP account of your choice right away.
+    <div class="row content content-head">
+        <div class="col-md-12">
+            <h1>LDAP Settings</h1>
+            <p class="description">
+                This page is the only resource you need to set up the Graylog LDAP integration. You can test the
+                connection to your LDAP server and even try to log in with an LDAP account of your choice right away.
+            </p>
+        </div>
     </div>
 
-    <div class="row">
+    <div class="row content">
+        <div class="col-lg-8">
         @helper.form(action = routes.LdapController.saveLdapSettings(), 'class -> "form-horizontal", 'id -> "ldap-settings") {
-            <div class="control-group">
-                <label class="control-label" for="ldap-enabled">Use LDAP</label>
-                <div class="controls">
-                    <input type="checkbox" id="ldap-enabled" name="enabled" value="true" @if("true".equals(ldapForm("enabled").value())) {checked}>
-                    <span class="help-block">User accounts will be taken from LDAP/Active Directory, the administrator account will still be available.</span>
-                </div>
-            </div>
-            <div class="control-group">
-                <label class="control-label">Server Type</label>
-                <div class="controls">
-                    <label class="radio inline" for="type-ldap">
-                        <input type="radio" name="activeDirectory" id="type-ldap" value="false" @if("false".equals(ldapForm("activeDirectory").value())) {checked}> LDAP
-                    </label>
-                    <label class="radio inline" for="type-activedirectory">
-                        <input type="radio" name="activeDirectory" id="type-activedirectory" value="true" @if("true".equals(ldapForm("activeDirectory").value())) {checked}> Active Directory
-                    </label>
-                </div>
-            </div>
-
-            <div class="control-group uri-edit-component" data-uri="@ldapForm("ldapUri").value()">
-                <input type="hidden" id="ldap-uri" name="ldapUri" value="@ldapForm("ldapUri").value()">
-                <label class="control-label" for="ldap-uri-host">LDAP Server Address</label>
-                <div class="controls">
-                    <div class="input-prepend input-append">
-                        <span class="add-on" id="ldap-uri-scheme">ldap://</span>
-                        <input type="text" class="inline input-large" id="ldap-uri-host" value="" placeholder="Hostname" required>
-                        <span class="add-on">:</span>
-                        <input type="text" class="inline input-mini" id="ldap-uri-port" value="" placeholder="Port" required>
+            <div class="form-group">
+                <div class="col-sm-offset-3 col-sm-9">
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" id="ldap-enabled" name="enabled" value="true" @if("true".equals(ldapForm("enabled").value())) {checked}>
+                            Enable LDAP
+                        </label>
                     </div>
-                    <label class="checkbox inline">
-                        <input type="checkbox" id="ldap-uri-ssl"> SSL
-                    </label>
-                    <label class="checkbox inline">
-                        <input type="checkbox" name="useStartTls" value="true" id="ldap-uri-starttls" @if("true".equals(ldapForm("useStartTls").value())) {checked}> StartTLS
-                    </label>
-                    <label class="checkbox inline">
-                        <input type="checkbox" name="trustAllCertificates" value="true" id="trust-all-certificates" @if("true".equals(ldapForm("trustAllCertificates").value())) {checked}> Allow self-signed certificates
-                    </label>
+                    <span class="help-block">
+                        User accounts will be taken from LDAP/Active Directory, the administrator account will still be available.</span>
                 </div>
             </div>
 
-            <div class="control-group">
-                <label class="control-label" for="systemUsername">System Username</label>
-                <div class="controls">
-                    <input type="text" id="systemUsername" value="@ldapForm("systemUsername").value()" name="systemUsername" placeholder="System User DN">
-                    <span class="help-block"></span> <!-- for correct margins -->
-                    <span class="help-block ldap-help">The username for the initial connection to the LDAP server, e.g. <code>uid=admin,ou=system</code>, this might be optional depending on your LDAP server.</span>
-                    <span class="help-block ad-help hidden">The username for the initial connection to the Active Directory server, e.g. <code>ldapbind@@some.domain</code>.<br>
-                        This needs to match the <code>userPrincipalName</code> of that user.</span>
+            <fieldset>
+                <legend class="col-sm-offset-3 col-sm-9">Server configuration</legend>
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">Server Type</label>
+                    <div class="col-sm-9">
+                        <label class="radio-inline" for="type-ldap">
+                            <input type="radio" name="activeDirectory" id="type-ldap" value="false" @if("false".equals(ldapForm("activeDirectory").value())) {checked}> LDAP
+                        </label>
+                        <label class="radio-inline" for="type-activedirectory">
+                            <input type="radio" name="activeDirectory" id="type-activedirectory" value="true" @if("true".equals(ldapForm("activeDirectory").value())) {checked}> Active Directory
+                        </label>
+                    </div>
                 </div>
-            </div>
-            <div class="control-group">
-                <label class="control-label" for="systemPassword">System Password</label>
-                <div class="controls">
-                    <input type="password" id="systemPassword" value="@ldapForm("systemPassword").value()" name="systemPassword" placeholder="System Password">
-                    <span class="help-block"></span> <!-- for correct margins -->
-                    <span class="help-block ldap-help">The password for the initial connection to the LDAP server.</span>
-                    <span class="help-block ad-help">The password for the initial connection to the Active Directory server.</span>
+
+                <div class="form-group uri-edit-component" data-uri="@ldapForm("ldapUri").value()">
+                    <input type="hidden" id="ldap-uri" name="ldapUri" value="@ldapForm("ldapUri").value()">
+                    <label class="col-sm-3 control-label" for="ldap-uri-host">LDAP Server Address</label>
+                    <div class="col-sm-9">
+                        <div class="input-group">
+                            <span class="input-group-addon" id="ldap-uri-scheme">ldap://</span>
+                            <input type="text" class="form-control" id="ldap-uri-host" value="" placeholder="Hostname" required>
+                            <span class="input-group-addon input-group-separator">:</span>
+                            <input type="number" class="form-control" id="ldap-uri-port" value="" min="1" placeholder="Port" required style="width: 120px;">
+                        </div>
+                        <label class="checkbox-inline">
+                            <input type="checkbox" id="ldap-uri-ssl"> SSL
+                        </label>
+                        <label class="checkbox-inline">
+                            <input type="checkbox" name="useStartTls" value="true" id="ldap-uri-starttls" @if("true".equals(ldapForm("useStartTls").value())) {checked}> StartTLS
+                        </label>
+                        <label class="checkbox-inline">
+                            <input type="checkbox" name="trustAllCertificates" value="true" id="trust-all-certificates" @if("true".equals(ldapForm("trustAllCertificates").value())) {checked}> Allow self-signed certificates
+                        </label>
+                    </div>
                 </div>
-            </div>
 
-            <div class="form-actions">
-                <button type="button" id="ldap-test-connection" class="btn btn-warning" disabled>Test Server Connection</button>
-                <span class="help-inline">Performs a background connection check with the address and credentials above.</span>
-                <span class="help-block" id="ldap-connectionfailure-reason"></span>
-            </div>
-
-            <div class="control-group">
-                <label class="control-label" for="searchBase">Search Base DN</label>
-                <div class="controls">
-                    <input type="text" id="searchBase" class="input-xxlarge" name="searchBase" placeholder="Search Base" value="@ldapForm("searchBase").value()" required>
-                    <span class="help-block"></span> <!-- for correct margins -->
-                    <span class="help-block ldap-help">The base tree to limit the LDAP search query to, e.g. <code>cn=users,dc=example,dc=com</code></span>
-                    <span class="help-block ad-help hidden">The base tree to limit the Active Directory search query to, e.g. <code>cn=users,dc=example,dc=com</code></span>
+                <div class="form-group">
+                    <label class="col-sm-3 control-label" for="systemUsername">System Username</label>
+                    <div class="col-sm-9">
+                        <input type="text" id="systemUsername" class="form-control" value="@ldapForm("systemUsername").value()" name="systemUsername" placeholder="System User DN">
+                        <span class="help-block ldap-help">
+                            The username for the initial connection to the LDAP server, e.g. <code>uid=admin,ou=system</code>
+                            , this might be optional depending on your LDAP server.</span>
+                        <span class="help-block ad-help hidden">
+                            The username for the initial connection to the Active Directory server, e.g. <code>
+                            ldapbind@@some.domain</code>.<br>
+                            This needs to match the <code>userPrincipalName</code> of that user.</span>
+                    </div>
                 </div>
-            </div>
-
-            <div class="control-group">
-                <label class="control-label" for="searchPattern">User Search Pattern</label>
-                <div class="controls">
-                    <input type="text" id="searchPattern" name="searchPattern" class="input-xxlarge" placeholder="Search Pattern" value="@ldapForm("searchPattern").value()" required>
-                    <span class="help-block"></span> <!-- for correct margins -->
-                    <span class="help-block ldap-help">For example <code>(&(objectClass=inetOrgPerson)(uid={0}))</code>. The string <code>{0}</code> will be replaced by the entered username.</span>
-                    <span class="help-block ad-help hidden">For example <code>(&(objectClass=user)(sAMAccountName={0}))</code>. The string <code>{0}</code> will be replaced by the entered username.</span>
+                <div class="form-group">
+                    <label class="col-sm-3 control-label" for="systemPassword">System Password</label>
+                    <div class="col-sm-9">
+                        <input type="password" id="systemPassword" class="form-control" value="@ldapForm("systemPassword").value()" name="systemPassword" placeholder="System Password">
+                        <span class="help-block ldap-help">The password for the initial connection to the LDAP server.</span>
+                        <span class="help-block ad-help">
+                            The password for the initial connection to the Active Directory server.</span>
+                    </div>
                 </div>
-            </div>
 
-            <div class="control-group">
-                <label class="control-label" for="displaynameAttribute">Display Name attribute</label>
-                <div class="controls">
-                    <input type="text" id="displaynameAttribute" name="displayNameAttribute" placeholder="Display Name Attribute" value="@ldapForm("displayNameAttribute").value()" required>
-                    <span class="help-block">If you are unsure which attribute to use, try to load a test user using the form below.</span>
-                    <span class="help-block ldap-help">Which LDAP attribute to use for the full name of the user in Graylog, e.g. <code>cn</code>.</span>
-                    <span class="help-block ad-help hidden">Which Active Directory attribute to use for the full name of the user in Graylog, e.g. <code>displayName</code>.</span>
+                <div class="form-group">
+                    <div class="col-sm-offset-3 col-sm-9">
+                        <button type="button" id="ldap-test-connection" class="btn btn-warning" disabled>
+                            Test Server Connection
+                        </button>
+                        <span class="help-block">
+                            Performs a background connection check with the address and credentials above.</span>
+                        <div class="alert alert-danger" id="ldap-connectionfailure-reason" style="display : none ;"></div>
+                    </div>
                 </div>
-            </div>
+            </fieldset>
 
-            <div class="control-group">
-                <label class="control-label" for="defaultGroup">Default permission group</label>
-                <div class="controls">
-                    <select id="defaultGroup" name="defaultGroup" placeholder="" required>
-                        <option value="reader" @if("reader".equals(ldapForm("defaultGroup").value())) {selected}>Reader</option>
-                        <option value="admin" @if("admin".equals(ldapForm("defaultGroup").value())) {selected}>Administrative</option>
-                    </select>
-                    <span class="help-block">This determines the default set of permissions a user will be assigned.</span>
-                    <div class="alert">Changing this will not affect accounts that have previously been created via LDAP!
-                        You can reset permissions of existing accounts or delete the entire account which will cause it to be recreated on the next login.</div>
+            <fieldset>
+                <legend class="col-sm-offset-3 col-sm-9">User Mapping</legend>
+                <div class="form-group">
+                    <label class="col-sm-3 control-label" for="searchBase">Search Base DN</label>
+                    <div class="col-sm-9">
+                        <input type="text" id="searchBase" class="form-control" name="searchBase" placeholder="Search Base" value="@ldapForm("searchBase").value()" required>
+                        <span class="help-block ldap-help">The base tree to limit the LDAP search query to, e.g. <code>
+                            cn=users,dc=example,dc=com</code>
+                        </span>
+                        <span class="help-block ad-help hidden">
+                            The base tree to limit the Active Directory search query to, e.g. <code>
+                            cn=users,dc=example,dc=com</code>
+                        </span>
+                    </div>
                 </div>
-            </div>
 
-            <div class="form-actions">
-                <p>Optionally you can perform a login test here. If you omit the password, just the LDAP entry will be loaded and shown below and no authentication attempt will be made.</p>
-                <input type="text" id="ldap-test-username" value="" placeholder="Username for login test">
-                <input type="password" id="ldap-test-password" value="" placeholder="Password">
-                <button type="button" id="ldap-test-login" class="btn btn-warning" disabled>Test login</button>
-                <span class="help-inline">Loads the LDAP entry for the given user name.</span>
-                <span class="help-block" id="ldap-loginfailure-reason"></span>
-                <div class="well hidden" id="attr-well">
-                    <h3>
-                        <i id="entry-exists" class="fa fa-meh ldap-failure"></i> User check
-                        <i id="login-authenticated" class="fa fa-meh ldap-failure"></i> Login check
-                    </h3>
-                    <pre id="login-exception" class="hidden"></pre>
-                    <dl id="ldap-entry-attributes">
-                    </dl>
+                <div class="form-group">
+                    <label class="col-sm-3 control-label" for="searchPattern">User Search Pattern</label>
+                    <div class="col-sm-9">
+                        <input type="text" id="searchPattern" name="searchPattern" class="form-control" placeholder="Search Pattern" value="@ldapForm("searchPattern").value()" required>
+                        <span class="help-block ldap-help">For example <code>(&(objectClass=inetOrgPerson)(uid={0}))</code>
+                            . The string <code>{0}</code> will be replaced by the entered username.
+                        </span>
+                        <span class="help-block ad-help hidden">For example <code>
+                            (&(objectClass=user)(sAMAccountName={0}))</code>. The string <code>{0}</code>
+                            will be replaced by the entered username.
+                        </span>
+                    </div>
                 </div>
-            </div>
 
-            <div class="form-actions">
-                <button type="submit" class="btn btn-primary">Save</button>
+                <div class="form-group">
+                    <label class="col-sm-3 control-label" for="displaynameAttribute">Display Name attribute</label>
+                    <div class="col-sm-9">
+                        <input type="text" id="displaynameAttribute" name="displayNameAttribute" class="form-control" placeholder="Display Name Attribute" value="@ldapForm("displayNameAttribute").value()" required>
+                        <span class="help-block">
+                            Try to load a test user using the form below, if you are unsure which attribute to use.
+                        </span>
+                        <span class="help-block ldap-help">
+                            Which LDAP attribute to use for the full name of the user in Graylog, e.g. <code>cn</code>.
+                        </span>
+                        <span class="help-block ad-help hidden">
+                            Which Active Directory attribute to use for the full name of the user in Graylog, e.g. <code>
+                            displayName</code>.
+                        </span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-sm-3 control-label" for="defaultGroup">Default User Role</label>
+                    <div class="col-sm-9">
+                        <div class="row">
+                            <div class="col-sm-4">
+                                <select id="defaultGroup" name="defaultGroup" class="form-control" placeholder="" required>
+                                    <option value="reader" @if("reader".equals(ldapForm("defaultGroup").value())) {selected}>Reader</option>
+                                    <option value="admin" @if("admin".equals(ldapForm("defaultGroup").value())) {selected}>Administrator</option>
+                                </select>
+                            </div>
+                        </div>
+                        <span class="help-block">
+                            Determines the default user role for new users.
+                        </span>
+                        <div class="panel panel-info">
+                            <div class="panel-body">
+                                Changing the default role will only affect to new users created via LDAP!<br/>
+                                In order to change existing accounts, you need to reset their permissions or delete them.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">Login Test</label>
+                    <div class="col-sm-9">
+                        <div class="row">
+                            <div class="col-sm-5">
+                                <input type="text" id="ldap-test-username" class="form-control" value="" placeholder="Username for login test">
+                            </div>
+                            <div class="col-sm-5">
+                                <input type="password" id="ldap-test-password" class="form-control" value="" placeholder="Password">
+                            </div>
+                            <div class="col-sm-2">
+                                <button type="button" id="ldap-test-login" class="btn btn-warning" disabled>Test login</button>
+                            </div>
+                        </div>
+                        <span class="help-block">Loads the LDAP entry for the given user name. If you omit the password,
+                            no authentication attempt will be made.</span>
+
+                        <span class="help-block" id="ldap-loginfailure-reason"></span>
+                        <div class="well well-lg hidden" id="attr-well">
+                            <h3>
+                                <i id="entry-exists" class="fa fa-meh ldap-failure"></i> User check
+                                <i id="login-authenticated" class="fa fa-meh ldap-failure"></i> Login check
+                            </h3>
+                            <pre id="login-exception" class="hidden"></pre>
+                            <dl id="ldap-entry-attributes">
+                            </dl>
+                        </div>
+
+                    </div>
+                </div>
+            </fieldset>
+
+            <div class="form-group">
+                <div class="col-sm-offset-3 col-sm-9">
+                    <button type="submit" class="btn btn-success">Save LDAP settings</button>
+                </div>
             </div>
         }
+        </div>
     </div>
 }

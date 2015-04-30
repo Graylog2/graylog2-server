@@ -1,4 +1,4 @@
-@(title: String, sidebarContent: Html, searchQuery: String = "", currentUser: org.graylog2.restclient.models.User, hasSearch: Boolean = true)(content: Html)(implicit stream: org.graylog2.restclient.models.Stream = null)
+@(title: String, sidebarContent: Html, searchQuery: String = "", currentUser: org.graylog2.restclient.models.User, hasSearch: Boolean = true, reactSearch: Boolean = false)(content: Html)(implicit stream: org.graylog2.restclient.models.Stream = null)
 @import play.libs.Json
 @import views.helpers.Permissions._
 @import lib.security.RestPermissions._
@@ -28,39 +28,50 @@
             @if(hasSearch && (stream != null || (isPermitted(SEARCHES_ABSOLUTE) || isPermitted(SEARCHES_RELATIVE) || isPermitted(SEARCHES_KEYWORD)))) {
 			    @partials.universalsearch(searchQuery)
             }
+            @if(reactSearch) {
+                <div id="react-search-bar"></div>
+            }
 
-            <div class="row error-bar">
-            @if(flash.get("error") != null && !flash.get("error").isEmpty()) {
-                <div class="alert alert-error main-error">
-                    <strong>Error!</strong>
-                    <a class="close" data-dismiss="alert" href="#">×</a>@flash.get("error")
+            <div class="row alert-bar">
+                <div class="col-sm-12">
+                @if(flash.get("error") != null && !flash.get("error").isEmpty()) {
+                    <div class="alert alert-danger">
+                        <strong>Error!</strong>
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        @flash.get("error")
+                    </div>
+                }
+                @if(flash.get("success") != null && !flash.get("success").isEmpty()) {
+                    <div class="alert alert-success">
+                        <strong>Success!</strong>
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        @flash.get("success")
+                    </div>
+                }
                 </div>
-            }
-            @if(flash.get("success") != null && !flash.get("success").isEmpty()) {
-                <div class="alert alert-success main-error">
-                    <strong>Success!</strong>
-                    <a class="close" data-dismiss="alert" href="#">×</a>@flash.get("success")
-                </div>
-            }
             </div>
             <div class="row">
-            @if(sidebarContent != null) {
-                <div class="col-md-3" id="sidebar">
-                    <div class="content-col" id="sidebar-inner">
-                    @sidebarContent
-                    </div>
-                </div>
-            }
-
-            @if(sidebarContent != null) {
-                <div class="col-md-9" id="main-content-sidebar">
+                @if(reactSearch) {
                     @content
-                </div>
-            } else {
-                <div class="col-md-12" id="main-content">
-                @content
-                </div>
-            }
+                } else {
+                    @if(sidebarContent != null) {
+                        <div class="col-md-3" id="sidebar">
+                            <div class="content-col" id="sidebar-inner">
+                            @sidebarContent
+                            </div>
+                        </div>
+                    }
+
+                    @if(sidebarContent != null) {
+                        <div class="col-md-9" id="main-content-sidebar">
+                        @content
+                        </div>
+                    } else {
+                        <div class="col-md-12" id="main-content">
+                        @content
+                        </div>
+                    }
+                }
            </div>
 	   </div>
 

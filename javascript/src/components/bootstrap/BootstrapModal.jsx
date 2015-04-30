@@ -1,40 +1,75 @@
 'use strict';
 
 var React = require('react/addons');
+var Modal = require('react-bootstrap').Modal;
+var OverlayMixin = require('react-bootstrap').OverlayMixin;
+
 var $ = require('jquery'); // excluded and shimed
+
+var BootstrapModalTrigger = React.createClass({
+    mixins: [OverlayMixin],
+
+    getInitialState() {
+        return {
+            isModalOpen: false
+        };
+    },
+    _modalShown() {
+        if (this.state.isModalOpen && typeof this.props.onShown === 'function') {
+            this.props.onShown();
+        }
+    },
+    open() {
+        this.setState({isModalOpen: true}, this._modalShown);
+    },
+    close() {
+        this.setState({isModalOpen: false});
+        if (typeof this.props.onRequestHide === 'function') {
+            this.props.onRequestHide();
+        }
+    },
+    render() {
+        return <span/>;
+    },
+    // This is called by the `OverlayMixin` when this component
+    // is mounted or updated and the return value is appended to the body.
+    renderOverlay() {
+        if (!this.state.isModalOpen) {
+            return <span/>;
+        }
+
+        return (
+            <Modal onRequestHide={this.close}>
+                {this.props.children}
+            </Modal>
+        );
+    }
+});
 
 // adapted from react examples (https://github.com/facebook/react/tree/master/examples/jquery-bootstrap)
 var BootstrapModal = React.createClass({
-    componentDidMount() {
-        this._modalNode()
-            .modal({backdrop: 'static', keyboard: true, show: false});
-        $(this._modalNode()).on("hidden.bs.modal", this.props.onHidden);
-    },
-    componentWillUnmount() {
-        $(this._modalNode()).off("hidden.bs.modal");
-    },
     close() {
-        this._modalNode().modal('hide');
+        this.refs.modal.close();
     },
     open() {
-        var modal = this._modalNode();
-        modal.modal('show');
-        modal.on("shown.bs.modal", () => {
-            var element = $("input", this.refs.body.getDOMNode()).first();
+        if (window.event) {
+            window.event.preventDefault();
+        }
+        this.refs.modal.open();
+    },
+    _focusFirstInput() {
+        var element = $("input[type!=hidden],select,textarea", React.findDOMNode(this.refs.body)).first();
 
-            if (element.length === 0) {
-                element = $("input, button", this.refs.footer.getDOMNode()).first();
-            }
+        if (element.length === 0) {
+            element = $("input, button", React.findDOMNode(this.refs.footer)).first();
+        }
 
-            element.focus();
-        });
+        element.focus();
     },
     _submit(event) {
+        event.target.checkValidity();
         this.props.onConfirm(event);
         event.preventDefault();
-    },
-    _modalNode() {
-        return $(this.refs.modal.getDOMNode());
     },
     render() {
         var confirmButton = null;
@@ -46,9 +81,9 @@ var BootstrapModal = React.createClass({
         if (this.props.cancel && this.props.onCancel) {
             cancelButton = (
                 <button type="button" className="btn" onClick={this.props.onCancel}>
-                      {this.props.cancel}
+                    {this.props.cancel}
                 </button>
-                );
+            );
         }
         var formContent = (
             <div>
@@ -60,8 +95,8 @@ var BootstrapModal = React.createClass({
                         aria-label="Close"
                         onClick={this.props.onCancel}
                         dangerouslySetInnerHTML={{__html: '&times'}}
-                    />
-                            {Array.isArray(this.props.children) ? this.props.children[0] : this.props.children}
+                        />
+                    {Array.isArray(this.props.children) ? this.props.children[0] : this.props.children}
                 </div>
                 <div ref="body" className="modal-body">
                     <div className="container-fluid">
@@ -69,31 +104,29 @@ var BootstrapModal = React.createClass({
                     </div>
                 </div>
                 <div ref="footer" className="modal-footer">
-                          {cancelButton}
-                          {confirmButton}
+                    {cancelButton}
+                    {confirmButton}
                 </div>
             </div>
         );
         var form = (
-            <form 
-                onSubmit={this._submit} 
-                className={this.props.formClass} 
-                encType={this.props.encType} 
+            <form
+                onSubmit={this._submit}
+                className={this.props.formClass}
+                encType={this.props.encType}
                 method={this.props.method}
                 action={this.props.action}>
                 {formContent}
             </form>
         );
-        
+
         return (
-            <div ref="modal" className="modal fade" aria-hidden="true" role="dialog" tabIndex="-1">
-                <div className="modal-dialog">
-                    <div className="modal-content">
-                        {form}
-                    </div>
-                </div>
-            </div>
-            );
+            <BootstrapModalTrigger ref="modal"
+                                   onShown={this._focusFirstInput}
+                                   onRequestHide={this.props.onHidden}>
+                {form}
+            </BootstrapModalTrigger>
+        );
     }
 });
 

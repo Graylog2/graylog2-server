@@ -111,7 +111,7 @@ function browserifyCall(debug) {
         browserifyConfig.fullPaths = true;
     }
     var b = browserify(browserifyConfig);
-    b.plugin('tsify', {noImplicitAny: false}).on('error', function (err) {
+    b.plugin('tsify', {noImplicitAny: false, target: 'ES5'}).on('error', function (err) {
         gutil.log(err);
         this.emit('end');
     });

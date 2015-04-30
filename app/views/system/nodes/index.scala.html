@@ -16,21 +16,16 @@
 
     <div class="row content content-head">
         <div class="col-md-10">
-            <h1><i class="fa fa-sitemap"></i> Nodes</h1>
+            <h1>Nodes</h1>
 
             <p class="description">
                 This page provides a real-time overview of the nodes in your Graylog cluster.
             </p>
 
-            <p class="description">
+            @views.html.partials.support.list_small() {
                 You can pause message processing at any time. The process buffers will not accept any new messages until you
                 resume it. If the message journal is enabled for a node, which it is by default, incoming messages will be
-                persisted to disk, even when processing is disabled. If it is disabled, you might lose messages sent to inputs
-                that do not support buffering, such as TCP and UDP-based inputs.
-            </p>
-
-            @views.html.partials.support.list() {
-                Processing <strong class="total-throughput focuslimit"></strong> messages per second.
+                persisted to disk, even when processing is disabled.
             }
         </div>
     </div>
@@ -40,12 +35,12 @@
             @if(jvms.size == 1) {
                 <h2>You are running one <span class="u-light">graylog-server</span> node</h2>
             } else {
-                <h2>You are running @jvms.size graylog-server nodes</h2>
+                <h2>You are running @jvms.size <span class="u-light">graylog-server</span> nodes</h2>
             }
 
             @for(jvm <- jvms) {
                 <div class="graylog-node">
-                    <div class="row">
+                    <div class="row row-sm">
                         <div class="col-md-5">
                             <h2 class="graylog-node-title">
                                 @views.html.partials.node_title_link(nodes.get(jvm.getNodeId))
@@ -53,17 +48,33 @@
                         </div>
 
                         <div class="col-md-7" style="text-align: right;">
-                            <a href="#" class="btn btn-info">Details</a>
-                            <a href="#" class="btn btn-info">Metrics</a>
-                            <a href="#" class="btn btn-info">API browser</a>
+                            <a href="@routes.NodesController.node(jvm.getNodeId)" class="btn btn-info">Details</a>
+                            <a href="@routes.MetricsController.ofNode(jvm.getNodeId)" class="btn btn-info">Metrics</a>
+                            <a href="@nodes.get(jvm.getNodeId).getTransportAddress/api-browser" class="btn btn-info" target="_blank">
+                                <i class="fa fa-external-link"></i>&nbsp;
+                                API browser
+                            </a>
 
                             <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false" style="margin-left: 15px;">
                                 More actions <span class="caret"></span>
                             </button>
 
                             <ul class="dropdown-menu" role="menu">
-                                <li><a href="#">Pause message processing</a></li>
-
+                                @if(isPermitted(PROCESSING_CHANGESTATE)) {
+                                    <li>
+                                    @if(nodes.get(jvm.getNodeId).isProcessing) {
+                                        <a class="change-message-processing"
+                                        data-action="pause"
+                                        data-node-id="@jvm.getNodeId"
+                                        href="#">Pause message processing</a>
+                                    } else {
+                                        <a class="change-message-processing"
+                                        data-action="resume"
+                                        data-node-id="@jvm.getNodeId"
+                                        href="#">Resume message processing</a>
+                                    }
+                                    </li>
+                                }
                                 @if(isPermitted(LBSTATUS_CHANGE)) {
                                     <li class="dropdown-submenu">
                                         <a href="#">Override LB status</a>
@@ -86,15 +97,35 @@
                                         </ul>
                                     </li>
                                 }
-                                <li><a href="#">Shut down node</a></li>
-                                <li class="divider"></li>
-                                <li><a href="#">Local message inputs</a></li>
-                                <li><a href="#">Get thread dump</a></li>
+
+                                @if(isPermitted(NODE_SHUTDOWN)) {
+                                    <li>
+                                        <a href="@routes.NodesController.shutdown(jvm.getNodeId)"
+                                        data-super-confirm="Really shutdown node?"
+                                        data-super-confirm-word="SHUTDOWN">
+                                            Graceful shutdown
+                                        </a>
+                                    </li>
+                                }
+
+                                @if(isPermitted(INPUTS_READ) || isPermitted(THREADS_DUMP)) {
+                                    <li class="divider"></li>
+                                }
+
+                                @if(isPermitted(INPUTS_READ)) {
+                                    <li>
+                                        <a href="@routes.InputsController.manage(jvm.getNodeId)">Local message inputs</a>
+                                    </li>
+                                }
+
+                                @if(isPermitted(THREADS_DUMP)) {
+                                    <li><a href="@routes.NodesController.threadDump(jvm.getNodeId)">Get thread dump</a></li>
+                                }
                             </ul>
                         </div>
                     </div>
 
-                    <div class="row">
+                    <div class="row row-sm">
                         <div class="col-md-3">
                             <dl class="graylog-node-state">
                                 <dt>Current lifecycle state:</dt>
@@ -104,7 +135,7 @@
                                     @if(nodes.get(jvm.getNodeId).isProcessing) {
                                         Enabled
                                     } else {
-                                        Disabled
+                                        <span class="text-danger">Disabled</span>
                                     }
                                 </dd>
                                 <dt>Load balancer indication:</dt>
@@ -112,7 +143,7 @@
                                     @if(nodes.get(jvm.getNodeId).lbAlive()) {
                                         ALIVE
                                     } else {
-                                        DEAD
+                                        <span class="text-danger">DEAD</span>
                                     }
                                 </dd>
                             </dl>
@@ -123,32 +154,19 @@
 
                     <div class="row">
                         <div class="col-md-12">
+
                             @if(nodes.get(jvm.getNodeId).isProcessing) {
-                                <span class="sentence">
-                                    Processing
-                                    <strong class="node-throughput focuslimit" data-node-id="@jvm.getNodeId">?</strong>
-                                    messages per second.
-                                </span>
+                                <span class="react-node-throughput" data-node-id="@jvm.getNodeId"></span>
                             } else {
-                                <span class="sentence">
+                                <span class="text-danger">
                                     Processing is <strong>paused</strong>.
                                 </span>
                             }
 
                             @if(nodes.get(jvm.getNodeId).getJournalInfo.enabled) {
-                                <strong>
-                                    <span class="number-format" data-format="0,0">@nodes.get(jvm.getNodeId).getJournalInfo.uncommittedJournalEntries</span>
-                                    unprocessed
-
-                                    @if(nodes.get(jvm.getNodeId).getJournalInfo.uncommittedJournalEntries == 1) {
-                                        message
-                                    } else {
-                                        messages
-                                    }
-                                </strong>
-                                are currently in the journal.
+                                <span class="react-journal-state" data-node-id="@jvm.getNodeId"></span>
                             } else {
-                                Message journal is not enabled.
+                                <span class="text-warn">Message journal is not enabled.</span>
                             }
                         </div>
                     </div>

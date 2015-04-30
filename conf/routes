@@ -17,8 +17,9 @@ GET           /                                                                 
 GET           /startpage                                                                         @controllers.StartpageController.redirect()
 
 # Search
-GET           /search                                                                            @controllers.SearchController.index(q ?= "", rangetype ?= "", relative:Integer ?= -1, from ?= "", to ?= "", keyword ?= "", interval ?= "", page:Integer ?= 1, saved:String ?= "", sortField:String ?= "", sortOrder:String ?= "", fields:String ?= "", width:Integer ?= -1)
-GET           /search/csv                                                                        @controllers.SearchController.exportAsCsv(q ?= "", filter ?= "", rangetype ?= "", relative:Integer ?= -1, from ?= "", to ?= "", keyword ?= "", fields:String ?= "")
+GET         /search                                                                  @controllers.SearchController.index(q ?= "", rangetype ?= "", relative:Integer ?= -1, from ?= "", to ?= "", keyword ?= "", interval ?= "", page:Integer ?= 1, saved:String ?= "", sortField:String ?= "", sortOrder:String ?= "", fields:String ?= "", width:Integer ?= -1)
+GET         /searchv2                                                                @controllers.SearchControllerV2.index(q ?= "", rangetype ?= "relative", relative:Integer ?= 600, from ?= "", to ?= "", keyword ?= "", interval ?= "", page:Integer ?= 1, saved:String ?= "", sortField:String ?= "", sortOrder:String ?= "", fields:String ?= "", width:Integer ?= -1)
+GET         /search/csv                                                              @controllers.SearchController.exportAsCsv(q ?= "", filter ?= "", rangetype ?= "", relative:Integer ?= -1, from ?= "", to ?= "", keyword ?= "", fields:String ?= "")
 
 # Messages
 GET           /messages/:index/:id                                                               @controllers.MessagesController.show(index: String, id: String)
@@ -43,10 +44,7 @@ POST          /streams/:stream_id/clone                                         
 GET           /streams/:stream_id/csv                                                            @controllers.StreamSearchController.exportAsCsv(q ?= "", stream_id: String, rangetype ?= "", relative:Integer ?= -1, from ?= "", to ?= "", keyword ?= "", fields:String ?="")
 
 # Stream Outputs
-GET           /streams/:stream_id/outputs                                                        @controllers.StreamOutputsController.index(stream_id: String)
-POST          /streams/:stream_id/outputs/add                                                    @controllers.StreamOutputsController.add(stream_id: String)
-POST          /streams/:stream_id/outputs/:output_id/delete                                      @controllers.StreamOutputsController.remove(stream_id: String, output_id: String)
-POST          /streams/:stream_id/outputs                                                        @controllers.StreamOutputsController.create(stream_id: String)
+GET         /streams/:stream_id/outputs                                              @controllers.StreamOutputsController.index(stream_id: String)
 
 # Alerts
 GET           /streams/:stream_id/alerts                                                         @controllers.AlertsController.index(stream_id: String)
@@ -89,9 +87,7 @@ POST          /system/grokpatterns/import                                       
 GET           /system/agents                                                                     @controllers.AgentsController.index()
 
 # Outputs
-GET           /system/outputs                                                                    @controllers.OutputsController.index()
-POST          /system/outputs                                                                    @controllers.OutputsController.create()
-POST          /system/outputs/:output_id/terminate                                               @controllers.OutputsController.terminate(output_id: String, redirectToStream ?= "")
+GET         /system/outputs                                                          @controllers.OutputsController.index()
 
 POST          /system/inputs/:input_id/start                                                     @controllers.InputsController.start(input_id: String)
 POST          /system/inputs/:input_id/stop                                                      @controllers.InputsController.stop(input_id: String)
@@ -186,24 +182,26 @@ GET           /a/analyze/:index/:id/:field                                      
 ->            /a/metrics                                                                         controllers.api.MetricsController.metrics
 
 # API: System
-GET           /a/system/fields                                                                   @controllers.api.SystemApiController.fields()
-GET           /a/system/jobs                                                                     @controllers.api.SystemApiController.jobs()
-GET           /a/system/notifications                                                            @controllers.api.SystemApiController.notifications()
-DELETE        /a/system/notifications/:notification_type                                         @controllers.api.SystemApiController.deleteNotification(notification_type: String)
-GET           /a/system/throughput                                                               @controllers.api.SystemApiController.totalThroughput()
-GET           /a/system/throughput/node/:node_id                                                 @controllers.api.SystemApiController.nodeThroughput(node_id: String)
-GET           /a/system/throughput/radio/:radio_id                                               @controllers.api.SystemApiController.radioThroughput(radio_id: String)
-GET           /a/system/throughput/stream/:stream_id                                             @controllers.api.SystemApiController.streamThroughput(stream_id: String)
-PUT           /a/system/processing/pause                                                         @controllers.api.SystemApiController.pauseMessageProcessing()
-PUT           /a/system/processing/resume                                                        @controllers.api.SystemApiController.resumeMessageProcessing()
-GET           /a/system/node/:node_id/heap                                                       @controllers.api.SystemApiController.heap(node_id: String)
-GET           /a/system/node/:node_id/journal                                                    @controllers.api.SystemApiController.journal(node_id: String)
-GET           /a/system/radio/:radio_id/heap                                                     @controllers.api.SystemApiController.radioHeap(radio_id: String)
-GET           /a/system/internallogs/:node_id                                                    @controllers.api.SystemApiController.internalLogsOfNode(node_id: String)
-GET           /a/system/internallogs/:node_id/metrics                                            @controllers.api.SystemApiController.internalLogMetricsOfNode(node_id: String)
-GET           /a/system/users/:username                                                          @controllers.UsersController.isUniqueUsername(username: String)
-GET           /a/system/user/:username                                                           @controllers.UsersController.loadUser(username: String)
-PUT           /a/system/user/:username/preferences                                               @controllers.UsersController.saveUserPreferences(username: String)
+GET         /a/system/fields                                                         @controllers.api.SystemApiController.fields()
+GET         /a/system/jobs                                                           @controllers.api.SystemApiController.jobs()
+GET         /a/system/notifications                                                  @controllers.api.SystemApiController.notifications()
+DELETE      /a/system/notifications/:notification_type                               @controllers.api.SystemApiController.deleteNotification(notification_type: String)
+GET         /a/system/throughput                                                     @controllers.api.SystemApiController.totalThroughput()
+GET         /a/system/throughput/node/:node_id                                       @controllers.api.SystemApiController.nodeThroughput(node_id: String)
+GET         /a/system/throughput/radio/:radio_id                                     @controllers.api.SystemApiController.radioThroughput(radio_id: String)
+GET         /a/system/throughput/stream/:stream_id                                   @controllers.api.SystemApiController.streamThroughput(stream_id: String)
+PUT         /a/system/processing/pause                                               @controllers.api.SystemApiController.pauseMessageProcessing()
+PUT         /a/system/processing/resume                                              @controllers.api.SystemApiController.resumeMessageProcessing()
+GET         /a/system/node/:node_id/heap                                             @controllers.api.SystemApiController.heap(node_id: String)
+GET         /a/system/node/:node_id/journal                                          @controllers.api.SystemApiController.journal(node_id: String)
+GET         /a/system/radio/:radio_id/heap                                           @controllers.api.SystemApiController.radioHeap(radio_id: String)
+GET         /a/system/internallogs/:node_id                                          @controllers.api.SystemApiController.internalLogsOfNode(node_id: String)
+GET         /a/system/internallogs/:node_id/metrics                                  @controllers.api.SystemApiController.internalLogMetricsOfNode(node_id: String)
+GET         /a/system/users                                                          @controllers.api.UsersApiController.listUsers()
+GET         /a/system/users/:username                                                @controllers.api.UsersApiController.isUniqueUsername(username: String)
+GET         /a/system/user/:username                                                 @controllers.api.UsersApiController.loadUser(username: String)
+DELETE      /a/system/user/:username                                                 @controllers.api.UsersApiController.deleteUser(username: String)
+PUT         /a/system/user/:username/preferences                                     @controllers.api.UsersApiController.saveUserPreferences(username: String)
 
 # API: Inputs
 GET           /a/system/inputs/:node_id/:input_id/recent_message                                 @controllers.api.InputsApiController.recentMessage(node_id: String, input_id: String, filtered: Boolean ?= false)
@@ -240,7 +238,8 @@ POST        /a/dashboards/:dashboard_id/widgets/:widget_id/description          
 POST        /a/dashboards/:dashboard_id/widgets/:widget_id/cachetime                 @controllers.api.DashboardsApiController.updateWidgetCacheTime(dashboard_id: String, widget_id: String)
 
 # API: Streams
-POST          /a/streams/:stream_id/testMatch                                                    @controllers.api.StreamsApiController.testMatch(stream_id: String)
+POST        /a/streams/:stream_id/testMatch                                          @controllers.api.StreamsApiController.testMatch(stream_id: String)
+GET         /a/streams                                                               @controllers.api.StreamsApiController.listStreams()
 
 # API: Alerts
 GET           /a/streams/alerts/allowed                                                          @controllers.api.AlertsApiController.allAllowedSince(since:Integer ?= 0)
@@ -261,11 +260,29 @@ POST          /a/system/contentpacks/:pack_id/delete                            
 # API: Sources
 GET           /a/sources                                                                         @controllers.api.SourcesApiController.list(range: Integer ?= 86400)
 
-# API: Grok patterns
-GET           /a/system/grokpatterns                                                             @controllers.api.GrokPatternsApiController.index()
-POST          /a/system/grokpatterns/update                                                      @controllers.api.GrokPatternsApiController.update()
-POST          /a/system/grokpatterns/create                                                      @controllers.api.GrokPatternsApiController.create()
-DELETE        /a/system/grokpatterns/:pattern_id                                                 @controllers.api.GrokPatternsApiController.delete(pattern_id: String)
+# Grok patterns
+GET         /a/system/grokpatterns                                                   @controllers.api.GrokPatternsApiController.index()
+POST        /a/system/grokpatterns/update                                            @controllers.api.GrokPatternsApiController.update()
+POST        /a/system/grokpatterns/create                                            @controllers.api.GrokPatternsApiController.create()
+DELETE      /a/system/grokpatterns/:pattern_id                                       @controllers.api.GrokPatternsApiController.delete(pattern_id: String)
+
+# API: Outputs
+GET         /a/system/outputs                                                        @controllers.api.OutputsApiController.index()
+POST        /a/system/outputs                                                        @controllers.api.OutputsApiController.create()
+GET         /a/system/outputs/available/:output_type                                 @controllers.api.OutputsApiController.available(output_type: String)
+GET         /a/system/outputs/availableTypes                                         @controllers.api.OutputsApiController.availableTypes()
+DELETE      /a/system/outputs/:output_id                                             @controllers.api.OutputsApiController.delete(output_id: String)
+PUT         /a/system/outputs/:output_id                                             @controllers.api.OutputsApiController.update(output_id: String)
+GET         /a/streams/:stream_id/outputs                                            @controllers.api.StreamOutputsApiController.index(stream_id: String)
+DELETE      /a/streams/:stream_id/outputs/:output_id                                 @controllers.api.StreamOutputsApiController.delete(stream_id: String, output_id: String)
+PUT         /a/streams/:stream_id/outputs/:output_id                                 @controllers.api.StreamOutputsApiController.add(stream_id: String, output_id: String)
+
+# API: AlarmCallbacks
+GET         /a/streams/:stream_id/alarmcallbacks                                     @controllers.api.AlarmCallbacksApiController.list(stream_id: String)
+GET         /a/streams/:stream_id/alarmcallbacks/available                           @controllers.api.AlarmCallbacksApiController.available(stream_id: String)
+POST        /a/streams/:stream_id/alarmcallbacks                                     @controllers.api.AlarmCallbacksApiController.create(stream_id: String)
+DELETE      /a/streams/:stream_id/alarmcallbacks/:alarmcallback_id                   @controllers.api.AlarmCallbacksApiController.delete(stream_id: String, alarmcallback_id: String)
+PUT         /a/streams/:stream_id/alarmcallbacks/:alarmcallback_id                   @controllers.api.AlarmCallbacksApiController.update(stream_id: String, alarmcallback_id: String)
 
 # API: Agents
 GET           /a/system/agents                                                                   @controllers.api.AgentsApiController.index()

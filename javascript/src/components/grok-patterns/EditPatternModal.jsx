@@ -51,10 +51,16 @@ var EditDashboardModal = React.createClass({
                           required></textarea>
             </fieldset>
         );
+        var triggerButtonContent;
+        if (this.props.create) {
+            triggerButtonContent = "Create pattern";
+        } else {
+            triggerButtonContent = <span><i className="fa fa-edit"></i> Edit</span>;
+        }
         return (
             <span>
-                <button onClick={this.openModal} className={this.props.create ? "btn btn-xs btn-success" : "btn btn-xs"}>
-                    <i className="fa fa-edit"></i> {this.props.create ? "Create pattern" : "Edit"}
+                <button onClick={this.openModal} className={this.props.create ? "btn btn-success" : "btn btn-default btn-xs"}>
+                    {triggerButtonContent}
                 </button>
                 <BootstrapModal ref="modal" onCancel={this._closeModal} onConfirm={this._save} cancel="Cancel" confirm="Save">
                    {header}

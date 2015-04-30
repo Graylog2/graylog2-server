@@ -1,12 +1,8 @@
-@(currentUser: org.graylog2.restclient.models.User, breadcrumbs: lib.BreadcrumbList, users: List[org.graylog2.restclient.models.User], permissions:List[String])
+@(currentUser: org.graylog2.restclient.models.User, breadcrumbs: lib.BreadcrumbList, permissions:List[String])
 @import org.graylog2.restclient.models.User
 @import views.helpers.Permissions._
 @import lib.security.RestPermissions._
 @import controllers.routes
-
-@hasAdminPermission(user: User) = @{
-    user.getPermissions().indexOf("*") != -1;
-}
 
 @main("Users", null, "", currentUser, false) {
 
@@ -14,12 +10,12 @@
 
     <div class="row content content-head">
         <div class="col-md-12">
-            <div class="pull-right">
-                @if(isPermitted(LDAP_EDIT)) {<a id="configure-ldap" class="btn btn-default" href="@routes.LdapController.index()">Configure LDAP</a>}
+            <div class="pull-right actions">
+                @if(isPermitted(LDAP_EDIT)) {<a id="configure-ldap" class="btn btn-info" href="@routes.LdapController.index()">Configure LDAP</a>}
                 @if(isPermitted(USERS_CREATE)) { <a id="create-user-btn" class="btn btn-success" href="@routes.UsersController.newUserForm()">Create new user</a> }
             </div>
 
-            <h1><i class="fa fa-group"></i> User accounts</h1>
+            <h1>User accounts</h1>
             <p class="description">Create as many users as you want next to the default administrator user here. You can also configure
             LDAP and make changes to already existing users.</p>
 
@@ -28,54 +24,7 @@
 
     <div class="row content">
         <div class="col-md-12">
-            <table class="table table-striped users-list">
-                <thead>
-                    <tr>
-                        <th></th>
-                        <th class="name">Name</th>
-                        <th>User Id</th>
-                        <th>Email Address</th>
-                        <th>Permissions</th>
-                        <th class="actions">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                @for(user <- users.filter(user => isPermitted(USERS_EDIT, user.getName)).sortBy(_.getFullName)) {
-                    <tr class="@{
-                        if(user.getName.equals(currentUser.getName)) "info" else ""
-                    }">
-                        <td class="centered">
-                        @if(user.isReadonly) {
-                            <i title="System User" class="fa fa-lock"></i>
-                        }
-                        @if(user.isExternal) {
-                            <i title="LDAP User" class="fa fa-cloud"></i>
-                        }
-                        </td>
-                        <td class="limited">@user.getFullName</td>
-                        <td class="limited">@user.getName</td>
-                        <td class="limited">@user.getEmail</td>
-                        <td>@if(hasAdminPermission(user)) {
-                            <span class="label label-info">Admin</span>
-                        } else {
-                            <span class="label">Reader</span>
-                        }
-                        </td>
-                        <td>
-                            @if(!user.isReadonly) {
-                                @if(isPermitted(USERS_EDIT)) {
-                                    <form class="edit-user-form" data-username="@user.getName" method="POST" action="@routes.UsersController.delete(user.getName)">
-                                        <button id="delete-user" type="submit" class="btn btn-xs btn-danger" title="Delete" data-confirm="Really delete user @user.getName?"> <i class="fa fa-remove"></i> Delete</button>
-                                    </form>
-                                }
-
-                                <a id="edit-user" href="@routes.UsersController.editUserForm(user.getName)" class="btn btn-default btn-xs" title="Edit user @user.getName"> <i class="fa fa-edit"></i> Edit</a>
-                            }
-                        </td>
-                    </tr>
-                }
-                </tbody>
-            </table>
+            <div id="react-user-list" data-current-username="@currentUser.getName"></div>
         </div>
     </div>
 }

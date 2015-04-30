@@ -9,10 +9,6 @@
 @import org.joda.time.DateTime
 @import org.joda.time.DateTimeZone
 
-@journalIsOvercommitted(journalInfo: JournalInfo) = @{
-    journalInfo.journalSizeLimit == 0 || ((journalInfo.journalSize * 100.0) / journalInfo.journalSizeLimit >= 100.0)
-}
-
 @main("Node " + node.getNodeId, null, "", currentUser, false) {
 
 
@@ -24,7 +20,7 @@
 
             <div class="pull-right">
                 <div class="btn-group">
-                    <a class="btn btn-info btn-sm dropdown-toggle" data-toggle="dropdown" href="#">
+                    <a class="btn btn-info dropdown-toggle" data-toggle="dropdown" href="#">
                         Actions
                         <span class="caret"></span>
                     </a>
@@ -34,7 +30,7 @@
                         }
                         <li><a href="@routes.MetricsController.ofNode(node.getNodeId)">Metrics</a></li>
                         @if(isPermitted(LOGGERS_READ)) {
-                            <li><a href="@routes.LoggingController.index()">Internal logging</a></li>
+                            <li><a href="@routes.LoggingController.index()">Configure internal logging</a></li>
                         }
                         <li>
                             <a href="@node.getTransportAddress/api-browser" target="_blank">
@@ -46,7 +42,7 @@
                 </div>
             </div>
 
-            <h1><i class="fa fa-sitemap"></i> Node @node.getHostname / @node.getShortNodeId</h1>
+            <h1>Node @node.getHostname / @node.getShortNodeId</h1>
 
             <p class="description">This page shows details of a Graylog server node that is active and reachable in your cluster.</p>
 
@@ -89,8 +85,7 @@
                         <input type="submit" class="btn btn-xs btn-danger pull-right" value="Pause processing" data-confirm="Really pause message processing?">
                     </form>
                     }
-                    <i class="fa fa-ok-sign"></i> &nbsp; Node is processing <strong class="node-throughput focuslimit" data-node-id="@node.getNodeId">?</strong>
-                    messages per second.
+                    <span class="react-node-throughput" data-node-id="@node.getNodeId"></span>
                 </div>
             } else {
                 <div class="alert alert-danger">
@@ -107,7 +102,11 @@
 
     <div class="row content">
         <div class="col-md-12">
-            <h2><i class="fa fa-tasks"></i> Memory/Heap usage</h2>
+            <div class="row row-sm">
+                <div class="col-md-12">
+                    <h2>Memory/Heap usage</h2>
+                </div>
+            </div>
 
             <div class="react-jvm-heap" data-node-id="@node.getNodeId"></div>
 
@@ -118,8 +117,19 @@
 
     <div class="row content">
         <div class="col-md-12">
-            <h2><i class="fa fa-shield"></i> Buffers</h2>
-            <div class="row">
+
+            <div class="row row-sm">
+                <div class="col-md-12">
+                    <h2>Buffers</h2>
+
+                    <p class="description">
+                        The buffers are built to cache small amounts of messages for a very short time
+                        (usually milliseconds) on their way through the different processors.
+                    </p>
+                </div>
+            </div>
+
+            <div class="row row-sm">
                 <div class="col-md-4">
                     <div class="react-buffer-usage" data-node-id="@node.getNodeId" data-title="Input buffer" data-buffer-type="input"></div>
                 </div>
@@ -130,78 +140,28 @@
                     <div class="react-buffer-usage" data-node-id="@node.getNodeId" data-title="Output buffer" data-buffer-type="output"></div>
                 </div>
             </div>
-
-            The buffers are built to cache small amounts of messages on their way through the different processors.
         </div>
     </div>
 
-    
+
 
     <div class="row content">
         <div class="col-md-12">
-            <h2><i class="fa fa-hdd-o"></i> Disk Journal</h2>
-            @if(node.getJournalInfo.enabled) {
-                <p>Incoming messages are written to the disk journal to ensure they are kept safe in case of a server failure. The journal also helps keeping Graylog working if any of the outputs is too slow to keep up with the message rate
-                or whenever there is a peak in incoming messages. It makes sure that Graylog does not buffer all of those messages in main memory and avoids overly long garbage collection pauses that way.
-                </p>
-                <div class="row">
-                    <div class="col-md-6">
-                        <h3>Configuration</h3>
-                        <dl class="system-journal">
-                            <dt>Path:</dt>
-                            <dd>@node.getJournalInfo.journalConfig.directory</dd>
-                            <dt>Earliest entry: </dt>
-                            <dd>@DateHelper.readablePeriodFromNow(node.getJournalInfo.oldestSegment)</dd>
-                            <dt>Maximum size:</dt>
-                            <dd>
-                                <span class="number-format" data-format="0,0">@node.getJournalInfo.journalConfig.maxSize</span>
-                                bytes
-                            </dd>
-                            <dt>Maximum age:</dt>
-                            <dd>@DateHelper.readableDuration(node.getJournalInfo.journalConfig.maxAge)</dd>
-                            <dt>Flush policy:</dt>
-                            <dd>
-                                Every <span class="number-format" data-format="0,0">@node.getJournalInfo.journalConfig.flushInterval</span>
-                                messages or @DateHelper.readableDuration(node.getJournalInfo.journalConfig.flushAge)
-                            </dd>
-                        </dl>
-                    </div>
-                    <div class="col-md-6">
-                        <h3>Utilization</h3>
-                        @defining(NumberHelper.asPercent(node.getJournalInfo.journalSize, node.getJournalInfo.journalSizeLimit, 1, false)) { utilizationPercent =>
-                            <div class="progress progress-percentage node-journal-usage">
-                                @if(journalIsOvercommitted(node.getJournalInfo)) {
-                                    <div class="progress-bar progress-bar-warning" data-percentage="100" style="width : 100%;">
-                                } else {
-                                    <div class="progress-bar progress-bar-warning" data-percentage="@utilizationPercent" style="width : @utilizationPercent%;">
-                                }
-                                    <span class="number-format" data-format="0.0%">@utilizationPercent%</span>
-                                </div>
-                            </div>
-                            @if(journalIsOvercommitted(node.getJournalInfo)) {
-                                <strong>Warning!</strong> The journal utilization is exceeding the maximum size
-                                defined. <a href="@routes.SystemController.index()">Click here</a> for more information.<br/>
-                            }
-                            <strong><span class="number-format" data-format="0,0">@node.getJournalInfo.uncommittedJournalEntries</span> unprocessed messages</strong>
-                            are currently in the journal, in @node.getJournalInfo.numberOfSegments segments.<br/>
-                            <strong><span class="number-format" data-format="0,0">@node.getJournalInfo.appendEventsPerSecond</span> messages</strong>
-                            have been appended in the last second,
-                            <strong><span class="number-format" data-format="0,0">@node.getJournalInfo.readEventsPerSecond</span> messages</strong>
-                            have been read in the last second.
-                        }
-                    </div>
-                </div>
-           } else {
-                The disk journal is disabled for this node.
-            }
+            <div id="react-journal-info"
+                data-node-id="@node.getNodeId"
+                data-journal-enabled="@node.getJournalInfo.enabled"
+                data-journal-dir="@node.getJournalInfo.journalConfig.directory"
+                data-journal-max-size="@node.getJournalInfo.journalConfig.maxSize"
+                data-journal-maxage="@node.getJournalInfo.journalConfig.maxAge"
+                data-journal-flush-interval="@node.getJournalInfo.journalConfig.flushInterval"
+                data-journal-flush-age="@node.getJournalInfo.journalConfig.flushAge">
+            </div>
         </div>
     </div>
 
-    
-
     <div class="row content">
         <div class="col-md-6">
-            <h2><i class="fa fa-cogs"></i> System</h2>
+            <h2> System</h2>
 
             <dl class="system-system">
                 <dt>Hostname:</dt>
@@ -222,7 +182,7 @@
         </div>
 
         <div class="col-md-6">
-            <h2><i class="fa fa-sign-in"></i> REST API</h2>
+            <h2>REST API</h2>
 
             <dl class="system-rest">
                 <dt>Transport address:</dt>
@@ -243,10 +203,10 @@
     
     <div class="row content">
         <div class="col-md-12">
-            <h2><i class="fa fa-cloud-download"></i> Installed Plugins <span style="font-size: 12px;">@installedPlugins.size() @pluralize("plugin", installedPlugins.size) installed.</span></h2>
+            <h2>Installed Plugins <span style="font-size: 12px;">@installedPlugins.size() @pluralize("plugin", installedPlugins.size) installed.</span></h2>
 
             @if(installedPlugins.size() > 0) {
-                <table class="table table-striped table-hover table-condensed">
+                <table class="table table-striped table-hover table-condensed table-sm">
                     <thead>
                         <tr>
                             <th>Name</th>
@@ -286,9 +246,9 @@
             @if(isPermitted(INPUTS_EDIT)) {
             <a href="@routes.InputsController.manage(node.getNodeId)" class="btn btn-sm btn-success pull-right">Manage inputs</a>
             }
-            <h2><i class="fa fa-cloud-download"></i> Installed/available input types <span style="font-size: 12px;">@node.getInputs.size() @pluralize("input", node.getInputs.size) running.</span></h2>
+            <h2>Installed/available input types <span style="font-size: 12px;">@node.getInputs.size() @pluralize("input", node.getInputs.size) running.</span></h2>
 
-            <table class="table table-striped table-hover table-condensed">
+            <table class="table table-striped table-hover table-condensed table-sm">
                 <thead>
                     <tr>
                         <th>Name</th>

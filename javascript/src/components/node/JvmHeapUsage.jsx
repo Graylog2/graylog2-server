@@ -31,6 +31,7 @@ var JvmHeapUsage = React.createClass({
             callback: (update, hasError) => {
                 if (hasError) {
                     this.setState({hasError: hasError});
+                    return;
                 }
                 // update is [{nodeId, values: [{name, value: {metric}}]} ...]
                 // metric can be various different things, depending on metric {type: "GAUGE"|"COUNTER"|"METER"|"TIMER"}
@@ -55,9 +56,9 @@ var JvmHeapUsage = React.createClass({
                 this.setState({
                     initialized: true,
                     usedMemory: used,
-                    usedPercentage: Math.floor(usedPercentage),
+                    usedPercentage: usedPercentage,
                     committedMemory: committed,
-                    committedPercentage: Math.floor(committedPercentage),
+                    committedPercentage: committedPercentage,
                     maxMemory: max,
                     hasError: hasError
                 });

@@ -159,7 +159,7 @@ $(document).ready(function() {
     });
 
     if (dashboard.length > 0) {
-        dashboard.on("delete.widget", function (event, details) {
+        dashboard.on("delete.graylog.widget", function (event, details) {
             var dashboardId = $(".dashboard .gridster").data("dashboard-id");
             var widgetId = details.widgetId;
             var widget = $("[data-widget-id=" + widgetId + "]");
@@ -215,7 +215,7 @@ $(document).ready(function() {
         $(".hidden-unlocked").hide();
 
         $(".dashboard .widget").each(function() {
-            $(this).trigger("unlocked.dashboard");
+            $(this).trigger("unlocked.graylog.dashboard");
         });
 
         toggleDashboardLock.text("Lock");
@@ -231,7 +231,7 @@ $(document).ready(function() {
         $(".only-unlocked").hide();
 
         $(".dashboard .widget").each(function() {
-            $(this).trigger("locked.dashboard");
+            $(this).trigger("locked.graylog.dashboard");
         });
 
         toggleDashboardLock.text("Unlock / Edit");

@@ -1,19 +1,16 @@
 @(user: org.graylog2.restclient.models.User, currentUser: org.graylog2.restclient.models.User, breadcrumbs: lib.BreadcrumbList)
-@main("Users", views.html.system.sidebar(), "", currentUser) {
+@main("User " + user.getName, null, "", currentUser, false) {
 
     @views.html.partials.breadcrumbs(breadcrumbs)
 
-    <div class="row">
-        <h1><i class="fa fa-user"></i> User &raquo;@user.getName&laquo;</h1>
-        <i class="fa fa-envelope-o"></i>
-        <a href="mailto:@user.getEmail">@user.getEmail</a>
+    <div class="row content">
+        <div class="col-sm-6">
+            <h1>User &raquo;@user.getName&laquo;</h1>
+            <address>
+                <strong>@user.getFullName</strong><br>
+                <a href="mailto:@user.getEmail">@user.getEmail</a><br>
+                <strong>Timezone </strong> @user.getTimeZone
+            </address>
+        </div>
     </div>
-
-    <dl class="user-details">
-        <dt>Full name</dt>
-        <dd>@user.getFullName</dd>
-
-        <dt>Timezone</dt>
-        <dd>@user.getTimeZone</dd>
-    </dl>
 }
