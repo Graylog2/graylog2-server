@@ -2,6 +2,7 @@
 
 var React = require('react/addons');
 var AgentsStore = require('../../stores/agents/AgentsStore');
+var AgentRow = require('./AgentRow');
 
 var AgentList = React.createClass({
     AGENT_DATA_REFRESH: 5*1000,
@@ -52,7 +53,7 @@ var AgentList = React.createClass({
                 .filter((agent) => {return (this.state.showInactive || agent.active);})
                 .sort(this._bySortField)
                 .map((agent) => {
-                    return <Agent key={agent.id} agent={agent}/>;
+                    return <AgentRow key={agent.id} agent={agent}/>;
                 }
             );
 
