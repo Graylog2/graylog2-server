@@ -52,31 +52,7 @@ var AgentList = React.createClass({
                 .filter((agent) => {return (this.state.showInactive || agent.active);})
                 .sort(this._bySortField)
                 .map((agent) => {
-                    var agentClass = agent.active ? "" : "greyedOut inactive";
-                    var style = {};
-                    var annotation = agent.active ? "" : "(inactive)";
-                    var osGlyph = this._getOsGlyph(agent.node_details.operating_system);
-                    return (
-                        <tr className={agentClass} style={style}>
-                            <td className="limited">
-                                {agent.id}
-                                {annotation}
-                            </td>
-                            <td className="limited">
-                                {agent.node_id}
-                            </td>
-                            <td className="limited">
-                                {agent.agent_version}
-                            </td>
-                            <td className="limited">
-                                {osGlyph}
-                                {agent.node_details.operating_system}
-                            </td>
-                            <td className="limited">
-                                {moment(agent.last_seen).fromNow()}
-                            </td>
-                        </tr>
-                    );
+                    return <Agent key={agent.id} agent={agent}/>;
                 }
             );
 
@@ -97,9 +73,9 @@ var AgentList = React.createClass({
                                 <thead>
                                 <tr>
                                     <th className="name" onClick={this.sortById}>
-                                        Agent ID
+                                        Agent Id
                                     </th>
-                                    <th onClick={this.sortByNodeId}>Node Id</th>
+                                    <th onClick={this.sortByNodeId}>Host Name</th>
                                     <th onClick={this.sortByAgentVersion}>Agent Version</th>
                                     <th onClick={this.sortByOperatingSystem}>Operating System</th>
                                     <th onClick={this.sortByLastSeen}>Last Seen</th>
@@ -134,21 +110,6 @@ var AgentList = React.createClass({
     },
     sortByAgentVersion() {
         this.setState({sort: (agent) => {return agent.agent_version;}});
-    },
-    _getOsGlyph(operatingSystem) {
-        var glyphClass = "fa-question-circle";
-        var os = operatingSystem.trim().toLowerCase();
-        if (os.indexOf("mac os") > -1) {
-            glyphClass = "fa-apple";
-        }
-        if (os.indexOf("linux") > -1) {
-            glyphClass = "fa-linux";
-        }
-        if (os.indexOf("win") > -1) {
-            glyphClass = "fa-windows";
-        }
-
-        return (<i className={"fa " + glyphClass}></i>);
     }
 });
 
