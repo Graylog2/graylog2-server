@@ -93,7 +93,7 @@
         <!-- to work around filtering bug, which makes maven.build.timestamp inaccessible -->
         <build.timestamp>${maven.build.timestamp}</build.timestamp>
 
-        <metrics.version>3.1.1</metrics.version>
+        <metrics.version>3.1.2</metrics.version>
         <jackson.version>2.5.3</jackson.version>
         <jersey.version>2.17</jersey.version>
         <!-- The HK2 version should match the version being used by Jersey -->
