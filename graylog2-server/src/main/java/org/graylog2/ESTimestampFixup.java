@@ -33,6 +33,7 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Scopes;
+import com.google.inject.Stage;
 import org.apache.log4j.Level;
 import org.elasticsearch.action.admin.cluster.health.ClusterHealthRequest;
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
@@ -169,7 +170,7 @@ public class ESTimestampFixup {
         final Configuration configuration = readConfiguration(jadConfig, commandLineOptions);
 
         final GuiceInstantiationService instantiationService = new GuiceInstantiationService();
-        final Injector injector = Guice.createInjector(new Bindings(configuration));
+        final Injector injector = Guice.createInjector(Stage.PRODUCTION, new Bindings(configuration));
 
         instantiationService.setInjector(injector);
 
