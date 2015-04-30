@@ -38,7 +38,7 @@ import java.util.Objects;
 import java.util.ServiceLoader;
 import java.util.Set;
 
-import static com.google.inject.internal.util.$Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 public class PluginLoader {
     private static final Logger LOG = LoggerFactory.getLogger(PluginLoader.class);
